@@ -2,83 +2,87 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E41C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:23:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB7E4C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:25:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6248E2054F
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:23:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8799D206C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 10:25:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EHfw2cJE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6248E2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zM+xSxNe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8799D206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOux-0000Ux-JG
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:23:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51442)
+	id 1jLOwu-0002iM-OP
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 06:25:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50113)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jLOsM-0006L4-UX
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:21:07 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jLOjo-0006jC-Ef
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1jLOsL-0008LP-Vr
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:21:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28539
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jLOsL-0008LG-SG
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:21:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586168465;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZyFSoghJX8HUqTYq4IubdmBS99a/vIhBGky/l6aaBro=;
- b=EHfw2cJEmwPWx5YwTGaq1yjU7/MUdNHwQ4JSJ/fZHi7qA5SWpscX3rkQU/7bdzyifIjyMc
- Z3aJDA7bIBTPNF/S4wvRiS6T4lStBxS4Nwlkhd5Y51THutwD/6247/omxRLwS4ubtvDsXy
- YmysVanfrUfeLHo8SQwOATIH63SQD+o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-BcQpguxoOpKBXERbp9eECQ-1; Mon, 06 Apr 2020 06:21:01 -0400
-X-MC-Unique: BcQpguxoOpKBXERbp9eECQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B0A0801E5D;
- Mon,  6 Apr 2020 10:21:00 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-113-60.ams2.redhat.com
- [10.36.113.60])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D2A7396B7B;
- Mon,  6 Apr 2020 10:20:54 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id EE79116E2C; Mon,  6 Apr 2020 12:20:53 +0200 (CEST)
-Date: Mon, 6 Apr 2020 12:20:53 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH v2 04/12] acpi: serial: don't use _STA method
-Message-ID: <20200406102053.nppv674hrqtaz2tu@sirius.home.kraxel.org>
-References: <20200403080502.8154-1-kraxel@redhat.com>
- <20200403080502.8154-5-kraxel@redhat.com>
- <20200403120052.5a40bb3f@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jLOjn-0002ok-DN
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:16 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:44265)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jLOjn-0002mA-7M
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 06:12:15 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id c15so801031wro.11
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 03:12:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=sVStBWBB/nYKZSZLm9qzTwRd2BAPghRDv9sMPC8uICQ=;
+ b=zM+xSxNeCpi6cl/P7qydRzmwD2hcWmp//lyl2LYNTfcwsp9wjtLXgqnOSNNvLjy7Rp
+ HiK7Gj4Ye1pVS3VZycGGWcbxUDZYealw2QgecFUTt81WE+jZyCGJTK4Th9UdhRzIMfm8
+ nY79NhT8kgXaSJ2hFvl8C2xpCEql3ar4S17wMZsMDwaHlsOvBVIWyhk5kXe4OX4Yk480
+ IHEUjcyqnZ1ySg/w9yZDmtIalEMQz6R+oVbMKQ6KqQU9Zcr6tREozKm+KRbKVv9OBgrj
+ 8H84yWoHaLpYheWziEvyCxLTR8yLxjwzDgpa4tCksNkJKB/kNjnZMn1xfrI5Kdmu/3HC
+ DCCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=sVStBWBB/nYKZSZLm9qzTwRd2BAPghRDv9sMPC8uICQ=;
+ b=GU43TvJJkb7M0qcZOYUshOlQ1k5o/uvWrmDHUdddu1TRfDTjs/zNgyU5i/7CFB0lv7
+ TSEw7A1F5UtZERRFpA07Si0cKi8opEfpyqtc6vBEih37oLMwPB+S7/90/37llbY5liSc
+ YBNnGzYesMFymfJXI0IDu9+olVD87LqUsVc2S6YqW2oe+bY8jWGrJlfZ/sZvSxaLL8dF
+ chcgtIbzRYWbwtreq5qAPYk/OriQsMC1riafV9HOhF0pFMQzaCajqVFFfHWMGUs/jXnm
+ 4V64u19xMFKou1A9nac7R56E3DOAvXS9hg1V7Smemw0wD7oLACDhfJ9R3xib+YiaYA5c
+ oEkw==
+X-Gm-Message-State: AGi0PuZxtZUx447bHVbAOtxjCkZhUpr6ckZxLMQxyDOQ4RiZ6r78YwAk
+ PHJqSoIxHdhJjNywBiig2Am2226YJDIB4A==
+X-Google-Smtp-Source: APiQypJcI51Rn3etkNJA9kqHzC8gv7FknwDUG3UaeEiCpb65fgXCdCIIkOXl0pbq9LRRXv9ehlp7iA==
+X-Received: by 2002:adf:e6ce:: with SMTP id y14mr5634343wrm.45.1586167933729; 
+ Mon, 06 Apr 2020 03:12:13 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id f187sm25163765wme.9.2020.04.06.03.12.12
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 06 Apr 2020 03:12:13 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 06/11] dump: Fix writing of ELF section
+Date: Mon,  6 Apr 2020 11:12:00 +0100
+Message-Id: <20200406101205.23027-7-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200406101205.23027-1-peter.maydell@linaro.org>
+References: <20200406101205.23027-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200403120052.5a40bb3f@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,27 +94,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> I'd drop this patch and squash commit message into 8/12,
-> but I don't insist since get_system_io() added here is removed by 8/12,
-> so either way=20
+In write_elf_section() we set the 'shdr' pointer to point to local
+structures shdr32 or shdr64, which we fill in to be written out to
+the ELF dump.  Unfortunately the address we pass to fd_write_vmcore()
+has a spurious '&' operator, so instead of writing out the section
+header we write out the literal pointer value followed by whatever is
+on the stack after the 'shdr' local variable.
 
-They are logically separate changes (even though the first enables the
-second), so I'd prefer to keep them separate.
+Pass the correct address into fd_write_vmcore().
 
-Reordering the series so they are grouped makes sense though I think.
+Spotted by Coverity: CID 1421970.
 
-take care,
-  Gerd
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20200324173630.12221-1-peter.maydell@linaro.org
+---
+ dump/dump.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dump/dump.c b/dump/dump.c
+index 6fb6e1245ad..22ed1d3b0d4 100644
+--- a/dump/dump.c
++++ b/dump/dump.c
+@@ -364,7 +364,7 @@ static void write_elf_section(DumpState *s, int type, Error **errp)
+         shdr = &shdr64;
+     }
+ 
+-    ret = fd_write_vmcore(&shdr, shdr_size, s);
++    ret = fd_write_vmcore(shdr, shdr_size, s);
+     if (ret < 0) {
+         error_setg_errno(errp, -ret,
+                          "dump: failed to write section header table");
+-- 
+2.20.1
 
 
