@@ -2,98 +2,89 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C1AC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:56:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B83C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:57:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD8C4206F5
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:56:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFCC7206F5
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:57:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="peV0U3Ma"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD8C4206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N+B8rn2k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFCC7206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOUR-0002Tr-R7
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:56:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44298)
+	id 1jLOVZ-0004Ft-5V
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:57:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46957)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGv-0002WW-C1
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:26 -0400
+ (envelope-from <frasse.iglesias@gmail.com>) id 1jLORL-0006AD-Ry
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:53:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOGu-0002PZ-1o
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:25 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:35004)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jLOGt-0002Or-Pq
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:42:23 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369dotd089403;
- Mon, 6 Apr 2020 09:42:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=bx0c6Hybu8iBv8fzwLbjyVA2WnIXvJlvCCBNV6FRf0M=;
- b=peV0U3MabJE4ngS3qBpnou4FPYS0r7UcUz+S80iXgVhAEab9Swi4oG21U1DpzIoMl/+F
- ue85EMPV0fXJH6wfyx7eUpQtiIbF4akKOLRkHd2QniG83apnKXprCo3kuaRm2NetaTvs
- kXkFe5MyCPi7C78IGwygThlbvJzZELZvd/RYiQeppe3NaaMYA2aOlTDCvUlJD6CxJo65
- n6ZyKbQTCyCylXgiwVojwQJLOS/O5pQAKjeWOW5fopRToS4KOM+1rAnqIy92knuwbH73
- zqgsJeq+GucFl3sl0zRbIKxeCCTdEg73iIRaKBRhy/uELNJgKWrwI9agDD3KnAdGSTVn dg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2130.oracle.com with ESMTP id 306hnqwtxf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:42:07 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369cVKr006344;
- Mon, 6 Apr 2020 09:42:07 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by userp3020.oracle.com with ESMTP id 3073xvtuv2-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 06 Apr 2020 09:42:07 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0369g5uN006940;
- Mon, 6 Apr 2020 09:42:05 GMT
-Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 06 Apr 2020 02:42:04 -0700
-From: elena.ufimtseva@oracle.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 20/36] multi-process: Forward PCI config space acceses to
- the remote process
-Date: Mon,  6 Apr 2020 02:41:10 -0700
-Message-Id: <7a75d79057f2c412230ea1dbac4debe3a7d8eba8.1586165556.git.elena.ufimtseva@oracle.com>
-X-Mailer: git-send-email 2.25.GIT
-In-Reply-To: <cover.1586165555.git.elena.ufimtseva@oracle.com>
-References: <cover.1586165555.git.elena.ufimtseva@oracle.com>
+ (envelope-from <frasse.iglesias@gmail.com>) id 1jLORK-0003kO-Kd
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:53:11 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:38176)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+ id 1jLORK-0003j2-BC; Mon, 06 Apr 2020 05:53:10 -0400
+Received: by mail-lj1-x241.google.com with SMTP id v16so13974956ljg.5;
+ Mon, 06 Apr 2020 02:53:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=zZu81AvTz7XnpfPxkUx7W0nVmjRXqKzPOgYt9ht6Xbg=;
+ b=N+B8rn2khK41TbDt3qFaha7FQvtALO0YNnbJS6fRlmK8jipn4fhO6Bl30ZbyxlyWeR
+ 517UL+gEZAHMhVE/iNSerYY11iJEDxP5LSmzWo2KxYyZk+qJzAMfIcBQ830N0UqChatX
+ 9WSj0IoGDq1YfodSaOxDR6qdtpJQUbqhLm1w28HHhDM9oZnp8v/xc20cZ4o7Rb7Zo1f5
+ i8tiib+8U1m7y8Iw6XKD6J2etCIhnBqJx0ZOZ8/ShHvT88gppeO5oVBjeFN3QH4ODt5j
+ LxrklU+EWzPMwifuLNKmeXf2YMgDNSKYlGeOnvNIjy77C0VHU7+rWmHboSta/kLGkTfZ
+ ToNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=zZu81AvTz7XnpfPxkUx7W0nVmjRXqKzPOgYt9ht6Xbg=;
+ b=rmsXbV7D59Yh5uE46yKusKlREQs7ABY6MrBXpBYSQIcGFKmWbOYiK3kdVztyvgYxW+
+ bn30hEcqHOrjtRZjkl/hAmyfln5f6OQuve+WKmpSrQUoP/4GRoLo3DnKShbupFSEJH8b
+ w1299ITRmBFpTQ1pP8yj9wjGmXUqPiTIqCuoGSPj1eKP3XNWZQ27KpgQtTJMR5OXeZr1
+ NUaV71zOcCbxKioGKR78QiIoytL/86bgZZZBq7yUWv4APNC1cK1T6JfKBl4HUdfAbyxA
+ mwL1AIyC/GGpc3hlvp98tDoBogiPoxdQZMIiJqT/GPXxKSOQuTMwa2Yw9cC6OUvEdzwm
+ HFjw==
+X-Gm-Message-State: AGi0PuZdmrksReGcVnO6v56nrYem2g+zTscczBmZeJCY4IE7YBrSpmo0
+ VLsh8dsTkjdJwQnEC6mg6t4=
+X-Google-Smtp-Source: APiQypKcgtIshjJvSBFpX7tF8KydMkJZdec/rZ9lLTyX/Eu+B3+TJ46OiWN87CiqUrEYk8yjlwIW0w==
+X-Received: by 2002:a2e:9d85:: with SMTP id c5mr11466060ljj.168.1586166788978; 
+ Mon, 06 Apr 2020 02:53:08 -0700 (PDT)
+Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
+ by smtp.gmail.com with ESMTPSA id
+ e12sm12070373ljl.36.2020.04.06.02.53.07
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 06 Apr 2020 02:53:08 -0700 (PDT)
+Date: Mon, 6 Apr 2020 11:53:06 +0200
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Subject: Re: [PATCH v1 2/2] dma/xlnx-zdma: Fix descriptor loading (REG) wrt
+ endianness
+Message-ID: <20200406095305.n542oyamddwh4uj7@fralle-msi>
+References: <20200404122718.25111-1-edgar.iglesias@gmail.com>
+ <20200404122718.25111-3-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- mlxlogscore=999
- adultscore=0 spamscore=0 phishscore=0 malwarescore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060083
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- phishscore=0 adultscore=0
- priorityscore=1501 mlxscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 spamscore=0 impostorscore=0 suspectscore=1
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060083
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200404122718.25111-3-edgar.iglesias@gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,202 +96,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, kraxel@redhat.com, jag.raman@oracle.com,
- quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, stefanha@redhat.com, thanos.makatos@nutanix.com,
- rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com, alistair@alistair23.me,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ frederic.konrad@adacore.com, qemu-arm@nongnu.org, philmd@redhat.com,
+ luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+On [2020 Apr 04] Sat 14:27:18, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> 
+> Fix descriptor loading from registers wrt host endianness.
+> 
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-The Proxy Object sends the PCI config space accesses as messages
-to the remote process over the communication channel
+Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
----
- hw/proxy/qemu-proxy.c    | 61 ++++++++++++++++++++++++++++++++++++++++
- include/io/mpqemu-link.h |  8 ++++++
- io/mpqemu-link.c         |  6 ++++
- remote/remote-main.c     | 32 +++++++++++++++++++++
- 4 files changed, 107 insertions(+)
-
-diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-index 9b5e429a88..87cf39c672 100644
---- a/hw/proxy/qemu-proxy.c
-+++ b/hw/proxy/qemu-proxy.c
-@@ -14,6 +14,65 @@
- #include "hw/proxy/qemu-proxy.h"
- #include "hw/pci/pci.h"
- 
-+static int config_op_send(PCIProxyDev *dev, uint32_t addr, uint32_t *val, int l,
-+                          unsigned int op)
-+{
-+    MPQemuMsg msg;
-+    struct conf_data_msg conf_data;
-+    int wait;
-+
-+    memset(&msg, 0, sizeof(MPQemuMsg));
-+    conf_data.addr = addr;
-+    conf_data.val = (op == PCI_CONFIG_WRITE) ? *val : 0;
-+    conf_data.l = l;
-+
-+    msg.data2 = (uint8_t *)&conf_data;
-+    if (!msg.data2) {
-+        return -ENOMEM;
-+    }
-+
-+    msg.size = sizeof(conf_data);
-+    msg.cmd = op;
-+    msg.bytestream = 1;
-+
-+    if (op == PCI_CONFIG_WRITE) {
-+        msg.num_fds = 0;
-+    } else {
-+        /* TODO: Dont create fd each time for send. */
-+        wait = GET_REMOTE_WAIT;
-+        msg.num_fds = 1;
-+        msg.fds[0] = wait;
-+    }
-+
-+    mpqemu_msg_send(&msg, dev->mpqemu_link->dev);
-+
-+    if (op == PCI_CONFIG_READ) {
-+        *val = (uint32_t)wait_for_remote(wait);
-+        PUT_REMOTE_WAIT(wait);
-+    }
-+
-+    return 0;
-+}
-+
-+static uint32_t pci_proxy_read_config(PCIDevice *d, uint32_t addr, int len)
-+{
-+    uint32_t val;
-+
-+    (void)pci_default_read_config(d, addr, len);
-+
-+    config_op_send(PCI_PROXY_DEV(d), addr, &val, len, PCI_CONFIG_READ);
-+
-+    return val;
-+}
-+
-+static void pci_proxy_write_config(PCIDevice *d, uint32_t addr, uint32_t val,
-+                                   int l)
-+{
-+    pci_default_write_config(d, addr, val, l);
-+
-+    config_op_send(PCI_PROXY_DEV(d), addr, &val, l, PCI_CONFIG_WRITE);
-+}
-+
- static void proxy_set_socket(Object *obj, const char *str, Error **errp)
- {
-     PCIProxyDev *pdev = PCI_PROXY_DEV(obj);
-@@ -86,6 +145,8 @@ static void pci_proxy_dev_class_init(ObjectClass *klass, void *data)
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
- 
-     k->realize = pci_proxy_dev_realize;
-+    k->config_read = pci_proxy_read_config;
-+    k->config_write = pci_proxy_write_config;
- }
- 
- static const TypeInfo pci_proxy_dev_type_info = {
-diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
-index ebae9afc45..7228a1915e 100644
---- a/include/io/mpqemu-link.h
-+++ b/include/io/mpqemu-link.h
-@@ -39,9 +39,17 @@ typedef enum {
-     INIT = 0,
-     SYNC_SYSMEM,
-     CONNECT_DEV,
-+    PCI_CONFIG_WRITE,
-+    PCI_CONFIG_READ,
-     MAX,
- } mpqemu_cmd_t;
- 
-+struct conf_data_msg {
-+    uint32_t addr;
-+    uint32_t val;
-+    int l;
-+};
-+
- typedef struct {
-     hwaddr gpas[REMOTE_MAX_FDS];
-     uint64_t sizes[REMOTE_MAX_FDS];
-diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
-index b395869a22..643c0588ce 100644
---- a/io/mpqemu-link.c
-+++ b/io/mpqemu-link.c
-@@ -361,6 +361,12 @@ bool mpqemu_msg_valid(MPQemuMsg *msg)
-             return false;
-         }
-         break;
-+    case PCI_CONFIG_WRITE:
-+    case PCI_CONFIG_READ:
-+        if (msg->size != sizeof(struct conf_data_msg)) {
-+            return false;
-+        }
-+        break;
-     default:
-         break;
-     }
-diff --git a/remote/remote-main.c b/remote/remote-main.c
-index 22319cb5ea..b5ed31f63b 100644
---- a/remote/remote-main.c
-+++ b/remote/remote-main.c
-@@ -41,6 +41,32 @@ static MPQemuLinkState *mpqemu_link;
- 
- #define LINK_TO_DEV(link) ((PCIDevice *)link->opaque)
- 
-+static void process_config_write(PCIDevice *dev, MPQemuMsg *msg)
-+{
-+    struct conf_data_msg *conf = (struct conf_data_msg *)msg->data2;
-+
-+    qemu_mutex_lock_iothread();
-+    pci_default_write_config(dev, conf->addr, conf->val, conf->l);
-+    qemu_mutex_unlock_iothread();
-+}
-+
-+static void process_config_read(PCIDevice *dev, MPQemuMsg *msg)
-+{
-+    struct conf_data_msg *conf = (struct conf_data_msg *)msg->data2;
-+    uint32_t val;
-+    int wait;
-+
-+    wait = msg->fds[0];
-+
-+    qemu_mutex_lock_iothread();
-+    val = pci_default_read_config(dev, conf->addr, conf->l);
-+    qemu_mutex_unlock_iothread();
-+
-+    notify_proxy(wait, val);
-+
-+    PUT_REMOTE_WAIT(wait);
-+}
-+
- static gpointer dev_thread(gpointer data)
- {
-     MPQemuLinkState *link = data;
-@@ -99,6 +125,12 @@ static void process_msg(GIOCondition cond, MPQemuLinkState *link,
-     case CONNECT_DEV:
-         process_connect_dev_msg(msg);
-         break;
-+    case PCI_CONFIG_WRITE:
-+        process_config_write(LINK_TO_DEV(link), msg);
-+        break;
-+    case PCI_CONFIG_READ:
-+        process_config_read(LINK_TO_DEV(link), msg);
-+        break;
-     default:
-         error_setg(&err, "Unknown command");
-         goto finalize_loop;
--- 
-2.25.GIT
-
+> ---
+>  hw/dma/xlnx-zdma.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
+> index 5f4775f663..4121a1b489 100644
+> --- a/hw/dma/xlnx-zdma.c
+> +++ b/hw/dma/xlnx-zdma.c
+> @@ -299,6 +299,14 @@ static void zdma_put_regaddr64(XlnxZDMA *s, unsigned int basereg, uint64_t addr)
+>      s->regs[basereg + 1] = addr >> 32;
+>  }
+>  
+> +static void zdma_load_descriptor_reg(XlnxZDMA *s, unsigned int reg,
+> +                                     XlnxZDMADescr *descr)
+> +{
+> +    descr->addr = zdma_get_regaddr64(s, reg);
+> +    descr->size = s->regs[reg + 2];
+> +    descr->attr = s->regs[reg + 3];
+> +}
+> +
+>  static bool zdma_load_descriptor(XlnxZDMA *s, uint64_t addr,
+>                                   XlnxZDMADescr *descr)
+>  {
+> @@ -324,8 +332,7 @@ static void zdma_load_src_descriptor(XlnxZDMA *s)
+>      unsigned int ptype = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, POINT_TYPE);
+>  
+>      if (ptype == PT_REG) {
+> -        memcpy(&s->dsc_src, &s->regs[R_ZDMA_CH_SRC_DSCR_WORD0],
+> -               sizeof(s->dsc_src));
+> +        zdma_load_descriptor_reg(s, R_ZDMA_CH_SRC_DSCR_WORD0, &s->dsc_src);
+>          return;
+>      }
+>  
+> @@ -360,8 +367,7 @@ static void zdma_load_dst_descriptor(XlnxZDMA *s)
+>      bool dst_type;
+>  
+>      if (ptype == PT_REG) {
+> -        memcpy(&s->dsc_dst, &s->regs[R_ZDMA_CH_DST_DSCR_WORD0],
+> -               sizeof(s->dsc_dst));
+> +        zdma_load_descriptor_reg(s, R_ZDMA_CH_DST_DSCR_WORD0, &s->dsc_dst);
+>          return;
+>      }
+>  
+> -- 
+> 2.20.1
+> 
 
