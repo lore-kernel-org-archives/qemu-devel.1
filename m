@@ -2,89 +2,98 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B83C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5971C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:57:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFCC7206F5
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:57:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90696206F5
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 09:57:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N+B8rn2k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFCC7206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="bNj9g0pS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90696206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLOVZ-0004Ft-5V
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:57:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46957)
+	id 1jLOVj-0004VB-MC
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 05:57:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44940)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frasse.iglesias@gmail.com>) id 1jLORL-0006AD-Ry
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:53:12 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOIQ-0005lu-0N
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:43:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frasse.iglesias@gmail.com>) id 1jLORK-0003kO-Kd
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:53:11 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:38176)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
- id 1jLORK-0003j2-BC; Mon, 06 Apr 2020 05:53:10 -0400
-Received: by mail-lj1-x241.google.com with SMTP id v16so13974956ljg.5;
- Mon, 06 Apr 2020 02:53:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=zZu81AvTz7XnpfPxkUx7W0nVmjRXqKzPOgYt9ht6Xbg=;
- b=N+B8rn2khK41TbDt3qFaha7FQvtALO0YNnbJS6fRlmK8jipn4fhO6Bl30ZbyxlyWeR
- 517UL+gEZAHMhVE/iNSerYY11iJEDxP5LSmzWo2KxYyZk+qJzAMfIcBQ830N0UqChatX
- 9WSj0IoGDq1YfodSaOxDR6qdtpJQUbqhLm1w28HHhDM9oZnp8v/xc20cZ4o7Rb7Zo1f5
- i8tiib+8U1m7y8Iw6XKD6J2etCIhnBqJx0ZOZ8/ShHvT88gppeO5oVBjeFN3QH4ODt5j
- LxrklU+EWzPMwifuLNKmeXf2YMgDNSKYlGeOnvNIjy77C0VHU7+rWmHboSta/kLGkTfZ
- ToNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=zZu81AvTz7XnpfPxkUx7W0nVmjRXqKzPOgYt9ht6Xbg=;
- b=rmsXbV7D59Yh5uE46yKusKlREQs7ABY6MrBXpBYSQIcGFKmWbOYiK3kdVztyvgYxW+
- bn30hEcqHOrjtRZjkl/hAmyfln5f6OQuve+WKmpSrQUoP/4GRoLo3DnKShbupFSEJH8b
- w1299ITRmBFpTQ1pP8yj9wjGmXUqPiTIqCuoGSPj1eKP3XNWZQ27KpgQtTJMR5OXeZr1
- NUaV71zOcCbxKioGKR78QiIoytL/86bgZZZBq7yUWv4APNC1cK1T6JfKBl4HUdfAbyxA
- mwL1AIyC/GGpc3hlvp98tDoBogiPoxdQZMIiJqT/GPXxKSOQuTMwa2Yw9cC6OUvEdzwm
- HFjw==
-X-Gm-Message-State: AGi0PuZdmrksReGcVnO6v56nrYem2g+zTscczBmZeJCY4IE7YBrSpmo0
- VLsh8dsTkjdJwQnEC6mg6t4=
-X-Google-Smtp-Source: APiQypKcgtIshjJvSBFpX7tF8KydMkJZdec/rZ9lLTyX/Eu+B3+TJ46OiWN87CiqUrEYk8yjlwIW0w==
-X-Received: by 2002:a2e:9d85:: with SMTP id c5mr11466060ljj.168.1586166788978; 
- Mon, 06 Apr 2020 02:53:08 -0700 (PDT)
-Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
- by smtp.gmail.com with ESMTPSA id
- e12sm12070373ljl.36.2020.04.06.02.53.07
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 06 Apr 2020 02:53:08 -0700 (PDT)
-Date: Mon, 6 Apr 2020 11:53:06 +0200
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Subject: Re: [PATCH v1 2/2] dma/xlnx-zdma: Fix descriptor loading (REG) wrt
- endianness
-Message-ID: <20200406095305.n542oyamddwh4uj7@fralle-msi>
-References: <20200404122718.25111-1-edgar.iglesias@gmail.com>
- <20200404122718.25111-3-edgar.iglesias@gmail.com>
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jLOIO-0003hd-KY
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:43:57 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:47186)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
+ id 1jLOIO-0003gH-CU
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 05:43:56 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369hfiE073043;
+ Mon, 6 Apr 2020 09:43:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=FWBqwWKfJON+64uL8pkeFeHCcs+bEyi4l1FtgC6XwwY=;
+ b=bNj9g0pSfANmDIT4RN06ZtvUm471Kox7u0adkaXOok1C6ayBtBLIeNtG1lu4ZP8UXAJ7
+ VupkEn74yVUtXvvfEBPYoB+73FMuw2o0/u9f0COXbrMiIzmwTA8IV871WNfCJUocFJVA
+ QzV+qNneUM06XkNd9ON6ik9gbBloWZWUb0MZrV0Bj9xXQZz8cCdY9Zma4yWD8MOXrj+l
+ g1uRFnKfuHnrMbqCcsRmmpmmH38cCnJ0uObJmXRXV5BxRV4B4mmBEjRNAHoOdvMGp2SH
+ 0nxwEI5gkxPSApw4L/Qa7//UZRmn1GyfnvU3jf0TOs/gDi+4mLUHr3oknRMuJlmVkXBQ 3Q== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 306j6m5tjf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 06 Apr 2020 09:43:50 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0369cgbJ092204;
+ Mon, 6 Apr 2020 09:41:50 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3030.oracle.com with ESMTP id 3073spk5rs-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 06 Apr 2020 09:41:50 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0369flpI013481;
+ Mon, 6 Apr 2020 09:41:48 GMT
+Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 06 Apr 2020 02:41:47 -0700
+From: elena.ufimtseva@oracle.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 09/36] multi-process: Add config option for multi-process
+ QEMU
+Date: Mon,  6 Apr 2020 02:40:59 -0700
+Message-Id: <ce3ade1fc25275947e992f3eda5287b88898bd9e.1586165556.git.elena.ufimtseva@oracle.com>
+X-Mailer: git-send-email 2.25.GIT
+In-Reply-To: <cover.1586165555.git.elena.ufimtseva@oracle.com>
+References: <cover.1586165555.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200404122718.25111-3-edgar.iglesias@gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::241
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ phishscore=0 spamscore=0
+ malwarescore=0 suspectscore=1 adultscore=0 bulkscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004060083
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ mlxlogscore=999 spamscore=0
+ priorityscore=1501 suspectscore=1 lowpriorityscore=0 malwarescore=0
+ impostorscore=0 mlxscore=0 phishscore=0 adultscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004060084
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,69 +105,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com, alistair@alistair23.me,
- richard.henderson@linaro.org, qemu-devel@nongnu.org,
- frederic.konrad@adacore.com, qemu-arm@nongnu.org, philmd@redhat.com,
- luc.michel@greensocs.com
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, stefanha@redhat.com, thanos.makatos@nutanix.com,
+ rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On [2020 Apr 04] Sat 14:27:18, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> 
-> Fix descriptor loading from registers wrt host endianness.
-> 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+From: Jagannathan Raman <jag.raman@oracle.com>
 
-Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Add a configuration option to separate multi-process code
 
-> ---
->  hw/dma/xlnx-zdma.c | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
-> index 5f4775f663..4121a1b489 100644
-> --- a/hw/dma/xlnx-zdma.c
-> +++ b/hw/dma/xlnx-zdma.c
-> @@ -299,6 +299,14 @@ static void zdma_put_regaddr64(XlnxZDMA *s, unsigned int basereg, uint64_t addr)
->      s->regs[basereg + 1] = addr >> 32;
->  }
->  
-> +static void zdma_load_descriptor_reg(XlnxZDMA *s, unsigned int reg,
-> +                                     XlnxZDMADescr *descr)
-> +{
-> +    descr->addr = zdma_get_regaddr64(s, reg);
-> +    descr->size = s->regs[reg + 2];
-> +    descr->attr = s->regs[reg + 3];
-> +}
-> +
->  static bool zdma_load_descriptor(XlnxZDMA *s, uint64_t addr,
->                                   XlnxZDMADescr *descr)
->  {
-> @@ -324,8 +332,7 @@ static void zdma_load_src_descriptor(XlnxZDMA *s)
->      unsigned int ptype = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, POINT_TYPE);
->  
->      if (ptype == PT_REG) {
-> -        memcpy(&s->dsc_src, &s->regs[R_ZDMA_CH_SRC_DSCR_WORD0],
-> -               sizeof(s->dsc_src));
-> +        zdma_load_descriptor_reg(s, R_ZDMA_CH_SRC_DSCR_WORD0, &s->dsc_src);
->          return;
->      }
->  
-> @@ -360,8 +367,7 @@ static void zdma_load_dst_descriptor(XlnxZDMA *s)
->      bool dst_type;
->  
->      if (ptype == PT_REG) {
-> -        memcpy(&s->dsc_dst, &s->regs[R_ZDMA_CH_DST_DSCR_WORD0],
-> -               sizeof(s->dsc_dst));
-> +        zdma_load_descriptor_reg(s, R_ZDMA_CH_DST_DSCR_WORD0, &s->dsc_dst);
->          return;
->      }
->  
-> -- 
-> 2.20.1
-> 
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+---
+ configure | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/configure b/configure
+index e225a1e3ff..3fbb66a5d5 100755
+--- a/configure
++++ b/configure
+@@ -509,6 +509,7 @@ libpmem=""
+ default_devices="yes"
+ plugins="no"
+ fuzzing="no"
++mpqemu="no"
+ 
+ supported_cpu="no"
+ supported_os="no"
+@@ -1601,6 +1602,10 @@ for opt do
+   ;;
+   --gdb=*) gdb_bin="$optarg"
+   ;;
++  --enable-mpqemu) mpqemu=yes
++  ;;
++  --disable-mpqemu) mpqemu=no
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+@@ -1894,6 +1899,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   debug-mutex     mutex debugging support
+   libpmem         libpmem support
+   xkbcommon       xkbcommon support
++  mpqemu          multi-process QEMU support
+ 
+ NOTE: The object files are built at the place where configure is launched
+ EOF
+@@ -6772,6 +6778,7 @@ echo "default devices   $default_devices"
+ echo "plugin support    $plugins"
+ echo "fuzzing support   $fuzzing"
+ echo "gdb               $gdb_bin"
++echo "multiprocess QEMU $mpqemu"
+ 
+ if test "$supported_cpu" = "no"; then
+     echo
+@@ -7590,6 +7597,10 @@ if test "$libpmem" = "yes" ; then
+   echo "CONFIG_LIBPMEM=y" >> $config_host_mak
+ fi
+ 
++if test "$mpqemu" = "yes" ; then
++  echo "CONFIG_MPQEMU=y" >> $config_host_mak
++fi
++
+ if test "$bochs" = "yes" ; then
+   echo "CONFIG_BOCHS=y" >> $config_host_mak
+ fi
+-- 
+2.25.GIT
+
 
