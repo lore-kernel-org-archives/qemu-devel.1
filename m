@@ -2,83 +2,90 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F390C2BA18
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 05:26:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB7AFC2BA18
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 06:28:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D27AE2075E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 05:26:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="QsAoyr3K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D27AE2075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 87E94206C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 06:28:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87E94206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLKGq-0006Rp-1l
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 01:26:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44354)
+	id 1jLLF5-0004wK-Os
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 02:28:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49194)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <keithp@keithp.com>) id 1jLKFr-0005du-98
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 01:25:07 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1jLLEK-0004W1-Ld
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 02:27:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <keithp@keithp.com>) id 1jLKFm-0003fu-2c
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 01:25:02 -0400
-Received: from home.keithp.com ([63.227.221.253]:46062 helo=elaine.keithp.com)
+ (envelope-from <yi.l.liu@intel.com>) id 1jLLEH-0002aX-ID
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 02:27:31 -0400
+Received: from mga17.intel.com ([192.55.52.151]:59889)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <keithp@keithp.com>)
- id 1jLKFl-0003cK-9W; Mon, 06 Apr 2020 01:24:58 -0400
-Received: from localhost (localhost [127.0.0.1])
- by elaine.keithp.com (Postfix) with ESMTP id EB3603F2A0DC;
- Sun,  5 Apr 2020 22:24:53 -0700 (PDT)
-X-Virus-Scanned: Debian amavisd-new at keithp.com
-Received: from elaine.keithp.com ([127.0.0.1])
- by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
- with LMTP id mOm7EwO5WgD0; Sun,  5 Apr 2020 22:24:52 -0700 (PDT)
-Received: from keithp.com (koto.keithp.com [10.0.0.2])
- by elaine.keithp.com (Postfix) with ESMTPSA id 8690C3F2A0D9;
- Sun,  5 Apr 2020 22:24:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
- t=1586150692; bh=FhQJ7V7+hDaexErsqDDmpG2Bid21lEoyZ68AMhNo3xI=;
- h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
- b=QsAoyr3KkRI8wAR+FC6I1RLqeA4oem4A6/sRVe67WLsEUpm2bCqnYexVo3g7xGdL2
- bnJJNEX/w+xWYLkW85/U2u4d7T3d5fxuR5qIJYMYdafVF3l1J6+zjJlBkNY/HZ2DmF
- 4+PBScT/avsYXSlC97L40wOTVeTkkLxXSiJQJY8kUej+dQLRb7+6lT/fRRsqbtsbyd
- ytXHO2WpjjGNRE6dmOkz9USARDqGVw6aCS9/kSLvIn1YBjGKBqIS74hVYNyt7SKwLm
- FxOTj2DeVC/i0+aKv7/cbZ8sQTlIFJFFICpNKo/BwXHzUIGPrDCrWYD0Lju79i9TNv
- 38ELkrnQvaBXw==
-Received: by keithp.com (Postfix, from userid 1000)
- id 313091582127; Sun,  5 Apr 2020 22:24:51 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>,
- Palmer Dabbelt <palmerdabbelt@google.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "open list\:RISC-V" <qemu-riscv@nongnu.org>
-Subject: Re: [PATCH] riscv: Add semihosting support [v5]
-In-Reply-To: <CAFEAcA_df6Uc_kqAvbELOQyUSnv-n+bDvJtYf2s5wCxwNXm-eg@mail.gmail.com>
-References: <20200128233224.515233-1-keithp@keithp.com>
- <CAFEAcA_dD3eAfKvOGOoXe3NWKg1PiW8=s2Xk41w19Tk67R-R4A@mail.gmail.com>
- <877e1arz2w.fsf@keithp.org>
- <CAFEAcA8Vs5Bp7tPgxLOG_T0350-Y_w7SitNzNuvHZN6AB=b0gg@mail.gmail.com>
- <mhng-e399eb36-5106-485c-972c-db2610e42dff@palmerdabbelt-glaptop1>
- <CAFEAcA_df6Uc_kqAvbELOQyUSnv-n+bDvJtYf2s5wCxwNXm-eg@mail.gmail.com>
-Date: Sun, 05 Apr 2020 22:24:50 -0700
-Message-ID: <87mu7ptcd9.fsf@keithp.com>
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1jLLEH-0002QL-7R
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 02:27:29 -0400
+IronPort-SDR: lQMyl05InJLKhFQNAg5+i9eTLmkqxZsI6CkKwME+OUi0GHBd/OAIT73J1dwwrj7JMY6YjfzomG
+ lvXvnLIvd2lg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 05 Apr 2020 23:27:19 -0700
+IronPort-SDR: udLNQtKnplKOANSHNefWn+DFDgNm3iYb9KLeAJ8TUpem+lCs8d05sCdo2Tzi0wF1v4Sb6outNS
+ 4gseJJ1Kx+Kg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,350,1580803200"; d="scan'208";a="285777810"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+ by fmsmga002.fm.intel.com with ESMTP; 05 Apr 2020 23:27:19 -0700
+Received: from fmsmsx117.amr.corp.intel.com (10.18.116.17) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 5 Apr 2020 23:27:19 -0700
+Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
+ fmsmsx117.amr.corp.intel.com (10.18.116.17) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 5 Apr 2020 23:27:19 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.225]) by
+ SHSMSX154.ccr.corp.intel.com ([169.254.7.214]) with mapi id 14.03.0439.000;
+ Mon, 6 Apr 2020 14:27:16 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "alex.williamson@redhat.com"
+ <alex.williamson@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>
+Subject: RE: [PATCH v2 05/22] hw/pci: modify pci_setup_iommu() to set
+ PCIIOMMUOps
+Thread-Topic: [PATCH v2 05/22] hw/pci: modify pci_setup_iommu() to set
+ PCIIOMMUOps
+Thread-Index: AQHWBkplYx1wDloSfEiqLsnvUo9sNqhgcquAgAUOJcD//8SGAIAAk3Hw//9/i4CABlFvIA==
+Date: Mon, 6 Apr 2020 06:27:15 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A222F32@SHSMSX104.ccr.corp.intel.com>
+References: <1585542301-84087-1-git-send-email-yi.l.liu@intel.com>
+ <1585542301-84087-6-git-send-email-yi.l.liu@intel.com>
+ <d7185758-701e-03f0-b804-f71587d65e65@redhat.com>
+ <A2975661238FB949B60364EF0F2C25743A21EDF9@SHSMSX104.ccr.corp.intel.com>
+ <532069f1-123e-1ba0-cbd0-c849c2e0c5aa@redhat.com>
+ <A2975661238FB949B60364EF0F2C25743A21F191@SHSMSX104.ccr.corp.intel.com>
+ <a187b5cf-3693-0aa4-5cf9-4f5761885948@redhat.com>
+In-Reply-To: <a187b5cf-3693-0aa4-5cf9-4f5761885948@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="==-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.227.221.253
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.151
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,1426 +97,334 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>, "Tian,
+ Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>, "Sun,
+ Yi Y" <yi.y.sun@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>, "Wu,
+ Hao" <hao.wu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: "Keith Packard" <keithp@keithp.com>
-From: "Keith Packard" via <qemu-devel@nongnu.org>
 
---==-=-=
-Content-Type: multipart/mixed; boundary="=-=-="
-
---=-=-=
-Content-Type: text/plain
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> I don't think a semihosting specification for RISC-V needs
-> necessarily to be a very heavyweight thing -- it is, after
-> all, a debug API at heart -- but I do agree that you should
-> have one.
-
-We've had a couple of weeks of discussion in the RISC-V sw-dev group and
-have created a new specification for RISC-V semihosting. It is located
-within the RISC-V consortium github account here:
-
-        https://github.com/riscv/riscv-semihosting-spec
-
-The current version is 0.2, and this patch to QEMU implements that
-version.
-
-
---=-=-=
-Content-Type: text/x-diff; charset=utf-8
-Content-Disposition: inline;
- filename=0001-riscv-Add-semihosting-support-v5.patch
-Content-Transfer-Encoding: quoted-printable
-
-From=20404ff408fa00ab7f65d1842966854824c418020c Mon Sep 17 00:00:00 2001
-From: Keith Packard <keithp@keithp.com>
-Date: Mon, 21 Oct 2019 01:12:13 -0700
-Subject: [PATCH] riscv: Add semihosting support [v5]
-
-Adapt the arm semihosting support code for RISCV. This implementation
-is based on the standard for RISC-V semihosting version 0.2 as
-documented in
-
-   https://github.com/riscv/riscv-semihosting-spec/releases/tag/0.2
-
-Signed-off-by: Keith Packard <keithp@keithp.com>
-
-=2D--
-
-v2:
-	Update PC after exception is handled to follow
-	change in the ARM version for SYS_READC
-
-v3:
-	Disallow semihosting in user mode; report a regular
-	breakpoint in that case.
-
-v4:
-	Fix errors reported by checkpatch
-
-v5:
-	Reference current RISC-V semihosting specification
-=2D--
- default-configs/riscv32-softmmu.mak           |    1 +
- linux-user/qemu.h                             |    2 +
- qemu-options.hx                               |   10 +-
- target/riscv/Makefile.objs                    |    2 +-
- target/riscv/cpu.h                            |    2 +
- target/riscv/cpu_bits.h                       |    1 +
- target/riscv/cpu_helper.c                     |    9 +
- .../riscv/insn_trans/trans_privileged.inc.c   |   24 +-
- target/riscv/riscv-semi.c                     | 1084 +++++++++++++++++
- target/riscv/translate.c                      |   11 +
- 10 files changed, 1140 insertions(+), 6 deletions(-)
- create mode 100644 target/riscv/riscv-semi.c
-
-diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-=
-softmmu.mak
-index 1ae077ed87..21b7bedf19 100644
-=2D-- a/default-configs/riscv32-softmmu.mak
-+++ b/default-configs/riscv32-softmmu.mak
-@@ -3,6 +3,7 @@
- # Uncomment the following lines to disable these optional devices:
- #
- #CONFIG_PCI_DEVICES=3Dn
-+CONFIG_SEMIHOSTING=3Dy
-=20
- # Boards:
- #
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 792c74290f..fb59776a34 100644
-=2D-- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -105,6 +105,8 @@ typedef struct TaskState {
-     /* FPA state */
-     FPA11 fpa;
- # endif
-+#endif
-+#if defined(TARGET_ARM) || defined(TARGET_RISCV)
-     int swi_errno;
- #endif
- #if defined(TARGET_I386) && !defined(TARGET_X86_64)
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 16debd03cb..917b32ef32 100644
-=2D-- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4103,10 +4103,10 @@ ERST
- DEF("semihosting", 0, QEMU_OPTION_semihosting,
-     "-semihosting    semihosting mode\n",
-     QEMU_ARCH_ARM | QEMU_ARCH_M68K | QEMU_ARCH_XTENSA | QEMU_ARCH_LM32 |
-=2D    QEMU_ARCH_MIPS | QEMU_ARCH_NIOS2)
-+    QEMU_ARCH_MIPS | QEMU_ARCH_NIOS2 | QEMU_ARCH_RISCV)
- SRST
- ``-semihosting``
-=2D    Enable semihosting mode (ARM, M68K, Xtensa, MIPS, Nios II only).
-+    Enable semihosting mode (ARM, M68K, Xtensa, MIPS, Nios II only, RISC-V=
-).
-=20
-     Note that this allows guest direct access to the host filesystem, so
-     should only be used with a trusted guest OS.
-@@ -4118,10 +4118,10 @@ DEF("semihosting-config", HAS_ARG, QEMU_OPTION_semi=
-hosting_config,
-     "-semihosting-config [enable=3Don|off][,target=3Dnative|gdb|auto][,cha=
-rdev=3Did][,arg=3Dstr[,...]]\n" \
-     "                semihosting configuration\n",
- QEMU_ARCH_ARM | QEMU_ARCH_M68K | QEMU_ARCH_XTENSA | QEMU_ARCH_LM32 |
-=2DQEMU_ARCH_MIPS | QEMU_ARCH_NIOS2)
-+QEMU_ARCH_MIPS | QEMU_ARCH_NIOS2 | QEMU_ARCH_RISCV)
- SRST
- ``-semihosting-config [enable=3Don|off][,target=3Dnative|gdb|auto][,charde=
-v=3Did][,arg=3Dstr[,...]]``
-=2D    Enable and configure semihosting (ARM, M68K, Xtensa, MIPS, Nios II
-+    Enable and configure semihosting (ARM, M68K, Xtensa, MIPS, Nios II, RI=
-SC-V
-     only).
-=20
-     Note that this allows guest direct access to the host filesystem, so
-@@ -4136,6 +4136,8 @@ SRST
-     open/read/write/seek/select. Tensilica baremetal libc for ISS and
-     linux platform "sim" use this interface.
-=20
-+    On RISC-V this implements the standard semihosting API, version 0.2.
-+
-     ``target=3Dnative|gdb|auto``
-         Defines where the semihosting calls will be addressed, to QEMU
-         (``native``) or to GDB (``gdb``). The default is ``auto``, which
-diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
-index ff651f69f6..6fd7f40e29 100644
-=2D-- a/target/riscv/Makefile.objs
-+++ b/target/riscv/Makefile.objs
-@@ -1,4 +1,4 @@
-=2Dobj-y +=3D translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o=
- gdbstub.o
-+obj-y +=3D translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o g=
-dbstub.o riscv-semi.o
- obj-$(CONFIG_SOFTMMU) +=3D pmp.o
-=20
- ifeq ($(CONFIG_SOFTMMU),y)
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 7d21addbab..f605f6b70a 100644
-=2D-- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -397,6 +397,8 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState =
-*cs);
- typedef CPURISCVState CPUArchState;
- typedef RISCVCPU ArchCPU;
-=20
-+target_ulong do_riscv_semihosting(CPURISCVState *env);
-+
- #include "exec/cpu-all.h"
-=20
- #endif /* RISCV_CPU_H */
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index 7f64ee1174..b100f79044 100644
-=2D-- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -527,6 +527,7 @@
- #define RISCV_EXCP_INST_PAGE_FAULT               0xc /* since: priv-1.10.0=
- */
- #define RISCV_EXCP_LOAD_PAGE_FAULT               0xd /* since: priv-1.10.0=
- */
- #define RISCV_EXCP_STORE_PAGE_FAULT              0xf /* since: priv-1.10.0=
- */
-+#define RISCV_EXCP_SEMIHOST                      0x10
- #define RISCV_EXCP_INST_GUEST_PAGE_FAULT         0x14
- #define RISCV_EXCP_LOAD_GUEST_ACCESS_FAULT       0x15
- #define RISCV_EXCP_STORE_GUEST_AMO_ACCESS_FAULT  0x17
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index d3ba9efb02..96776a97dc 100644
-=2D-- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -858,6 +858,15 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-     target_ulong htval =3D 0;
-     target_ulong mtval2 =3D 0;
-=20
-+    if  (cause =3D=3D RISCV_EXCP_SEMIHOST) {
-+        if (env->priv >=3D PRV_S) {
-+            env->gpr[xA0] =3D do_riscv_semihosting(env);
-+            env->pc +=3D 4;
-+            return;
-+        }
-+        cause =3D RISCV_EXCP_BREAKPOINT;
-+    }
-+
-     if (!async) {
-         /* set tval to badaddr for traps with address information */
-         switch (cause) {
-diff --git a/target/riscv/insn_trans/trans_privileged.inc.c b/target/riscv/=
-insn_trans/trans_privileged.inc.c
-index 76c2fad71c..57f393847f 100644
-=2D-- a/target/riscv/insn_trans/trans_privileged.inc.c
-+++ b/target/riscv/insn_trans/trans_privileged.inc.c
-@@ -29,7 +29,29 @@ static bool trans_ecall(DisasContext *ctx, arg_ecall *a)
-=20
- static bool trans_ebreak(DisasContext *ctx, arg_ebreak *a)
- {
-=2D    generate_exception(ctx, RISCV_EXCP_BREAKPOINT);
-+    uint32_t pre    =3D opcode_at(&ctx->base, ctx->base.pc_next - 4);
-+    uint32_t ebreak =3D opcode_at(&ctx->base, ctx->base.pc_next);
-+    uint32_t post   =3D opcode_at(&ctx->base, ctx->base.pc_next + 4);
-+
-+    /*
-+     * The RISC-V semihosting spec specifies the following
-+     * three-instruction sequence to flag a semihosting call:
-+     *
-+     *      slli zero, zero, 0x1f       0x01f01013
-+     *      ebreak                      0x00100073
-+     *      srai zero, zero, 0x7        0x40705013
-+     *
-+     * The two shift operations on the zero register are no-ops, used
-+     * here to signify a semihosting exception, rather than a breakpoint.
-+     *
-+     * Uncompressed instructions are used so that the sequence is easy
-+     * to validate.
-+     */
-+    if  (pre =3D=3D 0x01f01013 && ebreak =3D=3D 0x00100073 && post =3D=3D =
-0x40705013) {
-+        generate_exception(ctx, RISCV_EXCP_SEMIHOST);
-+    } else {
-+        generate_exception(ctx, RISCV_EXCP_BREAKPOINT);
-+    }
-     exit_tb(ctx); /* no chaining */
-     ctx->base.is_jmp =3D DISAS_NORETURN;
-     return true;
-diff --git a/target/riscv/riscv-semi.c b/target/riscv/riscv-semi.c
-new file mode 100644
-index 0000000000..18707f32c5
-=2D-- /dev/null
-+++ b/target/riscv/riscv-semi.c
-@@ -0,0 +1,1084 @@
-+/*
-+ *  RISC-V semihosting syscalls
-+ *
-+ *  Copyright (c) 2005, 2007 CodeSourcery.
-+ *  Copyright (c) 2019 Linaro
-+ *  Copyright =C2=A9 2019 Keith Packard
-+ *  Written by Paul Brook.
-+ *  Adapted for RISC-V by Keith Packard
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ *  ARM Semihosting is documented in:
-+ *     Semihosting for AArch32 and AArch64 Release 2.0
-+ *     https://static.docs.arm.com/100863/0200/semihosting.pdf
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "cpu.h"
-+#include "hw/semihosting/semihost.h"
-+#include "hw/semihosting/console.h"
-+#include "qemu/log.h"
-+#ifdef CONFIG_USER_ONLY
-+#include "qemu.h"
-+
-+#define RISCV_HEAP_SIZE (128 * 1024 * 1024)
-+#else
-+#include "exec/gdbstub.h"
-+#include "qemu/cutils.h"
-+#endif
-+
-+#define TARGET_SYS_OPEN        0x01
-+#define TARGET_SYS_CLOSE       0x02
-+#define TARGET_SYS_WRITEC      0x03
-+#define TARGET_SYS_WRITE0      0x04
-+#define TARGET_SYS_WRITE       0x05
-+#define TARGET_SYS_READ        0x06
-+#define TARGET_SYS_READC       0x07
-+#define TARGET_SYS_ISTTY       0x09
-+#define TARGET_SYS_SEEK        0x0a
-+#define TARGET_SYS_FLEN        0x0c
-+#define TARGET_SYS_TMPNAM      0x0d
-+#define TARGET_SYS_REMOVE      0x0e
-+#define TARGET_SYS_RENAME      0x0f
-+#define TARGET_SYS_CLOCK       0x10
-+#define TARGET_SYS_TIME        0x11
-+#define TARGET_SYS_SYSTEM      0x12
-+#define TARGET_SYS_ERRNO       0x13
-+#define TARGET_SYS_GET_CMDLINE 0x15
-+#define TARGET_SYS_HEAPINFO    0x16
-+#define TARGET_SYS_EXIT        0x18
-+#define TARGET_SYS_SYNCCACHE   0x19
-+#define TARGET_SYS_EXIT_EXTENDED 0x20
-+
-+/*
-+ * ADP_Stopped_ApplicationExit is used for exit(0),
-+ * anything else is implemented as exit(1)
-+ */
-+#define ADP_Stopped_ApplicationExit     (0x20026)
-+
-+#ifndef O_BINARY
-+#define O_BINARY 0
-+#endif
-+
-+#define GDB_O_RDONLY  0x000
-+#define GDB_O_WRONLY  0x001
-+#define GDB_O_RDWR    0x002
-+#define GDB_O_APPEND  0x008
-+#define GDB_O_CREAT   0x200
-+#define GDB_O_TRUNC   0x400
-+#define GDB_O_BINARY  0
-+
-+static int gdb_open_modeflags[12] =3D {
-+    GDB_O_RDONLY,
-+    GDB_O_RDONLY | GDB_O_BINARY,
-+    GDB_O_RDWR,
-+    GDB_O_RDWR | GDB_O_BINARY,
-+    GDB_O_WRONLY | GDB_O_CREAT | GDB_O_TRUNC,
-+    GDB_O_WRONLY | GDB_O_CREAT | GDB_O_TRUNC | GDB_O_BINARY,
-+    GDB_O_RDWR | GDB_O_CREAT | GDB_O_TRUNC,
-+    GDB_O_RDWR | GDB_O_CREAT | GDB_O_TRUNC | GDB_O_BINARY,
-+    GDB_O_WRONLY | GDB_O_CREAT | GDB_O_APPEND,
-+    GDB_O_WRONLY | GDB_O_CREAT | GDB_O_APPEND | GDB_O_BINARY,
-+    GDB_O_RDWR | GDB_O_CREAT | GDB_O_APPEND,
-+    GDB_O_RDWR | GDB_O_CREAT | GDB_O_APPEND | GDB_O_BINARY
-+};
-+
-+static int open_modeflags[12] =3D {
-+    O_RDONLY,
-+    O_RDONLY | O_BINARY,
-+    O_RDWR,
-+    O_RDWR | O_BINARY,
-+    O_WRONLY | O_CREAT | O_TRUNC,
-+    O_WRONLY | O_CREAT | O_TRUNC | O_BINARY,
-+    O_RDWR | O_CREAT | O_TRUNC,
-+    O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
-+    O_WRONLY | O_CREAT | O_APPEND,
-+    O_WRONLY | O_CREAT | O_APPEND | O_BINARY,
-+    O_RDWR | O_CREAT | O_APPEND,
-+    O_RDWR | O_CREAT | O_APPEND | O_BINARY
-+};
-+
-+typedef enum GuestFDType {
-+    GuestFDUnused =3D 0,
-+    GuestFDHost =3D 1,
-+    GuestFDGDB =3D 2,
-+    GuestFDFeatureFile =3D 3,
-+} GuestFDType;
-+
-+/*
-+ * Guest file descriptors are integer indexes into an array of
-+ * these structures (we will dynamically resize as necessary).
-+ */
-+typedef struct GuestFD {
-+    GuestFDType type;
-+    union {
-+        int hostfd;
-+        target_ulong featurefile_offset;
-+    };
-+} GuestFD;
-+
-+static GArray *guestfd_array;
-+
-+/*
-+ * Allocate a new guest file descriptor and return it; if we
-+ * couldn't allocate a new fd then return -1.
-+ * This is a fairly simplistic implementation because we don't
-+ * expect that most semihosting guest programs will make very
-+ * heavy use of opening and closing fds.
-+ */
-+static int alloc_guestfd(void)
-+{
-+    guint i;
-+
-+    if (!guestfd_array) {
-+        /* New entries zero-initialized, i.e. type GuestFDUnused */
-+        guestfd_array =3D g_array_new(FALSE, TRUE, sizeof(GuestFD));
-+    }
-+
-+    for (i =3D 0; i < guestfd_array->len; i++) {
-+        GuestFD *gf =3D &g_array_index(guestfd_array, GuestFD, i);
-+
-+        if (gf->type =3D=3D GuestFDUnused) {
-+            return i;
-+        }
-+    }
-+
-+    /* All elements already in use: expand the array */
-+    g_array_set_size(guestfd_array, i + 1);
-+    return i;
-+}
-+
-+/*
-+ * Look up the guestfd in the data structure; return NULL
-+ * for out of bounds, but don't check whether the slot is unused.
-+ * This is used internally by the other guestfd functions.
-+ */
-+static GuestFD *do_get_guestfd(int guestfd)
-+{
-+    if (!guestfd_array) {
-+        return NULL;
-+    }
-+
-+    if (guestfd < 0 || guestfd >=3D guestfd_array->len) {
-+        return NULL;
-+    }
-+
-+    return &g_array_index(guestfd_array, GuestFD, guestfd);
-+}
-+
-+/*
-+ * Associate the specified guest fd (which must have been
-+ * allocated via alloc_fd() and not previously used) with
-+ * the specified host/gdb fd.
-+ */
-+static void associate_guestfd(int guestfd, int hostfd)
-+{
-+    GuestFD *gf =3D do_get_guestfd(guestfd);
-+
-+    assert(gf);
-+    gf->type =3D use_gdb_syscalls() ? GuestFDGDB : GuestFDHost;
-+    gf->hostfd =3D hostfd;
-+}
-+
-+/*
-+ * Deallocate the specified guest file descriptor. This doesn't
-+ * close the host fd, it merely undoes the work of alloc_fd().
-+ */
-+static void dealloc_guestfd(int guestfd)
-+{
-+    GuestFD *gf =3D do_get_guestfd(guestfd);
-+
-+    assert(gf);
-+    gf->type =3D GuestFDUnused;
-+}
-+
-+/*
-+ * Given a guest file descriptor, get the associated struct.
-+ * If the fd is not valid, return NULL. This is the function
-+ * used by the various semihosting calls to validate a handle
-+ * from the guest.
-+ * Note: calling alloc_guestfd() or dealloc_guestfd() will
-+ * invalidate any GuestFD* obtained by calling this function.
-+ */
-+static GuestFD *get_guestfd(int guestfd)
-+{
-+    GuestFD *gf =3D do_get_guestfd(guestfd);
-+
-+    if (!gf || gf->type =3D=3D GuestFDUnused) {
-+        return NULL;
-+    }
-+    return gf;
-+}
-+
-+/*
-+ * The semihosting API has no concept of its errno being thread-safe,
-+ * as the API design predates SMP CPUs and was intended as a simple
-+ * real-hardware set of debug functionality. For QEMU, we make the
-+ * errno be per-thread in linux-user mode; in softmmu it is a simple
-+ * global, and we assume that the guest takes care of avoiding any races.
-+ */
-+#ifndef CONFIG_USER_ONLY
-+static target_ulong syscall_err;
-+
-+#include "exec/softmmu-semi.h"
-+#endif
-+
-+static inline uint32_t set_swi_errno(CPURISCVState *env, uint32_t code)
-+{
-+    if (code =3D=3D (uint32_t)-1) {
-+#ifdef CONFIG_USER_ONLY
-+        CPUState *cs =3D env_cpu(env);
-+        TaskState *ts =3D cs->opaque;
-+
-+        ts->swi_errno =3D errno;
-+#else
-+        syscall_err =3D errno;
-+#endif
-+    }
-+    return code;
-+}
-+
-+static inline uint32_t get_swi_errno(CPURISCVState *env)
-+{
-+#ifdef CONFIG_USER_ONLY
-+    CPUState *cs =3D env_cpu(env);
-+    TaskState *ts =3D cs->opaque;
-+
-+    return ts->swi_errno;
-+#else
-+    return syscall_err;
-+#endif
-+}
-+
-+static target_ulong riscv_semi_syscall_len;
-+
-+static void riscv_semi_cb(CPUState *cs, target_ulong ret, target_ulong err)
-+{
-+    RISCVCPU *cpu =3D RISCV_CPU(cs);
-+    CPURISCVState *env =3D &cpu->env;
-+    target_ulong reg0 =3D env->gpr[xA0];
-+
-+    if (ret =3D=3D (target_ulong)-1) {
-+        errno =3D err;
-+        set_swi_errno(env, -1);
-+        reg0 =3D ret;
-+    } else {
-+        /* Fixup syscalls that use nonstardard return conventions.  */
-+        switch (reg0) {
-+        case TARGET_SYS_WRITE:
-+        case TARGET_SYS_READ:
-+            reg0 =3D riscv_semi_syscall_len - ret;
-+            break;
-+        case TARGET_SYS_SEEK:
-+            reg0 =3D 0;
-+            break;
-+        default:
-+            reg0 =3D ret;
-+            break;
-+        }
-+    }
-+    env->gpr[xA0] =3D reg0;
-+}
-+
-+static target_ulong riscv_flen_buf(RISCVCPU *cpu)
-+{
-+    /*
-+     * Return an address in target memory of 64 bytes where the remote
-+     * gdb should write its stat struct. (The format of this structure
-+     * is defined by GDB's remote protocol and is not target-specific.)
-+     * We put this on the guest's stack just below SP.
-+     */
-+    CPURISCVState *env =3D &cpu->env;
-+    target_ulong sp;
-+
-+    sp =3D env->gpr[xSP];
-+
-+    return sp - 64;
-+}
-+
-+static void riscv_semi_flen_cb(CPUState *cs, target_ulong ret, target_ulon=
-g err)
-+{
-+    RISCVCPU *cpu =3D RISCV_CPU(cs);
-+    CPURISCVState *env =3D &cpu->env;
-+    /*
-+     * The size is always stored in big-endian order, extract
-+     *  the value. We assume the size always fit in 32 bits.
-+     */
-+    uint32_t size;
-+    cpu_memory_rw_debug(cs, riscv_flen_buf(cpu) + 32, (uint8_t *)&size, 4,=
- 0);
-+    size =3D be32_to_cpu(size);
-+    env->gpr[xA0] =3D size;
-+    errno =3D err;
-+    set_swi_errno(env, -1);
-+}
-+
-+static int riscv_semi_open_guestfd;
-+
-+static void riscv_semi_open_cb(CPUState *cs, target_ulong ret, target_ulon=
-g err)
-+{
-+    RISCVCPU *cpu =3D RISCV_CPU(cs);
-+    CPURISCVState *env =3D &cpu->env;
-+    if (ret =3D=3D (target_ulong)-1) {
-+        errno =3D err;
-+        set_swi_errno(env, -1);
-+        dealloc_guestfd(riscv_semi_open_guestfd);
-+    } else {
-+        associate_guestfd(riscv_semi_open_guestfd, ret);
-+        ret =3D riscv_semi_open_guestfd;
-+    }
-+
-+    env->gpr[xA0] =3D ret;
-+}
-+
-+static target_ulong riscv_gdb_syscall(RISCVCPU *cpu, gdb_syscall_complete_=
-cb cb,
-+                                    const char *fmt, ...)
-+{
-+    va_list va;
-+    CPURISCVState *env =3D &cpu->env;
-+
-+    va_start(va, fmt);
-+    gdb_do_syscallv(cb, fmt, va);
-+    va_end(va);
-+
-+    /*
-+     * FIXME: in softmmu mode, the gdbstub will schedule our callback
-+     * to occur, but will not actually call it to complete the syscall
-+     * until after this function has returned and we are back in the
-+     * CPU main loop. Therefore callers to this function must not
-+     * do anything with its return value, because it is not necessarily
-+     * the result of the syscall, but could just be the old value of X0.
-+     * The only thing safe to do with this is that the callers of
-+     * do_riscv_semihosting() will write it straight back into X0.
-+     * (In linux-user mode, the callback will have happened before
-+     * gdb_do_syscallv() returns.)
-+     *
-+     * We should tidy this up so neither this function nor
-+     * do_riscv_semihosting() return a value, so the mistake of
-+     * doing something with the return value is not possible to make.
-+     */
-+
-+    return env->gpr[xA0];
-+}
-+
-+/*
-+ * Types for functions implementing various semihosting calls
-+ * for specific types of guest file descriptor. These must all
-+ * do the work and return the required return value for the guest,
-+ * setting the guest errno if appropriate.
-+ */
-+typedef uint32_t sys_closefn(RISCVCPU *cpu, GuestFD *gf);
-+typedef uint32_t sys_writefn(RISCVCPU *cpu, GuestFD *gf,
-+                             target_ulong buf, uint32_t len);
-+typedef uint32_t sys_readfn(RISCVCPU *cpu, GuestFD *gf,
-+                            target_ulong buf, uint32_t len);
-+typedef uint32_t sys_isattyfn(RISCVCPU *cpu, GuestFD *gf);
-+typedef uint32_t sys_seekfn(RISCVCPU *cpu, GuestFD *gf,
-+                            target_ulong offset);
-+typedef uint32_t sys_flenfn(RISCVCPU *cpu, GuestFD *gf);
-+
-+static uint32_t host_closefn(RISCVCPU *cpu, GuestFD *gf)
-+{
-+    CPURISCVState *env =3D &cpu->env;
-+
-+    return set_swi_errno(env, close(gf->hostfd));
-+}
-+
-+static uint32_t host_writefn(RISCVCPU *cpu, GuestFD *gf,
-+                             target_ulong buf, uint32_t len)
-+{
-+    uint32_t ret;
-+    CPURISCVState *env =3D &cpu->env;
-+    char *s =3D lock_user(VERIFY_READ, buf, len, 1);
-+    if (!s) {
-+        /* Return bytes not written on error */
-+        return len;
-+    }
-+    ret =3D set_swi_errno(env, write(gf->hostfd, s, len));
-+    unlock_user(s, buf, 0);
-+    if (ret =3D=3D (uint32_t)-1) {
-+        ret =3D 0;
-+    }
-+    /* Return bytes not written */
-+    return len - ret;
-+}
-+
-+static uint32_t host_readfn(RISCVCPU *cpu, GuestFD *gf,
-+                            target_ulong buf, uint32_t len)
-+{
-+    uint32_t ret;
-+    CPURISCVState *env =3D &cpu->env;
-+    char *s =3D lock_user(VERIFY_WRITE, buf, len, 0);
-+    if (!s) {
-+        /* return bytes not read */
-+        return len;
-+    }
-+    do {
-+        ret =3D set_swi_errno(env, read(gf->hostfd, s, len));
-+    } while (ret =3D=3D -1 && errno =3D=3D EINTR);
-+    unlock_user(s, buf, len);
-+    if (ret =3D=3D (uint32_t)-1) {
-+        ret =3D 0;
-+    }
-+    /* Return bytes not read */
-+    return len - ret;
-+}
-+
-+static uint32_t host_isattyfn(RISCVCPU *cpu, GuestFD *gf)
-+{
-+    return isatty(gf->hostfd);
-+}
-+
-+static uint32_t host_seekfn(RISCVCPU *cpu, GuestFD *gf, target_ulong offse=
-t)
-+{
-+    CPURISCVState *env =3D &cpu->env;
-+    uint32_t ret =3D set_swi_errno(env, lseek(gf->hostfd, offset, SEEK_SET=
-));
-+    if (ret =3D=3D (uint32_t)-1) {
-+        return -1;
-+    }
-+    return 0;
-+}
-+
-+static uint32_t host_flenfn(RISCVCPU *cpu, GuestFD *gf)
-+{
-+    CPURISCVState *env =3D &cpu->env;
-+    struct stat buf;
-+    uint32_t ret =3D set_swi_errno(env, fstat(gf->hostfd, &buf));
-+    if (ret =3D=3D (uint32_t)-1) {
-+        return -1;
-+    }
-+    return buf.st_size;
-+}
-+
-+static uint32_t gdb_closefn(RISCVCPU *cpu, GuestFD *gf)
-+{
-+    return riscv_gdb_syscall(cpu, riscv_semi_cb, "close,%x", gf->hostfd);
-+}
-+
-+static uint32_t gdb_writefn(RISCVCPU *cpu, GuestFD *gf,
-+                            target_ulong buf, uint32_t len)
-+{
-+    riscv_semi_syscall_len =3D len;
-+    return riscv_gdb_syscall(cpu, riscv_semi_cb, "write,%x,%x,%x",
-+                           gf->hostfd, buf, len);
-+}
-+
-+static uint32_t gdb_readfn(RISCVCPU *cpu, GuestFD *gf,
-+                           target_ulong buf, uint32_t len)
-+{
-+    riscv_semi_syscall_len =3D len;
-+    return riscv_gdb_syscall(cpu, riscv_semi_cb, "read,%x,%x,%x",
-+                           gf->hostfd, buf, len);
-+}
-+
-+static uint32_t gdb_isattyfn(RISCVCPU *cpu, GuestFD *gf)
-+{
-+    return riscv_gdb_syscall(cpu, riscv_semi_cb, "isatty,%x", gf->hostfd);
-+}
-+
-+static uint32_t gdb_seekfn(RISCVCPU *cpu, GuestFD *gf, target_ulong offset)
-+{
-+    return riscv_gdb_syscall(cpu, riscv_semi_cb, "lseek,%x,%x,0",
-+                           gf->hostfd, offset);
-+}
-+
-+static uint32_t gdb_flenfn(RISCVCPU *cpu, GuestFD *gf)
-+{
-+    return riscv_gdb_syscall(cpu, riscv_semi_flen_cb, "fstat,%x,%x",
-+                           gf->hostfd, riscv_flen_buf(cpu));
-+}
-+
-+#define SHFB_MAGIC_0 0x53
-+#define SHFB_MAGIC_1 0x48
-+#define SHFB_MAGIC_2 0x46
-+#define SHFB_MAGIC_3 0x42
-+
-+/* Feature bits reportable in feature byte 0 */
-+#define SH_EXT_EXIT_EXTENDED (1 << 0)
-+#define SH_EXT_STDOUT_STDERR (1 << 1)
-+
-+static const uint8_t featurefile_data[] =3D {
-+    SHFB_MAGIC_0,
-+    SHFB_MAGIC_1,
-+    SHFB_MAGIC_2,
-+    SHFB_MAGIC_3,
-+    SH_EXT_EXIT_EXTENDED | SH_EXT_STDOUT_STDERR, /* Feature byte 0 */
-+};
-+
-+static void init_featurefile_guestfd(int guestfd)
-+{
-+    GuestFD *gf =3D do_get_guestfd(guestfd);
-+
-+    assert(gf);
-+    gf->type =3D GuestFDFeatureFile;
-+    gf->featurefile_offset =3D 0;
-+}
-+
-+static uint32_t featurefile_closefn(RISCVCPU *cpu, GuestFD *gf)
-+{
-+    /* Nothing to do */
-+    return 0;
-+}
-+
-+static uint32_t featurefile_writefn(RISCVCPU *cpu, GuestFD *gf,
-+                                    target_ulong buf, uint32_t len)
-+{
-+    /* This fd can never be open for writing */
-+    CPURISCVState *env =3D &cpu->env;
-+
-+    errno =3D EBADF;
-+    return set_swi_errno(env, -1);
-+}
-+
-+static uint32_t featurefile_readfn(RISCVCPU *cpu, GuestFD *gf,
-+                                   target_ulong buf, uint32_t len)
-+{
-+    uint32_t i;
-+#ifndef CONFIG_USER_ONLY
-+    CPURISCVState *env =3D &cpu->env;
-+#endif
-+    char *s;
-+
-+    s =3D lock_user(VERIFY_WRITE, buf, len, 0);
-+    if (!s) {
-+        return len;
-+    }
-+
-+    for (i =3D 0; i < len; i++) {
-+        if (gf->featurefile_offset >=3D sizeof(featurefile_data)) {
-+            break;
-+        }
-+        s[i] =3D featurefile_data[gf->featurefile_offset];
-+        gf->featurefile_offset++;
-+    }
-+
-+    unlock_user(s, buf, len);
-+
-+    /* Return number of bytes not read */
-+    return len - i;
-+}
-+
-+static uint32_t featurefile_isattyfn(RISCVCPU *cpu, GuestFD *gf)
-+{
-+    return 0;
-+}
-+
-+static uint32_t featurefile_seekfn(RISCVCPU *cpu, GuestFD *gf,
-+                                   target_ulong offset)
-+{
-+    gf->featurefile_offset =3D offset;
-+    return 0;
-+}
-+
-+static uint32_t featurefile_flenfn(RISCVCPU *cpu, GuestFD *gf)
-+{
-+    return sizeof(featurefile_data);
-+}
-+
-+typedef struct GuestFDFunctions {
-+    sys_closefn *closefn;
-+    sys_writefn *writefn;
-+    sys_readfn *readfn;
-+    sys_isattyfn *isattyfn;
-+    sys_seekfn *seekfn;
-+    sys_flenfn *flenfn;
-+} GuestFDFunctions;
-+
-+static const GuestFDFunctions guestfd_fns[] =3D {
-+    [GuestFDHost] =3D {
-+        .closefn =3D host_closefn,
-+        .writefn =3D host_writefn,
-+        .readfn =3D host_readfn,
-+        .isattyfn =3D host_isattyfn,
-+        .seekfn =3D host_seekfn,
-+        .flenfn =3D host_flenfn,
-+    },
-+    [GuestFDGDB] =3D {
-+        .closefn =3D gdb_closefn,
-+        .writefn =3D gdb_writefn,
-+        .readfn =3D gdb_readfn,
-+        .isattyfn =3D gdb_isattyfn,
-+        .seekfn =3D gdb_seekfn,
-+        .flenfn =3D gdb_flenfn,
-+    },
-+    [GuestFDFeatureFile] =3D {
-+        .closefn =3D featurefile_closefn,
-+        .writefn =3D featurefile_writefn,
-+        .readfn =3D featurefile_readfn,
-+        .isattyfn =3D featurefile_isattyfn,
-+        .seekfn =3D featurefile_seekfn,
-+        .flenfn =3D featurefile_flenfn,
-+    },
-+};
-+
-+/*
-+ * Read the input value from the argument block; fail the semihosting
-+ * call if the memory read fails.
-+ */
-+#define GET_ARG(n) do {                                                 \
-+        if (get_user_ual(arg ## n, args + (n) * sizeof(target_ulong))) { \
-+            errno =3D EFAULT;                                             \
-+            return set_swi_errno(env, -1);                              \
-+        }                                                               \
-+    } while (0)
-+
-+#define SET_ARG(n, val)                                 \
-+    put_user_ual(val, args + (n) * sizeof(target_ulong))
-+
-+/*
-+ * Do a semihosting call.
-+ *
-+ * The specification always says that the "return register" either
-+ * returns a specific value or is corrupted, so we don't need to
-+ * report to our caller whether we are returning a value or trying to
-+ * leave the register unchanged. We use 0xdeadbeef as the return value
-+ * when there isn't a defined return value for the call.
-+ */
-+target_ulong do_riscv_semihosting(CPURISCVState *env)
-+{
-+    RISCVCPU *cpu =3D env_archcpu(env);
-+    CPUState *cs =3D env_cpu(env);
-+    target_ulong args;
-+    target_ulong arg0, arg1, arg2, arg3;
-+    char *s;
-+    int nr;
-+    uint32_t ret;
-+    uint32_t len;
-+    GuestFD *gf;
-+
-+    nr =3D env->gpr[xA0] & 0xffffffffU;
-+    args =3D env->gpr[xA1];
-+
-+    switch (nr) {
-+    case TARGET_SYS_OPEN:
-+    {
-+        int guestfd;
-+
-+        GET_ARG(0);
-+        GET_ARG(1);
-+        GET_ARG(2);
-+        s =3D lock_user_string(arg0);
-+        if (!s) {
-+            errno =3D EFAULT;
-+            return set_swi_errno(env, -1);
-+        }
-+        if (arg1 >=3D 12) {
-+            unlock_user(s, arg0, 0);
-+            errno =3D EINVAL;
-+            return set_swi_errno(env, -1);
-+        }
-+
-+        guestfd =3D alloc_guestfd();
-+        if (guestfd < 0) {
-+            unlock_user(s, arg0, 0);
-+            errno =3D EMFILE;
-+            return set_swi_errno(env, -1);
-+        }
-+
-+        if (strcmp(s, ":tt") =3D=3D 0) {
-+            int result_fileno;
-+
-+            /*
-+             * We implement SH_EXT_STDOUT_STDERR, so:
-+             *  open for read =3D=3D stdin
-+             *  open for write =3D=3D stdout
-+             *  open for append =3D=3D stderr
-+             */
-+            if (arg1 < 4) {
-+                result_fileno =3D STDIN_FILENO;
-+            } else if (arg1 < 8) {
-+                result_fileno =3D STDOUT_FILENO;
-+            } else {
-+                result_fileno =3D STDERR_FILENO;
-+            }
-+            associate_guestfd(guestfd, result_fileno);
-+            unlock_user(s, arg0, 0);
-+            return guestfd;
-+        }
-+        if (strcmp(s, ":semihosting-features") =3D=3D 0) {
-+            unlock_user(s, arg0, 0);
-+            /* We must fail opens for modes other than 0 ('r') or 1 ('rb')=
- */
-+            if (arg1 !=3D 0 && arg1 !=3D 1) {
-+                dealloc_guestfd(guestfd);
-+                errno =3D EACCES;
-+                return set_swi_errno(env, -1);
-+            }
-+            init_featurefile_guestfd(guestfd);
-+            return guestfd;
-+        }
-+
-+        if (use_gdb_syscalls()) {
-+            riscv_semi_open_guestfd =3D guestfd;
-+            ret =3D riscv_gdb_syscall(cpu, riscv_semi_open_cb,
-+                                    "open,%s,%x,1a4", arg0,
-+                                    (int)arg2 + 1, gdb_open_modeflags[arg1=
-]);
-+        } else {
-+            ret =3D set_swi_errno(env, open(s, open_modeflags[arg1], 0644)=
-);
-+            if (ret =3D=3D (uint32_t)-1) {
-+                dealloc_guestfd(guestfd);
-+            } else {
-+                associate_guestfd(guestfd, ret);
-+                ret =3D guestfd;
-+            }
-+        }
-+        unlock_user(s, arg0, 0);
-+        return ret;
-+    }
-+    case TARGET_SYS_CLOSE:
-+        GET_ARG(0);
-+
-+        gf =3D get_guestfd(arg0);
-+        if (!gf) {
-+            errno =3D EBADF;
-+            return set_swi_errno(env, -1);
-+        }
-+
-+        ret =3D guestfd_fns[gf->type].closefn(cpu, gf);
-+        dealloc_guestfd(arg0);
-+        return ret;
-+    case TARGET_SYS_WRITEC:
-+        qemu_semihosting_console_outc(env, args);
-+        return 0xdeadbeef;
-+    case TARGET_SYS_WRITE0:
-+        return qemu_semihosting_console_outs(env, args);
-+    case TARGET_SYS_WRITE:
-+        GET_ARG(0);
-+        GET_ARG(1);
-+        GET_ARG(2);
-+        len =3D arg2;
-+
-+        gf =3D get_guestfd(arg0);
-+        if (!gf) {
-+            errno =3D EBADF;
-+            return set_swi_errno(env, -1);
-+        }
-+
-+        return guestfd_fns[gf->type].writefn(cpu, gf, arg1, len);
-+    case TARGET_SYS_READ:
-+        GET_ARG(0);
-+        GET_ARG(1);
-+        GET_ARG(2);
-+        len =3D arg2;
-+
-+        gf =3D get_guestfd(arg0);
-+        if (!gf) {
-+            errno =3D EBADF;
-+            return set_swi_errno(env, -1);
-+        }
-+
-+        return guestfd_fns[gf->type].readfn(cpu, gf, arg1, len);
-+    case TARGET_SYS_READC:
-+        return qemu_semihosting_console_inc(env);
-+    case TARGET_SYS_ISTTY:
-+        GET_ARG(0);
-+
-+        gf =3D get_guestfd(arg0);
-+        if (!gf) {
-+            errno =3D EBADF;
-+            return set_swi_errno(env, -1);
-+        }
-+
-+        return guestfd_fns[gf->type].isattyfn(cpu, gf);
-+    case TARGET_SYS_SEEK:
-+        GET_ARG(0);
-+        GET_ARG(1);
-+
-+        gf =3D get_guestfd(arg0);
-+        if (!gf) {
-+            errno =3D EBADF;
-+            return set_swi_errno(env, -1);
-+        }
-+
-+        return guestfd_fns[gf->type].seekfn(cpu, gf, arg1);
-+    case TARGET_SYS_FLEN:
-+        GET_ARG(0);
-+
-+        gf =3D get_guestfd(arg0);
-+        if (!gf) {
-+            errno =3D EBADF;
-+            return set_swi_errno(env, -1);
-+        }
-+
-+        return guestfd_fns[gf->type].flenfn(cpu, gf);
-+    case TARGET_SYS_TMPNAM:
-+        qemu_log_mask(LOG_UNIMP, "%s: SYS_TMPNAM not implemented", __func_=
-_);
-+        return -1;
-+    case TARGET_SYS_REMOVE:
-+        GET_ARG(0);
-+        GET_ARG(1);
-+        if (use_gdb_syscalls()) {
-+            ret =3D riscv_gdb_syscall(cpu, riscv_semi_cb, "unlink,%s",
-+                                  arg0, (int)arg1 + 1);
-+        } else {
-+            s =3D lock_user_string(arg0);
-+            if (!s) {
-+                errno =3D EFAULT;
-+                return set_swi_errno(env, -1);
-+            }
-+            ret =3D  set_swi_errno(env, remove(s));
-+            unlock_user(s, arg0, 0);
-+        }
-+        return ret;
-+    case TARGET_SYS_RENAME:
-+        GET_ARG(0);
-+        GET_ARG(1);
-+        GET_ARG(2);
-+        GET_ARG(3);
-+        if (use_gdb_syscalls()) {
-+            return riscv_gdb_syscall(cpu, riscv_semi_cb, "rename,%s,%s",
-+                                   arg0, (int)arg1 + 1, arg2, (int)arg3 + =
-1);
-+        } else {
-+            char *s2;
-+            s =3D lock_user_string(arg0);
-+            s2 =3D lock_user_string(arg2);
-+            if (!s || !s2) {
-+                errno =3D EFAULT;
-+                ret =3D set_swi_errno(env, -1);
-+            } else {
-+                ret =3D set_swi_errno(env, rename(s, s2));
-+            }
-+            if (s2) {
-+                unlock_user(s2, arg2, 0);
-+            }
-+            if (s) {
-+                unlock_user(s, arg0, 0);
-+            }
-+            return ret;
-+        }
-+    case TARGET_SYS_CLOCK:
-+        return clock() / (CLOCKS_PER_SEC / 100);
-+    case TARGET_SYS_TIME:
-+        return set_swi_errno(env, time(NULL));
-+    case TARGET_SYS_SYSTEM:
-+        GET_ARG(0);
-+        GET_ARG(1);
-+        if (use_gdb_syscalls()) {
-+            return riscv_gdb_syscall(cpu, riscv_semi_cb, "system,%s",
-+                                   arg0, (int)arg1 + 1);
-+        } else {
-+            s =3D lock_user_string(arg0);
-+            if (!s) {
-+                errno =3D EFAULT;
-+                return set_swi_errno(env, -1);
-+            }
-+            ret =3D set_swi_errno(env, system(s));
-+            unlock_user(s, arg0, 0);
-+            return ret;
-+        }
-+    case TARGET_SYS_ERRNO:
-+        return get_swi_errno(env);
-+    case TARGET_SYS_GET_CMDLINE:
-+        {
-+            /*
-+             * Build a command-line from the original argv.
-+             *
-+             * The inputs are:
-+             *     * arg0, pointer to a buffer of at least the size
-+             *               specified in arg1.
-+             *     * arg1, size of the buffer pointed to by arg0 in
-+             *               bytes.
-+             *
-+             * The outputs are:
-+             *     * arg0, pointer to null-terminated string of the
-+             *               command line.
-+             *     * arg1, length of the string pointed to by arg0.
-+             */
-+
-+            char *output_buffer;
-+            size_t input_size;
-+            size_t output_size;
-+            int status =3D 0;
-+#if !defined(CONFIG_USER_ONLY)
-+            const char *cmdline;
-+#else
-+            TaskState *ts =3D cs->opaque;
-+#endif
-+            GET_ARG(0);
-+            GET_ARG(1);
-+            input_size =3D arg1;
-+            /* Compute the size of the output string.  */
-+#if !defined(CONFIG_USER_ONLY)
-+            cmdline =3D semihosting_get_cmdline();
-+            if (cmdline =3D=3D NULL) {
-+                cmdline =3D ""; /* Default to an empty line. */
-+            }
-+            output_size =3D strlen(cmdline) + 1; /* Count terminating 0. */
-+#else
-+            unsigned int i;
-+
-+            output_size =3D ts->info->arg_end - ts->info->arg_start;
-+            if (!output_size) {
-+                /*
-+                 * We special-case the "empty command line" case (argc=3D=
-=3D0).
-+                 * Just provide the terminating 0.
-+                 */
-+                output_size =3D 1;
-+            }
-+#endif
-+
-+            if (output_size > input_size) {
-+                /* Not enough space to store command-line arguments.  */
-+                errno =3D E2BIG;
-+                return set_swi_errno(env, -1);
-+            }
-+
-+            /* Adjust the command-line length.  */
-+            if (SET_ARG(1, output_size - 1)) {
-+                /* Couldn't write back to argument block */
-+                errno =3D EFAULT;
-+                return set_swi_errno(env, -1);
-+            }
-+
-+            /* Lock the buffer on the RISC-V side.  */
-+            output_buffer =3D lock_user(VERIFY_WRITE, arg0, output_size, 0=
-);
-+            if (!output_buffer) {
-+                errno =3D EFAULT;
-+                return set_swi_errno(env, -1);
-+            }
-+
-+            /* Copy the command-line arguments.  */
-+#if !defined(CONFIG_USER_ONLY)
-+            pstrcpy(output_buffer, output_size, cmdline);
-+#else
-+            if (output_size =3D=3D 1) {
-+                /* Empty command-line.  */
-+                output_buffer[0] =3D '\0';
-+                goto out;
-+            }
-+
-+            if (copy_from_user(output_buffer, ts->info->arg_start,
-+                               output_size)) {
-+                errno =3D EFAULT;
-+                status =3D set_swi_errno(env, -1);
-+                goto out;
-+            }
-+
-+            /* Separate arguments by white spaces.  */
-+            for (i =3D 0; i < output_size - 1; i++) {
-+                if (output_buffer[i] =3D=3D 0) {
-+                    output_buffer[i] =3D ' ';
-+                }
-+            }
-+        out:
-+#endif
-+            /* Unlock the buffer on the RISC-V side.  */
-+            unlock_user(output_buffer, arg0, output_size);
-+
-+            return status;
-+        }
-+    case TARGET_SYS_HEAPINFO:
-+        {
-+            target_ulong retvals[4];
-+            target_ulong limit;
-+            int i;
-+#ifdef CONFIG_USER_ONLY
-+            TaskState *ts =3D cs->opaque;
-+#endif
-+
-+            GET_ARG(0);
-+
-+#ifdef CONFIG_USER_ONLY
-+            /*
-+             * Some C libraries assume the heap immediately follows .bss, =
-so
-+             * allocate it using sbrk.
-+             */
-+            if (!ts->heap_limit) {
-+                abi_ulong ret;
-+
-+                ts->heap_base =3D do_brk(0);
-+                limit =3D ts->heap_base + RISCV_HEAP_SIZE;
-+                /* Try a big heap, and reduce the size if that fails.  */
-+                for (;;) {
-+                    ret =3D do_brk(limit);
-+                    if (ret >=3D limit) {
-+                        break;
-+                    }
-+                    limit =3D (ts->heap_base >> 1) + (limit >> 1);
-+                }
-+                ts->heap_limit =3D limit;
-+            }
-+
-+            retvals[0] =3D ts->heap_base;
-+            retvals[1] =3D ts->heap_limit;
-+            retvals[2] =3D ts->stack_base;
-+            retvals[3] =3D 0; /* Stack limit.  */
-+#else
-+            limit =3D ram_size;
-+            /* TODO: Make this use the limit of the loaded application.  */
-+            retvals[0] =3D limit / 2;
-+            retvals[1] =3D limit;
-+            retvals[2] =3D limit; /* Stack base */
-+            retvals[3] =3D 0; /* Stack limit.  */
-+#endif
-+
-+            for (i =3D 0; i < ARRAY_SIZE(retvals); i++) {
-+                bool fail;
-+
-+                fail =3D put_user_ual(retvals[i],
-+                                    arg0 + i * sizeof(target_ulong));
-+
-+                if (fail) {
-+                    /* Couldn't write back to argument block */
-+                    errno =3D EFAULT;
-+                    return set_swi_errno(env, -1);
-+                }
-+            }
-+            return 0;
-+        }
-+    case TARGET_SYS_EXIT:
-+    case TARGET_SYS_EXIT_EXTENDED:
-+        if (nr =3D=3D TARGET_SYS_EXIT_EXTENDED || sizeof(target_ulong) =3D=
-=3D 0) {
-+            /*
-+             * The A64 version of SYS_EXIT takes a parameter block,
-+             * so the application-exit type can return a subcode which
-+             * is the exit status code from the application.
-+             * SYS_EXIT_EXTENDED is an a new-in-v2.0 optional function
-+             * which allows A32/T32 guests to also provide a status code.
-+             */
-+            GET_ARG(0);
-+            GET_ARG(1);
-+
-+            if (arg0 =3D=3D ADP_Stopped_ApplicationExit) {
-+                ret =3D arg1;
-+            } else {
-+                ret =3D 1;
-+            }
-+        } else {
-+            /*
-+             * The A32/T32 version of SYS_EXIT specifies only
-+             * Stopped_ApplicationExit as normal exit, but does not
-+             * allow the guest to specify the exit status code.
-+             * Everything else is considered an error.
-+             */
-+            ret =3D (args =3D=3D ADP_Stopped_ApplicationExit) ? 0 : 1;
-+        }
-+        gdb_exit(env, ret);
-+        exit(ret);
-+    case TARGET_SYS_SYNCCACHE:
-+        /*
-+         * Clean the D-cache and invalidate the I-cache for the specified
-+         * virtual address range. This is a nop for us since we don't
-+         * implement caches. This is only present on A64.
-+         */
-+        if (sizeof(target_ulong) =3D=3D 8) {
-+            return 0;
-+        }
-+        /* fall through -- invalid for A32/T32 */
-+    default:
-+        fprintf(stderr, "qemu: Unsupported SemiHosting SWI 0x%02x\n", nr);
-+        cpu_dump_state(cs, stderr, 0);
-+        abort();
-+    }
-+}
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 43bf7e39a6..eb65ace367 100644
-=2D-- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -56,6 +56,7 @@ typedef struct DisasContext {
-        to reset this known value.  */
-     int frm;
-     bool ext_ifencei;
-+    CPUState *cs;
- } DisasContext;
-=20
- #ifdef TARGET_RISCV64
-@@ -705,6 +706,15 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
-     return true;
- }
-=20
-+static uint32_t opcode_at(DisasContextBase *dcbase, target_ulong pc)
-+{
-+    DisasContext *ctx =3D container_of(dcbase, DisasContext, base);
-+    CPUState *cpu =3D ctx->cs;
-+    CPURISCVState *env =3D cpu->env_ptr;
-+
-+    return cpu_ldl_code(env, pc);
-+}
-+
- /* Include insn module translation function */
- #include "insn_trans/trans_rvi.inc.c"
- #include "insn_trans/trans_rvm.inc.c"
-@@ -772,6 +782,7 @@ static void riscv_tr_init_disas_context(DisasContextBas=
-e *dcbase, CPUState *cs)
-     ctx->misa =3D env->misa;
-     ctx->frm =3D -1;  /* unknown rounding mode */
-     ctx->ext_ifencei =3D cpu->cfg.ext_ifencei;
-+    ctx->cs =3D cs;
- }
-=20
- static void riscv_tr_tb_start(DisasContextBase *db, CPUState *cpu)
-=2D-=20
-2.25.1
-
-
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-
-
-=2D-=20
-=2Dkeith
-
---=-=-=--
-
---==-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl6KvSIACgkQ2yIaaQAA
-ABGMDQ/+MU9W82GU8/mgTFPa9u7TGls8CJHzv3X5qcfW/2howR1+9yFV757+QJe4
-38T4fX2Ax0aMbDbVoQmHUwPsgYQkllfqL9ikRb4DscpjCtIJPJbPZxs8MPv50hgt
-vF20cvDiJeCg5eHT5usVi3mU+cSyXfu4NZK274ijpPrGKU/CGw7of6EZe1nNZXtU
-e2VYRMEy+1KTv4Bj06otJ+J6jiBT1KetqBJoNtdt0IodcelIwtVkagSsIeCA/ltx
-W7E5v5ll9Oud5XhlvtiFYAbEGq0EepcAiMzKps52+OmBdZRW4LBXF/1vwhe393mP
-7qPPU4+9ZdfLXznxIBg4sJGZdH4HxlRY9Vy7o0MyBw29Bzoe0z9cg12HU3wOEzNp
-PHK5EXeuUYxtmG/UE1QD9yQ4+kLKRGFbu4PhS9maD9tmRUZ9DtZKXbFramAIrMdP
-bUJZyQjYRhot8YFA8myOPV8/DxHhTv9Fs7gfmkwK8CO1eliCJg2Uqobt0/pN+GMV
-zM7ZbFMm3/yKmZD4w8xXeTgfjHVqkF5cpIVfyk5BTN/sTq9YSimuQKofzpJdqott
-ANhwZmx4UEVEp9q6LlJAe+E5yBPK4lye2XNjb9LiAl51XekwIoX7fjvNzUwRmXO2
-GoSP7/bnDydqgaC4lfkxq/e4v/nHHo5yrQkQW8jwapHfHmh36Jk=
-=hJDQ
------END PGP SIGNATURE-----
---==-=-=--
-
+SGkgRXJpY++8jA0KDQo+IEZyb206IEF1Z2VyIEVyaWMgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4N
+Cj4gU2VudDogVGh1cnNkYXksIEFwcmlsIDIsIDIwMjAgOTo0OSBQTQ0KPiBUbzogTGl1LCBZaSBM
+IDx5aS5sLmxpdUBpbnRlbC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7DQo+IFN1YmplY3Q6
+IFJlOiBbUEFUQ0ggdjIgMDUvMjJdIGh3L3BjaTogbW9kaWZ5IHBjaV9zZXR1cF9pb21tdSgpIHRv
+IHNldA0KPiBQQ0lJT01NVU9wcw0KPiANCj4gSGkgWWksDQo+IA0KPiBPbiA0LzIvMjAgMzozNyBQ
+TSwgTGl1LCBZaSBMIHdyb3RlOg0KPiA+IEhpIEVyaWMsDQo+ID4NCj4gPj4gRnJvbTogQXVnZXIg
+RXJpYyA8IGVyaWMuYXVnZXJAcmVkaGF0LmNvbSA+DQo+ID4+IFNlbnQ6IFRodXJzZGF5LCBBcHJp
+bCAyLCAyMDIwIDg6NDEgUE0NCj4gPj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwuY29t
+PjsgcWVtdS1kZXZlbEBub25nbnUub3JnOw0KPiA+PiBTdWJqZWN0OiBSZTogW1BBVENIIHYyIDA1
+LzIyXSBody9wY2k6IG1vZGlmeSBwY2lfc2V0dXBfaW9tbXUoKSB0byBzZXQNCj4gPj4gUENJSU9N
+TVVPcHMNCj4gPj4NCj4gPj4gSGkgWWksDQo+ID4+DQo+ID4+IE9uIDQvMi8yMCAxMDo1MiBBTSwg
+TGl1LCBZaSBMIHdyb3RlOg0KPiA+Pj4+IEZyb206IEF1Z2VyIEVyaWMgPCBlcmljLmF1Z2VyQHJl
+ZGhhdC5jb20+DQo+ID4+Pj4gU2VudDogTW9uZGF5LCBNYXJjaCAzMCwgMjAyMCA3OjAyIFBNDQo+
+ID4+Pj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPjsgcWVtdS1kZXZlbEBub25n
+bnUub3JnOw0KPiA+Pj4+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjIgMDUvMjJdIGh3L3BjaTogbW9k
+aWZ5IHBjaV9zZXR1cF9pb21tdSgpIHRvDQo+ID4+Pj4gc2V0IFBDSUlPTU1VT3BzDQo+ID4+Pj4N
+Cj4gPj4+Pg0KPiA+Pj4+DQo+ID4+Pj4gT24gMy8zMC8yMCA2OjI0IEFNLCBMaXUgWWkgTCB3cm90
+ZToNCj4gPj4+Pj4gVGhpcyBwYXRjaCBtb2RpZmllcyBwY2lfc2V0dXBfaW9tbXUoKSB0byBzZXQg
+UENJSU9NTVVPcHMgaW5zdGVhZA0KPiA+Pj4+PiBvZiBzZXR0aW5nIFBDSUlPTU1VRnVuYy4gUENJ
+SU9NTVVGdW5jIGlzIHVzZWQgdG8gZ2V0IGFuIGFkZHJlc3MNCj4gPj4+Pj4gc3BhY2UgZm9yIGEg
+UENJIGRldmljZSBpbiB2ZW5kb3Igc3BlY2lmaWMgd2F5LiBUaGUgUENJSU9NTVVPcHMNCj4gPj4+
+Pj4gc3RpbGwgb2ZmZXJzIHRoaXMgZnVuY3Rpb25hbGl0eS4gQnV0IHVzaW5nIFBDSUlPTU1VT3Bz
+IGxlYXZlcw0KPiA+Pj4+PiBzcGFjZSB0byBhZGQgbW9yZSBpb21tdSByZWxhdGVkIHZlbmRvciBz
+cGVjaWZpYyBvcGVyYXRpb25zLg0KPiA+Pj4+Pg0KPiA+Pj4+PiBDYzogS2V2aW4gVGlhbiA8a2V2
+aW4udGlhbkBpbnRlbC5jb20+DQo+ID4+Pj4+IENjOiBKYWNvYiBQYW4gPGphY29iLmp1bi5wYW5A
+bGludXguaW50ZWwuY29tPg0KPiA+Pj4+PiBDYzogUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29t
+Pg0KPiA+Pj4+PiBDYzogRXJpYyBBdWdlciA8ZXJpYy5hdWdlckByZWRoYXQuY29tPg0KPiA+Pj4+
+PiBDYzogWWkgU3VuIDx5aS55LnN1bkBsaW51eC5pbnRlbC5jb20+DQo+ID4+Pj4+IENjOiBEYXZp
+ZCBHaWJzb24gPGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdT4NCj4gPj4+Pj4gQ2M6IE1pY2hh
+ZWwgUy4gVHNpcmtpbiA8bXN0QHJlZGhhdC5jb20+DQo+ID4+Pj4+IFJldmlld2VkLWJ5OiBEYXZp
+ZCBHaWJzb24gPGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdT4NCj4gPj4+Pj4gUmV2aWV3ZWQt
+Ynk6IFBldGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT4NCj4gPj4+Pj4gU2lnbmVkLW9mZi1ieTog
+TGl1IFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPj4+Pj4gLS0tDQo+ID4+Pj4+ICBody9h
+bHBoYS90eXBob29uLmMgICAgICAgfCAgNiArKysrKy0NCj4gPj4+Pj4gIGh3L2FybS9zbW11LWNv
+bW1vbi5jICAgICB8ICA2ICsrKysrLQ0KPiA+Pj4+PiAgaHcvaHBwYS9kaW5vLmMgICAgICAgICAg
+IHwgIDYgKysrKystDQo+ID4+Pj4+ICBody9pMzg2L2FtZF9pb21tdS5jICAgICAgfCAgNiArKysr
+Ky0NCj4gPj4+Pj4gIGh3L2kzODYvaW50ZWxfaW9tbXUuYyAgICB8ICA2ICsrKysrLQ0KPiA+Pj4+
+PiAgaHcvcGNpLWhvc3QvZGVzaWdud2FyZS5jIHwgIDYgKysrKystDQo+ID4+Pj4+ICBody9wY2kt
+aG9zdC9wbnZfcGhiMy5jICAgfCAgNiArKysrKy0NCj4gPj4+Pj4gIGh3L3BjaS1ob3N0L3Budl9w
+aGI0LmMgICB8ICA2ICsrKysrLQ0KPiA+Pj4+PiAgaHcvcGNpLWhvc3QvcHBjZTUwMC5jICAgIHwg
+IDYgKysrKystDQo+ID4+Pj4+ICBody9wY2ktaG9zdC9wcmVwLmMgICAgICAgfCAgNiArKysrKy0N
+Cj4gPj4+Pj4gIGh3L3BjaS1ob3N0L3NhYnJlLmMgICAgICB8ICA2ICsrKysrLQ0KPiA+Pj4+PiAg
+aHcvcGNpL3BjaS5jICAgICAgICAgICAgIHwgMTIgKysrKysrKy0tLS0tDQo+ID4+Pj4+ICBody9w
+cGMvcHBjNDQwX3BjaXguYyAgICAgfCAgNiArKysrKy0NCj4gPj4+Pj4gIGh3L3BwYy9zcGFwcl9w
+Y2kuYyAgICAgICB8ICA2ICsrKysrLQ0KPiA+Pj4+PiAgaHcvczM5MHgvczM5MC1wY2ktYnVzLmMg
+IHwgIDggKysrKysrLS0gIGh3L3ZpcnRpby92aXJ0aW8taW9tbXUuYw0KPiA+Pj4+PiB8DQo+ID4+
+Pj4+IDYNCj4gPj4+Pj4gKysrKystDQo+ID4+Pj4+ICBpbmNsdWRlL2h3L3BjaS9wY2kuaCAgICAg
+fCAgOCArKysrKystLQ0KPiA+Pj4+PiAgaW5jbHVkZS9ody9wY2kvcGNpX2J1cy5oIHwgIDIgKy0N
+Cj4gPj4+Pj4gIDE4IGZpbGVzIGNoYW5nZWQsIDkwIGluc2VydGlvbnMoKyksIDI0IGRlbGV0aW9u
+cygtKQ0KPiA+Pj4+Pg0KPiA+Pj4+PiBkaWZmIC0tZ2l0IGEvaHcvYWxwaGEvdHlwaG9vbi5jIGIv
+aHcvYWxwaGEvdHlwaG9vbi5jIGluZGV4DQo+ID4+Pj4+IDE3OTVlMmYuLmYyNzFkZTEgMTAwNjQ0
+DQo+ID4+Pj4+IC0tLSBhL2h3L2FscGhhL3R5cGhvb24uYw0KPiA+Pj4+PiArKysgYi9ody9hbHBo
+YS90eXBob29uLmMNCj4gPj4+Pj4gQEAgLTc0MCw2ICs3NDAsMTAgQEAgc3RhdGljIEFkZHJlc3NT
+cGFjZQ0KPiA+Pj4+PiAqdHlwaG9vbl9wY2lfZG1hX2lvbW11KFBDSUJ1cw0KPiA+Pj4+ICpidXMs
+IHZvaWQgKm9wYXF1ZSwgaW50IGRldmZuKQ0KPiA+Pj4+PiAgICAgIHJldHVybiAmcy0+cGNoaXAu
+aW9tbXVfYXM7DQo+ID4+Pj4+ICB9DQo+ID4+Pj4+DQo+ID4+Pj4+ICtzdGF0aWMgY29uc3QgUENJ
+SU9NTVVPcHMgdHlwaG9vbl9pb21tdV9vcHMgPSB7DQo+ID4+Pj4+ICsgICAgLmdldF9hZGRyZXNz
+X3NwYWNlID0gdHlwaG9vbl9wY2lfZG1hX2lvbW11LCB9Ow0KPiA+Pj4+PiArDQo+ID4+Pj4+ICBz
+dGF0aWMgdm9pZCB0eXBob29uX3NldF9pcnEodm9pZCAqb3BhcXVlLCBpbnQgaXJxLCBpbnQgbGV2
+ZWwpICB7DQo+ID4+Pj4+ICAgICAgVHlwaG9vblN0YXRlICpzID0gb3BhcXVlOw0KPiA+Pj4+PiBA
+QCAtODk3LDcgKzkwMSw3IEBAIFBDSUJ1cyAqdHlwaG9vbl9pbml0KE1lbW9yeVJlZ2lvbiAqcmFt
+LCBJU0FCdXMNCj4gPj4+PiAqKmlzYV9idXMsIHFlbXVfaXJxICpwX3J0Y19pcnEsDQo+ID4+Pj4+
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJpb21tdS10eXBob29uIiwgVUlOVDY0X01B
+WCk7DQo+ID4+Pj4+ICAgICAgYWRkcmVzc19zcGFjZV9pbml0KCZzLT5wY2hpcC5pb21tdV9hcywg
+TUVNT1JZX1JFR0lPTigmcy0NCj4gPj4+Pj4gcGNoaXAuaW9tbXUpLA0KPiA+Pj4+PiAgICAgICAg
+ICAgICAgICAgICAgICAgICAicGNoaXAwLXBjaSIpOw0KPiA+Pj4+PiAtICAgIHBjaV9zZXR1cF9p
+b21tdShiLCB0eXBob29uX3BjaV9kbWFfaW9tbXUsIHMpOw0KPiA+Pj4+PiArICAgIHBjaV9zZXR1
+cF9pb21tdShiLCAmdHlwaG9vbl9pb21tdV9vcHMsIHMpOw0KPiA+Pj4+Pg0KPiA+Pj4+PiAgICAg
+IC8qIFBjaGlwMCBQQ0kgc3BlY2lhbC9pbnRlcnJ1cHQgYWNrbm93bGVkZ2UsIDB4ODAxLkY4MDAu
+MDAwMCwgNjRNQi4gICovDQo+ID4+Pj4+ICAgICAgbWVtb3J5X3JlZ2lvbl9pbml0X2lvKCZzLT5w
+Y2hpcC5yZWdfaWFjaywgT0JKRUNUKHMpLA0KPiA+Pj4+PiAmYWxwaGFfcGNpX2lhY2tfb3BzLCBk
+aWZmIC0tZ2l0IGEvaHcvYXJtL3NtbXUtY29tbW9uLmMNCj4gPj4+Pj4gYi9ody9hcm0vc21tdS1j
+b21tb24uYyBpbmRleCBlMTNhNWY0Li40NDcxNDZlIDEwMDY0NA0KPiA+Pj4+PiAtLS0gYS9ody9h
+cm0vc21tdS1jb21tb24uYw0KPiA+Pj4+PiArKysgYi9ody9hcm0vc21tdS1jb21tb24uYw0KPiA+
+Pj4+PiBAQCAtMzQzLDYgKzM0MywxMCBAQCBzdGF0aWMgQWRkcmVzc1NwYWNlICpzbW11X2ZpbmRf
+YWRkX2FzKFBDSUJ1cw0KPiA+Pj4+PiAqYnVzLA0KPiA+Pj4+IHZvaWQgKm9wYXF1ZSwgaW50IGRl
+dmZuKQ0KPiA+Pj4+PiAgICAgIHJldHVybiAmc2Rldi0+YXM7DQo+ID4+Pj4+ICB9DQo+ID4+Pj4+
+DQo+ID4+Pj4+ICtzdGF0aWMgY29uc3QgUENJSU9NTVVPcHMgc21tdV9vcHMgPSB7DQo+ID4+Pj4+
+ICsgICAgLmdldF9hZGRyZXNzX3NwYWNlID0gc21tdV9maW5kX2FkZF9hcywgfTsNCj4gPj4+Pj4g
+Kw0KPiA+Pj4+PiAgSU9NTVVNZW1vcnlSZWdpb24gKnNtbXVfaW9tbXVfbXIoU01NVVN0YXRlICpz
+LCB1aW50MzJfdCBzaWQpICB7DQo+ID4+Pj4+ICAgICAgdWludDhfdCBidXNfbiwgZGV2Zm47DQo+
+ID4+Pj4+IEBAIC00MzcsNyArNDQxLDcgQEAgc3RhdGljIHZvaWQgc21tdV9iYXNlX3JlYWxpemUo
+RGV2aWNlU3RhdGUNCj4gPj4+Pj4gKmRldiwgRXJyb3INCj4gPj4+PiAqKmVycnApDQo+ID4+Pj4+
+ICAgICAgcy0+c21tdV9wY2lidXNfYnlfYnVzcHRyID0gZ19oYXNoX3RhYmxlX25ldyhOVUxMLCBO
+VUxMKTsNCj4gPj4+Pj4NCj4gPj4+Pj4gICAgICBpZiAocy0+cHJpbWFyeV9idXMpIHsNCj4gPj4+
+Pj4gLSAgICAgICAgcGNpX3NldHVwX2lvbW11KHMtPnByaW1hcnlfYnVzLCBzbW11X2ZpbmRfYWRk
+X2FzLCBzKTsNCj4gPj4+Pj4gKyAgICAgICAgcGNpX3NldHVwX2lvbW11KHMtPnByaW1hcnlfYnVz
+LCAmc21tdV9vcHMsIHMpOw0KPiA+Pj4+PiAgICAgIH0gZWxzZSB7DQo+ID4+Pj4+ICAgICAgICAg
+IGVycm9yX3NldGcoZXJycCwgIlNNTVUgaXMgbm90IGF0dGFjaGVkIHRvIGFueSBQQ0kgYnVzISIp
+Ow0KPiA+Pj4+PiAgICAgIH0NCj4gPj4+Pj4gZGlmZiAtLWdpdCBhL2h3L2hwcGEvZGluby5jIGIv
+aHcvaHBwYS9kaW5vLmMgaW5kZXgNCj4gPj4+Pj4gMmIxYjM4Yy4uM2RhNGY4NA0KPiA+Pj4+PiAx
+MDA2NDQNCj4gPj4+Pj4gLS0tIGEvaHcvaHBwYS9kaW5vLmMNCj4gPj4+Pj4gKysrIGIvaHcvaHBw
+YS9kaW5vLmMNCj4gPj4+Pj4gQEAgLTQ1OSw2ICs0NTksMTAgQEAgc3RhdGljIEFkZHJlc3NTcGFj
+ZQ0KPiA+Pj4+PiAqZGlub19wY2lob3N0X3NldF9pb21tdShQQ0lCdXMNCj4gPj4+PiAqYnVzLCB2
+b2lkICpvcGFxdWUsDQo+ID4+Pj4+ICAgICAgcmV0dXJuICZzLT5ibV9hczsNCj4gPj4+Pj4gIH0N
+Cj4gPj4+Pj4NCj4gPj4+Pj4gK3N0YXRpYyBjb25zdCBQQ0lJT01NVU9wcyBkaW5vX2lvbW11X29w
+cyA9IHsNCj4gPj4+Pj4gKyAgICAuZ2V0X2FkZHJlc3Nfc3BhY2UgPSBkaW5vX3BjaWhvc3Rfc2V0
+X2lvbW11LCB9Ow0KPiA+Pj4+PiArDQo+ID4+Pj4+ICAvKg0KPiA+Pj4+PiAgICogRGlubyBpbnRl
+cnJ1cHRzIGFyZSBjb25uZWN0ZWQgYXMgc2hvd24gb24gUGFnZSA3OCwgVGFibGUgMjMNCj4gPj4+
+Pj4gICAqIChMaXR0bGUtZW5kaWFuIGJpdCBudW1iZXJzKQ0KPiA+Pj4+PiBAQCAtNTgwLDcgKzU4
+NCw3IEBAIFBDSUJ1cyAqZGlub19pbml0KE1lbW9yeVJlZ2lvbiAqYWRkcl9zcGFjZSwNCj4gPj4+
+Pj4gICAgICBtZW1vcnlfcmVnaW9uX2FkZF9zdWJyZWdpb24oJnMtPmJtLCAweGZmZjAwMDAwLA0K
+PiA+Pj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmcy0+Ym1fY3B1X2FsaWFz
+KTsNCj4gPj4+Pj4gICAgICBhZGRyZXNzX3NwYWNlX2luaXQoJnMtPmJtX2FzLCAmcy0+Ym0sICJw
+Y2ktYm0iKTsNCj4gPj4+Pj4gLSAgICBwY2lfc2V0dXBfaW9tbXUoYiwgZGlub19wY2lob3N0X3Nl
+dF9pb21tdSwgcyk7DQo+ID4+Pj4+ICsgICAgcGNpX3NldHVwX2lvbW11KGIsICZkaW5vX2lvbW11
+X29wcywgcyk7DQo+ID4+Pj4+DQo+ID4+Pj4+ICAgICAgKnBfcnRjX2lycSA9IHFlbXVfYWxsb2Nh
+dGVfaXJxKGRpbm9fc2V0X3RpbWVyX2lycSwgcywgMCk7DQo+ID4+Pj4+ICAgICAgKnBfc2VyX2ly
+cSA9IHFlbXVfYWxsb2NhdGVfaXJxKGRpbm9fc2V0X3NlcmlhbF9pcnEsIHMsIDApOw0KPiA+Pj4+
+PiBkaWZmIC0tZ2l0IGEvaHcvaTM4Ni9hbWRfaW9tbXUuYyBiL2h3L2kzODYvYW1kX2lvbW11LmMg
+aW5kZXgNCj4gPj4+Pj4gYjExNzVlNS4uNWZlYzMwZSAxMDA2NDQNCj4gPj4+Pj4gLS0tIGEvaHcv
+aTM4Ni9hbWRfaW9tbXUuYw0KPiA+Pj4+PiArKysgYi9ody9pMzg2L2FtZF9pb21tdS5jDQo+ID4+
+Pj4+IEBAIC0xNDUxLDYgKzE0NTEsMTAgQEAgc3RhdGljIEFkZHJlc3NTcGFjZQ0KPiA+Pj4+ICph
+bWR2aV9ob3N0X2RtYV9pb21tdShQQ0lCdXMgKmJ1cywgdm9pZCAqb3BhcXVlLCBpbnQgZGV2Zm4p
+DQo+ID4+Pj4+ICAgICAgcmV0dXJuICZpb21tdV9hc1tkZXZmbl0tPmFzOw0KPiA+Pj4+PiAgfQ0K
+PiA+Pj4+Pg0KPiA+Pj4+PiArc3RhdGljIGNvbnN0IFBDSUlPTU1VT3BzIGFtZHZpX2lvbW11X29w
+cyA9IHsNCj4gPj4+Pj4gKyAgICAuZ2V0X2FkZHJlc3Nfc3BhY2UgPSBhbWR2aV9ob3N0X2RtYV9p
+b21tdSwgfTsNCj4gPj4+Pj4gKw0KPiA+Pj4+PiAgc3RhdGljIGNvbnN0IE1lbW9yeVJlZ2lvbk9w
+cyBtbWlvX21lbV9vcHMgPSB7DQo+ID4+Pj4+ICAgICAgLnJlYWQgPSBhbWR2aV9tbWlvX3JlYWQs
+DQo+ID4+Pj4+ICAgICAgLndyaXRlID0gYW1kdmlfbW1pb193cml0ZSwNCj4gPj4+Pj4gQEAgLTE1
+NzcsNyArMTU4MSw3IEBAIHN0YXRpYyB2b2lkIGFtZHZpX3JlYWxpemUoRGV2aWNlU3RhdGUgKmRl
+diwNCj4gPj4+Pj4gRXJyb3IgKiplcnJwKQ0KPiA+Pj4+Pg0KPiA+Pj4+PiAgICAgIHN5c2J1c19p
+bml0X21taW8oU1lTX0JVU19ERVZJQ0UocyksICZzLT5tbWlvKTsNCj4gPj4+Pj4gICAgICBzeXNi
+dXNfbW1pb19tYXAoU1lTX0JVU19ERVZJQ0UocyksIDAsIEFNRFZJX0JBU0VfQUREUik7DQo+ID4+
+Pj4+IC0gICAgcGNpX3NldHVwX2lvbW11KGJ1cywgYW1kdmlfaG9zdF9kbWFfaW9tbXUsIHMpOw0K
+PiA+Pj4+PiArICAgIHBjaV9zZXR1cF9pb21tdShidXMsICZhbWR2aV9pb21tdV9vcHMsIHMpOw0K
+PiA+Pj4+PiAgICAgIHMtPmRldmlkID0gb2JqZWN0X3Byb3BlcnR5X2dldF9pbnQoT0JKRUNUKCZz
+LT5wY2kpLCAiYWRkciIsIGVycnApOw0KPiA+Pj4+PiAgICAgIG1zaV9pbml0KCZzLT5wY2kuZGV2
+LCAwLCAxLCB0cnVlLCBmYWxzZSwgZXJycCk7DQo+ID4+Pj4+ICAgICAgYW1kdmlfaW5pdChzKTsN
+Cj4gPj4+Pj4gZGlmZiAtLWdpdCBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYyBiL2h3L2kzODYvaW50
+ZWxfaW9tbXUuYyBpbmRleA0KPiA+Pj4+PiBkZjdhZDI1Li40YjIyOTEwIDEwMDY0NA0KPiA+Pj4+
+PiAtLS0gYS9ody9pMzg2L2ludGVsX2lvbW11LmMNCj4gPj4+Pj4gKysrIGIvaHcvaTM4Ni9pbnRl
+bF9pb21tdS5jDQo+ID4+Pj4+IEBAIC0zNzI5LDYgKzM3MjksMTAgQEAgc3RhdGljIEFkZHJlc3NT
+cGFjZQ0KPiA+Pj4+PiAqdnRkX2hvc3RfZG1hX2lvbW11KFBDSUJ1cw0KPiA+Pj4+ICpidXMsIHZv
+aWQgKm9wYXF1ZSwgaW50IGRldmZuKQ0KPiA+Pj4+PiAgICAgIHJldHVybiAmdnRkX2FzLT5hczsN
+Cj4gPj4+Pj4gIH0NCj4gPj4+Pj4NCj4gPj4+Pj4gK3N0YXRpYyBQQ0lJT01NVU9wcyB2dGRfaW9t
+bXVfb3BzID0gew0KPiA+Pj4+IHN0YXRpYyBjb25zdA0KPiA+Pj4NCj4gPj4+IGdvdCBpdC4NCj4g
+Pj4+DQo+ID4+Pj4+ICsgICAgLmdldF9hZGRyZXNzX3NwYWNlID0gdnRkX2hvc3RfZG1hX2lvbW11
+LCB9Ow0KPiA+Pj4+PiArDQo+ID4+Pj4+ICBzdGF0aWMgYm9vbCB2dGRfZGVjaWRlX2NvbmZpZyhJ
+bnRlbElPTU1VU3RhdGUgKnMsIEVycm9yICoqZXJycCkgIHsNCj4gPj4+Pj4gICAgICBYODZJT01N
+VVN0YXRlICp4ODZfaW9tbXUgPSBYODZfSU9NTVVfREVWSUNFKHMpOyBAQCAtMzg0MCw3DQo+ID4+
+Pj4+ICszODQ0LDcgQEAgc3RhdGljIHZvaWQgdnRkX3JlYWxpemUoRGV2aWNlU3RhdGUgKmRldiwg
+RXJyb3IgKiplcnJwKQ0KPiA+Pj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIGdfZnJlZSwgZ19mcmVlKTsNCj4gPj4+Pj4gICAgICB2dGRfaW5pdChzKTsN
+Cj4gPj4+Pj4gICAgICBzeXNidXNfbW1pb19tYXAoU1lTX0JVU19ERVZJQ0UocyksIDAsDQo+ID4+
+Pj4gUTM1X0hPU1RfQlJJREdFX0lPTU1VX0FERFIpOw0KPiA+Pj4+PiAtICAgIHBjaV9zZXR1cF9p
+b21tdShidXMsIHZ0ZF9ob3N0X2RtYV9pb21tdSwgZGV2KTsNCj4gPj4+Pj4gKyAgICBwY2lfc2V0
+dXBfaW9tbXUoYnVzLCAmdnRkX2lvbW11X29wcywgZGV2KTsNCj4gPj4+Pj4gICAgICAvKiBQc2V1
+ZG8gYWRkcmVzcyBzcGFjZSB1bmRlciByb290IFBDSSBidXMuICovDQo+ID4+Pj4+ICAgICAgeDg2
+bXMtPmlvYXBpY19hcyA9IHZ0ZF9ob3N0X2RtYV9pb21tdShidXMsIHMsDQo+ID4+Pj4gUTM1X1BT
+RVVET19ERVZGTl9JT0FQSUMpOw0KPiA+Pj4+Pg0KPiA+Pj4+PiBxZW11X2FkZF9tYWNoaW5lX2lu
+aXRfZG9uZV9ub3RpZmllcigmdnRkX21hY2hpbmVfZG9uZV9ub3RpZnkpOw0KPiA+Pj4+PiBkaWZm
+IC0tZ2l0IGEvaHcvcGNpLWhvc3QvZGVzaWdud2FyZS5jIGIvaHcvcGNpLWhvc3QvZGVzaWdud2Fy
+ZS5jDQo+ID4+Pj4+IGluZGV4IGRkMjQ1NTEuLjRjNjMzOGEgMTAwNjQ0DQo+ID4+Pj4+IC0tLSBh
+L2h3L3BjaS1ob3N0L2Rlc2lnbndhcmUuYw0KPiA+Pj4+PiArKysgYi9ody9wY2ktaG9zdC9kZXNp
+Z253YXJlLmMNCj4gPj4+Pj4gQEAgLTY0NSw2ICs2NDUsMTAgQEAgc3RhdGljIEFkZHJlc3NTcGFj
+ZQ0KPiA+Pj4+ICpkZXNpZ253YXJlX3BjaWVfaG9zdF9zZXRfaW9tbXUoUENJQnVzICpidXMsIHZv
+aWQgKm9wYXF1ZSwNCj4gPj4+Pj4gICAgICByZXR1cm4gJnMtPnBjaS5hZGRyZXNzX3NwYWNlOyAg
+fQ0KPiA+Pj4+Pg0KPiA+Pj4+PiArc3RhdGljIGNvbnN0IFBDSUlPTU1VT3BzIGRlc2lnbndhcmVf
+aW9tbXVfb3BzID0gew0KPiA+Pj4+PiArICAgIC5nZXRfYWRkcmVzc19zcGFjZSA9IGRlc2lnbndh
+cmVfcGNpZV9ob3N0X3NldF9pb21tdSwgfTsNCj4gPj4+Pj4gKw0KPiA+Pj4+PiAgc3RhdGljIHZv
+aWQgZGVzaWdud2FyZV9wY2llX2hvc3RfcmVhbGl6ZShEZXZpY2VTdGF0ZSAqZGV2LCBFcnJvcg0K
+PiA+Pj4+PiAqKmVycnApICB7DQo+ID4+Pj4+ICAgICAgUENJSG9zdFN0YXRlICpwY2kgPSBQQ0lf
+SE9TVF9CUklER0UoZGV2KTsgQEAgLTY4Niw3ICs2OTAsNyBAQA0KPiA+Pj4+PiBzdGF0aWMgdm9p
+ZCBkZXNpZ253YXJlX3BjaWVfaG9zdF9yZWFsaXplKERldmljZVN0YXRlICpkZXYsIEVycm9yICoq
+ZXJycCkNCj4gPj4+Pj4gICAgICBhZGRyZXNzX3NwYWNlX2luaXQoJnMtPnBjaS5hZGRyZXNzX3Nw
+YWNlLA0KPiA+Pj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAmcy0+cGNpLmFkZHJlc3Nfc3Bh
+Y2Vfcm9vdCwNCj4gPj4+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgInBjaWUtYnVzLWFkZHJl
+c3Mtc3BhY2UiKTsNCj4gPj4+Pj4gLSAgICBwY2lfc2V0dXBfaW9tbXUocGNpLT5idXMsIGRlc2ln
+bndhcmVfcGNpZV9ob3N0X3NldF9pb21tdSwgcyk7DQo+ID4+Pj4+ICsgICAgcGNpX3NldHVwX2lv
+bW11KHBjaS0+YnVzLCAmZGVzaWdud2FyZV9pb21tdV9vcHMsIHMpOw0KPiA+Pj4+Pg0KPiA+Pj4+
+PiAgICAgIHFkZXZfc2V0X3BhcmVudF9idXMoREVWSUNFKCZzLT5yb290KSwgQlVTKHBjaS0+YnVz
+KSk7DQo+ID4+Pj4+ICAgICAgcWRldl9pbml0X25vZmFpbChERVZJQ0UoJnMtPnJvb3QpKTsNCj4g
+Pj4+Pj4gZGlmZiAtLWdpdCBhL2h3L3BjaS1ob3N0L3Budl9waGIzLmMgYi9ody9wY2ktaG9zdC9w
+bnZfcGhiMy5jIGluZGV4DQo+ID4+Pj4+IDc0NjE4ZmEuLmVjZmU2MjcgMTAwNjQ0DQo+ID4+Pj4+
+IC0tLSBhL2h3L3BjaS1ob3N0L3Budl9waGIzLmMNCj4gPj4+Pj4gKysrIGIvaHcvcGNpLWhvc3Qv
+cG52X3BoYjMuYw0KPiA+Pj4+PiBAQCAtOTYxLDYgKzk2MSwxMCBAQCBzdGF0aWMgQWRkcmVzc1Nw
+YWNlDQo+ID4+Pj4+ICpwbnZfcGhiM19kbWFfaW9tbXUoUENJQnVzDQo+ID4+Pj4gKmJ1cywgdm9p
+ZCAqb3BhcXVlLCBpbnQgZGV2Zm4pDQo+ID4+Pj4+ICAgICAgcmV0dXJuICZkcy0+ZG1hX2FzOw0K
+PiA+Pj4+PiAgfQ0KPiA+Pj4+Pg0KPiA+Pj4+PiArc3RhdGljIFBDSUlPTU1VT3BzIHBudl9waGIz
+X2lvbW11X29wcyA9IHsNCj4gPj4+PiBzdGF0aWMgY29uc3QNCj4gPj4+IGdvdCBpdC4gOi0pDQo+
+ID4+Pg0KPiA+Pj4+PiArICAgIC5nZXRfYWRkcmVzc19zcGFjZSA9IHBudl9waGIzX2RtYV9pb21t
+dSwgfTsNCj4gPj4+Pj4gKw0KPiA+Pj4+PiAgc3RhdGljIHZvaWQgcG52X3BoYjNfaW5zdGFuY2Vf
+aW5pdChPYmplY3QgKm9iaikgIHsNCj4gPj4+Pj4gICAgICBQbnZQSEIzICpwaGIgPSBQTlZfUEhC
+MyhvYmopOyBAQCAtMTA1OSw3ICsxMDYzLDcgQEAgc3RhdGljDQo+ID4+Pj4+IHZvaWQgcG52X3Bo
+YjNfcmVhbGl6ZShEZXZpY2VTdGF0ZSAqZGV2LCBFcnJvcg0KPiA+Pj4+ICoqZXJycCkNCj4gPj4+
+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmcGhiLT5wY2lfbW1pbywg
+JnBoYi0+cGNpX2lvLA0KPiA+Pj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIDAsIDQsDQo+ID4+Pj4+IFRZUEVfUE5WX1BIQjNfUk9PVF9CVVMpOw0KPiA+Pj4+Pg0KPiA+
+Pj4+PiAtICAgIHBjaV9zZXR1cF9pb21tdShwY2ktPmJ1cywgcG52X3BoYjNfZG1hX2lvbW11LCBw
+aGIpOw0KPiA+Pj4+PiArICAgIHBjaV9zZXR1cF9pb21tdShwY2ktPmJ1cywgJnBudl9waGIzX2lv
+bW11X29wcywgcGhiKTsNCj4gPj4+Pj4NCj4gPj4+Pj4gICAgICAvKiBBZGQgYSBzaW5nbGUgUm9v
+dCBwb3J0ICovDQo+ID4+Pj4+ICAgICAgcWRldl9wcm9wX3NldF91aW50OChERVZJQ0UoJnBoYi0+
+cm9vdCksICJjaGFzc2lzIiwNCj4gPj4+Pj4gcGhiLT5jaGlwX2lkKTsgZGlmZiAtLWdpdCBhL2h3
+L3BjaS1ob3N0L3Budl9waGI0LmMNCj4gPj4+Pj4gYi9ody9wY2ktaG9zdC9wbnZfcGhiNC5jIGlu
+ZGV4DQo+ID4+Pj4+IDIzY2YwOTMuLjA0ZTk1ZTMgMTAwNjQ0DQo+ID4+Pj4+IC0tLSBhL2h3L3Bj
+aS1ob3N0L3Budl9waGI0LmMNCj4gPj4+Pj4gKysrIGIvaHcvcGNpLWhvc3QvcG52X3BoYjQuYw0K
+PiA+Pj4+PiBAQCAtMTE0OCw2ICsxMTQ4LDEwIEBAIHN0YXRpYyBBZGRyZXNzU3BhY2UNCj4gPj4+
+Pj4gKnBudl9waGI0X2RtYV9pb21tdShQQ0lCdXMNCj4gPj4+PiAqYnVzLCB2b2lkICpvcGFxdWUs
+IGludCBkZXZmbikNCj4gPj4+Pj4gICAgICByZXR1cm4gJmRzLT5kbWFfYXM7DQo+ID4+Pj4+ICB9
+DQo+ID4+Pj4+DQo+ID4+Pj4+ICtzdGF0aWMgUENJSU9NTVVPcHMgcG52X3BoYjRfaW9tbXVfb3Bz
+ID0gew0KPiA+Pj4+IGlkZW0NCj4gPj4+IHdpbGwgYWRkIGNvbnN0Lg0KPiA+Pj4NCj4gPj4+Pj4g
+KyAgICAuZ2V0X2FkZHJlc3Nfc3BhY2UgPSBwbnZfcGhiNF9kbWFfaW9tbXUsIH07DQo+ID4+Pj4+
+ICsNCj4gPj4+Pj4gIHN0YXRpYyB2b2lkIHBudl9waGI0X2luc3RhbmNlX2luaXQoT2JqZWN0ICpv
+YmopICB7DQo+ID4+Pj4+ICAgICAgUG52UEhCNCAqcGhiID0gUE5WX1BIQjQob2JqKTsgQEAgLTEy
+MDUsNyArMTIwOSw3IEBAIHN0YXRpYw0KPiA+Pj4+PiB2b2lkIHBudl9waGI0X3JlYWxpemUoRGV2
+aWNlU3RhdGUgKmRldiwgRXJyb3INCj4gPj4+PiAqKmVycnApDQo+ID4+Pj4+ICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgcG52X3BoYjRfc2V0X2lycSwgcG52X3BoYjRfbWFw
+X2lycSwgcGhiLA0KPiA+Pj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICZwaGItPnBjaV9tbWlvLCAmcGhiLT5wY2lfaW8sDQo+ID4+Pj4+ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgMCwgNCwgVFlQRV9QTlZfUEhCNF9ST09UX0JVUyk7DQo+ID4+
+Pj4+IC0gICAgcGNpX3NldHVwX2lvbW11KHBjaS0+YnVzLCBwbnZfcGhiNF9kbWFfaW9tbXUsIHBo
+Yik7DQo+ID4+Pj4+ICsgICAgcGNpX3NldHVwX2lvbW11KHBjaS0+YnVzLCAmcG52X3BoYjRfaW9t
+bXVfb3BzLCBwaGIpOw0KPiA+Pj4+Pg0KPiA+Pj4+PiAgICAgIC8qIEFkZCBhIHNpbmdsZSBSb290
+IHBvcnQgKi8NCj4gPj4+Pj4gICAgICBxZGV2X3Byb3Bfc2V0X3VpbnQ4KERFVklDRSgmcGhiLT5y
+b290KSwgImNoYXNzaXMiLA0KPiA+Pj4+PiBwaGItPmNoaXBfaWQpOyBkaWZmIC0tZ2l0IGEvaHcv
+cGNpLWhvc3QvcHBjZTUwMC5jDQo+ID4+Pj4+IGIvaHcvcGNpLWhvc3QvcHBjZTUwMC5jIGluZGV4
+IGQ3MTA3MjcuLjViYWY1ZGIgMTAwNjQ0DQo+ID4+Pj4+IC0tLSBhL2h3L3BjaS1ob3N0L3BwY2U1
+MDAuYw0KPiA+Pj4+PiArKysgYi9ody9wY2ktaG9zdC9wcGNlNTAwLmMNCj4gPj4+Pj4gQEAgLTQz
+OSw2ICs0MzksMTAgQEAgc3RhdGljIEFkZHJlc3NTcGFjZQ0KPiA+Pj4+PiAqZTUwMF9wY2lob3N0
+X3NldF9pb21tdShQQ0lCdXMNCj4gPj4+PiAqYnVzLCB2b2lkICpvcGFxdWUsDQo+ID4+Pj4+ICAg
+ICAgcmV0dXJuICZzLT5ibV9hczsNCj4gPj4+Pj4gIH0NCj4gPj4+Pj4NCj4gPj4+Pj4gK3N0YXRp
+YyBjb25zdCBQQ0lJT01NVU9wcyBwcGNlNTAwX2lvbW11X29wcyA9IHsNCj4gPj4+Pj4gKyAgICAu
+Z2V0X2FkZHJlc3Nfc3BhY2UgPSBlNTAwX3BjaWhvc3Rfc2V0X2lvbW11LCB9Ow0KPiA+Pj4+PiAr
+DQo+ID4+Pj4+ICBzdGF0aWMgdm9pZCBlNTAwX3BjaWhvc3RfcmVhbGl6ZShEZXZpY2VTdGF0ZSAq
+ZGV2LCBFcnJvciAqKmVycnApICB7DQo+ID4+Pj4+ICAgICAgU3lzQnVzRGV2aWNlICpzYmQgPSBT
+WVNfQlVTX0RFVklDRShkZXYpOyBAQCAtNDczLDcgKzQ3Nyw3IEBADQo+ID4+Pj4+IHN0YXRpYyB2
+b2lkIGU1MDBfcGNpaG9zdF9yZWFsaXplKERldmljZVN0YXRlICpkZXYsIEVycm9yICoqZXJycCkN
+Cj4gPj4+Pj4gICAgICBtZW1vcnlfcmVnaW9uX2luaXQoJnMtPmJtLCBPQkpFQ1QocyksICJibS1l
+NTAwIiwgVUlOVDY0X01BWCk7DQo+ID4+Pj4+ICAgICAgbWVtb3J5X3JlZ2lvbl9hZGRfc3VicmVn
+aW9uKCZzLT5ibSwgMHgwLCAmcy0+YnVzbWVtKTsNCj4gPj4+Pj4gICAgICBhZGRyZXNzX3NwYWNl
+X2luaXQoJnMtPmJtX2FzLCAmcy0+Ym0sICJwY2ktYm0iKTsNCj4gPj4+Pj4gLSAgICBwY2lfc2V0
+dXBfaW9tbXUoYiwgZTUwMF9wY2lob3N0X3NldF9pb21tdSwgcyk7DQo+ID4+Pj4+ICsgICAgcGNp
+X3NldHVwX2lvbW11KGIsICZwcGNlNTAwX2lvbW11X29wcywgcyk7DQo+ID4+Pj4+DQo+ID4+Pj4+
+ICAgICAgcGNpX2NyZWF0ZV9zaW1wbGUoYiwgMCwgImU1MDAtaG9zdC1icmlkZ2UiKTsNCj4gPj4+
+Pj4NCj4gPj4+Pj4gZGlmZiAtLWdpdCBhL2h3L3BjaS1ob3N0L3ByZXAuYyBiL2h3L3BjaS1ob3N0
+L3ByZXAuYyBpbmRleA0KPiA+Pj4+PiAxYTAyZTlhLi43YzU3MzExIDEwMDY0NA0KPiA+Pj4+PiAt
+LS0gYS9ody9wY2ktaG9zdC9wcmVwLmMNCj4gPj4+Pj4gKysrIGIvaHcvcGNpLWhvc3QvcHJlcC5j
+DQo+ID4+Pj4+IEBAIC0yMTMsNiArMjEzLDEwIEBAIHN0YXRpYyBBZGRyZXNzU3BhY2UNCj4gPj4+
+Pj4gKnJhdmVuX3BjaWhvc3Rfc2V0X2lvbW11KFBDSUJ1cw0KPiA+Pj4+ICpidXMsIHZvaWQgKm9w
+YXF1ZSwNCj4gPj4+Pj4gICAgICByZXR1cm4gJnMtPmJtX2FzOw0KPiA+Pj4+PiAgfQ0KPiA+Pj4+
+Pg0KPiA+Pj4+PiArc3RhdGljIGNvbnN0IFBDSUlPTU1VT3BzIHJhdmVuX2lvbW11X29wcyA9IHsN
+Cj4gPj4+Pj4gKyAgICAuZ2V0X2FkZHJlc3Nfc3BhY2UgPSByYXZlbl9wY2lob3N0X3NldF9pb21t
+dSwgfTsNCj4gPj4+Pj4gKw0KPiA+Pj4+PiAgc3RhdGljIHZvaWQgcmF2ZW5fY2hhbmdlX2dwaW8o
+dm9pZCAqb3BhcXVlLCBpbnQgbiwgaW50IGxldmVsKSAgew0KPiA+Pj4+PiAgICAgIFBSRVBQQ0lT
+dGF0ZSAqcyA9IG9wYXF1ZTsNCj4gPj4+Pj4gQEAgLTMwMyw3ICszMDcsNyBAQCBzdGF0aWMgdm9p
+ZCByYXZlbl9wY2lob3N0X2luaXRmbihPYmplY3QgKm9iaikNCj4gPj4+Pj4gICAgICBtZW1vcnlf
+cmVnaW9uX2FkZF9zdWJyZWdpb24oJnMtPmJtLCAwICAgICAgICAgLCAmcy0NCj4gPj4+IGJtX3Bj
+aV9tZW1vcnlfYWxpYXMpOw0KPiA+Pj4+PiAgICAgIG1lbW9yeV9yZWdpb25fYWRkX3N1YnJlZ2lv
+bigmcy0+Ym0sIDB4ODAwMDAwMDAsICZzLQ0KPiA+Ym1fcmFtX2FsaWFzKTsNCj4gPj4+Pj4gICAg
+ICBhZGRyZXNzX3NwYWNlX2luaXQoJnMtPmJtX2FzLCAmcy0+Ym0sICJyYXZlbi1ibSIpOw0KPiA+
+Pj4+PiAtICAgIHBjaV9zZXR1cF9pb21tdSgmcy0+cGNpX2J1cywgcmF2ZW5fcGNpaG9zdF9zZXRf
+aW9tbXUsIHMpOw0KPiA+Pj4+PiArICAgIHBjaV9zZXR1cF9pb21tdSgmcy0+cGNpX2J1cywgJnJh
+dmVuX2lvbW11X29wcywgcyk7DQo+ID4+Pj4+DQo+ID4+Pj4+ICAgICAgaC0+YnVzID0gJnMtPnBj
+aV9idXM7DQo+ID4+Pj4+DQo+ID4+Pj4+IGRpZmYgLS1naXQgYS9ody9wY2ktaG9zdC9zYWJyZS5j
+IGIvaHcvcGNpLWhvc3Qvc2FicmUuYyBpbmRleA0KPiA+Pj4+PiAyYjg1MDNiLi4yNTE1NDliIDEw
+MDY0NA0KPiA+Pj4+PiAtLS0gYS9ody9wY2ktaG9zdC9zYWJyZS5jDQo+ID4+Pj4+ICsrKyBiL2h3
+L3BjaS1ob3N0L3NhYnJlLmMNCj4gPj4+Pj4gQEAgLTExMiw2ICsxMTIsMTAgQEAgc3RhdGljIEFk
+ZHJlc3NTcGFjZQ0KPiA+Pj4+PiAqc2FicmVfcGNpX2RtYV9pb21tdShQQ0lCdXMNCj4gPj4+PiAq
+YnVzLCB2b2lkICpvcGFxdWUsIGludCBkZXZmbikNCj4gPj4+Pj4gICAgICByZXR1cm4gJmlzLT5p
+b21tdV9hczsNCj4gPj4+Pj4gIH0NCj4gPj4+Pj4NCj4gPj4+Pj4gK3N0YXRpYyBjb25zdCBQQ0lJ
+T01NVU9wcyBzYWJyZV9pb21tdV9vcHMgPSB7DQo+ID4+Pj4+ICsgICAgLmdldF9hZGRyZXNzX3Nw
+YWNlID0gc2FicmVfcGNpX2RtYV9pb21tdSwgfTsNCj4gPj4+Pj4gKw0KPiA+Pj4+PiAgc3RhdGlj
+IHZvaWQgc2FicmVfY29uZmlnX3dyaXRlKHZvaWQgKm9wYXF1ZSwgaHdhZGRyIGFkZHIsDQo+ID4+
+Pj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0X3QgdmFsLCB1bnNpZ25l
+ZCBzaXplKSAgeyBAQA0KPiA+Pj4+PiAtNDAyLDcgKzQwNiw3IEBAIHN0YXRpYyB2b2lkIHNhYnJl
+X3JlYWxpemUoRGV2aWNlU3RhdGUgKmRldiwgRXJyb3IgKiplcnJwKQ0KPiA+Pj4+PiAgICAgIC8q
+IElPTU1VICovDQo+ID4+Pj4+ICAgICAgbWVtb3J5X3JlZ2lvbl9hZGRfc3VicmVnaW9uX292ZXJs
+YXAoJnMtPnNhYnJlX2NvbmZpZywgMHgyMDAsDQo+ID4+Pj4+ICAgICAgICAgICAgICAgICAgICAg
+IHN5c2J1c19tbWlvX2dldF9yZWdpb24oU1lTX0JVU19ERVZJQ0Uocy0+aW9tbXUpLCAwKSwgMSk7
+DQo+ID4+Pj4+IC0gICAgcGNpX3NldHVwX2lvbW11KHBoYi0+YnVzLCBzYWJyZV9wY2lfZG1hX2lv
+bW11LCBzLT5pb21tdSk7DQo+ID4+Pj4+ICsgICAgcGNpX3NldHVwX2lvbW11KHBoYi0+YnVzLCAm
+c2FicmVfaW9tbXVfb3BzLCBzLT5pb21tdSk7DQo+ID4+Pj4+DQo+ID4+Pj4+ICAgICAgLyogQVBC
+IHNlY29uZGFyeSBidXNzZXMgKi8NCj4gPj4+Pj4gICAgICBwY2lfZGV2ID0gcGNpX2NyZWF0ZV9t
+dWx0aWZ1bmN0aW9uKHBoYi0+YnVzLCBQQ0lfREVWRk4oMSwgMCksDQo+ID4+Pj4+IHRydWUsIGRp
+ZmYgLS1naXQgYS9ody9wY2kvcGNpLmMgYi9ody9wY2kvcGNpLmMgaW5kZXgNCj4gPj4+Pj4gZTFl
+ZDY2Ny4uYWE5MDI1Yw0KPiA+Pj4+PiAxMDA2NDQNCj4gPj4+Pj4gLS0tIGEvaHcvcGNpL3BjaS5j
+DQo+ID4+Pj4+ICsrKyBiL2h3L3BjaS9wY2kuYw0KPiA+Pj4+PiBAQCAtMjY0NCw3ICsyNjQ0LDcg
+QEAgQWRkcmVzc1NwYWNlDQo+ID4+Pj4gKnBjaV9kZXZpY2VfaW9tbXVfYWRkcmVzc19zcGFjZShQ
+Q0lEZXZpY2UgKmRldikNCj4gPj4+Pj4gICAgICBQQ0lCdXMgKmlvbW11X2J1cyA9IGJ1czsNCj4g
+Pj4+Pj4gICAgICB1aW50OF90IGRldmZuID0gZGV2LT5kZXZmbjsNCj4gPj4+Pj4NCj4gPj4+Pj4g
+LSAgICB3aGlsZSAoaW9tbXVfYnVzICYmICFpb21tdV9idXMtPmlvbW11X2ZuICYmIGlvbW11X2J1
+cy0NCj4gPj4+IHBhcmVudF9kZXYpDQo+ID4+Pj4gew0KPiA+Pj4+PiArICAgIHdoaWxlIChpb21t
+dV9idXMgJiYgIWlvbW11X2J1cy0+aW9tbXVfb3BzICYmDQo+ID4+Pj4+ICsgaW9tbXVfYnVzLT5w
+YXJlbnRfZGV2KSB7DQo+ID4+Pj4gRGVwZW5kaW5nIG9uIGZ1dHVyZSB1c2FnZSwgdGhpcyBpcyBu
+b3Qgc3RyaWN0bHkgaWRlbnRpY2FsIHRvIHRoZQ0KPiA+Pj4+IG9yaWdpbmFsIGNvZGUuIFlvdSBl
+eGl0IHRoZSBsb29wIGFzIHNvb24gYXMgYSBpb21tdV9idXMtPmlvbW11X29wcw0KPiA+Pj4+IGlz
+IHNldCB3aGF0ZXZlciB0aGUgcHJlc2VuY2Ugb2YgZ2V0X2FkZHJlc3Nfc3BhY2UoKS4NCj4gPj4+
+DQo+ID4+PiBUbyBiZSBpZGVudGljYWwgd2l0aCBvcmlnaW5hbCBjb2RlLCBtYXkgYWRkaW5nIHRo
+ZQ0KPiA+Pj4gZ2V0X2FkZHJlc3Nfc3BhY2UoKSBwcmVzZW5jZSBjaGVjay4gVGhlbiB0aGUgbG9v
+cCBleGl0cyB3aGVuIHRoZQ0KPiA+Pj4gaW9tbXVfYnVzLT5pb21tdV9vcHMgaXMgc2V0IGFuZCBt
+ZWFud2hpbGUgaW9tbXVfYnVzLT5pb21tdV9vcHMtDQo+ID5nZXRfYWRkcmVzc19zcGFjZSgpIGlz
+IHNldC4NCj4gPj4+IEJ1dCBpcyBpdCBwb3NzaWJsZSB0aGF0IHRoZXJlIGlzIGFuIGludGVybWVk
+aWF0ZSBpb21tdV9idXMgd2hpY2ggaGFzDQo+ID4+PiBpb21tdV9vcHMgc2V0IGJ1dCB0aGUgZ2V0
+X2FkZHJlc3Nfc3BhY2UoKSBpcyBjbGVhci4gSSBndWVzcyBub3QgYXMNCj4gPj4+IGlvbW11X29w
+cyBpcyBzZXQgYnkgdklPTU1VIGFuZCB2SU9NTVUgd29uJ3QgZGlmZmVyZW50aWF0ZSBidXNlcz8N
+Cj4gPj4NCj4gPj4gSSBkb24ndCBrbm93LiBUaGF0IGRlcGVuZHMgb24gaG93IHRoZSBvcHMgYXJl
+IGdvaW5nIHRvIGJlIHVzZWQgaW4gdGhlDQo+ID4+IGZ1dHVyZS4gQ2FuJ3QgeW91IGVuZm9yY2Ug
+dGhlIGZhY3QgdGhhdCBnZXRfYWRkcmVzc19zcGFjZSgpIGlzIGEgbWFuZGF0b3J5IG9wcz8NCj4g
+Pg0KPiA+IE5vLCBJIGRpZG4ndCBtZWFuIHRoYXQuIEFjdHVhbGx5LCBpbiB0aGUgcGF0Y2gsIHRo
+ZSBnZXRfYWRkcmVzc19zcGFjZSgpIHByZXNlbmNlIGlzDQo+IGNoZWNrZWQuDQo+ID4gSSdtIG5v
+dCBzdXJlIGlmIHlvdXIgcG9pbnQgaXMgdG8gYWRkIGdldF9hZGRyZXNzX3NwYWNlKCkgcHJlc2Vu
+Y2UNCj4gPiBjaGVjayBpbnN0ZWFkIG9mIGp1c3QgY2hlY2tpbmcgdGhlIGlvbW11X29wcyBwcmVz
+ZW5jZS4NCj4gWWVzIHRoYXQgd2FzIG15IHBvaW50LiBJIHdhbnRlZCB0byB1bmRlcmxpbmUgdGhl
+IGNoZWNrcyBhcmUgbm90IHN0cmljdGx5IGlkZW50aWNhbA0KPiBhbmQgbWF5YmUgZHVyaW5nIGVu
+dW1lcmF0aW9uIHlvdSBtYXkgZmluZCBhIGRldmljZSB3aXRoIG9wcyBzZXQgYW5kIG5vDQo+IGdl
+dF9hZGRyZXNzX3NwYWNlKCkuDQoNCkkgc2VlLiBCdXQgdGhpcyBoYXBwZW5zIG9ubHkgd2hlbiB0
+aGVyZSBhcmUgbXVsdGlwbGUgaW9tbXVfb3BzIGluc3RhbmNlcw0KcHJvdmlkZWQgYnkgdklPTU1V
+LiByaWdodD8gRm9yIHNvbWUgYnVzZXMsIHZJT01NVSBzZXQgYW4gaW9tbXVfb3BzDQp3aXRoIGdl
+dF9hZGRyZXNzX3NwYWNlKCkgc2V0LCBidXQgZm9yIG90aGVycyBpdCBzZXRzIGFuIGlvbW11X29w
+cyB3L28NCmdldF9hZGRyZXNzX3NwYWNlKCkuIElzIGl0IHBvc3NpYmxlPw0KDQo+IFRoZW4gSSBt
+ZWFudCBtYXliZSB5b3Ugc2hvdWxkIGVuZm9yY2Ugc29tZXdoZXJlIGluIHRoZQ0KPiBjb2RlIG9y
+IGluIHRoZSBkb2N1bWVudGF0aW9uIHRoYXQgZ2V0X2FkZHJlc3Nfc3BhY2UoKSBpcyBhIG1hbmRh
+dG9yeSBvcGVyYXRpb24gaW4NCj4gdGhlIG9wcyBzdHJ1Y3QgYW5kIG11c3QgYmUgc2V0IGFzIHNv
+b24gYXMgdGhlIHN0cnVjdCBpcyBwYXNzZWQuIG1heWJlIGluDQo+IHBjaV9zZXR1cF9pb21tdSgp
+IHlvdSBjb3VsZCBjaGVjayB0aGF0IGdldF9hZGRyZXNzX3NwYWNlIGlzIHNldD8NCg0KSG93IGFi
+b3V0IG90aGVyIGNhbGxiYWNrcyBpbiBpb21tdV9vcHM/IEl0IHdvdWxkIGJlIHN0cmFuZ2UgdGhh
+dCBvbmx5DQpjaGVjayBnZXRfYWRkcmVzc19zcGFjZSgpIGFuZCBpZ25vcmUgb3RoZXIgY2FsbGJh
+Y2tzLg0KDQpSZWdhcmRzLA0KWWkgTGl1DQo=
 
