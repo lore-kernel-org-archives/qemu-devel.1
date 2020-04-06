@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D49C2C2BA17
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:09:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52109C2BA17
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:09:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6613206B8
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:09:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 254AD206B8
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 18:09:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ok4WPrVU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6613206B8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c8xkEx52"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 254AD206B8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLWBa-0006GX-Q3
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 14:09:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36354)
+	id 1jLWBo-0006eR-8w
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 14:09:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36543)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrD-0002FC-R0
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:25 -0400
+ id 1jLVrO-0002SV-Lx
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrB-00037s-MD
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:23 -0400
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:40470)
+ id 1jLVrM-0003LU-NA
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:34 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38813)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVrB-00037R-GR
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:21 -0400
-Received: by mail-wm1-x329.google.com with SMTP id a81so298429wmf.5
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 10:48:21 -0700 (PDT)
+ id 1jLVrM-0003Kv-H5; Mon, 06 Apr 2020 13:48:32 -0400
+Received: by mail-wr1-x442.google.com with SMTP id 31so507523wre.5;
+ Mon, 06 Apr 2020 10:48:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=YhVPUQsfht6jA/IUTaj+buf6eqXAxfk/bBYv1XmJLk4=;
- b=ok4WPrVUixwIKypERf9YDPnea3W9Jvy7sanmZCZ+u9uMZMV0TH+h1feoKfAQYSCia8
- aKVETMkgPqRtKV8RFGFlosxY5dcheaR53J56AWxRC+WN8A2DzL6MTUDRuuMODdrknKxK
- bkXjAganl6WsOl5iBU3GAo2UTdCjldIL9JyeYnAdSoKtfpDVoQHIv9HGCfqJa0pL4MJC
- di1OSYsrTpiRA3X91/YG7grAFgRt4Ocxk4utXW4ouE/YOrZs/ujnjPs7o5WYSfHRanD9
- 0JX2VpHs8JBQ/kzOLblGZ4T0vl8nH9zO8XN4QGAU4pnURoHNxmrmuNxEaVdtzWAcd40y
- xoNg==
+ bh=+O8FSNw/XveJvWULa4+Jfl3G5r6TBg2LXwiWGWDolCA=;
+ b=c8xkEx5253ZlB+tHpoFgXdeE6lpIRb05XoVmVIrsvgGN7C/XgCsb1tHBxhbhmpJeqX
+ Yfj7RP84XVticQ5WoWAkf3g96ghqBAxHqc1rSJXm32uFY+KwPKQj4RpgHYK/B7E77M/i
+ Dbndx73PkhXjIP0Bb0n6TvOQR5TCjiTF+/cU/aQ2ntvKX1iYzrgVA3Q0GaCS8bo19bAX
+ r6LQtnznge9/pGOhSvs4WqcLeFOKVjHOzl0Okpeka/IoHFWrueYZuPfrroVWKwFfV0XP
+ Z5v121RLVkegmcC9nfeRUw/aSv61rF4dXUiDkZrFAiN8C1qvHropKCc2UxuZATBdk8nn
+ rN4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=YhVPUQsfht6jA/IUTaj+buf6eqXAxfk/bBYv1XmJLk4=;
- b=XoTDMhSTbm/02aSi04JEye4G4VXFWMOTjXquHkIK80FCTVBSNl2Fc19espPZAQ3g8e
- 3HUejHi4IvD9Gp9vbSeEOw3vHNdXLNLn6aQHPJ3fd14kqOVzzlGlsyJ22cMElBwRyqFO
- /eCdhZo+Wqy0aZnelAUHtQc0N0VMxto/QkRwOhpsNOq1TwoD9tmFh7o4lFp5xLBOhciF
- S6sElYLcana5yf+B4PE7ML+BIag8ld8lLR/QUnz90OKImy5BTqIWkGB9b2RPELSsc8le
- oV/QnEow+kLEjW6ECbYvE3nS9Y0/U/BdfFtaR3jt29eLNKkj6Zt+bQU4uPx6faQlprpI
- F12Q==
-X-Gm-Message-State: AGi0PubeyU5zwUG3WHhtwqdD2blOBR9NRKSeRTW4X/320flWE3JS2xuX
- MocstZZTa0j0gB4iRbrXCgPxjN+NPNg=
-X-Google-Smtp-Source: APiQypIiSUddRW6GrDP1x9LqwJu4HPIC+MyntKbNyZdQRmc6Zn7xN1OrxmXLbGwi5yjCUEDF0VqzBQ==
-X-Received: by 2002:a1c:4d13:: with SMTP id o19mr205798wmh.82.1586195300185;
- Mon, 06 Apr 2020 10:48:20 -0700 (PDT)
+ bh=+O8FSNw/XveJvWULa4+Jfl3G5r6TBg2LXwiWGWDolCA=;
+ b=aLDUIbGbRmHZ6a3Ff3SI/T7FRNQ+7BJCxKXn42eTaW6PH4DLFzIHeIUIqo7o7QG83H
+ nXSjWBfpP4PBIVC9ccJ5TG26b3+U3W2PFIYegE2vBcXjsIVeFuGC8TZVUnAXQ+xGGHCR
+ 2UkfxLlzGAszUtlDqMdUrxXJ4dudrUPn51d/G/I+b57IlwzxGsBgbhdOvU2SUaHHWV+z
+ HUmalE/aUMkACxkBhisW/V9bhKWTbWlTqv1KzrK6GOw1pDkKelmbbbgnFMni0EGXy+dw
+ kGxh/C0dYLkYs0wanbL6hNhUxZb4cdti/0/+zi17TvYHBmPMultA6PX9b7POBLRZXyYQ
+ HpnQ==
+X-Gm-Message-State: AGi0PubS8I95C3nFJz1g+wAV1zFv+X7ZhuEBsQB7odfdlcLukSvMxbra
+ Ql+iPDEPyJjin3nm7u4hWCRlUeTbXQ8=
+X-Google-Smtp-Source: APiQypKkX0vnL4MDsxAOGu63ql2Q1nV98knENmX2pZypRz7cVNiIbMk/Xu/11dcJB+1V3n1wbXEvdQ==
+X-Received: by 2002:adf:90ea:: with SMTP id i97mr339112wri.123.1586195311425; 
+ Mon, 06 Apr 2020 10:48:31 -0700 (PDT)
 Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.48.19
+ by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.48.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Apr 2020 10:48:19 -0700 (PDT)
+ Mon, 06 Apr 2020 10:48:30 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH-for-5.1 v2 25/54] scripts/coccinelle: Catch missing
- error_propagate() calls in realize()
-Date: Mon,  6 Apr 2020 19:47:14 +0200
-Message-Id: <20200406174743.16956-26-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v2 33/54] hw/intc/arm_gicv3_its_kvm: Add missing
+ error-propagation code
+Date: Mon,  6 Apr 2020 19:47:22 +0200
+Message-Id: <20200406174743.16956-34-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200406174743.16956-1-f4bug@amsat.org>
 References: <20200406174743.16956-1-f4bug@amsat.org>
@@ -87,7 +86,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::329
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,95 +100,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ "open list:ARM cores" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In some DeviceClass::realize() while we can propagate errors
-to the caller, we forgot to do so. Add a Coccinelle patch to
-automatically add the missing code.
+Patch created mechanically by running:
 
-Inspired-by: Peter Maydell <peter.maydell@linaro.org>
+  $ spatch \
+    --macro-file scripts/cocci-macro-file.h --include-headers \
+    --sp-file scripts/coccinelle/use-error_propagate-in-realize.cocci \
+    --keep-comments --smpl-spacing --in-place --dir hw
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- .../use-error_propagate-in-realize.cocci      | 54 +++++++++++++++++++
- MAINTAINERS                                   |  1 +
- 2 files changed, 55 insertions(+)
- create mode 100644 scripts/coccinelle/use-error_propagate-in-realize.cocci
+ hw/intc/arm_gicv3_its_kvm.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/coccinelle/use-error_propagate-in-realize.cocci b/scripts/coccinelle/use-error_propagate-in-realize.cocci
-new file mode 100644
-index 0000000000..7b59277a50
---- /dev/null
-+++ b/scripts/coccinelle/use-error_propagate-in-realize.cocci
-@@ -0,0 +1,54 @@
-+// Add missing error-propagation code in DeviceClass::realize()
-+//
-+// Copyright: (C) 2020 Philippe Mathieu-Daudé
-+// This work is licensed under the terms of the GNU GPLv2 or later.
-+//
-+// spatch \
-+//  --macro-file scripts/cocci-macro-file.h --include-headers \
-+//  --sp-file scripts/coccinelle/use-error_abort-in-instance_init.cocci \
-+//  --keep-comments --timeout 60 --in-place
-+//
-+// Inspired by https://www.mail-archive.com/qemu-devel@nongnu.org/msg691638.html
-+
-+
-+@ match_class_init @
-+TypeInfo info;
-+identifier class_initfn;
-+@@
-+    info.class_init = class_initfn;
-+
-+
-+@ match_realize @
-+identifier match_class_init.class_initfn;
-+DeviceClass *dc;
-+identifier realizefn;
-+@@
-+void class_initfn(...)
-+{
-+    ...
-+    dc->realize = realizefn;
-+    ...
-+}
-+
-+
-+@ propagate_in_realize @
-+identifier match_realize.realizefn;
-+identifier err;
-+identifier errp;
-+identifier func_with_errp;
-+symbol error_abort, error_fatal;
-+@@
-+void realizefn(..., Error **errp)
-+{
-+    ...
-+    Error *err = NULL;
-+    <+...
-+    func_with_errp(...,
-+-                      \(&error_abort\|&error_fatal\));
-++                      &err);
-++   if (err) {
-++       error_propagate(errp, err);
-++       return;
-++   }
-+    ...+>
-+}
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d06ffeddd5..7b58f02efb 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2059,6 +2059,7 @@ F: scripts/coccinelle/error_propagate_null.cocci
- F: scripts/coccinelle/remove_local_err.cocci
- F: scripts/coccinelle/simplify-init-realize-error_propagate.cocci
- F: scripts/coccinelle/use-error_fatal.cocci
-+F: scripts/coccinelle/use-error_propagate-in-realize.cocci
+diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
+index ad0ebabc87..3d2c4e22f5 100644
+--- a/hw/intc/arm_gicv3_its_kvm.c
++++ b/hw/intc/arm_gicv3_its_kvm.c
+@@ -101,7 +101,11 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
  
- GDB stub
- M: Alex Bennée <alex.bennee@linaro.org>
+     /* explicit init of the ITS */
+     kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+-                      KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true, &error_abort);
++                      KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+ 
+     /* register the base address */
+     kvm_arm_register_device(&s->iomem_its_cntrl, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
 -- 
 2.21.1
 
