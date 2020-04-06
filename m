@@ -7,78 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B00EAC2BA17
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:54:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7900C2BA17
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:54:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B14F206F8
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:54:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 999E4206F8
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 17:54:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zv67Gidq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B14F206F8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BzmpXXpW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 999E4206F8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLVwx-0004pp-Md
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 13:54:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35770)
+	id 1jLVxB-0005RG-Nl
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 13:54:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35929)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVqk-0001TS-3N
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:47:55 -0400
+ id 1jLVqt-0001gR-Vs
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVqh-0001Rh-Jq
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:47:53 -0400
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:35397)
+ id 1jLVqs-0001sc-IB
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:48:03 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37326)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jLVqh-0001LY-2M
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 13:47:51 -0400
-Received: by mail-wm1-x329.google.com with SMTP id i19so333533wmb.0
- for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 10:47:50 -0700 (PDT)
+ id 1jLVqr-0001ng-Bi; Mon, 06 Apr 2020 13:48:02 -0400
+Received: by mail-wr1-x443.google.com with SMTP id w10so513991wrm.4;
+ Mon, 06 Apr 2020 10:48:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=iReDTzs2Dt50WrfdNdr1+4DatVHniwe5YHMC666osXs=;
- b=Zv67GidqC99G9Gve+Ccp7YzDO1MRq3kW4OVGIlwS0rpyZYGj45aYTI/PxuIFvjdGlp
- +y2ZB9LClb1vzF9rMAeW3dsAMdmvQLFbbX9B4Q86BCVwasrd+ZsILTTiEFPbfgwI5Llw
- 79tKup106tKsBObTfcg5pj1nSQrpqaUA6bm++UzZ9fVb/afNf/1BQ8Di6GP8GYjVSLUJ
- OngYWB4vWdq1zyEeLlQQJ4ERT4HrSMYEHqkYG312LRinyPbgdfnozgGngmBgONi44YoQ
- SWylms/zKsL4hPt+KwTXSVE1FMKmwNw2jw5U6n4HRlYTl/SUEtpYTa+CsGipJMGxrBn7
- 2jOA==
+ bh=3C5u9DrXZj6rRyHI74cwCLmjedB/NXARv4QiTEDtzdw=;
+ b=BzmpXXpW7EEA5jqIDETxNdtM+2Y/Ra/w9UV/aPg/syX2t5t7NrXFDnQS0d9IgSaWnn
+ vzN4hqnvcKpcdVYe6pxdKHyEJ63mJQtLsDYD2DKwLwiwideF82cL+KDW4TC6Ao2eVhgN
+ aEpBnjBpRsvgvg2UdMMNGw2m16z+jsIaRCSOVmybyourCKbhVcp5YKs1x8NxeMEMaL0I
+ eU3YAktle+U7ghEkm+BDl38xUbxzq74QZ35tN7TmEMz20t27N/X/4EkLduiELZVw2kaw
+ JkZGRmwIiEaIAIyq1b/2VGgGaWSABTCmqFA36hadQjP0xMu3VCt0PgwyVIWEUUxeQdJG
+ s/rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=iReDTzs2Dt50WrfdNdr1+4DatVHniwe5YHMC666osXs=;
- b=dJFbA1+9MMzdEeK5CgkT8eVrva0DoPVN/ZiQNhtl8fDUie7utSy2vxCdgiqwfJYQnV
- q7YqxdmIItPfrQ+Q/sLdS6HBJUbugpQNLOXIz2KYQksoe2v4R95qJDpji6j2arMyHIv1
- 7g+ZC0i4Oa3mXc4PVuRzjmqV8K6VnJc/I3cCgaLiFWUHlKqX9nkoTAJpiMy0E+lqtDwm
- 6yOIwlGeTArbJPXlPXOFNMH+0RkJPpNS7IgJNNqJ0cOSiFr4/vS8hf9kkJNHpomFNCxi
- Z0yZeLnoQ6KV3182amB0u9EOiA/LNEVsaA3ahk7RuKN2LYjgvECU7NydwrjcGGA3BLYl
- +cQg==
-X-Gm-Message-State: AGi0PubGxnQTdWXOXvOw9CrAqJmnDppbBYEXvXVNG19RiPpeyFq87KU6
- ZzZoxOr2vAQyV59h/6QEh0JRq1+X7Gw=
-X-Google-Smtp-Source: APiQypLdx/GjEcHz6rJ7WbzX0/P9ebNLuTecdw2Ea/3fCP6OGGDNcJhQB5QpOMmbt16ngpOExEDkOQ==
-X-Received: by 2002:a05:600c:2257:: with SMTP id
- a23mr529751wmm.128.1586195268801; 
- Mon, 06 Apr 2020 10:47:48 -0700 (PDT)
+ bh=3C5u9DrXZj6rRyHI74cwCLmjedB/NXARv4QiTEDtzdw=;
+ b=ZrjT8eh/WyIby44lzz0CYpuqsHyWLKsL14/lxeOIlXh21RKggkq2paYBbCwQNRs4lX
+ xMikwGhl8OyUd9mApeU2JJqmJxX7bc5pIF/juxy4PgBnicwy+ROYiCr1AxrX/xRHWYIB
+ Kh93Yn1aGEPVsaoyZZwlk5PdvkI73MotSpyhjogkYsvuaYh38ACy+6YFIs3Z0s+mv5kX
+ zp9VILi2YUHUqTFgtdgNHOyxNRrL3EDZBZ0Sh79tsK71zP6NZ74wcGGf3sqCav4UmkNr
+ WMInmWfMhWsNgWXO1qunCgLz1VLaPVpDws/ATFfrjwdCk3h/wpT80/yLzaKTW6rlneNN
+ l/4A==
+X-Gm-Message-State: AGi0PuZ2KJwZuWOs6UNN2Ulj1VNOdapBSdKIL198jMbwJKkgRakmO06a
+ FnT3VnNnl2ZqO6B18IDTydEsoYbmbD0=
+X-Google-Smtp-Source: APiQypIMxwSmnEtOgCvmsz39WSmC/Oia50+cLhNzfAQJwO+V8sHTK+hVoi1jZIeeZ4Iw8sb/42fzoQ==
+X-Received: by 2002:a5d:5228:: with SMTP id i8mr389256wra.156.1586195280250;
+ Mon, 06 Apr 2020 10:48:00 -0700 (PDT)
 Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.47.47
+ by smtp.gmail.com with ESMTPSA id a67sm364880wmc.30.2020.04.06.10.47.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Apr 2020 10:47:48 -0700 (PDT)
+ Mon, 06 Apr 2020 10:47:59 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH-for-5.1 v2 02/54] scripts/coccinelle: Script to simplify
- DeviceClass error propagation
-Date: Mon,  6 Apr 2020 19:46:51 +0200
-Message-Id: <20200406174743.16956-3-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v2 10/54] hw/arm/fsl-imx31: Move some code from
+ realize() to init()
+Date: Mon,  6 Apr 2020 19:46:59 +0200
+Message-Id: <20200406174743.16956-11-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200406174743.16956-1-f4bug@amsat.org>
 References: <20200406174743.16956-1-f4bug@amsat.org>
@@ -88,7 +86,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::329
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,109 +100,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ Peter Chubb <peter.chubb@nicta.com.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ "open list:i.MX31 kzm" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When a device uses an Error* with data not modified before realize(),
-this call can be moved to init(). Add a Coccinelle patch to find such
-uses.
+Coccinelle reported:
+
+  $ spatch ... --timeout 60 --sp-file \
+    scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+  HANDLING: hw/arm/fsl-imx31.c
+  >>> possible moves from fsl_imx31_init() to fsl_imx31_realize() in hw/arm/fsl-imx31.c:68
+
+Move the calls using &error_abort which don't depend of input
+updated before realize() to init().
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- ...implify-init-realize-error_propagate.cocci | 69 +++++++++++++++++++
- MAINTAINERS                                   |  1 +
- 2 files changed, 70 insertions(+)
- create mode 100644 scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+ hw/arm/fsl-imx31.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/coccinelle/simplify-init-realize-error_propagate.cocci b/scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-new file mode 100644
-index 0000000000..2e3ec4d98a
---- /dev/null
-+++ b/scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-@@ -0,0 +1,69 @@
-+// Find error-propagation calls that don't need to be in DeviceClass::realize()
-+// because they don't use information user can change before calling realize(),
-+// so they can be moved to DeviceClass:initfn() where error propagation is not
-+// needed.
-+//
-+// Copyright: (C) 2020 Philippe Mathieu-Daudé
-+// This work is licensed under the terms of the GNU GPLv2 or later.
-+//
-+// spatch \
-+//  --macro-file scripts/cocci-macro-file.h \
-+//  --sp-file \
-+//    scripts/coccinelle/simplify-init-realize-error_propagate.cocci \
-+//  --timeout 60
-+//
-+// Inspired by https://www.mail-archive.com/qemu-devel@nongnu.org/msg692500.html
-+
-+
-+@ match_class_init @
-+TypeInfo info;
-+identifier class_initfn;
-+@@
-+    info.class_init = class_initfn;
-+
-+
-+@ match_instance_init @
-+TypeInfo info;
-+identifier instance_initfn;
-+@@
-+    info.instance_init = instance_initfn;
-+
-+
-+@ match_realize @
-+identifier match_class_init.class_initfn;
-+DeviceClass *dc;
-+identifier realizefn;
-+@@
-+void class_initfn(...)
-+{
-+    ...
-+    dc->realize = realizefn;
-+    ...
-+}
-+
-+
-+@ propagate_in_realize @
-+identifier match_realize.realizefn;
-+identifier err;
-+identifier errp;
-+identifier func_with_errp =~ "(?!object_property_set_link)";
-+symbol error_abort, error_fatal;
-+position pos;
-+@@
-+void realizefn@pos(..., Error **errp)
-+{
-+    ...
-+    Error *err = NULL;
-+    <+...
-+    func_with_errp(..., \(&error_abort\|&error_fatal\));
-+    ...+>
-+}
-+
-+
-+@ script:python @
-+initfn << match_instance_init.instance_initfn;
-+realizefn << match_realize.realizefn;
-+p << propagate_in_realize.pos;
-+@@
-+print('>>> possible moves from {}() to {}() in {}:{}'
-+      .format(initfn, realizefn, p[0].file, p[0].line))
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9d156d73b3..d06ffeddd5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2057,6 +2057,7 @@ F: scripts/coccinelle/err-bad-newline.cocci
- F: scripts/coccinelle/error-use-after-free.cocci
- F: scripts/coccinelle/error_propagate_null.cocci
- F: scripts/coccinelle/remove_local_err.cocci
-+F: scripts/coccinelle/simplify-init-realize-error_propagate.cocci
- F: scripts/coccinelle/use-error_fatal.cocci
+diff --git a/hw/arm/fsl-imx31.c b/hw/arm/fsl-imx31.c
+index 8472d2e911..61287e24f6 100644
+--- a/hw/arm/fsl-imx31.c
++++ b/hw/arm/fsl-imx31.c
+@@ -62,6 +62,8 @@ static void fsl_imx31_init(Object *obj)
+     for (i = 0; i < FSL_IMX31_NUM_GPIOS; i++) {
+         sysbus_init_child_obj(obj, "gpio[*]", &s->gpio[i], sizeof(s->gpio[i]),
+                               TYPE_IMX_GPIO);
++        object_property_set_bool(OBJECT(&s->gpio[i]), false, "has-edge-sel",
++                                 &error_abort);
+     }
+ }
  
- GDB stub
+@@ -191,8 +193,6 @@ static void fsl_imx31_realize(DeviceState *dev, Error **errp)
+             { FSL_IMX31_GPIO3_ADDR, FSL_IMX31_GPIO3_IRQ }
+         };
+ 
+-        object_property_set_bool(OBJECT(&s->gpio[i]), false, "has-edge-sel",
+-                                 &error_abort);
+         object_property_set_bool(OBJECT(&s->gpio[i]), true, "realized", &err);
+         if (err) {
+             error_propagate(errp, err);
 -- 
 2.21.1
 
