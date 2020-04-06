@@ -2,100 +2,89 @@ Return-Path: <SRS0=By5p=5W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8169C2BA1A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 21:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95BC0C2BA1A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 21:42:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DE98206C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 21:38:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DE98206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 621AC206C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Apr 2020 21:42:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O/rDgy4A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 621AC206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLZRR-0003gS-Mj
-	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 17:38:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38807)
+	id 1jLZVX-0006eS-IE
+	for qemu-devel@archiver.kernel.org; Mon, 06 Apr 2020 17:42:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39407)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <farman@linux.ibm.com>) id 1jLZQq-0003Gd-A5
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 17:37:25 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jLZUo-0005s3-Ad
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 17:41:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <farman@linux.ibm.com>) id 1jLZQp-0004MK-5V
- for qemu-devel@nongnu.org; Mon, 06 Apr 2020 17:37:24 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55958)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <farman@linux.ibm.com>)
- id 1jLZQo-0004Lu-TM; Mon, 06 Apr 2020 17:37:23 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 036LY7QE112558; Mon, 6 Apr 2020 17:37:22 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 3082k2aeee-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 06 Apr 2020 17:37:21 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 036LZjM7118178;
- Mon, 6 Apr 2020 17:37:21 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 3082k2aee0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 06 Apr 2020 17:37:21 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 036LZsSc008317;
- Mon, 6 Apr 2020 21:37:20 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma01dal.us.ibm.com with ESMTP id 306hv680p1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 06 Apr 2020 21:37:20 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
- [9.57.199.107])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 036LbJv440173878
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 6 Apr 2020 21:37:19 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 99A8A124053;
- Mon,  6 Apr 2020 21:37:19 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 11A2A124052;
- Mon,  6 Apr 2020 21:37:19 +0000 (GMT)
-Received: from [9.160.96.56] (unknown [9.160.96.56])
- by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
- Mon,  6 Apr 2020 21:37:18 +0000 (GMT)
-Subject: Re: [RFC PATCH v2 7/7] vfio-ccw: Add support for the CRW irq
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200206214509.16434-1-farman@linux.ibm.com>
- <20200206214509.16434-8-farman@linux.ibm.com>
- <20200406182255.129a6798.cohuck@redhat.com>
-From: Eric Farman <farman@linux.ibm.com>
-Message-ID: <ff56c045-b4eb-bb54-c719-091cd16b6b7e@linux.ibm.com>
-Date: Mon, 6 Apr 2020 17:37:18 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jLZUm-0007Rl-W2
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 17:41:30 -0400
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:39447)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jLZUm-0007R4-Pw
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 17:41:28 -0400
+Received: by mail-wm1-x336.google.com with SMTP id y20so1098923wma.4
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 14:41:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=fd4qMe0MNlLWQw0m356lBepCE1KHD5482aT3VMneRyU=;
+ b=O/rDgy4ArDBSgC64odnOlwjrIG8xrsj8sYaiBs60aGJRtGEq9QSau62jdEhxlPIHHf
+ 0qsnQ6OBUFZrCYkwMJn5fXaUF8aSA8Bo7YaJMeWGmO9OUIjYjGMrkGjgz/TRG9l3dZcp
+ T0od1Rf0CGRV+kQIkGLQH8AFJ+WrzbcjwwTuVGdUQPYg2oQmY0g8bBcbaKFeS0ZriOVh
+ TuCDxMkSV5UIO8yB9RfPoQNxhPFMzdtwckqnco/LoeztuUeWG4pL6aRGLxoskKyyScDM
+ eTNIBSxlMMtG7XgNjZpK5Hjvj4itas7LCQSHBNAZB9o+09vpfY9r7vV5bMAIFsl2Oh96
+ Oyjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=fd4qMe0MNlLWQw0m356lBepCE1KHD5482aT3VMneRyU=;
+ b=n68IOgiJi89FomcM7fH+uR74NdeL1H0p3MejltZPG1vrMzO1Xmn0wUVYqVjjQgBL8W
+ F/4VQdYXFRu0QmbHMmjfHFaKGrqzSyUJBn9Sz4ep6VyvRGn7DfbDPQyEE0pHlqtuH850
+ CfpFtbFygiUh2h+KL3HdLo+nmkecE017ELfpxjlxWwUip3ME1Erfjz0T2ri8T80GbMnM
+ ijlXF2rt1nwmuGYmF3kJ1N8mYLaBnvow7l9JezhhnhBH9vWVDmgcYIiEnKZN8XszAH2r
+ aNk2FvnMXUfVYYj/HFEQWyBGsD0/R8snJA/R9CDUlB0QVYUwzIJEeMA4ZLLh1hn8y2oa
+ Kkkw==
+X-Gm-Message-State: AGi0PuYvfO1wxMCGaFIJpQZo6/GW7DMfgtZmxoki3ytonCN1KcWqI6bX
+ Tqabp9qr634F6HrjjhBvG6ZcfVV8uNE=
+X-Google-Smtp-Source: APiQypI8Nw8wJIFACpz1Y0nnk08aB0dmr5fpB+2pDNlaFpytHW/ZCBmf2j7glJkG2xTIRB4eo2Or8g==
+X-Received: by 2002:a1c:5446:: with SMTP id p6mr1369265wmi.172.1586209287182; 
+ Mon, 06 Apr 2020 14:41:27 -0700 (PDT)
+Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id v7sm28011239wrs.96.2020.04.06.14.41.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 06 Apr 2020 14:41:26 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.0?] .github: Enable repo-lockdown bot to refuse GitHub
+ pull requests
+Date: Mon,  6 Apr 2020 23:41:25 +0200
+Message-Id: <20200406214125.18538-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <20200406182255.129a6798.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-06_10:2020-04-06,
- 2020-04-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- suspectscore=0 adultscore=0 priorityscore=1501 impostorscore=0
- malwarescore=0 clxscore=1015 mlxscore=0 phishscore=0 mlxlogscore=999
- spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060160
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::336
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,125 +96,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
- qemu-s390x@nongnu.org, Jared Rossi <jrossi@linux.ibm.com>,
- qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Some GitHub users try to open pull requests against the GitHub
+mirror. Unfortunate these get ignored until eventually someone
+notices and closes the request.
 
+Enable the 'Repo Lockdown' [*] 3rd party bot which can autorespond
+to pull requests with a friendly comment, close the request, and
+then lock it to prevent further comments.
 
-On 4/6/20 12:22 PM, Cornelia Huck wrote:
-> On Thu,  6 Feb 2020 22:45:09 +0100
-> Eric Farman <farman@linux.ibm.com> wrote:
-> 
->> From: Farhan Ali <alifm@linux.ibm.com>
->>
->> The CRW irq will be used by vfio-ccw to notify the userspace
->> about any CRWs the userspace needs to handle. Let's add support
->> for it.
->>
->> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
->> Signed-off-by: Eric Farman <farman@linux.ibm.com>
->> ---
->>
->> Notes:
->>     v1->v2:
->>      - Add a loop to continually read region while data is
->>        present, queueing CRWs as found [CH]
->>     v0->v1: [EF]
->>      - Check vcdev->crw_region before registering the irq,
->>        in case host kernel does not have matching support
->>      - Split the refactoring changes to an earlier (new) patch
->>        (and don't remove the "num_irqs" check in the register
->>        routine, but adjust it to the check the input variable)
->>      - Don't revert the cool vfio_set_irq_signaling() stuff
->>      - Unregister CRW IRQ before IO IRQ in unrealize
->>      - s/crw1/crw0/
->>
->>  hw/vfio/ccw.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 51 insertions(+)
->>
-> 
->> @@ -265,6 +266,40 @@ static void vfio_ccw_reset(DeviceState *dev)
->>      ioctl(vcdev->vdev.fd, VFIO_DEVICE_RESET);
->>  }
->>  
->> +static void vfio_ccw_crw_notifier_handler(void *opaque)
->> +{
->> +    VFIOCCWDevice *vcdev = opaque;
->> +    struct ccw_crw_region *region = vcdev->crw_region;
->> +    CRW crw;
->> +    int size;
->> +    uint8_t rsc, erc;
->> +
->> +    if (!event_notifier_test_and_clear(&vcdev->crw_notifier)) {
->> +        return;
->> +    }
->> +
->> +    do {
->> +        memset(region, 0, sizeof(*region));
->> +        size = pread(vcdev->vdev.fd, region, vcdev->crw_region_size,
->> +                     vcdev->crw_region_offset);
->> +
->> +        if (size == -1) {
->> +            error_report("vfio-ccw: Read crw region failed with errno=%d", errno);
->> +            break;
->> +        }
->> +
->> +        if (size == 0 || region->crw0 == 0) {
-> 
-> Does it make any sense to expect both of them as an indication that
-> there are no more crws at the moment? Grabbing a zeroed crw makes the
-> most sense as a stop condition, I think.
+[*] https://github.com/dessant/repo-lockdown
 
-I think it was overkill on my part.  Though it appears I am missing the
-"zeroing" of the region once it got read.  Whoops.  Okay, those are easy
-fixups.
+Suggested-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+Repo Lockdown is enabled on https://github.com/qemu/qemu/
+---
+ .github/lockdown.yml | 35 +++++++++++++++++++++++++++++++++++
+ MAINTAINERS          |  1 +
+ 2 files changed, 36 insertions(+)
+ create mode 100644 .github/lockdown.yml
 
-> 
-> Also, I'm not sure anymore whether having space for two crws makes too
-> much sense. If we have a case in the future where we get two chained
-> crws, the code will retry anyway and just fetch the chained crw and
-> queue it, wouldn't it?
+diff --git a/.github/lockdown.yml b/.github/lockdown.yml
+new file mode 100644
+index 0000000000..94472d1256
+--- /dev/null
++++ b/.github/lockdown.yml
+@@ -0,0 +1,35 @@
++# Configuration for Repo Lockdown - https://github.com/dessant/repo-lockdown
++
++# Close issues and pull requests
++close: true
++
++# Lock issues and pull requests
++lock: true
++
++issues:
++  comment: |
++    Thank you for your interest in the QEMU project.
++
++    This repository is a read-only mirror of the project's master
++    repostories hosted on https://git.qemu.org/git/qemu.git.
++    The project does not process issues filed on GitHub.
++
++    The project issues are tracked on Launchpad:
++    https://bugs.launchpad.net/qemu
++
++    QEMU welcomes bug report contributions. You can fill new ones on:
++    https://bugs.launchpad.net/qemu/+filebug
++
++pulls:
++  comment: |
++    Thank you for your interest in the QEMU project.
++
++    This repository is a read-only mirror of the project's master
++    repostories hosted on https://git.qemu.org/git/qemu.git.
++    The project does not process merge requests filed on GitHub.
++
++    QEMU welcomes contributions of code (either fixing bugs or adding new
++    functionality). However, we get a lot of patches, and so we have some
++    guidelines about submitting patches described in our Wiki:
++    https://wiki.qemu.org/Contribute/SubmitAPatch and
++    https://wiki.qemu.org/Contribute/FAQ
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9d156d73b3..0559e84790 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2833,6 +2833,7 @@ M: Alex Bennée <alex.bennee@linaro.org>
+ M: Fam Zheng <fam@euphon.net>
+ R: Philippe Mathieu-Daudé <philmd@redhat.com>
+ S: Maintained
++F: .github/lockdown.yml
+ F: .travis.yml
+ F: scripts/travis/
+ F: .shippable.yml
+-- 
+2.21.1
 
-I suppose.
-
-I thought the reason for including them now was to avoid "if region size
-== 4 vs 8 vs XX" logic at some mysterious time in the future.  But
-certainly ripping it out so we only pass a single CRW at a time would
-simplify this quite a bit.
-
-> 
->> +            /* No more CRWs to queue */
->> +            break;
->> +        }
->> +
->> +        memcpy(&crw, &region->crw0, sizeof(CRW));
->> +        rsc = (crw.flags & 0x0f00) >> 8;
->> +        erc = crw.flags & 0x003f;
-> 
-> I think we already have something for that... ah yes,
-> CRW_FLAGS_MASK_RSC and CRW_FLAGS_MASK_ERC.
-
-Huh, look at that.  :)
-
-> 
->> +        css_queue_crw(rsc, erc, 0, 0, crw.rsid);
-> 
-> ...or maybe an alternative interface that allows us to queue a
-> ready-made crw?
-
-Sure, that would be nice.  I'll add that as an additional patch to this
-series, prior to this one.
-
-> 
->> +    } while (1);
->> +}
->> +
->>  static void vfio_ccw_io_notifier_handler(void *opaque)
->>  {
->>      VFIOCCWDevice *vcdev = opaque;
-> 
 
