@@ -2,79 +2,89 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04D8CC2BA80
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 16:39:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E344BC2BB55
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 16:52:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7C602072A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 16:39:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0FCF2076E
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 16:52:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="juwtMfnE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7C602072A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lT6GNFB+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0FCF2076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLrFx-0001yR-1R
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 12:39:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52774)
+	id 1jLrSG-0007S2-Ro
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 12:52:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54299)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jLrF5-0001XS-6A
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 12:38:28 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jLrPk-00058w-ER
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 12:49:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jLrF3-0004A8-Sq
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 12:38:26 -0400
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:43970)
+ (envelope-from <alex.bennee@linaro.org>) id 1jLrPj-0007qG-AC
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 12:49:28 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35772)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jLrF3-00049T-NB
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 12:38:25 -0400
-Received: by mail-oi1-x22c.google.com with SMTP id k5so2044700oiw.10
- for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 09:38:25 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jLrPj-0007oa-05
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 12:49:27 -0400
+Received: by mail-wr1-x444.google.com with SMTP id g3so4718710wrx.2
+ for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 09:49:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=g2K6/kivdpb/gy0FkXHfjWtw8hqxceT1RbziT4cqcfk=;
- b=juwtMfnEBGuBnS8U9fHm02rArXiocT0m5wVIjKOvq2KyJ6Cu+Z0x1I57TszzIOuHR6
- lp/R1mp2QBpKXNcpsJNh3uFduQZVfuFV8zsbj4wudx8HR9j73s9MQEfOGo+F4vusA/EJ
- MrW55lNBlEWyMSFLS5Tl4Ciw/ko5FZbp9cEAw//QtyOI0V38VBUJznfuOdTlZr2WIphm
- nRZZYbyQ/pmvawBTW9TLhCir9JYxZ5nTpDdpqBKhqebK5Zj7YyK9865gXxrIqyipiMpR
- J8arQJuPWnEequGz6QImVwS0OJXnfbL7uwuD7d3XJihcqg1JMy1gK/ub1fJxX3hh7qm+
- 1wWw==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=LdpF01ktrNUfZW4bVeaysVbrsuqT8gEeZIMiG7KygtU=;
+ b=lT6GNFB+0qlp4uWHTTT5gG8sk52dw7X6PrAxjS1dHrR1su8sPE2DUqn+MK1CY5dnK3
+ uOqCMDZnyt9Lgw92ghndJPLH+Bczz0L/n0gdV21k11E1qL67BHbdTPHM5bjQhzFJAOxO
+ 3TO6tGAfHtW/wplruaiDSZBS+rxju9C9LDXUuxGNGCtTe/zJa/D+QlkaeNcprIYvT2Ei
+ yLuhmzM9i7SMk/T4MXahQt5CNMRtILjr7DkbUJNWfsnQx67cALaEJzYriAvEUFPtH4iv
+ w71CmP2ZmEs/2Gyq2PA/pSXDgKsAfXi9uFbL0nS5xvp39Fg8oQ0tCpRSfx/2ZBh0zZnh
+ WcBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=g2K6/kivdpb/gy0FkXHfjWtw8hqxceT1RbziT4cqcfk=;
- b=sk2ZWSOTWwBuM1hi+lHAvewx8yZvynBLJM3jeh3JNZXOQccXqEScsBYJgip9SsuC6n
- juppTRNMRKZmeIsfMOlnq6Y+YW7PvbHcxSCEowtgB54RmJk3W9wsArxhXAwbaIFrBxN2
- EppcwBujlJK5jjqS51q01RnVSasKiDsf6fyhyAQjAiRgBPAac1WygH1mukOsLykm3qRn
- 7xY93EEO/blC9lZE67o8rE9DobE8s15Qk/bcKJY+72E80rearrXlmIf66OqdqG5WtwlP
- RYTj7GM4XARyc1elldiWfmK+34G5pVpwh672dm50Yg1/c/+lB/mrhmUNFqnPwEEtunSX
- bOlg==
-X-Gm-Message-State: AGi0PuZQaMufc00/nVv+iEqPr8jluwNbrhoLCB8LJYvkf98PObPjwum8
- jQr3SfXk7xAjxEF4BkEULR61HvfeO2bG0fimbjxaRQ==
-X-Google-Smtp-Source: APiQypLPIjuHWdLMeP1Fs2lKMQHM7FgV169a19dKc+gFCfCPgDfowW9cwv0roNin+a12b0bxCGk++BMTIksyu83qOD4=
-X-Received: by 2002:aca:c608:: with SMTP id w8mr97958oif.163.1586277504802;
- Tue, 07 Apr 2020 09:38:24 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=LdpF01ktrNUfZW4bVeaysVbrsuqT8gEeZIMiG7KygtU=;
+ b=aeaJ58S7BVx/gjDBMvZokPYT/77Y8l02bbRVGDtP/FoX0mzynXg8Q9Y85A6dZRpmqJ
+ zjFCBwrqLjTi68yIglsX+Lsjn6qK2lLTZL1AFoIsIOt3EH2+rQYGRJ18hStdYX2f0LJf
+ ICAE0AJQK/FVM5S3izr6FUra5XVw5al62P7yhv+BvO70vqM7JMGXtUsHMae9m0IIz2nb
+ FgUbKNogB+hqsUO0yw5gTx5Te3QOMS2W0ee4N7RTUHbRhxmy70BPZ6O7WNg0J8tdvqr+
+ EXynR8JdpSp8QWlHrhYASua+tMpFsaZdIbcdAVj2ZDheiKLoDL4TyuzK+tPcE3Dr+/Ct
+ r1wg==
+X-Gm-Message-State: AGi0PuawffJOYLimmyMsEL7VRSkECcgyjIgUymfSNtDneG40oRw/4GSy
+ YLTWSqtOW5d7xRqQ/mosvP+qAg==
+X-Google-Smtp-Source: APiQypK+g4N2NgGRBo+5MXt0qvZbnzM8f2wTKzYpnzAZRYe1/VNutaTkP8hBCvJNUwqz3xRD6ci16Q==
+X-Received: by 2002:a5d:6104:: with SMTP id v4mr3946856wrt.213.1586278165565; 
+ Tue, 07 Apr 2020 09:49:25 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id n6sm32934401wrp.30.2020.04.07.09.49.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Apr 2020 09:49:24 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3E16D1FF7E;
+ Tue,  7 Apr 2020 17:49:23 +0100 (BST)
+References: <20200407140746.8041-1-pbonzini@redhat.com>
+ <20200407140746.8041-2-pbonzini@redhat.com>
+User-agent: mu4e 1.3.10; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 1/5] atomics: convert to reStructuredText
+In-reply-to: <20200407140746.8041-2-pbonzini@redhat.com>
+Date: Tue, 07 Apr 2020 17:49:23 +0100
+Message-ID: <87ftdf9r70.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20200407114523.27583-1-armbru@redhat.com>
-In-Reply-To: <20200407114523.27583-1-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Apr 2020 17:38:13 +0100
-Message-ID: <CAFEAcA9N49kG++QtbJ6vsWeBf=xbyGSCwQnONeepG4gw-6AJBQ@mail.gmail.com>
-Subject: Re: [PULL 0/1] QAPI patches for 2020-04-07
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::22c
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,38 +96,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: fangying1@huawei.com, qemu-devel@nongnu.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 7 Apr 2020 at 12:46, Markus Armbruster <armbru@redhat.com> wrote:
->
-> The following changes since commit 53ef8a92eb04ee19640f5aad3bff36cd4a36c250:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200406' into staging (2020-04-06 12:36:45 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2020-04-07
->
-> for you to fetch changes up to 1394dc0690e7a1514bd6594322d5a2105e881769:
->
->   json: Fix check for unbalanced right curly brace (2020-04-07 13:10:11 +0200)
->
-> ----------------------------------------------------------------
-> QAPI patches for 2020-04-07
->
-> ----------------------------------------------------------------
-> Simran Singhal (1):
->       json: Fix check for unbalanced right curly brace
->
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Applied, thanks.
+> No attempts to fix or update the text; these are left for the next
+> patch in the series.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
--- PMM
+--=20
+Alex Benn=C3=A9e
 
