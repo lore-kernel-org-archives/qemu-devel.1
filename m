@@ -2,73 +2,85 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0C9EC2D0EC
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 21:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66EDFC2D0EC
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 22:14:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EE9B20730
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 21:42:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EE9B20730
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 34AC020730
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 22:14:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qVa6ALr5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34AC020730
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLvzZ-0006yR-K5
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 17:42:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41525)
+	id 1jLwU2-0006UD-Aq
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 18:14:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34745)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jLvy8-0005cs-ME
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 17:41:17 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jLwTD-00060A-VW
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 18:13:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jLvy7-0007v2-Hm
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 17:41:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41414)
+ (envelope-from <peter.maydell@linaro.org>) id 1jLwTC-0003cC-Dt
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 18:13:23 -0400
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:32972)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jLvy7-0007uI-CX
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 17:41:15 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jLvy6-00082e-Ml
- for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 21:41:14 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AB3392E80E7
- for <qemu-devel@nongnu.org>; Tue,  7 Apr 2020 21:41:14 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jLwTC-0003YO-0f
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 18:13:22 -0400
+Received: by mail-ot1-x335.google.com with SMTP id 22so4888708otf.0
+ for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 15:13:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=UsucZV2y4UQhnbWExsDrnLUHUp7t4hWaxJQR+dm5YB0=;
+ b=qVa6ALr5fdVfw5RQj+3nwlG3to5V1muPSNWzv+1ud+0++smo014WiINhRbPC47P/GU
+ GpAKac1pzYFeoljc9z0Gpyhk4uDrGXq+rwwvCAWBoVTF6S1yAXTRjzCsaJPNUOTbnjL9
+ 1N6tX/V1Dm254M2DiG8GLQuWfGVi+4ZiNmEBcHQRgwl8X5eg0+o+pUD0W/OeuPjmkux8
+ QBRMVtXZHd9tuedTGn3ULAdtJ3RBHOCi/H33PD3TPKwLl2LK0pKFKRIo9ik4Y70TfmvC
+ PvLLR0nZvsoGNvjztzfL+iFiTH4+/eWLHbKZ+mY41F/9SjPa37LRC8qFrxqlr9hxLB+K
+ jbYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=UsucZV2y4UQhnbWExsDrnLUHUp7t4hWaxJQR+dm5YB0=;
+ b=XJdDIBPbCxpQdcRCcbK7ULd8pxDoKdKJHX+e/+cc6oBTdQdo2dLzgiT12WLx6q6n0C
+ NKGX+3v8xjakCHroQzXPdskF0GcsUgCHy72KVoRtFVjJScZNrqHm7IYAsCdp2fEL2Eo8
+ JUeN4zotfhDjXJzvaKZs7hN7UKQbFd4uPxUtN6JfkPi3pfUNQIkCFwEkiDQinqKbzx/J
+ sva5odhg2kH44FzhEPBRGhgH/HvTVwrx+e6QbGuaRsOCMF5wh90ShtC3gl0Da9wjn9hc
+ kzgmztdJ63JfJh0FVYWCX3FGXNfm6xBhoy7XOZDAKYjNhoqu9uRbjF+qymCyRoYzWrLs
+ mQ9A==
+X-Gm-Message-State: AGi0Pub2ljqaN3ZGG2T48tqnFzAElEXXE6LLracpnAkeoH4j3NtYDFjG
+ pbRPy7ngXd1b+gv0C+osyAYtPewJElT54Bx+PLWkTA==
+X-Google-Smtp-Source: APiQypJO5PIalsjHvFFY4soy4e95dDkD3FbpPRxZt6v+uixweK4EOPShFfD5bn/HRjoBdTpZ3XaM+liwVqgiOU3sxNA=
+X-Received: by 2002:a05:6830:11d5:: with SMTP id
+ v21mr3468057otq.91.1586297599245; 
+ Tue, 07 Apr 2020 15:13:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20200407155118.20139-1-alex.bennee@linaro.org>
+In-Reply-To: <20200407155118.20139-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Apr 2020 23:13:08 +0100
+Message-ID: <CAFEAcA_YM-eFewESuVCM--waDUHMEsf2y7uKd0Qvy0Lc8rE9DQ@mail.gmail.com>
+Subject: Re: [PULL for 5.0-rc2 00/13] various fixes
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Apr 2020 21:35:36 -0000
-From: JS <1859916@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: js1943 mark-cave-ayland
-X-Launchpad-Bug-Reporter: JS (js1943)
-X-Launchpad-Bug-Modifier: JS (js1943)
-References: <157915593050.14807.16939354364023930380.malonedeb@wampee.canonical.com>
-Message-Id: <158629533719.21707.939647143719243213.malone@gac.canonical.com>
-Subject: [Bug 1859916] Re: coreaudio not working on MacOS
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a296f04231dee355be5db73cc878b9e21689a253";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 260454907beefb31782f8572b900dcf70734cd71
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,85 +89,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859916 <1859916@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is working now. Tested with 4.1.1, 4.2 and 5rc1.
+On Tue, 7 Apr 2020 at 16:51, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+>
+> The following changes since commit 53ef8a92eb04ee19640f5aad3bff36cd4a36c2=
+50:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-202=
+00406' into staging (2020-04-06 12:36:45 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-misc-fixes-070420-1
+>
+> for you to fetch changes up to cce743abbf398a324879039cd582349b36da0ea6:
+>
+>   tcg/i386: Fix %r12 guest_base initialization (2020-04-07 16:19:49 +0100=
+)
+>
+> ----------------------------------------------------------------
+> Various fixes:
+>
+>   - add .github repo lockdown config
+>   - better handle missing symbols in elf-ops
+>   - protect fcntl64 with #ifdef
+>   - remove unused macros from test
+>   - fix handling of /proc/self/maps
+>   - avoid BAD_SHIFT in x80 softfloat
+>   - properly terminate on .hex EOF
+>   - fix configure probe on windows cross build
+>   - fix %r12 guest_base initialization
 
-** Changed in: qemu
-       Status: New =3D> Invalid
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859916
+Applied, thanks.
 
-Title:
-  coreaudio not working on MacOS
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-Status in QEMU:
-  Invalid
-
-Bug description:
-  OS: MacOS Catalina 10.15.2
-
-  qemu-system-x86_64 -version
-  QEMU emulator version 4.2.50 (v4.2.0-13-g084a398bf8-dirty)
-  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-
-  Qemu install via brew: brew install qemu
-
-  ---
-
-  I use following to install Ubuntu 18.04 desktop successfully:-
-
-  IMG_CD=3D$HOME/Downloads/iso/ubuntu-18.04.3-desktop-amd64.iso
-  IMG_FILE=3D$HOME/code/vm/qemu/u64d01.qcow2
-  MAC_ADDR=3Dxx:xx:xx:xx:xx:xx
-
-  qemu-system-x86_64 \
-  -no-user-config -nodefaults \
-  -show-cursor \
-  -name u64d01 \
-  -M q35,accel=3Dhvf,usb=3Doff,vmport=3Doff \
-  -cpu host -smp 4 -m 2048 \
-  -overcommit mem-lock=3Doff \
-  -overcommit cpu-pm=3Doff \
-  -rtc base=3Dutc,clock=3Dhost \
-  \
-  -device virtio-tablet-pci \
-  -device virtio-vga \
-  \
-  -device virtio-blk-pci,drive=3Dssd1 \
-  -drive id=3Dssd1,file=3D$IMG_FILE,if=3Dnone,format=3Dqcow2 \
-  \
-  -device virtio-net-pci,netdev=3Dnic1,mac=3D$MAC_ADDR \
-  -netdev user,id=3Dnic1,ipv4=3Don,ipv6=3Don,hostname=3Du64d01,hostfwd=3Dtc=
-p::2222-:22 \
-  \
-  -device ich9-intel-hda,id=3Dsnd,msi=3Don \
-  -device hda-output,id=3Dsnd-codec0,bus=3Dsnd.0,cad=3D0,audiodev=3Dsnd0 \
-  -audiodev coreaudio,id=3Dsnd0,out.buffer-count=3D10000 \
-  \
-  -cdrom $IMG_CD
-
-  Removing the last -cdrom line Ubuntu desktop boot up and everything
-  work perfectly except the audio.
-
-  I test with wav audio driver by replacing the -audiodev line as
-  follow, which save the client audio to a wave file:
-
-  -audiodev wav,id=3Dsnd0,path=3D$HOME/qemu.wav
-
-  I start the vm, open firefox, play a few video, then shutdown the vm.
-  Then I can play the qemu.wav file and all the audio was recorded
-  there.
-
-  However, I can't get audio directly with coreaudio.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859916/+subscriptions
+-- PMM
 
