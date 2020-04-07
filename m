@@ -2,77 +2,75 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86E64C2BABC
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 09:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D64ACC2BABC
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 09:12:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 254A2206F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 09:12:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2552206F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 09:12:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZuqDcovt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 254A2206F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="DhFZdMeS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2552206F7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLkH1-0007z6-Af
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 05:11:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58427)
+	id 1jLkH9-0007dK-N5
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 05:12:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52212)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jLkFU-0006Sj-Q4
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 05:10:26 -0400
+ (envelope-from <joel.stan@gmail.com>) id 1jLjrT-0005Pk-Sg
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 04:45:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1jLkFT-0005Iu-Sy
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 05:10:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36618
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jLkFT-0005IA-OV
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 05:10:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586250623;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=GFLMtEby526XwM+KZFxCy1SC8KWxDQ3asUq7H9NWTlc=;
- b=ZuqDcovtJck3efQp0q/XHzu3QF7RqXXm23+s9Y3mLxi7YJm8tNr8Jh0pgQkfjwoynmR5Lq
- B54rjXPlv6L8rxb4+G45XKE/88rSH15t6v8oGKuKsrT3V2MqFCXsHyu5kMUKMJcEoJm/VZ
- CKe1IWbMZJb7Qc9EK4OGH4fM0RJ9fh8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-WmcSVNzMNZOQGReMF2iR_A-1; Tue, 07 Apr 2020 05:10:19 -0400
-X-MC-Unique: WmcSVNzMNZOQGReMF2iR_A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C09F1922023;
- Tue,  7 Apr 2020 09:10:18 +0000 (UTC)
-Received: from localhost (ovpn-113-168.ams2.redhat.com [10.36.113.168])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CAC1210002BC;
- Tue,  7 Apr 2020 09:10:17 +0000 (UTC)
-Date: Tue, 7 Apr 2020 10:10:16 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH 0/4] async: fix hangs on weakly-ordered architectures
-Message-ID: <20200407091016.GD247777@stefanha-x1.localdomain>
-References: <20200406191320.13371-1-pbonzini@redhat.com>
+ (envelope-from <joel.stan@gmail.com>) id 1jLjrN-0001IS-CM
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 04:45:35 -0400
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:34363)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <joel.stan@gmail.com>) id 1jLjrL-0001Gv-9j
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 04:45:27 -0400
+Received: by mail-qk1-x742.google.com with SMTP id i186so863404qke.1
+ for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 01:45:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ydEtRGAkc0YXG55b5Np4abx2y7Vaj86FY6hLk8OgnIY=;
+ b=DhFZdMeSFLF8XJhhtq4LoDGLY1AiQG+Wr36CsFlBOyboisz/BMFmEYa9RRfKctWWo6
+ wwL1jO3cMFAcr9oNYFm3I2kgdHqoqT6Jp6YO72+mJVShgFuOLf9nVjai1yzzSRlGmt/h
+ cVdCvibx0WCksdN3oI6+dUaYyTxlpL6I7tAYo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ydEtRGAkc0YXG55b5Np4abx2y7Vaj86FY6hLk8OgnIY=;
+ b=pwXjUnQVlmz8Lg1xpV78/V/00dn6a8q0MeZo2claU86oeTq5+185+X7W+G0XX63vJP
+ 1fnZPquBq79oSA0vag1/VE7+hDMGiJnbI26G1+Dapko88QYHRK9HEekQ6ClJV5BXrZHB
+ uFgH8OyYt5GLZymdy3OOyUG+OP6UP/wXHhjs4nQVZpJxIqhIb7hIlZJMHVugaDOTeTPU
+ qdSQ6F0t7Q6Poe7ynDaeoaB2Chs28xdZVahOV9QJKtcZrK8QVtmj8qUYiwR+R2Agwpul
+ tMtBwEaA6NUpFB55ecS0licuRVQXOg+2FZxBuQCBwxQTuPFvKf1hobH6Yt8F2hNXot9c
+ pgZA==
+X-Gm-Message-State: AGi0PuZv5OfzdmXMu4AT0TuRO+rJFfahgt2hZCjACBJoEGMg77hGvsVG
+ NKKfPEkTCv7wKGgZ0OzlKdvnbT8IhSFWZ1K6kzI=
+X-Google-Smtp-Source: APiQypIcVsd5NL5YR6AIW4PXc2qfRwJHXD1yJGfeQDlfRHahgDiUMKdbq+pJ+dDRdQBKESm0BRWNeZeyGG9j3Uc70I4=
+X-Received: by 2002:a37:a84b:: with SMTP id r72mr1098230qke.414.1586249126069; 
+ Tue, 07 Apr 2020 01:45:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200406191320.13371-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="/3yNEOqWowh/8j+e"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <0b02fe788de99120894f87f6d5c60e15d6a75d85.1586213450.git.dirty@apple.com>
+ <CAFEAcA9FSVzxwudyaDoCty8B+Up33caM20qytLNO7HAXWmcwtg@mail.gmail.com>
+In-Reply-To: <CAFEAcA9FSVzxwudyaDoCty8B+Up33caM20qytLNO7HAXWmcwtg@mail.gmail.com>
+From: Joel Stanley <joel@jms.id.au>
+Date: Tue, 7 Apr 2020 08:45:14 +0000
+Message-ID: <CACPK8Xc3mpoakAqq2_wccCH6_2i+V4NB61CmdxtMecJ4ejzgmQ@mail.gmail.com>
+Subject: Re: [PATCH v1] nrf51: Fix last GPIO CNF address
+To: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::742
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,66 +82,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ying Fang <fangying1@huawei.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Cameron Esfahani <dirty@apple.com>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---/3yNEOqWowh/8j+e
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tue, 7 Apr 2020 at 08:41, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Mon, 6 Apr 2020 at 23:55, Cameron Esfahani <dirty@apple.com> wrote:
+> >
+> > NRF51_GPIO_REG_CNF_END doesn't actually refer to the start of the last
+> > valid CNF register: it's referring to the last byte of the last valid
+> > CNF register.
+> >
+> > This hasn't been a problem up to now, as current implementation in
+> > memory.c turns an unaligned 4-byte read from 0x77f to a single byte read
+> > and the qtest only looks at the least-significant byte of the register.
+> >
+> > But, when running with Cedric Le Goater's <clg@kaod.org> pending fix for
+> > unaligned accesses in memory.c, the qtest breaks.
+>
+> Do you have a link to this patch, please? I had a quick search through
+> my mailing list articles but couldn't see anything obviously relevant.
 
-On Mon, Apr 06, 2020 at 03:13:16PM -0400, Paolo Bonzini wrote:
-> Patch 4 fixes qemu-img and qemu-io hangs on weakly-ordered architectures.
-> Patch 1-3 are related docs fixes and improvements.
->=20
-> This is RFC because it relies on the iothread being locked during aio_pol=
-l
-> on the main AioContext.  If I add assertions for this however I see a
-> failure for test 267, so I am posting it as a preview before I debug that=
-.
-> The doc patches can also go in independently of course.
->=20
-> Paolo
->=20
-> Paolo Bonzini (4):
->   atomics: convert to reStructuredText
->   atomics: update documentation for C11
->   rcu: do not mention atomic_mb_read/set in documentation
->   async: use explicit memory barriers
->=20
->  docs/devel/atomics.rst | 385 +++++++++++++++++++++++++++++++++++++++
->  docs/devel/atomics.txt | 403 -----------------------------------------
->  docs/devel/index.rst   |   1 +
->  docs/devel/rcu.txt     |   4 +-
->  util/aio-posix.c       |   9 +-
->  util/aio-win32.c       |   8 +-
->  util/async.c           |  12 +-
->  7 files changed, 413 insertions(+), 409 deletions(-)
->  create mode 100644 docs/devel/atomics.rst
->  delete mode 100644 docs/devel/atomics.txt
+There is a reference in this thread:
 
-I have left comments requesting clarifications, but the code change
-looks fine:
+https://lore.kernel.org/qemu-devel/dd8fc1f7-56d9-4d9f-96a4-0fdcafdc8f55@www.fastmail.com/
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+The patch is here:
 
---/3yNEOqWowh/8j+e
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6MQ3gACgkQnKSrs4Gr
-c8hFeAf+MML8QwSVnrPlfjhTtkHNvn8JTzv0uqh4m79SIQgbnoZUgD86pejouTBH
-NnBmd7qSVmTShWb6HTMxPOaDKBIKLNlfKK+nWmPDkyEPqb3Aovt7KqVnk8L+lk6y
-evuD/17SQBk1+vfOH8i6//XzZ8Bd6I5K3IlPHv30HqeWa5x6kweeQbiBS41PpE17
-ebprm4Dd3oD63znjFC/vGLaE8x7O85qGea6bhWFnnRpSTzACQs4hJ7lMeMBS7Fuo
-0TUyo+Y7g9wMBOlzhsU1r+HYU4kWF2AxQBA/ny5DM5IIKpK/0SYrsw8/CX2olNSA
-l2w51q6KJSurQv6mQ7j5nAzqO0CRdA==
-=DTjI
------END PGP SIGNATURE-----
-
---/3yNEOqWowh/8j+e--
-
+https://lore.kernel.org/qemu-devel/20170630030058.28943-1-andrew@aj.id.au/
 
