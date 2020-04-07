@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A2F3C2BA16
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 04:40:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85EADC2BA16
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 04:40:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 020E420748
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 04:40:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5070420748
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 04:40:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="UKlNeUrS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 020E420748
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="W+mhxOeM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5070420748
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLg1z-00064Q-7F
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 00:40:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52340)
+	id 1jLg2N-0006NT-H6
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 00:40:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52395)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jLfyM-0007yQ-Fd
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 00:36:27 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jLfyN-0007zs-Gv
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 00:36:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jLfyL-0004Cn-9F
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 00:36:26 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:40711 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1jLfyM-0004EU-4y
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 00:36:27 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:44791)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jLfyK-0004Al-UH; Tue, 07 Apr 2020 00:36:25 -0400
+ id 1jLfyL-0004Bi-Ps; Tue, 07 Apr 2020 00:36:26 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48xF3K4Hptz9sSk; Tue,  7 Apr 2020 14:36:13 +1000 (AEST)
+ id 48xF3K3SH6z9sSb; Tue,  7 Apr 2020 14:36:13 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1586234173;
- bh=EYxcaKAJK6jtK2yRfiXyVNG0eInMoSPB/jy3Zpie/2s=;
+ bh=DUnTri7UMEV9sPL1R6ffZJAUsoqegh6MBdGQbtcDAxU=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=UKlNeUrSEksUbGIyc8O6geQ/NhgpCdKvaAsM3Ar5+gjtxzq6LIdMPqAr5yiZ/tf9z
- jxB7zxacvQUGeF27BTJB5qwEkS5JsssIt4E6GMVrv7YmCrPYTThtz2GFT7Dx5v/PIY
- EKsJcpZEMkxC8fAX/gt7Z7dpSg1ep+/KBKLgIDq4=
+ b=W+mhxOeMtJvqlhPBm0agJzRIEoupKGsXeppToXgisYD2ACkiW+emDykx0FTMYNl4T
+ prp6bJJUkg2cALl3URuOM31HW5bqjCpkoy0up/MQOvZ5DTXDzfTcrxjnJPkpSFtV46
+ g9zgkmNYk8ynjaryW2OaCLT9RCYFq3lgKMaWDIKs=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 08/10] hw/ppc/ppc440_uc.c: Remove incorrect iothread locking
- from dcr_write_pcie()
-Date: Tue,  7 Apr 2020 14:36:04 +1000
-Message-Id: <20200407043606.291546-9-david@gibson.dropbear.id.au>
+Subject: [PULL 06/10] ppc/spapr: Don't kill the guest if a recovered FWNMI
+ machine check delivery fails
+Date: Tue,  7 Apr 2020 14:36:02 +1000
+Message-Id: <20200407043606.291546-7-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.25.2
 In-Reply-To: <20200407043606.291546-1-david@gibson.dropbear.id.au>
 References: <20200407043606.291546-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,68 +69,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
- clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: aik@ozlabs.ru, qemu-devel@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
+ groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Nicholas Piggin <npiggin@gmail.com>
 
-In dcr_write_pcie() we take the iothread lock around a call to
-pcie_host_mmcfg_udpate().  This is an incorrect attempt to deal with
-the bug fixed in commit 235352ee6e73d7716, where we were not taking
-the iothread lock before calling device dcr read/write functions.
-(It's not sufficient locking, because although the other cases in the
-switch statement won't assert, there is no locking which prevents
-multiple guest CPUs from trying to access the PPC460EXPCIEState
-struct at the same time and corrupting data.)
+Try to be tolerant of FWNMI delivery errors if the machine check had been
+recovered by the host.
 
-Unfortunately with commit 235352ee6e73d7716 we are now trying
-to recursively take the iothread lock, which will assert:
-
-  $ qemu-system-ppc -M sam460ex --display none
-  **
-  ERROR:/home/petmay01/linaro/qemu-from-laptop/qemu/cpus.c:1830:qemu_mute=
-x_lock_iothread_impl: assertion failed: (!qemu_mutex_iothread_locked())
-  Aborted (core dumped)
-
-Remove the locking within dcr_write_pcie().
-
-Fixes: 235352ee6e73d7716
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20200330125228.24994-1-peter.maydell@linaro.org>
-Tested-by: BALATON Zoltan <balaton@eik.bme.hu>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Message-Id: <20200325142906.221248-5-npiggin@gmail.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+[dwg: Updated comment at Greg's suggestion]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/ppc440_uc.c | 3 ---
- 1 file changed, 3 deletions(-)
+ hw/ppc/spapr_events.c | 30 +++++++++++++++++++++++++-----
+ 1 file changed, 25 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
-index d5ea962249..b30e093cbb 100644
---- a/hw/ppc/ppc440_uc.c
-+++ b/hw/ppc/ppc440_uc.c
-@@ -13,7 +13,6 @@
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu/log.h"
--#include "qemu/main-loop.h"
- #include "qemu/module.h"
- #include "cpu.h"
- #include "hw/irq.h"
-@@ -1183,9 +1182,7 @@ static void dcr_write_pcie(void *opaque, int dcrn, =
-uint32_t val)
-     case PEGPL_CFGMSK:
-         s->cfg_mask =3D val;
-         size =3D ~(val & 0xfffffffe) + 1;
--        qemu_mutex_lock_iothread();
-         pcie_host_mmcfg_update(PCIE_HOST_BRIDGE(s), val & 1, s->cfg_base=
-, size);
--        qemu_mutex_unlock_iothread();
-         break;
-     case PEGPL_MSGBAH:
-         s->msg_base =3D ((uint64_t)val << 32) | (s->msg_base & 0xfffffff=
-f);
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index c8964eb25d..1069d0197b 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -833,13 +833,28 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu=
+, bool recovered)
+     /* get rtas addr from fdt */
+     rtas_addr =3D spapr_get_rtas_addr();
+     if (!rtas_addr) {
+-        error_report(
++        if (!recovered) {
++            error_report(
+ "FWNMI: Unable to deliver machine check to guest: rtas_addr not found.")=
+;
+-        qemu_system_guest_panicked(NULL);
++            qemu_system_guest_panicked(NULL);
++        } else {
++            warn_report(
++"FWNMI: Unable to deliver machine check to guest: rtas_addr not found. "
++"Machine check recovered.");
++        }
+         g_free(ext_elog);
+         return;
+     }
+=20
++    /*
++     * By taking the interlock, we assume that the MCE will be
++     * delivered to the guest. CAUTION: don't add anything that could
++     * prevent the MCE to be delivered after this line, otherwise the
++     * guest won't be able to release the interlock and ultimately
++     * hang/crash?
++     */
++    spapr->fwnmi_machine_check_interlock =3D cpu->vcpu_id;
++
+     stq_be_phys(&address_space_memory, rtas_addr + RTAS_ERROR_LOG_OFFSET=
+,
+                 env->gpr[3]);
+     cpu_physical_memory_write(rtas_addr + RTAS_ERROR_LOG_OFFSET +
+@@ -876,9 +891,15 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recov=
+ered)
+          * that CPU called "ibm,nmi-interlock")
+          */
+         if (spapr->fwnmi_machine_check_interlock =3D=3D cpu->vcpu_id) {
+-            error_report(
++            if (!recovered) {
++                error_report(
+ "FWNMI: Unable to deliver machine check to guest: nested machine check."=
+);
+-            qemu_system_guest_panicked(NULL);
++                qemu_system_guest_panicked(NULL);
++            } else {
++                warn_report(
++"FWNMI: Unable to deliver machine check to guest: nested machine check. =
+"
++"Machine check recovered.");
++            }
+             return;
+         }
+         qemu_cond_wait_iothread(&spapr->fwnmi_machine_check_interlock_co=
+nd);
+@@ -906,7 +927,6 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recove=
+red)
+         warn_report("Received a fwnmi while migration was in progress");
+     }
+=20
+-    spapr->fwnmi_machine_check_interlock =3D cpu->vcpu_id;
+     spapr_mce_dispatch_elog(cpu, recovered);
+ }
+=20
 --=20
 2.25.2
 
