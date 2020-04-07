@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62263C2BA80
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A41C2BA80
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:56:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B1FC2072A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:54:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E11E2072A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:56:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sr4j9s1Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B1FC2072A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LUi2JkXA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E11E2072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLqYQ-0000Eu-B5
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 11:54:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43667)
+	id 1jLqa1-0002r0-Ht
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 11:56:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43733)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jLqVe-0003TC-7A
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:31 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jLqVj-0003gS-G8
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jLqVd-0004LX-4b
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:30 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33652)
+ (envelope-from <alex.bennee@linaro.org>) id 1jLqVi-0004Qc-I9
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:35 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:35332)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jLqVc-0004Kw-Uw
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:29 -0400
-Received: by mail-wr1-x441.google.com with SMTP id a25so4514848wrd.0
- for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 08:51:28 -0700 (PDT)
+ id 1jLqVi-0004Pu-B7
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:34 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id r26so2381427wmh.0
+ for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 08:51:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=knuvWGJJjL2l+VM/Pu56sYdaHUVTSyIKJQEQhEZXCg8=;
- b=sr4j9s1YKOZfp2w+RIR3IaPWFx9+8+LQBxRZ4/zmJR/U78j8z/xVZYAgcrc1reyWZ7
- v1MHYYmNnJoPzIjwV5PQjh0dvFj+uL0XOxoeY8h/3aYyzVmKpMZJvn4UbRLiEkTPlOws
- LitRB9IrJpeM2a8yHRhlreW0lWvrBWSLbsI//ZF5qL2Md6a/SqGJW4pkM1W1ch386eB+
- P7XwxF4cy4jwZEmCe4RAJDrr+GV8VKRjsXkxAALsbQ7bbvMjOt/XfhsylbEdCHsbbGgY
- pLCmFPDaeRBNIlIwTzpbCw+7OXKSlkEKZBwjqPdAeHn2t06DQD2jwjjUuvrrsGahhDAF
- kCsQ==
+ bh=rtMP8ceKEL32RxJnzf/04PfZMF0AhqQhuzU8HQYfCC8=;
+ b=LUi2JkXAP2knRV0g2mRSbykVlLamWHHX/kbUWBV/mEN7jTEPFQiyYyKpVEeK7YCdf6
+ grn7xRdEYs6MdplFoMz7H+XWCnEfxEEARuEuEpCj16HUhxQEcX18zgAfk1wxXWFYUMfV
+ 05+icVClCIgaZEljagw9i3iolyowYBEs17ml+8JV4okd4RUMIUWQDb4NMFqzfGw3R9+P
+ hWRLGheQqO+Q5fL+dT2P+bPoCoZGudokuLKzMF2CpmkWAojG5xlUI3Sy9KPd09dawu4y
+ QYVIaAi5LPMWOjifGhXw7tAensV1ic5tzOc965UKIz5QEnsrc8C0niOOG5V3pVCpf8vo
+ yb0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=knuvWGJJjL2l+VM/Pu56sYdaHUVTSyIKJQEQhEZXCg8=;
- b=JardRk4uvRaV8Nxic45LDUpwMZsw3BlDP66QWkfT3VBKc7XRIzagi0kEy+s/GvZsnZ
- 9vexZqw7fRr5G/qK/RzNqBvgOjm9uDWunrD1Ys1gvYd8PYuVv5ep2TAW2jdk4rmYBhVO
- vXbYKZMTAFG7U5w5snjKxzx4ZTEIFHdN6OeqwKXSexmgwOutY2/5Qy0JCMZY1yINs5Oz
- gA2O6wXHlSWR3i7+ONYNQTeNgVppDWDH4mf14Fln877L4Mx4flt/xTus4p5uu6BSLnt8
- p4vfCp8LSgV3c3p7fXctVNhJBWk2NX2FoEJQOhr/7TpW0sPsVoymJAoNCIYUcnXIkKVx
- tYiQ==
-X-Gm-Message-State: AGi0PuZ0xoDpdznT47ZEuShaVEAHZApDik46OAMDD07oGz9B6QQVwn7K
- BZKw5sxQKf+m2SgLN2LSijZsXA==
-X-Google-Smtp-Source: APiQypJ0dbYs8SRX5m98jhtJDdUHK/lSjLgYoREG6PYnmwu675h5dohOA+/se7BhebKWJF8Dnbhj2A==
-X-Received: by 2002:adf:c3d0:: with SMTP id d16mr3664143wrg.180.1586274688050; 
- Tue, 07 Apr 2020 08:51:28 -0700 (PDT)
+ bh=rtMP8ceKEL32RxJnzf/04PfZMF0AhqQhuzU8HQYfCC8=;
+ b=MazbOi4uiYggiHaixLIHWEL5Q2JQacUv7F4ox+mQPM+z/0z2gYm86gStVNsMn+b1+r
+ E7cnIJ7jQqzf91xm0UHUI52bL6qxPb34rGAl0I8AkkjfyKUVqgAV/Y8GP1GH90G2SIgE
+ fVQCPE2RfPR5V9ixyjeDUXIIYpTntq/6utmNd+a+tQUdPgcR2ZY4NTQKqbpROzCuW/Jg
+ 7Kf5cMnu/4r0hHPuJlEbLiuHmRar+VQgRVa5sBTBWCliDCybM+Tv2THNBku3D5x9EkKq
+ j0UYCfcYAitHkb98/WVFR31cJbS5MJhEGaLjHpkXQEqoeUVFmJRrgIGq8YSOVV23n+HH
+ enUA==
+X-Gm-Message-State: AGi0PuYDLR36Ho3bmQ8+/xOnqSvIvA16AxSed2nzYWKdHZWFDhp0QzFn
+ 0IzkAEA62w90GJpdSMzZHdg2L4mHJl4=
+X-Google-Smtp-Source: APiQypLIuKFGNbkZC5FAL/L47KW6gQV7nBfU1FLVoPfcLdfke0Cj3DYzS7sgitjVMcAQ+EsuOJ/t5Q==
+X-Received: by 2002:a1c:1fca:: with SMTP id f193mr2935310wmf.5.1586274693285; 
+ Tue, 07 Apr 2020 08:51:33 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m19sm2755823wml.21.2020.04.07.08.51.20
+ by smtp.gmail.com with ESMTPSA id w15sm21898416wra.25.2020.04.07.08.51.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Tue, 07 Apr 2020 08:51:26 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B392E1FF91;
+ by zen.linaroharston (Postfix) with ESMTP id F1F491FF96;
  Tue,  7 Apr 2020 16:51:18 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 05/13] linux-user: more debug for init_guest_space
-Date: Tue,  7 Apr 2020 16:51:10 +0100
-Message-Id: <20200407155118.20139-6-alex.bennee@linaro.org>
+Subject: [PULL 08/13] softfloat: Fix BAD_SHIFT from normalizeFloatx80Subnormal
+Date: Tue,  7 Apr 2020 16:51:13 +0100
+Message-Id: <20200407155118.20139-9-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200407155118.20139-1-alex.bennee@linaro.org>
 References: <20200407155118.20139-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,49 +96,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Searching for memory space can cause problems so lets extend the
-CPU_LOG_PAGE output so you can watch init_guest_space fail to
-allocate memory. A more involved fix is actually required to make this
-function play nicely with the large guard pages the sanitiser likes to
-use.
+From: Richard Henderson <richard.henderson@linaro.org>
 
+All other calls to normalize*Subnormal detect zero input before
+the call -- this is the only outlier.  This case can happen with
++0.0 + +0.0 = +0.0 or -0.0 + -0.0 = -0.0, so return a zero of
+the correct sign.
+
+Reported-by: Coverity (CID 1421991)
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200403191150.863-5-alex.bennee@linaro.org>
+Message-Id: <20200327232042.10008-1-richard.henderson@linaro.org>
+Message-Id: <20200403191150.863-8-alex.bennee@linaro.org>
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 8198be04460..619c054cc48 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2172,6 +2172,8 @@ unsigned long init_guest_space(unsigned long host_start,
- 
-         /* Check to see if the address is valid.  */
-         if (host_start && real_start != current_start) {
-+            qemu_log_mask(CPU_LOG_PAGE, "invalid %lx && %lx != %lx\n",
-+                          host_start, real_start, current_start);
-             goto try_again;
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 301ce3b537b..ae6ba718540 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -5856,6 +5856,9 @@ static floatx80 addFloatx80Sigs(floatx80 a, floatx80 b, flag zSign,
+         zSig1 = 0;
+         zSig0 = aSig + bSig;
+         if ( aExp == 0 ) {
++            if (zSig0 == 0) {
++                return packFloatx80(zSign, 0, 0);
++            }
+             normalizeFloatx80Subnormal( zSig0, &zExp, &zSig0 );
+             goto roundAndPack;
          }
- 
-@@ -2240,7 +2242,11 @@ unsigned long init_guest_space(unsigned long host_start,
-          * probably a bad strategy if not, which means we got here
-          * because of trouble with ARM commpage setup.
-          */
--        munmap((void *)real_start, real_size);
-+        if (munmap((void *)real_start, real_size) != 0) {
-+            error_report("%s: failed to unmap %lx:%lx (%s)", __func__,
-+                         real_start, real_size, strerror(errno));
-+            abort();
-+        }
-         current_start += align;
-         if (host_start == current_start) {
-             /* Theoretically possible if host doesn't have any suitably
 -- 
 2.20.1
 
