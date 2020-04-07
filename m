@@ -2,89 +2,83 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E344BC2BB55
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 16:52:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63164C2BA1A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 16:56:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0FCF2076E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 16:52:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2EC5620730
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 16:56:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lT6GNFB+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0FCF2076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="1M5VAnnR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EC5620730
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLrSG-0007S2-Ro
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 12:52:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54299)
+	id 1jLrWp-0001CO-9r
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 12:56:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55492)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jLrPk-00058w-ER
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 12:49:29 -0400
+ (envelope-from <dan.j.williams@intel.com>) id 1jLrWE-0000nV-6T
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 12:56:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jLrPj-0007qG-AC
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 12:49:28 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35772)
+ (envelope-from <dan.j.williams@intel.com>) id 1jLrWB-0005XO-EJ
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 12:56:08 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:40660)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jLrPj-0007oa-05
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 12:49:27 -0400
-Received: by mail-wr1-x444.google.com with SMTP id g3so4718710wrx.2
- for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 09:49:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=LdpF01ktrNUfZW4bVeaysVbrsuqT8gEeZIMiG7KygtU=;
- b=lT6GNFB+0qlp4uWHTTT5gG8sk52dw7X6PrAxjS1dHrR1su8sPE2DUqn+MK1CY5dnK3
- uOqCMDZnyt9Lgw92ghndJPLH+Bczz0L/n0gdV21k11E1qL67BHbdTPHM5bjQhzFJAOxO
- 3TO6tGAfHtW/wplruaiDSZBS+rxju9C9LDXUuxGNGCtTe/zJa/D+QlkaeNcprIYvT2Ei
- yLuhmzM9i7SMk/T4MXahQt5CNMRtILjr7DkbUJNWfsnQx67cALaEJzYriAvEUFPtH4iv
- w71CmP2ZmEs/2Gyq2PA/pSXDgKsAfXi9uFbL0nS5xvp39Fg8oQ0tCpRSfx/2ZBh0zZnh
- WcBQ==
+ (Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+ id 1jLrWB-0005UZ-2Y
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 12:56:07 -0400
+Received: by mail-ed1-x544.google.com with SMTP id w26so4915150edu.7
+ for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 09:56:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=intel-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=mTczqT+kK6n3hmfu2zYAUvRuvEg4SvKcA2Drd/f9b9k=;
+ b=1M5VAnnRdaFY24eIX4CInXyr3x7O+nuNHAOMdkul9Nhn4OCORHM67Di3bcvHXBctNa
+ 08M0tabLhmhrkAydtGdQCkZSytK9qFoWVsLDc0WeyvmKZ42m5NjTmG5XrOqksg3gPjkl
+ Wh8sjH7wh2SxcLV29IpwAiTWpU0icBPDxNqo9hEymhCsWBEbeuI2VBrfwW7GZ4vtRAKV
+ 6szJuRutvlX6//r7hxvKsvn82qwLtJDm07vEn3aFU5LBttEL+qwCUcBGYjL897TC9Zsm
+ yQqcPvjX6tFLE5nalTZvoOaQV7t3Ele1O/n5WSCSLDxTyjKGmbzHNW+L0ry26KLdniNF
+ 81JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=LdpF01ktrNUfZW4bVeaysVbrsuqT8gEeZIMiG7KygtU=;
- b=aeaJ58S7BVx/gjDBMvZokPYT/77Y8l02bbRVGDtP/FoX0mzynXg8Q9Y85A6dZRpmqJ
- zjFCBwrqLjTi68yIglsX+Lsjn6qK2lLTZL1AFoIsIOt3EH2+rQYGRJ18hStdYX2f0LJf
- ICAE0AJQK/FVM5S3izr6FUra5XVw5al62P7yhv+BvO70vqM7JMGXtUsHMae9m0IIz2nb
- FgUbKNogB+hqsUO0yw5gTx5Te3QOMS2W0ee4N7RTUHbRhxmy70BPZ6O7WNg0J8tdvqr+
- EXynR8JdpSp8QWlHrhYASua+tMpFsaZdIbcdAVj2ZDheiKLoDL4TyuzK+tPcE3Dr+/Ct
- r1wg==
-X-Gm-Message-State: AGi0PuawffJOYLimmyMsEL7VRSkECcgyjIgUymfSNtDneG40oRw/4GSy
- YLTWSqtOW5d7xRqQ/mosvP+qAg==
-X-Google-Smtp-Source: APiQypK+g4N2NgGRBo+5MXt0qvZbnzM8f2wTKzYpnzAZRYe1/VNutaTkP8hBCvJNUwqz3xRD6ci16Q==
-X-Received: by 2002:a5d:6104:: with SMTP id v4mr3946856wrt.213.1586278165565; 
- Tue, 07 Apr 2020 09:49:25 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n6sm32934401wrp.30.2020.04.07.09.49.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Apr 2020 09:49:24 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3E16D1FF7E;
- Tue,  7 Apr 2020 17:49:23 +0100 (BST)
-References: <20200407140746.8041-1-pbonzini@redhat.com>
- <20200407140746.8041-2-pbonzini@redhat.com>
-User-agent: mu4e 1.3.10; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/5] atomics: convert to reStructuredText
-In-reply-to: <20200407140746.8041-2-pbonzini@redhat.com>
-Date: Tue, 07 Apr 2020 17:49:23 +0100
-Message-ID: <87ftdf9r70.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=mTczqT+kK6n3hmfu2zYAUvRuvEg4SvKcA2Drd/f9b9k=;
+ b=X/PbIaIntXqeheWGxys89V45boDYRMGu4K7tRW+g5qWb7kbegkEO91ly38onApZGWf
+ WcT/lmnxduO9Ofe5E45lDkGBBcCg/wvJJAq73+7z0eproWE1+LcFqtoaia0eF/H/Rbdb
+ kIMEpd+J8eON7tt9DJz25mU/lRoi4oKmoKEBhCbxpTnz/kMuGq9fdHzIdKBzDlRoLz5C
+ QQ0GEgdOLrkehAUOEhBZE7XXLPhi0Nh9D7IcAx94Q8gv9XD2l7vbOTRpwtdOi87RiJ1x
+ 5x2bINnxfnPOCrzw0fsuhl46EQPV45QIgxt6DXRizleCzQexODDUXCY3Eecrf64SbDRt
+ tgNA==
+X-Gm-Message-State: AGi0PuabqyfbM441p6hCgFWyGnOAzdZDejp7XlD6d7X0tMLtu8iuz36b
+ xOdzKK3bQU1VBCguNemGOIGqXaGmR8NteT9RL366Jw==
+X-Google-Smtp-Source: APiQypIZ1IEshG3C6ZB0PZTUWpNupJO44MvzGukfUdPG4zKvoEFitm68Afr6jS6UNKaKoPlefJYC4VM0Yhlq4jJuQRg=
+X-Received: by 2002:a05:6402:22b7:: with SMTP id
+ cx23mr2747346edb.383.1586278562000; 
+ Tue, 07 Apr 2020 09:56:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20200401031314.11592-1-jingqi.liu@intel.com>
+ <c906a3ae-c9d2-5802-5988-3c1d0302109b@oracle.com>
+In-Reply-To: <c906a3ae-c9d2-5802-5988-3c1d0302109b@oracle.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Tue, 7 Apr 2020 09:55:50 -0700
+Message-ID: <CAPcyv4igr9-DJx2ehoHj7sXk5g5GmgmivCqM3VpmJV7J4QM+kA@mail.gmail.com>
+Subject: Re: [PATCH] exec: fetch the alignment of Linux devdax pmem character
+ device nodes
+To: Joao Martins <joao.m.martins@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,21 +90,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fangying1@huawei.com, qemu-devel@nongnu.org, stefanha@redhat.com
+Cc: Jingqi Liu <jingqi.liu@intel.com>, Richard Henderson <rth@twiddle.net>,
+ Qemu Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> No attempts to fix or update the text; these are left for the next
-> patch in the series.
+On Tue, Apr 7, 2020 at 4:01 AM Joao Martins <joao.m.martins@oracle.com> wrote:
 >
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>
+>
+> On 4/1/20 4:13 AM, Jingqi Liu wrote:
+> > If the backend file is devdax pmem character device, the alignment
+> > specified by the option 'align=NUM' in the '-object memory-backend-file'
+> > needs to match the alignment requirement of the devdax pmem character device.
+> >
+> > This patch fetches the devdax pmem file 'align', so that we can compare
+> > it with the NUM of 'align=NUM'.
+> > The NUM needs to be larger than or equal to the devdax pmem file 'align'.
+> >
+> > It also fixes the problem that mmap() returns failure in qemu_ram_mmap()
+> > when the NUM of 'align=NUM' is less than the devdax pmem file 'align'.
+> >
+> > Cc: Dan Williams <dan.j.williams@intel.com>
+> > Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+> > ---
+> >  exec.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 45 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/exec.c b/exec.c
+> > index de9d949902..8221abffec 100644
+> > --- a/exec.c
+> > +++ b/exec.c
+> > @@ -1736,6 +1736,42 @@ static int64_t get_file_size(int fd)
+> >      return size;
+> >  }
+> >
+> > +static int64_t get_file_align(int fd)
+> > +{
+> > +    int64_t align = -1;
+> > +#if defined(__linux__)
+> > +    struct stat st;
+> > +
+> > +    if (fstat(fd, &st) < 0) {
+> > +        return -errno;
+> > +    }
+> > +
+> > +    /* Special handling for devdax character devices */
+> > +    if (S_ISCHR(st.st_mode)) {
+> > +        g_autofree char *subsystem_path = NULL;
+> > +        g_autofree char *subsystem = NULL;
+> > +
+> > +        subsystem_path = g_strdup_printf("/sys/dev/char/%d:%d/subsystem",
+> > +                                         major(st.st_rdev), minor(st.st_rdev));
+> > +        subsystem = g_file_read_link(subsystem_path, NULL);
+> > +
+> > +        if (subsystem && g_str_has_suffix(subsystem, "/dax")) {
+> > +            g_autofree char *align_path = NULL;
+> > +            g_autofree char *align_str = NULL;
+> > +
+> > +            align_path = g_strdup_printf("/sys/dev/char/%d:%d/device/align",
+> > +                                    major(st.st_rdev), minor(st.st_rdev));
+> > +
+>
+> Perhaps, you meant instead:
+>
+>         /sys/dev/char/%d:%d/align
+>
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Hmm, are you sure that's working? I expect the alignment to be found
+in the region device:
 
---=20
-Alex Benn=C3=A9e
+/sys/class/dax:
+/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0012:00/ndbus1/region1/dax1.1/dax1.0
+$(readlink -f /sys/dev/char/253\:263)/../align
+$(readlink -f /sys/dev/char/253\:263)/device/align
+
+
+/sys/bus/dax:
+/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0012:00/ndbus1/region1/dax1.0/dax1.0
+$(readlink -f /sys/dev/char/253\:265)/../align
+$(readlink -f /sys/dev/char/253\:265)/device/align <-- No such file
+
+The use of the /sys/dev/char/%d:%d/device is only supported by the
+deprecated /sys/class/dax. The current /sys/bus/dax device-model can
+be a drop in replacement as long as software is not written to the
+/sys/class sysfs layout, i.e. it uses ../ instead of device/ to walk
+to the region properties.
 
