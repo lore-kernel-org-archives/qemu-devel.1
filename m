@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A8AC2D0EC
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 21:41:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0C9EC2D0EC
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 21:42:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46EF720730
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 21:41:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46EF720730
+	by mail.kernel.org (Postfix) with ESMTPS id 6EE9B20730
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 21:42:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EE9B20730
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLvyi-000665-Gi
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 17:41:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41516)
+	id 1jLvzZ-0006yR-K5
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 17:42:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41525)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jLvy7-0005c0-UA
+ (envelope-from <bounces@canonical.com>) id 1jLvy8-0005cs-ME
  for qemu-devel@nongnu.org; Tue, 07 Apr 2020 17:41:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jLvy6-0007uD-OU
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 17:41:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41386)
+ (envelope-from <bounces@canonical.com>) id 1jLvy7-0007v2-Hm
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 17:41:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41414)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jLvy6-0007tD-JF
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 17:41:14 -0400
+ id 1jLvy7-0007uI-CX
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 17:41:15 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jLvy4-000820-S8
- for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 21:41:12 +0000
+ id 1jLvy6-00082e-Ml
+ for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 21:41:14 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C5B3B2E8107
- for <qemu-devel@nongnu.org>; Tue,  7 Apr 2020 21:41:12 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id AB3392E80E7
+ for <qemu-devel@nongnu.org>; Tue,  7 Apr 2020 21:41:14 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Apr 2020 21:33:46 -0000
+Date: Tue, 07 Apr 2020 21:35:36 -0000
 From: JS <1859916@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,7 +56,7 @@ X-Launchpad-Bug-Commenters: js1943 mark-cave-ayland
 X-Launchpad-Bug-Reporter: JS (js1943)
 X-Launchpad-Bug-Modifier: JS (js1943)
 References: <157915593050.14807.16939354364023930380.malonedeb@wampee.canonical.com>
-Message-Id: <158629522654.12023.14909807690250830877.malone@chaenomeles.canonical.com>
+Message-Id: <158629533719.21707.939647143719243213.malone@gac.canonical.com>
 Subject: [Bug 1859916] Re: coreaudio not working on MacOS
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -64,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="a296f04231dee355be5db73cc878b9e21689a253";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2376f1fc626515d70443b3804b55a1e58dd6de04
+X-Launchpad-Hash: 260454907beefb31782f8572b900dcf70734cd71
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,8 +82,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I recently test it again, coreaudio is working on 4.1.1, 4.2 and 5rc1 on
-MacOS.
+It is working now. Tested with 4.1.1, 4.2 and 5rc1.
+
+** Changed in: qemu
+       Status: New =3D> Invalid
 
 -- =
 
