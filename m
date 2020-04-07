@@ -2,89 +2,87 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 178E2C2BB55
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:52:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E545C2BA80
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:52:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D97E820730
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:52:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4CCA120730
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:52:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E7cVgqrm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D97E820730
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WSccltEY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CCA120730
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLqWk-0004zG-1N
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 11:52:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43607)
+	id 1jLqWl-00056o-GY
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 11:52:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43643)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jLqVX-0003NF-MX
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:24 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jLqVc-0003QP-QG
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jLqVW-0004Fp-KY
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:23 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43722)
+ (envelope-from <alex.bennee@linaro.org>) id 1jLqVb-0004KC-Lt
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:28 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:53045)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jLqVW-0004FD-Ep
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:22 -0400
-Received: by mail-wr1-x441.google.com with SMTP id w15so4446745wrv.10
- for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 08:51:22 -0700 (PDT)
+ id 1jLqVb-0004JX-Fs
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:27 -0400
+Received: by mail-wm1-x335.google.com with SMTP id t203so2239758wmt.2
+ for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 08:51:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=VJ6+jJuK9aM49AP9y9RG5kZxMwVILHzFOXjQWpNENXw=;
- b=E7cVgqrmx8m42zTAkUJ3leJxd5Zh9dPKamAXLo1ffqZ6Slnpe2RS+diupvVwo4VcDj
- Lm1YuGw2ImaGRPIrf+INC5+7o0WIQCdYdiuk1mjOubKpoLqpnjzzCYyOxm6NWco1WfsG
- haVz/7irjlwr8VXVZQqWmivLQqL3TscBXMdrTHPexT5rceZWhhk2/8JjoYx5zxuyrXlG
- +rt9sSNjsv+5EPDsuFyuVl/rY6emTU4DbQrov9YMcxP8TI6qJ4gBaHblF1FsreZRT2p3
- pUaH5FZ0zJI+BwdkvljGYQRiK2dyYtqgfV571LCFpwbFq0hNLH/5u754Epxn2xkIL85X
- zTZA==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ErBqsEg90J/rMI3zUeIrTPRPG0UcgfPkvLOHEBfuAjA=;
+ b=WSccltEYHqOkVcmXduMu7OKxsoBtnVbSHcZFgq1vn6Pg9FRuoqZKsyKlMYZCp1H355
+ QfBIfeftvr3m1AIm3tZkV3BWA7A3xy9DHV4NsreVcLxVSlTwc0bHbV0m/+3sAJ1gudd0
+ 3StuOktSoNrx9ZTe8t5yXJDJQnJ32DI2gpm418TPJ6pIG12pJ2SpU1go1u09muYqr0XY
+ 5TJdD2DZzjAFfc/pHxQ+JIse6Afc93yc5OVqB+ALTR8P4ccJUggihDxbiOsEStpXVbaD
+ /46MSUHuMk/Uv5BzAUjKUAj3BjjUoXcvJSuA0eT4mXNKqpV6DluaN4oOYe7NTuvXp4eL
+ dOVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=VJ6+jJuK9aM49AP9y9RG5kZxMwVILHzFOXjQWpNENXw=;
- b=RVRy9RYyzt19iIjbkqoi1Yv872NpMKpgCXwbHECzNcVTRaWF3DbBzJhDR5sPB81TaW
- nMSw5TR2j2oXkOIWkSsFL7I8SfzCiQ1x/SW8BCxE0UuPWsCLdz4gOWlwgn2TzFgvJNA3
- l8B/C772LqgeOZTlbrqnHl43PbO1wzk7lrVRNO4oaOUHUNseUMQ77200ww3pTdC0ZuOl
- P4+CRILPcB2R52t8nfI6PlR0+g0ktK9zztBSkSkDldlSdcuIsHDmIbC98IUTdXgflrQW
- n8YnqOR7Ws2TTK5c5xgSJpu4ByjFnmB1qbosLG7b7Kpiwza8V7SFrcC8yQuF3LdUJlR9
- HnIw==
-X-Gm-Message-State: AGi0Pua/vf0Hu7HkWkrjVLiB+eWkd/C/EtaptnWcmtEliO85jDw40Z8u
- aEpXcTFIY8Rd0RCnu/w6sQatmQ==
-X-Google-Smtp-Source: APiQypIj+YUA9HsryvVOCSbNoY3pvZb25vDpN+nLm4jVHAZx3MduCBA17p5iSQhUsmj7k2//EtvHxg==
-X-Received: by 2002:a5d:6452:: with SMTP id d18mr3336077wrw.405.1586274681427; 
- Tue, 07 Apr 2020 08:51:21 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ErBqsEg90J/rMI3zUeIrTPRPG0UcgfPkvLOHEBfuAjA=;
+ b=eKSwHPXslDnCD4TcfavpTskWYyAj/FOIfcmCpXw4gQA0TtxEfrf7RnLthEIgomsRFc
+ LmVuqxm3+OPZmHySQXVObXXrS51BDoUjcMZN/H2ebO3sbxHZ931Da+hzp154lGS7Eb3S
+ qsL4gaLdrUwbcCnXk62vlYy34AW6ZXiPla6IVqz690BsM24JX4iuh8skUpqd6KjtCw5i
+ BRkB86TAzBKj+xsu7m5cHxZSi+nk9g3GL5TaznXxOZgKYFt/8wFdrD+3qgkYMmb0EOAc
+ PYPGFc7edB9XbbmCKefqxuWImGbrO2gAp1cowwtjNFNu5CiF+cSRYyO/09ks41irFrtG
+ tHfw==
+X-Gm-Message-State: AGi0PuZfbaOfKHS+rKOFpIGX+gWocHtWIbdn2mjRCPS9bEUrakaqOe5U
+ tonHivBaPc+ZgJmRqE//neXNIw==
+X-Google-Smtp-Source: APiQypIHP5RY8sRN5fpQ5RsPBrAUyCRHss5lxfoXqGWIiyBmPrzTp5hQeeuSueJk5yKihSFeyNBw4A==
+X-Received: by 2002:a7b:c8cd:: with SMTP id f13mr3016808wml.138.1586274686414; 
+ Tue, 07 Apr 2020 08:51:26 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id i1sm2871571wmb.33.2020.04.07.08.51.19
+ by smtp.gmail.com with ESMTPSA id p22sm2849589wmc.42.2020.04.07.08.51.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Tue, 07 Apr 2020 08:51:19 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 854881FF8F;
+ by zen.linaroharston (Postfix) with ESMTP id 43C851FF7E;
  Tue,  7 Apr 2020 16:51:18 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 03/13] linux-user: protect fcntl64 with an #ifdef
-Date: Tue,  7 Apr 2020 16:51:08 +0100
-Message-Id: <20200407155118.20139-4-alex.bennee@linaro.org>
+Subject: [PULL for 5.0-rc2 00/13] various fixes
+Date: Tue,  7 Apr 2020 16:51:05 +0100
+Message-Id: <20200407155118.20139-1-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200407155118.20139-1-alex.bennee@linaro.org>
-References: <20200407155118.20139-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,51 +94,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Riku Voipio <riku.voipio@iki.fi>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Checking TARGET_ABI_BITS is sketchy - we should check for the presence
-of the define to be sure. Also clean up the white space while we are
-there.
+The following changes since commit 53ef8a92eb04ee19640f5aad3bff36cd4a36c250:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200403191150.863-3-alex.bennee@linaro.org>
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200406' into staging (2020-04-06 12:36:45 +0100)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 5af55fca781..b679bc6b136 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -11331,11 +11331,11 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-            This is a hint, so ignoring and returning success is ok.  */
-         return 0;
- #endif
--#if TARGET_ABI_BITS == 32
-+#ifdef TARGET_NR_fcntl64
-     case TARGET_NR_fcntl64:
-     {
--	int cmd;
--	struct flock64 fl;
-+        int cmd;
-+        struct flock64 fl;
-         from_flock64_fn *copyfrom = copy_from_user_flock64;
-         to_flock64_fn *copyto = copy_to_user_flock64;
- 
-@@ -11346,7 +11346,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         }
- #endif
- 
--	cmd = target_to_host_fcntl_cmd(arg2);
-+        cmd = target_to_host_fcntl_cmd(arg2);
-         if (cmd == -TARGET_EINVAL) {
-             return cmd;
-         }
+are available in the Git repository at:
+
+  https://github.com/stsquad/qemu.git tags/pull-misc-fixes-070420-1
+
+for you to fetch changes up to cce743abbf398a324879039cd582349b36da0ea6:
+
+  tcg/i386: Fix %r12 guest_base initialization (2020-04-07 16:19:49 +0100)
+
+----------------------------------------------------------------
+Various fixes:
+
+  - add .github repo lockdown config
+  - better handle missing symbols in elf-ops
+  - protect fcntl64 with #ifdef
+  - remove unused macros from test
+  - fix handling of /proc/self/maps
+  - avoid BAD_SHIFT in x80 softfloat
+  - properly terminate on .hex EOF
+  - fix configure probe on windows cross build
+  - fix %r12 guest_base initialization
+
+----------------------------------------------------------------
+Alex Bennée (8):
+      elf-ops: bail out if we have no function symbols
+      linux-user: protect fcntl64 with an #ifdef
+      tests/tcg: remove extraneous pasting macros
+      linux-user: more debug for init_guest_space
+      target/xtensa: add FIXME for translation memory leak
+      linux-user: factor out reading of /proc/self/maps
+      linux-user: clean-up padding on /proc/self/maps
+      hw/core: properly terminate loading .hex on EOF record
+
+Denis Plotnikov (1):
+      gdbstub: fix compiler complaining
+
+Philippe Mathieu-Daudé (1):
+      .github: Enable repo-lockdown bot to refuse GitHub pull requests
+
+Richard Henderson (3):
+      softfloat: Fix BAD_SHIFT from normalizeFloatx80Subnormal
+      configure: Add -Werror to PIE probe
+      tcg/i386: Fix %r12 guest_base initialization
+
+ configure                      |  4 +--
+ include/hw/elf_ops.h           | 48 +++++++++++++------------
+ include/qemu/selfmap.h         | 44 +++++++++++++++++++++++
+ fpu/softfloat.c                |  3 ++
+ gdbstub.c                      |  4 +--
+ hw/core/loader.c               |  5 ++-
+ linux-user/elfload.c           |  8 ++++-
+ linux-user/syscall.c           | 80 ++++++++++++++++++++++--------------------
+ target/xtensa/translate.c      |  5 +++
+ tcg/i386/tcg-target.inc.c      |  2 +-
+ util/selfmap.c                 | 78 ++++++++++++++++++++++++++++++++++++++++
+ .github/lockdown.yml           | 34 ++++++++++++++++++
+ MAINTAINERS                    |  1 +
+ tests/tcg/x86_64/system/boot.S |  5 +--
+ util/Makefile.objs             |  1 +
+ 15 files changed, 250 insertions(+), 72 deletions(-)
+ create mode 100644 include/qemu/selfmap.h
+ create mode 100644 util/selfmap.c
+ create mode 100644 .github/lockdown.yml
+
 -- 
 2.20.1
 
