@@ -4,94 +4,99 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A37CC2BA1A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 18:17:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2E07C2BA80
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 18:29:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E383820768
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 18:17:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9642B20768
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 18:29:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EF6E9f1+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E383820768
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="daab56cp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9642B20768
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLsmo-0008OS-VV
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 14:17:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38435)
+	id 1jLsyk-0003c8-Mj
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 14:29:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39972)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jLsm0-0007wN-56
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 14:16:36 -0400
+ (envelope-from <joao.m.martins@oracle.com>) id 1jLsxo-0002fo-VB
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 14:28:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jLslv-0003R4-Bm
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 14:16:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47535
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jLslv-0003Qi-3o
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 14:16:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586283386;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LMapuAZmDhzAhlmvM7BXhFh1UeKga5JGU6s0flbQba8=;
- b=EF6E9f1+SUBLafYcs7EsxcZoeTwUr1dUatsFpNZZpb4hjhzcJ16hjVzYykxW/lIPcSXeoa
- 91rLiwcK++lx339z1urbP6q7XBvLHQlELpwKs/Vwxyf2OD4I52DFnFu+jRRYQ46T0U3GJL
- z9t/GF3ArywNlUw5ktxSRPs38uL5YAU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-92-KdKpfLOfPkabkgR75sZ-KQ-1; Tue, 07 Apr 2020 14:16:22 -0400
-X-MC-Unique: KdKpfLOfPkabkgR75sZ-KQ-1
-Received: by mail-wr1-f71.google.com with SMTP id j12so2403840wrr.18
- for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 11:16:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=LMapuAZmDhzAhlmvM7BXhFh1UeKga5JGU6s0flbQba8=;
- b=sqTuSUvGXm0H+YprzHqrL22CQ7QlND90ICAVySYdw904wOsnFjkP9AOeNrmQ3Iub2s
- lejgaAtHLx4FCcVRr9MKBRVQxsv5uT9j6AQenWdxHEMFf644ykhwXj6VmdUPUzfXH1Tj
- Kk69ovjOy+69eICxdHNZYPVtQCNDS9Z8xgBnVaPkDdcXv0HJ1bjLDJUlwFm9j2u2TprU
- HpdCxza25IxkdKI1DKbJUqW+BvecBZuK+qR6NAwNMVlXdZ8cGSh4rIKMj8v1xaER7Uk+
- Yi5ijoBpNifcX6CeW22HbBC39wYmrUH4zRs2BUYjLA8O0dRO9Tt1fIr2qA/L5arvBEe+
- 33vg==
-X-Gm-Message-State: AGi0PubcgnI4Ku1EsHqDEXIP9fsj9sWDHfqeJJYUl9O4sR64iaFRlrzE
- HiKMFVPHc+sWzq0fnPQHBgXGTvJk4ppzQqZPvX2/Gpsxe/i02Th0lnYZPflWufVUCCYSKeLskTz
- yk56jMhk5/53KHef+h9ezw5U8+bQNBkE=
-X-Received: by 2002:adf:e991:: with SMTP id h17mr3896964wrm.17.1586283381284; 
- Tue, 07 Apr 2020 11:16:21 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJXpQr0dsGsFaEOcXYjKehzMfiNAvNOTPB4BKfTqX9Scg1VYm2JBGPnj9euNB0G0LeM/YHcKlAyEw6mOcx7GZA=
-X-Received: by 2002:adf:e991:: with SMTP id h17mr3896933wrm.17.1586283380971; 
- Tue, 07 Apr 2020 11:16:20 -0700 (PDT)
+ (envelope-from <joao.m.martins@oracle.com>) id 1jLsxn-0002rt-Fv
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 14:28:44 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:36274)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <joao.m.martins@oracle.com>)
+ id 1jLsxn-0002rK-78
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 14:28:43 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 037IHwkY041134;
+ Tue, 7 Apr 2020 18:28:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=7bCTxY1yhPzq4cmBCs+Bjs3LGFuaSgDFYrwUmriX7rU=;
+ b=daab56cpVTFX7lfheqdgIEimJuwlTKXL+9j22X5kM7l24W5099tqoS+rWZOR277UEYz9
+ 2/VMeq4VBJZbHAD/fXsXjQtTBF4RUII82SHA8lTQc7EPBoGD9dsnd/DJY9tZ0G/BxHh8
+ W9H2M63mnfBV2y/X46JbbU/K96Srw2/J2Gnb/LEtiqGgxcdopNarFyU0AeI4e5aMe8BX
+ 7N8NC64cQC+dXsejfXedteACNop3rGGfTuEOGAH1f1MRNqM03VHo6pBk4MVxK/FTdx4f
+ bLXullJSCQh6PpVCMFvA0Aor48TQD/iu+7LC1glGhpq3seHyA+t/eNctGHZk2k8YKAwQ xg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 308ffdcrfs-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 07 Apr 2020 18:28:38 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 037IGeLH159426;
+ Tue, 7 Apr 2020 18:28:37 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3030.oracle.com with ESMTP id 3073ssp03e-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 07 Apr 2020 18:28:37 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 037ISak1005830;
+ Tue, 7 Apr 2020 18:28:36 GMT
+Received: from [10.175.215.143] (/10.175.215.143)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 07 Apr 2020 11:28:36 -0700
+Subject: Re: [PATCH] exec: fetch the alignment of Linux devdax pmem character
+ device nodes
+To: Dan Williams <dan.j.williams@intel.com>
+References: <20200401031314.11592-1-jingqi.liu@intel.com>
+ <c906a3ae-c9d2-5802-5988-3c1d0302109b@oracle.com>
+ <CAPcyv4igr9-DJx2ehoHj7sXk5g5GmgmivCqM3VpmJV7J4QM+kA@mail.gmail.com>
+From: Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <3873cb30-608c-6a27-c19f-f6446898796f@oracle.com>
+Date: Tue, 7 Apr 2020 19:28:33 +0100
 MIME-Version: 1.0
-References: <20200406174743.16956-1-f4bug@amsat.org>
- <20200406174743.16956-49-f4bug@amsat.org>
- <04663728-06f3-85bf-74b7-45184f90aa0a@virtuozzo.com>
- <ac7213fd-3ea2-e80c-7308-5f2de02c341c@redhat.com>
- <ae9ced39-f039-ffb5-b33b-df93b0f35e36@virtuozzo.com>
- <ffd970c9-c8f3-b6c4-3592-cbace296f986@redhat.com>
- <50d08d50-3ce2-2ee1-7529-5cfbfbcc5331@redhat.com>
- <044eece3-542a-8e99-c865-e77368478fb1@virtuozzo.com>
-In-Reply-To: <044eece3-542a-8e99-c865-e77368478fb1@virtuozzo.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Tue, 7 Apr 2020 20:16:09 +0200
-Message-ID: <CAP+75-Vbu1ywKRpaqcmZPS3vaSm1=2Vp1bqMcGPqH_6gXd_=tg@mail.gmail.com>
-Subject: Re: [PATCH-for-5.1 v2 48/54] scripts/coccinelle: Use &error_abort in
- TypeInfo::instance_init()
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+In-Reply-To: <CAPcyv4igr9-DJx2ehoHj7sXk5g5GmgmivCqM3VpmJV7J4QM+kA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9584
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ phishscore=0 spamscore=0
+ malwarescore=0 suspectscore=1 adultscore=0 bulkscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004070150
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9584
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ priorityscore=1501
+ impostorscore=0 malwarescore=0 mlxlogscore=999 lowpriorityscore=0
+ clxscore=1015 phishscore=0 mlxscore=0 bulkscore=0 adultscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004070150
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,247 +108,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Jingqi Liu <jingqi.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Qemu Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Apr 7, 2020 at 7:55 PM Vladimir Sementsov-Ogievskiy
-<vsementsov@virtuozzo.com> wrote:
->
-> 07.04.2020 20:27, Philippe Mathieu-Daud=C3=A9 wrote:
-> > On 4/7/20 3:07 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> >> On 4/7/20 3:01 PM, Vladimir Sementsov-Ogievskiy wrote:
-> >>> 07.04.2020 14:03, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>>> On 4/7/20 9:07 AM, Vladimir Sementsov-Ogievskiy wrote:
-> >>>>> 06.04.2020 20:47, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>>>>> The instance_init() calls are not suppose to fail. Add a
-> >>>>>> Coccinelle script to use &error_abort instead of ignoring
-> >>>>>> errors by using a NULL Error*.
-> >>>>>>
-> >>>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> >>>>>> ---
-> >>>>>>   .../use-error_abort-in-instance_init.cocci    | 52 +++++++++++++=
-++++++
-> >>>>>>   MAINTAINERS                                   |  1 +
-> >>>>>>   2 files changed, 53 insertions(+)
-> >>>>>>   create mode 100644 scripts/coccinelle/use-error_abort-in-instanc=
-e_init.cocci
-> >>>>>>
-> >>>>>> diff --git a/scripts/coccinelle/use-error_abort-in-instance_init.c=
-occi b/scripts/coccinelle/use-error_abort-in-instance_init.cocci
-> >>>>>> new file mode 100644
-> >>>>>> index 0000000000..8302d74a0c
-> >>>>>> --- /dev/null
-> >>>>>> +++ b/scripts/coccinelle/use-error_abort-in-instance_init.cocci
-> >>>>>> @@ -0,0 +1,52 @@
-> >>>>>> +// Use &error_abort in TypeInfo::instance_init()
-> >>>>>> +//
-> >>>>>> +// Copyright: (C) 2020 Philippe Mathieu-Daud=C3=A9
-> >>>>>> +// This work is licensed under the terms of the GNU GPLv2 or late=
-r.
-> >>>>>> +//
-> >>>>>> +// spatch \
-> >>>>>> +//  --macro-file scripts/cocci-macro-file.h --include-headers \
-> >>>>>> +//  --sp-file scripts/coccinelle/use-error_abort-in-instance_init=
-.cocci \
-> >>>>>> +//  --keep-comments --in-place
-> >>>>>> +//
-> >>>>>> +// Inspired by https://www.mail-archive.com/qemu-devel@nongnu.org=
-/msg692500.html
-> >>>>>> +// and https://www.mail-archive.com/qemu-devel@nongnu.org/msg6936=
-37.html
-> >>>>>> +
-> >>>>>> +
-> >>>>>> +@ has_qapi_error @
-> >>>>>> +@@
-> >>>>>> +    #include "qapi/error.h"
-> >>>>>> +
-> >>>>>> +
-> >>>>>> +@ match_instance_init @
-> >>>>>> +TypeInfo info;
-> >>>>>> +identifier instance_initfn;
-> >>>>>> +@@
-> >>>>>> +    info.instance_init =3D instance_initfn;
-> >>>>>> +
-> >>>>>> +
-> >>>>>> +@ use_error_abort @
-> >>>>>> +identifier match_instance_init.instance_initfn;
-> >>>>>> +identifier func_with_error;
-> >>>>>> +expression parentobj, propname, childobj, size, type, errp;
-> >>>>>> +position pos;
-> >>>>>> +@@
-> >>>>>> +void instance_initfn(...)
-> >>>>>> +{
-> >>>>>> +   <+...
-> >>>>>> +(
-> >>>>>> +   object_initialize_child(parentobj, propname,
-> >>>>>> +                           childobj, size, type,
-> >>>>>> +                           errp, NULL);
-> >>>
-> >>> I think, it doesn't actually differs from just object_initialize_chil=
-d(..., NULL); and you don't need all these metavaraibles
-> >>>
-> >>>>>> +|
-> >>>>>> +   func_with_error@pos(...,
-> >>>>>> +-                           NULL);
-> >>>>>> ++                           &error_abort);
-> >>>>>> +)
-> >>>>>
-> >>>>>
-> >>>>> Hmm. I don't follow, what are you trying to achieve by this ( | ) c=
-onstruction? The second pattern (func_with_error...) will be matched anyway=
-, with or without first pattern (object_initialize_child...) matched. And f=
-irst pattern does nothing.
-> >>>>
-> >>>> Expected behavior :)
-> >>>>
-> >>>> If object_initialize_child() matched:
-> >>>>    do nothing.
-> >>>> Else:
-> >>>>    transform.
-> >>>
-> >>> Ah, understand, thanks. Checked, it works.
-> >>>
-> >>> Possibly simpler way is just define func_with_errno identifier like t=
-his:
-> >>>
-> >>> identifier func_with_error !=3D object_initialize_child;
-> >
-> > Thanks for the tip Vladimir, I simplified as:
-> >
-> > @ use_error_abort @
-> > identifier match_instance_init.instance_initfn;
-> > identifier func_with_error !=3D {qbus_create_inplace, object_initialize=
-_child};
->
-> New syntax for me, great)
->
-> > position pos;
-> > @@
-> > void instance_initfn(...)
-> > {
-> >     <+...
-> >     func_with_error@pos(...,
-> > -                           NULL);
-> > +                           &error_abort);
-> >     ...+>
-> > }
-> >
-> > BTW do you know how to automatically add an include ("qapi/error.h" bel=
-ow)?
->
-> No, I don't.
->
-> I can guess something like this
->
-> @ already_has_include @
-> @@
->
-> #include <qapi/error.h>
->
-> @ depends on !already_has_include && use_error_abort @
->
->   #include ...
-> +#include <qapi/error.h>
+On 4/7/20 5:55 PM, Dan Williams wrote:
+> On Tue, Apr 7, 2020 at 4:01 AM Joao Martins <joao.m.martins@oracle.com> wrote:
+>> On 4/1/20 4:13 AM, Jingqi Liu wrote:
+>>> If the backend file is devdax pmem character device, the alignment
+>>> specified by the option 'align=NUM' in the '-object memory-backend-file'
+>>> needs to match the alignment requirement of the devdax pmem character device.
+>>>
+>>> This patch fetches the devdax pmem file 'align', so that we can compare
+>>> it with the NUM of 'align=NUM'.
+>>> The NUM needs to be larger than or equal to the devdax pmem file 'align'.
+>>>
+>>> It also fixes the problem that mmap() returns failure in qemu_ram_mmap()
+>>> when the NUM of 'align=NUM' is less than the devdax pmem file 'align'.
+>>>
+>>> Cc: Dan Williams <dan.j.williams@intel.com>
+>>> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+>>> ---
+>>>  exec.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+>>>  1 file changed, 45 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/exec.c b/exec.c
+>>> index de9d949902..8221abffec 100644
+>>> --- a/exec.c
+>>> +++ b/exec.c
+>>> @@ -1736,6 +1736,42 @@ static int64_t get_file_size(int fd)
+>>>      return size;
+>>>  }
+>>>
+>>> +static int64_t get_file_align(int fd)
+>>> +{
+>>> +    int64_t align = -1;
+>>> +#if defined(__linux__)
+>>> +    struct stat st;
+>>> +
+>>> +    if (fstat(fd, &st) < 0) {
+>>> +        return -errno;
+>>> +    }
+>>> +
+>>> +    /* Special handling for devdax character devices */
+>>> +    if (S_ISCHR(st.st_mode)) {
+>>> +        g_autofree char *subsystem_path = NULL;
+>>> +        g_autofree char *subsystem = NULL;
+>>> +
+>>> +        subsystem_path = g_strdup_printf("/sys/dev/char/%d:%d/subsystem",
+>>> +                                         major(st.st_rdev), minor(st.st_rdev));
+>>> +        subsystem = g_file_read_link(subsystem_path, NULL);
+>>> +
+>>> +        if (subsystem && g_str_has_suffix(subsystem, "/dax")) {
+>>> +            g_autofree char *align_path = NULL;
+>>> +            g_autofree char *align_str = NULL;
+>>> +
+>>> +            align_path = g_strdup_printf("/sys/dev/char/%d:%d/device/align",
+>>> +                                    major(st.st_rdev), minor(st.st_rdev));
+>>> +
+>>
+>> Perhaps, you meant instead:
+>>
+>>         /sys/dev/char/%d:%d/align
+>>
+> 
+> Hmm, are you sure that's working? 
 
-OMG this works!
+It is, except that I made the slight mistake of testing with a bunch of wip
+patches on top which one of them actually adds the 'align' to child dax device.
 
-@ depends on !has_qapi_error && use_error_abort @
-@@
-    #include ...
-+   #include "qapi/error.h"
+Argh, my apologies - and thanks for noticing.
 
-Produces:
+> I expect the alignment to be found
+> in the region device:
+> 
+> /sys/class/dax:
+> /sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0012:00/ndbus1/region1/dax1.1/dax1.0
+> $(readlink -f /sys/dev/char/253\:263)/../align
+> $(readlink -f /sys/dev/char/253\:263)/device/align
+> 
+> 
+> /sys/bus/dax:
+> /sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0012:00/ndbus1/region1/dax1.0/dax1.0
+> $(readlink -f /sys/dev/char/253\:265)/../align
+> $(readlink -f /sys/dev/char/253\:265)/device/align <-- No such file
+> 
+> The use of the /sys/dev/char/%d:%d/device is only supported by the
+> deprecated /sys/class/dax. 
 
-diff -u -p a/e1000.c b/e1000.c
---- a/e1000.c
-+++ b/e1000.c
-@@ -39,6 +39,7 @@
+I don't have the deprecated dax class enabled as could you tell, so the second
+case is what I was testing. Except it wasn't a namespace/nvdimm but rather an
+hmem device-dax.
 
- #include "e1000x_common.h"
- #include "trace.h"
-+#include "qapi/error.h"
+'../align' though covers only one case? What about hmem which '../align' returns
+ENOENT; perhaps using '../dax_region/align' instead which is common to both?
+Albeit that wouldn't address the sub-division devices (that I mention above)
 
- static const uint8_t bcast[] =3D {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-
-@@ -1774,7 +1775,7 @@ static void e1000_instance_init(Object *
-     E1000State *n =3D E1000(obj);
-     device_add_bootindex_property(obj, &n->conf.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  DEVICE(n), NULL);
-+                                  DEVICE(n), &error_abort);
- }
-
-
->
-> =3D=3D=3D
->
-> or maybe in one rule:
->
-> @@
-> ... when !=3D error.h
->   #include ...
-> +#include <qapi/error.h>
-> ... when !=3D error.h
->
->
-> (possibly last line is not needed)..
->
-> what spec says about includes:
->
-> An #include may be followed by "...", <...> or simply .... With either qu=
-otes or angle brackets, it is possible to put a partial path, ending with .=
-.., such as <include/...>, or to put a complete path. A #include with ... m=
-atches any include, with either quotes or angle brackets. Partial paths or =
-complete are not allowed in the latter case. Something that is added before=
- an include will be put before the last matching include that is not under =
-an ifdef in the file. Likewise, something that is added after an include wi=
-ll be put after the last matching include that is not under an ifdef in the=
- file.
->
-> >
-> >>>
-> >>>>
-> >>>>>
-> >>>>>
-> >>>>>> +   ...+>
-> >>>>>> +}
-> >>>>>> +
-> >>>>>> +
-> >>>>>> +@script:python depends on use_error_abort && !has_qapi_error@
-> >>>>>> +p << use_error_abort.pos;
-> >>>>>> +@@
-> >>>>>> +print('[[manual edit required, %s misses #include "qapi/error.h"]=
-]' % p[0].file)
-> >>>>>> diff --git a/MAINTAINERS b/MAINTAINERS
-> >>>>>> index 14de2a31dc..ae71a0a4b0 100644
-> >>>>>> --- a/MAINTAINERS
-> >>>>>> +++ b/MAINTAINERS
-> >>>>>> @@ -2059,6 +2059,7 @@ F: scripts/coccinelle/error-use-after-free.c=
-occi
-> >>>>>>   F: scripts/coccinelle/error_propagate_null.cocci
-> >>>>>>   F: scripts/coccinelle/remove_local_err.cocci
-> >>>>>>   F: scripts/coccinelle/simplify-init-realize-error_propagate.cocc=
-i
-> >>>>>> +F: scripts/coccinelle/use-error_abort-in-instance_init.cocci
-> >>>>>>   F: scripts/coccinelle/use-error_fatal.cocci
-> >>>>>>   F: scripts/coccinelle/use-error_propagate-in-realize.cocci
-> >>>>>>
-> >>>>>
-> >>>>>
-> >>>>
-> >>>
-> >>>
-> >
->
->
-> --
-> Best regards,
-> Vladimir
->
-
+> The current /sys/bus/dax device-model can
+> be a drop in replacement as long as software is not written to the
+> /sys/class sysfs layout, i.e. it uses ../ instead of device/ to walk
+> to the region properties.
+> 
+/nods
 
