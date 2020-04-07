@@ -7,73 +7,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A7A5C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 12:38:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E4EC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 12:39:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 546C620719
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 12:38:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C10620719
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 12:39:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DbIzRhVe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 546C620719
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WBWqSfws"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C10620719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLnV6-0000YT-Ez
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 08:38:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34653)
+	id 1jLnVS-0000jF-IU
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 08:39:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34717)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jLnU5-0007WS-96
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 08:37:46 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jLnUB-0007Xd-6C
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 08:37:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jLnU4-0006gK-5w
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 08:37:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60249
+ (envelope-from <mreitz@redhat.com>) id 1jLnUA-0006mM-1u
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 08:37:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46483
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jLnU4-0006ft-1p
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 08:37:40 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jLnU6-0006kO-3x
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 08:37:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586263059;
+ s=mimecast20190719; t=1586263061;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lKH+gnzqiUbJPgjeEmnTWF0F/bRzuMD4YCHrY2ck3S4=;
- b=DbIzRhVexfoMNpFNqN4+QB3Zu1dMXPgWFMEdCGK40RwCBR076OK5OkUN3Dexq9MzxDG99O
- 38xIsARXsKzDhVuow8Ohnyd8CLJtmNFXkV8DmyjmiPbCDTyn8tFhFLoLDkr5twCrLadoC3
- Kr6ZFgR8XRy5cfr5VUJcGOE0W7wS3Xo=
+ bh=ese7sDnkOl2TttdL7Z3dDx9mHq1RyE6x+22JvmNhHBg=;
+ b=WBWqSfwsCjXgaZjTw1jSMPxFXqV7XxD49xmz6CcaWePjZ6KYvfR4CaZ0EDWHxGWDxjPtXE
+ jGFy45l/Ab2SKFPdO4HTcEH1YvmuRGVtlAEY9dgy+jJZdof2fDWXAM1qUJc2BEWWXRoYI3
+ twZTaKnl0r5Zevb8ly/jR2tJ2fihy0Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338-tvwDbPj3O5KfI0lpfg7u5A-1; Tue, 07 Apr 2020 08:37:37 -0400
-X-MC-Unique: tvwDbPj3O5KfI0lpfg7u5A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-171-oBFHmciuO-yU0ksCRPLrIg-1; Tue, 07 Apr 2020 08:37:39 -0400
+X-MC-Unique: oBFHmciuO-yU0ksCRPLrIg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 491561007277;
- Tue,  7 Apr 2020 12:37:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 669651B18BC0;
+ Tue,  7 Apr 2020 12:37:38 +0000 (UTC)
 Received: from localhost (ovpn-114-84.ams2.redhat.com [10.36.114.84])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B018E9B905;
- Tue,  7 Apr 2020 12:37:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 05FED5C28E;
+ Tue,  7 Apr 2020 12:37:37 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 2/5] qemu-img: Report convert errors by bytes, not sectors
-Date: Tue,  7 Apr 2020 14:37:24 +0200
-Message-Id: <20200407123727.829933-3-mreitz@redhat.com>
+Subject: [PULL 3/5] qcow2: Check request size in
+ qcow2_co_pwritev_compressed_part()
+Date: Tue,  7 Apr 2020 14:37:25 +0200
+Message-Id: <20200407123727.829933-4-mreitz@redhat.com>
 In-Reply-To: <20200407123727.829933-1-mreitz@redhat.com>
 References: <20200407123727.829933-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,65 +93,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Blake <eblake@redhat.com>
+From: Alberto Garcia <berto@igalia.com>
 
-Various qemu-img commands are inconsistent on whether they report
-status/errors in terms of bytes or sector offsets.  The latter is
-confusing (especially as more places move to 4k block sizes), so let's
-switch everything to just use bytes everywhere.  One iotest is
-impacted.
+When issuing a compressed write request the number of bytes must be a
+multiple of the cluster size or reach the end of the last cluster.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+With the current code such requests are allowed and we hit an
+assertion:
+
+   $ qemu-img create -f qcow2 img.qcow2 1M
+   $ qemu-io -c 'write -c 0 32k' img.qcow2
+
+   qemu-io: block/qcow2.c:4257: qcow2_co_pwritev_compressed_task:
+   Assertion `bytes =3D=3D s->cluster_size || (bytes < s->cluster_size &&
+              (offset + bytes =3D=3D bs->total_sectors << BDRV_SECTOR_BITS)=
+)' failed.
+   Aborted
+
+This patch fixes a regression introduced in 0d483dce38
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Message-Id: <20200406143401.26854-1-berto@igalia.com>
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20200402135717.476398-1-eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-img.c                 | 8 ++++----
- tests/qemu-iotests/244.out | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ block/qcow2.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index b167376bd7..821cbf610e 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1924,8 +1924,8 @@ retry:
-         if (status =3D=3D BLK_DATA && !copy_range) {
-             ret =3D convert_co_read(s, sector_num, n, buf);
-             if (ret < 0) {
--                error_report("error while reading sector %" PRId64
--                             ": %s", sector_num, strerror(-ret));
-+                error_report("error while reading at byte %lld: %s",
-+                             sector_num * BDRV_SECTOR_SIZE, strerror(-ret)=
-);
-                 s->ret =3D ret;
-             }
-         } else if (!s->min_sparse && status =3D=3D BLK_ZERO) {
-@@ -1953,8 +1953,8 @@ retry:
-                 ret =3D convert_co_write(s, sector_num, n, buf, status);
-             }
-             if (ret < 0) {
--                error_report("error while writing sector %" PRId64
--                             ": %s", sector_num, strerror(-ret));
-+                error_report("error while writing at byte %lld: %s",
-+                             sector_num * BDRV_SECTOR_SIZE, strerror(-ret)=
-);
-                 s->ret =3D ret;
-             }
-         }
-diff --git a/tests/qemu-iotests/244.out b/tests/qemu-iotests/244.out
-index e6f4dc7993..56329deb4b 100644
---- a/tests/qemu-iotests/244.out
-+++ b/tests/qemu-iotests/244.out
-@@ -33,7 +33,7 @@ Convert to compressed target with data file:
- Formatting 'TEST_DIR/t.IMGFMT.src', fmt=3DIMGFMT size=3D67108864
- wrote 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--qemu-img: error while writing sector 0: Operation not supported
-+qemu-img: error while writing at byte 0: Operation not supported
+diff --git a/block/qcow2.c b/block/qcow2.c
+index e8cbcc1ec1..b524b0c53f 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4355,6 +4355,11 @@ qcow2_co_pwritev_compressed_part(BlockDriverState *b=
+s,
+         return -EINVAL;
+     }
 =20
- Convert uncompressed, then write compressed data manually:
- Images are identical.
++    if (offset_into_cluster(s, bytes) &&
++        (offset + bytes) !=3D (bs->total_sectors << BDRV_SECTOR_BITS)) {
++        return -EINVAL;
++    }
++
+     while (bytes && aio_task_pool_status(aio) =3D=3D 0) {
+         uint64_t chunk_size =3D MIN(bytes, s->cluster_size);
+=20
 --=20
 2.25.1
 
