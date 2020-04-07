@@ -2,121 +2,65 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62411C2BA16
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 078FCC2BA16
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:30:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2831220678
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:28:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="VX9uPYZG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2831220678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id CD379206F5
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:30:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD379206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLif4-0006fV-6T
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 03:28:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42110)
+	id 1jLigX-00083z-VL
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 03:30:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42252)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jLieP-00067q-2W
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:28:02 -0400
+ (envelope-from <jingqi.liu@intel.com>) id 1jLifg-0007MO-Go
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:29:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jLieO-0000Gi-4u
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:28:01 -0400
-Received: from mail-eopbgr140123.outbound.protection.outlook.com
- ([40.107.14.123]:58366 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jLieL-000067-Nm; Tue, 07 Apr 2020 03:27:57 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=egRRdyipAbRCDfYGopsWSVCbU1utUADehKLnblZhYx4wU0byraRxVBJkXrVZjaZ3wg0PhruJ1/Bse43o2N4WrMhc6cIvmY2ayD7az9zdzjRmTFCsWcQVoH3st5KLwpGwW3dH3smmhjNncu1YUGJJXPupYE5me+5qiq6nAN12brj+t9RkjD7SgSxbJhI3jzIUKbsDK5dxPq51W5l0e7XoGWXk/mUrN6KzSAuhjG1oPYGJFM21rXilGA3rSozBUoh/T/f3AWZNlq9PFGSU/HgwWNEtl45IcL3QqdKjVvmFT+hGppWEl8xb42d8ZMZkOUPvcAaYwlqHHud8LXPCvzBGeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0ehWGCYkjp1btbfrjg6PQw0CchtkNpW/PA9mI7rXKPk=;
- b=nwkAbwzUKihLxXATyrKrhhucVr/hoAG+EbHRH7e0sM3NtDtoqVjIAlHP9l+QPphEvEXAjbjhkiB4BHltB8cXcTgn9EVrJMRYSSSS7rJYq3V8XHVg/51voKxQ+hHKS5VQZdCpnVzWmPNHcysoAhJ/u7ZaiUrNkk2cX01DHnFnFLsqYvxNcnY6mpbzL+pMb5gRWZ8R3h7NQ1WTWIWOLfVOjkyqQPkSFPU43HWo+Otrg4iD53a4GzRHecNpDJuNE+RAdlN54ys1jdea0fXOK6FeWQwwvMAcyi48wYdb7yHYOSrb1QF3XpShTsaTYqNRj/+vnNlwXU2j2iHDzZz+DYrJQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0ehWGCYkjp1btbfrjg6PQw0CchtkNpW/PA9mI7rXKPk=;
- b=VX9uPYZGy7H6uXweH0hFOZ4dz+tVTxWYR3jcyLdpiQ7dopV0KfJovrHRVOBFj3ESxeztHIj1TY5902B5NQ1B7TKU5HAtda6FLF0dlPdMiJjhdJXV9ksEAaoWP/bCgJZsjEP1tsvqcdvH2oSrxV2zIHGLLrJZAj+4cXZcRiFKxeM=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
- AM7PR08MB5381.eurprd08.prod.outlook.com (10.141.172.87) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2878.20; Tue, 7 Apr 2020 07:27:53 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.021; Tue, 7 Apr 2020
- 07:27:53 +0000
-Subject: Re: [PATCH v2] qcow2: Check request size in
- qcow2_co_pwritev_compressed_part()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <20200406143401.26854-1-berto@igalia.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200407102749882
-Message-ID: <90ae7712-7624-2367-a035-f155d3e7e4f3@virtuozzo.com>
-Date: Tue, 7 Apr 2020 10:27:49 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200406143401.26854-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM5PR0701CA0004.eurprd07.prod.outlook.com
- (2603:10a6:203:51::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <jingqi.liu@intel.com>) id 1jLife-0001E2-Hp
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:29:19 -0400
+Received: from mga09.intel.com ([134.134.136.24]:32209)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
+ id 1jLife-00015I-8i
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:29:18 -0400
+IronPort-SDR: uKbjD2jv3M55ufV7RB1RFHYwvy5ya3IiuJm9lACVupyR4enLnDbBQCkIDDzikB+TWHaJHOWmTu
+ rZolfJphyhZQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 07 Apr 2020 00:29:08 -0700
+IronPort-SDR: W8FfYhXnqa/n2PuMdGAn3tZJHQprFAQ+h8su7EvhzYMP+xaLcStqy1+xLoqfUdVM5Wb/nk59CH
+ skYKZLdB0ceQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,353,1580803200"; d="scan'208";a="452346554"
+Received: from unknown (HELO [10.238.4.245]) ([10.238.4.245])
+ by fmsmga006.fm.intel.com with ESMTP; 07 Apr 2020 00:29:06 -0700
+Subject: Re: [PATCH] exec: fetch the alignment of Linux devdax pmem character
+ device nodes
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+References: <20200401031314.11592-1-jingqi.liu@intel.com>
+From: "Liu, Jingqi" <jingqi.liu@intel.com>
+Message-ID: <2c45ec7c-f3ea-2962-47a6-9330f0a2f146@intel.com>
+Date: Tue, 7 Apr 2020 15:29:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.160) by
- AM5PR0701CA0004.eurprd07.prod.outlook.com (2603:10a6:203:51::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.11 via Frontend
- Transport; Tue, 7 Apr 2020 07:27:52 +0000
-X-Tagtoolbar-Keys: D20200407102749882
-X-Originating-IP: [185.215.60.160]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a2d28e54-e5bd-4457-29aa-08d7dac52f04
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5381:
-X-LD-Processed: 0bc7f26d-0264-416e-a6fc-8352af79c58f,ExtAddr
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5381D16AECA04BCC4BDD4E7CC1C30@AM7PR08MB5381.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:350;
-X-Forefront-PRVS: 036614DD9C
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(39830400003)(346002)(396003)(366004)(136003)(376002)(4326008)(8936002)(8676002)(186003)(81166006)(26005)(478600001)(31696002)(16526019)(86362001)(36756003)(5660300002)(107886003)(52116002)(81156014)(31686004)(66556008)(54906003)(2906002)(6666004)(2616005)(316002)(16576012)(956004)(66476007)(6486002)(66946007);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9424HWYnSisdTu9Yx4MHsBFozwzEleY6Ltm2AbSqzLNg7F90DcJuEiue89eFG7/tYQwJ3QLLvchUyC6pPwyFfNvq7ZVNFa3ksLHxGkisJfGwr7VHJapd0vi0lt+Xa4dS6m9ClfqMtnk5jn63iyYEDFjQYAybvVfWFrV8Tq3JLF9iDSu6bHEyGrqR4S7n1u6qs3hwgt6OTgzM3cnOsFelMaYugPPVwchBbO5YrLDXw+WH0zXa7sy0nOEPE46Q+0uClqFdIljHh4Qhnl0ZTBek4y77m9xW0glkIJTXwxt/3rWxCdWemQZyjyNbv6jh9NIXxZptY9bbFW3bEnkiDmhxrY7hrsr+ZMzh/zz1fYdzCzBiWXGsNsFn4Ri4BFTXg9DPfC6KELCxXkcNPZ9h7OoWErI/OgMlXG8cPBK7LoUs2Ui7mms8WTCzKGVLBWYuvetx
-X-MS-Exchange-AntiSpam-MessageData: AxwCioqIDycthnDQVtQ7D7KqxbF8scDWHcB+JH5DQjNQaj0UTcl00kWvsBkh5LZ1s9vWFpze7mg4VylXpNGLjf1ovHJv10IRhddB8pP21KYl5f3mleYCryguMyTJOCd5+L9YFDAUHtDjVj7n5iX1qQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a2d28e54-e5bd-4457-29aa-08d7dac52f04
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2020 07:27:53.0111 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EekEmDuLka71CH1kJLWujvg8XgwQayg6NA5Ob3L3j+HUCxH6cgX3f9Q1wvauQHyofauiLVNDYeUbww056MQVgQ/aCwn+NUZcunSx1tG7Mz8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5381
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.14.123
+In-Reply-To: <20200401031314.11592-1-jingqi.liu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,59 +72,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: "Williams, Dan J" <dan.j.williams@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-06.04.2020 17:34, Alberto Garcia wrote:
-> When issuing a compressed write request the number of bytes must be a
-> multiple of the cluster size or reach the end of the last cluster.
-> 
-> With the current code such requests are allowed and we hit an
-> assertion:
-> 
->     $ qemu-img create -f qcow2 img.qcow2 1M
->     $ qemu-io -c 'write -c 0 32k' img.qcow2
-> 
->     qemu-io: block/qcow2.c:4257: qcow2_co_pwritev_compressed_task:
->     Assertion `bytes == s->cluster_size || (bytes < s->cluster_size &&
->                (offset + bytes == bs->total_sectors << BDRV_SECTOR_BITS))' failed.
->     Aborted
-> 
-> This patch fixes a regression introduced in 0d483dce38
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+Ping.
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Any comments are appreciated.
 
+Hi Paolo, Richard,
+
+Any comments about this ?
+
+
+Thanks,
+
+Jingqi
+
+On 4/1/2020 11:13 AM, Liu, Jingqi wrote:
+> If the backend file is devdax pmem character device, the alignment
+> specified by the option 'align=NUM' in the '-object memory-backend-file'
+> needs to match the alignment requirement of the devdax pmem character device.
+>
+> This patch fetches the devdax pmem file 'align', so that we can compare
+> it with the NUM of 'align=NUM'.
+> The NUM needs to be larger than or equal to the devdax pmem file 'align'.
+>
+> It also fixes the problem that mmap() returns failure in qemu_ram_mmap()
+> when the NUM of 'align=NUM' is less than the devdax pmem file 'align'.
+>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
 > ---
->   block/qcow2.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 2bb536b014..587cf51948 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -4349,6 +4349,11 @@ qcow2_co_pwritev_compressed_part(BlockDriverState *bs,
->           return -EINVAL;
->       }
+>   exec.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 45 insertions(+), 1 deletion(-)
+>
+> diff --git a/exec.c b/exec.c
+> index de9d949902..8221abffec 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1736,6 +1736,42 @@ static int64_t get_file_size(int fd)
+>       return size;
+>   }
 >   
-> +    if (offset_into_cluster(s, bytes) &&
-> +        (offset + bytes) != (bs->total_sectors << BDRV_SECTOR_BITS)) {
-> +        return -EINVAL;
+> +static int64_t get_file_align(int fd)
+> +{
+> +    int64_t align = -1;
+> +#if defined(__linux__)
+> +    struct stat st;
+> +
+> +    if (fstat(fd, &st) < 0) {
+> +        return -errno;
 > +    }
 > +
->       while (bytes && aio_task_pool_status(aio) == 0) {
->           uint64_t chunk_size = MIN(bytes, s->cluster_size);
+> +    /* Special handling for devdax character devices */
+> +    if (S_ISCHR(st.st_mode)) {
+> +        g_autofree char *subsystem_path = NULL;
+> +        g_autofree char *subsystem = NULL;
+> +
+> +        subsystem_path = g_strdup_printf("/sys/dev/char/%d:%d/subsystem",
+> +                                         major(st.st_rdev), minor(st.st_rdev));
+> +        subsystem = g_file_read_link(subsystem_path, NULL);
+> +
+> +        if (subsystem && g_str_has_suffix(subsystem, "/dax")) {
+> +            g_autofree char *align_path = NULL;
+> +            g_autofree char *align_str = NULL;
+> +
+> +            align_path = g_strdup_printf("/sys/dev/char/%d:%d/device/align",
+> +                                    major(st.st_rdev), minor(st.st_rdev));
+> +
+> +            if (g_file_get_contents(align_path, &align_str, NULL, NULL)) {
+> +                return g_ascii_strtoll(align_str, NULL, 0);
+> +            }
+> +        }
+> +    }
+> +#endif /* defined(__linux__) */
+> +
+> +    return align;
+> +}
+> +
+>   static int file_ram_open(const char *path,
+>                            const char *region_name,
+>                            bool *created,
+> @@ -2275,7 +2311,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+>   {
+>       RAMBlock *new_block;
+>       Error *local_err = NULL;
+> -    int64_t file_size;
+> +    int64_t file_size, file_align;
 >   
-> 
-
-
--- 
-Best regards,
-Vladimir
+>       /* Just support these ram flags by now. */
+>       assert((ram_flags & ~(RAM_SHARED | RAM_PMEM)) == 0);
+> @@ -2311,6 +2347,14 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+>           return NULL;
+>       }
+>   
+> +    file_align = get_file_align(fd);
+> +    if (file_align > 0 && mr && file_align > mr->align) {
+> +        error_setg(errp, "backing store align 0x%" PRIx64
+> +                   " is larger than 'align' option 0x" RAM_ADDR_FMT,
+> +                   file_align, mr->align);
+> +        return NULL;
+> +    }
+> +
+>       new_block = g_malloc0(sizeof(*new_block));
+>       new_block->mr = mr;
+>       new_block->used_length = size;
 
