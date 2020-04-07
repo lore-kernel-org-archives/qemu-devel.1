@@ -2,48 +2,51 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E30C9C2BB55
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C879C2BB55
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:00:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBD5320731
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:58:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBD5320731
+	by mail.kernel.org (Postfix) with ESMTPS id 64D5B20731
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:00:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64D5B20731
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLlwE-0001HJ-Ta
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 06:58:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47290)
+	id 1jLlxm-0004HT-GR
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 07:00:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <miaoyubo@huawei.com>) id 1jLlvG-00080J-AM
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:57:39 -0400
+ (envelope-from <miaoyubo@huawei.com>) id 1jLlvH-00080S-3c
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:57:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <miaoyubo@huawei.com>) id 1jLlvF-0007SM-3u
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:57:38 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3224 helo=huawei.com)
+ (envelope-from <miaoyubo@huawei.com>) id 1jLlvF-0007Ss-Qz
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:57:39 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3665 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1jLlvE-0007P1-Cs
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:57:36 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id E2023E5B0D510805F3F6;
- Tue,  7 Apr 2020 18:57:27 +0800 (CST)
+ (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1jLlvF-0007RY-F9
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:57:37 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 13E114575909739E6918;
+ Tue,  7 Apr 2020 18:57:28 +0800 (CST)
 Received: from DESKTOP-D7EVK5B.china.huawei.com (10.173.221.29) by
  DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 7 Apr 2020 18:57:17 +0800
+ 14.3.487.0; Tue, 7 Apr 2020 18:57:20 +0800
 From: Yubo Miao <miaoyubo@huawei.com>
 To: <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>, <lersek@redhat.com>
-Subject: [PATCH v5 0/8] pci_expander_brdige:acpi:Support pxb-pcie for ARM
-Date: Tue, 7 Apr 2020 18:56:58 +0800
-Message-ID: <20200407105706.1920-1-miaoyubo@huawei.com>
+Subject: [PATCH v5 6/8] unit-test: The files changed.
+Date: Tue, 7 Apr 2020 18:57:04 +0800
+Message-ID: <20200407105706.1920-7-miaoyubo@huawei.com>
 X-Mailer: git-send-email 2.24.1.windows.2
+In-Reply-To: <20200407105706.1920-1-miaoyubo@huawei.com>
+References: <20200407105706.1920-1-miaoyubo@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.173.221.29]
@@ -71,54 +74,164 @@ Sender: "Qemu-devel"
 
 From: miaoyubo <miaoyubo@huawei.com>
 
-Changes with v4
-v5->v4: Not using specific resources for PXB.
-Instead, the resources for pxb are composed of the bar space of the
-pci-bridge/pcie-root-port behined it and the config space of devices
-behind it.
+The unit-test is seperated into three patches:
+1. The files changed and list in bios-tables-test-allowed-diff.h
+2. The unit-test
+3. The binary file and clear bios-tables-test-allowed-diff.h
 
-Only if the bios(uefi for arm) support multiple roots,
-configure space of devices behind pxbs could be obtained.
-The uefi work is updated for discussion by the following link:
-https://edk2.groups.io/g/devel/message/56901?p=3D,,,20,0,0,0::Created,,ad=
-d+extra+roots+for+Arm,20,2,0,72723351=20
-[PATCH] ArmVirtPkg/FdtPciHostBridgeLib: add extra roots for Arm.
+The ASL diff would also be listed.
+Sice there are 1000+lines diff, some changes would be omitted.
 
-Currently pxb-pcie is not supported by arm,
-the reason for it is pxb-pcie is not described in DSDT table
-and only one main host bridge is described in acpi tables,
-which means it is not impossible to present different io numas
-for different devices.
+  * Original Table Header:
+  *     Signature        "DSDT"
+- *     Length           0x000014BB (5307)
++ *     Length           0x00001E7A (7802)
+  *     Revision         0x02
+- *     Checksum         0xD1
++ *     Checksum         0x57
+  *     OEM ID           "BOCHS "
+  *     OEM Table ID     "BXPCDSDT"
+  *     OEM Revision     0x00000001 (1)
 
-This series of patches make arm to support PXB-PCIE.
++        Device (PC80)
++        {
++            Name (_HID, "PNP0A08" /* PCI Express Bus */)  // _HID: Hardw=
+are ID
++            Name (_CID, "PNP0A03" /* PCI Bus */)  // _CID: Compatible ID
++            Name (_ADR, Zero)  // _ADR: Address
++            Name (_CCA, One)  // _CCA: Cache Coherency Attribute
++            Name (_SEG, Zero)  // _SEG: PCI Segment
++            Name (_BBN, 0x80)  // _BBN: BIOS Bus Number
++            Name (_UID, 0x80)  // _UID: Unique ID
++            Name (_STR, Unicode ("pxb Device"))  // _STR: Description St=
+ring
++            Name (_PRT, Package (0x80)  // _PRT: PCI Routing Table
++            {
++                Package (0x04)
++                {
++                    0xFFFF,
++                    Zero,
++                    GSI0,
++                    Zero
++                },
++
 
-Users can configure pxb-pcie with certain numa, Example command
-is:
+Packages are omitted.
 
-   -device pxb-pcie,id=3Dpci.7,bus_nr=3D128,numa_node=3D0,bus=3Dpcie.0,ad=
-dr=3D0x9
++                Package (0x04)
++                {
++                    0x001FFFFF,
++                    0x03,
++                    GSI2,
++                    Zero
++                }
++            })
++            Device (GSI0)
++            {
++                Name (_HID, "PNP0C0F" /* PCI Interrupt Link Device */)  =
+// _HID: Hardware ID
++                Name (_UID, Zero)  // _UID: Unique ID
++                Name (_PRS, ResourceTemplate ()  // _PRS: Possible Resou=
+rce Settings
++                {
++                    Interrupt (ResourceConsumer, Level, ActiveHigh, Excl=
+usive, ,, )
++                    {
++                        0x00000023,
++                    }
++                })
++                Name (_CRS, ResourceTemplate ()  // _CRS: Current Resour=
+ce Settings
++                {
++                    Interrupt (ResourceConsumer, Level, ActiveHigh, Excl=
+usive, ,, )
++                    {
++                        0x00000023,
++                    }
++                })
++                Method (_SRS, 1, NotSerialized)  // _SRS: Set Resource S=
+ettings
++                {
++                }
++            }
 
+GSI1,2,3 are omitted.
 
-miaoyubo (8):
-  acpi:Extract two APIs from acpi_dsdt_add_pci
-  fw_cfg: Write the extra roots into the fw_cfg
-  acpi:Extract crs build form acpi_build.c
-  acpi: Refactor the source of host bridge and build tables for pxb
-  acpi: align the size to 128k
-  unit-test: The files changed.
-  unit-test: Add testcase for pxb
-  unit-test: add the binary file and clear diff.h
++            Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource S=
+ettings
++            {
++                WordBusNumber (ResourceProducer, MinFixed, MaxFixed, Pos=
+Decode,
++                    0x0000,             // Granularity
++                    0x0080,             // Range Minimum
++                    0x0080,             // Range Maximum
++                    0x0000,             // Translation Offset
++                    0x0001,             // Length
++                    ,, )
++            })
++            Name (SUPP, Zero)
++            Name (CTRL, Zero)
++            Method (_OSC, 4, NotSerialized)  // _OSC: Operating System C=
+apabilities
++            {
++                CreateDWordField (Arg3, Zero, CDW1)
++                If ((Arg0 =3D=3D ToUUID ("33db4d5b-1ff7-401c-9657-7441c0=
+3dd766") /* PCI Host Bridge Device */))
++                {
++                    CreateDWordField (Arg3, 0x04, CDW2)
++                    CreateDWordField (Arg3, 0x08, CDW3)
++                    SUPP =3D CDW2 /* \_SB_.PC80._OSC.CDW2 */
++                    CTRL =3D CDW3 /* \_SB_.PC80._OSC.CDW3 */
++                    CTRL &=3D 0x1F
++                    If ((Arg1 !=3D One))
++                    {
++                        CDW1 |=3D 0x08
++                    }
++
++                    If ((CDW3 !=3D CTRL))
++                    {
++                        CDW1 |=3D 0x10
++                    }
++
++                    CDW3 =3D CTRL /* \_SB_.PC80.CTRL */
++                    Return (Arg3)
++                }
++                Else
++                {
++                    CDW1 |=3D 0x04
++                    Return (Arg3)
++                }
++            }
 
- hw/acpi/aml-build.c            | 275 +++++++++++++++++++++++++++++++
- hw/arm/virt-acpi-build.c       | 251 ++++++++++++++++++++++-------
- hw/arm/virt.c                  |  23 +++
- hw/i386/acpi-build.c           | 285 ---------------------------------
- include/hw/acpi/aml-build.h    |  23 +++
- tests/data/acpi/virt/DSDT.pxb  | Bin 0 -> 7802 bytes
- tests/qtest/bios-tables-test.c |  58 ++++++-
- 7 files changed, 564 insertions(+), 351 deletions(-)
- create mode 100644 tests/data/acpi/virt/DSDT.pxb
+DSM is are omitted
 
+         Device (PCI0)
+         {
+             Name (_HID, "PNP0A08" /* PCI Express Bus */)  // _HID: Hardw=
+are ID
+                     WordBusNumber (ResourceProducer, MinFixed, MaxFixed,=
+ PosDecode,
+                         0x0000,             // Granularity
+                         0x0000,             // Range Minimum
+-                        0x00FF,             // Range Maximum
++                        0x007F,             // Range Maximum
+                         0x0000,             // Translation Offset
+-                        0x0100,             // Length
++                        0x0080,             // Length
+
+Signed-off-by: miaoyubo <miaoyubo@huawei.com>
+---
+ tests/qtest/bios-tables-test-allowed-diff.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bi=
+os-tables-test-allowed-diff.h
+index dfb8523c8b..90c53925fc 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,2 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/virt/DSDT.pxb",
 --=20
 2.19.1
 
