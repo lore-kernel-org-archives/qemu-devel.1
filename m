@@ -2,119 +2,76 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47C08C2BA16
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36380C2BA16
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:40:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F4008206F5
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:38:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F35D4206F5
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:40:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="lpf/ZbFX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F4008206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="F2B8MImA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F35D4206F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLioY-0002AX-4y
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 03:38:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43046)
+	id 1jLiqq-0003Fn-1L
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 03:40:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43112)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jLins-0001kx-6g
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:37:49 -0400
+ (envelope-from <joel.stan@gmail.com>) id 1jLioV-0002I4-Bn
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:38:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jLinq-0006S1-On
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:37:48 -0400
-Received: from mail-eopbgr70110.outbound.protection.outlook.com
- ([40.107.7.110]:25383 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jLinq-0006QV-GU; Tue, 07 Apr 2020 03:37:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Zg6Kremn5z6o9gvtt/irTVVAw1B+Ap2mBo95DRoaiHYZCT14J71ju2tMLkPBdLEUKdY9TWhL3QbazFjN7KwtoN4ToYKgY7h57OM/ige/h+c1Gi1m3uqZerE1ZzDGkG/6bcFvD6+grlwefmO+60oYVA1KjDf/QGiJ2HwoR9mP+wvX0LS/caLTCTBKxyzTvl0PHnkS/jPGaPjvYdwG0NhB9vS39E0a/WwYyuqnMxDMvOkzCZpLXjiZt12t6T7MRe2PGShDf1AzNb/8lljUHFBKHBXZcTxGFgcEZTDA7K59YkmH44wQjPm/2sd94cJ3oD0kDUiEE/zePIFc0iLszhr5Pg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bNTGBsQQ/wncu5GU2bckT/ajX/bBwux9uikC5E7CZeY=;
- b=AyanjHCQdxfie2frg2VZgSpBCEjs4Nf751ON50nHI5C2NKhxZQ1eWvcVOrUpK0wu5MdRfqUttWLDoC9sRON6df+x+0Tenc68jGnvQgBBiigiwGjT1nydZdDolSmAeA484vfavHqf/HjrBaAmQTSC4XaM0i4qUxsJgNx0CJx3brUhja0SeJumouWOo45oOtgO3op3GbA2Dc97x1WLn4iRpSGc8dFPEx1KxtoiBWP4GZcCxPL5IfDFcqYaED3iYRxwI4RDOUx1pTtkvpKRm8wP5uA0WTsqz34P4dP3vHF7Kt3nSnEswozreMPg8Ox1fPutg0trTQ3D0G0GphCbiqXP4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bNTGBsQQ/wncu5GU2bckT/ajX/bBwux9uikC5E7CZeY=;
- b=lpf/ZbFXMxp/tS43Eymfh3qXhe3uhVqI3qSexuOovT7Fc9KV/s6SvqpdB3NAgwUGZC3CjRPTsKvMBB45r4STIoCkMwQZBNhtkKnisokcqv1e4EDOVwX4dnkeLvFaDlGhO6oEjVLnqvY/bbcFlES4VBGPBvqhlr6D6k9OPhR3MX0=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
- AM7PR08MB5352.eurprd08.prod.outlook.com (10.141.174.136) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2878.16; Tue, 7 Apr 2020 07:37:43 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.021; Tue, 7 Apr 2020
- 07:37:43 +0000
-Subject: Re: [PATCH v2 2/2] iotests: rework test finding
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200325102131.23270-1-vsementsov@virtuozzo.com>
- <20200325102131.23270-3-vsementsov@virtuozzo.com>
- <d3ff5ccf-88cc-5be7-d56c-49f394c0ba23@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200407103741454
-Message-ID: <c6f04077-1d17-2292-286c-35553cc19317@virtuozzo.com>
-Date: Tue, 7 Apr 2020 10:37:41 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <d3ff5ccf-88cc-5be7-d56c-49f394c0ba23@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: AM6P194CA0063.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:209:84::40) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <joel.stan@gmail.com>) id 1jLioT-0006fy-UK
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:38:27 -0400
+Received: from mail-qv1-xf41.google.com ([2607:f8b0:4864:20::f41]:40771)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
+ id 1jLioQ-0006e9-O5; Tue, 07 Apr 2020 03:38:23 -0400
+Received: by mail-qv1-xf41.google.com with SMTP id k9so670863qvw.7;
+ Tue, 07 Apr 2020 00:38:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yTS6hRvvxXn64hapJKMOlMcAkMMWPD1NjnnO6nw9tE0=;
+ b=F2B8MImA2W99gMQ1GqRRFQeOTzeFFpZK9hMByWVBDtFOGVAgKVND2DzqKYiMsCBUcj
+ cSq4enSGoYZ1IfdyJd8XaRKoiEVPwf9WqCLLGfSQEtOkX0ciymmYLsAa/W4xOCpDXeW/
+ et2Byf4sUz2C+FjWyBPWQjF1ZY2Q20EsFNPvA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yTS6hRvvxXn64hapJKMOlMcAkMMWPD1NjnnO6nw9tE0=;
+ b=IviGXYEJ9OyxqcMh1cAtsXU745FZsQIG+ujtk4N2FyUacJEDNeF3xuuNFcsXSvpJMb
+ 1qPi6Px710Wvb2XJY4x3Qz2EzgC6ycNzSivcm3X7OsH45OMq6dtq0nVgm1csFtbtwCXj
+ sPU1mbvfIEFAmPCalg5snIrjxVqoIYexO+Zc4chIpeDppXcIxD+wGOiG63p3QRh5ux67
+ /rcodO96dJk6DtcsLqRR+cNxKBnN6E50N7V1ndwJ3vob/NNj0OTiT+FU9fHn/dIi+N+Q
+ arJFm8s9TKIMa5dSMFby5eAYk24uU0eKC/yxkcm12TihNmn2nYoNs87bQxaDwFDptA7m
+ M5GA==
+X-Gm-Message-State: AGi0Pub5vCCzoq9d3mx3H4SIQzYY/u0+d0a5tJCro3nfroL0TRs+Yg3Q
+ 8HlLaBzz/N36hHupYe8JmrLF+FlieQzpurkilTQ=
+X-Google-Smtp-Source: APiQypL96ExZOnzr5pprllw9HMBevWNHO+OI0840CjuJdiLJ5mlebnmew5L+Jkb/2VSVYZwXbBu1tV7Ui2HONb/Za3w=
+X-Received: by 2002:a0c:f207:: with SMTP id h7mr894166qvk.20.1586245101805;
+ Tue, 07 Apr 2020 00:38:21 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.160) by
- AM6P194CA0063.EURP194.PROD.OUTLOOK.COM (2603:10a6:209:84::40) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2878.16 via Frontend Transport; Tue, 7 Apr 2020 07:37:42 +0000
-X-Tagtoolbar-Keys: D20200407103741454
-X-Originating-IP: [185.215.60.160]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 64d64bf3-9539-4a45-e9fa-08d7dac68ebf
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5352:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB535208DB44A11F019EFF8E3DC1C30@AM7PR08MB5352.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-Forefront-PRVS: 036614DD9C
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(396003)(136003)(346002)(366004)(39840400004)(376002)(8936002)(86362001)(8676002)(186003)(66946007)(66556008)(66476007)(16526019)(31696002)(81156014)(81166006)(6486002)(2616005)(956004)(478600001)(31686004)(2906002)(5660300002)(316002)(36756003)(4326008)(52116002)(16576012)(53546011)(26005);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fBOd4VdKELmZ7a9DQKZBt0bXEoCyKLRU4nPSDTv7ypjT3MuuUp6FLAGMM1i3OMsALh9Znkqn0/3c2Jkb7uoS+0SPCMuIm0VAGJIfWVtB9pmRYp/cz0BpDEpLCYXnGqDrVbxcVwtDy3i3MPYlpF+kyAFfMLNaSWyJibcEmSXD45cnxFEpujPFR8Lk5qOFfcE+Z1p9RiZ41oJfr9sw/ZdN0dM4ljkt0XK/rtcJOfv6Cvj4OKUuI6f8FejUUWTQISauB+q2oAfytkzm4jBi7WTppCbzAJJ2Oa4cA4UhjqOHB5myKD2VU8gwtJJrxT0fK6fPvOLn/qTIIyiC5ax16/PBAVHCFkxl7P6J9XLD2UwTpfb57X3rzPkZ9I0u7aWVbsIE95A+VlXEo6Wsy30U3B/RlxM17SYy3elcnz5hB5b43eoqjAqJfLBJUQqewrlnak+j
-X-MS-Exchange-AntiSpam-MessageData: j5t27e6Rsa3amu52RE7jaR4KhikG83+46NOjVZ1rdUdPy7FJnJ9ONDfFhbuM+THQ+JGbx0NfSYdnla2HxZVSNA3gV6pP0Y9QWwBXk1Ikn2nwn7HkDd1FDdw0H++qmq8CkHpnNYg0Wkl0uXuAnG3x1w==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 64d64bf3-9539-4a45-e9fa-08d7dac68ebf
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2020 07:37:43.0979 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PMk8ZTyPXWka2ROQ36K5P5CbQkBsbE9iI/fuSRvwo06CYiD4BhjkPB6oK1Tdm1rFc+tL9UauxzXUKc41fDzkZ6c+Th8bnm6A2sQ3UibnCKI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5352
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.7.110
+References: <20200407072517.671521-1-joel@jms.id.au>
+In-Reply-To: <20200407072517.671521-1-joel@jms.id.au>
+From: Joel Stanley <joel@jms.id.au>
+Date: Tue, 7 Apr 2020 07:38:09 +0000
+Message-ID: <CACPK8XfHnE_kEPw++CdLRG9r=xJmLZkuV4WXP7NKTo8mW+dJvA@mail.gmail.com>
+Subject: Re: [PATCH] aspeed: Add boot stub for smp booting
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
+ Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::f41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,240 +83,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-06.04.2020 16:02, Max Reitz wrote:
-> On 25.03.20 11:21, Vladimir Sementsov-Ogievskiy wrote:
->> Add python script with new logic of searching for tests:
->>
->> Old behavior:
->>   - tests are named [0-9][0-9][0-9]
->>   - tests must be registered in group file (even if test doesn't belong
->>     to any group, like 142)
->>
->> New behavior:
->>   - group file is dropped
->>   - tests are searched by file-name instead of group file, so it's not
->>     needed more to "register the test", just create it with name
->>     test-*. Old names like [0-9][0-9][0-9] are supported too, but not
->>     recommended for new tests
->>   - groups are parsed from '# group: ' line inside test files
->>   - optional file group.local may be used to define some additional
->>     groups for downstreams
->>   - 'disabled' group is used to temporary disable tests. So instead of
->>     commenting tests in old 'group' file you now can add them to
->>     disabled group with help of 'group.local' file
->>
->> Benefits:
->>   - no rebase conflicts in group file on patch porting from branch to
->>     branch
->>   - no conflicts in upstream, when different series want to occupy same
->>     test number
->>   - meaningful names for test files
->>     For example, with digital number, when some person wants to add some
->>     test about block-stream, he most probably will just create a new
->>     test. But if there would be test-block-stream test already, he will
->>     at first look at it and may be just add a test-case into it.
->>     And anyway meaningful names are better and test-* notation is
->>     already used in tests directory.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   docs/devel/testing.rst           |  51 +++++-
->>   tests/qemu-iotests/check         |  20 +--
->>   tests/qemu-iotests/find_tests.py |  72 ++++++++
->>   tests/qemu-iotests/group         | 298 -------------------------------
->>   4 files changed, 132 insertions(+), 309 deletions(-)
->>   create mode 100755 tests/qemu-iotests/find_tests.py
->>   delete mode 100644 tests/qemu-iotests/group
->=20
-> [...]
->=20
->> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
->> index f7a2d3d6c3..09b2ced2f0 100755
->> --- a/tests/qemu-iotests/check
->> +++ b/tests/qemu-iotests/check
->> @@ -168,9 +168,7 @@ do
->>       if $group
->>       then
->>           # arg after -g
->> -        group_list=3D$(sed -n <"$source_iotests/group" -e 's/$/ /' -e "=
-/^[0-9][0-9][0-9].* $r /"'{
->> -s/ .*//p
->> -}')
->> +        group_list=3D$(./find_tests.py "$r")
->>           if [ -z "$group_list" ]
->>           then
->>               echo "Group \"$r\" is empty or not defined?"
->> @@ -193,10 +191,8 @@ s/ .*//p
->>       then
->>           # arg after -x
->>           # Populate $tmp.list with all tests
->> -        awk '/^[0-9]{3,}/ {print $1}' "${source_iotests}/group" > $tmp.=
-list 2>/dev/null
->> -        group_list=3D$(sed -n <"$source_iotests/group" -e 's/$/ /' -e "=
-/^[0-9][0-9][0-9].* $r /"'{
->> -s/ .*//p
->> -}')
->> +        ./find_tests.py > $tmp.list 2>/dev/null
->> +        group_list=3D$(./find_tests.py "$r")
->>           if [ -z "$group_list" ]
->>           then
->>               echo "Group \"$r\" is empty or not defined?"
->> @@ -486,10 +482,14 @@ testlist options
->>               fi
->>               ;;
->>  =20
->> -        *)
->> +        [0-9]*)
->>               start=3D$r
->>               end=3D$r
->>               ;;
->> +        *)
->=20
-> Should this be test-*, or do we really want to allow any filename here?
->=20
->> +            echo $r >> $tmp.list
->> +            xpand=3Dfalse
->> +            ;;
->>  =20
->>       esac
->>  =20
->> @@ -504,7 +504,7 @@ testlist options
->>   BEGIN        { for (t=3D'$start'; t<=3D'$end'; t++) printf "%03d\n",t =
-}' \
->>           | while read id
->>           do
->> -            if grep -s "^$id\( \|\$\)" "$source_iotests/group" >/dev/nu=
-ll
->> +            if (./find_tests.py | grep "$id")
->=20
-> I... Actually have no idea what this loop is supposed to do, but
-> couldn=92t we cache the find_tests.py output?
->=20
->>               then
->>                   # in group file ... OK
->>                   echo $id >>$tmp.list
->> @@ -566,7 +566,7 @@ else
->>           touch $tmp.list
->>       else
->>           # no test numbers, do everything from group file
->> -        sed -n -e '/^[0-9][0-9][0-9]*/s/^\([0-9]*\).*/\1/p' <"$source_i=
-otests/group" >$tmp.list
->> +        find_tests.py > $tmp.list
->>       fi
->>   fi
->>  =20
->=20
-> The modifications to check seem a bit too tame to me.  Can=92t we do some
-> more radical changes to drastically reduce the complexity of the check
-> script and move it to the new Python script?  Do we need the whole code
-> to handle a number of groups and excluded groups there?  Can=92t we just
-> give the Python scripts a list of groups to include and a list of groups
-> to exclude and let it handle the rest?
+On Tue, 7 Apr 2020 at 07:25, Joel Stanley <joel@jms.id.au> wrote:
+>
+> This is a boot stub that is similar to the code u-boot runs, allowing
+> the kernel to boot the secondary CPU.
+>
+> u-boot works as follows:
+>
+>  1. Initialises the SMP mailbox area in the SCU at 0x1e6e2180 with default values
+>
+>  2. Copies a stub named 'mailbox_insn' from flash to the SCU, just above the
+>     mailbox area
+>
+>  3. Sets AST_SMP_MBOX_FIELD_READY to a magic value to indicate the
+>     secondary can begin execution from the stub
+>
+>  4. The stub waits until the AST_SMP_MBOX_FIELD_GOSIGN register is set to
+>     a magic value
+>
+>  5. Jumps to the address in AST_SMP_MBOX_FIELD_ENTRY, starting Linux
+>
+> Linux indicates it is ready by writing the address of its entrypoint
+> function to AST_SMP_MBOX_FIELD_ENTRY and the 'go' magic number to
+> AST_SMP_MBOX_FIELD_GOSIGN. The secondary CPU sees this at step 4 and
+> breaks out of it's loop.
+>
+> To be compatible, a fixed qemu stub is loaded into the mailbox area. As
+> qemu can ensure the stub is loaded before execution starts, we do not
+> need to emulate the AST_SMP_MBOX_FIELD_READY behaviour of u-boot. The
+> secondary CPU's program counter points to the beginning of the stub,
+> allowing qemu to start secondaries at step four.
+>
+> Reboot behaviour is preserved by resetting AST_SMP_MBOX_FIELD_GOSIGN
+> when the secondaries are reset.
+>
+> This is only configured when the system is booted with -kernel and qemu
+> does not execute u-boot first.
+>
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
+> ---
+>  hw/arm/aspeed.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 65 insertions(+)
+>
+> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> index a6a2102a93cb..bc4386cc6174 100644
+> --- a/hw/arm/aspeed.c
+> +++ b/hw/arm/aspeed.c
+> @@ -116,6 +116,58 @@ static const MemoryRegionOps max_ram_ops = {
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+>  };
+>
+> +#define AST_SMP_MAILBOX_BASE            0x1e6e2180
+> +#define AST_SMP_MBOX_FIELD_ENTRY        (AST_SMP_MAILBOX_BASE + 0x0)
+> +#define AST_SMP_MBOX_FIELD_GOSIGN       (AST_SMP_MAILBOX_BASE + 0x4)
+> +#define AST_SMP_MBOX_FIELD_READY        (AST_SMP_MAILBOX_BASE + 0x8)
+> +#define AST_SMP_MBOX_FIELD_POLLINSN     (AST_SMP_MAILBOX_BASE + 0xc)
+> +#define AST_SMP_MBOX_CODE               (AST_SMP_MAILBOX_BASE + 0x10)
+> +#define AST_SMP_MBOX_GOSIGN             0xabbaab00
+> +
+> +static void aspeed_write_smpboot(ARMCPU *cpu,
+> +                                 const struct arm_boot_info *info)
+> +{
+> +    static const uint32_t poll_mailbox_ready[] = {
+> +        /*
+> +         * r2 = per-cpu go sign value
+> +         * r1 = AST_SMP_MBOX_FIELD_ENTRY
+> +         * r0 = AST_SMP_MBOX_FIELD_GOSIGN
+> +         */
+> +        0xee100fb0,  /* mrc     p15, 0, r0, c0, c0, 5 */
+> +        0xe21000ff,  /* ands    r0, r0, #255          */
+> +        0xe59f201c,  /* ldr     r2, [pc, #28]         */
+> +        0xe1822000,  /* orr     r2, r2, r0            */
+> +
+> +        0xe59f1018,  /* ldr     r1, [pc, #24]         */
+> +        0xe59f0018,  /* ldr     r0, [pc, #24]         */
+> +
+> +        0xe320f002,  /* wfe                           */
+> +        0xe5904000,  /* ldr     r4, [r0]              */
+> +        0xe1520004,  /* cmp     r2, r4                */
+> +        0x1afffffb,  /* bne     <wfe>                 */
+> +        0xe591f000,  /* ldr     pc, [r1]              */
+> +        AST_SMP_MBOX_GOSIGN,
+> +        AST_SMP_MBOX_FIELD_ENTRY,
+> +        AST_SMP_MBOX_FIELD_GOSIGN,
+> +    };
+> +
+> +    rom_add_blob_fixed("aspeed.smpboot", poll_mailbox_ready,
+> +                       sizeof(poll_mailbox_ready),
+> +                       info->smp_loader_start);
+> +}
+> +
+> +static void aspeed_reset_secondary(ARMCPU *cpu,
+> +                                   const struct arm_boot_info *info)
+> +{
+> +    AddressSpace *as = arm_boot_address_space(cpu, info);
+> +    CPUState *cs = CPU(cpu);
+> +
+> +    /* info->smp_bootreg_addr */
+> +    address_space_stl_notdirty(as, AST_SMP_MBOX_FIELD_GOSIGN, 0,
+> +                               MEMTXATTRS_UNSPECIFIED, NULL);
+> +    cpu_set_pc(cs, info->smp_loader_start);
+> +}
+> +
+>  #define FIRMWARE_ADDR 0x0
+>
+>  static void write_boot_rom(DriveInfo *dinfo, hwaddr addr, size_t rom_size,
+> @@ -270,6 +322,19 @@ static void aspeed_machine_init(MachineState *machine)
+>          }
+>      }
+>
+> +    if (machine->kernel_filename) {
 
-Okay.. It is inevitable. I will)
+I just realised this shouldn't be executed on non-ast2600 platforms.
+We could test for the number of CPUs like this:
 
->=20
->> diff --git a/tests/qemu-iotests/find_tests.py b/tests/qemu-iotests/find_=
-tests.py
->> new file mode 100755
->> index 0000000000..5de0615ebc
->> --- /dev/null
->> +++ b/tests/qemu-iotests/find_tests.py
->> @@ -0,0 +1,72 @@
->> +#!/usr/bin/env python3
->> +
->> +import os
->> +import glob
->> +from collections import defaultdict
->> +
->> +
->> +class TestFinder:
->> +    def __init__(self):
->> +        self.groups =3D defaultdict(set)
->> +        self.all_tests =3D glob.glob('[0-9][0-9][0-9]')
->> +
->> +        self.all_tests +=3D [f for f in glob.iglob('test-*')
->> +                           if not f.endswith('.out')]
->> +
->> +        for t in self.all_tests:
->> +            with open(t) as f:
->> +                for line in f:
->> +                    if line.startswith('# group: '):
->> +                        for g in line.split()[2:]:
->> +                            self.groups[g].add(t)
->> +
->> +    def add_group_file(self, fname):
->> +        with open(fname) as f:
->> +            for line in f:
->> +                line =3D line.strip()
->> +
->> +                if (not line) or line[0] =3D=3D '#':
->> +                    continue
->> +
->> +                words =3D line.split()
->> +                test_file =3D words[0]
->> +                groups =3D words[1:]
->> +
->> +                if test_file not in self.all_tests:
->> +                    print('Warning: {}: "{}" test is not found. '
->> +                          'Skip.'.format(fname, test_file))
->> +                    continue
->> +
->> +                for g in groups:
->> +                    self.groups[g].add(test_file)> +
->> +    def find_tests(self, group=3DNone):
->> +        if group is None:
->> +            tests =3D self.all_tests
->=20
-> Should we exclude the disabled group here?
+if (machine->kernel_filename && aspeed_board_binfo.nb_cpus > 1) {
 
-Hmm, yes we should.
-
->=20
->> +        elif group not in self.groups:
->> +            tests =3D []
->> +        elif group !=3D 'disabled' and 'disabled' in self.groups:
->> +            tests =3D self.groups[group] - self.groups['disabled']
->> +        else:
->> +            tests =3D self.groups[group]
->> +
->> +        return sorted(tests)
->> +
->> +
->> +if __name__ =3D=3D '__main__':
->> +    import sys
->> +
->> +    if len(sys.argv) > 2:
->> +        print("Usage ./find_tests.py [group]")
->> +        sys.exit(1)
->> +
->> +    tf =3D TestFinder()
->> +    if os.path.isfile('group'):
->> +        tf.add_group_file('group')
->=20
-> So is it =93group=94 or =94group.local=94? :)
-
-oops.
-
->=20
-> Max
->=20
->> +
->> +    if len(sys.argv) =3D=3D 2:
->> +        tests =3D tf.find_tests(sys.argv[1])
->> +    else:
->> +        tests =3D tf.find_tests()
->> +
->> +    print('\n'.join(tests))
->=20
-
-
---=20
-Best regards,
-Vladimir
+> +        /* With no u-boot we must set up a boot stub for the secondary CPU */
+> +        MemoryRegion *smpboot = g_new(MemoryRegion, 1);
+> +        memory_region_init_ram(smpboot, OBJECT(bmc), "aspeed.smpboot",
+> +                               0x80, &error_abort);
+> +        memory_region_add_subregion(get_system_memory(),
+> +                                    AST_SMP_MAILBOX_BASE, smpboot);
+> +
+> +        aspeed_board_binfo.write_secondary_boot = aspeed_write_smpboot;
+> +        aspeed_board_binfo.secondary_cpu_reset_hook = aspeed_reset_secondary;
+> +        aspeed_board_binfo.smp_loader_start = AST_SMP_MBOX_CODE;
+> +    }
+> +
+>      aspeed_board_binfo.ram_size = ram_size;
+>      aspeed_board_binfo.loader_start = sc->memmap[ASPEED_SDRAM];
+>      aspeed_board_binfo.nb_cpus = bmc->soc.num_cpus;
+> --
+> 2.25.1
+>
 
