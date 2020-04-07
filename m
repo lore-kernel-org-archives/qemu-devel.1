@@ -2,68 +2,79 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D79A6C2BA16
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 08:58:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC91EC2BA16
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 09:00:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB02820748
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 08:58:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB02820748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id B0E43206F7
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 09:00:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HLjlVWBE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0E43206F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLk4A-0002ba-Pt
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 04:58:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51339)
+	id 1jLk5b-0003zc-Nw
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 05:00:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35550)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jingqi.liu@intel.com>) id 1jLjlW-0002h5-EI
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 04:39:31 -0400
+ (envelope-from <ckmichael8@gmail.com>) id 1jLd9L-0000GL-Ia
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 21:35:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jingqi.liu@intel.com>) id 1jLjlO-0005x8-S6
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 04:39:24 -0400
-Received: from mga03.intel.com ([134.134.136.65]:24279)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
- id 1jLjlO-0005w3-Ki
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 04:39:18 -0400
-IronPort-SDR: olgFW5mn4smBxxZQCrJvyUGDL/zb5Ea50GJQMx7NdfwqMhwqZENXVsUfzjVU5igrBFrmz4B+6r
- eBRmST7bB1oQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
- by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 07 Apr 2020 01:39:15 -0700
-IronPort-SDR: 2GeIXM19M3OQYNeQZUqeAvfOMqHnIO3ClZc83/bP/aUuKxneoFVZPY+j8qq4X0hfB4x8AVPuGZ
- 2FgTTtgnw7oA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,353,1580803200"; d="scan'208";a="254390438"
-Received: from unknown (HELO [10.238.4.245]) ([10.238.4.245])
- by orsmga006.jf.intel.com with ESMTP; 07 Apr 2020 01:39:14 -0700
-Subject: Re: [PATCH] exec: fetch the alignment of Linux devdax pmem character
- device nodes
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, 
- "Williams, Dan J" <dan.j.williams@intel.com>
-References: <20200401031314.11592-1-jingqi.liu@intel.com>
- <2c45ec7c-f3ea-2962-47a6-9330f0a2f146@intel.com>
- <64ba0e18-2fa3-f5bd-7711-1d91f1dc74da@redhat.com>
-From: "Liu, Jingqi" <jingqi.liu@intel.com>
-Message-ID: <c60943a9-18b0-19c6-ae1f-39af8c1d7fb0@intel.com>
-Date: Tue, 7 Apr 2020 16:39:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <ckmichael8@gmail.com>) id 1jLd9K-0007uF-1X
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 21:35:35 -0400
+Received: from mail-vs1-xe2e.google.com ([2607:f8b0:4864:20::e2e]:41659)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <ckmichael8@gmail.com>)
+ id 1jLd9J-0007sw-Sc
+ for qemu-devel@nongnu.org; Mon, 06 Apr 2020 21:35:33 -0400
+Received: by mail-vs1-xe2e.google.com with SMTP id a63so1177168vsa.8
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 18:35:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=GrV0p78i5gwYJ04UoF6aIMp/LpMBVDcYPtaSrKgUy/Q=;
+ b=HLjlVWBEapiM6XslcdAW4qeL2HXqjxzJqMoTuLJDNknjfBfbicZuCQEb6rOYMPnPMS
+ 0TX7fXXYFf+tx6XB2vOZaNgRUy48s4Ni8b+yFwQMs5rMw9Lo8DnLk5YrWax3b/lUFC2t
+ GlYdszjoNFjd1hISL6Nx1YeeJygrOh0pAdEFLGNK8pPZXeOTO+EgPNNO6YC2FuL/mhO8
+ X2f9qpBHFEBxjdc63dYGT7Rifmha1GIyx3UIbjJdqjel/IMROMOmytYCCaHjaOHeGIz9
+ L2j5AbhQ2fzNI5AicafSve7XOPkKtT5GiUMLQ01ZyKP5DiRMkjUhZWIixNxbeXCP4fbv
+ fWPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=GrV0p78i5gwYJ04UoF6aIMp/LpMBVDcYPtaSrKgUy/Q=;
+ b=EMZT5cLSrNBbYeEiq+1LzbQA9MZvqQwW2hYZQ56nGdd8wOxLijQiapynHjRiKKms16
+ as9O5/6HWmHjVfu+73tVq9X3G7afj0O0AwEeH5CDx+GuDELknep+qWMDC98qEHw9lqz8
+ V12eV+C7yibMWNzaH155A57ROqSc3p6VBmRjrIXHpX628BVOhPlkKlAn7hEb+QlpzQtD
+ GHgeapst+UZ1AsLh8vVqwT1GGCWAFTOCUglmNpO7oVW+DHPS0RhrcpxpQpTNoyReiV7T
+ QBrIgQKVQZAtJExoo5QB7jAhVDeVybH+gJbR4Ob2a9adqz+M6l5rCF356nX9ge89v+xe
+ 3Z8Q==
+X-Gm-Message-State: AGi0PuamafV/tMPjJiudw9nhyAJ298r6Y4B2cQFNdMFG0RP3Vug4wClF
+ 93f2/rsCkyVvy2EjCZ8W1LdPP+gbndskgPlFdGU=
+X-Google-Smtp-Source: APiQypJ3LpECiH90wnJ60rxJHdMmbTdKt7eQbCu7Jvoc3o4tpeTFAlWdR4091Lwg64xTVNfcWDHpTyI1fpNy1KD2xoI=
+X-Received: by 2002:a67:2c8b:: with SMTP id s133mr149202vss.6.1586223332582;
+ Mon, 06 Apr 2020 18:35:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <64ba0e18-2fa3-f5bd-7711-1d91f1dc74da@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.65
+From: Michael Lee <ckmichael8@gmail.com>
+Date: Tue, 7 Apr 2020 09:35:21 +0800
+Message-ID: <CAGNnKHAd21Z6L0LR6xj0cLVZ6WS7uNTYZDTvE2-BUhU+GvNiFA@mail.gmail.com>
+Subject: RFE: add usbredir device reset blacklist options support to allow
+ macOS guest to iOS device usbredir
+To: kraxel@redhat.com
+Content-Type: multipart/alternative; boundary="00000000000045ed3205a2a966aa"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::e2e
+X-Mailman-Approved-At: Tue, 07 Apr 2020 04:58:30 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,133 +86,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/7/2020 4:08 PM, Paolo Bonzini wrote:
-> On 07/04/20 09:29, Liu, Jingqi wrote:
->> Ping.
->>
->> Any comments are appreciated.
->>
->> Hi Paolo, Richard,
->>
->> Any comments about this ?
-> I was hoping to get a review from someone else because I have no way to
-> test it.  But I've now queued the patch, thanks.
+--00000000000045ed3205a2a966aa
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Paolo,
+Description of problem:
+Currently, when a iOS device is redirected to a macOS VM, it falls into a
+reset-not-found loop.
+Version-Release number of selected component (if applicable):
+latest
+How reproducible:
+100%
+Steps to Reproduce:
 
-Thanks for your comments.
+   1. Connect an iOS device to Ubuntu 18.04.2 LTS (I believe it is the same
+   for any distro.)
+   2. Connect virt-manager/virt-viewer to a macOS VM through SPICE (I am
+   using OSX 10.15 Catalina)
+   3. Attempt to redirect the iOS device (iPad in my case) to the VM
+   through usb redirection.
 
-Hi Dan,
 
-Can you help review this patch ?
 
-Thanks,
+Actual results:
+For any odd number of attempt, the guest macOS will send a reset to the iOS
+device which causes the host to reset the USB connection in the host side.
+In the UI, it will be displayed as a successful connection for a few
+seconds before it disconnects. After this, the iOS device will reconnect
+itself, but via a different device name /dev/bus/usb/x/y+1.
+For any even number of attempt, when I select the iOS device in the
+virt-manager/virt-viewer UI, the connection will not success and instead a
+LIBUSB_ERROR_NOT_FOUND error will be provided. Then the UI will reload and
+get the new device name of the iOS device, falling into the behavior of the
+aforementioned odd number of attempt.
+Expected results:
+The macOS detects the iOS device and connects to it happily.
+Additional info:
+It seems that this bug has been first identified as in
+https://bugs.freedesktop.org/show_bug.cgi?id=100149, for a Samsung Android
+device, which the developers of SPICE applied a hotfix in
+https://gitlab.freedesktop.org/spice/usbredir/-/blob/master/usbredirhost/usbredirhost.c#L147.
+However, there were no settings available for users to fix it.
+A similar bug that also consists of a macOS guest/iOS device pair, but
+instead of being usbredir, is usb-host, has been identified and patched in
+https://github.com/qemu/qemu/commit/ba4c735b4fc74e309ce4b2551d258e442ef513a5,
+which is further modified into
+https://github.com/qemu/qemu/blame/146aa0f104bb3bf88e43c4082a0bfc4bbda4fbd8/hw/usb/host-libusb.c#L1486.
+Following such patch, I have attempted to apply such patch at host-side in
+https://github.com/michaellee8/qemu/blob/master/hw/usb/redirect.c (not
+correctly formatted currently, pls ignore it atm), however I discovered
+that this is not enough since it is also a SPICE issue, which resolves to
+virt-manager/virt-viewer.
+This is probably a cross-project issue between qemu, spice (usbredir) and
+virt-manager/virt-viewer, which would some effort to coordinate a solution.
+However a working solution for this problem would probably benefits a lot
+of users whom relies on connecting a mobile device into a VM, for purposes
+like easier mobile development. Considering the report for the Samsung
+Android Device on a PC use case, such issue is probably
+cross-OS/cross-device.
 
-Jingqi
+cross-references:
+- https://bugzilla.redhat.com/show_bug.cgi?id=1821518
+- https://bugzilla.redhat.com/show_bug.cgi?id=1821517
+- https://gitlab.freedesktop.org/spice/usbredir/-/issues/10
 
-> Paolo
->
->> Thanks,
->>
->> Jingqi
->>
->> On 4/1/2020 11:13 AM, Liu, Jingqi wrote:
->>> If the backend file is devdax pmem character device, the alignment
->>> specified by the option 'align=NUM' in the '-object memory-backend-file'
->>> needs to match the alignment requirement of the devdax pmem character
->>> device.
->>>
->>> This patch fetches the devdax pmem file 'align', so that we can compare
->>> it with the NUM of 'align=NUM'.
->>> The NUM needs to be larger than or equal to the devdax pmem file 'align'.
->>>
->>> It also fixes the problem that mmap() returns failure in qemu_ram_mmap()
->>> when the NUM of 'align=NUM' is less than the devdax pmem file 'align'.
->>>
->>> Cc: Dan Williams <dan.j.williams@intel.com>
->>> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
->>> ---
->>>    exec.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
->>>    1 file changed, 45 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/exec.c b/exec.c
->>> index de9d949902..8221abffec 100644
->>> --- a/exec.c
->>> +++ b/exec.c
->>> @@ -1736,6 +1736,42 @@ static int64_t get_file_size(int fd)
->>>        return size;
->>>    }
->>>    +static int64_t get_file_align(int fd)
->>> +{
->>> +    int64_t align = -1;
->>> +#if defined(__linux__)
->>> +    struct stat st;
->>> +
->>> +    if (fstat(fd, &st) < 0) {
->>> +        return -errno;
->>> +    }
->>> +
->>> +    /* Special handling for devdax character devices */
->>> +    if (S_ISCHR(st.st_mode)) {
->>> +        g_autofree char *subsystem_path = NULL;
->>> +        g_autofree char *subsystem = NULL;
->>> +
->>> +        subsystem_path =
->>> g_strdup_printf("/sys/dev/char/%d:%d/subsystem",
->>> +                                         major(st.st_rdev),
->>> minor(st.st_rdev));
->>> +        subsystem = g_file_read_link(subsystem_path, NULL);
->>> +
->>> +        if (subsystem && g_str_has_suffix(subsystem, "/dax")) {
->>> +            g_autofree char *align_path = NULL;
->>> +            g_autofree char *align_str = NULL;
->>> +
->>> +            align_path =
->>> g_strdup_printf("/sys/dev/char/%d:%d/device/align",
->>> +                                    major(st.st_rdev),
->>> minor(st.st_rdev));
->>> +
->>> +            if (g_file_get_contents(align_path, &align_str, NULL,
->>> NULL)) {
->>> +                return g_ascii_strtoll(align_str, NULL, 0);
->>> +            }
->>> +        }
->>> +    }
->>> +#endif /* defined(__linux__) */
->>> +
->>> +    return align;
->>> +}
->>> +
->>>    static int file_ram_open(const char *path,
->>>                             const char *region_name,
->>>                             bool *created,
->>> @@ -2275,7 +2311,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t
->>> size, MemoryRegion *mr,
->>>    {
->>>        RAMBlock *new_block;
->>>        Error *local_err = NULL;
->>> -    int64_t file_size;
->>> +    int64_t file_size, file_align;
->>>          /* Just support these ram flags by now. */
->>>        assert((ram_flags & ~(RAM_SHARED | RAM_PMEM)) == 0);
->>> @@ -2311,6 +2347,14 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t
->>> size, MemoryRegion *mr,
->>>            return NULL;
->>>        }
->>>    +    file_align = get_file_align(fd);
->>> +    if (file_align > 0 && mr && file_align > mr->align) {
->>> +        error_setg(errp, "backing store align 0x%" PRIx64
->>> +                   " is larger than 'align' option 0x" RAM_ADDR_FMT,
->>> +                   file_align, mr->align);
->>> +        return NULL;
->>> +    }
->>> +
->>>        new_block = g_malloc0(sizeof(*new_block));
->>>        new_block->mr = mr;
->>>        new_block->used_length = size;
+--00000000000045ed3205a2a966aa
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Description of problem:<br>Currently, when a iOS device is=
+ redirected to a macOS VM, it falls into a reset-not-found loop.<br>Version=
+-Release number of selected component (if applicable):<br>latest<br>How rep=
+roducible:<br>100%<br>Steps to Reproduce:<br><ol><li>Connect an iOS device =
+to Ubuntu 18.04.2 LTS (I believe it is the same for any distro.)</li><li>Co=
+nnect virt-manager/virt-viewer to a macOS VM through SPICE (I am using OSX =
+10.15 Catalina)</li><li>Attempt to redirect the iOS device (iPad in my case=
+) to the VM through usb redirection.</li></ol><br><br>Actual results:<br>Fo=
+r any odd number of attempt, the guest macOS will send a reset to the iOS d=
+evice which causes the host to reset the USB connection in the host side. I=
+n the UI, it will be displayed as a successful connection for a few seconds=
+ before it disconnects. After this, the iOS device will reconnect itself, b=
+ut via a different device name /dev/bus/usb/x/y+1.<br>For any even number o=
+f attempt, when I select the iOS device in the virt-manager/virt-viewer UI,=
+ the connection will not success and instead a LIBUSB_ERROR_NOT_FOUND error=
+ will be provided. Then the UI will reload and get the new device name of t=
+he iOS device, falling into the behavior of the aforementioned odd number o=
+f attempt.<br>Expected results:<br>The macOS detects the iOS device and con=
+nects to it happily.<br>Additional info:<br>It seems that this bug has been=
+ first identified as in <a href=3D"https://bugs.freedesktop.org/show_bug.cg=
+i?id=3D100149">https://bugs.freedesktop.org/show_bug.cgi?id=3D100149</a>, f=
+or a Samsung Android device, which the developers of SPICE applied a hotfix=
+ in <a href=3D"https://gitlab.freedesktop.org/spice/usbredir/-/blob/master/=
+usbredirhost/usbredirhost.c#L147">https://gitlab.freedesktop.org/spice/usbr=
+edir/-/blob/master/usbredirhost/usbredirhost.c#L147</a>. However, there wer=
+e no settings available for users to fix it.<br>A similar bug that also con=
+sists of a macOS guest/iOS device pair, but instead of being usbredir, is u=
+sb-host, has been identified and patched in <a href=3D"https://github.com/q=
+emu/qemu/commit/ba4c735b4fc74e309ce4b2551d258e442ef513a5">https://github.co=
+m/qemu/qemu/commit/ba4c735b4fc74e309ce4b2551d258e442ef513a5</a>, which is f=
+urther modified into <a href=3D"https://github.com/qemu/qemu/blame/146aa0f1=
+04bb3bf88e43c4082a0bfc4bbda4fbd8/hw/usb/host-libusb.c#L1486">https://github=
+.com/qemu/qemu/blame/146aa0f104bb3bf88e43c4082a0bfc4bbda4fbd8/hw/usb/host-l=
+ibusb.c#L1486</a>. Following such patch, I have attempted to apply such pat=
+ch at host-side in <a href=3D"https://github.com/michaellee8/qemu/blob/mast=
+er/hw/usb/redirect.c">https://github.com/michaellee8/qemu/blob/master/hw/us=
+b/redirect.c</a> (not correctly formatted currently, pls ignore it atm), ho=
+wever I discovered that this is not enough since it is also a SPICE issue, =
+which resolves to virt-manager/virt-viewer.<br>This is probably a cross-pro=
+ject issue between qemu, spice (usbredir) and virt-manager/virt-viewer, whi=
+ch would some effort to coordinate a solution. However a working solution f=
+or this problem would probably benefits a lot of users whom relies on conne=
+cting a mobile device into a VM, for purposes like easier mobile developmen=
+t. Considering the report for the Samsung Android Device on a PC use case, =
+such issue is probably cross-OS/cross-device.<br><br>cross-references:<br>-=
+ <a href=3D"https://bugzilla.redhat.com/show_bug.cgi?id=3D1821518">https://=
+bugzilla.redhat.com/show_bug.cgi?id=3D1821518</a><br>- <a href=3D"https://b=
+ugzilla.redhat.com/show_bug.cgi?id=3D1821517">https://bugzilla.redhat.com/s=
+how_bug.cgi?id=3D1821517</a><br>- <a href=3D"https://gitlab.freedesktop.org=
+/spice/usbredir/-/issues/10">https://gitlab.freedesktop.org/spice/usbredir/=
+-/issues/10</a><br></div>
+
+--00000000000045ed3205a2a966aa--
 
