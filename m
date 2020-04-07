@@ -1,83 +1,106 @@
 Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41760C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:33:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40CDEC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:37:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08E8B2063A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:33:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08F832063A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:37:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iQ6c8ZHW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08E8B2063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Vf6Xt6MD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08F832063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLmU8-0006Iu-7i
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 07:33:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52682)
+	id 1jLmY6-0008LZ-53
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 07:37:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53354)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <beata.michalska@linaro.org>) id 1jLmTB-00050b-3D
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:32:42 -0400
+ (envelope-from <anthony.perard@citrix.com>) id 1jLmXJ-0007XD-3m
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:36:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <beata.michalska@linaro.org>) id 1jLmT9-0005nE-VW
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:32:41 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:39677)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <beata.michalska@linaro.org>)
- id 1jLmT9-0005mT-RN
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:32:39 -0400
-Received: by mail-il1-x142.google.com with SMTP id r5so2816623ilq.6
- for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 04:32:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Ig2mq+AH5o0UP+b5KHhG9X0qqULQtiCnJDgxb4T5GVk=;
- b=iQ6c8ZHWKobiDdIZ3BcuUVM0Xewv31lvkznxohyjVKNlwXhELtKc0lVBLTq+EkrGvX
- 0PneZH0rNVtsHE9O/beClqQx0aSDvFy8T8+/Lnb3xQy3P4YtyOtfaEBCCzMB29yCUH76
- 3VJflY4XMe13gSIYOlwt8gmsbZFAGgOn+p9Cif2RL5HPVbG4K1nQ6Aohgh1olbcWOR3g
- eGnvSdmsEJ6d8cM8oHht5zQCtknJJuAeH9E/2rS9d5wHwb0dOT06x1Ka526c839KAtWA
- OTu6qp8WBlp+lmgK1vJL5L2BasL/gtpRzVEF1kPHqYPmPIn+aiMnLU7Kb5w2UWQ7Holj
- /p3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Ig2mq+AH5o0UP+b5KHhG9X0qqULQtiCnJDgxb4T5GVk=;
- b=mTDMvLklAMzzd0NSoHPEZq9DFv5GjeXSNKArQGFY3afkYRrZs3sdcsALKJdE6qw3zp
- RcetLa83CV2InSY3IrbDUKjxOZLcVCDaA3t0NGKqk0z9MaKR6arWMpTCKcapfljJ8C6F
- mNpoV4kXDFcIT9/0fduPNxqj1uNiy2s9DGJf+ZGI5PLRohQmqyalRuQiTvl7vn4cKVfy
- Z1FeUnP9lXX1Hy9lmBazYHKT1zXsj4+tSYTpz/FSTN2xx92mJ16i2laZXTPP2hYxp9Jl
- DGFo218ByTNoCmvDYG4ig7c+UycQhJRCcxUGNmtFvfeZ6AoXEgUeTNBZxJViU7SC7YIs
- uzxw==
-X-Gm-Message-State: AGi0Puba8hRyjXQPPkgbNSv50p3yh5fe3WxCk9tJrVzP0UUwwumuR+sx
- 79XkoYHITwOOOZ86Eor3lnCS1lGsZHMSkdT0YHOtvg==
-X-Google-Smtp-Source: APiQypLPwRgW4x4+sMjDp/TWI4NTo7d5tYyS36ZSVaDFbxEF/D5s3AnWWgYm2v2l2t9PPVUgnprj5uycuII70QtXf4Q=
-X-Received: by 2002:a92:3a8c:: with SMTP id i12mr1977302ilf.69.1586259159061; 
- Tue, 07 Apr 2020 04:32:39 -0700 (PDT)
+ (envelope-from <anthony.perard@citrix.com>) id 1jLmXH-0001ua-Rs
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:36:57 -0400
+Received: from esa2.hc3370-68.iphmx.com ([216.71.145.153]:57755)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
+ id 1jLmXH-0001q4-Hh
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:36:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1586259416;
+ h=date:from:to:cc:subject:message-id:references:
+ mime-version:in-reply-to;
+ bh=SsT9Oamj5OxkPofHKhqRAG6YWFiTyrPsDiTXFS8P8dI=;
+ b=Vf6Xt6MDWHjpygaa4EXCRjQ4jEXLHz2d54OYUFDXdvNFMWlHfB6eCdr4
+ T7WP9oAplnXPz4IL7OOzZnoN4CCRfSaSc8Kh7YtfHO4+C/MdWJO6aLYvi
+ 1Z1c+q25I7iYS6GF5XzFjpdk/HT/Lbpf7tVJicAtlbQns1sySvo/dKeKu E=;
+Authentication-Results: esa2.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=anthony.perard@citrix.com;
+ spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ anthony.perard@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa2.hc3370-68.iphmx.com: domain of
+ anthony.perard@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
+ ip4:168.245.78.127 ~all"
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: CX4Ax/5XjbHe8LgKLKbtJcs+9a5cNoxD4z3MFeS2nn4M6QRYm/NrbD44xZ93/ojCtDpHof4ASR
+ mD+6fv/wZJXYX4l2r1g8tYsczE4vsxJ4R2TyO/Z9TwVfCJJo5uGK3oLnGGoVpiAbo0FfJ7nbvn
+ DTWcMWE6+0Qo3aco83TMOFZJ2UtzxXpZpRLOQPaLeEb/Vntq2B/qy8XMt+QVJEE3VXeQ0uYPcP
+ ZRPehZqU2/ZuJn+YpHQFd8A70MSoS38oJOvsgpdIKhG2CCzKLLbJVtCz2R9gsNu6PQgf6gWOzB
+ gZ4=
+X-SBRS: 2.7
+X-MesageID: 15303930
+X-Ironport-Server: esa2.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.72,353,1580792400"; d="scan'208";a="15303930"
+Date: Tue, 7 Apr 2020 12:36:34 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH for-5.0] xen: fixup RAM memory region initialization
+Message-ID: <20200407113634.GW4088@perard.uk.xensource.com>
+References: <20200327104828.12647-1-imammedo@redhat.com>
+ <20200330165248.GR4088@perard.uk.xensource.com>
+ <20200402142925.75e0c482@redhat.com>
+ <20200402132530.GS4088@perard.uk.xensource.com>
+ <20200402163033.45585e70@redhat.com>
 MIME-Version: 1.0
-References: <20200323113227.3169-1-beata.michalska@linaro.org>
- <20200323113227.3169-3-beata.michalska@linaro.org>
- <20200403084435.zvfewiivn7orsnll@kamzik.brq.redhat.com>
- <CAFEAcA8fMzWhvt0R9MhXuLYb4Wo+Yz484HNC9YAE59yxz5xD0w@mail.gmail.com>
-In-Reply-To: <CAFEAcA8fMzWhvt0R9MhXuLYb4Wo+Yz484HNC9YAE59yxz5xD0w@mail.gmail.com>
-From: Beata Michalska <beata.michalska@linaro.org>
-Date: Tue, 7 Apr 2020 12:32:28 +0100
-Message-ID: <CADSWDzsmpeXVKjDT7jKnx2XN18EWNOPsYJuxEUytofq8VZePww@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] target/arm: kvm: Handle potential issue with dabt
- injection
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000b2abce05a2b1bd16"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::142
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200402163033.45585e70@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 216.71.145.153
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,119 +112,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>,
- Christoffer Dall <Christoffer.Dall@arm.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org,
+ ehabkost@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b2abce05a2b1bd16
-Content-Type: text/plain; charset="UTF-8"
+On Thu, Apr 02, 2020 at 04:30:33PM +0200, Igor Mammedov wrote:
+> 1. why xen uses memory_region_init_ram() which does not allocate anything
 
-On Tue, 7 Apr 2020 at 12:24, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Fri, 3 Apr 2020 at 09:44, Andrew Jones <drjones@redhat.com> wrote:
-> >
-> > On Mon, Mar 23, 2020 at 11:32:27AM +0000, Beata Michalska wrote:
-> > > Injecting external data abort through KVM might trigger
-> > > an issue on kernels that do not get updated to include the KVM fix.
-> > > For those and aarch32 guests, the injected abort gets misconfigured
-> > > to be an implementation defined exception. This leads to the guest
-> > > repeatedly re-running the faulting instruction.
-> > >
-> > > Add support for handling that case.
-> > > [
-> > >   Fixed-by: 018f22f95e8a
-> > >       ('KVM: arm: Fix DFSR setting for non-LPAE aarch32 guests')
-> > >   Fixed-by: 21aecdbd7f3a
-> > >       ('KVM: arm: Make inject_abt32() inject an external abort
-instead')
-> > > ]
-> > >
->
-> > I'll leave the decision to take this KVM bug workaround patch at all to
-Peter,
-> > and I didn't actually review whether or not
-kvm_arm_verify_ext_dabt_pending
-> > is doing what it claims it's doing, so I'm reluctant to give an r-b on
-> > this patch. But, as far as the code goes, besides the comments above, it
-> > looks fine to me.
->
-> I think that having the workaround for the broken kernels is
-> reasonable (in fact it might have been my suggestion).
->
+This seems to be due to history.
 
-I will update the current version to cover the review feedback
-and resend the patches soon.
+>    can it use plain memory_region_init() instead?
 
-Thanks a lot!
+I can give it a try. And it doesn't work, I had to call qemu_ram_alloc() as
+well, to set ram_memory.ram_block.
 
-BR
-Beata
-> thanks
-> -- PMM
+On the other and, I think memory_region_init_ram_nomigrate() would be
+enough. QEMU didn't complain when I migrated the guest.
 
---000000000000b2abce05a2b1bd16
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> 2. how main ram is allocated?
 
-<div><br>
-<br>
-On Tue, 7 Apr 2020 at 12:24, Peter Maydell &lt;<a href=3D"mailto:peter.mayd=
-ell@linaro.org" target=3D"_blank">peter.maydell@linaro.org</a>&gt; wrote:<b=
-r>
-&gt;<br>
-&gt; On Fri, 3 Apr 2020 at 09:44, Andrew Jones &lt;<a href=3D"mailto:drjone=
-s@redhat.com" target=3D"_blank">drjones@redhat.com</a>&gt; wrote:<br>
-&gt; &gt;<br>
-&gt; &gt; On Mon, Mar 23, 2020 at 11:32:27AM +0000, Beata Michalska wrote:<=
-br>
-&gt; &gt; &gt; Injecting external data abort through KVM might trigger<br>
-&gt; &gt; &gt; an issue on kernels that do not get updated to include the K=
-VM fix.<br>
-&gt; &gt; &gt; For those and aarch32 guests, the injected abort gets miscon=
-figured<br>
-&gt; &gt; &gt; to be an implementation defined exception. This leads to the=
- guest<br>
-&gt; &gt; &gt; repeatedly re-running the faulting instruction.<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt; Add support for handling that case.<br>
-&gt; &gt; &gt; [<br>
-&gt; &gt; &gt;=C2=A0 =C2=A0Fixed-by: 018f22f95e8a<br>
-&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0(&#39;KVM: arm: Fix DFSR setting f=
-or non-LPAE aarch32 guests&#39;)<br>
-&gt; &gt; &gt;=C2=A0 =C2=A0Fixed-by: 21aecdbd7f3a<br>
-&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0(&#39;KVM: arm: Make inject_abt32(=
-) inject an external abort instead&#39;)<br>
-&gt; &gt; &gt; ]<br>
-&gt; &gt; &gt;<br>
-&gt;<br>
-&gt; &gt; I&#39;ll leave the decision to take this KVM bug workaround patch=
- at all to Peter,<br>
-&gt; &gt; and I didn&#39;t actually review whether or not kvm_arm_verify_ex=
-t_dabt_pending<br>
-&gt; &gt; is doing what it claims it&#39;s doing, so I&#39;m reluctant to g=
-ive an r-b on<br>
-&gt; &gt; this patch. But, as far as the code goes, besides the comments ab=
-ove, it<br>
-&gt; &gt; looks fine to me.<br>
-&gt;<br>
-&gt; I think that having the workaround for the broken kernels is<br>
-&gt; reasonable (in fact it might have been my suggestion).<br>
-&gt;<br>
-<br></div><div>
-I will update the current version to cover the review feedback<br>
-and resend the patches soon.<br>
-<br>
-Thanks a lot!<br>
-<br>
-BR<br>
-Beata<br>
-&gt; thanks<br>
-&gt; -- PMM<br>
-</div>
+It's done by the toolstack, libxl. It creates a new domain in the
+hypervisor, memory allocation is part of this, then QEMU is started, for
+emulation of some devices.
 
---000000000000b2abce05a2b1bd16--
+There is one thing that QEMU does in regards to memory, it's the call
+xc_domain_populate_physmap_exact() in xen_ram_alloc(). This is for when
+an emulated PCI device needs some memory, like for the VGA region.
+
+> 3. code has
+>            /*                                                                       
+>          * Xen does not allocate the memory continuously, it keeps a             
+>          * hole of the size computed above or passed in.                         
+>          */                                                                      
+>         block_len = (1ULL << 32) + x86ms->above_4g_mem_size; 
+>    which fixes up size ram memory region
+>    can we allocate 1 memory region of ram_size and then
+>    alias lower and upper memory instead of that?
+
+I don't know, I don't think I know enough about how memory_region are
+used to be able to answer that.
+
+> 4. how RAM migration works in case of xen?
+
+From QEMU, we only migrate devices states, we call the
+"xen-save-devices-state" QMP command. Memory migration is done by the
+toolstack. In QEMU, there is a bodge in xen_ram_alloc() to avoid having
+QEMU doing some "allocation" during migration.
+
+I hope that help.
+Cheers,
+
+-- 
+Anthony PERARD
 
