@@ -2,89 +2,100 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B33CBC2BA1A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:59:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5C15C2BB55
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 16:03:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A17C2075E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:59:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CCB520768
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 16:03:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mVZeilI2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A17C2075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Hx27tEtG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CCB520768
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLqdd-0008G7-NQ
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 11:59:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43761)
+	id 1jLqgr-0003RM-2C
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 12:03:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44161)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jLqVm-0003pK-Os
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:40 -0400
+ (envelope-from <joao.m.martins@oracle.com>) id 1jLqXg-0007eU-6f
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:53:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jLqVl-0004Si-J3
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:38 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:42130)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jLqVl-0004S6-DL
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:37 -0400
-Received: by mail-wr1-x433.google.com with SMTP id h15so4463653wrx.9
- for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 08:51:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=6B+33TDAfIaOLpicgY8n+ylFencr6qohELifXSSvkE0=;
- b=mVZeilI2YzyMDuyyFkQnkFrkD8G/vEsr7Vz//hcMCcaxuLqVMrqGslf8CLPepOCTKG
- 4oo4haNCToi6HUVTMRx8gR505gVrszSGTYnVNax1kX6exw06qD3FBlFHPvvQVqEuDu2v
- jX8Nmv/L1UjiopQf3IsBAfRNmkTT8g2WWtC/+94fju7p9eyltcQHdxt2UNsmj0Tfhz7m
- NQaUN4SEE++V1TQAANF4TFi+DSzDPZPjjmpfpBypDFHG3BuTJvevIEbVgoLoqDt0FAkc
- yuw1uyBC5Bwn3pFRlihUmrXVCPPrGoMGub7bQBox9ROJGgMfOzospe8y40yHzgb2R1tp
- wwbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=6B+33TDAfIaOLpicgY8n+ylFencr6qohELifXSSvkE0=;
- b=iytMvamwi/r4w5EOVLH1EqqnAWLT5UyXvtXTZbhZ3YWZl84kCg2Sdsvk/Ej5I2iwFt
- sz2+RmX1027WEnb0mCAeKbJthe+kT7nklbvyPgfRn5ipkhFSwHxrjqTTZEwTDo1hCECb
- yF0inYAnCN8UBoHIf9ZTvNLkotk0v/HaPdkQc1xzUBfk1T7wgIChcXKwQ5k1Te8rmbF5
- CV8KuZl6L0QVTGoAAYEfQMGXCeOm/TXloaMK8CYpzjgyi++c4I81NE0K8lj4Ss4atsp0
- wtojqi5I9/TwUMG+dZ3OjXASLT6b4j1v3HtZ7AQy9LGRydyO+mPynYChZ3Zpa0aO2+5W
- BnLg==
-X-Gm-Message-State: AGi0PuZwtJOVoZsx9rxSOPFZfRyfZcODPiF7PlWvKFDr8eSHWBOgSC8O
- KTFOTyXnSmGR3BNHFiywcpwr/BEWzVU=
-X-Google-Smtp-Source: APiQypI4LrFw1TmdOD7nuzNpDiXH0AsCXatkT8BYpKLOgFl9Cfp760ewJO3QMA6QDeA6I0H2cyezIQ==
-X-Received: by 2002:adf:ee8b:: with SMTP id b11mr3323659wro.404.1586274696290; 
- Tue, 07 Apr 2020 08:51:36 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id w18sm8881639wrn.55.2020.04.07.08.51.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Apr 2020 08:51:33 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3F0721FF9A;
- Tue,  7 Apr 2020 16:51:19 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 11/13] hw/core: properly terminate loading .hex on EOF record
-Date: Tue,  7 Apr 2020 16:51:16 +0100
-Message-Id: <20200407155118.20139-12-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200407155118.20139-1-alex.bennee@linaro.org>
-References: <20200407155118.20139-1-alex.bennee@linaro.org>
+ (envelope-from <joao.m.martins@oracle.com>) id 1jLqXf-00062c-47
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:53:35 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:41754)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <joao.m.martins@oracle.com>)
+ id 1jLqXe-00061a-RT
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:53:35 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 037FqaVK001252;
+ Tue, 7 Apr 2020 15:53:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=/AlQo5ZMSYyWL/AGF8EGAc+tUV3HzXcLDhl7dLkG7xQ=;
+ b=Hx27tEtGBM7F0r3OvTQCyWVCMBeGU20oaELqqCjeU89ADz/Webw/maw3abJcI9APZ4WD
+ wfhO3RW8nDcmz/kZGmYm4S/a0Kt/9lf6hrrZiGQSktXTgf/VNACQPJZvOHsCwtrxul5/
+ FesfZ/UHhXTf6gk688fBZ/8ttEnNurpDr6tJQffNOkbfEj82VgfRSUBoBa7QO1lDn4ZG
+ 8l5oTsv/WyK6+3RGTZBJSYhWyHdZWQSK3zIUpEmpYWzdpNzBZ0E7nCtdia1ho+JhPl6/
+ 6UlSM7kDQiuqJfcxXMsWzTZjp6d+1q1kRY84CK8k50r8AI/KcxGaramISZT21SohqUmi pQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2130.oracle.com with ESMTP id 308ffdbwm0-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 07 Apr 2020 15:53:32 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 037FlTQo155939;
+ Tue, 7 Apr 2020 15:51:32 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3020.oracle.com with ESMTP id 30741enkm2-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 07 Apr 2020 15:51:32 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 037FpVTi024103;
+ Tue, 7 Apr 2020 15:51:31 GMT
+Received: from [10.175.215.143] (/10.175.215.143)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 07 Apr 2020 08:51:31 -0700
+Subject: Re: [PATCH] exec: fetch the alignment of Linux devdax pmem character
+ device nodes
+To: Paolo Bonzini <pbonzini@redhat.com>, Jingqi Liu <jingqi.liu@intel.com>
+References: <20200401031314.11592-1-jingqi.liu@intel.com>
+ <c906a3ae-c9d2-5802-5988-3c1d0302109b@oracle.com>
+ <b15709c2-bea7-2717-6833-ac4616b88660@redhat.com>
+From: Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <7de3eccb-f0b4-a858-2fc4-addfc7b198aa@oracle.com>
+Date: Tue, 7 Apr 2020 16:51:28 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::433
+In-Reply-To: <b15709c2-bea7-2717-6833-ac4616b88660@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9583
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ phishscore=0
+ malwarescore=0 bulkscore=0 spamscore=0 adultscore=0 mlxlogscore=999
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004070130
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9583
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ priorityscore=1501
+ impostorscore=0 malwarescore=0 mlxlogscore=999 lowpriorityscore=0
+ clxscore=1015 phishscore=0 mlxscore=0 bulkscore=0 adultscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004070130
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,63 +107,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Dan Williams <dan.j.williams@intel.com>, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The https://makecode.microbit.org/#editor generates slightly weird
-.hex files which work fine on a real microbit but causes QEMU to
-choke. The reason is extraneous data after the EOF record which causes
-the loader to attempt to write a bigger file than it should to the
-"rom". According to the HEX file spec an EOF really should be the last
-thing we process so lets do that.
+On 4/7/20 3:31 PM, Paolo Bonzini wrote:
+> On 07/04/20 12:59, Joao Martins wrote:
+>> Perhaps, you meant instead:
+>>
+>> 	/sys/dev/char/%d:%d/align
+>>
+>>  ?
+>>
+> 
+> So it works with that change?
 
-Reported-by: Ursula Bennée <alex.bennee@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200403191150.863-12-alex.bennee@linaro.org>
+Yeah.
 
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index eeef6da9a1b..8bbb1797a4c 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -1447,6 +1447,7 @@ typedef struct {
-     uint32_t current_rom_index;
-     uint32_t rom_start_address;
-     AddressSpace *as;
-+    bool complete;
- } HexParser;
- 
- /* return size or -1 if error */
-@@ -1484,6 +1485,7 @@ static int handle_record_type(HexParser *parser)
-                                   parser->current_rom_index,
-                                   parser->rom_start_address, parser->as);
-         }
-+        parser->complete = true;
-         return parser->total_size;
-     case EXT_SEG_ADDR_RECORD:
-     case EXT_LINEAR_ADDR_RECORD:
-@@ -1548,11 +1550,12 @@ static int parse_hex_blob(const char *filename, hwaddr *addr, uint8_t *hex_blob,
-         .bin_buf = g_malloc(hex_blob_size),
-         .start_addr = addr,
-         .as = as,
-+        .complete = false
-     };
- 
-     rom_transaction_begin();
- 
--    for (; hex_blob < end; ++hex_blob) {
-+    for (; hex_blob < end && !parser.complete; ++hex_blob) {
-         switch (*hex_blob) {
-         case '\r':
-         case '\n':
--- 
-2.20.1
-
+	Joao
 
