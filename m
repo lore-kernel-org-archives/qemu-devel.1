@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B89C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:23:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DD31C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:24:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F2A320753
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:23:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC5F02074F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:24:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="GgoZGmKK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F2A320753
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="fBP35TLK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC5F02074F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLq4o-00012q-E2
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 11:23:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38759)
+	id 1jLq5x-0003CC-4s
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 11:24:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38765)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anthony.perard@citrix.com>) id 1jLq42-0008D7-9N
+ (envelope-from <anthony.perard@citrix.com>) id 1jLq42-0008E5-OE
  for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:22:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anthony.perard@citrix.com>) id 1jLq41-0000VR-8g
+ (envelope-from <anthony.perard@citrix.com>) id 1jLq41-0000Vh-TD
  for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:22:58 -0400
 Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:13489)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
- id 1jLq40-0000TJ-Sf
+ id 1jLq41-0000TJ-LK
  for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:22:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1586272977;
+ d=citrix.com; s=securemail; t=1586272978;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=qk1Y4jepw5ZUFH8O7s3prQyFWb+r4UOxrpJ04Jwz6vo=;
- b=GgoZGmKK8TkTo9wAHfUFKoEhYh/MDrfWcpPNJ1Y1JIrfmIqy8rvZHY6u
- tDz9e0Zt3WTw0El01IYb5I6lf/dU8Kg4GAtR8ANDISHSNhpdNtDjL51Be
- 1aPnNz1EtCJYRY/0RaJjs3A5Bie29mmW5vJPCeCDNnXTysbMZT7Q//di9 4=;
+ bh=zpD/qULcUWjnXe5Pei47zmPvZSaeufrHyKCovEQ8IY0=;
+ b=fBP35TLK1W/7PZUQGPLuBQDyE/1dS3G8hMgq+nJfTCgrE2B8oNJ+B30z
+ 5zTkLiCo/P1IFfN2L7Mj9WkQ4zCYhByMmsmKqzAW5b2v2ZKVPIblSkG/Y
+ GUG6+MICz7W/hpKtC+l5Pl2kHsE6rJULOcbrNMuiT5X4NglJXI93mzfoP I=;
 Authentication-Results: esa1.hc3370-68.iphmx.com;
  dkim=none (message not signed) header.i=none;
  spf=None smtp.pra=anthony.perard@citrix.com;
@@ -75,23 +75,22 @@ Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
  envelope-from="anthony.perard@citrix.com";
  x-sender="postmaster@mail.citrix.com";
  x-conformance=sidf_compatible
-IronPort-SDR: uJfw3vKfJcYjs2uYVUJY2Vqq4/96T8V+v/wBgcIrMvNqvt5u1WxRVXNo6wLv9KOa+i4hoW+dp1
- nvxF367qo1JJakgKbTVrvv124fXRlU1hiM1DezCI8AD65BnARTYJPyEmjXkdZgyRbUAPLfm430
- /CqeFeUgiyHOPAsksTFtT24nF7GshbMxRELlvxmk1s+L6BEaASJLDYHTQE2n+Y7VatC/LvrAG/
- BpEnnGqdJeavXRQqX6usRCNYpETrfT8sLyjQPmM533ZTEbdhPsXW4syivaAfud+3Jo0h/T81q/
- KP4=
+IronPort-SDR: kIpJUdp/ueeziAdKh5CGN0J6Of7NJxXM7lkAmrFurtwL8Nti4/kW70mNzCLO/YPcuUrkSBnyju
+ hOF6Jspwi3Xkj/jXa0FPpfunPEQRgsAup8Eto8FuPJqlIK/0knMN1H429JH7VaUHURz/KgN/Ea
+ XkzvyPWPQZ+Up7cJv2GF+q9Hh27bPlEZxtTGJyjkroE/fsDBaWYSEoVsuZggKe23bYe1EDPO1h
+ JgFukRRiHec3wCj2Fjqoe8xuvbxriSu1WnXngqD3AbMNLELlA7KKs70KShHxsWTh9Saf1EMVzV
+ PKk=
 X-SBRS: 2.7
-X-MesageID: 15534900
+X-MesageID: 15534906
 X-Ironport-Server: esa1.hc3370-68.iphmx.com
 X-Remote-IP: 162.221.158.21
 X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.72,355,1580792400"; d="scan'208";a="15534900"
+X-IronPort-AV: E=Sophos;i="5.72,355,1580792400"; d="scan'208";a="15534906"
 From: Anthony PERARD <anthony.perard@citrix.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PULL 1/3] hw/usb/xen-usb.c: Pass struct usbback_req* to
- usbback_packet_complete()
-Date: Tue, 7 Apr 2020 16:22:35 +0100
-Message-ID: <20200407152237.1468704-2-anthony.perard@citrix.com>
+Subject: [PULL 3/3] MAINTAINERS: Add xen-usb.c to Xen section
+Date: Tue, 7 Apr 2020 16:22:37 +0100
+Message-ID: <20200407152237.1468704-4-anthony.perard@citrix.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200407152237.1468704-1-anthony.perard@citrix.com>
 References: <20200407152237.1468704-1-anthony.perard@citrix.com>
@@ -116,66 +115,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
-
-The function usbback_packet_complete() currently takes a USBPacket*,
-which must be a pointer to the packet field within a struct
-usbback_req; the function uses container_of() to get the struct
-usbback_req* given the USBPacket*.
-
-This is unnecessarily confusing (and in particular it confuses the
-Coverity Scan analysis, resulting in the false positive CID 1421919
-where it thinks that we write off the end of the structure). Since
-both callsites already have the pointer to the struct usbback_req,
-just pass that in directly.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
-Message-Id: <20200323164318.26567-1-peter.maydell@linaro.org>
 Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+Acked-by: Paul Durrant <paul@xen.org>
+Message-Id: <20200406165043.1447837-1-anthony.perard@citrix.com>
 ---
- hw/usb/xen-usb.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/usb/xen-usb.c b/hw/usb/xen-usb.c
-index 1fc2f32ce93d..961190d0f78c 100644
---- a/hw/usb/xen-usb.c
-+++ b/hw/usb/xen-usb.c
-@@ -347,13 +347,11 @@ static int32_t usbback_xlat_status(int status)
-     return -ESHUTDOWN;
- }
- 
--static void usbback_packet_complete(USBPacket *packet)
-+static void usbback_packet_complete(struct usbback_req *usbback_req)
- {
--    struct usbback_req *usbback_req;
-+    USBPacket *packet = &usbback_req->packet;
-     int32_t status;
- 
--    usbback_req = container_of(packet, struct usbback_req, packet);
--
-     QTAILQ_REMOVE(&usbback_req->stub->submit_q, usbback_req, q);
- 
-     status = usbback_xlat_status(packet->status);
-@@ -566,7 +564,7 @@ static void usbback_dispatch(struct usbback_req *usbback_req)
- 
-     usb_handle_packet(usbback_req->stub->dev, &usbback_req->packet);
-     if (usbback_req->packet.status != USB_RET_ASYNC) {
--        usbback_packet_complete(&usbback_req->packet);
-+        usbback_packet_complete(usbback_req);
-     }
-     return;
- 
-@@ -993,7 +991,7 @@ static void xen_bus_complete(USBPort *port, USBPacket *packet)
- 
-     usbif = usbback_req->usbif;
-     TR_REQ(&usbif->xendev, "\n");
--    usbback_packet_complete(packet);
-+    usbback_packet_complete(usbback_req);
- }
- 
- static USBPortOps xen_usb_port_ops = {
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9d156d73b31e..839959f7e4ac 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -440,6 +440,7 @@ F: hw/9pfs/xen-9p*
+ F: hw/char/xen_console.c
+ F: hw/display/xenfb.c
+ F: hw/net/xen_nic.c
++F: hw/usb/xen-usb.c
+ F: hw/block/xen*
+ F: hw/block/dataplane/xen*
+ F: hw/xen/
 -- 
 Anthony PERARD
 
