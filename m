@@ -2,85 +2,79 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5520AC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4039AC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:21:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E8CC20678
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:20:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0BE4720678
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:21:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KuGpDYbb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E8CC20678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vTdl0fNn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BE4720678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLmHY-0006id-BC
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 07:20:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50634)
+	id 1jLmIC-0007n0-6t
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 07:21:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jLmFY-00039X-1Y
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:18:38 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jLmHM-0006in-LK
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:20:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jLmFW-0002Lr-Je
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:18:35 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43247)
+ (envelope-from <peter.maydell@linaro.org>) id 1jLmHL-0003KY-Ga
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:20:28 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39690)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sundeep.lkml@gmail.com>)
- id 1jLmFW-0002LP-DR; Tue, 07 Apr 2020 07:18:34 -0400
-Received: by mail-pg1-x542.google.com with SMTP id s4so1562096pgk.10;
- Tue, 07 Apr 2020 04:18:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=oC4LI+rsC3AfaHKWa06ELH+UcID+dQ6LdmleZ0eZwSQ=;
- b=KuGpDYbbtfb5Cf99k+/n+7CnaaIPFoJX8UuZRSxE2wC94n+k0+N4XsziDe20YEf4Vk
- F4zCxMHbDQL66nmPGhMWSVGtKA3Qoj1fb3CRGqSUAFzJkgi2JeyheWzvvriBEayysiPf
- E3Rbf4H7ty3OQoqbZUCIw9B1+sftvSvN4K2iVQvcK4ObsZYjwY4RYB2abGA0miL5qqhk
- sqvxfSqyOWXlpkTyvzzxA7jhMkVq6G6QoqzFv++kJhXCZhsOdYkqnZmAHQX0TyxjOsJs
- 3PKRzCKTeL90elEc8L6fl/zx+9l+85eRRMt2Mz0/3/aO8JVSweYbQx64VydL632COZVA
- yb7A==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jLmHL-0003K6-3r
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:20:27 -0400
+Received: by mail-ot1-x344.google.com with SMTP id x11so2682838otp.6
+ for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 04:20:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=x2+nwSjRG6XjsqnAHFP2Vana1pZcaxvgG6B1KaoFv+k=;
+ b=vTdl0fNnGhhXTHIm4CgpKMPFbWxw/U51MywzbRux6SomKND9gX35Peex2xtrD4EDtN
+ f55Ep6W3yB13eDYkJTSaZ2Dm3puKwYbC+ofZm5KJmDXbV7mUhNrbUXQ1kJ3DEDcNiJae
+ W3gYKqRlKhJ1Yo5RoqndC0mGEZafooR54uJUcLHtaBoXKICZ8onD2Y5v3nZqywugEoFD
+ ddXGYtihDsOvJrNL3cdvRUfYLBtyCfIt67Ghuv4iGtdZmHthfiBPuxP5ZfH0rFRxy+Ss
+ 3L/ZP0thbYFIH0z483SdeFRCFmdQNEQTMxUyteH/3cMfAOSB7HRqG4b3mbxr0s+H0U6R
+ 1qfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=oC4LI+rsC3AfaHKWa06ELH+UcID+dQ6LdmleZ0eZwSQ=;
- b=PLKlFSS5n2HOVFQbrG12kg3BLNtAJ6h9ZP89Y3k4xPcjNTx+g+Z7DQANCOoINrz/mw
- HqWarLmRrVQ05JehCkhxAmjWWMetMer8sw6EM+YvsehJB7WYSJCf47688rnInhkP31pd
- XEFDQlzNJ/Hd0VCmlsc7OuDp88EphMSj83ZFpuoRZCRnkkB0s+XcSIbj4iObc1enf2Vy
- 1utAuyU7mbkXTluQha0hQVPmssqudva18lvcx7PcXK3SW1PYgTeMx+YbP3L71HxGXtYR
- o8RWYxRnj6VTyNWeJEDGoens45RJPdBL5mxnp6WBAxDGtIDWqt1nr/ioPKqhIR3SYHGp
- jpug==
-X-Gm-Message-State: AGi0PuZYaranYBBO6NXAEgnj6i53/+60shsb513EEbo6m7/RBTF3EMDF
- rO8jKR1bBxxCRK7gnEDg03M=
-X-Google-Smtp-Source: APiQypKLBqaoL8pcfuQgI1QXdw3au9xiQbDhV3o1qjg0kZ6dZsUMPe3MUqhqKUL24a1YbNbCVRAnXw==
-X-Received: by 2002:a63:a361:: with SMTP id v33mr1552496pgn.324.1586258313490; 
- Tue, 07 Apr 2020 04:18:33 -0700 (PDT)
-Received: from hyd1358.marvell.com ([115.113.156.2])
- by smtp.googlemail.com with ESMTPSA id
- s137sm14357855pfs.45.2020.04.07.04.18.30
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 07 Apr 2020 04:18:33 -0700 (PDT)
-From: sundeep.lkml@gmail.com
-To: jasowang@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Subject: [Qemu devel PATCH v3 3/3] tests/boot_linux_console: Add ethernet test
- to SmartFusion2
-Date: Tue,  7 Apr 2020 16:45:34 +0530
-Message-Id: <1586258134-6932-4-git-send-email-sundeep.lkml@gmail.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1586258134-6932-1-git-send-email-sundeep.lkml@gmail.com>
-References: <1586258134-6932-1-git-send-email-sundeep.lkml@gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=x2+nwSjRG6XjsqnAHFP2Vana1pZcaxvgG6B1KaoFv+k=;
+ b=JQZjWHSo2w6iZ8wdp5b6oFhFjqr1NOSzS7lnHY1lAYiUaQqZBa//Z5JZ/+v0EaQjvJ
+ ndPJA3UGQ8u4QLLCRWzDnu7DtUrl3l6mbs1T31lf5pV4JBf13OfGOI0zPi77NIy1QNIl
+ jxLVWt3GRc5pyQHgZKmWPRK7ZvVbwfcUUZe/snPk9XJZJPWkPo7Umlr3+31ZNr639mgb
+ BjXSBvGB8QOTTvt5y39DsP/ImIOfiErrGZJVo2LHBmzI5Morw48eV4+7SDRfP4Nrst7C
+ cmRXENhbFxeLdOVwVV5StyVivgQznkfWpn+Q/wXL9CONcrcmqwpW/hu6e0fOodJgmsjs
+ 7PkA==
+X-Gm-Message-State: AGi0PuYO3pMATWB/ZHDUxv3GgaGVjjnUgFw1jnBt82LgueaAkLH5LJQS
+ /jhifNmwrAuluaIIk8a2Eu5WR543pwegaCR3Bi/S1g==
+X-Google-Smtp-Source: APiQypIhMj5Pz0erUPm1pjzU3uyMnck4O8rj0UfeCkiHyQ9He4AvZgrPVylSdUsbOTj8lywLRkYhCv/T5je5RvWpfM4=
+X-Received: by 2002:a9d:1920:: with SMTP id j32mr1031562ota.221.1586258426249; 
+ Tue, 07 Apr 2020 04:20:26 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200407111618.17241-1-cfontana@suse.de>
+In-Reply-To: <20200407111618.17241-1-cfontana@suse.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Apr 2020 12:20:15 +0100
+Message-ID: <CAFEAcA9SYT227B9K7yHcv_J==r4xZ1spUSNzL_bRXUpAjT5QVA@mail.gmail.com>
+Subject: Re: [PATCH] configure: check for bison,
+ flex before dtc submodule build
+To: Claudio Fontana <cfontana@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,58 +86,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>,
+ Alex Bennee <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+On Tue, 7 Apr 2020 at 12:16, Claudio Fontana <cfontana@suse.de> wrote:
+>
+> if fdt is required, and the system DTC (libfdt) is not usable,
+> check for the dtc submodule requirements before trying to build it,
+> and error out with a helpful message in case the dependencies are not met.
+>
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
 
-In addition to simple serial test this patch uses ping
-to test the ethernet block modelled in SmartFusion2 SoC.
+Does the dtc module actually need bison/flex, or does it just
+print an ugly warning about it? We only want the 'libfdt' part
+of dtc, which doesn't need the parser, we don't need to build
+the actual dtc compiler.
 
-Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
----
- tests/acceptance/boot_linux_console.py | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
-
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index f825cd9..c6b06a1 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -336,13 +336,13 @@ class BootLinuxConsole(Test):
-         """
-         uboot_url = ('https://raw.githubusercontent.com/'
-                      'Subbaraya-Sundeep/qemu-test-binaries/'
--                     'fa030bd77a014a0b8e360d3b7011df89283a2f0b/u-boot')
--        uboot_hash = 'abba5d9c24cdd2d49cdc2a8aa92976cf20737eff'
-+                     'fe371d32e50ca682391e1e70ab98c2942aeffb01/u-boot')
-+        uboot_hash = 'cbb8cbab970f594bf6523b9855be209c08374ae2'
-         uboot_path = self.fetch_asset(uboot_url, asset_hash=uboot_hash)
-         spi_url = ('https://raw.githubusercontent.com/'
-                    'Subbaraya-Sundeep/qemu-test-binaries/'
--                   'fa030bd77a014a0b8e360d3b7011df89283a2f0b/spi.bin')
--        spi_hash = '85f698329d38de63aea6e884a86fbde70890a78a'
-+                   'fe371d32e50ca682391e1e70ab98c2942aeffb01/spi.bin')
-+        spi_hash = '65523a1835949b6f4553be96dec1b6a38fb05501'
-         spi_path = self.fetch_asset(spi_url, asset_hash=spi_hash)
- 
-         self.vm.set_console()
-@@ -352,7 +352,12 @@ class BootLinuxConsole(Test):
-                          '-drive', 'file=' + spi_path + ',if=mtd,format=raw',
-                          '-no-reboot')
-         self.vm.launch()
--        self.wait_for_console_pattern('init started: BusyBox')
-+        self.wait_for_console_pattern('Enter \'help\' for a list')
-+
-+        exec_command_and_wait_for_pattern(self, 'ifconfig eth0 10.0.2.15',
-+                                                 'eth0: link becomes ready')
-+        exec_command_and_wait_for_pattern(self, 'ping -c 3 10.0.2.2',
-+            '3 packets transmitted, 3 packets received, 0% packet loss')
- 
-     def do_test_arm_raspi2(self, uart_id):
-         """
--- 
-2.7.4
-
+thanks
+-- PMM
 
