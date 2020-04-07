@@ -2,82 +2,118 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A51BC2BA16
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 06:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEFBDC2BA16
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 06:42:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA1232072A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 06:35:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9AB6A20644
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 06:42:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CtoRkJzv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA1232072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="s0oyhG+Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AB6A20644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLhpw-00040P-21
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 02:35:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35692)
+	id 1jLhwJ-00061w-Qn
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 02:42:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36335)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jLhpI-0003RN-As
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 02:35:13 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jLhve-0005Vc-R3
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 02:41:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1jLhpH-0006bb-33
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 02:35:12 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54108
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jLhpG-0006Zt-VE
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 02:35:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586241310;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OtCwYSRvCxdPf1mspUMSi8AniHAuyoy1pt5ezSng6qA=;
- b=CtoRkJzvw2/u8tfF3dmTp6hJ54yUWlAOsJlWrMNOAv+aAw8wHpmFPi0lb5Ch5Bs1f1ntCd
- 10ezUATr8U7upJVfTPMu3eTozThIbzahEYM0fbzruFT708KG/Ftr8mNbbliWPnZc0mxF9H
- hdrQdk/dMFme4PhuRyJfs1Vb4MN0MC8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-KGQNKkPAODKa8290TPtm1g-1; Tue, 07 Apr 2020 02:35:06 -0400
-X-MC-Unique: KGQNKkPAODKa8290TPtm1g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB7881137844;
- Tue,  7 Apr 2020 06:35:04 +0000 (UTC)
-Received: from gondolin (ovpn-112-38.ams2.redhat.com [10.36.112.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 239E35C28E;
- Tue,  7 Apr 2020 06:35:02 +0000 (UTC)
-Date: Tue, 7 Apr 2020 08:35:00 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Eric Farman <farman@linux.ibm.com>
-Subject: Re: [RFC PATCH v2 7/7] vfio-ccw: Add support for the CRW irq
-Message-ID: <20200407083500.755d66cf.cohuck@redhat.com>
-In-Reply-To: <ff56c045-b4eb-bb54-c719-091cd16b6b7e@linux.ibm.com>
-References: <20200206214509.16434-1-farman@linux.ibm.com>
- <20200206214509.16434-8-farman@linux.ibm.com>
- <20200406182255.129a6798.cohuck@redhat.com>
- <ff56c045-b4eb-bb54-c719-091cd16b6b7e@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jLhvc-0002ZA-W3
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 02:41:46 -0400
+Received: from mail-eopbgr30092.outbound.protection.outlook.com
+ ([40.107.3.92]:11649 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jLhvc-0002WT-9y; Tue, 07 Apr 2020 02:41:44 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OVEVx5UNP1kWTv0nRQATylkqVEvRaampqNsxsyaksK0MIIT1sUstFLMSkbOYA/ZEprMwCFqLJEAJWYWalDlGAJ0gstADorHO9KcEFAV1r3AEJsiBUclgqevgEHpHbf3EqMLBPceOEUuzfTrg/8LMCYCxBWKdqkaelPh0q1hmIpNa3Xk7g4Lg4xSrrhE5v7QMRHB9yjAd13HmxBj4UtSTCyvxg82t9y2WfpE7lu/3EYZAcQgdjnSq0Q1QcTbwFz4hZ9lYlxy09ehLD1wI/USuXSVavX+I6leCFIO0adBlQyum3AXULD0c1ekwMemYFUUBlB2hf4gpEMD1/K4BZCu/iQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MDHm3ZCI+3IKn1PE64GtDL5DTWvmqbON2qqgsiUQF/E=;
+ b=Uoz8CafXGwk5ZnapYGTn/SVE9pTb+In5l/84ffYiInNJ37O2ALxgKlO6bAMHyGpDDn2QsWAt6/PXq0uz3YIO2uOcbUB/6M6KrVJvA2tlAe82QU0w9aZR97wpgv7VVyzga8c9wuet/TqgA1G2SiSqKAyuW395PY+MXyUhwE7orT+8SSSGpUGb3Nh+raZJv2Uhk1zaXLIO652EcoaFQ1HcW7d1ZeQfT95HqT+YgUlnS3vHj+G4Bq1O3tnDrei72tRmJBoLEMXILPEwBlEmxafGEPGZCcLucwjUl1Kff3kCUcEpXcSx86KK7X4vx0PhOrMlo5r01dGtoXZ5FxQbOgcZ/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MDHm3ZCI+3IKn1PE64GtDL5DTWvmqbON2qqgsiUQF/E=;
+ b=s0oyhG+YzEpYy45H/FhVdT7pgNVTi/nMfEp74wMZPIbmBsOPAySJSom3UKEVl6AkLcOCfRW6fLzBIvVuhssYYOn+AnmP6X562p94erJI2llQTg601kGRRHpHLRkizBFxZYsliAEMmFJb2qMx8CqeGfbFmDT67nfZQhlCTMPVfUE=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
+ AM7PR08MB5416.eurprd08.prod.outlook.com (10.141.174.140) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2878.15; Tue, 7 Apr 2020 06:41:41 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.021; Tue, 7 Apr 2020
+ 06:41:41 +0000
+Subject: Re: [PATCH for-5.0 v2 2/3] block: Increase BB.in_flight for coroutine
+ interfaces
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200406171403.6761-1-kwolf@redhat.com>
+ <20200406171403.6761-3-kwolf@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200407094132107
+Message-ID: <9d0aa9cc-61a1-fd14-357e-6fb0ba2742dd@virtuozzo.com>
+Date: Tue, 7 Apr 2020 09:41:32 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200406171403.6761-3-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-ClientProxiedBy: AM6P195CA0017.EURP195.PROD.OUTLOOK.COM
+ (2603:10a6:209:81::30) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.160) by
+ AM6P195CA0017.EURP195.PROD.OUTLOOK.COM (2603:10a6:209:81::30) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2878.16 via Frontend Transport; Tue, 7 Apr 2020 06:41:33 +0000
+X-Tagtoolbar-Keys: D20200407094132107
+X-Originating-IP: [185.215.60.160]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 90d61c2c-67ba-4613-3721-08d7dabeb6ec
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5416:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB541648075BBE1AAEE354F447C1C30@AM7PR08MB5416.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 036614DD9C
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(136003)(366004)(39840400004)(346002)(376002)(396003)(36756003)(31686004)(6486002)(956004)(4326008)(2616005)(52116002)(5660300002)(186003)(16526019)(16576012)(2906002)(66476007)(66946007)(66556008)(8676002)(31696002)(316002)(26005)(81166006)(478600001)(8936002)(81156014)(86362001);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pP57gFntoUirSc+X+3nPNh+EQ+vwkah05rsIJqdhkBIIM6Xn6/yTjvs4bHec9NmbI09Kj3AN4u2l6BJGd+UZS2YF88WHI3Vmg6TKCKqB4wW8OtdZ/krNLvj4Yru0SqZUDnnepsYwOxUPtKNh1hvXEH5NrRfdBA5YtvZVOfWV0gcLizCXraUv3NPJB2fH8x56JH+iw6qfs+hl/JFOeblKB4pEb9WJ6TbayzYsSZqU6OVXTOfk/+8gRmQhTSKC0A6VqvDQxdfSr4zhBEmfUiFNNF4VnnnMqS7ARvHNyj0VxSfeYcADglz62+MGGJXEpXP10Q9SEYampRay0LfwY0mMX3q+Y3oOLfZ0MXjdpSV0AbC7mKDn6XCCmV5bZxkyoPsJF6Zl7H6GsgAB0Va52VlMDn/TxGK85gujsZvqYCq1KmwisIuEIvemtKEIzfahNMaJ
+X-MS-Exchange-AntiSpam-MessageData: m2tBzCegcMG87CVNGJR1tLYbAg7e5Di8ZAtxeqQNEwK6VZB4Hkv50XwkstWCH4V/PsnM5H/l797tRrjkWw08tB6Wc4XlE1WibTS46H2xu2HBWI9HaWZlTknGlblxEUzcTUWEaBtdzxg0XbaaM2R8Pw==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90d61c2c-67ba-4613-3721-08d7dabeb6ec
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2020 06:41:41.3344 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0+VC+qVp5CKtbYITsRbIIuKG6EQAyDG+po0QmqYSX/9Q0/ItmGiVDWFCqQZSemOPmEozJbupAeQ635FkleM/TQqMmth015wVu7OSzmLlwOg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5416
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.3.92
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,138 +125,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
- qemu-s390x@nongnu.org, Jared Rossi <jrossi@linux.ibm.com>,
- qemu-devel@nongnu.org
+Cc: s.reiter@proxmox.com, qemu-devel@nongnu.org, dietmar@proxmox.com,
+ stefanha@redhat.com, mreitz@redhat.com, t.lamprecht@proxmox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 6 Apr 2020 17:37:18 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
+06.04.2020 20:14, Kevin Wolf wrote:
+> External callers of blk_co_*() don't currently increase the
+> BlockBackend.in_flight counter, but calls from blk_aio_*() do, so there
+> is an inconsistency whether the counter has been increased or not.
+> 
+> This patch moves the actual operations to static functions that can
+> later know they will always be called with in_flight increased exactly
+> once, even for external callers using the blk_co_*() coroutine
+> interfaces.
+> 
+> If the public blk_co_*() interface is unused, remove it.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
-> On 4/6/20 12:22 PM, Cornelia Huck wrote:
-> > On Thu,  6 Feb 2020 22:45:09 +0100
-> > Eric Farman <farman@linux.ibm.com> wrote:
-> >   
-> >> From: Farhan Ali <alifm@linux.ibm.com>
-> >>
-> >> The CRW irq will be used by vfio-ccw to notify the userspace
-> >> about any CRWs the userspace needs to handle. Let's add support
-> >> for it.
-> >>
-> >> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
-> >> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> >> ---
-> >>
-> >> Notes:
-> >>     v1->v2:
-> >>      - Add a loop to continually read region while data is
-> >>        present, queueing CRWs as found [CH]
-> >>     v0->v1: [EF]
-> >>      - Check vcdev->crw_region before registering the irq,
-> >>        in case host kernel does not have matching support
-> >>      - Split the refactoring changes to an earlier (new) patch
-> >>        (and don't remove the "num_irqs" check in the register
-> >>        routine, but adjust it to the check the input variable)
-> >>      - Don't revert the cool vfio_set_irq_signaling() stuff
-> >>      - Unregister CRW IRQ before IO IRQ in unrealize
-> >>      - s/crw1/crw0/
-> >>
-> >>  hw/vfio/ccw.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
-> >>  1 file changed, 51 insertions(+)
-> >>  
-> >   
-> >> @@ -265,6 +266,40 @@ static void vfio_ccw_reset(DeviceState *dev)
-> >>      ioctl(vcdev->vdev.fd, VFIO_DEVICE_RESET);
-> >>  }
-> >>  
-> >> +static void vfio_ccw_crw_notifier_handler(void *opaque)
-> >> +{
-> >> +    VFIOCCWDevice *vcdev = opaque;
-> >> +    struct ccw_crw_region *region = vcdev->crw_region;
-> >> +    CRW crw;
-> >> +    int size;
-> >> +    uint8_t rsc, erc;
-> >> +
-> >> +    if (!event_notifier_test_and_clear(&vcdev->crw_notifier)) {
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    do {
-> >> +        memset(region, 0, sizeof(*region));
-> >> +        size = pread(vcdev->vdev.fd, region, vcdev->crw_region_size,
-> >> +                     vcdev->crw_region_offset);
-> >> +
-> >> +        if (size == -1) {
-> >> +            error_report("vfio-ccw: Read crw region failed with errno=%d", errno);
-> >> +            break;
-> >> +        }
-> >> +
-> >> +        if (size == 0 || region->crw0 == 0) {  
-> > 
-> > Does it make any sense to expect both of them as an indication that
-> > there are no more crws at the moment? Grabbing a zeroed crw makes the
-> > most sense as a stop condition, I think.  
-> 
-> I think it was overkill on my part.  Though it appears I am missing the
-> "zeroing" of the region once it got read.  Whoops.  Okay, those are easy
-> fixups.
 
-Yes, just looking at the zeroed region (after changing the kernel part)
-seems like the right thing here.
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-> 
-> > 
-> > Also, I'm not sure anymore whether having space for two crws makes too
-> > much sense. If we have a case in the future where we get two chained
-> > crws, the code will retry anyway and just fetch the chained crw and
-> > queue it, wouldn't it?  
-> 
-> I suppose.
-> 
-> I thought the reason for including them now was to avoid "if region size
-> == 4 vs 8 vs XX" logic at some mysterious time in the future.  But
-> certainly ripping it out so we only pass a single CRW at a time would
-> simplify this quite a bit.
 
-Yes, injecting in a loop is easy anyway.
+Still, did you consider instead just move inc/dec to _co_ functions, like
 
-> 
-> >   
-> >> +            /* No more CRWs to queue */
-> >> +            break;
-> >> +        }
-> >> +
-> >> +        memcpy(&crw, &region->crw0, sizeof(CRW));
-> >> +        rsc = (crw.flags & 0x0f00) >> 8;
-> >> +        erc = crw.flags & 0x003f;  
-> > 
-> > I think we already have something for that... ah yes,
-> > CRW_FLAGS_MASK_RSC and CRW_FLAGS_MASK_ERC.  
-> 
-> Huh, look at that.  :)
-> 
-> >   
-> >> +        css_queue_crw(rsc, erc, 0, 0, crw.rsid);  
-> > 
-> > ...or maybe an alternative interface that allows us to queue a
-> > ready-made crw?  
-> 
-> Sure, that would be nice.  I'll add that as an additional patch to this
-> series, prior to this one.
 
-Agreed, makes sense.
+@@ -1154,6 +1154,7 @@ int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
+      int ret;
+      BlockDriverState *bs;
 
-> 
-> >   
-> >> +    } while (1);
-> >> +}
-> >> +
-> >>  static void vfio_ccw_io_notifier_handler(void *opaque)
-> >>  {
-> >>      VFIOCCWDevice *vcdev = opaque;  
-> >   
-> 
++    blk_inc_in_flight(blk);
+      blk_wait_while_drained(blk);
 
+      /* Call blk_bs() only after waiting, the graph may have changed */
+@@ -1175,6 +1176,7 @@ int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
+
+      ret = bdrv_co_preadv(blk->root, offset, bytes, qiov, flags);
+      bdrv_dec_in_flight(bs);
++    blk_dec_in_flight(blk);
+      return ret;
+  }
+
+@@ -1337,7 +1339,6 @@ static void blk_aio_complete(BlkAioEmAIOCB *acb)
+  {
+      if (acb->has_returned) {
+          acb->common.cb(acb->common.opaque, acb->rwco.ret);
+-        blk_dec_in_flight(acb->rwco.blk);
+          qemu_aio_unref(acb);
+      }
+  }
+@@ -1357,7 +1358,6 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
+      BlkAioEmAIOCB *acb;
+      Coroutine *co;
+
+-    blk_inc_in_flight(blk);
+      acb = blk_aio_get(&blk_aio_em_aiocb_info, blk, cb, opaque);
+      acb->rwco = (BlkRwCo) {
+          .blk    = blk,
+@@ -1388,9 +1388,7 @@ static void blk_aio_read_entry(void *opaque)
+      QEMUIOVector *qiov = rwco->iobuf;
+
+      if (rwco->blk->quiesce_counter) {
+-        blk_dec_in_flight(rwco->blk);
+          blk_wait_while_drained(rwco->blk);
+-        blk_inc_in_flight(rwco->blk);
+      }
+
+      assert(qiov->size == acb->bytes);
+
+
+
+(and same for write, ioctl, flush, discard). It seems more consistent.. Should it work?
+
+
+-- 
+Best regards,
+Vladimir
 
