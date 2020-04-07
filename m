@@ -2,85 +2,85 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FC1FC2D0EC
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 19:08:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4351FC2D0EC
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 19:10:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C07320748
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 19:08:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF2B820748
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 19:10:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h2hKGpjq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C07320748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mjNB9B+W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF2B820748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLta9-0002lw-7w
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 15:08:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45531)
+	id 1jLtc1-0003w8-5G
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 15:10:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jLtZX-0002BY-76
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 15:07:44 -0400
+ (envelope-from <jcmvbkbc@gmail.com>) id 1jLtbP-0003XC-6I
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 15:09:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jLtZV-00008i-Ow
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 15:07:42 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:39841)
+ (envelope-from <jcmvbkbc@gmail.com>) id 1jLtbO-0001hd-5I
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 15:09:39 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36250)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jLtZV-00006X-Hw
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 15:07:41 -0400
-Received: by mail-pg1-x542.google.com with SMTP id g32so2171013pgb.6
- for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 12:07:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1jLtbO-0001hK-06
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 15:09:38 -0400
+Received: by mail-pf1-x442.google.com with SMTP id n10so1239771pff.3
+ for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 12:09:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=ZGk61WNrpGDP6QSZdndDZCbGnp9yVuwh0dhPIo77VUo=;
- b=h2hKGpjqhgCC3I9QJ7UJ72N/QtdTZpED2R+k4xbpWC6QML50GYLqu4BsNLjRaIFklJ
- FHj4d5ymRBRtJw3Ar2Hr3uuTrcafbtGw+35FZXx5KbUaqP3GKtLX/8U4QUEGvEKAPvs/
- YtLeOfUPM35KpX74ryAsYRCQSfrirJ+V6kdtluo+EtQQpPSXY0fe5kXX5FaTBWlnnWap
- 2d2y+v0M3FEP13q+P2Jf5mKYWuSMU5fw0X/yd/af860qrDF5J7Ch+P9SsnLJalIGYTjp
- jDJSgRDp5U9I0zLXe3KPOZZcWzxwjQ8BLszhPD4x4uch5THIZHcdSvyhiN3vs77rVU3e
- 4AzQ==
+ bh=pVPn1A8lH7D9dBMNrDxt3UTPqMe9uBm7OsqcSSTllH8=;
+ b=mjNB9B+WwRhyEGpC7+CGl/PyCJb4aha1UpjFP8hdfqS+dZI0/c7+f2QLhSN9Fm1n8e
+ KcJ+iAqJDtJQoTgHy4Foyc6XO8YvRP0YZqZhUpZOpFyRtzWKZ/O2kKdneNzJ8zE8CTdw
+ LTfZxvMak2+sH5UIabsQ01maYh6pYRUCG63qYr9W5yH6qVTmCY78BOqve9s1WOrvohTV
+ KM/alnkhMg6RZWkvnQGaDySNv66Yfu2W9XO8p7TmZwRN/tMt9/i9hVu51YMTLk/0ino/
+ eG7ecx0/TJSwJ1sLF/YA3RdEBhgYLDYgqTjuFCvkDyFS+niXFad4Sedub1WLEnz20jok
+ 8cBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=ZGk61WNrpGDP6QSZdndDZCbGnp9yVuwh0dhPIo77VUo=;
- b=XVAu+qQKmzJloPhZggEOeC3rwlgjkH4bQUDBYqQnRCCc+t3twlNTfxDXOTFGnNTQG5
- G8mf5G4udQfe5+WxGoxouXtmdxGm1BKArqnOLAA6DdU/UInRw1/YEWPglfwjFjuyF7AU
- RIkt0J/WtpeNSNV73FvpgdwxebCzegmqpa4ATPQ6ELeIwFX36WqMDUlRvbhAh3rnLS/V
- Z6bUTtHnMYS4a/EGy/ODj1v3IMJpNmmBu+KIbIJglCBan++8B8GSZ2PEFO/tewiO7y1D
- co5E+6vabEBzJdVAJkvnxfPh25jrbZcdFEDXOT4gH+R2t4P9GQnsyXq0RFYBRG1wTIXA
- 6ZfQ==
-X-Gm-Message-State: AGi0PubM59RHmS1i/wNlb6unPizz3ssA99aLVwZ7qnQ8BniHy3hyXB+s
- l+1r6kyX9R+6TmwjoXCWvin9o+VZKq4=
-X-Google-Smtp-Source: APiQypLGHcXiq025MQYpGcRmMk30OLSldijn8Os4+rPYW8xkTd5tXRiGfNJU9x2l/Kzcx37u+jxQIQ==
-X-Received: by 2002:a63:e4a:: with SMTP id 10mr3425064pgo.90.1586286460128;
- Tue, 07 Apr 2020 12:07:40 -0700 (PDT)
-Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
- [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id q71sm14830635pfc.92.2020.04.07.12.07.39
+ bh=pVPn1A8lH7D9dBMNrDxt3UTPqMe9uBm7OsqcSSTllH8=;
+ b=X+B8RfxFUTdXXFB/pm3TOxS94nKYd+UHn0g5SuSdHV/4aHwNQbIVI7e4Onxo2yEl/r
+ z4UCUR6jypLqhKhIF0vwXQ8Ngf9GwUGA+m+61gygpd4s+LOSRTy4LbcMZ9yoq3MllUru
+ CSzP2Mwkw1DFGWwr09Mri+2O7St8m+WlqNjipHeqWApowQGe/1V10gjemSOTRNSm0Xm0
+ /5KC+aleWnz2XxLnfDe88X7peNuo4fYtGU6LU6jFHxOqhFqEHhNkhwc7V2EhHiEIvige
+ Xl3SyqPkic1g4MCl3r+5/2N3nQ9uNTpz6Z/C7HRGi/rJ0bUDAIXoy8TJ7Cg/zzwq4T5X
+ kVrQ==
+X-Gm-Message-State: AGi0PuZBZNUzXuXXuaowa1sAvpU0+b6Wzi8HQ0RPdf4fV7EEspAVWwle
+ Ji2N0fhYSnBTKdXoDc0ZZYrUXADYOg4=
+X-Google-Smtp-Source: APiQypLhy7cdEvADN8ROf5hhUyWrkaVcmphBPZlSVVfastqPqd/aJYiktq55HfmS7tZ+wq7GXbLDOQ==
+X-Received: by 2002:a63:af5c:: with SMTP id s28mr3445694pgo.21.1586286576530; 
+ Tue, 07 Apr 2020 12:09:36 -0700 (PDT)
+Received: from octofox.hsd1.ca.comcast.net
+ ([2601:641:400:63f0:a487:3b8:7ffc:c9e4])
+ by smtp.gmail.com with ESMTPSA id b3sm13852348pgs.69.2020.04.07.12.09.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Apr 2020 12:07:39 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ Tue, 07 Apr 2020 12:09:36 -0700 (PDT)
+From: Max Filippov <jcmvbkbc@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.0? v2] target/xtensa: Statically allocate
- xtensa_insnbufs in DisasContext
-Date: Tue,  7 Apr 2020 12:07:38 -0700
-Message-Id: <20200407190738.15162-1-richard.henderson@linaro.org>
+Subject: [PATCH] target/xtensa: statically allocate xtensa_insnbufs in
+ DisasContext
+Date: Tue,  7 Apr 2020 12:09:25 -0700
+Message-Id: <20200407190925.4879-1-jcmvbkbc@gmail.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,28 +92,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Filippov <jcmvbkbc@gmail.com>, alex.bennee@linaro.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Filippov <jcmvbkbc@gmail.com>
-
 Rather than dynamically allocate, and risk failing to free
 when we longjmp out of the translator, allocate the maximum
-buffer size from any of the supported cpus.
+buffer size based on the maximum supported instruction length.
 
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-[rth: Merged the fixup in Max's reply to his original]
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
  target/xtensa/cpu.h       |  3 +++
  target/xtensa/helper.c    |  1 +
- target/xtensa/translate.c | 18 ++----------------
- 3 files changed, 6 insertions(+), 16 deletions(-)
+ target/xtensa/translate.c | 17 ++---------------
+ 3 files changed, 6 insertions(+), 15 deletions(-)
 
 diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index c0d69fad96..7a46dccbe1 100644
+index c0d69fad96c5..7a46dccbe11b 100644
 --- a/target/xtensa/cpu.h
 +++ b/target/xtensa/cpu.h
 @@ -213,6 +213,9 @@ enum {
@@ -127,7 +125,7 @@ index c0d69fad96..7a46dccbe1 100644
  #define MAX_OPCODE_ARGS 16
  #define MAX_NAREG 64
 diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
-index 376a61f339..7073381f03 100644
+index 376a61f3397c..7073381f03b2 100644
 --- a/target/xtensa/helper.c
 +++ b/target/xtensa/helper.c
 @@ -96,6 +96,7 @@ static void init_libisa(XtensaConfig *config)
@@ -139,7 +137,7 @@ index 376a61f339..7073381f03 100644
      formats = xtensa_isa_num_formats(config->isa);
      regfiles = xtensa_isa_num_regfiles(config->isa);
 diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 37f65b1f03..b898ee2261 100644
+index 37f65b1f0305..91c7776c2544 100644
 --- a/target/xtensa/translate.c
 +++ b/target/xtensa/translate.c
 @@ -72,8 +72,8 @@ struct DisasContext {
@@ -153,11 +151,10 @@ index 37f65b1f03..b898ee2261 100644
  };
  
  static TCGv_i32 cpu_pc;
-@@ -1173,16 +1173,6 @@ static void xtensa_tr_init_disas_context(DisasContextBase *dcbase,
-     dc->cwoe = tb_flags & XTENSA_TBFLAG_CWOE;
+@@ -1174,15 +1174,6 @@ static void xtensa_tr_init_disas_context(DisasContextBase *dcbase,
      dc->callinc = ((tb_flags & XTENSA_TBFLAG_CALLINC_MASK) >>
                     XTENSA_TBFLAG_CALLINC_SHIFT);
--
+ 
 -    /*
 -     * FIXME: This will leak when a failed instruction load or similar
 -     * event causes us to longjump out of the translation loop and
@@ -170,7 +167,7 @@ index 37f65b1f03..b898ee2261 100644
      init_sar_tracker(dc);
  }
  
-@@ -1272,10 +1262,6 @@ static void xtensa_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+@@ -1272,10 +1263,6 @@ static void xtensa_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
      DisasContext *dc = container_of(dcbase, DisasContext, base);
  
      reset_sar_tracker(dc);
