@@ -2,131 +2,120 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B08C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 14:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BE45C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 14:57:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D33702078C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 14:55:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3386D20747
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 14:57:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QFAExDXi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D33702078C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="u7rnrzYD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3386D20747
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLpcy-0004j1-2U
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 10:55:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60940)
+	id 1jLpev-0006m2-Af
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 10:57:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33337)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jLpcN-0004Cm-Go
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 10:54:24 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jLpeG-0006Iq-6Q
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 10:56:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jLpcM-0008Ua-3S
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 10:54:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25164
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jLpcM-0008U1-09
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 10:54:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586271261;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=spnlELuFhSESS/JcyiT9+2pjukwXaeOLKLfG4H6kDvc=;
- b=QFAExDXirmYqHcS40WpCjd3lEJMedry3WBb5MArs2LWqTxduaUgoicLDe7X12Kj8yqJQhz
- teBzpD2wQhIrzMhV+56oamK54JQEhdNg56mQcyl0arrOJHeOgy0Gswhq1KPT69JpHyjInb
- 4hAu80tjKL4X3BD09MmLQ4anW3gbrhY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-ITaKuKcnN8-S8sT_S18SdQ-1; Tue, 07 Apr 2020 10:54:12 -0400
-X-MC-Unique: ITaKuKcnN8-S8sT_S18SdQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69ECA8017CE;
- Tue,  7 Apr 2020 14:54:10 +0000 (UTC)
-Received: from [10.36.114.167] (ovpn-114-167.ams2.redhat.com [10.36.114.167])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 793A860BEC;
- Tue,  7 Apr 2020 14:54:02 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 v2 2/3] fw_cfg: Migrate ACPI table mr sizes
- separately
-To: "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20200403101827.30664-1-shameerali.kolothum.thodi@huawei.com>
- <20200403101827.30664-3-shameerali.kolothum.thodi@huawei.com>
- <00b69974-4b63-0c7c-c6ad-ed0f2eb712b9@redhat.com>
- <20200407103340-mutt-send-email-mst@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <5b91cf11-79b8-aa00-8f64-f56a3f67c641@redhat.com>
-Date: Tue, 7 Apr 2020 16:54:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200407103340-mutt-send-email-mst@kernel.org>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jLpeE-0001Jk-Q6
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 10:56:19 -0400
+Received: from mail-eopbgr60118.outbound.protection.outlook.com
+ ([40.107.6.118]:65346 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jLpeE-0001Il-2i; Tue, 07 Apr 2020 10:56:18 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LDncmTBYCRcAvjtvz54FTfrAjzM42xqr6Ero1koy68kFZ/tDomfwbFvmReKxZb4YX7fr0jz2uNb2BrC9LgUYmWI+mUEKYNjwRnju8ksM225YW4YAlTzMH6xJKT12k9hTh3nfVHUrLyBRqfB1WHV85d6gQRpX2ZECeT0vfYJ8gIKfaMXceWqocFIpSXscaJTG+3Ag3dpQqVjjsqvM6/DIy2Jq8RVJmedyyk7xOzwOHcyaM4fU5ScQDukGiEtsaywcHUM1QsWd3n2iwW0XXl4sSPZcZgUdTTxGLTcwjI4WKdEq5qk5xURXFeDam5R5pBFlvrEpsQe5fj6/3/o38Aeo9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1u+aLio+yQJst1uBEGdfJBREhL1iQPfcEua18MVXoas=;
+ b=ewSAJX9asvB1qY7VL9JBGay8iY8Jaw5SJ1uJz83jZijHKN+Bu/uYj6YiXmXCQe07j7y1Nk+Qp/u4lqXtqNA1u7+XrxHFrpMelQ8kE1HAsbNyNYv7M7vXX547X7UmLOgS1zv09nxwxfKX3aLSWsbbLHDRMhzdlfPgA9Y0NOlcM4zkFM/pjQAygXZ9K+X5NfJqUe4md9KYwffDprOqcGMISajAoYDdEK4zjURiktuoCA+Sw+qlecQRlwULhYbnNAWkiW2Ec9idZLZRckUvzomslPRNGNzsiHJqtyUwp2dxzr8eAPMj93aKgCEXEI4p8wRN7C+FIMU7HsQM7oNSs7iJ7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1u+aLio+yQJst1uBEGdfJBREhL1iQPfcEua18MVXoas=;
+ b=u7rnrzYDFk4j2Oihj6y6hQkUkdWy7XaJ+GU2Mp+P9D8JiTcnBs5r957eAazbtSdMvOmtk72HaJlTZftSdhuacrVzP/zb2DWe3VqaO5C7yNDn4Wg74igWXu58TuuB+3A7FdlJIqRw6xHxx7BCLlFwzIK1nUgHz5vwxPesr56erlk=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
+ AM7PR08MB5413.eurprd08.prod.outlook.com (10.141.173.146) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2878.15; Tue, 7 Apr 2020 14:56:15 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.021; Tue, 7 Apr 2020
+ 14:56:15 +0000
+Subject: Re: [PATCH for-5.0 v3 2/3] block: Increase BB.in_flight for coroutine
+ and sync interfaces
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200407121259.21350-1-kwolf@redhat.com>
+ <20200407121259.21350-3-kwolf@redhat.com>
+ <2a1985c1-5d36-6537-86f5-e95baaca7416@virtuozzo.com>
+ <20200407144212.GG7695@linux.fritz.box>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200407175613801
+Message-ID: <399cb66a-528e-b92b-546f-a712608bcc14@virtuozzo.com>
+Date: Tue, 7 Apr 2020 17:56:13 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200407144212.GG7695@linux.fritz.box>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM6P192CA0020.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:209:83::33) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.160) by
+ AM6P192CA0020.EURP192.PROD.OUTLOOK.COM (2603:10a6:209:83::33) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2878.19 via Frontend Transport; Tue, 7 Apr 2020 14:56:14 +0000
+X-Tagtoolbar-Keys: D20200407175613801
+X-Originating-IP: [185.215.60.160]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e2617e06-4d9f-4b95-f8c4-08d7db03d229
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5413:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5413D265727509BE41DA1FB8C1C30@AM7PR08MB5413.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 036614DD9C
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(366004)(376002)(396003)(39840400004)(346002)(136003)(4326008)(86362001)(6486002)(31686004)(52116002)(36756003)(26005)(478600001)(6916009)(2906002)(81166006)(81156014)(8936002)(16576012)(66946007)(31696002)(66556008)(16526019)(186003)(2616005)(66476007)(956004)(8676002)(316002)(5660300002);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: g4Ne72HL/gCllex0LtxYGF35bxV+xD0LS9DoFRxYjh+joZj45R1cOcmkS7eUTIf2a6KrmtF3/z+FdSq0EXdyQkSg6GtLFV2n986IrjdkCemctwBNjMrgySsQKIBkztnAgh6A4hDhKz4ZfGBUu9+2sFSY0h9ZO6xwgXCC/CQ6+XVVHnJdsmCDP+0CwGNWg5jBc9OsQN/oTAago22KDt1/p6qRgIo5k9KkjawSysSB5ieDY3iXQHA94jTDxY6TyBvdw3cgWPiJ8C65hPTthJYLQPblQo7opx1t065cAQCe+t65GvrSkvNb7LMcMT7XeP7AI0iIrfKr+GY+Ak+mR/cPdOr4xAR4FubZ2L1a68k8A7J9/IfjWE6px26UgO9wMuL3KlcH+90oRBGUYcMv8eGfRR8D70fUZko4vBXb3nW3dqW0ZDHkf0HgurJXDNYxJ0qM
+X-MS-Exchange-AntiSpam-MessageData: EBERu9ix6MjdfW0LNZVrnJs4LtuR1/tLEYvQSCOe3YfuA94qfp4vhnNkx5Xv9lR38uWagMCiZW0fAcSGZBBptPOH6OeyuxxDKjB4Ny8l7KNWDlivE1Y/Co5Ddx3TsLBg+JvIMUjooirBtajkBMtAGA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e2617e06-4d9f-4b95-f8c4-08d7db03d229
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2020 14:56:15.4949 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: N93OBxho9HKu1JexzS/G6AQhH9oJZqHfQ8RoiGYQjtp4VUtzhkQM3zqwOmE9WRhTtTRg3JzA111LuaDlm3ddTF/TrgxdEuFK65PNbLtLBpM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5413
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.6.118
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -138,118 +127,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com,
- shannon.zhaosl@gmail.com, linuxarm@huawei.com, qemu-devel@nongnu.org,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, dgilbert@redhat.com,
- eric.auger@redhat.com, qemu-arm@nongnu.org, xuwei5@hisilicon.com,
- imammedo@redhat.com, lersek@redhat.com
+Cc: qemu-block@nongnu.org, s.reiter@proxmox.com, qemu-devel@nongnu.org,
+ dietmar@proxmox.com, stefanha@redhat.com, mreitz@redhat.com,
+ t.lamprecht@proxmox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07.04.20 16:34, Michael S. Tsirkin wrote:
-> On Tue, Apr 07, 2020 at 04:17:46PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
->> On 4/3/20 12:18 PM, Shameer Kolothum wrote:
->>> Any sub-page size update to ACPI MRs will be lost during
->>> migration, as we use aligned size in ram_load_precopy() ->
->>> qemu_ram_resize() path. This will result in inconsistency in
->>> FWCfgEntry sizes between source and destination. In order to avoid
->>> this, save and restore them separately during migration.
+07.04.2020 17:42, Kevin Wolf wrote:
+> Am 07.04.2020 um 16:22 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> 07.04.2020 15:12, Kevin Wolf wrote:
+>>> External callers of blk_co_*() and of the synchronous blk_*() functions
+>>> don't currently increase the BlockBackend.in_flight counter, but calls
+>>> from blk_aio_*() do, so there is an inconsistency whether the counter
+>>> has been increased or not.
 >>>
->>> Up until now, this problem may not be that relevant for x86 as both
->>> ACPI table and Linker MRs gets padded and aligned. Also at present,
->>> qemu_ram_resize() doesn't invoke callback to update FWCfgEntry for
->>> unaligned size changes. But since we are going to fix the
->>> qemu_ram_resize() in the subsequent patch, the issue may become
->>> more serious especially for RSDP MR case.
+>>> This patch moves the actual operations to static functions that can
+>>> later know they will always be called with in_flight increased exactly
+>>> once, even for external callers using the blk_co_*() coroutine
+>>> interfaces.
 >>>
->>> Moreover, the issue will soon become prominent in arm/virt as well
->>> where the MRs are not padded or aligned at all and eventually have
->>> acpi table changes as part of future additions like NVDIMM hot-add
->>> feature.
+>>> If the public blk_co_*() interface is unused, remove it.
 >>>
->>> Suggested-by: David Hildenbrand <david@redhat.com>
->>> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
->>> Acked-by: David Hildenbrand <david@redhat.com>
->>> ---
->>> v1 --> v2
->>>   - Changed *_mr_size from size_t to uint64_t to address portability.
->>>   - post_copy only done if sizes are not aligned.
->>>
->>> Please find previous discussions here,
->>> https://patchwork.kernel.org/patch/11339591/#23140343
->>> ---
->>>   hw/core/machine.c         |  1 +
->>>   hw/nvram/fw_cfg.c         | 91 ++++++++++++++++++++++++++++++++++++++=
--
->>>   include/hw/nvram/fw_cfg.h |  6 +++
->>>   3 files changed, 97 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/hw/core/machine.c b/hw/core/machine.c
->>> index de0c425605..c1a444cb75 100644
->>> --- a/hw/core/machine.c
->>> +++ b/hw/core/machine.c
->>> @@ -39,6 +39,7 @@ GlobalProperty hw_compat_4_2[] =3D {
->>>       { "usb-redir", "suppress-remote-wake", "off" },
->>>       { "qxl", "revision", "4" },
->>>       { "qxl-vga", "revision", "4" },
->>> +    { "fw_cfg", "acpi-mr-restore", "false" },
->>>   };
->>>   const size_t hw_compat_4_2_len =3D G_N_ELEMENTS(hw_compat_4_2);
->>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
->>> index 179b302f01..4be6c9d9fd 100644
->>> --- a/hw/nvram/fw_cfg.c
->>> +++ b/hw/nvram/fw_cfg.c
->>> @@ -39,6 +39,7 @@
->>>   #include "qemu/config-file.h"
->>>   #include "qemu/cutils.h"
->>>   #include "qapi/error.h"
->>> +#include "hw/acpi/aml-build.h"
->>>   #define FW_CFG_FILE_SLOTS_DFLT 0x20
->>> @@ -610,6 +611,55 @@ bool fw_cfg_dma_enabled(void *opaque)
->>>       return s->dma_enabled;
->>>   }
->>> +static bool fw_cfg_acpi_mr_restore(void *opaque)
->>> +{
->>> +    FWCfgState *s =3D opaque;
->>> +    bool mr_aligned;
->>> +
->>> +    mr_aligned =3D QEMU_IS_ALIGNED(s->table_mr_size, qemu_real_host_pa=
-ge_size) &&
->>> +                 QEMU_IS_ALIGNED(s->linker_mr_size, qemu_real_host_pag=
-e_size) &&
->>> +                 QEMU_IS_ALIGNED(s->rsdp_mr_size, qemu_real_host_page_=
-size);
->>> +    return s->acpi_mr_restore && !mr_aligned;
+>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 >>
->> This code is hard to review.
+>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >>
->> Is this equivalent?
+>> side question:
 >>
->>     if (!s->acpi_mr_restore) {
->>         return false;
->>     }
->>     if (!QEMU_IS_ALIGNED(s->table_mr_size, qemu_real_host_page_size)) {
->>         return false;
->>     }
->>     if (!QEMU_IS_ALIGNED(s->linker_mr_size, qemu_real_host_page_size)) {
->>         return false;
->>     }
->>     if (!QEMU_IS_ALIGNED(s->rsdp_mr_size, qemu_real_host_page_size)) {
->>         return false;
->>     }
->>     return true;
->=20
-> I think I prefer the original version though. Matter of taste?
+>> Should we inc/dec in blk_make_zero, blk_truncate?
+> 
+> I don't think it's necessary. They call into their bdrv_* counterpart
+> immediately, so the node-level counter should be enough.
+> 
 
-At least I find the original code fairly easy to read - just as the
-proposed alternative. So, yes, matter of taste I'd say.
+bdrv_make_zero is not one request, it does block_status/pwrite_zeroes in a loop. So drained section may occur during bdrv_make_zero. Possibly, nothing bad in it?
+
+blk_truncate may do coroutine_enter before incrementing node-level counter, which may only schedule it..
 
 
---=20
-Thanks,
 
-David / dhildenb
-
+-- 
+Best regards,
+Vladimir
 
