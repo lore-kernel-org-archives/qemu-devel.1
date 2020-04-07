@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D691FC2BA1A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44AC4C2BB55
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:54:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9769B20678
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:54:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DDC620678
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 15:54:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="im2/Gh9H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9769B20678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oICfkXuy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DDC620678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLqYO-0000AN-NI
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 11:54:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43686)
+	id 1jLqYQ-0000Dk-8O
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 11:54:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43624)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jLqVf-0003UE-8t
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:32 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jLqVY-0003NK-Mu
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jLqVe-0004Mg-AP
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:31 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:34733)
+ (envelope-from <alex.bennee@linaro.org>) id 1jLqVX-0004HD-Q9
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:24 -0400
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:56292)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jLqVe-0004Lt-4h
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:30 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id 65so4506025wrl.1
- for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 08:51:30 -0700 (PDT)
+ id 1jLqVX-0004G3-KI
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 11:51:23 -0400
+Received: by mail-wm1-x32f.google.com with SMTP id e26so2231890wmk.5
+ for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 08:51:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=j8FdPU/oaPxbpC8XFRmXIv/XBHTSg+RMGViKj8kJEZw=;
- b=im2/Gh9Hxw0EKBnx3wf00FbaA4avWtSg5SUZZLF+t+ggQJqi0XzkuiFQTjWIHQri40
- gtPfUzbSbgZsCYcdGnip4B22aq+y8QEH3OKtcB+XBz61GEFj5aA2oJtEjMI1wqM+oFyD
- bmNOrDtLib0s9SvtyC5jujraGOtCBn9p+s7OUOfg7TV6IKBpuNCQpXFjjsOIqrlD6Lp0
- Iy0Vnq+wcdjFpod/FI3je8SVBZhNWt3rqTMbCmIiAxKiWJtniucq4vzxzSYEPsuMXAYm
- EPsABRbTU+KPnBA5v+zbXrHLuK/FkAZkmkcbeq4VC7fFi8qUQVDfg9ntXEYH0Ah5oXlX
- Jn2g==
+ bh=PbesXQUG3Qr2w0fWSAAmJ+0PO5T8KwoqRlchy88FHNA=;
+ b=oICfkXuyhHmVwAl/4mRoLJSLXNu7mcNg6OYmbVeiUFowmscviTbv4Jng1F5GyClnCG
+ ms1SJSe9UBA9xZMjeB++Tr09GKcAG4QIyBQ8UJ8xAx/Wfz1pzunESgQ0LkE+p6w/9T8x
+ e8nF2eM0WTFnpHSlT9AhKUimda8H6RDkF+P2P3DHHx19D5bMTuyJSYCflRFIef8FQK0U
+ 1OTAx/YMXLHU6AGNpJEaDuuxd5OO0MwFg0upr8ZkZrDo9p0WHhELLe3yvM/f+gPEP9HF
+ K34jXbe2209aKKo1vcGrHS1pjy0P/Rm9+XVMF9isBJm2nrQ52SqWnzh/J/TdlHVsa5QJ
+ Ev7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=j8FdPU/oaPxbpC8XFRmXIv/XBHTSg+RMGViKj8kJEZw=;
- b=qoA0UoCezi8vD20hHsuR1bENyJrjshLR9GNxOhA/ubTxVD9IkFVT2ASchi7L0Mj/ZR
- 3Zw/+w52kAhl6Y36YN2f9wO4hlL++JEUpGEkczkxWVKBwxdc8ErHKeydkGB5MJcf31fL
- G2izyqJFPKR4gbaDTnwQ/haTGhquxq8b1Ud4HB4K78Il3XmtsphsjzGyBwSlNOOSQuEG
- lPchirUpAUqjJ72ut0wh84gAuCY3zWOexJtG7k0EpNYnwHS/N/F2Q/5s2nCewWCiT6g3
- lkMOoy46gaNqGTr6l61gMjcb7flzodE5ypubf773APA9mkFseNSpN7sQPcmdqe+uJU9A
- 9ktg==
-X-Gm-Message-State: AGi0Pub81vVN3PuoWQP4GWJSKzCBrfqmMQNjekXTolsn14SxxcqxNcfl
- xrDvA7IosLf+6gHTssBdIbRgsA==
-X-Google-Smtp-Source: APiQypICSKzQFOuf/Uzaliq7T18bt7H9bzWK+z0dTArpLf5JJ9tcbl0i4ysGORz1Vl6MmxvMWqYOfw==
-X-Received: by 2002:a5d:5707:: with SMTP id a7mr3392347wrv.108.1586274688989; 
- Tue, 07 Apr 2020 08:51:28 -0700 (PDT)
+ bh=PbesXQUG3Qr2w0fWSAAmJ+0PO5T8KwoqRlchy88FHNA=;
+ b=ZhT9JoTgEjIZr/L59qkPUbs1jDHn53mS/mx0jz7BOda27hzwePRRpKkCRNiXMA3Xi3
+ p+hYusJQUU8qfPOk76M5TPu1BonQQj319G2w3mlgqPGu9hP6LV2o/BTAg12twV1yI3Ss
+ T4BZ2OQ4cSPB/SfYm0sDUmR+gAksxz5g8YKEPv0oSykbg+nU3s0FMqdCRowmo8dFIZMa
+ hb0CiStHMF6oRcB2fT6cvvoucdrC7aRXl4P8vi/7Cw6NnintpwWfWw3DysBLT4D9IMzq
+ 7+kgXUzdL3BHvU1r5dnBQfMO2/dnaK/km+BexqBaKiLEtl45uiagAb+BcZSLMnIm69ik
+ EAHQ==
+X-Gm-Message-State: AGi0PuYU847egmJPwXwHh3p7kH4rZp95Xw3uYxNSyi71rmD9UPJIRS1I
+ IBzqQhpIkvPP31hNjBgTzReNpg==
+X-Google-Smtp-Source: APiQypI6enBHBjwxKsjTmidUIkeHHES++K9FcDFLYF4KpUS94vV4Iiu4+FBpNBoHGxZQGHAlvD0LLg==
+X-Received: by 2002:a05:600c:2251:: with SMTP id
+ a17mr2993003wmm.106.1586274682624; 
+ Tue, 07 Apr 2020 08:51:22 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s13sm15474804wrw.20.2020.04.07.08.51.20
+ by smtp.gmail.com with ESMTPSA id p3sm11048654wrq.97.2020.04.07.08.51.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Apr 2020 08:51:26 -0700 (PDT)
+ Tue, 07 Apr 2020 08:51:19 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C71061FF92;
+ by zen.linaroharston (Postfix) with ESMTP id A00BA1FF90;
  Tue,  7 Apr 2020 16:51:18 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 06/13] target/xtensa: add FIXME for translation memory leak
-Date: Tue,  7 Apr 2020 16:51:11 +0100
-Message-Id: <20200407155118.20139-7-alex.bennee@linaro.org>
+Subject: [PULL 04/13] tests/tcg: remove extraneous pasting macros
+Date: Tue,  7 Apr 2020 16:51:09 +0100
+Message-Id: <20200407155118.20139-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200407155118.20139-1-alex.bennee@linaro.org>
 References: <20200407155118.20139-1-alex.bennee@linaro.org>
@@ -84,7 +85,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42a
+X-Received-From: 2a00:1450:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,38 +97,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Filippov <jcmvbkbc@gmail.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Dynamically allocating a new structure within the DisasContext can
-potentially leak as we can longjmp out of the translation loop (see
-test_phys_mem). The proper fix would be to use static allocation
-within the DisasContext but as the Xtensa translator imports it's code
-from elsewhere I leave that as an exercise for the maintainer.
+We are not using them and they just get in the way.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Acked-by: Max Filippov <jcmvbkbc@gmail.com>
-Message-Id: <20200403191150.863-6-alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200403191150.863-4-alex.bennee@linaro.org>
 
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 8aa972cafdf..37f65b1f030 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -1174,6 +1174,11 @@ static void xtensa_tr_init_disas_context(DisasContextBase *dcbase,
-     dc->callinc = ((tb_flags & XTENSA_TBFLAG_CALLINC_MASK) >>
-                    XTENSA_TBFLAG_CALLINC_SHIFT);
+diff --git a/tests/tcg/x86_64/system/boot.S b/tests/tcg/x86_64/system/boot.S
+index 205cfbd3982..73b19a2bda6 100644
+--- a/tests/tcg/x86_64/system/boot.S
++++ b/tests/tcg/x86_64/system/boot.S
+@@ -41,10 +41,7 @@
+ #define XEN_ELFNOTE_PHYS32_ENTRY  18
  
-+    /*
-+     * FIXME: This will leak when a failed instruction load or similar
-+     * event causes us to longjump out of the translation loop and
-+     * hence not clean-up in xtensa_tr_tb_stop
-+     */
-     if (dc->config->isa) {
-         dc->insnbuf = xtensa_insnbuf_alloc(dc->config->isa);
-         dc->slotbuf = xtensa_insnbuf_alloc(dc->config->isa);
+ #define __ASM_FORM(x)	x
+-#define __ASM_FORM_RAW(x)     x
+-#define __ASM_FORM_COMMA(x) x,
+-#define __ASM_SEL(a,b)           __ASM_FORM(b)
+-#define __ASM_SEL_RAW(a,b)      __ASM_FORM_RAW(b)
++#define __ASM_SEL(a,b)  __ASM_FORM(b)
+ #define _ASM_PTR	__ASM_SEL(.long, .quad)
+ 
+ 	ELFNOTE(Xen, XEN_ELFNOTE_VIRT_BASE,      _ASM_PTR 0x100000)
 -- 
 2.20.1
 
