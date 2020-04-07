@@ -2,119 +2,83 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A6E7C2BA16
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 05:46:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B22C8C2BA16
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 05:53:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 277B92072A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 05:46:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E76520747
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 05:53:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ayY0qRbP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 277B92072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PnO82JAU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E76520747
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLh44-0003fD-Ad
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 01:46:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59444)
+	id 1jLhAX-0005j7-Kc
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 01:53:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60078)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jLh3H-00035P-Q0
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 01:45:37 -0400
+ (envelope-from <arilou@gmail.com>) id 1jLh9j-0004Y8-2Z
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 01:52:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jLh3B-0005zO-LP
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 01:45:34 -0400
-Received: from mail-eopbgr70127.outbound.protection.outlook.com
- ([40.107.7.127]:59333 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jLh3B-0005xZ-1l; Tue, 07 Apr 2020 01:45:29 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XW7ik8sCwSBX/F+DFEC02NvEGSoYSfRffD+baVwvMW+dvs9gAAGf8DWnlnzUilhmgh6HxLIv6kTuHKScPKf3N6jaUKx/UwqNgpnXST2A/delr1ZfssXZN2pLGKvvQOgA3fDgj3cAq9+nfOlhb6BoGI2HsS480k28HJOUxHxFHaqvRtioTCjDTEV434RJdbgYLr1hg1tDSOZbLB+uhLJq4vToKf9W8j0SP9jiMxsKq4M/XNZJgpogz5tLiWn+BP060gPjH9dAy+H1FeStbzlDyN8/l8s/EeN1hJGa593bbHrw4Po1pN0Tp29kQoUosLeJT0S2hPJUbj30ASPorPaX0g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xWgrF57R2t9k3qOlOjyohCLQs/UWIvLj7x+5UUbwYNA=;
- b=cbC+U5Q2iRMHiQFrADNVVxJdCMz53mjLaZT/4D32uHKmWdpS1+8tXBmh+I2PnJDazz8PqNJKww4C4g5bswuPlgo6m+XkfXz9Gx8haRrg6TUxJrcQENz7FAib4DkRdTCYBT//t8bgljfcnhDJWfI6diorZltJ2wJogprCnP/cZziTlKf7UgOcTJvq5ORhDAhqVVqxZgSqauhyr7/a+khMMNTZTphH7D4c886svVKC4eY5qUx3KRAbF/eIoX+JheGfa9cWsAV8uvU72Yra4Irmo+0xczhLs6EnYFLRcgLrEiftiiTbma4OhGjcbs+NZwcJ1kA6ACiXMbsJO0nX3Z/8KA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xWgrF57R2t9k3qOlOjyohCLQs/UWIvLj7x+5UUbwYNA=;
- b=ayY0qRbPcFlWW+M7alewuxNFhOrTBGrxoVzohMR9y9ZT0rAUHqZsT1LmrlQi0FJTSd250qiMssUewalkTrJzWDWgDCptN+GmgT8mMWw3ENdlCajMCwVva1G88xpj/3aFiRh/TpsCdjzj4AzaibbtIqMF2qtXhLLLXvuVm+dkVlE=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
- AM7PR08MB5478.eurprd08.prod.outlook.com (10.141.172.206) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2878.16; Tue, 7 Apr 2020 05:45:25 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.021; Tue, 7 Apr 2020
- 05:45:25 +0000
-Subject: Re: [PATCH for-5.0 v2 1/3] block-backend: Reorder flush/pdiscard
- function definitions
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200406171403.6761-1-kwolf@redhat.com>
- <20200406171403.6761-2-kwolf@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200407084523485
-Message-ID: <042e919a-ea77-a72b-b220-689a529ffcfe@virtuozzo.com>
-Date: Tue, 7 Apr 2020 08:45:23 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200406171403.6761-2-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR10CA0034.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:150::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <arilou@gmail.com>) id 1jLh9i-0002UF-2S
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 01:52:15 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41950)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <arilou@gmail.com>) id 1jLh9h-0002To-Su
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 01:52:14 -0400
+Received: by mail-wr1-x443.google.com with SMTP id h9so2370125wrc.8
+ for <qemu-devel@nongnu.org>; Mon, 06 Apr 2020 22:52:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Q15iIjtIW/s1mxdsOFedtcSl+7MWn1XWqmIP6Tyxwyo=;
+ b=PnO82JAUmBjFagfKmdbkZ6map3GbzkKLPg7+6+BJd5t75nL9/L5mktOs0bilwK8e0Y
+ i/uVjI48GEvolEF7bwp4GyaXhzUtJIDEM8XSgnh4HYryt6yNjxWtfGAOURdb0G2nftGm
+ 3kIuxb/nEjozioHIguTDHQvaufwX4R6ef+OrZgRwqAsRtc/0U4qrs4EyYz/e71dAFzvP
+ 6R3TJNiHbAT16siL1kxVukBA0+ek/ucIzOawD9q5fUEOfmYLEQdo20TJ/Etq13Vg44OH
+ i3ikRtQK9IAS7at9+thH1sn9Q7pwybf77vmwsbIL4AAzhYo90wFxUL+gb414wD12kLFs
+ 4v6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Q15iIjtIW/s1mxdsOFedtcSl+7MWn1XWqmIP6Tyxwyo=;
+ b=iiqkLbIg6Lq/fZiVi6+RfQejksCFlQYDpC00APNLiE+B5Yu/Pq8XTpMCbqq+QqcUtn
+ +HqbqnI+zM5lE7X6wHpRvdD1pAR852fH48duXw1y1FtVR6ocr3CG+kYp2Ry13cKlrhm5
+ umTA50E/oIjwPyiiE3xLfFzsfsheUAknrdKLfq8swMlsPsgBr10fnQ8vdQXWqD11xGmU
+ 3/xfwVOR03BlaZqPRFR7h19qJDZ3ThbK7TSJPQAhQbfjHl0xcDtrb3j8jP00SYmW/K3w
+ ikO3OdaaWFglVnGdx+tm0XbeXUDcti7vJqOP38uUhB83rsOLOyMkTWAXhL1J1QJWoA/1
+ HONA==
+X-Gm-Message-State: AGi0PubakLaI/Y3PqoJPAveouWRYor76YopzuFqFLmwP74AmxFHDmRSr
+ sgfza5i1uLOlz/NtdIKAG4TxsXoQa/Q=
+X-Google-Smtp-Source: APiQypJxGSt+sX16XE/N2jeiOLPN6Ta4xsnx8rfNdbqmoSv8kAHDBO7iW/Gr0fh751ahC10oUehgEQ==
+X-Received: by 2002:a5d:6143:: with SMTP id y3mr755365wrt.242.1586238732499;
+ Mon, 06 Apr 2020 22:52:12 -0700 (PDT)
+Received: from jondnuc.lan (IGLD-84-229-155-55.inter.net.il. [84.229.155.55])
+ by smtp.gmail.com with ESMTPSA id
+ n11sm32271007wrg.72.2020.04.06.22.52.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 06 Apr 2020 22:52:11 -0700 (PDT)
+From: Jon Doron <arilou@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/7] hyperv: VMBus implementation
+Date: Tue,  7 Apr 2020 08:51:49 +0300
+Message-Id: <20200407055156.137249-1-arilou@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.160) by
- AM0PR10CA0034.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.16 via Frontend
- Transport; Tue, 7 Apr 2020 05:45:24 +0000
-X-Tagtoolbar-Keys: D20200407084523485
-X-Originating-IP: [185.215.60.160]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9e06424b-9f8b-4d45-f528-08d7dab6debe
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5478:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB547841B5E7BC399DE432DE80C1C30@AM7PR08MB5478.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
-X-Forefront-PRVS: 036614DD9C
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(366004)(346002)(136003)(396003)(39830400003)(376002)(16526019)(66556008)(6486002)(316002)(66946007)(8676002)(52116002)(66476007)(16576012)(4744005)(2906002)(31686004)(81166006)(81156014)(8936002)(36756003)(478600001)(956004)(2616005)(186003)(86362001)(31696002)(4326008)(26005)(5660300002);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4tLcqrJQZCo24boIfA06k8HvzdX5BEAHSa9eW79kGQbUhWY19tRTaiUL5Em5ggWejASkT5L5viCJUH4kfvjNdzYSP9jqdlKNDYesDLQfSUYOsMuHLGluNgwbgbE7gZ01hZJHxC0zb+mvTELfINlqF8se/OAGrZvD8w0RMKE36Y+ZikewzxfqYA6/XNUxB1ACgr7AoaKoaAmC26rSgWVZgw68VlT7WuKDJhEsMWNTz5L+pRDbUPZfU3bgOSOCIRKb8nGDWBNGp7D3jWqhYl+okiWRJvzdHli4utRyneuKfz2VtvzFtZzkvR7cm7Myw5oQ4FstanCGhYgwLFz4goYLHUCCs11qviJqXK7YJ5w+sIbiM7xo5P6SIhvoumgYFDojQVH/xPzpgk0PS8pLcrcBLtp55rvOid4nK2ElhGgOoUK2OG93a9yxMm5T9n49S3Yi
-X-MS-Exchange-AntiSpam-MessageData: SFOYUIuZaLQfoLNqIF5pQK7xY9qL6bVgRkg2YKMNDr63+TUX/KVnOsc/P3yQfPbwvIttWFfQrvVk1r3NAUmAVzMYDfG0de39DMpbWCrSHQ4HgsR0NdB8Wp/D2kp0zjzfNOL2T4NQeAG4HnuSC5begQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9e06424b-9f8b-4d45-f528-08d7dab6debe
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2020 05:45:25.3816 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0CkVBXUaTYFBEoZGC7ceGKvmH2SWDz8UCQTB0QWIbtu8ksvqd3XBdFEg0+lzlTu4I24n2uTmGxC8xU0HImYk4m6HGD6IBFHRqsIk9SkqUP0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5478
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.7.127
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,22 +90,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: s.reiter@proxmox.com, qemu-devel@nongnu.org, dietmar@proxmox.com,
- stefanha@redhat.com, mreitz@redhat.com, t.lamprecht@proxmox.com
+Cc: mail@maciej.szmigiero.name, eyakovlev@virtuozzo.com, ehabkost@redhat.com,
+ rvkagan@gmail.com, liran.alon@oracle.com, pbonzini@redhat.com,
+ vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-06.04.2020 20:14, Kevin Wolf wrote:
-> Move all variants of the flush/pdiscard functions to a single place and
-> put the blk_co_*() version first because it is called by all other
-> variants (and will become static in the next patch).
-> 
-> Signed-off-by: Kevin Wolf<kwolf@redhat.com>
+This is a rebase of the old patchset from Roman for HyperV VMBus
+implementation.
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+How to use:
+-device vmbus-bridge
+
+Later on new paravirtualized devices can be implemented on top of it
+(Network/SCSI/etc.)
+
+VMBus is a collection of technologies.  At its lowest layer, it's a message
+passing and signaling mechanism, allowing efficient passing of messages to and
+from guest VMs.  A layer higher, it's a mechanism for defining channels of
+communication, where each channel is tagged with a type (which implies a
+protocol) and a instance ID.  A layer higher than that, it's a bus driver,
+serving as the basis of device enumeration within a VM, where a channel can
+optionally be exposed as a paravirtual device.  When a server-side (paravirtual
+back-end) component wishes to offer a channel to a guest VM, it does so by
+specifying a channel type, a mode, and an instance ID.  VMBus then exposes this
+in the guest.
+
+More information about VMBus can be found in the file
+vmbuskernelmodeclientlibapi.h in Microsoft's WDK.
+
+v3:
+Fixed an error asan
+
+v2:
+Rebased on top of latest patchset from Roman and Maciej
+
+Jon Doron (7):
+  hyperv: expose API to determine if synic is enabled
+  hyperv: SControl is optional to enable SynIc
+  vmbus: add vmbus protocol definitions
+  vmbus: vmbus implementation
+  i386:pc: whitelist dynamic vmbus-bridge
+  i386: Hyper-V VMBus ACPI DSDT entry
+  vmbus: add infrastructure to save/load vmbus requests
+
+ Makefile.objs                    |    1 +
+ hw/hyperv/Kconfig                |    5 +
+ hw/hyperv/Makefile.objs          |    1 +
+ hw/hyperv/hyperv.c               |  250 ++-
+ hw/hyperv/trace-events           |   18 +
+ hw/hyperv/vmbus.c                | 2778 ++++++++++++++++++++++++++++++
+ hw/i386/acpi-build.c             |   43 +
+ hw/i386/pc_piix.c                |    2 +
+ hw/i386/pc_q35.c                 |    2 +
+ include/hw/hyperv/hyperv.h       |    3 +
+ include/hw/hyperv/vmbus-bridge.h |   35 +
+ include/hw/hyperv/vmbus-proto.h  |  222 +++
+ include/hw/hyperv/vmbus.h        |  230 +++
+ target/i386/hyperv.c             |    2 +
+ 14 files changed, 3510 insertions(+), 82 deletions(-)
+ create mode 100644 hw/hyperv/trace-events
+ create mode 100644 hw/hyperv/vmbus.c
+ create mode 100644 include/hw/hyperv/vmbus-bridge.h
+ create mode 100644 include/hw/hyperv/vmbus-proto.h
+ create mode 100644 include/hw/hyperv/vmbus.h
 
 -- 
-Best regards,
-Vladimir
+2.24.1
+
 
