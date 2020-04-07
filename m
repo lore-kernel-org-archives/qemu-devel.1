@@ -2,122 +2,83 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E4BC2BA16
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:16:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B44C2BABC
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:28:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CB9A20747
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:16:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 60DD520678
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:28:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="XMtZ6R0b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CB9A20747
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/3Bn1gT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60DD520678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLiTE-0003lp-9w
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 03:16:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40284)
+	id 1jLiei-00063D-Dg
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 03:28:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41811)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jLiSa-0003Mq-NL
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:15:50 -0400
+ (envelope-from <joel.stan@gmail.com>) id 1jLic3-0005Of-5u
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:25:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jLiSY-0008EJ-RR
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:15:48 -0400
-Received: from mail-db8eur05on2113.outbound.protection.outlook.com
- ([40.107.20.113]:12129 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jLiSY-0008DE-GC
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:15:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UNBIbdD53YmN/P+CErgGmZC5D/KNX2D26Tv5m+JX2plwG4vlyqtvpKmfPMjaBFIy4qOmPNTbydST7tr4MwGgJjdnHwq+LiXmR5SX6IiYTD+MHn49qtHdQzy8e+Gy4mdDZeM7HBjx/oCNQAtKo4Cx41gAyxoboOvMxYTn4xYaPcIxCqOwjNfGmxP3FyB6GbF/qIWR8CDOdUUtrHOF858cvR/9ebcfUs5N8iNDk0IdYbe+O5fw0iXbiFkaYUGZ/RF05NBwdaCnJWUyuPhVsXo/FWEGJXLqAwD19Cxk7qzdSaColZ4X8S7Aev7mXDxTLsltHNgPSoRpJTE6huOE8OWTIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xG+d4O6YERhca/d9hJWmo/s2m22bvQ2L1gqS7lkP7SY=;
- b=FFD00YWqoORHOYKXe0T3du7S3KB6SPgfZh9YY4DdzCb99pVUfWGyTHZAMIFxF8vJ14JwjJar2IF+lU7kUxujJ0Ch8agSfTh3QMlU1VmGbpUGjUy7OMShc9m0gc2uqRFAi6tAEtUUUVZcTaYqLFsB2AkeCGv2ph9rudtQy3eAsuGlNIzcyZ6QlBeiGTWnkOQPjiP4Um29B6lLYZ11FkISj2ZWXWdpleAWm+LWi2F5JGn0Fv/oBdusCEwl5jCIH7LrobUdJ1PDYCkqfUHZUhZ3dfFNa1/c10Did9NIVnnhVfe/xFyDATE2pqQRmTyFYg+UeyALAjVtLtN4ySK89kcNcQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xG+d4O6YERhca/d9hJWmo/s2m22bvQ2L1gqS7lkP7SY=;
- b=XMtZ6R0bhFRnvq/8C3i+K83La6HZDGwLIeoE4ubGgQ1lZn0UkQawtydHSBi3aRfRedifpv5rIHTMjIOJVn4Hka9iraW7Dhz+aV7gotTeMib/ySBUuYEA3vin5mhcrsd/3uJr6BYTwUKRSRBL0DDYEnyV+uD0g4Y/z20sViC88iE=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
- AM7PR08MB5382.eurprd08.prod.outlook.com (10.141.173.13) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2878.20; Tue, 7 Apr 2020 07:15:44 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.021; Tue, 7 Apr 2020
- 07:15:44 +0000
-Subject: Re: [PATCH-for-5.1 v2 50/54] scripts/coccinelle: Find eventually
- missing error_propagate() calls
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
-References: <20200406174743.16956-1-f4bug@amsat.org>
- <20200406174743.16956-51-f4bug@amsat.org>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200407101541467
-Message-ID: <9eea0efd-eaba-738b-560c-02cc878cb4c3@virtuozzo.com>
-Date: Tue, 7 Apr 2020 10:15:41 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200406174743.16956-51-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: AM7PR04CA0030.eurprd04.prod.outlook.com
- (2603:10a6:20b:110::40) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <joel.stan@gmail.com>) id 1jLic1-0003JC-Tq
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:25:35 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:38695)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
+ id 1jLibz-0003AB-9o; Tue, 07 Apr 2020 03:25:31 -0400
+Received: by mail-pg1-x543.google.com with SMTP id m17so1298316pgj.5;
+ Tue, 07 Apr 2020 00:25:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=xSQjae3iHp8vDRdLTBEjdVkFcRaIif/B6y8hlJTqhks=;
+ b=W/3Bn1gTxVlm6EolmJPogDFtbHGj29NTffMytH1J0dkzzc4idq8uDlZJ6uFVPthMp1
+ hoyjaXfksqCE+ixUmxa+/ZAHy9xkuib1qq5ZVMOuPmNuc90MjSO2J03MppN32auN4/zs
+ +pjC+u6GuH74KtYqfwdvN+70vb1BUMS7yxxB18OLNLl+RKKjaINt0qm/gu4dv3fSb3m1
+ P3ZTBxAQA5cLrb3KOfhgob6vZyXWnKKCszI9d1HRka57jaav6jUz31R1GotnBRHm6VQs
+ LMnju+j83C9M8BxNs9pp/WtodNXtu17RXBSAqIZ0CrgZJosq8233/Hrz4/JY0fKAWdcv
+ M0Lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=xSQjae3iHp8vDRdLTBEjdVkFcRaIif/B6y8hlJTqhks=;
+ b=SF080vFbGbc4F/zcPhnjJkRsoKsO2zUt/HoNlYFAV8/9eYGyjuXYsFgor0HbqW4U8Q
+ vbubaM2AMx5bSb3WynkSh6e6aL7tvKpxUoBqey6sS02D/w54TSpVCkfTDff4W7wIwjjh
+ D75vn/+yDAMex73lBhD4pOZ6RAabQO9roUiNom0RMAbSGI42M5SnpFFsInMzHkOPwzuT
+ 41G3ttq+dmVc5kuYCXcR2aZuHXxpv/eZ9znj85gnJ9qvqCXZypEV8lTM7UhkRKrOUGlT
+ ZJGIlmp4FJ3A4p4PXBIPYEnByjziV6IO406ck5ywmCEPE+lpM9msTXABohR0VLC2g86S
+ YxbA==
+X-Gm-Message-State: AGi0PuaNc9WIopxbGTJ3sIpdnzh2WTEzzgNj4azPmdrbmmb9D4bD+OaV
+ oNKX6nhbfidcFMOySlSBhyA=
+X-Google-Smtp-Source: APiQypLcqngxCy/MFC9HQ1YJSoo/tnNdxSWzl2MskWSFurd6AZsJvJm2HxRasJgc0AbCpauqp+qcyw==
+X-Received: by 2002:a62:e515:: with SMTP id n21mr1291117pff.103.1586244329822; 
+ Tue, 07 Apr 2020 00:25:29 -0700 (PDT)
+Received: from localhost.localdomain ([45.124.203.18])
+ by smtp.gmail.com with ESMTPSA id 189sm13177249pfg.170.2020.04.07.00.25.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Apr 2020 00:25:29 -0700 (PDT)
+From: Joel Stanley <joel@jms.id.au>
+To: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+Subject: [PATCH] aspeed: Add boot stub for smp booting
+Date: Tue,  7 Apr 2020 16:55:17 +0930
+Message-Id: <20200407072517.671521-1-joel@jms.id.au>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.160) by
- AM7PR04CA0030.eurprd04.prod.outlook.com (2603:10a6:20b:110::40) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.15 via Frontend
- Transport; Tue, 7 Apr 2020 07:15:44 +0000
-X-Tagtoolbar-Keys: D20200407101541467
-X-Originating-IP: [185.215.60.160]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b87fe711-f733-4897-cd26-08d7dac37cd3
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5382:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5382DB92A44EEA1EC4A1C214C1C30@AM7PR08MB5382.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 036614DD9C
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(376002)(396003)(346002)(366004)(136003)(39840400004)(8676002)(6486002)(31686004)(966005)(81166006)(478600001)(86362001)(31696002)(66476007)(36756003)(66556008)(6666004)(66946007)(81156014)(2906002)(8936002)(4326008)(52116002)(316002)(110136005)(26005)(186003)(16526019)(2616005)(16576012)(5660300002)(956004);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: yWtUSjh1EycKY8ctTfz+JYv+cgmLFOCct1kyRvS+7bxgiFwqoZXYdzX3aQm5NRScTMWW1lqAQBO2W12guz9wK5LYXjpMBOTyzSA4g9v6rOJ6eEqIz6Vob7nVzLoPhKWYFuGfD/g4xEJHvED6jWjz5xHeIINO63klWWmanbwbWhs8g4zn+jtXCTnkrKQgbBD9Krs7MiHaBccbywDC4H1717Cb6Dfbf8c5nPKwWk6I+ny/AbaKoQ3NYHxt0u7pwNxM9cKri1nCACcXmXKo6uIfCkTzz0a4gOG0j9hQsjQIAcs0mQgh/ppoYm9Ow3Z9gBOrl2p9h2SLqWvLQXwqTNPmkXEUX9keud44XGdQ3lbQw6z8s5tbtqvQN4+qbkvdiJoozcCdD/UDdML0qQygZJCnRzClosEa3nDSueHvbyrlf+Ive4C2V2AXVQ+3CarEwCdw2zDXdxEIrhxD3oo26r7x6lxe9j/dHbipR8l+QeytL7Jd8MEiKsdshFwMxD4klq8Zs5GyPSzZJHQPqokqLMJRjw==
-X-MS-Exchange-AntiSpam-MessageData: KqSaXXVQXgVvXBDLbo9rUrrZMFxTekpRMzaeUFmvOxyUHsCxf88lTMEZXsuFXD5A+aGjcDaVI6AIS9TLf42O8t08HbZArTI0ivjdGM/TN2o1LrHGVUn2tgF3HT+aAb4zYAwCEQV/epYuukVHvrOeQw==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b87fe711-f733-4897-cd26-08d7dac37cd3
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2020 07:15:44.5461 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hs0AsjwrHvql8q5/L6/cz6xTwsx4c9xWPs/gXRtZPbtyN5ef2KsF9ZwdSDSYZRlflGtV1Erif+RpqPRki1Xaf978hrb2uDa+FIBpY8fVb4c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5382
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.20.113
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,110 +90,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-06.04.2020 20:47, Philippe Mathieu-Daud=C3=A9 wrote:
-> In some places in we put an error into a local Error*, but
-> forget to use it. Add a Coccinelle patch to find such cases
-> and report them.
->=20
-> Inspired-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->   .../find-missing-error_propagate.cocci        | 53 +++++++++++++++++++
->   MAINTAINERS                                   |  1 +
->   2 files changed, 54 insertions(+)
->   create mode 100644 scripts/coccinelle/find-missing-error_propagate.cocc=
-i
->=20
-> diff --git a/scripts/coccinelle/find-missing-error_propagate.cocci b/scri=
-pts/coccinelle/find-missing-error_propagate.cocci
-> new file mode 100644
-> index 0000000000..8b75b37b64
-> --- /dev/null
-> +++ b/scripts/coccinelle/find-missing-error_propagate.cocci
-> @@ -0,0 +1,53 @@
-> +// Find places likely missing error-propagation code, but code is too
-> +// complex for automatic transformation, so manual analysis is required.
-> +//
-> +// Copyright: (C) 2020 Philippe Mathieu-Daud=C3=A9
-> +// This work is licensed under the terms of the GNU GPLv2 or later.
-> +//
-> +// spatch \
-> +//  --macro-file scripts/cocci-macro-file.h --include-headers \
-> +//  --sp-file scripts/coccinelle/find-missing-error_propagate.cocci
-> +//
-> +// Inspired by https://www.mail-archive.com/qemu-devel@nongnu.org/msg691=
-638.html
-> +
-> +
-> +// First match two subsequent calls using local Error*
-> +// in function provided a Error** argument
-> +//
-> +@discard_func_with_errp_argument@
-> +typedef Error;
-> +Error *local_err;
-> +identifier func, errp, errfunc1, errfunc2;
-> +@@
-> +void func(..., Error **errp)
-> +{
-> + <+...
-> + errfunc1(..., &local_err);
-> + ... when !=3D local_err          // local_err is not used between the c=
-alls
-> + errfunc2(..., &local_err);
-> + ...+>
-> +}
-> +
-> +
-> +// Again, match two subsequent calls using local Error*
-> +// but ignoring within functions provided a Error** argument
-> +//
-> +@manual depends on never discard_func_with_errp_argument@
+This is a boot stub that is similar to the code u-boot runs, allowing
+the kernel to boot the secondary CPU.
 
-What depends on never does? As I can imagine, it checks that previous rule =
-never matched in current file (or all files given to coccinelle as paramete=
-rs?) ? Couldn't we miss interesting case that way? When both patterns are i=
-n one file?
+u-boot works as follows:
 
-> +Error *local_err;
-> +identifier errfunc1, errfunc2;
-> +position p;
-> +@@
-> + errfunc1@p(..., &local_err);
-> + ... when !=3D local_err
-> + errfunc2(..., &local_err);
-> +
-> +
-> +// As it is likely too complex to transform, report the hit
-> +//
-> +@script:python@
-> +f << manual.errfunc1;
-> +p << manual.p;
-> +@@
-> +print("[[manual check required: "
-> +      "error_propagate() might be missing in {}() {}:{}:{}]]".format(
-> +            f, p[0].file, p[0].line, p[0].column))
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index ae71a0a4b0..29d29461f3 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2057,6 +2057,7 @@ F: scripts/coccinelle/add-missing-error_propagate.c=
-occi
->   F: scripts/coccinelle/err-bad-newline.cocci
->   F: scripts/coccinelle/error-use-after-free.cocci
->   F: scripts/coccinelle/error_propagate_null.cocci
-> +F: scripts/coccinelle/find-missing-error_propagate.cocci
->   F: scripts/coccinelle/remove_local_err.cocci
->   F: scripts/coccinelle/simplify-init-realize-error_propagate.cocci
->   F: scripts/coccinelle/use-error_abort-in-instance_init.cocci
->=20
+ 1. Initialises the SMP mailbox area in the SCU at 0x1e6e2180 with default values
 
+ 2. Copies a stub named 'mailbox_insn' from flash to the SCU, just above the
+    mailbox area
 
---=20
-Best regards,
-Vladimir
+ 3. Sets AST_SMP_MBOX_FIELD_READY to a magic value to indicate the
+    secondary can begin execution from the stub
+
+ 4. The stub waits until the AST_SMP_MBOX_FIELD_GOSIGN register is set to
+    a magic value
+
+ 5. Jumps to the address in AST_SMP_MBOX_FIELD_ENTRY, starting Linux
+
+Linux indicates it is ready by writing the address of its entrypoint
+function to AST_SMP_MBOX_FIELD_ENTRY and the 'go' magic number to
+AST_SMP_MBOX_FIELD_GOSIGN. The secondary CPU sees this at step 4 and
+breaks out of it's loop.
+
+To be compatible, a fixed qemu stub is loaded into the mailbox area. As
+qemu can ensure the stub is loaded before execution starts, we do not
+need to emulate the AST_SMP_MBOX_FIELD_READY behaviour of u-boot. The
+secondary CPU's program counter points to the beginning of the stub,
+allowing qemu to start secondaries at step four.
+
+Reboot behaviour is preserved by resetting AST_SMP_MBOX_FIELD_GOSIGN
+when the secondaries are reset.
+
+This is only configured when the system is booted with -kernel and qemu
+does not execute u-boot first.
+
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+---
+ hw/arm/aspeed.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
+
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index a6a2102a93cb..bc4386cc6174 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -116,6 +116,58 @@ static const MemoryRegionOps max_ram_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
+ 
++#define AST_SMP_MAILBOX_BASE            0x1e6e2180
++#define AST_SMP_MBOX_FIELD_ENTRY        (AST_SMP_MAILBOX_BASE + 0x0)
++#define AST_SMP_MBOX_FIELD_GOSIGN       (AST_SMP_MAILBOX_BASE + 0x4)
++#define AST_SMP_MBOX_FIELD_READY        (AST_SMP_MAILBOX_BASE + 0x8)
++#define AST_SMP_MBOX_FIELD_POLLINSN     (AST_SMP_MAILBOX_BASE + 0xc)
++#define AST_SMP_MBOX_CODE               (AST_SMP_MAILBOX_BASE + 0x10)
++#define AST_SMP_MBOX_GOSIGN             0xabbaab00
++
++static void aspeed_write_smpboot(ARMCPU *cpu,
++                                 const struct arm_boot_info *info)
++{
++    static const uint32_t poll_mailbox_ready[] = {
++        /*
++         * r2 = per-cpu go sign value
++         * r1 = AST_SMP_MBOX_FIELD_ENTRY
++         * r0 = AST_SMP_MBOX_FIELD_GOSIGN
++         */
++        0xee100fb0,  /* mrc     p15, 0, r0, c0, c0, 5 */
++        0xe21000ff,  /* ands    r0, r0, #255          */
++        0xe59f201c,  /* ldr     r2, [pc, #28]         */
++        0xe1822000,  /* orr     r2, r2, r0            */
++
++        0xe59f1018,  /* ldr     r1, [pc, #24]         */
++        0xe59f0018,  /* ldr     r0, [pc, #24]         */
++
++        0xe320f002,  /* wfe                           */
++        0xe5904000,  /* ldr     r4, [r0]              */
++        0xe1520004,  /* cmp     r2, r4                */
++        0x1afffffb,  /* bne     <wfe>                 */
++        0xe591f000,  /* ldr     pc, [r1]              */
++        AST_SMP_MBOX_GOSIGN,
++        AST_SMP_MBOX_FIELD_ENTRY,
++        AST_SMP_MBOX_FIELD_GOSIGN,
++    };
++
++    rom_add_blob_fixed("aspeed.smpboot", poll_mailbox_ready,
++                       sizeof(poll_mailbox_ready),
++                       info->smp_loader_start);
++}
++
++static void aspeed_reset_secondary(ARMCPU *cpu,
++                                   const struct arm_boot_info *info)
++{
++    AddressSpace *as = arm_boot_address_space(cpu, info);
++    CPUState *cs = CPU(cpu);
++
++    /* info->smp_bootreg_addr */
++    address_space_stl_notdirty(as, AST_SMP_MBOX_FIELD_GOSIGN, 0,
++                               MEMTXATTRS_UNSPECIFIED, NULL);
++    cpu_set_pc(cs, info->smp_loader_start);
++}
++
+ #define FIRMWARE_ADDR 0x0
+ 
+ static void write_boot_rom(DriveInfo *dinfo, hwaddr addr, size_t rom_size,
+@@ -270,6 +322,19 @@ static void aspeed_machine_init(MachineState *machine)
+         }
+     }
+ 
++    if (machine->kernel_filename) {
++        /* With no u-boot we must set up a boot stub for the secondary CPU */
++        MemoryRegion *smpboot = g_new(MemoryRegion, 1);
++        memory_region_init_ram(smpboot, OBJECT(bmc), "aspeed.smpboot",
++                               0x80, &error_abort);
++        memory_region_add_subregion(get_system_memory(),
++                                    AST_SMP_MAILBOX_BASE, smpboot);
++
++        aspeed_board_binfo.write_secondary_boot = aspeed_write_smpboot;
++        aspeed_board_binfo.secondary_cpu_reset_hook = aspeed_reset_secondary;
++        aspeed_board_binfo.smp_loader_start = AST_SMP_MBOX_CODE;
++    }
++
+     aspeed_board_binfo.ram_size = ram_size;
+     aspeed_board_binfo.loader_start = sc->memmap[ASPEED_SDRAM];
+     aspeed_board_binfo.nb_cpus = bmc->soc.num_cpus;
+-- 
+2.25.1
+
 
