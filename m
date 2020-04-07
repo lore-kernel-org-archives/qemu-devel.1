@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B27DC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:42:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBAD1C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:42:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6924220644
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:42:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A842E20644
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:42:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hiS+glXZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6924220644
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LkGVxEHa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A842E20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLlgL-00037H-KZ
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 06:42:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45159)
+	id 1jLlgf-0003QS-T8
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 06:42:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45231)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jLldz-0006oN-Jp
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:39:48 -0400
+ (envelope-from <philmd@redhat.com>) id 1jLle9-00076V-CE
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:39:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jLldw-0003mH-3i
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:39:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52256
+ (envelope-from <philmd@redhat.com>) id 1jLle8-0003vS-5i
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:39:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42536
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jLldw-0003m5-0c
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:39:44 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jLle8-0003ud-20
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:39:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586255983;
+ s=mimecast20190719; t=1586255994;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JvbaRt6FjvsveUuC+vOjrJEApSprL7Ma0wM7xUkHHic=;
- b=hiS+glXZcwtBaVyT+HU0EwgGNLE3Z/cBgQZ7M0CVd/Nq77PbRrIUStGknCsuz3zr1fS4Px
- j/gU1wX56bLV3VGBF7Zo8PZQZJl/3dQ8ybAH/EJ3pEkImHMoxKLu31svcrPpdhGcunqkpj
- X+W0fQ2BzIV/eVG3Rkeo8TXkCUeAv8k=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-310-ppd0tFcPNQeF2FA6W9hOtQ-1; Tue, 07 Apr 2020 06:39:36 -0400
-X-MC-Unique: ppd0tFcPNQeF2FA6W9hOtQ-1
-Received: by mail-wr1-f70.google.com with SMTP id c8so1520296wru.20
- for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 03:39:35 -0700 (PDT)
+ bh=EFAV8BWw7vUpDiip7PjHHx3idMX+P2HOVfCLWi/V21w=;
+ b=LkGVxEHaFcKOlKSektxXYwBP3z6SNTD9BDFVojqpPU30aXwNt4vGglDBXPszlksnTkVO9c
+ WmSga549d5wjFiV/5E3KQJCFw1UZl12AcGa+X+snkTyz5JyHmU6UQb48um6u4I/+jU+vl3
+ kmn5nF4sOeaMw7r1U1UpV1GS/V5nLkY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-VgXym7AaPIyvg41ildP4xQ-1; Tue, 07 Apr 2020 06:39:52 -0400
+X-MC-Unique: VgXym7AaPIyvg41ildP4xQ-1
+Received: by mail-wm1-f69.google.com with SMTP id f8so424593wmh.4
+ for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 03:39:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8eDnRTWyU3nAHcaQhD153aO8yrsrCY+01wCb/6HMgdw=;
- b=uiMiagbxeaM9imXiPK7oPf3XyOJzbQWYQ2EX48+dKWx4iVwCDwH4V9O59OLj2AFWzy
- 2YwT1wg7vrOPywt2WCjyP+s31vTuxbseN+ByAi9S71vkL8mcro2ZBhQP4Xhl9mRreVCf
- hMq476epDqxZfJFuCDG4O5V1kQOFhbHu8v+aHslgfytNtrKxNnVN7hcq4HRjecytHjOL
- VrGVMfoXuyT809O2kzonO/tEgJg2axCNKjEku1PBlRrf7K+8T6Z6QXzMIiFsQHW8WVVu
- VxEcXU5LdqbODY7cQREtV6/VXj0Ppkh71guPOUeKRzQDFLYTjPPm+4U+EYrejCqERe4A
- HJ6w==
-X-Gm-Message-State: AGi0PuYGaSNFVzxT5COx5BoDTPCVmXyhx/myP4ERz0p96g09kwA7/Rr6
- flfmw8L94cDO3rO6+HBWXUDlncMrbiWMwS5BTDsJzpBZgTxHSgfoL7MZnL3tmY/LOGCnzojx3uB
- fFpsOwsd7xaDFJMM=
-X-Received: by 2002:adf:e90b:: with SMTP id f11mr2042017wrm.65.1586255974666; 
- Tue, 07 Apr 2020 03:39:34 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJOPaS1hq3jTix9n7KFmemITVyjpxh5KMR1OJd3FxWdwwJY8h2bGS/FmyA0KGs0qxnf8y6KFQ==
-X-Received: by 2002:adf:e90b:: with SMTP id f11mr2041993wrm.65.1586255974412; 
- Tue, 07 Apr 2020 03:39:34 -0700 (PDT)
+ bh=85bgvfAvchsqkW8ko6hk+W6U/5ywoj9z028mmfe5LFY=;
+ b=qAHseHot7xe7UlHSUT4pZbWQ9xU7vi5+SxjOP9OUOOHTVFvs/YEBR5B6sSuFjk1Y2z
+ p0We9jLRK5Vc0aGnHaj+3Dev68B36d4KGh/10GuGzN+OH59pjoDvauLMW2Q7+lzZ6qCp
+ kml5sIMCRnT9cytHZ97iMttZrK5Zm2iXdNUn3r01EJMJuFkuIDzFZpNWRNe/TprJ4gVN
+ hMM+76JpGP7rcVwGnHclszooi9jSUwcWwCiYymrsjj86Vq4LXqgLVLMOeGkRZbObBc5v
+ +4heceV4PNWHpSdG23q2EgS27FzBTubqTryAj/yaxJBhtcVwexTGS9g/JPuvZ+eUpe/b
+ 7Kjg==
+X-Gm-Message-State: AGi0Pub431rlWvTQcIJ24HcYpNzBaRyNGPQPw9ItQWsBUh1KX/oVnSTQ
+ 2uGfJhIP3Ikyp7dsHKMaBxlF+EVAH2O7qUU+Il/T7l5pEHS8ds9GcQcRYCMtw1zG7b0uV28PFed
+ s/dyh8/rI5P9FgVw=
+X-Received: by 2002:a5d:684c:: with SMTP id o12mr2245354wrw.0.1586255990844;
+ Tue, 07 Apr 2020 03:39:50 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKT3n/0EU6l2K/8+jJDGnQ/WpM11VjP1eq+KA87B6e50kBma3fC0xhUiB9McUDjOT6cokNbng==
+X-Received: by 2002:a5d:684c:: with SMTP id o12mr2245336wrw.0.1586255990642;
+ Tue, 07 Apr 2020 03:39:50 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id k185sm1847211wmb.7.2020.04.07.03.39.32
+ by smtp.gmail.com with ESMTPSA id o9sm25512071wru.29.2020.04.07.03.39.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Apr 2020 03:39:33 -0700 (PDT)
+ Tue, 07 Apr 2020 03:39:50 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/5] tests/acceptance/ppc_prep_40p: Use cdn.netbsd.org hostname
-Date: Tue,  7 Apr 2020 12:39:17 +0200
-Message-Id: <20200407103920.32558-3-philmd@redhat.com>
+Subject: [PULL 5/5] .travis.yml: Cache acceptance-test assets
+Date: Tue,  7 Apr 2020 12:39:20 +0200
+Message-Id: <20200407103920.32558-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200407103920.32558-1-philmd@redhat.com>
 References: <20200407103920.32558-1-philmd@redhat.com>
@@ -91,7 +91,8 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,42 +115,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use NetBSD content delivery network to get faster downloads.
+Keep all acceptance-test assets in the same cache bucket.
 
-Suggested-by: Kamil Rytarowski <kamil@netbsd.org>
+As of v5.0.0-rc1, the cache is 2610.11MB:
+https://travis-ci.org/github/philmd/qemu/jobs/670558103
+
 Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-Id: <20200211134504.9156-1-philmd@redhat.com>
+Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Message-Id: <20200403172919.24621-6-philmd@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/acceptance/ppc_prep_40p.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ .travis.yml | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tests/acceptance/ppc_prep_40p.py b/tests/acceptance/ppc_prep_4=
-0p.py
-index b27572f212..138064285a 100644
---- a/tests/acceptance/ppc_prep_40p.py
-+++ b/tests/acceptance/ppc_prep_40p.py
-@@ -34,7 +34,7 @@ def test_factory_firmware_and_netbsd(self):
-                     '7020-40p/P12H0456.IMG')
-         bios_hash =3D '1775face4e6dc27f3a6ed955ef6eb331bf817f03'
-         bios_path =3D self.fetch_asset(bios_url, asset_hash=3Dbios_hash)
--        drive_url =3D ('https://ftp.netbsd.org/pub/NetBSD/NetBSD-archive/'
-+        drive_url =3D ('https://cdn.netbsd.org/pub/NetBSD/NetBSD-archive/'
-                      'NetBSD-4.0/prep/installation/floppy/generic_com0.fs'=
-)
-         drive_hash =3D 'dbcfc09912e71bd5f0d82c7c1ee43082fb596ceb'
-         drive_path =3D self.fetch_asset(drive_url, asset_hash=3Ddrive_hash=
-)
-@@ -66,7 +66,7 @@ def test_openbios_and_netbsd(self):
-         :avocado: tags=3Darch:ppc
-         :avocado: tags=3Dmachine:40p
-         """
--        drive_url =3D ('https://ftp.netbsd.org/pub/NetBSD/iso/7.1.2/'
-+        drive_url =3D ('https://cdn.netbsd.org/pub/NetBSD/iso/7.1.2/'
-                      'NetBSD-7.1.2-prep.iso')
-         drive_hash =3D 'ac6fa2707d888b36d6fa64de6e7fe48e'
-         drive_path =3D self.fetch_asset(drive_url, asset_hash=3Ddrive_hash=
-,
+diff --git a/.travis.yml b/.travis.yml
+index e0c72210b7..2fd63eceaa 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -318,8 +318,10 @@ jobs:
+       env:
+         - CONFIG=3D"--enable-tools --target-list=3Daarch64-softmmu,alpha-s=
+oftmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-so=
+ftmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sp=
+arc-softmmu,x86_64-softmmu,xtensa-softmmu"
+         - TEST_CMD=3D"make check-acceptance"
++        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-acceptance"
+       after_script:
+         - python3 -c 'import json; r =3D json.load(open("tests/results/lat=
+est/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"=
+] not in ("PASS", "SKIP")]' | xargs cat
++        - du -chs $HOME/avocado/data/cache
+       addons:
+         apt:
+           packages:
 --=20
 2.21.1
 
