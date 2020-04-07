@@ -2,81 +2,107 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F21C2BB54
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:46:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A968C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:51:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20C71206F7
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:46:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25EA220678
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 11:51:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g6avaygP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20C71206F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bol5EbBS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25EA220678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLmgc-0005S1-7U
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 07:46:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55377)
+	id 1jLmla-0000DK-Bx
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 07:51:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56141)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jLmfa-0003lQ-5U
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:45:31 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jLmkr-00083S-Nn
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:50:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jLmfZ-0008IV-6F
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:45:30 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50418
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1jLmkq-0003cB-FF
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:50:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53516
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jLmfZ-0008Hr-2Q
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:45:29 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jLmkq-0003bv-Bp
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 07:50:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586259928;
+ s=mimecast20190719; t=1586260256;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tCF4fUBaZZBRV7HxeYvrs0Oa24SfGlc/AdUK/2/5O4E=;
- b=g6avaygPrY0N+t6LkaFF9OEhbs1dsM+QoO0mosXQndPhr50vpPIGj2Wmx4MeDgFJriUCvz
- lckAG7EoazXPw0mDmJa6AJTleEcHUr3x4gwstl2QFvtoNFz2eQ+a8qtwJ8MGojZj6JUKHC
- feGUpegCOp1IKkBWwhyGeO6i3u82vQ8=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=s+ndHbvTrKbk1V3apW4mI/ReUGW9N1uahO4VqkkPWYE=;
+ b=Bol5EbBS/Yb36vb/jm59Il91/KkIPWszOD9nLNFqVun717VD15URZU0SUqqnRIUKIRkESc
+ BB4EQ75gLucVvK2ZwpPfvgle/okV0qiMYkq51bFv92iNvgJ5G21I7JknWV4DJmGXy+S2KE
+ lEmGyHRh86EZUcnI9jjFXcbNEkWgLm8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-X6RoHFiqMSKEfYVIqj44SA-1; Tue, 07 Apr 2020 07:45:25 -0400
-X-MC-Unique: X6RoHFiqMSKEfYVIqj44SA-1
+ us-mta-374-QrNCYp35OjCW_eca-8YWTg-1; Tue, 07 Apr 2020 07:50:46 -0400
+X-MC-Unique: QrNCYp35OjCW_eca-8YWTg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 057C8107ACC4;
- Tue,  7 Apr 2020 11:45:25 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
- [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BD3A5C0DAB;
- Tue,  7 Apr 2020 11:45:24 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 3CF0411384A9; Tue,  7 Apr 2020 13:45:23 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 1/1] json: Fix check for unbalanced right curly brace
-Date: Tue,  7 Apr 2020 13:45:23 +0200
-Message-Id: <20200407114523.27583-2-armbru@redhat.com>
-In-Reply-To: <20200407114523.27583-1-armbru@redhat.com>
-References: <20200407114523.27583-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0C388017F4;
+ Tue,  7 Apr 2020 11:50:44 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-84.ams2.redhat.com
+ [10.36.114.84])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6823C5E000;
+ Tue,  7 Apr 2020 11:50:38 +0000 (UTC)
+Subject: Re: [PATCH v2 for-5.0] xen-block: Fix double qlist remove and request
+ leak
+To: Anthony PERARD <anthony.perard@citrix.com>, qemu-devel@nongnu.org
+References: <20200406105954.GT4088@perard.uk.xensource.com>
+ <20200406140217.1441858-1-anthony.perard@citrix.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <49d00051-13fc-e0b0-26e3-b1171ed876d3@redhat.com>
+Date: Tue, 7 Apr 2020 13:50:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200406140217.1441858-1-anthony.perard@citrix.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="qyisY4yAYPrHI5GTSgH4kc3EHGf19lNaU"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,54 +114,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Simran Singhal <singhalsimran0@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ qemu-block@nongnu.org, Paul Durrant <paul@xen.org>, qemu-stable@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, xen-devel@lists.xenproject.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Simran Singhal <singhalsimran0@gmail.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qyisY4yAYPrHI5GTSgH4kc3EHGf19lNaU
+Content-Type: multipart/mixed; boundary="ENINMToKaB9vrevpYUVwgT5QDWFcdQ7c9"
 
-We immediately diagnose unbalanced right curly brace:
+--ENINMToKaB9vrevpYUVwgT5QDWFcdQ7c9
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-    $ qemu-kvm --nodefaults --nographic --qmp stdio
-    {"QMP": {"version": {"qemu": {"micro": 91, "minor": 2, "major": 4},
-    "package": "v5.0.0-rc1-1-gf6ce4a439a08"}, "capabilities": ["oob"]}}
-    }
-    {"error": {"class": "GenericError", "desc": "JSON parse error,
-    expecting value"}}
+On 06.04.20 16:02, Anthony PERARD wrote:
+> Commit a31ca6801c02 ("qemu/queue.h: clear linked list pointers on
+> remove") revealed that a request was removed twice from a list, once
+> in xen_block_finish_request() and a second time in
+> xen_block_release_request() when both function are called from
+> xen_block_complete_aio(). But also, the `requests_inflight' counter is
+> decreased twice, and thus became negative.
+>=20
+> This is a bug that was introduced in bfd0d6366043, where a `finished'
+> list was removed.
+>=20
+> That commit also introduced a leak of request in xen_block_do_aio().
+> That function calls xen_block_finish_request() but the request is
+> never released after that.
+>=20
+> To fix both issue, we do two changes:
+> - we squash finish_request() and release_request() together as we want
+>   to remove a request from 'inflight' list to add it to 'freelist'.
+> - before releasing a request, we need to let now the result to the
+>   other end, thus we should call xen_block_send_response() before
+>   releasing a request.
+>=20
+> The first change fix the double QLIST_REMOVE() as we remove the extra
+> call. The second change makes the leak go away because if we want to
+> call finish_request(), we need to call a function that do all of
+> finish, send response, and release.
+>=20
+> Fixes: bfd0d6366043 ("xen-block: improve response latency")
+> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+> ---
+>  hw/block/dataplane/xen-block.c | 48 ++++++++++++----------------------
+>  1 file changed, 16 insertions(+), 32 deletions(-)
 
-except within square bracket:
+I=E2=80=99m going to send a pull request today anyway, so I hope you won=E2=
+=80=99t mind
+and let me take this patch to my branch (with Paul=E2=80=99s suggestions
+incorporated):
 
-    [}
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-The check for unbalanced braces has a typo.  Fix it.
+Max
 
-Fixes: 8d3265b3d00db1071d1d3bf8433b4818088fdeb5
-Signed-off-by: Simran Singhal <singhalsimran0@gmail.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200402182848.GA3023@simran-Inspiron-5558>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[Commit message rewritten to explain what's broken]
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- qobject/json-streamer.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
-index 47dd7ea576..b93d97b995 100644
---- a/qobject/json-streamer.c
-+++ b/qobject/json-streamer.c
-@@ -85,7 +85,7 @@ void json_message_process_token(JSONLexer *lexer, GString=
- *input,
-     g_queue_push_tail(&parser->tokens, token);
-=20
-     if ((parser->brace_count > 0 || parser->bracket_count > 0)
--        && parser->bracket_count >=3D 0 && parser->bracket_count >=3D 0) {
-+        && parser->brace_count >=3D 0 && parser->bracket_count >=3D 0) {
-         return;
-     }
-=20
---=20
-2.21.1
+--ENINMToKaB9vrevpYUVwgT5QDWFcdQ7c9--
+
+--qyisY4yAYPrHI5GTSgH4kc3EHGf19lNaU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6MaQwACgkQ9AfbAGHV
+z0BjKwgAnZBIpnb2xRgxK0fvRt9/6YyEOdhcb5vq9CV934FypodV/gEqa0hZIRuB
+2owjDzIBxxwkIFhqyeCjhDfRM4hp69j+VAZKXmDv4ch+PItoVSDjri0b7VC6q7FM
+KjV7mv++yHhLwkNfSURA/TKs+JgARs0MAfjmsKmq9Kx2QvN/u7SSMujkHVVZ7jLT
+ihq7HjTo3g41tcg8fTTEpRpKOPI+XV4DXp90X4hVyu84FKVs/aBm/yVcyPad7rUu
+x6adT75hwQ4GDtFcVp6REaHnHGTnqOEGcXBCaH65dWpJrXIYYfUs2ASGVV8C+4+a
+2X3nfrbK01OpxSrnCgisATtHzxVIRw==
+=FZi0
+-----END PGP SIGNATURE-----
+
+--qyisY4yAYPrHI5GTSgH4kc3EHGf19lNaU--
 
 
