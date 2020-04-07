@@ -2,123 +2,107 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CF4CC2BB54
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F722C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:05:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBA6720731
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:02:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53DFB20771
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:05:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Yix9GWqW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBA6720731
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GjaRq7kE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53DFB20771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLl3h-0005Rw-2X
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 06:02:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38487)
+	id 1jLl7G-0007z6-Ht
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 06:05:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39719)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jLl2C-0004Z1-WF
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:00:46 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jLl5t-0006lK-Gw
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:04:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jLl2A-0003Wn-5V
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:00:43 -0400
-Received: from mail-vi1eur05on2128.outbound.protection.outlook.com
- ([40.107.21.128]:1915 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jLl29-0003SI-H4; Tue, 07 Apr 2020 06:00:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UM6UUKC0oi/FgnsACIuJfkkb0Tnzn0sWuRqBuqU/AhH27yP17jvHSE4yS9Smk9gZxjEaCVgFO5EAIKbjHRGPbmuZ4Rlj9sYBBRtqNJZqwv/fxLdAlQt7aBLFZ0EHX+hvDMgpNuzy5VwiCxCAV8N3tIp1NFPF4iccthcuGTGzoLCPLHmSBuCTim9lcLhzHGc1RixVgcmooJvsdcae7F0CScoER1Tw3hvFousEAein/0edwPmPefHYfCcqLdvW1EPRBWknvMYJxc6tXAOVxMV2zo/wmpOdXxVNHWfWf8S7zkH2eA0ph2WtG3As4mEZcRwNYYMx751vb9Xe8THIJjkUdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DEdmTurBAtc5KsCbNX8sYK7BcMqWpd+GJ/8HwJlvtDM=;
- b=nd5lsLKLHxSjmVuj8t1GUA0EWWiABO14dQHqD357cmy4KFgBWY6IvByqN0EiE562ypq4QWviUM+VInNpIjhYNMJx/5lkr1IygMY0NJwIFJufIgdiSUVvnrXoN4+/m61XxZ/sX2oF1GYxK2nxD4SCGgr5jgUkZRx1sT/JXFgjxui5M5iZm74AjMZnBQ68tBEtS8lhyfdVBJ9dGTcebZA2pUUJOcDp6VqtstzW2ZZDMJrXM7W4GWvdNAbanqi4flHqC5DymcIBqbThKCog4ErH2rvRSY1+hcY2SQppt8HiB/jrREtIiOyZlw+jc2zpuROliF2RVSU2ahy976ensTuzoA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DEdmTurBAtc5KsCbNX8sYK7BcMqWpd+GJ/8HwJlvtDM=;
- b=Yix9GWqWryYX1jDfpxaj71ZJuDVaAX7WEgEblOIslSrwnlKH8w8Pm3WiQQT19XB7Hmy5is/OiWga1oseqlfkt0sjIIpYd53XIYM2nEFRo2qnIjfx5BSXq+V5NPZCrQTJSPQe9yDndnLK4EF5xbA2CgzJOXIHh7d5XyYK15bW5JU=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
- AM7PR08MB5399.eurprd08.prod.outlook.com (10.141.172.22) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2878.20; Tue, 7 Apr 2020 10:00:38 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.021; Tue, 7 Apr 2020
- 10:00:38 +0000
+ (envelope-from <mreitz@redhat.com>) id 1jLl5r-0006rX-A4
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:04:32 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39703
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jLl5r-0006pk-4M
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:04:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586253869;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=9jR2JvXNCKYIiMyqnMXRmojizuVOCspRY6x0P5x1kPY=;
+ b=GjaRq7kE31GXeGGTMuo5e4+f2PgGy64ExMTuQ+DGk1Q/lD9jH68KIHNfWGHVxoKKiOwxpj
+ q+OgM3EwO81ZhMM2FCAHmqCvz7xOJWALXgG5ppUWDBlTmGl54NEj9Sx9hHxMcnSt0nTJNy
+ aQqGiIqlUOnwBkEExOsYuQkrxJdjHwc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-255-7Op43mIPPYew7D4NDKubtg-1; Tue, 07 Apr 2020 06:04:26 -0400
+X-MC-Unique: 7Op43mIPPYew7D4NDKubtg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0E73107ACC9;
+ Tue,  7 Apr 2020 10:04:25 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-84.ams2.redhat.com
+ [10.36.114.84])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 14F4F5E000;
+ Tue,  7 Apr 2020 10:04:19 +0000 (UTC)
 Subject: Re: [PATCH for-5.0 v2 2/3] block: Increase BB.in_flight for coroutine
  interfaces
-To: Kevin Wolf <kwolf@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 References: <20200406171403.6761-1-kwolf@redhat.com>
  <20200406171403.6761-3-kwolf@redhat.com>
- <9d0aa9cc-61a1-fd14-357e-6fb0ba2742dd@virtuozzo.com>
- <20200407085216.GA7695@linux.fritz.box>
- <b1a2cb59-7969-5bb7-f5ce-ec4ab51199cb@virtuozzo.com>
- <20200407094814.GC7695@linux.fritz.box>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200407130036397
-Message-ID: <18511cc4-158a-a998-c30a-fbb402af48a5@virtuozzo.com>
-Date: Tue, 7 Apr 2020 13:00:36 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200407094814.GC7695@linux.fritz.box>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM6PR04CA0056.eurprd04.prod.outlook.com
- (2603:10a6:20b:f0::33) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <5c5ee71e-f2d7-201d-73d1-2ee9a68b042a@redhat.com>
+Date: Tue, 7 Apr 2020 12:04:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.160) by
- AM6PR04CA0056.eurprd04.prod.outlook.com (2603:10a6:20b:f0::33) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2878.16 via Frontend Transport; Tue, 7 Apr 2020 10:00:37 +0000
-X-Tagtoolbar-Keys: D20200407130036397
-X-Originating-IP: [185.215.60.160]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4ccceb15-2732-4aca-2a0c-08d7dada85f0
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5399:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5399BE6A6373772C11D545BBC1C30@AM7PR08MB5399.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 036614DD9C
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(39840400004)(396003)(136003)(366004)(346002)(376002)(81156014)(31696002)(2616005)(16526019)(186003)(16576012)(66946007)(66556008)(4326008)(6916009)(5660300002)(66476007)(86362001)(956004)(6486002)(81166006)(31686004)(8936002)(2906002)(316002)(8676002)(26005)(478600001)(36756003)(52116002);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 51YL+Mjnd5kuqieVwA9xznlqQW5MUdq9Y5SR4Q0H5lyC2bpqqPDgtR5/zrRr8cO7bYbEUK/5VRDFLsT1iiH/2hXeov37NyrXnw/nylTtrNQfqP5CsqH1CvWA1I7wVyeUWAdoA4ofJQKfJGQhLgmtr3HHqXQcnfam7QTS0e8KXSkjtWUzwo8qvcx90XI7q3QDqfWDYUeMnLwQMF2WHi+8OPy51sdJ1raoaO/2fYzQmbJKt9pAHBCSz9Bn51hb/Cz+FZ5gk+yF84S9i9aI6vG6TM1XxoKNXBvOpDCKCT2OwA1jgOYKp5nYnA8VQemXYecx130YUu47B0ZbnUjKCwgfk+/2zRXh/qcehf/Lb7Wzh0rk1dnmFcqt1rYLujqSBu8hZqSDaH/WBOKsKVD87BoawwLRzu5BlCRbXC4z9yM2yw85AdA8rzjvj2rL3nV7eSkF
-X-MS-Exchange-AntiSpam-MessageData: zy/C02r2jqtXb147thS54dPe+IK6h3N3CXegKhCdCEkOkUhYQMdLfbvj2cYx9EPHUKHtizsYSyDtHT0MCHodbtEbmtzMRQdxcyV96ovAaJrkXQ8M+vUvNyi29PNJ+kbepaUbgZFkg6HsJEAtLwrcDQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ccceb15-2732-4aca-2a0c-08d7dada85f0
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2020 10:00:38.2343 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rOQw4WMHettGepqMxPq/4N6DPsiXaQJPX7tsZFyZT7oI7vqNJRZKWb/AjWVdOcvhbKhRVdlTw9GLu2mqc7cqagqcpnn5ruOlnnszfa9MuIk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5399
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+In-Reply-To: <20200406171403.6761-3-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="z2DbYfHiarufDTS7JlYrNFJknEBZ5F25g"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 40.107.21.128
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,63 +114,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, s.reiter@proxmox.com, qemu-devel@nongnu.org,
- dietmar@proxmox.com, stefanha@redhat.com, mreitz@redhat.com,
- t.lamprecht@proxmox.com
+Cc: vsementsov@virtuozzo.com, s.reiter@proxmox.com, qemu-devel@nongnu.org,
+ t.lamprecht@proxmox.com, stefanha@redhat.com, dietmar@proxmox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-07.04.2020 12:48, Kevin Wolf wrote:
-> Am 07.04.2020 um 11:10 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> 07.04.2020 11:52, Kevin Wolf wrote:
->>> Am 07.04.2020 um 08:41 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>>> 06.04.2020 20:14, Kevin Wolf wrote:
->>>>> External callers of blk_co_*() don't currently increase the
->>>>> BlockBackend.in_flight counter, but calls from blk_aio_*() do, so there
->>>>> is an inconsistency whether the counter has been increased or not.
->>>>>
->>>>> This patch moves the actual operations to static functions that can
->>>>> later know they will always be called with in_flight increased exactly
->>>>> once, even for external callers using the blk_co_*() coroutine
->>>>> interfaces.
->>>>>
->>>>> If the public blk_co_*() interface is unused, remove it.
->>>>>
->>>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>>>
->>>>
->>>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>>
->>>> Still, did you consider instead just move inc/dec to _co_ functions, like
->>>> [...]
->>>> (and same for write, ioctl, flush, discard). It seems more
->>>> consistent.. Should it work?
->>>
->>> No, it would be wrong because it would be too late. The main purpose of
->>> blk_inc_in_flight() is to keep the request covered during the first and
->>> the last phase outside of blk_co_*(), which can potentially involve BHs
->>> like blk_aio_complete_bh().
->>
->> OK, thanks, I see now, we want to caver possible completion BH.
->> Hmm, not too late but too early (for decrement).. As nothing interesting
->> happening between increment in blk_aio_prwv and entering the coroutine with
->> _do_ function.
-> 
-> Basically it covers everything that isn't yet covered by
-> bdrv_inc/dec_in_flight() on the node level, but completion is probably
-> the most important part.
-> 
-> Start, too, because actually something very interesting is happening
-> between blk_aio_prwv() and blk_do_*(): It uses bdrv_coroutine_enter(),
-> which in some circumstances may end up only scheduling the coroutine
-> instead of immediately entering it.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--z2DbYfHiarufDTS7JlYrNFJknEBZ5F25g
+Content-Type: multipart/mixed; boundary="sZ4UUrRMWDPNdjvD8dihVciL438DENSYu"
 
-I missed this fact, I thought bdrv_coroutine_enter is simpler. OK, thanks. You answered my question in next too.
+--sZ4UUrRMWDPNdjvD8dihVciL438DENSYu
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 06.04.20 19:14, Kevin Wolf wrote:
+> External callers of blk_co_*() don't currently increase the
+> BlockBackend.in_flight counter, but calls from blk_aio_*() do, so there
+> is an inconsistency whether the counter has been increased or not.
+>=20
+> This patch moves the actual operations to static functions that can
+> later know they will always be called with in_flight increased exactly
+> once, even for external callers using the blk_co_*() coroutine
+> interfaces.
+>=20
+> If the public blk_co_*() interface is unused, remove it.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/sysemu/block-backend.h |  1 -
+>  block/block-backend.c          | 94 +++++++++++++++++++++++++++-------
+>  2 files changed, 76 insertions(+), 19 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
--- 
-Best regards,
-Vladimir
+--sZ4UUrRMWDPNdjvD8dihVciL438DENSYu--
+
+--z2DbYfHiarufDTS7JlYrNFJknEBZ5F25g
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6MUCIACgkQ9AfbAGHV
+z0AWBQgAs1DmSFpq2vk9Oi7MtS2Is/mGBiMEL7yt304+LzM4jHUZtU2KyzJwsrJG
+ZqYM5qNjfzmU5WYjDmXC4xzTtkNSPSOQTJjJPxPL6MjBCy25k4y4/LmgxGLC8FDe
+5TOvNbKwPBQSUw6xVlGCE99NM+6ee/WXV7k2Pd+OYc9ZWGP4KRJGmZ8F3TERlcba
+oKZJHTMjSYMECmJcbgknB1ftTIKVP4kjMvR/O9etWTjpXX6vpGyqOj0fMg30AkgC
+8pnrFYJ66o0eMz6PXyOO8f6wxFqZAmCN1BJmlBwDrPcKTwe9v4v9vpsxI+eb4OsC
+3NQ/Sc8k8Xd1XCZwLHV9sbXhbhL3Fg==
+=XDrS
+-----END PGP SIGNATURE-----
+
+--z2DbYfHiarufDTS7JlYrNFJknEBZ5F25g--
+
 
