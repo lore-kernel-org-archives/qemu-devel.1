@@ -2,83 +2,121 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B44C2BABC
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:28:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62411C2BA16
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:28:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60DD520678
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:28:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2831220678
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:28:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/3Bn1gT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60DD520678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="VX9uPYZG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2831220678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLiei-00063D-Dg
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 03:28:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41811)
+	id 1jLif4-0006fV-6T
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 03:28:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42110)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <joel.stan@gmail.com>) id 1jLic3-0005Of-5u
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:25:36 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jLieP-00067q-2W
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:28:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joel.stan@gmail.com>) id 1jLic1-0003JC-Tq
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:25:35 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:38695)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
- id 1jLibz-0003AB-9o; Tue, 07 Apr 2020 03:25:31 -0400
-Received: by mail-pg1-x543.google.com with SMTP id m17so1298316pgj.5;
- Tue, 07 Apr 2020 00:25:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=xSQjae3iHp8vDRdLTBEjdVkFcRaIif/B6y8hlJTqhks=;
- b=W/3Bn1gTxVlm6EolmJPogDFtbHGj29NTffMytH1J0dkzzc4idq8uDlZJ6uFVPthMp1
- hoyjaXfksqCE+ixUmxa+/ZAHy9xkuib1qq5ZVMOuPmNuc90MjSO2J03MppN32auN4/zs
- +pjC+u6GuH74KtYqfwdvN+70vb1BUMS7yxxB18OLNLl+RKKjaINt0qm/gu4dv3fSb3m1
- P3ZTBxAQA5cLrb3KOfhgob6vZyXWnKKCszI9d1HRka57jaav6jUz31R1GotnBRHm6VQs
- LMnju+j83C9M8BxNs9pp/WtodNXtu17RXBSAqIZ0CrgZJosq8233/Hrz4/JY0fKAWdcv
- M0Lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=xSQjae3iHp8vDRdLTBEjdVkFcRaIif/B6y8hlJTqhks=;
- b=SF080vFbGbc4F/zcPhnjJkRsoKsO2zUt/HoNlYFAV8/9eYGyjuXYsFgor0HbqW4U8Q
- vbubaM2AMx5bSb3WynkSh6e6aL7tvKpxUoBqey6sS02D/w54TSpVCkfTDff4W7wIwjjh
- D75vn/+yDAMex73lBhD4pOZ6RAabQO9roUiNom0RMAbSGI42M5SnpFFsInMzHkOPwzuT
- 41G3ttq+dmVc5kuYCXcR2aZuHXxpv/eZ9znj85gnJ9qvqCXZypEV8lTM7UhkRKrOUGlT
- ZJGIlmp4FJ3A4p4PXBIPYEnByjziV6IO406ck5ywmCEPE+lpM9msTXABohR0VLC2g86S
- YxbA==
-X-Gm-Message-State: AGi0PuaNc9WIopxbGTJ3sIpdnzh2WTEzzgNj4azPmdrbmmb9D4bD+OaV
- oNKX6nhbfidcFMOySlSBhyA=
-X-Google-Smtp-Source: APiQypLcqngxCy/MFC9HQ1YJSoo/tnNdxSWzl2MskWSFurd6AZsJvJm2HxRasJgc0AbCpauqp+qcyw==
-X-Received: by 2002:a62:e515:: with SMTP id n21mr1291117pff.103.1586244329822; 
- Tue, 07 Apr 2020 00:25:29 -0700 (PDT)
-Received: from localhost.localdomain ([45.124.203.18])
- by smtp.gmail.com with ESMTPSA id 189sm13177249pfg.170.2020.04.07.00.25.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Apr 2020 00:25:29 -0700 (PDT)
-From: Joel Stanley <joel@jms.id.au>
-To: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH] aspeed: Add boot stub for smp booting
-Date: Tue,  7 Apr 2020 16:55:17 +0930
-Message-Id: <20200407072517.671521-1-joel@jms.id.au>
-X-Mailer: git-send-email 2.25.1
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jLieO-0000Gi-4u
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:28:01 -0400
+Received: from mail-eopbgr140123.outbound.protection.outlook.com
+ ([40.107.14.123]:58366 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jLieL-000067-Nm; Tue, 07 Apr 2020 03:27:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=egRRdyipAbRCDfYGopsWSVCbU1utUADehKLnblZhYx4wU0byraRxVBJkXrVZjaZ3wg0PhruJ1/Bse43o2N4WrMhc6cIvmY2ayD7az9zdzjRmTFCsWcQVoH3st5KLwpGwW3dH3smmhjNncu1YUGJJXPupYE5me+5qiq6nAN12brj+t9RkjD7SgSxbJhI3jzIUKbsDK5dxPq51W5l0e7XoGWXk/mUrN6KzSAuhjG1oPYGJFM21rXilGA3rSozBUoh/T/f3AWZNlq9PFGSU/HgwWNEtl45IcL3QqdKjVvmFT+hGppWEl8xb42d8ZMZkOUPvcAaYwlqHHud8LXPCvzBGeg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0ehWGCYkjp1btbfrjg6PQw0CchtkNpW/PA9mI7rXKPk=;
+ b=nwkAbwzUKihLxXATyrKrhhucVr/hoAG+EbHRH7e0sM3NtDtoqVjIAlHP9l+QPphEvEXAjbjhkiB4BHltB8cXcTgn9EVrJMRYSSSS7rJYq3V8XHVg/51voKxQ+hHKS5VQZdCpnVzWmPNHcysoAhJ/u7ZaiUrNkk2cX01DHnFnFLsqYvxNcnY6mpbzL+pMb5gRWZ8R3h7NQ1WTWIWOLfVOjkyqQPkSFPU43HWo+Otrg4iD53a4GzRHecNpDJuNE+RAdlN54ys1jdea0fXOK6FeWQwwvMAcyi48wYdb7yHYOSrb1QF3XpShTsaTYqNRj/+vnNlwXU2j2iHDzZz+DYrJQQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0ehWGCYkjp1btbfrjg6PQw0CchtkNpW/PA9mI7rXKPk=;
+ b=VX9uPYZGy7H6uXweH0hFOZ4dz+tVTxWYR3jcyLdpiQ7dopV0KfJovrHRVOBFj3ESxeztHIj1TY5902B5NQ1B7TKU5HAtda6FLF0dlPdMiJjhdJXV9ksEAaoWP/bCgJZsjEP1tsvqcdvH2oSrxV2zIHGLLrJZAj+4cXZcRiFKxeM=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (10.141.175.15) by
+ AM7PR08MB5381.eurprd08.prod.outlook.com (10.141.172.87) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2878.20; Tue, 7 Apr 2020 07:27:53 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::3944:477e:1562:cfcf%8]) with mapi id 15.20.2878.021; Tue, 7 Apr 2020
+ 07:27:53 +0000
+Subject: Re: [PATCH v2] qcow2: Check request size in
+ qcow2_co_pwritev_compressed_part()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <20200406143401.26854-1-berto@igalia.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200407102749882
+Message-ID: <90ae7712-7624-2367-a035-f155d3e7e4f3@virtuozzo.com>
+Date: Tue, 7 Apr 2020 10:27:49 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200406143401.26854-1-berto@igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM5PR0701CA0004.eurprd07.prod.outlook.com
+ (2603:10a6:203:51::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.160) by
+ AM5PR0701CA0004.eurprd07.prod.outlook.com (2603:10a6:203:51::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.11 via Frontend
+ Transport; Tue, 7 Apr 2020 07:27:52 +0000
+X-Tagtoolbar-Keys: D20200407102749882
+X-Originating-IP: [185.215.60.160]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a2d28e54-e5bd-4457-29aa-08d7dac52f04
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5381:
+X-LD-Processed: 0bc7f26d-0264-416e-a6fc-8352af79c58f,ExtAddr
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5381D16AECA04BCC4BDD4E7CC1C30@AM7PR08MB5381.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:350;
+X-Forefront-PRVS: 036614DD9C
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(39830400003)(346002)(396003)(366004)(136003)(376002)(4326008)(8936002)(8676002)(186003)(81166006)(26005)(478600001)(31696002)(16526019)(86362001)(36756003)(5660300002)(107886003)(52116002)(81156014)(31686004)(66556008)(54906003)(2906002)(6666004)(2616005)(316002)(16576012)(956004)(66476007)(6486002)(66946007);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9424HWYnSisdTu9Yx4MHsBFozwzEleY6Ltm2AbSqzLNg7F90DcJuEiue89eFG7/tYQwJ3QLLvchUyC6pPwyFfNvq7ZVNFa3ksLHxGkisJfGwr7VHJapd0vi0lt+Xa4dS6m9ClfqMtnk5jn63iyYEDFjQYAybvVfWFrV8Tq3JLF9iDSu6bHEyGrqR4S7n1u6qs3hwgt6OTgzM3cnOsFelMaYugPPVwchBbO5YrLDXw+WH0zXa7sy0nOEPE46Q+0uClqFdIljHh4Qhnl0ZTBek4y77m9xW0glkIJTXwxt/3rWxCdWemQZyjyNbv6jh9NIXxZptY9bbFW3bEnkiDmhxrY7hrsr+ZMzh/zz1fYdzCzBiWXGsNsFn4Ri4BFTXg9DPfC6KELCxXkcNPZ9h7OoWErI/OgMlXG8cPBK7LoUs2Ui7mms8WTCzKGVLBWYuvetx
+X-MS-Exchange-AntiSpam-MessageData: AxwCioqIDycthnDQVtQ7D7KqxbF8scDWHcB+JH5DQjNQaj0UTcl00kWvsBkh5LZ1s9vWFpze7mg4VylXpNGLjf1ovHJv10IRhddB8pP21KYl5f3mleYCryguMyTJOCd5+L9YFDAUHtDjVj7n5iX1qQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a2d28e54-e5bd-4457-29aa-08d7dac52f04
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2020 07:27:53.0111 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EekEmDuLka71CH1kJLWujvg8XgwQayg6NA5Ob3L3j+HUCxH6cgX3f9Q1wvauQHyofauiLVNDYeUbww056MQVgQ/aCwn+NUZcunSx1tG7Mz8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5381
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.14.123
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,136 +128,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a boot stub that is similar to the code u-boot runs, allowing
-the kernel to boot the secondary CPU.
+06.04.2020 17:34, Alberto Garcia wrote:
+> When issuing a compressed write request the number of bytes must be a
+> multiple of the cluster size or reach the end of the last cluster.
+> 
+> With the current code such requests are allowed and we hit an
+> assertion:
+> 
+>     $ qemu-img create -f qcow2 img.qcow2 1M
+>     $ qemu-io -c 'write -c 0 32k' img.qcow2
+> 
+>     qemu-io: block/qcow2.c:4257: qcow2_co_pwritev_compressed_task:
+>     Assertion `bytes == s->cluster_size || (bytes < s->cluster_size &&
+>                (offset + bytes == bs->total_sectors << BDRV_SECTOR_BITS))' failed.
+>     Aborted
+> 
+> This patch fixes a regression introduced in 0d483dce38
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 
-u-boot works as follows:
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
- 1. Initialises the SMP mailbox area in the SCU at 0x1e6e2180 with default values
+> ---
+>   block/qcow2.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 2bb536b014..587cf51948 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -4349,6 +4349,11 @@ qcow2_co_pwritev_compressed_part(BlockDriverState *bs,
+>           return -EINVAL;
+>       }
+>   
+> +    if (offset_into_cluster(s, bytes) &&
+> +        (offset + bytes) != (bs->total_sectors << BDRV_SECTOR_BITS)) {
+> +        return -EINVAL;
+> +    }
+> +
+>       while (bytes && aio_task_pool_status(aio) == 0) {
+>           uint64_t chunk_size = MIN(bytes, s->cluster_size);
+>   
+> 
 
- 2. Copies a stub named 'mailbox_insn' from flash to the SCU, just above the
-    mailbox area
 
- 3. Sets AST_SMP_MBOX_FIELD_READY to a magic value to indicate the
-    secondary can begin execution from the stub
-
- 4. The stub waits until the AST_SMP_MBOX_FIELD_GOSIGN register is set to
-    a magic value
-
- 5. Jumps to the address in AST_SMP_MBOX_FIELD_ENTRY, starting Linux
-
-Linux indicates it is ready by writing the address of its entrypoint
-function to AST_SMP_MBOX_FIELD_ENTRY and the 'go' magic number to
-AST_SMP_MBOX_FIELD_GOSIGN. The secondary CPU sees this at step 4 and
-breaks out of it's loop.
-
-To be compatible, a fixed qemu stub is loaded into the mailbox area. As
-qemu can ensure the stub is loaded before execution starts, we do not
-need to emulate the AST_SMP_MBOX_FIELD_READY behaviour of u-boot. The
-secondary CPU's program counter points to the beginning of the stub,
-allowing qemu to start secondaries at step four.
-
-Reboot behaviour is preserved by resetting AST_SMP_MBOX_FIELD_GOSIGN
-when the secondaries are reset.
-
-This is only configured when the system is booted with -kernel and qemu
-does not execute u-boot first.
-
-Signed-off-by: Joel Stanley <joel@jms.id.au>
----
- hw/arm/aspeed.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
-
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index a6a2102a93cb..bc4386cc6174 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -116,6 +116,58 @@ static const MemoryRegionOps max_ram_ops = {
-     .endianness = DEVICE_NATIVE_ENDIAN,
- };
- 
-+#define AST_SMP_MAILBOX_BASE            0x1e6e2180
-+#define AST_SMP_MBOX_FIELD_ENTRY        (AST_SMP_MAILBOX_BASE + 0x0)
-+#define AST_SMP_MBOX_FIELD_GOSIGN       (AST_SMP_MAILBOX_BASE + 0x4)
-+#define AST_SMP_MBOX_FIELD_READY        (AST_SMP_MAILBOX_BASE + 0x8)
-+#define AST_SMP_MBOX_FIELD_POLLINSN     (AST_SMP_MAILBOX_BASE + 0xc)
-+#define AST_SMP_MBOX_CODE               (AST_SMP_MAILBOX_BASE + 0x10)
-+#define AST_SMP_MBOX_GOSIGN             0xabbaab00
-+
-+static void aspeed_write_smpboot(ARMCPU *cpu,
-+                                 const struct arm_boot_info *info)
-+{
-+    static const uint32_t poll_mailbox_ready[] = {
-+        /*
-+         * r2 = per-cpu go sign value
-+         * r1 = AST_SMP_MBOX_FIELD_ENTRY
-+         * r0 = AST_SMP_MBOX_FIELD_GOSIGN
-+         */
-+        0xee100fb0,  /* mrc     p15, 0, r0, c0, c0, 5 */
-+        0xe21000ff,  /* ands    r0, r0, #255          */
-+        0xe59f201c,  /* ldr     r2, [pc, #28]         */
-+        0xe1822000,  /* orr     r2, r2, r0            */
-+
-+        0xe59f1018,  /* ldr     r1, [pc, #24]         */
-+        0xe59f0018,  /* ldr     r0, [pc, #24]         */
-+
-+        0xe320f002,  /* wfe                           */
-+        0xe5904000,  /* ldr     r4, [r0]              */
-+        0xe1520004,  /* cmp     r2, r4                */
-+        0x1afffffb,  /* bne     <wfe>                 */
-+        0xe591f000,  /* ldr     pc, [r1]              */
-+        AST_SMP_MBOX_GOSIGN,
-+        AST_SMP_MBOX_FIELD_ENTRY,
-+        AST_SMP_MBOX_FIELD_GOSIGN,
-+    };
-+
-+    rom_add_blob_fixed("aspeed.smpboot", poll_mailbox_ready,
-+                       sizeof(poll_mailbox_ready),
-+                       info->smp_loader_start);
-+}
-+
-+static void aspeed_reset_secondary(ARMCPU *cpu,
-+                                   const struct arm_boot_info *info)
-+{
-+    AddressSpace *as = arm_boot_address_space(cpu, info);
-+    CPUState *cs = CPU(cpu);
-+
-+    /* info->smp_bootreg_addr */
-+    address_space_stl_notdirty(as, AST_SMP_MBOX_FIELD_GOSIGN, 0,
-+                               MEMTXATTRS_UNSPECIFIED, NULL);
-+    cpu_set_pc(cs, info->smp_loader_start);
-+}
-+
- #define FIRMWARE_ADDR 0x0
- 
- static void write_boot_rom(DriveInfo *dinfo, hwaddr addr, size_t rom_size,
-@@ -270,6 +322,19 @@ static void aspeed_machine_init(MachineState *machine)
-         }
-     }
- 
-+    if (machine->kernel_filename) {
-+        /* With no u-boot we must set up a boot stub for the secondary CPU */
-+        MemoryRegion *smpboot = g_new(MemoryRegion, 1);
-+        memory_region_init_ram(smpboot, OBJECT(bmc), "aspeed.smpboot",
-+                               0x80, &error_abort);
-+        memory_region_add_subregion(get_system_memory(),
-+                                    AST_SMP_MAILBOX_BASE, smpboot);
-+
-+        aspeed_board_binfo.write_secondary_boot = aspeed_write_smpboot;
-+        aspeed_board_binfo.secondary_cpu_reset_hook = aspeed_reset_secondary;
-+        aspeed_board_binfo.smp_loader_start = AST_SMP_MBOX_CODE;
-+    }
-+
-     aspeed_board_binfo.ram_size = ram_size;
-     aspeed_board_binfo.loader_start = sc->memmap[ASPEED_SDRAM];
-     aspeed_board_binfo.nb_cpus = bmc->soc.num_cpus;
 -- 
-2.25.1
-
+Best regards,
+Vladimir
 
