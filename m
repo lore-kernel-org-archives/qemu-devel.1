@@ -2,65 +2,81 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 078FCC2BA16
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:30:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA0DC2BABC
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:30:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD379206F5
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:30:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD379206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5C08B206F5
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 07:30:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YpXfIyxd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C08B206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLigX-00083z-VL
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 03:30:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42252)
+	id 1jLigp-0008Vk-IE
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 03:30:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41840)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jingqi.liu@intel.com>) id 1jLifg-0007MO-Go
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:29:21 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jLicF-0005TO-N9
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jingqi.liu@intel.com>) id 1jLife-0001E2-Hp
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:29:19 -0400
-Received: from mga09.intel.com ([134.134.136.24]:32209)
+ (envelope-from <cohuck@redhat.com>) id 1jLicE-0003l4-7y
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:25:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44090
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
- id 1jLife-00015I-8i
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:29:18 -0400
-IronPort-SDR: uKbjD2jv3M55ufV7RB1RFHYwvy5ya3IiuJm9lACVupyR4enLnDbBQCkIDDzikB+TWHaJHOWmTu
- rZolfJphyhZQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 07 Apr 2020 00:29:08 -0700
-IronPort-SDR: W8FfYhXnqa/n2PuMdGAn3tZJHQprFAQ+h8su7EvhzYMP+xaLcStqy1+xLoqfUdVM5Wb/nk59CH
- skYKZLdB0ceQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,353,1580803200"; d="scan'208";a="452346554"
-Received: from unknown (HELO [10.238.4.245]) ([10.238.4.245])
- by fmsmga006.fm.intel.com with ESMTP; 07 Apr 2020 00:29:06 -0700
-Subject: Re: [PATCH] exec: fetch the alignment of Linux devdax pmem character
- device nodes
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
-References: <20200401031314.11592-1-jingqi.liu@intel.com>
-From: "Liu, Jingqi" <jingqi.liu@intel.com>
-Message-ID: <2c45ec7c-f3ea-2962-47a6-9330f0a2f146@intel.com>
-Date: Tue, 7 Apr 2020 15:29:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jLicE-0003jT-4Q
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 03:25:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586244345;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cFLoFf2Zz2S4HXM+15Zcf1ZXm7YCuHDUwF3z0XzR934=;
+ b=YpXfIyxdABo7Y1XE/1RxS6z8zgtyuV+aoTBt28DrPLQumDRAV/9yv7NSQU+JlKP/TQyYoV
+ l+M7ycI52obacHtqw6FLCdRsJ8xQybWP0ATvHX7DPRnpfZ8ko6P5ts6ReRP9AnUrhXb6eR
+ U+ygs8k9FHixGaAhoro8j7VABd3RbU8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-513-iH-BjwjGPri-lzxGtNRvwQ-1; Tue, 07 Apr 2020 03:25:42 -0400
+X-MC-Unique: iH-BjwjGPri-lzxGtNRvwQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 355EA107B7D4;
+ Tue,  7 Apr 2020 07:25:41 +0000 (UTC)
+Received: from gondolin (ovpn-112-38.ams2.redhat.com [10.36.112.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 295255C64E;
+ Tue,  7 Apr 2020 07:25:36 +0000 (UTC)
+Date: Tue, 7 Apr 2020 09:25:34 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 5/8] pc-bios: s390x: Move panic() into header and add
+ infinite loop
+Message-ID: <20200407092534.2edb0276.cohuck@redhat.com>
+In-Reply-To: <20200324150847.10476-6-frankja@linux.ibm.com>
+References: <20200324150847.10476-1-frankja@linux.ibm.com>
+ <20200324150847.10476-6-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200401031314.11592-1-jingqi.liu@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.24
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,112 +88,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Williams, Dan J" <dan.j.williams@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping.
+On Tue, 24 Mar 2020 11:08:44 -0400
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Any comments are appreciated.
+> panic() was defined for the ccw and net bios, i.e. twice, so it's
+> cleaner to rather put it into the header.
 
-Hi Paolo, Richard,
+They were also slightly different, so unifying them makes sense.
 
-Any comments about this ?
-
-
-Thanks,
-
-Jingqi
-
-On 4/1/2020 11:13 AM, Liu, Jingqi wrote:
-> If the backend file is devdax pmem character device, the alignment
-> specified by the option 'align=NUM' in the '-object memory-backend-file'
-> needs to match the alignment requirement of the devdax pmem character device.
->
-> This patch fetches the devdax pmem file 'align', so that we can compare
-> it with the NUM of 'align=NUM'.
-> The NUM needs to be larger than or equal to the devdax pmem file 'align'.
->
-> It also fixes the problem that mmap() returns failure in qemu_ram_mmap()
-> when the NUM of 'align=NUM' is less than the devdax pmem file 'align'.
->
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+> 
+> Also let's add an infinite loop into the assembly of disabled_wait() so
+> the caller doesn't need to take care of it.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->   exec.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
->   1 file changed, 45 insertions(+), 1 deletion(-)
->
-> diff --git a/exec.c b/exec.c
-> index de9d949902..8221abffec 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1736,6 +1736,42 @@ static int64_t get_file_size(int fd)
->       return size;
->   }
->   
-> +static int64_t get_file_align(int fd)
+>  pc-bios/s390-ccw/main.c     | 7 -------
+>  pc-bios/s390-ccw/netmain.c  | 8 --------
+>  pc-bios/s390-ccw/s390-ccw.h | 7 ++++++-
+>  pc-bios/s390-ccw/start.S    | 5 +++--
+>  4 files changed, 9 insertions(+), 18 deletions(-)
+> 
+
+> @@ -91,6 +90,12 @@ bool menu_is_enabled_enum(void);
+>  
+>  #define MAX_BOOT_ENTRIES  31
+>  
+> +static inline void panic(const char *string)
 > +{
-> +    int64_t align = -1;
-> +#if defined(__linux__)
-> +    struct stat st;
-> +
-> +    if (fstat(fd, &st) < 0) {
-> +        return -errno;
-> +    }
-> +
-> +    /* Special handling for devdax character devices */
-> +    if (S_ISCHR(st.st_mode)) {
-> +        g_autofree char *subsystem_path = NULL;
-> +        g_autofree char *subsystem = NULL;
-> +
-> +        subsystem_path = g_strdup_printf("/sys/dev/char/%d:%d/subsystem",
-> +                                         major(st.st_rdev), minor(st.st_rdev));
-> +        subsystem = g_file_read_link(subsystem_path, NULL);
-> +
-> +        if (subsystem && g_str_has_suffix(subsystem, "/dax")) {
-> +            g_autofree char *align_path = NULL;
-> +            g_autofree char *align_str = NULL;
-> +
-> +            align_path = g_strdup_printf("/sys/dev/char/%d:%d/device/align",
-> +                                    major(st.st_rdev), minor(st.st_rdev));
-> +
-> +            if (g_file_get_contents(align_path, &align_str, NULL, NULL)) {
-> +                return g_ascii_strtoll(align_str, NULL, 0);
-> +            }
-> +        }
-> +    }
-> +#endif /* defined(__linux__) */
-> +
-> +    return align;
+> +    sclp_print(string);
+> +    disabled_wait();
 > +}
 > +
->   static int file_ram_open(const char *path,
->                            const char *region_name,
->                            bool *created,
-> @@ -2275,7 +2311,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
->   {
->       RAMBlock *new_block;
->       Error *local_err = NULL;
-> -    int64_t file_size;
-> +    int64_t file_size, file_align;
->   
->       /* Just support these ram flags by now. */
->       assert((ram_flags & ~(RAM_SHARED | RAM_PMEM)) == 0);
-> @@ -2311,6 +2347,14 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
->           return NULL;
->       }
->   
-> +    file_align = get_file_align(fd);
-> +    if (file_align > 0 && mr && file_align > mr->align) {
-> +        error_setg(errp, "backing store align 0x%" PRIx64
-> +                   " is larger than 'align' option 0x" RAM_ADDR_FMT,
-> +                   file_align, mr->align);
-> +        return NULL;
-> +    }
-> +
->       new_block = g_malloc0(sizeof(*new_block));
->       new_block->mr = mr;
->       new_block->used_length = size;
+>  static inline void fill_hex(char *out, unsigned char val)
+>  {
+>      const char hex[] = "0123456789abcdef";
+> diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
+> index aa8fceb19da2164a..35be141d8da38d07 100644
+> --- a/pc-bios/s390-ccw/start.S
+> +++ b/pc-bios/s390-ccw/start.S
+> @@ -47,8 +47,9 @@ memsetxc:
+>   */
+>  	.globl disabled_wait
+>  disabled_wait:
+> -        larl %r1,disabled_wait_psw
+> -        lpswe   0(%r1)
+> +        larl	%r1,disabled_wait_psw
+> +        lpswe	0(%r1)
+> +1:	j	1b
+>  
+>  
+>  /*
+
+Possibly dumb question: Does checking code now figure out correctly
+that code flow does not continue after disabled_wait()?
+
 
