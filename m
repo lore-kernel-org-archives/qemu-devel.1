@@ -2,107 +2,106 @@ Return-Path: <SRS0=U3m5=5X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F722C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:05:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 156BCC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:10:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53DFB20771
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:05:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3FDD20719
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:10:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GjaRq7kE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53DFB20771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="WvQoQIlx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3FDD20719
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLl7G-0007z6-Ht
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 06:05:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39719)
+	id 1jLlBd-0001B8-2q
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 06:10:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40801)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jLl5t-0006lK-Gw
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:04:34 -0400
+ (envelope-from <dirty@apple.com>) id 1jLlAt-0000ij-Vo
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:09:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jLl5r-0006rX-A4
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:04:32 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39703
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jLl5r-0006pk-4M
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:04:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586253869;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=9jR2JvXNCKYIiMyqnMXRmojizuVOCspRY6x0P5x1kPY=;
- b=GjaRq7kE31GXeGGTMuo5e4+f2PgGy64ExMTuQ+DGk1Q/lD9jH68KIHNfWGHVxoKKiOwxpj
- q+OgM3EwO81ZhMM2FCAHmqCvz7xOJWALXgG5ppUWDBlTmGl54NEj9Sx9hHxMcnSt0nTJNy
- aQqGiIqlUOnwBkEExOsYuQkrxJdjHwc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-7Op43mIPPYew7D4NDKubtg-1; Tue, 07 Apr 2020 06:04:26 -0400
-X-MC-Unique: 7Op43mIPPYew7D4NDKubtg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0E73107ACC9;
- Tue,  7 Apr 2020 10:04:25 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-84.ams2.redhat.com
- [10.36.114.84])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 14F4F5E000;
- Tue,  7 Apr 2020 10:04:19 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 v2 2/3] block: Increase BB.in_flight for coroutine
- interfaces
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200406171403.6761-1-kwolf@redhat.com>
- <20200406171403.6761-3-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <5c5ee71e-f2d7-201d-73d1-2ee9a68b042a@redhat.com>
-Date: Tue, 7 Apr 2020 12:04:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200406171403.6761-3-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="z2DbYfHiarufDTS7JlYrNFJknEBZ5F25g"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+ (envelope-from <dirty@apple.com>) id 1jLlAs-00039x-V2
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:09:43 -0400
+Received: from ma1-aaemail-dr-lapp02.apple.com ([17.171.2.68]:58390)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dirty@apple.com>) id 1jLlAs-00039c-PG
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:09:42 -0400
+Received: from pps.filterd (ma1-aaemail-dr-lapp02.apple.com [127.0.0.1])
+ by ma1-aaemail-dr-lapp02.apple.com (8.16.0.27/8.16.0.27) with SMTP id
+ 037A6obf049702; Tue, 7 Apr 2020 03:09:33 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
+ h=sender : content-type
+ : mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to; s=20180706;
+ bh=C/Tx4rpY5TqnGN0KGIcGwW3BP1HdAZKJC9VWdA/5iUM=;
+ b=WvQoQIlxh09kn4WdYL2M9aa1xKVdaTnho2Pc8jFPlG/90NBcFYIcrmWCOadtUEdYlVu3
+ g97DLS5FgyU+W3HzRn2sbhuhHgIqIKtxJx9i/+o46qMkQsUZcJMSMFqw7BydKmeo8aNQ
+ FD9px7MzDZp6RBR0HNmTG4FqRhAXGduCBIi4kAco0x8gDDDSzPhH60TfzwxuKAinhxwy
+ IC6RDSpUICPY550MWstq5BIasqVvEGnlIZ8hfE10slxVOgdrHNc1JnfxKmo8MyzPRnZB
+ 4iFWKsnDCkD27DqFTSOINAT28FsQ69LRZiRvsnjSziM+sm2SgHOTX6ffqDBFyRjZnL6M Mg== 
+Received: from rn-mailsvcp-mta-lapp04.rno.apple.com
+ (rn-mailsvcp-mta-lapp04.rno.apple.com [10.225.203.152])
+ by ma1-aaemail-dr-lapp02.apple.com with ESMTP id 306pwtqqeg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
+ Tue, 07 Apr 2020 03:09:33 -0700
+Received: from rn-mailsvcp-mmp-lapp02.rno.apple.com
+ (rn-mailsvcp-mmp-lapp02.rno.apple.com [17.179.253.15])
+ by rn-mailsvcp-mta-lapp04.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020)) with ESMTPS id <0Q8E00NBCXJWO590@rn-mailsvcp-mta-lapp04.rno.apple.com>; 
+ Tue, 07 Apr 2020 03:09:32 -0700 (PDT)
+Received: from process_milters-daemon.rn-mailsvcp-mmp-lapp02.rno.apple.com by
+ rn-mailsvcp-mmp-lapp02.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020)) id <0Q8E00M00X4KSE00@rn-mailsvcp-mmp-lapp02.rno.apple.com>; Tue,
+ 07 Apr 2020 03:09:32 -0700 (PDT)
+X-Va-A: 
+X-Va-T-CD: 19bf591f1631dacef6cd419e595ed10e
+X-Va-E-CD: 525671786f253ed03682d9bd52b2ca38
+X-Va-R-CD: 232d18ad9ecc4440b29bb0e6a41132a7
+X-Va-CD: 0
+X-Va-ID: f90db92c-8ac8-41ce-ba2f-7bbeef330aef
+X-V-A: 
+X-V-T-CD: 19bf591f1631dacef6cd419e595ed10e
+X-V-E-CD: 525671786f253ed03682d9bd52b2ca38
+X-V-R-CD: 232d18ad9ecc4440b29bb0e6a41132a7
+X-V-CD: 0
+X-V-ID: c2619292-488c-48f7-9f72-129d0b835bdb
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-07_02:2020-04-07,
+ 2020-04-07 signatures=0
+Received: from [17.234.106.165] (unknown [17.234.106.165])
+ by rn-mailsvcp-mmp-lapp02.rno.apple.com
+ (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
+ 2020))
+ with ESMTPSA id <0Q8E00EMTXJWCA90@rn-mailsvcp-mmp-lapp02.rno.apple.com>; Tue,
+ 07 Apr 2020 03:09:32 -0700 (PDT)
+Content-type: text/plain; charset=utf-8
+MIME-version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH v1] nrf51: Fix last GPIO CNF address
+In-reply-to: <6aac0d31-d0a4-d103-e3b5-89feef27c018@redhat.com>
+Date: Tue, 07 Apr 2020 03:09:31 -0700
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, kraxel@redhat.com,
+ joel@jms.id.au, clg@kaod.org
+Content-transfer-encoding: quoted-printable
+Message-id: <BFA58F3C-CA4F-4ADF-854F-2658134D3888@apple.com>
+References: <0b02fe788de99120894f87f6d5c60e15d6a75d85.1586213450.git.dirty@apple.com>
+ <6aac0d31-d0a4-d103-e3b5-89feef27c018@redhat.com>
+To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-07_02:2020-04-07,
+ 2020-04-07 signatures=0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 17.171.2.68
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,61 +113,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, s.reiter@proxmox.com, qemu-devel@nongnu.org,
- t.lamprecht@proxmox.com, stefanha@redhat.com, dietmar@proxmox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Cameron Esfahani <dirty@apple.com>
+From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---z2DbYfHiarufDTS7JlYrNFJknEBZ5F25g
-Content-Type: multipart/mixed; boundary="sZ4UUrRMWDPNdjvD8dihVciL438DENSYu"
+I'm not burying anything.  This patch is stand alone and all the tests =
+do work.  They work with or without Cedric's nee Andrew's patch.  But, =
+if some derivative of that patch is eventually implemented, something =
+needs to be done for this NRF51 gpio qtest to work.
 
---sZ4UUrRMWDPNdjvD8dihVciL438DENSYu
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+There are two possibilities for the following qtest in microbit-test.c:
 
-On 06.04.20 19:14, Kevin Wolf wrote:
-> External callers of blk_co_*() don't currently increase the
-> BlockBackend.in_flight counter, but calls from blk_aio_*() do, so there
-> is an inconsistency whether the counter has been increased or not.
+>     actual =3D qtest_readl(qts, NRF51_GPIO_BASE + =
+NRF51_GPIO_REG_CNF_END) & 0x01;
+>     g_assert_cmpuint(actual, =3D=3D, 0x01);
+
+
+1 - The code is purposefully reading 32-bits from an unaligned address =
+which only partially refers to a documented register.  And the only =
+reason this code works is because that 32-bit value is turned into a =
+8-bit read.  And if that's the case, then someone should update a =
+comment in the test to indicate that this is being done purposefully.
+2 - NRF51_GPIO_REG_CNF_END is incorrectly set to be 0x77F.  Looking at =
+the documentation for this chip, the last defined CNF register starts at =
+0x77C.
+
+The NRF51 doesn't support unaligned accesses, so I assume that =
+possibility 1 isn't true.
+
+So, is NRF51_GPIO_REG_CNF_END supposed to refer to a valid register, or =
+the end of the implementation space?
+
+If it's the former, then it should be adjusted to 0x77c and possibly =
+update the below code in nrf51_gpio.c (line 156):
+
+>     case NRF51_GPIO_REG_CNF_START ... NRF51_GPIO_REG_CNF_END:
+
+
+to become
+
+>     case NRF51_GPIO_REG_CNF_START ... NRF51_GPIO_REG_CNF_END + 3:
+
+if unaligned access are expected to work.  But, considering the NRF51 =
+doesn't support unaligned accesses, I don't think this appropriate.
+
+If it's the latter, then the test cases in microbit-test.c should be =
+updated to something like the following:
+
+>     actual =3D qtest_readl(qts, NRF51_GPIO_BASE + =
+NRF51_GPIO_REG_CNF_END - 3) & 0x01;
+>     g_assert_cmpuint(actual, =3D=3D, 0x01);
+
+
+Cameron Esfahani
+dirty@apple.com
+
+"Americans are very skilled at creating a custom meaning from something =
+that's mass-produced."
+
+Ann Powers
+
+
+> On Apr 7, 2020, at 1:44 AM, Philippe Mathieu-Daud=C3=A9 =
+<philmd@redhat.com> wrote:
 >=20
-> This patch moves the actual operations to static functions that can
-> later know they will always be called with in_flight increased exactly
-> once, even for external callers using the blk_co_*() coroutine
-> interfaces.
+>> Considering NRF51 doesn't support unaligned accesses, the simplest =
+fix
+>> is to actually set NRF51_GPIO_REG_CNF_END to the start of the last =
+valid
+>> CNF register: 0x77c.
 >=20
-> If the public blk_co_*() interface is unused, remove it.
+> NAck. You are burying bugs deeper. This test has to work.
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  include/sysemu/block-backend.h |  1 -
->  block/block-backend.c          | 94 +++++++++++++++++++++++++++-------
->  2 files changed, 76 insertions(+), 19 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---sZ4UUrRMWDPNdjvD8dihVciL438DENSYu--
-
---z2DbYfHiarufDTS7JlYrNFJknEBZ5F25g
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6MUCIACgkQ9AfbAGHV
-z0AWBQgAs1DmSFpq2vk9Oi7MtS2Is/mGBiMEL7yt304+LzM4jHUZtU2KyzJwsrJG
-ZqYM5qNjfzmU5WYjDmXC4xzTtkNSPSOQTJjJPxPL6MjBCy25k4y4/LmgxGLC8FDe
-5TOvNbKwPBQSUw6xVlGCE99NM+6ee/WXV7k2Pd+OYc9ZWGP4KRJGmZ8F3TERlcba
-oKZJHTMjSYMECmJcbgknB1ftTIKVP4kjMvR/O9etWTjpXX6vpGyqOj0fMg30AkgC
-8pnrFYJ66o0eMz6PXyOO8f6wxFqZAmCN1BJmlBwDrPcKTwe9v4v9vpsxI+eb4OsC
-3NQ/Sc8k8Xd1XCZwLHV9sbXhbhL3Fg==
-=XDrS
------END PGP SIGNATURE-----
-
---z2DbYfHiarufDTS7JlYrNFJknEBZ5F25g--
+> What would be helpful is qtests with unaligned accesses (expected to =
+work) such your USB XHCI VERSION example.
 
 
