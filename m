@@ -4,80 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB7AFC2BB85
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 17:23:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E263AC2BA1A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 17:23:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAA45206C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 17:23:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1E31206C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 17:23:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iA3gP3RC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAA45206C0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MPLN4UY1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1E31206C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLrwF-0001hf-Pw
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 13:23:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59152)
+	id 1jLrwo-0002eF-Sa
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 13:23:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59220)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wrampazz@redhat.com>) id 1jLrvc-00018t-Ph
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 13:22:25 -0400
+ (envelope-from <wrampazz@redhat.com>) id 1jLrvy-0001Wv-Fa
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 13:22:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wrampazz@redhat.com>) id 1jLrvY-0001Fq-H0
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 13:22:24 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30222
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <wrampazz@redhat.com>) id 1jLrvx-0001e0-G7
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 13:22:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28389
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wrampazz@redhat.com>) id 1jLrvY-0001FM-Db
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 13:22:20 -0400
+ (Exim 4.71) (envelope-from <wrampazz@redhat.com>) id 1jLrvx-0001di-Ch
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 13:22:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586280139;
+ s=mimecast20190719; t=1586280164;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+QHFISUFMZioHvbAh2EkJvxAWXgMmM/5OfSPbNFz+os=;
- b=iA3gP3RCTphuHigBcfdz+jwJJ4VnOcIsbVRK+LPesAb3cY4ZgFE7CNEedSoVTIxp08VyIF
- xChisB0BWdaioqfQ07KBN9Yl3xgXJoRlGCh/H6qnnsm9HA9mfxSLWiEwfKo63FqJy+lwnO
- qg7ecQRzW58X/B14aPGTFqz1GCrFbGI=
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
- [209.85.222.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-yEuHGIgQPZeqkqAsDgqovg-1; Tue, 07 Apr 2020 13:22:17 -0400
-X-MC-Unique: yEuHGIgQPZeqkqAsDgqovg-1
-Received: by mail-ua1-f70.google.com with SMTP id 42so1510087uar.1
- for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 10:22:17 -0700 (PDT)
+ bh=cv7xA6w6QvGJ3nuzCWRu3TQuvdHUeqDsWDaXLeu5O7E=;
+ b=MPLN4UY1CsOYgo/VyXsw8hwhQoP7uHY2oyg9CIet5ygwRZUJE30CyZOE7gvXgES5Nux5Lv
+ UX0+TVpdTZYAQ7xiqq+Jm1GLuOfgM2h4qeH0u+gpvbLa7sQdNibat96ZwtuU/ttI5yipD2
+ 6PsoZHzHomFa2uG4vZcfySwwagrm3EQ=
+Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
+ [209.85.222.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-221-gmNZhwswMkyko7qIVPJo8w-1; Tue, 07 Apr 2020 13:22:43 -0400
+X-MC-Unique: gmNZhwswMkyko7qIVPJo8w-1
+Received: by mail-ua1-f72.google.com with SMTP id 77so1488127uaj.8
+ for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 10:22:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=BCwXd7FZr0OvckV+dnQE4FNqK7NKIbAioaAtM6VT0dY=;
- b=K88lHGgjimd1EwStP1Vel3poJHQugOJ+41xmocOlmSR+ZfYkv8j8v9ixelwa1/F6zp
- qlu7o0h+LwNcsh6Urh4zD8X5I3yYlo0gqKB3aU8bC1QRue33AulCFC+gHaKc8UTI8RFI
- zJO7eBLVI1pO5yDaC1L4fzCaVoTuvU+VDww6BvKH1DHr1VA5yWUNZVHskvx0FrbTjsOk
- +ZBtrkc01UpieTPF5XV2ro1Q1pJVwtUIAXb70tSn/Tqb+dqhCPWnFALVUyluHzNhImXq
- nfvWrihmw9jOoqCTWMWvbylGAcyEU4GGHHgpkKMbA47LVmq5+FRd7dOjCPJXAFnnfuJ0
- mfJw==
-X-Gm-Message-State: AGi0PuZpFcuZxEtBvX77ITb/qG+rR5lQuEiNZSAFemPmi0d+McgrzZ2R
- mQ17Qvm46nQHDKGvSTYK2ixqTSsEtOJCxtNDxOZzt1hxMPY2VA9GmhxC85diN15pIn7MRtW+rVd
- ay/sakq9SmGc5uhocW/Xp9pxWfNc/cWk=
-X-Received: by 2002:a1f:eb04:: with SMTP id j4mr2412726vkh.16.1586280137110;
- Tue, 07 Apr 2020 10:22:17 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIUdeIv/VHxlOBjv5xlUGloJ6Vi5nb9pN33BZK9U2Zfa1mRCuDVI9DoltSwVcBxIP0zdBuQ55QzcicGw2Z1wJU=
-X-Received: by 2002:a1f:eb04:: with SMTP id j4mr2412698vkh.16.1586280136697;
- Tue, 07 Apr 2020 10:22:16 -0700 (PDT)
+ bh=Awh6ULP1pIjgeUsRq1bmrb4LNEYLj6ZkdZkk97RR0hA=;
+ b=jmYXzQSv1tzTc0giR9wbFqc5T3VqvTtdNK3MZCMaz1l0YezeAwYMlldHQrf1H4VW4E
+ s0HFo4TOO9cqrrA+j+P3WWXuQ/iF9QDpsmswGSvqH5KwqQgZP5pvSpwRhOfenb71r6NO
+ s8mUNSx3prSsKeDb2QxkX5WBEuXhRcxSdjN8X+KKpXsfHBs7tQ4KOl95xGwmcSl3Uu+4
+ dMX6a0xsC08KzD8+Sm6eoHD5QJ2I7X1yLRMGhKFPadesYz6cgf0cMn/EB9evjJ1wdLcf
+ 61KliyO+MUSnn+MfoS4H0bXvrpHYUt4iQZck87yQf0Bfdtg+teu89q2xB3gMF6McqPJU
+ GriQ==
+X-Gm-Message-State: AGi0Pub5sKtu/y5LuvMqbhUmGk/SYdBIyMAtLDMlV7AVEP4/VOxSagFA
+ v8ggtolWaQyRJSP5u8umINK8ECDpV9IcmCWH4OhNhO6cFQjRyehJfLwG99Py1DX2aWZv4yyrgdb
+ /HvbpFIiKrSnToWuufvMyzbEMZ81P5a8=
+X-Received: by 2002:a1f:4312:: with SMTP id q18mr2285860vka.27.1586280162574; 
+ Tue, 07 Apr 2020 10:22:42 -0700 (PDT)
+X-Google-Smtp-Source: APiQypK2oB32nn06K6NBA6ItNG/NsSbLyi+oXyT1Wl/SNPzhIXE599yXDBvlkEIADKdmdKYulHs/bcrPJ8KFjGr7IiU=
+X-Received: by 2002:a1f:4312:: with SMTP id q18mr2285855vka.27.1586280162302; 
+ Tue, 07 Apr 2020 10:22:42 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200407155642.10716-1-ovoshcha@redhat.com>
- <20200407155642.10716-3-ovoshcha@redhat.com>
-In-Reply-To: <20200407155642.10716-3-ovoshcha@redhat.com>
+ <20200407155642.10716-4-ovoshcha@redhat.com>
+In-Reply-To: <20200407155642.10716-4-ovoshcha@redhat.com>
 From: Willian Rampazzo <wrampazz@redhat.com>
-Date: Tue, 7 Apr 2020 14:22:05 -0300
-Message-ID: <CAKJDGDZ+1GF4SQoGRXFqzi_+Bd=rfbPeXfhxiM35NY2xOHtCQQ@mail.gmail.com>
-Subject: Re: [PATCH v5 2/3] Acceptance test: provides new functions
+Date: Tue, 7 Apr 2020 14:22:31 -0300
+Message-ID: <CAKJDGDb3cg2svLA2ayw9oLmr8iA0Q9xPdEYVeG2DhToDgmn_kA@mail.gmail.com>
+Subject: Re: [PATCH v5 3/3] Acceptance test: provides to use RDMA transport
+ for migration test
 To: Oksana Vohchana <ovoshcha@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -85,7 +87,7 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,78 +108,36 @@ Sender: "Qemu-devel"
 
 On Tue, Apr 7, 2020 at 1:07 PM Oksana Vohchana <ovoshcha@redhat.com> wrote:
 >
-> Provides new functions related to the rdma migration test
-> Adds functions to check if service RDMA is enabled and gets
-> the ip address on the interface where it was configured
+> Adds test for RDMA migration check
 >
 > Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
 > ---
->  tests/acceptance/migration.py | 45 +++++++++++++++++++++++++++++++++++
->  1 file changed, 45 insertions(+)
+>  tests/acceptance/migration.py | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 >
 > diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.p=
 y
-> index e4c39b85a1..1c3a684395 100644
+> index 1c3a684395..99563ae850 100644
 > --- a/tests/acceptance/migration.py
 > +++ b/tests/acceptance/migration.py
-> @@ -11,12 +11,57 @@
->
->
->  import tempfile
-> +import json
->  from avocado_qemu import Test
->  from avocado import skipUnless
->
->  from avocado.utils import network
->  from avocado.utils import wait
->  from avocado.utils.path import find_command
-> +from avocado.utils.network.interfaces import NetworkInterface
-> +from avocado.utils.network.hosts import LocalHost
-> +from avocado.utils import service
-> +from avocado.utils import process
+> @@ -120,3 +120,15 @@ class Migration(Test):
+>          """
+>          free_port =3D self._get_free_port()
+>          dest_uri =3D 'exec:nc -l localhost %u' % free_port
 > +
-> +
-> +def get_rdma_status():
-> +    """Verify the status of RDMA service.
-> +
-> +    return: True if rdma service is enabled, False otherwise.
-> +    """
-> +    rdma_stat =3D service.ServiceManager()
-> +    return bool(rdma_stat.status('rdma'))
-> +
-> +def get_interface_rdma():
-> +    """Get the interface name where RDMA is configured.
-> +
-> +    return: The interface name or False if none is found
-> +    """
-> +    cmd =3D 'rdma link show -j'
-> +    out =3D json.loads(process.getoutput(cmd))
-> +    try:
-> +        for i in out:
-> +            if i['state'] =3D=3D 'ACTIVE':
-> +                return i['netdev']
-> +    except KeyError:
-> +        pass
-> +    return False
-> +
-> +def get_ip_rdma(interface):
-> +    """Get the IP address on a specific interface.
-> +
-> +    :param interface: Network interface name
-> +    :return: IP addresses as a list, otherwise will return False
-> +    """
-> +    local =3D LocalHost()
-> +    network_in =3D NetworkInterface(interface, local)
-> +    try:
-> +        ip =3D network_in.get_ipaddrs()
+> +    @skipUnless(get_rdma_status(), 'RDMA service is disabled or not inst=
+alled')
+> +    @skipUnless(get_interface_rdma(), 'RDMA interface not configured')
+> +    def test_migration_with_rdma_localhost(self):
+> +        iface =3D get_interface_rdma()
+> +        ip =3D get_ip_rdma(iface)
 > +        if ip:
-> +            return ip
-> +    except:
-> +        pass
-> +    return False
->
->
->  class Migration(Test):
+> +            free_port =3D self._get_free_port(address=3Dip[0])
+> +        else:
+> +            self.cancel("Ip address doesn't configured properly on inter=
+face:%s" % iface)
+> +        dest_uri =3D 'rdma:%s:%u' % (ip, free_port)
+> +        self.do_migrate(dest_uri)
 > --
 > 2.21.1
 >
