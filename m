@@ -6,64 +6,65 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB54C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 215FAC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:16:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5718420719
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:13:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC94220731
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Apr 2020 10:16:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dcSXKKVg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5718420719
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WEqktJd1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC94220731
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jLlEC-0002aX-Ik
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 06:13:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41186)
+	id 1jLlHO-0004cc-3i
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 06:16:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41551)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jLlDX-00024g-2H
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:12:28 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jLlGR-0003kH-BX
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:15:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jLlDW-0004s1-4W
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:12:27 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58671
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1jLlGQ-0007PU-1F
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:15:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26081
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jLlDW-0004rP-15
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:12:26 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jLlGP-0007Ow-T7
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 06:15:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586254345;
+ s=mimecast20190719; t=1586254525;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=jpLqhR8mHG+/5zyroAiolBMKF96sybM3c7otLvkcIV0=;
- b=dcSXKKVgEhHJHZrYuqZEnvLOS9l86geXT+owwa+QcgZ2NiflU7C1jAzf6ahcE2Uq83I5H0
- Qo8b7gQQzmfn4F2S+3DOBU05GFGt12mJRZnDW5YLnDeoOD+ETan2GEuyeCxoRt1849EyJC
- pZuEMbpeUhroyLNb5lcSFSri3A78agc=
+ bh=t/DMFbdJUjosRTJgmS5SD+uacsbh02zfxeP3baWc93A=;
+ b=WEqktJd1Y/20jBprkqUPvKBVthJK1C1KRIHfNVJFsidg7Rt+T074mcd0Z7gH5c6pqWvSU+
+ DkPDZQmGe3gtMv/N+L/ZsvMdG1IHMCB5f2hu5gOJnrt3PQF2vx6vn0GT0RUPgurE/Bv0eN
+ OsQFhlYGpB0IcJBDviv2KEk1Ka0vJ4k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-vC5A1XMFOvi5Sa-L7BAopQ-1; Tue, 07 Apr 2020 06:12:20 -0400
-X-MC-Unique: vC5A1XMFOvi5Sa-L7BAopQ-1
+ us-mta-211-HlenrhgVOXKGTJXQEW3FIg-1; Tue, 07 Apr 2020 06:15:20 -0400
+X-MC-Unique: HlenrhgVOXKGTJXQEW3FIg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F29A21005509;
- Tue,  7 Apr 2020 10:12:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DF1E800D4E;
+ Tue,  7 Apr 2020 10:15:19 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-114-84.ams2.redhat.com
  [10.36.114.84])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E3F14119583;
- Tue,  7 Apr 2020 10:12:13 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 v2 3/3] block: Fix blk->in_flight during
- blk_wait_while_drained()
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 288BE119583;
+ Tue,  7 Apr 2020 10:15:13 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 v2 2/3] block: Increase BB.in_flight for coroutine
+ interfaces
+From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 References: <20200406171403.6761-1-kwolf@redhat.com>
- <20200406171403.6761-4-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
+ <20200406171403.6761-3-kwolf@redhat.com>
+ <5c5ee71e-f2d7-201d-73d1-2ee9a68b042a@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
  /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
@@ -88,20 +89,21 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <b96851fa-0fcb-d2d2-ef7d-0ab69933eee3@redhat.com>
-Date: Tue, 7 Apr 2020 12:12:11 +0200
+Message-ID: <eead4e39-0784-1550-f245-ebe98e73f17e@redhat.com>
+Date: Tue, 7 Apr 2020 12:15:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200406171403.6761-4-kwolf@redhat.com>
+In-Reply-To: <5c5ee71e-f2d7-201d-73d1-2ee9a68b042a@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="xQs6bSLl2sh9m2EAPlzbOvsFSYfJTZD7C"
+ boundary="nOLRaxHFMgINuHH4Z9bU9dFaum4ZlG5iv"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,51 +122,66 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xQs6bSLl2sh9m2EAPlzbOvsFSYfJTZD7C
-Content-Type: multipart/mixed; boundary="MGRDRYf9LS5qWrv7IQLApRRp3OgvF2Yqg"
+--nOLRaxHFMgINuHH4Z9bU9dFaum4ZlG5iv
+Content-Type: multipart/mixed; boundary="moxcqbmdM4kmuOswuFmwTKe825u4pR8Sc"
 
---MGRDRYf9LS5qWrv7IQLApRRp3OgvF2Yqg
+--moxcqbmdM4kmuOswuFmwTKe825u4pR8Sc
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 06.04.20 19:14, Kevin Wolf wrote:
-> Waiting in blk_wait_while_drained() while blk->in_flight is increased
-> for the current request is wrong because it will cause the drain
-> operation to deadlock.
+On 07.04.20 12:04, Max Reitz wrote:
+> On 06.04.20 19:14, Kevin Wolf wrote:
+>> External callers of blk_co_*() don't currently increase the
+>> BlockBackend.in_flight counter, but calls from blk_aio_*() do, so there
+>> is an inconsistency whether the counter has been increased or not.
+>>
+>> This patch moves the actual operations to static functions that can
+>> later know they will always be called with in_flight increased exactly
+>> once, even for external callers using the blk_co_*() coroutine
+>> interfaces.
+>>
+>> If the public blk_co_*() interface is unused, remove it.
+>>
+>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> ---
+>>  include/sysemu/block-backend.h |  1 -
+>>  block/block-backend.c          | 94 +++++++++++++++++++++++++++-------
+>>  2 files changed, 76 insertions(+), 19 deletions(-)
 >=20
-> This patch makes sure that blk_wait_while_drained() is called with
-> blk->in_flight increased exactly once for the current request, and that
-> it temporarily decreases the counter while it waits.
->=20
-> Fixes: cf3129323f900ef5ddbccbe86e4fa801e88c566e
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/block-backend.c | 17 +++++------------
->  1 file changed, 5 insertions(+), 12 deletions(-)
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+On second thought (I assumed this would be addressed by the third
+patch), blk_prw() no longer increments in_flight, but the blk_co_*
+functions do that now.  In v1, blk_prw() did that.
+
+I thought we=E2=80=99d want blk_prw() to set in_flight, just like blk_aio_p=
+rwv()
+does, and then let the synchronous functions that use blk_prw() pass the
+blk_do_* functions to it.
+
+Max
 
 
---MGRDRYf9LS5qWrv7IQLApRRp3OgvF2Yqg--
+--moxcqbmdM4kmuOswuFmwTKe825u4pR8Sc--
 
---xQs6bSLl2sh9m2EAPlzbOvsFSYfJTZD7C
+--nOLRaxHFMgINuHH4Z9bU9dFaum4ZlG5iv
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6MUfsACgkQ9AfbAGHV
-z0DK6wgAjx9AAGKiriIJYBfizsM9Xl6aetRPAZ/RdkzckYAQF1eu39iKzsU0whu2
-PP9trnswGrSlqkN+pmw6gpW4kTKq1GihtTHAzQ/v8qbccWJlmQvWbfam5BPkvjBW
-nuTX6XMmrjcfCymsJdXrpj8GM0iX904DmT4yp2WYqlxuipFf3f06q9OfgnU+CVwC
-Yodrxv9PEodAul1OfvdnLENj6TK22MTl8D/NqKlI1Yj41n8l0RU/V520DdKRS/Y8
-+b+d/d06c9U5Dj3pX40trD54WezMHkeyiDXJxnBqN2jcxp3KghQ5DaUY/cgFVXnc
-OiYYzPPnP7NSMiV3bFNw/1zvdAW0gg==
-=eJTT
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6MUrAACgkQ9AfbAGHV
+z0C3uwf/f1THa3bXMQO1Yji2lyAj5g6AIxEyg8mgLwQA2GJaA1q2fHzxfDCQ4Wei
+sJnhHUA22L+p4qxmVNDbvjzaI72+rCvrqdYkG2gAOP6arxm7+nWXtxp6SxwuKUMS
+xT3NklqTDyCrpT/JFmYZXhdlZ4ZnBYPHX7UGeD0guwdEW1UlwTUnAJGn5olkDd8i
+77YPromrR4DsdZVXUe0sRcVhMcvy4Tbpomj7tjI+wB4yl7ctN391f9QWPhfC6zju
+0vmQMfXYZabinVYVMu7RcuMGj5ptWiAmUO8Sq6cQacAo/m+mf//tf3zyhaDHpKCM
+Rmi7Ef9jvsPP4xHpFJ80tZW5JN69AA==
+=XOW0
 -----END PGP SIGNATURE-----
 
---xQs6bSLl2sh9m2EAPlzbOvsFSYfJTZD7C--
+--nOLRaxHFMgINuHH4Z9bU9dFaum4ZlG5iv--
 
 
