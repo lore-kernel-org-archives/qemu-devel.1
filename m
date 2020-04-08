@@ -2,85 +2,85 @@ Return-Path: <SRS0=OEAU=5Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16DC9C2D0F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 18:42:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43EDFC2D0F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 18:42:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2F902072F
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 18:42:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0AFE22072F
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 18:42:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="B1+Ng5ux"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2F902072F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="AID12IoX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AFE22072F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMFeb-0008Jr-Mx
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 14:42:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58060)
+	id 1jMFeq-0008MN-SP
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 14:42:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58101)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1jMFWh-0006eu-BL
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 14:34:16 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1jMFWl-0006fj-57
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 14:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lukasstraub2@web.de>) id 1jMFWg-0004Yk-Ee
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 14:34:15 -0400
-Received: from mout.web.de ([212.227.17.11]:46761)
+ (envelope-from <lukasstraub2@web.de>) id 1jMFWj-0004bM-EY
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 14:34:19 -0400
+Received: from mout.web.de ([212.227.15.14]:45147)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1jMFWg-0004XN-1J
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 14:34:14 -0400
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1jMFWi-0004a6-Tb
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 14:34:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1586370835;
- bh=Ok7tKtjZZkKFvWc5NnUyDQ4Xr69cRQd1e1Rf/HuBLN4=;
+ s=dbaedf251592; t=1586370838;
+ bh=RhytEYIToMDE5YHdnIg0FVpbU4nEuG0hSpwe6f7bLJU=;
  h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=B1+Ng5uxSFUmv9TQKe59ZQw7wMAeif7QVySz8Qk5lgdi/OuzsMQ39iUV8dUkXfMlS
- qN2TebgTZcHTMXOPa57u/lib5CFj8ojcUOJneKzSOLGRG/cpYgI2ZKkcu65H/dTKJm
- au3pl3oLW3b127PJMaL6f8F6V1gqWpI2zhiSeKJc=
+ b=AID12IoXhOz6+9wbx67GZ7YWliMxBfdzv5mHrgbxD1gpPWeqGC8X9o/d+Mu936ETq
+ jZVFnHieq7ePj8Xn89kQ871GFk39wfJJF6nd5T1lC9i+cwpyHpFf2i2HNFaORwHBPE
+ zCx/hQlUMR7i2H+HdltCHBtFKE3FrErmOc6MbXnk=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([88.130.61.62]) by smtp.web.de (mrweb103
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0MPHKO-1jQdEZ10wC-004VBS; Wed, 08
- Apr 2020 20:33:55 +0200
-Date: Wed, 8 Apr 2020 20:33:53 +0200
+Received: from luklap ([88.130.61.62]) by smtp.web.de (mrweb002
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0M6ml2-1j890k1HAi-00wV2b; Wed, 08
+ Apr 2020 20:33:58 +0200
+Date: Wed, 8 Apr 2020 20:33:57 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH 2/3] chardev/char.c: Use qemu_co_sleep_ns if in coroutine
-Message-ID: <f231c9abc706f5825e41c0fbaa4fc82de1121435.1586370737.git.lukasstraub2@web.de>
+Subject: [PATCH 3/3] net/colo-compare.c: Fix deadlock
+Message-ID: <87c2f42b46f93fb89867f82e45aa2689eff98432.1586370737.git.lukasstraub2@web.de>
 In-Reply-To: <cover.1586370737.git.lukasstraub2@web.de>
 References: <cover.1586370737.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/DuFjdNgzUpI/ZMtZtNsb/0T";
+Content-Type: multipart/signed; boundary="Sig_/L+2.h.Ec3Jq0qZHEGzP5U43";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:k1fw5k77W1NyeRTs3Wjdh2c+m6balKpYGf7d4/4vCZqFPea4tjl
- BVfTjA1Ncywgbt9jQcPTrx9yc2Ao5r85wGiirMnGgm2Ngvgp+b3J59IrUXdRELkWYlbwzeY
- IZsNmuECb3fybvWOu7Y7q5X8DYq3za/fYO0cYfTxsLgmUmrE/6UnDCRZP+JH4fzx0Bbxmm6
- 84mFVf8IDwPT1SWI7OEJg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:BT95PjSaaH4=:z8+hTZBDLXdQXzvWczBjN9
- YLLVsE5cQDTIWeRviWWwKIAUReIh+nj2FK/H6Y7nQOQDvnLVdPyzJBlr6gSg1dgCb25Srm5ub
- ESSles58iTVkMNY/uaXNa7QdmE8w445UMK6nLmL1ApytZ9OAdXGD79O16gYThPvBsnT1me+4f
- QnnSN/1PTaZfkAXLIaQGU8z0G8oG2AwfDSeDiprZmhNCqhLii1ddn+ZMmIlXPkBv11AcWQbSf
- xzEHoT/lr7NwOBDnuge5Lfr5cs4xqNi74UjGYAvIMAvLuGrQ+3HC/NNqXQRzlY0dtPyHgsr4m
- F+FxWvlUA3fEoZD7FiWZKH9fOMfBaMZyLBO/W1/dc1U4n4k9SFpf2WiGqv/YYQr+M6TGydKIr
- 5ccx2iX6u8w40roWYuIv/+9XIOeAUjzTlntNJeCfMTkSNV5mCEqO7nREfQ4xDKLJoF/6QJyRE
- Pg1yiY6DDCOLViB8sLwihfAcBBuz8VcLtH/vxF6lOQNIiWb8AtH5bkAB86BLSUxvfJaE4K/4g
- uwNKsUgAf2voX++A7yCah6kU5HfZ4S16/pxBSHOde2N4J/B8AjxdpkPuy3J6JQlWeYyN1lt0L
- papGKVVxU+kijHQrfrtw3eZc1xm2cqivZCGY9T3eYa77QG96OM+Qv4mrG8Q1SEiR9X2FWduGZ
- 1s6jGBPQYxDpcsNMyYD7RQE/Af8MvDwXrEzgDCuG+TdBEw3OwXCEG2nL2YCVlkUlnk8tJdfrD
- GZphpvJVHtVJ5NiarpR5V7J1ewB9jH4jSYOjDM+hehmVfzj2j/vEJlml3vEiYi/Gg+IEDD8kO
- sXGG47ZPAia2u3G90SHFTKnQNR0+a9g5znuAoJJPyKwV2HtmuYFyXvq0NwqlODSkg7jLnC90D
- 5iF8Bd/S+ytJQaHOhVMepmFnZjGQjFOiFUCwn0b/+khtncbmuyXQ+11qNW+oMfgqvfJ0w1Ysh
- yEWpWi7Ft1983+G5WRalf8iFpQoItmajGl1dwJrNkZHvAioAYWQ08M7MXMWwJba4+646176xK
- ZKh81YbaCpeS+Y4TVE9Z/cKE15QaD0Sjd7XgwxIFbXK5gnevH+hh1dansm+kdm5YFIhdDS7fB
- SmFXBwpXKfd6+H0uZ1jyDfhoUUgqda1PNKhB7ugDTqs7akWZR+rlNjG2i2qvdFauv2X3nuFvH
- 8Hh8KkTlufSupu6CZ7oyxUm83xJ0XOlSu+xRu4q3fZmx5EaMTKupaKJFXdMssX7vpCp07kKpd
- fV7HbzSUjwQZPPGmJ
+X-Provags-ID: V03:K1:6P0btB26cQR3S1W4ZnWoZmq2Q1A9azBS5IUKaWKmKtcj4u8oa6i
+ cboZDiG6i5kWVsTZnXUy46S3owUkD+RM+ydU9GfyOtStf9RuuIExC2ciDbOx1zg8vDyDamU
+ ehLUCpS76hdFsoLajMpX7XzH3gA2HAwGnXSKDiGz9ghcyFj4ymmGlalfbgQF3vsm8K+aJ5C
+ SmL7duObJkyGWFadBwNvg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:mkh/OnB4Thw=:zlGTC46mkMPzvm9NVyLQFr
+ rNSMPiSVRO5WgPjSyvGr9VvOEKFnKv5Z/GI7GBcJfSpMgt6v5deJN1lO8LKpHcjD2yNcBJMXD
+ x8SDmI8RKO0UDT7g48VvqU9G8pGyt500fL+8a3wbnjS34je+dRANsGygGvCwFb+T1+7JXYNfz
+ CIB9jLJ/ZrJEd0WYtWmE68Tj9x0NsSAoc9cx3twwtmbyT+HoCGwMB9qhLFuMitW9GuIdyhVcV
+ JgIU4f6f7+Ik2GZuI7t1vZtkAkn5yiZiGJHZSVxyrfnSQiF10HpoYqYdi+yNgD4hWUhFKm20F
+ RBVVSsMkVD5CvNL1G9ftIaNu6Xr4LgfpYiYzR/kwIjkojS2HA2bKRzYQF0SdJ5fInRPu2f25T
+ 23kccOeNcPD76Gl6qX+86FLXmygXCn1ep2LFW8EUB9TU8oJwpY2pNYIImHDICgEX4nPPXjvcX
+ eNflK8lF9ROVP1pHvoLIjDsiO8I2mss+RdkLvMNcHIm8BjLejraGhpPOwamVciFtMmgd2+2Xm
+ VR9WOHqjiTiAe3h/+7niB6x4dGLh6jLQFZw+9DwAfb3gLmYWgSFtxVe9pW9ChYrXbGqC2Xlkf
+ 4eaW261ixYNIq7+J1gTt02Zu1O2pIGk73Ku1D+ZXOTtb/O8nePxrsGEhwiqmJ9Pc5eLZxowd2
+ PyU2j/7Z6GPCAuIQMqHe7P0Ybcc3XRcPDr0xdZJhkSEJGqcaUlI8sLxBw96+YvG/oSMwzzvYu
+ Pu/mwyYEMeP1pD1+CBZlTHQ08e6bfbkbI4D9CZE9y9jx/q3k8BuLtE3WRwdHh8aK91yXsUaUQ
+ fSlOKFSAZrn0grS+cfzywI6P3psKrfRt+ifOG8xmC3XO5JlMpUHcJOqr8vYe3+YIl6HtU1MsG
+ IIZstG5grCvD61hQanHML6di/Ss/Aw4QwtbJzSi3P4qVCeIWZQi7BIvK1ff6ZQxDJ7vSjwr3d
+ BC5OMpYvw1xmU6n/HHlHfMVlj7lLNtXb1Px5vePZF0EHl23Eu1tbxuk/GAFtOQgHuRV//OL5u
+ scLwn//bbr8QWmCHfZAs8ZK1n73bgi+Az0wS6TAyjdkb7s8E42+irc+nJ0tR+F4vnWnmv9qmJ
+ UdzfgPWxprVSiEEWO4rSZANEDjJ7YKaNvknyjEnPWValK/Ja27hvmssdWfBgba17bQtlSaeU8
+ 8tCTTvEf2DEnrXQpcLysXsDlQjfgl2533aG1mOpa1CFO/ZdSiMYmKbxow6SP3VaX64D0l8gxI
+ dYrzJcCMN+HXysdVO
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.11
+X-Received-From: 212.227.15.14
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,66 +99,192 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/DuFjdNgzUpI/ZMtZtNsb/0T
+--Sig_/L+2.h.Ec3Jq0qZHEGzP5U43
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-This will be needed in the next patch.
+The chr_out chardev is connected to a filter-redirector
+running in the main loop. qemu_chr_fe_write_all might block
+here in compare_chr_send if the (socket-)buffer is full.
+If another filter-redirector in the main loop want's to
+send data to chr_pri_in it might also block if the buffer
+is full. This leads to a deadlock because both event loops
+get blocked.
+
+Fix this by converting compare_chr_send to a coroutine
+and return error if it is in use.
 
 Signed-off-by: Lukas Straub <lukasstraub2@web.de>
 ---
- chardev/char.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ net/colo-compare.c | 82 +++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 71 insertions(+), 11 deletions(-)
 
-diff --git a/chardev/char.c b/chardev/char.c
-index 04075389bf..51ad0dc6b3 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -38,6 +38,7 @@
- #include "qemu/module.h"
- #include "qemu/option.h"
- #include "qemu/id.h"
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 1de4220fe2..82787d3055 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -32,6 +32,9 @@
+ #include "migration/migration.h"
+ #include "util.h"
+=20
++#include "block/aio-wait.h"
 +#include "qemu/coroutine.h"
++
+ #define TYPE_COLO_COMPARE "colo-compare"
+ #define COLO_COMPARE(obj) \
+     OBJECT_CHECK(CompareState, (obj), TYPE_COLO_COMPARE)
+@@ -77,6 +80,17 @@ static int event_unhandled_count;
+  *                    |packet  |  |packet  +    |packet  | |packet  +
+  *                    +--------+  +--------+    +--------+ +--------+
+  */
++
++typedef struct SendCo {
++    Coroutine *co;
++    uint8_t *buf;
++    uint32_t size;
++    uint32_t vnet_hdr_len;
++    bool notify_remote_frame;
++    bool done;
++    int ret;
++} SendCo;
++
+ typedef struct CompareState {
+     Object parent;
 =20
- #include "chardev/char-mux.h"
+@@ -91,6 +105,7 @@ typedef struct CompareState {
+     SocketReadState pri_rs;
+     SocketReadState sec_rs;
+     SocketReadState notify_rs;
++    SendCo sendco;
+     bool vnet_hdr;
+     uint32_t compare_timeout;
+     uint32_t expired_scan_cycle;
+@@ -699,19 +714,17 @@ static void colo_compare_connection(void *opaque, voi=
+d *user_data)
+     }
+ }
 =20
-@@ -119,7 +120,11 @@ static int qemu_chr_write_buffer(Chardev *s,
-     retry:
-         res =3D cc->chr_write(s, buf + *offset, len - *offset);
-         if (res < 0 && errno =3D=3D EAGAIN && write_all) {
--            g_usleep(100);
-+            if (qemu_in_coroutine()) {
-+                qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 100000);
-+            } else {
-+                g_usleep(100);
-+            }
-             goto retry;
-         }
+-static int compare_chr_send(CompareState *s,
+-                            const uint8_t *buf,
+-                            uint32_t size,
+-                            uint32_t vnet_hdr_len,
+-                            bool notify_remote_frame)
++static void coroutine_fn _compare_chr_send(void *opaque)
+ {
++    CompareState *s =3D opaque;
++    SendCo *sendco =3D &s->sendco;
++    const uint8_t *buf =3D sendco->buf;
++    uint32_t size =3D sendco->size;
++    uint32_t vnet_hdr_len =3D sendco->vnet_hdr_len;
++    bool notify_remote_frame =3D sendco->notify_remote_frame;
+     int ret =3D 0;
+     uint32_t len =3D htonl(size);
 =20
+-    if (!size) {
+-        return 0;
+-    }
+-
+     if (notify_remote_frame) {
+         ret =3D qemu_chr_fe_write_all(&s->chr_notify_dev,
+                                     (uint8_t *)&len,
+@@ -754,10 +767,50 @@ static int compare_chr_send(CompareState *s,
+         goto err;
+     }
+=20
+-    return 0;
++    sendco->ret =3D 0;
++    goto out;
+=20
+ err:
+-    return ret < 0 ? ret : -EIO;
++    sendco->ret =3D ret < 0 ? ret : -EIO;
++out:
++    sendco->co =3D NULL;
++    g_free(sendco->buf);
++    sendco->buf =3D NULL;
++    sendco->done =3D true;
++    aio_wait_kick();
++}
++
++static int compare_chr_send(CompareState *s,
++                            const uint8_t *buf,
++                            uint32_t size,
++                            uint32_t vnet_hdr_len,
++                            bool notify_remote_frame)
++{
++    SendCo *sendco =3D &s->sendco;
++
++    if (!size) {
++        return 0;
++    }
++
++    if (sendco->done) {
++        sendco->co =3D qemu_coroutine_create(_compare_chr_send, s);
++        sendco->buf =3D g_malloc(size);
++        sendco->size =3D size;
++        sendco->vnet_hdr_len =3D vnet_hdr_len;
++        sendco->notify_remote_frame =3D notify_remote_frame;
++        sendco->done =3D false;
++        memcpy(sendco->buf, buf, size);
++        qemu_coroutine_enter(sendco->co);
++        if (sendco->done) {
++            /* report early errors */
++            return sendco->ret;
++        } else {
++            /* else assume success */
++            return 0;
++        }
++    }
++
++    return -ENOBUFS;
+ }
+=20
+ static int compare_chr_can_read(void *opaque)
+@@ -1146,6 +1199,8 @@ static void colo_compare_complete(UserCreatable *uc, =
+Error **errp)
+     CompareState *s =3D COLO_COMPARE(uc);
+     Chardev *chr;
+=20
++    s->sendco.done =3D true;
++
+     if (!s->pri_indev || !s->sec_indev || !s->outdev || !s->iothread) {
+         error_setg(errp, "colo compare needs 'primary_in' ,"
+                    "'secondary_in','outdev','iothread' property set");
+@@ -1281,6 +1336,11 @@ static void colo_compare_finalize(Object *obj)
+     CompareState *s =3D COLO_COMPARE(obj);
+     CompareState *tmp =3D NULL;
+=20
++    AioContext *ctx =3D iothread_get_aio_context(s->iothread);
++    aio_context_acquire(ctx);
++    AIO_WAIT_WHILE(ctx, !s->sendco.done);
++    aio_context_release(ctx);
++
+     qemu_chr_fe_deinit(&s->chr_pri_in, false);
+     qemu_chr_fe_deinit(&s->chr_sec_in, false);
+     qemu_chr_fe_deinit(&s->chr_out, false);
 --=20
 2.20.1
 
-
---Sig_/DuFjdNgzUpI/ZMtZtNsb/0T
+--Sig_/L+2.h.Ec3Jq0qZHEGzP5U43
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl6OGREACgkQNasLKJxd
-slhKcQ/+On2FKNMk/h0d2MJTB2FPl+Ve+/mVVexpjwZke1c1rH5k6PXt70EcWdA5
-hoKVBuo2aUlK93gs2OFt7ms+NI6Mn7+XbIMnJtSKa6C/pEjC+O27IgLWP8gP2Awx
-k/gmvJZ2WO062Gg7iK23h+vxhCMz2XahjqdZvuRw2YyLSZdUrfmNT0OUe5fg+xMz
-/dzKeUKaUGeoZOeIapn1nlF+RCBFH18QdgGlGBrn9y+eDqzTm6ZWpbh+k9WKahhx
-ucysuyILVQSec51VWGOzodSd/YmFNlhFqp3RhK7s/qUaRuqfKUREyh798FGhibd7
-sn0map37KLw2u4iAhY1+/tUat1pOgUQtS9zY3uqX6qveHMWgkMZFo2jU8/Dj3EyJ
-JWOLhgH3vFZKfOwqUqdPREpPAt8hMpAqEBNXAtjDVQzMjOM02TkfwQuOuINTCczr
-i141LN/48g3B1YU2B7CJ0b4N/hJI2ukIwj2e1NvdbNdZfZsTweKi+IoSImWpPSE/
-rZL7CaC1et4c+qgUMPN9O7QODC27La+TL3fuieK+HEJYhD3gQv+MC3Iy41Fx0o2W
-SZ8kNTVCfATOBurNGGQxInunE3XwT5SOCbYRTW6CIW9pOLnhaTgsne6iRYjBEfrJ
-fD6H+sVo09Pq26jfVmnagq7dqOJGXxjbD+18ZCZndqNngT71bSg=
-=zSeq
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl6OGRUACgkQNasLKJxd
+slifIQ/7Bd9MoM7cQKU/zp+g74f73NtSsFn7C5K2EFq63kPCdvn/wY/nqJ2tNNv5
+sUsBxcFuMdNnRisyEBR+ClJ//cf7WLind7rR1pTDsU1tAJt/IHQDTQTEANpF7Ym6
+2JaTZRuWIebbMhklBI3OX/B5LKKTb3qs3cBdV6dKuuG5TSfBAhzvrTjKEKhiJ2dj
+EZb1ZroIGqEVTXAw2QTbDm+HcmcM3EoUK5ctfXi+YDat2qDyMMni41j9tXWsqtX1
+iLXfp28hMObbwa4Tvb2qKve0KA8LgB9fiFVa5Vvr2As5Hgrxfr5+PSD/6ZldsQAU
+loJwzQapTh31Co3g5jxid+3tZIkhYND1KkZ50Ad4Wys9CIubLZH5JYQS9fcWDncF
+ITgOtHDW9l9Py35daa6EpwLsQ9yhoL/jyxarvxGXXxx4gtupTScmqXOLRN1d2wwM
+VYuPGqulA8c2harNIBuxIMJpErS+zsCnEPke4ACZzNzemEdRixEVo72pRD1qJH+3
+16nO9LObWL27GD/8BsYBYinaYJRRjbk+XsGtJgcXJgjem8gD0l7FpSsGJM7lVAom
+IdJD1U/ZqKmN2Lvi40ry0dlo2F+ObsSrW9Ga5qSr/RdxX79Ni1FsPsotB/nom7NC
+CNbDRfXiMm+O7yYjXjBt47C7vwSk5RtvTDLAFqCcXbykj6YHmjk=
+=U53D
 -----END PGP SIGNATURE-----
 
---Sig_/DuFjdNgzUpI/ZMtZtNsb/0T--
+--Sig_/L+2.h.Ec3Jq0qZHEGzP5U43--
 
