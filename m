@@ -2,106 +2,70 @@ Return-Path: <SRS0=OEAU=5Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC3F2C2D0EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 06:14:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E73A0C2D0EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 06:37:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AB8020730
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 06:14:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="pbSSTzyL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AB8020730
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id B8FDC206C0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 06:37:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8FDC206C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jM3yl-0007mV-MG
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 02:14:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59015)
+	id 1jM4Kh-0004gP-SM
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 02:37:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32844)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty@apple.com>) id 1jM3y0-00076A-BH
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 02:13:41 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jM4K3-0004Fq-Lb
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 02:36:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty@apple.com>) id 1jM3xz-0002tY-7e
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 02:13:40 -0400
-Received: from nwk-aaemail-lapp03.apple.com ([17.151.62.68]:46404)
+ (envelope-from <no-reply@patchew.org>) id 1jM4K2-0000Rj-6q
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 02:36:27 -0400
+Resent-Date: Wed, 08 Apr 2020 02:36:27 -0400
+Resent-Message-Id: <E1jM4K2-0000Rj-6q@eggs.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21758)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dirty@apple.com>) id 1jM3xy-0002tH-UX
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 02:13:39 -0400
-Received: from pps.filterd (nwk-aaemail-lapp03.apple.com [127.0.0.1])
- by nwk-aaemail-lapp03.apple.com (8.16.0.27/8.16.0.27) with SMTP id
- 0386BwW8033579; Tue, 7 Apr 2020 23:13:38 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
- h=sender : content-type
- : mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to; s=20180706;
- bh=tYwPd7/9kGEzFTMdPUfuPd02l0/hQ/TzVGc4gL41Lik=;
- b=pbSSTzyL9FLBAd5kSskm/NiVsK6dJsVfMy1skTcdiRkmrAxBQ/SHEcAbFDfl51nCqrO/
- 7m67yRL/RwFL5AtdNhgMpXLlhyzqUtBkCF/zFyQmxcCpNg7lZ1pauC5gezAlJV293DSp
- SGXjykOhkJGZQK4oPvd1cg8jwGe4OXfpCEiNWfIe4c+xmKw7WvuNtOxN4QN8lqDXU4C1
- 33mjkMcauObhFzNv01nBdr5EJIP2L2++po9bpjDnk011C7bLN7KPmVnqMjaYj4s5v2sk
- yyGxFovkTkulaYPFYkvOMkyOapS/62cwNvNhEjX1EtAv175GTAfrhsLjNkpQl0bUVKVp Pg== 
-Received: from rn-mailsvcp-mta-lapp04.rno.apple.com
- (rn-mailsvcp-mta-lapp04.rno.apple.com [10.225.203.152])
- by nwk-aaemail-lapp03.apple.com with ESMTP id 3091hnxm3t-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
- Tue, 07 Apr 2020 23:13:37 -0700
-Received: from rn-mailsvcp-mmp-lapp03.rno.apple.com
- (rn-mailsvcp-mmp-lapp03.rno.apple.com [17.179.253.16])
- by rn-mailsvcp-mta-lapp04.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020)) with ESMTPS id <0Q8G00K2KHAPH530@rn-mailsvcp-mta-lapp04.rno.apple.com>; 
- Tue, 07 Apr 2020 23:13:37 -0700 (PDT)
-Received: from process_milters-daemon.rn-mailsvcp-mmp-lapp03.rno.apple.com by
- rn-mailsvcp-mmp-lapp03.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020)) id <0Q8G00A00H7TD500@rn-mailsvcp-mmp-lapp03.rno.apple.com>; Tue,
- 07 Apr 2020 23:13:37 -0700 (PDT)
-X-Va-A: 
-X-Va-T-CD: 99f89d79671c95ffdbff058802d4710e
-X-Va-E-CD: 34a278cb7c818dbc69944c99c536a0f2
-X-Va-R-CD: 68f981851bdce5e823c6430bc244ff39
-X-Va-CD: 0
-X-Va-ID: 1b30282c-1aab-4c61-9c11-dffd3043099a
-X-V-A: 
-X-V-T-CD: 99f89d79671c95ffdbff058802d4710e
-X-V-E-CD: 34a278cb7c818dbc69944c99c536a0f2
-X-V-R-CD: 68f981851bdce5e823c6430bc244ff39
-X-V-CD: 0
-X-V-ID: 1e052a03-6a39-4fa1-ba76-74e177e02db6
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-07_10:2020-04-07,
- 2020-04-07 signatures=0
-Received: from [17.234.109.17] (unknown [17.234.109.17])
- by rn-mailsvcp-mmp-lapp03.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020))
- with ESMTPSA id <0Q8G00KP1HAPUK00@rn-mailsvcp-mmp-lapp03.rno.apple.com>; Tue,
- 07 Apr 2020 23:13:37 -0700 (PDT)
-Content-type: text/plain; charset=us-ascii
-MIME-version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v1 2/3] hvf: Make long mode enter and exit code clearer.
-In-reply-to: <20200405185125.GD74346@SPB-NB-133.local>
-Date: Tue, 07 Apr 2020 23:13:37 -0700
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
-Content-transfer-encoding: quoted-printable
-Message-id: <82DAC78F-C970-4CF7-871F-5E96C4F0C75F@apple.com>
-References: <cover.1585607927.git.dirty@apple.com>
- <17777cc82122d29903bad7268b4c33e83b27d9a6.1585607927.git.dirty@apple.com>
- <20200405185125.GD74346@SPB-NB-133.local>
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-X-Mailer: Apple Mail (2.3445.104.11)
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-07_10:2020-04-07,
- 2020-04-07 signatures=0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 17.151.62.68
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jM4K1-0000RC-Vn
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 02:36:26 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1586327777; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=N9k76jOgM3hfAVt0bV9eppyxk/uQpUhecmqIRdr7vBnxEu5AX6SNAuFjNQ2pFMDG4/mE+Kl3UgQ+JZi27H6d5rKU0YFiklaqhyzZwSFKt1tFHblIQizzNHn2gKclPtcGqE/mAQRpDQjTE4qNQSvpPT15/O6GurzYGvp3Be2hh3c=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1586327777;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=G9c8k2GmYfvIDtAQDlSyzA5arOGYwzmg5ckalm9d2nc=; 
+ b=aK3dS2BECyCncDVo6azR4lwgT21+oW156mOAIs7evdwiSRTBkDmrmOnBUvYS7BUQ0luuGwbi4DmfjRhGh/d6wZFE4rdloxHWxCYx9p8GU00l4X1y0BVOnY0zdlgz/mbAj4RNUUHKxb1stEp+7UfJUAqZ0+QyLtwwRf+puyfkXvM=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1586327775893597.4286643570914;
+ Tue, 7 Apr 2020 23:36:15 -0700 (PDT)
+In-Reply-To: <20200408003552.58095-1-mansourweb@gmail.com>
+Subject: Re: [PATCH] When updating the PFLASH file contents,
+ we should check for a possible failure of blk_pwrite(). Similar to
+ 3a68829 commit
+Message-ID: <158632777484.16886.8863170245355826794@39012742ff91>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mansourweb@gmail.com
+Date: Tue, 7 Apr 2020 23:36:15 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.57
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,93 +77,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: qemu-devel@nongnu.org
+Cc: mansourweb@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: Cameron Esfahani <dirty@apple.com>
-From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-I'll update with your feedback.
-
-Cameron Esfahani
-dirty@apple.com
-
-"We do what we must because we can."
-
-Aperture Science
-
-
-
-> On Apr 5, 2020, at 11:51 AM, Roman Bolshakov <r.bolshakov@yadro.com> =
-wrote:
->=20
-> On Mon, Mar 30, 2020 at 05:16:05PM -0700, Cameron Esfahani wrote:
->> Signed-off-by: Cameron Esfahani <dirty@apple.com>
->> ---
->> target/i386/hvf/vmx.h | 12 +++++++-----
->> 1 file changed, 7 insertions(+), 5 deletions(-)
->>=20
->> diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
->> index 8ec2e6414e..1a1b150c97 100644
->> --- a/target/i386/hvf/vmx.h
->> +++ b/target/i386/hvf/vmx.h
->> @@ -121,6 +121,7 @@ static inline void macvm_set_cr0(hv_vcpuid_t =
-vcpu, uint64_t cr0)
->>     uint64_t pdpte[4] =3D {0, 0, 0, 0};
->>     uint64_t efer =3D rvmcs(vcpu, VMCS_GUEST_IA32_EFER);
->>     uint64_t old_cr0 =3D rvmcs(vcpu, VMCS_GUEST_CR0);
->> +    uint64_t changed_cr0 =3D old_cr0 ^ cr0;
->>     uint64_t mask =3D CR0_PG_MASK | CR0_CD_MASK | CR0_NW_MASK |
->>                     CR0_NE_MASK | CR0_ET_MASK;
->>=20
->> @@ -139,11 +140,12 @@ static inline void macvm_set_cr0(hv_vcpuid_t =
-vcpu, uint64_t cr0)
->>     wvmcs(vcpu, VMCS_CR0_SHADOW, cr0);
->>=20
->>     if (efer & MSR_EFER_LME) {
->> -        if (!(old_cr0 & CR0_PG_MASK) && (cr0 & CR0_PG_MASK)) {
->> -            enter_long_mode(vcpu, cr0, efer);
->> -        }
->> -        if (!(cr0 & CR0_PG_MASK)) {
->> -            exit_long_mode(vcpu, cr0, efer);
->> +        if (changed_cr0 & CR0_PG_MASK) {
->> +            if (cr0 & CR0_PG_MASK) {
->> +                enter_long_mode(vcpu, cr0, efer);
->> +            } else {
->> +                exit_long_mode(vcpu, cr0, efer);
->> +            }
->>         }
->>     }
->>=20
->> --=20
->> 2.24.0
->>=20
->=20
-> The changes look good but I have a few nitpicks.
->=20
-> The summary line should not have "." at the end, please see
-> =
-(https://wiki.qemu.org/Contribute/SubmitAPatch#Write_a_meaningful_commit_m=
-essage):
->> Whether the "single line summary of change" starts with a capital is =
-a
->> matter of taste, but we prefer that the summary does not end in "."
->=20
-> Also, it would be good to mention in the title/commit message that =
-with the
-> change QEMU is skipping unconditional writes to the guest =
-IA32_EFER.LMA
-> and VMCS Entry Controls in compatibility mode, instead it does so only
-> when the actual switch out of long mode happens. (It's worth to =
-mention
-> any other issues the patch helps to address, if any).
->=20
-> The comment in the previous patch may be dropped here IMO.
->=20
-> Besides that,
-> Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
->=20
-> Thanks,
-> Roman
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQwODAwMzU1Mi41ODA5
+NS0xLW1hbnNvdXJ3ZWJAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
+dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
+aW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0hdIFdoZW4gdXBkYXRpbmcgdGhlIFBGTEFTSCBm
+aWxlIGNvbnRlbnRzLCB3ZSBzaG91bGQgY2hlY2sgZm9yIGEgcG9zc2libGUgZmFpbHVyZSBvZiBi
+bGtfcHdyaXRlKCkuIFNpbWlsYXIgdG8gM2E2ODgyOSBjb21taXQKTWVzc2FnZS1pZDogMjAyMDA0
+MDgwMDM1NTIuNTgwOTUtMS1tYW5zb3Vyd2ViQGdtYWlsLmNvbQpUeXBlOiBzZXJpZXMKCj09PSBU
+RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rl
+di9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
+YmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
+J3Rlc3QnCmUyZDZkNmUgV2hlbiB1cGRhdGluZyB0aGUgUEZMQVNIIGZpbGUgY29udGVudHMsIHdl
+IHNob3VsZCBjaGVjayBmb3IgYSBwb3NzaWJsZSBmYWlsdXJlIG9mIGJsa19wd3JpdGUoKS4gU2lt
+aWxhciB0byAzYTY4ODI5IGNvbW1pdAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IGNvZGUg
+aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjc6IEZJTEU6IGh3L2Jsb2NrL3BmbGFzaF9j
+ZmkwMS5jOjQxMDoKK15JaWYgKHJldCA8IDApIHskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
+IG5ldmVyIHVzZSB0YWJzCiM1MDogRklMRTogaHcvYmxvY2svcGZsYXNoX2NmaTAyLmM6NDA0Ogor
+XklpZiAocmV0IDwgMCkgeyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
+YnMKIzUxOiBGSUxFOiBody9ibG9jay9wZmxhc2hfY2ZpMDIuYzo0MDU6CiteSSAgICBlcnJvcl9y
+ZXBvcnQoIkNvdWxkIG5vdCB1cGRhdGUgUEZMQVNIOiAlcyIsIHN0cmVycm9yKC1yZXQpKTskCgp0
+b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDM2IGxpbmVzIGNoZWNrZWQKCkNvbW1pdCBlMmQ2
+ZDZlMjhkYWYgKFdoZW4gdXBkYXRpbmcgdGhlIFBGTEFTSCBmaWxlIGNvbnRlbnRzLCB3ZSBzaG91
+bGQgY2hlY2sgZm9yIGEgcG9zc2libGUgZmFpbHVyZSBvZiBibGtfcHdyaXRlKCkuIFNpbWlsYXIg
+dG8gM2E2ODgyOSBjb21taXQpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQg
+RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cg
+aXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNDA4MDAzNTUyLjU4
+MDk1LTEtbWFuc291cndlYkBnbWFpbC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3Nh
+Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEByZWRoYXQuY29t
 
