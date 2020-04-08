@@ -6,109 +6,97 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F958C2D0EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 15:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D0E2C2D0EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 15:57:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3FA5206F5
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 15:50:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3FA5206F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 53A1420769
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 15:57:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53A1420769
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=inria.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMCxs-0001EV-1U
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 11:50:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36039)
+	id 1jMD5P-0004nc-CY
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 11:57:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37474)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jMCw7-0000MM-Pc
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 11:48:21 -0400
+ (envelope-from <Brice.Goglin@inria.fr>) id 1jMD4W-0004NF-OJ
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 11:57:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jMCw4-0002wm-Ja
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 11:48:18 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:33325)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jMCw4-0002w9-BD
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 11:48:16 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MMGAg-1jdBr23oIw-00JJLr; Wed, 08 Apr 2020 17:48:11 +0200
-To: Brice Goglin <Brice.Goglin@inria.fr>, qemu-devel@nongnu.org
-References: <fb4c55fa-d539-67ee-c6c9-de8fb63c8488@inria.fr>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
+ (envelope-from <Brice.Goglin@inria.fr>) id 1jMD4V-0007JQ-4Y
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 11:57:00 -0400
+Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:41759)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Brice.Goglin@inria.fr>)
+ id 1jMD4U-0007Fn-BH
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 11:56:59 -0400
+X-IronPort-AV: E=Sophos;i="5.72,359,1580770800"; d="scan'208";a="345392088"
+Received: from 91-160-5-165.subs.proxad.net (HELO [192.168.44.21])
+ ([91.160.5.165])
+ by mail3-relais-sop.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-SHA;
+ 08 Apr 2020 17:56:55 +0200
 Subject: Re: linux-user: keep the name-ending parenthesis in /proc/self/stat
-Message-ID: <e613c88e-0940-11e0-254d-9c6d86d9ae5b@vivier.eu>
-Date: Wed, 8 Apr 2020 17:48:04 +0200
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <fb4c55fa-d539-67ee-c6c9-de8fb63c8488@inria.fr>
+ <e613c88e-0940-11e0-254d-9c6d86d9ae5b@vivier.eu>
+From: Brice Goglin <Brice.Goglin@inria.fr>
+Autocrypt: addr=Brice.Goglin@inria.fr; prefer-encrypt=mutual; keydata=
+ mQINBFNg91oBEADMfOyfz9iilNPe1Yy3pheXLf5O/Vpr+gFJoXcjA80bMeSWBf4on8Mt5Fg/
+ jpVuNBhii0Zyq4Lip1I2ve+WQjfL3ixYQqvNRLgfw/FL0gNHSOe9dVFo0ol0lT+vu3AXOVmh
+ AM4IrsOp2Tmt+w89Oyvu+xwHW54CJX3kXp4c7COz79A6OhbMEPQUreerTavSvYpH5pLY55WX
+ qOSdjmlXD45yobQbMg9rFBy1BECrj4DJSpym/zJMFVnyC5yAq2RdPFRyvYfS0c491adD/iw9
+ eFZY1XWj+WqLSW8zEejdl78npWOucfin7eAKvov5Bqa1MLGS/2ojVMHXJN0qpStpKcueV5Px
+ igX8i4O4pPT10xCXZ7R6KIGUe1FE0N7MLErLvBF6AjMyiFHix9rBG0pWADgCQUUFjc8YBKng
+ nwIKl39uSpk5W5rXbZ9nF3Gp/uigTBNVvaLO4PIDw9J3svHQwCB31COsUWS1QhoLMIQPdUkk
+ GarScanm8i37Ut9G+nB4nLeDRYpPIVBFXFD/DROIEfLqOXNbGwOjDd5RWuzA0TNzJSeOkH/0
+ qYr3gywjiE81zALO3UeDj8TaPAv3Dmu7SoI86Bl7qm6UOnSL7KQxZWuMTlU3BF3d+0Ly0qxv
+ k1XRPrL58IyoHIgAVom0uUnLkRKHczdhGDpNzsQDJaO71EPp8QARAQABtCRCcmljZSBHb2ds
+ aW4gPEJyaWNlLkdvZ2xpbkBpbnJpYS5mcj6JAjgEEwECACIFAlNg+aMCGwMGCwkIBwMCBhUI
+ AgkKCwQWAgMBAh4BAheAAAoJEESRkPMjWr076RoQAJhJ1q5+wlHIf+YvM0N1V1hQyf+aL35+
+ BPqxlyw4H65eMWIN/63yWhcxrLwNCdgY1WDWGoiW8KVCCHwJAmrXukFvXjsvShLQJavWRgKH
+ eea12T9XtLc6qY/DEi2/rZvjOCKsMjnc1CYW71jbofaQP6lJsmC+RPWrnL/kjZyVrVrg7/Jo
+ GemLmi/Ny7nLAOt6uL0MC/Mwld14Yud57Qz6VTDGSOvpNacbkJtcCwL3KZDBfSDnZtSbeclY
+ srXoMnFXEJJjKJ6kcJrZDYPrNPkgFpSId/WKJ5pZBoRsKH/w2OdxwtXKCYHksMCiI4+4fVFD
+ WlmVNYzW8ZKXjAstLh+xGABkLVXs+0WjvC67iTZBXTmbYJ5eodv8U0dCIR/dxjK9wxVKbIr2
+ D+UVbGlfqUuh1zzL68YsOg3L0Xc6TQglKVl6RxX87fCU8ycIs9pMbXeRDoJohflo8NUDpljm
+ zqGlZxBjvb40p37ReJ+VfjWqAvVh+6JLaMpeva/2K1Nvr9O/DOkSRNetrd86PslrIwz8yP4l
+ FaeG0dUwdRdnToNz6E8lbTVOwximW+nwEqOZUs1pQNKDejruN7Xnorr7wVBfp6zZmFCcmlw9
+ 8pSMV3p85wg6nqJnBkQNTzlljycBvZLVvqc6hPOSXpXf5tjkuUVWgtbCc8TDEQFx8Phkgda6
+ K1LNuQINBFNg91oBEADp3vwjw8tQBnNfYJNJMs6AXC8PXB5uApT1pJ0fioaXvifPNL6gzsGt
+ AF53aLeqB7UXuByHr8Bmsz7BvwA06XfXXdyLQP+8Oz3ZnUpw5inDIzLpRbUuAjI+IjUtguIK
+ AkU1rZNdCXMOqEwCaomRitwaiX9H7yiDTKCUaqx8yAuAQWactWDdyFii2FA7IwVlD/GBqMWV
+ weZsMfeWgPumKB3jyElm1RpkzULrtKbu7MToMH2fmWqBtTkRptABkY7VEd8qENKJBZKJGisk
+ Fk6ylp8VzZdwbAtEDDTGK00Vg4PZGiIGbQo8mBqbc63DY+MdyUEksTTu2gTcqZMm/unQUJA8
+ xB4JrTAyljo/peIt6lsQa4+/eVolfKL1t1C3DY8f4wMoqnZORagnWA2oHsLsYKvcnqzA0QtY
+ IIb1S1YatV+MNMFf3HuN7xr/jWlfdt59quXiOHU3qxIzXJo/OfC3mwNW4zQWJkG233UOf6YE
+ rmrSaTIBTIWF8CxGY9iXPaJGNYSUa6R/VJS09EWeZgRz9Gk3h5AyDrdo5RFN9HNwOj41o0cj
+ eLDF69092Lg5p5isuOqsrlPi5imHKcDtrXS7LacUI6H0c8onWoH9LuW99WznEtFgPJg++TAv
+ f9M2x57Gzl+/nYTB5/Kpl1qdPPC91zUipiKbnF5f8bQpol0WC+ovmQARAQABiQIfBBgBAgAJ
+ BQJTYPdaAhsMAAoJEESRkPMjWr074+0P/iEcN27dx3oBTzoeGEBhZUVQRZ7w4A61H/vW8oO8
+ IPkZv9kFr5pCfIonmHEbBlg6yfjeHXwF5SF2ywWRKkRsFHpaFWywxqk9HWXu8cGR1pFsrwC3
+ EdossuVbEFNmhjHvcAo11nJ7JFzPTEnlPjE6OY9tEDwl+kp1WvyXqNk9bosaX8ivikhmhB47
+ 7BA3Kv8uUE7UL6p7CBdqumaOFISi1we5PYE4P/6YcyhQ9Z2wH6ad2PpwAFNBwxSu+xCrVmaD
+ skAwknf6UVPN3bt67sFAaVgotepx6SPhBuH4OSOxVHMDDLMu7W7pJjnSKzMcAyXmdjON05Sz
+ SaILwfceByvHAnvcFh2pXK9U4E/SyWZDJEcGRRt79akzZxls52stJK/2Tsr0vKtZVAwogiaK
+ uSp+m6BRQcVVhTo/Kq3E0tSnsTHFeIO6QFHKJCJv4FRE3Dmtz15lueihUBowsq9Hk+u3UiLo
+ SmrMAZ6KgA4SQxB2p8/M53kNJl92HHc9nc//aCQDi1R71NyhtSx+6PyivoBkuaKYs+S4pHmt
+ sFE+5+pkUNROtm4ExLen4N4OL6Kq85mWGf2f6hd+OWtn8we1mADjDtdnDHuv+3E3cacFJPP/
+ wFV94ZhqvW4QcyBWcRNFA5roa7vcnu/MsCcBoheR0UdYsOnJoEpSZswvC/BGqJTkA2sf
+Message-ID: <5b8c6e88-f25b-0944-373a-59c45d602be0@inria.fr>
+Date: Wed, 8 Apr 2020 17:56:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <fb4c55fa-d539-67ee-c6c9-de8fb63c8488@inria.fr>
+In-Reply-To: <e613c88e-0940-11e0-254d-9c6d86d9ae5b@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:HF2WmZ2L8dubtuL1ZqwsdCBK14e/z5XKNEI4yEHzSGeY6wsSRQx
- 8A7JbDAnJOXNv4H4mNHjBtWZQf0cfbGmJHbVuyOxadSkMBnTK53b13aojLUw3TNoFsT/jkJ
- PvVfNetl5yz5s09VEbx5osuE3FFK1fv43zonJoxNLmrOlaW6DRq32iu+lzO2KKNRNIuL6Tb
- 1D4tvlqHgueq/PkfCJUaw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:y1pdn/bDFEA=:+BE/SYWYm9zq7qFVuIdO7T
- ekc4fEug6Q1LVfK6CXbYS6AXGZjapcVZXgjiFlwWcP7ehfZDfW64HtyojtdRK5oMd/fZiFEpA
- EdgUCBtxakF0PLfPygsBlj0Ia9I+GfW57Q6IlvICKkhGuEqM4FONPaGao6K/s5DlSe2Y/MWIW
- nyHaxskKN4DsBb1LeLinUFsS+togGSbyzPfdIiSmKfuKPhl2h/ly9s8vcAHxnc4iKihNdCbgI
- 3p+qJEjCrw+cQ5SKWsVl5BKdAUyUkAcbFhA9ayN5e0bDPZRHzRIYo+FF90OfcLOjaWjjIAlvu
- Cd9lZW1oFoAKSIWEJ2p4S2sotmRgESbsm2AQrPKElNjNJpLZ/5+gd3thSPOMXMp2Uoj9rcqtO
- /6Tv+D14gMMk4Gg6w0IXvL9EjEnAEzG1RTS9ba//MBCae9nZ70Bz28scXaNWa7aHasZUU0XNH
- H6zYypuLJboVYEbbtR7YtZscb+60M8JlL0kppUGnXqAOxvIYUatXQ2DPAO9Y8NhdZk4QgpSbb
- 4envm8jy4C8mnSVf5GzRxI8//9NLasnVV7R8tQPx8tsIucP4hb4+LNekJZXvPApBuPFVsiuJZ
- bTzjt+3OhtRHFDRZeulQ4UpexWx3LppYc90I0BOl6i1DvbBm3SxuzI1Qn3RBjMeV+rPTMqY2O
- TBj5pahVWnZMdOzbCwkF91JJAn6AZ5cPMfCOZXE4qsnt03NeZmUPh9xKMS5Tvh4U6nQ+9v8Sc
- QorqCagXeLOISzKo9oxU+SRxAgtPgVZkiiynCFMO2SICZ6gnS6I8Wm6k3YEd8p9O2AhRfSSmv
- fhqh/jf05Zx22y4rDWbiRnXA83qVpmQRJbs+q33WteRFeiqJXgOezYzzXx5REEIvnwFN0x5
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.135
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.134.164.104
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,60 +113,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 08/04/2020 à 10:24, Brice Goglin a écrit :
-> When the program name is very long, qemu-user may truncate it in
-> /proc/self/stat. However the truncation must keep the ending ") "
-> to conform to the proc manpage which says:
->     (2) comm  %s
->            The  filename of the executable, in parentheses.  This
->            is visible whether or not the  executable  is  swapped
->            out.
-> 
-> To reproduce:
-> $ ln -s /bin/cat <filenamewithmorethan128chars>
-> $ qemu-x86_64 ./<filenamewithmorethan128chars> /proc/self/stat
-> 
-> Before the patch, you get:
-> 1134631 (<filenametruncated>0 0 0 0 0 0 0 0 ...
-> After the patch:
-> 1134631 (<filenametruncat>) 0 0 0 0 0 0 0 0 ...
-> 
-> This fixes an issue with hwloc failing to parse /proc/self/stat
-> when Ludovic Courtes was testing it in Guix over qemu-aarch64.
-> 
-> Signed-off-by: Philippe_Mathieu-Daudé <philmd@redhat.com>
+Please apply my first patch if you believe Philippe's patch is wrong. I
+can't spend more time debugging this trivial issue unfortunately.
 
-You can't add "Signed-off-by" of someone else, in this case you could
-add "Suggested-by:".
+Brice
 
-The subject of your patch should include "[PATCH]" (and the version of
-the patch, "[PATCH v2]").
 
-https://wiki.qemu.org/Contribute/SubmitAPatch
 
-> Signed-off-by: Brice Goglin <Brice.Goglin@inria.fr>
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -7305,7 +7305,11 @@ static int open_self_stat(void *cpu_env, int fd)
->          snprintf(buf, sizeof(buf), "%"PRId64 " ", val);
->        } else if (i == 1) {
->          /* app name */
-> -        snprintf(buf, sizeof(buf), "(%s) ", ts->bprm->argv[0]);
-> +        char *ptr = buf;
-> +
-> +        *ptr++ = '(';
-> +        ptr = stpncpy(ptr, ts->bprm->argv[0], sizeof(buf) - 3);
-
-To have space for the NUL character I think it should be "sizeof(buf) - 4".
-
-> +        strcpy(ptr, ") ");
->        } else if (i == 27) {
->          /* stack bottom */
->          val = start_stack;
-> 
-
-Thanks,
-Laurent
+Le 08/04/2020 à 17:48, Laurent Vivier a écrit :
+> Le 08/04/2020 à 10:24, Brice Goglin a écrit :
+>> When the program name is very long, qemu-user may truncate it in
+>> /proc/self/stat. However the truncation must keep the ending ") "
+>> to conform to the proc manpage which says:
+>>     (2) comm  %s
+>>            The  filename of the executable, in parentheses.  This
+>>            is visible whether or not the  executable  is  swapped
+>>            out.
+>>
+>> To reproduce:
+>> $ ln -s /bin/cat <filenamewithmorethan128chars>
+>> $ qemu-x86_64 ./<filenamewithmorethan128chars> /proc/self/stat
+>>
+>> Before the patch, you get:
+>> 1134631 (<filenametruncated>0 0 0 0 0 0 0 0 ...
+>> After the patch:
+>> 1134631 (<filenametruncat>) 0 0 0 0 0 0 0 0 ...
+>>
+>> This fixes an issue with hwloc failing to parse /proc/self/stat
+>> when Ludovic Courtes was testing it in Guix over qemu-aarch64.
+>>
+>> Signed-off-by: Philippe_Mathieu-Daudé <philmd@redhat.com>
+> You can't add "Signed-off-by" of someone else, in this case you could
+> add "Suggested-by:".
+>
+> The subject of your patch should include "[PATCH]" (and the version of
+> the patch, "[PATCH v2]").
+>
+> https://wiki.qemu.org/Contribute/SubmitAPatch
+>
+>> Signed-off-by: Brice Goglin <Brice.Goglin@inria.fr>
+>>
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -7305,7 +7305,11 @@ static int open_self_stat(void *cpu_env, int fd)
+>>          snprintf(buf, sizeof(buf), "%"PRId64 " ", val);
+>>        } else if (i == 1) {
+>>          /* app name */
+>> -        snprintf(buf, sizeof(buf), "(%s) ", ts->bprm->argv[0]);
+>> +        char *ptr = buf;
+>> +
+>> +        *ptr++ = '(';
+>> +        ptr = stpncpy(ptr, ts->bprm->argv[0], sizeof(buf) - 3);
+> To have space for the NUL character I think it should be "sizeof(buf) - 4".
+>
+>> +        strcpy(ptr, ") ");
+>>        } else if (i == 27) {
+>>          /* stack bottom */
+>>          val = start_stack;
+>>
+> Thanks,
+> Laurent
 
