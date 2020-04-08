@@ -2,56 +2,87 @@ Return-Path: <SRS0=OEAU=5Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB404C2D0EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 13:03:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82861C2D0EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 13:04:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 951BD206F7
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 13:03:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 951BD206F7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4A1CB206F7
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 13:04:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R3kD5yzG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A1CB206F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMAN4-0007LV-OC
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 09:03:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39770)
+	id 1jMANA-0007Sm-CO
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 09:04:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <miaoyubo@huawei.com>) id 1jMAI7-0008VQ-1r
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:58:52 -0400
+ (envelope-from <kraxel@redhat.com>) id 1jMAIw-000214-Ty
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:59:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <miaoyubo@huawei.com>) id 1jMAI5-00058D-Mu
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:58:50 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3733 helo=huawei.com)
+ (envelope-from <kraxel@redhat.com>) id 1jMAIw-0005SX-09
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:59:42 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43906
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1jMAI5-00054i-B4
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:58:49 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id CE5E38C204DE5671C2A8;
- Wed,  8 Apr 2020 20:58:39 +0800 (CST)
-Received: from DESKTOP-D7EVK5B.china.huawei.com (10.173.221.29) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 8 Apr 2020 20:58:31 +0800
-From: Yubo Miao <miaoyubo@huawei.com>
-To: <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>, <lersek@redhat.com>
-Subject: [PATCH v6 0/8] pci_expander_brdige:acpi:Support pxb-pcie for ARM
-Date: Wed, 8 Apr 2020 20:58:08 +0800
-Message-ID: <20200408125816.955-1-miaoyubo@huawei.com>
-X-Mailer: git-send-email 2.24.1.windows.2
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jMAIv-0005Ry-Si
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:59:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586350781;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VNwPELplmwfD1kCGcXRDxJa4F+4njivrwX3kZHTE16A=;
+ b=R3kD5yzGEX1RxpXXqTQwIkvJZ2AA8DMbT4CA6pKKeIUVamdYJNEjnhJt+qbQKinr5P4uKk
+ syXoG2x8Kqx/hMDBpRnGlhsHIASzJu6+H0Q/AmgYRMImHaeKkzmMTUwKw0fU2aYj69pKI0
+ LBe5FdniztGXAo2FnqLCaNvhu3Klwbw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-436-_BrUqFhXO9GJJdNH-dtZUQ-1; Wed, 08 Apr 2020 08:59:38 -0400
+X-MC-Unique: _BrUqFhXO9GJJdNH-dtZUQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7CB08017F5;
+ Wed,  8 Apr 2020 12:59:36 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-113-60.ams2.redhat.com
+ [10.36.113.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BD60560C63;
+ Wed,  8 Apr 2020 12:59:30 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id A28A01750A; Wed,  8 Apr 2020 14:59:28 +0200 (CEST)
+Date: Wed, 8 Apr 2020 14:59:28 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH v2 07/12] acpi: move aml builder code for rtc device
+Message-ID: <20200408125928.scuf2eh34553q3ao@sirius.home.kraxel.org>
+References: <20200403080502.8154-1-kraxel@redhat.com>
+ <20200403080502.8154-8-kraxel@redhat.com>
+ <20200403120921.258db9a5@redhat.com>
+ <20200406082517.uyz7zv4jiqqjbcli@sirius.home.kraxel.org>
+ <20200406141705.77d90b68@redhat.com>
+ <20200407102658.x5tb4txcpvmtxfj7@sirius.home.kraxel.org>
+ <20200408132727.374c470d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.173.221.29]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200408132727.374c470d@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.191
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,66 +94,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, miaoyubo@huawei.com, imammedo@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: miaoyubo <miaoyubo@huawei.com>
+  Hi,
 
-Changes with v5
-v5->v6: stat crs_range_insert in aml_build.h
+> > > > > > +    crs =3D aml_resource_template();
+> > > > > > +    aml_append(crs, aml_io(AML_DECODE16, 0x0070, 0x0070, 0x10,=
+ 0x02));
+> maybe replace magic 0x0070 with macro
+>   RTC_BASE_ADDR
 
-Changes with v4
-v4->v5: Not using specific resources for PXB.
-Instead, the resources for pxb are composed of the bar space of the
-pci-bridge/pcie-root-port behined it and the config space of devices
-behind it.
+Yes, that sounds better.
 
-Only if the bios(uefi for arm) support multiple roots,
-configure space of devices behind pxbs could be obtained.
-The uefi work is updated for discussion by the following link:
-https://edk2.groups.io/g/devel/message/56901?p=3D,,,20,0,0,0::Created,,ad=
-d+extra+roots+for+Arm,20,2,0,72723351=20
-[PATCH] ArmVirtPkg/FdtPciHostBridgeLib: add extra roots for Arm.
+> > > > > > +    aml_append(crs, aml_irq_no_flags(8));
+> > > > > > +    aml_append(crs, aml_io(AML_DECODE16, 0x0072, 0x0072, 0x02,=
+ 0x06));
+>=20
+> one more comment, is this last io record correct?
+> (looking at realize it maps only 2 bytes at 0x70)
 
-Currently pxb-pcie is not supported by arm,
-the reason for it is pxb-pcie is not described in DSDT table
-and only one main host bridge is described in acpi tables,
-which means it is not impossible to present different io numas
-for different devices.
+No idea, I've just moved around the code.
 
-This series of patches make arm to support PXB-PCIE.
+Good question though.  Also why this splitted in two ranges the first
+place.  Looking at physical hardware (my workstation) I see this:
 
-Users can configure pxb-pcie with certain numa, Example command
-is:
+        Device (RTC)
+        {
+            Name (_HID, EisaId ("PNP0B00") /* AT Real-Time Clock */)  // _H=
+ID: Hardware ID
+            Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Sett=
+ings
+            {
+                IO (Decode16,
+                    0x0070,             // Range Minimum
+                    0x0070,             // Range Maximum
+                    0x01,               // Alignment
+                    0x08,               // Length
+                    )
+                IRQNoFlags ()
+                    {8}
+            })
+        }
 
-   -device pxb-pcie,id=3Dpci.7,bus_nr=3D128,numa_node=3D0,bus=3Dpcie.0,ad=
-dr=3D0x9
+Clues anyone?
 
-miaoyubo (8):
-  acpi: Extract two APIs from acpi_dsdt_add_pci
-  fw_cfg: Write the extra roots into the fw_cfg
-  acpi: Extract crs build form acpi_build.c
-  acpi: Refactor the source of host bridge and build tables for pxb
-  acpi: Align the size to 128k
-  unit-test: The files changed.
-  unit-test: Add testcase for pxb
-  unit-test: Add the binary file and clear diff.h
-
- hw/acpi/aml-build.c            | 275 +++++++++++++++++++++++++++++++
- hw/arm/virt-acpi-build.c       | 251 ++++++++++++++++++++++-------
- hw/arm/virt.c                  |  23 +++
- hw/i386/acpi-build.c           | 285 ---------------------------------
- include/hw/acpi/aml-build.h    |  25 +++
- tests/data/acpi/virt/DSDT.pxb  | Bin 0 -> 7802 bytes
- tests/qtest/bios-tables-test.c |  58 ++++++-
- 7 files changed, 566 insertions(+), 351 deletions(-)
- create mode 100644 tests/data/acpi/virt/DSDT.pxb
-
---=20
-2.19.1
-
+thanks,
+  Gerd
 
 
