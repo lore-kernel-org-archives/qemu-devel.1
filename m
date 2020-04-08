@@ -2,70 +2,83 @@ Return-Path: <SRS0=OEAU=5Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A0CC2D0EC
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 02:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32CF9C2D0EC
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 02:26:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEA7A206BE
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 02:26:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEA7A206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id EF00C206BE
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 02:26:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=smartx-com.20150623.gappssmtp.com header.i=@smartx-com.20150623.gappssmtp.com header.b="w5TZ9R05"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF00C206BE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jM0Pw-0003cX-Tk
-	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 22:26:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39157)
+	id 1jM0QZ-0004M7-76
+	for qemu-devel@archiver.kernel.org; Tue, 07 Apr 2020 22:26:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39601)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jingqi.liu@intel.com>) id 1jM0PI-00037l-7z
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 22:25:37 -0400
+ (envelope-from <fengli@smartx.com>) id 1jM0Pd-0003Pj-6m
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 22:25:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jingqi.liu@intel.com>) id 1jM0PG-00029P-El
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 22:25:35 -0400
-Received: from mga03.intel.com ([134.134.136.65]:30247)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
- id 1jM0PG-00025b-5G
- for qemu-devel@nongnu.org; Tue, 07 Apr 2020 22:25:34 -0400
-IronPort-SDR: IK0RZNAIEBKpFS8AO9Kliwxvrrz/Wha/Vuk0xHW4gOg/UwvKgnX/m2lzS4r7WsDKRx0yUju+Q8
- cY+tg/IbKAIg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 07 Apr 2020 19:25:29 -0700
-IronPort-SDR: swITCJNrJqDcbjiTXvS/abIRR+6uayNvPS2N5eoXn/nRBRPbXatoMYWYkYKSFCaa/GPXgG1t/b
- XtfgCIt3lWLQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,357,1580803200"; d="scan'208";a="452669511"
-Received: from jingqili-mobl.ccr.corp.intel.com (HELO [10.238.4.245])
- ([10.238.4.245])
- by fmsmga006.fm.intel.com with ESMTP; 07 Apr 2020 19:25:28 -0700
-Subject: Re: [PATCH] exec: fetch the alignment of Linux devdax pmem character
- device nodes
-To: Joao Martins <joao.m.martins@oracle.com>,
- "Williams, Dan J" <dan.j.williams@intel.com>
-References: <20200401031314.11592-1-jingqi.liu@intel.com>
- <c906a3ae-c9d2-5802-5988-3c1d0302109b@oracle.com>
- <CAPcyv4igr9-DJx2ehoHj7sXk5g5GmgmivCqM3VpmJV7J4QM+kA@mail.gmail.com>
- <3873cb30-608c-6a27-c19f-f6446898796f@oracle.com>
-From: "Liu, Jingqi" <jingqi.liu@intel.com>
-Message-ID: <9959e648-94f6-3be3-2271-3d2b855e7e48@intel.com>
-Date: Wed, 8 Apr 2020 10:25:27 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <fengli@smartx.com>) id 1jM0Pa-0002jE-Ug
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 22:25:56 -0400
+Received: from mail-ua1-x942.google.com ([2607:f8b0:4864:20::942]:43708)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <fengli@smartx.com>) id 1jM0Pa-0002gg-KZ
+ for qemu-devel@nongnu.org; Tue, 07 Apr 2020 22:25:54 -0400
+Received: by mail-ua1-x942.google.com with SMTP id g24so2136092uan.10
+ for <qemu-devel@nongnu.org>; Tue, 07 Apr 2020 19:25:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=smartx-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:from:date:message-id:subject:to:cc
+ :content-transfer-encoding;
+ bh=QUsmYknwvXS5jHeVb9UmcxW3NPCdLzru5P2I7Y4+m/g=;
+ b=w5TZ9R056RxEj/G40B2VmuyYxOkGhZosFtHnZ8FyFktgqGVO/8RSxCw4Pug+HJo77X
+ jXYQcnKZqtEEAwNGIffGQ0QWf1PuK+dWtszCNQW4o93oFN1YA6i4JnAbPvjuFMOj55Mg
+ stn5fnZ3LyAiVLrwDD0F7MxG7/NrE1X9fL19fYDUL+eFWAbWzFVSWsWs4BzGj3or5U5N
+ hTL9sPo6xA5uvVZoKyaf6hD9h3xwo052v1mOS3agllGKF10Fk0AG3UVdVIlccz+Z2LGG
+ +wvWbD/DCGJAEsjQWXPNwuezPQlt7AnohzJ+lfPj+1o9MhZOXnSjwYbAiJrKEPR3mXoE
+ QoXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
+ :content-transfer-encoding;
+ bh=QUsmYknwvXS5jHeVb9UmcxW3NPCdLzru5P2I7Y4+m/g=;
+ b=YNz4ibbCr7Lf/GT6bsA6Tn7bWCeXjIz3ikUCGBx+4FzowE3fowGsgkXcC9dUyyxGWg
+ W02FjVZjBwc9bEvpQPjvqjNcDkLzkQnDYCvDKo2a+VNL/h4NE0cu5L3H9IoBlF3L5Ut5
+ NdjC4eJWnzoRlOLGLiixqbUqSDOpsEDqIB17IlZdST+aXv6ETuzH0VJGC2yDSh+2m266
+ gRZeyr1IiQ/HPXODwo/aub2JCVu2mOvN8hSEOAJ0ex6nA/bCNFQGuMabYIXW3TkFx2PD
+ fHQcCi6RV41dr8vYROGcfCqtzRlX5BC0ZI9AuJIl2k7V3DPqcVQjZedo8PzYyGQCIZ8I
+ IX1w==
+X-Gm-Message-State: AGi0PuaS7KQb+qzq6W9xD2/JLbdBV2jaGtWybUJllSgMnPMBHVgMDhqX
+ pZHFAK5smO8igSkLZ3lGUavf9VI4ElDzF6rxTTLf/DGZinF525755VEbs2XAYdCd4oUiCVb8Ad2
+ SGGvQC35IK/47+2ratQaGe1mj
+X-Google-Smtp-Source: APiQypIxlYLBkuhSqIdesEEbo+heGgN5IuHRJ6I6rUIA7VoYzpoD2u4eNTVKPJLIgIqQ3NYd/ceQOl+ix7Ds6q/fmXw=
+X-Received: by 2002:ab0:1d10:: with SMTP id j16mr3893669uak.91.1586312753231; 
+ Tue, 07 Apr 2020 19:25:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <3873cb30-608c-6a27-c19f-f6446898796f@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.65
+From: Li Feng <fengli@smartx.com>
+Date: Wed, 8 Apr 2020 10:25:42 +0800
+Message-ID: <CAHckoCzojVSHLAwBP2QhFx3Gw6j9DVPRwNSML9D4GQMzKr9Y3g@mail.gmail.com>
+Subject: hotplug issue of vhost-user-blk
+To: "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, 
+ "open list:Block layer core" <qemu-block@nongnu.org>, 
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ raphael.norwitz@nutanix.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::942
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,123 +90,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Qemu Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: Kyle Zhang <kyle@smartx.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/8/2020 2:28 AM, Joao Martins wrote:
-> On 4/7/20 5:55 PM, Dan Williams wrote:
->> On Tue, Apr 7, 2020 at 4:01 AM Joao Martins <joao.m.martins@oracle.com> wrote:
->>> On 4/1/20 4:13 AM, Jingqi Liu wrote:
->>>> If the backend file is devdax pmem character device, the alignment
->>>> specified by the option 'align=NUM' in the '-object memory-backend-file'
->>>> needs to match the alignment requirement of the devdax pmem character device.
->>>>
->>>> This patch fetches the devdax pmem file 'align', so that we can compare
->>>> it with the NUM of 'align=NUM'.
->>>> The NUM needs to be larger than or equal to the devdax pmem file 'align'.
->>>>
->>>> It also fixes the problem that mmap() returns failure in qemu_ram_mmap()
->>>> when the NUM of 'align=NUM' is less than the devdax pmem file 'align'.
->>>>
->>>> Cc: Dan Williams <dan.j.williams@intel.com>
->>>> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
->>>> ---
->>>>   exec.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
->>>>   1 file changed, 45 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/exec.c b/exec.c
->>>> index de9d949902..8221abffec 100644
->>>> --- a/exec.c
->>>> +++ b/exec.c
->>>> @@ -1736,6 +1736,42 @@ static int64_t get_file_size(int fd)
->>>>       return size;
->>>>   }
->>>>
->>>> +static int64_t get_file_align(int fd)
->>>> +{
->>>> +    int64_t align = -1;
->>>> +#if defined(__linux__)
->>>> +    struct stat st;
->>>> +
->>>> +    if (fstat(fd, &st) < 0) {
->>>> +        return -errno;
->>>> +    }
->>>> +
->>>> +    /* Special handling for devdax character devices */
->>>> +    if (S_ISCHR(st.st_mode)) {
->>>> +        g_autofree char *subsystem_path = NULL;
->>>> +        g_autofree char *subsystem = NULL;
->>>> +
->>>> +        subsystem_path = g_strdup_printf("/sys/dev/char/%d:%d/subsystem",
->>>> +                                         major(st.st_rdev), minor(st.st_rdev));
->>>> +        subsystem = g_file_read_link(subsystem_path, NULL);
->>>> +
->>>> +        if (subsystem && g_str_has_suffix(subsystem, "/dax")) {
->>>> +            g_autofree char *align_path = NULL;
->>>> +            g_autofree char *align_str = NULL;
->>>> +
->>>> +            align_path = g_strdup_printf("/sys/dev/char/%d:%d/device/align",
->>>> +                                    major(st.st_rdev), minor(st.st_rdev));
->>>> +
->>> Perhaps, you meant instead:
->>>
->>>          /sys/dev/char/%d:%d/align
->>>
->> Hmm, are you sure that's working?
-> It is, except that I made the slight mistake of testing with a bunch of wip
-> patches on top which one of them actually adds the 'align' to child dax device.
->
-> Argh, my apologies - and thanks for noticing.
->
->> I expect the alignment to be found
->> in the region device:
->>
->> /sys/class/dax:
->> /sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0012:00/ndbus1/region1/dax1.1/dax1.0
->> $(readlink -f /sys/dev/char/253\:263)/../align
->> $(readlink -f /sys/dev/char/253\:263)/device/align
->>
->>
->> /sys/bus/dax:
->> /sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0012:00/ndbus1/region1/dax1.0/dax1.0
->> $(readlink -f /sys/dev/char/253\:265)/../align
->> $(readlink -f /sys/dev/char/253\:265)/device/align <-- No such file
->>
->> The use of the /sys/dev/char/%d:%d/device is only supported by the
->> deprecated /sys/class/dax.
+Hi all,
 
-Hi Dan,
+Hotplug of vhost-user-blk doesn't not work in qemu master branch and
+all previous version.
 
-Thanks for your comments.
+The action I insert a vhost-user-blk disk is:
+(qemu) chardev-add socket,id=3Dspdk_vhost_blk2,path=3D/vhost-blk.0,reconnec=
+t=3D1
+(qemu) device_add
+vhost-user-blk-pci,chardev=3Dspdk_vhost_blk2,id=3Dspdk_vhost_blk2,num-queue=
+s=3D4
 
-Seems it is a mistake.
+Until here, it's well.
 
-It should be: $(readlink -f /sys/dev/char/253\:263)/../../align
+Then I unplug it from qemu:
+(qemu) device_del spdk_vhost_blk2
+(qemu) chardev-remove spdk_vhost_blk2
+Error: Chardev 'spdk_vhost_blk2' is busy
 
-> I don't have the deprecated dax class enabled as could you tell, so the second
-> case is what I was testing. Except it wasn't a namespace/nvdimm but rather an
-> hmem device-dax.
->
-> '../align' though covers only one case? What about hmem which '../align' returns
-> ENOENT; perhaps using '../dax_region/align' instead which is common to both?
-> Albeit that wouldn't address the sub-division devices (that I mention above)
+The related code is here:
+qmp_chardev_remove
+    -> qemu_chr_is_busy
+    -> object_unparent(OBJECT(chr));
 
-Seems that you mean to use $(readlink -f 
-/sys/dev/char/253\:263)/../../dax_region/align.
+ 330 static bool qemu_chr_is_busy(Chardev *s)
+ 331 {
+ 332     if (CHARDEV_IS_MUX(s)) {
+ 333         MuxChardev *d =3D MUX_CHARDEV(s);
+ 334         return d->mux_cnt >=3D 0;
+ 335     } else {
+ 336         return s->be !=3D NULL;
+ 337     }
+ 338 }
 
-Right ?
+My question is:
+1. s->be is set to NULL when qemu_chr_fe_deinit is called.
+However, the qmp_chardev_remove is blocked at qemu_chr_is_busy check,
+then the object_unparent will not be called.
+2. Is there a path that device_del will trigger the s->be that been set to =
+NULL?
 
-Thanks,
+How should I fix this issue?
+I have tested that comment the qemu_chr_is_busy works well.
 
-Jingqi
+Thanks in advance.
 
->> The current /sys/bus/dax device-model can
->> be a drop in replacement as long as software is not written to the
->> /sys/class sysfs layout, i.e. it uses ../ instead of device/ to walk
->> to the region properties.
->>
-> /nods
+Feng Li
+
+--=20
+The SmartX email address is only for business purpose. Any sent message=20
+that is not related to the business is not authorized or permitted by=20
+SmartX.
+=E6=9C=AC=E9=82=AE=E7=AE=B1=E4=B8=BA=E5=8C=97=E4=BA=AC=E5=BF=97=E5=87=8C=E6=
+=B5=B7=E7=BA=B3=E7=A7=91=E6=8A=80=E6=9C=89=E9=99=90=E5=85=AC=E5=8F=B8=EF=BC=
+=88SmartX=EF=BC=89=E5=B7=A5=E4=BD=9C=E9=82=AE=E7=AE=B1. =E5=A6=82=E6=9C=AC=
+=E9=82=AE=E7=AE=B1=E5=8F=91=E5=87=BA=E7=9A=84=E9=82=AE=E4=BB=B6=E4=B8=8E=E5=
+=B7=A5=E4=BD=9C=E6=97=A0=E5=85=B3,=E8=AF=A5=E9=82=AE=E4=BB=B6=E6=9C=AA=E5=
+=BE=97=E5=88=B0=E6=9C=AC=E5=85=AC=E5=8F=B8=E4=BB=BB=E4=BD=95=E7=9A=84=E6=98=
+=8E=E7=A4=BA=E6=88=96=E9=BB=98=E7=A4=BA=E7=9A=84=E6=8E=88=E6=9D=83.
+
+
 
