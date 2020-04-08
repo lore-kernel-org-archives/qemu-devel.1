@@ -2,87 +2,58 @@ Return-Path: <SRS0=OEAU=5Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82861C2D0EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 13:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 832B1C2D0EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 13:05:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A1CB206F7
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 13:04:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R3kD5yzG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A1CB206F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 53D0A206F7
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 13:05:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D0A206F7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMANA-0007Sm-CO
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 09:04:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39966)
+	id 1jMAOG-0000PA-Gg
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 09:05:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39741)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jMAIw-000214-Ty
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:59:43 -0400
+ (envelope-from <miaoyubo@huawei.com>) id 1jMAI6-0008VH-Hl
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:58:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1jMAIw-0005SX-09
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:59:42 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43906
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <miaoyubo@huawei.com>) id 1jMAI5-00057u-BC
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:58:50 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:36632 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jMAIv-0005Ry-Si
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:59:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586350781;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VNwPELplmwfD1kCGcXRDxJa4F+4njivrwX3kZHTE16A=;
- b=R3kD5yzGEX1RxpXXqTQwIkvJZ2AA8DMbT4CA6pKKeIUVamdYJNEjnhJt+qbQKinr5P4uKk
- syXoG2x8Kqx/hMDBpRnGlhsHIASzJu6+H0Q/AmgYRMImHaeKkzmMTUwKw0fU2aYj69pKI0
- LBe5FdniztGXAo2FnqLCaNvhu3Klwbw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-_BrUqFhXO9GJJdNH-dtZUQ-1; Wed, 08 Apr 2020 08:59:38 -0400
-X-MC-Unique: _BrUqFhXO9GJJdNH-dtZUQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7CB08017F5;
- Wed,  8 Apr 2020 12:59:36 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-113-60.ams2.redhat.com
- [10.36.113.60])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BD60560C63;
- Wed,  8 Apr 2020 12:59:30 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id A28A01750A; Wed,  8 Apr 2020 14:59:28 +0200 (CEST)
-Date: Wed, 8 Apr 2020 14:59:28 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH v2 07/12] acpi: move aml builder code for rtc device
-Message-ID: <20200408125928.scuf2eh34553q3ao@sirius.home.kraxel.org>
-References: <20200403080502.8154-1-kraxel@redhat.com>
- <20200403080502.8154-8-kraxel@redhat.com>
- <20200403120921.258db9a5@redhat.com>
- <20200406082517.uyz7zv4jiqqjbcli@sirius.home.kraxel.org>
- <20200406141705.77d90b68@redhat.com>
- <20200407102658.x5tb4txcpvmtxfj7@sirius.home.kraxel.org>
- <20200408132727.374c470d@redhat.com>
+ (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1jMAI5-00056Q-0G
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:58:49 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 04ADFE5C3A63C306B1CD;
+ Wed,  8 Apr 2020 20:58:45 +0800 (CST)
+Received: from DESKTOP-D7EVK5B.china.huawei.com (10.173.221.29) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.487.0; Wed, 8 Apr 2020 20:58:34 +0800
+From: Yubo Miao <miaoyubo@huawei.com>
+To: <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>, <lersek@redhat.com>
+Subject: [PATCH v6 5/8] acpi: Align the size to 128k
+Date: Wed, 8 Apr 2020 20:58:13 +0800
+Message-ID: <20200408125816.955-6-miaoyubo@huawei.com>
+X-Mailer: git-send-email 2.24.1.windows.2
+In-Reply-To: <20200408125816.955-1-miaoyubo@huawei.com>
+References: <20200408125816.955-1-miaoyubo@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200408132727.374c470d@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain
+X-Originating-IP: [10.173.221.29]
+X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,59 +65,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: berrange@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ xiexiangyou@huawei.com, miaoyubo@huawei.com, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+From: miaoyubo <miaoyubo@huawei.com>
 
-> > > > > > +    crs =3D aml_resource_template();
-> > > > > > +    aml_append(crs, aml_io(AML_DECODE16, 0x0070, 0x0070, 0x10,=
- 0x02));
-> maybe replace magic 0x0070 with macro
->   RTC_BASE_ADDR
+If table size is changed between virt_acpi_build and
+virt_acpi_build_update, the table size would not be updated to
+UEFI, therefore, just align the size to 128kb, which is enough
+and same with x86. It would warn if 64k is not enough and the
+align size should be updated.
 
-Yes, that sounds better.
+Signed-off-by: miaoyubo <miaoyubo@huawei.com>
+---
+ hw/arm/virt-acpi-build.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-> > > > > > +    aml_append(crs, aml_irq_no_flags(8));
-> > > > > > +    aml_append(crs, aml_io(AML_DECODE16, 0x0072, 0x0072, 0x02,=
- 0x06));
->=20
-> one more comment, is this last io record correct?
-> (looking at realize it maps only 2 bytes at 0x70)
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 7bcd04dfb7..89bb768b0c 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -54,6 +54,8 @@
+ #include "hw/pci/pci_bridge.h"
+ #define ARM_SPI_BASE 32
+=20
++#define ACPI_BUILD_TABLE_SIZE             0x20000
++
+ static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
+ {
+     uint16_t i;
+@@ -883,6 +885,15 @@ struct AcpiBuildState {
+     bool patched;
+ } AcpiBuildState;
+=20
++static void acpi_align_size(GArray *blob, unsigned align)
++{
++    /*
++     * Align size to multiple of given size. This reduces the chance
++     * we need to change size in the future (breaking cross version migr=
+ation).
++     */
++    g_array_set_size(blob, ROUND_UP(acpi_data_len(blob), align));
++}
++
+ static
+ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+ {
+@@ -953,6 +964,20 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuil=
+dTables *tables)
+         build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
+     }
+=20
++    /*
++     * The align size is 128, warn if 64k is not enough therefore
++     * the align size could be resized.
++     */
++    if (tables_blob->len > ACPI_BUILD_TABLE_SIZE / 2) {
++        warn_report("ACPI table size %u exceeds %d bytes,"
++                    " migration may not work",
++                    tables_blob->len, ACPI_BUILD_TABLE_SIZE / 2);
++        error_printf("Try removing CPUs, NUMA nodes, memory slots"
++                     " or PCI bridges.");
++    }
++    acpi_align_size(tables_blob, ACPI_BUILD_TABLE_SIZE);
++
++
+     /* Cleanup memory that's no longer used. */
+     g_array_free(table_offsets, true);
+ }
+--=20
+2.19.1
 
-No idea, I've just moved around the code.
-
-Good question though.  Also why this splitted in two ranges the first
-place.  Looking at physical hardware (my workstation) I see this:
-
-        Device (RTC)
-        {
-            Name (_HID, EisaId ("PNP0B00") /* AT Real-Time Clock */)  // _H=
-ID: Hardware ID
-            Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Sett=
-ings
-            {
-                IO (Decode16,
-                    0x0070,             // Range Minimum
-                    0x0070,             // Range Maximum
-                    0x01,               // Alignment
-                    0x08,               // Length
-                    )
-                IRQNoFlags ()
-                    {8}
-            })
-        }
-
-Clues anyone?
-
-thanks,
-  Gerd
 
 
