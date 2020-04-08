@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29EC5C2D0EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 12:59:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD7CC2BA2B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 12:59:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC745206F7
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 12:59:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC745206F7
+	by mail.kernel.org (Postfix) with ESMTPS id D0AF3206F7
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 12:59:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0AF3206F7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMAJ5-0001gY-3P
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 08:59:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39726)
+	id 1jMAJ6-0001gC-0F
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 08:59:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39749)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <miaoyubo@huawei.com>) id 1jMAI6-0008VF-7A
+ (envelope-from <miaoyubo@huawei.com>) id 1jMAI6-0008VI-Mo
  for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:58:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <miaoyubo@huawei.com>) id 1jMAI4-00057H-LL
+ (envelope-from <miaoyubo@huawei.com>) id 1jMAI5-00057n-5i
  for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:58:50 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3734 helo=huawei.com)
+Received: from szxga06-in.huawei.com ([45.249.212.32]:36626 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1jMAI4-00054j-1P
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:58:48 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id D4944FF1204E8B325098;
- Wed,  8 Apr 2020 20:58:39 +0800 (CST)
+ (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1jMAI4-00056R-Ei
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:58:49 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id E71CBAE3E4A40088D63C;
+ Wed,  8 Apr 2020 20:58:44 +0800 (CST)
 Received: from DESKTOP-D7EVK5B.china.huawei.com (10.173.221.29) by
  DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 8 Apr 2020 20:58:32 +0800
+ 14.3.487.0; Wed, 8 Apr 2020 20:58:35 +0800
 From: Yubo Miao <miaoyubo@huawei.com>
 To: <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>, <lersek@redhat.com>
-Subject: [PATCH v6 1/8] acpi: Extract two APIs from acpi_dsdt_add_pci
-Date: Wed, 8 Apr 2020 20:58:09 +0800
-Message-ID: <20200408125816.955-2-miaoyubo@huawei.com>
+Subject: [PATCH v6 6/8] unit-test: The files changed.
+Date: Wed, 8 Apr 2020 20:58:14 +0800
+Message-ID: <20200408125816.955-7-miaoyubo@huawei.com>
 X-Mailer: git-send-email 2.24.1.windows.2
 In-Reply-To: <20200408125816.955-1-miaoyubo@huawei.com>
 References: <20200408125816.955-1-miaoyubo@huawei.com>
@@ -53,7 +53,7 @@ X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.191
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,206 +73,164 @@ Sender: "Qemu-devel"
 
 From: miaoyubo <miaoyubo@huawei.com>
 
-Extract two APIs acpi_dsdt_add_pci_route_table and
-acpi_dsdt_add_pci_osc form acpi_dsdt_add_pci. The first
-API is used to specify the pci route table and the second
-API is used to declare the operation system capabilities.
-These two APIs would be used to specify the pxb-pcie in DSDT.
+The unit-test is seperated into three patches:
+1. The files changed and list in bios-tables-test-allowed-diff.h
+2. The unit-test
+3. The binary file and clear bios-tables-test-allowed-diff.h
+
+The ASL diff would also be listed.
+Sice there are 1000+lines diff, some changes would be omitted.
+
+  * Original Table Header:
+  *     Signature        "DSDT"
+- *     Length           0x000014BB (5307)
++ *     Length           0x00001E7A (7802)
+  *     Revision         0x02
+- *     Checksum         0xD1
++ *     Checksum         0x57
+  *     OEM ID           "BOCHS "
+  *     OEM Table ID     "BXPCDSDT"
+  *     OEM Revision     0x00000001 (1)
+
++        Device (PC80)
++        {
++            Name (_HID, "PNP0A08" /* PCI Express Bus */)  // _HID: Hardw=
+are ID
++            Name (_CID, "PNP0A03" /* PCI Bus */)  // _CID: Compatible ID
++            Name (_ADR, Zero)  // _ADR: Address
++            Name (_CCA, One)  // _CCA: Cache Coherency Attribute
++            Name (_SEG, Zero)  // _SEG: PCI Segment
++            Name (_BBN, 0x80)  // _BBN: BIOS Bus Number
++            Name (_UID, 0x80)  // _UID: Unique ID
++            Name (_STR, Unicode ("pxb Device"))  // _STR: Description St=
+ring
++            Name (_PRT, Package (0x80)  // _PRT: PCI Routing Table
++            {
++                Package (0x04)
++                {
++                    0xFFFF,
++                    Zero,
++                    GSI0,
++                    Zero
++                },
++
+
+Packages are omitted.
+
++                Package (0x04)
++                {
++                    0x001FFFFF,
++                    0x03,
++                    GSI2,
++                    Zero
++                }
++            })
++            Device (GSI0)
++            {
++                Name (_HID, "PNP0C0F" /* PCI Interrupt Link Device */)  =
+// _HID: Hardware ID
++                Name (_UID, Zero)  // _UID: Unique ID
++                Name (_PRS, ResourceTemplate ()  // _PRS: Possible Resou=
+rce Settings
++                {
++                    Interrupt (ResourceConsumer, Level, ActiveHigh, Excl=
+usive, ,, )
++                    {
++                        0x00000023,
++                    }
++                })
++                Name (_CRS, ResourceTemplate ()  // _CRS: Current Resour=
+ce Settings
++                {
++                    Interrupt (ResourceConsumer, Level, ActiveHigh, Excl=
+usive, ,, )
++                    {
++                        0x00000023,
++                    }
++                })
++                Method (_SRS, 1, NotSerialized)  // _SRS: Set Resource S=
+ettings
++                {
++                }
++            }
+
+GSI1,2,3 are omitted.
+
++            Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource S=
+ettings
++            {
++                WordBusNumber (ResourceProducer, MinFixed, MaxFixed, Pos=
+Decode,
++                    0x0000,             // Granularity
++                    0x0080,             // Range Minimum
++                    0x0080,             // Range Maximum
++                    0x0000,             // Translation Offset
++                    0x0001,             // Length
++                    ,, )
++            })
++            Name (SUPP, Zero)
++            Name (CTRL, Zero)
++            Method (_OSC, 4, NotSerialized)  // _OSC: Operating System C=
+apabilities
++            {
++                CreateDWordField (Arg3, Zero, CDW1)
++                If ((Arg0 =3D=3D ToUUID ("33db4d5b-1ff7-401c-9657-7441c0=
+3dd766") /* PCI Host Bridge Device */))
++                {
++                    CreateDWordField (Arg3, 0x04, CDW2)
++                    CreateDWordField (Arg3, 0x08, CDW3)
++                    SUPP =3D CDW2 /* \_SB_.PC80._OSC.CDW2 */
++                    CTRL =3D CDW3 /* \_SB_.PC80._OSC.CDW3 */
++                    CTRL &=3D 0x1F
++                    If ((Arg1 !=3D One))
++                    {
++                        CDW1 |=3D 0x08
++                    }
++
++                    If ((CDW3 !=3D CTRL))
++                    {
++                        CDW1 |=3D 0x10
++                    }
++
++                    CDW3 =3D CTRL /* \_SB_.PC80.CTRL */
++                    Return (Arg3)
++                }
++                Else
++                {
++                    CDW1 |=3D 0x04
++                    Return (Arg3)
++                }
++            }
+
+DSM is are omitted
+
+         Device (PCI0)
+         {
+             Name (_HID, "PNP0A08" /* PCI Express Bus */)  // _HID: Hardw=
+are ID
+                     WordBusNumber (ResourceProducer, MinFixed, MaxFixed,=
+ PosDecode,
+                         0x0000,             // Granularity
+                         0x0000,             // Range Minimum
+-                        0x00FF,             // Range Maximum
++                        0x007F,             // Range Maximum
+                         0x0000,             // Translation Offset
+-                        0x0100,             // Length
++                        0x0080,             // Length
 
 Signed-off-by: miaoyubo <miaoyubo@huawei.com>
 ---
- hw/arm/virt-acpi-build.c | 129 ++++++++++++++++++++++-----------------
- 1 file changed, 72 insertions(+), 57 deletions(-)
+ tests/qtest/bios-tables-test-allowed-diff.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 7ef0733d71..e8ba09855c 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -146,29 +146,11 @@ static void acpi_dsdt_add_virtio(Aml *scope,
-     }
- }
-=20
--static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
--                              uint32_t irq, bool use_highmem, bool highm=
-em_ecam)
-+static void acpi_dsdt_add_pci_route_table(Aml *dev, Aml *scope,
-+                                          uint32_t irq)
- {
--    int ecam_id =3D VIRT_ECAM_ID(highmem_ecam);
--    Aml *method, *crs, *ifctx, *UUID, *ifctx1, *elsectx, *buf;
-     int i, slot_no;
--    hwaddr base_mmio =3D memmap[VIRT_PCIE_MMIO].base;
--    hwaddr size_mmio =3D memmap[VIRT_PCIE_MMIO].size;
--    hwaddr base_pio =3D memmap[VIRT_PCIE_PIO].base;
--    hwaddr size_pio =3D memmap[VIRT_PCIE_PIO].size;
--    hwaddr base_ecam =3D memmap[ecam_id].base;
--    hwaddr size_ecam =3D memmap[ecam_id].size;
--    int nr_pcie_buses =3D size_ecam / PCIE_MMCFG_SIZE_MIN;
--
--    Aml *dev =3D aml_device("%s", "PCI0");
--    aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08")));
--    aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
--    aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
--    aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
--    aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
--    aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")))=
-;
--    aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
--
-+    Aml *method, *crs;
-     /* Declare the PCI Routing Table. */
-     Aml *rt_pkg =3D aml_varpackage(PCI_SLOT_MAX * PCI_NUM_PINS);
-     for (slot_no =3D 0; slot_no < PCI_SLOT_MAX; slot_no++) {
-@@ -204,41 +186,11 @@ static void acpi_dsdt_add_pci(Aml *scope, const Mem=
-MapEntry *memmap,
-         aml_append(dev_gsi, method);
-         aml_append(dev, dev_gsi);
-     }
-+}
-=20
--    method =3D aml_method("_CBA", 0, AML_NOTSERIALIZED);
--    aml_append(method, aml_return(aml_int(base_ecam)));
--    aml_append(dev, method);
--
--    method =3D aml_method("_CRS", 0, AML_NOTSERIALIZED);
--    Aml *rbuf =3D aml_resource_template();
--    aml_append(rbuf,
--        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE=
-,
--                            0x0000, 0x0000, nr_pcie_buses - 1, 0x0000,
--                            nr_pcie_buses));
--    aml_append(rbuf,
--        aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
--                         AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000, base=
-_mmio,
--                         base_mmio + size_mmio - 1, 0x0000, size_mmio));
--    aml_append(rbuf,
--        aml_dword_io(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
--                     AML_ENTIRE_RANGE, 0x0000, 0x0000, size_pio - 1, bas=
-e_pio,
--                     size_pio));
--
--    if (use_highmem) {
--        hwaddr base_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].base;
--        hwaddr size_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].size;
--
--        aml_append(rbuf,
--            aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXE=
-D,
--                             AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000,
--                             base_mmio_high,
--                             base_mmio_high + size_mmio_high - 1, 0x0000=
-,
--                             size_mmio_high));
--    }
--
--    aml_append(method, aml_return(rbuf));
--    aml_append(dev, method);
--
-+static void acpi_dsdt_add_pci_osc(Aml *dev, Aml *scope)
-+{
-+    Aml *method, *UUID, *ifctx, *ifctx1, *elsectx, *buf;
-     /* Declare an _OSC (OS Control Handoff) method */
-     aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
-     aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
-@@ -246,7 +198,8 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMa=
-pEntry *memmap,
-     aml_append(method,
-         aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
-=20
--    /* PCI Firmware Specification 3.0
-+    /*
-+     * PCI Firmware Specification 3.0
-      * 4.5.1. _OSC Interface for PCI Host Bridge Devices
-      * The _OSC interface for a PCI/PCI-X/PCI Express hierarchy is
-      * identified by the Universal Unique IDentifier (UUID)
-@@ -291,7 +244,8 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMa=
-pEntry *memmap,
-=20
-     method =3D aml_method("_DSM", 4, AML_NOTSERIALIZED);
-=20
--    /* PCI Firmware Specification 3.0
-+    /*
-+     * PCI Firmware Specification 3.0
-      * 4.6.1. _DSM for PCI Express Slot Information
-      * The UUID in _DSM in this context is
-      * {E5C937D0-3553-4D7A-9117-EA4D19C3434D}
-@@ -309,6 +263,67 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemM=
-apEntry *memmap,
-     buf =3D aml_buffer(1, byte_list);
-     aml_append(method, aml_return(buf));
-     aml_append(dev, method);
-+}
-+
-+static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-+                              uint32_t irq, bool use_highmem, bool highm=
-em_ecam)
-+{
-+    int ecam_id =3D VIRT_ECAM_ID(highmem_ecam);
-+    Aml *method, *crs;
-+    hwaddr base_mmio =3D memmap[VIRT_PCIE_MMIO].base;
-+    hwaddr size_mmio =3D memmap[VIRT_PCIE_MMIO].size;
-+    hwaddr base_pio =3D memmap[VIRT_PCIE_PIO].base;
-+    hwaddr size_pio =3D memmap[VIRT_PCIE_PIO].size;
-+    hwaddr base_ecam =3D memmap[ecam_id].base;
-+    hwaddr size_ecam =3D memmap[ecam_id].size;
-+    int nr_pcie_buses =3D size_ecam / PCIE_MMCFG_SIZE_MIN;
-+
-+    Aml *dev =3D aml_device("%s", "PCI0");
-+    aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08")));
-+    aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
-+    aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
-+    aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
-+    aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
-+    aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")))=
-;
-+    aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
-+
-+    acpi_dsdt_add_pci_route_table(dev, scope, irq);
-+
-+    method =3D aml_method("_CBA", 0, AML_NOTSERIALIZED);
-+    aml_append(method, aml_return(aml_int(base_ecam)));
-+    aml_append(dev, method);
-+
-+    method =3D aml_method("_CRS", 0, AML_NOTSERIALIZED);
-+    Aml *rbuf =3D aml_resource_template();
-+    aml_append(rbuf,
-+        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE=
-,
-+                            0x0000, 0x0000, nr_pcie_buses - 1, 0x0000,
-+                            nr_pcie_buses));
-+    aml_append(rbuf,
-+        aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
-+                         AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000, base=
-_mmio,
-+                         base_mmio + size_mmio - 1, 0x0000, size_mmio));
-+    aml_append(rbuf,
-+        aml_dword_io(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
-+                     AML_ENTIRE_RANGE, 0x0000, 0x0000, size_pio - 1, bas=
-e_pio,
-+                     size_pio));
-+
-+    if (use_highmem) {
-+        hwaddr base_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].base;
-+        hwaddr size_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].size;
-+
-+        aml_append(rbuf,
-+            aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXE=
-D,
-+                             AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000,
-+                             base_mmio_high,
-+                             base_mmio_high + size_mmio_high - 1, 0x0000=
-,
-+                             size_mmio_high));
-+    }
-+
-+    aml_append(method, aml_return(rbuf));
-+    aml_append(dev, method);
-+
-+    acpi_dsdt_add_pci_osc(dev, scope);
-=20
-     Aml *dev_res0 =3D aml_device("%s", "RES0");
-     aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bi=
+os-tables-test-allowed-diff.h
+index dfb8523c8b..90c53925fc 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,2 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/virt/DSDT.pxb",
 --=20
 2.19.1
 
