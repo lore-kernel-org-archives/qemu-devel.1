@@ -2,106 +2,58 @@ Return-Path: <SRS0=OEAU=5Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AFC1C2D0EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 12:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29EC5C2D0EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 12:59:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AAA02051A
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 12:50:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dIKMIcVL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AAA02051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EC745206F7
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 12:59:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC745206F7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMAA2-0005J0-He
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 08:50:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38382)
+	id 1jMAJ5-0001gY-3P
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 08:59:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39726)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jMA91-0004R1-Bh
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:49:28 -0400
+ (envelope-from <miaoyubo@huawei.com>) id 1jMAI6-0008VF-7A
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:58:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jMA90-0000Xa-ED
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:49:27 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32088
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <miaoyubo@huawei.com>) id 1jMAI4-00057H-LL
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:58:50 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3734 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jMA90-0000XH-AZ
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:49:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586350165;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=t7zpjpAdw1wcxqXlOCVBiWPcaXOEIDWcPW1P0Jvz3iw=;
- b=dIKMIcVLpCCXsH5IGQzc2ApSKwiUnmdeSDbP8MNWu6G5mNgfG4NpZYYbkbNSzML3ec/AhW
- BOcwVw8yYYlcdpE8oPdjh0Nn+gMvVsz1kc6TR9N3laKI+uOQ/6vl+B6C7H4ei82CBHYcik
- YfUWyBPEqG1y09nixRB1aYmlSe52lNM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-g5fuLiXpORWN68IVUXdMaA-1; Wed, 08 Apr 2020 08:49:21 -0400
-X-MC-Unique: g5fuLiXpORWN68IVUXdMaA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A8F0800D4E;
- Wed,  8 Apr 2020 12:49:19 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-144.ams2.redhat.com
- [10.36.113.144])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ADE045C3FA;
- Wed,  8 Apr 2020 12:49:16 +0000 (UTC)
-Subject: Re: [PATCH v4 18/30] qcow2: Add subcluster support to
- qcow2_get_host_offset()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1584468723.git.berto@igalia.com>
- <1cc780f735044ac9138808234589d2c278c9cfbf.1584468723.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <69ca2dca-92f2-a1b2-33ab-f112a88b6163@redhat.com>
-Date: Wed, 8 Apr 2020 14:49:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1jMAI4-00054j-1P
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 08:58:48 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id D4944FF1204E8B325098;
+ Wed,  8 Apr 2020 20:58:39 +0800 (CST)
+Received: from DESKTOP-D7EVK5B.china.huawei.com (10.173.221.29) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.487.0; Wed, 8 Apr 2020 20:58:32 +0800
+From: Yubo Miao <miaoyubo@huawei.com>
+To: <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>, <lersek@redhat.com>
+Subject: [PATCH v6 1/8] acpi: Extract two APIs from acpi_dsdt_add_pci
+Date: Wed, 8 Apr 2020 20:58:09 +0800
+Message-ID: <20200408125816.955-2-miaoyubo@huawei.com>
+X-Mailer: git-send-email 2.24.1.windows.2
+In-Reply-To: <20200408125816.955-1-miaoyubo@huawei.com>
+References: <20200408125816.955-1-miaoyubo@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1cc780f735044ac9138808234589d2c278c9cfbf.1584468723.git.berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="fxMiEpSIr5QFFKbhNLMdW62KVGePgZ9O9"
+Content-Type: text/plain
+X-Originating-IP: [10.173.221.29]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,59 +65,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: berrange@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ xiexiangyou@huawei.com, miaoyubo@huawei.com, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fxMiEpSIr5QFFKbhNLMdW62KVGePgZ9O9
-Content-Type: multipart/mixed; boundary="muhzVaavICL0WRyDJLbtBuFPBA6YDLXxv"
+From: miaoyubo <miaoyubo@huawei.com>
 
---muhzVaavICL0WRyDJLbtBuFPBA6YDLXxv
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Extract two APIs acpi_dsdt_add_pci_route_table and
+acpi_dsdt_add_pci_osc form acpi_dsdt_add_pci. The first
+API is used to specify the pci route table and the second
+API is used to declare the operation system capabilities.
+These two APIs would be used to specify the pxb-pcie in DSDT.
 
-On 17.03.20 19:16, Alberto Garcia wrote:
-> The logic of this function remains pretty much the same, except that
-> it uses count_contiguous_subclusters(), which combines the logic of
-> count_contiguous_clusters() / count_contiguous_clusters_unallocated()
-> and checks individual subclusters.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2.h         |  38 +++++------
->  block/qcow2-cluster.c | 143 +++++++++++++++++++++---------------------
->  2 files changed, 85 insertions(+), 96 deletions(-)
+Signed-off-by: miaoyubo <miaoyubo@huawei.com>
+---
+ hw/arm/virt-acpi-build.c | 129 ++++++++++++++++++++++-----------------
+ 1 file changed, 72 insertions(+), 57 deletions(-)
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 7ef0733d71..e8ba09855c 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -146,29 +146,11 @@ static void acpi_dsdt_add_virtio(Aml *scope,
+     }
+ }
+=20
+-static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+-                              uint32_t irq, bool use_highmem, bool highm=
+em_ecam)
++static void acpi_dsdt_add_pci_route_table(Aml *dev, Aml *scope,
++                                          uint32_t irq)
+ {
+-    int ecam_id =3D VIRT_ECAM_ID(highmem_ecam);
+-    Aml *method, *crs, *ifctx, *UUID, *ifctx1, *elsectx, *buf;
+     int i, slot_no;
+-    hwaddr base_mmio =3D memmap[VIRT_PCIE_MMIO].base;
+-    hwaddr size_mmio =3D memmap[VIRT_PCIE_MMIO].size;
+-    hwaddr base_pio =3D memmap[VIRT_PCIE_PIO].base;
+-    hwaddr size_pio =3D memmap[VIRT_PCIE_PIO].size;
+-    hwaddr base_ecam =3D memmap[ecam_id].base;
+-    hwaddr size_ecam =3D memmap[ecam_id].size;
+-    int nr_pcie_buses =3D size_ecam / PCIE_MMCFG_SIZE_MIN;
+-
+-    Aml *dev =3D aml_device("%s", "PCI0");
+-    aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08")));
+-    aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
+-    aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
+-    aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
+-    aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
+-    aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")))=
+;
+-    aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
+-
++    Aml *method, *crs;
+     /* Declare the PCI Routing Table. */
+     Aml *rt_pkg =3D aml_varpackage(PCI_SLOT_MAX * PCI_NUM_PINS);
+     for (slot_no =3D 0; slot_no < PCI_SLOT_MAX; slot_no++) {
+@@ -204,41 +186,11 @@ static void acpi_dsdt_add_pci(Aml *scope, const Mem=
+MapEntry *memmap,
+         aml_append(dev_gsi, method);
+         aml_append(dev, dev_gsi);
+     }
++}
+=20
+-    method =3D aml_method("_CBA", 0, AML_NOTSERIALIZED);
+-    aml_append(method, aml_return(aml_int(base_ecam)));
+-    aml_append(dev, method);
+-
+-    method =3D aml_method("_CRS", 0, AML_NOTSERIALIZED);
+-    Aml *rbuf =3D aml_resource_template();
+-    aml_append(rbuf,
+-        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE=
+,
+-                            0x0000, 0x0000, nr_pcie_buses - 1, 0x0000,
+-                            nr_pcie_buses));
+-    aml_append(rbuf,
+-        aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
+-                         AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000, base=
+_mmio,
+-                         base_mmio + size_mmio - 1, 0x0000, size_mmio));
+-    aml_append(rbuf,
+-        aml_dword_io(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
+-                     AML_ENTIRE_RANGE, 0x0000, 0x0000, size_pio - 1, bas=
+e_pio,
+-                     size_pio));
+-
+-    if (use_highmem) {
+-        hwaddr base_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].base;
+-        hwaddr size_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].size;
+-
+-        aml_append(rbuf,
+-            aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXE=
+D,
+-                             AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000,
+-                             base_mmio_high,
+-                             base_mmio_high + size_mmio_high - 1, 0x0000=
+,
+-                             size_mmio_high));
+-    }
+-
+-    aml_append(method, aml_return(rbuf));
+-    aml_append(dev, method);
+-
++static void acpi_dsdt_add_pci_osc(Aml *dev, Aml *scope)
++{
++    Aml *method, *UUID, *ifctx, *ifctx1, *elsectx, *buf;
+     /* Declare an _OSC (OS Control Handoff) method */
+     aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
+     aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
+@@ -246,7 +198,8 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMa=
+pEntry *memmap,
+     aml_append(method,
+         aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
+=20
+-    /* PCI Firmware Specification 3.0
++    /*
++     * PCI Firmware Specification 3.0
+      * 4.5.1. _OSC Interface for PCI Host Bridge Devices
+      * The _OSC interface for a PCI/PCI-X/PCI Express hierarchy is
+      * identified by the Universal Unique IDentifier (UUID)
+@@ -291,7 +244,8 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMa=
+pEntry *memmap,
+=20
+     method =3D aml_method("_DSM", 4, AML_NOTSERIALIZED);
+=20
+-    /* PCI Firmware Specification 3.0
++    /*
++     * PCI Firmware Specification 3.0
+      * 4.6.1. _DSM for PCI Express Slot Information
+      * The UUID in _DSM in this context is
+      * {E5C937D0-3553-4D7A-9117-EA4D19C3434D}
+@@ -309,6 +263,67 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemM=
+apEntry *memmap,
+     buf =3D aml_buffer(1, byte_list);
+     aml_append(method, aml_return(buf));
+     aml_append(dev, method);
++}
++
++static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
++                              uint32_t irq, bool use_highmem, bool highm=
+em_ecam)
++{
++    int ecam_id =3D VIRT_ECAM_ID(highmem_ecam);
++    Aml *method, *crs;
++    hwaddr base_mmio =3D memmap[VIRT_PCIE_MMIO].base;
++    hwaddr size_mmio =3D memmap[VIRT_PCIE_MMIO].size;
++    hwaddr base_pio =3D memmap[VIRT_PCIE_PIO].base;
++    hwaddr size_pio =3D memmap[VIRT_PCIE_PIO].size;
++    hwaddr base_ecam =3D memmap[ecam_id].base;
++    hwaddr size_ecam =3D memmap[ecam_id].size;
++    int nr_pcie_buses =3D size_ecam / PCIE_MMCFG_SIZE_MIN;
++
++    Aml *dev =3D aml_device("%s", "PCI0");
++    aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08")));
++    aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
++    aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
++    aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
++    aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
++    aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")))=
+;
++    aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
++
++    acpi_dsdt_add_pci_route_table(dev, scope, irq);
++
++    method =3D aml_method("_CBA", 0, AML_NOTSERIALIZED);
++    aml_append(method, aml_return(aml_int(base_ecam)));
++    aml_append(dev, method);
++
++    method =3D aml_method("_CRS", 0, AML_NOTSERIALIZED);
++    Aml *rbuf =3D aml_resource_template();
++    aml_append(rbuf,
++        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE=
+,
++                            0x0000, 0x0000, nr_pcie_buses - 1, 0x0000,
++                            nr_pcie_buses));
++    aml_append(rbuf,
++        aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
++                         AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000, base=
+_mmio,
++                         base_mmio + size_mmio - 1, 0x0000, size_mmio));
++    aml_append(rbuf,
++        aml_dword_io(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
++                     AML_ENTIRE_RANGE, 0x0000, 0x0000, size_pio - 1, bas=
+e_pio,
++                     size_pio));
++
++    if (use_highmem) {
++        hwaddr base_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].base;
++        hwaddr size_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].size;
++
++        aml_append(rbuf,
++            aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXE=
+D,
++                             AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000,
++                             base_mmio_high,
++                             base_mmio_high + size_mmio_high - 1, 0x0000=
+,
++                             size_mmio_high));
++    }
++
++    aml_append(method, aml_return(rbuf));
++    aml_append(dev, method);
++
++    acpi_dsdt_add_pci_osc(dev, scope);
+=20
+     Aml *dev_res0 =3D aml_device("%s", "RES0");
+     aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
+--=20
+2.19.1
 
-(Oops, totally missed the L1 entry out of bounds / L1 entry empty part
-in v3.)
-
-
---muhzVaavICL0WRyDJLbtBuFPBA6YDLXxv--
-
---fxMiEpSIr5QFFKbhNLMdW62KVGePgZ9O9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6NyEoACgkQ9AfbAGHV
-z0CJ1wf/YsZdoHgoElta2IZPsECeWGsvs7i8h3u0JdQCzg1szOusKVmczUeBFZV9
-nlRERRYvUGBDX3Xm8r5jpmpLuVLmFsH5h1gUXS4vIKHJCbFRdsEjUHXtzzChO5Wp
-o0ym8ONg0SUWQgIzBNwsMIBJnCdOq67p/gePWPhw40mTpP7FT34QBJqYZ6YeSyDP
-WG7feSEeza6UpRrvOGM8vqXwpzWhuY3Jo8oB3qOMStgOj4OYwmuRuNN6MicGMAgS
-arnHXOC+7zgPzQQ8QXSrZr2E+nfOI70rswIKrDOLgWlyxgu0tLzZ8brudP6yp8Pn
-66z2QdQbrTDBfMl8c4TOl4IpZO15Bg==
-=Zzj+
------END PGP SIGNATURE-----
-
---fxMiEpSIr5QFFKbhNLMdW62KVGePgZ9O9--
 
 
