@@ -2,87 +2,113 @@ Return-Path: <SRS0=OEAU=5Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BDE2C2D0EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 15:35:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F958C2D0EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 15:50:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13E0C206F7
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 15:35:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="egOm0rpP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13E0C206F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id F3FA5206F5
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 15:50:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3FA5206F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMCjm-0002P9-3P
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 11:35:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33454)
+	id 1jMCxs-0001EV-1U
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 11:50:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36039)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jMCfS-0005tP-JR
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 11:31:08 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jMCw7-0000MM-Pc
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 11:48:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jMCfR-0008Bx-CP
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 11:31:06 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:43014)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jMCfR-0008Bg-6Z
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 11:31:05 -0400
-Received: by mail-pg1-x541.google.com with SMTP id s4so3452974pgk.10
- for <qemu-devel@nongnu.org>; Wed, 08 Apr 2020 08:31:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ZGk61WNrpGDP6QSZdndDZCbGnp9yVuwh0dhPIo77VUo=;
- b=egOm0rpPsfA+JcFU+ZAumseK3G1qt5+0guBCINOwVNfjwirppjZe6B4/VGErtNeCGg
- lAXICa7zfO7Yrw3WmnepaFPzNObE2fnDSZeKBnZUGR36yMrwYfbRlU1yOLq/p5eBHSCH
- wGPAe3ydiFDK+zr2fofm3bvuorDLAmLM1AnEH3wYubDvtrZq3J93R13zYJaOERTdrAtB
- 6sCPXWLI76GtEpf530z9PSDHv3wInPPPfyMMayUR9llCRKferSAqMRvoc6fe49PRn25i
- oeZ2lJTUH3vnL3vq1ZkjBOUkwr1IRNk69n0Sn4NbQ3DcggoRh9YEcVxfT2sX2gexffQX
- lZ+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ZGk61WNrpGDP6QSZdndDZCbGnp9yVuwh0dhPIo77VUo=;
- b=Yi0YJTOXE2VsnjJ/dKPZ7fmpapzOXteXdPkDfwyBXmjfg3DOaB6qLOMWNalDWLA7ZS
- Zz9sVLxJ7pCYmqaewbGyDmuCBZJGjal9HqxZLXSvAXeswjNizZocAjHq+pM24itRTpOd
- XZ0NI/SnFgPFlEPVI5Kok+/gD1sZ5rGBl68PlFri9ehO9OBZALobacJxYrJJ/UnvYJ2E
- z7V0YbH9kA8eDkOfP8aDd0fM8yRIjgc67wW6FW6e2RMbOPPpS1eOH2lfTQ6j/yIyLdH1
- Yyxcdb9p0MhuJypNBPyT+iq0dpFkf/MSPnS7wRO6kIp/wketDL+ALehQ7LerNuf0GS3S
- 7R2w==
-X-Gm-Message-State: AGi0PuYMf/HxQNNexc/cY8o1t/3MeIY/Dwt/dzjNGp1gdt3xJXHPWml2
- 3rV95gCqCKYdl6euyIeBuwGaFUIJXsw=
-X-Google-Smtp-Source: APiQypKOJgM92Uw1ND36UJS72RidY5r+kP1+opVVKY97BHay+RlAdp/JqIfIrhfyzndwZvxLUPlUqA==
-X-Received: by 2002:a65:670e:: with SMTP id u14mr7723317pgf.264.1586359863191; 
- Wed, 08 Apr 2020 08:31:03 -0700 (PDT)
-Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
- [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id t4sm16920454pfb.156.2020.04.08.08.31.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Apr 2020 08:31:02 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.0? v2] target/xtensa: Statically allocate
- xtensa_insnbufs in DisasContext
-Date: Wed,  8 Apr 2020 08:30:57 -0700
-Message-Id: <20200408153057.31794-3-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200408153057.31794-1-richard.henderson@linaro.org>
-References: <20200408153057.31794-1-richard.henderson@linaro.org>
+ (envelope-from <laurent@vivier.eu>) id 1jMCw4-0002wm-Ja
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 11:48:18 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:33325)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jMCw4-0002w9-BD
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 11:48:16 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MMGAg-1jdBr23oIw-00JJLr; Wed, 08 Apr 2020 17:48:11 +0200
+To: Brice Goglin <Brice.Goglin@inria.fr>, qemu-devel@nongnu.org
+References: <fb4c55fa-d539-67ee-c6c9-de8fb63c8488@inria.fr>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: linux-user: keep the name-ending parenthesis in /proc/self/stat
+Message-ID: <e613c88e-0940-11e0-254d-9c6d86d9ae5b@vivier.eu>
+Date: Wed, 8 Apr 2020 17:48:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <fb4c55fa-d539-67ee-c6c9-de8fb63c8488@inria.fr>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+X-Provags-ID: V03:K1:HF2WmZ2L8dubtuL1ZqwsdCBK14e/z5XKNEI4yEHzSGeY6wsSRQx
+ 8A7JbDAnJOXNv4H4mNHjBtWZQf0cfbGmJHbVuyOxadSkMBnTK53b13aojLUw3TNoFsT/jkJ
+ PvVfNetl5yz5s09VEbx5osuE3FFK1fv43zonJoxNLmrOlaW6DRq32iu+lzO2KKNRNIuL6Tb
+ 1D4tvlqHgueq/PkfCJUaw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:y1pdn/bDFEA=:+BE/SYWYm9zq7qFVuIdO7T
+ ekc4fEug6Q1LVfK6CXbYS6AXGZjapcVZXgjiFlwWcP7ehfZDfW64HtyojtdRK5oMd/fZiFEpA
+ EdgUCBtxakF0PLfPygsBlj0Ia9I+GfW57Q6IlvICKkhGuEqM4FONPaGao6K/s5DlSe2Y/MWIW
+ nyHaxskKN4DsBb1LeLinUFsS+togGSbyzPfdIiSmKfuKPhl2h/ly9s8vcAHxnc4iKihNdCbgI
+ 3p+qJEjCrw+cQ5SKWsVl5BKdAUyUkAcbFhA9ayN5e0bDPZRHzRIYo+FF90OfcLOjaWjjIAlvu
+ Cd9lZW1oFoAKSIWEJ2p4S2sotmRgESbsm2AQrPKElNjNJpLZ/5+gd3thSPOMXMp2Uoj9rcqtO
+ /6Tv+D14gMMk4Gg6w0IXvL9EjEnAEzG1RTS9ba//MBCae9nZ70Bz28scXaNWa7aHasZUU0XNH
+ H6zYypuLJboVYEbbtR7YtZscb+60M8JlL0kppUGnXqAOxvIYUatXQ2DPAO9Y8NhdZk4QgpSbb
+ 4envm8jy4C8mnSVf5GzRxI8//9NLasnVV7R8tQPx8tsIucP4hb4+LNekJZXvPApBuPFVsiuJZ
+ bTzjt+3OhtRHFDRZeulQ4UpexWx3LppYc90I0BOl6i1DvbBm3SxuzI1Qn3RBjMeV+rPTMqY2O
+ TBj5pahVWnZMdOzbCwkF91JJAn6AZ5cPMfCOZXE4qsnt03NeZmUPh9xKMS5Tvh4U6nQ+9v8Sc
+ QorqCagXeLOISzKo9oxU+SRxAgtPgVZkiiynCFMO2SICZ6gnS6I8Wm6k3YEd8p9O2AhRfSSmv
+ fhqh/jf05Zx22y4rDWbiRnXA83qVpmQRJbs+q33WteRFeiqJXgOezYzzXx5REEIvnwFN0x5
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,96 +120,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Max Filippov <jcmvbkbc@gmail.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Filippov <jcmvbkbc@gmail.com>
+Le 08/04/2020 à 10:24, Brice Goglin a écrit :
+> When the program name is very long, qemu-user may truncate it in
+> /proc/self/stat. However the truncation must keep the ending ") "
+> to conform to the proc manpage which says:
+>     (2) comm  %s
+>            The  filename of the executable, in parentheses.  This
+>            is visible whether or not the  executable  is  swapped
+>            out.
+> 
+> To reproduce:
+> $ ln -s /bin/cat <filenamewithmorethan128chars>
+> $ qemu-x86_64 ./<filenamewithmorethan128chars> /proc/self/stat
+> 
+> Before the patch, you get:
+> 1134631 (<filenametruncated>0 0 0 0 0 0 0 0 ...
+> After the patch:
+> 1134631 (<filenametruncat>) 0 0 0 0 0 0 0 0 ...
+> 
+> This fixes an issue with hwloc failing to parse /proc/self/stat
+> when Ludovic Courtes was testing it in Guix over qemu-aarch64.
+> 
+> Signed-off-by: Philippe_Mathieu-Daudé <philmd@redhat.com>
 
-Rather than dynamically allocate, and risk failing to free
-when we longjmp out of the translator, allocate the maximum
-buffer size from any of the supported cpus.
+You can't add "Signed-off-by" of someone else, in this case you could
+add "Suggested-by:".
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-[rth: Merged the fixup in Max's reply to his original]
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/xtensa/cpu.h       |  3 +++
- target/xtensa/helper.c    |  1 +
- target/xtensa/translate.c | 18 ++----------------
- 3 files changed, 6 insertions(+), 16 deletions(-)
+The subject of your patch should include "[PATCH]" (and the version of
+the patch, "[PATCH v2]").
 
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index c0d69fad96..7a46dccbe1 100644
---- a/target/xtensa/cpu.h
-+++ b/target/xtensa/cpu.h
-@@ -213,6 +213,9 @@ enum {
- #define MEMCTL_IL0EN 0x1
- 
- #define MAX_INSN_LENGTH 64
-+#define MAX_INSNBUF_LENGTH \
-+    ((MAX_INSN_LENGTH + sizeof(xtensa_insnbuf_word) - 1) / \
-+     sizeof(xtensa_insnbuf_word))
- #define MAX_INSN_SLOTS 32
- #define MAX_OPCODE_ARGS 16
- #define MAX_NAREG 64
-diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
-index 376a61f339..7073381f03 100644
---- a/target/xtensa/helper.c
-+++ b/target/xtensa/helper.c
-@@ -96,6 +96,7 @@ static void init_libisa(XtensaConfig *config)
- 
-     config->isa = xtensa_isa_init(config->isa_internal, NULL, NULL);
-     assert(xtensa_isa_maxlength(config->isa) <= MAX_INSN_LENGTH);
-+    assert(xtensa_insnbuf_size(config->isa) <= MAX_INSNBUF_LENGTH);
-     opcodes = xtensa_isa_num_opcodes(config->isa);
-     formats = xtensa_isa_num_formats(config->isa);
-     regfiles = xtensa_isa_num_regfiles(config->isa);
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 37f65b1f03..b898ee2261 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -72,8 +72,8 @@ struct DisasContext {
-     unsigned cpenable;
- 
-     uint32_t op_flags;
--    xtensa_insnbuf insnbuf;
--    xtensa_insnbuf slotbuf;
-+    xtensa_insnbuf_word insnbuf[MAX_INSNBUF_LENGTH];
-+    xtensa_insnbuf_word slotbuf[MAX_INSNBUF_LENGTH];
- };
- 
- static TCGv_i32 cpu_pc;
-@@ -1173,16 +1173,6 @@ static void xtensa_tr_init_disas_context(DisasContextBase *dcbase,
-     dc->cwoe = tb_flags & XTENSA_TBFLAG_CWOE;
-     dc->callinc = ((tb_flags & XTENSA_TBFLAG_CALLINC_MASK) >>
-                    XTENSA_TBFLAG_CALLINC_SHIFT);
--
--    /*
--     * FIXME: This will leak when a failed instruction load or similar
--     * event causes us to longjump out of the translation loop and
--     * hence not clean-up in xtensa_tr_tb_stop
--     */
--    if (dc->config->isa) {
--        dc->insnbuf = xtensa_insnbuf_alloc(dc->config->isa);
--        dc->slotbuf = xtensa_insnbuf_alloc(dc->config->isa);
--    }
-     init_sar_tracker(dc);
- }
- 
-@@ -1272,10 +1262,6 @@ static void xtensa_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
-     reset_sar_tracker(dc);
--    if (dc->config->isa) {
--        xtensa_insnbuf_free(dc->config->isa, dc->insnbuf);
--        xtensa_insnbuf_free(dc->config->isa, dc->slotbuf);
--    }
-     if (dc->icount) {
-         tcg_temp_free(dc->next_icount);
-     }
--- 
-2.20.1
+https://wiki.qemu.org/Contribute/SubmitAPatch
 
+> Signed-off-by: Brice Goglin <Brice.Goglin@inria.fr>
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -7305,7 +7305,11 @@ static int open_self_stat(void *cpu_env, int fd)
+>          snprintf(buf, sizeof(buf), "%"PRId64 " ", val);
+>        } else if (i == 1) {
+>          /* app name */
+> -        snprintf(buf, sizeof(buf), "(%s) ", ts->bprm->argv[0]);
+> +        char *ptr = buf;
+> +
+> +        *ptr++ = '(';
+> +        ptr = stpncpy(ptr, ts->bprm->argv[0], sizeof(buf) - 3);
+
+To have space for the NUL character I think it should be "sizeof(buf) - 4".
+
+> +        strcpy(ptr, ") ");
+>        } else if (i == 27) {
+>          /* stack bottom */
+>          val = start_stack;
+> 
+
+Thanks,
+Laurent
 
