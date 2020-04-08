@@ -2,64 +2,55 @@ Return-Path: <SRS0=OEAU=5Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F33AEC2D0EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 04:42:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF443C2D0EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 05:57:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADF9020747
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 04:42:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="D+/+RvnF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADF9020747
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 9C838206C0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 05:57:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C838206C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jM2XM-0005DQ-PU
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 00:42:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49251)
+	id 1jM3iB-0004FM-S4
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 01:57:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57364)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jM2We-0004hT-7o
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 00:41:21 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jM3hF-0003bQ-7Q
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 01:56:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jM2Wc-0005I4-Lw
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 00:41:19 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:50795)
+ (envelope-from <its@irrelevant.dk>) id 1jM3hE-0005pv-78
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 01:56:21 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:35218)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jM2Wb-0005E5-LJ; Wed, 08 Apr 2020 00:41:18 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48xs6X4zWBz9sSq; Wed,  8 Apr 2020 14:41:08 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1586320868;
- bh=Mni4oCH1bLQ2KSyObvT0ICIz/ZsKltGRovkWC95CZH4=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=D+/+RvnFRxcIFnPqKJjSpkz9r1/umkINLszCE7GrBaTj1h7lm2F3JTkcBmk3gvEFg
- 91zSDHITzmcIj/S7S+JWR4uEPmEljWPgPDE6XXcQ5x2PCwfW0XRdVornLvMaJ5PUUC
- Ms9A43YJ07VJORAPxOZoovPmFZ2fBdfqdk+Yo+js=
-Date: Wed, 8 Apr 2020 14:33:49 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH for-5.0?] linux-user/ppc: Fix padding in mcontext_t for
- ppc64
-Message-ID: <20200408043349.GC304335@umbus.fritz.box>
-References: <20200407032105.26711-1-richard.henderson@linaro.org>
- <20200408021006.GB44664@umbus.fritz.box>
- <d0f45182-024f-db52-440c-d2aa9b597812@linaro.org>
+ (Exim 4.71) (envelope-from <its@irrelevant.dk>)
+ id 1jM3hB-0005mK-QG; Wed, 08 Apr 2020 01:56:17 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 583F2BF41D;
+ Wed,  8 Apr 2020 05:56:11 +0000 (UTC)
+Date: Wed, 8 Apr 2020 07:56:07 +0200
+From: Klaus Birkelund Jensen <its@irrelevant.dk>
+To: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Subject: Re: [PATCH v1] nvme: indicate CMB support through controller
+ capabilities register
+Message-ID: <20200408055607.g2ii7gwqbnv6cd3w@apples.localdomain>
+References: <20200401184219.14911-1-andrzej.jakowski@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="GPJrCs/72TxItFYR"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <d0f45182-024f-db52-440c-d2aa9b597812@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+In-Reply-To: <20200401184219.14911-1-andrzej.jakowski@linux.intel.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 128.199.63.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,72 +62,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- laurent@vivier.eu
+Cc: kbusch@kernel.org, kwolf@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Apr  1 11:42, Andrzej Jakowski wrote:
+> This patch sets CMBS bit in controller capabilities register when user
+> configures NVMe driver with CMB support, so capabilites are correctly reported
+> to guest OS.
+> 
+> Signed-off-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+> ---
+>  hw/block/nvme.c      | 2 ++
+>  include/block/nvme.h | 4 ++++
+>  2 files changed, 6 insertions(+)
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index d28335cbf3..986803398f 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -1393,6 +1393,8 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>      n->bar.intmc = n->bar.intms = 0;
+>  
+>      if (n->cmb_size_mb) {
+> +        /* Contoller capabilities */
+> +        NVME_CAP_SET_CMBS(n->bar.cap, 1);
+>  
+>          NVME_CMBLOC_SET_BIR(n->bar.cmbloc, 2);
+>          NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
+> diff --git a/include/block/nvme.h b/include/block/nvme.h
+> index 8fb941c653..561891b140 100644
+> --- a/include/block/nvme.h
+> +++ b/include/block/nvme.h
+> @@ -27,6 +27,7 @@ enum NvmeCapShift {
+>      CAP_CSS_SHIFT      = 37,
+>      CAP_MPSMIN_SHIFT   = 48,
+>      CAP_MPSMAX_SHIFT   = 52,
+> +    CAP_CMB_SHIFT      = 57,
+>  };
+>  
+>  enum NvmeCapMask {
+> @@ -39,6 +40,7 @@ enum NvmeCapMask {
+>      CAP_CSS_MASK       = 0xff,
+>      CAP_MPSMIN_MASK    = 0xf,
+>      CAP_MPSMAX_MASK    = 0xf,
+> +    CAP_CMB_MASK       = 0x1,
+>  };
+>  
+>  #define NVME_CAP_MQES(cap)  (((cap) >> CAP_MQES_SHIFT)   & CAP_MQES_MASK)
+> @@ -69,6 +71,8 @@ enum NvmeCapMask {
+>                                                             << CAP_MPSMIN_SHIFT)
+>  #define NVME_CAP_SET_MPSMAX(cap, val) (cap |= (uint64_t)(val & CAP_MPSMAX_MASK)\
+>                                                              << CAP_MPSMAX_SHIFT)
+> +#define NVME_CAP_SET_CMBS(cap, val) (cap |= (uint64_t)(val & CAP_CMB_MASK)\
+> +                                                            << CAP_CMB_SHIFT)
+>  
+>  enum NvmeCcShift {
+>      CC_EN_SHIFT     = 0,
+> -- 
+> 2.21.1
+> 
 
---GPJrCs/72TxItFYR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Looks good.
 
-On Tue, Apr 07, 2020 at 08:44:47PM -0700, Richard Henderson wrote:
-> On 4/7/20 7:10 PM, David Gibson wrote:
-> >> Should we in fact disable ppc64abi32?
-> >> I can't see how it could work enough to be useful as-is.
-> >=20
-> > Yeah, I think so.  Last time we had a problem in this area, I couldn't
-> > even figure out what ppc64abi32 was supposed to *be*, let alone what
-> > the use case for it is.  Given that, it's hard to imagine it's been
-> > working (whatever that means) any time recently.
->=20
-> What it's *supposed* to be is a ppc32 binary running on a 64-bit cpu, e.g=
-=2E a
-> 32-bit binary on power7 with the kernel's compat syscalls.  You get to do
-> native 64-bit arithmetic and have 32-bit pointers.
-
-Right, I guessed that from the name, but I couldn't find anything that
-explicitly confirmed that.
-
-> I guess there's a kind of a use case there somewhere, but it's rather nic=
-he,
-
-Extremely.
-
-> and someone has to care more than they have until now.
->=20
->=20
-> r~
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---GPJrCs/72TxItFYR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6NVCwACgkQbDjKyiDZ
-s5KNjw/9GtNpn6oEpTn9Ej1BrIP/zdVPjOfD+yZSSu3XNbzTMZvrvU2XYT5Hyr1+
-yMeLri0cQkgNhSNh9187aEkkzfKzmKeGzs5tEWYXg4/51IjvhdM78zQX64eTrOF8
-8YpQNVVOtF058MACqwpa10uR7u1qsRSaETkc/gsfuOZJAo3y0uIDHH+8IvkzS1w6
-6v7pL3an8P0+4OUwy1SFHlp5wintBty0Spa0e+4vRN8gB7guObQpccTJYJZ152jA
-JpfjDewrfCMhsYG1ySGGVwBJZ2iAMFwfogjZNTV1sib+TTsU7ApUgzy8b1Hd/NNJ
-zqH+SW/bs9UQ5KE7QzYfZXeuqXuXLQndt1sNImuerV1n0ApW3P9hYOoYx79/S7+/
-GDR0JihC27FE0K9OyJtQequaGRwqKqU7obkfYejG7DUlpfw3mYPeIpQ874iQ4B1R
-fKgGQwNKpScjWEdE00lZMAISsfwecA7e+jiTCqbt2co9guinwO223w7d1CVewT7N
-QZf388dq+hLp4nhTavVVzD8sano1JlFlYuDGM5nAwDJ7yiA6ASS7rpDv5X2H+url
-BXQx9F0PQDt57KiJSZ+lU8HmSIObbsWZopXWVEXuZk86eGifQZVfDdFzF60C1fUN
-WT5moEj04PioNV1Nh+d6c/2pabN/4gh50DuOw+AWPao0siEZe90=
-=g/77
------END PGP SIGNATURE-----
-
---GPJrCs/72TxItFYR--
+Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
 
