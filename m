@@ -2,61 +2,83 @@ Return-Path: <SRS0=OEAU=5Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A84BC2D0EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 08:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F6D1C2D0EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 09:07:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 197502074F
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 08:55:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 197502074F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id EC0922074F
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 09:07:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VKPXdQ6n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC0922074F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jM6Ur-00035e-8U
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 04:55:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54588)
+	id 1jM6fl-0002In-51
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 05:07:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59245)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cfontana@suse.de>) id 1jM6Dq-00009g-FJ
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 04:38:11 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jM6LF-0004N8-51
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 04:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cfontana@suse.de>) id 1jM5lb-0001xI-TZ
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 04:09:42 -0400
-Received: from mx2.suse.de ([195.135.220.15]:35210)
+ (envelope-from <imammedo@redhat.com>) id 1jM6LD-0002Dy-CW
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 04:45:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56578
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cfontana@suse.de>) id 1jM5lb-0001wF-KT
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 04:08:59 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
- by mx2.suse.de (Postfix) with ESMTP id EDE73AD6B;
- Wed,  8 Apr 2020 08:08:57 +0000 (UTC)
-Subject: Re: [PATCH] configure: check for bison, flex before dtc submodule
- build
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200407111618.17241-1-cfontana@suse.de>
- <CAFEAcA9SYT227B9K7yHcv_J==r4xZ1spUSNzL_bRXUpAjT5QVA@mail.gmail.com>
- <20200408015717.GA44664@umbus.fritz.box>
- <1353d8a4-fe8b-ee8f-2f42-f1f463188767@suse.de>
- <20200408080046.GD304335@umbus.fritz.box>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <8019e044-04d8-df5a-9eae-c525ac1881e5@suse.de>
-Date: Wed, 8 Apr 2020 10:08:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jM6LD-0002Do-4G
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 04:45:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586335546;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CV6v+7b84TmRYGjD1UFwdw7I8sjvK5I7Q8fmXQQc8r0=;
+ b=VKPXdQ6n+9D3zcdiJ6QlrvkI9kbzxgDVuSyMGEn3LQlVQUyoHcTZ64moWKCMTGCg4qlzhS
+ DKsK/AQ5PRxxLWfFJ0mfYduARh9AvDvD0FJm/yjCk0dKfbdyVFWuARkv80v+rLt40YxpjF
+ FNbjjgFyYp0Q7E9mO9FleZWmU+E6eg4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-LPUBMjDMPMG_T__2zYdObQ-1; Wed, 08 Apr 2020 04:45:44 -0400
+X-MC-Unique: LPUBMjDMPMG_T__2zYdObQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80491106BC09;
+ Wed,  8 Apr 2020 08:45:43 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6948860BFB;
+ Wed,  8 Apr 2020 08:45:38 +0000 (UTC)
+Date: Wed, 8 Apr 2020 10:45:36 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Anthony PERARD <anthony.perard@citrix.com>
+Subject: Re: [PATCH for-5.0] xen: fixup RAM memory region initialization
+Message-ID: <20200408104536.4a353c10@redhat.com>
+In-Reply-To: <20200407113634.GW4088@perard.uk.xensource.com>
+References: <20200327104828.12647-1-imammedo@redhat.com>
+ <20200330165248.GR4088@perard.uk.xensource.com>
+ <20200402142925.75e0c482@redhat.com>
+ <20200402132530.GS4088@perard.uk.xensource.com>
+ <20200402163033.45585e70@redhat.com>
+ <20200407113634.GW4088@perard.uk.xensource.com>
 MIME-Version: 1.0
-In-Reply-To: <20200408080046.GD304335@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic]
-X-Received-From: 195.135.220.15
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,175 +90,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alex Bennee <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org,
+ ehabkost@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/8/20 10:00 AM, David Gibson wrote:
-> On Wed, Apr 08, 2020 at 09:52:40AM +0200, Claudio Fontana wrote:
->> On 4/8/20 3:57 AM, David Gibson wrote:
->>> On Tue, Apr 07, 2020 at 12:20:15PM +0100, Peter Maydell wrote:
->>>> On Tue, 7 Apr 2020 at 12:16, Claudio Fontana <cfontana@suse.de> wrote:
->>>>>
->>>>> if fdt is required, and the system DTC (libfdt) is not usable,
->>>>> check for the dtc submodule requirements before trying to build it,
->>>>> and error out with a helpful message in case the dependencies are not met.
->>>>>
->>>>> Signed-off-by: Claudio Fontana <cfontana@suse.de>
->>>>
->>>> Does the dtc module actually need bison/flex, or does it just
->>>> print an ugly warning about it? We only want the 'libfdt' part
->>>> of dtc, which doesn't need the parser, we don't need to build
->>>> the actual dtc compiler.
->>>
->>> Assuming we're just invoking "make libfdt" within the submodule,
->>> rather than "make" which will build dtc as well, then bison / flex
->>> shouldn't be needed.
->>>
->>
->> Indeed; I just sent a patch that works for me,
->> tried a few in-tree and out-of-tree full builds, and it seems to work as intended.
->> patchew complains about docker builds/tests though, although running the same TEST SCRIPTs manually with docker works for me.
->>
->> The libfdt target inside dtc/Makefile actually causes more than just libfdt to be built:
->>
->> ~/git/qemu/dtc> make libdtc
->> 	 DEP tests/dumptrees.c
->> 	 DEP tests/trees.S
->> 	 DEP tests/testutils.c
->> 	 DEP tests/value-labels.c
->> 	 DEP tests/asm_tree_dump.c
->> 	 DEP tests/truncated_memrsv.c
->> 	 DEP tests/truncated_string.c
->> 	 DEP tests/truncated_property.c
->> 	 DEP tests/check_full.c
->> 	 DEP tests/check_header.c
->> 	 DEP tests/check_path.c
->> 	 DEP tests/overlay_bad_fixup.c
->> 	 DEP tests/overlay.c
->> 	 DEP tests/subnode_iterate.c
->> 	 DEP tests/property_iterate.c
->> 	 DEP tests/integer-expressions.c
->> 	 DEP tests/utilfdt_test.c
->> 	 DEP tests/path_offset_aliases.c
->> 	 DEP tests/add_subnode_with_nops.c
->> 	 DEP tests/dtbs_equal_unordered.c
->> 	 DEP tests/dtb_reverse.c
->> 	 DEP tests/dtbs_equal_ordered.c
->> 	 DEP tests/extra-terminating-null.c
->> 	 DEP tests/incbin.c
->> 	 DEP tests/boot-cpuid.c
->> 	 DEP tests/phandle_format.c
->> 	 DEP tests/path-references.c
->> 	 DEP tests/references.c
->> 	 DEP tests/string_escapes.c
->> 	 DEP tests/propname_escapes.c
->> 	 DEP tests/appendprop2.c
->> 	 DEP tests/appendprop1.c
->> 	 DEP tests/del_node.c
->> 	 DEP tests/del_property.c
->> 	 DEP tests/setprop.c
->> 	 DEP tests/set_name.c
->> 	 DEP tests/rw_tree1.c
->> 	 DEP tests/open_pack.c
->> 	 DEP tests/nopulate.c
->> 	 DEP tests/mangle-layout.c
->> 	 DEP tests/move_and_save.c
->> 	 DEP tests/sw_states.c
->> 	 DEP tests/sw_tree1.c
->> 	 DEP tests/nop_node.c
->> 	 DEP tests/nop_property.c
->> 	 DEP tests/setprop_inplace.c
->> 	 DEP tests/stringlist.c
->> 	 DEP tests/addr_size_cells2.c
->> 	 DEP tests/addr_size_cells.c
->> 	 DEP tests/notfound.c
->> 	 DEP tests/sized_cells.c
->> 	 DEP tests/char_literal.c
->> 	 DEP tests/get_alias.c
->> 	 DEP tests/node_offset_by_compatible.c
->> 	 DEP tests/node_check_compatible.c
->> 	 DEP tests/node_offset_by_phandle.c
->> 	 DEP tests/node_offset_by_prop_value.c
->> 	 DEP tests/parent_offset.c
->> 	 DEP tests/supernode_atdepth_offset.c
->> 	 DEP tests/get_path.c
->> 	 DEP tests/get_phandle.c
->> 	 DEP tests/getprop.c
->> 	 DEP tests/get_name.c
->> 	 DEP tests/path_offset.c
->> 	 DEP tests/subnode_offset.c
->> 	 DEP tests/find_property.c
->> 	 DEP tests/root_node.c
->> 	 DEP tests/get_mem_rsv.c
->> 	 DEP libfdt/fdt_overlay.c
->> 	 DEP libfdt/fdt_addresses.c
->> 	 DEP libfdt/fdt_empty_tree.c
->> 	 DEP libfdt/fdt_strerror.c
->> 	 DEP libfdt/fdt_rw.c
->> 	 DEP libfdt/fdt_sw.c
->> 	 DEP libfdt/fdt_wip.c
->> 	 DEP libfdt/fdt_ro.c
->> 	 DEP libfdt/fdt.c
->> 	 DEP util.c
->> 	 DEP fdtoverlay.c
->> 	 DEP fdtput.c
->> 	 DEP fdtget.c
->> 	 DEP fdtdump.c
->> 	 LEX convert-dtsv0-lexer.lex.c
->> make: flex: Command not found
->> 	 DEP srcpos.c
->> 	 BISON dtc-parser.tab.c
->> make: bison: Command not found
->> 	 LEX dtc-lexer.lex.c
->> make: flex: Command not found
->> 	 DEP treesource.c
->> 	 DEP livetree.c
->> 	 DEP fstree.c
->> 	 DEP flattree.c
->> 	 DEP dtc.c
->> 	 DEP data.c
->> 	 DEP checks.c
->> 	CHK version_gen.h
->> 	 LEX convert-dtsv0-lexer.lex.c
->> make: flex: Command not found
->> 	 BISON dtc-parser.tab.c
->> make: bison: Command not found
->> 	 LEX dtc-lexer.lex.c
->> make: flex: Command not found
->> make: *** No rule to make target 'libdtc'.  Stop.
->>
->>
->> so I just used dtc/libfdt/Makefile.libfdt directly and removed the
->> recursion altogether.
+On Tue, 7 Apr 2020 12:36:34 +0100
+Anthony PERARD <anthony.perard@citrix.com> wrote:
+
+> On Thu, Apr 02, 2020 at 04:30:33PM +0200, Igor Mammedov wrote:
+> > 1. why xen uses memory_region_init_ram() which does not allocate anything  
 > 
-> The Makefile setup of dtc/libfdt is a bit weird (mostly to allow for
-> Makefile fragments to be used in weird build environments).  But for
-> this case you might be better off still doing the recursion, but just
-> changing the target from 'all' to 'libfdt'.
+> This seems to be due to history.
+> 
+> >    can it use plain memory_region_init() instead?  
+> 
+> I can give it a try. And it doesn't work, I had to call qemu_ram_alloc() as
+> well, to set ram_memory.c.
+> 
+> On the other and, I think memory_region_init_ram_nomigrate() would be
+> enough. QEMU didn't complain when I migrated the guest.
 
-Hi David,
-
-that approach (recursing the same way, just building libfdt instead of all) is what I tried first,
-however as showcased above the libfdt target seems to cause more stuff to be built than necessary.
-
-Do you think we should change the external module to make the minimal build of libfdt work, instead of removing the recursion?
-
-Thanks,
-
-Claudio
-
+Why does it need ramblock fir main ram if it does not allocate nor migrate
+it using QEMU infrastructure?
 
 > 
->> Let me know what you think about the idea in general, or if anybody knows what is wrong in the patch that makes patchew complain?
->>
->> Ciao,
->>
->> Claudio
->>
+> > 2. how main ram is allocated?  
+> 
+> It's done by the toolstack, libxl. It creates a new domain in the
+> hypervisor, memory allocation is part of this, then QEMU is started, for
+> emulation of some devices.
+> 
+> There is one thing that QEMU does in regards to memory, it's the call
+> xc_domain_populate_physmap_exact() in xen_ram_alloc(). This is for when
+> an emulated PCI device needs some memory, like for the VGA region.
+> 
+> > 3. code has
+> >            /*                                                                       
+> >          * Xen does not allocate the memory continuously, it keeps a             
+> >          * hole of the size computed above or passed in.                         
+> >          */                                                                      
+> >         block_len = (1ULL << 32) + x86ms->above_4g_mem_size; 
+> >    which fixes up size ram memory region
+> >    can we allocate 1 memory region of ram_size and then
+> >    alias lower and upper memory instead of that?  
+> 
+> I don't know, I don't think I know enough about how memory_region are
+> used to be able to answer that.
+> 
+> > 4. how RAM migration works in case of xen?  
+> 
+> From QEMU, we only migrate devices states, we call the
+> "xen-save-devices-state" QMP command. Memory migration is done by the
+> toolstack. In QEMU, there is a bodge in xen_ram_alloc() to avoid having
+> QEMU doing some "allocation" during migration.
+> 
+> I hope that help.
+> Cheers,
 > 
 
 
