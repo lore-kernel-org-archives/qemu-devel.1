@@ -2,58 +2,67 @@ Return-Path: <SRS0=OEAU=5Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D174AC2D0EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 10:10:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 636CCC2D0EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 10:16:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4D1920747
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 10:10:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4D1920747
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 363DE20768
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 10:16:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 363DE20768
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jM7f5-0002IA-SM
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 06:10:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47205)
+	id 1jM7kd-0004Jz-9s
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 06:16:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cfontana@suse.de>) id 1jM7eV-0001mX-2V
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 06:09:48 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jM7jz-0003pG-BN
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 06:15:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cfontana@suse.de>) id 1jM7eT-0008PV-Iu
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 06:09:46 -0400
-Received: from mx2.suse.de ([195.135.220.15]:38494)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cfontana@suse.de>) id 1jM7eT-0008Ov-D0
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 06:09:45 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
- by mx2.suse.de (Postfix) with ESMTP id F0465AF4C;
- Wed,  8 Apr 2020 10:09:42 +0000 (UTC)
-Subject: Re: [PATCH] Makefile: libfdt: build only the strict necessary
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <158632959483.16886.907739858138361292@39012742ff91>
- <6b2eca03-8fd0-54de-1622-ba26d4f1a31e@suse.de>
- <20200408090852.GB1073390@redhat.com>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <bc7e5ddf-c765-fcd1-bad3-61b957e14a43@suse.de>
-Date: Wed, 8 Apr 2020 12:09:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <no-reply@patchew.org>) id 1jM7jy-00040s-2i
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 06:15:27 -0400
+Resent-Date: Wed, 08 Apr 2020 06:15:27 -0400
+Resent-Message-Id: <E1jM7jy-00040s-2i@eggs.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21731)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jM7jv-0003wV-5y; Wed, 08 Apr 2020 06:15:23 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1586340903; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=VP88jR4FJrbsOIiTs98V8YjhtGTLM9vhPcSpq0EuxoOGJ+Bv+1GnxTuKRPGpmsvgpOjxOvFqLnUZfq5KNvj1C2LqAh48XK6HVEFLC7/zRftNt6x9dgAA5Zp+vsIuixyxYEN6EHKfaACaA1lEWW4vgmIolcIc8dqXXuZ6A57DAM4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1586340903;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=ZJSRmXfgwdnHrbbQOeF/Yy7zpHUKyAc3ddVXS4N/k8c=; 
+ b=OrxcOFWyyoRFuAnsv8/0V95HkGgxeHxzLW+FK+SVBKuSZDJYGs2jKJpjDHSYh3lCf6jbF9dZCyTEN8aBbxMjrOVXlZEysyDgOi3gcqi7RTkWeXbXpGftBRECYAad9+JHMfdcySPVWBdvJ/HUILJIkMvWHvMGEzFnBpE2nt/WAt0=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1586340901691795.3472922101779;
+ Wed, 8 Apr 2020 03:15:01 -0700 (PDT)
+In-Reply-To: <20200408093051.9893-1-vsementsov@virtuozzo.com>
+Subject: Re: [PATCH for-5.0? 0/9] block/io: safer inc/dec in_flight sections
+Message-ID: <158634090023.16886.3594598374674479037@39012742ff91>
 MIME-Version: 1.0
-In-Reply-To: <20200408090852.GB1073390@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic]
-X-Received-From: 195.135.220.15
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: vsementsov@virtuozzo.com
+Date: Wed, 8 Apr 2020 03:15:01 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.57
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,97 +74,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, david@gibson.dropbear.id.au,
- alex.bennee@linaro.org, qemu-devel@nongnu.org, laurent@vivier.eu
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/8/20 11:08 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Apr 08, 2020 at 09:49:56AM +0200, Claudio Fontana wrote:
->> Hi,
->>
->> On 4/8/20 9:06 AM, no-reply@patchew.org wrote:
->>> Patchew URL: https://patchew.org/QEMU/20200408070231.20265-1-cfontana=
-@suse.de/
->>>
->>>
->>>
->>> Hi,
->>>
->>> This series failed the asan build test. Please find the testing comma=
-nds and
->>> their output below. If you have Docker installed, you can probably re=
-produce it
->>> locally.
->>
->> I can't reproduce this here running the commands (TEST SCRIPT) below..
->>
->>>
->>> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
->>> #!/bin/bash
->>> export ARCH=3Dx86_64
->>> make docker-image-fedora V=3D1 NETWORK=3D1
->>> time make docker-test-debug@fedora TARGET_LIST=3Dx86_64-softmmu J=3D1=
-4 NETWORK=3D1
->>> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->>>
->>> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
->>> Makefile:532: dtc/libfdt/Makefile.libfdt: No such file or directory
->>
->> hmm this is the include directive
->>
->> include $(LIBFDT_srcdir)/Makefile.libfdt
->>
->> is this test not getting the dtc submodule for some reason?
->=20
-> Note that this test script did not even get as far as trying to
-> build QEMU itself.
->=20
-> Starting from a clean checkout *WITHOUT* having run configure,
-> it is trying todo
->=20
->    make docker-image-fedora V=3D1 NETWORK=3D1
->=20
-> This should invoke the rules to launch docker, and then run
-> configure inside docker. Instead it is trying to build dtc.
->=20
-> So something in your changes has broken the ability to run
-> the docker make targets.
-
-Thanks, I can reproduce this now, will correct.
-
->=20
->>
->>> cc -nostdlib  -o dtc/libfdt/Makefile.libfdt.mo=20
->>
->> Hmm..
->>
->>> cc: fatal error: no input files
->>> compilation terminated.
->>> make: *** [dtc/libfdt/Makefile.libfdt.mo] Error 4
->>> Makefile:532: dtc/libfdt/Makefile.libfdt: No such file or directory
->>>   LD      dtc/libfdt/Makefile.libfdt.mo
->>> cc: fatal error: no input files
->>> compilation terminated.
->>> make: *** [dtc/libfdt/Makefile.libfdt.mo] Error 4
->>>
->>> real    0m0.585s
->>> user    0m0.384s
->>>
->>>
->>> The full log is available at
->>> http://patchew.org/logs/20200408070231.20265-1-cfontana@suse.de/testi=
-ng.asan/?type=3Dmessage.
->>> ---
->>> Email generated automatically by Patchew [https://patchew.org/].
->>> Please send your feedback to patchew-devel@redhat.com
->>>
->>
->>
->=20
-> Regards,
-> Daniel
->=20
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQwODA5MzA1MS45ODkz
+LTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0
+aGUgYXNhbiBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQK
+dGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2Fu
+IHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
+PQojIS9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3Jh
+IFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRf
+TElTVD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKICBDQyAgICAgIHFlbXUtc3RvcmFnZS1kYWVtb24ubwogIENDICAgICAgY2hhcmRldi9jaGFy
+Lm8KICBDQyAgICAgIGNoYXJkZXYvY2hhci1mZC5vCi90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9p
+by5jOjMyMzY6MjM6IGVycm9yOiB1bnVzZWQgdmFyaWFibGUgJ2JzJyBbLVdlcnJvciwtV3VudXNl
+ZC12YXJpYWJsZV0KICAgIEJsb2NrRHJpdmVyU3RhdGUgKmJzID0gY2hpbGQtPmJzOwogICAgICAg
+ICAgICAgICAgICAgICAgXgoxIGVycm9yIGdlbmVyYXRlZC4KbWFrZTogKioqIFsvdG1wL3FlbXUt
+dGVzdC9zcmMvcnVsZXMubWFrOjY5OiBibG9jay9pby5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0
+aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBs
+YXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2NCwgaW4gPG1v
+ZHVsZT4KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJw
+cm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tl
+cicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPWZlMDk1MDZlMTYz
+MDQ3MzdhZDg4YTQ3OTMzMGVlZGQwJywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAn
+c2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9eDg2XzY0LXNv
+ZnRtbXUnLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywg
+J0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVf
+RElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRv
+Y2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10
+ZXN0ZXItdG1wLXA4OHduNWQwL3NyYy9kb2NrZXItc3JjLjIwMjAtMDQtMDgtMDYuMTEuMDAuMTk1
+Nzc6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVu
+JywgJ3Rlc3QtZGVidWcnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVy
+PS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ZmUwOTUwNmUxNjMwNDczN2Fk
+ODhhNDc5MzMwZWVkZDAKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06
+IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtcDg4d241ZDAv
+c3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1kZWJ1Z0BmZWRvcmFdIEVycm9yIDIKCnJl
+YWwgICAgM201OS4xMDlzCnVzZXIgICAgMG04LjkyOHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxh
+YmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNDA4MDkzMDUxLjk4OTMtMS12c2Vt
+ZW50c292QHZpcnR1b3p6by5jb20vdGVzdGluZy5hc2FuLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
