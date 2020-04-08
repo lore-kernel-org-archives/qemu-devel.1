@@ -2,88 +2,90 @@ Return-Path: <SRS0=OEAU=5Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF66C2D0F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 19:51:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BEE9C2D0F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 20:27:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DEC12075E
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 19:51:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53F4920753
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 20:27:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MgqpimCt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DEC12075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="fJ7eRwRv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53F4920753
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMGj5-00055F-F6
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 15:51:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37243)
+	id 1jMHHy-0003vh-CG
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 16:27:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40250)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alexander.duyck@gmail.com>) id 1jMGh8-00021J-TS
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 15:49:08 -0400
+ (envelope-from <rvkagan@yandex-team.ru>) id 1jMHH8-00032h-MX
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 16:26:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alexander.duyck@gmail.com>) id 1jMGh6-00036O-JK
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 15:49:06 -0400
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:46011)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alexander.duyck@gmail.com>)
- id 1jMGh6-00035C-9r
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 15:49:04 -0400
-Received: by mail-qk1-x744.google.com with SMTP id m67so1525288qke.12
- for <qemu-devel@nongnu.org>; Wed, 08 Apr 2020 12:49:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:from:to:cc:date:message-id:in-reply-to:references
- :user-agent:mime-version:content-transfer-encoding;
- bh=gbRBokZUeADxG1Js0n3CcSXLvNNKI4dY2r2GfqE2RsE=;
- b=MgqpimCt0H1OWTla793dPDrS3KHHa360iRORSuhXbeVPJFS8obt1JfELdDdPlEnJbR
- gHBXkVZJ9nRoiqyO7HzVU0A3UsrhcnRCAywDHJWWhTFDPjeEseBzCyhvnnbO6cI+rpNA
- hYwyHR6i0hS3Ox/Zgc3PxPczF6rw4BPdpU8R9QRoIRC89Xjc+RPxcLOg+BzVIRIyojmQ
- UaofJvfRbYPbEbSVyO6R2VQcbFOqG+wX473EUq1SmrQ4VcPcMdQxA2OecxOGwc9G5daQ
- +YfqKB4qd9swYoOAavUXvisL/dQvAnRQQ9MNLDMlkwfEa3Eosq7iCoJoiSA82kRt/m4d
- O+Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
- :references:user-agent:mime-version:content-transfer-encoding;
- bh=gbRBokZUeADxG1Js0n3CcSXLvNNKI4dY2r2GfqE2RsE=;
- b=GuU5b9Sg8idZP/+35T233BB4pXpEf3E8gX19w1dHRJcqVtyuB2gFuwC3AgHIg2+pT3
- Ax1QyY7j5i19O/msE8ugWoNimFF43PUmZa0J7oe24TrJpBf2MFxGlifgXMY1h+cSt4Ge
- ZaKhV8V9lRyeCur+/rNbjkZNzLVkwxbHH+f6lRiP4FeuQ7+j1lUrVB3g9EdBH25t1lSI
- yoLfNyyIiLRejLS3I5towKVpfySuT1G08StPoH6bTnEsM+63j9RPtxnXBFbqYfHi+sK2
- ifEqXzRnmMGMXwrh/i8nHqTh/DeD8brGj0PXN0PBOc+EC/pwDPpH28PG/hSi/biYYn/6
- 6Ttg==
-X-Gm-Message-State: AGi0PuZeBO75AC+zP71238RMnqneJoNvSF5AGAo2Pi9EUAy/UIEpjEi3
- GkuQFT9VET4yU2bfL2B9BBtZu4vkLP8=
-X-Google-Smtp-Source: APiQypIQjGcgYg4WGbE7iWiimwp+tk8wjLK2fiN3pCooM7NfGBh4VE0u1+jO3zi1Imto1CLMi9XUCw==
-X-Received: by 2002:a05:620a:2016:: with SMTP id
- c22mr8992091qka.334.1586375343649; 
- Wed, 08 Apr 2020 12:49:03 -0700 (PDT)
-Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
- by smtp.gmail.com with ESMTPSA id y24sm6362658qtn.87.2020.04.08.12.49.02
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 08 Apr 2020 12:49:03 -0700 (PDT)
-Subject: [PATCH v17 RESUBMIT QEMU 3/3] virtio-balloon: Provide a interface
- for free page reporting
-From: Alexander Duyck <alexander.duyck@gmail.com>
-To: david@redhat.com, mst@redhat.com
-Date: Wed, 08 Apr 2020 12:49:01 -0700
-Message-ID: <20200408194901.24143.34991.stgit@localhost.localdomain>
-In-Reply-To: <20200408194628.24143.51644.stgit@localhost.localdomain>
-References: <20200408194628.24143.51644.stgit@localhost.localdomain>
-User-Agent: StGit/0.17.1-dirty
+ (envelope-from <rvkagan@yandex-team.ru>) id 1jMHH5-0003n4-39
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 16:26:16 -0400
+Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:49620)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <rvkagan@yandex-team.ru>)
+ id 1jMHH4-0003lL-FF
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 16:26:15 -0400
+Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
+ [IPv6:2a02:6b8:0:1a2d::301])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 4CA422E1578;
+ Wed,  8 Apr 2020 23:26:10 +0300 (MSK)
+Received: from sas1-9998cec34266.qloud-c.yandex.net
+ (sas1-9998cec34266.qloud-c.yandex.net [2a02:6b8:c14:3a0e:0:640:9998:cec3])
+ by mxbackcorp1o.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ HjaSTYqWHw-Q9nO3vsf; Wed, 08 Apr 2020 23:26:10 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1586377570; bh=ZpPIqvbMI8ufOwNfK45gpfl/pLjHoinPt/p4ONj6jWU=;
+ h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+ b=fJ7eRwRvKt/sz8Z03zGZUKX+2zhIAz906i16eYxgcDm3XR5fWY14k0enpMjmv8hZy
+ pBaE4OLv3ovc3PWt3K6hs06vgAQgFcdAsCdtIVZmD69jjVPwKSoG/4zTiSI5c+nPa4
+ Mj4nbL4UfVsiTt9X5VWe9MYP4MhCWG2DK5eTu+rY=
+Authentication-Results: mxbackcorp1o.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from unknown (unknown [2a02:6b8:b080:8210::1:b])
+ by sas1-9998cec34266.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ MNSpULgYSi-Q9W0X8Ev; Wed, 08 Apr 2020 23:26:09 +0300
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client certificate not present)
+Date: Wed, 8 Apr 2020 23:26:08 +0300
+From: Roman Kagan <rvkagan@yandex-team.ru>
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH v1 5/5] i386: Hyper-V VMBus ACPI DSDT entry
+Message-ID: <20200408202608.GA699284@rvkaganb>
+Mail-Followup-To: Roman Kagan <rvkagan@yandex-team.ru>,
+ "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+ Jon Doron <arilou@gmail.com>, QEMU <qemu-devel@nongnu.org>,
+ Evgeny Yakovlev <eyakovlev@virtuozzo.com>, ehabkost@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Liran Alon <liran.alon@oracle.com>
+References: <20200403142308.82990-6-arilou@gmail.com>
+ <76017793-735b-4bb5-0e69-ecded78af54d@maciej.szmigiero.name>
+ <CAP7QCog_EmLJ=O8Xi9Tc4Jst1=z62DXim9ScCyoPv7WugrSyOw@mail.gmail.com>
+ <CAP7QCogMdUis-=KsC--0ar2Zt2Vwcpn4HS+qCxPn5khtDTu+mA@mail.gmail.com>
+ <9b9c42d3-af9e-25e9-210e-c58ee5975941@maciej.szmigiero.name>
+ <472544e7-498a-4e28-06e9-83c102d6436b@maciej.szmigiero.name>
+ <20200406073246.GA7707@rvkaganb>
+ <CAP7QCojPsOYjw94k3rkH0A3rLFADLeVhgy502N=8X5wrUnoC6Q@mail.gmail.com>
+ <20200407185608.GA178651@rvkaganb>
+ <8c278ea8-81c5-7458-8979-c319470440d7@maciej.szmigiero.name>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::744
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8c278ea8-81c5-7458-8979-c319470440d7@maciej.szmigiero.name>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 77.88.29.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,128 +97,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: Evgeny Yakovlev <eyakovlev@virtuozzo.com>, Jon Doron <arilou@gmail.com>,
+ QEMU <qemu-devel@nongnu.org>, Liran Alon <liran.alon@oracle.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+On Tue, Apr 07, 2020 at 09:03:05PM +0200, Maciej S. Szmigiero wrote:
+> On 07.04.2020 20:56, Roman Kagan wrote:
+> > On Mon, Apr 06, 2020 at 11:20:39AM +0300, Jon Doron wrote:
+> >> Well I want it to be merged in :-)
+> > 
+> > Hmm I'm curious why, it has little to offer over virtio.
+> > 
+> > Anyway the series you've posted seems to be based on a fairly old
+> > version.
+> > 
+> > The one in openvz repo is more recent.  It's still in need for
+> > improvement, too, but should be testable at least.
+> 
+> Isn't the one at 
+> https://src.openvz.org/projects/UP/repos/qemu/commits?until=refs%2Fheads%2Fvmbus
+> the latest one?
+> 
+> It seems to be last changed in October 2019 - is there a
+> later one?
 
-Add support for what I am referring to as "free page reporting".
-Basically the idea is to function very similar to how the balloon works
-in that we basically end up madvising the page as not being used. However
-we don't really need to bother with any deflate type logic since the page
-will be faulted back into the guest when it is read or written to.
+There isn't, to the best of my knowledge.  It's still sorta unfinished,
+though, and the demand seems to have disappeared so I couldn't find the
+motivation to complete it.
 
-This is meant to be a simplification of the existing balloon interface
-to use for providing hints to what memory needs to be freed. I am assuming
-this is safe to do as the deflate logic does not actually appear to do very
-much other than tracking what subpages have been released and which ones
-haven't.
-
-Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
----
- hw/virtio/virtio-balloon.c         |   46 ++++++++++++++++++++++++++++++++++--
- include/hw/virtio/virtio-balloon.h |    2 +-
- 2 files changed, 45 insertions(+), 3 deletions(-)
-
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 455d85b7082f..5faafd2f62ac 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -321,6 +321,40 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
-     balloon_stats_change_timer(s, 0);
- }
- 
-+static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+    VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-+    VirtQueueElement *elem;
-+
-+    while ((elem = virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
-+    	unsigned int i;
-+
-+        for (i = 0; i < elem->in_num; i++) {
-+            void *addr = elem->in_sg[i].iov_base;
-+            size_t size = elem->in_sg[i].iov_len;
-+            ram_addr_t ram_offset;
-+            size_t rb_page_size;
-+            RAMBlock *rb;
-+
-+            if (qemu_balloon_is_inhibited() || dev->poison_val)
-+                continue;
-+
-+            rb = qemu_ram_block_from_host(addr, false, &ram_offset);
-+            rb_page_size = qemu_ram_pagesize(rb);
-+
-+            /* For now we will simply ignore unaligned memory regions */
-+            if ((ram_offset | size) & (rb_page_size - 1))
-+                continue;
-+
-+            ram_block_discard_range(rb, ram_offset, size);
-+        }
-+
-+        virtqueue_push(vq, elem, 0);
-+        virtio_notify(vdev, vq);
-+        g_free(elem);
-+    }
-+}
-+
- static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
-@@ -628,7 +662,8 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
-         return sizeof(struct virtio_balloon_config);
-     }
-     if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON) ||
--        virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-+        virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT) ||
-+        virtio_has_feature(features, VIRTIO_BALLOON_F_REPORTING)) {
-         return sizeof(struct virtio_balloon_config);
-     }
-     return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
-@@ -716,7 +751,8 @@ static uint64_t virtio_balloon_get_features(VirtIODevice *vdev, uint64_t f,
-     VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-     f |= dev->host_features;
-     virtio_add_feature(&f, VIRTIO_BALLOON_F_STATS_VQ);
--    if (virtio_has_feature(f, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-+    if (virtio_has_feature(f, VIRTIO_BALLOON_F_FREE_PAGE_HINT) ||
-+        virtio_has_feature(f, VIRTIO_BALLOON_F_REPORTING)) {
-         virtio_add_feature(&f, VIRTIO_BALLOON_F_PAGE_POISON);
-     }
- 
-@@ -806,6 +842,10 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-     s->dvq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
-     s->svq = virtio_add_queue(vdev, 128, virtio_balloon_receive_stats);
- 
-+    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_REPORTING)) {
-+        s->rvq = virtio_add_queue(vdev, 32, virtio_balloon_handle_report);
-+    }
-+
-     if (virtio_has_feature(s->host_features,
-                            VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-         s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
-@@ -939,6 +979,8 @@ static Property virtio_balloon_properties[] = {
-      */
-     DEFINE_PROP_BOOL("qemu-4-0-config-size", VirtIOBalloon,
-                      qemu_4_0_config_size, false),
-+    DEFINE_PROP_BIT("unused-page-reporting", VirtIOBalloon, host_features,
-+                    VIRTIO_BALLOON_F_REPORTING, true),
-     DEFINE_PROP_LINK("iothread", VirtIOBalloon, iothread, TYPE_IOTHREAD,
-                      IOThread *),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-index 7fe78e5c14d7..db5bf7127112 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -42,7 +42,7 @@ enum virtio_balloon_free_page_report_status {
- 
- typedef struct VirtIOBalloon {
-     VirtIODevice parent_obj;
--    VirtQueue *ivq, *dvq, *svq, *free_page_vq;
-+    VirtQueue *ivq, *dvq, *svq, *free_page_vq, *rvq;
-     uint32_t free_page_report_status;
-     uint32_t num_pages;
-     uint32_t actual;
-
+Thanks,
+Roman.
 
