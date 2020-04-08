@@ -2,67 +2,77 @@ Return-Path: <SRS0=OEAU=5Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1A4BC2D0EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 10:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CBBAC2D0EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 10:41:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 713A120768
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 10:26:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 713A120768
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 171F220753
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 10:41:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KGJiG0Mr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 171F220753
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jM7ui-0008VJ-KF
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 06:26:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49396)
+	id 1jM89O-0005JS-6l
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 06:41:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50986)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jM7u4-0007y9-7B
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 06:25:53 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jM88Y-0004iA-4j
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 06:40:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jM7u3-0003Wh-2J
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 06:25:52 -0400
-Resent-Date: Wed, 08 Apr 2020 06:25:52 -0400
-Resent-Message-Id: <E1jM7u3-0003Wh-2J@eggs.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21709)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jM7u0-0003Ve-G0; Wed, 08 Apr 2020 06:25:48 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1586341533; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=P49+lGOpU2N5ZNhRM89wUdjC2pPVOXtmx6vLX6L2N0MsVCjuqLW/McVjhnM3XyRTPmqH6umzBgkboCfzeFH9XySPCKk6jetFiyXOQZoWWhYB+ECB/+zV/1VYLQ/JR2t2A0KGw13fptutWxsWS8r+mBfqFHs3ZadBs6wwxWegrkk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1586341533;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=lRACiBCbdegW0GyEvdDPEoYXXGw/W+ugONw1bu5IHmM=; 
- b=UnMY/sqHNR8DJpLGd4q3fZsgRGpsYzVHqi2pojESQBbz6xdMlkBMyAdnIXqrOXu45FRvCeU9llG1JFtAwZ4iOko1SxgwBjK8ABTQyZutrN5jwztuBYujuSENeOTA8Ph+KKBr2zsYLnWCsHoQ9PEWVK3YbMSSl106LoW3lfGQmIs=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1586341532568957.6150182991196;
- Wed, 8 Apr 2020 03:25:32 -0700 (PDT)
-In-Reply-To: <20200408093051.9893-1-vsementsov@virtuozzo.com>
-Subject: Re: [PATCH for-5.0? 0/9] block/io: safer inc/dec in_flight sections
-Message-ID: <158634153097.16886.10882883810164250044@39012742ff91>
+ (envelope-from <imammedo@redhat.com>) id 1jM88W-0001fH-4g
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 06:40:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48428
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jM88V-0001f4-Tj
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 06:40:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586342447;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=br8XVJYlGyJzOcxTIihoJuqdGOfv9W56CwbbS6teb4k=;
+ b=KGJiG0MrTksueQB1sYD4Av35fa87cQmsSnedN47oCmRu5RWbu2oESTT9PGlNHxn0n1vbkb
+ 9fpPcLKMVqj30dQqDWFopHSX13R1MVhi5WbSmTK5o0ERzbA0zdgBsR1qLS1e8oCh5Wvqpk
+ CiPIyMewWuDPYjLiaQcSZUbEvVlzH5k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-408-ODsUQ6SFPpyvIUQgqploCg-1; Wed, 08 Apr 2020 06:40:45 -0400
+X-MC-Unique: ODsUQ6SFPpyvIUQgqploCg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D86D107ACC4;
+ Wed,  8 Apr 2020 10:40:44 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D3C0038F;
+ Wed,  8 Apr 2020 10:40:37 +0000 (UTC)
+Date: Wed, 8 Apr 2020 12:40:35 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Li Feng <fengli@smartx.com>
+Subject: Re: hotplug issue of vhost-user-blk
+Message-ID: <20200408124035.41c1d242@redhat.com>
+In-Reply-To: <CAHckoCzojVSHLAwBP2QhFx3Gw6j9DVPRwNSML9D4GQMzKr9Y3g@mail.gmail.com>
+References: <CAHckoCzojVSHLAwBP2QhFx3Gw6j9DVPRwNSML9D4GQMzKr9Y3g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: vsementsov@virtuozzo.com
-Date: Wed, 8 Apr 2020 03:25:32 -0700 (PDT)
-X-ZohoMailClient: External
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.57
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,51 +84,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, den@openvz.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ raphael.norwitz@nutanix.com, Kyle Zhang <kyle@smartx.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQwODA5MzA1MS45ODkz
-LTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0
-aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGlu
-ZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5z
-dGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9j
-a2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5n
-d0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAg
-ICBody9hY3BpL2NwdV9ob3RwbHVnLm8KICBDQyAgICAgIGh3L2FjcGkvbWVtb3J5X2hvdHBsdWcu
-bwovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svaW8uYzogSW4gZnVuY3Rpb24gJ2JkcnZfY29fcGRp
-c2NhcmQnOgovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svaW8uYzozMjM2OjIzOiBlcnJvcjogdW51
-c2VkIHZhcmlhYmxlICdicycgWy1XZXJyb3I9dW51c2VkLXZhcmlhYmxlXQogICAgIEJsb2NrRHJp
-dmVyU3RhdGUgKmJzID0gY2hpbGQtPmJzOwogICAgICAgICAgICAgICAgICAgICAgIF5+CmNjMTog
-YWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2U6ICoqKiBbL3RtcC9xZW11
-LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTogYmxvY2svaW8ub10gRXJyb3IgMQptYWtlOiAqKiogV2Fp
-dGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwg
-bGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjQsIGluIDxt
-b2R1bGU+Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3Vi
-cHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2Nr
-ZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD0wYTNjNDZlODI4
-ZjU0YzdlYWNjODU3MzNmMDg2ZTA5MycsICctdScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0Jywg
-J3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScs
-ICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScs
-ICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9JywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAv
-Y2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6
-L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTl6
-bnE2OWlpL3NyYy9kb2NrZXItc3JjLjIwMjAtMDQtMDgtMDYuMjMuMTguMTIzMzQ6L3Zhci90bXAv
-cWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWlu
-Z3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxh
-YmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MGEzYzQ2ZTgyOGY1NGM3ZWFjYzg1NzMzZjA4NmUw
-OTMKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGly
-ZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtOXpucTY5aWkvc3JjJwptYWtlOiAq
-KiogW2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgMm0xMi4z
-OTlzCnVzZXIgICAgMG04LjMyNnMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6
-Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNDA4MDkzMDUxLjk4OTMtMS12c2VtZW50c292QHZpcnR1
-b3p6by5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpF
-bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcu
-b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQu
-Y29t
+On Wed, 8 Apr 2020 10:25:42 +0800
+Li Feng <fengli@smartx.com> wrote:
+
+> Hi all,
+> 
+> Hotplug of vhost-user-blk doesn't not work in qemu master branch and
+> all previous version.
+> 
+> The action I insert a vhost-user-blk disk is:
+> (qemu) chardev-add socket,id=spdk_vhost_blk2,path=/vhost-blk.0,reconnect=1
+> (qemu) device_add
+> vhost-user-blk-pci,chardev=spdk_vhost_blk2,id=spdk_vhost_blk2,num-queues=4
+> 
+> Until here, it's well.
+> 
+> Then I unplug it from qemu:
+> (qemu) device_del spdk_vhost_blk2
+> (qemu) chardev-remove spdk_vhost_blk2
+> Error: Chardev 'spdk_vhost_blk2' is busy
+> 
+> The related code is here:
+> qmp_chardev_remove
+>     -> qemu_chr_is_busy
+>     -> object_unparent(OBJECT(chr));  
+> 
+>  330 static bool qemu_chr_is_busy(Chardev *s)
+>  331 {
+>  332     if (CHARDEV_IS_MUX(s)) {
+>  333         MuxChardev *d = MUX_CHARDEV(s);
+>  334         return d->mux_cnt >= 0;
+>  335     } else {
+>  336         return s->be != NULL;
+>  337     }
+>  338 }
+> 
+> My question is:
+> 1. s->be is set to NULL when qemu_chr_fe_deinit is called.
+> However, the qmp_chardev_remove is blocked at qemu_chr_is_busy check,
+> then the object_unparent will not be called.
+> 2. Is there a path that device_del will trigger the s->be that been set to NULL?
+
+device_del is request for guest to eject device and once it's done backend
+could be removed. 
+
+what's you command line? (so I could point out entry point where ejection happens
+for you to troubleshoot it further)
+
+> 
+> How should I fix this issue?
+> I have tested that comment the qemu_chr_is_busy works well.
+> 
+> Thanks in advance.
+> 
+> Feng Li
+> 
+
 
