@@ -2,75 +2,61 @@ Return-Path: <SRS0=OEAU=5Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 126D2C2D0EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 09:13:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A65DBC2D0EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 09:14:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFBDB2074F
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 09:13:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hzilrd6l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFBDB2074F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7C9BE20747
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Apr 2020 09:14:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C9BE20747
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jM6lq-0008Bv-VB
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 05:13:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36008)
+	id 1jM6mp-0001AE-NI
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 05:14:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36334)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jM6kT-0006Rh-Kg
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 05:11:55 -0400
+ (envelope-from <fangying1@huawei.com>) id 1jM6lD-0007Ok-Tj
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 05:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1jM6kR-0002TJ-DZ
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 05:11:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36438
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <fangying1@huawei.com>) id 1jM6lC-0002tn-HZ
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 05:12:39 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:34466 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jM6kR-0002Sp-A6
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 05:11:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586337110;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=+OnMlkR57OpXijgZ9SMDHND6/b9Z/s6xw8PDZc3TL68=;
- b=hzilrd6lg4KUZLkpUNqGuEEcjok0QZI9rdhi7LmT7kSPL0jEehMVkEBzpUTbyDwttJgH89
- zryT3+KWSxq2kriN3lHLQvnqIV/SHek5ziZp7WQvaEEAnq2bXaXMFDN0ttsYFpGDOXcbYy
- BtzgA1OBeQFC3FSZSGvnAxzSmjC0iRU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-FHyhIlw8MGa3cs-6_gpo9g-1; Wed, 08 Apr 2020 05:11:49 -0400
-X-MC-Unique: FHyhIlw8MGa3cs-6_gpo9g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A9ED18B9FC8;
- Wed,  8 Apr 2020 09:11:46 +0000 (UTC)
-Received: from localhost (ovpn-114-249.ams2.redhat.com [10.36.114.249])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2E4B68C08D;
- Wed,  8 Apr 2020 09:11:39 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.0] aio-posix: signal-proof fdmon-io_uring
-Date: Wed,  8 Apr 2020 10:11:39 +0100
-Message-Id: <20200408091139.273851-1-stefanha@redhat.com>
+ (Exim 4.71) (envelope-from <fangying1@huawei.com>)
+ id 1jM6lB-0002q9-WF
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 05:12:38 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 4DF4658F5B653A37508C;
+ Wed,  8 Apr 2020 17:12:27 +0800 (CST)
+Received: from [10.133.205.53] (10.133.205.53) by smtp.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server (TLS) id 14.3.487.0; Wed, 8 Apr 2020
+ 17:12:24 +0800
+Subject: Re: [RFC PATCH 0/4] async: fix hangs on weakly-ordered architectures
+To: Paolo Bonzini <pbonzini@redhat.com>, <qemu-devel@nongnu.org>
+References: <20200407140746.8041-1-pbonzini@redhat.com>
+From: Ying Fang <fangying1@huawei.com>
+Message-ID: <047d4327-8a79-ffc1-94fe-47355ed955c5@huawei.com>
+Date: Wed, 8 Apr 2020 17:12:24 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
+In-Reply-To: <20200407140746.8041-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.205.53]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,38 +68,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org,
- Julia Suvorova <jusual@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, sgarzare@redhat.com
+Cc: stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VGhlIGlvX3VyaW5nX2VudGVyKDIpIHN5c2NhbGwgcmV0dXJucyB3aXRoIGVycm5vPUVJTlRSIHdo
-ZW4gaW50ZXJydXB0ZWQKYnkgYSBzaWduYWwuICBSZXRyeSB0aGUgc3lzY2FsbCBpbiB0aGlzIGNh
-c2UuCgpJdCdzIGVzc2VudGlhbCB0byBkbyB0aGlzIGluIHRoZSBpb191cmluZ19zdWJtaXRfYW5k
-X3dhaXQoKSBjYXNlLiAgTXkKaW50ZXJwcmV0YXRpb24gb2YgdGhlIExpbnV4IHY1LjUgaW9fdXJp
-bmdfZW50ZXIoMikgY29kZSBpcyB0aGF0IGl0CnNob3VsZG4ndCBhZmZlY3QgdGhlIGlvX3VyaW5n
-X3N1Ym1pdCgpIGNhc2UsIGJ1dCB0aGVyZSBpcyBubyBndWFyYW50ZWUKdGhpcyB3aWxsIGFsd2F5
-cyBiZSB0aGUgY2FzZS4gIExldCdzIGNoZWNrIGZvciAtRUlOVFIgYXJvdW5kIGJvdGggQVBJcy4K
-Ck5vdGUgdGhhdCB0aGUgbGlidXJpbmcgQVBJcyBoYXZlIC1lcnJubyByZXR1cm4gdmFsdWVzLgoK
-U2lnbmVkLW9mZi1ieTogU3RlZmFuIEhham5vY3ppIDxzdGVmYW5oYUByZWRoYXQuY29tPgotLS0K
-IHV0aWwvZmRtb24taW9fdXJpbmcuYyB8IDEwICsrKysrKysrLS0KIDEgZmlsZSBjaGFuZ2VkLCA4
-IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvdXRpbC9mZG1vbi1p
-b191cmluZy5jIGIvdXRpbC9mZG1vbi1pb191cmluZy5jCmluZGV4IGI0ZDYxMDlmMjAuLmQ1YTgw
-ZWQ2ZmIgMTAwNjQ0Ci0tLSBhL3V0aWwvZmRtb24taW9fdXJpbmcuYworKysgYi91dGlsL2ZkbW9u
-LWlvX3VyaW5nLmMKQEAgLTg4LDcgKzg4LDEwIEBAIHN0YXRpYyBzdHJ1Y3QgaW9fdXJpbmdfc3Fl
-ICpnZXRfc3FlKEFpb0NvbnRleHQgKmN0eCkKICAgICB9CiAKICAgICAvKiBObyBmcmVlIHNxZXMg
-bGVmdCwgc3VibWl0IHBlbmRpbmcgc3FlcyBmaXJzdCAqLwotICAgIHJldCA9IGlvX3VyaW5nX3N1
-Ym1pdChyaW5nKTsKKyAgICBkbyB7CisgICAgICAgIHJldCA9IGlvX3VyaW5nX3N1Ym1pdChyaW5n
-KTsKKyAgICB9IHdoaWxlIChyZXQgPT0gLUVJTlRSKTsKKwogICAgIGFzc2VydChyZXQgPiAxKTsK
-ICAgICBzcWUgPSBpb191cmluZ19nZXRfc3FlKHJpbmcpOwogICAgIGFzc2VydChzcWUpOwpAQCAt
-MjgyLDcgKzI4NSwxMCBAQCBzdGF0aWMgaW50IGZkbW9uX2lvX3VyaW5nX3dhaXQoQWlvQ29udGV4
-dCAqY3R4LCBBaW9IYW5kbGVyTGlzdCAqcmVhZHlfbGlzdCwKIAogICAgIGZpbGxfc3FfcmluZyhj
-dHgpOwogCi0gICAgcmV0ID0gaW9fdXJpbmdfc3VibWl0X2FuZF93YWl0KCZjdHgtPmZkbW9uX2lv
-X3VyaW5nLCB3YWl0X25yKTsKKyAgICBkbyB7CisgICAgICAgIHJldCA9IGlvX3VyaW5nX3N1Ym1p
-dF9hbmRfd2FpdCgmY3R4LT5mZG1vbl9pb191cmluZywgd2FpdF9ucik7CisgICAgfSB3aGlsZSAo
-cmV0ID09IC1FSU5UUik7CisKICAgICBhc3NlcnQocmV0ID49IDApOwogCiAgICAgcmV0dXJuIHBy
-b2Nlc3NfY3FfcmluZyhjdHgsIHJlYWR5X2xpc3QpOwotLSAKMi4yNS4xCgo=
 
+
+On 2020/4/7 22:07, Paolo Bonzini wrote:
+> ARM machines and other weakly-ordered architectures have been suffering
+> for a long time from hangs in qemu-img and qemu-io.  For QEMU binaries
+> these are mitigated by the timers that sooner or later fire in the main
+> loop, but these will not happen for the tools and probably not with I/O
+> threads either.
+yes, we occasionally see qemu main thread hangs and VM stuck in in-shutdown
+state on aarch64 platform. So this could happen with I/O threads.
+> 
+> The fix is in patch 5.  Patch 1-3 are docs updates that explain the bug,
+> and patch 4 is a bugfix exposed by the new patch.
+> 
+> Paolo
+> 
+> Paolo Bonzini (5):
+>    atomics: convert to reStructuredText
+>    atomics: update documentation
+>    rcu: do not mention atomic_mb_read/set in documentation
+>    aio-wait: delegate polling of main AioContext if BQL not held
+>    async: use explicit memory barriers
+> 
+>   docs/devel/atomics.rst   | 501 +++++++++++++++++++++++++++++++++++++++
+>   docs/devel/atomics.txt   | 403 -------------------------------
+>   docs/devel/index.rst     |   1 +
+>   docs/devel/rcu.txt       |   4 +-
+>   include/block/aio-wait.h |  22 ++
+>   include/block/aio.h      |  29 +--
+>   util/aio-posix.c         |  16 +-
+>   util/aio-win32.c         |  17 +-
+>   util/async.c             |  16 +-
+>   9 files changed, 576 insertions(+), 433 deletions(-)
+>   create mode 100644 docs/devel/atomics.rst
+>   delete mode 100644 docs/devel/atomics.txt
+> 
 
