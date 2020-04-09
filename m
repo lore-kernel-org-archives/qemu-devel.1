@@ -2,70 +2,79 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6990C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 16:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38611C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 16:32:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EAF620771
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 16:09:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="BT0G9sa0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EAF620771
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 07D4E20768
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 16:32:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07D4E20768
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMZjj-0000yj-L6
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 12:09:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55066)
+	id 1jMa66-0005dW-88
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 12:32:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57066)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1jMZj7-0000Kn-Bl
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 12:08:26 -0400
+ (envelope-from <bounces@canonical.com>) id 1jMa5T-0005D6-6E
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 12:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1jMZj5-0001O4-Ta
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 12:08:24 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:35104)
+ (envelope-from <bounces@canonical.com>) id 1jMa5R-0003le-S9
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 12:31:31 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37342)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1jMZj5-0001MC-2s; Thu, 09 Apr 2020 12:08:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=NKPIp2dRkTf8NZYS41q9T5Or8ejKcaU3Fzs1utSqTys=; 
- b=BT0G9sa0e34fjD/3FrKjXHdCnYetWwpucMmi38yqPe4QoD4Pl8B9R5FpKAxnb7el76Mih/CLMPSH81HU3TeN1btoVbKLk+SXl4DQdM2tZWbxfrhGbUN9gG+by3oScqYB8fMeeSc9912syy3mQacm22eUVgL1+WzIeg1tUI3BEm7cN7HKKu3sGeRX+N0niqWJoIa0nn6kWw9B0NESVddNc0aa0Kag7hdHG3Z3+nCfs2Uv7pg5EihmK7XJx6xWAa7BrFuLA1wjErndQvy7pYnnqBAb7PohgNEpvnWC2WcZMa6XucJ/e5gDbOHKUmdrfXGIZcn39Ac/Dnm7tzE0tGOu2Q==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1jMZj0-0000eG-2j; Thu, 09 Apr 2020 18:08:18 +0200
-Received: from berto by mail.igalia.com with local (Exim)
- id 1jMZiz-0005GM-Pl; Thu, 09 Apr 2020 18:08:17 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Subject: Re: [PATCH v4 05/30] qcow2: Process QCOW2_CLUSTER_ZERO_ALLOC clusters
- in handle_copied()
-In-Reply-To: <66273cab-85f3-209e-1e8f-1b09ad8ff97b@virtuozzo.com>
-References: <cover.1584468723.git.berto@igalia.com>
- <42c52037c0c975e2d1cd23b470e7b61cbd0b3fa3.1584468723.git.berto@igalia.com>
- <66273cab-85f3-209e-1e8f-1b09ad8ff97b@virtuozzo.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Thu, 09 Apr 2020 18:08:17 +0200
-Message-ID: <w511row3amm.fsf@maestria.local.igalia.com>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jMa5R-0003lN-Mt
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 12:31:29 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jMa5P-00082u-KO
+ for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 16:31:27 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 97D092E8113
+ for <qemu-devel@nongnu.org>; Thu,  9 Apr 2020 16:31:27 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 09 Apr 2020 16:18:37 -0000
+From: Frank Heimes <1859656@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=maas; status=Triaged; importance=Low;
+ assignee=lee.trager@canonical.com; 
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: product=ubuntu-z-systems; status=Triaged; importance=High;
+ assignee=maas; 
+X-Launchpad-Bug-Tags: s390x
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: andrew-cloke fheimes ltrager paelzer sfeole
+X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
+X-Launchpad-Bug-Modifier: Frank Heimes (fheimes)
+References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
+Message-Id: <158644911744.17284.1369598348282523511.malone@wampee.canonical.com>
+Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
+ initial deploy
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 3b7d785bc16b74927ba6810b8de0fc8d78e3a58a
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,129 +83,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- "Denis V . Lunev" <den@openvz.org>
+Reply-To: Bug 1859656 <1859656@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu 09 Apr 2020 12:59:30 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
->>   static void calculate_l2_meta(BlockDriverState *bs,
->>                                 uint64_t host_cluster_offset,
->>                                 uint64_t guest_offset, unsigned bytes,
->> -                              QCowL2Meta **m, bool keep_old)
->> +                              uint64_t *l2_slice, QCowL2Meta **m, bool keep_old)
->>   {
->>       BDRVQcow2State *s = bs->opaque;
->> -    unsigned cow_start_from = 0;
->> +    int l2_index = offset_to_l2_slice_index(s, guest_offset);
->> +    uint64_t l2_entry;
->> +    unsigned cow_start_from, cow_end_to;
->>       unsigned cow_start_to = offset_into_cluster(s, guest_offset);
->>       unsigned cow_end_from = cow_start_to + bytes;
->> -    unsigned cow_end_to = ROUND_UP(cow_end_from, s->cluster_size);
->>       unsigned nb_clusters = size_to_clusters(s, cow_end_from);
->>       QCowL2Meta *old_m = *m;
->> +    QCow2ClusterType type;
->> +
->> +    assert(nb_clusters <= s->l2_slice_size - l2_index);
->> +
->> +    /* Return if there's no COW (all clusters are normal and we keep them) */
->> +    if (keep_old) {
->> +        int i;
->> +        for (i = 0; i < nb_clusters; i++) {
->> +            l2_entry = be64_to_cpu(l2_slice[l2_index + i]);
->> +            if (qcow2_get_cluster_type(bs, l2_entry) != QCOW2_CLUSTER_NORMAL) {
->
-> Could we also allow full ZERO_ALLOC clusters here?
+I still think that #29 could be a viable fix for this.
 
-No, because the L2 entry needs to be modified (in order to remove the
-'all zeroes' bit) and we need to create a QCowL2Meta entry for that (see
-qcow2_handle_l2meta()).
+-- =
 
->> +    /* Get the L2 entry of the first cluster */
->> +    l2_entry = be64_to_cpu(l2_slice[l2_index]);
->> +    type = qcow2_get_cluster_type(bs, l2_entry);
->> +
->> +    if (type == QCOW2_CLUSTER_NORMAL && keep_old) {
->> +        cow_start_from = cow_start_to;
->> +    } else {
->> +        cow_start_from = 0;
->> +    }
->> +
->> +    /* Get the L2 entry of the last cluster */
->> +    l2_entry = be64_to_cpu(l2_slice[l2_index + nb_clusters - 1]);
->> +    type = qcow2_get_cluster_type(bs, l2_entry);
->> +
->> +    if (type == QCOW2_CLUSTER_NORMAL && keep_old) {
->> +        cow_end_to = cow_end_from;
->> +    } else {
->> +        cow_end_to = ROUND_UP(cow_end_from, s->cluster_size);
->> +    }
->
-> These two ifs may be moved into if (keep_old), and drop "&& keep_old"
-> from conditions. This also will allow to drop extra calculations, move
-> new variables to if (keep_old) {} block and allow to pass
-> l2_slice=NULL together with keep_old=false.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859656
 
-In subsequent patches we're going to have more cases than just
-QCOW2_CLUSTER_NORMAL so I don't think it makes sense to move the
-keep_old check around.
+Title:
+  [2.6] Unable to reboot s390x KVM machine after initial deploy
 
->> @@ -1239,7 +1304,8 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
->>   
->>       l2_index = offset_to_l2_slice_index(s, guest_offset);
->>       nb_clusters = MIN(nb_clusters, s->l2_slice_size - l2_index);
->> -    assert(nb_clusters <= INT_MAX);
->> +    /* Limit total byte count to BDRV_REQUEST_MAX_BYTES */
->> +    nb_clusters = MIN(nb_clusters, BDRV_REQUEST_MAX_BYTES >> s->cluster_bits);
->>   
->>       /* Find L2 entry for the first involved cluster */
->>       ret = get_cluster_table(bs, guest_offset, &l2_slice, &l2_index);
->> @@ -1249,18 +1315,17 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
->>   
->>       cluster_offset = be64_to_cpu(l2_slice[l2_index]);
->
-> It would be good to s/cluster_offset/l2_entry/
->
-> And, "cluster_offset & L2E_OFFSET_MASK" is used so many times, so, I'd
-> not substitute, but keep both variables: l2_entry and cluster_offset.
+Status in MAAS:
+  Triaged
+Status in QEMU:
+  Incomplete
+Status in Ubuntu on IBM z Systems:
+  Triaged
 
-Sounds good, I can change that.
+Bug description:
+  MAAS version: 2.6.1 (7832-g17912cdc9-0ubuntu1~18.04.1)
+  Arch: S390x
 
->> +    /* Allocate at a given offset in the image file */
->> +    alloc_cluster_offset = *host_offset == INV_OFFSET ? INV_OFFSET :
->> +        start_of_cluster(s, *host_offset);
->> +    ret = do_alloc_cluster_offset(bs, guest_offset, &alloc_cluster_offset,
->> +                                  &nb_clusters);
->> +    if (ret < 0) {
->> +        goto out;
->>       }
->>   
->> -    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
->
-> actually we don't need l2_slice for keep_old=false in
-> calculate_l2_meta, so if calculate_l2_meta modified a bit, change of
-> function tail is not needed..
->
-> Still, may be l2_slice will be used in calculate_l2_meta() in further
-> patches? Will see..
+  Appears that MAAS can not find the s390x bootloader to boot from the
+  disk, not sure how maas determines this.  However this was working in
+  the past. I had originally thought that if the maas machine was
+  deployed then it defaulted to boot from disk.
 
-We'll need it in a later patch.
+  If I force the VM to book from disk, the VM starts up as expected.
 
->> -fail:
->> -    if (*m && (*m)->nb_clusters > 0) {
->> +out:
->> +    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
->> +    if (ret < 0 && *m && (*m)->nb_clusters > 0) {
->>           QLIST_REMOVE(*m, next_in_flight);
->>       }
->
-> Hmm, unrelated to the patch, but why do we remove meta, which we
-> didn't create?
+  Reproduce:
 
-Not sure actually, I would need to check further...
+  - Deploy Disco on S390x KVM instance
+  - Reboot it
 
-Berto
+  on the KVM console...
+
+  Connected to domain s2lp6g001
+  Escape character is ^]
+  done
+  =C2=A0=C2=A0Using IPv4 address: 10.246.75.160
+  =C2=A0=C2=A0Using TFTP server: 10.246.72.3
+  =C2=A0=C2=A0Bootfile name: 'boots390x.bin'
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  =C2=A0=C2=A0TFTP error: file not found: boots390x.bin
+  Trying pxelinux.cfg files...
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  =C2=A0=C2=A0Receiving data:  0 KBytes
+  Failed to load OS from network
+
+  =3D=3D> /var/log/maas/rackd.log <=3D=3D
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] boots39=
+0x.bin requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/6=
+5a9ca43-9541-49be-b315-e2ca85936ea2 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+1-52-54-00-e5-d7-bb requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64BA0 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64BA requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64B requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF64 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF6 requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+AF requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+A requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
+ requested by 10.246.75.160
+  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/d=
+efault requested by 10.246.75.160
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/maas/+bug/1859656/+subscriptions
 
