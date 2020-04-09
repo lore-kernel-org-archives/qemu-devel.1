@@ -6,78 +6,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1FDEC2BA2B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 15:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9806EC2BB86
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 15:34:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D9C4206E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 15:34:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64825206E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 15:34:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hHbD/Z9O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D9C4206E9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y3lIetz+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64825206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMZCO-0006r9-OW
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 11:34:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50506)
+	id 1jMZCP-0006s0-HB
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 11:34:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50515)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jMZ8j-00016U-75
+ (envelope-from <armbru@redhat.com>) id 1jMZ8j-00016X-Gn
  for qemu-devel@nongnu.org; Thu, 09 Apr 2020 11:30:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jMZ8h-0003dw-Pv
+ (envelope-from <armbru@redhat.com>) id 1jMZ8i-0003eo-2F
  for qemu-devel@nongnu.org; Thu, 09 Apr 2020 11:30:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52451
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26166
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jMZ8h-0003cv-Kr
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jMZ8h-0003as-U6
  for qemu-devel@nongnu.org; Thu, 09 Apr 2020 11:30:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586446247;
+ s=mimecast20190719; t=1586446245;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mB2y7knBNKmOhcBsBrN+C8nK1DyT+qjybYsMC2tHh7M=;
- b=hHbD/Z9O1AJRdjczCKhhWu8vdw2bvZKX+TmWzj9NSbZ2lqv+SzI2cXKbPGGNBTBGfLfYVp
- JG8l/9fPTlubcn3ua5FrlGkg5R6qBiEbz2cW/cUtAUQDy62ZGndz/ueUhqxv9s20yAL2kS
- ZGKTCsVv3pZF1bkVwUHrqAFRZMrfbK8=
+ bh=N4StbKGvjqHRcrZFfc5OaMe1Xocyuir9bg9VtEJzmWo=;
+ b=Y3lIetz+gwRQ9hfBptPFI0JhPaB606UCMhGZugEM0l+30XUlPZd9ifoL+bb+cADge6Rdk+
+ MHVKFI4eEEITPzHTVoXBcyPoWQf7/gjmyHp9uvsvozOKsgttXRoupobQUZThf9PztTUfU9
+ EDKFJuuChz0Q3VXZY/A+b+/0ybCR+uA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-73-ZmeEOw5SPa6HKsJ-oCHW9w-1; Thu, 09 Apr 2020 11:30:45 -0400
-X-MC-Unique: ZmeEOw5SPa6HKsJ-oCHW9w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-92-h4y8APE3NO-j_PAQfdL1Vg-1; Thu, 09 Apr 2020 11:30:43 -0400
+X-MC-Unique: h4y8APE3NO-j_PAQfdL1Vg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D2938018A1;
- Thu,  9 Apr 2020 15:30:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7A56107ACC4;
+ Thu,  9 Apr 2020 15:30:42 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
  [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 38ACA60BF3;
- Thu,  9 Apr 2020 15:30:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B4F2A9D348;
+ Thu,  9 Apr 2020 15:30:42 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 4DC2F11358BB; Thu,  9 Apr 2020 17:30:41 +0200 (CEST)
+ id 3A06611358AF; Thu,  9 Apr 2020 17:30:41 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.1 8/8] qemu-option: Move is_valid_option_list() to
- qemu-img.c and rewrite
-Date: Thu,  9 Apr 2020 17:30:41 +0200
-Message-Id: <20200409153041.17576-9-armbru@redhat.com>
+Subject: [PATCH for-5.1 2/8] qemu-options: Factor out get_opt_name_value()
+ helper
+Date: Thu,  9 Apr 2020 17:30:35 +0200
+Message-Id: <20200409153041.17576-3-armbru@redhat.com>
 In-Reply-To: <20200409153041.17576-1-armbru@redhat.com>
 References: <20200409153041.17576-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,112 +93,136 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-is_valid_option_list()'s purpose is ensuring qemu-img.c's can safely
-join multiple parameter strings separated by ',' like this:
-
-        g_strdup_printf("%s,%s", params1, params2);
-
-How it does that is anything but obvious.  A close reading of the code
-reveals that it fails exactly when its argument starts with ',' or
-ends with an odd number of ','.  Makes sense, actually, because when
-the argument starts with ',', a separating ',' preceding it would get
-escaped, and when it ends with an odd number of ',', a separating ','
-following it would get escaped.
-
-Move it to qemu-img.c and rewrite it the obvious way.
+The next commits will put it to use.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qemu/option.h |  1 -
- qemu-img.c            | 26 ++++++++++++++++++++++++++
- util/qemu-option.c    | 22 ----------------------
- 3 files changed, 26 insertions(+), 23 deletions(-)
+ util/qemu-option.c | 102 +++++++++++++++++++++++++--------------------
+ 1 file changed, 56 insertions(+), 46 deletions(-)
 
-diff --git a/include/qemu/option.h b/include/qemu/option.h
-index 844587cab3..eb4097889d 100644
---- a/include/qemu/option.h
-+++ b/include/qemu/option.h
-@@ -33,7 +33,6 @@ const char *get_opt_value(const char *p, char **value);
- void parse_option_size(const char *name, const char *value,
-                        uint64_t *ret, Error **errp);
- bool has_help_option(const char *param);
--bool is_valid_option_list(const char *param);
-=20
- enum QemuOptType {
-     QEMU_OPT_STRING =3D 0,  /* no parsing (use string as-is)              =
-          */
-diff --git a/qemu-img.c b/qemu-img.c
-index 28b27b738a..d8ca8a73e2 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -223,6 +223,32 @@ static bool qemu_img_object_print_help(const char *typ=
-e, QemuOpts *opts)
-     return true;
- }
-=20
-+/*
-+ * Is @optarg safe for accumulate_options()?
-+ * It is when multiple of them can be joined together separated by ','.
-+ * To make that work, @optarg must not start with ',' (or else a
-+ * separating ',' preceding it gets escaped), and it must not end with
-+ * an odd number of ',' (or else a separating ',' following it gets
-+ * escaped).
-+ */
-+static bool is_valid_option_list(const char *optarg)
-+{
-+    size_t len =3D strlen(optarg);
-+    size_t i;
-+
-+    if (optarg[0] =3D=3D ',') {
-+        return false;
-+    }
-+
-+    for (i =3D len; i > 0 && optarg[i - 1] =3D=3D ','; i--) {
-+    }
-+    if ((len - i) % 2) {
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
- static int accumulate_options(char **options, char *optarg)
- {
-     char *new_options;
 diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 279f1b3fb3..6f80807738 100644
+index 97172b5eaa..f08f4bc458 100644
 --- a/util/qemu-option.c
 +++ b/util/qemu-option.c
-@@ -165,28 +165,6 @@ void parse_option_size(const char *name, const char *v=
-alue,
-     *ret =3D size;
+@@ -805,61 +805,71 @@ void qemu_opts_print(QemuOpts *opts, const char *sepa=
+rator)
+     }
  }
 =20
--bool is_valid_option_list(const char *p)
--{
--    char *value =3D NULL;
--    bool result =3D false;
--
--    while (*p) {
--        p =3D get_opt_value(p, &value);
--        if ((*p && !*++p) ||
--            (!*value || *value =3D=3D ',')) {
--            goto out;
--        }
--
--        g_free(value);
--        value =3D NULL;
--    }
--
--    result =3D true;
--out:
--    g_free(value);
--    return result;
--}
--
- static const char *opt_type_to_string(enum QemuOptType type)
++static const char *get_opt_name_value(const char *params,
++                                      const char *firstname,
++                                      char **name, char **value)
++{
++    const char *p, *pe, *pc;
++
++    pe =3D strchr(params, '=3D');
++    pc =3D strchr(params, ',');
++
++    if (!pe || (pc && pc < pe)) {
++        /* found "foo,more" */
++        if (firstname) {
++            /* implicitly named first option */
++            *name =3D g_strdup(firstname);
++            p =3D get_opt_value(params, value);
++        } else {
++            /* option without value, must be a flag */
++            p =3D get_opt_name(params, name, ',');
++            if (strncmp(*name, "no", 2) =3D=3D 0) {
++                memmove(*name, *name + 2, strlen(*name + 2) + 1);
++                *value =3D g_strdup("off");
++            } else {
++                *value =3D g_strdup("on");
++            }
++        }
++    } else {
++        /* found "foo=3Dbar,more" */
++        p =3D get_opt_name(params, name, '=3D');
++        assert(*p =3D=3D '=3D');
++        p++;
++        p =3D get_opt_value(p, value);
++    }
++
++    assert(!*p || *p =3D=3D ',');
++    if (*p =3D=3D ',') {
++        p++;
++    }
++    return p;
++}
++
+ static void opts_do_parse(QemuOpts *opts, const char *params,
+                           const char *firstname, bool prepend,
+                           bool *invalidp, Error **errp)
  {
-     switch (type) {
+-    char *option =3D NULL;
+-    char *value =3D NULL;
+-    const char *p,*pe,*pc;
+     Error *local_err =3D NULL;
++    char *option, *value;
++    const char *p;
+=20
+-    for (p =3D params; *p !=3D '\0'; p++) {
+-        pe =3D strchr(p, '=3D');
+-        pc =3D strchr(p, ',');
+-        if (!pe || (pc && pc < pe)) {
+-            /* found "foo,more" */
+-            if (p =3D=3D params && firstname) {
+-                /* implicitly named first option */
+-                option =3D g_strdup(firstname);
+-                p =3D get_opt_value(p, &value);
+-            } else {
+-                /* option without value, probably a flag */
+-                p =3D get_opt_name(p, &option, ',');
+-                if (strncmp(option, "no", 2) =3D=3D 0) {
+-                    memmove(option, option+2, strlen(option+2)+1);
+-                    value =3D g_strdup("off");
+-                } else {
+-                    value =3D g_strdup("on");
+-                }
+-            }
+-        } else {
+-            /* found "foo=3Dbar,more" */
+-            p =3D get_opt_name(p, &option, '=3D');
+-            assert(*p =3D=3D '=3D');
+-            p++;
+-            p =3D get_opt_value(p, &value);
+-        }
+-        if (strcmp(option, "id") !=3D 0) {
+-            /* store and parse */
+-            opt_set(opts, option, value, prepend, invalidp, &local_err);
+-            value =3D NULL;
+-            if (local_err) {
+-                error_propagate(errp, local_err);
+-                goto cleanup;
+-            }
+-        }
+-        if (*p !=3D ',') {
+-            break;
++    for (p =3D params; *p;) {
++        p =3D get_opt_name_value(p, firstname, &option, &value);
++        firstname =3D NULL;
++
++        if (!strcmp(option, "id")) {
++            g_free(option);
++            g_free(value);
++            continue;
+         }
++
++        opt_set(opts, option, value, prepend, invalidp, &local_err);
+         g_free(option);
+-        g_free(value);
+-        option =3D value =3D NULL;
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
+     }
+-
+- cleanup:
+-    g_free(option);
+-    g_free(value);
+ }
+=20
+ /**
 --=20
 2.21.1
 
