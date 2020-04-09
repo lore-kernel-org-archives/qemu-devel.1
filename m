@@ -2,128 +2,67 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3222AC2BA2B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 14:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 882CCC2BA2B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 14:46:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E975D2078E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 14:43:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 518402051A
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 14:46:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dQ3t0Poj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E975D2078E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Q1bJ4v0O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 518402051A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMYPP-0007SP-4q
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 10:43:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41918)
+	id 1jMYRz-00008B-FP
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 10:46:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42141)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jMYOn-000729-VQ
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:43:26 -0400
+ (envelope-from <berto@igalia.com>) id 1jMYRI-00085s-TE
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:45:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jMYOm-0005nc-IG
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:43:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41125
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jMYOm-0005nK-E8
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:43:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586443399;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=QN9Wb7ytrjMW1+trcJTl/0wS1D4Hp1xagTJvgAMsWhA=;
- b=dQ3t0PojrbOS7A6aTSyh+u30ckzRgxP80iFLSIsvAdr07eXJTHDx39AeJcGAwe/XeLvMe5
- jrh/6qtaMNd4aYhg68xqsV82mGM8on9WW/3vx8ja1PvRK4hAjdJq2G9cYKMUu7k+pCbkC+
- CHXwpGz2iHnWOfKRcv2+rgir3JvxGJw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-208-5RgrnAFLP7ujndw2v0RByA-1; Thu, 09 Apr 2020 10:43:15 -0400
-X-MC-Unique: 5RgrnAFLP7ujndw2v0RByA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56EF785EE72;
- Thu,  9 Apr 2020 14:43:14 +0000 (UTC)
-Received: from [10.36.113.222] (ovpn-113-222.ams2.redhat.com [10.36.113.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 58A04396;
- Thu,  9 Apr 2020 14:43:10 +0000 (UTC)
-Subject: Re: [PATCH v18 QEMU 2/3] virtio-balloon: Add support for providing
- free page reports to host
-To: Alexander Duyck <alexander.duyck@gmail.com>
-References: <20200408225302.18764.209.stgit@localhost.localdomain>
- <20200408225523.18764.86514.stgit@localhost.localdomain>
- <a461c334-79f0-a638-962e-d6b136707ce3@redhat.com>
- <CAKgT0Ueu4P4Z-fNZiEnHDV2nCSrW7qJWVD17=VLHt_Le00NSWg@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <c4b7653e-523b-5fcc-9ef2-8559c438867c@redhat.com>
-Date: Thu, 9 Apr 2020 16:43:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <berto@igalia.com>) id 1jMYRH-00070H-Ds
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:45:56 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:50976)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1jMYRH-0006z4-5V; Thu, 09 Apr 2020 10:45:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=vCJuvbGEXOyQ+Z2ILvGgG2n7hg4j+b7qq3nEOfERyb4=; 
+ b=Q1bJ4v0Ox17ohXbIEvylu8DIgN13lplthKR1iBtQXhknK4rzB/XE/TnGp3HuUxqwoZoZFXb1dV0pmTHocIlyWGh+gnwT1VgsRsynPvYovJR8dVJ8A6g3x+oDqID5zsTt2Uk361I4NYGb/jR2ZQ1ie9jiyrdUOUHagHCmIfyITxLXMl8UwBwQvoCr549G3Yes0lVrMQHCUQ0sa8gfixIhERF4o2+aQS+7yuLa+Srzy+LtJ7TU+FvSAhCMfqxa2/aOUxm8uOgMj5Lhclyp3/pQbS+PTCJxiVf9N7TfUjhEVqukFckEtQhYIEwjDWXM9hroSpSAtncz89680cuCWC/Dzg==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jMYRD-0000Vv-6G; Thu, 09 Apr 2020 16:45:51 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jMYRC-00067P-T5; Thu, 09 Apr 2020 16:45:50 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Subject: Re: [PATCH v4 02/30] qcow2: Convert qcow2_get_cluster_offset() into
+ qcow2_get_host_offset()
+In-Reply-To: <71d9c655-90c9-f22d-a640-12551ac690a6@virtuozzo.com>
+References: <cover.1584468723.git.berto@igalia.com>
+ <65243debd4a41e1ebd13877c2e6c665759c37b38.1584468723.git.berto@igalia.com>
+ <71d9c655-90c9-f22d-a640-12551ac690a6@virtuozzo.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Thu, 09 Apr 2020 16:45:50 +0200
+Message-ID: <w518sj43eg1.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0Ueu4P4Z-fNZiEnHDV2nCSrW7qJWVD17=VLHt_Le00NSWg@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,47 +74,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09.04.20 16:41, Alexander Duyck wrote:
-> On Thu, Apr 9, 2020 at 12:36 AM David Hildenbrand <david@redhat.com> wrote:
->>
->> On 09.04.20 00:55, Alexander Duyck wrote:
->>> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
->>>
->>> Add support for the page reporting feature provided by virtio-balloon.
->>> Reporting differs from the regular balloon functionality in that is is
->>> much less durable than a standard memory balloon. Instead of creating a
->>> list of pages that cannot be accessed the pages are only inaccessible
->>> while they are being indicated to the virtio interface. Once the
->>> interface has acknowledged them they are placed back into their respective
->>> free lists and are once again accessible by the guest system.
->>>
->>> Unlike a standard balloon we don't inflate and deflate the pages. Instead
->>> we perform the reporting, and once the reporting is completed it is
->>> assumed that the page has been dropped from the guest and will be faulted
->>> back in the next time the page is accessed.
->>>
->>> This patch is a subset of the UAPI patch that was submitted for the Linux
->>> kernel. The original patch can be found at:
->>> https://lore.kernel.org/lkml/20200211224657.29318.68624.stgit@localhost.localdomain/
->>
->> You don't need all these comments.
-> 
-> Sorry about that. Those are basically the same comments from the
-> original upstream patch. I just wasn't aware of the process so I just
-> copied that over and added the comment/link to the original patch.
+On Thu 09 Apr 2020 09:50:52 AM CEST, Vladimir Sementsov-Ogievskiy wrote:
+>>       case QCOW2_CLUSTER_ZERO_PLAIN:
+>>       case QCOW2_CLUSTER_UNALLOCATED:
+>>           /* how many empty clusters ? */
+>>           c = count_contiguous_clusters_unallocated(bs, nb_clusters,
+>>                                                     &l2_slice[l2_index], type);
+>> -        *cluster_offset = 0;
+>> +        *host_offset = 0;
+>
+> Actually, dead assignment now.. But I feel that better to keep it.
+>
+> Hmm. May be, drop the first assignment of zero to host_offset? We
+> actually don't need it, user should not rely on host_offset if we
+> return an error.
 
-No worries, it just felt like "oh, he spent a lot of time writing this,
-but after all it wasn't necessary" :)
+Yeah, I'll drop the first one and keep this one.
 
--- 
-Thanks,
+>> @@ -3735,7 +3726,7 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+>>           offset = QEMU_ALIGN_DOWN(offset, s->cluster_size);
+>>           bytes = s->cluster_size;
+>
+> Unrelated to the patch, but.. Why we change bytes?? So, we can finish
+> with success, but zero-out only first cluster?
+>
+> Ah, found, generic block-layer take care of it and never issue
+> unaligned requests crossing cluster boundary.
 
-David / dhildenb
+That's right, hence the assert(head + bytes <= s->cluster_size); a few
+lines before.
 
+Berto
 
