@@ -2,62 +2,70 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF94C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 00:30:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58FF9C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 02:11:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 188C62078E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 00:30:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="eOueuYkL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 188C62078E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 24B77206C0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 02:11:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24B77206C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lemote.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jML5n-0001LJ-A6
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 20:30:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35693)
+	id 1jMMf5-00018a-B9
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 22:11:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44142)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jML4z-0000qs-0x
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 20:30:03 -0400
+ (envelope-from <chenhuacai@gmail.com>) id 1jMMeU-0000iK-FC
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 22:10:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jML4x-0001It-Ee
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 20:30:00 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:56761 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jML4w-0001GG-GN; Wed, 08 Apr 2020 20:29:59 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48yMV96tD9z9sSh; Thu,  9 Apr 2020 10:29:53 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1586392193;
- bh=XqaoRMx7tsegdDlLSSiMfxedf6z4c6oKr+ZbORDrqeQ=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=eOueuYkLZ2HkzeJx3z5v0Yl0dccR9RTOe7wqivz3n8pHu/pgUgNcfBPWqsmhp9WGs
- nPRinWEb9xF1XVKuWya+sZ4spa56wrJPE7XLoAw5X1KQkoIMuXm9OLM+65/jstPv1Z
- qDy2Axfy+j0Ofjlv7xwRdniHp+G3UF1MBT3rAIfI=
-Date: Thu, 9 Apr 2020 10:13:15 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Ganesh Goudar <ganeshgr@linux.ibm.com>
-Subject: Re: [PATCH] target/ppc: Fix wrong interpretation of the disposition
- flag.
-Message-ID: <20200409001315.GA2896@umbus.fritz.box>
-References: <20200408170944.16003-1-ganeshgr@linux.ibm.com>
+ (envelope-from <chenhuacai@gmail.com>) id 1jMMeR-0007Pg-Su
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 22:10:46 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:34024)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <chenhuacai@gmail.com>)
+ id 1jMMeQ-0007PF-Q5
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 22:10:43 -0400
+Received: by mail-io1-f65.google.com with SMTP id f3so2340439ioj.1
+ for <qemu-devel@nongnu.org>; Wed, 08 Apr 2020 19:10:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=txBN6c9y45hiNoUHbDgNuAN71/Bb2u7MuJtMIjOd4bI=;
+ b=qalATGYaz61qva0/utxEY/reXk7rTbFBXc/zog5aD/y+7FS2oa4yUhrKBzGRioq10x
+ lAQzgrxAKsOZekXm3t7v9c646hIamlHy3bnu79geQiDuTpBUE55Ew/ain/HuZlFLskOo
+ aU5rVE2eMcKguS9NPsgiObHNj/vVz+o1/1nK1rEzJdZ/e4kGGNc1s6v+yBLYKJRW0dTJ
+ HpQapOseX5q4lMFLXrISGnhToLvK5sgnvBrqkD4Dr0RNG3xp6JeZextpAG60mgZ9GEvs
+ 1axF1TQSaxoD7Cm5lxBCDbKNTd6ccqs+u6iSqqiwn3Q5xs41WqjCLL30TIM1JO2ixGE3
+ ZqlQ==
+X-Gm-Message-State: AGi0PuY05jg6u3a5jfXyRkZ5Wu413FQmABdP8TArBsOVv6yVjd3avf4O
+ n0P+zNWrZ6vzVyt0/i+csKijk45w4152NGFAUfo=
+X-Google-Smtp-Source: APiQypKS32yyeojtKXClBTDifoUDnn+IV7HBdtFsSyfDrgny1zHLrRgYfZA5bfvTDbHZFMnnOc+vPSkStyDf4d5GMyA=
+X-Received: by 2002:a6b:6c01:: with SMTP id a1mr10001969ioh.196.1586398242027; 
+ Wed, 08 Apr 2020 19:10:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="VbJkn9YxBvnuCH5J"
-Content-Disposition: inline
-In-Reply-To: <20200408170944.16003-1-ganeshgr@linux.ibm.com>
+References: <1586337380-25217-1-git-send-email-chenhc@lemote.com>
+ <1586337380-25217-3-git-send-email-chenhc@lemote.com>
+ <CAHiYmc61GZSvvwhCaC0B5q0GrEUN3CevDvNTEEWLE9PCJqVbvw@mail.gmail.com>
+In-Reply-To: <CAHiYmc61GZSvvwhCaC0B5q0GrEUN3CevDvNTEEWLE9PCJqVbvw@mail.gmail.com>
+From: Huacai Chen <chenhc@lemote.com>
+Date: Thu, 9 Apr 2020 10:17:46 +0800
+Message-ID: <CAAhV-H5moZ8kD5WAM1GvLRmg9spO7m=2DZZL+uUXAoo4iWZyVg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] MAINTAINERS: Add myself as fulong2e co-maintainer
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 209.85.166.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,148 +77,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mahesh@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- npiggin@gmail.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi, Aleksandar,
 
---VbJkn9YxBvnuCH5J
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, Apr 8, 2020 at 11:30 PM Aleksandar Markovic
+<aleksandar.qemu.devel@gmail.com> wrote:
+>
+> 11:08 Sre, 08.04.2020. Huacai Chen <chenhc@lemote.com> =D1=98=D0=B5 =D0=
+=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >
+> > I submitted the MIPS/fulong2e support about ten years ago, and after
+> > that I became a MIPS kernel developer. Last year, Philippe Mathieu-
+> > Daud=C3=A9 asked me that whether I can be a reviewer of MIPS/fulong2e, =
+and I
+> > promised that I will do some QEMU work in the next year (i.e., 2020 and
+> > later). I think now (and also in future) I can have some spare time, so
+> > I can finally do some real work on QEMU/MIPS. And if possible, I hope I
+> > can be a co-maintainer of MIPS/fulong2e.
+> >
+> > Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> > ---
+> >  MAINTAINERS | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 642c8e0..3281ff2 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -1073,6 +1073,7 @@ F: hw/mips/mips_r4k.c
+> >  Fulong 2E
+> >  M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> > +M: Huacai Chen <chenhc@lemote.com>
+> >  S: Odd Fixes
+> >  F: hw/mips/mips_fulong2e.c
+> >  F: hw/isa/vt82c686.c
+> > --
+> > 2.7.0
+> >
+>
+> First of all, I want to express great pleasure and delight seing your ser=
+ies, and this patch in particular.
+>
+> A warm welcome to QEMU developers communities!
+>
+> We are currenyly very busy preparing QEMU 5.0 release, and additionaly, E=
+aster holidays are in next few days or week (different parts od Christian w=
+orld have different calendars), so, fot thay and other reasons, don't expec=
+t promot replies from us.
+>
+> I would also like to see Jiaxng at least having official reviewer status,=
+ but, of course, only if he wants that.
+Thank you for your best wishes, I'm also very glad to see Jiaxun be an revi=
+ewer.
 
-On Wed, Apr 08, 2020 at 10:39:44PM +0530, Ganesh Goudar wrote:
-> Bitwise AND with kvm_run->flags to evaluate if we recovered from
-> MCE or not is not correct, As disposition in kvm_run->flags is a
-> two-bit integer value and not a bit map, So check for equality
-> instead of bitwise AND.
->=20
-> Without the fix qemu treats any unrecoverable mce error as recoverable
-> and ends up in a mce loop inside the guest, Below are the MCE logs before
-> and after the fix.
->=20
-> Before fix:
->=20
-> [   66.775757] MCE: CPU0: Initiator CPU
-> [   66.775891] MCE: CPU0: Unknown
-> [   66.776587] MCE: CPU0: machine check (Harmless) Host UE Indeterminate =
-[Recovered]
-> [   66.776857] MCE: CPU0: NIP: [c0080000000e00b8] mcetest_tlbie+0xb0/0x12=
-8 [mcetest_tlbie]
->=20
-> After fix:
->=20
-> [ 20.650577] CPU: 0 PID: 1415 Comm: insmod Tainted: G M O 5.6.0-fwnmi-arv=
-+ #11
-> [ 20.650618] NIP: c0080000023a00e8 LR: c0080000023a00d8 CTR: c00000000002=
-1fe0
-> [ 20.650660] REGS: c0000001fffd3d70 TRAP: 0200 Tainted: G M O (5.6.0-fwnm=
-i-arv+)
-> [ 20.650708] MSR: 8000000002a0b033 <SF,VEC,VSX,EE,FP,ME,IR,DR,RI,LE> CR: =
-42000222 XER: 20040000
-> [ 20.650758] CFAR: c00000000000b940 DAR: c0080000025e00e0 DSISR: 00000200=
- IRQMASK: 0
-> [ 20.650758] GPR00: c0080000023a00d8 c0000001fddd79a0 c0080000023a8500 00=
-00000000000039
-> [ 20.650758] GPR04: 0000000000000001 0000000000000000 0000000000000000 00=
-00000000000007
-> [ 20.650758] GPR08: 0000000000000007 c0080000025e00e0 0000000000000000 00=
-000000000000f7
-> [ 20.650758] GPR12: 0000000000000000 c000000001900000 c00000000101f398 c0=
-080000025c052f
-> [ 20.650758] GPR16: 00000000000003a8 c0080000025c0000 c0000001fddd7d70 c0=
-000000015b7940
-> [ 20.650758] GPR20: 000000000000fff1 c000000000f72c28 c0080000025a0988 00=
-00000000000000
-> [ 20.650758] GPR24: 0000000000000100 c0080000023a05d0 c0000000001f1d70 00=
-00000000000000
-> [ 20.650758] GPR28: c0000001fde20000 c0000001fd02b2e0 c0080000023a0000 c0=
-080000025e0000
-> [ 20.651178] NIP [c0080000023a00e8] mcetest_tlbie+0xe8/0xf0 [mcetest_tlbi=
-e]
-> [ 20.651220] LR [c0080000023a00d8] mcetest_tlbie+0xd8/0xf0 [mcetest_tlbie]
-> [ 20.651262] Call Trace:
-> [ 20.651280] [c0000001fddd79a0] [c0080000023a00d8] mcetest_tlbie+0xd8/0xf=
-0 [mcetest_tlbie] (unreliable)
-> [ 20.651340] [c0000001fddd7a10] [c00000000001091c] do_one_initcall+0x6c/0=
-x2c0
-> [ 20.651390] [c0000001fddd7af0] [c0000000001f7998] do_init_module+0x90/0x=
-298
-> [ 20.651433] [c0000001fddd7b80] [c0000000001f61a8] load_module+0x1f58/0x2=
-7a0
-> [ 20.651476] [c0000001fddd7d40] [c0000000001f6c70] __do_sys_finit_module+=
-0xe0/0x100
-> [ 20.651526] [c0000001fddd7e20] [c00000000000b9d0] system_call+0x5c/0x68
-> [ 20.651567] Instruction dump:
-> [ 20.651594] e8410018 3c620000 e8638020 480000cd e8410018 3c620000 e86380=
-28 480000bd
-> [ 20.651646] e8410018 7be904e4 39400000 612900e0 <7d434a64> 4bffff74 3c4c=
-0001 38428410
-> [ 20.651699] ---[ end trace 4c40897f016b4340 ]---
-> [ 20.653310]
-> Bus error
-> [ 20.655575] MCE: CPU0: machine check (Harmless) Host UE Indeterminate [N=
-ot recovered]
-> [ 20.655575] MCE: CPU0: NIP: [c0080000023a00e8] mcetest_tlbie+0xe8/0xf0 [=
-mcetest_tlbie]
-> [ 20.655576] MCE: CPU0: Initiator CPU
-> [ 20.655576] MCE: CPU0: Unknown
->=20
-> Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
-
-Applied to ppc-for-5.0, thanks.
-
-> ---
->  target/ppc/kvm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 03d0667e8f..2692f76130 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2816,11 +2816,11 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
->  #if defined(TARGET_PPC64)
->  int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run)
->  {
-> -    bool recovered =3D run->flags & KVM_RUN_PPC_NMI_DISP_FULLY_RECOV;
-> +    uint16_t flags =3D run->flags & KVM_RUN_PPC_NMI_DISP_MASK;
-> =20
->      cpu_synchronize_state(CPU(cpu));
-> =20
-> -    spapr_mce_req_event(cpu, recovered);
-> +    spapr_mce_req_event(cpu, flags =3D=3D KVM_RUN_PPC_NMI_DISP_FULLY_REC=
-OV);
-> =20
->      return 0;
->  }
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---VbJkn9YxBvnuCH5J
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6OaJsACgkQbDjKyiDZ
-s5IZpg//UNLIMhBhNwplpyMNh6NuK8Vd7lE7A9IZyTUzLqmSSFvODYNJYtb8uxVF
-Ku2KlLNvwAytex1bNksrERShEUQwesX6GqPcfUDoGdk0MtAGKRiRzRVH+2lNI9Ft
-5G8YRFzdXJKZ8h4LZuDdkY0hZp615F1NuAnrcwWH55nDrxd84/mTSmyVjqBq2zqd
-30RpgUF3zlCaCMaPGstwpAU49TwSTiOr56LPVL2X6HM8/6JplIb9fWAcKFhHNKZE
-F0xeNa3yUSGVz5931KMJzAzKTwK/MwGmbcp6mcI3NbwodJtK1aiU1ftKKDsEG7Nm
-dlH17b5kBAGCa4eWgH0EFwthTjM+rzpGlHCSJ7LaFsOXiHcP6ZgsK/LyhBC3IyEp
-eOYSUUiiu77+60ez7P4IAnC2PFtNx3D/j+xWeeehHrdD8OPtD/q10XI5v3KfpID5
-90nIiQO2CY6mGie6ebEg91mGsL49AMwMkez1K1xtTiVYay/fg8JijyejdADUaxwE
-VPiC7lnfMO6qqa8U/cfouKL7zNWYZ4IwxZQvo4lOOXntJ+QAvqra3W0fMdN2igr/
-uqaM6K0OzuYLWbzAr+8uEM8ZK5StBTw36XWFa/cFaWQ3MESjEsVbdmfgqjPi0vOH
-+3I5EUjQwgxCDm9Uf+Y2cb7+PXmR5EEu56i7P466LitWUCDZMcY=
-=dcS/
------END PGP SIGNATURE-----
-
---VbJkn9YxBvnuCH5J--
+Regards,
+Huacai
+>
+> Yours,
+> and wishing you and all people from China best health!
+>
+> Aleksandar
 
