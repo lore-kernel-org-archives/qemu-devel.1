@@ -6,93 +6,131 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27615C2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 20:19:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D0DC2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 20:23:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFA02206A1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 20:19:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A1B420757
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 20:23:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wnvq3IeQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFA02206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SvXd1mHu";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="Icmhtem1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A1B420757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMdeC-00005J-4t
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 16:19:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35866)
+	id 1jMdi1-0001dG-Ja
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 16:23:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36235)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jMddb-00081b-EB
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 16:19:00 -0400
+ (envelope-from <tsimpson@quicinc.com>) id 1jMdhM-00018h-Np
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 16:22:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jMdda-0002RB-Gj
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 16:18:59 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41436
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jMdda-0002Qh-DQ
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 16:18:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586463537;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3vKBb5Lc9IFuoMO1BKmiAVROFNQmWaGJXo1mut7TsPs=;
- b=Wnvq3IeQunoV+tmZdBA+136BCP+6AKtJ3uDUm64ghiHcMtjVt+xBAe0Uc8iXRz0rL5HqXw
- lFhnRZTQtj8Pcn1YD5ebrydFa5jPgnXWW/Zxo943peEWESG7br7eYv9D7CNmCwqUL4QmLB
- WSwibjmGryTONhedct0c4EoTe6e6yZc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-jeVownLINX6Ql3F9joc4cw-1; Thu, 09 Apr 2020 16:18:53 -0400
-X-MC-Unique: jeVownLINX6Ql3F9joc4cw-1
-Received: by mail-wr1-f71.google.com with SMTP id n7so7264842wru.9
- for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 13:18:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=AJBticWigxjd1m/sXCH6CS6jcYJfAhFRAd45SGm5I4E=;
- b=r8mHkEOVP/kMzoGtDGQfiEDR6pWCKuf6gSt81sRY2ed6JOC0LK5Ekp9BOkmt1pvrrN
- FNiViuVcjNwChGYV5k37JI2rDbA9sT6r1T8q7/oAALao3KvtWfOWiECAA29wmLIYz9Dt
- xw9jgNY67oPjX4inRrPaxbybjh6HZtkoYNKTBfPCeTLXSBndXkbXdPZJsLAp4i4vykMH
- 5As82vdI6DnP29U8ejIpIrHsRHGmqpH4KEsQGTYldXN71Np4MxIMxoT2aFeDNc/tbYyh
- /5qCptGPrleqkuSA26uq7u5EqOIdsdOrwnP2sLz8XQlrpkVwkYL8EwORTU+Mij2/DC7t
- CV7Q==
-X-Gm-Message-State: AGi0PubivKgg2C2XDstFgudxnMpXD8CTr5rPhj6rZ0iK5owbqpifThiL
- Q9ecbzNk8C8W0vpdEMTrg3vSql8rpkEoR/IrRJ021/z6d+CSssc1t3tXxk8Dnku4HOMT4zuxbSI
- s/wUKJQt/NoIj9e8=
-X-Received: by 2002:a05:600c:a:: with SMTP id
- g10mr1575970wmc.153.1586463532638; 
- Thu, 09 Apr 2020 13:18:52 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJdk9bk3/hjz3YKzU0Ix4SHglGYmuclXDqeBf5w8jw/FgBGlxwl4iGZY8rI7kKhKT8VPU2ilA==
-X-Received: by 2002:a05:600c:a:: with SMTP id
- g10mr1575949wmc.153.1586463532288; 
- Thu, 09 Apr 2020 13:18:52 -0700 (PDT)
-Received: from redhat.com (bzq-109-67-97-76.red.bezeqint.net. [109.67.97.76])
- by smtp.gmail.com with ESMTPSA id
- 106sm32337899wrc.46.2020.04.09.13.18.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 09 Apr 2020 13:18:51 -0700 (PDT)
-Date: Thu, 9 Apr 2020 16:18:49 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Li Feng <fengli@smartx.com>
-Subject: Re: hotplug issue of vhost-user-blk
-Message-ID: <20200409161748-mutt-send-email-mst@kernel.org>
-References: <CAHckoCzojVSHLAwBP2QhFx3Gw6j9DVPRwNSML9D4GQMzKr9Y3g@mail.gmail.com>
+ (envelope-from <tsimpson@quicinc.com>) id 1jMdhL-0004Gz-0H
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 16:22:51 -0400
+Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:58582)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tsimpson@quicinc.com>)
+ id 1jMdhK-0004Fn-IM
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 16:22:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1586463770; x=1617999770;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-transfer-encoding:mime-version;
+ bh=TRPjeP2kKGJGqa94zBmWwjqgr64QSTZaV7ZwuKpLfIw=;
+ b=SvXd1mHuqDRrhN0edf+QqaEj5KWdqN/07lhny7Is5DwC0aSfzBtD3H1t
+ oecKKdRbdEss1sUwNkrUwtmiQ7gSC3jFBVp5FNGLvaMnP+SmvWup2lJzn
+ bjQFJVtKcEIovjl4yCWEJuLtkHYjydBP7YCR3IMwndDhXnPluvk421opT c=;
+Received: from unknown (HELO ironmsg01-sd.qualcomm.com) ([10.53.140.141])
+ by alexa-out-sd-02.qualcomm.com with ESMTP; 09 Apr 2020 13:22:48 -0700
+Received: from nasanexm03g.na.qualcomm.com ([10.85.0.49])
+ by ironmsg01-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 09 Apr 2020 13:22:48 -0700
+Received: from apsanexr02e.ap.qualcomm.com (10.85.0.28) by
+ nasanexm03g.na.qualcomm.com (10.85.0.49) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Thu, 9 Apr 2020 13:22:47 -0700
+Received: from nasanexm03h.na.qualcomm.com (10.85.0.50) by
+ apsanexr02e.ap.qualcomm.com (10.85.0.28) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Thu, 9 Apr 2020 13:22:45 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm03h.na.qualcomm.com (10.85.0.50) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2 via Frontend Transport; Thu, 9 Apr 2020 13:22:45 -0700
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com (2603:10b6:a03:46::32)
+ by BYAPR02MB5656.namprd02.prod.outlook.com (2603:10b6:a03:96::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.17; Thu, 9 Apr
+ 2020 20:22:44 +0000
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::f09d:8640:4c4e:9803]) by BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::f09d:8640:4c4e:9803%6]) with mapi id 15.20.2900.015; Thu, 9 Apr 2020
+ 20:22:44 +0000
+From: Taylor Simpson <tsimpson@quicinc.com>
+To: "bcain@codeaurora.org" <bcain@codeaurora.org>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: RE: [RFC PATCH v2 20/67] Hexagon instruction utility functions
+Thread-Topic: [RFC PATCH v2 20/67] Hexagon instruction utility functions
+Thread-Index: AQHV7lZiglbdn13CRkOt6bs3YimnOqhxY5GAgAAYjWA=
+Date: Thu, 9 Apr 2020 20:22:44 +0000
+Message-ID: <BYAPR02MB4886A123EB6D0DF1362F9003DEC10@BYAPR02MB4886.namprd02.prod.outlook.com>
+References: <1582908244-304-1-git-send-email-tsimpson@quicinc.com>
+ <1582908244-304-21-git-send-email-tsimpson@quicinc.com>
+ <094101d60ea0$204c0ee0$60e42ca0$@codeaurora.org>
+In-Reply-To: <094101d60ea0$204c0ee0$60e42ca0$@codeaurora.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=tsimpson@quicinc.com; 
+x-originating-ip: [70.115.140.19]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6149a29d-15b6-48cb-2be2-08d7dcc3c30b
+x-ms-traffictypediagnostic: BYAPR02MB5656:
+x-microsoft-antispam-prvs: <BYAPR02MB5656C5110E4102726FEC8BB6DEC10@BYAPR02MB5656.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2582;
+x-forefront-prvs: 0368E78B5B
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BYAPR02MB4886.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(136003)(396003)(39860400002)(376002)(366004)(346002)(76116006)(66946007)(66556008)(66446008)(64756008)(66476007)(5660300002)(52536014)(26005)(86362001)(186003)(81166007)(478600001)(110136005)(54906003)(7696005)(53546011)(6506007)(4326008)(71200400001)(33656002)(2906002)(316002)(8936002)(55016002)(9686003)(8676002)(81156014);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: JSJSxDqBTakD2dtyozAN8pbU/bMVUhW2khRRj4uUv+O+cF3/D4lGauMSkbeOH2M4jvAFAHl/HBRN8aEjz6CSi5SnJC27rhpepQ4nmgdaBElbqNQmUZJQSon9puLzIxC9lt/aztxKnoTgFJ6fU4bypEmPAtwyuSK7xCx2JUu95fhAgIsfr4YzCQbtuin4ft1Tp04O0sUv1MiTxFQDH/QDWYwASe+TVrI3UggbOs7me7kO+4XgLwe9TiyK2PT+20JRiT7hGJwALXaLJi2upObc3W/tStyPb6gIGyxXpVANNMZqj3QXS0ZCzPYffbG1d1hxNeNWMMsYpf9g6fCV/BQXGY4A7VIQ3R3yadyZ5ukVmUKpOeX/zzBXfsgBh4ZCOvAR1RX/4XsrFuMqDay5CTHAbup3vikzw6B90w96l3mxeNvlaziJF/7u/BKCkVCeZ7Tg
+x-ms-exchange-antispam-messagedata: Qj4fCpyAl+yNbeIVXL5Y+BOS5Rvv/4cfmNlLIMRqlO1aOlKzOAe9iV5XemAJvZNkjLN+dp24jmPMiwNuBjHtw7C9/ASNxfv3MeQVk9iv1fbHgPAoD75Mu3XlIQwmEHbazzzo6WPKSi038tiyq/1MiA==
+x-ms-exchange-transport-forked: True
+arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j3OP7/pKUctbvNiK/202rpYrpzA5+PndutFnn6AgYE8DNrE9b/ANPalyH+4Z/jtY9cZNv1uRtos7OjTd2+GzVhzAgP4KuBopv5HUF11AdbrK73BK5NaBW+nKjiwVbm6kqFZObPdhJMaPGrW07wNxi7pOlzNnTJX3/5uf4+ZVevOVbjtuG19Zlf2rkLMiehXjETkaQOHobriRRuI1DcXQ+XWvRlpZzwJ6iWj3csWM9vYTehyfYJQznrwKhOX46l+vmYxoPLRUT5BvstHcoy/ppkqogIH3wbnRe96bUgqYowkaGPRxK01fh9AT/kSjGwaxlOy3mAjHi7couz/81un5OQ==
+arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GPdSNuqKmzPImKYJMkly8e1bKEZvlZte7lYPytUZZCg=;
+ b=guq6Wq2JlMj8PLCCOK9Boblk0x/mUpwwBkeyFLhC7NQdz5Bq/znBBWpBQfYG70QsSEJmeRJZiku3VkXP4oQkNAVAKki4ZQiCVT5Jo6qrpmsg21XmY08K4vQBapYDObzZdbGbqXVd6qergHEXJPgP/WA6a+cYTetwWO/J70bAy91gUnJ2X9PYi7QKFNFwq9CvpwMiZZSkmpTVc6eFxYlwG7nHdxAlFWrgWQ9kIj8fDpgESc+EY+vR0IHW12r0d4jSumv/65a+A5VInxsC3sxFBmVPr1ka5QxBN0RrhQMoZJyxa4HO7VHP6SNVGfp6jgBQIT8ts/BxbgTUSgV62Ul0Jg==
+arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GPdSNuqKmzPImKYJMkly8e1bKEZvlZte7lYPytUZZCg=;
+ b=Icmhtem1ONtg2Ea5o/lyF3SuH34l7PCZEhmq7oBT5mtgKrYT/BglJewQ+DXiN0/aFJKgcFeYhGlS1FzLkGmEVMop1IsIj0jt1w44/vWp8sa9SgVXKdWftaad3dxKTqiA2yFkyePSGkUfEcytx7sNw7T6Z4R8zdHNupGZP+PmjMI=
+x-ms-exchange-crosstenant-network-message-id: 6149a29d-15b6-48cb-2be2-08d7dcc3c30b
+x-ms-exchange-crosstenant-originalarrivaltime: 09 Apr 2020 20:22:44.3628 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname: 34FefAVrLJ0npYEsP6vfDVVIvc0WwLys5tIC2Bi6DzL5ENzKmVM6OyeVIQKO7jGscUiAnz+U2PQsddeNR/vfVQ==
+x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB5656
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <CAHckoCzojVSHLAwBP2QhFx3Gw6j9DVPRwNSML9D4GQMzKr9Y3g@mail.gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-OriginatorOrg: quicinc.com
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 199.106.114.39
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,80 +142,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Pan Nengyuan <pannengyuan@huawei.com>, jusual@redhat.com,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- raphael.norwitz@nutanix.com, Kyle Zhang <kyle@smartx.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: "philmd@redhat.com" <philmd@redhat.com>,
+ "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "laurent@vivier.eu" <laurent@vivier.eu>,
+ "aleksandar.m.mail@gmail.com" <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Apr 08, 2020 at 10:25:42AM +0800, Li Feng wrote:
-> Hi all,
->=20
-> Hotplug of vhost-user-blk doesn't not work in qemu master branch and
-> all previous version.
->=20
-> The action I insert a vhost-user-blk disk is:
-> (qemu) chardev-add socket,id=3Dspdk_vhost_blk2,path=3D/vhost-blk.0,reconn=
-ect=3D1
-> (qemu) device_add
-> vhost-user-blk-pci,chardev=3Dspdk_vhost_blk2,id=3Dspdk_vhost_blk2,num-que=
-ues=3D4
->=20
-> Until here, it's well.
->=20
-> Then I unplug it from qemu:
-> (qemu) device_del spdk_vhost_blk2
-> (qemu) chardev-remove spdk_vhost_blk2
-> Error: Chardev 'spdk_vhost_blk2' is busy
-
-Pan Nengyuan (cc'd) fixed unplug recently so I expect it
-worked for him after the patch ...
-
-> The related code is here:
-> qmp_chardev_remove
->     -> qemu_chr_is_busy
->     -> object_unparent(OBJECT(chr));
->=20
->  330 static bool qemu_chr_is_busy(Chardev *s)
->  331 {
->  332     if (CHARDEV_IS_MUX(s)) {
->  333         MuxChardev *d =3D MUX_CHARDEV(s);
->  334         return d->mux_cnt >=3D 0;
->  335     } else {
->  336         return s->be !=3D NULL;
->  337     }
->  338 }
->=20
-> My question is:
-> 1. s->be is set to NULL when qemu_chr_fe_deinit is called.
-> However, the qmp_chardev_remove is blocked at qemu_chr_is_busy check,
-> then the object_unparent will not be called.
-> 2. Is there a path that device_del will trigger the s->be that been set t=
-o NULL?
->=20
-> How should I fix this issue?
-> I have tested that comment the qemu_chr_is_busy works well.
->=20
-> Thanks in advance.
->=20
-> Feng Li
->=20
-> --=20
-> The SmartX email address is only for business purpose. Any sent message=
-=20
-> that is not related to the business is not authorized or permitted by=20
-> SmartX.
-> =E6=9C=AC=E9=82=AE=E7=AE=B1=E4=B8=BA=E5=8C=97=E4=BA=AC=E5=BF=97=E5=87=8C=
-=E6=B5=B7=E7=BA=B3=E7=A7=91=E6=8A=80=E6=9C=89=E9=99=90=E5=85=AC=E5=8F=B8=EF=
-=BC=88SmartX=EF=BC=89=E5=B7=A5=E4=BD=9C=E9=82=AE=E7=AE=B1. =E5=A6=82=E6=9C=
-=AC=E9=82=AE=E7=AE=B1=E5=8F=91=E5=87=BA=E7=9A=84=E9=82=AE=E4=BB=B6=E4=B8=8E=
-=E5=B7=A5=E4=BD=9C=E6=97=A0=E5=85=B3,=E8=AF=A5=E9=82=AE=E4=BB=B6=E6=9C=AA=
-=E5=BE=97=E5=88=B0=E6=9C=AC=E5=85=AC=E5=8F=B8=E4=BB=BB=E4=BD=95=E7=9A=84=E6=
-=98=8E=E7=A4=BA=E6=88=96=E9=BB=98=E7=A4=BA=E7=9A=84=E6=8E=88=E6=9D=83.
->=20
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogYmNhaW49Y29kZWF1cm9y
+YS5vcmdAbWcuY29kZWF1cm9yYS5vcmcNCj4gPGJjYWluPWNvZGVhdXJvcmEub3JnQG1nLmNvZGVh
+dXJvcmEub3JnPiBPbiBCZWhhbGYgT2YgQnJpYW4gQ2Fpbg0KPiBTZW50OiBUaHVyc2RheSwgQXBy
+aWwgOSwgMjAyMCAxOjUzIFBNDQo+IFRvOiBUYXlsb3IgU2ltcHNvbiA8dHNpbXBzb25AcXVpY2lu
+Yy5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gQ2M6IHJpa3Uudm9pcGlvQGlraS5maTsg
+cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZzsgbGF1cmVudEB2aXZpZXIuZXU7DQo+IHBoaWxt
+ZEByZWRoYXQuY29tOyBhbGVrc2FuZGFyLm0ubWFpbEBnbWFpbC5jb20NCj4gU3ViamVjdDogUkU6
+IFtSRkMgUEFUQ0ggdjIgMjAvNjddIEhleGFnb24gaW5zdHJ1Y3Rpb24gdXRpbGl0eSBmdW5jdGlv
+bnMNCj4NCj4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IFFlbXUtZGV2
+ZWwgPHFlbXUtZGV2ZWwtDQo+ID4gYm91bmNlcytiY2Fpbj1jb2RlYXVyb3JhLm9yZ0Bub25nbnUu
+b3JnPiBPbiBCZWhhbGYgT2YgVGF5bG9yDQo+IFNpbXBzb24NCj4gPiBTZW50OiBGcmlkYXksIEZl
+YnJ1YXJ5IDI4LCAyMDIwIDEwOjQzIEFNDQo+ID4gVG86IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0K
+PiA+IENjOiByaWt1LnZvaXBpb0Bpa2kuZmk7IHJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmc7
+IGxhdXJlbnRAdml2aWVyLmV1Ow0KPiA+IFRheWxvciBTaW1wc29uIDx0c2ltcHNvbkBxdWljaW5j
+LmNvbT47IHBoaWxtZEByZWRoYXQuY29tOw0KPiA+IGFsZWtzYW5kYXIubS5tYWlsQGdtYWlsLmNv
+bQ0KPiA+IFN1YmplY3Q6IFtSRkMgUEFUQ0ggdjIgMjAvNjddIEhleGFnb24gaW5zdHJ1Y3Rpb24g
+dXRpbGl0eSBmdW5jdGlvbnMNCj4gLi4uDQo+ID4gK2ludCBhcmNoX3NmX2ludnNxcnRfY29tbW9u
+KHNpemU0c190ICpScywgc2l6ZTRzX3QgKlJkLCBpbnQgKmFkanVzdCkNCj4gPiArew0KPiAuLi4N
+Cj4gPiArICAgIH0gZWxzZSBpZiAocl9jbGFzcyA9PSBGUF9JTkZJTklURSkgew0KPiA+ICsgICAg
+ICAgIC8qIEVKUDogb3IgcHV0IEluZiBpbiBudW0gZml4dXA/ICovDQo+ID4gKyAgICAgICAgUnNW
+ID0gZlNGSU5GVkFMKC0xKTsNCj4gPiArICAgICAgICBSZFYgPSBmU0ZJTkZWQUwoLTEpOw0KPiA+
+ICsgICAgfSBlbHNlIGlmIChyX2NsYXNzID09IEZQX1pFUk8pIHsNCj4gPiArICAgICAgICAvKiBF
+SlA6IG9yIHB1dCB6ZXJvIGluIG51bSBmaXh1cD8gKi8NCj4gPiArICAgICAgICBSc1YgPSBSc1Y7
+DQo+ID4gKyAgICAgICAgUmRWID0gZlNGT05FVkFMKDApOw0KPiAuLi4NCj4NCj4gVGhpcyAiUnNW
+ID0gUnNWIiBsb29rcyBsaWtlIGEgbG9naWMgZXJyb3I/ICBQcmVzdW1hYmx5IGl0J3Mgc2FmZSB0
+byByZW1vdmUgLS0NCj4gdW5sZXNzIHRoZXJlJ3Mgc29tZSBvdGhlciBmaWVsZCB0aGF0IHNob3Vs
+ZCBnZXQgaW5pdGlhbGl6ZWQgaGVyZT8gIFBlViBtYXliZT8NCg0KUHJvYmFibHkgYSBjb3B5L3Bh
+c3RlIGVycm9yLiAgSSB3aWxsIHJlbW92ZSBpdC4NCg0KVGhhbmtzLA0KVGF5bG9yDQoNCg==
 
