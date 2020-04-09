@@ -2,68 +2,67 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E2A9C2D0EA
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:37:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EED6AC2D0EA
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:45:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFB51206F7
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:37:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5EBC20678
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:45:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MqgZpwtq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFB51206F7
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M2RytW3m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5EBC20678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMRkL-0002MX-1M
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 03:37:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43262)
+	id 1jMRsG-0006Pv-Uc
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 03:45:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44374)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jMRjN-0001lq-FQ
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:36:10 -0400
+ (envelope-from <david@redhat.com>) id 1jMRre-0005rB-VJ
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:44:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jMRjL-00025D-9U
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:36:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20409
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1jMRrc-0004pA-MC
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:44:41 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36038)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jMRjL-00024s-0z
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:36:07 -0400
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jMRrc-0004p1-FX
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:44:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586417766;
+ s=mimecast20190719; t=1586418279;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ACqYHsoLLUIbB4MSYyfgBJy/6FSVDdoQea72TRuXnDY=;
- b=MqgZpwtq9SiAIIKj+LVRb3koJpGWbEqFyYe98qVdT1/bTvOYBZbzGOC7EcQ5ZQFsK4Wlg/
- 1khmYBulMFsnS35isfxTb67/+jkjIq9hnpMODEssPK5KBIMl6wLKo00f0IhvNNXpoS22wu
- GF27aFl/+8m7rqKvX0haocijdfxKQws=
+ bh=vwugBdRhNP0lTgVzwR3TeYVEMaLMR0nhi+PjF3CRxgE=;
+ b=M2RytW3m1xlrvV8G0aB5iKz7Tag3+vjDqaKzYL6i9v8Ivd3t9UvZeFwxCAlXk/oDBu/bXG
+ 9Dic4XyUEDTHlYcxiJpLQDT+VyOS5vhBRr7BFZLmCefoUHYMDsY6L25YzU9oOdZODi0RsS
+ UgiwhNpfQL/VmnBiEIII/crQSS7Kbzc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-a6fZUKCdMdGK8Kpy7zwrcw-1; Thu, 09 Apr 2020 03:35:59 -0400
-X-MC-Unique: a6fZUKCdMdGK8Kpy7zwrcw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-12-sX2JtbeTMGCGRQ8ghUdmDw-1; Thu, 09 Apr 2020 03:44:37 -0400
+X-MC-Unique: sX2JtbeTMGCGRQ8ghUdmDw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99B9618AB2C4;
- Thu,  9 Apr 2020 07:35:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F3C0DB61;
+ Thu,  9 Apr 2020 07:44:36 +0000 (UTC)
 Received: from [10.36.113.222] (ovpn-113-222.ams2.redhat.com [10.36.113.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CFA065DA82;
- Thu,  9 Apr 2020 07:35:54 +0000 (UTC)
-Subject: Re: [PATCH v18 QEMU 2/3] virtio-balloon: Add support for providing
- free page reports to host
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1DB3C1001B07;
+ Thu,  9 Apr 2020 07:44:31 +0000 (UTC)
+Subject: Re: [PATCH v18 QEMU 3/3] virtio-balloon: Provide a interface for free
+ page reporting
 To: Alexander Duyck <alexander.duyck@gmail.com>, mst@redhat.com
 References: <20200408225302.18764.209.stgit@localhost.localdomain>
- <20200408225523.18764.86514.stgit@localhost.localdomain>
+ <20200408225529.18764.44086.stgit@localhost.localdomain>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -109,20 +108,20 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <a461c334-79f0-a638-962e-d6b136707ce3@redhat.com>
-Date: Thu, 9 Apr 2020 09:35:53 +0200
+Message-ID: <06ac44b9-77ae-7686-8a65-7edff2cbf1b7@redhat.com>
+Date: Thu, 9 Apr 2020 09:44:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200408225523.18764.86514.stgit@localhost.localdomain>
+In-Reply-To: <20200408225529.18764.44086.stgit@localhost.localdomain>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -141,40 +140,115 @@ Sender: "Qemu-devel"
 
 On 09.04.20 00:55, Alexander Duyck wrote:
 > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> 
-> Add support for the page reporting feature provided by virtio-balloon.
-> Reporting differs from the regular balloon functionality in that is is
-> much less durable than a standard memory balloon. Instead of creating a
-> list of pages that cannot be accessed the pages are only inaccessible
-> while they are being indicated to the virtio interface. Once the
-> interface has acknowledged them they are placed back into their respective
-> free lists and are once again accessible by the guest system.
-> 
-> Unlike a standard balloon we don't inflate and deflate the pages. Instead
-> we perform the reporting, and once the reporting is completed it is
-> assumed that the page has been dropped from the guest and will be faulted
-> back in the next time the page is accessed.
-> 
-> This patch is a subset of the UAPI patch that was submitted for the Linux
-> kernel. The original patch can be found at:
-> https://lore.kernel.org/lkml/20200211224657.29318.68624.stgit@localhost.localdomain/
+>=20
+> Add support for what I am referring to as "free page reporting".
 
-You don't need all these comments.
+"Add support for "free page reporting".
 
-Usually we do
+> Basically the idea is to function very similar to how the balloon works
+> in that we basically end up madvising the page as not being used. However
 
-"linux-headers: update to contain virito-balloon free page reporting
+I'd get rid of one "basically".
 
-Let's sync the latest upstream changes for free page reporting. To be
-replaced by a full linux header sync.
+> we don't really need to bother with any deflate type logic since the page
+> will be faulted back into the guest when it is read or written to.
+>=20
+> This is meant to be a simplification of the existing balloon interface
+> to use for providing hints to what memory needs to be freed. I am assumin=
+g
 
-Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-"
+It's not really a simplification, it's something new. It's a new way of
+letting the guest automatically report free pages to the hypervisor, so
+the hypervisor can reuse them. In contrast to inflate/deflate, that's
+triggered via the hypervisor explicitly.
 
-mst will replace this by a full header sync (if necessary) when sending
-it upstream
+> this is safe to do as the deflate logic does not actually appear to do ve=
+ry
+> much other than tracking what subpages have been released and which ones
+> haven't.
 
--- 
+"I assume this is safe" does not sound very confident. Can we just drop
+the last sentence?
+
+>=20
+> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> ---
+>  hw/virtio/virtio-balloon.c         |   48 ++++++++++++++++++++++++++++++=
++++++-
+>  include/hw/virtio/virtio-balloon.h |    2 +-
+>  2 files changed, 47 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index 1c6d36a29a04..297b267198ac 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -321,6 +321,42 @@ static void balloon_stats_set_poll_interval(Object *=
+obj, Visitor *v,
+>      balloon_stats_change_timer(s, 0);
+>  }
+> =20
+> +static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *=
+vq)
+> +{
+> +    VirtIOBalloon *dev =3D VIRTIO_BALLOON(vdev);
+> +    VirtQueueElement *elem;
+> +
+> +    while ((elem =3D virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
+> +        unsigned int i;
+> +
+> +        for (i =3D 0; i < elem->in_num; i++) {
+> +            void *addr =3D elem->in_sg[i].iov_base;
+> +            size_t size =3D elem->in_sg[i].iov_len;
+> +            ram_addr_t ram_offset;
+> +            size_t rb_page_size;
+> +            RAMBlock *rb;
+> +
+> +            if (qemu_balloon_is_inhibited() || dev->poison_val) {
+> +                continue;
+> +            }
+
+These checks are not sufficient. See virtio_balloon_handle_output(),
+where we e.g., check that somebody doesn't try to discard the bios.
+
+Maybe we can factor our/unify the handling in both code paths.
+
+> +
+> +            rb =3D qemu_ram_block_from_host(addr, false, &ram_offset);
+> +            rb_page_size =3D qemu_ram_pagesize(rb);
+> +
+> +            /* For now we will simply ignore unaligned memory regions */
+> +            if ((ram_offset | size) & (rb_page_size - 1)) {
+
+"!QEMU_IS_ALIGNED()" please to make this easier to read.
+
+> +                continue;
+> +            }
+> +
+> +            ram_block_discard_range(rb, ram_offset, size);
+> +        }
+> +
+> +        virtqueue_push(vq, elem, 0);
+> +        virtio_notify(vdev, vq);
+> +        g_free(elem);
+> +    }
+> +}
+> +
+
+[...]
+
+>      if (virtio_has_feature(s->host_features,
+>                             VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
+>          s->free_page_vq =3D virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
+> @@ -940,6 +982,8 @@ static Property virtio_balloon_properties[] =3D {
+>       */
+>      DEFINE_PROP_BOOL("qemu-4-0-config-size", VirtIOBalloon,
+>                       qemu_4_0_config_size, false),
+> +    DEFINE_PROP_BIT("unused-page-reporting", VirtIOBalloon, host_feature=
+s,
+
+"free-page-reporting"
+
+--=20
 Thanks,
 
 David / dhildenb
