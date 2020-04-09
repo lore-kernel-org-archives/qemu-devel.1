@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8D9C2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 21:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 360F3C2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 21:19:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52A6B2074F
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 21:19:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0297B2074F
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 21:19:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nus5r/PB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52A6B2074F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iokV08AR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0297B2074F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMeZx-0007T4-EM
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 17:19:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42336)
+	id 1jMea0-0007Vo-2X
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 17:19:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42413)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jMeWS-000252-Op
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 17:15:42 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jMeWZ-0002G5-GQ
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 17:15:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jMeWR-0005gi-8S
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 17:15:40 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:50675)
+ (envelope-from <alex.bennee@linaro.org>) id 1jMeWY-0005rQ-9n
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 17:15:47 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:47076)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jMeWR-0005g3-2J
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 17:15:39 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id x25so294470wmc.0
- for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 14:15:39 -0700 (PDT)
+ id 1jMeWY-0005qa-46
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 17:15:46 -0400
+Received: by mail-wr1-x433.google.com with SMTP id f13so7119786wrm.13
+ for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 14:15:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=8kQXViYqUTZuPa2IrzFhn8UbNVNyk6FZ2Gjm7NSMqNs=;
- b=Nus5r/PBUtysXeNOzCbziBtjB2uborn+ThW7eupuqD/2pQJvPDsYIKnWlJnDVRBxaE
- sglav2nIVP9iwmP96Znw1zBwDaUTWM6+c20xnmRj9BGIsnIAszo06Tf+qrCGR028z6Ma
- mwCGOIFuhLzhx22Q5Gyz7tZs/sj8FO5MzcFMWnAoAyrZSkDtLWn/C81tQbGPeu7hyTrX
- NNFYWTZsARklMZDgZFBuENY2j7kVBhzJAbJWpI9NkKTJONaDjZWfAGb+Jg2VpvbkI5OB
- i9i1c6zRPoZwn0qLc6gL+xOa7Ya8WED3sbIfjW/ya9NoUQ5jzoYA3RNl00NkZhYmdR3y
- gvCg==
+ bh=NsgGnaK6H7tXZSUowxzbNGfoZoXPun4GYcBXJ76FIg0=;
+ b=iokV08ARsSiWllJ9cOA3WSv7O7YlPfESa/gnZ4Jr2a14wQsD5Mju2H6CgmQnJwU2iW
+ b5zuJTJk7+PJ137KF9mgQ1QQhiReONIFhcd/iCVjQRLo9kWeyYw+6HurYjHLvHofSGPc
+ af6EnETKMHmGLkZZwDEKxtC/e0E+lUCAKM465sZhnde7FZ4H/gRHcWu2wXBllMxb97Am
+ 22DzvRGM7sxdvoDUmwFIU2OTJF5vKzMMR0WoSYdKJj4r/D69Nc1c7b0pWjgJitgeqV6m
+ lLK0/KiW0XEmmnpg1GNsffZbQiTykkj/xz408UGAOpXFFJzR5XaiuhgMukAKIWHgLkxn
+ JMfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8kQXViYqUTZuPa2IrzFhn8UbNVNyk6FZ2Gjm7NSMqNs=;
- b=hmNDHPjRWqt3w7tjywpoQ+cLVXvnMU4OlMdVL6HxwmY7rprMFZx//xB3/jJpLtCEqZ
- I++OulBuC2Vpk8gVkAZ+gYJHUfMVWU7y3wdPsujZgu/FrSD43wOAjzUaLsEkxLn3nRj5
- ULTe9D1ijscw3QfB1P9uLnwG+00wCjujxbcPw0EzUsfihFQhj4OCIRPhOxIbiq54/6qM
- oTIqh8oxZPX5/B5g8irB5bKX05gogyeU5CYbcuCNBJ+D6/zIIlzvjuKO25BDMsuAi2vs
- 87F3IXxdo/A044ciD97hbJRJm9irv7U4iUKpbtbUG2NkUmYuTJ9+VRiVR86osi1XqPPY
- 01ew==
-X-Gm-Message-State: AGi0PuY8b7D+xIWaXnvRc66mp90kHlDUv/vH6rOA9qb1FOiZaOuu95MB
- jMXwSMknBUEoGP+C7wN7rHq3oA==
-X-Google-Smtp-Source: APiQypKbqLrtSh4fH8LcE2onNKIi88ZMocBJlO67z6NBzpwuHH0frhvfDQp7lg/mCsXEs4P3K+3dmQ==
-X-Received: by 2002:a1c:9c47:: with SMTP id f68mr1709909wme.148.1586466937998; 
- Thu, 09 Apr 2020 14:15:37 -0700 (PDT)
+ bh=NsgGnaK6H7tXZSUowxzbNGfoZoXPun4GYcBXJ76FIg0=;
+ b=fOtwgNaBosP5xHT00ghex701f6s1qAh1UyQ7DtJFvqs4r8rKWfFoybs3vxQ28zRPDZ
+ VFHVvHqiVzRKLqSZs7jYEmCJZwyxD45zpgVeZRcHDQ8Rf9Ay41TJGJ4Xh/AC7w8BP0Qv
+ 7pYezF3/ejpEpGPuuNLJ7uB4SasO2+nqEXeasAgFQImjbtnxA36tyqFCD6jTkbpQcqts
+ WXl3FiqAEMQPPTwBCGPodXykuN7vCEv4fMrVVMnB2J142xhMHBltIHaPhuGRQqnzBoZ8
+ czSCc9PIYVUF9sLAWrc3FXHLMFx6ikWUPmlxKkue9evDemQSMHG9viVlb4nD44RsN+1e
+ 7rmA==
+X-Gm-Message-State: AGi0PuarxtZFEeACruNd6L+r65bcXNn9M9r1jPw3tets3MqoBkGwY7JJ
+ 7ImJOx5e2RFOTZRZxXMowGgr4w==
+X-Google-Smtp-Source: APiQypKoFD1XjBzu3LhzxvXwnZt5npJILuC62nU6zdHnVpG7eurJAW8SeitIbGFMV7841ambAvUPuw==
+X-Received: by 2002:adf:e94a:: with SMTP id m10mr1130808wrn.324.1586466945102; 
+ Thu, 09 Apr 2020 14:15:45 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id j10sm24038122wru.85.2020.04.09.14.15.32
+ by smtp.gmail.com with ESMTPSA id o9sm36693010wru.29.2020.04.09.14.15.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 09 Apr 2020 14:15:35 -0700 (PDT)
+ Thu, 09 Apr 2020 14:15:41 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 830BE1FF91;
- Thu,  9 Apr 2020 22:15:30 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 0FA191FF9A;
+ Thu,  9 Apr 2020 22:15:31 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 05/11] tests/docker: add docs FEATURE flag and use for
- test-misc
-Date: Thu,  9 Apr 2020 22:15:23 +0100
-Message-Id: <20200409211529.5269-6-alex.bennee@linaro.org>
+Subject: [PATCH  v1 11/11] .travis.yml: Build OSX 10.14 with Xcode 10.0
+Date: Thu,  9 Apr 2020 22:15:29 +0100
+Message-Id: <20200409211529.5269-12-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200409211529.5269-1-alex.bennee@linaro.org>
 References: <20200409211529.5269-1-alex.bennee@linaro.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32e
+X-Received-From: 2a00:1450:4864:20::433
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,110 +96,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The test-misc docker test fails on a number of images which don't have
-the prerequisites to build the docs. Use the FEATURES flag so we can
-skip those tests.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-As the sphinx test fails to detect whatever feature we need to get
-hxtool to work we drop them from debian9 so the windows build doesn't
-attempt to build the docs.
+Travis recently made a change which generates various warnings
+such [*]:
 
+    CC      utils.o
+  In file included from cs.c:11:
+  In file included from /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/stdio.h:64:
+  /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/_stdio.h:93:16: warning: pointer is missing a nullability type specifier (_Nonnull, _Nullable, or _Null_unspecified) [-Wnullability-completeness]
+          unsigned char   *_base;
+                          ^
+  /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/_stdio.h:93:16: note: insert '_Nullable' if the pointer may be null
+          unsigned char   *_base;
+                          ^
+                            _Nullable
+
+We only aim to support MacOS 10.14 and 10.15. 10.14 comes with
+Xcode 10.0. These warnings are not emitted with this Xcode version,
+so switch back to it.
+
+[*] https://travis-ci.org/github/qemu/qemu/jobs/673000302#L1387
+
+Reported-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20200409190618.7402-1-philmd@redhat.com>
 ---
- tests/docker/dockerfiles/debian10.docker   | 2 ++
- tests/docker/dockerfiles/debian9.docker    | 2 --
- tests/docker/dockerfiles/fedora.docker     | 2 +-
- tests/docker/dockerfiles/travis.docker     | 2 +-
- tests/docker/dockerfiles/ubuntu.docker     | 2 +-
- tests/docker/dockerfiles/ubuntu1804.docker | 2 +-
- tests/docker/test-misc                     | 2 ++
- 7 files changed, 8 insertions(+), 6 deletions(-)
+ .travis.yml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dockerfiles/debian10.docker
-index 2fcdc406e83..0769700a416 100644
---- a/tests/docker/dockerfiles/debian10.docker
-+++ b/tests/docker/dockerfiles/debian10.docker
-@@ -34,3 +34,5 @@ RUN apt update && \
-         python3-sphinx \
-         texinfo \
-         $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
-+
-+ENV FEATURES docs
-diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles/debian9.docker
-index 92edbbf0f48..08cc970feb1 100644
---- a/tests/docker/dockerfiles/debian9.docker
-+++ b/tests/docker/dockerfiles/debian9.docker
-@@ -30,6 +30,4 @@ RUN apt update && \
-         pkg-config \
-         psmisc \
-         python3 \
--        python3-sphinx \
--        texinfo \
-         $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index 4bd2c953af8..179575ecaaa 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -103,4 +103,4 @@ ENV QEMU_CONFIGURE_OPTS --python=/usr/bin/python3
- RUN dnf install -y $PACKAGES
- RUN rpm -q $PACKAGES | sort > /packages.txt
- ENV PATH $PATH:/usr/libexec/python3-sphinx/
--ENV FEATURES mingw clang pyyaml asan
-+ENV FEATURES mingw clang pyyaml asan docs
-diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/dockerfiles/travis.docker
-index e8eb48dccfd..591282561bc 100644
---- a/tests/docker/dockerfiles/travis.docker
-+++ b/tests/docker/dockerfiles/travis.docker
-@@ -13,5 +13,5 @@ RUN apt-get -y install device-tree-compiler python3 python3-yaml dh-autoreconf g
- # Travis tools require PhantomJS / Neo4j / Maven accessible
- # in their PATH (QEMU build won't access them).
- ENV PATH /usr/local/phantomjs/bin:/usr/local/phantomjs:/usr/local/neo4j-3.2.7/bin:/usr/local/maven-3.5.2/bin:/usr/local/cmake-3.9.2/bin:/usr/local/clang-5.0.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
--ENV FEATURES clang pyyaml
-+ENV FEATURES clang pyyaml docs
- USER travis
-diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
-index b6c7b41dddd..eeb3b22bf20 100644
---- a/tests/docker/dockerfiles/ubuntu.docker
-+++ b/tests/docker/dockerfiles/ubuntu.docker
-@@ -68,4 +68,4 @@ ENV PACKAGES flex bison \
- RUN apt-get update && \
-     DEBIAN_FRONTEND=noninteractive apt-get -y install $PACKAGES
- RUN dpkg -l $PACKAGES | sort > /packages.txt
--ENV FEATURES clang pyyaml sdl2
-+ENV FEATURES clang pyyaml sdl2 docs
-diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/dockerfiles/ubuntu1804.docker
-index 1efedeef995..f66b06f4cff 100644
---- a/tests/docker/dockerfiles/ubuntu1804.docker
-+++ b/tests/docker/dockerfiles/ubuntu1804.docker
-@@ -54,7 +54,7 @@ ENV PACKAGES flex bison \
- RUN apt-get update && \
-     DEBIAN_FRONTEND=noninteractive apt-get -y install $PACKAGES
- RUN dpkg -l $PACKAGES | sort > /packages.txt
--ENV FEATURES clang pyyaml sdl2
-+ENV FEATURES clang pyyaml sdl2 docs
+diff --git a/.travis.yml b/.travis.yml
+index 2fd63eceaac..7c92206ea33 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -272,12 +272,12 @@ jobs:
  
- # https://bugs.launchpad.net/qemu/+bug/1838763
- ENV QEMU_CONFIGURE_OPTS --disable-libssh
-diff --git a/tests/docker/test-misc b/tests/docker/test-misc
-index d480afedca7..cc94a738dd0 100755
---- a/tests/docker/test-misc
-+++ b/tests/docker/test-misc
-@@ -14,6 +14,8 @@
+     # MacOSX builds - cirrus.yml also tests some MacOS builds including latest Xcode
  
- . common.rc
- 
-+requires docs
-+
- cd "$BUILD_DIR"
- 
- # build everything else but QEMU
+-    - name: "OSX Xcode 10.3"
++    - name: "OSX 10.14 (Xcode 10.0)"
+       env:
+         - BASE_CONFIG="--disable-docs --enable-tools"
+         - CONFIG="--target-list=i386-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,x86_64-softmmu"
+       os: osx
+-      osx_image: xcode10.3
++      osx_image: xcode10
+       compiler: clang
+       addons:
+         homebrew:
 -- 
 2.20.1
 
