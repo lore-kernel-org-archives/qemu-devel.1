@@ -2,83 +2,60 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B1CC2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 04:11:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1939C2D0EA
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 06:06:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F04FD20757
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 04:11:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QGVFPTML"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F04FD20757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B44D920757
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 06:06:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B44D920757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMOXX-0007Lb-3F
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 00:11:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55609)
+	id 1jMQKY-0005gt-T3
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 02:06:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35709)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1jMOWb-0006oe-5f
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 00:10:47 -0400
+ (envelope-from <teawaterz@linux.alibaba.com>) id 1jMQJp-0005GR-95
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 02:05:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1jMOWY-00012n-Is
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 00:10:45 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47289
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <teawaterz@linux.alibaba.com>) id 1jMQJh-0005ya-LO
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 02:05:36 -0400
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:20469)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jMOWY-00012U-F5
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 00:10:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586405442;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lSStXAm8nc0e5Hizj+fULW80WzfKC9BC+kM7MZmkW6U=;
- b=QGVFPTMLYLmSAP2cYO41XrJbYvSID3KjlJOL6vjxDshz9glLQ/ixBUDTnYy9jtSgJ5c1zc
- yH0+Nu4XRPHRq4PGVYus9RWlp5QKOBXO1nbz2a4zNYNHyp0xrZ8Ea1DNpd5c6uyNh+IwWd
- 0v6SuZ+EOOKWO5Ket2ZPW5ESQNf9U1U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-nACFeMPUNsmiqj56SNf4_Q-1; Thu, 09 Apr 2020 00:10:33 -0400
-X-MC-Unique: nACFeMPUNsmiqj56SNf4_Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 918E18018B8;
- Thu,  9 Apr 2020 04:10:32 +0000 (UTC)
-Received: from [10.72.13.188] (ovpn-13-188.pek2.redhat.com [10.72.13.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1C4C45C1C5;
- Thu,  9 Apr 2020 04:10:29 +0000 (UTC)
-Subject: Re: [Qemu devel PATCH v3 1/3] hw/net: Add Smartfusion2 emac block
-To: sundeep.lkml@gmail.com, peter.maydell@linaro.org, philmd@redhat.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org
-References: <1586258134-6932-1-git-send-email-sundeep.lkml@gmail.com>
- <1586258134-6932-2-git-send-email-sundeep.lkml@gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <4445ded1-e2ac-f422-4e5b-091af5efc9f4@redhat.com>
-Date: Thu, 9 Apr 2020 12:10:28 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <1586258134-6932-2-git-send-email-sundeep.lkml@gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+ (Exim 4.71) (envelope-from <teawaterz@linux.alibaba.com>)
+ id 1jMQJh-0005oR-4Y
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 02:05:33 -0400
+X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R111e4; CH=green; DM=||false|;
+ DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01f04397; MF=teawaterz@linux.alibaba.com;
+ NM=1; PH=DS; RN=13; SR=0; TI=SMTPD_---0Tv1UAfo_1586412304; 
+Received: from 30.25.195.195(mailfrom:teawaterz@linux.alibaba.com
+ fp:SMTPD_---0Tv1UAfo_1586412304) by smtp.aliyun-inc.com(127.0.0.1);
+ Thu, 09 Apr 2020 14:05:05 +0800
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [PATCH for Linux v2] virtio_balloon: Add
+ VIRTIO_BALLOON_VQ_INFLATE_CONT to handle THP split issue
+From: teawater <teawaterz@linux.alibaba.com>
+In-Reply-To: <20200326030318-mutt-send-email-mst@kernel.org>
+Date: Thu, 9 Apr 2020 14:05:04 +0800
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Message-Id: <3ACCC5DE-3EE7-40A2-942D-1751221F5E55@linux.alibaba.com>
+References: <1584893097-12317-1-git-send-email-teawater@gmail.com>
+ <20200326030318-mutt-send-email-mst@kernel.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 47.88.44.36
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,722 +67,504 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: pagupta@redhat.com, aquini@redhat.com, david@redhat.com,
+ qemu-devel@nongnu.org, mojha@codeaurora.org, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-mm@kvack.org,
+ Nadav Amit <namit@vmware.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Jason Wang <jasowang@redhat.com>, Hui Zhu <teawater@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2020/4/7 =E4=B8=8B=E5=8D=887:15, sundeep.lkml@gmail.com wrote:
-> From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
->
-> Modelled Ethernet MAC of Smartfusion2 SoC.
-> Micrel KSZ8051 PHY is present on Emcraft's
-> SOM kit hence same PHY is emulated.
->
-> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> ---
->   MAINTAINERS                |   2 +
->   hw/net/Makefile.objs       |   1 +
->   hw/net/msf2-emac.c         | 556 ++++++++++++++++++++++++++++++++++++++=
-+++++++
->   include/hw/net/msf2-emac.h |  50 ++++
->   4 files changed, 609 insertions(+)
->   create mode 100644 hw/net/msf2-emac.c
->   create mode 100644 include/hw/net/msf2-emac.h
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 9d156d7..6a103f2 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -918,6 +918,8 @@ F: include/hw/arm/msf2-soc.h
->   F: include/hw/misc/msf2-sysreg.h
->   F: include/hw/timer/mss-timer.h
->   F: include/hw/ssi/mss-spi.h
-> +F: hw/net/msf2-emac.c
-> +F: include/hw/net/msf2-emac.h
->  =20
->   Emcraft M2S-FG484
->   M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
-> index af4d194..f2b7398 100644
-> --- a/hw/net/Makefile.objs
-> +++ b/hw/net/Makefile.objs
-> @@ -55,3 +55,4 @@ common-obj-$(CONFIG_ROCKER) +=3D rocker/rocker.o rocker=
-/rocker_fp.o \
->   obj-$(call lnot,$(CONFIG_ROCKER)) +=3D rocker/qmp-norocker.o
->  =20
->   common-obj-$(CONFIG_CAN_BUS) +=3D can/
-> +common-obj-$(CONFIG_MSF2) +=3D msf2-emac.o
-> diff --git a/hw/net/msf2-emac.c b/hw/net/msf2-emac.c
-> new file mode 100644
-> index 0000000..cb80e19
-> --- /dev/null
-> +++ b/hw/net/msf2-emac.c
-> @@ -0,0 +1,556 @@
-> +/*
-> + * QEMU model of the Smartfusion2 Ethernet MAC.
-> + *
-> + * Copyright (c) 2020 Subbaraya Sundeep <sundeep.lkml@gmail.com>.
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-> + * of this software and associated documentation files (the "Software"),=
- to deal
-> + * in the Software without restriction, including without limitation the=
- rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be includ=
-ed in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-> + * THE SOFTWARE.
-> + *
-> + * Refer to section Ethernet MAC in the document:
-> + * UG0331: SmartFusion2 Microcontroller Subsystem User Guide
-> + * Datasheet URL:
-> + * https://www.microsemi.com/document-portal/cat_view/56661-internal-doc=
-uments/
-> + * 56758-soc?lang=3Den&limit=3D20&limitstart=3D220
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "qemu/log.h"
-> +#include "exec/address-spaces.h"
-> +#include "hw/registerfields.h"
-> +#include "hw/net/msf2-emac.h"
-> +#include "hw/net/mii.h"
-> +#include "hw/irq.h"
-> +#include "net/net.h"
-> +#include "hw/qdev-properties.h"
-> +#include "migration/vmstate.h"
-> +
-> +REG32(CFG1, 0x0)
-> +REG32(CFG2, 0x4)
-> +REG32(IFG, 0x8)
-> +REG32(HALF_DUPLEX, 0xc)
-> +REG32(FRM_LEN, 0x10)
-> +REG32(MII_CMD, 0x24)
-> +REG32(MII_ADDR, 0x28)
-> +REG32(MII_CTL, 0x2c)
-> +REG32(MII_STS, 0x30)
-> +REG32(STA1, 0x40)
-> +REG32(STA2, 0x44)
-> +REG32(FIFO_CFG0, 0x48)
-> +REG32(DMA_TX_CTL, 0x180)
-> +REG32(DMA_TX_DESC, 0x184)
-> +REG32(DMA_TX_STATUS, 0x188)
-> +REG32(DMA_RX_CTL, 0x18c)
-> +REG32(DMA_RX_DESC, 0x190)
-> +REG32(DMA_RX_STATUS, 0x194)
-> +REG32(DMA_IRQ_MASK, 0x198)
-> +REG32(DMA_IRQ, 0x19c)
-> +
-> +FIELD(DMA, PKTCNT, 16, 8)
-> +
-> +#define R_DMA_PKT_TXRX          (1 << 0)
-> +#define DMA_TX_UNDERRUN         (1 << 1)
-> +#define DMA_RX_OVERFLOW         (1 << 2)
-> +
-> +#define EMPTY_MASK              (1 << 31)
-> +#define PKT_SIZE                0x7FF
-> +
-> +#define CFG1_RESET              (1 << 31)
-> +#define CFG1_RX_EN              (1 << 2)
-> +#define CFG1_TX_EN              (1 << 0)
-> +
-> +#define DMA_TX_CTL_EN           (1 << 0)
-> +#define DMA_RX_CTL_EN           (1 << 0)
-> +
-> +#define MII_CMD_READ            (1 << 0)
-> +
-> +#define PHYADDR                 0x1
-> +#define MII_ADDR_MASK           0x1F
-> +#define PHY_ADDR_SHIFT          8
-> +#define MAX_PKT_SIZE            2048
-> +
-> +typedef struct {
-> +    uint32_t pktaddr;
-> +    uint32_t pktsize;
-> +    uint32_t next;
-> +} EmacDesc;
-> +
-> +static uint32_t emac_get_isr(MSF2EmacState *s)
-> +{
-> +    uint32_t ier =3D s->regs[R_DMA_IRQ_MASK];
-> +    uint32_t tx =3D s->regs[R_DMA_TX_STATUS] & 0xF;
-> +    uint32_t rx =3D s->regs[R_DMA_RX_STATUS] & 0xF;
-> +    uint32_t isr =3D (rx << 4) | tx;
-> +
-> +    s->regs[R_DMA_IRQ] =3D ier & isr;
-> +    return s->regs[R_DMA_IRQ];
-> +}
-> +
-> +static void emac_update_irq(MSF2EmacState *s)
-> +{
-> +    bool intr =3D emac_get_isr(s);
-> +
-> +    qemu_set_irq(s->irq, intr);
-> +}
-> +
-> +static void emac_load_desc(MSF2EmacState *s, EmacDesc *d, hwaddr desc)
-> +{
-> +    address_space_read(&s->dma_as, desc, MEMTXATTRS_UNSPECIFIED,
-> +                       (uint8_t *)d, sizeof *d);
-> +    /* Convert from LE into host endianness. */
-> +    d->pktaddr =3D le32_to_cpu(d->pktaddr);
-> +    d->pktsize =3D le32_to_cpu(d->pktsize);
-> +    d->next =3D le32_to_cpu(d->next);
-> +}
-> +
-> +static void emac_store_desc(MSF2EmacState *s, EmacDesc *d, hwaddr desc)
-> +{
-> +    /* Convert from host endianness into LE. */
-> +    d->pktaddr =3D cpu_to_le32(d->pktaddr);
-> +    d->pktsize =3D cpu_to_le32(d->pktsize);
-> +    d->next =3D cpu_to_le32(d->next);
-> +
-> +    address_space_write(&s->dma_as, desc, MEMTXATTRS_UNSPECIFIED,
-> +                        (uint8_t *)d, sizeof *d);
-> +}
-> +
-> +static void msf2_dma_tx(MSF2EmacState *s)
-> +{
-> +    hwaddr desc =3D s->regs[R_DMA_TX_DESC];
-> +    uint8_t buf[MAX_PKT_SIZE];
-> +    EmacDesc d;
-> +    int size;
-> +    uint8_t pktcnt;
-> +    uint32_t status;
-> +
-> +    if (!(s->regs[R_CFG1] & CFG1_TX_EN)) {
-> +        return;
-> +    }
-> +
-> +    while (1) {
-> +        emac_load_desc(s, &d, desc);
-> +        if (d.pktsize & EMPTY_MASK) {
-> +            break;
-> +        }
-> +        size =3D d.pktsize & PKT_SIZE;
-> +        address_space_read(&s->dma_as, d.pktaddr, MEMTXATTRS_UNSPECIFIED=
-,
-> +                           buf, size);
-> +        /*
-> +         * This is very basic way to send packets. Ideally there should =
-be
-> +         * a FIFO and packets should be sent out from FIFO only when
-> +         * R_CFG1 bit 0 is set.
-> +         */
-> +        qemu_send_packet(qemu_get_queue(s->nic), buf, size);
 
+> 2020=E5=B9=B43=E6=9C=8826=E6=97=A5 15:17=EF=BC=8CMichael S. Tsirkin =
+<mst@redhat.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> First, either QEMU or Linux version of any interface changes
+> should be copied to the virtio TC.
+>=20
+> :
 
-It looks to me loopback is not implemented.
+OK.
 
+>=20
+>=20
+> On Mon, Mar 23, 2020 at 12:04:56AM +0800, Hui Zhu wrote:
+>> The first version is in [1].
+>> According to the comments from Michael and David, I updated the =
+patch.
+>> 1. Added a separate vq inflate_cont_vq to transport inflate =
+continuous
+>>   pages.
+>> 2. Set all the pages in the continuous pages movable then they can be
+>>   compaction.
+>> 3. Added a new element pages_order to virtio_balloon_config.  It is =
+the
+>>   inflate pages order that is set by the QEMU.
+>> 4. If the balloon cannot get any continuous pages from the system.
+>>   Go back to use the single page to fill the balloon.
+>> 5.  Use balloon_pages_alloc to allocate the single page and =
+continuous
+>>    pages.  Replace __GFP_NORETRY with __GFP_RETRY_MAYFAIL when =
+allocating
+>>    the continuous pages because it can increase the success rate of
+>>    allocating large chunks of memory.
+>>=20
+>> Following is the introduction of the function.
+>> If the guest kernel has many fragmentation pages, use virtio_balloon
+>> will split THP of QEMU when it calls MADV_DONTNEED madvise to release
+>> the balloon pages.
+>> This is an example in a VM with 1G memory 1CPU:
+>> // This is the THP number before VM execution in the host.
+>> // None use THP.
+>> cat /proc/meminfo | grep AnonHugePages:
+>> AnonHugePages:         0 kB
+>>=20
+>> // After VM start, use usemem
+>> // =
+(https://git.kernel.org/pub/scm/linux/kernel/git/wfg/vm-scalability.git)
+>> // punch-holes function generates 400m fragmentation pages in the =
+guest
+>> // kernel.
+>> usemem --punch-holes -s -1 800m &
+>>=20
+>> // This is the THP number after this command in the host.
+>> // Some THP is used by VM because usemem will access 800M memory
+>> // in the guest.
+>> cat /proc/meminfo | grep AnonHugePages:
+>> AnonHugePages:    976896 kB
+>>=20
+>> // Connect to the QEMU monitor, setup balloon, and set it size to =
+600M.
+>> (qemu) device_add virtio-balloon-pci,id=3Dballoon1
+>> (qemu) info balloon
+>> balloon: actual=3D1024
+>> (qemu) balloon 600
+>> (qemu) info balloon
+>> balloon: actual=3D600
+>>=20
+>> // This is the THP number after inflate the balloon in the host.
+>> cat /proc/meminfo | grep AnonHugePages:
+>> AnonHugePages:    151552 kB
+>>=20
+>> THP number decreased more than 800M.
+>> The reason is usemem with punch-holes option will free every other
+>> page after allocation.  Then 400M free memory inside the guest kernel
+>> is fragmentation pages.
+>> The guest kernel will use them to inflate the balloon.  When these
+>> fragmentation pages are freed, THP will be split.
+>>=20
+>> This commit tries to handle this with add a new flag
+>> VIRTIO_BALLOON_VQ_INFLATE_CONT.
+>> When this flag is set, the balloon will try to use continuous pages
+>> inflate the balloon.  And the pages order is set to THP order.
+>> Then THP pages will be freed together in the host.
+>> This is an example in a VM with 1G memory 1CPU:
+>> // This is the THP number before VM execution in the host.
+>> // None use THP.
+>> cat /proc/meminfo | grep AnonHugePages:
+>> AnonHugePages:         0 kB
+>>=20
+>> // After VM start, use usemem punch-holes function generates 400M
+>> // fragmentation pages in the guest kernel.
+>> usemem --punch-holes -s -1 800m &
+>>=20
+>> // This is the THP number after this command in the host.
+>> // Some THP is used by VM because usemem will access 800M memory
+>> // in the guest.
+>> cat /proc/meminfo | grep AnonHugePages:
+>> AnonHugePages:    976896 kB
+>>=20
+>> // Connect to the QEMU monitor, setup balloon, and set it size to =
+600M.
+>> (qemu) device_add virtio-balloon-pci,id=3Dballoon1,cont-pages=3Don
+>> (qemu) info balloon
+>> balloon: actual=3D1024
+>> (qemu) balloon 600
+>> (qemu) info balloon
+>> balloon: actual=3D600
+>>=20
+>> // This is the THP number after inflate the balloon in the host.
+>> cat /proc/meminfo | grep AnonHugePages:
+>> AnonHugePages:    610304 kB
+>>=20
+>> The THP number decreases 358M.  This shows that
+>> VIRTIO_BALLOON_VQ_INFLATE_CONT can help handle the THP split issue.
+>>=20
+>> [1] https://lkml.org/lkml/2020/3/12/144
+>>=20
+>> Signed-off-by: Hui Zhu <teawaterz@linux.alibaba.com>
+>=20
+> I'd like to repeat my original idea of doing large page allocations
+> unconditionally within guest.
+>=20
 
-> +        d.pktsize |=3D EMPTY_MASK;
-> +        emac_store_desc(s, &d, desc);
-> +        /* update sent packets count */
-> +        status =3D s->regs[R_DMA_TX_STATUS];
-> +        pktcnt =3D extract32(status, R_DMA_PKTCNT_SHIFT, 8);
-> +        pktcnt++;
-> +        s->regs[R_DMA_TX_STATUS] =3D deposit32(status, R_DMA_PKTCNT_SHIF=
-T,
-> +                                             8, pktcnt);
-> +        s->regs[R_DMA_TX_STATUS] |=3D R_DMA_PKT_TXRX;
-> +        desc =3D d.next;
-> +    }
-> +    s->regs[R_DMA_TX_STATUS] |=3D DMA_TX_UNDERRUN;
-> +    s->regs[R_DMA_TX_CTL] &=3D ~DMA_TX_CTL_EN;
-> +}
-> +
-> +static void msf2_phy_update_link(MSF2EmacState *s)
-> +{
-> +    /* Autonegotiation status mirrors link status. */
-> +    if (qemu_get_queue(s->nic)->link_down) {
-> +        s->phy_regs[MII_BMSR] &=3D ~(MII_BMSR_AN_COMP |
-> +                                         MII_BMSR_LINK_ST);
-> +    } else {
-> +        s->phy_regs[MII_BMSR] |=3D (MII_BMSR_AN_COMP |
-> +                                         MII_BMSR_LINK_ST);
-> +    }
-> +}
-> +
-> +static void msf2_phy_reset(MSF2EmacState *s)
-> +{
-> +    memset(&s->phy_regs[0], 0, sizeof(s->phy_regs));
-> +    s->phy_regs[MII_BMCR] =3D 0x1140;
-> +    s->phy_regs[MII_BMSR] =3D 0x7968;
-> +    s->phy_regs[MII_PHYID1] =3D 0x0022;
-> +    s->phy_regs[MII_PHYID2] =3D 0x1550;
-> +    s->phy_regs[MII_ANAR] =3D 0x01E1;
-> +    s->phy_regs[MII_ANLPAR] =3D 0xCDE1;
-> +
-> +    msf2_phy_update_link(s);
-> +}
-> +
-> +static void write_to_phy(MSF2EmacState *s)
-> +{
-> +    uint8_t reg_addr =3D s->regs[R_MII_ADDR] & MII_ADDR_MASK;
-> +    uint8_t phy_addr =3D (s->regs[R_MII_ADDR] >> PHY_ADDR_SHIFT) & MII_A=
-DDR_MASK;
-> +    uint16_t data =3D s->regs[R_MII_CTL] & 0xFFFF;
-> +
-> +    if (phy_addr !=3D PHYADDR) {
-> +        return;
-> +    }
-> +
-> +    switch (reg_addr) {
-> +    case MII_BMCR:
-> +        if (data & MII_BMCR_RESET) {
-> +            /* Phy reset */
-> +            msf2_phy_reset(s);
-> +            data &=3D ~MII_BMCR_RESET;
-> +        }
-> +        if (data & MII_BMCR_AUTOEN) {
-> +            /* Complete autonegotiation immediately */
-> +            data &=3D ~MII_BMCR_AUTOEN;
-> +            s->phy_regs[MII_BMSR] |=3D MII_BMSR_AN_COMP;
-> +        }
-> +        break;
-> +    }
-> +
-> +    s->phy_regs[reg_addr] =3D data;
-> +}
-> +
-> +static uint16_t read_from_phy(MSF2EmacState *s)
-> +{
-> +    uint8_t reg_addr =3D s->regs[R_MII_ADDR] & MII_ADDR_MASK;
-> +    uint8_t phy_addr =3D (s->regs[R_MII_ADDR] >> PHY_ADDR_SHIFT) & MII_A=
-DDR_MASK;
-> +
-> +    if (phy_addr =3D=3D PHYADDR) {
-> +        return s->phy_regs[reg_addr];
-> +    } else {
-> +        return 0xFFFF;
-> +    }
-> +}
-> +
-> +static void msf2_emac_do_reset(MSF2EmacState *s)
-> +{
-> +    memset(&s->regs[0], 0, sizeof(s->regs));
-> +    s->regs[R_CFG1] =3D 0x80000000;
-> +    s->regs[R_CFG2] =3D 0x00007000;
-> +    s->regs[R_IFG] =3D 0x40605060;
-> +    s->regs[R_HALF_DUPLEX] =3D 0x00A1F037;
-> +    s->regs[R_FRM_LEN] =3D 0x00000600;
-> +
-> +    msf2_phy_reset(s);
-> +}
-> +
-> +static uint64_t emac_read(void *opaque, hwaddr addr, unsigned int size)
-> +{
-> +    MSF2EmacState *s =3D opaque;
-> +    uint32_t r =3D 0;
-> +
-> +    addr >>=3D 2;
-> +
-> +    switch (addr) {
-> +    case R_DMA_IRQ:
-> +        r =3D emac_get_isr(s);
-> +        break;
-> +    default:
-> +        if (addr < ARRAY_SIZE(s->regs)) {
-> +            r =3D s->regs[addr];
-> +        } else {
-> +            qemu_log_mask(LOG_GUEST_ERROR,
-> +                         "%s: Bad offset 0x%" HWADDR_PRIx "\n", __func__=
-,
-> +                         addr * 4);
-> +            return r;
-> +        }
-> +        break;
-> +    }
-> +    return r;
-> +}
-> +
-> +static void emac_write(void *opaque, hwaddr addr, uint64_t val64,
-> +        unsigned int size)
-> +{
-> +    MSF2EmacState *s =3D opaque;
-> +    uint32_t value =3D val64;
-> +    uint32_t enreqbits;
-> +    uint8_t pktcnt;
-> +
-> +    addr >>=3D 2;
-> +    switch (addr) {
-> +    case R_DMA_TX_CTL:
-> +        s->regs[addr] =3D value;
-> +        if (value & DMA_TX_CTL_EN) {
-> +            msf2_dma_tx(s);
-> +        }
-> +        break;
-> +    case R_DMA_RX_CTL:
-> +        s->regs[addr] =3D value;
-> +        if (value & DMA_RX_CTL_EN) {
-> +            s->rx_desc =3D s->regs[R_DMA_RX_DESC];
-> +            qemu_flush_queued_packets(qemu_get_queue(s->nic));
-> +        }
-> +        break;
-> +    case R_CFG1:
-> +        if (value & CFG1_RESET) {
-> +            msf2_emac_do_reset(s);
-> +        }
-> +    case R_FIFO_CFG0:
-> +       /*
-> +        * For our implementation, turning on modules is instantaneous,
-> +        * so the states requested via the *ENREQ bits appear in the
-> +        * *ENRPLY bits immediately. Also the reset bits to reset PE-MCXM=
-AC
-> +        * module are not emulated here since it deals with start of fram=
-es,
-> +        * inter-packet gap and control frames.
-> +        */
-> +        enreqbits =3D extract32(value, 8, 5);
-> +        value =3D deposit32(value, 16, 5, enreqbits);
-> +        s->regs[addr] =3D value;
-> +        break;
-> +    case R_DMA_TX_DESC:
-> +        if (value & 0x3) {
-> +            qemu_log_mask(LOG_GUEST_ERROR, "Tx Descriptor address should=
- be"
-> +                        " 32 bit aligned\n");
-> +        }
-> +        /* Ignore [1:0] bits */
-> +        s->regs[addr] =3D value & 0xFFFFFFFC;
-> +        break;
-> +    case R_DMA_RX_DESC:
-> +        if (value & 0x3) {
-> +            qemu_log_mask(LOG_GUEST_ERROR, "Rx Descriptor address should=
- be"
-> +                        " 32 bit aligned\n");
-> +        }
-> +        /* Ignore [1:0] bits */
-> +        s->regs[addr] =3D value & 0xFFFFFFFC;
-> +        break;
-> +    case R_DMA_TX_STATUS:
-> +        if (value & DMA_TX_UNDERRUN) {
-> +            s->regs[addr] &=3D ~DMA_TX_UNDERRUN;
-> +        }
-> +        if (value & R_DMA_PKT_TXRX) {
-> +            pktcnt =3D extract32(s->regs[addr], R_DMA_PKTCNT_SHIFT,
-> +                               R_DMA_PKTCNT_LENGTH);
-> +            pktcnt--;
-> +            s->regs[addr] =3D deposit32(s->regs[addr], R_DMA_PKTCNT_SHIF=
-T,
-> +                                      8, pktcnt);
-> +            if (pktcnt =3D=3D 0) {
-> +                s->regs[addr] &=3D ~R_DMA_PKT_TXRX;
-> +            }
-> +        }
-> +        break;
-> +    case R_DMA_RX_STATUS:
-> +        if (value & DMA_RX_OVERFLOW) {
-> +            s->regs[addr] &=3D ~DMA_RX_OVERFLOW;
-> +        }
-> +        if (value & R_DMA_PKT_TXRX) {
-> +            pktcnt =3D extract32(s->regs[addr], R_DMA_PKTCNT_SHIFT,
-> +                               R_DMA_PKTCNT_LENGTH);
-> +            pktcnt--;
-> +            s->regs[addr] =3D deposit32(s->regs[addr], R_DMA_PKTCNT_SHIF=
-T,
-> +                                      8, pktcnt);
-> +            if (pktcnt =3D=3D 0) {
-> +                s->regs[addr] &=3D ~R_DMA_PKT_TXRX;
-> +            }
-> +        }
-> +        break;
-> +    case R_DMA_IRQ:
-> +        break;
-> +    case R_MII_CMD:
-> +        if (value & MII_CMD_READ) {
-> +            s->regs[R_MII_STS] =3D read_from_phy(s);
-> +        }
-> +        break;
-> +    case R_MII_CTL:
-> +        s->regs[addr] =3D value;
-> +        write_to_phy(s);
-> +        break;
-> +    default:
-> +        if (addr < ARRAY_SIZE(s->regs)) {
-> +            s->regs[addr] =3D value;
-> +        } else {
-> +            qemu_log_mask(LOG_GUEST_ERROR,
-> +                         "%s: Bad offset 0x%" HWADDR_PRIx "\n", __func__=
-,
-> +                         addr * 4);
-> +            return;
-> +        }
-> +        break;
-> +    }
-> +    emac_update_irq(s);
-> +}
-> +
-> +static const MemoryRegionOps emac_ops =3D {
-> +    .read =3D emac_read,
-> +    .write =3D emac_write,
-> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
-> +    .valid =3D {
-> +        .min_access_size =3D 4,
-> +        .max_access_size =3D 4
-> +    }
-> +};
-> +
-> +static bool emac_can_rx(NetClientState *nc)
-> +{
-> +    MSF2EmacState *s =3D qemu_get_nic_opaque(nc);
-> +
-> +    return (s->regs[R_CFG1] & CFG1_RX_EN) &&
-> +           (s->regs[R_DMA_RX_CTL] & DMA_RX_CTL_EN);
-> +}
-> +
-> +static bool match_addr(MSF2EmacState *s, const uint8_t *buf)
-> +{
-> +    /* The broadcast MAC address: FF:FF:FF:FF:FF:FF */
-> +    static const uint8_t broadcast_addr[] =3D { 0xFF, 0xFF, 0xFF, 0xFF,
-> +                                              0xFF, 0xFF };
-> +    uint8_t addr[6];
-> +
-> +    if (!memcmp(buf, broadcast_addr, sizeof(broadcast_addr))) {
-> +        return true;
-> +    }
-> +
-> +    /*
-> +     * R_STA1 [31:24] : octet 1 of mac address
-> +     * R_STA1 [23:16] : octet 2 of mac address
-> +     *          .
-> +     *          .
-> +     * R_STA2 [31:24] : octet 5 of mac address
-> +     * R_STA2 [23:16] : octet 6 of mac address
-> +     */
-> +    stl_le_p(addr, s->regs[R_STA1]);
-> +    stw_le_p(addr + 4, s->regs[R_STA2] >> 16);
-> +
-> +    if (!memcmp(buf, addr, sizeof(addr))) {
-> +        return false;
-> +    }
-> +
-> +    return true;
-> +}
-> +
-> +static ssize_t emac_rx(NetClientState *nc, const uint8_t *buf, size_t si=
-ze)
-> +{
-> +    MSF2EmacState *s =3D qemu_get_nic_opaque(nc);
-> +    EmacDesc d;
-> +    uint8_t pktcnt;
-> +    uint32_t status;
-> +
-> +    if (size > (s->regs[R_FRM_LEN] & 0xFFFF)) {
-> +        return -1;
-> +    }
-> +    if (!match_addr(s, buf)) {
-> +        return -1;
-> +    }
-> +
-> +    emac_load_desc(s, &d, s->rx_desc);
-> +
-> +    if (d.pktsize & EMPTY_MASK) {
-> +        address_space_write(&s->dma_as, d.pktaddr, MEMTXATTRS_UNSPECIFIE=
-D,
-> +                            buf, size & PKT_SIZE);
+If so, should it transfer the large page information using inflate_vq?
 
-
-Do we need to check whether the descriptor has sufficient space for the=20
-packet?
-
-Thanks
-
-
-> +        d.pktsize =3D size & PKT_SIZE;
-> +        emac_store_desc(s, &d, s->rx_desc);
-> +        /* update received packets count */
-> +        status =3D s->regs[R_DMA_RX_STATUS];
-> +        pktcnt =3D extract32(status, R_DMA_PKTCNT_SHIFT, 8);
-> +        pktcnt++;
-> +        s->regs[R_DMA_RX_STATUS] =3D deposit32(status, R_DMA_PKTCNT_SHIF=
-T,
-> +                                             8, pktcnt);
-> +        s->regs[R_DMA_RX_STATUS] |=3D R_DMA_PKT_TXRX;
-> +        s->rx_desc =3D d.next;
-> +    } else {
-> +        s->regs[R_DMA_RX_CTL] &=3D ~DMA_RX_CTL_EN;
-> +        s->regs[R_DMA_RX_STATUS] |=3D DMA_RX_OVERFLOW;
-> +    }
-> +    emac_update_irq(s);
-> +    return size;
-> +}
-> +
-> +static void msf2_emac_reset(DeviceState *dev)
-> +{
-> +    MSF2EmacState *s =3D MSS_EMAC(dev);
-> +
-> +    msf2_emac_do_reset(s);
-> +}
-> +
-> +static void emac_set_link(NetClientState *nc)
-> +{
-> +    MSF2EmacState *s =3D qemu_get_nic_opaque(nc);
-> +
-> +    msf2_phy_update_link(s);
-> +}
-> +
-> +static NetClientInfo net_msf2_emac_info =3D {
-> +    .type =3D NET_CLIENT_DRIVER_NIC,
-> +    .size =3D sizeof(NICState),
-> +    .can_receive =3D emac_can_rx,
-> +    .receive =3D emac_rx,
-> +    .link_status_changed =3D emac_set_link,
-> +};
-> +
-> +static void msf2_emac_realize(DeviceState *dev, Error **errp)
-> +{
-> +    MSF2EmacState *s =3D MSS_EMAC(dev);
-> +
-> +    address_space_init(&s->dma_as,
-> +                       s->dma_mr ? s->dma_mr : get_system_memory(), "dma=
-");
-> +
-> +    qemu_macaddr_default_if_unset(&s->conf.macaddr);
-> +    s->nic =3D qemu_new_nic(&net_msf2_emac_info, &s->conf,
-> +                          object_get_typename(OBJECT(dev)), dev->id, s);
-> +    qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
-> +}
-> +
-> +static void msf2_emac_init(Object *obj)
-> +{
-> +    MSF2EmacState *s =3D MSS_EMAC(obj);
-> +
-> +    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
-> +
-> +    memory_region_init_io(&s->mmio, obj, &emac_ops, s,
-> +                          "msf2-emac", R_MAX * 4);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-> +}
-> +
-> +static Property msf2_emac_properties[] =3D {
-> +    DEFINE_NIC_PROPERTIES(MSF2EmacState, conf),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static const VMStateDescription vmstate_msf2_emac =3D {
-> +    .name =3D TYPE_MSS_EMAC,
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT32(rx_desc, MSF2EmacState),
-> +        VMSTATE_UINT16_ARRAY(phy_regs, MSF2EmacState, PHY_MAX_REGS),
-> +        VMSTATE_UINT32_ARRAY(regs, MSF2EmacState, R_MAX),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static void msf2_emac_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    dc->realize =3D msf2_emac_realize;
-> +    dc->reset =3D msf2_emac_reset;
-> +    dc->vmsd =3D &vmstate_msf2_emac;
-> +    device_class_set_props(dc, msf2_emac_properties);
-> +}
-> +
-> +static const TypeInfo msf2_emac_info =3D {
-> +    .name          =3D TYPE_MSS_EMAC,
-> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
-> +    .instance_size =3D sizeof(MSF2EmacState),
-> +    .instance_init =3D msf2_emac_init,
-> +    .class_init    =3D msf2_emac_class_init,
-> +};
-> +
-> +static void msf2_emac_register_types(void)
-> +{
-> +    type_register_static(&msf2_emac_info);
-> +}
-> +
-> +type_init(msf2_emac_register_types)
-> diff --git a/include/hw/net/msf2-emac.h b/include/hw/net/msf2-emac.h
-> new file mode 100644
-> index 0000000..ab0da62
-> --- /dev/null
-> +++ b/include/hw/net/msf2-emac.h
-> @@ -0,0 +1,50 @@
-> +/*
-> + * QEMU model of the Smartfusion2 Ethernet MAC.
-> + *
-> + * Copyright (c) 2020 Subbaraya Sundeep <sundeep.lkml@gmail.com>.
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-> + * of this software and associated documentation files (the "Software"),=
- to deal
-> + * in the Software without restriction, including without limitation the=
- rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be includ=
-ed in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "hw/sysbus.h"
-> +#include "net/net.h"
-> +
-> +#define TYPE_MSS_EMAC "msf2-emac"
-> +#define MSS_EMAC(obj) \
-> +    OBJECT_CHECK(MSF2EmacState, (obj), TYPE_MSS_EMAC)
-> +
-> +#define R_MAX         (0x1a0 / 4)
-> +#define PHY_MAX_REGS  32
-> +
-> +typedef struct MSF2EmacState {
-> +    SysBusDevice parent;
-> +
-> +    MemoryRegion mmio;
-> +    MemoryRegion *dma_mr;
-> +    AddressSpace dma_as;
-> +
-> +    qemu_irq irq;
-> +    NICState *nic;
-> +    NICConf conf;
-> +
-> +    uint32_t rx_desc;
-> +    uint16_t phy_regs[PHY_MAX_REGS];
-> +
-> +    uint32_t regs[R_MAX];
-> +} MSF2EmacState;
+>=20
+>> ---
+>> drivers/virtio/virtio_balloon.c     | 78 =
+++++++++++++++++++++++++++++++-------
+>> include/linux/balloon_compaction.h  |  9 ++++-
+>> include/uapi/linux/virtio_balloon.h |  3 ++
+>> mm/balloon_compaction.c             | 40 +++++++++++++++----
+>> 4 files changed, 109 insertions(+), 21 deletions(-)
+>>=20
+>> diff --git a/drivers/virtio/virtio_balloon.c =
+b/drivers/virtio/virtio_balloon.c
+>> index 341458f..fbd2b02f 100644
+>> --- a/drivers/virtio/virtio_balloon.c
+>> +++ b/drivers/virtio/virtio_balloon.c
+>> @@ -47,6 +47,7 @@ enum virtio_balloon_vq {
+>> 	VIRTIO_BALLOON_VQ_DEFLATE,
+>> 	VIRTIO_BALLOON_VQ_STATS,
+>> 	VIRTIO_BALLOON_VQ_FREE_PAGE,
+>> +	VIRTIO_BALLOON_VQ_INFLATE_CONT,
+>> 	VIRTIO_BALLOON_VQ_MAX
+>> };
+>>=20
+>> @@ -56,7 +57,8 @@ enum virtio_balloon_config_read {
+>>=20
+>> struct virtio_balloon {
+>> 	struct virtio_device *vdev;
+>> -	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, =
+*free_page_vq;
+>> +	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, =
+*free_page_vq,
+>> +			 *inflate_cont_vq;
+>>=20
+>> 	/* Balloon's own wq for cpu-intensive work items */
+>> 	struct workqueue_struct *balloon_wq;
+>> @@ -114,6 +116,12 @@ struct virtio_balloon {
+>>=20
+>> 	/* To register a shrinker to shrink memory upon memory pressure =
+*/
+>> 	struct shrinker shrinker;
+>> +
+>> +	/* Pages order if VIRTIO_BALLOON_F_CONT_PAGES is set.
+>> +	 * if VIRTIO_BALLOON_F_CONT_PAGES is not set,
+>> +	 * pages_order will be set to 0.
+>> +	 */
+>> +	__u32 pages_order;
+>> };
+>>=20
+>> static struct virtio_device_id id_table[] =3D {
+>> @@ -169,10 +177,11 @@ static void set_page_pfns(struct virtio_balloon =
+*vb,
+>> 					  page_to_balloon_pfn(page) + =
+i);
+>> }
+>>=20
+>> -static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+>> +static unsigned int fill_balloon_order(struct virtio_balloon *vb, =
+size_t num,
+>> +				       unsigned int order)
+>> {
+>> -	unsigned num_allocated_pages;
+>> -	unsigned num_pfns;
+>> +	unsigned int num_allocated_pages;
+>> +	unsigned int num_pfns;
+>> 	struct page *page;
+>> 	LIST_HEAD(pages);
+>>=20
+>> @@ -181,12 +190,12 @@ static unsigned fill_balloon(struct =
+virtio_balloon *vb, size_t num)
+>>=20
+>> 	for (num_pfns =3D 0; num_pfns < num;
+>> 	     num_pfns +=3D VIRTIO_BALLOON_PAGES_PER_PAGE) {
+>> -		struct page *page =3D balloon_page_alloc();
+>> +		struct page *page =3D balloon_pages_alloc(order);
+>>=20
+>> 		if (!page) {
+>> 			dev_info_ratelimited(&vb->vdev->dev,
+>> -					     "Out of puff! Can't get %u =
+pages\n",
+>> -					     =
+VIRTIO_BALLOON_PAGES_PER_PAGE);
+>> +				"Out of puff! Can't get %u pages\n",
+>> +				VIRTIO_BALLOON_PAGES_PER_PAGE << order);
+>> 			/* Sleep for at least 1/5 of a second before =
+retry. */
+>> 			msleep(200);
+>> 			break;
+>> @@ -200,25 +209,48 @@ static unsigned fill_balloon(struct =
+virtio_balloon *vb, size_t num)
+>> 	vb->num_pfns =3D 0;
+>>=20
+>> 	while ((page =3D balloon_page_pop(&pages))) {
+>> -		balloon_page_enqueue(&vb->vb_dev_info, page);
+>> +		balloon_pages_enqueue(&vb->vb_dev_info, page, order);
+>>=20
+>> 		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+>> -		vb->num_pages +=3D VIRTIO_BALLOON_PAGES_PER_PAGE;
+>> +		vb->num_pages +=3D VIRTIO_BALLOON_PAGES_PER_PAGE << =
+order;
+>> 		if (!virtio_has_feature(vb->vdev,
+>> 					=
+VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
+>> -			adjust_managed_page_count(page, -1);
+>> +			adjust_managed_page_count(page, -(1 << order));
+>> 		vb->num_pfns +=3D VIRTIO_BALLOON_PAGES_PER_PAGE;
+>> 	}
+>>=20
+>> -	num_allocated_pages =3D vb->num_pfns;
+>> +	num_allocated_pages =3D vb->num_pfns << order;
+>> 	/* Did we get any? */
+>> -	if (vb->num_pfns !=3D 0)
+>> -		tell_host(vb, vb->inflate_vq);
+>> +	if (vb->num_pfns !=3D 0) {
+>> +		if (order)
+>> +			tell_host(vb, vb->inflate_cont_vq);
+>> +		else
+>> +			tell_host(vb, vb->inflate_vq);
+>> +	}
+>> 	mutex_unlock(&vb->balloon_lock);
+>>=20
+>> 	return num_allocated_pages;
+>> }
+>>=20
+>> +static unsigned int fill_balloon(struct virtio_balloon *vb, size_t =
+num)
+>> +{
+>> +	unsigned int num_allocated_pages =3D 0;
+>> +
+>> +	if (vb->pages_order) {
+>> +		num_allocated_pages =3D fill_balloon_order(vb, num,
+>> +							 =
+vb->pages_order);
+>> +		if (!num_allocated_pages)
+>> +			dev_info_ratelimited(&vb->vdev->dev,
+>> +				"Fail get any continuous pages in order =
+%u\n",
+>> +				vb->pages_order);
+>> +	}
+>> +
+>> +	if (!num_allocated_pages)
+>> +		num_allocated_pages =3D fill_balloon_order(vb, num, 0);
+>> +
+>> +	return num_allocated_pages;
+>> +}
+>> +
+>> static void release_pages_balloon(struct virtio_balloon *vb,
+>> 				 struct list_head *pages)
+>> {
+>=20
+>=20
+> Hmm no this is not what was previously suggested. David Hildenbrand =
+proposed
+> starting with highest order and iterating until we reach 0.
+> And I proposed a new API to allocate some memory between min and max
+> orders.
+>=20
+>=20
+>> @@ -481,6 +513,8 @@ static int init_vqs(struct virtio_balloon *vb)
+>> 	names[VIRTIO_BALLOON_VQ_STATS] =3D NULL;
+>> 	callbacks[VIRTIO_BALLOON_VQ_FREE_PAGE] =3D NULL;
+>> 	names[VIRTIO_BALLOON_VQ_FREE_PAGE] =3D NULL;
+>> +	callbacks[VIRTIO_BALLOON_VQ_INFLATE_CONT] =3D NULL;
+>> +	names[VIRTIO_BALLOON_VQ_INFLATE_CONT] =3D NULL;
+>>=20
+>> 	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
+>> 		names[VIRTIO_BALLOON_VQ_STATS] =3D "stats";
+>> @@ -492,6 +526,11 @@ static int init_vqs(struct virtio_balloon *vb)
+>> 		callbacks[VIRTIO_BALLOON_VQ_FREE_PAGE] =3D NULL;
+>> 	}
+>>=20
+>> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_CONT_PAGES)) {
+>> +		names[VIRTIO_BALLOON_VQ_INFLATE_CONT] =3D =
+"inflate_cont";
+>> +		callbacks[VIRTIO_BALLOON_VQ_INFLATE_CONT] =3D =
+balloon_ack;
+>> +	}
+>> +
+>> 	err =3D vb->vdev->config->find_vqs(vb->vdev, =
+VIRTIO_BALLOON_VQ_MAX,
+>> 					 vqs, callbacks, names, NULL, =
+NULL);
+>> 	if (err)
+>> @@ -524,6 +563,10 @@ static int init_vqs(struct virtio_balloon *vb)
+>> 	if (virtio_has_feature(vb->vdev, =
+VIRTIO_BALLOON_F_FREE_PAGE_HINT))
+>> 		vb->free_page_vq =3D vqs[VIRTIO_BALLOON_VQ_FREE_PAGE];
+>>=20
+>> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_CONT_PAGES))
+>> +		vb->inflate_cont_vq
+>> +			=3D vqs[VIRTIO_BALLOON_VQ_INFLATE_CONT];
+>> +
+>> 	return 0;
+>> }
+>>=20
+>> @@ -945,6 +988,14 @@ static int virtballoon_probe(struct =
+virtio_device *vdev)
+>> 		if (err)
+>> 			goto out_del_balloon_wq;
+>> 	}
+>> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_CONT_PAGES)) {
+>> +		virtio_cread(vb->vdev, struct virtio_balloon_config,
+>> +			     pages_order, &vb->pages_order);
+>> +		if (!virtio_has_feature(vb->vdev, VIRTIO_F_VERSION_1))
+>> +			vb->pages_order
+>> +				=3D le32_to_cpu((__force =
+__le32)vb->pages_order);
+>> +	} else
+>> +		vb->pages_order =3D 0;
+>> 	virtio_device_ready(vdev);
+>>=20
+>> 	if (towards_target(vb))
+>> @@ -1058,6 +1109,7 @@ static unsigned int features[] =3D {
+>> 	VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
+>> 	VIRTIO_BALLOON_F_FREE_PAGE_HINT,
+>> 	VIRTIO_BALLOON_F_PAGE_POISON,
+>> +	VIRTIO_BALLOON_F_CONT_PAGES,
+>> };
+>>=20
+>> static struct virtio_driver virtio_balloon_driver =3D {
+>> diff --git a/include/linux/balloon_compaction.h =
+b/include/linux/balloon_compaction.h
+>> index 338aa27..8180bbf 100644
+>> --- a/include/linux/balloon_compaction.h
+>> +++ b/include/linux/balloon_compaction.h
+>> @@ -60,15 +60,22 @@ struct balloon_dev_info {
+>> 	struct inode *inode;
+>> };
+>>=20
+>> -extern struct page *balloon_page_alloc(void);
+>> +extern struct page *balloon_pages_alloc(unsigned int order);
+>> extern void balloon_page_enqueue(struct balloon_dev_info *b_dev_info,
+>> 				 struct page *page);
+>> +extern void balloon_pages_enqueue(struct balloon_dev_info =
+*b_dev_info,
+>> +				  struct page *page, unsigned int =
+order);
+>> extern struct page *balloon_page_dequeue(struct balloon_dev_info =
+*b_dev_info);
+>> extern size_t balloon_page_list_enqueue(struct balloon_dev_info =
+*b_dev_info,
+>> 				      struct list_head *pages);
+>> extern size_t balloon_page_list_dequeue(struct balloon_dev_info =
+*b_dev_info,
+>> 				     struct list_head *pages, size_t =
+n_req_pages);
+>>=20
+>> +static inline struct page *balloon_page_alloc(void)
+>> +{
+>> +	return balloon_pages_alloc(0);
+>> +}
+>> +
+>> static inline void balloon_devinfo_init(struct balloon_dev_info =
+*balloon)
+>> {
+>> 	balloon->isolated_pages =3D 0;
+>> diff --git a/include/uapi/linux/virtio_balloon.h =
+b/include/uapi/linux/virtio_balloon.h
+>> index a1966cd7..e21b0aa 100644
+>> --- a/include/uapi/linux/virtio_balloon.h
+>> +++ b/include/uapi/linux/virtio_balloon.h
+>> @@ -36,6 +36,7 @@
+>> #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on =
+OOM */
+>> #define VIRTIO_BALLOON_F_FREE_PAGE_HINT	3 /* VQ to report free =
+pages */
+>> #define VIRTIO_BALLOON_F_PAGE_POISON	4 /* Guest is using page =
+poisoning */
+>> +#define VIRTIO_BALLOON_F_CONT_PAGES	5 /* VQ to report continuous =
+pages */
+>>=20
+>> /* Size of a PFN in the balloon interface. */
+>> #define VIRTIO_BALLOON_PFN_SHIFT 12
+>> @@ -51,6 +52,8 @@ struct virtio_balloon_config {
+>> 	__u32 free_page_report_cmd_id;
+>> 	/* Stores PAGE_POISON if page poisoning is in use */
+>> 	__u32 poison_val;
+>> +	/* Pages order if VIRTIO_BALLOON_F_CONT_PAGES is set */
+>> +	__u32 pages_order;
+>> };
+>>=20
+>> #define VIRTIO_BALLOON_S_SWAP_IN  0   /* Amount of memory swapped in =
+*/
+>> diff --git a/mm/balloon_compaction.c b/mm/balloon_compaction.c
+>> index 26de020..87df4b2 100644
+>> --- a/mm/balloon_compaction.c
+>> +++ b/mm/balloon_compaction.c
+>> @@ -112,8 +112,8 @@ size_t balloon_page_list_dequeue(struct =
+balloon_dev_info *b_dev_info,
+>> EXPORT_SYMBOL_GPL(balloon_page_list_dequeue);
+>>=20
+>> /*
+>> - * balloon_page_alloc - allocates a new page for insertion into the =
+balloon
+>> - *			page list.
+>> + * balloon_pages_alloc - allocates a new page for insertion into the =
+balloon
+>> + *			 page list.
+>>  *
+>>  * Driver must call this function to properly allocate a new balloon =
+page.
+>>  * Driver must call balloon_page_enqueue before definitively removing =
+the page
+>> @@ -121,14 +121,21 @@ EXPORT_SYMBOL_GPL(balloon_page_list_dequeue);
+>>  *
+>>  * Return: struct page for the allocated page or NULL on allocation =
+failure.
+>>  */
+>> -struct page *balloon_page_alloc(void)
+>> +struct page *balloon_pages_alloc(unsigned int order)
+>> {
+>> -	struct page *page =3D alloc_page(balloon_mapping_gfp_mask() |
+>> -				       __GFP_NOMEMALLOC | __GFP_NORETRY =
+|
+>> -				       __GFP_NOWARN);
+>> +	gfp_t gfp_mask;
+>> +
+>> +	if (order > 1)
+>> +		gfp_mask =3D __GFP_RETRY_MAYFAIL;
+>> +	else
+>> +		gfp_mask =3D __GFP_NORETRY;
+>> +
+>> +	struct page *page =3D alloc_pages(balloon_mapping_gfp_mask() |
+>> +					gfp_mask | __GFP_NOMEMALLOC |
+>> +					__GFP_NOWARN, order);
+>> 	return page;
+>> }
+>> -EXPORT_SYMBOL_GPL(balloon_page_alloc);
+>> +EXPORT_SYMBOL_GPL(balloon_pages_alloc);
+>>=20
+>> /*
+>>  * balloon_page_enqueue - inserts a new page into the balloon page =
+list.
+>> @@ -155,6 +162,25 @@ void balloon_page_enqueue(struct =
+balloon_dev_info *b_dev_info,
+>> EXPORT_SYMBOL_GPL(balloon_page_enqueue);
+>>=20
+>> /*
+>> + * balloon_pages_enqueue - inserts continuous pages into the balloon =
+page list.
+>> + */
+>> +void balloon_pages_enqueue(struct balloon_dev_info *b_dev_info,
+>> +			   struct page *page, unsigned int order)
+>> +{
+>> +	unsigned long flags;
+>> +	unsigned long pfn =3D page_to_pfn(page);
+>> +	unsigned long last_pfn =3D pfn + (1 << order) - 1;
+>> +
+>> +	spin_lock_irqsave(&b_dev_info->pages_lock, flags);
+>> +	for (; pfn <=3D last_pfn; pfn++) {
+>> +		page =3D pfn_to_page(pfn);
+>> +		balloon_page_enqueue_one(b_dev_info, page);
+>> +	}
+>> +	spin_unlock_irqrestore(&b_dev_info->pages_lock, flags);
+>> +}
+>> +EXPORT_SYMBOL_GPL(balloon_pages_enqueue);
+>> +
+>> +/*
+>>  * balloon_page_dequeue - removes a page from balloon's page list and =
+returns
+>>  *			  its address to allow the driver to release the =
+page.
+>>  * @b_dev_info: balloon device decriptor where we will grab a page =
+from.
+>> --=20
+>> 2.7.4
 
 
