@@ -2,83 +2,73 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD67C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 12:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF15C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 12:36:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 967D120857
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 12:24:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SPlKt6fV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 967D120857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1E5662078E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 12:36:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E5662078E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rkmorris.us
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMWEN-0003vP-Re
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 08:24:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49878)
+	id 1jMWQ7-0007xU-8E
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 08:36:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51081)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jMWDP-00035q-Ul
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 08:23:30 -0400
+ (envelope-from <bounces@canonical.com>) id 1jMWPG-0007XT-Nd
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 08:35:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jMWDO-00055z-EA
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 08:23:27 -0400
-Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:39740)
+ (envelope-from <bounces@canonical.com>) id 1jMWPF-0004oe-IA
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 08:35:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58162)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jMWDO-00055Y-9X
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 08:23:26 -0400
-Received: by mail-oi1-x22a.google.com with SMTP id d63so3049606oig.6
- for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 05:23:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JmmEOfhMMGAXslmZW0AeJDWIV3MeSBwmrgpGZ1favDE=;
- b=SPlKt6fVBLTG3wPv36XWIk+O63PrLE4HKUvtvwwvMfdipnBTWjCcPnbPM+e5TCOx6f
- r2VeEbc/d9pFoT6CRR9AZBTUpXc3W+Lwht3oHevsy0dpCm+0hpaADa/ITvV5S6WII1bT
- GYKf3bEukdghigu9SReIghzp82IuHjwu/NWL6vkg4l1ztoWyZy69s0T084YFsNFEuysj
- RCzV6SItGUqokGVU8aFVCT5u4d5U2zIvz14DPY+NDf25Cd7GWikrq0jMdBYyeULaextT
- V+O/qJwkLoApMi+A8NOplBZLPLtbfkSbrAnaAN9SY+aOd7wZy+Q74xa8DR481Tr3VBE8
- G2Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JmmEOfhMMGAXslmZW0AeJDWIV3MeSBwmrgpGZ1favDE=;
- b=egRH1ahi1/cI6RTsKwfkU4Pk+tmsxElfaoLnDA+9J90gNe9Lc+wpMAZ3hqjNjyf3Aj
- MqkusSIqMxaRguXqzEC/i5p4EUUAY/SFNuLZoXghWFECpcQAn7l8sd+2a3sItFaWLHSP
- 3Leq7syoxf84tOh1rHeuEYJr475HKWvb1hFAvmiNdGdNLOkMH9xUTcJAXok2pf2eyuyv
- EuXX1dA9MxgCTrx8exAevgA2pooDCz2WbmYEhL9sq0vWNo94ZOeAiNaQGxyWKmA+QZPe
- mWYOt6uA3zhr8NYpAW+pEhHNHeb9Uadr31aQ1+VzELRK8dui3/mFPimokCCok922J2et
- fsQg==
-X-Gm-Message-State: AGi0PuYW/Xt6t23CXTDKHTLeCKL05xjoZxYXp3ywZ+Ne0Gw9ogGWRZfj
- FoyD54UNCJ8qJsUNxHjz/wsDXlgDdAWLCtCYwECcKw==
-X-Google-Smtp-Source: APiQypLNc8qx3YmgaHW5ksV+1eckIBCYvh7dpYNKP/reIgHnJZsUUJU+8OK2v5YifjoqVdJHXmjkM/DW0kBbZt1Oktw=
-X-Received: by 2002:a05:6808:8cb:: with SMTP id
- k11mr5695760oij.48.1586435005138; 
- Thu, 09 Apr 2020 05:23:25 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jMWPF-0004l4-CI
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 08:35:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jMWPC-0005Fu-KF
+ for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 12:35:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 964FC2E8107
+ for <qemu-devel@nongnu.org>; Thu,  9 Apr 2020 12:35:38 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200408000210.22182-1-jcmvbkbc@gmail.com>
-In-Reply-To: <20200408000210.22182-1-jcmvbkbc@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 9 Apr 2020 13:23:13 +0100
-Message-ID: <CAFEAcA9_TAiF+eThk5HLy5xD8JkpQWoxib94zjeL5iwjouXNsQ@mail.gmail.com>
-Subject: Re: [PULL for-5.0 0/2] target/xtensa fixes
-To: Max Filippov <jcmvbkbc@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22a
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 09 Apr 2020 12:24:22 -0000
+From: Russell Morris <ubuntu@rkmorris.us>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: windows
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 6-u3untu-h chewi
+X-Launchpad-Bug-Reporter: Russell Morris (6-u3untu-h)
+X-Launchpad-Bug-Modifier: Russell Morris (6-u3untu-h)
+References: <158621521246.22866.8297146941622716788.malonedeb@wampee.canonical.com>
+Message-Id: <158643506217.11855.10812002473391831794.malone@soybean.canonical.com>
+Subject: [Bug 1871250] Re: Failed to create HAX VM
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: f06a7ac3ec8badc8e6252d147439e4ab2b6ad1e7
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,43 +77,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1871250 <1871250@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 8 Apr 2020 at 01:02, Max Filippov <jcmvbkbc@gmail.com> wrote:
->
-> Hi Peter,
->
-> please pull the following two fixes for the target/xtensa.
->
-> The following changes since commit f3bac27cc1e303e1860cc55b9b6889ba39dee587:
->
->   Update version for v5.0.0-rc2 release (2020-04-07 23:13:37 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/OSLL/qemu-xtensa.git tags/20200407-xtensa
->
-> for you to fetch changes up to fde557ad25ff3370ef1dd0587d299a86e060bb23:
->
->   target/xtensa: statically allocate xtensa_insnbufs in DisasContext (2020-04-07 16:08:11 -0700)
->
-> ----------------------------------------------------------------
-> target/xtensa fixes for 5.0:
->
-> - fix pasto in pfwait.r opcode name;
-> - fix memory leak with dynamically allocated xtensa_insnbufs in
->   DisasContext.
->
-> ----------------------------------------------------------------
+No worries! And my apologies for some confusion too - I was trying
+v4.2.0 from the official (recent) downloads, and I think something
+wasn't quite right ... so I went back, manually built a clean v4.2.0. It
+worked, as you suspected.
 
+Good news is - seems we know the fix. Fast, and quite minor ... doesn't
+get better than that. LOL! How to get this in the formal / official
+code?
 
-Applied, thanks.
+Thanks!
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+-- =
 
--- PMM
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1871250
+
+Title:
+  Failed to create HAX VM
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  I'm running the latest (master) of QEMU, though the version doesn't
+  seem to matter - I also checked back to v4.2.0, exactly the same
+  issue. And this isn't about the VM (guest), if I even just try to run,
+
+  > "c:\Program Files\qemu\qemu-system-x86_64.exe" -accel hax
+
+  Basically, just get a window to open, with acceleration enabled ... I get,
+  Open the vm device error:/dev/hax_vm/vm00, ec:3
+  Failed to open vm 0
+  Failed to create HAX VM
+  No accelerator found.
+
+  But I checked - I have installed Intel HAXM, and verified it's running,
+  > sc query intelhaxm
+  SERVICE_NAME: intelhaxm
+          TYPE               : 1  KERNEL_DRIVER
+          STATE              : 4  RUNNING
+                                  (STOPPABLE, NOT_PAUSABLE, IGNORES_SHUTDOW=
+N)
+          WIN32_EXIT_CODE    : 0  (0x0)
+          SERVICE_EXIT_CODE  : 0  (0x0)
+          CHECKPOINT         : 0x0
+          WAIT_HINT          : 0x0
+
+  Just remove the accelerator (-accel hax), and I get a window - so this
+  is related to QEMU being able to contact / use the accelerator.
+
+  Help!?!?
+
+  Thanks!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1871250/+subscriptions
 
