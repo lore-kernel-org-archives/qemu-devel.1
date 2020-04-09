@@ -2,79 +2,82 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC6FCC2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 17:44:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EB5EC2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 17:45:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A72BF206C0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 17:44:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06BCB20769
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 17:45:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fXjLTtvd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A72BF206C0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C7nxcXfX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06BCB20769
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMbEB-0000dt-TO
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 13:44:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39539)
+	id 1jMbFA-00023g-5d
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 13:45:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40660)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jMbCJ-0005oF-5r
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 13:42:40 -0400
+ (envelope-from <eblake@redhat.com>) id 1jMbEB-0000mr-Cj
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 13:44:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1jMbC9-0006r0-8g
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 13:42:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59949
+ (envelope-from <eblake@redhat.com>) id 1jMbEA-0008M9-8s
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 13:44:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40253
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jMbC9-0006qS-5V
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 13:42:29 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jMbEA-0008Lq-3p
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 13:44:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586454148;
+ s=mimecast20190719; t=1586454273;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9oSA8W/SfbM+lUUD53gbWLAOnZTi1X9SPyoosEQaqi4=;
- b=fXjLTtvd3cpQ8T9Z6GQ8MyBjpkEtrHyjPs+oLd3ThP+PqVGh1h6isbmZ9SNJfwTRw0q7cs
- MxZaZewp4Slyf11OIVbcW8QxA432sgBMt7m49RAIIt/AjM//6lxe+x4mEcwv1E6sG/r93w
- A5Gu4rHD1Acx5XpxWkqk4cqxFL1soPo=
+ bh=ctcZQOPSxqOMbWBJWHXIApGBTS8/auFOqg9mso5cTjQ=;
+ b=C7nxcXfXAVQJbsGHTbcGRl1Z3mbTIdqNQ6rxe5sbBqb6pRzXliymMgvKFFBwEm2KbnaFBR
+ 0Q9AnOtx8xfVjN4f7i9QTCHhTjA3V7WKxAQhrTX9d85vkCpEmiDsCT0ltyaEYTfS7clQwG
+ F8Trxpz7RIcabOJZca+tGEzv5knIz8k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-js8vZNHxOiyDZalCatj8cA-1; Thu, 09 Apr 2020 13:42:26 -0400
-X-MC-Unique: js8vZNHxOiyDZalCatj8cA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-144-EMVpPRJxPx2wQf5ixl9rNg-1; Thu, 09 Apr 2020 13:44:28 -0400
+X-MC-Unique: EMVpPRJxPx2wQf5ixl9rNg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A0FC8017F3;
- Thu,  9 Apr 2020 17:42:25 +0000 (UTC)
-Received: from localhost (ovpn-114-141.ams2.redhat.com [10.36.114.141])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D04E911D2A4;
- Thu,  9 Apr 2020 17:42:24 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL for-5.0 3/3] async: use explicit memory barriers
-Date: Thu,  9 Apr 2020 18:42:09 +0100
-Message-Id: <20200409174209.321725-4-stefanha@redhat.com>
-In-Reply-To: <20200409174209.321725-1-stefanha@redhat.com>
-References: <20200409174209.321725-1-stefanha@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8AB9B800D5C;
+ Thu,  9 Apr 2020 17:44:27 +0000 (UTC)
+Received: from [10.3.114.49] (ovpn-114-49.phx2.redhat.com [10.3.114.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 189D15C1BB;
+ Thu,  9 Apr 2020 17:44:27 +0000 (UTC)
+Subject: Re: [PATCH for-5.1 0/8] qemu-option: Fix corner cases and clean up
+To: qemu-devel@nongnu.org, armbru@redhat.com
+References: <158645218790.18042.4891276831001916938@39012742ff91>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <61902667-8412-3d94-c298-ac89963d4f7f@redhat.com>
+Date: Thu, 9 Apr 2020 12:44:26 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <158645218790.18042.4891276831001916938@39012742ff91>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,123 +89,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Ying Fang <fangying1@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Fam Zheng <fam@euphon.net>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RnJvbTogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4KCldoZW4gdXNpbmcgQzEx
-IGF0b21pY3MsIG5vbi1zZXFjc3QgcmVhZHMgYW5kIHdyaXRlcyBkbyBub3QgcGFydGljaXBhdGUK
-aW4gdGhlIHRvdGFsIG9yZGVyIG9mIHNlcWNzdCBvcGVyYXRpb25zLiAgSW4gdXRpbC9hc3luYy5j
-IGFuZCB1dGlsL2Fpby1wb3NpeC5jLAppbiBwYXJ0aWN1bGFyLCB0aGUgcGF0dGVybiB0aGF0IHdl
-IHVzZQoKICAgICAgICAgIHdyaXRlIGN0eC0+bm90aWZ5X21lICAgICAgICAgICAgICAgICB3cml0
-ZSBiaC0+c2NoZWR1bGVkCiAgICAgICAgICByZWFkIGJoLT5zY2hlZHVsZWQgICAgICAgICAgICAg
-ICAgICAgcmVhZCBjdHgtPm5vdGlmeV9tZQogICAgICAgICAgaWYgIWJoLT5zY2hlZHVsZWQsIHNs
-ZWVwICAgICAgICAgICAgIGlmIGN0eC0+bm90aWZ5X21lLCBub3RpZnkKCm5lZWRzIHRvIHVzZSBz
-ZXFjc3Qgb3BlcmF0aW9ucyBmb3IgYm90aCB0aGUgd3JpdGUgYW5kIHRoZSByZWFkLiAgSW4KZ2Vu
-ZXJhbCB0aGlzIGlzIHNvbWV0aGluZyB0aGF0IHdlIGRvIG5vdCB3YW50LCBiZWNhdXNlIHRoZXJl
-IGNhbiBiZQptYW55IHNvdXJjZXMgdGhhdCBhcmUgcG9sbGVkIGluIGFkZGl0aW9uIHRvIGJvdHRv
-bSBoYWx2ZXMuICBUaGUKYWx0ZXJuYXRpdmUgaXMgdG8gcGxhY2UgYSBzZXFjc3QgbWVtb3J5IGJh
-cnJpZXIgYmV0d2VlbiB0aGUgd3JpdGUKYW5kIHRoZSByZWFkLiAgVGhpcyBhbHNvIGNvbWVzIHdp
-dGggYSBkaXNhZHZhbnRhZ2UsIGluIHRoYXQgdGhlCm1lbW9yeSBiYXJyaWVyIGlzIGltcGxpY2l0
-IG9uIHN0cm9uZ2x5LW9yZGVyZWQgYXJjaGl0ZWN0dXJlcyBhbmQKaXQgd2FzdGVzIGEgZmV3IGRv
-emVuIGNsb2NrIGN5Y2xlcy4KCkZvcnR1bmF0ZWx5LCBjdHgtPm5vdGlmeV9tZSBpcyBuZXZlciB3
-cml0dGVuIGNvbmN1cnJlbnRseSBieSB0d28KdGhyZWFkcywgc28gd2UgY2FuIGFzc2VydCB0aGF0
-IGFuZCByZWxheCB0aGUgd3JpdGVzIHRvIGN0eC0+bm90aWZ5X21lLgpUaGUgcmVzdWx0aW5nIHNv
-bHV0aW9uIHdvcmtzIGFuZCBwZXJmb3JtcyB3ZWxsIG9uIGJvdGggYWFyY2g2NCBhbmQgeDg2LgoK
-Tm90ZSB0aGF0IHRoZSBhdG9taWNfc2V0L2F0b21pY19yZWFkIGNvbWJpbmF0aW9uIGlzIG5vdCBh
-biBhdG9taWMKcmVhZC1tb2RpZnktd3JpdGUsIGFuZCB0aGVyZWZvcmUgaXQgaXMgZXZlbiB3ZWFr
-ZXIgdGhhbiBDMTEgQVRPTUlDX1JFTEFYRUQ7Cm9uIHg4NiwgQVRPTUlDX1JFTEFYRUQgY29tcGls
-ZXMgdG8gYSBsb2NrZWQgb3BlcmF0aW9uLgoKQW5hbHl6ZWQtYnk6IFlpbmcgRmFuZyA8ZmFuZ3lp
-bmcxQGh1YXdlaS5jb20+ClNpZ25lZC1vZmYtYnk6IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJl
-ZGhhdC5jb20+ClRlc3RlZC1ieTogWWluZyBGYW5nIDxmYW5neWluZzFAaHVhd2VpLmNvbT4KTWVz
-c2FnZS1JZDogPDIwMjAwNDA3MTQwNzQ2LjgwNDEtNi1wYm9uemluaUByZWRoYXQuY29tPgpTaWdu
-ZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+Ci0tLQogdXRp
-bC9haW8tcG9zaXguYyB8IDE2ICsrKysrKysrKysrKysrLS0KIHV0aWwvYWlvLXdpbjMyLmMgfCAx
-NyArKysrKysrKysrKysrKy0tLQogdXRpbC9hc3luYy5jICAgICB8IDE2ICsrKysrKysrKysrKy0t
-LS0KIDMgZmlsZXMgY2hhbmdlZCwgNDAgaW5zZXJ0aW9ucygrKSwgOSBkZWxldGlvbnMoLSkKCmRp
-ZmYgLS1naXQgYS91dGlsL2Fpby1wb3NpeC5jIGIvdXRpbC9haW8tcG9zaXguYwppbmRleCBjZDZj
-ZjBhNGE5Li5jMzYxM2QyOTllIDEwMDY0NAotLS0gYS91dGlsL2Fpby1wb3NpeC5jCisrKyBiL3V0
-aWwvYWlvLXBvc2l4LmMKQEAgLTU1OSw2ICs1NTksMTEgQEAgYm9vbCBhaW9fcG9sbChBaW9Db250
-ZXh0ICpjdHgsIGJvb2wgYmxvY2tpbmcpCiAgICAgaW50NjRfdCB0aW1lb3V0OwogICAgIGludDY0
-X3Qgc3RhcnQgPSAwOwogCisgICAgLyoKKyAgICAgKiBUaGVyZSBjYW5ub3QgYmUgdHdvIGNvbmN1
-cnJlbnQgYWlvX3BvbGwgY2FsbHMgZm9yIHRoZSBzYW1lIEFpb0NvbnRleHQgKG9yCisgICAgICog
-YW4gYWlvX3BvbGwgY29uY3VycmVudCB3aXRoIGEgR1NvdXJjZSBwcmVwYXJlL2NoZWNrL2Rpc3Bh
-dGNoIGNhbGxiYWNrKS4KKyAgICAgKiBXZSByZWx5IG9uIHRoaXMgYmVsb3cgdG8gYXZvaWQgc2xv
-dyBsb2NrZWQgYWNjZXNzZXMgdG8gY3R4LT5ub3RpZnlfbWUuCisgICAgICovCiAgICAgYXNzZXJ0
-KGluX2Fpb19jb250ZXh0X2hvbWVfdGhyZWFkKGN0eCkpOwogCiAgICAgLyogYWlvX25vdGlmeSBj
-YW4gYXZvaWQgdGhlIGV4cGVuc2l2ZSBldmVudF9ub3RpZmllcl9zZXQgaWYKQEAgLTU2OSw3ICs1
-NzQsMTMgQEAgYm9vbCBhaW9fcG9sbChBaW9Db250ZXh0ICpjdHgsIGJvb2wgYmxvY2tpbmcpCiAg
-ICAgICogc28gZGlzYWJsZSB0aGUgb3B0aW1pemF0aW9uIG5vdy4KICAgICAgKi8KICAgICBpZiAo
-YmxvY2tpbmcpIHsKLSAgICAgICAgYXRvbWljX2FkZCgmY3R4LT5ub3RpZnlfbWUsIDIpOworICAg
-ICAgICBhdG9taWNfc2V0KCZjdHgtPm5vdGlmeV9tZSwgYXRvbWljX3JlYWQoJmN0eC0+bm90aWZ5
-X21lKSArIDIpOworICAgICAgICAvKgorICAgICAgICAgKiBXcml0ZSBjdHgtPm5vdGlmeV9tZSBi
-ZWZvcmUgY29tcHV0aW5nIHRoZSB0aW1lb3V0CisgICAgICAgICAqIChyZWFkaW5nIGJvdHRvbSBo
-YWxmIGZsYWdzLCBldGMuKS4gIFBhaXJzIHdpdGgKKyAgICAgICAgICogc21wX21iIGluIGFpb19u
-b3RpZnkoKS4KKyAgICAgICAgICovCisgICAgICAgIHNtcF9tYigpOwogICAgIH0KIAogICAgIHFl
-bXVfbG9ja2NudF9pbmMoJmN0eC0+bGlzdF9sb2NrKTsKQEAgLTU5MCw3ICs2MDEsOCBAQCBib29s
-IGFpb19wb2xsKEFpb0NvbnRleHQgKmN0eCwgYm9vbCBibG9ja2luZykKICAgICB9CiAKICAgICBp
-ZiAoYmxvY2tpbmcpIHsKLSAgICAgICAgYXRvbWljX3N1YigmY3R4LT5ub3RpZnlfbWUsIDIpOwor
-ICAgICAgICAvKiBGaW5pc2ggdGhlIHBvbGwgYmVmb3JlIGNsZWFyaW5nIHRoZSBmbGFnLiAgKi8K
-KyAgICAgICAgYXRvbWljX3N0b3JlX3JlbGVhc2UoJmN0eC0+bm90aWZ5X21lLCBhdG9taWNfcmVh
-ZCgmY3R4LT5ub3RpZnlfbWUpIC0gMik7CiAgICAgICAgIGFpb19ub3RpZnlfYWNjZXB0KGN0eCk7
-CiAgICAgfQogCmRpZmYgLS1naXQgYS91dGlsL2Fpby13aW4zMi5jIGIvdXRpbC9haW8td2luMzIu
-YwppbmRleCBhMjNiOWMzNjRkLi43MjlkNTMzZmFmIDEwMDY0NAotLS0gYS91dGlsL2Fpby13aW4z
-Mi5jCisrKyBiL3V0aWwvYWlvLXdpbjMyLmMKQEAgLTMyMSw2ICszMjEsMTIgQEAgYm9vbCBhaW9f
-cG9sbChBaW9Db250ZXh0ICpjdHgsIGJvb2wgYmxvY2tpbmcpCiAgICAgaW50IGNvdW50OwogICAg
-IGludCB0aW1lb3V0OwogCisgICAgLyoKKyAgICAgKiBUaGVyZSBjYW5ub3QgYmUgdHdvIGNvbmN1
-cnJlbnQgYWlvX3BvbGwgY2FsbHMgZm9yIHRoZSBzYW1lIEFpb0NvbnRleHQgKG9yCisgICAgICog
-YW4gYWlvX3BvbGwgY29uY3VycmVudCB3aXRoIGEgR1NvdXJjZSBwcmVwYXJlL2NoZWNrL2Rpc3Bh
-dGNoIGNhbGxiYWNrKS4KKyAgICAgKiBXZSByZWx5IG9uIHRoaXMgYmVsb3cgdG8gYXZvaWQgc2xv
-dyBsb2NrZWQgYWNjZXNzZXMgdG8gY3R4LT5ub3RpZnlfbWUuCisgICAgICovCisgICAgYXNzZXJ0
-KGluX2Fpb19jb250ZXh0X2hvbWVfdGhyZWFkKGN0eCkpOwogICAgIHByb2dyZXNzID0gZmFsc2U7
-CiAKICAgICAvKiBhaW9fbm90aWZ5IGNhbiBhdm9pZCB0aGUgZXhwZW5zaXZlIGV2ZW50X25vdGlm
-aWVyX3NldCBpZgpAQCAtMzMxLDcgKzMzNywxMyBAQCBib29sIGFpb19wb2xsKEFpb0NvbnRleHQg
-KmN0eCwgYm9vbCBibG9ja2luZykKICAgICAgKiBzbyBkaXNhYmxlIHRoZSBvcHRpbWl6YXRpb24g
-bm93LgogICAgICAqLwogICAgIGlmIChibG9ja2luZykgewotICAgICAgICBhdG9taWNfYWRkKCZj
-dHgtPm5vdGlmeV9tZSwgMik7CisgICAgICAgIGF0b21pY19zZXQoJmN0eC0+bm90aWZ5X21lLCBh
-dG9taWNfcmVhZCgmY3R4LT5ub3RpZnlfbWUpICsgMik7CisgICAgICAgIC8qCisgICAgICAgICAq
-IFdyaXRlIGN0eC0+bm90aWZ5X21lIGJlZm9yZSBjb21wdXRpbmcgdGhlIHRpbWVvdXQKKyAgICAg
-ICAgICogKHJlYWRpbmcgYm90dG9tIGhhbGYgZmxhZ3MsIGV0Yy4pLiAgUGFpcnMgd2l0aAorICAg
-ICAgICAgKiBzbXBfbWIgaW4gYWlvX25vdGlmeSgpLgorICAgICAgICAgKi8KKyAgICAgICAgc21w
-X21iKCk7CiAgICAgfQogCiAgICAgcWVtdV9sb2NrY250X2luYygmY3R4LT5saXN0X2xvY2spOwpA
-QCAtMzY0LDggKzM3Niw3IEBAIGJvb2wgYWlvX3BvbGwoQWlvQ29udGV4dCAqY3R4LCBib29sIGJs
-b2NraW5nKQogICAgICAgICByZXQgPSBXYWl0Rm9yTXVsdGlwbGVPYmplY3RzKGNvdW50LCBldmVu
-dHMsIEZBTFNFLCB0aW1lb3V0KTsKICAgICAgICAgaWYgKGJsb2NraW5nKSB7CiAgICAgICAgICAg
-ICBhc3NlcnQoZmlyc3QpOwotICAgICAgICAgICAgYXNzZXJ0KGluX2Fpb19jb250ZXh0X2hvbWVf
-dGhyZWFkKGN0eCkpOwotICAgICAgICAgICAgYXRvbWljX3N1YigmY3R4LT5ub3RpZnlfbWUsIDIp
-OworICAgICAgICAgICAgYXRvbWljX3N0b3JlX3JlbGVhc2UoJmN0eC0+bm90aWZ5X21lLCBhdG9t
-aWNfcmVhZCgmY3R4LT5ub3RpZnlfbWUpIC0gMik7CiAgICAgICAgICAgICBhaW9fbm90aWZ5X2Fj
-Y2VwdChjdHgpOwogICAgICAgICB9CiAKZGlmZiAtLWdpdCBhL3V0aWwvYXN5bmMuYyBiL3V0aWwv
-YXN5bmMuYwppbmRleCBiOTQ1MThiOTQ4Li4zMTY1YTI4ZjJmIDEwMDY0NAotLS0gYS91dGlsL2Fz
-eW5jLmMKKysrIGIvdXRpbC9hc3luYy5jCkBAIC0yNDksNyArMjQ5LDE0IEBAIGFpb19jdHhfcHJl
-cGFyZShHU291cmNlICpzb3VyY2UsIGdpbnQgICAgKnRpbWVvdXQpCiB7CiAgICAgQWlvQ29udGV4
-dCAqY3R4ID0gKEFpb0NvbnRleHQgKikgc291cmNlOwogCi0gICAgYXRvbWljX29yKCZjdHgtPm5v
-dGlmeV9tZSwgMSk7CisgICAgYXRvbWljX3NldCgmY3R4LT5ub3RpZnlfbWUsIGF0b21pY19yZWFk
-KCZjdHgtPm5vdGlmeV9tZSkgfCAxKTsKKworICAgIC8qCisgICAgICogV3JpdGUgY3R4LT5ub3Rp
-ZnlfbWUgYmVmb3JlIGNvbXB1dGluZyB0aGUgdGltZW91dAorICAgICAqIChyZWFkaW5nIGJvdHRv
-bSBoYWxmIGZsYWdzLCBldGMuKS4gIFBhaXJzIHdpdGgKKyAgICAgKiBzbXBfbWIgaW4gYWlvX25v
-dGlmeSgpLgorICAgICAqLworICAgIHNtcF9tYigpOwogCiAgICAgLyogV2UgYXNzdW1lIHRoZXJl
-IGlzIG5vIHRpbWVvdXQgYWxyZWFkeSBzdXBwbGllZCAqLwogICAgICp0aW1lb3V0ID0gcWVtdV90
-aW1lb3V0X25zX3RvX21zKGFpb19jb21wdXRlX3RpbWVvdXQoY3R4KSk7CkBAIC0yNjgsNyArMjc1
-LDggQEAgYWlvX2N0eF9jaGVjayhHU291cmNlICpzb3VyY2UpCiAgICAgUUVNVUJIICpiaDsKICAg
-ICBCSExpc3RTbGljZSAqczsKIAotICAgIGF0b21pY19hbmQoJmN0eC0+bm90aWZ5X21lLCB+MSk7
-CisgICAgLyogRmluaXNoIGNvbXB1dGluZyB0aGUgdGltZW91dCBiZWZvcmUgY2xlYXJpbmcgdGhl
-IGZsYWcuICAqLworICAgIGF0b21pY19zdG9yZV9yZWxlYXNlKCZjdHgtPm5vdGlmeV9tZSwgYXRv
-bWljX3JlYWQoJmN0eC0+bm90aWZ5X21lKSAmIH4xKTsKICAgICBhaW9fbm90aWZ5X2FjY2VwdChj
-dHgpOwogCiAgICAgUVNMSVNUX0ZPUkVBQ0hfUkNVKGJoLCAmY3R4LT5iaF9saXN0LCBuZXh0KSB7
-CkBAIC00MTEsMTAgKzQxOSwxMCBAQCBMdXJpbmdTdGF0ZSAqYWlvX2dldF9saW51eF9pb191cmlu
-ZyhBaW9Db250ZXh0ICpjdHgpCiB2b2lkIGFpb19ub3RpZnkoQWlvQ29udGV4dCAqY3R4KQogewog
-ICAgIC8qIFdyaXRlIGUuZy4gYmgtPnNjaGVkdWxlZCBiZWZvcmUgcmVhZGluZyBjdHgtPm5vdGlm
-eV9tZS4gIFBhaXJzCi0gICAgICogd2l0aCBhdG9taWNfb3IgaW4gYWlvX2N0eF9wcmVwYXJlIG9y
-IGF0b21pY19hZGQgaW4gYWlvX3BvbGwuCisgICAgICogd2l0aCBzbXBfbWIgaW4gYWlvX2N0eF9w
-cmVwYXJlIG9yIGFpb19wb2xsLgogICAgICAqLwogICAgIHNtcF9tYigpOwotICAgIGlmIChjdHgt
-Pm5vdGlmeV9tZSkgeworICAgIGlmIChhdG9taWNfcmVhZCgmY3R4LT5ub3RpZnlfbWUpKSB7CiAg
-ICAgICAgIGV2ZW50X25vdGlmaWVyX3NldCgmY3R4LT5ub3RpZmllcik7CiAgICAgICAgIGF0b21p
-Y19tYl9zZXQoJmN0eC0+bm90aWZpZWQsIHRydWUpOwogICAgIH0KLS0gCjIuMjUuMQoK
+On 4/9/20 12:09 PM, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200409153041.17576-1-armbru@redhat.com/
+> 
+> 
+> 
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+
+> === OUTPUT BEGIN ===
+> 1/8 Checking commit 2e003109273b (tests-qemu-opts: Cover has_help_option(), qemu_opt_has_help_opt())
+> WARNING: Block comments use a leading /* on a separate line
+> #37: FILE: tests/test-qemu-opts.c:747:
+> +        { "a,b,,help", false /* BUG */, true, true },
+
+Annoying, but I don't mind ignoring it (especially since we fix the bug 
+later in the series).
+
+> 
+> total: 0 errors, 1 warnings, 50 lines checked
+> 
+> Patch 1/8 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 2/8 Checking commit 8bb805dd3730 (qemu-options: Factor out get_opt_name_value() helper)
+> 3/8 Checking commit b3630a346906 (qemu-option: Fix sloppy recognition of "id=..." after ", , ")
+> 4/8 Checking commit 5c1b2db0b7ad (qemu-option: Avoid has_help_option() in qemu_opts_parse_noisily())
+> 5/8 Checking commit 6845c29bee11 (qemu-option: Fix has_help_option()'s sloppy parsing)
+> 6/8 Checking commit b7fcaaeeeb6f (test-qemu-opts: Simplify test_has_help_option() after bug fix)
+> 7/8 Checking commit b164930d4c8d (qemu-img: Factor out accumulate_options() helper)
+> 8/8 Checking commit 505f5f389855 (qemu-option: Move is_valid_option_list() to qemu-img.c and rewrite)
+> ERROR: suspect code indent for conditional statements (4, 4)
+> #61: FILE: qemu-img.c:243:
+> +    for (i = len; i > 0 && optarg[i - 1] == ','; i--) {
+> +    }
+
+False positive. Maybe you can shut up the checker by:
+     for (...) {
+         /* nothing further to do */
+     }
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
