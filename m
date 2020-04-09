@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D64C9C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 14:52:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D515C2BB86
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 14:52:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A28E2206E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 14:52:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A28E2206E9
+	by mail.kernel.org (Postfix) with ESMTPS id 0377B206E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 14:52:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0377B206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMYXN-0005hd-SX
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 10:52:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43113)
+	id 1jMYXP-0005kC-6L
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 10:52:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43123)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jMYWV-0004u2-Vn
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:51:21 -0400
+ (envelope-from <bounces@canonical.com>) id 1jMYWX-0004u4-4k
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:51:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jMYWU-0001Cy-HH
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:51:19 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38900)
+ (envelope-from <bounces@canonical.com>) id 1jMYWV-0001DP-RF
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:51:21 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39000)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jMYWU-0001Ce-Bt
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:51:18 -0400
+ id 1jMYWV-0001DC-Lp
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:51:19 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jMYWS-0000zb-Ba
- for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 14:51:16 +0000
+ id 1jMYWU-00019G-Mi
+ for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 14:51:18 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 555C52E8107
- for <qemu-devel@nongnu.org>; Thu,  9 Apr 2020 14:51:16 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 97BBD2E8104
+ for <qemu-devel@nongnu.org>; Thu,  9 Apr 2020 14:51:18 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Apr 2020 14:34:59 -0000
+Date: Thu, 09 Apr 2020 14:37:14 -0000
 From: Sean Feole <sean.feole@canonical.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -61,7 +61,7 @@ X-Launchpad-Bug-Commenters: andrew-cloke fheimes ltrager paelzer sfeole
 X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
 X-Launchpad-Bug-Modifier: Sean Feole (sfeole)
 References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
-Message-Id: <158644289924.11806.6253987034588526277.malone@soybean.canonical.com>
+Message-Id: <158644303493.17525.7906547308647931670.malone@wampee.canonical.com>
 Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
  initial deploy
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -70,7 +70,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ea805b821bdcdd411b1cad841fc4517e5cd6d58b
+X-Launchpad-Hash: a281a40c5d249b954d6c7a6d51f84461efde4807
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -88,62 +88,24 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It would appear that this bug is once again causing problems with some of o=
-ur automated testing.  =
+Also, please note that the libvirt version did not change on the s390x
+Virtual Machine Host.
 
-S390x KVM deployments are failing for Focal. When attempting to investigate=
- a big I found that it is indeed this bug. =
+On S390x VM Host
 
-
-Our MAAS Server is Version:
-
-maas:
-  Installed: 2.7.0-8232-g.6e1dba4ab-0ubuntu1~18.04.1
-  Candidate: 2.7.0-8232-g.6e1dba4ab-0ubuntu1~18.04.1
-  Version table:
-
-
-I've attached the console log of the -KVM machine deploying.
-
-On MAAS the rack controller reports the following:
-sfeole@bsg75:~$ cat focal-s390x-maas.txt =
-
-=3D=3D> rackd.log <=3D=3D
-2020-04-09 14:14:59 provisioningserver.rackdservices.tftp: [info] boots390x=
-.bin requested by 10.246.75.177
-2020-04-09 14:14:59 provisioningserver.rackdservices.tftp: [info] s390x/65a=
-9ca43-9541-49be-b315-e2ca85936ea2 requested by 10.246.75.177
-2020-04-09 14:14:59 provisioningserver.rackdservices.tftp: [info] s390x/01-=
-52-54-00-e5-d7-bb requested by 10.246.75.177
-
-=3D=3D> regiond.log <=3D=3D
-2020-04-09 14:14:59 maasserver.rpc.leases: [info] Lease update: commit for =
-10.246.75.177 on 52:54:0:e5:d7:bb at 2020-04-09 14:14:59 (lease time: 600s)
-
-=3D=3D> rackd.log <=3D=3D
-2020-04-09 14:14:59 provisioningserver.rackdservices.tftp: [info] s390x/0AF=
-64BB1 requested by 10.246.75.177
-2020-04-09 14:14:59 provisioningserver.rackdservices.tftp: [info] s390x/0AF=
-64BB requested by 10.246.75.177
-2020-04-09 14:14:59 provisioningserver.rackdservices.tftp: [info] s390x/0AF=
-64B requested by 10.246.75.177
-2020-04-09 14:14:59 provisioningserver.rackdservices.tftp: [info] s390x/0AF=
-64 requested by 10.246.75.177
-2020-04-09 14:14:59 provisioningserver.rackdservices.tftp: [info] s390x/0AF=
-6 requested by 10.246.75.177
-2020-04-09 14:15:00 provisioningserver.rackdservices.tftp: [info] s390x/0AF=
- requested by 10.246.75.177
-2020-04-09 14:15:00 provisioningserver.rackdservices.tftp: [info] s390x/0A =
-requested by 10.246.75.177
-2020-04-09 14:15:00 provisioningserver.rackdservices.tftp: [info] s390x/0 r=
-equested by 10.246.75.177
-2020-04-09 14:15:00 provisioningserver.rackdservices.tftp: [info] s390x/def=
-ault requested by 10.246.75.177
-
-
-** Attachment added: "focal-s390x-deploy.txt"
-   https://bugs.launchpad.net/maas/+bug/1859656/+attachment/5350338/+files/=
-focal-s390x-deploy.txt
+ii  libvirt-clients                       4.0.0-1ubuntu8.14                =
+   s390x        Programs for the libvirt library
+ii  libvirt-daemon                        4.0.0-1ubuntu8.14                =
+   s390x        Virtualization daemon
+ii  libvirt-daemon-driver-storage-rbd     4.0.0-1ubuntu8.14                =
+   s390x        Virtualization daemon RBD storage driver
+ii  libvirt-daemon-system                 4.0.0-1ubuntu8.14                =
+   s390x        Libvirt daemon configuration files
+ii  libvirt0:s390x                        4.0.0-1ubuntu8.14                =
+   s390x        library for interfacing with different virtualization syste=
+ms
+ii  python-libvirt                        4.0.0-1                          =
+   s390x        libvirt Python bindings
 
 -- =
 
