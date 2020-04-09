@@ -2,63 +2,73 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EC5EC2BA2B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 14:12:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40351C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 14:16:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54CD920692
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 14:12:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54CD920692
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
+	by mail.kernel.org (Postfix) with ESMTPS id 10E3720771
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 14:16:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10E3720771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMXut-0004Lv-Fp
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 10:12:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38293)
+	id 1jMXyr-0006Am-9F
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 10:16:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38708)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.kiszka@siemens.com>) id 1jMXuH-0003ec-Uu
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:11:51 -0400
+ (envelope-from <bounces@canonical.com>) id 1jMXxz-0005if-NL
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:15:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.kiszka@siemens.com>) id 1jMXuF-0006Qt-Jr
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:11:48 -0400
-Received: from gecko.sbs.de ([194.138.37.40]:59321)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
- id 1jMXuF-0006Ds-AP
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:11:47 -0400
-Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
- by gecko.sbs.de (8.15.2/8.15.2) with ESMTPS id 039EBNun002817
- (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 9 Apr 2020 16:11:23 +0200
-Received: from [139.22.34.184] ([139.22.34.184])
- by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 039EBLIk014322;
- Thu, 9 Apr 2020 16:11:22 +0200
-Subject: Re: [RFC][PATCH v2 0/3] IVSHMEM version 2 device for QEMU
-To: Liang Yan <lyan@suse.com>, qemu-devel <qemu-devel@nongnu.org>
-References: <cover.1578407802.git.jan.kiszka@siemens.com>
- <e11366c8-44e6-2d58-7c0a-f49e497cc240@suse.com>
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <883ab460-77c2-a324-6c8b-eb2e74f6458c@siemens.com>
-Date: Thu, 9 Apr 2020 16:11:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <bounces@canonical.com>) id 1jMXxy-0008GA-1t
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:15:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58148)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jMXxx-0008Fi-S4
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 10:15:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jMXxw-0004H0-CP
+ for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 14:15:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 3CD7B2E8108
+ for <qemu-devel@nongnu.org>; Thu,  9 Apr 2020 14:15:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <e11366c8-44e6-2d58-7c0a-f49e497cc240@suse.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 194.138.37.40
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 09 Apr 2020 14:00:37 -0000
+From: Igor <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: e-philipp imammedo
+X-Launchpad-Bug-Reporter: Philipp Eppelt (e-philipp)
+X-Launchpad-Bug-Modifier: Igor (imammedo)
+References: <158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com>
+Message-Id: <20200409160037.431ec776@redhat.com>
+Subject: Re: [Bug 1871842] [NEW] AMD CPUID leaf 0x8000'0008 reported number of
+ cores inconsistent with ACPI.MADT
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 40dc5e50896b911b150bed5bad6faba8b0545a9a
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -67,92 +77,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jailhouse <jailhouse-dev@googlegroups.com>,
- Claudio Fontana <claudio.fontana@gmail.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Hannes Reinecke <hare@suse.de>, Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: Bug 1871842 <1871842@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200409140037.zy1boFJ0dx_xl39ahQhMwKQMQUf8Ib6-RrBPH9x4VVk@z>
 
-On 09.04.20 15:52, Liang Yan wrote:
-> 
-> 
-> On 1/7/20 9:36 AM, Jan Kiszka wrote:
->> Overdue update of the ivshmem 2.0 device model as presented at [1].
->>
->> Changes in v2:
->>   - changed PCI device ID to Siemens-granted one,
->>     adjusted PCI device revision to 0
->>   - removed unused feature register from device
->>   - addressed feedback on specification document
->>   - rebased over master
->>
->> This version is now fully in sync with the implementation for Jailhouse
->> that is currently under review [2][3], UIO and virtio-ivshmem drivers
->> are shared. Jailhouse will very likely pick up this revision of the
->> device in order to move forward with stressing it.
->>
->> More details on the usage with QEMU were in the original cover letter
->> (with adjustements to the new device ID):
->>
->> If you want to play with this, the basic setup of the shared memory
->> device is described in patch 1 and 3. UIO driver and also the
->> virtio-ivshmem prototype can be found at
->>
->>      http://git.kiszka.org/?p=linux.git;a=shortlog;h=refs/heads/queues/ivshmem2
->>
->> Accessing the device via UIO is trivial enough. If you want to use it
->> for virtio, this is additionally to the description in patch 3 needed on
->> the virtio console backend side:
->>
->>      modprobe uio_ivshmem
->>      echo "110a 4106 1af4 1100 ffc003 ffffff" > /sys/bus/pci/drivers/uio_ivshmem/new_id
->>      linux/tools/virtio/virtio-ivshmem-console /dev/uio0
->>
->> And for virtio block:
->>
->>      echo "110a 4106 1af4 1100 ffc002 ffffff" > /sys/bus/pci/drivers/uio_ivshmem/new_id
->>      linux/tools/virtio/virtio-ivshmem-console /dev/uio0 /path/to/disk.img
->>
->> After that, you can start the QEMU frontend instance with the
->> virtio-ivshmem driver installed which can use the new /dev/hvc* or
->> /dev/vda* as usual.
->>
-> Hi, Jan,
-> 
-> Nice work.
-> 
-> I did a full test for your this new version. QEMU device part looks
-> good, virtio console worked as expected. Just had some issue with
-> virtio-ivshmem-block tests here.
-> 
-> I suppose you mean "linux/tools/virtio/virtio-ivshmem-block"?
+On Thu, 09 Apr 2020 12:58:11 -0000
+Philipp Eppelt <1871842@bugs.launchpad.net> wrote:
 
-Yes, copy&paste mistake, had the same issue over in 
-https://github.com/siemens/jailhouse/blob/master/Documentation/inter-cell-communication.md
+> Public bug reported:
+> =
 
-> 
-> Noticed "ffc002" is the main difference, however I saw nothing response
-> when run echo command here, are there anything I need to prepare?
-> 
-> I build the driver in guest kernel already.
-> 
-> Do I need a new protocol or anything for below command line?
-> ivshmem2-server -F -l 64K -n 2 -V 3 -P 0x8003
+> Setup:
+> CPU: AMD EPYC-v2 or host's EPYC cpu
+> Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
+> qemu version: self build
+> git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
+> config: Configured with: '../configure' '--target-list=3Dx86_64-softmmu,m=
+ips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aar=
+ch64-softmmu,arm-softmmu' '--prefix=3D/opt/qemu-master'
+> =
 
-Yes, you need to adjust that command line - didn't I document that 
-somewhere? Looks like I didn't:
+> Cmdline: =
 
-ivshmem2-server -F -l 1M -n 2 -V 2 -P 0x8002
+> qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/b=
+in/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , =
+... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu =
+EPYC-v2 -m 4G -smp 4 =
 
-i.e. a bit more memory is good (but this isn't speed-optimized anyway), 
-you only need 2 vectors here (but more do not harm), and the protocol 
-indeed needs adjustment (that is the key).
+> =
 
-Jan
+> Issue:
+> We are developing an microkernel operating system called L4Re. We recentl=
+y got an AMD EPYC server for testing and we couldn't execute SMP tests of o=
+ur system when running Linux + qemu + VM w/ L4Re.
+> In fact, the kernel did not recognize any APs at all. On AMD CPUs the ker=
+nel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[N=
+C] or [ApicIdSize].  [0][1]
+> =
 
--- 
-Siemens AG, Corporate Technology, CT RDA IOT SES-DE
-Corporate Competence Center Embedded Linux
+> The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18=
+cf757 ECX: 0x703f EDX: 0x1000
+> The lower four bits of ECX are the [NC] field and all set.
+> =
+
+> When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as=
+ replacement and addition to the above cmdline) the CPUID leaf shows: EAX: =
+0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
+> Note, ECX is zero. Indicating that this is no SMP capabale CPU.
+> =
+
+> I'm debugging it using my local machine and the QEMU provided EPYC-v2
+> CPU model and it is reproducible there as well and reports:  EAX:
+> 0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
+> =
+
+> I checked other AMD based CPU models (phenom, opteron_g3/g5) and they beh=
+ave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
+> I believe that behavior here is wrong as ECX[NC] should report the number=
+ of cores per processor, as stated in the AMD manual [2] p.584. In my under=
+standing -smp 4 should then lead to ECX[NC] =3D 0x3.
+> =
+
+> The following table shows my findings with the -smp option:
+> Option | Qemu guest observed ECX value
+> -smp 4 | 0x0
+> -smp 4,cores=3D4  | 0x3
+> -smp 4,cores=3D2,thread=3D2 | 0x3
+> -smp 4,cores=3D4,threads=3D2 | QEMU boot error: topology false.
+> =
+
+> Now, I'm asking myself how the terminology of the AMD manual maps to QEMU=
+'s -smp option.
+> Obviously, nr_cores and nr_threads correspond to the cores and threads op=
+tions on the cmdline and cores * threads <=3D 4 (in this example), but what=
+ corresponds the X in -smp X to?
+I'd say X corresponds to number of logical CPUs.
+Depending on presence of other options these are distributed among them in =
+magical manner
+(see pc_smp_parse() for starters)
+
+> Querying 0x8000'0008 on the physical processor results in different
+> reports than quering QEMU's model as does it with -enable-kvm -cpu host.
+> =
+
+> Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
+> CPU leave reports a single core processor.
+it matches -smp X as it should be.
+
+> =
+
+> This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
+> wrong number.
+CCed author of recent epyc patches who might know how AMD should work bette=
+r than me.
+
+> =
+
+> Please let me know, if you need more information from my side.
+> =
+
+> =
+
+> [0] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
+28e2b879cbbd19/src/kern/ia32/kernel_thread-ia32.cpp#L109
+> [1] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
+28e2b879cbbd19/src/kern/ia32/cpu-ia32.cpp#L1120
+> [2] https://github.com/qemu/qemu/blob/f2a8261110c32c4dccd84e774d8dd7a0524=
+e00fb/target/i386/cpu.c#L5835
+> [3] https://www.amd.com/system/files/TechDocs/24594.pdf
+> =
+
+> ** Affects: qemu
+>      Importance: Undecided
+>          Status: New
+>
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1871842
+
+Title:
+  AMD CPUID leaf 0x8000'0008 reported number of cores  inconsistent with
+  ACPI.MADT
+
+Status in QEMU:
+  New
+
+Bug description:
+  Setup:
+  CPU: AMD EPYC-v2 or host's EPYC cpu
+  Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
+  qemu version: self build
+  git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
+  config: Configured with: '../configure' '--target-list=3Dx86_64-softmmu,m=
+ips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aar=
+ch64-softmmu,arm-softmmu' '--prefix=3D/opt/qemu-master'
+
+  Cmdline: =
+
+  qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/b=
+in/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , =
+... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu =
+EPYC-v2 -m 4G -smp 4 =
+
+
+  Issue:
+  We are developing an microkernel operating system called L4Re. We recentl=
+y got an AMD EPYC server for testing and we couldn't execute SMP tests of o=
+ur system when running Linux + qemu + VM w/ L4Re.
+  In fact, the kernel did not recognize any APs at all. On AMD CPUs the ker=
+nel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[N=
+C] or [ApicIdSize].  [0][1]
+
+  The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18=
+cf757 ECX: 0x703f EDX: 0x1000
+  The lower four bits of ECX are the [NC] field and all set.
+
+  When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as=
+ replacement and addition to the above cmdline) the CPUID leaf shows: EAX: =
+0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
+  Note, ECX is zero. Indicating that this is no SMP capabale CPU.
+
+  I'm debugging it using my local machine and the QEMU provided EPYC-v2
+  CPU model and it is reproducible there as well and reports:  EAX:
+  0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
+
+  I checked other AMD based CPU models (phenom, opteron_g3/g5) and they beh=
+ave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
+  I believe that behavior here is wrong as ECX[NC] should report the number=
+ of cores per processor, as stated in the AMD manual [2] p.584. In my under=
+standing -smp 4 should then lead to ECX[NC] =3D 0x3.
+
+  The following table shows my findings with the -smp option:
+  Option | Qemu guest observed ECX value
+  -smp 4 | 0x0
+  -smp 4,cores=3D4  | 0x3
+  -smp 4,cores=3D2,thread=3D2 | 0x3
+  -smp 4,cores=3D4,threads=3D2 | QEMU boot error: topology false.
+
+  Now, I'm asking myself how the terminology of the AMD manual maps to QEMU=
+'s -smp option.
+  Obviously, nr_cores and nr_threads correspond to the cores and threads op=
+tions on the cmdline and cores * threads <=3D 4 (in this example), but what=
+ corresponds the X in -smp X to?
+
+  Querying 0x8000'0008 on the physical processor results in different
+  reports than quering QEMU's model as does it with -enable-kvm -cpu
+  host.
+
+  Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
+  CPU leave reports a single core processor.
+
+  This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
+  wrong number.
+
+  =
+
+  Please let me know, if you need more information from my side.
+
+  =
+
+  [0] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
+28e2b879cbbd19/src/kern/ia32/kernel_thread-ia32.cpp#L109
+  [1] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
+28e2b879cbbd19/src/kern/ia32/cpu-ia32.cpp#L1120
+  [2] https://github.com/qemu/qemu/blob/f2a8261110c32c4dccd84e774d8dd7a0524=
+e00fb/target/i386/cpu.c#L5835
+  [3] https://www.amd.com/system/files/TechDocs/24594.pdf
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1871842/+subscriptions
 
