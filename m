@@ -2,97 +2,83 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6284BC2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 03:36:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B1CC2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 04:11:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 213C720757
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 03:36:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F04FD20757
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 04:11:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UD2adWWc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 213C720757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QGVFPTML"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F04FD20757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMNz3-0001fH-B6
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 23:36:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52364)
+	id 1jMOXX-0007Lb-3F
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 00:11:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55609)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <arilou@gmail.com>) id 1jMNyO-00019Y-83
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 23:35:25 -0400
+ (envelope-from <jasowang@redhat.com>) id 1jMOWb-0006oe-5f
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 00:10:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <arilou@gmail.com>) id 1jMNyM-0001AI-UQ
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 23:35:24 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36377)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <arilou@gmail.com>) id 1jMNyM-00019p-LT
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 23:35:22 -0400
-Received: by mail-wm1-x343.google.com with SMTP id d202so2615873wmd.1
- for <qemu-devel@nongnu.org>; Wed, 08 Apr 2020 20:35:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=w8KCpjZCG8xfuGdDTFu0huL9KfB9sfX0Tqe0uiM/vlM=;
- b=UD2adWWcNFcuniU0Vs1ITgDLiYgD8812dQFojNq457zD4q08LjoX0buVed2UKf0H9g
- kTTuubFyOpFvppLEbMbaUtlohdR7W7eOCQWhKjivRVOQwzIAXJg64gTOz3d2YxNYtTVA
- ds848jSds+2D65sW2TlnIgC5I+zpe15ZiiS5PI4iF7PdTrE7KUxKGU9ZcMYPaAxDIoNX
- IEpatplsifUFsM5eU5sM1be79biPNVPtxIYZ6Khnt/Kd59A9S61rpIktGTMmSolBL/X/
- pSTn9JpivJGm1ysCEiYfUIQsSgNJgI3EpzQntGRhgUQMsNpfqfmEk6WLb+ZsbkKWWIl/
- 3rGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=w8KCpjZCG8xfuGdDTFu0huL9KfB9sfX0Tqe0uiM/vlM=;
- b=ot2DQKrbhXZ9Kyq4m5h1o76YX17S9k1h0Yt2UqMU4iAnE7R3kQ7B7S4j1iFBHVQO1A
- Qa5TPl8G0Z/ugXvANRsBgsymy68GA3vK53TbWoJaCGCzLQKvrloD0azX7yv8c1UbmlcR
- bcgppNPV/QHoDPpa+wFY4Cg1NqSNsyb+1+ORo+xlytaJrOA80QmJ/X88dU9vqFqmYlM8
- 0GOUWse8GkYdqtLr4HcIzdYQdeCSUMWTh0mcVlM6ac28ahtztWpt65Yr8c29OPlX2+wF
- FlFxQ/Bi2ql7sBshxqPQh8LHK+e+dML0rWjoyPcLuYEDT1HbkpS0P0YQ7DWpqlAInJUl
- yVUA==
-X-Gm-Message-State: AGi0PuZtH2nkgBXsnTv1du1g4S6NAD4I1+kR0i+1GHzM5f862+6oTNbR
- LasLxscoU2f6zIWWeuaw3Qg=
-X-Google-Smtp-Source: APiQypLnHt2u83oK72P8YvVW4/RisVeMwrdpqSnMOYZPxr+Ne+H1rbuvY4EBolWy875pdFgcb8BWkw==
-X-Received: by 2002:a7b:c8cd:: with SMTP id f13mr7777913wml.138.1586403321256; 
- Wed, 08 Apr 2020 20:35:21 -0700 (PDT)
-Received: from jondnuc (IGLD-84-229-155-55.inter.net.il. [84.229.155.55])
- by smtp.gmail.com with ESMTPSA id h81sm2104943wme.42.2020.04.08.20.35.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Apr 2020 20:35:20 -0700 (PDT)
-Date: Thu, 9 Apr 2020 06:35:18 +0300
-From: Jon Doron <arilou@gmail.com>
-To: Roman Kagan <rvkagan@yandex-team.ru>,
- "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
- QEMU <qemu-devel@nongnu.org>,
- Evgeny Yakovlev <eyakovlev@virtuozzo.com>, ehabkost@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH v1 5/5] i386: Hyper-V VMBus ACPI DSDT entry
-Message-ID: <20200409033518.GC7606@jondnuc>
-References: <CAP7QCog_EmLJ=O8Xi9Tc4Jst1=z62DXim9ScCyoPv7WugrSyOw@mail.gmail.com>
- <CAP7QCogMdUis-=KsC--0ar2Zt2Vwcpn4HS+qCxPn5khtDTu+mA@mail.gmail.com>
- <9b9c42d3-af9e-25e9-210e-c58ee5975941@maciej.szmigiero.name>
- <472544e7-498a-4e28-06e9-83c102d6436b@maciej.szmigiero.name>
- <20200406073246.GA7707@rvkaganb>
- <CAP7QCojPsOYjw94k3rkH0A3rLFADLeVhgy502N=8X5wrUnoC6Q@mail.gmail.com>
- <20200407185608.GA178651@rvkaganb>
- <8c278ea8-81c5-7458-8979-c319470440d7@maciej.szmigiero.name>
- <20200408041639.GA7606@jondnuc> <20200408204742.GA709224@rvkaganb>
+ (envelope-from <jasowang@redhat.com>) id 1jMOWY-00012n-Is
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 00:10:45 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47289
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jMOWY-00012U-F5
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 00:10:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586405442;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lSStXAm8nc0e5Hizj+fULW80WzfKC9BC+kM7MZmkW6U=;
+ b=QGVFPTMLYLmSAP2cYO41XrJbYvSID3KjlJOL6vjxDshz9glLQ/ixBUDTnYy9jtSgJ5c1zc
+ yH0+Nu4XRPHRq4PGVYus9RWlp5QKOBXO1nbz2a4zNYNHyp0xrZ8Ea1DNpd5c6uyNh+IwWd
+ 0v6SuZ+EOOKWO5Ket2ZPW5ESQNf9U1U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-nACFeMPUNsmiqj56SNf4_Q-1; Thu, 09 Apr 2020 00:10:33 -0400
+X-MC-Unique: nACFeMPUNsmiqj56SNf4_Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 918E18018B8;
+ Thu,  9 Apr 2020 04:10:32 +0000 (UTC)
+Received: from [10.72.13.188] (ovpn-13-188.pek2.redhat.com [10.72.13.188])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1C4C45C1C5;
+ Thu,  9 Apr 2020 04:10:29 +0000 (UTC)
+Subject: Re: [Qemu devel PATCH v3 1/3] hw/net: Add Smartfusion2 emac block
+To: sundeep.lkml@gmail.com, peter.maydell@linaro.org, philmd@redhat.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org
+References: <1586258134-6932-1-git-send-email-sundeep.lkml@gmail.com>
+ <1586258134-6932-2-git-send-email-sundeep.lkml@gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <4445ded1-e2ac-f422-4e5b-091af5efc9f4@redhat.com>
+Date: Thu, 9 Apr 2020 12:10:28 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20200408204742.GA709224@rvkaganb>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+In-Reply-To: <1586258134-6932-2-git-send-email-sundeep.lkml@gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,74 +94,718 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/04/2020, Roman Kagan wrote:
->On Wed, Apr 08, 2020 at 07:16:39AM +0300, Jon Doron wrote:
->> On 07/04/2020, Maciej S. Szmigiero wrote:
->> > On 07.04.2020 20:56, Roman Kagan wrote:
->> > > On Mon, Apr 06, 2020 at 11:20:39AM +0300, Jon Doron wrote:
->> > > > Well I want it to be merged in :-)
->> > >
->> > > Hmm I'm curious why, it has little to offer over virtio.
->> > >
->> > > Anyway the series you've posted seems to be based on a fairly old
->> > > version.
->> > >
->> > > The one in openvz repo is more recent.  It's still in need for
->> > > improvement, too, but should be testable at least.
->>
->> Well I have implemented the hyperv synthetic kernel debugger interface, but
->> on Windows 10 it requires to have a working VMBus (it's not really using it,
->> but without a function vmbus that will answer to the initiate contact then
->> the kdnet will simply be stuck in a loop.
->
->I see, thanks, I've never heard of this before.
->
->> With the synthetic kernel debugger interface you can debug older OS (Win7 up
->> to latest Win10). The benefit is that its much faster than all other
->> interfaces.
->
->I guess you compare it to debugging via serial port.  I wonder where the
->difference comes from?  I thought the transport didn't require any
->significant throughput, and latency-wise the (emulated) serial port was
->just as good as any other.  Am I missing something?
->
->Thanks,
->Roman.
->
 
-Well kdcom is sending out UART through the virtual serial port, this
-results in very slow speeds (try it out if you get a chance), because
-of that most Windows kernel developers use  VMWare with a combination
-of a tool called VirtualKD which implements it's own debug transport on
-the Windows part and patches the hypervisor (aka VMWare) to get the 
-VMExits.
-This way it can transfer more and bigger blocks faster, to the debugger.
+On 2020/4/7 =E4=B8=8B=E5=8D=887:15, sundeep.lkml@gmail.com wrote:
+> From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>
+> Modelled Ethernet MAC of Smartfusion2 SoC.
+> Micrel KSZ8051 PHY is present on Emcraft's
+> SOM kit hence same PHY is emulated.
+>
+> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> ---
+>   MAINTAINERS                |   2 +
+>   hw/net/Makefile.objs       |   1 +
+>   hw/net/msf2-emac.c         | 556 ++++++++++++++++++++++++++++++++++++++=
++++++++
+>   include/hw/net/msf2-emac.h |  50 ++++
+>   4 files changed, 609 insertions(+)
+>   create mode 100644 hw/net/msf2-emac.c
+>   create mode 100644 include/hw/net/msf2-emac.h
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 9d156d7..6a103f2 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -918,6 +918,8 @@ F: include/hw/arm/msf2-soc.h
+>   F: include/hw/misc/msf2-sysreg.h
+>   F: include/hw/timer/mss-timer.h
+>   F: include/hw/ssi/mss-spi.h
+> +F: hw/net/msf2-emac.c
+> +F: include/hw/net/msf2-emac.h
+>  =20
+>   Emcraft M2S-FG484
+>   M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+> index af4d194..f2b7398 100644
+> --- a/hw/net/Makefile.objs
+> +++ b/hw/net/Makefile.objs
+> @@ -55,3 +55,4 @@ common-obj-$(CONFIG_ROCKER) +=3D rocker/rocker.o rocker=
+/rocker_fp.o \
+>   obj-$(call lnot,$(CONFIG_ROCKER)) +=3D rocker/qmp-norocker.o
+>  =20
+>   common-obj-$(CONFIG_CAN_BUS) +=3D can/
+> +common-obj-$(CONFIG_MSF2) +=3D msf2-emac.o
+> diff --git a/hw/net/msf2-emac.c b/hw/net/msf2-emac.c
+> new file mode 100644
+> index 0000000..cb80e19
+> --- /dev/null
+> +++ b/hw/net/msf2-emac.c
+> @@ -0,0 +1,556 @@
+> +/*
+> + * QEMU model of the Smartfusion2 Ethernet MAC.
+> + *
+> + * Copyright (c) 2020 Subbaraya Sundeep <sundeep.lkml@gmail.com>.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+> + * of this software and associated documentation files (the "Software"),=
+ to deal
+> + * in the Software without restriction, including without limitation the=
+ rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be includ=
+ed in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+> + * THE SOFTWARE.
+> + *
+> + * Refer to section Ethernet MAC in the document:
+> + * UG0331: SmartFusion2 Microcontroller Subsystem User Guide
+> + * Datasheet URL:
+> + * https://www.microsemi.com/document-portal/cat_view/56661-internal-doc=
+uments/
+> + * 56758-soc?lang=3Den&limit=3D20&limitstart=3D220
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "qemu/log.h"
+> +#include "exec/address-spaces.h"
+> +#include "hw/registerfields.h"
+> +#include "hw/net/msf2-emac.h"
+> +#include "hw/net/mii.h"
+> +#include "hw/irq.h"
+> +#include "net/net.h"
+> +#include "hw/qdev-properties.h"
+> +#include "migration/vmstate.h"
+> +
+> +REG32(CFG1, 0x0)
+> +REG32(CFG2, 0x4)
+> +REG32(IFG, 0x8)
+> +REG32(HALF_DUPLEX, 0xc)
+> +REG32(FRM_LEN, 0x10)
+> +REG32(MII_CMD, 0x24)
+> +REG32(MII_ADDR, 0x28)
+> +REG32(MII_CTL, 0x2c)
+> +REG32(MII_STS, 0x30)
+> +REG32(STA1, 0x40)
+> +REG32(STA2, 0x44)
+> +REG32(FIFO_CFG0, 0x48)
+> +REG32(DMA_TX_CTL, 0x180)
+> +REG32(DMA_TX_DESC, 0x184)
+> +REG32(DMA_TX_STATUS, 0x188)
+> +REG32(DMA_RX_CTL, 0x18c)
+> +REG32(DMA_RX_DESC, 0x190)
+> +REG32(DMA_RX_STATUS, 0x194)
+> +REG32(DMA_IRQ_MASK, 0x198)
+> +REG32(DMA_IRQ, 0x19c)
+> +
+> +FIELD(DMA, PKTCNT, 16, 8)
+> +
+> +#define R_DMA_PKT_TXRX          (1 << 0)
+> +#define DMA_TX_UNDERRUN         (1 << 1)
+> +#define DMA_RX_OVERFLOW         (1 << 2)
+> +
+> +#define EMPTY_MASK              (1 << 31)
+> +#define PKT_SIZE                0x7FF
+> +
+> +#define CFG1_RESET              (1 << 31)
+> +#define CFG1_RX_EN              (1 << 2)
+> +#define CFG1_TX_EN              (1 << 0)
+> +
+> +#define DMA_TX_CTL_EN           (1 << 0)
+> +#define DMA_RX_CTL_EN           (1 << 0)
+> +
+> +#define MII_CMD_READ            (1 << 0)
+> +
+> +#define PHYADDR                 0x1
+> +#define MII_ADDR_MASK           0x1F
+> +#define PHY_ADDR_SHIFT          8
+> +#define MAX_PKT_SIZE            2048
+> +
+> +typedef struct {
+> +    uint32_t pktaddr;
+> +    uint32_t pktsize;
+> +    uint32_t next;
+> +} EmacDesc;
+> +
+> +static uint32_t emac_get_isr(MSF2EmacState *s)
+> +{
+> +    uint32_t ier =3D s->regs[R_DMA_IRQ_MASK];
+> +    uint32_t tx =3D s->regs[R_DMA_TX_STATUS] & 0xF;
+> +    uint32_t rx =3D s->regs[R_DMA_RX_STATUS] & 0xF;
+> +    uint32_t isr =3D (rx << 4) | tx;
+> +
+> +    s->regs[R_DMA_IRQ] =3D ier & isr;
+> +    return s->regs[R_DMA_IRQ];
+> +}
+> +
+> +static void emac_update_irq(MSF2EmacState *s)
+> +{
+> +    bool intr =3D emac_get_isr(s);
+> +
+> +    qemu_set_irq(s->irq, intr);
+> +}
+> +
+> +static void emac_load_desc(MSF2EmacState *s, EmacDesc *d, hwaddr desc)
+> +{
+> +    address_space_read(&s->dma_as, desc, MEMTXATTRS_UNSPECIFIED,
+> +                       (uint8_t *)d, sizeof *d);
+> +    /* Convert from LE into host endianness. */
+> +    d->pktaddr =3D le32_to_cpu(d->pktaddr);
+> +    d->pktsize =3D le32_to_cpu(d->pktsize);
+> +    d->next =3D le32_to_cpu(d->next);
+> +}
+> +
+> +static void emac_store_desc(MSF2EmacState *s, EmacDesc *d, hwaddr desc)
+> +{
+> +    /* Convert from host endianness into LE. */
+> +    d->pktaddr =3D cpu_to_le32(d->pktaddr);
+> +    d->pktsize =3D cpu_to_le32(d->pktsize);
+> +    d->next =3D cpu_to_le32(d->next);
+> +
+> +    address_space_write(&s->dma_as, desc, MEMTXATTRS_UNSPECIFIED,
+> +                        (uint8_t *)d, sizeof *d);
+> +}
+> +
+> +static void msf2_dma_tx(MSF2EmacState *s)
+> +{
+> +    hwaddr desc =3D s->regs[R_DMA_TX_DESC];
+> +    uint8_t buf[MAX_PKT_SIZE];
+> +    EmacDesc d;
+> +    int size;
+> +    uint8_t pktcnt;
+> +    uint32_t status;
+> +
+> +    if (!(s->regs[R_CFG1] & CFG1_TX_EN)) {
+> +        return;
+> +    }
+> +
+> +    while (1) {
+> +        emac_load_desc(s, &d, desc);
+> +        if (d.pktsize & EMPTY_MASK) {
+> +            break;
+> +        }
+> +        size =3D d.pktsize & PKT_SIZE;
+> +        address_space_read(&s->dma_as, d.pktaddr, MEMTXATTRS_UNSPECIFIED=
+,
+> +                           buf, size);
+> +        /*
+> +         * This is very basic way to send packets. Ideally there should =
+be
+> +         * a FIFO and packets should be sent out from FIFO only when
+> +         * R_CFG1 bit 0 is set.
+> +         */
+> +        qemu_send_packet(qemu_get_queue(s->nic), buf, size);
 
-With the synthetic debugger interface in-place (which you can use since 
-Windows 7) all these tricks are not really required, you just need to 
-implement it :P .
 
-Thanks,
--- Jon.
+It looks to me loopback is not implemented.
 
->> In addition to that Michael Kelley from Microsoft has informed us that
->> Microsoft might be dropped the synthetic kernel debugger interface sometime
->> in the future, and it seems like the new mode is simply to use hvnet device
->> for the communication (which is again much faster).
->>
->> Cheers,
->> -- Jon.
->> >
->> > Isn't the one at
->> > https://src.openvz.org/projects/UP/repos/qemu/commits?until=refs%2Fheads%2Fvmbus
->> > the latest one?
->> >
->> > It seems to be last changed in October 2019 - is there a
->> > later one?
->> >
->> > > Thanks,
->> > > Roman.
->> >
->> > Thanks,
->> > Maciej
+
+> +        d.pktsize |=3D EMPTY_MASK;
+> +        emac_store_desc(s, &d, desc);
+> +        /* update sent packets count */
+> +        status =3D s->regs[R_DMA_TX_STATUS];
+> +        pktcnt =3D extract32(status, R_DMA_PKTCNT_SHIFT, 8);
+> +        pktcnt++;
+> +        s->regs[R_DMA_TX_STATUS] =3D deposit32(status, R_DMA_PKTCNT_SHIF=
+T,
+> +                                             8, pktcnt);
+> +        s->regs[R_DMA_TX_STATUS] |=3D R_DMA_PKT_TXRX;
+> +        desc =3D d.next;
+> +    }
+> +    s->regs[R_DMA_TX_STATUS] |=3D DMA_TX_UNDERRUN;
+> +    s->regs[R_DMA_TX_CTL] &=3D ~DMA_TX_CTL_EN;
+> +}
+> +
+> +static void msf2_phy_update_link(MSF2EmacState *s)
+> +{
+> +    /* Autonegotiation status mirrors link status. */
+> +    if (qemu_get_queue(s->nic)->link_down) {
+> +        s->phy_regs[MII_BMSR] &=3D ~(MII_BMSR_AN_COMP |
+> +                                         MII_BMSR_LINK_ST);
+> +    } else {
+> +        s->phy_regs[MII_BMSR] |=3D (MII_BMSR_AN_COMP |
+> +                                         MII_BMSR_LINK_ST);
+> +    }
+> +}
+> +
+> +static void msf2_phy_reset(MSF2EmacState *s)
+> +{
+> +    memset(&s->phy_regs[0], 0, sizeof(s->phy_regs));
+> +    s->phy_regs[MII_BMCR] =3D 0x1140;
+> +    s->phy_regs[MII_BMSR] =3D 0x7968;
+> +    s->phy_regs[MII_PHYID1] =3D 0x0022;
+> +    s->phy_regs[MII_PHYID2] =3D 0x1550;
+> +    s->phy_regs[MII_ANAR] =3D 0x01E1;
+> +    s->phy_regs[MII_ANLPAR] =3D 0xCDE1;
+> +
+> +    msf2_phy_update_link(s);
+> +}
+> +
+> +static void write_to_phy(MSF2EmacState *s)
+> +{
+> +    uint8_t reg_addr =3D s->regs[R_MII_ADDR] & MII_ADDR_MASK;
+> +    uint8_t phy_addr =3D (s->regs[R_MII_ADDR] >> PHY_ADDR_SHIFT) & MII_A=
+DDR_MASK;
+> +    uint16_t data =3D s->regs[R_MII_CTL] & 0xFFFF;
+> +
+> +    if (phy_addr !=3D PHYADDR) {
+> +        return;
+> +    }
+> +
+> +    switch (reg_addr) {
+> +    case MII_BMCR:
+> +        if (data & MII_BMCR_RESET) {
+> +            /* Phy reset */
+> +            msf2_phy_reset(s);
+> +            data &=3D ~MII_BMCR_RESET;
+> +        }
+> +        if (data & MII_BMCR_AUTOEN) {
+> +            /* Complete autonegotiation immediately */
+> +            data &=3D ~MII_BMCR_AUTOEN;
+> +            s->phy_regs[MII_BMSR] |=3D MII_BMSR_AN_COMP;
+> +        }
+> +        break;
+> +    }
+> +
+> +    s->phy_regs[reg_addr] =3D data;
+> +}
+> +
+> +static uint16_t read_from_phy(MSF2EmacState *s)
+> +{
+> +    uint8_t reg_addr =3D s->regs[R_MII_ADDR] & MII_ADDR_MASK;
+> +    uint8_t phy_addr =3D (s->regs[R_MII_ADDR] >> PHY_ADDR_SHIFT) & MII_A=
+DDR_MASK;
+> +
+> +    if (phy_addr =3D=3D PHYADDR) {
+> +        return s->phy_regs[reg_addr];
+> +    } else {
+> +        return 0xFFFF;
+> +    }
+> +}
+> +
+> +static void msf2_emac_do_reset(MSF2EmacState *s)
+> +{
+> +    memset(&s->regs[0], 0, sizeof(s->regs));
+> +    s->regs[R_CFG1] =3D 0x80000000;
+> +    s->regs[R_CFG2] =3D 0x00007000;
+> +    s->regs[R_IFG] =3D 0x40605060;
+> +    s->regs[R_HALF_DUPLEX] =3D 0x00A1F037;
+> +    s->regs[R_FRM_LEN] =3D 0x00000600;
+> +
+> +    msf2_phy_reset(s);
+> +}
+> +
+> +static uint64_t emac_read(void *opaque, hwaddr addr, unsigned int size)
+> +{
+> +    MSF2EmacState *s =3D opaque;
+> +    uint32_t r =3D 0;
+> +
+> +    addr >>=3D 2;
+> +
+> +    switch (addr) {
+> +    case R_DMA_IRQ:
+> +        r =3D emac_get_isr(s);
+> +        break;
+> +    default:
+> +        if (addr < ARRAY_SIZE(s->regs)) {
+> +            r =3D s->regs[addr];
+> +        } else {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                         "%s: Bad offset 0x%" HWADDR_PRIx "\n", __func__=
+,
+> +                         addr * 4);
+> +            return r;
+> +        }
+> +        break;
+> +    }
+> +    return r;
+> +}
+> +
+> +static void emac_write(void *opaque, hwaddr addr, uint64_t val64,
+> +        unsigned int size)
+> +{
+> +    MSF2EmacState *s =3D opaque;
+> +    uint32_t value =3D val64;
+> +    uint32_t enreqbits;
+> +    uint8_t pktcnt;
+> +
+> +    addr >>=3D 2;
+> +    switch (addr) {
+> +    case R_DMA_TX_CTL:
+> +        s->regs[addr] =3D value;
+> +        if (value & DMA_TX_CTL_EN) {
+> +            msf2_dma_tx(s);
+> +        }
+> +        break;
+> +    case R_DMA_RX_CTL:
+> +        s->regs[addr] =3D value;
+> +        if (value & DMA_RX_CTL_EN) {
+> +            s->rx_desc =3D s->regs[R_DMA_RX_DESC];
+> +            qemu_flush_queued_packets(qemu_get_queue(s->nic));
+> +        }
+> +        break;
+> +    case R_CFG1:
+> +        if (value & CFG1_RESET) {
+> +            msf2_emac_do_reset(s);
+> +        }
+> +    case R_FIFO_CFG0:
+> +       /*
+> +        * For our implementation, turning on modules is instantaneous,
+> +        * so the states requested via the *ENREQ bits appear in the
+> +        * *ENRPLY bits immediately. Also the reset bits to reset PE-MCXM=
+AC
+> +        * module are not emulated here since it deals with start of fram=
+es,
+> +        * inter-packet gap and control frames.
+> +        */
+> +        enreqbits =3D extract32(value, 8, 5);
+> +        value =3D deposit32(value, 16, 5, enreqbits);
+> +        s->regs[addr] =3D value;
+> +        break;
+> +    case R_DMA_TX_DESC:
+> +        if (value & 0x3) {
+> +            qemu_log_mask(LOG_GUEST_ERROR, "Tx Descriptor address should=
+ be"
+> +                        " 32 bit aligned\n");
+> +        }
+> +        /* Ignore [1:0] bits */
+> +        s->regs[addr] =3D value & 0xFFFFFFFC;
+> +        break;
+> +    case R_DMA_RX_DESC:
+> +        if (value & 0x3) {
+> +            qemu_log_mask(LOG_GUEST_ERROR, "Rx Descriptor address should=
+ be"
+> +                        " 32 bit aligned\n");
+> +        }
+> +        /* Ignore [1:0] bits */
+> +        s->regs[addr] =3D value & 0xFFFFFFFC;
+> +        break;
+> +    case R_DMA_TX_STATUS:
+> +        if (value & DMA_TX_UNDERRUN) {
+> +            s->regs[addr] &=3D ~DMA_TX_UNDERRUN;
+> +        }
+> +        if (value & R_DMA_PKT_TXRX) {
+> +            pktcnt =3D extract32(s->regs[addr], R_DMA_PKTCNT_SHIFT,
+> +                               R_DMA_PKTCNT_LENGTH);
+> +            pktcnt--;
+> +            s->regs[addr] =3D deposit32(s->regs[addr], R_DMA_PKTCNT_SHIF=
+T,
+> +                                      8, pktcnt);
+> +            if (pktcnt =3D=3D 0) {
+> +                s->regs[addr] &=3D ~R_DMA_PKT_TXRX;
+> +            }
+> +        }
+> +        break;
+> +    case R_DMA_RX_STATUS:
+> +        if (value & DMA_RX_OVERFLOW) {
+> +            s->regs[addr] &=3D ~DMA_RX_OVERFLOW;
+> +        }
+> +        if (value & R_DMA_PKT_TXRX) {
+> +            pktcnt =3D extract32(s->regs[addr], R_DMA_PKTCNT_SHIFT,
+> +                               R_DMA_PKTCNT_LENGTH);
+> +            pktcnt--;
+> +            s->regs[addr] =3D deposit32(s->regs[addr], R_DMA_PKTCNT_SHIF=
+T,
+> +                                      8, pktcnt);
+> +            if (pktcnt =3D=3D 0) {
+> +                s->regs[addr] &=3D ~R_DMA_PKT_TXRX;
+> +            }
+> +        }
+> +        break;
+> +    case R_DMA_IRQ:
+> +        break;
+> +    case R_MII_CMD:
+> +        if (value & MII_CMD_READ) {
+> +            s->regs[R_MII_STS] =3D read_from_phy(s);
+> +        }
+> +        break;
+> +    case R_MII_CTL:
+> +        s->regs[addr] =3D value;
+> +        write_to_phy(s);
+> +        break;
+> +    default:
+> +        if (addr < ARRAY_SIZE(s->regs)) {
+> +            s->regs[addr] =3D value;
+> +        } else {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                         "%s: Bad offset 0x%" HWADDR_PRIx "\n", __func__=
+,
+> +                         addr * 4);
+> +            return;
+> +        }
+> +        break;
+> +    }
+> +    emac_update_irq(s);
+> +}
+> +
+> +static const MemoryRegionOps emac_ops =3D {
+> +    .read =3D emac_read,
+> +    .write =3D emac_write,
+> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> +    .valid =3D {
+> +        .min_access_size =3D 4,
+> +        .max_access_size =3D 4
+> +    }
+> +};
+> +
+> +static bool emac_can_rx(NetClientState *nc)
+> +{
+> +    MSF2EmacState *s =3D qemu_get_nic_opaque(nc);
+> +
+> +    return (s->regs[R_CFG1] & CFG1_RX_EN) &&
+> +           (s->regs[R_DMA_RX_CTL] & DMA_RX_CTL_EN);
+> +}
+> +
+> +static bool match_addr(MSF2EmacState *s, const uint8_t *buf)
+> +{
+> +    /* The broadcast MAC address: FF:FF:FF:FF:FF:FF */
+> +    static const uint8_t broadcast_addr[] =3D { 0xFF, 0xFF, 0xFF, 0xFF,
+> +                                              0xFF, 0xFF };
+> +    uint8_t addr[6];
+> +
+> +    if (!memcmp(buf, broadcast_addr, sizeof(broadcast_addr))) {
+> +        return true;
+> +    }
+> +
+> +    /*
+> +     * R_STA1 [31:24] : octet 1 of mac address
+> +     * R_STA1 [23:16] : octet 2 of mac address
+> +     *          .
+> +     *          .
+> +     * R_STA2 [31:24] : octet 5 of mac address
+> +     * R_STA2 [23:16] : octet 6 of mac address
+> +     */
+> +    stl_le_p(addr, s->regs[R_STA1]);
+> +    stw_le_p(addr + 4, s->regs[R_STA2] >> 16);
+> +
+> +    if (!memcmp(buf, addr, sizeof(addr))) {
+> +        return false;
+> +    }
+> +
+> +    return true;
+> +}
+> +
+> +static ssize_t emac_rx(NetClientState *nc, const uint8_t *buf, size_t si=
+ze)
+> +{
+> +    MSF2EmacState *s =3D qemu_get_nic_opaque(nc);
+> +    EmacDesc d;
+> +    uint8_t pktcnt;
+> +    uint32_t status;
+> +
+> +    if (size > (s->regs[R_FRM_LEN] & 0xFFFF)) {
+> +        return -1;
+> +    }
+> +    if (!match_addr(s, buf)) {
+> +        return -1;
+> +    }
+> +
+> +    emac_load_desc(s, &d, s->rx_desc);
+> +
+> +    if (d.pktsize & EMPTY_MASK) {
+> +        address_space_write(&s->dma_as, d.pktaddr, MEMTXATTRS_UNSPECIFIE=
+D,
+> +                            buf, size & PKT_SIZE);
+
+
+Do we need to check whether the descriptor has sufficient space for the=20
+packet?
+
+Thanks
+
+
+> +        d.pktsize =3D size & PKT_SIZE;
+> +        emac_store_desc(s, &d, s->rx_desc);
+> +        /* update received packets count */
+> +        status =3D s->regs[R_DMA_RX_STATUS];
+> +        pktcnt =3D extract32(status, R_DMA_PKTCNT_SHIFT, 8);
+> +        pktcnt++;
+> +        s->regs[R_DMA_RX_STATUS] =3D deposit32(status, R_DMA_PKTCNT_SHIF=
+T,
+> +                                             8, pktcnt);
+> +        s->regs[R_DMA_RX_STATUS] |=3D R_DMA_PKT_TXRX;
+> +        s->rx_desc =3D d.next;
+> +    } else {
+> +        s->regs[R_DMA_RX_CTL] &=3D ~DMA_RX_CTL_EN;
+> +        s->regs[R_DMA_RX_STATUS] |=3D DMA_RX_OVERFLOW;
+> +    }
+> +    emac_update_irq(s);
+> +    return size;
+> +}
+> +
+> +static void msf2_emac_reset(DeviceState *dev)
+> +{
+> +    MSF2EmacState *s =3D MSS_EMAC(dev);
+> +
+> +    msf2_emac_do_reset(s);
+> +}
+> +
+> +static void emac_set_link(NetClientState *nc)
+> +{
+> +    MSF2EmacState *s =3D qemu_get_nic_opaque(nc);
+> +
+> +    msf2_phy_update_link(s);
+> +}
+> +
+> +static NetClientInfo net_msf2_emac_info =3D {
+> +    .type =3D NET_CLIENT_DRIVER_NIC,
+> +    .size =3D sizeof(NICState),
+> +    .can_receive =3D emac_can_rx,
+> +    .receive =3D emac_rx,
+> +    .link_status_changed =3D emac_set_link,
+> +};
+> +
+> +static void msf2_emac_realize(DeviceState *dev, Error **errp)
+> +{
+> +    MSF2EmacState *s =3D MSS_EMAC(dev);
+> +
+> +    address_space_init(&s->dma_as,
+> +                       s->dma_mr ? s->dma_mr : get_system_memory(), "dma=
+");
+> +
+> +    qemu_macaddr_default_if_unset(&s->conf.macaddr);
+> +    s->nic =3D qemu_new_nic(&net_msf2_emac_info, &s->conf,
+> +                          object_get_typename(OBJECT(dev)), dev->id, s);
+> +    qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
+> +}
+> +
+> +static void msf2_emac_init(Object *obj)
+> +{
+> +    MSF2EmacState *s =3D MSS_EMAC(obj);
+> +
+> +    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
+> +
+> +    memory_region_init_io(&s->mmio, obj, &emac_ops, s,
+> +                          "msf2-emac", R_MAX * 4);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
+> +}
+> +
+> +static Property msf2_emac_properties[] =3D {
+> +    DEFINE_NIC_PROPERTIES(MSF2EmacState, conf),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static const VMStateDescription vmstate_msf2_emac =3D {
+> +    .name =3D TYPE_MSS_EMAC,
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT32(rx_desc, MSF2EmacState),
+> +        VMSTATE_UINT16_ARRAY(phy_regs, MSF2EmacState, PHY_MAX_REGS),
+> +        VMSTATE_UINT32_ARRAY(regs, MSF2EmacState, R_MAX),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static void msf2_emac_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +
+> +    dc->realize =3D msf2_emac_realize;
+> +    dc->reset =3D msf2_emac_reset;
+> +    dc->vmsd =3D &vmstate_msf2_emac;
+> +    device_class_set_props(dc, msf2_emac_properties);
+> +}
+> +
+> +static const TypeInfo msf2_emac_info =3D {
+> +    .name          =3D TYPE_MSS_EMAC,
+> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
+> +    .instance_size =3D sizeof(MSF2EmacState),
+> +    .instance_init =3D msf2_emac_init,
+> +    .class_init    =3D msf2_emac_class_init,
+> +};
+> +
+> +static void msf2_emac_register_types(void)
+> +{
+> +    type_register_static(&msf2_emac_info);
+> +}
+> +
+> +type_init(msf2_emac_register_types)
+> diff --git a/include/hw/net/msf2-emac.h b/include/hw/net/msf2-emac.h
+> new file mode 100644
+> index 0000000..ab0da62
+> --- /dev/null
+> +++ b/include/hw/net/msf2-emac.h
+> @@ -0,0 +1,50 @@
+> +/*
+> + * QEMU model of the Smartfusion2 Ethernet MAC.
+> + *
+> + * Copyright (c) 2020 Subbaraya Sundeep <sundeep.lkml@gmail.com>.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+> + * of this software and associated documentation files (the "Software"),=
+ to deal
+> + * in the Software without restriction, including without limitation the=
+ rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be includ=
+ed in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "hw/sysbus.h"
+> +#include "net/net.h"
+> +
+> +#define TYPE_MSS_EMAC "msf2-emac"
+> +#define MSS_EMAC(obj) \
+> +    OBJECT_CHECK(MSF2EmacState, (obj), TYPE_MSS_EMAC)
+> +
+> +#define R_MAX         (0x1a0 / 4)
+> +#define PHY_MAX_REGS  32
+> +
+> +typedef struct MSF2EmacState {
+> +    SysBusDevice parent;
+> +
+> +    MemoryRegion mmio;
+> +    MemoryRegion *dma_mr;
+> +    AddressSpace dma_as;
+> +
+> +    qemu_irq irq;
+> +    NICState *nic;
+> +    NICConf conf;
+> +
+> +    uint32_t rx_desc;
+> +    uint16_t phy_regs[PHY_MAX_REGS];
+> +
+> +    uint32_t regs[R_MAX];
+> +} MSF2EmacState;
+
 
