@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F68AC2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:42:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B9DC2BB85
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:42:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67742206F7
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:42:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67742206F7
+	by mail.kernel.org (Postfix) with ESMTPS id 9CB00206F7
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:42:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CB00206F7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rkmorris.us
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMc7u-0003yV-KW
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 14:42:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50617)
+	id 1jMc7v-000413-QY
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 14:42:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50616)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jMc72-00034S-6W
+ (envelope-from <bounces@canonical.com>) id 1jMc72-00034O-70
  for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:41:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jMc71-0005SR-25
+ (envelope-from <bounces@canonical.com>) id 1jMc71-0005SX-2m
  for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:41:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37606)
+Received: from indium.canonical.com ([91.189.90.7]:37596)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jMc70-0005Ro-Sb
+ id 1jMc70-0005RS-TW
  for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:41:15 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jMc6z-0006ba-Uy
+ id 1jMc6z-0006ak-CC
  for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 18:41:13 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E52102E8105
+ by loganberry.canonical.com (Postfix) with ESMTP id 594A12E8106
  for <qemu-devel@nongnu.org>; Thu,  9 Apr 2020 18:41:13 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Apr 2020 18:30:33 -0000
+Date: Thu, 09 Apr 2020 18:28:26 -0000
 From: Russell Morris <ubuntu@rkmorris.us>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,7 +56,7 @@ X-Launchpad-Bug-Commenters: 6-u3untu-h ajbennee eminus
 X-Launchpad-Bug-Reporter: Emin Ghuliev (eminus)
 X-Launchpad-Bug-Modifier: Russell Morris (6-u3untu-h)
 References: <155352235092.32006.12315829232895734213.malonedeb@soybean.canonical.com>
-Message-Id: <158645703402.11570.900125832756139080.malone@soybean.canonical.com>
+Message-Id: <158645690725.17331.9403472581328107479.malone@wampee.canonical.com>
 Subject: [Bug 1821595] Re: Failed to emulate MMIO access with
  EmulatorReturnStatus: 2
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 216654a4185ac9b772739fed63c9a161dde92fed
+X-Launchpad-Hash: 0efc3b68be47312eef37ac557b8cdaea2aa1706b
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,9 +83,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-And here,
-https://www.reddit.com/r/androiddev/comments/c7u6h2/android_virtual_device_=
-on_ryzen/
+Folks seem to think this is the fix,
+https://stackoverflow.com/questions/55197032/android-emulator-whpx-failed-t=
+o-emulate-mmio-access-exit-code-3
+
+But it's not working for me ... does it help you?
+
+Thanks!
 
 -- =
 
