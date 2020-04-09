@@ -2,84 +2,127 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 759ABC2D0EA
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E2A9C2D0EA
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:37:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D926F2072F
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:11:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFB51206F7
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:37:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VQHqFIK4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D926F2072F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MqgZpwtq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFB51206F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMRLh-00052p-3S
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 03:11:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40836)
+	id 1jMRkL-0002MX-1M
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 03:37:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43262)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jwsu1986@gmail.com>) id 1jMRL2-0004e5-8Z
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:11:01 -0400
+ (envelope-from <david@redhat.com>) id 1jMRjN-0001lq-FQ
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:36:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jwsu1986@gmail.com>) id 1jMRL1-0003V7-1i
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:11:00 -0400
-Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:45478)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jwsu1986@gmail.com>) id 1jMRL0-0003Uh-RI
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:10:59 -0400
-Received: by mail-ot1-x331.google.com with SMTP id 60so6595254otl.12
- for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 00:10:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=HZLzfzV2S5puOtCbekxiCNDU77l6CaWpRCXT3OrFe6o=;
- b=VQHqFIK4nlzYFXXNyEi8BWJtdlgJWUCwnTrEVa9J+TZQ74ln18XMxix0bCQbdRiVF9
- IlVxowCYIk0wow2Fjj3fGsAKrAmjcTaB8hUCIQSZhGColMFFNLcoKP37RbU3v9umHyNs
- GsWsxF4P4AnDl5+nKP4QFD025gsS1raa00dAz+3CLeuXoIJg2e3bt8SThg2ADkGOGTS0
- Wq3EV1oZW9W6js9W4KKMGuYteE74X2pHbDHFCwDpDb+PKjpFPdNek4pW3HCG1JHz15lR
- o5qwSTBJbnRE+ALmgShofo0kwZeqBc7OWp1razCDDXPvj3xZTw3wJU9cZ1whqbwKLQAD
- pMcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=HZLzfzV2S5puOtCbekxiCNDU77l6CaWpRCXT3OrFe6o=;
- b=kxQONnhvyA7aIT41tl4au78DxJBXkRnN1dBKWZdf15TCpBqr6HHFB3GPIdOttRi3Rr
- LnCjrzts6PiHpFNhCVPaJh0vwfaFd6T2Cqw9HzB4/aZ9/u2o0LQrWsrb4kNFnBzcILod
- crClGRS+z8mx5yvDr3QX/XVm1MKubGR5blPQzaENju5inNmo81vG2We4dbXpPesAQvPS
- fhjSsg4KkY+swHkJhqj7bPdkYLCUz7FJJ2Cf6hLkcBqK/r/WbIp5mmQwV6e5e7L3g5Sw
- iyfKEJkfaUiFcTUiSHYfPh7hN9Ucs+mfghFgYZVzZCwlylAfPvoWJo/r61ELQlWsOJhF
- uw+Q==
-X-Gm-Message-State: AGi0PuZlSsQ7Y9BJYUCLjCkRfJg9mo1LaAFtPjnr/JZoLQ8AyocU2m3i
- BF5SPwtZGMSCK7k9HOiUFLLDSXpJiASZjg1zoAI=
-X-Google-Smtp-Source: APiQypKkr3QfukKjl6+HZvyQO9QgfD9EF3qm7Ul0wElDzjZO281sf87SWN95Nq95O4/9CW3seOO+BvcxhFn0SZZh0Ps=
-X-Received: by 2002:a05:6830:4b7:: with SMTP id
- l23mr3062122otd.99.1586416257641; 
- Thu, 09 Apr 2020 00:10:57 -0700 (PDT)
+ (envelope-from <david@redhat.com>) id 1jMRjL-00025D-9U
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:36:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20409
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jMRjL-00024s-0z
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:36:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586417766;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=ACqYHsoLLUIbB4MSYyfgBJy/6FSVDdoQea72TRuXnDY=;
+ b=MqgZpwtq9SiAIIKj+LVRb3koJpGWbEqFyYe98qVdT1/bTvOYBZbzGOC7EcQ5ZQFsK4Wlg/
+ 1khmYBulMFsnS35isfxTb67/+jkjIq9hnpMODEssPK5KBIMl6wLKo00f0IhvNNXpoS22wu
+ GF27aFl/+8m7rqKvX0haocijdfxKQws=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-186-a6fZUKCdMdGK8Kpy7zwrcw-1; Thu, 09 Apr 2020 03:35:59 -0400
+X-MC-Unique: a6fZUKCdMdGK8Kpy7zwrcw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99B9618AB2C4;
+ Thu,  9 Apr 2020 07:35:58 +0000 (UTC)
+Received: from [10.36.113.222] (ovpn-113-222.ams2.redhat.com [10.36.113.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CFA065DA82;
+ Thu,  9 Apr 2020 07:35:54 +0000 (UTC)
+Subject: Re: [PATCH v18 QEMU 2/3] virtio-balloon: Add support for providing
+ free page reports to host
+To: Alexander Duyck <alexander.duyck@gmail.com>, mst@redhat.com
+References: <20200408225302.18764.209.stgit@localhost.localdomain>
+ <20200408225523.18764.86514.stgit@localhost.localdomain>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <a461c334-79f0-a638-962e-d6b136707ce3@redhat.com>
+Date: Thu, 9 Apr 2020 09:35:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200328124646.7778-1-dereksu@qnap.com>
- <20200328124646.7778-3-dereksu@qnap.com>
- <20200408211842.2c0f1e4a@luklap> <3f0534dbaa744ee4bff9f11615a3b964@intel.com>
-In-Reply-To: <3f0534dbaa744ee4bff9f11615a3b964@intel.com>
-From: Derek Su <jwsu1986@gmail.com>
-Date: Thu, 9 Apr 2020 15:10:46 +0800
-Message-ID: <CAFKS8hV_FKUj2Dg76UwP49JcmnoDgAQcBVCNdj2SizMfckYxVw@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] net/colo-compare.c: handling of the full primary
- or secondary queue
-To: "Zhang, Chen" <chen.zhang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::331
+In-Reply-To: <20200408225523.18764.86514.stgit@localhost.localdomain>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,91 +134,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lukas Straub <lukasstraub2@web.de>,
- "lizhijian@cn.fujitsu.com" <lizhijian@cn.fujitsu.com>,
- "chyang@qnap.com" <chyang@qnap.com>, Derek Su <dereksu@qnap.com>,
- "jasowang@redhat.com" <jasowang@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "ctcheng@qnap.com" <ctcheng@qnap.com>
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello, Zhang and Lukas
+On 09.04.20 00:55, Alexander Duyck wrote:
+> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> 
+> Add support for the page reporting feature provided by virtio-balloon.
+> Reporting differs from the regular balloon functionality in that is is
+> much less durable than a standard memory balloon. Instead of creating a
+> list of pages that cannot be accessed the pages are only inaccessible
+> while they are being indicated to the virtio interface. Once the
+> interface has acknowledged them they are placed back into their respective
+> free lists and are once again accessible by the guest system.
+> 
+> Unlike a standard balloon we don't inflate and deflate the pages. Instead
+> we perform the reporting, and once the reporting is completed it is
+> assumed that the page has been dropped from the guest and will be faulted
+> back in the next time the page is accessed.
+> 
+> This patch is a subset of the UAPI patch that was submitted for the Linux
+> kernel. The original patch can be found at:
+> https://lore.kernel.org/lkml/20200211224657.29318.68624.stgit@localhost.localdomain/
 
-Sure, after my re-test, the performance is hurt. Will update it later.
+You don't need all these comments.
 
-By the way, could I also move the "error_report("colo compare
-primary/secondary queue size too big, drop packet");" to trace?
-The use of error_report is a little strange and make a flood in log.
+Usually we do
 
-May I  also make "MAX_QUEUE_SIZE"  be user-configurable in this series?
+"linux-headers: update to contain virito-balloon free page reporting
 
+Let's sync the latest upstream changes for free page reporting. To be
+replaced by a full linux header sync.
+
+Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+"
+
+mst will replace this by a full header sync (if necessary) when sending
+it upstream
+
+-- 
 Thanks,
-Derek Su
 
+David / dhildenb
 
-
-
-Zhang, Chen <chen.zhang@intel.com> =E6=96=BC 2020=E5=B9=B44=E6=9C=889=E6=97=
-=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=882:59=E5=AF=AB=E9=81=93=EF=BC=9A
->
->
->
-> > -----Original Message-----
-> > From: Lukas Straub <lukasstraub2@web.de>
-> > Sent: Thursday, April 9, 2020 3:19 AM
-> > To: Derek Su <dereksu@qnap.com>
-> > Cc: qemu-devel@nongnu.org; lizhijian@cn.fujitsu.com; chyang@qnap.com;
-> > jasowang@redhat.com; ctcheng@qnap.com; Zhang, Chen
-> > <chen.zhang@intel.com>; jwsu1986@gmail.com
-> > Subject: Re: [PATCH v4 2/2] net/colo-compare.c: handling of the full pr=
-imary
-> > or secondary queue
-> >
-> > On Sat, 28 Mar 2020 20:46:46 +0800
-> > Derek Su <dereksu@qnap.com> wrote:
-> >
-> > > The pervious handling of the full primary or queue is only dropping
-> > > the packet. If there are lots of clients to the guest VM, the "drop"
-> > > will lead to the lost of the networking connection until next
-> > > checkpoint.
-> > >
-> > > To address the issue, this patch drops the packet firstly.
-> > > Then, do checkpoint and flush packets.
-> > >
-> > > Signed-off-by: Derek Su <dereksu@qnap.com>
-> >
-> > Hello,
-> > I had a look at this again and did some benchmarking.
-> > First just qemu 5.0-rc1 with my bugfixes
-> > ( https://lists.nongnu.org/archive/html/qemu-devel/2020-
-> > 04/msg01432.html ) Then qemu 5.0-rc1 with my bugfixes and this patch
-> > series.
-> >
-> > This commit hurts performance too much:
-> > Client-to-server bandwidth falls from ~45.9 Mbit/s to 22.9 Mbit/s.
-> > Server-to-client bandwidth falls from ~6.3 Mbit/s to just ~674 Kbit/s.
-> > Average latency rises from ~197ms to ~397ms.
-> >
-> > Meanwhile the packet loss without this commit is negligible, only 1-2 p=
-ing
-> > packets got lost during each test run.
-> >
-> > Instead I think we should just turn the error message into a trace so i=
-t
-> > doesn't flood the logs.
->
-> We re-test this patch, Lukas is right.
-> Sorry for the original idea, looks like it did not show better performanc=
-e in the test.
-> Agree with Lukas's comments. Derek, can you please change it?
->
-> Thanks
-> Zhang Chen
->
->
-> >
-> > Regards,
-> > Lukas Straub
 
