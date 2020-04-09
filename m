@@ -2,80 +2,89 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0807FC2BB86
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 13:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF84EC2BA2B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 13:18:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA0B720857
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 13:17:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A569D2082D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 13:18:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="QFst7E0c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA0B720857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SaJ1ckvq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A569D2082D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMX3i-0000jw-0O
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 09:17:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53202)
+	id 1jMX4r-0001ip-QL
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 09:18:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56516)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zheng.zhenyu@foxmail.com>) id 1jMWfm-0003pb-Ag
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 08:52:47 -0400
+ (envelope-from <mlureau@redhat.com>) id 1jMX2e-000806-Hp
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 09:16:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zheng.zhenyu@foxmail.com>) id 1jMWfe-0004rf-6l
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 08:52:39 -0400
-Received: from smtpbgsg2.qq.com ([54.254.200.128]:48291)
+ (envelope-from <mlureau@redhat.com>) id 1jMX2b-0005JH-B8
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 09:16:23 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33829
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zheng.zhenyu@foxmail.com>)
- id 1jMWfa-0004ks-Q5
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 08:52:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
- s=s201512; t=1586436742;
- bh=Poaqxg8/gkarDOvvc4vuApsPuFtiv0T+VbnCgQ2uWis=;
- h=From:To:Subject:Mime-Version:Date:Message-ID;
- b=QFst7E0cU+O+ctxDrFuMQYCbsx652blCyghAe0f3q3IwPGQFGzRJnQk3eyXMd/IjO
- 8n/YG9vp8wYsLwjBBszbrsbQQtIyrBsYJEqfYOL4f31KcRMRIkvLbnVhf/IC2PmSfP
- CJ5Gn2YhKlhLcQx+Qi07fIAuqscikKaFgTDCeJfk=
-X-QQ-FEAT: 0wsbT93u7eAFUQDCUb/2D4pj8FZ033XDwb9CtN1PNK8+E+GL3474L7qyd7y/0
- kUs0GLHXYwHvms+UzzmPVPiPuKIvB5ZeLe23SGcmz8CiAFP2QlK96upSfJuNLZKHiIhFyvP
- xFcaYTQSk/6ApPp6zsOZo7F+B86IZUSkLb9MCxfMb5N/BKlAsQ64tyVDtDVlF/Jlz1Asy0J
- lGPyGzw6LYoE0fjp+YN4O4TcNVKDSWDnEsr2SYssVXZ+zMgPcbFjevZYbnXQcUONdUZwRh2
- /Im2uwhrvWXS8DL7KazYVxyF0r/0i6NrliQg==
-X-QQ-SSF: 000000000000006000000000000000Z
-X-HAS-ATTACH: no
-X-QQ-BUSINESS-ORIGIN: 2
-X-Originating-IP: 111.21.129.56
-X-QQ-STYLE: 
-X-QQ-mid: webmail423t1586436741t2601392
-From: "=?ISO-8859-1?B?S2V2aW5a?=" <zheng.zhenyu@foxmail.com>
-To: "=?ISO-8859-1?B?cWVtdS1kZXZlbA==?=" <qemu-devel@nongnu.org>
-Subject: [PATCH] target/arm: Add Kunpeng-920
-Mime-Version: 1.0
-Content-Type: multipart/alternative;
- boundary="----=_NextPart_5E8F1A85_10157FA8_6D045645"
-Content-Transfer-Encoding: 8Bit
-Date: Thu, 9 Apr 2020 20:52:21 +0800
-X-Priority: 3
-Message-ID: <tencent_40A25AAA0184A47D23DEABAB49067CBA3E05@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
- id ; Thu, 09 Apr 2020 20:52:21 +0800 (CST)
-Feedback-ID: webmail:foxmail.com:bgforeign:bgforeign12
-X-QQ-Bgrelay: 1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 54.254.200.128
-X-Mailman-Approved-At: Thu, 09 Apr 2020 09:16:10 -0400
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1jMX2b-0005Is-1C
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 09:16:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586438180;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZRExIM2Z2m5qDrESh7Oi3RNfeWIJhsVi+U/vpkAR0rw=;
+ b=SaJ1ckvq+qt3qHRBBg7Kv7pvuYK4Yquf9gF7m5jKgfrjycw0+Z7I6PyCfpicat6ECVdzcn
+ v0572XcWxkVSnunO7OgsLX1XJ79m0zftnHU/VH/qrBCVdybAWBf6BK5Ol7FU3Dh6nTR/Cb
+ 8xOpxhQdgDFzq8nGMlQL/h9acXwOuGg=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-5aJPXa-5PG6lRMYPGtfZdA-1; Thu, 09 Apr 2020 09:16:13 -0400
+X-MC-Unique: 5aJPXa-5PG6lRMYPGtfZdA-1
+Received: by mail-io1-f71.google.com with SMTP id a16so3376133ios.9
+ for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 06:16:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=hr07qM0B92ytmiO12hneByD+ycutNapukJr649WflaQ=;
+ b=NN35Ju0O4j8GM/Otz6dO1h80VsaHJ5wwvOkvyaatLHH8Te5eNYTpPgSl1tdxYnVgvF
+ JOf18EZk4CZ1jiBFJ6+qF+UoP/kPPyM41E7LC9/yYinn+swkXfAFujvFAnVRuypIAXDS
+ jsb5tuCEx7Lze2tIR8i+NOQ9WfXbeF/IS1ElYEAtRXkg1RpErfu5KTggD3PBkmnSWOBZ
+ EgoveEQ8Ro89tkMEg1OATB0/UQid+RwX0QWGPu/KtHX+MLIdeWUDMxxcLLFyZc2geSil
+ nfKF1RMJoQeXVdxMAtPw3L+e8R7+WKtBT/ohU8XH7XEBCOl2nUt2yrgUbYcB256RFGz9
+ qwTg==
+X-Gm-Message-State: AGi0PuYQMapTZJAbBk/gyVGsBDPwM5URg+nucwD9TX+MLod61qhPGvnd
+ y6xfpXaWnLUsgLVBavzMOSQ2XF7606ZMo0sT4oNSrGkgY1suhwlZS5Rjq063vgfSNX71zGeQKGG
+ QvWiFQ+7nEQzP7sdBexRhUbeLEuCiOP4=
+X-Received: by 2002:a92:91d6:: with SMTP id e83mr5222831ill.165.1586438173008; 
+ Thu, 09 Apr 2020 06:16:13 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKumHX6pFF+L99C61k7Rtw9tHy9pvrnlMG6E6wd0FWKTuXS4ReUYF2Ue8J9YJ/MyHjuEVt/FCeRCsl1wNeb8kU=
+X-Received: by 2002:a92:91d6:: with SMTP id e83mr5222798ill.165.1586438172709; 
+ Thu, 09 Apr 2020 06:16:12 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200409124601.toh6jpbfcwiwzb6z@r>
+In-Reply-To: <20200409124601.toh6jpbfcwiwzb6z@r>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Thu, 9 Apr 2020 15:16:01 +0200
+Message-ID: <CAMxuvayJjHH_dqyoPCweQDysubzv=bKnJqgp9TxZNcNKnLTJhw@mail.gmail.com>
+Subject: Re: Replace GSource with AioContext for chardev
+To: Coiby Xu <coiby.xu@gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,138 +96,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
+Hi
 
-------=_NextPart_5E8F1A85_10157FA8_6D045645
-Content-Type: text/plain;
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: base64
+On Thu, Apr 9, 2020 at 2:46 PM Coiby Xu <coiby.xu@gmail.com> wrote:
+>
+>
+> Hi,
+>
+> I'm now implementing vhost-user block device backend
+> https://patchew.org/QEMU/20200309100342.14921-1-coiby.xu@gmail.com/
+> and want to use chardev to help manage vhost-user client connections
+> and read socket message. However there are two issues that need to be
+> addressed.
+>
+> Firstly, chardev isn't suitable for the case when exported drive is
+> run in an IOThread because for mow chardev use GSource to dispatch
+> socket fd events. So I have to specify which IOThread the exported
+> drive is using when launching vhost-user block device backend,
+> for example, the following syntax will be used,
+>
+>    -drive file=3Dfile.img,id=3Ddisk -device virtio-blk,drive=3Ddisk,iothr=
+ead=3Diothread0 \
+>     -object vhost-user-blk-server,node-name=3Ddisk,chardev=3Dmon1,iothrea=
+d=3Diothread0 \
+>     -object iothread,id=3Diothread0 \
+>     -chardev socket,id=3Dmon1,path=3D/tmp/vhost-user-blk_vhost.socket,ser=
+ver,nowait
+>
+> then iothread_get_g_main_context(IOThread *iothread) has to be called
+> to run the gcontext in IOThread. If we use AioContext to dispatch socket
+> fd events, we needn't to specify IOThread twice. Besides aio_poll is fast=
+er
+> than g_main_loop_run.
+>
+> Secondly, socket chardev's async read handler (set through
+> qemu_chr_fe_set_handlers) doesn't take the case of socket short read
+> into consideration.  I plan to add one which will make use qio_channel_yi=
+eld.
+>
+> According to
+> [1] Improving the QEMU Event Loop - Linux Foundation Events
+> http://events17.linuxfoundation.org/sites/events/files/slides/Improving%2=
+0the%20QEMU%20Event%20Loop%20-%203.pdf
+>
+> "Convert chardev GSource to aio or an equivalent source" (p.30) should ha=
+ve
+> been finished. I'm curious why the plan didn't continue. If it's desirabl=
+e,
+> I'm going to finish the leftover work to resolve the aforementioned two i=
+ssues.
 
-SGlTaWxpY29uIEt1bnBlbmctOTIwIENQVSBpcyBvbmUgb2YgdGhlIGNvbW1vbmx5IHVzZWQN
-CmRhdGEgY2VudGVyIENQVXMsIHRoaXMgcGF0Y2ggYWRkcyBpdCB0byB0YXJnZXQuDQoNClNp
-Z25lZC1vZmYtYnk6IFpoZW55dSBaaGVuZyA8emhlbmd6aGVueXVsaXhpQGdtYWlsLmNvbSZn
-dDsNCg0KLS0tDQombmJzcDtody9hcm0vdmlydC5jJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7IHwmbmJzcDsgMSArDQombmJzcDt0YXJnZXQvYXJtL2NwdTY0LmMgfCAyMCArKysr
-KysrKysrKysrKysrKysrKw0KJm5ic3A7MiBmaWxlcyBjaGFuZ2VkLCAyMSBpbnNlcnRpb25z
-KCspDQoNCmRpZmYgLS1naXQgYS9ody9hcm0vdmlydC5jIGIvaHcvYXJtL3ZpcnQuYw0KaW5k
-ZXggN2RjOTZhYmY3Mi4uODQ1N2Q5ZGVlZSAxMDA2NDQNCi0tLSBhL2h3L2FybS92aXJ0LmMN
-CisrKyBiL2h3L2FybS92aXJ0LmMNCkBAIC0xOTcsNiArMTk3LDcgQEAgc3RhdGljIGNvbnN0
-IGNoYXIgKnZhbGlkX2NwdXNbXSA9IHsNCiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBBUk1f
-Q1BVX1RZUEVfTkFNRSgiY29ydGV4LWE1MyIpLA0KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-IEFSTV9DUFVfVFlQRV9OQU1FKCJjb3J0ZXgtYTU3IiksDQombmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsgQVJNX0NQVV9UWVBFX05BTUUoImNvcnRleC1hNzIiKSwNCismbmJzcDsmbmJzcDsm
-bmJzcDsgQVJNX0NQVV9UWVBFX05BTUUoIkt1bnBlbmctOTIwIiksDQombmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsgQVJNX0NQVV9UWVBFX05BTUUoImhvc3QiKSwNCiZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyBBUk1fQ1BVX1RZUEVfTkFNRSgibWF4IiksDQombmJzcDt9Ow0KZGlmZiAt
-LWdpdCBhL3RhcmdldC9hcm0vY3B1NjQuYyBiL3RhcmdldC9hcm0vY3B1NjQuYw0KaW5kZXgg
-NjJkMzZmOWU4ZC4uZWZlMTY3NjI2MyAxMDA2NDQNCi0tLSBhL3RhcmdldC9hcm0vY3B1NjQu
-Yw0KKysrIGIvdGFyZ2V0L2FybS9jcHU2NC5jDQpAQCAtMjUzLDYgKzI1MywyNSBAQCBzdGF0
-aWMgdm9pZCBhYXJjaDY0X2E3Ml9pbml0Zm4oT2JqZWN0ICpvYmopDQombmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsgZGVmaW5lX2FybV9jcF9yZWdzKGNwdSwgY29ydGV4X2E3Ml9hNTdfYTUz
-X2NwX3JlZ2luZm8pOw0KJm5ic3A7fQ0KJm5ic3A7DQorc3RhdGljIHZvaWQgYWFyY2g2NF9r
-dW5wZW5nXzkyMF9pbml0Zm4oT2JqZWN0ICpvYmopDQorew0KKyZuYnNwOyZuYnNwOyZuYnNw
-OyBBUk1DUFUgKmNwdSA9IEFSTV9DUFUob2JqKTsNCisNCismbmJzcDsmbmJzcDsmbmJzcDsg
-LyoNCismbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgKiBIaVNpbGljb24gS3VucGVuZy05MjAg
-Q1BVIGlzIHNpbWlsYXIgdG8gY29ydGV4LWE3MiwNCismbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsgKiBzbyBmaXJzdCBpbml0aWFsaXplIGNwdSBkYXRhIGFzIGNvcnRleC1hNzIgQ1BVLA0K
-KyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAqIGFuZCB0aGVuIHVwZGF0ZSB0aGUgY29ycmVz
-cG9uZGluZyByZWdpc3RlcnMuDQorJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICovDQorJm5i
-c3A7Jm5ic3A7Jm5ic3A7IGFhcmNoNjRfYTcyX2luaXRmbihvYmopOw0KKw0KKyZuYnNwOyZu
-YnNwOyZuYnNwOyBjcHUtJmd0O21pZHIgPSAweDQ4MGZkMDEwOw0KKyZuYnNwOyZuYnNwOyZu
-YnNwOyBjcHUtJmd0O2N0ciA9IDB4ODQ0NDgwMDQ7DQorJm5ic3A7Jm5ic3A7Jm5ic3A7IGNw
-dS0mZ3Q7aXNhci5pZF9hYTY0cGZyMCA9IDB4MTEwMDExMTE7DQorJm5ic3A7Jm5ic3A7Jm5i
-c3A7IGNwdS0mZ3Q7aXNhci5pZF9hYTY0ZGZyMCA9IDB4MTEwMzA1NDA4Ow0KKyZuYnNwOyZu
-YnNwOyZuYnNwOyBjcHUtJmd0O2lzYXIuaWRfYWE2NGlzYXIwID0gMHgxMDIxMTEyMDsNCism
-bmJzcDsmbmJzcDsmbmJzcDsgY3B1LSZndDtpc2FyLmlkX2FhNjRtbWZyMCA9IDB4MTAxMTI1
-Ow0KK30NCisNCiZuYnNwO3ZvaWQgYXJtX2NwdV9zdmVfZmluYWxpemUoQVJNQ1BVICpjcHUs
-IEVycm9yICoqZXJycCkNCiZuYnNwO3sNCiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAvKg0K
-QEAgLTc0Nyw2ICs3NjYsNyBAQCBzdGF0aWMgY29uc3QgQVJNQ1BVSW5mbyBhYXJjaDY0X2Nw
-dXNbXSA9IHsNCiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyB7IC5uYW1lID0gImNvcnRleC1h
-NTciLCZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAu
-aW5pdGZuID0gYWFyY2g2NF9hNTdfaW5pdGZuIH0sDQombmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsgeyAubmFtZSA9ICJjb3J0ZXgtYTUzIiwmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsgLmluaXRmbiA9IGFhcmNoNjRfYTUzX2luaXRmbiB9LA0K
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHsgLm5hbWUgPSAiY29ydGV4LWE3MiIsJm5ic3A7
-Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IC5pbml0Zm4gPSBh
-YXJjaDY0X2E3Ml9pbml0Zm4gfSwNCismbmJzcDsmbmJzcDsmbmJzcDsgeyAubmFtZSA9ICJL
-dW5wZW5nLTkyMCIsJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-IC5pbml0Zm4gPSBhYXJjaDY0X2t1bnBlbmdfOTIwX2luaXRmbn0sDQombmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsgeyAubmFtZSA9ICJtYXgiLCZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyAuaW5pdGZuID0gYWFyY2g2NF9tYXhfaW5pdGZuIH0sDQombmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsgeyAubmFtZSA9IE5VTEwgfQ0KJm5ic3A7fTsNCi0tIA0KMi4yNi4w
-LndpbmRvd3MuMQ==
+Converting all chardevs to Aio might be challenging, and doesn't bring
+much benefits imho.
 
-------=_NextPart_5E8F1A85_10157FA8_6D045645
-Content-Type: text/html;
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: base64
-
-PG1ldGEgaHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIiBjb250ZW50PSJ0ZXh0L2h0bWw7IGNo
-YXJzZXQ9R0IxODAzMCI+PGRpdj5IaVNpbGljb24gS3VucGVuZy05MjAgQ1BVIGlzIG9uZSBv
-ZiB0aGUgY29tbW9ubHkgdXNlZDwvZGl2PjxkaXY+ZGF0YSBjZW50ZXIgQ1BVcywgdGhpcyBw
-YXRjaCBhZGRzIGl0IHRvIHRhcmdldC48YnI+PGJyPlNpZ25lZC1vZmYtYnk6IFpoZW55dSBa
-aGVuZyAmbHQ7emhlbmd6aGVueXVsaXhpQGdtYWlsLmNvbSZndDs8YnI+PGJyPi0tLTxicj4m
-bmJzcDtody9hcm0vdmlydC5jJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHwmbmJz
-cDsgMSArPGJyPiZuYnNwO3RhcmdldC9hcm0vY3B1NjQuYyB8IDIwICsrKysrKysrKysrKysr
-KysrKysrPGJyPiZuYnNwOzIgZmlsZXMgY2hhbmdlZCwgMjEgaW5zZXJ0aW9ucygrKTxicj48
-YnI+ZGlmZiAtLWdpdCBhL2h3L2FybS92aXJ0LmMgYi9ody9hcm0vdmlydC5jPGJyPmluZGV4
-IDdkYzk2YWJmNzIuLjg0NTdkOWRlZWUgMTAwNjQ0PGJyPi0tLSBhL2h3L2FybS92aXJ0LmM8
-YnI+KysrIGIvaHcvYXJtL3ZpcnQuYzxicj5AQCAtMTk3LDYgKzE5Nyw3IEBAIHN0YXRpYyBj
-b25zdCBjaGFyICp2YWxpZF9jcHVzW10gPSB7PGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyBBUk1fQ1BVX1RZUEVfTkFNRSgiY29ydGV4LWE1MyIpLDxicj4mbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsgQVJNX0NQVV9UWVBFX05BTUUoImNvcnRleC1hNTciKSw8YnI+Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7IEFSTV9DUFVfVFlQRV9OQU1FKCJjb3J0ZXgtYTcyIiksPGJyPism
-bmJzcDsmbmJzcDsmbmJzcDsgQVJNX0NQVV9UWVBFX05BTUUoIkt1bnBlbmctOTIwIiksPGJy
-PiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBBUk1fQ1BVX1RZUEVfTkFNRSgiaG9zdCIpLDxi
-cj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgQVJNX0NQVV9UWVBFX05BTUUoIm1heCIpLDxi
-cj4mbmJzcDt9Ozxicj5kaWZmIC0tZ2l0IGEvdGFyZ2V0L2FybS9jcHU2NC5jIGIvdGFyZ2V0
-L2FybS9jcHU2NC5jPGJyPmluZGV4IDYyZDM2ZjllOGQuLmVmZTE2NzYyNjMgMTAwNjQ0PGJy
-Pi0tLSBhL3RhcmdldC9hcm0vY3B1NjQuYzxicj4rKysgYi90YXJnZXQvYXJtL2NwdTY0LmM8
-YnI+QEAgLTI1Myw2ICsyNTMsMjUgQEAgc3RhdGljIHZvaWQgYWFyY2g2NF9hNzJfaW5pdGZu
-KE9iamVjdCAqb2JqKTxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgZGVmaW5lX2FybV9j
-cF9yZWdzKGNwdSwgY29ydGV4X2E3Ml9hNTdfYTUzX2NwX3JlZ2luZm8pOzxicj4mbmJzcDt9
-PGJyPiZuYnNwOzxicj4rc3RhdGljIHZvaWQgYWFyY2g2NF9rdW5wZW5nXzkyMF9pbml0Zm4o
-T2JqZWN0ICpvYmopPGJyPit7PGJyPismbmJzcDsmbmJzcDsmbmJzcDsgQVJNQ1BVICpjcHUg
-PSBBUk1fQ1BVKG9iaik7PGJyPis8YnI+KyZuYnNwOyZuYnNwOyZuYnNwOyAvKjxicj4rJm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICogSGlTaWxpY29uIEt1bnBlbmctOTIwIENQVSBpcyBz
-aW1pbGFyIHRvIGNvcnRleC1hNzIsPGJyPismbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgKiBz
-byBmaXJzdCBpbml0aWFsaXplIGNwdSBkYXRhIGFzIGNvcnRleC1hNzIgQ1BVLDxicj4rJm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICogYW5kIHRoZW4gdXBkYXRlIHRoZSBjb3JyZXNwb25k
-aW5nIHJlZ2lzdGVycy48YnI+KyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAqLzxicj4rJm5i
-c3A7Jm5ic3A7Jm5ic3A7IGFhcmNoNjRfYTcyX2luaXRmbihvYmopOzxicj4rPGJyPismbmJz
-cDsmbmJzcDsmbmJzcDsgY3B1LSZndDttaWRyID0gMHg0ODBmZDAxMDs8YnI+KyZuYnNwOyZu
-YnNwOyZuYnNwOyBjcHUtJmd0O2N0ciA9IDB4ODQ0NDgwMDQ7PGJyPismbmJzcDsmbmJzcDsm
-bmJzcDsgY3B1LSZndDtpc2FyLmlkX2FhNjRwZnIwID0gMHgxMTAwMTExMTs8YnI+KyZuYnNw
-OyZuYnNwOyZuYnNwOyBjcHUtJmd0O2lzYXIuaWRfYWE2NGRmcjAgPSAweDExMDMwNTQwODs8
-YnI+KyZuYnNwOyZuYnNwOyZuYnNwOyBjcHUtJmd0O2lzYXIuaWRfYWE2NGlzYXIwID0gMHgx
-MDIxMTEyMDs8YnI+KyZuYnNwOyZuYnNwOyZuYnNwOyBjcHUtJmd0O2lzYXIuaWRfYWE2NG1t
-ZnIwID0gMHgxMDExMjU7PGJyPit9PGJyPis8YnI+Jm5ic3A7dm9pZCBhcm1fY3B1X3N2ZV9m
-aW5hbGl6ZShBUk1DUFUgKmNwdSwgRXJyb3IgKiplcnJwKTxicj4mbmJzcDt7PGJyPiZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyAvKjxicj5AQCAtNzQ3LDYgKzc2Niw3IEBAIHN0YXRpYyBj
-b25zdCBBUk1DUFVJbmZvIGFhcmNoNjRfY3B1c1tdID0gezxicj4mbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsgeyAubmFtZSA9ICJjb3J0ZXgtYTU3IiwmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgLmluaXRmbiA9IGFhcmNoNjRfYTU3X2luaXRm
-biB9LDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgeyAubmFtZSA9ICJjb3J0ZXgtYTUz
-IiwmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgLmlu
-aXRmbiA9IGFhcmNoNjRfYTUzX2luaXRmbiB9LDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsgeyAubmFtZSA9ICJjb3J0ZXgtYTcyIiwmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsmbmJzcDsmbmJzcDsgLmluaXRmbiA9IGFhcmNoNjRfYTcyX2luaXRmbiB9LDxi
-cj4rJm5ic3A7Jm5ic3A7Jm5ic3A7IHsgLm5hbWUgPSAiS3VucGVuZy05MjAiLCZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAuaW5pdGZuID0gYWFyY2g2NF9r
-dW5wZW5nXzkyMF9pbml0Zm59LDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgeyAubmFt
-ZSA9ICJtYXgiLCZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
-YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAuaW5pdGZu
-ID0gYWFyY2g2NF9tYXhfaW5pdGZuIH0sPGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyB7
-IC5uYW1lID0gTlVMTCB9PGJyPiZuYnNwO307PGJyPi0tIDxicj4yLjI2LjAud2luZG93cy4x
-PGJyPjwvZGl2Pg==
-
-------=_NextPart_5E8F1A85_10157FA8_6D045645--
-
-
+Perhaps a better approach would be to rely on a new chardev API to
+steal the chardev underlying fd or QIO... (mostly keeping -chardev for
+CLI/QMP compatibility reason - although breaking some chardev features
+that imho aren't compatible with all use cases, like replay, muxing,
+swapping etc). The chardev should probably be removed after that...
 
 
