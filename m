@@ -2,80 +2,80 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1924C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 13:11:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0807FC2BB86
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 13:17:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64E3F2082D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 13:11:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA0B720857
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 13:17:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="vBX+zH6/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64E3F2082D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="QFst7E0c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA0B720857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMWxh-0005aO-CG
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 09:11:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55538)
+	id 1jMX3i-0000jw-0O
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 09:17:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53202)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrew@daynix.com>) id 1jMWv2-0002FO-44
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 09:08:35 -0400
+ (envelope-from <zheng.zhenyu@foxmail.com>) id 1jMWfm-0003pb-Ag
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 08:52:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrew@daynix.com>) id 1jMWv0-0002YR-8b
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 09:08:32 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43267)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <andrew@daynix.com>) id 1jMWuz-0002Xy-Qb
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 09:08:30 -0400
-Received: by mail-wr1-x443.google.com with SMTP id i10so5543326wrv.10
- for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 06:08:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=31nXiREDwDNysLDOie+698fwuC4z0cISt9Vv2Q9+1c4=;
- b=vBX+zH6/ANZAaAXHCVyTNwaIP02Nr5LOkvSbjmwHj2DdbO/RadBiY/25GytHQixxpP
- 3wLpTKApZXzn5exB+lKNF+7x0L4RW1OStH6rvdiTDtPBlRkTcw1+XKOlrZE9Yii9plcR
- 0qWer+97WmyAqQQasWuwTnAcK3dTUUratE+s35ZkAgsqc+jidsk3CkYYbZ6L3fMsoerh
- WQzdKHY3wwmQ+Jmq+jDH4+tAEpuheD5EkhxvVC3MfB1LCa4KbKWcT+8q1dlR0itRsAea
- iWof62nNZZTSwgRvx9vBLEGsprx6c7tZDu9Lpvlet3gqXYyph56CD4K2nehhVo/VLVwg
- QSVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=31nXiREDwDNysLDOie+698fwuC4z0cISt9Vv2Q9+1c4=;
- b=GkYcd0bdOSzkcHMz21g7tsN+rDpCHhORtg41qwnkZDXMEvDGRV2j6FTczDJ2HyWvIK
- uq0nT4C+q6asopSLaktXy7EUR4ll3ouHrP8fI6o6/KjQTHqKT0Kr946PA8UJA8BUZQ3O
- Ytq2x3/SjvWQKKfT3mzCdOUj9odp3ZMn0Q1UyKQV9kFlFlsxWFkzpIUM42j+aTXh2VBJ
- 30JVuy4lqOZD8LJbfwgv7m5Gy9z6xRt+MftM+AsteCUQOhyhEJRuWLTPygLBU0iaRPV+
- uuA1vCpdAnqonWXw02mhi+W3+ljhkgXLRLpfAAYc+KPjANLiOEWc+OGT0ynDfwLc3ANy
- DnEA==
-X-Gm-Message-State: AGi0PuZcjHZiOjNCeW8PscqnemyTDdLi0fzol8c7ZNj8eND1tPSoKG92
- 8t0ljt7iuNkebNUizpQQAywNyMMMEr0mT1HWwx30jg==
-X-Google-Smtp-Source: APiQypJoUghQmtyl9aWSpKAULBnMKiWhuCdK1V9NiV5f+XcYofXH3QjF7LEkmuffXUoTacnpOrBkNbi6DYKqma/2wno=
-X-Received: by 2002:a5d:4611:: with SMTP id t17mr14974812wrq.16.1586437707987; 
- Thu, 09 Apr 2020 06:08:27 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200405191940.866972-1-andrew@daynix.com>
- <e756b1b3-2346-822c-974c-79c40970c09d@redhat.com>
-In-Reply-To: <e756b1b3-2346-822c-974c-79c40970c09d@redhat.com>
-From: Andrew Melnichenko <andrew@daynix.com>
-Date: Thu, 9 Apr 2020 16:35:29 +0300
-Message-ID: <CABcq3pFMaRSj6TD8NQMbeqFXe8zqUVJQcuv9bTD=Qi8SfiYuQg@mail.gmail.com>
-Subject: Re: [PATCH] Fixed IPv6 payload lenght without jumbo option
-To: Jason Wang <jasowang@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000000b0f9305a2db508f"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+ (envelope-from <zheng.zhenyu@foxmail.com>) id 1jMWfe-0004rf-6l
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 08:52:39 -0400
+Received: from smtpbgsg2.qq.com ([54.254.200.128]:48291)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zheng.zhenyu@foxmail.com>)
+ id 1jMWfa-0004ks-Q5
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 08:52:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+ s=s201512; t=1586436742;
+ bh=Poaqxg8/gkarDOvvc4vuApsPuFtiv0T+VbnCgQ2uWis=;
+ h=From:To:Subject:Mime-Version:Date:Message-ID;
+ b=QFst7E0cU+O+ctxDrFuMQYCbsx652blCyghAe0f3q3IwPGQFGzRJnQk3eyXMd/IjO
+ 8n/YG9vp8wYsLwjBBszbrsbQQtIyrBsYJEqfYOL4f31KcRMRIkvLbnVhf/IC2PmSfP
+ CJ5Gn2YhKlhLcQx+Qi07fIAuqscikKaFgTDCeJfk=
+X-QQ-FEAT: 0wsbT93u7eAFUQDCUb/2D4pj8FZ033XDwb9CtN1PNK8+E+GL3474L7qyd7y/0
+ kUs0GLHXYwHvms+UzzmPVPiPuKIvB5ZeLe23SGcmz8CiAFP2QlK96upSfJuNLZKHiIhFyvP
+ xFcaYTQSk/6ApPp6zsOZo7F+B86IZUSkLb9MCxfMb5N/BKlAsQ64tyVDtDVlF/Jlz1Asy0J
+ lGPyGzw6LYoE0fjp+YN4O4TcNVKDSWDnEsr2SYssVXZ+zMgPcbFjevZYbnXQcUONdUZwRh2
+ /Im2uwhrvWXS8DL7KazYVxyF0r/0i6NrliQg==
+X-QQ-SSF: 000000000000006000000000000000Z
+X-HAS-ATTACH: no
+X-QQ-BUSINESS-ORIGIN: 2
+X-Originating-IP: 111.21.129.56
+X-QQ-STYLE: 
+X-QQ-mid: webmail423t1586436741t2601392
+From: "=?ISO-8859-1?B?S2V2aW5a?=" <zheng.zhenyu@foxmail.com>
+To: "=?ISO-8859-1?B?cWVtdS1kZXZlbA==?=" <qemu-devel@nongnu.org>
+Subject: [PATCH] target/arm: Add Kunpeng-920
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="----=_NextPart_5E8F1A85_10157FA8_6D045645"
+Content-Transfer-Encoding: 8Bit
+Date: Thu, 9 Apr 2020 20:52:21 +0800
+X-Priority: 3
+Message-ID: <tencent_40A25AAA0184A47D23DEABAB49067CBA3E05@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
+ id ; Thu, 09 Apr 2020 20:52:21 +0800 (CST)
+Feedback-ID: webmail:foxmail.com:bgforeign:bgforeign12
+X-QQ-Bgrelay: 1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 54.254.200.128
+X-Mailman-Approved-At: Thu, 09 Apr 2020 09:16:10 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,304 +87,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dmitry.fleytman@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000000b0f9305a2db508f
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+This is a multi-part message in MIME format.
 
-> Do we support ipv6 segmentation then?
-No, but - if the backend supports big frames there is an issue that IPv6
-plen doesn't have valid value.
-Actually, It's a good idea to add IPv6 fragmentation - I would do it later.
+------=_NextPart_5E8F1A85_10157FA8_6D045645
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
+
+SGlTaWxpY29uIEt1bnBlbmctOTIwIENQVSBpcyBvbmUgb2YgdGhlIGNvbW1vbmx5IHVzZWQN
+CmRhdGEgY2VudGVyIENQVXMsIHRoaXMgcGF0Y2ggYWRkcyBpdCB0byB0YXJnZXQuDQoNClNp
+Z25lZC1vZmYtYnk6IFpoZW55dSBaaGVuZyA8emhlbmd6aGVueXVsaXhpQGdtYWlsLmNvbSZn
+dDsNCg0KLS0tDQombmJzcDtody9hcm0vdmlydC5jJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+Jm5ic3A7IHwmbmJzcDsgMSArDQombmJzcDt0YXJnZXQvYXJtL2NwdTY0LmMgfCAyMCArKysr
+KysrKysrKysrKysrKysrKw0KJm5ic3A7MiBmaWxlcyBjaGFuZ2VkLCAyMSBpbnNlcnRpb25z
+KCspDQoNCmRpZmYgLS1naXQgYS9ody9hcm0vdmlydC5jIGIvaHcvYXJtL3ZpcnQuYw0KaW5k
+ZXggN2RjOTZhYmY3Mi4uODQ1N2Q5ZGVlZSAxMDA2NDQNCi0tLSBhL2h3L2FybS92aXJ0LmMN
+CisrKyBiL2h3L2FybS92aXJ0LmMNCkBAIC0xOTcsNiArMTk3LDcgQEAgc3RhdGljIGNvbnN0
+IGNoYXIgKnZhbGlkX2NwdXNbXSA9IHsNCiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBBUk1f
+Q1BVX1RZUEVfTkFNRSgiY29ydGV4LWE1MyIpLA0KJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+IEFSTV9DUFVfVFlQRV9OQU1FKCJjb3J0ZXgtYTU3IiksDQombmJzcDsmbmJzcDsmbmJzcDsm
+bmJzcDsgQVJNX0NQVV9UWVBFX05BTUUoImNvcnRleC1hNzIiKSwNCismbmJzcDsmbmJzcDsm
+bmJzcDsgQVJNX0NQVV9UWVBFX05BTUUoIkt1bnBlbmctOTIwIiksDQombmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsgQVJNX0NQVV9UWVBFX05BTUUoImhvc3QiKSwNCiZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyBBUk1fQ1BVX1RZUEVfTkFNRSgibWF4IiksDQombmJzcDt9Ow0KZGlmZiAt
+LWdpdCBhL3RhcmdldC9hcm0vY3B1NjQuYyBiL3RhcmdldC9hcm0vY3B1NjQuYw0KaW5kZXgg
+NjJkMzZmOWU4ZC4uZWZlMTY3NjI2MyAxMDA2NDQNCi0tLSBhL3RhcmdldC9hcm0vY3B1NjQu
+Yw0KKysrIGIvdGFyZ2V0L2FybS9jcHU2NC5jDQpAQCAtMjUzLDYgKzI1MywyNSBAQCBzdGF0
+aWMgdm9pZCBhYXJjaDY0X2E3Ml9pbml0Zm4oT2JqZWN0ICpvYmopDQombmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsgZGVmaW5lX2FybV9jcF9yZWdzKGNwdSwgY29ydGV4X2E3Ml9hNTdfYTUz
+X2NwX3JlZ2luZm8pOw0KJm5ic3A7fQ0KJm5ic3A7DQorc3RhdGljIHZvaWQgYWFyY2g2NF9r
+dW5wZW5nXzkyMF9pbml0Zm4oT2JqZWN0ICpvYmopDQorew0KKyZuYnNwOyZuYnNwOyZuYnNw
+OyBBUk1DUFUgKmNwdSA9IEFSTV9DUFUob2JqKTsNCisNCismbmJzcDsmbmJzcDsmbmJzcDsg
+LyoNCismbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgKiBIaVNpbGljb24gS3VucGVuZy05MjAg
+Q1BVIGlzIHNpbWlsYXIgdG8gY29ydGV4LWE3MiwNCismbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsgKiBzbyBmaXJzdCBpbml0aWFsaXplIGNwdSBkYXRhIGFzIGNvcnRleC1hNzIgQ1BVLA0K
+KyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAqIGFuZCB0aGVuIHVwZGF0ZSB0aGUgY29ycmVz
+cG9uZGluZyByZWdpc3RlcnMuDQorJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICovDQorJm5i
+c3A7Jm5ic3A7Jm5ic3A7IGFhcmNoNjRfYTcyX2luaXRmbihvYmopOw0KKw0KKyZuYnNwOyZu
+YnNwOyZuYnNwOyBjcHUtJmd0O21pZHIgPSAweDQ4MGZkMDEwOw0KKyZuYnNwOyZuYnNwOyZu
+YnNwOyBjcHUtJmd0O2N0ciA9IDB4ODQ0NDgwMDQ7DQorJm5ic3A7Jm5ic3A7Jm5ic3A7IGNw
+dS0mZ3Q7aXNhci5pZF9hYTY0cGZyMCA9IDB4MTEwMDExMTE7DQorJm5ic3A7Jm5ic3A7Jm5i
+c3A7IGNwdS0mZ3Q7aXNhci5pZF9hYTY0ZGZyMCA9IDB4MTEwMzA1NDA4Ow0KKyZuYnNwOyZu
+YnNwOyZuYnNwOyBjcHUtJmd0O2lzYXIuaWRfYWE2NGlzYXIwID0gMHgxMDIxMTEyMDsNCism
+bmJzcDsmbmJzcDsmbmJzcDsgY3B1LSZndDtpc2FyLmlkX2FhNjRtbWZyMCA9IDB4MTAxMTI1
+Ow0KK30NCisNCiZuYnNwO3ZvaWQgYXJtX2NwdV9zdmVfZmluYWxpemUoQVJNQ1BVICpjcHUs
+IEVycm9yICoqZXJycCkNCiZuYnNwO3sNCiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAvKg0K
+QEAgLTc0Nyw2ICs3NjYsNyBAQCBzdGF0aWMgY29uc3QgQVJNQ1BVSW5mbyBhYXJjaDY0X2Nw
+dXNbXSA9IHsNCiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyB7IC5uYW1lID0gImNvcnRleC1h
+NTciLCZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAu
+aW5pdGZuID0gYWFyY2g2NF9hNTdfaW5pdGZuIH0sDQombmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsgeyAubmFtZSA9ICJjb3J0ZXgtYTUzIiwmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsgLmluaXRmbiA9IGFhcmNoNjRfYTUzX2luaXRmbiB9LA0K
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHsgLm5hbWUgPSAiY29ydGV4LWE3MiIsJm5ic3A7
+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IC5pbml0Zm4gPSBh
+YXJjaDY0X2E3Ml9pbml0Zm4gfSwNCismbmJzcDsmbmJzcDsmbmJzcDsgeyAubmFtZSA9ICJL
+dW5wZW5nLTkyMCIsJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
+IC5pbml0Zm4gPSBhYXJjaDY0X2t1bnBlbmdfOTIwX2luaXRmbn0sDQombmJzcDsmbmJzcDsm
+bmJzcDsmbmJzcDsgeyAubmFtZSA9ICJtYXgiLCZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyAuaW5pdGZuID0gYWFyY2g2NF9tYXhfaW5pdGZuIH0sDQombmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsgeyAubmFtZSA9IE5VTEwgfQ0KJm5ic3A7fTsNCi0tIA0KMi4yNi4w
+LndpbmRvd3MuMQ==
+
+------=_NextPart_5E8F1A85_10157FA8_6D045645
+Content-Type: text/html;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
+
+PG1ldGEgaHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIiBjb250ZW50PSJ0ZXh0L2h0bWw7IGNo
+YXJzZXQ9R0IxODAzMCI+PGRpdj5IaVNpbGljb24gS3VucGVuZy05MjAgQ1BVIGlzIG9uZSBv
+ZiB0aGUgY29tbW9ubHkgdXNlZDwvZGl2PjxkaXY+ZGF0YSBjZW50ZXIgQ1BVcywgdGhpcyBw
+YXRjaCBhZGRzIGl0IHRvIHRhcmdldC48YnI+PGJyPlNpZ25lZC1vZmYtYnk6IFpoZW55dSBa
+aGVuZyAmbHQ7emhlbmd6aGVueXVsaXhpQGdtYWlsLmNvbSZndDs8YnI+PGJyPi0tLTxicj4m
+bmJzcDtody9hcm0vdmlydC5jJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHwmbmJz
+cDsgMSArPGJyPiZuYnNwO3RhcmdldC9hcm0vY3B1NjQuYyB8IDIwICsrKysrKysrKysrKysr
+KysrKysrPGJyPiZuYnNwOzIgZmlsZXMgY2hhbmdlZCwgMjEgaW5zZXJ0aW9ucygrKTxicj48
+YnI+ZGlmZiAtLWdpdCBhL2h3L2FybS92aXJ0LmMgYi9ody9hcm0vdmlydC5jPGJyPmluZGV4
+IDdkYzk2YWJmNzIuLjg0NTdkOWRlZWUgMTAwNjQ0PGJyPi0tLSBhL2h3L2FybS92aXJ0LmM8
+YnI+KysrIGIvaHcvYXJtL3ZpcnQuYzxicj5AQCAtMTk3LDYgKzE5Nyw3IEBAIHN0YXRpYyBj
+b25zdCBjaGFyICp2YWxpZF9jcHVzW10gPSB7PGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
+OyBBUk1fQ1BVX1RZUEVfTkFNRSgiY29ydGV4LWE1MyIpLDxicj4mbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsgQVJNX0NQVV9UWVBFX05BTUUoImNvcnRleC1hNTciKSw8YnI+Jm5ic3A7Jm5i
+c3A7Jm5ic3A7Jm5ic3A7IEFSTV9DUFVfVFlQRV9OQU1FKCJjb3J0ZXgtYTcyIiksPGJyPism
+bmJzcDsmbmJzcDsmbmJzcDsgQVJNX0NQVV9UWVBFX05BTUUoIkt1bnBlbmctOTIwIiksPGJy
+PiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyBBUk1fQ1BVX1RZUEVfTkFNRSgiaG9zdCIpLDxi
+cj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgQVJNX0NQVV9UWVBFX05BTUUoIm1heCIpLDxi
+cj4mbmJzcDt9Ozxicj5kaWZmIC0tZ2l0IGEvdGFyZ2V0L2FybS9jcHU2NC5jIGIvdGFyZ2V0
+L2FybS9jcHU2NC5jPGJyPmluZGV4IDYyZDM2ZjllOGQuLmVmZTE2NzYyNjMgMTAwNjQ0PGJy
+Pi0tLSBhL3RhcmdldC9hcm0vY3B1NjQuYzxicj4rKysgYi90YXJnZXQvYXJtL2NwdTY0LmM8
+YnI+QEAgLTI1Myw2ICsyNTMsMjUgQEAgc3RhdGljIHZvaWQgYWFyY2g2NF9hNzJfaW5pdGZu
+KE9iamVjdCAqb2JqKTxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgZGVmaW5lX2FybV9j
+cF9yZWdzKGNwdSwgY29ydGV4X2E3Ml9hNTdfYTUzX2NwX3JlZ2luZm8pOzxicj4mbmJzcDt9
+PGJyPiZuYnNwOzxicj4rc3RhdGljIHZvaWQgYWFyY2g2NF9rdW5wZW5nXzkyMF9pbml0Zm4o
+T2JqZWN0ICpvYmopPGJyPit7PGJyPismbmJzcDsmbmJzcDsmbmJzcDsgQVJNQ1BVICpjcHUg
+PSBBUk1fQ1BVKG9iaik7PGJyPis8YnI+KyZuYnNwOyZuYnNwOyZuYnNwOyAvKjxicj4rJm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICogSGlTaWxpY29uIEt1bnBlbmctOTIwIENQVSBpcyBz
+aW1pbGFyIHRvIGNvcnRleC1hNzIsPGJyPismbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgKiBz
+byBmaXJzdCBpbml0aWFsaXplIGNwdSBkYXRhIGFzIGNvcnRleC1hNzIgQ1BVLDxicj4rJm5i
+c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7ICogYW5kIHRoZW4gdXBkYXRlIHRoZSBjb3JyZXNwb25k
+aW5nIHJlZ2lzdGVycy48YnI+KyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAqLzxicj4rJm5i
+c3A7Jm5ic3A7Jm5ic3A7IGFhcmNoNjRfYTcyX2luaXRmbihvYmopOzxicj4rPGJyPismbmJz
+cDsmbmJzcDsmbmJzcDsgY3B1LSZndDttaWRyID0gMHg0ODBmZDAxMDs8YnI+KyZuYnNwOyZu
+YnNwOyZuYnNwOyBjcHUtJmd0O2N0ciA9IDB4ODQ0NDgwMDQ7PGJyPismbmJzcDsmbmJzcDsm
+bmJzcDsgY3B1LSZndDtpc2FyLmlkX2FhNjRwZnIwID0gMHgxMTAwMTExMTs8YnI+KyZuYnNw
+OyZuYnNwOyZuYnNwOyBjcHUtJmd0O2lzYXIuaWRfYWE2NGRmcjAgPSAweDExMDMwNTQwODs8
+YnI+KyZuYnNwOyZuYnNwOyZuYnNwOyBjcHUtJmd0O2lzYXIuaWRfYWE2NGlzYXIwID0gMHgx
+MDIxMTEyMDs8YnI+KyZuYnNwOyZuYnNwOyZuYnNwOyBjcHUtJmd0O2lzYXIuaWRfYWE2NG1t
+ZnIwID0gMHgxMDExMjU7PGJyPit9PGJyPis8YnI+Jm5ic3A7dm9pZCBhcm1fY3B1X3N2ZV9m
+aW5hbGl6ZShBUk1DUFUgKmNwdSwgRXJyb3IgKiplcnJwKTxicj4mbmJzcDt7PGJyPiZuYnNw
+OyZuYnNwOyZuYnNwOyZuYnNwOyAvKjxicj5AQCAtNzQ3LDYgKzc2Niw3IEBAIHN0YXRpYyBj
+b25zdCBBUk1DUFVJbmZvIGFhcmNoNjRfY3B1c1tdID0gezxicj4mbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsgeyAubmFtZSA9ICJjb3J0ZXgtYTU3IiwmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgLmluaXRmbiA9IGFhcmNoNjRfYTU3X2luaXRm
+biB9LDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgeyAubmFtZSA9ICJjb3J0ZXgtYTUz
+IiwmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgLmlu
+aXRmbiA9IGFhcmNoNjRfYTUzX2luaXRmbiB9LDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsgeyAubmFtZSA9ICJjb3J0ZXgtYTcyIiwmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
+cDsmbmJzcDsmbmJzcDsmbmJzcDsgLmluaXRmbiA9IGFhcmNoNjRfYTcyX2luaXRmbiB9LDxi
+cj4rJm5ic3A7Jm5ic3A7Jm5ic3A7IHsgLm5hbWUgPSAiS3VucGVuZy05MjAiLCZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAuaW5pdGZuID0gYWFyY2g2NF9r
+dW5wZW5nXzkyMF9pbml0Zm59LDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgeyAubmFt
+ZSA9ICJtYXgiLCZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZu
+YnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAuaW5pdGZu
+ID0gYWFyY2g2NF9tYXhfaW5pdGZuIH0sPGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyB7
+IC5uYW1lID0gTlVMTCB9PGJyPiZuYnNwO307PGJyPi0tIDxicj4yLjI2LjAud2luZG93cy4x
+PGJyPjwvZGl2Pg==
+
+------=_NextPart_5E8F1A85_10157FA8_6D045645--
 
 
-On Thu, Apr 9, 2020 at 6:15 AM Jason Wang <jasowang@redhat.com> wrote:
 
->
-> On 2020/4/6 =E4=B8=8A=E5=8D=883:19, andrew@daynix.com wrote:
-> > From: Andrew Melnychenko <andrew@daynix.com>
-> >
-> > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1708065
-> > e1000e driver doesn't sets 'plen' field for IPv6 for big packets
-> > if TSO is enabled. Jumbo option isn't added yet, until
-> > qemu supports packets greater than 64K.
-> >
-> > Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
-> > ---
-> >   hw/net/e1000e_core.c |  1 +
-> >   hw/net/net_tx_pkt.c  | 31 +++++++++++++++++++++++++++++++
-> >   hw/net/net_tx_pkt.h  |  7 +++++++
-> >   include/net/eth.h    |  1 +
-> >   4 files changed, 40 insertions(+)
-> >
-> > diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-> > index d5676871fa..a1ec55598b 100644
-> > --- a/hw/net/e1000e_core.c
-> > +++ b/hw/net/e1000e_core.c
-> > @@ -656,6 +656,7 @@ e1000e_tx_pkt_send(E1000ECore *core, struct
-> e1000e_tx *tx, int queue_index)
-> >       NetClientState *queue =3D qemu_get_subqueue(core->owner_nic,
-> target_queue);
-> >
-> >       e1000e_setup_tx_offloads(core, tx);
-> > +    net_tx_pkt_fix_ip6_payload_len(tx->tx_pkt);
->
->
-> A question here:
->
-> I don't see any code that set ip6_plen during
-> net_tx_pkt_do_sw_fragmentation(). This is described in 7.3.6.2.1 and
-> 7.3.6.2.2 in the datasheet.
->
-> And:
->
-> 1) eth_setup_ip4_fragmentation() only deal with ipv4
->
-> 2) eth_fix_ip4_checksum() assumes a ipv4 header
->
-> Do we support ipv6 segmentation then?
->
-> Thanks
->
->
-> >
-> >       net_tx_pkt_dump(tx->tx_pkt);
-> >
-> > diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
-> > index 162f802dd7..b05d554ac3 100644
-> > --- a/hw/net/net_tx_pkt.c
-> > +++ b/hw/net/net_tx_pkt.c
-> > @@ -635,3 +635,34 @@ bool net_tx_pkt_send_loopback(struct NetTxPkt *pkt=
-,
-> NetClientState *nc)
-> >
-> >       return res;
-> >   }
-> > +
-> > +void net_tx_pkt_fix_ip6_payload_len(struct NetTxPkt *pkt)
-> > +{
-> > +    /*
-> > +     * If ipv6 payload length field is 0 - then there should be
-> Hop-by-Hop
-> > +     * option for packets greater than 65,535.
-> > +     * For packets with payload less than 65,535: fix 'plen' field.
-> > +     * For now, qemu drops every packet with size greater 64K
-> > +     * (see net_tx_pkt_send()) so, there is no reason to add jumbo
-> option to ip6
-> > +     * hop-by-hop extension if it's missed
-> > +     */
-> > +
-> > +    struct iovec *l2 =3D &pkt->vec[NET_TX_PKT_L2HDR_FRAG];
-> > +    if (eth_get_l3_proto(l2, 1, l2->iov_len) =3D=3D ETH_P_IPV6) {
-> > +        struct ip6_header *ip6 =3D (struct ip6_header *) pkt->l3_hdr;
-> > +        /*
-> > +         * TODO: if qemu would support >64K packets - add jumbo option
-> check
-> > +         * something like that:
-> > +         * 'if (ip6->ip6_plen =3D=3D 0 && !has_jumbo_option(ip6)) {'
-> > +         */
-> > +        if (ip6->ip6_plen =3D=3D 0) {
-> > +            if (pkt->payload_len <=3D ETH_MAX_IP_DGRAM_LEN) {
-> > +                ip6->ip6_plen =3D htons(pkt->payload_len);
-> > +            }
-> > +            /*
-> > +             * TODO: if qemu would support >64K packets
-> > +             * add jumbo option for packets greater then 65,535 bytes
-> > +             */
-> > +        }
-> > +    }
-> > +}
-> > diff --git a/hw/net/net_tx_pkt.h b/hw/net/net_tx_pkt.h
-> > index 212ecc62fc..912d56ef13 100644
-> > --- a/hw/net/net_tx_pkt.h
-> > +++ b/hw/net/net_tx_pkt.h
-> > @@ -187,4 +187,11 @@ bool net_tx_pkt_parse(struct NetTxPkt *pkt);
-> >   */
-> >   bool net_tx_pkt_has_fragments(struct NetTxPkt *pkt);
-> >
-> > +/**
-> > + * Fix IPv6 'plen' field.
-> > + *
-> > + * @pkt            packet
-> > + */
-> > +void net_tx_pkt_fix_ip6_payload_len(struct NetTxPkt *pkt);
-> > +
-> >   #endif
-> > diff --git a/include/net/eth.h b/include/net/eth.h
-> > index 7f45c678e7..0671be6916 100644
-> > --- a/include/net/eth.h
-> > +++ b/include/net/eth.h
-> > @@ -186,6 +186,7 @@ struct tcp_hdr {
-> >
-> >   #define ip6_nxt      ip6_ctlun.ip6_un1.ip6_un1_nxt
-> >   #define ip6_ecn_acc  ip6_ctlun.ip6_un3.ip6_un3_ecn
-> > +#define ip6_plen     ip6_ctlun.ip6_un1.ip6_un1_plen
-> >
-> >   #define PKT_GET_ETH_HDR(p)        \
-> >       ((struct eth_header *)(p))
->
->
-
---0000000000000b0f9305a2db508f
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div>&gt; Do we support ipv6 segmentation then?</div><div>=
-No, but - if the backend supports big frames there is an issue that IPv6 pl=
-en doesn&#39;t have valid value.</div><div>Actually, It&#39;s a good idea t=
-o add IPv6 fragmentation - I would do it later.</div><div><br></div></div><=
-br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Thu,=
- Apr 9, 2020 at 6:15 AM Jason Wang &lt;<a href=3D"mailto:jasowang@redhat.co=
-m">jasowang@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_q=
-uote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,2=
-04);padding-left:1ex"><br>
-On 2020/4/6 =E4=B8=8A=E5=8D=883:19, <a href=3D"mailto:andrew@daynix.com" ta=
-rget=3D"_blank">andrew@daynix.com</a> wrote:<br>
-&gt; From: Andrew Melnychenko &lt;<a href=3D"mailto:andrew@daynix.com" targ=
-et=3D"_blank">andrew@daynix.com</a>&gt;<br>
-&gt;<br>
-&gt; Buglink: <a href=3D"https://bugzilla.redhat.com/show_bug.cgi?id=3D1708=
-065" rel=3D"noreferrer" target=3D"_blank">https://bugzilla.redhat.com/show_=
-bug.cgi?id=3D1708065</a><br>
-&gt; e1000e driver doesn&#39;t sets &#39;plen&#39; field for IPv6 for big p=
-ackets<br>
-&gt; if TSO is enabled. Jumbo option isn&#39;t added yet, until<br>
-&gt; qemu supports packets greater than 64K.<br>
-&gt;<br>
-&gt; Signed-off-by: Andrew Melnychenko &lt;<a href=3D"mailto:andrew@daynix.=
-com" target=3D"_blank">andrew@daynix.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 =C2=A0hw/net/e1000e_core.c |=C2=A0 1 +<br>
-&gt;=C2=A0 =C2=A0hw/net/net_tx_pkt.c=C2=A0 | 31 +++++++++++++++++++++++++++=
-++++<br>
-&gt;=C2=A0 =C2=A0hw/net/net_tx_pkt.h=C2=A0 |=C2=A0 7 +++++++<br>
-&gt;=C2=A0 =C2=A0include/net/eth.h=C2=A0 =C2=A0 |=C2=A0 1 +<br>
-&gt;=C2=A0 =C2=A04 files changed, 40 insertions(+)<br>
-&gt;<br>
-&gt; diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c<br>
-&gt; index d5676871fa..a1ec55598b 100644<br>
-&gt; --- a/hw/net/e1000e_core.c<br>
-&gt; +++ b/hw/net/e1000e_core.c<br>
-&gt; @@ -656,6 +656,7 @@ e1000e_tx_pkt_send(E1000ECore *core, struct e1000e=
-_tx *tx, int queue_index)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0NetClientState *queue =3D qemu_get_subqueue(=
-core-&gt;owner_nic, target_queue);<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0e1000e_setup_tx_offloads(core, tx);<br>
-&gt; +=C2=A0 =C2=A0 net_tx_pkt_fix_ip6_payload_len(tx-&gt;tx_pkt);<br>
-<br>
-<br>
-A question here:<br>
-<br>
-I don&#39;t see any code that set ip6_plen during <br>
-net_tx_pkt_do_sw_fragmentation(). This is described in 7.3.6.2.1 and <br>
-7.3.6.2.2 in the datasheet.<br>
-<br>
-And:<br>
-<br>
-1) eth_setup_ip4_fragmentation() only deal with ipv4<br>
-<br>
-2) eth_fix_ip4_checksum() assumes a ipv4 header<br>
-<br>
-Do we support ipv6 segmentation then?<br>
-<br>
-Thanks<br>
-<br>
-<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0net_tx_pkt_dump(tx-&gt;tx_pkt);<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt; diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c<br>
-&gt; index 162f802dd7..b05d554ac3 100644<br>
-&gt; --- a/hw/net/net_tx_pkt.c<br>
-&gt; +++ b/hw/net/net_tx_pkt.c<br>
-&gt; @@ -635,3 +635,34 @@ bool net_tx_pkt_send_loopback(struct NetTxPkt *pk=
-t, NetClientState *nc)<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0return res;<br>
-&gt;=C2=A0 =C2=A0}<br>
-&gt; +<br>
-&gt; +void net_tx_pkt_fix_ip6_payload_len(struct NetTxPkt *pkt)<br>
-&gt; +{<br>
-&gt; +=C2=A0 =C2=A0 /*<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0* If ipv6 payload length field is 0 - then there =
-should be Hop-by-Hop<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0* option for packets greater than 65,535.<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0* For packets with payload less than 65,535: fix =
-&#39;plen&#39; field.<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0* For now, qemu drops every packet with size grea=
-ter 64K<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0* (see net_tx_pkt_send()) so, there is no reason =
-to add jumbo option to ip6<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0* hop-by-hop extension if it&#39;s missed<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0*/<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 struct iovec *l2 =3D &amp;pkt-&gt;vec[NET_TX_PKT_L2HDR_=
-FRAG];<br>
-&gt; +=C2=A0 =C2=A0 if (eth_get_l3_proto(l2, 1, l2-&gt;iov_len) =3D=3D ETH_=
-P_IPV6) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct ip6_header *ip6 =3D (struct ip6_he=
-ader *) pkt-&gt;l3_hdr;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* TODO: if qemu would support &gt;6=
-4K packets - add jumbo option check<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* something like that:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* &#39;if (ip6-&gt;ip6_plen =3D=3D =
-0 &amp;&amp; !has_jumbo_option(ip6)) {&#39;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (ip6-&gt;ip6_plen =3D=3D 0) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (pkt-&gt;payload_len &lt=
-;=3D ETH_MAX_IP_DGRAM_LEN) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ip6-&gt;ip6_p=
-len =3D htons(pkt-&gt;payload_len);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* TODO: if qemu would=
- support &gt;64K packets<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* add jumbo option fo=
-r packets greater then 65,535 bytes<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-&gt; +}<br>
-&gt; diff --git a/hw/net/net_tx_pkt.h b/hw/net/net_tx_pkt.h<br>
-&gt; index 212ecc62fc..912d56ef13 100644<br>
-&gt; --- a/hw/net/net_tx_pkt.h<br>
-&gt; +++ b/hw/net/net_tx_pkt.h<br>
-&gt; @@ -187,4 +187,11 @@ bool net_tx_pkt_parse(struct NetTxPkt *pkt);<br>
-&gt;=C2=A0 =C2=A0*/<br>
-&gt;=C2=A0 =C2=A0bool net_tx_pkt_has_fragments(struct NetTxPkt *pkt);<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt; +/**<br>
-&gt; + * Fix IPv6 &#39;plen&#39; field.<br>
-&gt; + *<br>
-&gt; + * @pkt=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 packet<br>
-&gt; + */<br>
-&gt; +void net_tx_pkt_fix_ip6_payload_len(struct NetTxPkt *pkt);<br>
-&gt; +<br>
-&gt;=C2=A0 =C2=A0#endif<br>
-&gt; diff --git a/include/net/eth.h b/include/net/eth.h<br>
-&gt; index 7f45c678e7..0671be6916 100644<br>
-&gt; --- a/include/net/eth.h<br>
-&gt; +++ b/include/net/eth.h<br>
-&gt; @@ -186,6 +186,7 @@ struct tcp_hdr {<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0#define ip6_nxt=C2=A0 =C2=A0 =C2=A0 ip6_ctlun.ip6_un1.ip6_=
-un1_nxt<br>
-&gt;=C2=A0 =C2=A0#define ip6_ecn_acc=C2=A0 ip6_ctlun.ip6_un3.ip6_un3_ecn<br=
->
-&gt; +#define ip6_plen=C2=A0 =C2=A0 =C2=A0ip6_ctlun.ip6_un1.ip6_un1_plen<br=
->
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0#define PKT_GET_ETH_HDR(p)=C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br=
->
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0((struct eth_header *)(p))<br>
-<br>
-</blockquote></div>
-
---0000000000000b0f9305a2db508f--
 
