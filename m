@@ -2,98 +2,115 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A459BC2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D835C2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:04:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C1AA20757
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:02:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OAVinZHh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C1AA20757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 448AC2072F
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:04:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 448AC2072F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMbVj-0005Zt-J2
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 14:02:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43618)
+	id 1jMbXL-000761-F8
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 14:04:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43805)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jMbUh-0004Re-LU
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:01:40 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jMbVi-0005nk-GP
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:02:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jMbUg-0001BS-KU
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:01:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36612
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jMbUg-0001Au-GE
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:01:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586455298;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=F5U6sFpx2dH/GaJD3694bYIhd8KMdcHVrUQFq/q+enY=;
- b=OAVinZHhMZBMvnWdqfVC+tra6tIXCFB54ldpUuRl+dpYJWOKSBvk4BqugpSE9WzZx0ye+M
- hncMFN/V7iUrY4xkGQ0rar03FMX+367Zce/RNXTMeekUgiAgRc0L6HIEjQLIxeLEhWZpSJ
- 75ZoD7ewXRNLZHIJGGkvBqXcJLwAa/I=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-45-oUWP4OLvPQ2pwaTGKLC4hw-1; Thu, 09 Apr 2020 14:01:36 -0400
-X-MC-Unique: oUWP4OLvPQ2pwaTGKLC4hw-1
-Received: by mail-wm1-f69.google.com with SMTP id w8so413726wmk.5
- for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 11:01:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=XerKs3Mbx2b79V0d+hgonl7siBG/nHxzL60tiDiMwjg=;
- b=U/wrOSYpL1uM1QpAXTDGrNvj0H3NSAZn2W1pqveJUIIJgqN2bLIKWW37nMo8boGptx
- 11rK219FM334QyU45LgrKL+cqPFrYvOl+zt8SAMrC1y3p4PG1RuAQfE0LF6pXUqYDm1q
- kMJx8fi+9bS5/5W7hBUG3sYA0eeOTwO4+F6cp2Q48y4gT9kgY+EPi3S5b0/Nt19Y1uxs
- s+s+q567Zgt3URKj4ES2h4htdxLWFnvEolXuHZXVPimkxiSSQUGev9EqMCqZsqntcgvV
- k0dulpTgtm6psZf3MMZ0yhFSGJP05JEj3J35wyAR9QCWLwTpXfOS0WOZERH+2bVubeUs
- 5d4g==
-X-Gm-Message-State: AGi0PuaeY/5B7mkqqBUo1XPBsTXH+m+Gl5EYwRQ8mq2K+8yprA5E0XD1
- HviqEcYshoD0kgk2kn+x//y+yGLpgPFFumkQ+NoIYUsfvyQD9CBC34cqlCYM7lk0Ezi9iGt0lh6
- Kv1orsVSFT4C3MU4=
-X-Received: by 2002:a1c:4d18:: with SMTP id o24mr948848wmh.141.1586455295057; 
- Thu, 09 Apr 2020 11:01:35 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIsQkT3VQAHQmBNuMcQg/sSOd45W00HdXZKoeNtTZDLkoWhfqqFiye3VgiJ0KRxKX+yAvTTAw==
-X-Received: by 2002:a1c:4d18:: with SMTP id o24mr948827wmh.141.1586455294786; 
- Thu, 09 Apr 2020 11:01:34 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id c190sm4649081wme.10.2020.04.09.11.01.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 09 Apr 2020 11:01:34 -0700 (PDT)
-Date: Thu, 9 Apr 2020 14:01:30 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 2/2] gdbstub: i386: Fix gdb_get_reg16() parameter to
- unbreak gdb
-Message-ID: <20200409180130.GA10061@xz-x1>
-References: <20200409164954.36902-1-peterx@redhat.com>
- <20200409164954.36902-3-peterx@redhat.com>
- <b559bedc-c6d7-922b-35fd-96ac4f068d9b@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1jMbVh-0001sT-GV
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:02:42 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:46049)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jMbVh-0001rk-82
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:02:41 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MFbeI-1jVwl340kw-00H6Pi; Thu, 09 Apr 2020 20:02:36 +0200
+Subject: Re: [PATCH-for-5.0] target/m68k/helper: Fix m68k_fpu_gdb_get_reg()
+ use of GByteArray
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200409172509.4078-1-philmd@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
+ dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
+ CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
+ ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
+ HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
+ rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
+ jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
+ NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
+ WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
+ lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
+ BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
+ gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
+ +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
+ rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
+ 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
+ wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
+ ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
+ d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
+ 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
+ tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
+ inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
+ 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
+ VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
+ US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
+ w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
+ FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
+ hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
+ ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
+ ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
+ OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
+ JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
+ ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
+Message-ID: <3698980f-1fb0-a62c-a274-6f81ff5d5e29@vivier.eu>
+Date: Thu, 9 Apr 2020 20:02:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <b559bedc-c6d7-922b-35fd-96ac4f068d9b@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200409172509.4078-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:xJ1ISTE6IVLTUZl1XrXvb5bjXQ/sJS+PfPgvhKRPGX0UU7BU21b
+ M3qYV6xb/sUbiB5hppohjeBf40UtQEnw5Hx6Kk0swpsYAoax1WM3PxiMN16Nua73zA3QqzH
+ dz7NBz7JxJspi7phjVbBnCXv8S5M0PcbyBJOkgcIPl291gsUr0lxKf50pIIOf9+omrAGCnv
+ LhZ9mSftMIbRp/IcS2Ytw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:2SAm6bXEVYM=:+34HGDRGVemw7U3CjWI05M
+ k+ZVH8FQCc793lPcK7et5QO/gGs6kxhoYUexfdm2zRGkvqpYRyTwMTjdBYJucujl73GozgQ/+
+ nTzO0MjilKBldL/4YI36LM8f8ysIOWUnz5fBI9MK5xmxiI80WNmnelBA2RGWDYj12KNjwXNUl
+ jg0UjLaFP52uo7d/wPSuxm5l5VVZjUEI4/uPuKe3ql1ryKkRXRfImFOQsO1RKe9I4QT1AnaJn
+ U0NcnVC5jhyFEnGq4/AEyEy4zIAhwVImRtiz5X+4yANMg08PnmCLlMW+kTO+O3qeBtFz78vBZ
+ f7baCKxYJVEcyAyCRxrMYR/MjSTyj3tuJsYYyzo0sAV7YmuhCVJ6AvxOY3xcSRFi1LGJvIslm
+ b0dhwYseSyupecm4lbqXM78N89184rMXDaeSUVVi4nqJURcPwq+w3dn/jFLEgJBnPLeo518ZM
+ xmNW8J+aCD/aVViaHEJyIn3XGP0YW4XfGLTIydmhSKXPmwlEkR5+is7h5jOKp6s9oMzvueLtt
+ CUxLlSEEMDV1MHrEuBjH7kDMesQ8y0FHJFuO12Qxyb2mIvselu8XWJW5u2rh34Jalp8LiDZk+
+ iSksMhFIGBlqJu1Mm+bsgB2/I29vJervQcmSfrQI+dMa4WYUSfVBJNtpEor7VjMUKe6ezBbgx
+ L7tQbvPK4ZDjrKhyS0wZ5TqgZQN3w/2J2fDoQAVnzlT+7HJXAy8ewBjnngjO+GfkFluFYxJUD
+ f/1+1ua9UqS0KBgP8jSkKN5n/AGHjkr79oL/asctiEQm/2RJX6TUBOkldpZHRA5N+bnHY4C6Q
+ vbmhlVAw6UA6IVlBO8JRsoSd19RngA4Gqu7gwlGdPHgVOTXQ/o3E4laruKBueKyUPcit2DV
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,39 +122,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Peter Xu <peterx@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Phil,
-
-On Thu, Apr 09, 2020 at 07:21:04PM +0200, Philippe Mathieu-Daud=C3=A9 wrote=
-:
-> On 4/9/20 6:49 PM, Peter Xu wrote:
-> > We should only pass in gdb_get_reg16() with the GByteArray* object
-> > itself, no need to shift.  Without this patch, gdb remote attach will
-> > crash QEMU.
->=20
-> You are correct.
->=20
+Le 09/04/2020 à 19:25, Philippe Mathieu-Daudé a écrit :
+> Since a010bdbe719 the gdbstub API takes a GByteArray*.
+> Unfortunately we forgot to update the gdb_get_reg*()
+> calls.  Do it now.
+> 
 > Fixes: a010bdbe719 ("extend GByteArray to read register helpers")
+> Reported-by: Peter Xu <peterx@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> Based-on: <20200409164954.36902-1-peterx@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  target/m68k/helper.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+> index 014657c637..cad4083895 100644
+> --- a/target/m68k/helper.c
+> +++ b/target/m68k/helper.c
+> @@ -109,8 +109,8 @@ static int m68k_fpu_gdb_get_reg(CPUM68KState *env, GByteArray *mem_buf, int n)
+>  {
+>      if (n < 8) {
+>          int len = gdb_get_reg16(mem_buf, env->fregs[n].l.upper);
+> -        len += gdb_get_reg16(mem_buf + len, 0);
+> -        len += gdb_get_reg64(mem_buf + len, env->fregs[n].l.lower);
+> +        len += gdb_get_reg16(mem_buf, 0);
+> +        len += gdb_get_reg64(mem_buf, env->fregs[n].l.lower);
+>          return len;
+>      }
+>      switch (n) {
+> 
 
-Oh I forgot to paste the fix line.  However, is it b7b8756a9c
-("target/i386: use gdb_get_reg helpers", 2020-03-17) instead?
-
->=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Thanks!
-
->=20
-> Same problem in m68k_fpu_gdb_get_reg().
->=20
-> TODO for 5.1, rename mem_buf -> array.
-
---=20
-Peter Xu
-
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
