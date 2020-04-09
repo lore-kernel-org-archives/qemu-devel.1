@@ -2,89 +2,97 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3CA5C2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C33C2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:54:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0ACE206C0
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:54:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B447206C0
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:54:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="HaJLcDIa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0ACE206C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pcq74WUI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B447206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMcJg-0004om-Rx
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 14:54:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54489)
+	id 1jMcJt-0005Ae-6l
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 14:54:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54509)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounce+347305.be9e4a-qemu-devel=nongnu.org@mg.codeaurora.org>)
- id 1jMcIy-0004CC-AU
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:53:37 -0400
+ (envelope-from <peterx@redhat.com>) id 1jMcJB-0004Ld-1A
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:53:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounce+347305.be9e4a-qemu-devel=nongnu.org@mg.codeaurora.org>)
- id 1jMcIw-0003AE-Ux
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:53:35 -0400
-Received: from mail27.static.mailgun.info ([104.130.122.27]:43214)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71)
- (envelope-from <bounce+347305.be9e4a-qemu-devel=nongnu.org@mg.codeaurora.org>)
- id 1jMcIs-00038y-Uq
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:53:34 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org;
- q=dns/txt; 
- s=smtp; t=1586458414; h=Content-Transfer-Encoding: Content-Type:
- MIME-Version: Message-ID: Date: Subject: In-Reply-To: References: Cc:
- To: From: Reply-To: Sender;
- bh=+fX/Jt3dORws/u2PQTPifRK9AmPx8ihEQA9JT1bOKZc=;
- b=HaJLcDIa1OV/Hu2qi6hRGiUW41hR8GHsvMGelgi+Bk2Gw52slzmEr830zJzdI6ygxaNLba/k
- 1pIqmLOyCpo6rBguB++xLtxNhX7gDoLVZIOCiTnBHgJvU/s6JP2q8Q4U9S4RP6WsB7IAaQ10
- MI1Cd85W/8F+m6lHwtRhbLKzshI=
-X-Mailgun-Sending-Ip: 104.130.122.27
-X-Mailgun-Sid: WyIxNGFmMSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiYmU5ZTRhIl0=
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
- by mxa.mailgun.org with ESMTP id 5e8f6f1d.7f231fcfb4c8-smtp-out-n04;
- Thu, 09 Apr 2020 18:53:17 -0000 (UTC)
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
- id ADE6DC43636; Thu,  9 Apr 2020 18:53:16 +0000 (UTC)
-Received: from BCAIN (104-54-226-75.lightspeed.austtx.sbcglobal.net
- [104.54.226.75])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested) (Authenticated sender: bcain)
- by smtp.codeaurora.org (Postfix) with ESMTPSA id 1110CC433D2;
- Thu,  9 Apr 2020 18:53:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 1110CC433D2
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org;
- dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org;
- spf=none smtp.mailfrom=bcain@codeaurora.org
-From: "Brian Cain" <bcain@codeaurora.org>
-To: "'Taylor Simpson'" <tsimpson@quicinc.com>,
-	<qemu-devel@nongnu.org>
-References: <1582908244-304-1-git-send-email-tsimpson@quicinc.com>
- <1582908244-304-21-git-send-email-tsimpson@quicinc.com>
-In-Reply-To: <1582908244-304-21-git-send-email-tsimpson@quicinc.com>
-Subject: RE: [RFC PATCH v2 20/67] Hexagon instruction utility functions
-Date: Thu, 9 Apr 2020 13:53:13 -0500
-Message-ID: <094101d60ea0$204c0ee0$60e42ca0$@codeaurora.org>
+ (envelope-from <peterx@redhat.com>) id 1jMcJ9-0003EG-C5
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:53:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37444
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jMcJ9-0003E2-4X
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:53:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586458426;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aYV4uTplYMAq8KuYDV68hAEaDjLoqvdKwWRFKBvfSsI=;
+ b=Pcq74WUIxI8ZyxmgzK/msKZPqhzFgPJdjaVzK160AlNZeu8M7KxBXKf+RGcXNpSe9Vr68q
+ i3OMAlipF4+EWBC+WjvLwAZdv7QeeqJA6D1Zwfp9Po5AuPx7esmFzv2dZRK7F/LL8qQ0Zl
+ zG3jgN1utfdJ/v8eJa0tacMIGk/F8fk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-456-ZVoxWenSN529kwrAMgJTbw-1; Thu, 09 Apr 2020 14:53:44 -0400
+X-MC-Unique: ZVoxWenSN529kwrAMgJTbw-1
+Received: by mail-wr1-f70.google.com with SMTP id o10so7048052wrj.7
+ for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 11:53:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=62KN7G64tPZWKHEdlakQ9hbfUlW8qTH35Q5STcBfFZ4=;
+ b=PgANu+ALsKLAlrjol57sAWzQyb11/XBzsHKahyKV6sE6HSn2NXJya3qZdVitKVU669
+ p9j7QI4FewLqjihZcqN8T0AP6JaDd5l4mIs2zxCzUmsq5MEbTPdXQn+4dHEaJ//eefF9
+ v9IMAV5h5ehJDK3XAILZkuxQ9tvgFsurvkyg1jvAqgrk9ci2NUIghI8Cv1vuN4eH2hPU
+ L5ylW5Mw1CasITdK4dK7ag++cAnxLE4P/GAJZRWUMnuvRi39oeUbn0bRA/cFU7H/MXB0
+ wPDVdGejSk5QOOhEKsskK+ZbFmrnamWGkl8anrC8lxx8mdtHCiuT8AoZaYNzS8bsjW0S
+ IFwA==
+X-Gm-Message-State: AGi0PubL5Vnimm2N52SAklv/hrovH0PzM6i7Zoif/UFtlgF22K+Jo+pA
+ FWwiaP64qG+X63cpGzOl6b0g5THcd9UCFgYVhsQODyJAbrltxYujMchnu9YfAPYjPCDOepccSn6
+ T5OhjjuyWGe2LkhE=
+X-Received: by 2002:adf:eed1:: with SMTP id a17mr525527wrp.287.1586458423707; 
+ Thu, 09 Apr 2020 11:53:43 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLms8/SxvUhF4AAHQlacvPXscWOESP//mkOhGlSyFQkDSkXeUqcxzvqEDah1C4yOb1XIb78uA==
+X-Received: by 2002:adf:eed1:: with SMTP id a17mr525516wrp.287.1586458423536; 
+ Thu, 09 Apr 2020 11:53:43 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id c190sm4814039wme.10.2020.04.09.11.53.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 09 Apr 2020 11:53:43 -0700 (PDT)
+Date: Thu, 9 Apr 2020 14:53:39 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Subject: Re: [PATCH-for-5.0] target/m68k/helper: Fix m68k_fpu_gdb_get_reg()
+ use of GByteArray
+Message-ID: <20200409185339.GB40299@xz-x1>
+References: <20200409172509.4078-1-philmd@redhat.com>
+ <20200409182215.GA40299@xz-x1>
+ <92ba02b2-1bad-9f97-a931-2270b9c3508d@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
+In-Reply-To: <92ba02b2-1bad-9f97-a931-2270b9c3508d@vivier.eu>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: en-us
-Thread-Index: AQJgtZ7g3UB8eJn6k76/Xfeqryq/RADn8twSp1SDK5A=
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 104.130.122.27
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,38 +104,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: bcain@codeaurora.org
-Cc: philmd@redhat.com, riku.voipio@iki.fi, richard.henderson@linaro.org,
- laurent@vivier.eu, aleksandar.m.mail@gmail.com
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Qemu-devel <qemu-devel-
-> bounces+bcain=3Dcodeaurora.org@nongnu.org> On Behalf Of Taylor Simpson
-> Sent: Friday, February 28, 2020 10:43 AM
-> To: qemu-devel@nongnu.org
-> Cc: riku.voipio@iki.fi; richard.henderson@linaro.org; =
-laurent@vivier.eu;
-> Taylor Simpson <tsimpson@quicinc.com>; philmd@redhat.com;
-> aleksandar.m.mail@gmail.com
-> Subject: [RFC PATCH v2 20/67] Hexagon instruction utility functions
-...
-> +int arch_sf_invsqrt_common(size4s_t *Rs, size4s_t *Rd, int *adjust)
-> +{
-...
-> +    } else if (r_class =3D=3D FP_INFINITE) {
-> +        /* EJP: or put Inf in num fixup? */
-> +        RsV =3D fSFINFVAL(-1);
-> +        RdV =3D fSFINFVAL(-1);
-> +    } else if (r_class =3D=3D FP_ZERO) {
-> +        /* EJP: or put zero in num fixup? */
-> +        RsV =3D RsV;
-> +        RdV =3D fSFONEVAL(0);
-...
+On Thu, Apr 09, 2020 at 08:36:22PM +0200, Laurent Vivier wrote:
+> Le 09/04/2020 =C3=A0 20:22, Peter Xu a =C3=A9crit=C2=A0:
+> > On Thu, Apr 09, 2020 at 07:25:08PM +0200, Philippe Mathieu-Daud=C3=A9 w=
+rote:
+> >> Since a010bdbe719 the gdbstub API takes a GByteArray*.
+> >> Unfortunately we forgot to update the gdb_get_reg*()
+> >> calls.  Do it now.
+> >>
+> >> Fixes: a010bdbe719 ("extend GByteArray to read register helpers")
+> >=20
+> > Should this be instead 462474d760 ("target/m68k: use gdb_get_reg
+> > helpers", 2020-03-17)?
+>=20
+> No, this one is correct because it uses an "uint8_t *", then a010bdbe719
+> changed this to a GByteArray and didn't remove the "+ len".
 
-This "RsV =3D RsV" looks like a logic error?  Presumably it's safe to =
-remove -- unless there's some other field that should get initialized =
-here?  PeV maybe?
+Ah right...
+
+--=20
+Peter Xu
+
 
