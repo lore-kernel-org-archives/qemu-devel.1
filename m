@@ -2,126 +2,121 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EED6AC2D0EA
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:45:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09CD1C2D0EA
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:51:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5EBC20678
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:45:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B620B20678
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:51:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M2RytW3m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5EBC20678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Vl2tdkYP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B620B20678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMRsG-0006Pv-Uc
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 03:45:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44374)
+	id 1jMRyX-0000qk-VK
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 03:51:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jMRre-0005rB-VJ
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:44:44 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jMRxp-0000LL-78
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:51:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jMRrc-0004pA-MC
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:44:41 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36038)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jMRrc-0004p1-FX
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:44:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586418279;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=vwugBdRhNP0lTgVzwR3TeYVEMaLMR0nhi+PjF3CRxgE=;
- b=M2RytW3m1xlrvV8G0aB5iKz7Tag3+vjDqaKzYL6i9v8Ivd3t9UvZeFwxCAlXk/oDBu/bXG
- 9Dic4XyUEDTHlYcxiJpLQDT+VyOS5vhBRr7BFZLmCefoUHYMDsY6L25YzU9oOdZODi0RsS
- UgiwhNpfQL/VmnBiEIII/crQSS7Kbzc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-12-sX2JtbeTMGCGRQ8ghUdmDw-1; Thu, 09 Apr 2020 03:44:37 -0400
-X-MC-Unique: sX2JtbeTMGCGRQ8ghUdmDw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F3C0DB61;
- Thu,  9 Apr 2020 07:44:36 +0000 (UTC)
-Received: from [10.36.113.222] (ovpn-113-222.ams2.redhat.com [10.36.113.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1DB3C1001B07;
- Thu,  9 Apr 2020 07:44:31 +0000 (UTC)
-Subject: Re: [PATCH v18 QEMU 3/3] virtio-balloon: Provide a interface for free
- page reporting
-To: Alexander Duyck <alexander.duyck@gmail.com>, mst@redhat.com
-References: <20200408225302.18764.209.stgit@localhost.localdomain>
- <20200408225529.18764.44086.stgit@localhost.localdomain>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <06ac44b9-77ae-7686-8a65-7edff2cbf1b7@redhat.com>
-Date: Thu, 9 Apr 2020 09:44:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200408225529.18764.44086.stgit@localhost.localdomain>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jMRxn-00078B-UE
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:51:05 -0400
+Received: from mail-eopbgr00123.outbound.protection.outlook.com
+ ([40.107.0.123]:57406 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jMRxi-00076C-T3; Thu, 09 Apr 2020 03:50:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jMhbbopmcKeS6uAWNQLiir3lOqe/XFwaBJOqZlJY9BMXiWLA+Pq2zJYYHPTZ+ItMVrcgJFtPaIv5PboqxAeuI0GWqiganlM+8965wd4oSP6tNo/D1YCiiqZSfPfoEYMRNOJe9ARJBGEC5t96JeBIhZl72EuzGj1xF1bj3UPmE5sp+cqWwsV8MiBjNtll87MT+ViIW9lA42nEqhcyFvLO7R+PRrIuaeSiobYhiMFByHPSZep0wZ5uXjWgPLxteBleTP/yShiXiqr/t4ay99UlPnR0rlZOiS8IiD+FhuNkRrN7TEiwpYFfk/YZAquGChaxgMSOlh47RfmNxMj2m+kC7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=33NLVpuyA9gf0SqIKYH7LutKZQvXm8+O4QKYygWxsoQ=;
+ b=meIieLNdLBrCvKp5gkDzTfMVn0ifN8l9JcouvlMtMTqxBAVJCbYzfnxfeVQjOdph+uqxwVamrE5J82z+Ou75VDapBlIxGZFB5NvIrL5Bt8QCwz/mcgGndL2bRLEBzFi+aIPpXPlTt6PDJMTRFvBjIqeONdkM9nvAYGKRIAkcLGXCGTrlXbt3Pyx7ZtG24YNbmbM5PVuBbEh8MasZ346ovgri9e1nvPNlsRsX4G1lPLoaPdLX0JDav1idJA1rGAlTmi8ABzyq1d3U0xGFyrJ9aZ2dtxskxdB51UF/e0xhNLNtCFIfgnnPT5G8Inni1ihJBpI3tNvtnGUV2MAWQwSH7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=33NLVpuyA9gf0SqIKYH7LutKZQvXm8+O4QKYygWxsoQ=;
+ b=Vl2tdkYPIEmVPGy242xARzVCQq6aJCWkFSJvWfp8RnpGAulAfS3QfndjRTUPnNrTQUChhjEGdRoteallsJGiaZpcEYxdIT8oS/mrhW6NCiP8bHp/lDdl6rmgNWIp5M9W1ousrUySoOxf4f5r8Z1Fy0wSIJzLGeWqxtRHo3sSx5g=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5448.eurprd08.prod.outlook.com (2603:10a6:20b:106::10)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.20; Thu, 9 Apr
+ 2020 07:50:54 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.2900.015; Thu, 9 Apr 2020
+ 07:50:54 +0000
+Subject: Re: [PATCH v4 02/30] qcow2: Convert qcow2_get_cluster_offset() into
+ qcow2_get_host_offset()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1584468723.git.berto@igalia.com>
+ <65243debd4a41e1ebd13877c2e6c665759c37b38.1584468723.git.berto@igalia.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200409105052838
+Message-ID: <71d9c655-90c9-f22d-a640-12551ac690a6@virtuozzo.com>
+Date: Thu, 9 Apr 2020 10:50:52 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <65243debd4a41e1ebd13877c2e6c665759c37b38.1584468723.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM6P191CA0028.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:209:8b::41) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.186) by
+ AM6P191CA0028.EURP191.PROD.OUTLOOK.COM (2603:10a6:209:8b::41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2900.15 via Frontend Transport; Thu, 9 Apr 2020 07:50:53 +0000
+X-Tagtoolbar-Keys: D20200409105052838
+X-Originating-IP: [185.215.60.186]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 708f4ff7-b1a9-44c0-6490-08d7dc5abb58
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5448:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB54486A5D6A563B1E6E7A56EFC1C10@AM7PR08MB5448.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2331;
+X-Forefront-PRVS: 0368E78B5B
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(346002)(39840400004)(376002)(396003)(136003)(366004)(478600001)(8936002)(16576012)(5660300002)(8676002)(6486002)(26005)(956004)(16526019)(81156014)(2616005)(186003)(54906003)(66556008)(66946007)(316002)(2906002)(66476007)(31696002)(4326008)(81166007)(107886003)(36756003)(52116002)(31686004)(86362001);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: HmYq85BpGSoXdYbjAIUbIR1J8JSEkfqg2tkYK3KM99oXhx1oHBA1NWE3s0EHKrbpw+q2lzstuoB9chwee4y4mPGj+QfSpwVkCmdQQI1nj31rjhyef5bCIMMBIuJkbWiGPs/v4bBMGuarZfrTiuZONC8NMsNeAzmRnQSFNOqoUiT7GiKaKcwfRQgvaTbxRRUoQ/YWBpL/bLNY6QTeM3q530l8EHefcji/OM9ELdN0sklGgcUbz+OJBKHHzc+dDfGReH2lUeIfN5ZiJI56UbIHEQ8bSti4lCp7n8XADNysKw1EId7OQ975vO91pEnaeY00m8PdpMu+uRxDUKtrh7nL2/V7UL4ZwEylIgV5/sDboW83N/1gQLoRxzaFSca8eY9vuXxDRym9xHfXspf8pO7t38EifI/kaE5W4HQcV2IT+V8/xUsrYKEs2IeEpYgS5Zhf
+X-MS-Exchange-AntiSpam-MessageData: G8A99SCmv6R/xqPRidVYCEg0hCy/yAGYRUSg4Psv1XdP9R0UdaZoux6+0qel/6OB5WtYj/K003yl185XnNTEh2LPWnApc2ONH8PlrlWq1JzMNN+DFJbfLBBRvEUoev3nkjC2qPkRJ3pbwDX+Jn+sBw==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 708f4ff7-b1a9-44c0-6490-08d7dc5abb58
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2020 07:50:54.7431 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iL2Dc1FFuqxscJdraoXsSLPxotTzVlPI2dP1sjrJUJi+8Uwcc4Xs5RcQUPXtocvrLr2jXfuzioKjExgzoqExJZzboqJsZekoN9dVvTsADpg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5448
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.0.123
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,124 +128,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09.04.20 00:55, Alexander Duyck wrote:
-> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
->=20
-> Add support for what I am referring to as "free page reporting".
+17.03.2020 21:15, Alberto Garcia wrote:
+> qcow2_get_cluster_offset() takes an (unaligned) guest offset and
+> returns the (aligned) offset of the corresponding cluster in the qcow2
+> image.
+> 
+> In practice none of the callers need to know where the cluster starts
+> so this patch makes the function calculate and return the final host
+> offset directly. The function is also renamed accordingly.
 
-"Add support for "free page reporting".
+Great that you rename functions and variables which change their behavior, it simplifies reviewing!
 
-> Basically the idea is to function very similar to how the balloon works
-> in that we basically end up madvising the page as not being used. However
+> 
+> There is a pre-existing exception with compressed clusters: in this
+> case the function returns the complete cluster descriptor (containing
+> the offset and size of the compressed data). This does not change with
+> this patch but it is now documented.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 
-I'd get rid of one "basically".
+[..]
 
-> we don't really need to bother with any deflate type logic since the page
-> will be faulted back into the guest when it is read or written to.
->=20
-> This is meant to be a simplification of the existing balloon interface
-> to use for providing hints to what memory needs to be freed. I am assumin=
-g
+> -int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+> -                             unsigned int *bytes, uint64_t *cluster_offset)
+> +int qcow2_get_host_offset(BlockDriverState *bs, uint64_t offset,
+> +                          unsigned int *bytes, uint64_t *host_offset)
+>   {
+>       BDRVQcow2State *s = bs->opaque;
+>       unsigned int l2_index;
+> -    uint64_t l1_index, l2_offset, *l2_slice;
+> +    uint64_t l1_index, l2_offset, *l2_slice, l2_entry;
+>       int c;
+>       unsigned int offset_in_cluster;
+>       uint64_t bytes_available, bytes_needed, nb_clusters;
+> @@ -537,7 +542,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+>           bytes_needed = bytes_available;
+>       }
+>   
+> -    *cluster_offset = 0;
+> +    *host_offset = 0;
+>   
+>       /* seek to the l2 offset in the l1 table */
+>   
+> @@ -570,7 +575,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+>       /* find the cluster offset for the given disk offset */
+>   
+>       l2_index = offset_to_l2_slice_index(s, offset);
+> -    *cluster_offset = be64_to_cpu(l2_slice[l2_index]);
+> +    l2_entry = be64_to_cpu(l2_slice[l2_index]);
+>   
+>       nb_clusters = size_to_clusters(s, bytes_needed);
+>       /* bytes_needed <= *bytes + offset_in_cluster, both of which are unsigned
+> @@ -578,7 +583,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+>        * true */
+>       assert(nb_clusters <= INT_MAX);
+>   
+> -    type = qcow2_get_cluster_type(bs, *cluster_offset);
+> +    type = qcow2_get_cluster_type(bs, l2_entry);
+>       if (s->qcow_version < 3 && (type == QCOW2_CLUSTER_ZERO_PLAIN ||
+>                                   type == QCOW2_CLUSTER_ZERO_ALLOC)) {
+>           qcow2_signal_corruption(bs, true, -1, -1, "Zero cluster entry found"
+> @@ -599,41 +604,42 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+>           }
+>           /* Compressed clusters can only be processed one by one */
+>           c = 1;
+> -        *cluster_offset &= L2E_COMPRESSED_OFFSET_SIZE_MASK;
+> +        *host_offset = l2_entry & L2E_COMPRESSED_OFFSET_SIZE_MASK;
+>           break;
+>       case QCOW2_CLUSTER_ZERO_PLAIN:
+>       case QCOW2_CLUSTER_UNALLOCATED:
+>           /* how many empty clusters ? */
+>           c = count_contiguous_clusters_unallocated(bs, nb_clusters,
+>                                                     &l2_slice[l2_index], type);
+> -        *cluster_offset = 0;
+> +        *host_offset = 0;
 
-It's not really a simplification, it's something new. It's a new way of
-letting the guest automatically report free pages to the hypervisor, so
-the hypervisor can reuse them. In contrast to inflate/deflate, that's
-triggered via the hypervisor explicitly.
+Actually, dead assignment now.. But I feel that better to keep it.
 
-> this is safe to do as the deflate logic does not actually appear to do ve=
-ry
-> much other than tracking what subpages have been released and which ones
-> haven't.
+Hmm. May be, drop the first assignment of zero to host_offset? We actually don't need it, user should not rely on host_offset if we return an error.
 
-"I assume this is safe" does not sound very confident. Can we just drop
-the last sentence?
+>           break;
+>       case QCOW2_CLUSTER_ZERO_ALLOC:
+>       case QCOW2_CLUSTER_NORMAL:
+>           /* how many allocated clusters ? */
+>           c = count_contiguous_clusters(bs, nb_clusters, s->cluster_size,
+>                                         &l2_slice[l2_index], QCOW_OFLAG_ZERO);
+> -        *cluster_offset &= L2E_OFFSET_MASK;
+> -        if (offset_into_cluster(s, *cluster_offset)) {
+> +        *host_offset = l2_entry & L2E_OFFSET_MASK;
+> +        if (offset_into_cluster(s, *host_offset)) {
+>               qcow2_signal_corruption(bs, true, -1, -1,
+>                                       "Cluster allocation offset %#"
+>                                       PRIx64 " unaligned (L2 offset: %#" PRIx64
+> -                                    ", L2 index: %#x)", *cluster_offset,
+> +                                    ", L2 index: %#x)", *host_offset,
+>                                       l2_offset, l2_index);
+>               ret = -EIO;
+>               goto fail;
+>           }
+> -        if (has_data_file(bs) && *cluster_offset != offset - offset_in_cluster)
 
->=20
-> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> ---
->  hw/virtio/virtio-balloon.c         |   48 ++++++++++++++++++++++++++++++=
-+++++-
->  include/hw/virtio/virtio-balloon.h |    2 +-
->  2 files changed, 47 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index 1c6d36a29a04..297b267198ac 100644
-> --- a/hw/virtio/virtio-balloon.c
-> +++ b/hw/virtio/virtio-balloon.c
-> @@ -321,6 +321,42 @@ static void balloon_stats_set_poll_interval(Object *=
-obj, Visitor *v,
->      balloon_stats_change_timer(s, 0);
->  }
-> =20
-> +static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *=
-vq)
-> +{
-> +    VirtIOBalloon *dev =3D VIRTIO_BALLOON(vdev);
-> +    VirtQueueElement *elem;
-> +
-> +    while ((elem =3D virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
-> +        unsigned int i;
-> +
-> +        for (i =3D 0; i < elem->in_num; i++) {
-> +            void *addr =3D elem->in_sg[i].iov_base;
-> +            size_t size =3D elem->in_sg[i].iov_len;
-> +            ram_addr_t ram_offset;
-> +            size_t rb_page_size;
-> +            RAMBlock *rb;
-> +
-> +            if (qemu_balloon_is_inhibited() || dev->poison_val) {
-> +                continue;
-> +            }
+[..]
 
-These checks are not sufficient. See virtio_balloon_handle_output(),
-where we e.g., check that somebody doesn't try to discard the bios.
+> @@ -3735,7 +3726,7 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+>           offset = QEMU_ALIGN_DOWN(offset, s->cluster_size);
+>           bytes = s->cluster_size;
 
-Maybe we can factor our/unify the handling in both code paths.
+Unrelated to the patch, but.. Why we change bytes?? So, we can finish with success, but zero-out only first cluster?
 
-> +
-> +            rb =3D qemu_ram_block_from_host(addr, false, &ram_offset);
-> +            rb_page_size =3D qemu_ram_pagesize(rb);
-> +
-> +            /* For now we will simply ignore unaligned memory regions */
-> +            if ((ram_offset | size) & (rb_page_size - 1)) {
+Ah, found, generic block-layer take care of it and never issue unaligned requests crossing cluster boundary.
 
-"!QEMU_IS_ALIGNED()" please to make this easier to read.
+>           nr = s->cluster_size;
+> -        ret = qcow2_get_cluster_offset(bs, offset, &nr, &off);
+> +        ret = qcow2_get_host_offset(bs, offset, &nr, &off);
+>           if (ret != QCOW2_CLUSTER_UNALLOCATED &&
+>               ret != QCOW2_CLUSTER_ZERO_PLAIN &&
+>               ret != QCOW2_CLUSTER_ZERO_ALLOC) {
+> @@ -3800,7 +3791,7 @@ qcow2_co_copy_range_from(BlockDriverState *bs,
+>           cur_bytes = MIN(bytes, INT_MAX);
+>           cur_write_flags = write_flags;
+>   
+> -        ret = qcow2_get_cluster_offset(bs, src_offset, &cur_bytes, &copy_offset);
+> +        ret = qcow2_get_host_offset(bs, src_offset, &cur_bytes, &copy_offset);
+>           if (ret < 0) {
+>               goto out;
+>           }
+> @@ -3832,7 +3823,6 @@ qcow2_co_copy_range_from(BlockDriverState *bs,
+>   
+>           case QCOW2_CLUSTER_NORMAL:
+>               child = s->data_file;
+> -            copy_offset += offset_into_cluster(s, src_offset);
+>               break;
+>   
+>           default:
+> 
 
-> +                continue;
-> +            }
-> +
-> +            ram_block_discard_range(rb, ram_offset, size);
-> +        }
-> +
-> +        virtqueue_push(vq, elem, 0);
-> +        virtio_notify(vdev, vq);
-> +        g_free(elem);
-> +    }
-> +}
-> +
+with or without first assignment dropped:
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-[...]
-
->      if (virtio_has_feature(s->host_features,
->                             VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
->          s->free_page_vq =3D virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
-> @@ -940,6 +982,8 @@ static Property virtio_balloon_properties[] =3D {
->       */
->      DEFINE_PROP_BOOL("qemu-4-0-config-size", VirtIOBalloon,
->                       qemu_4_0_config_size, false),
-> +    DEFINE_PROP_BIT("unused-page-reporting", VirtIOBalloon, host_feature=
-s,
-
-"free-page-reporting"
-
---=20
-Thanks,
-
-David / dhildenb
-
+-- 
+Best regards,
+Vladimir
 
