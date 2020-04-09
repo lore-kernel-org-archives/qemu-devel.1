@@ -2,124 +2,108 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE4DDC2D0EA
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:59:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 063FDC2D0EA
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 08:23:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F048821973
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:59:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0A33206F5
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 08:23:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Ic84U0YZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F048821973
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MnaO6LNg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0A33206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMS5c-0002eq-5d
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 03:59:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46026)
+	id 1jMSTT-0006JO-Vi
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 04:23:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48258)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jMS4e-00029a-Nn
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:58:09 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jMSSj-0005sj-7M
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 04:23:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jMS4d-0001lt-Ge
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 03:58:08 -0400
-Received: from mail-db8eur05on2120.outbound.protection.outlook.com
- ([40.107.20.120]:57440 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jMS4a-0001kh-De; Thu, 09 Apr 2020 03:58:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N53tYtS5JRbg/6+m071+eHzV6cV4d3itGy+bvVlA5H7eCkwPIwGcR4pAKkZRlnktoqs9lkJvHzXqSvAJ/UtOzcO3IdBKZNHSpZWqp1qc+uriB58SjZkric72u87H/Oj/NnM+7ujKQvbCk9jpKIx3hFtKwXqASKiTfJYaO3TaS9adQcGNFQ/8vkTVY7mpCu11Jy1jsgAvYTcSHsIHqhhZWSAltYt13oVzPMNWB2+oBT6A3pmbtMWQnHoxyIwvx9z+RjMWpPfyihU2TmNe2+iW0fszeFYOqXrO56DbwwKpKBZbwtNM+DKWg6qnkewhRhA7penP5K8NBA+y/91YtoAzSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nIfD5leIaIIYLkgFtlEBnqj+hQ8B255908NGp78QnHA=;
- b=VgsrXbYA3cUYo2eCBp8ZDIQ+HMb7ljs5hUuhRIouy0ZYZPnHTBc1MgypWMP8B8nmTGUkCYtXOT8yFhcVD/Jr+BRr8jYBw7+K1c0brgUzgakO0qFVbD2+5VxZs0NKYkdTcuosQxtoCMe5bkHUHlMyRzkdVEcrMWlzW/OQoGMQeVk4C0gaDphVX5QSUwVGjaZfsLn3hQls5i5uTn0avfXfDzRjBfmapAgJ0xf3SaduF/voI+KbkgQdbe/1vNkhaxV/b7v4pmcBD9OtPRrNLkKKoFA6xOoSPdWAnry+wlFKUnoN0RuzJjyOL7NXp1Mp+NPpkgdjf18JcaNLysVGV3nDbQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nIfD5leIaIIYLkgFtlEBnqj+hQ8B255908NGp78QnHA=;
- b=Ic84U0YZ8Ltr2I+2XmWudhk5xpQOccI+sg+jh4f7mLkMOp1LvYbkoELKtdgREWNxonBnMjDg+8lM/j4bbzD4MZCYqiSguQEb7+gPtrc5Nn80yMZ+QlRbtVofcIJUZJsxK7Htq1LHRceAMwFApHR0x83zQJGdZVLCm8dREJ4R7Xc=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5349.eurprd08.prod.outlook.com (2603:10a6:20b:107::22)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.15; Thu, 9 Apr
- 2020 07:58:01 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.2900.015; Thu, 9 Apr 2020
- 07:58:01 +0000
-Subject: Re: [PATCH v4 02/30] qcow2: Convert qcow2_get_cluster_offset() into
- qcow2_get_host_offset()
-To: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-devel@nongnu.org
+ (envelope-from <mreitz@redhat.com>) id 1jMSSe-0002FX-0k
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 04:23:01 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44896
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jMSSd-0002FP-TZ
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 04:22:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586420575;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=usJWEbxkocnv/RXHDl5hwJKzBMOceVMdylh/9/2t8fM=;
+ b=MnaO6LNgJQ7pPI3IbLj0IAaYDv+gHM1m9xlmRiBQ+MDpf4JmWSvPTV2xvBgVIKtxlm360n
+ d8aSNypX89ET7FJwx5/dmzYQE5SbaC0dgs8w/N06+cI/MyaLtkVzswn+ZcMULy4LUaNKtQ
+ 3nEcKCsq3JERuhVg53qPiAlk4miWlkg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-172-_owRHk-WOrOgcUaK_nvELA-1; Thu, 09 Apr 2020 04:22:51 -0400
+X-MC-Unique: _owRHk-WOrOgcUaK_nvELA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74996801E5C;
+ Thu,  9 Apr 2020 08:22:49 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-98.ams2.redhat.com
+ [10.36.114.98])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C33DEC0D89;
+ Thu,  9 Apr 2020 08:22:45 +0000 (UTC)
+Subject: Re: [PATCH v4 13/30] qcow2: Add QCow2SubclusterType and
+ qcow2_get_subcluster_type()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 References: <cover.1584468723.git.berto@igalia.com>
- <65243debd4a41e1ebd13877c2e6c665759c37b38.1584468723.git.berto@igalia.com>
- <2f8f3cba-d4e4-49f2-722f-fc6cc96bdd65@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200409105759711
-Message-ID: <7c21a1f3-e263-9175-2d6d-41aafba85f55@virtuozzo.com>
-Date: Thu, 9 Apr 2020 10:57:59 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <2f8f3cba-d4e4-49f2-722f-fc6cc96bdd65@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: AM7PR02CA0019.eurprd02.prod.outlook.com
- (2603:10a6:20b:100::29) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ <fe21a93340427771899c47569c47063b849b54e6.1584468723.git.berto@igalia.com>
+ <d2b34b1c-4b4b-f363-3bbc-7c3999cf79a2@redhat.com>
+ <w51tv1tuazg.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <e61e0b0f-3f3a-67e9-87f5-81c5d1587e8a@redhat.com>
+Date: Thu, 9 Apr 2020 10:22:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.186) by
- AM7PR02CA0019.eurprd02.prod.outlook.com (2603:10a6:20b:100::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.17 via Frontend
- Transport; Thu, 9 Apr 2020 07:58:00 +0000
-X-Tagtoolbar-Keys: D20200409105759711
-X-Originating-IP: [185.215.60.186]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e22e909c-1ec1-42c7-e726-08d7dc5bb9e1
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5349:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB53492243B4F8DE353C518FB2C1C10@AM7PR08MB5349.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
-X-Forefront-PRVS: 0368E78B5B
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(136003)(376002)(39840400004)(396003)(366004)(346002)(16526019)(2906002)(53546011)(66476007)(4326008)(186003)(6486002)(31696002)(66946007)(66556008)(107886003)(26005)(2616005)(956004)(5660300002)(8676002)(52116002)(86362001)(36756003)(8936002)(81166007)(54906003)(31686004)(16576012)(316002)(478600001)(110136005)(81156014);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Zt0sEaWjf+IkOmnQwCQValohyEFVvIjbsLa36cIDfvAvAc8aBpy7tF3i6meKBbVe69GPMpXuJNm1sn7UN6OyQkOqm5hc72+k/WTJhTwCT0d3WaQdeloVFUeNGQaT7WkpV+H0thgqvkc2OwoLa3F3EgrFpOkAbi6lCXA2idFDlT13EJHCKvMSgBrPgH3BB8vvOWruUlqDrg9X1u27XAF3espriUrj2lOhHa8fXYzyIm0xjuRfKZTx5dW5bJNk+XNWUWSGH09IyLURIE4mRA8nZQxQy5BdMxRHDyovs82ea/k5ACx4G2FzSNuGaXSIWTwHoFncdXhFqTjbbFA3XOTaWSpiXSkjB2fqblswFdvpKIF75bgVGXNDhZGJGv8uHx+zYGKT8V5ekryHDOQ6hp82qNrt92Q+TIbc5ECTXeFHCGWbqdsNftXVTQArI3MS7xEv
-X-MS-Exchange-AntiSpam-MessageData: JvrliJvRFJbIxlXLHq/RHFBkUmV5QeGJBXOXLZHd0lVfdtua8B/PRNrnjgxHvFW9vl7SFzma5CnmTyIxS6hsEY1PZXuNPkPaagiVTKhTEuap1KPaf9zvqFX2zDG0gr31E8IwUF7Ny7PShMY5PHnk7Q==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e22e909c-1ec1-42c7-e726-08d7dc5bb9e1
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2020 07:58:01.6273 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: k9YBRgUazOBA3yWiDdohZDj5AMhXG9lIff/pIvIIXy8/fdok353RdRjNcgKLaxOEvk2oA/m9TOBd1iKSjb6o1tdpQqtL1dEMZoyjT4CN/50=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5349
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.20.120
+In-Reply-To: <w51tv1tuazg.fsf@maestria.local.igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="1olcFbFnCUcqEoglShDBMPXKsuNg7JAZj"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,147 +115,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
- Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-08.04.2020 13:51, Max Reitz wrote:
-> On 17.03.20 19:15, Alberto Garcia wrote:
->> qcow2_get_cluster_offset() takes an (unaligned) guest offset and
->> returns the (aligned) offset of the corresponding cluster in the qcow2
->> image.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1olcFbFnCUcqEoglShDBMPXKsuNg7JAZj
+Content-Type: multipart/mixed; boundary="Bbg0qnm9p4ITSig3uUMAyDmufg3bSRVsi"
+
+--Bbg0qnm9p4ITSig3uUMAyDmufg3bSRVsi
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 08.04.20 19:46, Alberto Garcia wrote:
+> On Wed 08 Apr 2020 01:23:42 PM CEST, Max Reitz wrote:
+>>> +        switch (type) {
+>>> +        case QCOW2_CLUSTER_COMPRESSED:
+>>> +            return QCOW2_SUBCLUSTER_COMPRESSED;
 >>
->> In practice none of the callers need to know where the cluster starts
->> so this patch makes the function calculate and return the final host
->> offset directly. The function is also renamed accordingly.
->>
->> There is a pre-existing exception with compressed clusters: in this
->> case the function returns the complete cluster descriptor (containing
->> the offset and size of the compressed data). This does not change with
->> this patch but it is now documented.
->>
->> Signed-off-by: Alberto Garcia <berto@igalia.com>
->> ---
->>   block/qcow2.h         |  4 ++--
->>   block/qcow2-cluster.c | 38 ++++++++++++++++++++++----------------
->>   block/qcow2.c         | 24 +++++++-----------------
->>   3 files changed, 31 insertions(+), 35 deletions(-)
->>
->> diff --git a/block/qcow2.h b/block/qcow2.h
->> index 0942126232..f47ef6ca4e 100644
->> --- a/block/qcow2.h
->> +++ b/block/qcow2.h
+>> Why did you drop the check that l2_bitmap =3D=3D 0 here?
 >=20
-> [...]
->=20
->>       case QCOW2_CLUSTER_ZERO_ALLOC:
->>       case QCOW2_CLUSTER_NORMAL:
->>           /* how many allocated clusters ? */
->>           c =3D count_contiguous_clusters(bs, nb_clusters, s->cluster_si=
-ze,
->>                                         &l2_slice[l2_index], QCOW_OFLAG_=
-ZERO);
->> -        *cluster_offset &=3D L2E_OFFSET_MASK;
->> -        if (offset_into_cluster(s, *cluster_offset)) {
->> +        *host_offset =3D l2_entry & L2E_OFFSET_MASK;
->> +        if (offset_into_cluster(s, *host_offset)) {
->>               qcow2_signal_corruption(bs, true, -1, -1,
->>                                       "Cluster allocation offset %#"
->>                                       PRIx64 " unaligned (L2 offset: %#"=
- PRIx64
->> -                                    ", L2 index: %#x)", *cluster_offset=
-,
->> +                                    ", L2 index: %#x)", *host_offset,
->>                                       l2_offset, l2_index);
->>               ret =3D -EIO;
->>               goto fail;
->>           }
->> -        if (has_data_file(bs) && *cluster_offset !=3D offset - offset_i=
-n_cluster)
->> +        if (has_data_file(bs) && *host_offset !=3D offset - offset_in_c=
-luster)
->>           {
->=20
-> (1) The { should be moved to the preceding line;
->=20
-> (2) I think it makes more sense to move the
-> =E2=80=9C*host_offset +=3D offset_in_cluster=E2=80=9D before this conditi=
-on, so it becomes
-> =E2=80=9C... && *host_offset !=3D offset=E2=80=9D.
->=20
->>               qcow2_signal_corruption(bs, true, -1, -1,
->>                                       "External data file host cluster o=
-ffset %#"
->=20
-> (Maybe we then need to drop the =E2=80=9Ccluster=E2=80=9D from this line,=
- but other than
-> that, it would fit with this error message.)
->=20
+> We don't generally check that reserved bits are 0. It would for example
+> allow us to add a new compatible feature in the future using those bits.
 
-Message would be less useful I think, better is compare two cluster offsets=
-, as host cluster offset is specified by qcow2 metadata, not host offset.
+OK.  The spec as you wrote it would allow that, and if we ever used
+those bits we=92d probably need to add a feature bit to the header anyway.
+ (More so if we returned an error here.)
 
-What about squashing this:
-
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -615,32 +615,34 @@ int qcow2_get_host_offset(BlockDriverState *bs, uint6=
-4_t offset,
-          break;
-      case QCOW2_CLUSTER_ZERO_ALLOC:
-      case QCOW2_CLUSTER_NORMAL:
-+    {
-+        uint64_t host_cluster_offset =3D l2_slice & L2E_OFFSET_MASK;
-+        *host_offset =3D host_cluster_offset + offset_in_cluster;
-+
-          /* how many allocated clusters ? */
-          c =3D count_contiguous_clusters(bs, nb_clusters, s->cluster_size,
-                                        &l2_slice[l2_index], QCOW_OFLAG_ZER=
-O);
--        *host_offset =3D l2_entry & L2E_OFFSET_MASK;
--        if (offset_into_cluster(s, *host_offset)) {
-+        if (offset_into_cluster(s, host_cluster_offset)) {
-              qcow2_signal_corruption(bs, true, -1, -1,
-                                      "Cluster allocation offset %#"
-                                      PRIx64 " unaligned (L2 offset: %#" PR=
-Ix64
--                                    ", L2 index: %#x)", *host_offset,
-+                                    ", L2 index: %#x)", host_cluster_offse=
-t,
-                                      l2_offset, l2_index);
-              ret =3D -EIO;
-              goto fail;
-          }
--        if (has_data_file(bs) && *host_offset !=3D offset - offset_in_clus=
-ter)
--        {
-+        if (has_data_file(bs) && *host_offset !=3D offset) {
-              qcow2_signal_corruption(bs, true, -1, -1,
-                                      "External data file host cluster offs=
-et %#"
-                                      PRIx64 " does not match guest cluster=
- "
-                                      "offset: %#" PRIx64
--                                    ", L2 index: %#x)", *host_offset,
-+                                    ", L2 index: %#x)", host_cluster_offse=
-t,
-                                      offset - offset_in_cluster, l2_index)=
-;
-              ret =3D -EIO;
-              goto fail;
-          }
--        *host_offset +=3D offset_in_cluster;
-          break;
-+    }
-      default:
-          abort();
-      }
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
+--Bbg0qnm9p4ITSig3uUMAyDmufg3bSRVsi--
 
---=20
-Best regards,
-Vladimir
+--1olcFbFnCUcqEoglShDBMPXKsuNg7JAZj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6O21IACgkQ9AfbAGHV
+z0AXjwf9ETie8Ao0bZvlWTInxRVUy7zg2ZP9+d7Wag17n6Egq7cm4IvL7Z6UQrhK
+YEiKwzG97Jzqvt3PMQeLCSZ/KpAswZIQSHGnUd7dg4VzBn60zlvYDIjW1QvMI4fu
+KO744GK37V9EqxhKNnCtRl2Ou0czsh/GVK4j73x0eKA0Z+phzmV5+K6qfIu4ORu7
+J+BQIzifucnuRjUJR82awsf0PsdlURL7bKRYYxj+Er1GM71ABN4zCe9Rt15vBv1u
+4NxL8vQDvQfh/vlAywSAO+eTjvC7rulotvxXZ/ADH0aVSIL6Y0ULUZjqXYnXQtiX
+o9hNxH9s8cEDwbWlDkagAfP1L+5Ehw==
+=v66C
+-----END PGP SIGNATURE-----
+
+--1olcFbFnCUcqEoglShDBMPXKsuNg7JAZj--
+
 
