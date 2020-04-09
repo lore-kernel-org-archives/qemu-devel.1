@@ -2,116 +2,120 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70982C2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33FABC2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:39:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4387920771
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:37:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4387920771
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id E403B206F7
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:39:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="D8FmBr7I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E403B206F7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMc3E-0007j3-ET
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 14:37:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48733)
+	id 1jMc4w-0000oG-4n
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 14:39:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48994)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jMc2P-0006pX-1D
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:36:30 -0400
+ (envelope-from <Babu.Moger@amd.com>) id 1jMc3f-0008Ho-ES
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:37:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jMc2O-0003M4-2c
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:36:28 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:60479)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jMc2N-0003Lp-Qc
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:36:28 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Mr7iw-1iz5Rx31Jm-00oCcR; Thu, 09 Apr 2020 20:36:23 +0200
-Subject: Re: [PATCH-for-5.0] target/m68k/helper: Fix m68k_fpu_gdb_get_reg()
- use of GByteArray
-To: Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>
-References: <20200409172509.4078-1-philmd@redhat.com>
- <20200409182215.GA40299@xz-x1>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <92ba02b2-1bad-9f97-a931-2270b9c3508d@vivier.eu>
-Date: Thu, 9 Apr 2020 20:36:22 +0200
+ (envelope-from <Babu.Moger@amd.com>) id 1jMc3e-0003kS-4G
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:37:47 -0400
+Received: from mail-bn8nam12on2046.outbound.protection.outlook.com
+ ([40.107.237.46]:44000 helo=NAM12-BN8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1jMc3d-0003k7-Rk
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:37:46 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JAIfDMCZtnJ9/c7FBXGLXH1GvTiAB9iIxpiyrBQgu9W9YIy/4tJk1oNeo1m2XkymIWaxmJWDS2hyUml8/eg0CXNeGF7MvoHzO5c1C20PbjxQ0pnPhkTH4rpky9zF6Sh4KzyPCtDakOWC/AjOTS7lMB8tjl72uUQB+7QdOc74liZ4AWF91b1E+hk4CMnFl3sfxAcde5ZKxay6qrU/TqdITzUcSUK65BROiE1dahoQUl056XOy+moiw9N3JVXY0Emc2MylTIItCdlyJ/pOY2d6f8toayivJyc1X0OgTAcI3SIM/KMSZ+RF3in9g1cFIaYLV26/TVu++ZEfnkZVOMbRTw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H3X/T1DJw1evflLSmHzxplhkgrrWutRWu4Q47mT08po=;
+ b=Mj1jgWhJXBD+QyOC8EBJNxkkKDM+Fy6haLFVtvIofmf693UPFCfqYU6ITMNq/Jj1M3DufPxL3X44ca3PyxFgTU0Jy6ZzgxKCNSNDftkM+LTPC/CSWYNvKXFjnk2Ot2QnkGtoZOwCjNo6TGYkUnsIGP+wTvcQqNZG2ADvZiUH61sij/wsrtDoNKBO7wSquDV6xkskhEbg31fWUh0r/D/xg8en2+acJ6smDkUpoub1zUgkgH1JMG0lEKdpOd1fYihCkysV/W7XS4OC7wO7sZk5z12JshdHBBNVHCiz+j29h6/PtaBS02+K1yC4QxJtLWoZU/qgX4YR2EybPTFhdtag1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H3X/T1DJw1evflLSmHzxplhkgrrWutRWu4Q47mT08po=;
+ b=D8FmBr7ITwy2AxV0Cf5hrjukeTuHHqO4chd4EZXUr92BeVUN/F3USxSCcCpRkMXMwOtC3UsoCh0QzGiDggVtO+729I/wqC5pqwnAD76Q4QKbTdIRIWaqJ2qQ79fCtENZw60g0X8Y3n6iz/iVSBQK3iDeuB4bAyLF4NTi/wC5qMk=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2350.namprd12.prod.outlook.com (2603:10b6:802:24::31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.16; Thu, 9 Apr
+ 2020 18:37:43 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::382f:640c:215f:be93]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::382f:640c:215f:be93%5]) with mapi id 15.20.2878.021; Thu, 9 Apr 2020
+ 18:37:43 +0000
+Subject: Re: [Bug 1871842] [NEW] AMD CPUID leaf 0x8000'0008 reported number of
+ cores inconsistent with ACPI.MADT
+To: Igor Mammedov <imammedo@redhat.com>,
+ Philipp Eppelt <1871842@bugs.launchpad.net>
+References: <158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com>
+ <20200409160037.431ec776@redhat.com>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <679ba0cc-1af0-42ee-f8bc-26e7cafcc304@amd.com>
+Date: Thu, 9 Apr 2020 13:37:41 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200409182215.GA40299@xz-x1>
+ Thunderbird/68.4.1
+In-Reply-To: <20200409160037.431ec776@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ezPjhHx54ofTmc7yNoJ86eM4n85AVaYo12MV1nkfk3yRCWYtRrd
- JRPGn88AE9k7iD60Uy3TigNA0TNTgKHIZcCBvIdxjFw3rtInK5xGw3sYLXQt8yeb6MzorfI
- Vv0UAQmDr2XYL2ypinxWKDNfpGibktzYgQjdL8xM6TJbDv411AqzMNFXuCWmoptT3H+MLGv
- AKP4D5AC7ZJoN0xEPZBqg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:iVuLyQm5AP0=:KEY0cjJ/rDx1y76DztXbZG
- rgGA3Gu9LU0IZaysGskoZNxch9sGP2+fJTg9kfwjlPvodE6nWKaAfmzduuFSgoFuo2ymWTBv6
- LUWt9aYGsbCT3vBo619jDHKSD8g2MBLBm7E/eR5fhZyn7h4Z6PY6jfLe/LMyAheRldeqs8Ume
- ts687XpFLYNVVDx+e6ruaaaESvrTyHmMr13PiTXKbC8uRt6ASG+wHIN4FfEY2c/uBYwULqdki
- LGGT5Bn0p/M10yQ4chNGJ7ySwxwm40tr7kM1KDju6j+pTux7We2aUiAbxHOWBusIcYV7Krp4k
- fnNMc+CvBNGPNqJjfFEPAEiwt3kqgVT5nM/ir5bSH2ujIOOdeLw/t7zviEkO7nY21tCv0ciUL
- 6NbfrLYkFtZgJmrZjjxTYabnaAjdKjn/B/Qtcn3gt49LFarQIiHuMlM/QzvA+YJB3vQRv4Hzk
- lDhdATAUYGuLBeXpdaAuodtaczJKa9PLlDLTlicIk3hVIAN95R2Y8e+4lY2QcrjfFGix8uzIX
- 0YGyv5l1U/10qKPgK8RDijEB20ncVwQN+NlcPXZWwA04Kwx1drNBEfgZjZN2EFdQwj1b6RJqM
- pg0N3mqdREPgivLE1w0oicSfsW3BOdiVheKyJjYdsOJWaXuR87UU6GyucgfuzVAysjIuIi4Ek
- m0RyNcaVQeHKa/A7kdkZ3Y6GyyfCBww7NJ5TFyLCFg1PAUuklrgRVA76JwwC8EFfO8QHZ7GSM
- W/2DJbFtaxzSVWsTxknoLx6t+TVae8Z7O61W8XrbPNv6VQKDJfzoelDZQ3fCLDRxmf2o/Lpd/
- 7LAQZ2Dhrf7s+A02+La32GD17rk5SQHfcJVXXnjsPj5SHGLfEfaQiMqQTGo7ivewLj1rEmb
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.133
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM5PR13CA0015.namprd13.prod.outlook.com
+ (2603:10b6:3:23::25) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.30.87] (165.204.77.1) by
+ DM5PR13CA0015.namprd13.prod.outlook.com (2603:10b6:3:23::25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2900.6 via Frontend Transport; Thu, 9 Apr 2020 18:37:43 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: e0ae670b-f192-4f5d-134f-08d7dcb51761
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2350:
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2350E32BE5673E2F56CBBA7F95C10@SN1PR12MB2350.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Forefront-PRVS: 0368E78B5B
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10009020)(4636009)(136003)(346002)(396003)(39860400002)(376002)(366004)(66556008)(4326008)(52116002)(66476007)(66946007)(6486002)(5660300002)(26005)(16576012)(316002)(186003)(81166007)(16526019)(81156014)(8936002)(31686004)(2906002)(2616005)(956004)(8676002)(36756003)(44832011)(110136005)(53546011)(31696002)(86362001)(478600001);
+ DIR:OUT; SFP:1101; 
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pu0MqfkdZTX+fL4jM6wdV+VQnK2vLuGogb3FowCLcviGkMBH98f3dPAe77PXdk6SKnBdLmTj/lrsSEJI2Rx/d5xXUeMoqfm154Jygddavx8jTsP4t3FZWJo9RzC/6JYhdYm0TLalDFrpfQnjdXCVVMH80pj8GdpodTh2msz22yPkUoHcSZsOkEmRE8tOQvSNsGgSQ8lD7c0l9SMp+rAEGOSbUX+8dzj1TyMv/Cb9KJz7PugE5N/ceiGiYI8nryoioPAf6E646nUWtYiNPOxujS7ggLfhuWmH7s/idLq6G1ANqS9HR6DBcLWyrvk5F4OGg/sorojwa5WLnnTz0rQ5Pr5hA9WnTmFnG5YdU7bqDPpa/JA7uHX2oD+6/DxCN+KNAr6wOgcpaYtMrtC6ZRaGMaQgMk/h2lFUy5rAw8WvZ2jsbczC7fqnY3ctzkaDdEbS
+X-MS-Exchange-AntiSpam-MessageData: 07V7Bj8LR9r6FLPIeX6yF2e079PHsQkAUvZQxWQBEwAfB/Hc/5kaYfoDLvGOOC4w88G4KlZOFpRraVlomytXH05BIx5Lzh+IAzQXf6v6pr4bBS1ga6zJQ7dlgVdnydW7UZ8mZWB0Mwp61pFhaAaNpA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e0ae670b-f192-4f5d-134f-08d7dcb51761
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2020 18:37:43.7752 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KKiKevJs8dVus1z610zfEoKkjgHgf/RnYeIvNks/RURJ7trtSEK0UbJ6g/7ZxIqE
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2350
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.237.46
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,63 +127,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 09/04/2020 à 20:22, Peter Xu a écrit :
-> On Thu, Apr 09, 2020 at 07:25:08PM +0200, Philippe Mathieu-Daudé wrote:
->> Since a010bdbe719 the gdbstub API takes a GByteArray*.
->> Unfortunately we forgot to update the gdb_get_reg*()
->> calls.  Do it now.
+
+
+On 4/9/20 9:00 AM, Igor Mammedov wrote:
+> On Thu, 09 Apr 2020 12:58:11 -0000
+> Philipp Eppelt <1871842@bugs.launchpad.net> wrote:
+> 
+>> Public bug reported:
 >>
->> Fixes: a010bdbe719 ("extend GByteArray to read register helpers")
-> 
-> Should this be instead 462474d760 ("target/m68k: use gdb_get_reg
-> helpers", 2020-03-17)?
-
-No, this one is correct because it uses an "uint8_t *", then a010bdbe719
-changed this to a GByteArray and didn't remove the "+ len".
-
-Thanks,
-Laurent
-
->> Reported-by: Peter Xu <peterx@redhat.com>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> 
->> ---
->> Based-on: <20200409164954.36902-1-peterx@redhat.com>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> (One benigh extra line; same thing could happen to me when amending
->  like this with "---")
-> 
->> ---
->>  target/m68k/helper.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
+>> Setup:
+>> CPU: AMD EPYC-v2 or host's EPYC cpu
+>> Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
+>> qemu version: self build
+>> git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
+>> config: Configured with: '../configure' '--target-list=x86_64-softmmu,mips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aarch64-softmmu,arm-softmmu' '--prefix=/opt/qemu-master'
 >>
->> diff --git a/target/m68k/helper.c b/target/m68k/helper.c
->> index 014657c637..cad4083895 100644
->> --- a/target/m68k/helper.c
->> +++ b/target/m68k/helper.c
->> @@ -109,8 +109,8 @@ static int m68k_fpu_gdb_get_reg(CPUM68KState *env, GByteArray *mem_buf, int n)
->>  {
->>      if (n < 8) {
->>          int len = gdb_get_reg16(mem_buf, env->fregs[n].l.upper);
->> -        len += gdb_get_reg16(mem_buf + len, 0);
->> -        len += gdb_get_reg64(mem_buf + len, env->fregs[n].l.lower);
->> +        len += gdb_get_reg16(mem_buf, 0);
->> +        len += gdb_get_reg64(mem_buf, env->fregs[n].l.lower);
->>          return len;
->>      }
->>      switch (n) {
->> -- 
->> 2.21.1
+>> Cmdline: 
+>> qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/bin/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , ... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu EPYC-v2 -m 4G -smp 4 
 >>
+>> Issue:
+>> We are developing an microkernel operating system called L4Re. We recently got an AMD EPYC server for testing and we couldn't execute SMP tests of our system when running Linux + qemu + VM w/ L4Re.
+>> In fact, the kernel did not recognize any APs at all. On AMD CPUs the kernel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[NC] or [ApicIdSize].  [0][1]
+>>
+>> The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18cf757 ECX: 0x703f EDX: 0x1000
+>> The lower four bits of ECX are the [NC] field and all set.
+>>
+>> When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as replacement and addition to the above cmdline) the CPUID leaf shows: EAX: 0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
+>> Note, ECX is zero. Indicating that this is no SMP capabale CPU.
+>>
+>> I'm debugging it using my local machine and the QEMU provided EPYC-v2
+>> CPU model and it is reproducible there as well and reports:  EAX:
+>> 0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
+>>
+>> I checked other AMD based CPU models (phenom, opteron_g3/g5) and they behave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
+>> I believe that behavior here is wrong as ECX[NC] should report the number of cores per processor, as stated in the AMD manual [2] p.584. In my understanding -smp 4 should then lead to ECX[NC] = 0x3.
+>>
+>> The following table shows my findings with the -smp option:
+>> Option | Qemu guest observed ECX value
+>> -smp 4 | 0x0
+>> -smp 4,cores=4  | 0x3
+>> -smp 4,cores=2,thread=2 | 0x3
+>> -smp 4,cores=4,threads=2 | QEMU boot error: topology false.
+>>
+>> Now, I'm asking myself how the terminology of the AMD manual maps to QEMU's -smp option.
+>> Obviously, nr_cores and nr_threads correspond to the cores and threads options on the cmdline and cores * threads <= 4 (in this example), but what corresponds the X in -smp X to?
+> I'd say X corresponds to number of logical CPUs.
+> Depending on presence of other options these are distributed among them in magical manner
+> (see pc_smp_parse() for starters)
 > 
+>> Querying 0x8000'0008 on the physical processor results in different
+>> reports than quering QEMU's model as does it with -enable-kvm -cpu host.
+>>
+>> Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
+>> CPU leave reports a single core processor.
+> it matches -smp X as it should be.
+> 
+>>
+>> This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
+>> wrong number.
+> CCed author of recent epyc patches who might know how AMD should work better than me.
 
+Hmm.. Interesting.. Not sure why this did not come up during my testing.
+Probably this cpuid information is not widely used.
+
+Yes. I am looking at it right now. I see that EPYC model is reporting
+wrong. Not sure why -cpu host is reporting wrong. I thought -cpu host gets
+the information directly from the host. Will investigate.
 
