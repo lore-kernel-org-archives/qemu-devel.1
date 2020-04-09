@@ -2,101 +2,97 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01030C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 15:38:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C91FC2BA2B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 15:38:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6C5920753
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 15:38:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6C5920753
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=inria.fr
+	by mail.kernel.org (Postfix) with ESMTPS id 22B2520753
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 15:38:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K+eCiCrA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22B2520753
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMZG1-0004Mt-UD
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 11:38:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51137)
+	id 1jMZGa-0004vO-9i
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 11:38:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50895)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Brice.Goglin@inria.fr>) id 1jMZBu-0006Dc-Ud
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 11:34:07 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1jMZA1-0003Pb-SZ
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 11:32:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Brice.Goglin@inria.fr>) id 1jMZBt-0006l6-Fh
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 11:34:06 -0400
-Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:22591)
+ (envelope-from <sgarzare@redhat.com>) id 1jMZ9z-0004zY-HZ
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 11:32:09 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22332
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Brice.Goglin@inria.fr>)
- id 1jMZBt-0006ge-6L
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 11:34:05 -0400
-X-IronPort-AV: E=Sophos;i="5.72,363,1580770800"; d="scan'208";a="444602462"
-Received: from 91-160-5-165.subs.proxad.net (HELO [192.168.44.21])
- ([91.160.5.165])
- by mail2-relais-roc.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-SHA;
- 09 Apr 2020 17:34:01 +0200
-Subject: Re: linux-user: keep the name-ending parenthesis in /proc/self/stat
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <fb4c55fa-d539-67ee-c6c9-de8fb63c8488@inria.fr>
- <87wo6oadcc.fsf@linaro.org>
-From: Brice Goglin <Brice.Goglin@inria.fr>
-Autocrypt: addr=Brice.Goglin@inria.fr; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <149b6a99-fa9e-7ba2-6325-3ad1ff151f6c@inria.fr>
-Date: Thu, 9 Apr 2020 17:34:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1jMZ9z-0004ys-Cr
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 11:32:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586446327;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MEWkL23L15Yiofk4qf00p3NvZ31mMznDK9tBMDat3oo=;
+ b=K+eCiCrAcMwFtTUZdWBBN5y8psWtsOEXz3hl3QvmD8N0Wa4nvqJimdXNaOCB9bwnVgoJ00
+ /VLOpIgCgGcU/0nmzw961n4fbb0KKHjqOyChqOXQ8IiuCexMjT477VgY3nv2eWM70l1Zb2
+ VnS7K82ZB9n5YuRhzKXdv/OwKwRaymU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-20-mF-gmR7-OvSHbh9PpugtQA-1; Thu, 09 Apr 2020 11:32:02 -0400
+X-MC-Unique: mF-gmR7-OvSHbh9PpugtQA-1
+Received: by mail-wm1-f69.google.com with SMTP id 14so79792wmo.9
+ for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 08:32:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=kKle+iTuz3A0uVk7GyX7jjKljPLpj5YjAAcv2ahgx7g=;
+ b=JSja14VJXb7lkTQGjwZpiWfAFxTS9JPMhLis+D005eMrr7gIRgUmVdnOQJ2eAUlFk5
+ CSlShLMD1wJm9fu1ZmRlzJdZFSovU9h3DupXy3OId3DExnRLmcHbxx9AE0O9xBFFbEMD
+ W9hmHDUTjNjP0U/nXzeP4p3kM1kL6SpL2DKGznGHe1Exn7MwSToSEs+28ImmEPYr247c
+ Jz9ZD2N2PQMXC8nhCpbaKR2/7WJulgIZp2L9/KpMGeg3Jg76GqR7fjYKldzUTDGPETXr
+ Cmax6feek40ZMQrAJPqOiQIyvbaVWVp4J2kICwQila+w3g3LBzsRIJ45LdsMIJYAywZD
+ xyCg==
+X-Gm-Message-State: AGi0PuYFACPJvdFJyeX6kdwiK2oR+akp4OXG2K8GbbKhvCgb1VdoyEFc
+ BkhxYtLIPVEDwUjHofcnVI+s2rmVc4uVsHkOWt1S6OlVCAywYfbzu3+Cf/ohepESMhBtqNpn1Y2
+ 15wYWqR+5N/1lPjo=
+X-Received: by 2002:a5d:61ca:: with SMTP id q10mr14529618wrv.348.1586446320597; 
+ Thu, 09 Apr 2020 08:32:00 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLBEDehdzCU47kuq+ryxzCL5+hbk4vxgpAXkul2cMUiTdYZMnALgmhDWLDzCX/tqPW5HZescg==
+X-Received: by 2002:a5d:61ca:: with SMTP id q10mr14529537wrv.348.1586446319526; 
+ Thu, 09 Apr 2020 08:31:59 -0700 (PDT)
+Received: from steredhat (host32-201-dynamic.27-79-r.retail.telecomitalia.it.
+ [79.27.201.32])
+ by smtp.gmail.com with ESMTPSA id f3sm4393619wmj.24.2020.04.09.08.31.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 09 Apr 2020 08:31:59 -0700 (PDT)
+Date: Thu, 9 Apr 2020 17:31:56 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH for-5.0] aio-posix: signal-proof fdmon-io_uring
+Message-ID: <20200409153156.qgjxmbmlh7be637z@steredhat>
+References: <20200408091139.273851-1-stefanha@redhat.com>
+ <20200408100603.wxhvodbbwivvstxh@steredhat>
+ <20200409145709.GC317045@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <87wo6oadcc.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.134.164.83
+In-Reply-To: <20200409145709.GC317045@stefanha-x1.localdomain>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,67 +104,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org,
+ Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 09/04/2020 à 17:27, Alex Bennée a écrit :
-> Brice Goglin <Brice.Goglin@inria.fr> writes:
->
->> When the program name is very long, qemu-user may truncate it in
->> /proc/self/stat. However the truncation must keep the ending ") "
->> to conform to the proc manpage which says:
->>     (2) comm  %s
->>            The  filename of the executable, in parentheses.  This
->>            is visible whether or not the  executable  is  swapped
->>            out.
->>
->> To reproduce:
->> $ ln -s /bin/cat <filenamewithmorethan128chars>
->> $ qemu-x86_64 ./<filenamewithmorethan128chars> /proc/self/stat
->>
->> Before the patch, you get:
->> 1134631 (<filenametruncated>0 0 0 0 0 0 0 0 ...
->> After the patch:
->> 1134631 (<filenametruncat>) 0 0 0 0 0 0 0 0 ...
->>
->> This fixes an issue with hwloc failing to parse /proc/self/stat
->> when Ludovic Courtes was testing it in Guix over qemu-aarch64.
->>
->> Signed-off-by: Philippe_Mathieu-Daudé <philmd@redhat.com>
->> Signed-off-by: Brice Goglin <Brice.Goglin@inria.fr>
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -7305,7 +7305,11 @@ static int open_self_stat(void *cpu_env, int fd)
->>          snprintf(buf, sizeof(buf), "%"PRId64 " ", val);
->>        } else if (i == 1) {
->>          /* app name */
->> -        snprintf(buf, sizeof(buf), "(%s) ", ts->bprm->argv[0]);
->> +        char *ptr = buf;
->> +
->> +        *ptr++ = '(';
->> +        ptr = stpncpy(ptr, ts->bprm->argv[0], sizeof(buf) - 3);
->> +        strcpy(ptr, ") ");
-> why not just use a format string:
->
->   snprintf(buf, sizeof(buf), "(%.125s) ", ts->bprm->argv[0]);
->
+On Thu, Apr 09, 2020 at 03:57:09PM +0100, Stefan Hajnoczi wrote:
+> On Wed, Apr 08, 2020 at 12:06:03PM +0200, Stefano Garzarella wrote:
+> > On Wed, Apr 08, 2020 at 10:11:39AM +0100, Stefan Hajnoczi wrote:
+> > > The io_uring_enter(2) syscall returns with errno=3DEINTR when interru=
+pted
+> > > by a signal.  Retry the syscall in this case.
+> > >=20
+> > > It's essential to do this in the io_uring_submit_and_wait() case.  My
+> > > interpretation of the Linux v5.5 io_uring_enter(2) code is that it
+> > > shouldn't affect the io_uring_submit() case, but there is no guarante=
+e
+> > > this will always be the case.  Let's check for -EINTR around both API=
+s.
+> > >=20
+> > > Note that the liburing APIs have -errno return values.
+> > >=20
+> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > ---
+> > >  util/fdmon-io_uring.c | 10 ++++++++--
+> > >  1 file changed, 8 insertions(+), 2 deletions(-)
+> >=20
+> > The patch LGTM:
+> >=20
+> > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> >=20
+> > Not related to this patch, looking at block/io_uring.c, should we retry
+> > if the io_uring_submit() fails with EINTR?
+> >=20
+> > I mean something like this:
+> >=20
+> > diff --git a/block/io_uring.c b/block/io_uring.c
+> > index a3142ca989..9765681f7c 100644
+> > --- a/block/io_uring.c
+> > +++ b/block/io_uring.c
+> > @@ -231,7 +231,7 @@ static int ioq_submit(LuringState *s)
+> >          trace_luring_io_uring_submit(s, ret);
+> >          /* Prevent infinite loop if submission is refused */
+> >          if (ret <=3D 0) {
+> > -            if (ret =3D=3D -EAGAIN) {
+> > +            if (ret =3D=3D -EAGAIN || ret =3D=3D -EINTR) {
+> >                  continue;
+> >              }
+> >              break;
+>=20
+> Thanks!
+>=20
+> I didn't do that for the reason described in the commit message.
 
-Go ahead and apply what you want (maybe 124 instead of 125 because of
-the ending \0).
+Yeah, I agree and it was not well documented in io_uring_enter(2)!
 
-My commit message above explains how to test things very quickly.
+> Philippe also mentioned that EINTR isn't listed on the io_uring_enter(2)
+> man page,
 
-I don't use qemu-user or Guix myself, and I can't spend time
-debugging/testing this further.
+FYI there was a discussion on io-uring list just few days ago [1] about
+that and now it is documented [2]. :-)
 
-Thank you
+>          although that is a bug because it does occur with
+> IORING_ENTER_GETEVENTS and min_complete > 0.
 
-Brice
+I think we are safe for now.
+IIUC io_uring_submit() sets min_complete to 0 and IORING_ENTER_GETEVENTS
+is set only if IOPOLL is enabled (or min_complete > 0), but it is not
+our case (for now).
 
+>=20
+> Feel free to send a separate patch.  It's probably not something that
+> needs to go into QEMU 5.0.
+
+Sure, I'll send it after the freeze.
+
+Thanks,
+Stefano
+
+[1] https://lore.kernel.org/io-uring/43b339d3dc0c4b6ab15652faf12afa30@cert.=
+org/t/#u
+[2] https://github.com/axboe/liburing/commit/344355ec6619de8f4e64584c973653=
+0b5346e4f4
 
 
