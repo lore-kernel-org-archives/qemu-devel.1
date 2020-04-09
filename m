@@ -6,39 +6,39 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7AA9C2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:36:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70982C2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:37:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAD28206F7
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:36:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAD28206F7
+	by mail.kernel.org (Postfix) with ESMTPS id 4387920771
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:37:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4387920771
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMc2J-0006cA-RH
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 14:36:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48673)
+	id 1jMc3E-0007j3-ET
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 14:37:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48733)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jMc1h-0006Br-Ly
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:35:46 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jMc2P-0006pX-1D
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:36:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jMc1g-00031m-J3
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:35:45 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:56477)
+ (envelope-from <laurent@vivier.eu>) id 1jMc2O-0003M4-2c
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:36:28 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:60479)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jMc1g-00030k-Ad
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:35:44 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jMc2N-0003Lp-Qc
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:36:28 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1My3Ad-1j5Msj2KAp-00zXrn for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020
- 20:35:42 +0200
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1Mr7iw-1iz5Rx31Jm-00oCcR; Thu, 09 Apr 2020 20:36:23 +0200
 Subject: Re: [PATCH-for-5.0] target/m68k/helper: Fix m68k_fpu_gdb_get_reg()
  use of GByteArray
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>
 References: <20200409172509.4078-1-philmd@redhat.com>
  <20200409182215.GA40299@xz-x1>
 From: Laurent Vivier <laurent@vivier.eu>
@@ -84,8 +84,8 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <3096f665-13eb-b8e3-3fe3-fe832638f09e@vivier.eu>
-Date: Thu, 9 Apr 2020 20:35:41 +0200
+Message-ID: <92ba02b2-1bad-9f97-a931-2270b9c3508d@vivier.eu>
+Date: Thu, 9 Apr 2020 20:36:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
@@ -93,23 +93,23 @@ In-Reply-To: <20200409182215.GA40299@xz-x1>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:AqyFkdnseVdkRBm2nA4DpkqDo8gJ2mIAcehrD/Ikcnh21IS3v9o
- YTFcP6gfpK4dUxr/ngA7MgOs8HmrAnomMlS3Q0QK/ZluoQY+FO5NWJ5Z0UGcjGWDxIIKBR1
- UYCRdniGMKXSrSoJvzgWLEtlSPrGmzWBAMZ6s4qYa7IwW5afVBRIW/0ZOIuTDyDBvHmw4cq
- nCSpmcs760Em5GJUNCKsw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:fgu/scRVX5c=:w6Jc3gTARybqkuNDG5LQhb
- 9B2gtyKyk3NXb14rd2KsFv9cVvOoiQNy2+JNWAWPYmku+h9u0XCWf4q3i0iYtgz/6O7dJd5xd
- oOLJSDS8jdFxGduTJpTbxYHZcJb1Z6Qw83qUFu8TNJvSNn5oa4xQsWvnOLng+fhvtDPksdSah
- 3JhATYndouMtJh8HzuVdW1/0Vc6hV1/tHR+hhdL9D1nYhezg2xHJYJPHiJM0KpJHePTZc4tOq
- JpjVPPXNSYK0znDgOnxVgEwj4r5BtpKdR5XqCbjPEHLRuslJ3srtb/ElZFkYyEj2TgWukHuey
- qjS1mIqbfxInERCOiQ6b4xI41uHfSAjL0+BgA72n4jsxbw1JRFnhMqswRcpTPinraHtF3ggvp
- vCUDFs5h++XpEeDZQZV6vjpKd8S2Pno+iISIR6KnoKMmr958XsFVlE1X0kp+/YAyKdm3LwV8/
- /Io2m0X/H9rFaxGnR26xlNZBo2YMF3E2Ag6A2D/2rEdnJ3inBBM5INorLCyWiKHUWJQjRz7vr
- NljX0M1aKuwagxacGnQRFrZyVM5U7YiuY84SV+qFcqF3UIrI+h+qvcB+eqOk0gmNAOz670LgX
- 6CND8J+1wtkGbpWmlKUpJZ9mqL5hXuFmUcYt73+AgXJgKkTTvTSO36wg7XcoLE8pSeH1deK8t
- al7ovssVoO+MyXkqWlMMs3pT9TV/49AhjdD1jfPDZL2AaiECcQQw6tLj+IfjAOumNlEdPtjo7
- oAiKj953XRULQP+Fh8KScm9CiOBjyeK9WUIsLokkCt0Vmt497FxRfolOCl6t1nztBftQunJmO
- JjggG0HzNCkj203Hh2yBWJd/8pUCYeJeUwfnI5/DZWiNYOaSLjsUMW/1aaLgnh17nHZ0ddG
+X-Provags-ID: V03:K1:ezPjhHx54ofTmc7yNoJ86eM4n85AVaYo12MV1nkfk3yRCWYtRrd
+ JRPGn88AE9k7iD60Uy3TigNA0TNTgKHIZcCBvIdxjFw3rtInK5xGw3sYLXQt8yeb6MzorfI
+ Vv0UAQmDr2XYL2ypinxWKDNfpGibktzYgQjdL8xM6TJbDv411AqzMNFXuCWmoptT3H+MLGv
+ AKP4D5AC7ZJoN0xEPZBqg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:iVuLyQm5AP0=:KEY0cjJ/rDx1y76DztXbZG
+ rgGA3Gu9LU0IZaysGskoZNxch9sGP2+fJTg9kfwjlPvodE6nWKaAfmzduuFSgoFuo2ymWTBv6
+ LUWt9aYGsbCT3vBo619jDHKSD8g2MBLBm7E/eR5fhZyn7h4Z6PY6jfLe/LMyAheRldeqs8Ume
+ ts687XpFLYNVVDx+e6ruaaaESvrTyHmMr13PiTXKbC8uRt6ASG+wHIN4FfEY2c/uBYwULqdki
+ LGGT5Bn0p/M10yQ4chNGJ7ySwxwm40tr7kM1KDju6j+pTux7We2aUiAbxHOWBusIcYV7Krp4k
+ fnNMc+CvBNGPNqJjfFEPAEiwt3kqgVT5nM/ir5bSH2ujIOOdeLw/t7zviEkO7nY21tCv0ciUL
+ 6NbfrLYkFtZgJmrZjjxTYabnaAjdKjn/B/Qtcn3gt49LFarQIiHuMlM/QzvA+YJB3vQRv4Hzk
+ lDhdATAUYGuLBeXpdaAuodtaczJKa9PLlDLTlicIk3hVIAN95R2Y8e+4lY2QcrjfFGix8uzIX
+ 0YGyv5l1U/10qKPgK8RDijEB20ncVwQN+NlcPXZWwA04Kwx1drNBEfgZjZN2EFdQwj1b6RJqM
+ pg0N3mqdREPgivLE1w0oicSfsW3BOdiVheKyJjYdsOJWaXuR87UU6GyucgfuzVAysjIuIi4Ek
+ m0RyNcaVQeHKa/A7kdkZ3Y6GyyfCBww7NJ5TFyLCFg1PAUuklrgRVA76JwwC8EFfO8QHZ7GSM
+ W/2DJbFtaxzSVWsTxknoLx6t+TVae8Z7O61W8XrbPNv6VQKDJfzoelDZQ3fCLDRxmf2o/Lpd/
+ 7LAQZ2Dhrf7s+A02+La32GD17rk5SQHfcJVXXnjsPj5SHGLfEfaQiMqQTGo7ivewLj1rEmb
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
@@ -123,6 +123,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -144,7 +146,6 @@ changed this to a GByteArray and didn't remove the "+ len".
 Thanks,
 Laurent
 
-> 
 >> Reported-by: Peter Xu <peterx@redhat.com>
 >> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > 
