@@ -2,72 +2,110 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8823C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 13:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59ADEC2BA2B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 13:09:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A5D32082D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 13:08:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A5D32082D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 19E372082D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 13:09:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PXYYAuRd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19E372082D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMWua-0001GE-8v
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 09:08:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55144)
+	id 1jMWwL-0003Wb-9L
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 09:09:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55085)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jMWsI-0008GU-TB
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 09:05:44 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jMWrw-0007tp-5l
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 09:05:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jMWsG-0001MZ-Sv
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 09:05:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38542)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jMWsG-0001MF-NG
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 09:05:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jMWsF-0001m7-HM
- for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 13:05:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 716652E8047
- for <qemu-devel@nongnu.org>; Thu,  9 Apr 2020 13:05:39 +0000 (UTC)
+ (envelope-from <mreitz@redhat.com>) id 1jMWrv-0001GE-4w
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 09:05:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30938
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jMWrv-0001Fv-1N
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 09:05:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586437518;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=kYgqIkv7yaYP9W82/hvFPZw0xyJRvV8j0MqfERW9mk4=;
+ b=PXYYAuRd1RlyaigAaTzCneosKYdL9AN27M7G7XtSblEsSSZwXvPbBPfCqXimD7V+D/TTay
+ vZwYSTCdEQ0JqdSQVJQ7FjxFl/ThKvudGAGwfbHZBZfuvqcjwd5DpJoffJD0NJr5mbhG1X
+ h8jQbMDy8/jw/TAqGI2iKizVAE8CZRA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-150-dcO1czuZML6VdP68Hz9ipw-1; Thu, 09 Apr 2020 09:05:14 -0400
+X-MC-Unique: dcO1czuZML6VdP68Hz9ipw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66890800D5C;
+ Thu,  9 Apr 2020 13:05:13 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-98.ams2.redhat.com
+ [10.36.114.98])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DE6FB5D9E5;
+ Thu,  9 Apr 2020 13:05:11 +0000 (UTC)
+Subject: Re: qcow2: Zero-initialization of external data files
+To: Eric Blake <eblake@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>
+References: <db0b4b5c-d564-f003-bbbc-9afdcac07cc4@redhat.com>
+ <50080252-ff22-78ed-0002-1742c694471b@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <8b4bc264-7bce-c9c1-1905-a22b4c61cae4@redhat.com>
+Date: Thu, 9 Apr 2020 15:05:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Apr 2020 12:58:11 -0000
-From: Philipp Eppelt <1871842@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: e-philipp
-X-Launchpad-Bug-Reporter: Philipp Eppelt (e-philipp)
-X-Launchpad-Bug-Modifier: Philipp Eppelt (e-philipp)
-Message-Id: <158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com>
-Subject: [Bug 1871842] [NEW] AMD CPUID leaf 0x8000'0008 reported number of
- cores inconsistent with ACPI.MADT
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0f09aef5183cbf53c3753f89d3bc451bcd792c0c
+In-Reply-To: <50080252-ff22-78ed-0002-1742c694471b@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="MLzLY8gT8UKDqPDDIOm10T7K1kAm2Oiai"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,190 +114,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1871842 <1871842@bugs.launchpad.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MLzLY8gT8UKDqPDDIOm10T7K1kAm2Oiai
+Content-Type: multipart/mixed; boundary="QpP9iWVKcHdctget9Hu5tSGfQnYxNEBGn"
 
-Setup:
-CPU: AMD EPYC-v2 or host's EPYC cpu
-Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
-qemu version: self build
-git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
-config: Configured with: '../configure' '--target-list=3Dx86_64-softmmu,mip=
-s64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aarch=
-64-softmmu,arm-softmmu' '--prefix=3D/opt/qemu-master'
+--QpP9iWVKcHdctget9Hu5tSGfQnYxNEBGn
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Cmdline: =
+On 07.04.20 00:22, Eric Blake wrote:
+> On 2/17/20 10:56 AM, Max Reitz wrote:
+>> Hi,
+>>
+>> AFAIU, external data files with data_file_raw=3Don are supposed to retur=
+n
+>> the same data as the qcow2 file when read.=C2=A0 But we still use the qc=
+ow2
+>> metadata structures (which are by default initialized to =E2=80=9Ceveryt=
+hing
+>> unallocated=E2=80=9D), even though we never ensure that the external dat=
+a file
+>> is zero, too, so this can happen:
+>>
+>> $ dd if=3D/dev/urandom of=3Dfoo.raw 64M
+>> [...]
+>>
+>> $ sudo losetup -f --show foo.raw
+>> /dev/loop0
+>>
+>> $ sudo ./qemu-img create -f qcow2 -o \
+>> =C2=A0=C2=A0=C2=A0=C2=A0 data_file=3D/dev/loop0,data_file_raw=3Don foo.q=
+cow2 64M
+>> [...]
+>>
+>> $ sudo ./qemu-io -c 'read -P 0 0 64M' foo.qcow2
+>> read 67108864/67108864 bytes at offset 0
+>> 64 MiB, 1 ops; 00.00 sec (25.036 GiB/sec and 400.5751 ops/sec)
+>=20
+> This looks like a bug (and we should fix it for 5.0 if possible)
 
-qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/bin=
-/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , ..=
-. " -serial stdio -nographic -monitor none -nographic -monitor none -cpu EP=
-YC-v2 -m 4G -smp 4 =
+It seems a bit difficult for 5.0 now.  (But I don=E2=80=99t think it=E2=80=
+=99d be a
+regression, so that shouldn=E2=80=99t be too bad.)
 
+> read
+> of a data_file_raw=3Don should not treat unallocated clusters as reading
+> 0, but rather as reading whatever the raw data contains.
+>=20
+>>
+>> $ sudo ./qemu-io -c 'read -P 0 0 64M' -f raw foo.raw
+>> Pattern verification failed at offset 0, 67108864 bytes
+>> read 67108864/67108864 bytes at offset 0
+>> 64 MiB, 1 ops; 00.01 sec (5.547 GiB/sec and 88.7484 ops/sec)
+>>
+>> I suppose this behavior is fine for blockdev-create because I guess it=
+=E2=80=99s
+>> the user=E2=80=99s responsibility to ensure that the external data file =
+is zero.
+>> =C2=A0 But maybe it isn=E2=80=99t, so that=E2=80=99s my first question: =
+Is it really the
+>> user=E2=80=99s responsibility or should we always ensure it=E2=80=99s ze=
+ro?
+>=20
+> I'd argue that requiring the user to pre-zero the raw data file is
+> undesirable; and that we should instead fix our code to not report the
+> image as reading all zeroes when creating with data_file_raw=3Don.
 
-Issue:
-We are developing an microkernel operating system called L4Re. We recently =
-got an AMD EPYC server for testing and we couldn't execute SMP tests of our=
- system when running Linux + qemu + VM w/ L4Re.
-In fact, the kernel did not recognize any APs at all. On AMD CPUs the kerne=
-l checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[NC]=
- or [ApicIdSize].  [0][1]
+OK.  I think that could be achieved by just enforcing @preallocation to
+be at least =E2=80=9Cmetadata=E2=80=9D whenever @data-file-raw is set.  Wou=
+ld that make
+sense?
 
-The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18cf=
-757 ECX: 0x703f EDX: 0x1000
-The lower four bits of ECX are the [NC] field and all set.
+Max
 
-When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as r=
-eplacement and addition to the above cmdline) the CPUID leaf shows: EAX: 0x=
-3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
-Note, ECX is zero. Indicating that this is no SMP capabale CPU.
-
-I'm debugging it using my local machine and the QEMU provided EPYC-v2
-CPU model and it is reproducible there as well and reports:  EAX:
-0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
-
-I checked other AMD based CPU models (phenom, opteron_g3/g5) and they behav=
-e the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
-I believe that behavior here is wrong as ECX[NC] should report the number o=
-f cores per processor, as stated in the AMD manual [2] p.584. In my underst=
-anding -smp 4 should then lead to ECX[NC] =3D 0x3.
-
-The following table shows my findings with the -smp option:
-Option | Qemu guest observed ECX value
--smp 4 | 0x0
--smp 4,cores=3D4  | 0x3
--smp 4,cores=3D2,thread=3D2 | 0x3
--smp 4,cores=3D4,threads=3D2 | QEMU boot error: topology false.
-
-Now, I'm asking myself how the terminology of the AMD manual maps to QEMU's=
- -smp option.
-Obviously, nr_cores and nr_threads correspond to the cores and threads opti=
-ons on the cmdline and cores * threads <=3D 4 (in this example), but what c=
-orresponds the X in -smp X to?
-
-Querying 0x8000'0008 on the physical processor results in different
-reports than quering QEMU's model as does it with -enable-kvm -cpu host.
-
-Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
-CPU leave reports a single core processor.
-
-This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
-wrong number.
-
-
-Please let me know, if you need more information from my side.
-
-
-[0] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d71328=
-e2b879cbbd19/src/kern/ia32/kernel_thread-ia32.cpp#L109
-[1] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d71328=
-e2b879cbbd19/src/kern/ia32/cpu-ia32.cpp#L1120
-[2] https://github.com/qemu/qemu/blob/f2a8261110c32c4dccd84e774d8dd7a0524e0=
-0fb/target/i386/cpu.c#L5835
-[3] https://www.amd.com/system/files/TechDocs/24594.pdf
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1871842
-
-Title:
-  AMD CPUID leaf 0x8000'0008 reported number of cores  inconsistent with
-  ACPI.MADT
-
-Status in QEMU:
-  New
-
-Bug description:
-  Setup:
-  CPU: AMD EPYC-v2 or host's EPYC cpu
-  Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
-  qemu version: self build
-  git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
-  config: Configured with: '../configure' '--target-list=3Dx86_64-softmmu,m=
-ips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aar=
-ch64-softmmu,arm-softmmu' '--prefix=3D/opt/qemu-master'
-
-  Cmdline: =
-
-  qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/b=
-in/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , =
-... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu =
-EPYC-v2 -m 4G -smp 4 =
+>> My second question is: If we decide that this is fine for
+>> blockdev-create, should at least qcow2_co_create_opts() ensure the data
+>> file it just created is zero?
+>=20
+> Having an option to make qemu force-zero the raw image during
+> qcow2_co_create_opts seems reasonable, but for performance reasons, I
+> don't think the flag should be on by default.
+>=20
 
 
-  Issue:
-  We are developing an microkernel operating system called L4Re. We recentl=
-y got an AMD EPYC server for testing and we couldn't execute SMP tests of o=
-ur system when running Linux + qemu + VM w/ L4Re.
-  In fact, the kernel did not recognize any APs at all. On AMD CPUs the ker=
-nel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[N=
-C] or [ApicIdSize].  [0][1]
 
-  The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18=
-cf757 ECX: 0x703f EDX: 0x1000
-  The lower four bits of ECX are the [NC] field and all set.
+--QpP9iWVKcHdctget9Hu5tSGfQnYxNEBGn--
 
-  When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as=
- replacement and addition to the above cmdline) the CPUID leaf shows: EAX: =
-0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
-  Note, ECX is zero. Indicating that this is no SMP capabale CPU.
+--MLzLY8gT8UKDqPDDIOm10T7K1kAm2Oiai
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  I'm debugging it using my local machine and the QEMU provided EPYC-v2
-  CPU model and it is reproducible there as well and reports:  EAX:
-  0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
+-----BEGIN PGP SIGNATURE-----
 
-  I checked other AMD based CPU models (phenom, opteron_g3/g5) and they beh=
-ave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
-  I believe that behavior here is wrong as ECX[NC] should report the number=
- of cores per processor, as stated in the AMD manual [2] p.584. In my under=
-standing -smp 4 should then lead to ECX[NC] =3D 0x3.
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6PHYUACgkQ9AfbAGHV
+z0AyiQgAsXAmSHQpPfJME9djs9vhL7HfvsqPuzxru+D5E2A0TCOkRuAS+HXHweuI
+Izv8AxyM5g8y6tW0+yGwkyEi0HaICuKPYbSkwq9+zBo9bcL+evPEx495FxMER+yt
+dA8sUiIXpM/X+Y4HuBT17056uSY/D/WCgoz0zFuxhUCnW04TbCdX+I2xXSkaTshO
+01c1WaZ/PMlCwTAx79iDn70EScqeiNhqWBlCIzvCOTg7RBc17930BxPzL0KEnKvt
+ZVn5ILfPw5qNgi/ikRkdCeAfysqGUeeAHylcZOkU3xP5Zv4Fq3eE2XHgSqQBVcmH
+cIWp+vmPa8qeykONEsQcahUnWG17xQ==
+=wWe1
+-----END PGP SIGNATURE-----
 
-  The following table shows my findings with the -smp option:
-  Option | Qemu guest observed ECX value
-  -smp 4 | 0x0
-  -smp 4,cores=3D4  | 0x3
-  -smp 4,cores=3D2,thread=3D2 | 0x3
-  -smp 4,cores=3D4,threads=3D2 | QEMU boot error: topology false.
+--MLzLY8gT8UKDqPDDIOm10T7K1kAm2Oiai--
 
-  Now, I'm asking myself how the terminology of the AMD manual maps to QEMU=
-'s -smp option.
-  Obviously, nr_cores and nr_threads correspond to the cores and threads op=
-tions on the cmdline and cores * threads <=3D 4 (in this example), but what=
- corresponds the X in -smp X to?
-
-  Querying 0x8000'0008 on the physical processor results in different
-  reports than quering QEMU's model as does it with -enable-kvm -cpu
-  host.
-
-  Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
-  CPU leave reports a single core processor.
-
-  This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
-  wrong number.
-
-  =
-
-  Please let me know, if you need more information from my side.
-
-  =
-
-  [0] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
-28e2b879cbbd19/src/kern/ia32/kernel_thread-ia32.cpp#L109
-  [1] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
-28e2b879cbbd19/src/kern/ia32/cpu-ia32.cpp#L1120
-  [2] https://github.com/qemu/qemu/blob/f2a8261110c32c4dccd84e774d8dd7a0524=
-e00fb/target/i386/cpu.c#L5835
-  [3] https://www.amd.com/system/files/TechDocs/24594.pdf
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1871842/+subscriptions
 
