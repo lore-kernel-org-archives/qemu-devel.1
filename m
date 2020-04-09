@@ -2,80 +2,81 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59015C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 02:41:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5741C2BA1A
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 03:16:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23B052087E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 02:40:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A57562087E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 03:16:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=jiaxun.yang@flygoat.com header.b="Qc0pFEMJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23B052087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HrWm1r/S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A57562087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMN7j-0006Kf-5W
-	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 22:40:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46215)
+	id 1jMNgT-00071N-BY
+	for qemu-devel@archiver.kernel.org; Wed, 08 Apr 2020 23:16:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50554)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jMN78-0005mx-KY
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 22:40:23 -0400
+ (envelope-from <jasowang@redhat.com>) id 1jMNfW-0006bS-Qr
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 23:15:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jMN77-0003XE-4B
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 22:40:22 -0400
-Received: from sender3-op-o12.zoho.com.cn ([124.251.121.243]:17876)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jMN76-0003Sk-DB
- for qemu-devel@nongnu.org; Wed, 08 Apr 2020 22:40:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1586399927; cv=none; d=zoho.com.cn; s=zohoarc; 
- b=kyCUbVt7DDHIp9oZ02HRhCgIwIdEQJdXW5cQQ4Kzy2vgBwGFm1VjAvtdNTZD1f9mzBT/JkWqhcru6Gq6FhKcu9QRFkd32dOtKP8MIGRTN9QcW7XxJir4XsTwv61VCVjW5+nlO5xnYcaMVmnhhuX17cC6KZabm4Gd5X7S2FnB9rI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com.cn;
- s=zohoarc; t=1586399927;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To;
- bh=L8RyLyIO5cA+WJS12LcCV4FTG3FjLOTzF3Niw96yqW4=; 
- b=l/BmSWAXYXcf65skADV/3IiGap1ivh4+nvfbFcy/lfwjo39RH+ZZoIk20Q5ea5fC+zPpnSbhcd3SUHBw/3Q655hO/WoNo1UU1wJoMg5MaZItVtgfKtiP8NFnKSi3vpcxYwWfyZeJ+ZyWR2e1MPqevlaZSpxonFvMfSqKn/ZRfwA=
-ARC-Authentication-Results: i=1; mx.zoho.com.cn;
- dkim=pass  header.i=flygoat.com;
- spf=pass  smtp.mailfrom=jiaxun.yang@flygoat.com;
- dmarc=pass header.from=<jiaxun.yang@flygoat.com>
- header.from=<jiaxun.yang@flygoat.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1586399927; 
- s=mail; d=flygoat.com; i=jiaxun.yang@flygoat.com;
- h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:MIME-Version:Content-Type:Content-Transfer-Encoding;
- bh=L8RyLyIO5cA+WJS12LcCV4FTG3FjLOTzF3Niw96yqW4=;
- b=Qc0pFEMJ3pNzFdH+4uwjJMMoj050mtwoKrfG3E1fBhPvMVvdxRxQrJJemnxf6OqE
- cWBcJPnCpHC+TMAgO2orJb4eyuAAx5nzmk+OeAFanI8AJVYSB8GdyM3E95JgfyA+29A
- QHLC2Q7AYU3noEzI0eFa2uaDhnMkQCTdzVxk9tg4=
-Received: from flygoat-x1e (122.235.212.87 [122.235.212.87]) by mx.zoho.com.cn
- with SMTPS id 1586399924957572.7251930516607;
- Thu, 9 Apr 2020 10:38:44 +0800 (CST)
-Date: Thu, 9 Apr 2020 10:38:44 +0800
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-To: Huacai Chen <chenhc@lemote.com>
-Subject: Re: [PATCH 3/3] MAINTAINERS: Add myself as fulong2e co-maintainer
-Message-ID: <20200409103844.1591548c@flygoat-x1e>
-In-Reply-To: <CAAhV-H5moZ8kD5WAM1GvLRmg9spO7m=2DZZL+uUXAoo4iWZyVg@mail.gmail.com>
-References: <1586337380-25217-1-git-send-email-chenhc@lemote.com>
- <1586337380-25217-3-git-send-email-chenhc@lemote.com>
- <CAHiYmc61GZSvvwhCaC0B5q0GrEUN3CevDvNTEEWLE9PCJqVbvw@mail.gmail.com>
- <CAAhV-H5moZ8kD5WAM1GvLRmg9spO7m=2DZZL+uUXAoo4iWZyVg@mail.gmail.com>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+ (envelope-from <jasowang@redhat.com>) id 1jMNfU-0004x3-2B
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 23:15:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34208
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1jMNfS-0004vD-Sc
+ for qemu-devel@nongnu.org; Wed, 08 Apr 2020 23:15:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586402149;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2YH08NYBxXydmwAYFpeth79et4ChRtTA7yv/IWL5RpQ=;
+ b=HrWm1r/S8hfoBiX+FtVjOuJzzQ81oEaNZUFyFxQsmNSLkiYnuiXGt63UkMN3i3X7UmO/tH
+ DzCGuweies1PBywbZkAA8ERjH86qsUwPkNKMYUnf/N6/5cIJc7+96fc5MkMFXt5tp3SBcU
+ 4kZfHf8fUSMlcB5VyUykMA4xRHtcqhY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-254-cBHlQCCBNZ6CTtkI8oZtsw-1; Wed, 08 Apr 2020 23:15:47 -0400
+X-MC-Unique: cBHlQCCBNZ6CTtkI8oZtsw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 243408017F5;
+ Thu,  9 Apr 2020 03:15:46 +0000 (UTC)
+Received: from [10.72.13.188] (ovpn-13-188.pek2.redhat.com [10.72.13.188])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7323AC0D9E;
+ Thu,  9 Apr 2020 03:15:44 +0000 (UTC)
+Subject: Re: [PATCH] Fixed IPv6 payload lenght without jumbo option
+To: andrew@daynix.com, qemu-devel@nongnu.org
+References: <20200405191940.866972-1-andrew@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <e756b1b3-2346-822c-974c-79c40970c09d@redhat.com>
+Date: Thu, 9 Apr 2020 11:15:42 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200405191940.866972-1-andrew@daynix.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-ZohoCNMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 124.251.121.243
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,90 +88,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>,
- Aurelien Jarno <aurelien@aurel32.net>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: dmitry.fleytman@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 9 Apr 2020 10:17:46 +0800
-Huacai Chen <chenhc@lemote.com> wrote:
 
-> Hi, Aleksandar,
->=20
-> On Wed, Apr 8, 2020 at 11:30 PM Aleksandar Markovic
-> <aleksandar.qemu.devel@gmail.com> wrote:
-> >
-> > 11:08 Sre, 08.04.2020. Huacai Chen <chenhc@lemote.com> =D1=98=D0=B5
-> > =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0: =20
-> > >
-> > > I submitted the MIPS/fulong2e support about ten years ago, and
-> > > after that I became a MIPS kernel developer. Last year, Philippe
-> > > Mathieu- Daud=C3=A9 asked me that whether I can be a reviewer of
-> > > MIPS/fulong2e, and I promised that I will do some QEMU work in
-> > > the next year (i.e., 2020 and later). I think now (and also in
-> > > future) I can have some spare time, so I can finally do some real
-> > > work on QEMU/MIPS. And if possible, I hope I can be a
-> > > co-maintainer of MIPS/fulong2e.
-> > >
-> > > Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > > ---
-> > >  MAINTAINERS | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/MAINTAINERS b/MAINTAINERS
-> > > index 642c8e0..3281ff2 100644
-> > > --- a/MAINTAINERS
-> > > +++ b/MAINTAINERS
-> > > @@ -1073,6 +1073,7 @@ F: hw/mips/mips_r4k.c
-> > >  Fulong 2E
-> > >  M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > >  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> > > +M: Huacai Chen <chenhc@lemote.com>
-> > >  S: Odd Fixes
-> > >  F: hw/mips/mips_fulong2e.c
-> > >  F: hw/isa/vt82c686.c
-> > > --
-> > > 2.7.0
-> > > =20
-> >
-> > First of all, I want to express great pleasure and delight seing
-> > your series, and this patch in particular.
-> >
-> > A warm welcome to QEMU developers communities!
-> >
-> > We are currenyly very busy preparing QEMU 5.0 release, and
-> > additionaly, Easter holidays are in next few days or week
-> > (different parts od Christian world have different calendars), so,
-> > fot thay and other reasons, don't expect promot replies from us.
-> >
-> > I would also like to see Jiaxng at least having official reviewer
-> > status, but, of course, only if he wants that. =20
-> Thank you for your best wishes, I'm also very glad to see Jiaxun be
-> an reviewer.
+On 2020/4/6 =E4=B8=8A=E5=8D=883:19, andrew@daynix.com wrote:
+> From: Andrew Melnychenko <andrew@daynix.com>
+>
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1708065
+> e1000e driver doesn't sets 'plen' field for IPv6 for big packets
+> if TSO is enabled. Jumbo option isn't added yet, until
+> qemu supports packets greater than 64K.
+>
+> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+> ---
+>   hw/net/e1000e_core.c |  1 +
+>   hw/net/net_tx_pkt.c  | 31 +++++++++++++++++++++++++++++++
+>   hw/net/net_tx_pkt.h  |  7 +++++++
+>   include/net/eth.h    |  1 +
+>   4 files changed, 40 insertions(+)
+>
+> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+> index d5676871fa..a1ec55598b 100644
+> --- a/hw/net/e1000e_core.c
+> +++ b/hw/net/e1000e_core.c
+> @@ -656,6 +656,7 @@ e1000e_tx_pkt_send(E1000ECore *core, struct e1000e_tx=
+ *tx, int queue_index)
+>       NetClientState *queue =3D qemu_get_subqueue(core->owner_nic, target=
+_queue);
+>  =20
+>       e1000e_setup_tx_offloads(core, tx);
+> +    net_tx_pkt_fix_ip6_payload_len(tx->tx_pkt);
 
-Thanks, but I was a primary school student at Loongson-2E's era, so I
-can do nothing with 2E.
 
-My experience with Loongson starts from 2F. And I'm more familiar with
-2K and 3A.
+A question here:
 
-I'm happy to contribute QEMU support for these platforms.
+I don't see any code that set ip6_plen during=20
+net_tx_pkt_do_sw_fragmentation(). This is described in 7.3.6.2.1 and=20
+7.3.6.2.2 in the datasheet.
 
-Thanks.
+And:
 
->=20
-> Regards,
-> Huacai
-> >
-> > Yours,
-> > and wishing you and all people from China best health!
-> >
-> > Aleksandar =20
+1) eth_setup_ip4_fragmentation() only deal with ipv4
 
---
-Jiaxun Yang
+2) eth_fix_ip4_checksum() assumes a ipv4 header
+
+Do we support ipv6 segmentation then?
+
+Thanks
+
+
+>  =20
+>       net_tx_pkt_dump(tx->tx_pkt);
+>  =20
+> diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
+> index 162f802dd7..b05d554ac3 100644
+> --- a/hw/net/net_tx_pkt.c
+> +++ b/hw/net/net_tx_pkt.c
+> @@ -635,3 +635,34 @@ bool net_tx_pkt_send_loopback(struct NetTxPkt *pkt, =
+NetClientState *nc)
+>  =20
+>       return res;
+>   }
+> +
+> +void net_tx_pkt_fix_ip6_payload_len(struct NetTxPkt *pkt)
+> +{
+> +    /*
+> +     * If ipv6 payload length field is 0 - then there should be Hop-by-H=
+op
+> +     * option for packets greater than 65,535.
+> +     * For packets with payload less than 65,535: fix 'plen' field.
+> +     * For now, qemu drops every packet with size greater 64K
+> +     * (see net_tx_pkt_send()) so, there is no reason to add jumbo optio=
+n to ip6
+> +     * hop-by-hop extension if it's missed
+> +     */
+> +
+> +    struct iovec *l2 =3D &pkt->vec[NET_TX_PKT_L2HDR_FRAG];
+> +    if (eth_get_l3_proto(l2, 1, l2->iov_len) =3D=3D ETH_P_IPV6) {
+> +        struct ip6_header *ip6 =3D (struct ip6_header *) pkt->l3_hdr;
+> +        /*
+> +         * TODO: if qemu would support >64K packets - add jumbo option c=
+heck
+> +         * something like that:
+> +         * 'if (ip6->ip6_plen =3D=3D 0 && !has_jumbo_option(ip6)) {'
+> +         */
+> +        if (ip6->ip6_plen =3D=3D 0) {
+> +            if (pkt->payload_len <=3D ETH_MAX_IP_DGRAM_LEN) {
+> +                ip6->ip6_plen =3D htons(pkt->payload_len);
+> +            }
+> +            /*
+> +             * TODO: if qemu would support >64K packets
+> +             * add jumbo option for packets greater then 65,535 bytes
+> +             */
+> +        }
+> +    }
+> +}
+> diff --git a/hw/net/net_tx_pkt.h b/hw/net/net_tx_pkt.h
+> index 212ecc62fc..912d56ef13 100644
+> --- a/hw/net/net_tx_pkt.h
+> +++ b/hw/net/net_tx_pkt.h
+> @@ -187,4 +187,11 @@ bool net_tx_pkt_parse(struct NetTxPkt *pkt);
+>   */
+>   bool net_tx_pkt_has_fragments(struct NetTxPkt *pkt);
+>  =20
+> +/**
+> + * Fix IPv6 'plen' field.
+> + *
+> + * @pkt            packet
+> + */
+> +void net_tx_pkt_fix_ip6_payload_len(struct NetTxPkt *pkt);
+> +
+>   #endif
+> diff --git a/include/net/eth.h b/include/net/eth.h
+> index 7f45c678e7..0671be6916 100644
+> --- a/include/net/eth.h
+> +++ b/include/net/eth.h
+> @@ -186,6 +186,7 @@ struct tcp_hdr {
+>  =20
+>   #define ip6_nxt      ip6_ctlun.ip6_un1.ip6_un1_nxt
+>   #define ip6_ecn_acc  ip6_ctlun.ip6_un3.ip6_un3_ecn
+> +#define ip6_plen     ip6_ctlun.ip6_un1.ip6_un1_plen
+>  =20
+>   #define PKT_GET_ETH_HDR(p)        \
+>       ((struct eth_header *)(p))
+
 
