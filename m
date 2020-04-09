@@ -2,82 +2,85 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11667C2D0EA
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 06:59:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0714CC2D0EA
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:00:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C02F42072F
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 06:59:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=smartx-com.20150623.gappssmtp.com header.i=@smartx-com.20150623.gappssmtp.com header.b="J4L9SJ1A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C02F42072F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
+	by mail.kernel.org (Postfix) with ESMTPS id CD5A52072F
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 07:00:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD5A52072F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMR9y-0001Tz-Ss
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 02:59:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39831)
+	id 1jMRB0-0002d7-26
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 03:00:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39911)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fengli@smartx.com>) id 1jMR9K-00010r-Rp
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 02:58:56 -0400
+ (envelope-from <chen.zhang@intel.com>) id 1jMRAF-0001yP-3J
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 02:59:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fengli@smartx.com>) id 1jMR9J-0000uU-Fk
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 02:58:54 -0400
-Received: from mail-vk1-xa43.google.com ([2607:f8b0:4864:20::a43]:34402)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <fengli@smartx.com>) id 1jMR9J-0000u0-82
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 02:58:53 -0400
-Received: by mail-vk1-xa43.google.com with SMTP id p123so2516580vkg.1
- for <qemu-devel@nongnu.org>; Wed, 08 Apr 2020 23:58:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=smartx-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=UOH+4sElY97Kn/fu2C6ks2/6LZaOAtgdKCvQI2y2+fA=;
- b=J4L9SJ1ArKQEfGSiMFfwm+KV8YoYQoN2mmrnJKtMWEM3GVXlcz9QXGVYOXRY9EZ70t
- 0vqQeY0zdnicGyb3w+Ehg9yh9bFkLPJxzmL6C9D9mpFolounLTTwnPBqKdNN43u3m3/K
- ZDECZ0Rce7mCErjgo9T8F8yu8jfHsAROiThnaTsztqykitKFhsT7otiuGEZF+EA5v0WM
- csa535xfLJ75SUY/Cn0UK2dcgpb9j9K39G3fah2aWkHaGHwLrs3zLKt8f8OLerZxzg2A
- IV8vqHcL6/hnskMmV96InLDxx21tgVp9qUpkstC935c/c68J+HvpUsyxwADs95dEojvQ
- NrcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=UOH+4sElY97Kn/fu2C6ks2/6LZaOAtgdKCvQI2y2+fA=;
- b=qln3UpkXWqWFGWsNIACi1TrnJKsUM6f09jeS0HemGrevas4aoTjhUkUIJLcbXsHoSd
- j9baB+DkmEewOOHCY003eEeOw8Etz0XtfulB1opqeaRBXnC3D47Y2AzoDQfuiD+rdZsh
- b3BxBK4pP2KBW85kLryXuR4QpQfu9s8O3151sXJR4yOCKa/aZ/UetCbgoJR5IzmrkJdS
- wKTSuJ9MhWQuD8dkNr8ucFJwwCphWrCt947CWqmDPUNIsQE4Ad2AYpcfylyFhrt73jTn
- Q9mdD8Tj2W4GyGm18JfZ/Y+WhWr9hj8gcC5zSBjHJQ0uIpIIM8nL2U81YPLHyIQg69bw
- 85qw==
-X-Gm-Message-State: AGi0PubVnauj1+vw8MI5KynmXLps1ycn+dkMUAV6k78CKwk5pUnRjAAx
- hMq/Oeck5qGgUqZhu7xID3eLeMadLddV/n3+CzJEv+9HCeo1glfpJsG7AjZin049oebkJDKyKSK
- vH7O2srXDmkAU7tRjBZlvOutf
-X-Google-Smtp-Source: APiQypJ2qjxC5BVeyr/RoX7MUgyi29dP3xrpuEdvwztCwipoWDBXi2gKB9DCV0blhhmFDUqKDspt4UmS5mo9dur50TU=
-X-Received: by 2002:a1f:b48c:: with SMTP id d134mr7975225vkf.76.1586415531389; 
- Wed, 08 Apr 2020 23:58:51 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAHckoCzojVSHLAwBP2QhFx3Gw6j9DVPRwNSML9D4GQMzKr9Y3g@mail.gmail.com>
- <20200408124035.41c1d242@redhat.com>
-In-Reply-To: <20200408124035.41c1d242@redhat.com>
-From: Li Feng <fengli@smartx.com>
-Date: Thu, 9 Apr 2020 14:58:40 +0800
-Message-ID: <CAHckoCzWgEr+u1UZVtF7YEZcD57hMvEH85YXgLfnvKHQ2KtAxA@mail.gmail.com>
-Subject: Re: hotplug issue of vhost-user-blk
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+ (envelope-from <chen.zhang@intel.com>) id 1jMRAD-0001Oc-81
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 02:59:50 -0400
+Received: from mga03.intel.com ([134.134.136.65]:14211)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+ id 1jMRAD-0001HN-0O
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 02:59:49 -0400
+IronPort-SDR: UQE+fUr4CWwitAKJh6pdOHX13T5sWadil2VDkoccG1KmRy9ffgfvozglMCeVNQPS1sAMTJXtti
+ aR49Gorsp+Sw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 08 Apr 2020 23:59:40 -0700
+IronPort-SDR: PtP67FNuc/6he5douLihdON9OhMQ0nKDiIH4uJlj/TJWifKZlGv9wWDn4VK5lYsw764nQXMUfM
+ K32vfxnvfTHA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,361,1580803200"; d="scan'208";a="251806707"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+ by orsmga003.jf.intel.com with ESMTP; 08 Apr 2020 23:59:40 -0700
+Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 8 Apr 2020 23:59:39 -0700
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ SHSMSX601.ccr.corp.intel.com (10.109.6.141) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Thu, 9 Apr 2020 14:59:36 +0800
+Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
+ SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
+ Thu, 9 Apr 2020 14:59:36 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Lukas Straub <lukasstraub2@web.de>, Derek Su <dereksu@qnap.com>
+Subject: RE: [PATCH v4 2/2] net/colo-compare.c: handling of the full primary
+ or secondary queue
+Thread-Topic: [PATCH v4 2/2] net/colo-compare.c: handling of the full primary
+ or secondary queue
+Thread-Index: AQHWBP8jbziCKwk6wUatrdITk0cinKhvJO0AgAFH8mA=
+Date: Thu, 9 Apr 2020 06:59:36 +0000
+Message-ID: <3f0534dbaa744ee4bff9f11615a3b964@intel.com>
+References: <20200328124646.7778-1-dereksu@qnap.com>
+ <20200328124646.7778-3-dereksu@qnap.com> <20200408211842.2c0f1e4a@luklap>
+In-Reply-To: <20200408211842.2c0f1e4a@luklap>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::a43
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 134.134.136.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,106 +92,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- raphael.norwitz@nutanix.com, Kyle Zhang <kyle@smartx.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: "lizhijian@cn.fujitsu.com" <lizhijian@cn.fujitsu.com>,
+ "chyang@qnap.com" <chyang@qnap.com>,
+ "jasowang@redhat.com" <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "ctcheng@qnap.com" <ctcheng@qnap.com>,
+ "jwsu1986@gmail.com" <jwsu1986@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks!
-After waiting some seconds after device_del:
-(qemu) device_del spdk_vhost_blk2
-sleep 5
-(qemu) chardev-remove spdk_vhost_blk2
-Error: Chardev 'spdk_vhost_blk2' is busy
-
-It works. However, I find some crashes about the vhost-user-blk.
-I will send out the patches after all tests.
-
-Thanks,
-
-Feng Li
-
-Igor Mammedov <imammedo@redhat.com> =E4=BA=8E2020=E5=B9=B44=E6=9C=888=E6=97=
-=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=886:40=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Wed, 8 Apr 2020 10:25:42 +0800
-> Li Feng <fengli@smartx.com> wrote:
->
-> > Hi all,
-> >
-> > Hotplug of vhost-user-blk doesn't not work in qemu master branch and
-> > all previous version.
-> >
-> > The action I insert a vhost-user-blk disk is:
-> > (qemu) chardev-add socket,id=3Dspdk_vhost_blk2,path=3D/vhost-blk.0,reco=
-nnect=3D1
-> > (qemu) device_add
-> > vhost-user-blk-pci,chardev=3Dspdk_vhost_blk2,id=3Dspdk_vhost_blk2,num-q=
-ueues=3D4
-> >
-> > Until here, it's well.
-> >
-> > Then I unplug it from qemu:
-> > (qemu) device_del spdk_vhost_blk2
-> > (qemu) chardev-remove spdk_vhost_blk2
-> > Error: Chardev 'spdk_vhost_blk2' is busy
-> >
-> > The related code is here:
-> > qmp_chardev_remove
-> >     -> qemu_chr_is_busy
-> >     -> object_unparent(OBJECT(chr));
-> >
-> >  330 static bool qemu_chr_is_busy(Chardev *s)
-> >  331 {
-> >  332     if (CHARDEV_IS_MUX(s)) {
-> >  333         MuxChardev *d =3D MUX_CHARDEV(s);
-> >  334         return d->mux_cnt >=3D 0;
-> >  335     } else {
-> >  336         return s->be !=3D NULL;
-> >  337     }
-> >  338 }
-> >
-> > My question is:
-> > 1. s->be is set to NULL when qemu_chr_fe_deinit is called.
-> > However, the qmp_chardev_remove is blocked at qemu_chr_is_busy check,
-> > then the object_unparent will not be called.
-> > 2. Is there a path that device_del will trigger the s->be that been set=
- to NULL?
->
-> device_del is request for guest to eject device and once it's done backen=
-d
-> could be removed.
->
-> what's you command line? (so I could point out entry point where ejection=
- happens
-> for you to troubleshoot it further)
->
-> >
-> > How should I fix this issue?
-> > I have tested that comment the qemu_chr_is_busy works well.
-> >
-> > Thanks in advance.
-> >
-> > Feng Li
-> >
->
-
---=20
-The SmartX email address is only for business purpose. Any sent message=20
-that is not related to the business is not authorized or permitted by=20
-SmartX.
-=E6=9C=AC=E9=82=AE=E7=AE=B1=E4=B8=BA=E5=8C=97=E4=BA=AC=E5=BF=97=E5=87=8C=E6=
-=B5=B7=E7=BA=B3=E7=A7=91=E6=8A=80=E6=9C=89=E9=99=90=E5=85=AC=E5=8F=B8=EF=BC=
-=88SmartX=EF=BC=89=E5=B7=A5=E4=BD=9C=E9=82=AE=E7=AE=B1. =E5=A6=82=E6=9C=AC=
-=E9=82=AE=E7=AE=B1=E5=8F=91=E5=87=BA=E7=9A=84=E9=82=AE=E4=BB=B6=E4=B8=8E=E5=
-=B7=A5=E4=BD=9C=E6=97=A0=E5=85=B3,=E8=AF=A5=E9=82=AE=E4=BB=B6=E6=9C=AA=E5=
-=BE=97=E5=88=B0=E6=9C=AC=E5=85=AC=E5=8F=B8=E4=BB=BB=E4=BD=95=E7=9A=84=E6=98=
-=8E=E7=A4=BA=E6=88=96=E9=BB=98=E7=A4=BA=E7=9A=84=E6=8E=88=E6=9D=83.
 
 
+> -----Original Message-----
+> From: Lukas Straub <lukasstraub2@web.de>
+> Sent: Thursday, April 9, 2020 3:19 AM
+> To: Derek Su <dereksu@qnap.com>
+> Cc: qemu-devel@nongnu.org; lizhijian@cn.fujitsu.com; chyang@qnap.com;
+> jasowang@redhat.com; ctcheng@qnap.com; Zhang, Chen
+> <chen.zhang@intel.com>; jwsu1986@gmail.com
+> Subject: Re: [PATCH v4 2/2] net/colo-compare.c: handling of the full prim=
+ary
+> or secondary queue
+>=20
+> On Sat, 28 Mar 2020 20:46:46 +0800
+> Derek Su <dereksu@qnap.com> wrote:
+>=20
+> > The pervious handling of the full primary or queue is only dropping
+> > the packet. If there are lots of clients to the guest VM, the "drop"
+> > will lead to the lost of the networking connection until next
+> > checkpoint.
+> >
+> > To address the issue, this patch drops the packet firstly.
+> > Then, do checkpoint and flush packets.
+> >
+> > Signed-off-by: Derek Su <dereksu@qnap.com>
+>=20
+> Hello,
+> I had a look at this again and did some benchmarking.
+> First just qemu 5.0-rc1 with my bugfixes
+> ( https://lists.nongnu.org/archive/html/qemu-devel/2020-
+> 04/msg01432.html ) Then qemu 5.0-rc1 with my bugfixes and this patch
+> series.
+>=20
+> This commit hurts performance too much:
+> Client-to-server bandwidth falls from ~45.9 Mbit/s to 22.9 Mbit/s.
+> Server-to-client bandwidth falls from ~6.3 Mbit/s to just ~674 Kbit/s.
+> Average latency rises from ~197ms to ~397ms.
+>=20
+> Meanwhile the packet loss without this commit is negligible, only 1-2 pin=
+g
+> packets got lost during each test run.
+>=20
+> Instead I think we should just turn the error message into a trace so it
+> doesn't flood the logs.
+
+We re-test this patch, Lukas is right.
+Sorry for the original idea, looks like it did not show better performance =
+in the test.
+Agree with Lukas's comments. Derek, can you please change it?
+
+Thanks
+Zhang Chen
+
+
+>=20
+> Regards,
+> Lukas Straub
 
