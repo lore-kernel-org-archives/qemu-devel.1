@@ -2,85 +2,84 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95E63C2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:04:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED211C2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:05:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 622BF2072F
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:04:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1EC620757
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 18:05:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TYzFrM1p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 622BF2072F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="djpZcho5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1EC620757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMbXT-0007Np-CS
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 14:04:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43715)
+	id 1jMbYi-0000em-Vg
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 14:05:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44208)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jMbV9-0004wu-Ib
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:02:08 -0400
+ (envelope-from <eblake@redhat.com>) id 1jMbY9-000060-Qb
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:05:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jMbV8-0001Vt-HW
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:02:07 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38702
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eblake@redhat.com>) id 1jMbY8-0003Va-QB
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:05:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34922
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jMbV8-0001U3-7z
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:02:06 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jMbY8-0003UV-MN
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 14:05:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586455324;
+ s=mimecast20190719; t=1586455510;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ohurTFnwHTFEvah1f7EZXFN/XV+nDXWrD4MHbi4zHEc=;
- b=TYzFrM1pKmut2aZhQls06xPwLD9MI+RfGM3F9T9zHD5OsWUWJpLjqMJNZ6iQ6HGvEXB0De
- I8K4ZkASPuXBofTxa1CZl6H/39XJdN9ceIW307Gw6retFyQgvB0fyNBoo3OK5j67uI6pkb
- gRMIOCeY0IUfeYCxuqerJDi331bNqCk=
+ bh=3knomRhlz8Y8QrDTmYj66/hAq1o7we2zKIt1pzHJzEQ=;
+ b=djpZcho5TGxpo9Nu8uvtmsE5G3V9xi2+Hg5nZuJsoECr7B53Kbl7hu99twjng824/10Kg4
+ c0KV6Y7U/RzfBDDSrYlggBLCIsevpzQHnDUGtLvojiUD+IyXk+D5k1Lv3yQ3FF91ap0ZgO
+ ZtnSjNZDFjkUv3VXNs6ZBfp0g+QNQsw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-167-Mjl1GEcMMeqHSazoxH7GOg-1; Thu, 09 Apr 2020 14:02:00 -0400
-X-MC-Unique: Mjl1GEcMMeqHSazoxH7GOg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-468-MsVVoN0WM-qtk4l3UVBaMw-1; Thu, 09 Apr 2020 14:05:08 -0400
+X-MC-Unique: MsVVoN0WM-qtk4l3UVBaMw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0033E800D53;
- Thu,  9 Apr 2020 18:02:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A8D38017F3;
+ Thu,  9 Apr 2020 18:05:07 +0000 (UTC)
 Received: from [10.3.114.49] (ovpn-114-49.phx2.redhat.com [10.3.114.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B3BA391;
- Thu,  9 Apr 2020 18:01:59 +0000 (UTC)
-Subject: Re: [PATCH for-5.1 2/8] qemu-options: Factor out get_opt_name_value()
- helper
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 001521001925;
+ Thu,  9 Apr 2020 18:05:06 +0000 (UTC)
+Subject: Re: [PATCH for-5.1 3/8] qemu-option: Fix sloppy recognition of
+ "id=..." after ", , "
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200409153041.17576-1-armbru@redhat.com>
- <20200409153041.17576-3-armbru@redhat.com>
+ <20200409153041.17576-4-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <5f39e636-f799-55f3-873f-08a3a0f53dca@redhat.com>
-Date: Thu, 9 Apr 2020 13:01:59 -0500
+Message-ID: <657eb2fd-5909-501e-4aa1-9e7490794d5b@redhat.com>
+Date: Thu, 9 Apr 2020 13:05:06 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200409153041.17576-3-armbru@redhat.com>
+In-Reply-To: <20200409153041.17576-4-armbru@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,55 +97,29 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 4/9/20 10:30 AM, Markus Armbruster wrote:
-> The next commits will put it to use.
-> 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   util/qemu-option.c | 102 +++++++++++++++++++++++++--------------------
->   1 file changed, 56 insertions(+), 46 deletions(-)
+>   tests/test-qemu-opts.c |  4 ++--
+>   util/qemu-option.c     | 27 +++++++++++++++++++--------
+>   2 files changed, 21 insertions(+), 10 deletions(-)
 > 
-
-> +static const char *get_opt_name_value(const char *params,
-> +                                      const char *firstname,
-> +                                      char **name, char **value)
-> +{
-> +    const char *p, *pe, *pc;
-> +
-> +    pe = strchr(params, '=');
-> +    pc = strchr(params, ',');
-> +
-> +    if (!pe || (pc && pc < pe)) {
-> +        /* found "foo,more" */
-> +        if (firstname) {
-> +            /* implicitly named first option */
-> +            *name = g_strdup(firstname);
-> +            p = get_opt_value(params, value);
-
-Is this correct even when params is "foo,,more"?  But...
-
->   static void opts_do_parse(QemuOpts *opts, const char *params,
->                             const char *firstname, bool prepend,
->                             bool *invalidp, Error **errp)
->   {
-> -    char *option = NULL;
-> -    char *value = NULL;
-> -    const char *p,*pe,*pc;
->       Error *local_err = NULL;
-> +    char *option, *value;
-> +    const char *p;
+> diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
+> index 0efe93b45e..27c24bb1a2 100644
+> --- a/tests/test-qemu-opts.c
+> +++ b/tests/test-qemu-opts.c
+> @@ -500,10 +500,10 @@ static void test_opts_parse(void)
+>       g_assert(!opts);
+>       /* TODO Cover .merge_lists = true */
 >   
-> -    for (p = params; *p != '\0'; p++) {
-> -        pe = strchr(p, '=');
-> -        pc = strchr(p, ',');
-> -        if (!pe || (pc && pc < pe)) {
-> -            /* found "foo,more" */
-> -            if (p == params && firstname) {
-> -                /* implicitly named first option */
-> -                option = g_strdup(firstname);
-> -                p = get_opt_value(p, &value);
+> -    /* Buggy ID recognition */
+> +    /* Buggy ID recognition (fixed) */
+>       opts = qemu_opts_parse(&opts_list_03, "x=,,id=bar", false, &error_abort);
+>       g_assert_cmpuint(opts_count(opts), ==, 1);
+> -    g_assert_cmpstr(qemu_opts_id(opts), ==, "bar"); /* BUG */
+> +    g_assert(!qemu_opts_id(opts));
+>       g_assert_cmpstr(qemu_opt_get(opts, "x"), ==, ",id=bar");
 
-...in this patch, it is just code motion, so if it is a bug, it's 
-pre-existing and worth a separate fix.
+Yay - that matches my intuition better about ,, handling.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
