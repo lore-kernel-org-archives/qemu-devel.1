@@ -2,95 +2,83 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59EC8C2BB85
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 17:25:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7277C2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 17:35:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28E9220769
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 17:25:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 732E620769
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 17:35:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AcPMO2Fy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E9220769
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DA0PBymC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 732E620769
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMaw8-00044k-8w
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 13:25:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36304)
+	id 1jMb5A-0000Lj-Jz
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 13:35:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38224)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jMavX-0003c9-02
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 13:25:20 -0400
+ (envelope-from <alexander.duyck@gmail.com>) id 1jMb4Q-0008LG-Uo
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 13:34:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jMavV-0001f4-VJ
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 13:25:18 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25353
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jMavV-0001es-S9
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 13:25:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586453117;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=YVVOB7piyvBYduzoVgeiZFUHFafTaja7XKty8+Jzn58=;
- b=AcPMO2FyYo9QdQI/4weqZboojcYRLgd/c5Q0gz2gG6O8H+u4z2dxYTPXzuBWUlgFA36cNK
- /p3cNzzhXx1/Aot++GpzyOeT+86cl4WcYBBVtzOmYm7QIiEf0q7DoMDXSsYBWEqR7ZArWg
- pM6x5sRI+f0a+GBdk0IitdLs3fszY3I=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-NPqHGKrDOne6l7RIh3g47w-1; Thu, 09 Apr 2020 13:25:14 -0400
-X-MC-Unique: NPqHGKrDOne6l7RIh3g47w-1
-Received: by mail-wm1-f70.google.com with SMTP id b203so162169wmd.6
- for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 10:25:13 -0700 (PDT)
+ (envelope-from <alexander.duyck@gmail.com>) id 1jMb4P-0000cN-Mk
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 13:34:30 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:33159)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alexander.duyck@gmail.com>)
+ id 1jMb4P-0000bk-GB
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 13:34:29 -0400
+Received: by mail-io1-xd44.google.com with SMTP id o127so434281iof.0
+ for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 10:34:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=hxXLScf4ZxxDDpPsIkUVUGtYfs4PtuvwlW9XD3T4Yrc=;
+ b=DA0PBymCQjy8cf6lvM9xgCDkS4bSwZFhOPXqi4m+HFc1MUhMTuOeLBI/TABmFftxZ0
+ mpj9aPvL5OVIWJgrgbBQW/Yz2FqiWvMyM4U/Vd0qUAyTrsiWz9pxtxfuOAgkiObsPNgP
+ 4xUSnkGE+77eIMBiNhmjthLFM5pMhwQYIPW4VfzjLbZy5Nl4qiWTK2P3EVjb6VDY+/nb
+ I36dgJncMtz/WXxijIb0QT08j7YdjCDLs2eCCYQf2MlpCEoDrac8TYLx/LmWPuIezc8+
+ 2u1tNL3THFfRY7Pc+irE6An0r1SZnMij2DGrE9hZnrEqt1N3CEefhNCCqnbbeyiqy/pn
+ z9Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=jDgeQzwFpOkE+RV13h1WdRCe2ZSb3MDfV8dB4086ZlY=;
- b=LSQiQpht/J9po8l/V+RKOMl2x2lKoKCn47qocOxcrgwv3TakYAL99Uy28SrtenmV1s
- X9aEpuqXf3JHSqJjDhL8VomZ2HJ0nRxv3XcfBSasoRByjxuyjH/FAW5A3xpGh20kc1x5
- 7fWR4+HOKp0i+fkTareuidQGh/6EzthYoDwsOq08E53iLGLnZ138KEY84hLm6sfbm4+6
- yZqsrHBhWNJfnBlAPHUt3TTqUoD8gvoP3JO0qyRUDoDSH5zSQM8YY5hpfk1bxAsr9rpc
- 0G4T6t+yCr/ryMMpbP1yck0Sr4V2m7fVGbA91hRocgp1lPbQMa5bddFLvcF6l2cbTFR/
- DVCQ==
-X-Gm-Message-State: AGi0PuZVrG8/DWKY1b5w0/C/a4Bz8QMk8XFcvpv/dtaTNVeU/KBxtZKD
- RPvDkcW1Is2/r1ZrY/KiVz1k0mBpvj42IBTOTRpNlKH79ieSCXzIvf/gbxDA3VYi3GgRp1svw/9
- Jalw0u3qIVkF1HmA=
-X-Received: by 2002:a1c:4c0f:: with SMTP id z15mr885936wmf.95.1586453112751;
- Thu, 09 Apr 2020 10:25:12 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ8LqtdPtcVKrSxafgEUmqZUG/HmZCwoCHKG2r/IOMl1+LL+UfqV65JJQUEY6bvorAxm7zIAw==
-X-Received: by 2002:a1c:4c0f:: with SMTP id z15mr885928wmf.95.1586453112590;
- Thu, 09 Apr 2020 10:25:12 -0700 (PDT)
-Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id n4sm4372836wmi.20.2020.04.09.10.25.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 09 Apr 2020 10:25:11 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0] target/m68k/helper: Fix m68k_fpu_gdb_get_reg() use of
- GByteArray
-Date: Thu,  9 Apr 2020 19:25:08 +0200
-Message-Id: <20200409172509.4078-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=hxXLScf4ZxxDDpPsIkUVUGtYfs4PtuvwlW9XD3T4Yrc=;
+ b=g/RP7nw21ZG3HDmsJRtQ4If7kHpMIIQDscFdi52KCORpEqW7F2fKqgjqU0+WcpUK/6
+ g85Wk9QESgdClXOnSzwmdtGdszPK+fkY3T7oYh5Dh006sWt10HZ4Or7qvEqj5mIMfDMa
+ Ykgs8ammVjjDOEFkoF/RYS5+KjAW4Q3SyUl0Z+3I9xXJtstPhNiWsMuPGvqjotuOC+Yk
+ Brl9QBeGgv+UrMlwPwgl8BNuJI8mCZaB+juZ6nES0IdUJ2jXzFhbNmIgXpDWRyz0p5Y4
+ OyJYKrHxuHiOKZviSLBpyjwtP0JnrIX5EFlwjUr3G37uquegDDNKvrcDOYDdyGIZEr4y
+ 7BAA==
+X-Gm-Message-State: AGi0PuaBtasbxD2UDKNWgcnfm8KhhZ172lZTThXU5vnEJXRFQdGXEpmf
+ NQYNeYoaqpm2QdZzFVzeAtSbC+irM48LEL+F+CY=
+X-Google-Smtp-Source: APiQypKGlZT5V0M70aL5+RYsYKqOx8UeQeez1bnjQC1divMSUNkvQafMUZAnot8kYUJ2e10i98CkgF4eyi20T1Qiwgs=
+X-Received: by 2002:a02:cce2:: with SMTP id l2mr516484jaq.83.1586453668120;
+ Thu, 09 Apr 2020 10:34:28 -0700 (PDT)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200408225302.18764.209.stgit@localhost.localdomain>
+ <20200408225529.18764.44086.stgit@localhost.localdomain>
+ <06ac44b9-77ae-7686-8a65-7edff2cbf1b7@redhat.com>
+In-Reply-To: <06ac44b9-77ae-7686-8a65-7edff2cbf1b7@redhat.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Thu, 9 Apr 2020 10:34:17 -0700
+Message-ID: <CAKgT0UdLRKyc47izJO-rukHmj4cWP1xOzrxBv1ZX4yF92nH8Kg@mail.gmail.com>
+Subject: Re: [PATCH v18 QEMU 3/3] virtio-balloon: Provide a interface for free
+ page reporting
+To: David Hildenbrand <david@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,44 +90,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Peter Xu <peterx@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since a010bdbe719 the gdbstub API takes a GByteArray*.
-Unfortunately we forgot to update the gdb_get_reg*()
-calls.  Do it now.
+On Thu, Apr 9, 2020 at 12:44 AM David Hildenbrand <david@redhat.com> wrote:
+>
+> On 09.04.20 00:55, Alexander Duyck wrote:
+> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> >
+> > Add support for what I am referring to as "free page reporting".
+>
+> "Add support for "free page reporting".
+>
+> > Basically the idea is to function very similar to how the balloon works
+> > in that we basically end up madvising the page as not being used. However
+>
+> I'd get rid of one "basically".
+>
+> > we don't really need to bother with any deflate type logic since the page
+> > will be faulted back into the guest when it is read or written to.
+> >
+> > This is meant to be a simplification of the existing balloon interface
+> > to use for providing hints to what memory needs to be freed. I am assuming
+>
+> It's not really a simplification, it's something new. It's a new way of
+> letting the guest automatically report free pages to the hypervisor, so
+> the hypervisor can reuse them. In contrast to inflate/deflate, that's
+> triggered via the hypervisor explicitly.
+>
+> > this is safe to do as the deflate logic does not actually appear to do very
+> > much other than tracking what subpages have been released and which ones
+> > haven't.
+>
+> "I assume this is safe" does not sound very confident. Can we just drop
+> the last sentence?
 
-Fixes: a010bdbe719 ("extend GByteArray to read register helpers")
-Reported-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Based-on: <20200409164954.36902-1-peterx@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- target/m68k/helper.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Agreed. I will make the requested changes to the patch description.
 
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index 014657c637..cad4083895 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -109,8 +109,8 @@ static int m68k_fpu_gdb_get_reg(CPUM68KState *env, GByt=
-eArray *mem_buf, int n)
- {
-     if (n < 8) {
-         int len =3D gdb_get_reg16(mem_buf, env->fregs[n].l.upper);
--        len +=3D gdb_get_reg16(mem_buf + len, 0);
--        len +=3D gdb_get_reg64(mem_buf + len, env->fregs[n].l.lower);
-+        len +=3D gdb_get_reg16(mem_buf, 0);
-+        len +=3D gdb_get_reg64(mem_buf, env->fregs[n].l.lower);
-         return len;
-     }
-     switch (n) {
---=20
-2.21.1
+>
+> >
+> > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> > ---
+> >  hw/virtio/virtio-balloon.c         |   48 +++++++++++++++++++++++++++++++++++-
+> >  include/hw/virtio/virtio-balloon.h |    2 +-
+> >  2 files changed, 47 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> > index 1c6d36a29a04..297b267198ac 100644
+> > --- a/hw/virtio/virtio-balloon.c
+> > +++ b/hw/virtio/virtio-balloon.c
+> > @@ -321,6 +321,42 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
+> >      balloon_stats_change_timer(s, 0);
+> >  }
+> >
+> > +static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *vq)
+> > +{
+> > +    VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
+> > +    VirtQueueElement *elem;
+> > +
+> > +    while ((elem = virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
+> > +        unsigned int i;
+> > +
+> > +        for (i = 0; i < elem->in_num; i++) {
+> > +            void *addr = elem->in_sg[i].iov_base;
+> > +            size_t size = elem->in_sg[i].iov_len;
+> > +            ram_addr_t ram_offset;
+> > +            size_t rb_page_size;
+> > +            RAMBlock *rb;
+> > +
+> > +            if (qemu_balloon_is_inhibited() || dev->poison_val) {
+> > +                continue;
+> > +            }
+>
+> These checks are not sufficient. See virtio_balloon_handle_output(),
+> where we e.g., check that somebody doesn't try to discard the bios.
+>
+> Maybe we can factor our/unify the handling in both code paths.
 
+I am going to have to look at this further. If I understand correctly
+you are asking me to add all of the memory section checks that are in
+virtio_balloon_handle_output correct?
+
+I'm not sure it makes sense with the scatterlist approach I have taken
+here. All of the mappings were created as a scatterlist of writable
+DMA mappings unlike the regular balloon which is just stuffing PFN
+numbers into an array and then sending the array across. As such I
+would think there are already such protections in place. For instance,
+you wouldn't want to let virtio-net map the BIOS and request data be
+written into that either, correct? So I am assuming there is something
+there to prevent that already isn't there?
+
+> > +
+> > +            rb = qemu_ram_block_from_host(addr, false, &ram_offset);
+> > +            rb_page_size = qemu_ram_pagesize(rb);
+> > +
+> > +            /* For now we will simply ignore unaligned memory regions */
+> > +            if ((ram_offset | size) & (rb_page_size - 1)) {
+>
+> "!QEMU_IS_ALIGNED()" please to make this easier to read.
+
+done.
+
+> > +                continue;
+> > +            }
+> > +
+> > +            ram_block_discard_range(rb, ram_offset, size);
+> > +        }
+> > +
+> > +        virtqueue_push(vq, elem, 0);
+> > +        virtio_notify(vdev, vq);
+> > +        g_free(elem);
+> > +    }
+> > +}
+> > +
+>
+> [...]
+>
+> >      if (virtio_has_feature(s->host_features,
+> >                             VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
+> >          s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
+> > @@ -940,6 +982,8 @@ static Property virtio_balloon_properties[] = {
+> >       */
+> >      DEFINE_PROP_BOOL("qemu-4-0-config-size", VirtIOBalloon,
+> >                       qemu_4_0_config_size, false),
+> > +    DEFINE_PROP_BIT("unused-page-reporting", VirtIOBalloon, host_features,
+>
+> "free-page-reporting"
+
+Thanks for catching that. It has been a while since that was renamed
+and I must have let it slip through the cracks.
+
+- Alex
 
