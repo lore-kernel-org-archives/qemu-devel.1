@@ -2,91 +2,67 @@ Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58C67C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 15:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6990C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 16:09:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 225D320769
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 15:57:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7EAF620771
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 16:09:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FxmZcaxH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 225D320769
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="BT0G9sa0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EAF620771
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMZYk-0002lr-Ba
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 11:57:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53625)
+	id 1jMZjj-0000yj-L6
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 12:09:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55066)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jMZY3-0002CL-85
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 11:57:00 -0400
+ (envelope-from <berto@igalia.com>) id 1jMZj7-0000Kn-Bl
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 12:08:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jMZY1-0003ZV-OA
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 11:56:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34698
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jMZY1-0003YO-Jf
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 11:56:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586447816;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2LDy3l9+KzEGwFC4VLr1yLTxoQ0aDwdHn5lir992MAc=;
- b=FxmZcaxH30sqO6L6+7jucW6k/S8MFSDkfbkBY7gQykHVQfTXWsPMDlqxFk6DMdoCLlfyHP
- PGWUMtOPnaHjQzlBSHlxe7tZkX5C/On6u8QYl12rsrhl+nhA9h1W91l7kA3X6cIbzcSiyz
- dCDgJq+3PCkr46RdBoF0owQmVFmv9pA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-UrrCkAcuMteG9LZBkKhTnQ-1; Thu, 09 Apr 2020 11:56:55 -0400
-X-MC-Unique: UrrCkAcuMteG9LZBkKhTnQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEE4C85EE79;
- Thu,  9 Apr 2020 15:56:53 +0000 (UTC)
-Received: from [10.3.114.49] (ovpn-114-49.phx2.redhat.com [10.3.114.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 16AE29E0E5;
- Thu,  9 Apr 2020 15:56:49 +0000 (UTC)
-Subject: Re: qcow2: Zero-initialization of external data files
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>
-References: <db0b4b5c-d564-f003-bbbc-9afdcac07cc4@redhat.com>
- <50080252-ff22-78ed-0002-1742c694471b@redhat.com>
- <8b4bc264-7bce-c9c1-1905-a22b4c61cae4@redhat.com>
- <ad2542f0-1faf-88eb-9dac-36d87a2a795f@redhat.com>
- <ff515dc1-0ac1-08c6-b636-cd50c09cab7d@redhat.com>
- <e91aa2c9-5709-ee1c-d8e9-45f12493613e@redhat.com>
- <cc17fee7-3349-063c-3531-f6239676dc50@redhat.com>
- <713d39ff-29f6-f9e0-bbbc-c9b26ffd28a0@redhat.com>
- <5a8099d6-3885-2bfe-f85a-477c5cc76a45@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <8c7ba1fe-6995-2465-789b-29212d07bf23@redhat.com>
-Date: Thu, 9 Apr 2020 10:56:47 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <berto@igalia.com>) id 1jMZj5-0001O4-Ta
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 12:08:24 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:35104)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1jMZj5-0001MC-2s; Thu, 09 Apr 2020 12:08:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=NKPIp2dRkTf8NZYS41q9T5Or8ejKcaU3Fzs1utSqTys=; 
+ b=BT0G9sa0e34fjD/3FrKjXHdCnYetWwpucMmi38yqPe4QoD4Pl8B9R5FpKAxnb7el76Mih/CLMPSH81HU3TeN1btoVbKLk+SXl4DQdM2tZWbxfrhGbUN9gG+by3oScqYB8fMeeSc9912syy3mQacm22eUVgL1+WzIeg1tUI3BEm7cN7HKKu3sGeRX+N0niqWJoIa0nn6kWw9B0NESVddNc0aa0Kag7hdHG3Z3+nCfs2Uv7pg5EihmK7XJx6xWAa7BrFuLA1wjErndQvy7pYnnqBAb7PohgNEpvnWC2WcZMa6XucJ/e5gDbOHKUmdrfXGIZcn39Ac/Dnm7tzE0tGOu2Q==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jMZj0-0000eG-2j; Thu, 09 Apr 2020 18:08:18 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jMZiz-0005GM-Pl; Thu, 09 Apr 2020 18:08:17 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Subject: Re: [PATCH v4 05/30] qcow2: Process QCOW2_CLUSTER_ZERO_ALLOC clusters
+ in handle_copied()
+In-Reply-To: <66273cab-85f3-209e-1e8f-1b09ad8ff97b@virtuozzo.com>
+References: <cover.1584468723.git.berto@igalia.com>
+ <42c52037c0c975e2d1cd23b470e7b61cbd0b3fa3.1584468723.git.berto@igalia.com>
+ <66273cab-85f3-209e-1e8f-1b09ad8ff97b@virtuozzo.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Thu, 09 Apr 2020 18:08:17 +0200
+Message-ID: <w511row3amm.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <5a8099d6-3885-2bfe-f85a-477c5cc76a45@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,57 +74,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/9/20 10:46 AM, Eric Blake wrote:
+On Thu 09 Apr 2020 12:59:30 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
+>>   static void calculate_l2_meta(BlockDriverState *bs,
+>>                                 uint64_t host_cluster_offset,
+>>                                 uint64_t guest_offset, unsigned bytes,
+>> -                              QCowL2Meta **m, bool keep_old)
+>> +                              uint64_t *l2_slice, QCowL2Meta **m, bool keep_old)
+>>   {
+>>       BDRVQcow2State *s = bs->opaque;
+>> -    unsigned cow_start_from = 0;
+>> +    int l2_index = offset_to_l2_slice_index(s, guest_offset);
+>> +    uint64_t l2_entry;
+>> +    unsigned cow_start_from, cow_end_to;
+>>       unsigned cow_start_to = offset_into_cluster(s, guest_offset);
+>>       unsigned cow_end_from = cow_start_to + bytes;
+>> -    unsigned cow_end_to = ROUND_UP(cow_end_from, s->cluster_size);
+>>       unsigned nb_clusters = size_to_clusters(s, cow_end_from);
+>>       QCowL2Meta *old_m = *m;
+>> +    QCow2ClusterType type;
+>> +
+>> +    assert(nb_clusters <= s->l2_slice_size - l2_index);
+>> +
+>> +    /* Return if there's no COW (all clusters are normal and we keep them) */
+>> +    if (keep_old) {
+>> +        int i;
+>> +        for (i = 0; i < nb_clusters; i++) {
+>> +            l2_entry = be64_to_cpu(l2_slice[l2_index + i]);
+>> +            if (qcow2_get_cluster_type(bs, l2_entry) != QCOW2_CLUSTER_NORMAL) {
+>
+> Could we also allow full ZERO_ALLOC clusters here?
 
->>> We don't support concurrent modification. But if the guest is running
->>> and unmaps things, then shuts off, then we edit the raw file offline,
->>> then we restart the guest, the guest should see the results of those
->>> offline edits.
->>
->> Should it?=C2=A0 The specification doesn=E2=80=99t say anything about th=
-at.
->>
->> In fact, I think we have always said we explicitly discourage that
->> because this might lead to outdated metadata; even though we usually
->> meant =E2=80=9Cdirty bitmaps=E2=80=9D by that.
->=20
-> Hmm.=C2=A0 Kevin, I'd really like your opinion here.=C2=A0 The point of t=
-he=20
-> raw-external-data flag is to state that "qemu MUST ensure that whatever=
-=20
-> is done to this image while the guest is running is reflected through to=
-=20
-> the raw file, so that after the guest stops, the raw file alone is still=
-=20
-> viable to see what the guest saw".=C2=A0 But as you say, there's a differ=
-ence=20
-> between "the raw file will read what the guest saw" and "we can now edit=
-=20
-> the raw file without regards to the qcow2 wrapper but later reuse of the=
-=20
-> qcow2 wrapper won't be corrupted by those edits".
+No, because the L2 entry needs to be modified (in order to remove the
+'all zeroes' bit) and we need to create a QCowL2Meta entry for that (see
+qcow2_handle_l2meta()).
 
-Another random thought: Should we add a header extension that records=20
-the timestamps of an external data file?  That way, if the timestamps of=20
-the file have changed from what we recorded in our optional header, then=20
-we can flag to the user that our metadata may be stale because of what=20
-appears to be external edits.  But that's not always going to save us -=20
-timestamps on a block device don't behave the same as timestamps on a=20
-POSIX file, and just because timestamps change (such as when copying a=20
-file from one place to another) does not imply that contents have=20
-changed.  My personal take - unless adding such a header can definitely=20
-add safety, it may not be worth the cost of complicating the standard -=20
-this was more just documenting an idea I had even if we don't choose to=20
-pursue it.
+>> +    /* Get the L2 entry of the first cluster */
+>> +    l2_entry = be64_to_cpu(l2_slice[l2_index]);
+>> +    type = qcow2_get_cluster_type(bs, l2_entry);
+>> +
+>> +    if (type == QCOW2_CLUSTER_NORMAL && keep_old) {
+>> +        cow_start_from = cow_start_to;
+>> +    } else {
+>> +        cow_start_from = 0;
+>> +    }
+>> +
+>> +    /* Get the L2 entry of the last cluster */
+>> +    l2_entry = be64_to_cpu(l2_slice[l2_index + nb_clusters - 1]);
+>> +    type = qcow2_get_cluster_type(bs, l2_entry);
+>> +
+>> +    if (type == QCOW2_CLUSTER_NORMAL && keep_old) {
+>> +        cow_end_to = cow_end_from;
+>> +    } else {
+>> +        cow_end_to = ROUND_UP(cow_end_from, s->cluster_size);
+>> +    }
+>
+> These two ifs may be moved into if (keep_old), and drop "&& keep_old"
+> from conditions. This also will allow to drop extra calculations, move
+> new variables to if (keep_old) {} block and allow to pass
+> l2_slice=NULL together with keep_old=false.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+In subsequent patches we're going to have more cases than just
+QCOW2_CLUSTER_NORMAL so I don't think it makes sense to move the
+keep_old check around.
 
+>> @@ -1239,7 +1304,8 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
+>>   
+>>       l2_index = offset_to_l2_slice_index(s, guest_offset);
+>>       nb_clusters = MIN(nb_clusters, s->l2_slice_size - l2_index);
+>> -    assert(nb_clusters <= INT_MAX);
+>> +    /* Limit total byte count to BDRV_REQUEST_MAX_BYTES */
+>> +    nb_clusters = MIN(nb_clusters, BDRV_REQUEST_MAX_BYTES >> s->cluster_bits);
+>>   
+>>       /* Find L2 entry for the first involved cluster */
+>>       ret = get_cluster_table(bs, guest_offset, &l2_slice, &l2_index);
+>> @@ -1249,18 +1315,17 @@ static int handle_copied(BlockDriverState *bs, uint64_t guest_offset,
+>>   
+>>       cluster_offset = be64_to_cpu(l2_slice[l2_index]);
+>
+> It would be good to s/cluster_offset/l2_entry/
+>
+> And, "cluster_offset & L2E_OFFSET_MASK" is used so many times, so, I'd
+> not substitute, but keep both variables: l2_entry and cluster_offset.
+
+Sounds good, I can change that.
+
+>> +    /* Allocate at a given offset in the image file */
+>> +    alloc_cluster_offset = *host_offset == INV_OFFSET ? INV_OFFSET :
+>> +        start_of_cluster(s, *host_offset);
+>> +    ret = do_alloc_cluster_offset(bs, guest_offset, &alloc_cluster_offset,
+>> +                                  &nb_clusters);
+>> +    if (ret < 0) {
+>> +        goto out;
+>>       }
+>>   
+>> -    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
+>
+> actually we don't need l2_slice for keep_old=false in
+> calculate_l2_meta, so if calculate_l2_meta modified a bit, change of
+> function tail is not needed..
+>
+> Still, may be l2_slice will be used in calculate_l2_meta() in further
+> patches? Will see..
+
+We'll need it in a later patch.
+
+>> -fail:
+>> -    if (*m && (*m)->nb_clusters > 0) {
+>> +out:
+>> +    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
+>> +    if (ret < 0 && *m && (*m)->nb_clusters > 0) {
+>>           QLIST_REMOVE(*m, next_in_flight);
+>>       }
+>
+> Hmm, unrelated to the patch, but why do we remove meta, which we
+> didn't create?
+
+Not sure actually, I would need to check further...
+
+Berto
 
