@@ -1,69 +1,121 @@
-Return-Path: <SRS0=qpXq=5Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=FIxb=52=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A70C2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 23:32:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8695C2BA19
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 00:13:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B0032074F
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Apr 2020 23:32:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B0032074F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6D7E020768
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 00:13:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="H1UuCGra"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D7E020768
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMgek-0001Oc-B4
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 19:32:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55395)
+	id 1jMhIa-0000iI-MU
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 20:13:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59023)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jMge2-0000wt-T0
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 19:31:40 -0400
+ (envelope-from <Babu.Moger@amd.com>) id 1jMhHj-00006w-Uh
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 20:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jMgdy-0007JO-Ax
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 19:31:38 -0400
-Resent-Date: Thu, 09 Apr 2020 19:31:35 -0400
-Resent-Message-Id: <E1jMgdy-0007JO-Ax@eggs.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21311)
+ (envelope-from <Babu.Moger@amd.com>) id 1jMhHi-0007sl-8l
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 20:12:39 -0400
+Received: from mail-bn8nam12on2058.outbound.protection.outlook.com
+ ([40.107.237.58]:6134 helo=NAM12-BN8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jMgdy-0007Io-5s
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 19:31:34 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1586475087; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Gnf94TVfd3ozz5Q74zaSQH/LeAgFzKd4juzYNFEkkoAE10dEOQ7/IYHDJ9Gz37m2w689EEUi5WVoQdMUoJ5O2VftEdB7MDHiEJeyfdw2q3mD3esSYUw8V/uGgsa7F4Ot+EMoWZKIHMbCK8apDyOXmOijSfZQdRjNirjxw24r1h4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1586475087;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=+UmPFczc68RQDYJykJfxvqipdSoX5/yVP2UVlvG7hjQ=; 
- b=R+aklqn25QGHq+2GWxPRP9pukCQSIJZdyx92YidFst3aTbgZliB9yJLNrxNCY9feV6qHhBKjEUYHxyNv7ygShmNeqKW7imW6mbBfV1zwpFP5KQMCDnWfKtCv1+eBNciISSbImPf+va+yiHUXwwM7CWq+kN8ewxWGARkIrUQSLqU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1586475085732228.21149341721127;
- Thu, 9 Apr 2020 16:31:25 -0700 (PDT)
-In-Reply-To: <20200409211529.5269-1-alex.bennee@linaro.org>
-Subject: Re: [PATCH for 5.0-rc3 v1 00/11] more random fixes
-Message-ID: <158647508454.23508.6145580992517458969@39012742ff91>
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1jMhHh-0007s8-JY
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 20:12:37 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y5A71/KiBwgGYNEc0vwirJUpoF1zF6kQG4GM1d2vddk3w8gpdna85tEhiCVToATNW1vmPr8n4sJXyWQ6y5e8dZhTHGy0b72THODspVWqrhs0CumY2HnqTjfYwWpl72iAybci7Lh74Kvr2PMeukFh3MLj8GIa2lQT+Vc5Z5erOejMowpLp/Fqf+Mgi8roGTM/1uKJA9nSsS7LcNHcVsL8l4g+sCbWJqz1chi9Ycwx3Fg2q9xUKel1WSK+af2mtydGQiu4l8q/em+ielOgKmTZwJLk4S78ylYUQCndzpsqRGMeI7zdYC3y8ZTATJxHoswcOV2cJcvpstE4MAFuz2hf0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TqW2vRFijOo1+qHIoR0Sbgv8Ov0mUNhTGKGPHCa/XqQ=;
+ b=IKaJoAfndyzZDK0uXERUyVZg8Aayoxm8USwX3DuRlOFXvqd9N2IqiJBPkAdmK5SZ3J9JSZPrdbcy6x96BYRL4sPwc3li68E5l5/gww3tnfzU74gA6FjEKlOFTFKviuL5DQ2Y6BAgmW6K3LGwrDVFDz2B5dj4aa3W7FzqDVGTD9p7j5yVf1Rdt8ewdNJIWeF6OTx/IBl+sb0H4/KUit4Ajf2835v3PgSP+9p5Je9AUADq6n05m4MSKG9okVNbhnYknnRI3WqcE544nXpYt9aWdIYjAznYfmjW4gGkPpwIs3lK+JnUbT8MBpb9kTiTKZ8dkFwzXFpoVYQF1GyAuMrl+A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TqW2vRFijOo1+qHIoR0Sbgv8Ov0mUNhTGKGPHCa/XqQ=;
+ b=H1UuCGracPjt6fNf0/9fhExEZoDBSEMY3+OL514XdgnbnXu4NwpexjP0JuUL8G97O3OheTmdih4oCruulC7c5hZfiNQkFsgqDegau/ywOB2/CBCZym+YzICWIpqyxi3dhHtWNWzRNzBbMxPljdW4pN+W+qp4AL6xkMz/IsfpJb0=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2414.namprd12.prod.outlook.com (2603:10b6:802:2e::31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.20; Fri, 10 Apr
+ 2020 00:12:33 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::382f:640c:215f:be93]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::382f:640c:215f:be93%5]) with mapi id 15.20.2878.021; Fri, 10 Apr 2020
+ 00:12:33 +0000
+Subject: Re: [Bug 1871842] [NEW] AMD CPUID leaf 0x8000'0008 reported number of
+ cores inconsistent with ACPI.MADT
+To: Igor Mammedov <imammedo@redhat.com>,
+ Philipp Eppelt <1871842@bugs.launchpad.net>
+References: <158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com>
+ <20200409160037.431ec776@redhat.com>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <5f7b85c6-09af-1064-f7f8-66ea7abf3ae3@amd.com>
+Date: Thu, 9 Apr 2020 19:12:29 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <20200409160037.431ec776@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM5PR13CA0008.namprd13.prod.outlook.com
+ (2603:10b6:3:23::18) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alex.bennee@linaro.org
-Date: Thu, 9 Apr 2020 16:31:25 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.30.87] (165.204.77.1) by
+ DM5PR13CA0008.namprd13.prod.outlook.com (2603:10b6:3:23::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2900.6 via Frontend Transport; Fri, 10 Apr 2020 00:12:32 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 3e137ee5-54c1-404d-ebe7-08d7dce3dd61
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2414:
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2414CDE3DFFF00019E59616395DE0@SN1PR12MB2414.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 0369E8196C
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10009020)(4636009)(346002)(396003)(136003)(376002)(39860400002)(366004)(966005)(81156014)(66946007)(8936002)(4326008)(31696002)(86362001)(53546011)(45080400002)(16526019)(8676002)(66556008)(316002)(16576012)(31686004)(478600001)(110136005)(6666004)(52116002)(5660300002)(44832011)(36756003)(26005)(2906002)(6486002)(186003)(81166007)(956004)(2616005)(66476007);
+ DIR:OUT; SFP:1101; 
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nDQR89dIEmv5F+BjKDnU51CHuNXqrd/9epX3mbQ6UR2J3vTfBv58KXwrO3e1YOiAHOHP4f6RuXrPy8ejZ8QumMsCt4GMshWW6NxKIjVeE34qEvU5U5WvVRqXLznZgWtBr5i9J6o+a2cKt7CLdv6rAI1A/DaGQzoveOpx9C49ij45XSiulJMHirqp6PEaEsnU9SImYClybrip8J/DDZoehrq9MZ3HxyGISJ6Cea/zMlrl8hJKQ1OLVO1Kh9bBG64dQPFCrblJumu9dBFl9pli7aizptWHMx0TGpbqt6UczZyfs/6D5ZXew8S3mUmvsP7ShyR7vBBhqvIP/i1yuMdEjEETU60BZfQURMrOvZ6uuos67GNwL4DgJesajCROx8ZRxRbN3CqXuir2dw8Zw126/gHH+xzyDJYr95XCKjgYUXtFezdehBQQ3SCnQ25LIQbctxGPvvtYd//ZOa3kUFGeTR4ERr7xKPgKb9Aeye0yfPCMCtOqcVnLkshPIPzqxbYwJZSbeIm3dgBiREcJG7mGBg==
+X-MS-Exchange-AntiSpam-MessageData: mTpzPPPdV3xOemvKkiUcZVH/+PFN0ljgPqVTdxUVgET9qNaE+rWIEVUf3JJHqH/TA4rysaWd9G93hETHtl0yB2LvCz0COHBSN+0M62+wjOtSVwz/RcXsJApVr2v8D5faeLJeaJvb0XAQOsfVlg+OfA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3e137ee5-54c1-404d-ebe7-08d7dce3dd61
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2020 00:12:32.9161 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sC4j2xFh6TYkNwrpdYYXzmcnfQd+dEKkybqy/mnNuizfDK8iqNVa/v3rLVv3V2Yu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2414
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
  [fuzzy]
-X-Received-From: 136.143.188.53
+X-Received-From: 40.107.237.58
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,66 +127,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQwOTIxMTUyOS41MjY5
-LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIGZvciA1LjAtcmMzIHYxIDAwLzExXSBtb3Jl
-IHJhbmRvbSBmaXhlcwpNZXNzYWdlLWlkOiAyMDIwMDQwOTIxMTUyOS41MjY5LTEtYWxleC5iZW5u
-ZWVAbGluYXJvLm9yZwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4v
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBF
-TkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjI3NzliYWUgLnRyYXZpcy55
-bWw6IEJ1aWxkIE9TWCAxMC4xNCB3aXRoIFhjb2RlIDEwLjAKZmZhNjllZSBsaW51eC11c2VyOiBm
-aXggL3Byb2Mvc2VsZi9zdGF0IGhhbmRsaW5nCmRhNzM0OTYgZ2Ric3R1YjogaTM4NjogRml4IGdk
-Yl9nZXRfcmVnMTYoKSBwYXJhbWV0ZXIgdG8gdW5icmVhayBnZGIKYTczOTJkYiB0YXJnZXQvbTY4
-ay9oZWxwZXI6IEZpeCBtNjhrX2ZwdV9nZGJfZ2V0X3JlZygpIHVzZSBvZiBHQnl0ZUFycmF5CjZj
-ZGJlNGIgY29uZmlndXJlOiBkaXNhYmxlIFBJRSBmb3IgV2luZG93cyBidWlsZHMKZTcwYjQxYSBj
-b25maWd1cmU6IHJlZGlyZWN0IHNwaGlueC1idWlsZCBjaGVjayB0byBjb25maWcubG9nCjg0YjAw
-MjYgdGVzdHMvZG9ja2VyOiBhZGQgZG9jcyBGRUFUVVJFIGZsYWcgYW5kIHVzZSBmb3IgdGVzdC1t
-aXNjCmU5OTE2MzAgbGludXgtdXNlci9wcGM6IEZpeCBwYWRkaW5nIGluIG1jb250ZXh0X3QgZm9y
-IHBwYzY0CjNmZTAwMTUgYWNjZWwvdGNnOiBSZWxheCB2YSByZXN0cmljdGlvbnMgb24gNjQtYml0
-IGd1ZXN0cwozYTUwNDE0IGV4ZWMvY3B1LWFsbDogVXNlIGJvb2wgZm9yIGhhdmVfZ3Vlc3RfYmFz
-ZQo4MzI3ZDAxIGxpbnV4LXVzZXI6IGNvbXBsZXRlbHkgcmUtd3JpdGUgaW5pdF9ndWVzdF9zcGFj
-ZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMSBDaGVja2luZyBjb21taXQgODMyN2QwMTgzZDg0
-IChsaW51eC11c2VyOiBjb21wbGV0ZWx5IHJlLXdyaXRlIGluaXRfZ3Vlc3Rfc3BhY2UpCkVSUk9S
-OiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM3MTU6IEZJTEU6IGxpbnV4LXVzZXIvcWVtdS5oOjIyOToK
-KyAqICQKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjgxIGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDEvMTEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjIvMTEgQ2hlY2tpbmcgY29tbWl0
-IDNhNTA0MTQzYzc3MCAoZXhlYy9jcHUtYWxsOiBVc2UgYm9vbCBmb3IgaGF2ZV9ndWVzdF9iYXNl
-KQozLzExIENoZWNraW5nIGNvbW1pdCAzZmUwMDE1MWMwZTMgKGFjY2VsL3RjZzogUmVsYXggdmEg
-cmVzdHJpY3Rpb25zIG9uIDY0LWJpdCBndWVzdHMpCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4
-IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzkxOiBGSUxFOiBpbmNs
-dWRlL2V4ZWMvY3B1LWFsbC5oOjE4MjoKKyMgZGVmaW5lIEdVRVNUX0FERFJfTUFYXyAgfjB1bAoK
-dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzEx
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzExIENoZWNraW5nIGNvbW1pdCBlOTkxNjMw
-OTkwMjIgKGxpbnV4LXVzZXIvcHBjOiBGaXggcGFkZGluZyBpbiBtY29udGV4dF90IGZvciBwcGM2
-NCkKNS8xMSBDaGVja2luZyBjb21taXQgODRiMDAyNjgwYmEwICh0ZXN0cy9kb2NrZXI6IGFkZCBk
-b2NzIEZFQVRVUkUgZmxhZyBhbmQgdXNlIGZvciB0ZXN0LW1pc2MpCjYvMTEgQ2hlY2tpbmcgY29t
-bWl0IGU3MGI0MWE0YWMxZSAoY29uZmlndXJlOiByZWRpcmVjdCBzcGhpbngtYnVpbGQgY2hlY2sg
-dG8gY29uZmlnLmxvZykKNy8xMSBDaGVja2luZyBjb21taXQgNmNkYmU0YmNkYjZiIChjb25maWd1
-cmU6IGRpc2FibGUgUElFIGZvciBXaW5kb3dzIGJ1aWxkcykKOC8xMSBDaGVja2luZyBjb21taXQg
-YTczOTJkYjNlMDkxICh0YXJnZXQvbTY4ay9oZWxwZXI6IEZpeCBtNjhrX2ZwdV9nZGJfZ2V0X3Jl
-ZygpIHVzZSBvZiBHQnl0ZUFycmF5KQo5LzExIENoZWNraW5nIGNvbW1pdCBkYTczNDk2ZTVhZmQg
-KGdkYnN0dWI6IGkzODY6IEZpeCBnZGJfZ2V0X3JlZzE2KCkgcGFyYW1ldGVyIHRvIHVuYnJlYWsg
-Z2RiKQoxMC8xMSBDaGVja2luZyBjb21taXQgZmZhNjllZTAzZTYzIChsaW51eC11c2VyOiBmaXgg
-L3Byb2Mvc2VsZi9zdGF0IGhhbmRsaW5nKQoxMS8xMSBDaGVja2luZyBjb21taXQgMjc3OWJhZWY0
-ZjE0ICgudHJhdmlzLnltbDogQnVpbGQgT1NYIDEwLjE0IHdpdGggWGNvZGUgMTAuMCkKPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA0MDkyMTE1
-MjkuNTI2OS0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
-PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+Philipp,
+  Can you please check if this patch works for you.
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 90ffc5f..e467fee 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5831,10 +5831,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t
+index, uint32_t count,
+         }
+         *ebx = env->features[FEAT_8000_0008_EBX];
+         *ecx = 0;
+-        *edx = 0;
+         if (cs->nr_cores * cs->nr_threads > 1) {
+-            *ecx |= (cs->nr_cores * cs->nr_threads) - 1;
++            unsigned long max_apicids, bits_required;
++
++            max_apicids = (cs->nr_cores * cs->nr_threads) - 1;
++            if (max_apicids) {
++                /* Find out the number of bits to represent all the
+apicids */
++                bits_required = find_last_bit(&max_apicids,
+BITS_PER_BYTE) + 1;
++                *ecx |= bits_required << 12 | max_apicids;
++            }
+         }
++        *edx = 0;
+         break;
+     case 0x8000000A:
+         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+
+
+
+On 4/9/20 9:00 AM, Igor Mammedov wrote:
+> On Thu, 09 Apr 2020 12:58:11 -0000
+> Philipp Eppelt <1871842@bugs.launchpad.net> wrote:
+> 
+>> Public bug reported:
+>>
+>> Setup:
+>> CPU: AMD EPYC-v2 or host's EPYC cpu
+>> Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
+>> qemu version: self build
+>> git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
+>> config: Configured with: '../configure' '--target-list=x86_64-softmmu,mips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aarch64-softmmu,arm-softmmu' '--prefix=/opt/qemu-master'
+>>
+>> Cmdline: 
+>> qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/bin/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , ... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu EPYC-v2 -m 4G -smp 4 
+>>
+>> Issue:
+>> We are developing an microkernel operating system called L4Re. We recently got an AMD EPYC server for testing and we couldn't execute SMP tests of our system when running Linux + qemu + VM w/ L4Re.
+>> In fact, the kernel did not recognize any APs at all. On AMD CPUs the kernel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[NC] or [ApicIdSize].  [0][1]
+>>
+>> The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18cf757 ECX: 0x703f EDX: 0x1000
+>> The lower four bits of ECX are the [NC] field and all set.
+>>
+>> When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as replacement and addition to the above cmdline) the CPUID leaf shows: EAX: 0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
+>> Note, ECX is zero. Indicating that this is no SMP capabale CPU.
+>>
+>> I'm debugging it using my local machine and the QEMU provided EPYC-v2
+>> CPU model and it is reproducible there as well and reports:  EAX:
+>> 0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
+>>
+>> I checked other AMD based CPU models (phenom, opteron_g3/g5) and they behave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
+>> I believe that behavior here is wrong as ECX[NC] should report the number of cores per processor, as stated in the AMD manual [2] p.584. In my understanding -smp 4 should then lead to ECX[NC] = 0x3.
+>>
+>> The following table shows my findings with the -smp option:
+>> Option | Qemu guest observed ECX value
+>> -smp 4 | 0x0
+>> -smp 4,cores=4  | 0x3
+>> -smp 4,cores=2,thread=2 | 0x3
+>> -smp 4,cores=4,threads=2 | QEMU boot error: topology false.
+>>
+>> Now, I'm asking myself how the terminology of the AMD manual maps to QEMU's -smp option.
+>> Obviously, nr_cores and nr_threads correspond to the cores and threads options on the cmdline and cores * threads <= 4 (in this example), but what corresponds the X in -smp X to?
+> I'd say X corresponds to number of logical CPUs.
+> Depending on presence of other options these are distributed among them in magical manner
+> (see pc_smp_parse() for starters)
+> 
+>> Querying 0x8000'0008 on the physical processor results in different
+>> reports than quering QEMU's model as does it with -enable-kvm -cpu host.
+>>
+>> Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
+>> CPU leave reports a single core processor.
+> it matches -smp X as it should be.
+> 
+>>
+>> This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
+>> wrong number.
+> CCed author of recent epyc patches who might know how AMD should work better than me.
+> 
+>>
+>> Please let me know, if you need more information from my side.
+>>
+>>
+>> [0] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fkernkonzept%2Ffiasco%2Fblob%2F522ccc5f29ab120213cf02d71328e2b879cbbd19%2Fsrc%2Fkern%2Fia32%2Fkernel_thread-ia32.cpp%23L109&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=hcFJzLAVQoIh5IN9CP%2F9cUQNOZoBnpRA6FliJur1wzQ%3D&amp;reserved=0
+>> [1] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fkernkonzept%2Ffiasco%2Fblob%2F522ccc5f29ab120213cf02d71328e2b879cbbd19%2Fsrc%2Fkern%2Fia32%2Fcpu-ia32.cpp%23L1120&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=ANJIbYKbwfq2bDelH%2FRLKnDPIUZc1BwxHspmgxLU7gs%3D&amp;reserved=0
+>> [2] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fqemu%2Fqemu%2Fblob%2Ff2a8261110c32c4dccd84e774d8dd7a0524e00fb%2Ftarget%2Fi386%2Fcpu.c%23L5835&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=oj3mv9e5YOzUsfUjXK44gC8LybyWgMKo8JBIrRR%2BmDA%3D&amp;reserved=0
+>> [3] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.amd.com%2Fsystem%2Ffiles%2FTechDocs%2F24594.pdf&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=7Yr3J9ihlqSqXCXKN5JJNTByO3NGI%2BGMz2EqBF2Y4hw%3D&amp;reserved=0
+>>
+>> ** Affects: qemu
+>>      Importance: Undecided
+>>          Status: New
+>>
+> 
 
