@@ -2,88 +2,62 @@ Return-Path: <SRS0=FIxb=52=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0154C2D0EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 03:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34E5EC2D0EC
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 05:01:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A68CD20936
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 03:45:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VTX47Ykc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A68CD20936
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 08A8D20787
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 05:01:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08A8D20787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMkbJ-00071c-RI
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 23:45:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47714)
+	id 1jMlnd-000529-6P
+	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 01:01:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54306)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alexander.duyck@gmail.com>) id 1jMkXt-0001Ec-Si
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 23:41:35 -0400
+ (envelope-from <bowen.wang@intel.com>) id 1jMlme-0004Rh-Gi
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 01:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alexander.duyck@gmail.com>) id 1jMkXs-0007lU-NL
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 23:41:33 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:41735)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alexander.duyck@gmail.com>)
- id 1jMkXs-0007ke-HM
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 23:41:32 -0400
-Received: by mail-qk1-x742.google.com with SMTP id y3so1023802qky.8
- for <qemu-devel@nongnu.org>; Thu, 09 Apr 2020 20:41:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:from:to:cc:date:message-id:in-reply-to:references
- :user-agent:mime-version:content-transfer-encoding;
- bh=IZT5rQBEFmVBhwL98g+uKrEBfh0eqMpZVWez4s0eHKU=;
- b=VTX47Ykcrok+3feVdmvHYEHy8ay0S/Rs4i8qGeK+J1z9ha4RXX5/a8Wzykj9K/JSci
- KEcGJfoRyQf77TKGoYLXmjqGWZuV4cz7h+zz25oRJ38G5c2YP/oLnog2znL08o4wBfWn
- rJDdFMoY60L4E2IdZH2Td2fjk6vKHE5Ae7GNRJ1r6baaFgM+V/nxDB+hjMqRHzSnkqdu
- 7Ojk+f4HcYFUODQdvX7KClU6yiRnFE9MNF4ol6uKmFQE1B8hfv68wvVqWCXar6KQrz1C
- 3osg8mv42TZZolETnRbRkEFlk1YxWYyBo+zC4yLyEq+JUVd+6HEZkXuhzw3wCpgEf9Tj
- 8Xqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
- :references:user-agent:mime-version:content-transfer-encoding;
- bh=IZT5rQBEFmVBhwL98g+uKrEBfh0eqMpZVWez4s0eHKU=;
- b=V9KUJAUVMsVqgL8wptKYr5XE8mYibLQS7XkbXW86tNMGZgoXM4/e/tQvTE+w28JLJ5
- I+tNGi8StxL+tF9MPGD8+tag6949bfVG3KpqL03zhPqIdzd8ju6TT57TZNFL+ipAYzdK
- xC9/O1YCt8KScgsrtz9ZQhdnso879fYC3Lm66bh7BqHqNjl/0d7WRzQZBacy/zUV0kFi
- i+1VQim4w8hiRuqDOVis+EpVlSKyr6LTJLGEK6XwISCMwWyn3iSC6tTZ9yrjRvDVADRP
- FkUVVbNQNfSUGCdNgjh/MrhenuA1Tj4MksjZzcWgBrjhkKT/0J4Hi4bytKIRIcwjAyCS
- n4iw==
-X-Gm-Message-State: AGi0PuZxbXm9+cX5Cis7Ookz+xZzZF9XD69pz4bk8hKnw1CXiFp/N0hX
- A4+P+HOYGafNpKq+y1Nk7lDnZqniY54=
-X-Google-Smtp-Source: APiQypJbKhJxFUGefJZxWFDkQo7thGRq2yoFtNOTDl213jp8Nff/rfJ6q4XTW6QZRDEWPdx95jN1CA==
-X-Received: by 2002:a37:4117:: with SMTP id o23mr2176105qka.295.1586490091219; 
- Thu, 09 Apr 2020 20:41:31 -0700 (PDT)
-Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
- by smtp.gmail.com with ESMTPSA id o18sm708422qkk.52.2020.04.09.20.41.30
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 09 Apr 2020 20:41:30 -0700 (PDT)
-Subject: [PATCH v19 QEMU 1/4] virtio-balloon: Implement support for page
- poison tracking feature
-From: Alexander Duyck <alexander.duyck@gmail.com>
-To: pbonzini@redhat.com, david@redhat.com, mst@redhat.com
-Date: Thu, 09 Apr 2020 20:41:29 -0700
-Message-ID: <20200410034129.24738.36022.stgit@localhost.localdomain>
-In-Reply-To: <20200410033729.24738.22879.stgit@localhost.localdomain>
-References: <20200410033729.24738.22879.stgit@localhost.localdomain>
-User-Agent: StGit/0.17.1-dirty
+ (envelope-from <bowen.wang@intel.com>) id 1jMlmb-00059p-W1
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 01:00:51 -0400
+Received: from mga05.intel.com ([192.55.52.43]:20068)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bowen.wang@intel.com>)
+ id 1jMlmb-0004hm-O7
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 01:00:49 -0400
+IronPort-SDR: xIOrQ59SbanC3wfhHzPpVg+vW755D3LQr6bEw1T7OlPQ/jBDcqjdjq+OhgONlQux3KRYIzQyB3
+ 8Oq+32eomOaQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 09 Apr 2020 22:00:21 -0700
+IronPort-SDR: ilrqJ3TIqblCeNRKDlTzobM4izAPG+pyIot8y+BIMKGDpU21zFoH3QnyLgJg7bzK/k7Nm0Zg0Q
+ NvL4/EQBW+6Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,364,1580803200"; d="scan'208";a="452271483"
+Received: from desktop-do5fptk.sh.intel.com (HELO localhost.localdomain)
+ ([10.239.47.198])
+ by fmsmga005.fm.intel.com with ESMTP; 09 Apr 2020 22:00:19 -0700
+From: WangBowen <bowen.wang@intel.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hax: Add hax max vcpu IOCTL and support 64 vcpu
+Date: Fri, 10 Apr 2020 12:57:51 +0800
+Message-Id: <20200410045751.3448-1-bowen.wang@intel.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::742
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,122 +69,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: bowen.wang@intel.com, colin.xu@intel.com, wenchao.wang@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+This commit tried to obtain max vcpu of haxm driver by calling
+HAX_IOCTL_CAP_MAX_VCPU before creating the vm so that if using hax as
+the accelerator and the smp value is larger than the haxm driver
+supported max value, the program will terminate. Previously, it will
+create vm and vcpu one by one until haxm reports error. Also, the
+maximum vcpu value in qemu for haxm is updated from 0x10 to 0x40 in
+hax-i386.h.
 
-We need to make certain to advertise support for page poison tracking if
-we want to actually get data on if the guest will be poisoning pages. So
-if free page hinting is active we should add page poisoning support and
-let the guest disable it if it isn't using it.
+This patch resolves the issue by calling hax device ioctl
+HAX_IOCTL_CAP_MAX_VCPU in hax_init and store the min(haxm max, qemu max)
+in hax_state structure. The value will be compared with smp value in
+vm_create. (ioctl naming credit to KVM)
 
-Page poisoning will result in a page being dirtied on free. As such we
-cannot really avoid having to copy the page at least one more time since
-we will need to write the poison value to the destination. As such we can
-just ignore free page hinting if page poisoning is enabled as it will
-actually reduce the work we have to do.
+This commit results in if ioctl doesn't exist or occur error, it will
+continue running but output warning, if smp value is larger than the
+min(hax max,qemu max), it will terminate and output error message.
 
-Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Signed-off-by: WangBowen <bowen.wang@intel.com>
 ---
- hw/virtio/virtio-balloon.c         |   26 ++++++++++++++++++++++----
- include/hw/virtio/virtio-balloon.h |    1 +
- 2 files changed, 23 insertions(+), 4 deletions(-)
+ target/i386/hax-all.c     |  7 +++++--
+ target/i386/hax-i386.h    |  4 +++-
+ target/i386/hax-posix.c   | 29 +++++++++++++++++++++++++++++
+ target/i386/hax-posix.h   |  1 +
+ target/i386/hax-windows.c | 32 ++++++++++++++++++++++++++++++++
+ target/i386/hax-windows.h |  2 ++
+ 6 files changed, 72 insertions(+), 3 deletions(-)
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index a4729f7fc930..1c6d36a29a04 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -531,6 +531,15 @@ static void virtio_balloon_free_page_start(VirtIOBalloon *s)
-         return;
+diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+index a22adec5da..eadfa7c881 100644
+--- a/target/i386/hax-all.c
++++ b/target/i386/hax-all.c
+@@ -259,8 +259,9 @@ struct hax_vm *hax_vm_create(struct hax_state *hax, int max_cpus)
+         goto error;
      }
  
-+    /*
-+     * If page poisoning is enabled then we probably shouldn't bother with
-+     * the hinting since the poisoning will dirty the page and invalidate
-+     * the work we are doing anyway.
-+     */
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON)) {
-+        return;
+-    if (max_cpus > HAX_MAX_VCPU) {
+-        fprintf(stderr, "Maximum VCPU number QEMU supported is %d\n", HAX_MAX_VCPU);
++    if (max_cpus > hax->hax_max_vcpu) {
++        fprintf(stderr, "Maximum VCPU number QEMU and HAXM driver supported is %d\n",
++                hax->hax_max_vcpu);
+         goto error;
+     }
+ 
+@@ -332,6 +333,8 @@ static int hax_init(ram_addr_t ram_size, int max_cpus)
+         goto error;
+     }
+ 
++    hax->hax_max_vcpu = hax_max_vcpus_support(hax);
++
+     if (!hax_version_support(hax)) {
+         ret = -EINVAL;
+         goto error;
+diff --git a/target/i386/hax-i386.h b/target/i386/hax-i386.h
+index 7d988f81da..1ffa8df63a 100644
+--- a/target/i386/hax-i386.h
++++ b/target/i386/hax-i386.h
+@@ -38,9 +38,10 @@ struct hax_state {
+     struct hax_vm *vm;
+     uint64_t mem_quota;
+     bool supports_64bit_ramblock;
++    int hax_max_vcpu;
+ };
+ 
+-#define HAX_MAX_VCPU 0x10
++#define HAX_MAX_VCPU 0x40
+ #define MAX_VM_ID 0x40
+ #define MAX_VCPU_ID 0x40
+ 
+@@ -74,6 +75,7 @@ int hax_notify_qemu_version(hax_fd vm_fd, struct hax_qemu_version *qversion);
+ int hax_set_ram(uint64_t start_pa, uint32_t size, uint64_t host_va, int flags);
+ 
+ /* Common host function */
++int hax_max_vcpus_support(struct hax_state *hax);
+ int hax_host_create_vm(struct hax_state *hax, int *vm_id);
+ hax_fd hax_host_open_vm(struct hax_state *hax, int vm_id);
+ int hax_host_create_vcpu(hax_fd vm_fd, int vcpuid);
+diff --git a/target/i386/hax-posix.c b/target/i386/hax-posix.c
+index a5426a6dac..a4f9dce55e 100644
+--- a/target/i386/hax-posix.c
++++ b/target/i386/hax-posix.c
+@@ -163,6 +163,35 @@ int hax_host_create_vm(struct hax_state *hax, int *vmid)
+     return ret;
+ }
+ 
++int hax_max_vcpus_support(struct hax_state *hax)
++{
++    int ret;
++    int vcpu_num = 0;
++
++    if (hax_invalid_fd(hax->fd)) {
++        return vcpu_num;
 +    }
 +
-     if (s->free_page_report_cmd_id == UINT_MAX) {
-         s->free_page_report_cmd_id =
-                        VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
-@@ -618,12 +627,10 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
-     if (s->qemu_4_0_config_size) {
-         return sizeof(struct virtio_balloon_config);
-     }
--    if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON)) {
-+    if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON) ||
-+        virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-         return sizeof(struct virtio_balloon_config);
-     }
--    if (virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
--        return offsetof(struct virtio_balloon_config, poison_val);
--    }
-     return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
- }
- 
-@@ -634,6 +641,7 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
- 
-     config.num_pages = cpu_to_le32(dev->num_pages);
-     config.actual = cpu_to_le32(dev->actual);
-+    config.poison_val = cpu_to_le32(dev->poison_val);
- 
-     if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
-         config.free_page_report_cmd_id =
-@@ -697,6 +705,9 @@ static void virtio_balloon_set_config(VirtIODevice *vdev,
-         qapi_event_send_balloon_change(vm_ram_size -
-                         ((ram_addr_t) dev->actual << VIRTIO_BALLOON_PFN_SHIFT));
-     }
-+    dev->poison_val = virtio_vdev_has_feature(vdev,
-+                                              VIRTIO_BALLOON_F_PAGE_POISON) ?
-+                      le32_to_cpu(config.poison_val) : 0;
-     trace_virtio_balloon_set_config(dev->actual, oldactual);
- }
- 
-@@ -706,6 +717,9 @@ static uint64_t virtio_balloon_get_features(VirtIODevice *vdev, uint64_t f,
-     VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-     f |= dev->host_features;
-     virtio_add_feature(&f, VIRTIO_BALLOON_F_STATS_VQ);
-+    if (virtio_has_feature(f, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-+        virtio_add_feature(&f, VIRTIO_BALLOON_F_PAGE_POISON);
-+    }
- 
-     return f;
- }
-@@ -854,6 +868,8 @@ static void virtio_balloon_device_reset(VirtIODevice *vdev)
-         g_free(s->stats_vq_elem);
-         s->stats_vq_elem = NULL;
-     }
++    ret = ioctl(hax->fd, HAX_IOCTL_CAP_MAX_VCPU, &vcpu_num);
 +
-+    s->poison_val = 0;
++    if (ret == 0 && vcpu_num > 0) {
++        if (vcpu_num != HAX_MAX_VCPU) {
++            fprintf(stderr, "Warning: HAXM driver and QEMU are inconsistent"
++                    " in max vcpu number, HAXM driver: %d, QEMU: %d,"
++                    " refers to the smaller one.\n", vcpu_num, HAX_MAX_VCPU);
++            if (vcpu_num > HAX_MAX_VCPU) {
++                vcpu_num = HAX_MAX_VCPU;
++            }
++        }
++    } else {
++        vcpu_num = HAX_MAX_VCPU;
++        fprintf(stderr, "Warning: HAXM driver doesn't support HAX_IOCTL_CAP_MAX_VCPU,"
++                " will refer to max value defined in QEMU\n");
++    }
++
++    return vcpu_num;
++}
++
+ hax_fd hax_host_open_vm(struct hax_state *hax, int vm_id)
+ {
+     hax_fd fd;
+diff --git a/target/i386/hax-posix.h b/target/i386/hax-posix.h
+index fb7c64426d..42e58f6fa5 100644
+--- a/target/i386/hax-posix.h
++++ b/target/i386/hax-posix.h
+@@ -38,6 +38,7 @@ static inline void hax_close_fd(hax_fd fd)
+ #define HAX_IOCTL_CREATE_VM _IOWR(0, 0x21, uint32_t)
+ #define HAX_IOCTL_DESTROY_VM _IOW(0, 0x22, uint32_t)
+ #define HAX_IOCTL_CAPABILITY _IOR(0, 0x23, struct hax_capabilityinfo)
++#define HAX_IOCTL_CAP_MAX_VCPU _IOR(0, 0x25, uint32_t)
+ 
+ #define HAX_VM_IOCTL_VCPU_CREATE _IOWR(0, 0x80, uint32_t)
+ #define HAX_VM_IOCTL_ALLOC_RAM _IOWR(0, 0x81, struct hax_alloc_ram_info)
+diff --git a/target/i386/hax-windows.c b/target/i386/hax-windows.c
+index 5729ad9b48..c7816e1950 100644
+--- a/target/i386/hax-windows.c
++++ b/target/i386/hax-windows.c
+@@ -249,6 +249,38 @@ int hax_host_create_vm(struct hax_state *hax, int *vmid)
+     return 0;
  }
  
- static void virtio_balloon_set_status(VirtIODevice *vdev, uint8_t status)
-@@ -916,6 +932,8 @@ static Property virtio_balloon_properties[] = {
-                     VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
-     DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
-                     VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
-+    DEFINE_PROP_BIT("x-page-poison", VirtIOBalloon, host_features,
-+                    VIRTIO_BALLOON_F_PAGE_POISON, false),
-     /* QEMU 4.0 accidentally changed the config size even when free-page-hint
-      * is disabled, resulting in QEMU 3.1 migration incompatibility.  This
-      * property retains this quirk for QEMU 4.1 machine types.
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-index d1c968d2376e..7fe78e5c14d7 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -70,6 +70,7 @@ typedef struct VirtIOBalloon {
-     uint32_t host_features;
++int hax_max_vcpus_support(struct hax_state *hax)
++{
++    int ret;
++    int vcpu_num = 0;
++    DWORD dSize = 0;
++
++    if (hax_invalid_fd(hax->fd)) {
++        return vcpu_num;
++    }
++
++    ret = DeviceIoControl(hax->fd,
++                          HAX_IOCTL_CAP_MAX_VCPU,
++                          NULL, 0, &vcpu_num, sizeof(vcpu_num), &dSize,
++                          (LPOVERLAPPED) NULL);
++    if (ret && vcpu_num > 0) {
++        if (vcpu_num != HAX_MAX_VCPU) {
++            fprintf(stderr, "Warning: HAXM driver and QEMU are inconsistent"
++                    " in max vcpu number, HAXM driver: %d, QEMU: %d,"
++                    " refers to the smaller one.\n", vcpu_num, HAX_MAX_VCPU);
++            if (vcpu_num > HAX_MAX_VCPU) {
++                vcpu_num = HAX_MAX_VCPU;
++            }
++        }
++    } else {
++        vcpu_num = HAX_MAX_VCPU;
++        fprintf(stderr, "Warning: HAXM driver doesn't support HAX_IOCTL_CAP_MAX_VCPU,"
++                " will refer to max value defined in QEMU\n");
++    }
++
++    return vcpu_num;
++}
++
+ hax_fd hax_host_open_vm(struct hax_state *hax, int vm_id)
+ {
+     char *vm_name = NULL;
+diff --git a/target/i386/hax-windows.h b/target/i386/hax-windows.h
+index 12cbd813dc..c4fa88a2fa 100644
+--- a/target/i386/hax-windows.h
++++ b/target/i386/hax-windows.h
+@@ -48,6 +48,8 @@ static inline int hax_invalid_fd(hax_fd fd)
+                                          METHOD_BUFFERED, FILE_ANY_ACCESS)
+ #define HAX_IOCTL_CAPABILITY    CTL_CODE(HAX_DEVICE_TYPE, 0x910, \
+                                          METHOD_BUFFERED, FILE_ANY_ACCESS)
++#define HAX_IOCTL_CAP_MAX_VCPU  CTL_CODE(HAX_DEVICE_TYPE, 0x917, \
++                                         METHOD_BUFFERED, FILE_ANY_ACCESS)
  
-     bool qemu_4_0_config_size;
-+    uint32_t poison_val;
- } VirtIOBalloon;
- 
- #endif
+ #define HAX_VM_IOCTL_VCPU_CREATE   CTL_CODE(HAX_DEVICE_TYPE, 0x902, \
+                                             METHOD_BUFFERED, FILE_ANY_ACCESS)
+-- 
+2.24.1
 
 
