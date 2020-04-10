@@ -2,126 +2,63 @@ Return-Path: <SRS0=FIxb=52=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC7C3C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 11:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BE3C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 11:47:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 602DE206F7
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 11:44:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZWEnK4rm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 602DE206F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id AC846212CC
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 11:47:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC846212CC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMs5b-0001Z2-EA
-	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 07:44:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32846)
+	id 1jMs7k-0004Sq-Nw
+	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 07:47:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33204)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jMs4z-00013I-TC
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 07:44:14 -0400
+ (envelope-from <gengdongjiu@huawei.com>) id 1jMs6Q-0002Ht-BJ
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 07:45:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jMs4y-0000oI-SD
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 07:44:13 -0400
-Received: from mail-eopbgr10105.outbound.protection.outlook.com
- ([40.107.1.105]:12937 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jMs4u-0000lZ-S4; Fri, 10 Apr 2020 07:44:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=m0dMEBA7k78vVF2yUuKFxMa6t0i4+2AMV1suxtViFDG2nsNVUzr2cvN4n2tvrRaMulkxDoIdvst99Wkn9y7CDKd2oz0domSNulehCFk7tyulwcxM1wCewLz6kbO/BuwFV39f79fXfyX/sLZ/2msLtZOZspI56rW1v2sKwloR/dn4Iv6wkp34BcCUF/qxKE//izHhYBMMOw954MjPZNw4QEgimWxvbdz7oyvkqiRWAJUkrE0gXO+bOGVfI9AhBaO0xS+ZRCD1bMy/hTLRjHQQUHW8QtaodSNARxeJotFLfhuVRdx58BEo/TDlzXPxMc1T0RTDWuHfW+gHlqEGoSBXMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0xHsknqUE/+MKEPMt6MrgmW4rFHta73/IqiMyJ44MhE=;
- b=eoaUEUblEdyqJEEMhmqCBE09/sN8Xtcd8c4Um4s0p2xN+sCPUV7IsFgrRT/VW5VPGBdwTqQWQLKM6kklE56wbCbMM98KRByYy3VXpeMEFOaaXK+PCEMFQJtLtxxg2z9m9kqdDlf9fNqvBr6WrXHtji7JOx9/ZC7SaLgeAbzRWBOieJ7Fe4+yzTiFAGlSL2YSUef3s7bx8HpUPktbRCic5ANp+PvLsFEJS3f0fRan73ZNgmol1xn3TQz0AErSCSsqy6QeQRtrv2u9eqE8yduFZJU/b71O5G7LiXgWuiRZ00uKeCjXQrSi8nh3QYEFD2RJVs3K4ESlf2/U83n7n08AMQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0xHsknqUE/+MKEPMt6MrgmW4rFHta73/IqiMyJ44MhE=;
- b=ZWEnK4rmvQj81EfDpB0TtcpsKIvWlRO4BCYAGKAl3Sjon93ScpedZKymH1qYrMlTVXfnMgmJMchEUDNwMNsQOQ0Myupq3DaaZH+vWQq7WTfvt+ZEAGlHqMGGZKXS2hsw2co+3m/iTgxLhExRWNXr5A5jNmXtYDXpaeETciubBMM=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5318.eurprd08.prod.outlook.com (2603:10a6:20b:104::13)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.17; Fri, 10 Apr
- 2020 11:44:05 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.2900.015; Fri, 10 Apr 2020
- 11:44:05 +0000
-Subject: Re: [PATCH v12 2/3] qcow2: Allow writing compressed data of multiple
- clusters
-To: Alberto Garcia <berto@igalia.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-References: <1575288906-551879-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1575288906-551879-3-git-send-email-andrey.shinkevich@virtuozzo.com>
- <w51y2r41u4d.fsf@maestria.local.igalia.com>
- <5bbb126f-37c0-f107-c3b3-667ed43670fa@virtuozzo.com>
- <w51pncf61do.fsf@maestria.local.igalia.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200410144403359
-Message-ID: <c10e8f5d-fb64-c01d-dca3-6dbd0ace28ea@virtuozzo.com>
-Date: Fri, 10 Apr 2020 14:44:03 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <w51pncf61do.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0022.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:14::9) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <gengdongjiu@huawei.com>) id 1jMs6O-0001cz-F9
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 07:45:42 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3670 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
+ id 1jMs6J-0001Q1-Hy; Fri, 10 Apr 2020 07:45:36 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 8319DE944E0449F0B54B;
+ Fri, 10 Apr 2020 19:45:27 +0800 (CST)
+Received: from huawei.com (10.151.151.243) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Fri, 10 Apr 2020
+ 19:45:20 +0800
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+To: <imammedo@redhat.com>, <mst@redhat.com>, <xiaoguangrong.eric@gmail.com>,
+ <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>, <fam@euphon.net>,
+ <rth@twiddle.net>, <ehabkost@redhat.com>, <mtosatti@redhat.com>,
+ <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>,
+ <pbonzini@redhat.com>
+Subject: [PATCH v25 04/10] ACPI: Build related register address fields via
+ hardware error fw_cfg blob
+Date: Fri, 10 Apr 2020 19:46:33 +0800
+Message-ID: <20200410114639.32844-5-gengdongjiu@huawei.com>
+X-Mailer: git-send-email 2.18.0.huawei.25
+In-Reply-To: <20200410114639.32844-1-gengdongjiu@huawei.com>
+References: <20200410114639.32844-1-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.134) by
- FR2P281CA0022.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2900.17 via Frontend Transport; Fri, 10 Apr 2020 11:44:04 +0000
-X-Tagtoolbar-Keys: D20200410144403359
-X-Originating-IP: [185.215.60.134]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 85f1af06-5d6b-44ef-95aa-08d7dd4478d4
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5318:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB53181C9170E74B1FFF28B197C1DE0@AM7PR08MB5318.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-Forefront-PRVS: 0369E8196C
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(366004)(396003)(346002)(39840400004)(376002)(136003)(81156014)(8936002)(956004)(5660300002)(186003)(110136005)(16526019)(6486002)(26005)(2906002)(36756003)(478600001)(8676002)(2616005)(66476007)(107886003)(31696002)(16576012)(316002)(31686004)(66946007)(66556008)(52116002)(86362001)(4326008);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Xyj6uQSZHqQ5Y0o5sXangLcyO058nfHuTRnARbcIkbIe0OO0dNaEKN9CBw43i9bWU5m4u5kTm2M3wsteFIWoEmwFFjaX8su0598f90RyHnMxbiN81xcny1fPHl5e/xK5U7jg0MJaP0yXyZrLnViPVuFXIYGs0gzltaHyzD4d87/KG70YFus424yPqsp+HkCG4smUOXqPXEfN8TgdNowi2l29eN3Dm2X41NDMh2EWlN+lngEFMR+Fpb0wYjkwjstsWF6Xa8gcyrlbaVnudCY9nEodU7xOY1/JqsjkgyeySmsVJdY7YCa9XZYfOFBa06V7pC4GktOANgJpIEiihPZwAig4DkLtrBlWoQ3F0jrpHwUoDh3xagokDsX07g4l3wFZkcNB68yfX8aTCfvhTpu/XpydWfYcFLdTV+1/rmvMwkdT0V8on54Ig5scJVhsb8P5
-X-MS-Exchange-AntiSpam-MessageData: vHIHxmOXtFyB/tXtAXbaxRwNHXyd9PEvBoeWA8ekc+WoxF01I7bH/YSn9PGipAg1b3oiwJI4U7exIW7mpTRpifKdNuPg6PG2WkRIOaZICieryz1HryYPvvIlsvg6dGTL4FZwepoAQy6QRTfcLUYx0w==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 85f1af06-5d6b-44ef-95aa-08d7dd4478d4
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2020 11:44:05.2739 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MQfVxWXsyDnUMb8v1wb4JDC2yXU6KYTItjMM/s8yDWsP9pUvyvzXzJ6onY+RF5LiNqqN/RmwiBoFV50QOVuVcpqBL5DPfELO+sxtpAk8aj0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5318
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+Content-Type: text/plain
+X-Originating-IP: [10.151.151.243]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 40.107.1.105
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,48 +70,263 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, armbru@redhat.com, mreitz@redhat.com
+Cc: zhengxiang9@huawei.com, Jonathan.Cameron@huawei.com, linuxarm@huawei.com,
+ gengdongjiu@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-10.04.2020 14:12, Alberto Garcia wrote:
-> On Thu 09 Apr 2020 08:39:12 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
->>> Because of this a test cannot expect that running the same commands on
->>> an empty image produces always the same results.
->>>
->>> Is this something that we should be concerned about?
->>
->> Parallel writing compressed clusters is significant improvement, as it
->> allow compressing in really parallel threads.
-> 
-> I see, I just wasn't sure if you were aware of this side effect.
+This patch builds error_block_address and read_ack_register fields
+in hardware errors table , the error_block_address points to Generic
+Error Status Block(GESB) via bios_linker. The max size for one GESB
+is 1kb, For more detailed information, please refer to
+document: docs/specs/acpi_hest_ghes.rst
 
-No, we didn't thought about it, so good to know, thanks.
+Now we only support one Error source, if necessary, we can extend to
+support more.
 
-> 
->> So, I don't think we should make specific workaround for
->> testing... What exactly is the case?
-> 
-> I noticed this while writing some tests for the subcluster allocation
-> feature, but this is not a problem for me. Many of our iotests make
-> assumptions about the location of L2 and refcount tables so changing
-> those would break a lot of them. This thing only changes the offset of
-> the compressed data clusters (and their L2 entries), but as far as I'm
-> aware no one relies on them being predictable. I just need to make sure
-> that I don't do it either.
-> 
+Suggested-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+change since v24:
+1.move acpi_add_table() to the patch that adds acpi_build_hest()
+---
+ default-configs/arm-softmmu.mak |  1 +
+ hw/acpi/Kconfig                 |  4 ++
+ hw/acpi/Makefile.objs           |  1 +
+ hw/acpi/aml-build.c             |  2 +
+ hw/acpi/ghes.c                  | 89 +++++++++++++++++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c        |  5 +++
+ include/hw/acpi/aml-build.h     |  1 +
+ include/hw/acpi/ghes.h          | 28 +++++++++++++
+ 8 files changed, 131 insertions(+)
+ create mode 100644 hw/acpi/ghes.c
+ create mode 100644 include/hw/acpi/ghes.h
 
-OK. I had similar problems (because of asynchronicity) with existing iotests
-in may series for backup. As I remember, I had to add options to just disable
-asynchronicity for some tests. So, if needed, we can add some options for
-qcow2 (which can be used to justify number of parallel requests, not only to
-disable them at all). Still, of course, it's better to avoid testing only
-sequential IO when it is async without options.
-
-
-
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 36a0e89..8fc09a4 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -42,3 +42,4 @@ CONFIG_FSL_IMX7=y
+ CONFIG_FSL_IMX6UL=y
+ CONFIG_SEMIHOSTING=y
+ CONFIG_ALLWINNER_H3=y
++CONFIG_ACPI_APEI=y
+diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
+index 54209c6..1932f66 100644
+--- a/hw/acpi/Kconfig
++++ b/hw/acpi/Kconfig
+@@ -28,6 +28,10 @@ config ACPI_HMAT
+     bool
+     depends on ACPI
+ 
++config ACPI_APEI
++    bool
++    depends on ACPI
++
+ config ACPI_PCI
+     bool
+     depends on ACPI && PCI
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index 777da07..28c5ddb 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -8,6 +8,7 @@ common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+ common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
+ common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
+ common-obj-$(CONFIG_ACPI_HMAT) += hmat.o
++common-obj-$(CONFIG_ACPI_APEI) += ghes.o
+ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+ common-obj-$(call lnot,$(CONFIG_PC)) += acpi-x86-stub.o
+ 
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 2c3702b..3681ec6 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1578,6 +1578,7 @@ void acpi_build_tables_init(AcpiBuildTables *tables)
+     tables->table_data = g_array_new(false, true /* clear */, 1);
+     tables->tcpalog = g_array_new(false, true /* clear */, 1);
+     tables->vmgenid = g_array_new(false, true /* clear */, 1);
++    tables->hardware_errors = g_array_new(false, true /* clear */, 1);
+     tables->linker = bios_linker_loader_init();
+ }
+ 
+@@ -1588,6 +1589,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
+     g_array_free(tables->table_data, true);
+     g_array_free(tables->tcpalog, mfre);
+     g_array_free(tables->vmgenid, mfre);
++    g_array_free(tables->hardware_errors, mfre);
+ }
+ 
+ /*
+diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
+new file mode 100644
+index 0000000..e1b3f8f
+--- /dev/null
++++ b/hw/acpi/ghes.c
+@@ -0,0 +1,89 @@
++/*
++ * Support for generating APEI tables and recording CPER for Guests
++ *
++ * Copyright (c) 2020 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Author: Dongjiu Geng <gengdongjiu@huawei.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/units.h"
++#include "hw/acpi/ghes.h"
++#include "hw/acpi/aml-build.h"
++
++#define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
++#define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
++
++/* The max size in bytes for one error block */
++#define ACPI_GHES_MAX_RAW_DATA_LENGTH   (1 * KiB)
++
++/* Now only support ARMv8 SEA notification type error source */
++#define ACPI_GHES_ERROR_SOURCE_COUNT        1
++
++/*
++ * Build table for the hardware error fw_cfg blob.
++ * Initialize "etc/hardware_errors" and "etc/hardware_errors_addr" fw_cfg blobs.
++ * See docs/specs/acpi_hest_ghes.rst for blobs format.
++ */
++void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker)
++{
++    int i, error_status_block_offset;
++
++    /* Build error_block_address */
++    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
++        build_append_int_noprefix(hardware_errors, 0, sizeof(uint64_t));
++    }
++
++    /* Build read_ack_register */
++    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
++        /*
++         * Initialize the value of read_ack_register to 1, so GHES can be
++         * writeable after (re)boot.
++         * ACPI 6.2: 18.3.2.8 Generic Hardware Error Source version 2
++         * (GHESv2 - Type 10)
++         */
++        build_append_int_noprefix(hardware_errors, 1, sizeof(uint64_t));
++    }
++
++    /* Generic Error Status Block offset in the hardware error fw_cfg blob */
++    error_status_block_offset = hardware_errors->len;
++
++    /* Reserve space for Error Status Data Block */
++    acpi_data_push(hardware_errors,
++        ACPI_GHES_MAX_RAW_DATA_LENGTH * ACPI_GHES_ERROR_SOURCE_COUNT);
++
++    /* Tell guest firmware to place hardware_errors blob into RAM */
++    bios_linker_loader_alloc(linker, ACPI_GHES_ERRORS_FW_CFG_FILE,
++                             hardware_errors, sizeof(uint64_t), false);
++
++    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
++        /*
++         * Tell firmware to patch error_block_address entries to point to
++         * corresponding "Generic Error Status Block"
++         */
++        bios_linker_loader_add_pointer(linker,
++            ACPI_GHES_ERRORS_FW_CFG_FILE, sizeof(uint64_t) * i,
++            sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE,
++            error_status_block_offset + i * ACPI_GHES_MAX_RAW_DATA_LENGTH);
++    }
++
++    /*
++     * tell firmware to write hardware_errors GPA into
++     * hardware_errors_addr fw_cfg, once the former has been initialized.
++     */
++    bios_linker_loader_write_pointer(linker, ACPI_GHES_DATA_ADDR_FW_CFG_FILE,
++        0, sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE, 0);
++}
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 7ef0733..cc6ffcd 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -48,6 +48,7 @@
+ #include "sysemu/reset.h"
+ #include "kvm_arm.h"
+ #include "migration/vmstate.h"
++#include "hw/acpi/ghes.h"
+ 
+ #define ARM_SPI_BASE 32
+ 
+@@ -817,6 +818,10 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+     acpi_add_table(table_offsets, tables_blob);
+     build_spcr(tables_blob, tables->linker, vms);
+ 
++    if (vms->ras) {
++        build_ghes_error_table(tables->hardware_errors, tables->linker);
++    }
++
+     if (ms->numa_state->num_nodes > 0) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_srat(tables_blob, tables->linker, vms);
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index de4a406..8f13620 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -220,6 +220,7 @@ struct AcpiBuildTables {
+     GArray *rsdp;
+     GArray *tcpalog;
+     GArray *vmgenid;
++    GArray *hardware_errors;
+     BIOSLinker *linker;
+ } AcpiBuildTables;
+ 
+diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
+new file mode 100644
+index 0000000..50379b0
+--- /dev/null
++++ b/include/hw/acpi/ghes.h
+@@ -0,0 +1,28 @@
++/*
++ * Support for generating APEI tables and recording CPER for Guests
++ *
++ * Copyright (c) 2020 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Author: Dongjiu Geng <gengdongjiu@huawei.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef ACPI_GHES_H
++#define ACPI_GHES_H
++
++#include "hw/acpi/bios-linker-loader.h"
++
++void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
++#endif
 -- 
-Best regards,
-Vladimir
+1.8.3.1
+
 
