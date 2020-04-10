@@ -2,100 +2,69 @@ Return-Path: <SRS0=FIxb=52=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D63FC2BA2B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 11:12:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D5F9C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 11:13:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 634EB206F7
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 11:12:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5522206F7
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 11:13:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CRTZStv0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 634EB206F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="rfU6bPbM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5522206F7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMra1-00030C-Jz
-	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 07:12:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58578)
+	id 1jMrba-0004fk-3D
+	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 07:13:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58684)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jMrZQ-0002aJ-OV
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 07:11:37 -0400
+ (envelope-from <berto@igalia.com>) id 1jMraE-0003L7-2z
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 07:12:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jMrZP-0005KD-1T
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 07:11:36 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54821
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jMrZO-0005HC-U7
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 07:11:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586517093;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lgTYZTxE+j4KKX3tkfLZj2/rJwxDnF7COVKxhuR2NME=;
- b=CRTZStv0ov09b12h2pheDuyEA/C7QdoYgScp3u+rRBLpHwEevuDDFkrTX0yH6EooMMGjMz
- Pvh6tvUutg8ByjL511Tp0MI0KrndwbI+e9wdKvSaAvDWVBYdU6I+3qwbRiV9zkmnCeb13f
- 8bK7HxEWOIe/j1FjFwJiHxgLFCl+mkM=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-uwsQuFQHPk6YdW4TcGvSqA-1; Fri, 10 Apr 2020 07:11:32 -0400
-X-MC-Unique: uwsQuFQHPk6YdW4TcGvSqA-1
-Received: by mail-ed1-f71.google.com with SMTP id bm26so1810560edb.17
- for <qemu-devel@nongnu.org>; Fri, 10 Apr 2020 04:11:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=znsngmpaEKL492sEwLT7gY1lb9ak7IfVlw/eAuP6Zds=;
- b=f577odLnpUt3MeGEpSwyQbY0iRCTZflZhA+ZPH8uN+2h8NOvJTfshS2aKZ+ynCboMb
- 5raKJj/Y3nC81TqB1dCkaUl4GEjPhaEe/sGcgz1372VJeMLfS2ycfrP/Jtub7jPtIuo1
- 8TB39HPZ13RJ97PzmhVWiPmcaXXFyM3vfB4wUNIXTDPzISHuR8wiKd1yq3kRSz6Ow3Lg
- xzuq53KlFWE26021LOiqWK+ePiiqTaCfra3qovdaopwbiOzsgdp98DTdsZ1nwM9LF4ZQ
- HbYMabcyQeiWAAKg67p34SzmvlqNi4QP7lRPYMNDwU45v0UwtmnbY+nQRrVOveE6+aEz
- sdoQ==
-X-Gm-Message-State: AGi0PubHLlhVzDhDx+NkLx6SY++z+/fFyMuVUKYyNVtteBnnDKzOSHZ5
- J2cN3J7Jwi6VcSjcQIbNXKUYhXwvsivp3mYUuKl+Qi9KfDSqb2q/qzCLOSsS0nie5AmzozsGZAd
- Fap/wi3DkdAPXhHA=
-X-Received: by 2002:a50:e043:: with SMTP id g3mr4393900edl.220.1586517090984; 
- Fri, 10 Apr 2020 04:11:30 -0700 (PDT)
-X-Google-Smtp-Source: APiQypL9YKVn9vaLYxpuItSJRXIh71OiOEeclwUpeHLrxIKDpaSIflPVAZ5j9pOe1rXkSSrVm6AjzA==
-X-Received: by 2002:a50:e043:: with SMTP id g3mr4393877edl.220.1586517090762; 
- Fri, 10 Apr 2020 04:11:30 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id s4sm89233edw.19.2020.04.10.04.11.29
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 10 Apr 2020 04:11:30 -0700 (PDT)
-Subject: Re: [PATCH v1 10/11] linux-user: fix /proc/self/stat handling
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200409211529.5269-1-alex.bennee@linaro.org>
- <20200409211529.5269-11-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <88154583-5a03-a89c-f10e-06e6010abf95@redhat.com>
-Date: Fri, 10 Apr 2020 13:11:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <berto@igalia.com>) id 1jMraC-0005lO-Pf
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 07:12:25 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:48726)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1jMraC-0005Zx-7e; Fri, 10 Apr 2020 07:12:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=3bCHbqPAuLZy7lYbzXuiMl+UtbpBQO+m28vx3rtiymE=; 
+ b=rfU6bPbMiG0Uf5QHFAWY+J5HCVIhYu4KcXN8cHsOJPsfPUJ/QTw3RuwVDZyXU8dNc0ntiabFuEMcLthJ9VVheGljAb0N0u9QTFxi7BoT8KuUY0VzDc+eOz6++PoJzF5d+ueTbbvsN2bUNgFdO4bYpYRiwpmvBzxJUEX+owUGJPTehIoYCmIkQTL4yjnOVTeWT75bXOC/aPnJzG+696gscC4IlU3FR3KCAFgJypKvFPYlqyAdVjdQRcvYopTGd0Siy7GApAkNjY37wkJy13M/NkkS4Y/FdsKt8mMGRnGYJHM0hsjWNsNNKHSVhWtfloQqws5yTgNV3tH/rATA6bhMVw==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jMrZr-0002Bg-Lz; Fri, 10 Apr 2020 13:12:03 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jMrZr-0000wM-Cf; Fri, 10 Apr 2020 13:12:03 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+Subject: Re: [PATCH v12 2/3] qcow2: Allow writing compressed data of multiple
+ clusters
+In-Reply-To: <5bbb126f-37c0-f107-c3b3-667ed43670fa@virtuozzo.com>
+References: <1575288906-551879-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1575288906-551879-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <w51y2r41u4d.fsf@maestria.local.igalia.com>
+ <5bbb126f-37c0-f107-c3b3-667ed43670fa@virtuozzo.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Fri, 10 Apr 2020 13:12:03 +0200
+Message-ID: <w51pncf61do.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200409211529.5269-11-alex.bennee@linaro.org>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,102 +76,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ludovic Courtes <ludovic.courtes@inria.fr>,
- Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Brice Goglin <Brice.Goglin@inria.fr>
+Cc: kwolf@redhat.com, den@openvz.org, armbru@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing Ludovic in case he can test with Guix-HPC.
+On Thu 09 Apr 2020 08:39:12 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
+>> Because of this a test cannot expect that running the same commands on
+>> an empty image produces always the same results.
+>> 
+>> Is this something that we should be concerned about?
+>
+> Parallel writing compressed clusters is significant improvement, as it
+> allow compressing in really parallel threads.
 
-On 4/9/20 11:15 PM, Alex Benn=C3=A9e wrote:
-> In the original bug report long files names in Guix caused
-> /proc/self/stat be truncated without the trailing ") " as specified in
-> proc manpage which says:
->      (2) comm  %s
->             The  filename of the executable, in parentheses.  This
->             is visible whether or not the  executable  is  swapped
->             out.
->=20
-> Additionally it should only be reporting the executable name rather
-> than the full path. Fix both these failings while cleaning up the code
-> to use GString to build up the reported values. As the whole function
-> is cleaned up also adjust the white space to the current coding style.
->=20
-> Message-ID: <fb4c55fa-d539-67ee-c6c9-de8fb63c8488@inria.fr>
-> Reported-by: Brice Goglin <Brice.Goglin@inria.fr>
-> Cc: Philippe_Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->   linux-user/syscall.c | 43 +++++++++++++++++++------------------------
->   1 file changed, 19 insertions(+), 24 deletions(-)
->=20
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 6495ddc4cda..674f70e70a5 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -7295,34 +7295,29 @@ static int open_self_stat(void *cpu_env, int fd)
->   {
->       CPUState *cpu =3D env_cpu((CPUArchState *)cpu_env);
->       TaskState *ts =3D cpu->opaque;
-> -    abi_ulong start_stack =3D ts->info->start_stack;
-> +    g_autoptr(GString) buf =3D g_string_new(NULL);
->       int i;
->  =20
->       for (i =3D 0; i < 44; i++) {
-> -      char buf[128];
-> -      int len;
-> -      uint64_t val =3D 0;
-> -
-> -      if (i =3D=3D 0) {
-> -        /* pid */
-> -        val =3D getpid();
-> -        snprintf(buf, sizeof(buf), "%"PRId64 " ", val);
-> -      } else if (i =3D=3D 1) {
-> -        /* app name */
-> -        snprintf(buf, sizeof(buf), "(%s) ", ts->bprm->argv[0]);
-> -      } else if (i =3D=3D 27) {
-> -        /* stack bottom */
-> -        val =3D start_stack;
-> -        snprintf(buf, sizeof(buf), "%"PRId64 " ", val);
-> -      } else {
-> -        /* for the rest, there is MasterCard */
-> -        snprintf(buf, sizeof(buf), "0%c", i =3D=3D 43 ? '\n' : ' ');
-> -      }
-> +        if (i =3D=3D 0) {
-> +            /* pid */
-> +            g_string_printf(buf, FMT_pid " ", getpid());
-> +        } else if (i =3D=3D 1) {
-> +            /* app name */
-> +            gchar *bin =3D g_strrstr(ts->bprm->argv[0], "/");
-> +            bin =3D bin ? bin + 1 : ts->bprm->argv[0];
-> +            g_string_printf(buf, "(%.15s) ", bin);
+I see, I just wasn't sure if you were aware of this side effect.
 
-15 or 125? 15 seems short. From your previous test I understood it was=20
-124, for=20
-sizeof("cat_with9_123456789012345678901234567890123456789012345678901234567=
-89012345678901234567890123456789012345678901234567890___40").
+> So, I don't think we should make specific workaround for
+> testing... What exactly is the case?
 
-> +        } else if (i =3D=3D 27) {
-> +            /* stack bottom */
-> +            g_string_printf(buf, TARGET_ABI_FMT_ld " ", ts->info->start_=
-stack);
-> +        } else {
-> +            /* for the rest, there is MasterCard */
-> +            g_string_printf(buf, "0%c", i =3D=3D 43 ? '\n' : ' ');
-> +        }
->  =20
-> -      len =3D strlen(buf);
-> -      if (write(fd, buf, len) !=3D len) {
-> -          return -1;
-> -      }
-> +        if (write(fd, buf->str, buf->len) !=3D buf->len) {
-> +            return -1;
-> +        }
->       }
->  =20
->       return 0;
->=20
+I noticed this while writing some tests for the subcluster allocation
+feature, but this is not a problem for me. Many of our iotests make
+assumptions about the location of L2 and refcount tables so changing
+those would break a lot of them. This thing only changes the offset of
+the compressed data clusters (and their L2 entries), but as far as I'm
+aware no one relies on them being predictable. I just need to make sure
+that I don't do it either.
 
+Berto
 
