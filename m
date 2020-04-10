@@ -2,81 +2,91 @@ Return-Path: <SRS0=FIxb=52=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE829C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 14:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F5D9C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 14:52:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B88A120A8B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 14:47:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8B3420A8B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 14:52:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="huFxtN9u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B88A120A8B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QchP5oiA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8B3420A8B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMuwk-0001lh-QR
-	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 10:47:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53239)
+	id 1jMv11-0007H2-1E
+	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 10:52:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54377)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jMuuf-0006cS-VS
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 10:45:47 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jMv0O-0006ro-0F
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 10:51:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jMuue-0007En-Bn
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 10:45:45 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:36254)
+ (envelope-from <richard.henderson@linaro.org>) id 1jMv0M-0002ev-Nv
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 10:51:39 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:42889)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sundeep.lkml@gmail.com>)
- id 1jMuue-0007Aq-21; Fri, 10 Apr 2020 10:45:44 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id nu11so837644pjb.1;
- Fri, 10 Apr 2020 07:45:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=H8Wr/XSP4AU9lgIicqWiQ92HOFMiV/TIkOKb5t+4yLE=;
- b=huFxtN9uZ6Mr9cPY4hlGIj9RBdx98bQMWRl78eEOty0lQX9IxoHYVk0oNDeGIykHW+
- MJqb3h4br/wz1Ya4U5zPsvcEvZmOTBXm5/9mmzDt3JksR/crqEczSNVejVNOJ2tiU4xg
- WZB29z+SXir8ZZT6eLJM9u7CiuEmS0Dgs8JSOt+K6aSYilmoe5Pm7CoXHGV2ODIrUTYl
- F1KRJvE+8l/Sy06HmsyaCQHF68OuF+Y74Y+19y6OT2wHgEQ+NDvbIYM6pJGPileGuGeV
- 3SuIMzGgfRKF1NSNc+JEgFHP0joGe2Wrav1t8VjH2HF+/QP/hqNko2g/Pup0ClrzSOh8
- OBAg==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jMv0M-0002cl-9a
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 10:51:38 -0400
+Received: by mail-pg1-x544.google.com with SMTP id g6so1061249pgs.9
+ for <qemu-devel@nongnu.org>; Fri, 10 Apr 2020 07:51:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=A2efwbep2WIqV8cdCCsODJVnI0w6TbMYw+rmItyVqM0=;
+ b=QchP5oiAfJk57PH1YT+GW4ksUQaT664fYVNc6K02E6xatY7Enbt0YY92u/PKt7adET
+ l7El/lC2NXrL1i9uTwz3fS6dcGlXr70QbKVcvZulTo0kt/ERK+OHVaKhFXu+fzBkxwkX
+ /aVBFiA3JfJ36bS6BYmRkzWEPuv6hA7iDJP3LcBg+tUkEN2Q1e3Dzh+1Jumbw0vaXgfo
+ knVHrtKhHbPC3k7jM6LTPhClxvO3rcaZdoKPazE5QPH1LN5u8kuc2WU1oM6F+JHlVXoJ
+ xbICQMghI21szI9AGmtzc4iRBU7PKDX/p76ZqhwgfItNf0HbtDoVzw/lYhyBBwyKl+hu
+ Haig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=H8Wr/XSP4AU9lgIicqWiQ92HOFMiV/TIkOKb5t+4yLE=;
- b=WNAz/yc0TN7xcqnGg5nhX4yj+6f0TJYlLtPZPbQBHqqeI0Btpy5gjwOwU8veNnDSX4
- hk94q16h+UEmDWsNfQIMVWk/FX8QOG9rzAzzaj2idiRxt6GFtKzuRi8X54zAOD8VeBWW
- kHbbbhzIDqMNOd4g3UUSzz8o3wvPLgxK9bvieRP2YCYDhKAyJJjMmmwfcchxAv/s2BJL
- zitu2d73gHOaWfEO0YDlM3mgmDjiRTo6y5yDTdiVy/kkcUY6nF+b5VrCkTK8517172BE
- N8SLRrUqddHbG8jovWwmekssGMLvvDPR8B0Z8IkbFf4qh3W1TqPEmETESEpGOYU6ju9G
- da5g==
-X-Gm-Message-State: AGi0PuYeH0/SeuiRV4yl9PGx043RLFOeirRLcUGHdIL8pxvkJ262f0gN
- GJgjO7UwK+pto1jqb/DxrH4=
-X-Google-Smtp-Source: APiQypLBCTzYOCxvVcv3irsf9AVdLSoXzaeLdsTt2D9B377IAbwP6MV8mZE5H2EkkaFLPPlwgC/2mA==
-X-Received: by 2002:a17:90a:1b22:: with SMTP id
- q31mr5980020pjq.109.1586529942871; 
- Fri, 10 Apr 2020 07:45:42 -0700 (PDT)
-Received: from hyd1358.marvell.com ([115.113.156.2])
- by smtp.googlemail.com with ESMTPSA id p12sm1984667pfq.153.2020.04.10.07.45.40
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 10 Apr 2020 07:45:42 -0700 (PDT)
-From: sundeep.lkml@gmail.com
-To: jasowang@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Subject: [Qemu devel PATCH v4 0/3] Add SmartFusion2 EMAC block
-Date: Fri, 10 Apr 2020 20:15:23 +0530
-Message-Id: <1586529926-11441-1-git-send-email-sundeep.lkml@gmail.com>
-X-Mailer: git-send-email 2.7.4
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=A2efwbep2WIqV8cdCCsODJVnI0w6TbMYw+rmItyVqM0=;
+ b=RtrcR5TiPWwl/JRSajVaMjhFBubC9t70PIXEbAwIupJBBbO52sM1wVN0lF9BBrX2TY
+ jP61OH2LeaCi53koCzzv7YoakGg1xK3Npoo5JsucBPB+B42zxqlEka4DhipF/5XxUnaa
+ 9byb7m/MPTmLSndb5V2u/nF/sGkKLAC7Ma9XtqDnu3MfqvF7c50Ci3Id8ggV+l6JnWeW
+ o1Kki754Oca6uvd9dvkNbtj/bs5/yyAyCwHe0Huu4dYPNjFA/hBbGQ7CV2w/0F2wJfc8
+ zZBzUc/5xXzTgJSv+ECnnas/4wBdqflGSYKD0TcXUZ3Cq9fG3liwtqNUB0j8FfPHjq4o
+ 33vg==
+X-Gm-Message-State: AGi0PuYwWiYQwIYsycDe8mGDjkuSMKm18VNUvsrpiHh74vkbkPX1Z2Ij
+ nMmoIlJorkd/+kPbPO4xzxWL8w==
+X-Google-Smtp-Source: APiQypLuNY6+CncCfBmCE2e/LqRRZylPEgtLuZQ6Wcv6SxB/88ymUhySAIuqSfyPuHCeJ3959zF7/w==
+X-Received: by 2002:a63:3002:: with SMTP id w2mr4865651pgw.290.1586530296686; 
+ Fri, 10 Apr 2020 07:51:36 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id z15sm1980151pfg.152.2020.04.10.07.51.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 10 Apr 2020 07:51:36 -0700 (PDT)
+Subject: Re: [PATCH v1 10/11] linux-user: fix /proc/self/stat handling
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200409211529.5269-1-alex.bennee@linaro.org>
+ <20200409211529.5269-11-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <0871ff0f-28bc-728f-a5df-7980000a8f97@linaro.org>
+Date: Fri, 10 Apr 2020 07:51:34 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <20200409211529.5269-11-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1041
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,154 +98,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ =?UTF-8?Q?Philippe=5fMathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, Brice Goglin <Brice.Goglin@inria.fr>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+On 4/9/20 2:15 PM, Alex Bennée wrote:
+> In the original bug report long files names in Guix caused
+> /proc/self/stat be truncated without the trailing ") " as specified in
+> proc manpage which says:
+>     (2) comm  %s
+>            The  filename of the executable, in parentheses.  This
+>            is visible whether or not the  executable  is  swapped
+>            out.
+> 
+> Additionally it should only be reporting the executable name rather
+> than the full path. Fix both these failings while cleaning up the code
+> to use GString to build up the reported values. As the whole function
+> is cleaned up also adjust the white space to the current coding style.
+> 
+> Message-ID: <fb4c55fa-d539-67ee-c6c9-de8fb63c8488@inria.fr>
+> Reported-by: Brice Goglin <Brice.Goglin@inria.fr>
+> Cc: Philippe_Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  linux-user/syscall.c | 43 +++++++++++++++++++------------------------
+>  1 file changed, 19 insertions(+), 24 deletions(-)
 
-This patch set emulates Ethernet MAC block
-present in Microsemi SmartFusion2 SoC.
-
-v4:
-  Added loop back as per Jason's comment 
-v3:
-  Added SmartFusion2 ethernet test to tests/acceptance
-v2:
-  No changes. Fixed Signed-off mail id in patch 2/2
-
-Testing:
-
-1. Download u-boot.bin, uImage and msf2-devkit.dtb from
-   https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git
-2. Copy uImage and msf2-devkit.dtb to suitable Qemu tftp directory
-3. Launch Qemu by
-   ./arm-softmmu/qemu-system-arm -M emcraft-sf2 -serial mon:stdio -kernel \
-   u-boot.bin -display none -nic user,tftp=<qemu tftp directory>
-
-Example:
-./arm-softmmu/qemu-system-arm -M emcraft-sf2 -serial mon:stdio -kernel u-boot -display none -nic user,tftp=/home/hyd1358/qemu_tftp
-
-U-Boot 2010.03-00000-ga7695d6 (Apr 04 2020 - 15:07:27)
-
-CPU  : SmartFusion2 SoC (Cortex-M3 Hard IP)
-Freqs: CORTEX-M3=142MHz,PCLK0=71MHz,PCLK1=71MHz
-Board: M2S-FG484-SOM Rev 1A, www.emcraft.com
-DRAM:  64 MB
-*** Warning - bad CRC, using default environment
-
-In:    serial
-Out:   serial
-Err:   serial
-Net:   M2S_MAC
-
-Hit any key to stop autoboot:  3  0 
-
-M2S-FG484-SOM> run netboot
-Using M2S_MAC device
-TFTP from server 10.0.2.2; our IP address is 10.0.2.15
-Filename 'uImage'.
-Load address: 0xa0007fc0
-Loading: *#################################################################
- #################################################################
- #################################################################
- ###############################################################
-done
-Bytes transferred = 3681568 (382d20 hex)
-Using M2S_MAC device
-TFTP from server 10.0.2.2; our IP address is 10.0.2.15
-Filename 'msf2-devkit.dtb'.
-Load address: 0xa0000200
-Loading: *#
-done
-Bytes transferred = 1712 (6b0 hex)
-## Booting kernel from Legacy Image at a0007fc0 ...
-   Image Name:   
-   Image Type:   ARM Linux Kernel Image (uncompressed)
-   Data Size:    3681504 Bytes =  3.5 MB
-   Load Address: a0008000
-   Entry Point:  a0008001
-   Verifying Checksum ... OK
-   Loading Kernel Image ... OK
-OK
-
-Starting kernel ...
-
-[    0.000000] Booting Linux on physical CPU 0x0
-[    0.000000] Linux version 4.5.0-gb0e5502-dirty (hyd1358@hyd1358) (gcc version 4.4.1 (Sourcery G++ Lite 2010q1-189) ) #85 PREEMPT Sat Apr 4 23:26:40 IST 2020
-[    0.000000] CPU: ARMv7-M [410fc231] revision 1 (ARMv7M), cr=00000000
-[    0.000000] CPU: unknown data cache, unknown instruction cache
-[    0.000000] Machine model: Microsemi SmartFusion 2 development board
-[    0.000000] bootconsole [earlycon0] enabled
-[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 16256
-[    0.000000] Kernel command line: console=ttyS0,115200n8 panic=10 mem=64M@0xa0000000 earlyprintk
-[    0.000000] PID hash table entries: 256 (order: -2, 1024 bytes)
-[    0.000000] Dentry cache hash table entries: 8192 (order: 3, 32768 bytes)
-[    0.000000] Inode-cache hash table entries: 4096 (order: 2, 16384 bytes)
-[    0.000000] Memory: 61212K/65536K available (1612K kernel code, 75K rwdata, 680K rodata, 1224K init, 120K bss, 4324K reserved, 0K cma-reserved)
-[    0.000000] Virtual kernel memory layout:
-[    0.000000]     vector  : 0x00000000 - 0x00001000   (   4 kB)
-[    0.000000]     fixmap  : 0xffc00000 - 0xfff00000   (3072 kB)
-[    0.000000]     vmalloc : 0x00000000 - 0xffffffff   (4095 MB)
-[    0.000000]     lowmem  : 0xa0000000 - 0xa4000000   (  64 MB)
-[    0.000000]     modules : 0xa0000000 - 0xa0800000   (   8 MB)
-[    0.000000]       .text : 0xa0008000 - 0xa02453e8   (2293 kB)
-[    0.000000]       .init : 0xa0246000 - 0xa0378000   (1224 kB)
-[    0.000000]       .data : 0xa0378000 - 0xa038ace0   (  76 kB)
-[    0.000000]        .bss : 0xa038ace0 - 0xa03a8ea0   ( 121 kB)
-[    0.000000] SLUB: HWalign=32, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
-[    0.000000] Preemptible hierarchical RCU implementation.
-.
-.
-.
-[    0.445184] Found M2S MAC at 0x40041000, irq 18
-[    0.448810] libphy: msf2 MII bus: probed
-[    0.527047] ipip: IPv4 over IPv4 tunneling driver
-[    0.532367] NET: Registered protocol family 10
-[    0.542307] sit: IPv6 over IPv4 tunneling driver
-[    0.544655] NET: Registered protocol family 17
-[    0.565395] Freeing unused kernel memory: 1224K (a0246000 - a0378000)
-init started: BusyBox v1.31.1 (2020-01-25 20:01:06 IST)
-starting pid 26, tty '': '/etc/rc'
-starting pid 31, tty '/dev/ttyS0': '/bin/hush -i'
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-BusyBox v1.31.1 (2020-01-25 20:01:06 IST) hush - the humble shell
-Enter 'help' for a list of built-in commands.
-
-/ # ifconfig eth0 10.0.2.15
-[   11.116091] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
-/ # [   11.653634] eth0: link up (100/full)
-[   11.655246] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
-
-/ # ls
-dev   proc  sys   etc   usr   bin   tmp   sbin  mnt   init
-/ # tftp -gr uImage 10.0.2.2
-[   40.780983] random: nonblocking pool is initialized
-/ # ls
-dev     sys     usr     tmp     mnt     uImage
-proc    etc     bin     sbin    init
-/ #    
-
-
-Subbaraya Sundeep (3):
-  hw/net: Add Smartfusion2 emac block
-  msf2: Add EMAC block to SmartFusion2 SoC
-  tests/boot_linux_console: Add ethernet test to SmartFusion2
-
- MAINTAINERS                            |   2 +
- hw/arm/msf2-soc.c                      |  21 +-
- hw/net/Makefile.objs                   |   1 +
- hw/net/msf2-emac.c                     | 562 +++++++++++++++++++++++++++++++++
- include/hw/arm/msf2-soc.h              |   3 +
- include/hw/net/msf2-emac.h             |  50 +++
- tests/acceptance/boot_linux_console.py |  15 +-
- 7 files changed, 648 insertions(+), 6 deletions(-)
- create mode 100644 hw/net/msf2-emac.c
- create mode 100644 include/hw/net/msf2-emac.h
-
--- 
-2.7.4
+r~
 
 
