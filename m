@@ -2,74 +2,166 @@ Return-Path: <SRS0=FIxb=52=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0533CC2BA19
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 00:21:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23D87C2BA19
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 01:03:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB9FF2074F
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 00:21:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB9FF2074F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id D8B732074F
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 01:03:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8B732074F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMhQW-0003oQ-U7
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 20:21:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59656)
+	id 1jMi4v-00024W-3u
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 21:03:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33797)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jMhPp-0003JT-4d
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 20:21:02 -0400
+ (envelope-from <LYan@suse.com>) id 1jMi4K-0001fB-7n
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 21:02:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jMhPn-0002z4-D9
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 20:21:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41974)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jMhPn-0002xC-7H
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 20:20:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jMhPl-0004M2-AI
- for <qemu-devel@nongnu.org>; Fri, 10 Apr 2020 00:20:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 390C82E8109
- for <qemu-devel@nongnu.org>; Fri, 10 Apr 2020 00:20:57 +0000 (UTC)
-MIME-Version: 1.0
+ (envelope-from <LYan@suse.com>) id 1jMi4H-0008FU-Un
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 21:02:51 -0400
+Received: from m4a0073g.houston.softwaregrp.com ([15.124.2.131]:50664)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <LYan@suse.com>) id 1jMi4H-0008E5-OG
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 21:02:49 -0400
+Received: FROM m4a0073g.houston.softwaregrp.com (15.120.17.146) BY
+ m4a0073g.houston.softwaregrp.com WITH ESMTP; 
+ Fri, 10 Apr 2020 01:00:35 +0000
+Received: from M9W0067.microfocus.com (2002:f79:be::f79:be) by
+ M4W0334.microfocus.com (2002:f78:1192::f78:1192) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1591.10; Fri, 10 Apr 2020 00:59:23 +0000
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (15.124.72.11) by
+ M9W0067.microfocus.com (15.121.0.190) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1591.10 via Frontend Transport; Fri, 10 Apr 2020 00:59:22 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ilCyjd36FT9+uqgdbSob12n78yvRbvg4fXOwE/Lv539aEIfasmQbrDkduT9yq/hOW3rv1GTEB7sqmrZtjZzuLlybuTy2ChTEdd3PBId+pQSvl2v1MMu7ERFZWJodKTaOpidd915e/1RywxiwFudH4nZ/xWbQSgr3t3KXMdAGcqsB5NWdbLR3XBwFYx6Esd1ZGvUlTK67+kUm8VeMF2WwV9TXMoRBAIA0t1Ch4VI+BtgYrATq5lQWYQreiL3eppWkofgCdW/auj7uRBpyWbhtk38U3XRZCjY4LOP1L7F7kfAhh4nVHhPqpxNLdxSaTtxrPufsDEe6X9NNqWoKOcSPlA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yQq+W2/PrBxVpAD25zi/eeqZQFUdm3sZCvl9+wvcSZM=;
+ b=LNHSRKeOZ4jGV1bnkU/mFZu5Kg6UaKOyWgAnyJW+UnpCLqbhnXykEvvenobicxr/r0aLyIazeJSRKdUnzMPzcii+EzT/OdxsyCmPIB6Qpvjf3FF+2EN3z0QOgc/f1hio1HSk6IyuqQ6m6DAWR+1LDbzgMf2yjLDjaAHY57ywuk6kwznrElNlZnR/K37hUbUqgXZoaAUmC1G0Oj7nd11Wc0HuZfQwEpJQ0akoUcTN9TjQnBJ07dCgwKpN4OsxgDvDlc7RmaV/CWgSOJFjZ1QNPm2n4HDPn1nbYeLoFZaNfP8vnrh9Een1qS8tFZKkEX044G+izgJx+2V3LRGEn6pUGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: spf=none (sender IP is ) smtp.mailfrom=LYan@suse.com; 
+Received: from BYAPR18MB3047.namprd18.prod.outlook.com (2603:10b6:a03:105::32)
+ by BYAPR18MB2616.namprd18.prod.outlook.com (2603:10b6:a03:13c::17)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.19; Fri, 10 Apr
+ 2020 00:59:20 +0000
+Received: from BYAPR18MB3047.namprd18.prod.outlook.com
+ ([fe80::2d27:6a4b:3a2f:1ca1]) by BYAPR18MB3047.namprd18.prod.outlook.com
+ ([fe80::2d27:6a4b:3a2f:1ca1%4]) with mapi id 15.20.2878.022; Fri, 10 Apr 2020
+ 00:59:20 +0000
+Subject: Re: [RFC][PATCH v2 0/3] IVSHMEM version 2 device for QEMU
+To: Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel <qemu-devel@nongnu.org>
+References: <cover.1578407802.git.jan.kiszka@siemens.com>
+ <e11366c8-44e6-2d58-7c0a-f49e497cc240@suse.com>
+ <883ab460-77c2-a324-6c8b-eb2e74f6458c@siemens.com>
+From: Liang Yan <lyan@suse.com>
+Autocrypt: addr=lyan@suse.com; prefer-encrypt=mutual; keydata=
+ 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
+ yMQQ+LPXfanS4w==
+Message-ID: <e335c68c-c2a2-2012-f54c-20ec372dcb3b@suse.com>
+Date: Thu, 9 Apr 2020 20:59:17 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+In-Reply-To: <883ab460-77c2-a324-6c8b-eb2e74f6458c@siemens.com>
 Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 10 Apr 2020 00:12:29 -0000
-From: Babu Moger <1871842@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: babumoger e-philipp imammedo
-X-Launchpad-Bug-Reporter: Philipp Eppelt (e-philipp)
-X-Launchpad-Bug-Modifier: Babu Moger (babumoger)
-References: <158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com>
- <20200409160037.431ec776@redhat.com>
-Message-Id: <5f7b85c6-09af-1064-f7f8-66ea7abf3ae3@amd.com>
-Subject: Re: [Bug 1871842] [NEW] AMD CPUID leaf 0x8000'0008 reported number of
- cores inconsistent with ACPI.MADT
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8a0634044ec1020509e74328b303832b37249af9
+X-ClientProxiedBy: CH2PR08CA0009.namprd08.prod.outlook.com
+ (2603:10b6:610:5a::19) To BYAPR18MB3047.namprd18.prod.outlook.com
+ (2603:10b6:a03:105::32)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [IPv6:2605:a000:160e:228::abc] (2605:a000:160e:228::abc) by
+ CH2PR08CA0009.namprd08.prod.outlook.com (2603:10b6:610:5a::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2900.15 via Frontend Transport; Fri, 10 Apr 2020 00:59:19 +0000
+X-Originating-IP: [2605:a000:160e:228::abc]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 59080cd4-150b-45d3-8faa-08d7dcea66d9
+X-MS-TrafficTypeDiagnostic: BYAPR18MB2616:
+X-Microsoft-Antispam-PRVS: <BYAPR18MB2616C69050FE8BBBC07555B9BFDE0@BYAPR18MB2616.namprd18.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Forefront-PRVS: 0369E8196C
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BYAPR18MB3047.namprd18.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(376002)(136003)(366004)(39860400002)(346002)(396003)(4326008)(81156014)(16526019)(316002)(66476007)(36756003)(8936002)(66556008)(110136005)(66946007)(54906003)(81166007)(478600001)(2616005)(8676002)(5660300002)(966005)(53546011)(186003)(31696002)(52116002)(6486002)(2906002)(86362001)(31686004);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: suse.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 52FJtwCLYx7xQidVVYfxSc0tsD/G5L3hfcWTXWCqRNROFzlxeX7uwE6O2/Hy6++O3iwhxSOxtmc3XNr8vI/4kXHoaObeBbaGN++ToFmOlDyAIt0XHB03Sg/S9yrIlZjMmJ+rJy1MM6pZhtmzr5lfFP/vhTwcIQUAwRRkXJ6biuEAsiXxN9p/RrsQEXfxkJLe78qDUEFr6SphlFPMDZsGbC1NkiKlaX1TDRC2dkgP4VKWpqT4civUF14kXe6xgSVPXTSWAoWokR3ayazGa9vBBdQuNsSTS9pajk9upjOhDDPI0cJ/zwpg0ipPZmqcpu3h+ZlhGuSHBAzFIVRuTAjh8Oc6rU3S0azyuoO0F4NlSkhtf7Pp4DEfCiBea+YevBMyJM5rtY4bhvpidue45qhatdP4Wf3fr0VJ6558ffRd41vadn5NUf6qWX+TjRHo5y6ZnRZFmRwajHYdj+kqP/lrOpJvUN0ZY0mH40/DScGAmt6ceXkh7z5SEDYgWqLjuxTQFe1Og/mcEpTFEVwH/xWczw==
+X-MS-Exchange-AntiSpam-MessageData: rk8e9MeWaNxliFfqWbhN3wIY9UPIdqe4o9oDDwyFHog5nDfvtVTKiAOlg4Ie43GGLzt+koSR4efCPJI54Pe5ZOsivbfhZtnGKrP7G6IwMjAH0hvsateLi/7dMV78wM9uahHBzPHrQnxdmTNtEd0vp6h07Ox5OkqahAOzA1h10rA=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 59080cd4-150b-45d3-8faa-08d7dcea66d9
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2020 00:59:20.4555 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 856b813c-16e5-49a5-85ec-6f081e13b527
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7p9g0Pk3Z/OgQ8MLRvbs1MQ5E5fiW46DDQb/CBt7v4h1ZEQizJoqlZEF1HRu52qp
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR18MB2616
+X-OriginatorOrg: suse.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 15.124.2.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,257 +170,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1871842 <1871842@bugs.launchpad.net>
+Cc: Jailhouse <jailhouse-dev@googlegroups.com>,
+ Claudio Fontana <claudio.fontana@gmail.com>, "Michael
+ S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Hannes Reinecke <hare@suse.de>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200410001229.L-cr1IUcJe67N1IxMAHcDDuR4KXaXw1Sqw352Q5fokw@z>
-
-Philipp,
-  Can you please check if this patch works for you.
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 90ffc5f..e467fee 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5831,10 +5831,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t
-index, uint32_t count,
-         }
-         *ebx =3D env->features[FEAT_8000_0008_EBX];
-         *ecx =3D 0;
--        *edx =3D 0;
-         if (cs->nr_cores * cs->nr_threads > 1) {
--            *ecx |=3D (cs->nr_cores * cs->nr_threads) - 1;
-+            unsigned long max_apicids, bits_required;
-+
-+            max_apicids =3D (cs->nr_cores * cs->nr_threads) - 1;
-+            if (max_apicids) {
-+                /* Find out the number of bits to represent all the
-apicids */
-+                bits_required =3D find_last_bit(&max_apicids,
-BITS_PER_BYTE) + 1;
-+                *ecx |=3D bits_required << 12 | max_apicids;
-+            }
-         }
-+        *edx =3D 0;
-         break;
-     case 0x8000000A:
-         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
 
 
-On 4/9/20 9:00 AM, Igor Mammedov wrote:
-> On Thu, 09 Apr 2020 12:58:11 -0000
-> Philipp Eppelt <1871842@bugs.launchpad.net> wrote:
-> =
 
->> Public bug reported:
->>
->> Setup:
->> CPU: AMD EPYC-v2 or host's EPYC cpu
->> Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
->> qemu version: self build
->> git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
->> config: Configured with: '../configure' '--target-list=3Dx86_64-softmmu,=
-mips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aa=
-rch64-softmmu,arm-softmmu' '--prefix=3D/opt/qemu-master'
->>
->> Cmdline: =
-
->> qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/=
-bin/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco ,=
- ... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu=
- EPYC-v2 -m 4G -smp 4 =
-
->>
->> Issue:
->> We are developing an microkernel operating system called L4Re. We recent=
-ly got an AMD EPYC server for testing and we couldn't execute SMP tests of =
-our system when running Linux + qemu + VM w/ L4Re.
->> In fact, the kernel did not recognize any APs at all. On AMD CPUs the ke=
-rnel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[=
-NC] or [ApicIdSize].  [0][1]
->>
->> The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x1=
-8cf757 ECX: 0x703f EDX: 0x1000
->> The lower four bits of ECX are the [NC] field and all set.
->>
->> When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically a=
-s replacement and addition to the above cmdline) the CPUID leaf shows: EAX:=
- 0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
->> Note, ECX is zero. Indicating that this is no SMP capabale CPU.
->>
->> I'm debugging it using my local machine and the QEMU provided EPYC-v2
->> CPU model and it is reproducible there as well and reports:  EAX:
->> 0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
->>
->> I checked other AMD based CPU models (phenom, opteron_g3/g5) and they be=
-have the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
->> I believe that behavior here is wrong as ECX[NC] should report the numbe=
-r of cores per processor, as stated in the AMD manual [2] p.584. In my unde=
-rstanding -smp 4 should then lead to ECX[NC] =3D 0x3.
->>
->> The following table shows my findings with the -smp option:
->> Option | Qemu guest observed ECX value
->> -smp 4 | 0x0
->> -smp 4,cores=3D4  | 0x3
->> -smp 4,cores=3D2,thread=3D2 | 0x3
->> -smp 4,cores=3D4,threads=3D2 | QEMU boot error: topology false.
->>
->> Now, I'm asking myself how the terminology of the AMD manual maps to QEM=
-U's -smp option.
->> Obviously, nr_cores and nr_threads correspond to the cores and threads o=
-ptions on the cmdline and cores * threads <=3D 4 (in this example), but wha=
-t corresponds the X in -smp X to?
-> I'd say X corresponds to number of logical CPUs.
-> Depending on presence of other options these are distributed among them i=
-n magical manner
-> (see pc_smp_parse() for starters)
-> =
-
->> Querying 0x8000'0008 on the physical processor results in different
->> reports than quering QEMU's model as does it with -enable-kvm -cpu host.
->>
->> Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
->> CPU leave reports a single core processor.
-> it matches -smp X as it should be.
-> =
-
->>
->> This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
->> wrong number.
-> CCed author of recent epyc patches who might know how AMD should work bet=
-ter than me.
-> =
-
->>
->> Please let me know, if you need more information from my side.
+On 4/9/20 10:11 AM, Jan Kiszka wrote:
+> On 09.04.20 15:52, Liang Yan wrote:
 >>
 >>
->> [0] https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2F=
-github.com%2Fkernkonzept%2Ffiasco%2Fblob%2F522ccc5f29ab120213cf02d71328e2b8=
-79cbbd19%2Fsrc%2Fkern%2Fia32%2Fkernel_thread-ia32.cpp%23L109&amp;data=3D02%=
-7C01%7Cbabu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4=
-884e608e11a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=3DhcFJzLAVQoI=
-h5IN9CP%2F9cUQNOZoBnpRA6FliJur1wzQ%3D&amp;reserved=3D0
->> [1] https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2F=
-github.com%2Fkernkonzept%2Ffiasco%2Fblob%2F522ccc5f29ab120213cf02d71328e2b8=
-79cbbd19%2Fsrc%2Fkern%2Fia32%2Fcpu-ia32.cpp%23L1120&amp;data=3D02%7C01%7Cba=
-bu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e1=
-1a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=3DANJIbYKbwfq2bDelH%2F=
-RLKnDPIUZc1BwxHspmgxLU7gs%3D&amp;reserved=3D0
->> [2] https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2F=
-github.com%2Fqemu%2Fqemu%2Fblob%2Ff2a8261110c32c4dccd84e774d8dd7a0524e00fb%=
-2Ftarget%2Fi386%2Fcpu.c%23L5835&amp;data=3D02%7C01%7Cbabu.moger%40amd.com%7=
-C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C=
-0%7C637220379083511672&amp;sdata=3Doj3mv9e5YOzUsfUjXK44gC8LybyWgMKo8JBIrRR%=
-2BmDA%3D&amp;reserved=3D0
->> [3] https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2F=
-www.amd.com%2Fsystem%2Ffiles%2FTechDocs%2F24594.pdf&amp;data=3D02%7C01%7Cba=
-bu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e1=
-1a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=3D7Yr3J9ihlqSqXCXKN5JJ=
-NTByO3NGI%2BGMz2EqBF2Y4hw%3D&amp;reserved=3D0
+>> On 1/7/20 9:36 AM, Jan Kiszka wrote:
+>>> Overdue update of the ivshmem 2.0 device model as presented at [1].
+>>>
+>>> Changes in v2:
+>>> =C2=A0 - changed PCI device ID to Siemens-granted one,
+>>> =C2=A0=C2=A0=C2=A0 adjusted PCI device revision to 0
+>>> =C2=A0 - removed unused feature register from device
+>>> =C2=A0 - addressed feedback on specification document
+>>> =C2=A0 - rebased over master
+>>>
+>>> This version is now fully in sync with the implementation for Jailhouse
+>>> that is currently under review [2][3], UIO and virtio-ivshmem drivers
+>>> are shared. Jailhouse will very likely pick up this revision of the
+>>> device in order to move forward with stressing it.
+>>>
+>>> More details on the usage with QEMU were in the original cover letter
+>>> (with adjustements to the new device ID):
+>>>
+>>> If you want to play with this, the basic setup of the shared memory
+>>> device is described in patch 1 and 3. UIO driver and also the
+>>> virtio-ivshmem prototype can be found at
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0
+>>> http://git.kiszka.org/?p=3Dlinux.git;a=3Dshortlog;h=3Drefs/heads/queues=
+/ivshmem2
+>>>
+>>>
+>>> Accessing the device via UIO is trivial enough. If you want to use it
+>>> for virtio, this is additionally to the description in patch 3 needed o=
+n
+>>> the virtio console backend side:
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 modprobe uio_ivshmem
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 echo "110a 4106 1af4 1100 ffc003 ffffff" >
+>>> /sys/bus/pci/drivers/uio_ivshmem/new_id
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 linux/tools/virtio/virtio-ivshmem-console /dev=
+/uio0
+>>>
+>>> And for virtio block:
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 echo "110a 4106 1af4 1100 ffc002 ffffff" >
+>>> /sys/bus/pci/drivers/uio_ivshmem/new_id
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 linux/tools/virtio/virtio-ivshmem-console /dev=
+/uio0
+>>> /path/to/disk.img
+>>>
+>>> After that, you can start the QEMU frontend instance with the
+>>> virtio-ivshmem driver installed which can use the new /dev/hvc* or
+>>> /dev/vda* as usual.
+>>>
+>> Hi, Jan,
 >>
->> ** Affects: qemu
->>      Importance: Undecided
->>          Status: New
+>> Nice work.
 >>
->
+>> I did a full test for your this new version. QEMU device part looks
+>> good, virtio console worked as expected. Just had some issue with
+>> virtio-ivshmem-block tests here.
+>>
+>> I suppose you mean "linux/tools/virtio/virtio-ivshmem-block"?
+>=20
+> Yes, copy&paste mistake, had the same issue over in
+> https://github.com/siemens/jailhouse/blob/master/Documentation/inter-cell=
+-communication.md
+>=20
+>=20
+>>
+>> Noticed "ffc002" is the main difference, however I saw nothing response
+>> when run echo command here, are there anything I need to prepare?
+>>
+>> I build the driver in guest kernel already.
+>>
+>> Do I need a new protocol or anything for below command line?
+>> ivshmem2-server -F -l 64K -n 2 -V 3 -P 0x8003
+>=20
+> Yes, you need to adjust that command line - didn't I document that
+> somewhere? Looks like I didn't:
+>=20
+> ivshmem2-server -F -l 1M -n 2 -V 2 -P 0x8002
+>=20
+> i.e. a bit more memory is good (but this isn't speed-optimized anyway),
+> you only need 2 vectors here (but more do not harm), and the protocol
+> indeed needs adjustment (that is the key).
+>=20
 
--- =
+Thanks for the reply. I just confirmed that virtio-ivshmem-block worked
+with the new configruation, a "vdb" disk is mounted to fronted VM. I
+will send out a full test summary later.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1871842
-
-Title:
-  AMD CPUID leaf 0x8000'0008 reported number of cores  inconsistent with
-  ACPI.MADT
-
-Status in QEMU:
-  New
-
-Bug description:
-  Setup:
-  CPU: AMD EPYC-v2 or host's EPYC cpu
-  Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
-  qemu version: self build
-  git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
-  config: Configured with: '../configure' '--target-list=3Dx86_64-softmmu,m=
-ips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aar=
-ch64-softmmu,arm-softmmu' '--prefix=3D/opt/qemu-master'
-
-  Cmdline: =
-
-  qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/b=
-in/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , =
-... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu =
-EPYC-v2 -m 4G -smp 4 =
+Best,
+Liang
 
 
-  Issue:
-  We are developing an microkernel operating system called L4Re. We recentl=
-y got an AMD EPYC server for testing and we couldn't execute SMP tests of o=
-ur system when running Linux + qemu + VM w/ L4Re.
-  In fact, the kernel did not recognize any APs at all. On AMD CPUs the ker=
-nel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[N=
-C] or [ApicIdSize].  [0][1]
 
-  The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18=
-cf757 ECX: 0x703f EDX: 0x1000
-  The lower four bits of ECX are the [NC] field and all set.
-
-  When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as=
- replacement and addition to the above cmdline) the CPUID leaf shows: EAX: =
-0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
-  Note, ECX is zero. Indicating that this is no SMP capabale CPU.
-
-  I'm debugging it using my local machine and the QEMU provided EPYC-v2
-  CPU model and it is reproducible there as well and reports:  EAX:
-  0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
-
-  I checked other AMD based CPU models (phenom, opteron_g3/g5) and they beh=
-ave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
-  I believe that behavior here is wrong as ECX[NC] should report the number=
- of cores per processor, as stated in the AMD manual [2] p.584. In my under=
-standing -smp 4 should then lead to ECX[NC] =3D 0x3.
-
-  The following table shows my findings with the -smp option:
-  Option | Qemu guest observed ECX value
-  -smp 4 | 0x0
-  -smp 4,cores=3D4  | 0x3
-  -smp 4,cores=3D2,thread=3D2 | 0x3
-  -smp 4,cores=3D4,threads=3D2 | QEMU boot error: topology false.
-
-  Now, I'm asking myself how the terminology of the AMD manual maps to QEMU=
-'s -smp option.
-  Obviously, nr_cores and nr_threads correspond to the cores and threads op=
-tions on the cmdline and cores * threads <=3D 4 (in this example), but what=
- corresponds the X in -smp X to?
-
-  Querying 0x8000'0008 on the physical processor results in different
-  reports than quering QEMU's model as does it with -enable-kvm -cpu
-  host.
-
-  Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
-  CPU leave reports a single core processor.
-
-  This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
-  wrong number.
-
-  =
-
-  Please let me know, if you need more information from my side.
-
-  =
-
-  [0] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
-28e2b879cbbd19/src/kern/ia32/kernel_thread-ia32.cpp#L109
-  [1] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
-28e2b879cbbd19/src/kern/ia32/cpu-ia32.cpp#L1120
-  [2] https://github.com/qemu/qemu/blob/f2a8261110c32c4dccd84e774d8dd7a0524=
-e00fb/target/i386/cpu.c#L5835
-  [3] https://www.amd.com/system/files/TechDocs/24594.pdf
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1871842/+subscriptions
+> Jan
+>=20
 
