@@ -2,84 +2,83 @@ Return-Path: <SRS0=FIxb=52=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58865C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 14:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07AAFC2BA2B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 14:47:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2282B20A8B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 14:47:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C620920A8B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 14:47:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q3UjFZIz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2282B20A8B
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="svA2wAbN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C620920A8B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMuwH-0000h5-AD
-	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 10:47:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53322)
+	id 1jMuwT-00018O-Tq
+	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 10:47:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53275)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jMuun-0006i0-F7
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 10:45:54 -0400
+ (envelope-from <sundeep.lkml@gmail.com>) id 1jMuuk-0006gT-OX
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 10:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jMuum-0007WA-DZ
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 10:45:53 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:42850)
+ (envelope-from <sundeep.lkml@gmail.com>) id 1jMuuj-0007QN-I7
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 10:45:50 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:36892)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <sundeep.lkml@gmail.com>)
- id 1jMuum-0007Uu-7d; Fri, 10 Apr 2020 10:45:52 -0400
-Received: by mail-pg1-x542.google.com with SMTP id g6so1055441pgs.9;
- Fri, 10 Apr 2020 07:45:52 -0700 (PDT)
+ id 1jMuuj-0007Os-Cj; Fri, 10 Apr 2020 10:45:49 -0400
+Received: by mail-pf1-x441.google.com with SMTP id u65so1133444pfb.4;
+ Fri, 10 Apr 2020 07:45:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=oC4LI+rsC3AfaHKWa06ELH+UcID+dQ6LdmleZ0eZwSQ=;
- b=q3UjFZIzspKy6uVSbDGTBSYT6H/6K2BvXfAxw5pLG1xZTpsO3L3qy4dffeV/Jsh7Oi
- GrZmL8EqUzxWm1HMtBZ05bwRrXOroxTkdtjR2+ddmF25ZU2Zapmaecz+WlinOBbMNeSd
- zxgW6DGyBwYRffDLE1VCKPqzPgqjJyxj2A4BDVbJorSyGV6byv60subaDzEzq8GSPrG5
- yjA9qQXy2TUGRUGQeUakuR/0aVB9olpt/G1yUH4tzXIyxC3HgzOgov0gsTbPM1Vkvif8
- v6vghspncvKCjuTnEhDB2PKW2p+fpiyQxFRrAhxJ1mXYIYLXgoC2Y11fRpS1bkgnUjwI
- K3vA==
+ bh=bH/TVrbUH5Ze3DAXFfwxmJ+jVj75XcHyr/YCnr9aWPI=;
+ b=svA2wAbNvNLpRGQAB7IyXw4FYliHSAjP+ryyHVhf2+zbajJ4Gb1xd3ARoZNZAQHB+j
+ mwp8y2E+7BJKL0Tlm1ZnFzm6bCrBh2/UBmpEPWRbJuSPedLW0cTRpr5VCEt6Ffz1X0nP
+ 5MRyv5SW6OvzOF9EqQWpua8Az1FQzZNRAnluF5C1LyIcbwh5E6iJsALEwlWSX4c/P0eV
+ 32oXVZTuWkvR5O4fswjZnnXIQO8kOj+1tDSMjT+RqNP45RrGKARQvGW40bbOpgr3oEpD
+ uJtVkcHCypJtnBq6Cn3/cTfokZ/g7iuVvBtGWWpKHPZitVyDVT1c8lmP5/e0ySDEcBhV
+ Jw4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=oC4LI+rsC3AfaHKWa06ELH+UcID+dQ6LdmleZ0eZwSQ=;
- b=F6vmziBSigas4+WMo1SDzO4cynGjqXjlYjrYDHcYdtZZQ5f0+AFhPN0pp8ORYD6BKi
- kbQfCKqcnaQdHHIdiAXikSofLQyKGkUrqIp5C7Y/lH5kbgQRPZmIyBZv2nGzEfLQRtCL
- cS7AYLmFlFueu86pE+WTEr+nsxkZ2wtBWQFA3715+/VwK5U1FETadIkBdA2y8qi7V6Je
- /Z0S0xTNPAN/u89NTemS2w+rBF/FaqBd+S7w6hFYq4tWV6HfWvto+SbnFInentXN8rGA
- TjVVu0Yd8Hf5NnUcPV04wicKTUF5QblsqFgch7uYpHa/leCPgdsd+/ciFe7TKFVn4f5Q
- RN7w==
-X-Gm-Message-State: AGi0PubegdWrWKUPXbEEGK5CMJK80QoUXEPWbev8myUnTp40WPkumgH5
- BtvyziOclzdkgMXoh7flz/g=
-X-Google-Smtp-Source: APiQypLLMFmnDKLcfRgiIlg54ujUZ46ln0bq/MAi8wZtcqxAlzD1eanW2tS8Ax/bb4/4zQEu4gWmOg==
-X-Received: by 2002:a63:721a:: with SMTP id n26mr4995899pgc.386.1586529951237; 
- Fri, 10 Apr 2020 07:45:51 -0700 (PDT)
+ bh=bH/TVrbUH5Ze3DAXFfwxmJ+jVj75XcHyr/YCnr9aWPI=;
+ b=oXpZTuEdgbYYZnuDS+kDb4SgobKQloXI9Vng8Gr2rS9Yqbzhzdsm5F8ypTbbBA2IKL
+ j0S2OQ2c9rg96l0g6u/N34ETKLtoUhWptB+FQ3qAI8o/jGIsVyKo+x+puilSG9Cqy0rw
+ N9q2UTMaqUC8EKEEF2sKxoNh2kRP++yxLSimbRYbl6fKXFZRpxyjQAvEMkMYwo7l6fbF
+ G4DB5PUirLWMN4FlMkMMSTWKAHQlWq0GXiZwkh9tasgci93ApDnxWJmAm7uZ7ZwNEP10
+ w07ddaRILjxzv5YCegO0VxTi52Y9W1NlfASLsUooXYUndP9dHRkhKA2sMhGILqT1BRp7
+ 3JQQ==
+X-Gm-Message-State: AGi0PuZ6xlgY6ZtuweRlvgsFZO6O7r0zZAeW2lHKEuu7MzzKot2bv1oK
+ 81DWaMiwZjb1+bh82ooDjiQ=
+X-Google-Smtp-Source: APiQypKZRLeVdYSi1YedlfPf7RRUt9p4YDSXAzMUQxIZ7wExk4CkhuNay8RcpPI8WpruW6Kgzr7hXw==
+X-Received: by 2002:a63:6f88:: with SMTP id k130mr4676687pgc.194.1586529948508; 
+ Fri, 10 Apr 2020 07:45:48 -0700 (PDT)
 Received: from hyd1358.marvell.com ([115.113.156.2])
- by smtp.googlemail.com with ESMTPSA id p12sm1984667pfq.153.2020.04.10.07.45.48
+ by smtp.googlemail.com with ESMTPSA id p12sm1984667pfq.153.2020.04.10.07.45.46
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 10 Apr 2020 07:45:50 -0700 (PDT)
+ Fri, 10 Apr 2020 07:45:48 -0700 (PDT)
 From: sundeep.lkml@gmail.com
 To: jasowang@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
  qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Subject: [Qemu devel PATCH v4 3/3] tests/boot_linux_console: Add ethernet test
- to SmartFusion2
-Date: Fri, 10 Apr 2020 20:15:26 +0530
-Message-Id: <1586529926-11441-4-git-send-email-sundeep.lkml@gmail.com>
+Subject: [Qemu devel PATCH v4 2/3] msf2: Add EMAC block to SmartFusion2 SoC
+Date: Fri, 10 Apr 2020 20:15:25 +0530
+Message-Id: <1586529926-11441-3-git-send-email-sundeep.lkml@gmail.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1586529926-11441-1-git-send-email-sundeep.lkml@gmail.com>
 References: <1586529926-11441-1-git-send-email-sundeep.lkml@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,50 +97,102 @@ Sender: "Qemu-devel"
 
 From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-In addition to simple serial test this patch uses ping
-to test the ethernet block modelled in SmartFusion2 SoC.
+With SmartFusion2 Ethernet MAC model in
+place this patch adds the same to SoC.
 
 Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 ---
- tests/acceptance/boot_linux_console.py | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ hw/arm/msf2-soc.c         | 21 ++++++++++++++++++++-
+ include/hw/arm/msf2-soc.h |  3 +++
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index f825cd9..c6b06a1 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -336,13 +336,13 @@ class BootLinuxConsole(Test):
-         """
-         uboot_url = ('https://raw.githubusercontent.com/'
-                      'Subbaraya-Sundeep/qemu-test-binaries/'
--                     'fa030bd77a014a0b8e360d3b7011df89283a2f0b/u-boot')
--        uboot_hash = 'abba5d9c24cdd2d49cdc2a8aa92976cf20737eff'
-+                     'fe371d32e50ca682391e1e70ab98c2942aeffb01/u-boot')
-+        uboot_hash = 'cbb8cbab970f594bf6523b9855be209c08374ae2'
-         uboot_path = self.fetch_asset(uboot_url, asset_hash=uboot_hash)
-         spi_url = ('https://raw.githubusercontent.com/'
-                    'Subbaraya-Sundeep/qemu-test-binaries/'
--                   'fa030bd77a014a0b8e360d3b7011df89283a2f0b/spi.bin')
--        spi_hash = '85f698329d38de63aea6e884a86fbde70890a78a'
-+                   'fe371d32e50ca682391e1e70ab98c2942aeffb01/spi.bin')
-+        spi_hash = '65523a1835949b6f4553be96dec1b6a38fb05501'
-         spi_path = self.fetch_asset(spi_url, asset_hash=spi_hash)
+diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
+index 588d643..2f2db6d 100644
+--- a/hw/arm/msf2-soc.c
++++ b/hw/arm/msf2-soc.c
+@@ -35,6 +35,7 @@
  
-         self.vm.set_console()
-@@ -352,7 +352,12 @@ class BootLinuxConsole(Test):
-                          '-drive', 'file=' + spi_path + ',if=mtd,format=raw',
-                          '-no-reboot')
-         self.vm.launch()
--        self.wait_for_console_pattern('init started: BusyBox')
-+        self.wait_for_console_pattern('Enter \'help\' for a list')
+ #define MSF2_TIMER_BASE       0x40004000
+ #define MSF2_SYSREG_BASE      0x40038000
++#define MSF2_EMAC_BASE        0x40041000
+ 
+ #define ENVM_BASE_ADDRESS     0x60000000
+ 
+@@ -55,6 +56,7 @@ static const uint32_t uart_addr[MSF2_NUM_UARTS] = { 0x40000000 , 0x40010000 };
+ static const int spi_irq[MSF2_NUM_SPIS] = { 2, 3 };
+ static const int uart_irq[MSF2_NUM_UARTS] = { 10, 11 };
+ static const int timer_irq[MSF2_NUM_TIMERS] = { 14, 15 };
++static const int emac_irq[MSF2_NUM_EMACS] = { 12 };
+ 
+ static void do_sys_reset(void *opaque, int n, int level)
+ {
+@@ -81,6 +83,13 @@ static void m2sxxx_soc_initfn(Object *obj)
+         sysbus_init_child_obj(obj, "spi[*]", &s->spi[i], sizeof(s->spi[i]),
+                           TYPE_MSS_SPI);
+     }
 +
-+        exec_command_and_wait_for_pattern(self, 'ifconfig eth0 10.0.2.15',
-+                                                 'eth0: link becomes ready')
-+        exec_command_and_wait_for_pattern(self, 'ping -c 3 10.0.2.2',
-+            '3 packets transmitted, 3 packets received, 0% packet loss')
++    sysbus_init_child_obj(obj, "eth", &s->emac, sizeof(s->emac),
++                          TYPE_MSS_EMAC);
++    if (nd_table[0].used) {
++        qemu_check_nic_model(&nd_table[0], TYPE_MSS_EMAC);
++        qdev_set_nic_properties(DEVICE(&s->emac), &nd_table[0]);
++    }
+ }
  
-     def do_test_arm_raspi2(self, uart_id):
-         """
+ static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
+@@ -192,6 +201,17 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
+         g_free(bus_name);
+     }
+ 
++    dev = DEVICE(&s->emac);
++    object_property_set_bool(OBJECT(&s->emac), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++    busdev = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(busdev, 0, MSF2_EMAC_BASE);
++    sysbus_connect_irq(busdev, 0,
++                           qdev_get_gpio_in(armv7m, emac_irq[0]));
++
+     /* Below devices are not modelled yet. */
+     create_unimplemented_device("i2c_0", 0x40002000, 0x1000);
+     create_unimplemented_device("dma", 0x40003000, 0x1000);
+@@ -202,7 +222,6 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
+     create_unimplemented_device("can", 0x40015000, 0x1000);
+     create_unimplemented_device("rtc", 0x40017000, 0x1000);
+     create_unimplemented_device("apb_config", 0x40020000, 0x10000);
+-    create_unimplemented_device("emac", 0x40041000, 0x1000);
+     create_unimplemented_device("usb", 0x40043000, 0x1000);
+ }
+ 
+diff --git a/include/hw/arm/msf2-soc.h b/include/hw/arm/msf2-soc.h
+index 3cfe5c7..296ed03 100644
+--- a/include/hw/arm/msf2-soc.h
++++ b/include/hw/arm/msf2-soc.h
+@@ -29,12 +29,14 @@
+ #include "hw/timer/mss-timer.h"
+ #include "hw/misc/msf2-sysreg.h"
+ #include "hw/ssi/mss-spi.h"
++#include "hw/net/msf2-emac.h"
+ 
+ #define TYPE_MSF2_SOC     "msf2-soc"
+ #define MSF2_SOC(obj)     OBJECT_CHECK(MSF2State, (obj), TYPE_MSF2_SOC)
+ 
+ #define MSF2_NUM_SPIS         2
+ #define MSF2_NUM_UARTS        2
++#define MSF2_NUM_EMACS        1
+ 
+ /*
+  * System timer consists of two programmable 32-bit
+@@ -62,6 +64,7 @@ typedef struct MSF2State {
+     MSF2SysregState sysreg;
+     MSSTimerState timer;
+     MSSSpiState spi[MSF2_NUM_SPIS];
++    MSF2EmacState emac;
+ } MSF2State;
+ 
+ #endif
 -- 
 2.7.4
 
