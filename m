@@ -7,98 +7,97 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B88F9C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 10:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 685E0C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 11:02:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C9AD20787
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 10:51:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B2302078E
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 11:02:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EGFPZxnR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C9AD20787
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i+0QFERO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B2302078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMrGD-0002mW-J4
-	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 06:51:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56454)
+	id 1jMrQq-00060t-Cx
+	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 07:02:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56915)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jMrFC-0002MQ-Hp
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 06:50:43 -0400
+ (envelope-from <philmd@redhat.com>) id 1jMrKN-00048Z-GU
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 06:56:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jMrFA-0007OK-Vo
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 06:50:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28193
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jMrKL-0002yy-8F
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 06:56:02 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58972
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jMrFA-0007NR-Q6
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 06:50:40 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jMrKL-0002xk-52
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 06:56:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586515839;
+ s=mimecast20190719; t=1586516159;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Y/lhn1NBHmj6LkbzLBNu5LkK/0CkeR9NKLSHbRfGCmY=;
- b=EGFPZxnRw81FpTpMxA/+4CdCD7VKZ7jj4RHhL9SRk4SsqQeuGjEKOSCfqz0BS9M6C0ywUK
- PE//qrfWppVLkgUtD1znDHAvWvRR1W+zz5WMIK/C9giBGISgA/bJa4oNFepY/DRIYQSwZ1
- /TlHgZJXGcdB5W6lvE/9BaZiq9aQOvw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-FsTeSozrO7ao1ReB0xtHBA-1; Fri, 10 Apr 2020 06:50:38 -0400
-X-MC-Unique: FsTeSozrO7ao1ReB0xtHBA-1
-Received: by mail-wm1-f69.google.com with SMTP id d134so3103785wmd.0
- for <qemu-devel@nongnu.org>; Fri, 10 Apr 2020 03:50:37 -0700 (PDT)
+ bh=kOLA7AqaqpADD0ZR9/oqBIrBUf1FjNrKODwO5g6ohmU=;
+ b=i+0QFEROsJilopX32V2NyVS1MunKMKbNW4AfNI5GfIDHYRRX9qSVuiqSljkuZDwvWznXCt
+ p2gTkUEC6a/GlekmT8Cpe5siohKO/zPTfiY91bEzBQhia21Sh9bXegkNiV/c7lwABRGTmi
+ y4nsnW1t+LrYcqgdZEKzE1DTbZdy04Q=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-ehoVO-bXNjOhG-0ZSIcV1Q-1; Fri, 10 Apr 2020 06:55:56 -0400
+X-MC-Unique: ehoVO-bXNjOhG-0ZSIcV1Q-1
+Received: by mail-ed1-f72.google.com with SMTP id f11so1828142edc.4
+ for <qemu-devel@nongnu.org>; Fri, 10 Apr 2020 03:55:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Y/lhn1NBHmj6LkbzLBNu5LkK/0CkeR9NKLSHbRfGCmY=;
- b=iFGZgppT/Uo8cSuM5U8P9+tZuAhJfBBmO7aax+de94X1ICYjIbotFgYfnYJq4iDHzT
- kuEwdt7WtlU2JxT3xMT4lB+y3SwLuNgIipk3hZAvQaUwJhZ2khBUerfoMtxR2g1POUjF
- pQBk7WuOzYFAm8tvyTKEYeQguHrsStRgZCkPLBJfz7ohwy5QYSvTGsgEERwyJc0tnAWz
- Y11usJ7avI65ev2BvETF/pzpiwihpNV1lplUslFFSbUJsh0gczkA549WDfIGXD0Nx5uG
- /K+KNon+bBBk+cEtkHxALzKbI7i+/dLg5UZ42xTRN3GHoDy7u21BFUGafR/nCl0qAdP5
- ArYw==
-X-Gm-Message-State: AGi0PuYDlSAX9jrH2kPkYI7IR388i8bCsdOa7nM9rUUIEyzf/sRkSCoR
- rspHTQBnOHlfT/0+N0uQlqumeLuD74CvKwSf4zg5jpIj8h+4u5HQ//mzE34xsz/wFCwMfXhkINU
- Ze8eNnRSAodZEw0w=
-X-Received: by 2002:a05:600c:2255:: with SMTP id
- a21mr4645628wmm.150.1586515836793; 
- Fri, 10 Apr 2020 03:50:36 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLP4myDoXcGmOxP+F1NgRPCvdAiSwqtbpGgEDEbPps2C8Y3mXf/mpcx+NtCXxqvWuJ9QyV4fg==
-X-Received: by 2002:a05:600c:2255:: with SMTP id
- a21mr4645615wmm.150.1586515836571; 
- Fri, 10 Apr 2020 03:50:36 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e8a3:73c:c711:b995?
- ([2001:b07:6468:f312:e8a3:73c:c711:b995])
- by smtp.gmail.com with ESMTPSA id o9sm2301351wrx.48.2020.04.10.03.50.35
+ bh=+Qy0+sxx9vY8LwqhMfzG/MM9udzfMVKhxBEV71lHBa8=;
+ b=OpCkYfLgsMP86h18JYicJk6FR3Q7q0RaFduNg1Z37plE0Aq74tmbz6nwQ/wWMA+ebu
+ jV4JV6AnKe/Oeh/NwCl9/hklAwKWddi6F8/dYfO9+QVkxEV8DhqYJwKZargFlyFBbrp/
+ sRAEVtPEi5nYPWMZUJU+JUIVuhpmVd4xtHGS05davFWh0q4urHVHVk9nVX8yvaIxPblG
+ riEGQ9afPHjGn4ej+3uAWHgcFBthhfkSlIXRtj/ELlFztgUgceKkEbRZKGMc9gOAboE0
+ 8qeGpAyqM47XydgZKQRtklqV7rryk+5SLzYmawPGQui8wNS8G6F3gnyJckx9mwL2QB3Y
+ RuAA==
+X-Gm-Message-State: AGi0PuYD51rtO+NZRcI44RBXkzgJFVkpK2XUT+xBj5UapPoIu70JiB8H
+ vQThV0YQ/wqbgB7CkGawhxHuA3kZP8iJZ33ZhHS/LgQdOaH4OInWX/vBmHRJd+LAZYCkw6Hs4Wc
+ TzUP/ZtRHuBgJNQk=
+X-Received: by 2002:a17:907:270c:: with SMTP id
+ w12mr3373498ejk.258.1586516154840; 
+ Fri, 10 Apr 2020 03:55:54 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIbvYsXf+Sj3ctP1EpcO3kqssWOcQsBcbeAmJ8KeeO+BuBrgtm+86EyXYH7jwbpxIpbnCLUdQ==
+X-Received: by 2002:a17:907:270c:: with SMTP id
+ w12mr3373485ejk.258.1586516154564; 
+ Fri, 10 Apr 2020 03:55:54 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id ar26sm92759ejc.52.2020.04.10.03.55.53
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 10 Apr 2020 03:50:36 -0700 (PDT)
-Subject: Re: [PATCH v19 QEMU 4/4] memory: Do not allow direct write access to
- rom_device regions
-To: Alexander Duyck <alexander.duyck@gmail.com>, david@redhat.com,
- mst@redhat.com
-References: <20200410033729.24738.22879.stgit@localhost.localdomain>
- <20200410034150.24738.98143.stgit@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c9b60224-e280-7351-33df-bbb3e25f6cfd@redhat.com>
-Date: Fri, 10 Apr 2020 12:50:34 +0200
+ Fri, 10 Apr 2020 03:55:54 -0700 (PDT)
+Subject: Re: [PATCH v1 07/11] configure: disable PIE for Windows builds
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200409211529.5269-1-alex.bennee@linaro.org>
+ <20200409211529.5269-8-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <427d4303-f69b-bbf8-7b2d-12805c61f816@redhat.com>
+Date: Fri, 10 Apr 2020 12:55:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200410034150.24738.98143.stgit@localhost.localdomain>
+In-Reply-To: <20200409211529.5269-8-alex.bennee@linaro.org>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,49 +109,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: Bug 1871798 <1871798@bugs.launchpad.net>,
+ James Le Cuirot <chewi@aura-online.co.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/04/20 05:41, Alexander Duyck wrote:
-> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> 
-> According to the documentation in memory.h a ROM memory region will be
-> backed by RAM for reads, but is supposed to go through a callback for
-> writes. Currently we were not checking for the existence of the rom_device
-> flag when determining if we could perform a direct write or not.
-> 
-> To correct that add a check to memory_region_is_direct so that if the
-> memory region has the rom_device flag set we will return false for all
-> checks where is_write is set.
-> 
-> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+On 4/9/20 11:15 PM, Alex Benn=C3=A9e wrote:
+> It seems on some compilers the test can pass but still give you
+> broken binaries.
+>=20
+> [AJB untested - please could windows users test]
+>=20
+> Fixes: d2cd29e30736
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1871798
+> Cc: Bug 1871798 <1871798@bugs.launchpad.net>
+> Cc: James Le Cuirot <chewi@aura-online.co.uk>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > ---
->  include/exec/memory.h |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 1614d9a02c0c..e000bd2f97b2 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -2351,8 +2351,8 @@ void address_space_write_cached_slow(MemoryRegionCache *cache,
->  static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
->  {
->      if (is_write) {
-> -        return memory_region_is_ram(mr) &&
-> -               !mr->readonly && !memory_region_is_ram_device(mr);
-> +        return memory_region_is_ram(mr) && !mr->readonly &&
-> +               !mr->rom_device && !memory_region_is_ram_device(mr);
->      } else {
->          return (memory_region_is_ram(mr) && !memory_region_is_ram_device(mr)) ||
->                 memory_region_is_romd(mr);
-> 
+>   configure | 1 +
+>   1 file changed, 1 insertion(+)
+>=20
+> diff --git a/configure b/configure
+> index a207cce82bc..e9c5f630c14 100755
+> --- a/configure
+> +++ b/configure
+> @@ -807,6 +807,7 @@ MINGW32*)
+>       audio_drv_list=3D""
+>     fi
+>     supported_os=3D"yes"
+> +  pie=3D"no"
+>   ;;
+>   GNU/kFreeBSD)
+>     bsd=3D"yes"
+>=20
 
-Good catch.  I queued this up for 5.0.
-
-Thanks,
-
-Paolo
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
