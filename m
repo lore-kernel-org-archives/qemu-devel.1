@@ -2,84 +2,80 @@ Return-Path: <SRS0=FIxb=52=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8C02C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 13:48:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0AD9C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 13:51:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62F9E20CC7
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 13:48:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B45320CC7
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 13:51:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bAePj4EV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62F9E20CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="smTB9+qh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B45320CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMu1Y-0005Ci-J3
-	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 09:48:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45709)
+	id 1jMu4J-0006y2-Hd
+	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 09:51:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46151)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jMtza-0003Hy-RL
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 09:46:51 -0400
+ (envelope-from <luoyonggang@gmail.com>) id 1jMu3E-00066V-9c
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 09:50:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jMtzY-00022D-20
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 09:46:46 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:42900)
+ (envelope-from <luoyonggang@gmail.com>) id 1jMu3A-0004XT-Ip
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 09:50:32 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:43824)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sundeep.lkml@gmail.com>)
- id 1jMtzX-00021x-RM; Fri, 10 Apr 2020 09:46:44 -0400
-Received: by mail-io1-xd42.google.com with SMTP id y17so1753912iow.9;
- Fri, 10 Apr 2020 06:46:43 -0700 (PDT)
+ (Exim 4.71) (envelope-from <luoyonggang@gmail.com>)
+ id 1jMu3A-0004X4-4J; Fri, 10 Apr 2020 09:50:28 -0400
+Received: by mail-lj1-x242.google.com with SMTP id h25so1991503lja.10;
+ Fri, 10 Apr 2020 06:50:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=0LDWXyvRVFgeMnwzaAhFGEezldF9RkP2cc9XOKxcthg=;
- b=bAePj4EV9YnfKerAcXuDMXrYCJwJhQ21Fej20EMX8R/9/09SP9GsXrSCH/V5lrm6/4
- trJ65+1+anl80jNB/+nu7r/ZV0CMsyPrSR4TZPQtSqo7XPxutHeeFEGVolVi1thEov+W
- lnObfj/q174DamdPM5397fgSUYp1nICrm1T3xoRlJwpKWcyk4rzTdhWCqtpi421VahKr
- kprZ4i6g3OpWTl3knge3IwFC8fjc8g395btbAEbuNWTfcgmcndxLhCu/JUiCy/PF4cz1
- JeCyD+sso58GhSVAsEabldcIouVk307yd5br+EYgHrwYyaOalmeJZi267IV5TNC0KKwq
- WVdg==
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=z6XrEDUBTneDEWXqILqwOqRT/ZGTHdfVJaJ8LKQMqIM=;
+ b=smTB9+qhSTB3jwSlN+tlMpKMd+GBC0WR3WM2pfoAJQoCw2y+tnJD+IlMwnx3S8Olku
+ nLi32+4/FOzjG0b28mbjUabN/5TAadf4attq0cNwQTJc4HxP9ca5UL1Vj5ksPKx1z5Te
+ j4/ADBSPD8iyka0oXtDjAP3bav35Rmypssj3LsxSaCUib6QEpWnszQa8QPV7PPvJKe9N
+ bbUqrd2+l2ImNlJbZ1g1OvF6BDyZ6yINgSNAFVVCciReyG1tdNRgMCWYb2E7ELuW7LOR
+ Og/ippCCKd51O0y2GLkPdnU7ZQwxLP0W6qZrAOc1Hr8gWJSOvmk1OFFyFP8TVJqvYxwE
+ v1Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=0LDWXyvRVFgeMnwzaAhFGEezldF9RkP2cc9XOKxcthg=;
- b=ajIZLaF/Uc0RcGXJGNgBQ2hLsffE2SaylO4NekowmX+CL43fc4N9GxUYcGgFclFBwk
- xVDKMr7VJN9WJu+DaDVQXsHmq7saO70TZKs//yBVieklLkHl1dqqxGTYGvCJ+CbkXBIj
- jEJMZWGL7xprrpQWGjMVKjPy7bbJAZR9XuBYcBr2Ha339eo/+KHkiHiLVRrL43nhnoiA
- 4zU8BmYEfYxE/OsxWXEvosfPdzVK3D5Z2N6WZUoezturgUAET4q/yhhoq+W7bl/G7S59
- oN2foqpPb5KVX2fzn1+X7cGEs37x+5aOQ6BnaGEFO+m/9AOGk0oLaXeAh3ETV9OX8TJI
- yUYg==
-X-Gm-Message-State: AGi0PubDOledWUR/ndmvwZ70WoyBx/J0wbKsy82HspYQO5XrVHaPRRmd
- D5BFI/qR6ctbQj1P9i0xtDIKRsf7+IiFkn61rfs=
-X-Google-Smtp-Source: APiQypIhgUh4f32x6wAglDml6FVfr4kdBLqqkJ7o1IgJGn+qsfHfHCIm7oLsKEnRwDFYNu/ZfQhnJuVi8uz4UNljODU=
-X-Received: by 2002:a05:6602:14d4:: with SMTP id
- b20mr4371098iow.132.1586526402385; 
- Fri, 10 Apr 2020 06:46:42 -0700 (PDT)
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=z6XrEDUBTneDEWXqILqwOqRT/ZGTHdfVJaJ8LKQMqIM=;
+ b=SAide/t4bJxNE9WAAbLVMqsEc9EeCU/c7brPZSgq0+2QMYzGGTHdJMo+XyAjSOADU5
+ M5zAAM9oNFl4Jqr6kXZHxJhXsawd4Qa9U3DjHloka4nY/tUBnWdrHC3waoai4QWes7wO
+ XJaFRYW1SOjg0gNdzev/T/RqCR8clEVYH2xyBICCf2+I18w8axluCkZiUFxpVAiCHz7i
+ ucmbZdgEk95iyGYg1XxaW53d7hdIrkff7/3+NYH4wR2GQke3rVKRQ4E1icdc7M7qFGT4
+ 2l/xbBvFtVgbh1hnWLBcrdVGm+O3fUHVjhpmglAt/Up0GcV29soXyvvRrO2dfBFjsQkp
+ VLRQ==
+X-Gm-Message-State: AGi0PuZgVhVaL32feVckW+ANmsyEvA805iloSSmCtGrJaGuAAdBy1TZJ
+ Ilg5PNXpPuhlDNDI0LHaXohXSlnYnX2wnly3CV8=
+X-Google-Smtp-Source: APiQypJA/7Jaa8mOckzVQTHvqRRA5DPZ8fsDAXYz1BMbi656Lg/Pha4I+q89nnUJITcTBjYH9QewqB7y+0leNo1gH3g=
+X-Received: by 2002:a2e:9247:: with SMTP id v7mr2901819ljg.215.1586526626024; 
+ Fri, 10 Apr 2020 06:50:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <1586258134-6932-1-git-send-email-sundeep.lkml@gmail.com>
- <1586258134-6932-2-git-send-email-sundeep.lkml@gmail.com>
- <4445ded1-e2ac-f422-4e5b-091af5efc9f4@redhat.com>
-In-Reply-To: <4445ded1-e2ac-f422-4e5b-091af5efc9f4@redhat.com>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Fri, 10 Apr 2020 19:16:31 +0530
-Message-ID: <CALHRZuphUp1kq9vQOOwYizvQ=oE-eJLaX-+Ac+5Q0jdoROdY8A@mail.gmail.com>
-Subject: Re: [Qemu devel PATCH v3 1/3] hw/net: Add Smartfusion2 emac block
-To: Jason Wang <jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20200218171702.979F074637D@zero.eik.bme.hu>
+In-Reply-To: <20200218171702.979F074637D@zero.eik.bme.hu>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Fri, 10 Apr 2020 21:50:13 +0800
+Message-ID: <CAE2XoE9dd3NL3sNUNhR1VhntZX37UFUv7Lqf5HbDTi_0t0_Krg@mail.gmail.com>
+Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Content-Type: multipart/alternative; boundary="000000000000f8923605a2f0036e"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d42
+X-Received-From: 2a00:1450:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,750 +87,959 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: luoyonggang@gmail.com
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ John Arbuckle <programmingkidx@gmail.com>, qemu-ppc@nongnu.org,
+ Paul Clarke <pc@us.ibm.com>, Howard Spoelstra <hsp.cat7@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Jason,
+--000000000000f8923605a2f0036e
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 9, 2020 at 9:40 AM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2020/4/7 =E4=B8=8B=E5=8D=887:15, sundeep.lkml@gmail.com wrote:
-> > From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> >
-> > Modelled Ethernet MAC of Smartfusion2 SoC.
-> > Micrel KSZ8051 PHY is present on Emcraft's
-> > SOM kit hence same PHY is emulated.
-> >
-> > Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> > ---
-> >   MAINTAINERS                |   2 +
-> >   hw/net/Makefile.objs       |   1 +
-> >   hw/net/msf2-emac.c         | 556 ++++++++++++++++++++++++++++++++++++=
-+++++++++
-> >   include/hw/net/msf2-emac.h |  50 ++++
-> >   4 files changed, 609 insertions(+)
-> >   create mode 100644 hw/net/msf2-emac.c
-> >   create mode 100644 include/hw/net/msf2-emac.h
-> >
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 9d156d7..6a103f2 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -918,6 +918,8 @@ F: include/hw/arm/msf2-soc.h
-> >   F: include/hw/misc/msf2-sysreg.h
-> >   F: include/hw/timer/mss-timer.h
-> >   F: include/hw/ssi/mss-spi.h
-> > +F: hw/net/msf2-emac.c
-> > +F: include/hw/net/msf2-emac.h
-> >
-> >   Emcraft M2S-FG484
-> >   M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> > diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
-> > index af4d194..f2b7398 100644
-> > --- a/hw/net/Makefile.objs
-> > +++ b/hw/net/Makefile.objs
-> > @@ -55,3 +55,4 @@ common-obj-$(CONFIG_ROCKER) +=3D rocker/rocker.o rock=
-er/rocker_fp.o \
-> >   obj-$(call lnot,$(CONFIG_ROCKER)) +=3D rocker/qmp-norocker.o
-> >
-> >   common-obj-$(CONFIG_CAN_BUS) +=3D can/
-> > +common-obj-$(CONFIG_MSF2) +=3D msf2-emac.o
-> > diff --git a/hw/net/msf2-emac.c b/hw/net/msf2-emac.c
-> > new file mode 100644
-> > index 0000000..cb80e19
-> > --- /dev/null
-> > +++ b/hw/net/msf2-emac.c
-> > @@ -0,0 +1,556 @@
-> > +/*
-> > + * QEMU model of the Smartfusion2 Ethernet MAC.
-> > + *
-> > + * Copyright (c) 2020 Subbaraya Sundeep <sundeep.lkml@gmail.com>.
-> > + *
-> > + * Permission is hereby granted, free of charge, to any person obtaini=
-ng a copy
-> > + * of this software and associated documentation files (the "Software"=
-), to deal
-> > + * in the Software without restriction, including without limitation t=
-he rights
-> > + * to use, copy, modify, merge, publish, distribute, sublicense, and/o=
-r sell
-> > + * copies of the Software, and to permit persons to whom the Software =
-is
-> > + * furnished to do so, subject to the following conditions:
-> > + *
-> > + * The above copyright notice and this permission notice shall be incl=
-uded in
-> > + * all copies or substantial portions of the Software.
-> > + *
-> > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXP=
-RESS OR
-> > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABI=
-LITY,
-> > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT S=
-HALL
-> > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES O=
-R OTHER
-> > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARI=
-SING FROM,
-> > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> > + * THE SOFTWARE.
-> > + *
-> > + * Refer to section Ethernet MAC in the document:
-> > + * UG0331: SmartFusion2 Microcontroller Subsystem User Guide
-> > + * Datasheet URL:
-> > + * https://www.microsemi.com/document-portal/cat_view/56661-internal-d=
-ocuments/
-> > + * 56758-soc?lang=3Den&limit=3D20&limitstart=3D220
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "qemu-common.h"
-> > +#include "qemu/log.h"
-> > +#include "exec/address-spaces.h"
-> > +#include "hw/registerfields.h"
-> > +#include "hw/net/msf2-emac.h"
-> > +#include "hw/net/mii.h"
-> > +#include "hw/irq.h"
-> > +#include "net/net.h"
-> > +#include "hw/qdev-properties.h"
-> > +#include "migration/vmstate.h"
-> > +
-> > +REG32(CFG1, 0x0)
-> > +REG32(CFG2, 0x4)
-> > +REG32(IFG, 0x8)
-> > +REG32(HALF_DUPLEX, 0xc)
-> > +REG32(FRM_LEN, 0x10)
-> > +REG32(MII_CMD, 0x24)
-> > +REG32(MII_ADDR, 0x28)
-> > +REG32(MII_CTL, 0x2c)
-> > +REG32(MII_STS, 0x30)
-> > +REG32(STA1, 0x40)
-> > +REG32(STA2, 0x44)
-> > +REG32(FIFO_CFG0, 0x48)
-> > +REG32(DMA_TX_CTL, 0x180)
-> > +REG32(DMA_TX_DESC, 0x184)
-> > +REG32(DMA_TX_STATUS, 0x188)
-> > +REG32(DMA_RX_CTL, 0x18c)
-> > +REG32(DMA_RX_DESC, 0x190)
-> > +REG32(DMA_RX_STATUS, 0x194)
-> > +REG32(DMA_IRQ_MASK, 0x198)
-> > +REG32(DMA_IRQ, 0x19c)
-> > +
-> > +FIELD(DMA, PKTCNT, 16, 8)
-> > +
-> > +#define R_DMA_PKT_TXRX          (1 << 0)
-> > +#define DMA_TX_UNDERRUN         (1 << 1)
-> > +#define DMA_RX_OVERFLOW         (1 << 2)
-> > +
-> > +#define EMPTY_MASK              (1 << 31)
-> > +#define PKT_SIZE                0x7FF
-> > +
-> > +#define CFG1_RESET              (1 << 31)
-> > +#define CFG1_RX_EN              (1 << 2)
-> > +#define CFG1_TX_EN              (1 << 0)
-> > +
-> > +#define DMA_TX_CTL_EN           (1 << 0)
-> > +#define DMA_RX_CTL_EN           (1 << 0)
-> > +
-> > +#define MII_CMD_READ            (1 << 0)
-> > +
-> > +#define PHYADDR                 0x1
-> > +#define MII_ADDR_MASK           0x1F
-> > +#define PHY_ADDR_SHIFT          8
-> > +#define MAX_PKT_SIZE            2048
-> > +
-> > +typedef struct {
-> > +    uint32_t pktaddr;
-> > +    uint32_t pktsize;
-> > +    uint32_t next;
-> > +} EmacDesc;
-> > +
-> > +static uint32_t emac_get_isr(MSF2EmacState *s)
-> > +{
-> > +    uint32_t ier =3D s->regs[R_DMA_IRQ_MASK];
-> > +    uint32_t tx =3D s->regs[R_DMA_TX_STATUS] & 0xF;
-> > +    uint32_t rx =3D s->regs[R_DMA_RX_STATUS] & 0xF;
-> > +    uint32_t isr =3D (rx << 4) | tx;
-> > +
-> > +    s->regs[R_DMA_IRQ] =3D ier & isr;
-> > +    return s->regs[R_DMA_IRQ];
-> > +}
-> > +
-> > +static void emac_update_irq(MSF2EmacState *s)
-> > +{
-> > +    bool intr =3D emac_get_isr(s);
-> > +
-> > +    qemu_set_irq(s->irq, intr);
-> > +}
-> > +
-> > +static void emac_load_desc(MSF2EmacState *s, EmacDesc *d, hwaddr desc)
-> > +{
-> > +    address_space_read(&s->dma_as, desc, MEMTXATTRS_UNSPECIFIED,
-> > +                       (uint8_t *)d, sizeof *d);
-> > +    /* Convert from LE into host endianness. */
-> > +    d->pktaddr =3D le32_to_cpu(d->pktaddr);
-> > +    d->pktsize =3D le32_to_cpu(d->pktsize);
-> > +    d->next =3D le32_to_cpu(d->next);
-> > +}
-> > +
-> > +static void emac_store_desc(MSF2EmacState *s, EmacDesc *d, hwaddr desc=
-)
-> > +{
-> > +    /* Convert from host endianness into LE. */
-> > +    d->pktaddr =3D cpu_to_le32(d->pktaddr);
-> > +    d->pktsize =3D cpu_to_le32(d->pktsize);
-> > +    d->next =3D cpu_to_le32(d->next);
-> > +
-> > +    address_space_write(&s->dma_as, desc, MEMTXATTRS_UNSPECIFIED,
-> > +                        (uint8_t *)d, sizeof *d);
-> > +}
-> > +
-> > +static void msf2_dma_tx(MSF2EmacState *s)
-> > +{
-> > +    hwaddr desc =3D s->regs[R_DMA_TX_DESC];
-> > +    uint8_t buf[MAX_PKT_SIZE];
-> > +    EmacDesc d;
-> > +    int size;
-> > +    uint8_t pktcnt;
-> > +    uint32_t status;
-> > +
-> > +    if (!(s->regs[R_CFG1] & CFG1_TX_EN)) {
-> > +        return;
-> > +    }
-> > +
-> > +    while (1) {
-> > +        emac_load_desc(s, &d, desc);
-> > +        if (d.pktsize & EMPTY_MASK) {
-> > +            break;
-> > +        }
-> > +        size =3D d.pktsize & PKT_SIZE;
-> > +        address_space_read(&s->dma_as, d.pktaddr, MEMTXATTRS_UNSPECIFI=
-ED,
-> > +                           buf, size);
-> > +        /*
-> > +         * This is very basic way to send packets. Ideally there shoul=
-d be
-> > +         * a FIFO and packets should be sent out from FIFO only when
-> > +         * R_CFG1 bit 0 is set.
-> > +         */
-> > +        qemu_send_packet(qemu_get_queue(s->nic), buf, size);
->
->
-> It looks to me loopback is not implemented.
+Are this stable now? I'd like to see hard float to be landed:)
 
-Right. I will do that.
->
->
-> > +        d.pktsize |=3D EMPTY_MASK;
-> > +        emac_store_desc(s, &d, desc);
-> > +        /* update sent packets count */
-> > +        status =3D s->regs[R_DMA_TX_STATUS];
-> > +        pktcnt =3D extract32(status, R_DMA_PKTCNT_SHIFT, 8);
-> > +        pktcnt++;
-> > +        s->regs[R_DMA_TX_STATUS] =3D deposit32(status, R_DMA_PKTCNT_SH=
-IFT,
-> > +                                             8, pktcnt);
-> > +        s->regs[R_DMA_TX_STATUS] |=3D R_DMA_PKT_TXRX;
-> > +        desc =3D d.next;
-> > +    }
-> > +    s->regs[R_DMA_TX_STATUS] |=3D DMA_TX_UNDERRUN;
-> > +    s->regs[R_DMA_TX_CTL] &=3D ~DMA_TX_CTL_EN;
-> > +}
-> > +
-> > +static void msf2_phy_update_link(MSF2EmacState *s)
-> > +{
-> > +    /* Autonegotiation status mirrors link status. */
-> > +    if (qemu_get_queue(s->nic)->link_down) {
-> > +        s->phy_regs[MII_BMSR] &=3D ~(MII_BMSR_AN_COMP |
-> > +                                         MII_BMSR_LINK_ST);
-> > +    } else {
-> > +        s->phy_regs[MII_BMSR] |=3D (MII_BMSR_AN_COMP |
-> > +                                         MII_BMSR_LINK_ST);
-> > +    }
-> > +}
-> > +
-> > +static void msf2_phy_reset(MSF2EmacState *s)
-> > +{
-> > +    memset(&s->phy_regs[0], 0, sizeof(s->phy_regs));
-> > +    s->phy_regs[MII_BMCR] =3D 0x1140;
-> > +    s->phy_regs[MII_BMSR] =3D 0x7968;
-> > +    s->phy_regs[MII_PHYID1] =3D 0x0022;
-> > +    s->phy_regs[MII_PHYID2] =3D 0x1550;
-> > +    s->phy_regs[MII_ANAR] =3D 0x01E1;
-> > +    s->phy_regs[MII_ANLPAR] =3D 0xCDE1;
-> > +
-> > +    msf2_phy_update_link(s);
-> > +}
-> > +
-> > +static void write_to_phy(MSF2EmacState *s)
-> > +{
-> > +    uint8_t reg_addr =3D s->regs[R_MII_ADDR] & MII_ADDR_MASK;
-> > +    uint8_t phy_addr =3D (s->regs[R_MII_ADDR] >> PHY_ADDR_SHIFT) & MII=
-_ADDR_MASK;
-> > +    uint16_t data =3D s->regs[R_MII_CTL] & 0xFFFF;
-> > +
-> > +    if (phy_addr !=3D PHYADDR) {
-> > +        return;
-> > +    }
-> > +
-> > +    switch (reg_addr) {
-> > +    case MII_BMCR:
-> > +        if (data & MII_BMCR_RESET) {
-> > +            /* Phy reset */
-> > +            msf2_phy_reset(s);
-> > +            data &=3D ~MII_BMCR_RESET;
-> > +        }
-> > +        if (data & MII_BMCR_AUTOEN) {
-> > +            /* Complete autonegotiation immediately */
-> > +            data &=3D ~MII_BMCR_AUTOEN;
-> > +            s->phy_regs[MII_BMSR] |=3D MII_BMSR_AN_COMP;
-> > +        }
-> > +        break;
-> > +    }
-> > +
-> > +    s->phy_regs[reg_addr] =3D data;
-> > +}
-> > +
-> > +static uint16_t read_from_phy(MSF2EmacState *s)
-> > +{
-> > +    uint8_t reg_addr =3D s->regs[R_MII_ADDR] & MII_ADDR_MASK;
-> > +    uint8_t phy_addr =3D (s->regs[R_MII_ADDR] >> PHY_ADDR_SHIFT) & MII=
-_ADDR_MASK;
-> > +
-> > +    if (phy_addr =3D=3D PHYADDR) {
-> > +        return s->phy_regs[reg_addr];
-> > +    } else {
-> > +        return 0xFFFF;
-> > +    }
-> > +}
-> > +
-> > +static void msf2_emac_do_reset(MSF2EmacState *s)
-> > +{
-> > +    memset(&s->regs[0], 0, sizeof(s->regs));
-> > +    s->regs[R_CFG1] =3D 0x80000000;
-> > +    s->regs[R_CFG2] =3D 0x00007000;
-> > +    s->regs[R_IFG] =3D 0x40605060;
-> > +    s->regs[R_HALF_DUPLEX] =3D 0x00A1F037;
-> > +    s->regs[R_FRM_LEN] =3D 0x00000600;
-> > +
-> > +    msf2_phy_reset(s);
-> > +}
-> > +
-> > +static uint64_t emac_read(void *opaque, hwaddr addr, unsigned int size=
-)
-> > +{
-> > +    MSF2EmacState *s =3D opaque;
-> > +    uint32_t r =3D 0;
-> > +
-> > +    addr >>=3D 2;
-> > +
-> > +    switch (addr) {
-> > +    case R_DMA_IRQ:
-> > +        r =3D emac_get_isr(s);
-> > +        break;
-> > +    default:
-> > +        if (addr < ARRAY_SIZE(s->regs)) {
-> > +            r =3D s->regs[addr];
-> > +        } else {
-> > +            qemu_log_mask(LOG_GUEST_ERROR,
-> > +                         "%s: Bad offset 0x%" HWADDR_PRIx "\n", __func=
-__,
-> > +                         addr * 4);
-> > +            return r;
-> > +        }
-> > +        break;
-> > +    }
-> > +    return r;
-> > +}
-> > +
-> > +static void emac_write(void *opaque, hwaddr addr, uint64_t val64,
-> > +        unsigned int size)
-> > +{
-> > +    MSF2EmacState *s =3D opaque;
-> > +    uint32_t value =3D val64;
-> > +    uint32_t enreqbits;
-> > +    uint8_t pktcnt;
-> > +
-> > +    addr >>=3D 2;
-> > +    switch (addr) {
-> > +    case R_DMA_TX_CTL:
-> > +        s->regs[addr] =3D value;
-> > +        if (value & DMA_TX_CTL_EN) {
-> > +            msf2_dma_tx(s);
-> > +        }
-> > +        break;
-> > +    case R_DMA_RX_CTL:
-> > +        s->regs[addr] =3D value;
-> > +        if (value & DMA_RX_CTL_EN) {
-> > +            s->rx_desc =3D s->regs[R_DMA_RX_DESC];
-> > +            qemu_flush_queued_packets(qemu_get_queue(s->nic));
-> > +        }
-> > +        break;
-> > +    case R_CFG1:
-> > +        if (value & CFG1_RESET) {
-> > +            msf2_emac_do_reset(s);
-> > +        }
-> > +    case R_FIFO_CFG0:
-> > +       /*
-> > +        * For our implementation, turning on modules is instantaneous,
-> > +        * so the states requested via the *ENREQ bits appear in the
-> > +        * *ENRPLY bits immediately. Also the reset bits to reset PE-MC=
-XMAC
-> > +        * module are not emulated here since it deals with start of fr=
-ames,
-> > +        * inter-packet gap and control frames.
-> > +        */
-> > +        enreqbits =3D extract32(value, 8, 5);
-> > +        value =3D deposit32(value, 16, 5, enreqbits);
-> > +        s->regs[addr] =3D value;
-> > +        break;
-> > +    case R_DMA_TX_DESC:
-> > +        if (value & 0x3) {
-> > +            qemu_log_mask(LOG_GUEST_ERROR, "Tx Descriptor address shou=
-ld be"
-> > +                        " 32 bit aligned\n");
-> > +        }
-> > +        /* Ignore [1:0] bits */
-> > +        s->regs[addr] =3D value & 0xFFFFFFFC;
-> > +        break;
-> > +    case R_DMA_RX_DESC:
-> > +        if (value & 0x3) {
-> > +            qemu_log_mask(LOG_GUEST_ERROR, "Rx Descriptor address shou=
-ld be"
-> > +                        " 32 bit aligned\n");
-> > +        }
-> > +        /* Ignore [1:0] bits */
-> > +        s->regs[addr] =3D value & 0xFFFFFFFC;
-> > +        break;
-> > +    case R_DMA_TX_STATUS:
-> > +        if (value & DMA_TX_UNDERRUN) {
-> > +            s->regs[addr] &=3D ~DMA_TX_UNDERRUN;
-> > +        }
-> > +        if (value & R_DMA_PKT_TXRX) {
-> > +            pktcnt =3D extract32(s->regs[addr], R_DMA_PKTCNT_SHIFT,
-> > +                               R_DMA_PKTCNT_LENGTH);
-> > +            pktcnt--;
-> > +            s->regs[addr] =3D deposit32(s->regs[addr], R_DMA_PKTCNT_SH=
-IFT,
-> > +                                      8, pktcnt);
-> > +            if (pktcnt =3D=3D 0) {
-> > +                s->regs[addr] &=3D ~R_DMA_PKT_TXRX;
-> > +            }
-> > +        }
-> > +        break;
-> > +    case R_DMA_RX_STATUS:
-> > +        if (value & DMA_RX_OVERFLOW) {
-> > +            s->regs[addr] &=3D ~DMA_RX_OVERFLOW;
-> > +        }
-> > +        if (value & R_DMA_PKT_TXRX) {
-> > +            pktcnt =3D extract32(s->regs[addr], R_DMA_PKTCNT_SHIFT,
-> > +                               R_DMA_PKTCNT_LENGTH);
-> > +            pktcnt--;
-> > +            s->regs[addr] =3D deposit32(s->regs[addr], R_DMA_PKTCNT_SH=
-IFT,
-> > +                                      8, pktcnt);
-> > +            if (pktcnt =3D=3D 0) {
-> > +                s->regs[addr] &=3D ~R_DMA_PKT_TXRX;
-> > +            }
-> > +        }
-> > +        break;
-> > +    case R_DMA_IRQ:
-> > +        break;
-> > +    case R_MII_CMD:
-> > +        if (value & MII_CMD_READ) {
-> > +            s->regs[R_MII_STS] =3D read_from_phy(s);
-> > +        }
-> > +        break;
-> > +    case R_MII_CTL:
-> > +        s->regs[addr] =3D value;
-> > +        write_to_phy(s);
-> > +        break;
-> > +    default:
-> > +        if (addr < ARRAY_SIZE(s->regs)) {
-> > +            s->regs[addr] =3D value;
-> > +        } else {
-> > +            qemu_log_mask(LOG_GUEST_ERROR,
-> > +                         "%s: Bad offset 0x%" HWADDR_PRIx "\n", __func=
-__,
-> > +                         addr * 4);
-> > +            return;
-> > +        }
-> > +        break;
-> > +    }
-> > +    emac_update_irq(s);
-> > +}
-> > +
-> > +static const MemoryRegionOps emac_ops =3D {
-> > +    .read =3D emac_read,
-> > +    .write =3D emac_write,
-> > +    .endianness =3D DEVICE_NATIVE_ENDIAN,
-> > +    .valid =3D {
-> > +        .min_access_size =3D 4,
-> > +        .max_access_size =3D 4
-> > +    }
-> > +};
-> > +
-> > +static bool emac_can_rx(NetClientState *nc)
-> > +{
-> > +    MSF2EmacState *s =3D qemu_get_nic_opaque(nc);
-> > +
-> > +    return (s->regs[R_CFG1] & CFG1_RX_EN) &&
-> > +           (s->regs[R_DMA_RX_CTL] & DMA_RX_CTL_EN);
-> > +}
-> > +
-> > +static bool match_addr(MSF2EmacState *s, const uint8_t *buf)
-> > +{
-> > +    /* The broadcast MAC address: FF:FF:FF:FF:FF:FF */
-> > +    static const uint8_t broadcast_addr[] =3D { 0xFF, 0xFF, 0xFF, 0xFF=
-,
-> > +                                              0xFF, 0xFF };
-> > +    uint8_t addr[6];
-> > +
-> > +    if (!memcmp(buf, broadcast_addr, sizeof(broadcast_addr))) {
-> > +        return true;
-> > +    }
-> > +
-> > +    /*
-> > +     * R_STA1 [31:24] : octet 1 of mac address
-> > +     * R_STA1 [23:16] : octet 2 of mac address
-> > +     *          .
-> > +     *          .
-> > +     * R_STA2 [31:24] : octet 5 of mac address
-> > +     * R_STA2 [23:16] : octet 6 of mac address
-> > +     */
-> > +    stl_le_p(addr, s->regs[R_STA1]);
-> > +    stw_le_p(addr + 4, s->regs[R_STA2] >> 16);
-> > +
-> > +    if (!memcmp(buf, addr, sizeof(addr))) {
-> > +        return false;
-> > +    }
-> > +
-> > +    return true;
-> > +}
-> > +
-> > +static ssize_t emac_rx(NetClientState *nc, const uint8_t *buf, size_t =
-size)
-> > +{
-> > +    MSF2EmacState *s =3D qemu_get_nic_opaque(nc);
-> > +    EmacDesc d;
-> > +    uint8_t pktcnt;
-> > +    uint32_t status;
-> > +
-> > +    if (size > (s->regs[R_FRM_LEN] & 0xFFFF)) {
-> > +        return -1;
-> > +    }
-> > +    if (!match_addr(s, buf)) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    emac_load_desc(s, &d, s->rx_desc);
-> > +
-> > +    if (d.pktsize & EMPTY_MASK) {
-> > +        address_space_write(&s->dma_as, d.pktaddr, MEMTXATTRS_UNSPECIF=
-IED,
-> > +                            buf, size & PKT_SIZE);
->
->
-> Do we need to check whether the descriptor has sufficient space for the
-> packet?
+On Wed, Feb 19, 2020 at 1:19 AM BALATON Zoltan <balaton@eik.bme.hu> wrote:
 
-Not needed. As per datasheet:
-"For the transmit operations, the 12-bit field gives the size of
-packet to be transferred in bytes.
-In the receive operations, the DMA controller writes the
-number of bytes received to this field.
-The value of this field prior to the transfer being made is
-ignored."
+> While other targets take advantage of using host FPU to do floating
+> point computations, this was disabled for PPC target because always
+> clearing exception flags before every FP op made it slightly slower
+> than emulating everyting with softfloat. To emulate some FPSCR bits,
+> clearing of fp_status may be necessary (unless these could be handled
+> e.g. using FP exceptions on host but there's no API for that in QEMU
+> yet) but preserving at least the inexact flag makes hardfloat usable
+> and faster than softfloat. Since most clients don't actually care
+> about this flag, we can gain some speed trading some emulation
+> accuracy.
+>
+> This patch implements a simple way to keep the inexact flag set for
+> hardfloat while still allowing to revert to softfloat for workloads
+> that need more accurate albeit slower emulation. (Set hardfloat
+> property of CPU, i.e. -cpu name,hardfloat=3Dfalse for that.) There may
+> still be room for further improvement but this seems to increase
+> floating point performance. Unfortunately the softfloat case is slower
+> than before this patch so this patch only makes sense if the default
+> is also set to enable hardfloat.
+>
+> Because of the above this patch at the moment is mainly for testing
+> different workloads to evaluate how viable would this be in practice.
+> Thus, RFC and not ready for merge yet.
+>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
+> v2: use different approach to avoid needing if () in
+> helper_reset_fpstatus() but this does not seem to change overhead
+> much, also make it a single patch as adding the hardfloat option is
+> only a few lines; with this we can use same value at other places where
+> float_status is reset and maybe enable hardfloat for a few more places
+> for a little more performance but not too much. With this I got:
+>
+> lame: 3:13, lame_vmx: 1:55 (this is probably within jitter though and
+> still far from the results on real hardware) also tried mplayer test
+> and got results between 144-146s (this test is more VMX bound).
+>
+> I've also done some profiling for hardfloat=3Dtrue and false cases with
+> this patch to see what are the hot functions. Results are:
+>
+> Overhead  Command          Symbol
+> -cpu G4,hardfloat=3Dfalse, lame:
+>    9.82%  qemu-system-ppc  [.] round_canonical
+>    8.35%  qemu-system-ppc  [.] soft_f64_muladd
+>    7.16%  qemu-system-ppc  [.] soft_f64_addsub
+>    5.27%  qemu-system-ppc  [.] float32_to_float64
+>    5.20%  qemu-system-ppc  [.] helper_compute_fprf_float64
+>    4.61%  qemu-system-ppc  [.] helper_frsp
+>    4.59%  qemu-system-ppc  [.] soft_f64_mul
+>    4.01%  qemu-system-ppc  [.] float_to_float.isra.26
+>    3.84%  qemu-system-ppc  [.] float64_classify
+>    2.97%  qemu-system-ppc  [.] do_float_check_status
+>
+> -cpu G4,hardfloat=3Dfalse, lame_vmx:
+> Overhead  Command          Symbol
+>   10.04%  qemu-system-ppc  [.] float32_muladd
+>    9.49%  qemu-system-ppc  [.] helper_vperm
+>    6.10%  qemu-system-ppc  [.] round_canonical
+>    4.13%  qemu-system-ppc  [.] soft_f64_addsub
+>    3.23%  qemu-system-ppc  [.] helper_frsp
+>    3.13%  qemu-system-ppc  [.] soft_f64_muladd
+>    2.88%  qemu-system-ppc  [.] helper_vmaddfp
+>    2.69%  qemu-system-ppc  [.] float32_add
+>    2.60%  qemu-system-ppc  [.] float32_to_float64
+>    2.52%  qemu-system-ppc  [.] helper_compute_fprf_float64
+>
+> -cpu G4,hardfloat=3Dtrue, lame:
+>   11.59%  qemu-system-ppc  [.] round_canonical
+>    6.18%  qemu-system-ppc  [.] helper_compute_fprf_float64
+>    6.01%  qemu-system-ppc  [.] float32_to_float64
+>    4.58%  qemu-system-ppc  [.] float64_classify
+>    3.87%  qemu-system-ppc  [.] helper_frsp
+>    3.75%  qemu-system-ppc  [.] float_to_float.isra.26
+>    3.48%  qemu-system-ppc  [.] helper_todouble
+>    3.31%  qemu-system-ppc  [.] float64_muladd
+>    3.21%  qemu-system-ppc  [.] do_float_check_status
+>    3.01%  qemu-system-ppc  [.] float64_mul
+>
+> -cpu G4,hardfloat=3Dtrue, lame_vmx:
+>    9.34%  qemu-system-ppc  [.] float32_muladd
+>    8.83%  qemu-system-ppc  [.] helper_vperm
+>    5.41%  qemu-system-ppc  [.] round_canonical
+>    4.51%  qemu-system-ppc  [.] page_collection_lock
+>    3.58%  qemu-system-ppc  [.] page_trylock_add.isra.17
+>    2.71%  qemu-system-ppc  [.] helper_vmaddfp
+>    2.53%  qemu-system-ppc  [.] float32_add
+>    2.30%  qemu-system-ppc  [.] helper_compute_fprf_float64
+>    2.21%  qemu-system-ppc  [.] float32_to_float64
+>    2.06%  qemu-system-ppc  [.] helper_frsp
+>
+> round_canonical seems to come up frequently in this with large overhead.
+>
+> Could those with better test cases or benchmarks give it a test please
+> on different CPUs to see what else this would break?
+>
+> ---
+> fpu/softfloat.c                 | 14 +++++++-------
+>  target/ppc/cpu.h                |  2 ++
+>  target/ppc/fpu_helper.c         | 32 ++++++++++++++++----------------
+>  target/ppc/translate_init.inc.c |  3 +++
+>  4 files changed, 28 insertions(+), 23 deletions(-)
+>
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index 301ce3b537..6d3f4af72a 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -216,15 +216,15 @@ GEN_INPUT_FLUSH3(float64_input_flush3, float64)
+>  #endif
+>
+>  /*
+> - * Some targets clear the FP flags before most FP operations. This
+> prevents
+> - * the use of hardfloat, since hardfloat relies on the inexact flag bein=
+g
+> - * already set.
+> + * Disable hardfloat for known problem cases.
+> + * Additionally, some targets clear the FP flags before most FP
+> operations.
+> + * This prevents the use of hardfloat, since it relies on the inexact fl=
+ag
+> + * being already set and clearing it often may result in slower
+> computations.
+> + * Those targets could also be listed here.
+>   */
+> -#if defined(TARGET_PPC) || defined(__FAST_MATH__)
+> -# if defined(__FAST_MATH__)
+> -#  warning disabling hardfloat due to -ffast-math: hardfloat requires an
+> exact \
+> +#if defined(__FAST_MATH__)
+> +# warning disabling hardfloat due to -ffast-math: hardfloat requires an
+> exact \
+>      IEEE implementation
+> -# endif
+>  # define QEMU_NO_HARDFLOAT 1
+>  # define QEMU_SOFTFLOAT_ATTR QEMU_FLATTEN
+>  #else
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index b283042515..5f412f9fba 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1033,6 +1033,7 @@ struct CPUPPCState {
+>      float_status vec_status;
+>      float_status fp_status; /* Floating point execution context */
+>      target_ulong fpscr;     /* Floating point status and control registe=
+r
+> */
+> +    int default_fp_excpt_flags;
+>
+>      /* Internal devices resources */
+>      ppc_tb_t *tb_env;      /* Time base and decrementer */
+> @@ -1163,6 +1164,7 @@ struct PowerPCCPU {
+>      void *machine_data;
+>      int32_t node_id; /* NUMA node this CPU belongs to */
+>      PPCHash64Options *hash64_opts;
+> +    bool hardfloat;  /* use hardfloat (this breaks FPSCR[FI] bit
+> emulation) */
+>
+>      /* Those resources are used only during code translation */
+>      /* opcode handlers */
+> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+> index ae43b08eb5..bbbd1cb987 100644
+> --- a/target/ppc/fpu_helper.c
+> +++ b/target/ppc/fpu_helper.c
+> @@ -659,7 +659,7 @@ void helper_float_check_status(CPUPPCState *env)
+>
+>  void helper_reset_fpstatus(CPUPPCState *env)
+>  {
+> -    set_float_exception_flags(0, &env->fp_status);
+> +    set_float_exception_flags(env->default_fp_excpt_flags,
+> &env->fp_status);
+>  }
+>
+>  static void float_invalid_op_addsub(CPUPPCState *env, bool set_fpcc,
+> @@ -1823,7 +1823,7 @@ void helper_##name(CPUPPCState *env, ppc_vsr_t *xt,
+>                         \
+>
+>     \
+>      for (i =3D 0; i < nels; i++) {
+>    \
+>          float_status tstat =3D env->fp_status;
+>    \
+> -        set_float_exception_flags(0, &tstat);
+>     \
+> +        set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>     \
+>          t.fld =3D tp##_##op(xa->fld, xb->fld, &tstat);
+>    \
+>          env->fp_status.float_exception_flags |=3D
+> tstat.float_exception_flags; \
+>
+>     \
+> @@ -1867,7 +1867,7 @@ void helper_xsaddqp(CPUPPCState *env, uint32_t
+> opcode,
+>          tstat.float_rounding_mode =3D float_round_to_odd;
+>      }
+>
+> -    set_float_exception_flags(0, &tstat);
+> +    set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>      t.f128 =3D float128_add(xa->f128, xb->f128, &tstat);
+>      env->fp_status.float_exception_flags |=3D tstat.float_exception_flag=
+s;
+>
+> @@ -1902,7 +1902,7 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+>                         \
+>
+>     \
+>      for (i =3D 0; i < nels; i++) {
+>    \
+>          float_status tstat =3D env->fp_status;
+>    \
+> -        set_float_exception_flags(0, &tstat);
+>     \
+> +        set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>     \
+>          t.fld =3D tp##_mul(xa->fld, xb->fld, &tstat);
+>     \
+>          env->fp_status.float_exception_flags |=3D
+> tstat.float_exception_flags; \
+>
+>     \
+> @@ -1942,7 +1942,7 @@ void helper_xsmulqp(CPUPPCState *env, uint32_t
+> opcode,
+>          tstat.float_rounding_mode =3D float_round_to_odd;
+>      }
+>
+> -    set_float_exception_flags(0, &tstat);
+> +    set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>      t.f128 =3D float128_mul(xa->f128, xb->f128, &tstat);
+>      env->fp_status.float_exception_flags |=3D tstat.float_exception_flag=
+s;
+>
+> @@ -1976,7 +1976,7 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+>                          \
+>
+>      \
+>      for (i =3D 0; i < nels; i++) {
+>     \
+>          float_status tstat =3D env->fp_status;
+>     \
+> -        set_float_exception_flags(0, &tstat);
+>      \
+> +        set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>      \
+>          t.fld =3D tp##_div(xa->fld, xb->fld, &tstat);
+>      \
+>          env->fp_status.float_exception_flags |=3D
+> tstat.float_exception_flags;  \
+>
+>      \
+> @@ -2019,7 +2019,7 @@ void helper_xsdivqp(CPUPPCState *env, uint32_t
+> opcode,
+>          tstat.float_rounding_mode =3D float_round_to_odd;
+>      }
+>
+> -    set_float_exception_flags(0, &tstat);
+> +    set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>      t.f128 =3D float128_div(xa->f128, xb->f128, &tstat);
+>      env->fp_status.float_exception_flags |=3D tstat.float_exception_flag=
+s;
+>
+> @@ -2095,7 +2095,7 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+> ppc_vsr_t *xb)             \
+>
+>     \
+>      for (i =3D 0; i < nels; i++) {
+>    \
+>          float_status tstat =3D env->fp_status;
+>    \
+> -        set_float_exception_flags(0, &tstat);
+>     \
+> +        set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>     \
+>          t.fld =3D tp##_sqrt(xb->fld, &tstat);
+>     \
+>          env->fp_status.float_exception_flags |=3D
+> tstat.float_exception_flags; \
+>
+>     \
+> @@ -2143,7 +2143,7 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+> ppc_vsr_t *xb)             \
+>
+>     \
+>      for (i =3D 0; i < nels; i++) {
+>    \
+>          float_status tstat =3D env->fp_status;
+>    \
+> -        set_float_exception_flags(0, &tstat);
+>     \
+> +        set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>     \
+>          t.fld =3D tp##_sqrt(xb->fld, &tstat);
+>     \
+>          t.fld =3D tp##_div(tp##_one, t.fld, &tstat);
+>    \
+>          env->fp_status.float_exception_flags |=3D
+> tstat.float_exception_flags; \
+> @@ -2305,7 +2305,7 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+>                          \
+>
+>      \
+>      for (i =3D 0; i < nels; i++) {
+>     \
+>          float_status tstat =3D env->fp_status;
+>     \
+> -        set_float_exception_flags(0, &tstat);
+>      \
+> +        set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>      \
+>          if (r2sp && (tstat.float_rounding_mode =3D=3D
+> float_round_nearest_even)) {\
+>              /*
+>     \
+>               * Avoid double rounding errors by rounding the intermediate
+>     \
+> @@ -2886,7 +2886,7 @@ uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_=
+t
+> xb)
+>      uint64_t result, sign, exp, frac;
+>
+>      float_status tstat =3D env->fp_status;
+> -    set_float_exception_flags(0, &tstat);
+> +    set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>
+>      sign =3D extract64(xb, 63,  1);
+>      exp  =3D extract64(xb, 52, 11);
+> @@ -2924,7 +2924,7 @@ uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_=
+t
+> xb)
+>  uint64_t helper_xscvspdpn(CPUPPCState *env, uint64_t xb)
+>  {
+>      float_status tstat =3D env->fp_status;
+> -    set_float_exception_flags(0, &tstat);
+> +    set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>
+>      return float32_to_float64(xb >> 32, &tstat);
+>  }
+> @@ -3327,7 +3327,7 @@ void helper_xsrqpi(CPUPPCState *env, uint32_t opcod=
+e,
+>      }
+>
+>      tstat =3D env->fp_status;
+> -    set_float_exception_flags(0, &tstat);
+> +    set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>      set_float_rounding_mode(rmode, &tstat);
+>      t.f128 =3D float128_round_to_int(xb->f128, &tstat);
+>      env->fp_status.float_exception_flags |=3D tstat.float_exception_flag=
+s;
+> @@ -3384,7 +3384,7 @@ void helper_xsrqpxp(CPUPPCState *env, uint32_t
+> opcode,
+>      }
+>
+>      tstat =3D env->fp_status;
+> -    set_float_exception_flags(0, &tstat);
+> +    set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>      set_float_rounding_mode(rmode, &tstat);
+>      round_res =3D float128_to_floatx80(xb->f128, &tstat);
+>      t.f128 =3D floatx80_to_float128(round_res, &tstat);
+> @@ -3415,7 +3415,7 @@ void helper_xssqrtqp(CPUPPCState *env, uint32_t
+> opcode,
+>          tstat.float_rounding_mode =3D float_round_to_odd;
+>      }
+>
+> -    set_float_exception_flags(0, &tstat);
+> +    set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>      t.f128 =3D float128_sqrt(xb->f128, &tstat);
+>      env->fp_status.float_exception_flags |=3D tstat.float_exception_flag=
+s;
+>
+> @@ -3449,7 +3449,7 @@ void helper_xssubqp(CPUPPCState *env, uint32_t
+> opcode,
+>          tstat.float_rounding_mode =3D float_round_to_odd;
+>      }
+>
+> -    set_float_exception_flags(0, &tstat);
+> +    set_float_exception_flags(env->default_fp_excpt_flags, &tstat);
+>      t.f128 =3D float128_sub(xa->f128, xb->f128, &tstat);
+>      env->fp_status.float_exception_flags |=3D tstat.float_exception_flag=
+s;
+>
+> diff --git a/target/ppc/translate_init.inc.c
+> b/target/ppc/translate_init.inc.c
+> index 53995f62ea..ab1a6db4f1 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -10736,6 +10736,8 @@ static void ppc_cpu_reset(CPUState *s)
+>      /* tininess for underflow is detected before rounding */
+>      set_float_detect_tininess(float_tininess_before_rounding,
+>                                &env->fp_status);
+> +    /* hardfloat needs inexact flag already set */
+> +    env->default_fp_excpt_flags =3D (cpu->hardfloat ? float_flag_inexact=
+ :
+> 0);
+>
+>      for (i =3D 0; i < ARRAY_SIZE(env->spr_cb); i++) {
+>          ppc_spr_t *spr =3D &env->spr_cb[i];
+> @@ -10868,6 +10870,7 @@ static Property ppc_cpu_properties[] =3D {
+>                       false),
+>      DEFINE_PROP_BOOL("pre-3.0-migration", PowerPCCPU, pre_3_0_migration,
+>                       false),
+> +    DEFINE_PROP_BOOL("hardfloat", PowerPCCPU, hardfloat, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>
+> --
+> 2.21.1
+>
+>
+>
 
-Thanks,
-Sundeep
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
+--000000000000f8923605a2f0036e
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Are this stable now? I&#39;d like to see hard float to be =
+landed:)</div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmai=
+l_attr">On Wed, Feb 19, 2020 at 1:19 AM BALATON Zoltan &lt;<a href=3D"mailt=
+o:balaton@eik.bme.hu">balaton@eik.bme.hu</a>&gt; wrote:<br></div><blockquot=
+e class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px s=
+olid rgb(204,204,204);padding-left:1ex">While other targets take advantage =
+of using host FPU to do floating<br>
+point computations, this was disabled for PPC target because always<br>
+clearing exception flags before every FP op made it slightly slower<br>
+than emulating everyting with softfloat. To emulate some FPSCR bits,<br>
+clearing of fp_status may be necessary (unless these could be handled<br>
+e.g. using FP exceptions on host but there&#39;s no API for that in QEMU<br=
 >
-> Thanks
+yet) but preserving at least the inexact flag makes hardfloat usable<br>
+and faster than softfloat. Since most clients don&#39;t actually care<br>
+about this flag, we can gain some speed trading some emulation<br>
+accuracy.<br>
+<br>
+This patch implements a simple way to keep the inexact flag set for<br>
+hardfloat while still allowing to revert to softfloat for workloads<br>
+that need more accurate albeit slower emulation. (Set hardfloat<br>
+property of CPU, i.e. -cpu name,hardfloat=3Dfalse for that.) There may<br>
+still be room for further improvement but this seems to increase<br>
+floating point performance. Unfortunately the softfloat case is slower<br>
+than before this patch so this patch only makes sense if the default<br>
+is also set to enable hardfloat.<br>
+<br>
+Because of the above this patch at the moment is mainly for testing<br>
+different workloads to evaluate how viable would this be in practice.<br>
+Thus, RFC and not ready for merge yet.<br>
+<br>
+Signed-off-by: BALATON Zoltan &lt;<a href=3D"mailto:balaton@eik.bme.hu" tar=
+get=3D"_blank">balaton@eik.bme.hu</a>&gt;<br>
+---<br>
+v2: use different approach to avoid needing if () in<br>
+helper_reset_fpstatus() but this does not seem to change overhead<br>
+much, also make it a single patch as adding the hardfloat option is<br>
+only a few lines; with this we can use same value at other places where<br>
+float_status is reset and maybe enable hardfloat for a few more places<br>
+for a little more performance but not too much. With this I got:<br>
+<br>
+lame: 3:13, lame_vmx: 1:55 (this is probably within jitter though and<br>
+still far from the results on real hardware) also tried mplayer test<br>
+and got results between 144-146s (this test is more VMX bound).<br>
+<br>
+I&#39;ve also done some profiling for hardfloat=3Dtrue and false cases with=
+<br>
+this patch to see what are the hot functions. Results are:<br>
+<br>
+Overhead=C2=A0 Command=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Symbol<br>
+-cpu G4,hardfloat=3Dfalse, lame:<br>
+=C2=A0 =C2=A09.82%=C2=A0 qemu-system-ppc=C2=A0 [.] round_canonical<br>
+=C2=A0 =C2=A08.35%=C2=A0 qemu-system-ppc=C2=A0 [.] soft_f64_muladd<br>
+=C2=A0 =C2=A07.16%=C2=A0 qemu-system-ppc=C2=A0 [.] soft_f64_addsub<br>
+=C2=A0 =C2=A05.27%=C2=A0 qemu-system-ppc=C2=A0 [.] float32_to_float64<br>
+=C2=A0 =C2=A05.20%=C2=A0 qemu-system-ppc=C2=A0 [.] helper_compute_fprf_floa=
+t64<br>
+=C2=A0 =C2=A04.61%=C2=A0 qemu-system-ppc=C2=A0 [.] helper_frsp<br>
+=C2=A0 =C2=A04.59%=C2=A0 qemu-system-ppc=C2=A0 [.] soft_f64_mul<br>
+=C2=A0 =C2=A04.01%=C2=A0 qemu-system-ppc=C2=A0 [.] float_to_float.isra.26<b=
+r>
+=C2=A0 =C2=A03.84%=C2=A0 qemu-system-ppc=C2=A0 [.] float64_classify<br>
+=C2=A0 =C2=A02.97%=C2=A0 qemu-system-ppc=C2=A0 [.] do_float_check_status<br=
 >
+<br>
+-cpu G4,hardfloat=3Dfalse, lame_vmx:<br>
+Overhead=C2=A0 Command=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Symbol<br>
+=C2=A0 10.04%=C2=A0 qemu-system-ppc=C2=A0 [.] float32_muladd<br>
+=C2=A0 =C2=A09.49%=C2=A0 qemu-system-ppc=C2=A0 [.] helper_vperm<br>
+=C2=A0 =C2=A06.10%=C2=A0 qemu-system-ppc=C2=A0 [.] round_canonical<br>
+=C2=A0 =C2=A04.13%=C2=A0 qemu-system-ppc=C2=A0 [.] soft_f64_addsub<br>
+=C2=A0 =C2=A03.23%=C2=A0 qemu-system-ppc=C2=A0 [.] helper_frsp<br>
+=C2=A0 =C2=A03.13%=C2=A0 qemu-system-ppc=C2=A0 [.] soft_f64_muladd<br>
+=C2=A0 =C2=A02.88%=C2=A0 qemu-system-ppc=C2=A0 [.] helper_vmaddfp<br>
+=C2=A0 =C2=A02.69%=C2=A0 qemu-system-ppc=C2=A0 [.] float32_add<br>
+=C2=A0 =C2=A02.60%=C2=A0 qemu-system-ppc=C2=A0 [.] float32_to_float64<br>
+=C2=A0 =C2=A02.52%=C2=A0 qemu-system-ppc=C2=A0 [.] helper_compute_fprf_floa=
+t64<br>
+<br>
+-cpu G4,hardfloat=3Dtrue, lame:<br>
+=C2=A0 11.59%=C2=A0 qemu-system-ppc=C2=A0 [.] round_canonical<br>
+=C2=A0 =C2=A06.18%=C2=A0 qemu-system-ppc=C2=A0 [.] helper_compute_fprf_floa=
+t64<br>
+=C2=A0 =C2=A06.01%=C2=A0 qemu-system-ppc=C2=A0 [.] float32_to_float64<br>
+=C2=A0 =C2=A04.58%=C2=A0 qemu-system-ppc=C2=A0 [.] float64_classify<br>
+=C2=A0 =C2=A03.87%=C2=A0 qemu-system-ppc=C2=A0 [.] helper_frsp<br>
+=C2=A0 =C2=A03.75%=C2=A0 qemu-system-ppc=C2=A0 [.] float_to_float.isra.26<b=
+r>
+=C2=A0 =C2=A03.48%=C2=A0 qemu-system-ppc=C2=A0 [.] helper_todouble<br>
+=C2=A0 =C2=A03.31%=C2=A0 qemu-system-ppc=C2=A0 [.] float64_muladd<br>
+=C2=A0 =C2=A03.21%=C2=A0 qemu-system-ppc=C2=A0 [.] do_float_check_status<br=
 >
-> > +        d.pktsize =3D size & PKT_SIZE;
-> > +        emac_store_desc(s, &d, s->rx_desc);
-> > +        /* update received packets count */
-> > +        status =3D s->regs[R_DMA_RX_STATUS];
-> > +        pktcnt =3D extract32(status, R_DMA_PKTCNT_SHIFT, 8);
-> > +        pktcnt++;
-> > +        s->regs[R_DMA_RX_STATUS] =3D deposit32(status, R_DMA_PKTCNT_SH=
-IFT,
-> > +                                             8, pktcnt);
-> > +        s->regs[R_DMA_RX_STATUS] |=3D R_DMA_PKT_TXRX;
-> > +        s->rx_desc =3D d.next;
-> > +    } else {
-> > +        s->regs[R_DMA_RX_CTL] &=3D ~DMA_RX_CTL_EN;
-> > +        s->regs[R_DMA_RX_STATUS] |=3D DMA_RX_OVERFLOW;
-> > +    }
-> > +    emac_update_irq(s);
-> > +    return size;
-> > +}
-> > +
-> > +static void msf2_emac_reset(DeviceState *dev)
-> > +{
-> > +    MSF2EmacState *s =3D MSS_EMAC(dev);
-> > +
-> > +    msf2_emac_do_reset(s);
-> > +}
-> > +
-> > +static void emac_set_link(NetClientState *nc)
-> > +{
-> > +    MSF2EmacState *s =3D qemu_get_nic_opaque(nc);
-> > +
-> > +    msf2_phy_update_link(s);
-> > +}
-> > +
-> > +static NetClientInfo net_msf2_emac_info =3D {
-> > +    .type =3D NET_CLIENT_DRIVER_NIC,
-> > +    .size =3D sizeof(NICState),
-> > +    .can_receive =3D emac_can_rx,
-> > +    .receive =3D emac_rx,
-> > +    .link_status_changed =3D emac_set_link,
-> > +};
-> > +
-> > +static void msf2_emac_realize(DeviceState *dev, Error **errp)
-> > +{
-> > +    MSF2EmacState *s =3D MSS_EMAC(dev);
-> > +
-> > +    address_space_init(&s->dma_as,
-> > +                       s->dma_mr ? s->dma_mr : get_system_memory(), "d=
-ma");
-> > +
-> > +    qemu_macaddr_default_if_unset(&s->conf.macaddr);
-> > +    s->nic =3D qemu_new_nic(&net_msf2_emac_info, &s->conf,
-> > +                          object_get_typename(OBJECT(dev)), dev->id, s=
-);
-> > +    qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a=
-);
-> > +}
-> > +
-> > +static void msf2_emac_init(Object *obj)
-> > +{
-> > +    MSF2EmacState *s =3D MSS_EMAC(obj);
-> > +
-> > +    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
-> > +
-> > +    memory_region_init_io(&s->mmio, obj, &emac_ops, s,
-> > +                          "msf2-emac", R_MAX * 4);
-> > +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-> > +}
-> > +
-> > +static Property msf2_emac_properties[] =3D {
-> > +    DEFINE_NIC_PROPERTIES(MSF2EmacState, conf),
-> > +    DEFINE_PROP_END_OF_LIST(),
-> > +};
-> > +
-> > +static const VMStateDescription vmstate_msf2_emac =3D {
-> > +    .name =3D TYPE_MSS_EMAC,
-> > +    .version_id =3D 1,
-> > +    .minimum_version_id =3D 1,
-> > +    .fields =3D (VMStateField[]) {
-> > +        VMSTATE_UINT32(rx_desc, MSF2EmacState),
-> > +        VMSTATE_UINT16_ARRAY(phy_regs, MSF2EmacState, PHY_MAX_REGS),
-> > +        VMSTATE_UINT32_ARRAY(regs, MSF2EmacState, R_MAX),
-> > +        VMSTATE_END_OF_LIST()
-> > +    }
-> > +};
-> > +
-> > +static void msf2_emac_class_init(ObjectClass *klass, void *data)
-> > +{
-> > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> > +
-> > +    dc->realize =3D msf2_emac_realize;
-> > +    dc->reset =3D msf2_emac_reset;
-> > +    dc->vmsd =3D &vmstate_msf2_emac;
-> > +    device_class_set_props(dc, msf2_emac_properties);
-> > +}
-> > +
-> > +static const TypeInfo msf2_emac_info =3D {
-> > +    .name          =3D TYPE_MSS_EMAC,
-> > +    .parent        =3D TYPE_SYS_BUS_DEVICE,
-> > +    .instance_size =3D sizeof(MSF2EmacState),
-> > +    .instance_init =3D msf2_emac_init,
-> > +    .class_init    =3D msf2_emac_class_init,
-> > +};
-> > +
-> > +static void msf2_emac_register_types(void)
-> > +{
-> > +    type_register_static(&msf2_emac_info);
-> > +}
-> > +
-> > +type_init(msf2_emac_register_types)
-> > diff --git a/include/hw/net/msf2-emac.h b/include/hw/net/msf2-emac.h
-> > new file mode 100644
-> > index 0000000..ab0da62
-> > --- /dev/null
-> > +++ b/include/hw/net/msf2-emac.h
-> > @@ -0,0 +1,50 @@
-> > +/*
-> > + * QEMU model of the Smartfusion2 Ethernet MAC.
-> > + *
-> > + * Copyright (c) 2020 Subbaraya Sundeep <sundeep.lkml@gmail.com>.
-> > + *
-> > + * Permission is hereby granted, free of charge, to any person obtaini=
-ng a copy
-> > + * of this software and associated documentation files (the "Software"=
-), to deal
-> > + * in the Software without restriction, including without limitation t=
-he rights
-> > + * to use, copy, modify, merge, publish, distribute, sublicense, and/o=
-r sell
-> > + * copies of the Software, and to permit persons to whom the Software =
-is
-> > + * furnished to do so, subject to the following conditions:
-> > + *
-> > + * The above copyright notice and this permission notice shall be incl=
-uded in
-> > + * all copies or substantial portions of the Software.
-> > + *
-> > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXP=
-RESS OR
-> > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABI=
-LITY,
-> > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT S=
-HALL
-> > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES O=
-R OTHER
-> > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARI=
-SING FROM,
-> > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> > + * THE SOFTWARE.
-> > + */
-> > +
-> > +#include "hw/sysbus.h"
-> > +#include "net/net.h"
-> > +
-> > +#define TYPE_MSS_EMAC "msf2-emac"
-> > +#define MSS_EMAC(obj) \
-> > +    OBJECT_CHECK(MSF2EmacState, (obj), TYPE_MSS_EMAC)
-> > +
-> > +#define R_MAX         (0x1a0 / 4)
-> > +#define PHY_MAX_REGS  32
-> > +
-> > +typedef struct MSF2EmacState {
-> > +    SysBusDevice parent;
-> > +
-> > +    MemoryRegion mmio;
-> > +    MemoryRegion *dma_mr;
-> > +    AddressSpace dma_as;
-> > +
-> > +    qemu_irq irq;
-> > +    NICState *nic;
-> > +    NICConf conf;
-> > +
-> > +    uint32_t rx_desc;
-> > +    uint16_t phy_regs[PHY_MAX_REGS];
-> > +
-> > +    uint32_t regs[R_MAX];
-> > +} MSF2EmacState;
+=C2=A0 =C2=A03.01%=C2=A0 qemu-system-ppc=C2=A0 [.] float64_mul<br>
+<br>
+-cpu G4,hardfloat=3Dtrue, lame_vmx:<br>
+=C2=A0 =C2=A09.34%=C2=A0 qemu-system-ppc=C2=A0 [.] float32_muladd<br>
+=C2=A0 =C2=A08.83%=C2=A0 qemu-system-ppc=C2=A0 [.] helper_vperm<br>
+=C2=A0 =C2=A05.41%=C2=A0 qemu-system-ppc=C2=A0 [.] round_canonical<br>
+=C2=A0 =C2=A04.51%=C2=A0 qemu-system-ppc=C2=A0 [.] page_collection_lock<br>
+=C2=A0 =C2=A03.58%=C2=A0 qemu-system-ppc=C2=A0 [.] page_trylock_add.isra.17=
+<br>
+=C2=A0 =C2=A02.71%=C2=A0 qemu-system-ppc=C2=A0 [.] helper_vmaddfp<br>
+=C2=A0 =C2=A02.53%=C2=A0 qemu-system-ppc=C2=A0 [.] float32_add<br>
+=C2=A0 =C2=A02.30%=C2=A0 qemu-system-ppc=C2=A0 [.] helper_compute_fprf_floa=
+t64<br>
+=C2=A0 =C2=A02.21%=C2=A0 qemu-system-ppc=C2=A0 [.] float32_to_float64<br>
+=C2=A0 =C2=A02.06%=C2=A0 qemu-system-ppc=C2=A0 [.] helper_frsp<br>
+<br>
+round_canonical seems to come up frequently in this with large overhead.<br=
 >
+<br>
+Could those with better test cases or benchmarks give it a test please<br>
+on different CPUs to see what else this would break?<br>
+<br>
+---<br>
+fpu/softfloat.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0| 14 +++++++-------<br>
+=C2=A0target/ppc/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 |=C2=A0 2 ++<br>
+=C2=A0target/ppc/fpu_helper.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 32 +++++++=
++++++++++----------------<br>
+=C2=A0target/ppc/translate_init.inc.c |=C2=A0 3 +++<br>
+=C2=A04 files changed, 28 insertions(+), 23 deletions(-)<br>
+<br>
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c<br>
+index 301ce3b537..6d3f4af72a 100644<br>
+--- a/fpu/softfloat.c<br>
++++ b/fpu/softfloat.c<br>
+@@ -216,15 +216,15 @@ GEN_INPUT_FLUSH3(float64_input_flush3, float64)<br>
+=C2=A0#endif<br>
+<br>
+=C2=A0/*<br>
+- * Some targets clear the FP flags before most FP operations. This prevent=
+s<br>
+- * the use of hardfloat, since hardfloat relies on the inexact flag being<=
+br>
+- * already set.<br>
++ * Disable hardfloat for known problem cases.<br>
++ * Additionally, some targets clear the FP flags before most FP operations=
+.<br>
++ * This prevents the use of hardfloat, since it relies on the inexact flag=
+<br>
++ * being already set and clearing it often may result in slower computatio=
+ns.<br>
++ * Those targets could also be listed here.<br>
+=C2=A0 */<br>
+-#if defined(TARGET_PPC) || defined(__FAST_MATH__)<br>
+-# if defined(__FAST_MATH__)<br>
+-#=C2=A0 warning disabling hardfloat due to -ffast-math: hardfloat requires=
+ an exact \<br>
++#if defined(__FAST_MATH__)<br>
++# warning disabling hardfloat due to -ffast-math: hardfloat requires an ex=
+act \<br>
+=C2=A0 =C2=A0 =C2=A0IEEE implementation<br>
+-# endif<br>
+=C2=A0# define QEMU_NO_HARDFLOAT 1<br>
+=C2=A0# define QEMU_SOFTFLOAT_ATTR QEMU_FLATTEN<br>
+=C2=A0#else<br>
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h<br>
+index b283042515..5f412f9fba 100644<br>
+--- a/target/ppc/cpu.h<br>
++++ b/target/ppc/cpu.h<br>
+@@ -1033,6 +1033,7 @@ struct CPUPPCState {<br>
+=C2=A0 =C2=A0 =C2=A0float_status vec_status;<br>
+=C2=A0 =C2=A0 =C2=A0float_status fp_status; /* Floating point execution con=
+text */<br>
+=C2=A0 =C2=A0 =C2=A0target_ulong fpscr;=C2=A0 =C2=A0 =C2=A0/* Floating poin=
+t status and control register */<br>
++=C2=A0 =C2=A0 int default_fp_excpt_flags;<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0/* Internal devices resources */<br>
+=C2=A0 =C2=A0 =C2=A0ppc_tb_t *tb_env;=C2=A0 =C2=A0 =C2=A0 /* Time base and =
+decrementer */<br>
+@@ -1163,6 +1164,7 @@ struct PowerPCCPU {<br>
+=C2=A0 =C2=A0 =C2=A0void *machine_data;<br>
+=C2=A0 =C2=A0 =C2=A0int32_t node_id; /* NUMA node this CPU belongs to */<br=
+>
+=C2=A0 =C2=A0 =C2=A0PPCHash64Options *hash64_opts;<br>
++=C2=A0 =C2=A0 bool hardfloat;=C2=A0 /* use hardfloat (this breaks FPSCR[FI=
+] bit emulation) */<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0/* Those resources are used only during code translatio=
+n */<br>
+=C2=A0 =C2=A0 =C2=A0/* opcode handlers */<br>
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c<br>
+index ae43b08eb5..bbbd1cb987 100644<br>
+--- a/target/ppc/fpu_helper.c<br>
++++ b/target/ppc/fpu_helper.c<br>
+@@ -659,7 +659,7 @@ void helper_float_check_status(CPUPPCState *env)<br>
+<br>
+=C2=A0void helper_reset_fpstatus(CPUPPCState *env)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 set_float_exception_flags(0, &amp;env-&gt;fp_status);<br>
++=C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_excpt_flags, &a=
+mp;env-&gt;fp_status);<br>
+=C2=A0}<br>
+<br>
+=C2=A0static void float_invalid_op_addsub(CPUPPCState *env, bool set_fpcc,<=
+br>
+@@ -1823,7 +1823,7 @@ void helper_##name(CPUPPCState *env, ppc_vsr_t *xt,=
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0for (i =3D 0; i &lt; nels; i++) {=C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0float_status tstat =3D env-&gt;fp_status;=
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_e=
+xcpt_flags, &amp;tstat);=C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0t.fld =3D tp##_##op(xa-&gt;fld, xb-&gt;fl=
+d, &amp;tstat);=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;fp_status.float_exception_flags |=
+=3D tstat.float_exception_flags; \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+@@ -1867,7 +1867,7 @@ void helper_xsaddqp(CPUPPCState *env, uint32_t opcode=
+,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tstat.float_rounding_mode =3D float_round=
+_to_odd;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-=C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);<br>
++=C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_excpt_flags, &a=
+mp;tstat);<br>
+=C2=A0 =C2=A0 =C2=A0t.f128 =3D float128_add(xa-&gt;f128, xb-&gt;f128, &amp;=
+tstat);<br>
+=C2=A0 =C2=A0 =C2=A0env-&gt;fp_status.float_exception_flags |=3D tstat.floa=
+t_exception_flags;<br>
+<br>
+@@ -1902,7 +1902,7 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0for (i =3D 0; i &lt; nels; i++) {=C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0float_status tstat =3D env-&gt;fp_status;=
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_e=
+xcpt_flags, &amp;tstat);=C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0t.fld =3D tp##_mul(xa-&gt;fld, xb-&gt;fld=
+, &amp;tstat);=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;fp_status.float_exception_flags |=
+=3D tstat.float_exception_flags; \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+@@ -1942,7 +1942,7 @@ void helper_xsmulqp(CPUPPCState *env, uint32_t opcode=
+,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tstat.float_rounding_mode =3D float_round=
+_to_odd;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-=C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);<br>
++=C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_excpt_flags, &a=
+mp;tstat);<br>
+=C2=A0 =C2=A0 =C2=A0t.f128 =3D float128_mul(xa-&gt;f128, xb-&gt;f128, &amp;=
+tstat);<br>
+=C2=A0 =C2=A0 =C2=A0env-&gt;fp_status.float_exception_flags |=3D tstat.floa=
+t_exception_flags;<br>
+<br>
+@@ -1976,7 +1976,7 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0for (i =3D 0; i &lt; nels; i++) {=C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0float_status tstat =3D env-&gt;fp_status;=
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_e=
+xcpt_flags, &amp;tstat);=C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0t.fld =3D tp##_div(xa-&gt;fld, xb-&gt;fld=
+, &amp;tstat);=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;fp_status.float_exception_flags |=
+=3D tstat.float_exception_flags;=C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+@@ -2019,7 +2019,7 @@ void helper_xsdivqp(CPUPPCState *env, uint32_t opcode=
+,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tstat.float_rounding_mode =3D float_round=
+_to_odd;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-=C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);<br>
++=C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_excpt_flags, &a=
+mp;tstat);<br>
+=C2=A0 =C2=A0 =C2=A0t.f128 =3D float128_div(xa-&gt;f128, xb-&gt;f128, &amp;=
+tstat);<br>
+=C2=A0 =C2=A0 =C2=A0env-&gt;fp_status.float_exception_flags |=3D tstat.floa=
+t_exception_flags;<br>
+<br>
+@@ -2095,7 +2095,7 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt, ppc=
+_vsr_t *xb)=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0for (i =3D 0; i &lt; nels; i++) {=C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0float_status tstat =3D env-&gt;fp_status;=
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_e=
+xcpt_flags, &amp;tstat);=C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0t.fld =3D tp##_sqrt(xb-&gt;fld, &amp;tsta=
+t);=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;fp_status.float_exception_flags |=
+=3D tstat.float_exception_flags; \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+@@ -2143,7 +2143,7 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt, ppc=
+_vsr_t *xb)=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0for (i =3D 0; i &lt; nels; i++) {=C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0float_status tstat =3D env-&gt;fp_status;=
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_e=
+xcpt_flags, &amp;tstat);=C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0t.fld =3D tp##_sqrt(xb-&gt;fld, &amp;tsta=
+t);=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0t.fld =3D tp##_div(tp##_one, t.fld, &amp;=
+tstat);=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;fp_status.float_exception_flags |=
+=3D tstat.float_exception_flags; \<br>
+@@ -2305,7 +2305,7 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0for (i =3D 0; i &lt; nels; i++) {=C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0float_status tstat =3D env-&gt;fp_status;=
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_e=
+xcpt_flags, &amp;tstat);=C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (r2sp &amp;&amp; (tstat.float_rounding=
+_mode =3D=3D float_round_nearest_even)) {\<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 * Avoid double rounding er=
+rors by rounding the intermediate=C2=A0 =C2=A0 =C2=A0 \<br>
+@@ -2886,7 +2886,7 @@ uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t =
+xb)<br>
+=C2=A0 =C2=A0 =C2=A0uint64_t result, sign, exp, frac;<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0float_status tstat =3D env-&gt;fp_status;<br>
+-=C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);<br>
++=C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_excpt_flags, &a=
+mp;tstat);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0sign =3D extract64(xb, 63,=C2=A0 1);<br>
+=C2=A0 =C2=A0 =C2=A0exp=C2=A0 =3D extract64(xb, 52, 11);<br>
+@@ -2924,7 +2924,7 @@ uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t =
+xb)<br>
+=C2=A0uint64_t helper_xscvspdpn(CPUPPCState *env, uint64_t xb)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0float_status tstat =3D env-&gt;fp_status;<br>
+-=C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);<br>
++=C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_excpt_flags, &a=
+mp;tstat);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0return float32_to_float64(xb &gt;&gt; 32, &amp;tstat);<=
+br>
+=C2=A0}<br>
+@@ -3327,7 +3327,7 @@ void helper_xsrqpi(CPUPPCState *env, uint32_t opcode,=
+<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0tstat =3D env-&gt;fp_status;<br>
+-=C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);<br>
++=C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_excpt_flags, &a=
+mp;tstat);<br>
+=C2=A0 =C2=A0 =C2=A0set_float_rounding_mode(rmode, &amp;tstat);<br>
+=C2=A0 =C2=A0 =C2=A0t.f128 =3D float128_round_to_int(xb-&gt;f128, &amp;tsta=
+t);<br>
+=C2=A0 =C2=A0 =C2=A0env-&gt;fp_status.float_exception_flags |=3D tstat.floa=
+t_exception_flags;<br>
+@@ -3384,7 +3384,7 @@ void helper_xsrqpxp(CPUPPCState *env, uint32_t opcode=
+,<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0tstat =3D env-&gt;fp_status;<br>
+-=C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);<br>
++=C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_excpt_flags, &a=
+mp;tstat);<br>
+=C2=A0 =C2=A0 =C2=A0set_float_rounding_mode(rmode, &amp;tstat);<br>
+=C2=A0 =C2=A0 =C2=A0round_res =3D float128_to_floatx80(xb-&gt;f128, &amp;ts=
+tat);<br>
+=C2=A0 =C2=A0 =C2=A0t.f128 =3D floatx80_to_float128(round_res, &amp;tstat);=
+<br>
+@@ -3415,7 +3415,7 @@ void helper_xssqrtqp(CPUPPCState *env, uint32_t opcod=
+e,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tstat.float_rounding_mode =3D float_round=
+_to_odd;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-=C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);<br>
++=C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_excpt_flags, &a=
+mp;tstat);<br>
+=C2=A0 =C2=A0 =C2=A0t.f128 =3D float128_sqrt(xb-&gt;f128, &amp;tstat);<br>
+=C2=A0 =C2=A0 =C2=A0env-&gt;fp_status.float_exception_flags |=3D tstat.floa=
+t_exception_flags;<br>
+<br>
+@@ -3449,7 +3449,7 @@ void helper_xssubqp(CPUPPCState *env, uint32_t opcode=
+,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tstat.float_rounding_mode =3D float_round=
+_to_odd;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-=C2=A0 =C2=A0 set_float_exception_flags(0, &amp;tstat);<br>
++=C2=A0 =C2=A0 set_float_exception_flags(env-&gt;default_fp_excpt_flags, &a=
+mp;tstat);<br>
+=C2=A0 =C2=A0 =C2=A0t.f128 =3D float128_sub(xa-&gt;f128, xb-&gt;f128, &amp;=
+tstat);<br>
+=C2=A0 =C2=A0 =C2=A0env-&gt;fp_status.float_exception_flags |=3D tstat.floa=
+t_exception_flags;<br>
+<br>
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.in=
+c.c<br>
+index 53995f62ea..ab1a6db4f1 100644<br>
+--- a/target/ppc/translate_init.inc.c<br>
++++ b/target/ppc/translate_init.inc.c<br>
+@@ -10736,6 +10736,8 @@ static void ppc_cpu_reset(CPUState *s)<br>
+=C2=A0 =C2=A0 =C2=A0/* tininess for underflow is detected before rounding *=
+/<br>
+=C2=A0 =C2=A0 =C2=A0set_float_detect_tininess(float_tininess_before_roundin=
+g,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;env-&gt;fp_status);<br>
++=C2=A0 =C2=A0 /* hardfloat needs inexact flag already set */<br>
++=C2=A0 =C2=A0 env-&gt;default_fp_excpt_flags =3D (cpu-&gt;hardfloat ? floa=
+t_flag_inexact : 0);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0for (i =3D 0; i &lt; ARRAY_SIZE(env-&gt;spr_cb); i++) {=
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ppc_spr_t *spr =3D &amp;env-&gt;spr_cb[i]=
+;<br>
+@@ -10868,6 +10870,7 @@ static Property ppc_cpu_properties[] =3D {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 false),<br>
+=C2=A0 =C2=A0 =C2=A0DEFINE_PROP_BOOL(&quot;pre-3.0-migration&quot;, PowerPC=
+CPU, pre_3_0_migration,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 false),<br>
++=C2=A0 =C2=A0 DEFINE_PROP_BOOL(&quot;hardfloat&quot;, PowerPCCPU, hardfloa=
+t, true),<br>
+=C2=A0 =C2=A0 =C2=A0DEFINE_PROP_END_OF_LIST(),<br>
+=C2=A0};<br>
+<br>
+-- <br>
+2.21.1<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div>
+
+--000000000000f8923605a2f0036e--
 
