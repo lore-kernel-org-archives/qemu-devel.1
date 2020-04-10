@@ -1,122 +1,75 @@
 Return-Path: <SRS0=FIxb=52=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E33BBC2BA19
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 00:14:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0533CC2BA19
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 00:21:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9965B20768
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 00:14:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="riRjD/lj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9965B20768
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id CB9FF2074F
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 00:21:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB9FF2074F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMhJ6-0001Ml-QB
-	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 20:14:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59042)
+	id 1jMhQW-0003oQ-U7
+	for qemu-devel@archiver.kernel.org; Thu, 09 Apr 2020 20:21:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59656)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1jMhI5-0000ST-GN
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 20:13:03 -0400
+ (envelope-from <bounces@canonical.com>) id 1jMhPp-0003JT-4d
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 20:21:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1jMhI3-0007y9-33
- for qemu-devel@nongnu.org; Thu, 09 Apr 2020 20:13:00 -0400
-Received: from mail-eopbgr70115.outbound.protection.outlook.com
- ([40.107.7.115]:34368 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jMhI2-0007xZ-BV; Thu, 09 Apr 2020 20:12:59 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eI72pAsbJXdbFPWzfz7tJ+zsjnIn2SHhy2c3QBRlXwbXJQnfd4RRWgPjnEQCwk2CF38g+FO1XAInCDYElj1bBRReOo67xjto79CP0VWjJgE5ctjsU4e1h+njZg/pL6jiJuFv6B1UYzmApj+4qSKdH5viDFZv0IjUNKTLMksZ2z45zRViF134WnqupXE7avRKFn5pmDUYlk49CeJPcSHg6PdtCP+2zoQs29bnwKHDrENq6IZjQhl/sq5w2za7dznXFNcaHnxRzZMmwI0TN2Pnnnn8ao3A5+Nqzu4tte78uIWiVReEjQJwD95jvDRRFi/U+Z7YwPTIhNofhF7ZlnskJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y1/1hmnxebuCcJf9si73Ri3GjrhrOL8aOFJBFxw/OxQ=;
- b=T0ybMQvM+uPAlRepk7LZAiH07KFmoYyAtIryT9HW81y5rg04MjkqnDiZdkOy1X+NjkwfQ1cEZ9Vn5OYe5zJAPzzz30s+BBGklflMk0XiSZsC4R2M+71/i8u56zR4/rJrWT26V2kU26LlZOKcxe2F7jscSlNaTlryzJ0T5VQbbHJhQvtI8M5E/7aXUwdnnPIAAFTZYid9jsREXHOdJijGeHo5Sg313VY0bPg5OGIG3SLm9dFHCqlyWk247uP7So+D3OkoUqCOixXsKESgTAFFdJ4A0jzr5yTxw0b4y3cFhjVpHvI1Mm/5SYZnMn7BzPc1RKY1NTIm1xzoPe9BN9b6PA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y1/1hmnxebuCcJf9si73Ri3GjrhrOL8aOFJBFxw/OxQ=;
- b=riRjD/ljxbVa8x81SsHL4gHCI3f7hnH8NFDnBaz7OMxnGxl5zpuJsxEc7g4TIQLymOvsvLHY5MltQiudcqHR1LCBd6mZ5iQA3Dsp3wVm6dYJD3l/ArN0euy77ShI5nzY8uLJOe21dAptwUZ780jqqh6hHbUxyeRSm73ORLaLcQY=
-Received: from AM6PR08MB5048.eurprd08.prod.outlook.com (2603:10a6:20b:ee::31)
- by AM6PR08MB4421.eurprd08.prod.outlook.com (2603:10a6:20b:71::23)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.17; Fri, 10 Apr
- 2020 00:12:54 +0000
-Received: from AM6PR08MB5048.eurprd08.prod.outlook.com
- ([fe80::d530:4303:deff:33b3]) by AM6PR08MB5048.eurprd08.prod.outlook.com
- ([fe80::d530:4303:deff:33b3%6]) with mapi id 15.20.2900.015; Fri, 10 Apr 2020
- 00:12:54 +0000
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Alberto Garcia
- <berto@igalia.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Subject: Re: [PATCH v12 2/3] qcow2: Allow writing compressed data of multiple
- clusters
-Thread-Topic: [PATCH v12 2/3] qcow2: Allow writing compressed data of multiple
- clusters
-Thread-Index: AQHVqQoqZLOxCCmSgEmNHsQclBfRxKhxy8gAgAAedgCAAFZd9g==
-Date: Fri, 10 Apr 2020 00:12:54 +0000
-Message-ID: <AM6PR08MB504841785FF8C1149D70DFC3F4C10@AM6PR08MB5048.eurprd08.prod.outlook.com>
-References: <1575288906-551879-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1575288906-551879-3-git-send-email-andrey.shinkevich@virtuozzo.com>
- <w51y2r41u4d.fsf@maestria.local.igalia.com>,
- <5bbb126f-37c0-f107-c3b3-667ed43670fa@virtuozzo.com>
-In-Reply-To: <5bbb126f-37c0-f107-c3b3-667ed43670fa@virtuozzo.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
-x-originating-ip: [109.252.115.13]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 54369bae-ed4b-405c-501b-08d7dce3ea78
-x-ms-traffictypediagnostic: AM6PR08MB4421:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB44214BEC480B38EEE62F5CE6F4DE0@AM6PR08MB4421.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3631;
-x-forefront-prvs: 0369E8196C
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB5048.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(39840400004)(376002)(396003)(136003)(366004)(346002)(4326008)(53546011)(6506007)(71200400001)(7696005)(110136005)(54906003)(316002)(55016002)(9686003)(8676002)(81156014)(8936002)(107886003)(2906002)(33656002)(19627405001)(81166007)(186003)(86362001)(44832011)(66446008)(66476007)(5660300002)(66946007)(76116006)(64756008)(52536014)(66556008)(26005)(478600001);
- DIR:OUT; SFP:1102; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: fW4BMr9gKLf/xpETZHD9HVYP2NCdUocUyz7RhXCTUsagqEgBQJLLD504oQyM+OfC5iV8iXiKB9qwwm7C2sgjP5ITc3emERDc9/x2zoUdk+UPSk6nVXbqr/z1ZQp2avGtJmxSTYiepOfxEu4VR/Plqfiymdkj681NykpvLmqrXUqDvCwoLoTHUhpyyhpQxP9dNLuAkOUnhYOUU3+vxoFOPhgC7eCtcFEWPgWdCf0/YwdAyj5OxaD5JEPwHfYQFDjvwSayhmJIM2eXHbeglDfO4sw9z4CnGgPoWizgB8fkCVZW87lnIxAzB49W3eiYwzdIfTpRN5A1iYz9JDr+A9a2rnadUzwciBhqjkB+9abWu5wPUFtXptZEGGJICK5iPudmD7RO3MSGdndRlMsIexAl/XHK1Kqbz8Lh+O8MNmJOX5aWsDS8t8k5EF7uo5iC0qiP
-x-ms-exchange-antispam-messagedata: YFIAcgt543oXrJYVqwmUJPUoQ2SSqiGcjew7a6opTeAu9oV1u5q/wybvkDBSvg5rA+cLFX3iu6tek2VYk/jrA95yAqbKKg5XGezpKTvQX6GdhF+b9PU1m4UrKAGEAmV3jQVeuT106AyeZzSaNbZSZg==
-Content-Type: multipart/alternative;
- boundary="_000_AM6PR08MB504841785FF8C1149D70DFC3F4C10AM6PR08MB5048eurp_"
+ (envelope-from <bounces@canonical.com>) id 1jMhPn-0002z4-D9
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 20:21:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41974)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jMhPn-0002xC-7H
+ for qemu-devel@nongnu.org; Thu, 09 Apr 2020 20:20:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jMhPl-0004M2-AI
+ for <qemu-devel@nongnu.org>; Fri, 10 Apr 2020 00:20:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 390C82E8109
+ for <qemu-devel@nongnu.org>; Fri, 10 Apr 2020 00:20:57 +0000 (UTC)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 54369bae-ed4b-405c-501b-08d7dce3ea78
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Apr 2020 00:12:54.4415 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FyN4qhk/Yer39SD75wNIfm+aJVhe6BuunNjbcErw3o6xC+ZswDTyJhiBIxoD5WdsS0sBygaVYwBBCIQF3HQuR2ZnhG3Dua/wG6V9n3FDulg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4421
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.7.115
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 10 Apr 2020 00:12:29 -0000
+From: Babu Moger <1871842@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: babumoger e-philipp imammedo
+X-Launchpad-Bug-Reporter: Philipp Eppelt (e-philipp)
+X-Launchpad-Bug-Modifier: Babu Moger (babumoger)
+References: <158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com>
+ <20200409160037.431ec776@redhat.com>
+Message-Id: <5f7b85c6-09af-1064-f7f8-66ea7abf3ae3@amd.com>
+Subject: Re: [Bug 1871842] [NEW] AMD CPUID leaf 0x8000'0008 reported number of
+ cores inconsistent with ACPI.MADT
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 8a0634044ec1020509e74328b303832b37249af9
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -125,316 +78,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Reply-To: Bug 1871842 <1871842@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200410001229.L-cr1IUcJe67N1IxMAHcDDuR4KXaXw1Sqw352Q5fokw@z>
 
---_000_AM6PR08MB504841785FF8C1149D70DFC3F4C10AM6PR08MB5048eurp_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Philipp,
+  Can you please check if this patch works for you.
 
-We could assign indices to the clusters/chunks and improve the algorithm to=
- write them down on the disk in the same order adjacently. If you find it f=
-easible for QEMU, I'd like to create a task for doing that, shall I?
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 90ffc5f..e467fee 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5831,10 +5831,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t
+index, uint32_t count,
+         }
+         *ebx =3D env->features[FEAT_8000_0008_EBX];
+         *ecx =3D 0;
+-        *edx =3D 0;
+         if (cs->nr_cores * cs->nr_threads > 1) {
+-            *ecx |=3D (cs->nr_cores * cs->nr_threads) - 1;
++            unsigned long max_apicids, bits_required;
++
++            max_apicids =3D (cs->nr_cores * cs->nr_threads) - 1;
++            if (max_apicids) {
++                /* Find out the number of bits to represent all the
+apicids */
++                bits_required =3D find_last_bit(&max_apicids,
+BITS_PER_BYTE) + 1;
++                *ecx |=3D bits_required << 12 | max_apicids;
++            }
+         }
++        *edx =3D 0;
+         break;
+     case 0x8000000A:
+         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
 
-Andrey
 
-________________________________
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Sent: Thursday, April 9, 2020 9:39 PM
-To: Alberto Garcia <berto@igalia.com>; Andrey Shinkevich <andrey.shinkevich=
-@virtuozzo.com>; qemu-devel@nongnu.org <qemu-devel@nongnu.org>; qemu-block@=
-nongnu.org <qemu-block@nongnu.org>
-Cc: kwolf@redhat.com <kwolf@redhat.com>; armbru@redhat.com <armbru@redhat.c=
-om>; mreitz@redhat.com <mreitz@redhat.com>; Denis Lunev <den@virtuozzo.com>
-Subject: Re: [PATCH v12 2/3] qcow2: Allow writing compressed data of multip=
-le clusters
+On 4/9/20 9:00 AM, Igor Mammedov wrote:
+> On Thu, 09 Apr 2020 12:58:11 -0000
+> Philipp Eppelt <1871842@bugs.launchpad.net> wrote:
+> =
 
-09.04.2020 19:50, Alberto Garcia wrote:
-> On Mon 02 Dec 2019 01:15:05 PM CET, Andrey Shinkevich wrote:
->> +static coroutine_fn int
->> +qcow2_co_pwritev_compressed_part(BlockDriverState *bs,
->> +                                 uint64_t offset, uint64_t bytes,
->> +                                 QEMUIOVector *qiov, size_t qiov_offset=
-)
->> +{
->> +    BDRVQcow2State *s =3D bs->opaque;
->> +    AioTaskPool *aio =3D NULL;
->> +    int ret =3D 0;
->> +
->> +    if (has_data_file(bs)) {
->> +        return -ENOTSUP;
->> +    }
->> +
->> +    if (bytes =3D=3D 0) {
->> +        /*
->> +         * align end of file to a sector boundary to ease reading with
->> +         * sector based I/Os
->> +         */
->> +        int64_t len =3D bdrv_getlength(bs->file->bs);
->> +        if (len < 0) {
->> +            return len;
->> +        }
->> +        return bdrv_co_truncate(bs->file, len, false, PREALLOC_MODE_OFF=
-, NULL);
->> +    }
->> +
->> +    if (offset_into_cluster(s, offset)) {
->> +        return -EINVAL;
->> +    }
->> +
->> +    while (bytes && aio_task_pool_status(aio) =3D=3D 0) {
->> +        uint64_t chunk_size =3D MIN(bytes, s->cluster_size);
->> +
->> +        if (!aio && chunk_size !=3D bytes) {
->> +            aio =3D aio_task_pool_new(QCOW2_MAX_WORKERS);
->> +        }
->> +
->> +        ret =3D qcow2_add_task(bs, aio, qcow2_co_pwritev_compressed_tas=
-k_entry,
->> +                             0, 0, offset, chunk_size, qiov, qiov_offse=
-t, NULL);
->> +        if (ret < 0) {
->> +            break;
->> +        }
->> +        qiov_offset +=3D chunk_size;
->> +        offset +=3D chunk_size;
->> +        bytes -=3D chunk_size;
->> +    }
+>> Public bug reported:
+>>
+>> Setup:
+>> CPU: AMD EPYC-v2 or host's EPYC cpu
+>> Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
+>> qemu version: self build
+>> git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
+>> config: Configured with: '../configure' '--target-list=3Dx86_64-softmmu,=
+mips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aa=
+rch64-softmmu,arm-softmmu' '--prefix=3D/opt/qemu-master'
+>>
+>> Cmdline: =
+
+>> qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/=
+bin/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco ,=
+ ... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu=
+ EPYC-v2 -m 4G -smp 4 =
+
+>>
+>> Issue:
+>> We are developing an microkernel operating system called L4Re. We recent=
+ly got an AMD EPYC server for testing and we couldn't execute SMP tests of =
+our system when running Linux + qemu + VM w/ L4Re.
+>> In fact, the kernel did not recognize any APs at all. On AMD CPUs the ke=
+rnel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[=
+NC] or [ApicIdSize].  [0][1]
+>>
+>> The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x1=
+8cf757 ECX: 0x703f EDX: 0x1000
+>> The lower four bits of ECX are the [NC] field and all set.
+>>
+>> When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically a=
+s replacement and addition to the above cmdline) the CPUID leaf shows: EAX:=
+ 0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
+>> Note, ECX is zero. Indicating that this is no SMP capabale CPU.
+>>
+>> I'm debugging it using my local machine and the QEMU provided EPYC-v2
+>> CPU model and it is reproducible there as well and reports:  EAX:
+>> 0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
+>>
+>> I checked other AMD based CPU models (phenom, opteron_g3/g5) and they be=
+have the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
+>> I believe that behavior here is wrong as ECX[NC] should report the numbe=
+r of cores per processor, as stated in the AMD manual [2] p.584. In my unde=
+rstanding -smp 4 should then lead to ECX[NC] =3D 0x3.
+>>
+>> The following table shows my findings with the -smp option:
+>> Option | Qemu guest observed ECX value
+>> -smp 4 | 0x0
+>> -smp 4,cores=3D4  | 0x3
+>> -smp 4,cores=3D2,thread=3D2 | 0x3
+>> -smp 4,cores=3D4,threads=3D2 | QEMU boot error: topology false.
+>>
+>> Now, I'm asking myself how the terminology of the AMD manual maps to QEM=
+U's -smp option.
+>> Obviously, nr_cores and nr_threads correspond to the cores and threads o=
+ptions on the cmdline and cores * threads <=3D 4 (in this example), but wha=
+t corresponds the X in -smp X to?
+> I'd say X corresponds to number of logical CPUs.
+> Depending on presence of other options these are distributed among them i=
+n magical manner
+> (see pc_smp_parse() for starters)
+> =
+
+>> Querying 0x8000'0008 on the physical processor results in different
+>> reports than quering QEMU's model as does it with -enable-kvm -cpu host.
+>>
+>> Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
+>> CPU leave reports a single core processor.
+> it matches -smp X as it should be.
+> =
+
+>>
+>> This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
+>> wrong number.
+> CCed author of recent epyc patches who might know how AMD should work bet=
+ter than me.
+> =
+
+>>
+>> Please let me know, if you need more information from my side.
+>>
+>>
+>> [0] https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2F=
+github.com%2Fkernkonzept%2Ffiasco%2Fblob%2F522ccc5f29ab120213cf02d71328e2b8=
+79cbbd19%2Fsrc%2Fkern%2Fia32%2Fkernel_thread-ia32.cpp%23L109&amp;data=3D02%=
+7C01%7Cbabu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4=
+884e608e11a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=3DhcFJzLAVQoI=
+h5IN9CP%2F9cUQNOZoBnpRA6FliJur1wzQ%3D&amp;reserved=3D0
+>> [1] https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2F=
+github.com%2Fkernkonzept%2Ffiasco%2Fblob%2F522ccc5f29ab120213cf02d71328e2b8=
+79cbbd19%2Fsrc%2Fkern%2Fia32%2Fcpu-ia32.cpp%23L1120&amp;data=3D02%7C01%7Cba=
+bu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e1=
+1a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=3DANJIbYKbwfq2bDelH%2F=
+RLKnDPIUZc1BwxHspmgxLU7gs%3D&amp;reserved=3D0
+>> [2] https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2F=
+github.com%2Fqemu%2Fqemu%2Fblob%2Ff2a8261110c32c4dccd84e774d8dd7a0524e00fb%=
+2Ftarget%2Fi386%2Fcpu.c%23L5835&amp;data=3D02%7C01%7Cbabu.moger%40amd.com%7=
+C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C=
+0%7C637220379083511672&amp;sdata=3Doj3mv9e5YOzUsfUjXK44gC8LybyWgMKo8JBIrRR%=
+2BmDA%3D&amp;reserved=3D0
+>> [3] https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2F=
+www.amd.com%2Fsystem%2Ffiles%2FTechDocs%2F24594.pdf&amp;data=3D02%7C01%7Cba=
+bu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e1=
+1a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=3D7Yr3J9ihlqSqXCXKN5JJ=
+NTByO3NGI%2BGMz2EqBF2Y4hw%3D&amp;reserved=3D0
+>>
+>> ** Affects: qemu
+>>      Importance: Undecided
+>>          Status: New
+>>
 >
-> This patch allows the user to write more than one cluster of compressed
-> data at a time, and it does so by splitting the request into many
-> cluster-sized requests and using qcow2_add_task() for each one of them.
->
-> What happens however is that there's no guarantee that the requests are
-> processed in the same order that they were added.
->
-> One consequence is that running on an empty qcow2 file a command as
-> simple as this one:
->
->     qemu-io -c 'write -c 0 256k' image.qcow2
->
-> does not always produce the same results.
->
-> This does not have any user-visible consequences for the guest. In all
-> cases the data is correctly written, it's just that the ordering of the
-> compressed clusters (and therefore the contents of the L2 entries) will
-> be different each time.
->
-> Because of this a test cannot expect that running the same commands on
-> an empty image produces always the same results.
->
-> Is this something that we should be concerned about?
->
 
-Parallel writing compressed clusters is significant improvement, as it allo=
-w compressing in really parallel threads.
+-- =
 
-Generally, async parallel issuing of several requests gives more performanc=
-e than handling peaces one-by-one, mirror works on this basis and it is fas=
-t. I've already moved qcow2 to this idea (aio tasks in qcow2 code), and in =
-progress of moving backup job. So, I think that asynchrony and ambiguity wo=
-uld be native for block-layer anyway.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1871842
 
-Hmm. Still, what about cluster sequence? For normal clusters there may be s=
-imple thing to do: preallocation (at least of metadata). So, we can pre-cre=
-ate cluster sequence.. But what to do with compressed clusters if we want s=
-pecific order for them, I don't know. On the other hand, ordering of normal=
- cluster may make sence: it should increase performnace of following IO. Bu=
-t for compressed clusters it's not the case.
+Title:
+  AMD CPUID leaf 0x8000'0008 reported number of cores  inconsistent with
+  ACPI.MADT
 
-So, I don't think we should make specific workaround for testing... What ex=
-actly is the case?
+Status in QEMU:
+  New
 
---
-Best regards,
-Vladimir
+Bug description:
+  Setup:
+  CPU: AMD EPYC-v2 or host's EPYC cpu
+  Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
+  qemu version: self build
+  git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
+  config: Configured with: '../configure' '--target-list=3Dx86_64-softmmu,m=
+ips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aar=
+ch64-softmmu,arm-softmmu' '--prefix=3D/opt/qemu-master'
 
---_000_AM6PR08MB504841785FF8C1149D70DFC3F4C10AM6PR08MB5048eurp_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+  Cmdline: =
 
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
-1">
-<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
-ttom:0;} </style>
-</head>
-<body dir=3D"ltr">
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);">
-We could assign indices to the clusters/chunks and improve the algorithm to=
- write them down on the disk in the same order adjacently. If you find it f=
-easible for QEMU, I'd like to create a task for doing that, shall I?</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);">
-<br>
-</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);">
-Andrey</div>
-<div id=3D"appendonsend"></div>
-<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
-t; color:rgb(0,0,0)">
-<br>
-</div>
-<hr tabindex=3D"-1" style=3D"display:inline-block; width:98%">
-<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" co=
-lor=3D"#000000" style=3D"font-size:11pt"><b>From:</b> Vladimir Sementsov-Og=
-ievskiy &lt;vsementsov@virtuozzo.com&gt;<br>
-<b>Sent:</b> Thursday, April 9, 2020 9:39 PM<br>
-<b>To:</b> Alberto Garcia &lt;berto@igalia.com&gt;; Andrey Shinkevich &lt;a=
-ndrey.shinkevich@virtuozzo.com&gt;; qemu-devel@nongnu.org &lt;qemu-devel@no=
-ngnu.org&gt;; qemu-block@nongnu.org &lt;qemu-block@nongnu.org&gt;<br>
-<b>Cc:</b> kwolf@redhat.com &lt;kwolf@redhat.com&gt;; armbru@redhat.com &lt=
-;armbru@redhat.com&gt;; mreitz@redhat.com &lt;mreitz@redhat.com&gt;; Denis =
-Lunev &lt;den@virtuozzo.com&gt;<br>
-<b>Subject:</b> Re: [PATCH v12 2/3] qcow2: Allow writing compressed data of=
- multiple clusters</font>
-<div>&nbsp;</div>
-</div>
-<div class=3D"BodyFragment"><font size=3D"2"><span style=3D"font-size:11pt"=
->
-<div class=3D"PlainText">09.04.2020 19:50, Alberto Garcia wrote:<br>
-&gt; On Mon 02 Dec 2019 01:15:05 PM CET, Andrey Shinkevich wrote:<br>
-&gt;&gt; &#43;static coroutine_fn int<br>
-&gt;&gt; &#43;qcow2_co_pwritev_compressed_part(BlockDriverState *bs,<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; uint64_t offset, u=
-int64_t bytes,<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; QEMUIOVector *qiov=
-, size_t qiov_offset)<br>
-&gt;&gt; &#43;{<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp; BDRVQcow2State *s =3D bs-&gt;opaque;<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp; AioTaskPool *aio =3D NULL;<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp; int ret =3D 0;<br>
-&gt;&gt; &#43;<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp; if (has_data_file(bs)) {<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return -ENOTSUP;<b=
-r>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp; }<br>
-&gt;&gt; &#43;<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp; if (bytes =3D=3D 0) {<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /*<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * align end =
-of file to a sector boundary to ease reading with<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * sector bas=
-ed I/Os<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int64_t len =3D bd=
-rv_getlength(bs-&gt;file-&gt;bs);<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (len &lt; 0) {<=
-br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp; return len;<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return bdrv_co_tru=
-ncate(bs-&gt;file, len, false, PREALLOC_MODE_OFF, NULL);<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp; }<br>
-&gt;&gt; &#43;<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp; if (offset_into_cluster(s, offset)) {<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return -EINVAL;<br=
->
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp; }<br>
-&gt;&gt; &#43;<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp; while (bytes &amp;&amp; aio_task_pool_stat=
-us(aio) =3D=3D 0) {<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; uint64_t chunk_siz=
-e =3D MIN(bytes, s-&gt;cluster_size);<br>
-&gt;&gt; &#43;<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (!aio &amp;&amp=
-; chunk_size !=3D bytes) {<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp; aio =3D aio_task_pool_new(QCOW2_MAX_WORKERS);<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
-&gt;&gt; &#43;<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret =3D qcow2_add_=
-task(bs, aio, qcow2_co_pwritev_compressed_task_entry,<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0, 0, offset, chunk_size, qiov, qiov_offse=
-t, NULL);<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (ret &lt; 0) {<=
-br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp; break;<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; qiov_offset &#43;=
-=3D chunk_size;<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; offset &#43;=3D ch=
-unk_size;<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bytes -=3D chunk_s=
-ize;<br>
-&gt;&gt; &#43;&nbsp;&nbsp;&nbsp; }<br>
-&gt; <br>
-&gt; This patch allows the user to write more than one cluster of compresse=
-d<br>
-&gt; data at a time, and it does so by splitting the request into many<br>
-&gt; cluster-sized requests and using qcow2_add_task() for each one of them=
-.<br>
-&gt; <br>
-&gt; What happens however is that there's no guarantee that the requests ar=
-e<br>
-&gt; processed in the same order that they were added.<br>
-&gt; <br>
-&gt; One consequence is that running on an empty qcow2 file a command as<br=
->
-&gt; simple as this one:<br>
-&gt; <br>
-&gt;&nbsp;&nbsp;&nbsp;&nbsp; qemu-io -c 'write -c 0 256k' image.qcow2<br>
-&gt; <br>
-&gt; does not always produce the same results.<br>
-&gt; <br>
-&gt; This does not have any user-visible consequences for the guest. In all=
-<br>
-&gt; cases the data is correctly written, it's just that the ordering of th=
-e<br>
-&gt; compressed clusters (and therefore the contents of the L2 entries) wil=
-l<br>
-&gt; be different each time.<br>
-&gt; <br>
-&gt; Because of this a test cannot expect that running the same commands on=
-<br>
-&gt; an empty image produces always the same results.<br>
-&gt; <br>
-&gt; Is this something that we should be concerned about?<br>
-&gt; <br>
-<br>
-Parallel writing compressed clusters is significant improvement, as it allo=
-w compressing in really parallel threads.<br>
-<br>
-Generally, async parallel issuing of several requests gives more performanc=
-e than handling peaces one-by-one, mirror works on this basis and it is fas=
-t. I've already moved qcow2 to this idea (aio tasks in qcow2 code), and in =
-progress of moving backup job. So,
- I think that asynchrony and ambiguity would be native for block-layer anyw=
-ay.<br>
-<br>
-Hmm. Still, what about cluster sequence? For normal clusters there may be s=
-imple thing to do: preallocation (at least of metadata). So, we can pre-cre=
-ate cluster sequence.. But what to do with compressed clusters if we want s=
-pecific order for them, I don't
- know. On the other hand, ordering of normal cluster may make sence: it sho=
-uld increase performnace of following IO. But for compressed clusters it's =
-not the case.<br>
-<br>
-So, I don't think we should make specific workaround for testing... What ex=
-actly is the case?<br>
-<br>
--- <br>
-Best regards,<br>
-Vladimir<br>
-</div>
-</span></font></div>
-</body>
-</html>
+  qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/b=
+in/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , =
+... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu =
+EPYC-v2 -m 4G -smp 4 =
 
---_000_AM6PR08MB504841785FF8C1149D70DFC3F4C10AM6PR08MB5048eurp_--
+
+  Issue:
+  We are developing an microkernel operating system called L4Re. We recentl=
+y got an AMD EPYC server for testing and we couldn't execute SMP tests of o=
+ur system when running Linux + qemu + VM w/ L4Re.
+  In fact, the kernel did not recognize any APs at all. On AMD CPUs the ker=
+nel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[N=
+C] or [ApicIdSize].  [0][1]
+
+  The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18=
+cf757 ECX: 0x703f EDX: 0x1000
+  The lower four bits of ECX are the [NC] field and all set.
+
+  When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as=
+ replacement and addition to the above cmdline) the CPUID leaf shows: EAX: =
+0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
+  Note, ECX is zero. Indicating that this is no SMP capabale CPU.
+
+  I'm debugging it using my local machine and the QEMU provided EPYC-v2
+  CPU model and it is reproducible there as well and reports:  EAX:
+  0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
+
+  I checked other AMD based CPU models (phenom, opteron_g3/g5) and they beh=
+ave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
+  I believe that behavior here is wrong as ECX[NC] should report the number=
+ of cores per processor, as stated in the AMD manual [2] p.584. In my under=
+standing -smp 4 should then lead to ECX[NC] =3D 0x3.
+
+  The following table shows my findings with the -smp option:
+  Option | Qemu guest observed ECX value
+  -smp 4 | 0x0
+  -smp 4,cores=3D4  | 0x3
+  -smp 4,cores=3D2,thread=3D2 | 0x3
+  -smp 4,cores=3D4,threads=3D2 | QEMU boot error: topology false.
+
+  Now, I'm asking myself how the terminology of the AMD manual maps to QEMU=
+'s -smp option.
+  Obviously, nr_cores and nr_threads correspond to the cores and threads op=
+tions on the cmdline and cores * threads <=3D 4 (in this example), but what=
+ corresponds the X in -smp X to?
+
+  Querying 0x8000'0008 on the physical processor results in different
+  reports than quering QEMU's model as does it with -enable-kvm -cpu
+  host.
+
+  Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
+  CPU leave reports a single core processor.
+
+  This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
+  wrong number.
+
+  =
+
+  Please let me know, if you need more information from my side.
+
+  =
+
+  [0] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
+28e2b879cbbd19/src/kern/ia32/kernel_thread-ia32.cpp#L109
+  [1] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
+28e2b879cbbd19/src/kern/ia32/cpu-ia32.cpp#L1120
+  [2] https://github.com/qemu/qemu/blob/f2a8261110c32c4dccd84e774d8dd7a0524=
+e00fb/target/i386/cpu.c#L5835
+  [3] https://www.amd.com/system/files/TechDocs/24594.pdf
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1871842/+subscriptions
 
