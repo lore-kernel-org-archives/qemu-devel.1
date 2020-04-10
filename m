@@ -2,63 +2,65 @@ Return-Path: <SRS0=FIxb=52=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CDF7C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 11:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB353C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 12:02:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D88DB206F7
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 11:51:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D88DB206F7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D0FA2082D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Apr 2020 12:02:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="DC8nGmik"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D0FA2082D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jMsBn-0004mj-4G
-	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 07:51:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33172)
+	id 1jMsMv-0007fr-Mp
+	for qemu-devel@archiver.kernel.org; Fri, 10 Apr 2020 08:02:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34724)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1jMs6P-0002F1-7H
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 07:45:42 -0400
+ (envelope-from <berto@igalia.com>) id 1jMsMD-00076s-IL
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 08:02:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1jMs6N-0001cD-KA
- for qemu-devel@nongnu.org; Fri, 10 Apr 2020 07:45:41 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:59284 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1jMs6J-0001Pt-ID; Fri, 10 Apr 2020 07:45:36 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 58D14C91F3E7B0E15CBA;
- Fri, 10 Apr 2020 19:45:27 +0800 (CST)
-Received: from huawei.com (10.151.151.243) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Fri, 10 Apr 2020
- 19:45:19 +0800
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-To: <imammedo@redhat.com>, <mst@redhat.com>, <xiaoguangrong.eric@gmail.com>,
- <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>, <fam@euphon.net>,
- <rth@twiddle.net>, <ehabkost@redhat.com>, <mtosatti@redhat.com>,
- <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>,
- <pbonzini@redhat.com>
-Subject: [PATCH v25 03/10] docs: APEI GHES generation and CPER record
- description
-Date: Fri, 10 Apr 2020 19:46:32 +0800
-Message-ID: <20200410114639.32844-4-gengdongjiu@huawei.com>
-X-Mailer: git-send-email 2.18.0.huawei.25
-In-Reply-To: <20200410114639.32844-1-gengdongjiu@huawei.com>
-References: <20200410114639.32844-1-gengdongjiu@huawei.com>
+ (envelope-from <berto@igalia.com>) id 1jMsMB-0000S3-IM
+ for qemu-devel@nongnu.org; Fri, 10 Apr 2020 08:02:00 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:53566)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1jMsMA-0000RX-Vp; Fri, 10 Apr 2020 08:01:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=67LcdiaciSg5e5ixDgNjH5OyipQFGgSnSPYIcV4RlD0=; 
+ b=DC8nGmikOy2edV1upargJz1iZO0Ri6vjSKmGH8orkFJeyZKLxc58Q3rBR8ohXWPFwoGXjGwCDtlPRDs8H9JB+ofr05pqKS6/YTLfLaQavfpap2SC5JLsw6kYCKHk25cvqYuflhB/R2IGVzaKAaTvc++haoAL0c0tEc0zG+c37N5c/qLWad4nQGZSQ1oXy9mOjgu0XMdMjTaxynxfR/QoT0YSSRv89hOhz85I0R+X4tvp28aYOgoCDfQgGQWlyppvJTFsAqMT9QlCinRLl/zsLEfXKhAUWdJRoTGPi3jSEQqgps8ry9hM7g98+sW1oKWf8pY83CbWt9nhf6+hzF6hxQ==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jMsM8-0006yD-L5; Fri, 10 Apr 2020 14:01:56 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jMsM8-00030M-Be; Fri, 10 Apr 2020 14:01:56 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v4 07/30] qcow2: Document the Extended L2 Entries feature
+In-Reply-To: <8c88b96f-c6f5-e06c-73e1-56001089a7ca@redhat.com>
+References: <cover.1584468723.git.berto@igalia.com>
+ <aa1ac3fbb1d42db67d930b76255c9b7b19c07b42.1584468723.git.berto@igalia.com>
+ <8c88b96f-c6f5-e06c-73e1-56001089a7ca@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Fri, 10 Apr 2020 14:01:56 +0200
+Message-ID: <w51mu7j5z2j.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Originating-IP: [10.151.151.243]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.32
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,150 +72,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhengxiang9@huawei.com, Jonathan.Cameron@huawei.com, linuxarm@huawei.com,
- gengdongjiu@huawei.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add APEI/GHES detailed design document
+On Thu 09 Apr 2020 05:12:16 PM CEST, Eric Blake wrote:
+> Hmm - raw external files are incompatible with backing files.  Should
+> we also document that extended L2 entries are incompatible with raw
+> external files?
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
----
- docs/specs/acpi_hest_ghes.rst | 110 ++++++++++++++++++++++++++++++++++++++++++
- docs/specs/index.rst          |   1 +
- 2 files changed, 111 insertions(+)
- create mode 100644 docs/specs/acpi_hest_ghes.rst
+Ok, I can also add additional checks to forbid creating such images.
 
-diff --git a/docs/specs/acpi_hest_ghes.rst b/docs/specs/acpi_hest_ghes.rst
-new file mode 100644
-index 0000000..68f1fbe
---- /dev/null
-+++ b/docs/specs/acpi_hest_ghes.rst
-@@ -0,0 +1,110 @@
-+APEI tables generating and CPER record
-+======================================
-+
-+..
-+   Copyright (c) 2020 HUAWEI TECHNOLOGIES CO., LTD.
-+
-+   This work is licensed under the terms of the GNU GPL, version 2 or later.
-+   See the COPYING file in the top-level directory.
-+
-+Design Details
-+--------------
-+
-+::
-+
-+         etc/acpi/tables                           etc/hardware_errors
-+      ====================                   ===============================
-+  + +--------------------------+            +----------------------------+
-+  | | HEST                     | +--------->|    error_block_address1    |------+
-+  | +--------------------------+ |          +----------------------------+      |
-+  | | GHES1                    | | +------->|    error_block_address2    |------+-+
-+  | +--------------------------+ | |        +----------------------------+      | |
-+  | | .................        | | |        |      ..............        |      | |
-+  | | error_status_address-----+-+ |        -----------------------------+      | |
-+  | | .................        |   |   +--->|    error_block_addressN    |------+-+---+
-+  | | read_ack_register--------+-+ |   |    +----------------------------+      | |   |
-+  | | read_ack_preserve        | +-+---+--->|     read_ack_register1     |      | |   |
-+  | | read_ack_write           |   |   |    +----------------------------+      | |   |
-+  + +--------------------------+   | +-+--->|     read_ack_register2     |      | |   |
-+  | | GHES2                    |   | | |    +----------------------------+      | |   |
-+  + +--------------------------+   | | |    |       .............        |      | |   |
-+  | | .................        |   | | |    +----------------------------+      | |   |
-+  | | error_status_address-----+---+ | | +->|     read_ack_registerN     |      | |   |
-+  | | .................        |     | | |  +----------------------------+      | |   |
-+  | | read_ack_register--------+-----+ | |  |Generic Error Status Block 1|<-----+ |   |
-+  | | read_ack_preserve        |       | |  |-+------------------------+-+        |   |
-+  | | read_ack_write           |       | |  | |          CPER          | |        |   |
-+  + +--------------------------|       | |  | |          CPER          | |        |   |
-+  | | ...............          |       | |  | |          ....          | |        |   |
-+  + +--------------------------+       | |  | |          CPER          | |        |   |
-+  | | GHESN                    |       | |  |-+------------------------+-|        |   |
-+  + +--------------------------+       | |  |Generic Error Status Block 2|<-------+   |
-+  | | .................        |       | |  |-+------------------------+-+            |
-+  | | error_status_address-----+-------+ |  | |           CPER         | |            |
-+  | | .................        |         |  | |           CPER         | |            |
-+  | | read_ack_register--------+---------+  | |           ....         | |            |
-+  | | read_ack_preserve        |            | |           CPER         | |            |
-+  | | read_ack_write           |            +-+------------------------+-+            |
-+  + +--------------------------+            |         ..........         |            |
-+                                            |----------------------------+            |
-+                                            |Generic Error Status Block N |<----------+
-+                                            |-+-------------------------+-+
-+                                            | |          CPER           | |
-+                                            | |          CPER           | |
-+                                            | |          ....           | |
-+                                            | |          CPER           | |
-+                                            +-+-------------------------+-+
-+
-+
-+(1) QEMU generates the ACPI HEST table. This table goes in the current
-+    "etc/acpi/tables" fw_cfg blob. Each error source has different
-+    notification types.
-+
-+(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
-+    also needs to populate this blob. The "etc/hardware_errors" fw_cfg blob
-+    contains an address registers table and an Error Status Data Block table.
-+
-+(3) The address registers table contains N Error Block Address entries
-+    and N Read Ack Register entries. The size for each entry is 8-byte.
-+    The Error Status Data Block table contains N Error Status Data Block
-+    entries. The size for each entry is 4096(0x1000) bytes. The total size
-+    for the "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
-+    N is the number of the kinds of hardware error sources.
-+
-+(4) QEMU generates the ACPI linker/loader script for the firmware. The
-+    firmware pre-allocates memory for "etc/acpi/tables", "etc/hardware_errors"
-+    and copies blob contents there.
-+
-+(5) QEMU generates N ADD_POINTER commands, which patch addresses in the
-+    "error_status_address" fields of the HEST table with a pointer to the
-+    corresponding "address registers" in the "etc/hardware_errors" blob.
-+
-+(6) QEMU generates N ADD_POINTER commands, which patch addresses in the
-+    "read_ack_register" fields of the HEST table with a pointer to the
-+    corresponding "read_ack_register" within the "etc/hardware_errors" blob.
-+
-+(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
-+    addresses in the "error_block_address" fields with a pointer to the
-+    respective "Error Status Data Block" in the "etc/hardware_errors" blob.
-+
-+(8) QEMU defines a third and write-only fw_cfg blob which is called
-+    "etc/hardware_errors_addr". Through that blob, the firmware can send back
-+    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
-+    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER command
-+    for the firmware. The firmware will write back the start address of
-+    "etc/hardware_errors" blob to the fw_cfg file "etc/hardware_errors_addr".
-+
-+(9) When QEMU gets a SIGBUS from the kernel, QEMU writes CPER into corresponding
-+    "Error Status Data Block", guest memory, and then injects platform specific
-+    interrupt (in case of arm/virt machine it's Synchronous External Abort) as a
-+    notification which is necessary for notifying the guest.
-+
-+(10) This notification (in virtual hardware) will be handled by the guest
-+     kernel, on receiving notification, guest APEI driver could read the CPER error
-+     and take appropriate action.
-+
-+(11) kvm_arch_on_sigbus_vcpu() uses source_id as index in "etc/hardware_errors" to
-+     find out "Error Status Data Block" entry corresponding to error source. So supported
-+     source_id values should be assigned here and not be changed afterwards to make sure
-+     that guest will write error into expected "Error Status Data Block" even if guest was
-+     migrated to a newer QEMU.
-diff --git a/docs/specs/index.rst b/docs/specs/index.rst
-index de46a8b..426632a 100644
---- a/docs/specs/index.rst
-+++ b/docs/specs/index.rst
-@@ -14,3 +14,4 @@ Contents:
-    ppc-spapr-xive
-    acpi_hw_reduced_hotplug
-    tpm
-+   acpi_hest_ghes
--- 
-1.8.3.1
-
+Berto
 
