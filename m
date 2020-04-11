@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFB77C2BA2B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF2FCC2BBC7
 	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 09:23:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A571B20857
+	by mail.kernel.org (Postfix) with ESMTPS id C7EB7212CC
 	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 09:23:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A571B20857
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7EB7212CC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNCMF-0002zQ-QF
-	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 05:23:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38906)
+	id 1jNCMH-00030X-0T
+	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 05:23:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38905)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cfontana@suse.de>) id 1jNCLJ-0001Mz-T9
+ (envelope-from <cfontana@suse.de>) id 1jNCLJ-0001My-S6
  for qemu-devel@nongnu.org; Sat, 11 Apr 2020 05:22:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cfontana@suse.de>) id 1jNCLI-0001Un-O1
+ (envelope-from <cfontana@suse.de>) id 1jNCLI-0001UT-Jr
  for qemu-devel@nongnu.org; Sat, 11 Apr 2020 05:22:25 -0400
-Received: from mx2.suse.de ([195.135.220.15]:38958)
+Received: from mx2.suse.de ([195.135.220.15]:38956)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cfontana@suse.de>) id 1jNCLI-0001U8-G4
+ (Exim 4.71) (envelope-from <cfontana@suse.de>) id 1jNCLI-0001U6-BN
  for qemu-devel@nongnu.org; Sat, 11 Apr 2020 05:22:24 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
- by mx2.suse.de (Postfix) with ESMTP id 86D68AC19;
+ by mx2.suse.de (Postfix) with ESMTP id 87069AC58;
  Sat, 11 Apr 2020 09:22:22 +0000 (UTC)
 From: Claudio Fontana <cfontana@suse.de>
 To: Peter Maydell <peter.maydell@linaro.org>,
@@ -42,8 +42,8 @@ To: Peter Maydell <peter.maydell@linaro.org>,
  Philippe Mathieu-Daude <philmd@redhat.com>,
  Markus Armbruster <armbru@redhat.com>
 Subject: [PATCH 1/2] Makefile: libfdt: build only the strict necessary
-Date: Sat, 11 Apr 2020 11:22:01 +0200
-Message-Id: <20200411092203.4167-2-cfontana@suse.de>
+Date: Sat, 11 Apr 2020 11:22:02 +0200
+Message-Id: <20200411092203.4167-3-cfontana@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20200411092203.4167-1-cfontana@suse.de>
 References: <20200411092203.4167-1-cfontana@suse.de>
