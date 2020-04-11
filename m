@@ -2,77 +2,78 @@ Return-Path: <SRS0=9/5m=53=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C38C2BA19
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 18:32:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3325C2BA19
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 18:34:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEBA12051A
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 18:32:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9EFFF2051A
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 18:34:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tM3tqWQt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEBA12051A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lMys+IwJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EFFF2051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNKw2-0008Ll-UN
-	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 14:32:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34743)
+	id 1jNKxY-00018Q-Rj
+	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 14:34:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34770)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jNKst-00064u-Qs
- for qemu-devel@nongnu.org; Sat, 11 Apr 2020 14:29:40 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jNKsv-000658-KU
+ for qemu-devel@nongnu.org; Sat, 11 Apr 2020 14:29:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jNKss-0003O5-L9
- for qemu-devel@nongnu.org; Sat, 11 Apr 2020 14:29:39 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:36985)
+ (envelope-from <peter.maydell@linaro.org>) id 1jNKsu-0003PG-Hl
+ for qemu-devel@nongnu.org; Sat, 11 Apr 2020 14:29:41 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46602)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jNKss-0003NM-FT
- for qemu-devel@nongnu.org; Sat, 11 Apr 2020 14:29:38 -0400
-Received: by mail-wr1-x430.google.com with SMTP id w10so5803296wrm.4
- for <qemu-devel@nongnu.org>; Sat, 11 Apr 2020 11:29:38 -0700 (PDT)
+ id 1jNKsu-0003Oo-Br
+ for qemu-devel@nongnu.org; Sat, 11 Apr 2020 14:29:40 -0400
+Received: by mail-wr1-x444.google.com with SMTP id f13so5759904wrm.13
+ for <qemu-devel@nongnu.org>; Sat, 11 Apr 2020 11:29:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=K3xopzk9ZlZX+c2ieZ27XJmBTBZ8Z8Hb6pkp8KbVxfo=;
- b=tM3tqWQtJRDv2IXwsoJYlHcQ+FpbV4uKwGDcux9RYRzQt3b9x2Ff8CwuvHsi14p/t3
- vfjqZXUl9WdGMhtgycXJ/6hwuHZQzoqRcR8/eHXo1mQP5dRcPNwB3W/BtaoYfSBQ6N9e
- 6LLQUHh97L6QI7kNcLX2sYItUmnALrcEjoF21+GuoIE6nkk/WltzPK3DjYAtm2v5rNL7
- 8tl1NneRbFFA5BevQoujKS1CLdB09YhQE7YPuCPHecK0GpmokmG4ICyGe0V6x+oaWrOX
- NYVvLm6fDiJy1Wv+802tw2kqEuXUOTE9SI3UmuHCPQxySAsYr5eIA1pITdVAmp9RdEPD
- mktw==
+ bh=CRIV+Q39jqb8M8RfkaJ8QOUQyFaSY22+KDzJSczZeRM=;
+ b=lMys+IwJxhrC+8ZIvO+0LQ4mvYqexwpWYwlJYuD70iAq/cg7iCz2oJrQLZ9XSt6Nc5
+ 31BY+UGiDujpQ2Chnp6YHtbNhgcZcEYU/5sBSDx44tnphuZPT6K+2RsZU9pDXJFQRg9G
+ DD4RIxceu/bbqZF2AHFhSSOXZ8ydpY0vfN7oo0vfnrdW2ZcYKV14TPlMLnzWv7Jf0sAf
+ 0cKBvhuMaWst74NHy2HLZCCoM/qK4GkMMal0kseTi5wYmKducwTMMBPfwviesB3a2687
+ dayjWZUe9FHCheCGTHntuCuFcPAYPnWnijIP8UaDBPRPmXbhBBsQPLDEMaRWHRpiMxlH
+ Y6Lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=K3xopzk9ZlZX+c2ieZ27XJmBTBZ8Z8Hb6pkp8KbVxfo=;
- b=nVZUhecpEMoESfvAzGQfense7n+fOw7Bd1ND3uYY2wm8wmS+fN7QKQY3y319tbMstW
- +904ZsJB3FRMJ3nKJyqus5igIa9W9V1TqA36VQLtLWfTV5ZPCoD2g+mKGVbeemC3ffvD
- ukqvQFuX91moyrYR45q6mJfNCFXyRT720kwnKBH+//4dS2HvWO+g8N8cRytySCdsVv5C
- iFp3+iNUW4jS5nTjsZ+tpqIg1lMDbvQlfcQfoXa0Ye8uvggf49Rw0ka455Q2txnhq4zU
- LaY1sOVgJg5CRBKMDamu9IchwB+8yroMLbHxnuGeDdl0NvZLynuCTVFUI4z5XCzgdPKZ
- BRsw==
-X-Gm-Message-State: AGi0PuYzYKpV0q3hhd770qnI4FkDoWVyAwkDhEX9sV6kiF/QB4MvoayK
- zC+Txixz/3o7odibtCs9SMDcFHNKfyvf7A==
-X-Google-Smtp-Source: APiQypI/+SgKj1ASs4nHy0fMhJDyL49PvevSzN/SjUq5X/q5cZuRG0tB4oRuTjqAwmCSrtaz2HbsSw==
-X-Received: by 2002:adf:df82:: with SMTP id z2mr385664wrl.58.1586629777241;
- Sat, 11 Apr 2020 11:29:37 -0700 (PDT)
+ bh=CRIV+Q39jqb8M8RfkaJ8QOUQyFaSY22+KDzJSczZeRM=;
+ b=PO+8thH9R4hAcCsuYGZ7n54Qk506oGFpx1OvgAYW4udIr9bnwHZOaqUuBrAw1ucAPz
+ t9+WVAwJJIogtFbWbBkZS2dICSXE0OIym9irXDbEdM2ypJTYzORhpIL2qqFlH2llqjXR
+ pEtpwAyuLaQl7Wn64WrfkfeV2yDar9LnsFRWx51UZXRCYKR4+aMt9Kpy1N2H9QdbqiNQ
+ sRQVlgFNddzDLc7bYwVpKnrLH6crYTDv3B+wxQItUnvuJRRPRQo3FmhpWlHgm29RuREH
+ Nm3/nk7QNubA/er41MtmTcKbBandmAckt2qRj9npQO+Ymhyuj+pWrOm7MojOSNDZ14WM
+ LmyA==
+X-Gm-Message-State: AGi0PuYteW706U085Y544uwl6/sSX5JexurLfyF07fs9H6fXOFPR43Xa
+ pO13sQxGeil4Erj4p2DAM8fAo3zyIwj9IQ==
+X-Google-Smtp-Source: APiQypIGoQJMif1oQv2gaa57GdIrEaP9MnadTHStUMu7JLcCjiWU0bbd/d7llGjOP021bITS3yrZ1w==
+X-Received: by 2002:a05:6000:110a:: with SMTP id
+ z10mr7458968wrw.389.1586629779066; 
+ Sat, 11 Apr 2020 11:29:39 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 68sm8910939wrm.65.2020.04.11.11.29.36
+ by smtp.gmail.com with ESMTPSA id 68sm8910939wrm.65.2020.04.11.11.29.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 11 Apr 2020 11:29:36 -0700 (PDT)
+ Sat, 11 Apr 2020 11:29:38 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.0? 1/3] configure: Honour --disable-werror for Sphinx
-Date: Sat, 11 Apr 2020 19:29:32 +0100
-Message-Id: <20200411182934.28678-2-peter.maydell@linaro.org>
+Subject: [PATCH for-5.0? 3/3] kernel-doc: Use c:struct for Sphinx 3.0 and later
+Date: Sat, 11 Apr 2020 19:29:34 +0100
+Message-Id: <20200411182934.28678-4-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200411182934.28678-1-peter.maydell@linaro.org>
 References: <20200411182934.28678-1-peter.maydell@linaro.org>
@@ -80,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::430
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,67 +98,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we are not making warnings fatal for compilation, make them
-non-fatal when building the Sphinx documentation also.  (For instance
-Sphinx 3.0 warns about some constructs that older versions were happy
-with, which is a build failure if we use the warnings-as-errors
-flag.)
+The kernel-doc Sphinx plugin and associated script currently emit
+'c:type' directives for "struct foo" documentation.
 
-This provides a workaround at least for LP:1872113.
+Sphinx 3.0 warns about this:
+  /home/petmay01/linaro/qemu-from-laptop/qemu/docs/../include/exec/memory.h:3: WARNING: Type must be either just a name or a typedef-like declaration.
+  If just a name:
+    Error in declarator or parameters
+    Invalid C declaration: Expected identifier in nested name, got keyword: struct [error at 6]
+      struct MemoryListener
+      ------^
+  If typedef-like declaration:
+    Error in declarator or parameters
+    Invalid C declaration: Expected identifier in nested name. [error at 21]
+      struct MemoryListener
+      ---------------------^
 
+because it wants us to use the new-in-3.0 'c:struct' instead.
+
+Plumb the Sphinx version through to the kernel-doc script
+and use it to select 'c:struct' for newer versions than 3.0.
+
+Fixes: LP:1872113
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- configure | 9 ++++++++-
- Makefile  | 2 +-
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ docs/sphinx/kerneldoc.py |  1 +
+ scripts/kernel-doc       | 16 +++++++++++++++-
+ 2 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index 22870f38672..7b9ae0418d0 100755
---- a/configure
-+++ b/configure
-@@ -4928,6 +4928,12 @@ if check_include sys/kcov.h ; then
-     kcov=yes
- fi
+diff --git a/docs/sphinx/kerneldoc.py b/docs/sphinx/kerneldoc.py
+index 1159405cb92..3e879402064 100644
+--- a/docs/sphinx/kerneldoc.py
++++ b/docs/sphinx/kerneldoc.py
+@@ -99,6 +99,7 @@ class KernelDocDirective(Directive):
+                 env.note_dependency(os.path.abspath(f))
+                 cmd += ['-export-file', f]
  
-+# If we're making warnings fatal, apply this to Sphinx runs as well
-+sphinx_werror=""
-+if test "$werror" = "yes"; then
-+    sphinx_werror="-W"
-+fi
-+
- # Check we have a new enough version of sphinx-build
- has_sphinx_build() {
-     # This is a bit awkward but works: create a trivial document and
-@@ -4936,7 +4942,7 @@ has_sphinx_build() {
-     # sphinx-build doesn't exist at all or if it is too old.
-     mkdir -p "$TMPDIR1/sphinx"
-     touch "$TMPDIR1/sphinx/index.rst"
--    "$sphinx_build" -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMPDIR1/sphinx/out" >/dev/null 2>&1
-+    "$sphinx_build" $sphinx_werror -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMPDIR1/sphinx/out" >/dev/null 2>&1
- }
++        cmd += ['-sphinx-version', sphinx.__version__]
+         cmd += [filename]
  
- # Check if tools are available to build documentation.
-@@ -7631,6 +7637,7 @@ echo "INSTALL_PROG=$install -c -m 0755" >> $config_host_mak
- echo "INSTALL_LIB=$install -c -m 0644" >> $config_host_mak
- echo "PYTHON=$python" >> $config_host_mak
- echo "SPHINX_BUILD=$sphinx_build" >> $config_host_mak
-+echo "SPHINX_WERROR=$sphinx_werror" >> $config_host_mak
- echo "GENISOIMAGE=$genisoimage" >> $config_host_mak
- echo "CC=$cc" >> $config_host_mak
- if $iasl -h > /dev/null 2>&1; then
-diff --git a/Makefile b/Makefile
-index 84ef8816000..8a9113e6663 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1076,7 +1076,7 @@ sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html \
- # Note the use of different doctree for each (manual, builder) tuple;
- # this works around Sphinx not handling parallel invocation on
- # a single doctree: https://github.com/sphinx-doc/sphinx/issues/2946
--build-manual = $(call quiet-command,CONFDIR="$(qemu_confdir)" $(SPHINX_BUILD) $(if $(V),,-q) -W -b $2 -D version=$(VERSION) -D release="$(FULL_VERSION)" -d .doctrees/$1-$2 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)/$1")
-+build-manual = $(call quiet-command,CONFDIR="$(qemu_confdir)" $(SPHINX_BUILD) $(if $(V),,-q) $(SPHINX_WERROR) -b $2 -D version=$(VERSION) -D release="$(FULL_VERSION)" -d .doctrees/$1-$2 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)/$1")
- # We assume all RST files in the manual's directory are used in it
- manual-deps = $(wildcard $(SRC_PATH)/docs/$1/*.rst $(SRC_PATH)/docs/$1/*/*.rst) \
-               $(SRC_PATH)/docs/defs.rst.inc \
+         try:
+diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+index 8dc30e01e58..030b5c8691f 100755
+--- a/scripts/kernel-doc
++++ b/scripts/kernel-doc
+@@ -71,6 +71,8 @@ Output selection (mutually exclusive):
+ 			DOC: sections. May be specified multiple times.
+ 
+ Output selection modifiers:
++  -sphinx-version VER   Generate rST syntax for the specified Sphinx version.
++                        Only works with reStructuredTextFormat.
+   -no-doc-sections	Do not output DOC: sections.
+   -enable-lineno        Enable output of #define LINENO lines. Only works with
+                         reStructuredText format.
+@@ -286,6 +288,7 @@ use constant {
+ };
+ my $output_selection = OUTPUT_ALL;
+ my $show_not_found = 0;	# No longer used
++my $sphinx_version = "0.0"; # if not specified, assume old
+ 
+ my @export_file_list;
+ 
+@@ -436,6 +439,8 @@ while ($ARGV[0] =~ m/^--?(.*)/) {
+ 	    $enable_lineno = 1;
+     } elsif ($cmd eq 'show-not-found') {
+ 	$show_not_found = 1;  # A no-op but don't fail
++    } elsif ($cmd eq 'sphinx-version') {
++        $sphinx_version = shift @ARGV;
+     } else {
+ 	# Unknown argument
+         usage();
+@@ -963,7 +968,16 @@ sub output_struct_rst(%) {
+     my $oldprefix = $lineprefix;
+     my $name = $args{'type'} . " " . $args{'struct'};
+ 
+-    print "\n\n.. c:type:: " . $name . "\n\n";
++    # Sphinx 3.0 and up will emit warnings for "c:type:: struct Foo".
++    # It wants to see "c:struct:: Foo" (and will add the word 'struct' in
++    # the rendered output).
++    if ((split(/\./, $sphinx_version))[0] >= 3) {
++        my $sname = $name;
++        $sname =~ s/^struct //;
++        print "\n\n.. c:struct:: " . $sname . "\n\n";
++    } else {
++        print "\n\n.. c:type:: " . $name . "\n\n";
++    }
+     print_lineno($declaration_start_line);
+     $lineprefix = "   ";
+     output_highlight_rst($args{'purpose'});
 -- 
 2.20.1
 
