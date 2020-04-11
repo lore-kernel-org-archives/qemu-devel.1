@@ -2,48 +2,47 @@ Return-Path: <SRS0=9/5m=53=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70265C2BA19
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 04:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC19C2BA19
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 04:21:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 423992078E
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 04:20:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 423992078E
+	by mail.kernel.org (Postfix) with ESMTPS id DFB612078E
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 04:21:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFB612078E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jN7d0-00078u-G9
-	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 00:20:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47139)
+	id 1jN7dc-0008Vp-3k
+	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 00:21:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47101)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiangyifei@huawei.com>) id 1jN7Zb-0000IG-B8
+ (envelope-from <jiangyifei@huawei.com>) id 1jN7ZZ-0000FW-E7
  for qemu-devel@nongnu.org; Sat, 11 Apr 2020 00:16:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiangyifei@huawei.com>) id 1jN7ZY-0006VL-Qi
- for qemu-devel@nongnu.org; Sat, 11 Apr 2020 00:16:50 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:43850 helo=huawei.com)
+ (envelope-from <jiangyifei@huawei.com>) id 1jN7ZX-0006Rw-V2
+ for qemu-devel@nongnu.org; Sat, 11 Apr 2020 00:16:49 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3743 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jiangyifei@huawei.com>)
- id 1jN7ZY-0006Oj-En; Sat, 11 Apr 2020 00:16:48 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 89F88E4D640B17DDB427;
+ id 1jN7ZX-0006OQ-KU; Sat, 11 Apr 2020 00:16:47 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id AB30B18C808FAF5A511A;
  Sat, 11 Apr 2020 12:16:45 +0800 (CST)
 Received: from huawei.com (10.173.222.107) by DGGEMS408-HUB.china.huawei.com
  (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Sat, 11 Apr 2020
- 12:16:38 +0800
+ 12:16:36 +0800
 From: Yifei Jiang <jiangyifei@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
-Subject: [PATCH RFC v2 8/9] target/riscv: Handler KVM_EXIT_RISCV_SBI exit
-Date: Sat, 11 Apr 2020 12:14:26 +0800
-Message-ID: <20200411041427.14828-9-jiangyifei@huawei.com>
+Subject: [PATCH RFC v2 6/9] target/riscv: Support start kernel directly by KVM
+Date: Sat, 11 Apr 2020 12:14:24 +0800
+Message-ID: <20200411041427.14828-7-jiangyifei@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20200411041427.14828-1-jiangyifei@huawei.com>
 References: <20200411041427.14828-1-jiangyifei@huawei.com>
@@ -53,7 +52,7 @@ X-Originating-IP: [10.173.222.107]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,158 +73,165 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use char-fe handler console sbi call, which implement early
-console io while apply 'earlycon=sbi' into kernel parameters.
-
-The common SBI interface sbi_ecall_interface.h is introduced from
-https://github.com/riscv/opensbi/blob/master/include/sbi/sbi_ecall_interface.h.
+Get kernel and fdt start address in virt.c, and pass them to KVM
+when cpu reset. In addition, add kvm_riscv.h to place riscv specific
+interface.
 
 Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
 Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
 ---
- target/riscv/kvm.c                 | 42 ++++++++++++++++-
- target/riscv/sbi_ecall_interface.h | 72 ++++++++++++++++++++++++++++++
- 2 files changed, 113 insertions(+), 1 deletion(-)
- create mode 100644 target/riscv/sbi_ecall_interface.h
+ hw/riscv/virt.c          | 16 +++++++++++++---
+ target/riscv/cpu.c       |  4 ++++
+ target/riscv/cpu.h       |  3 +++
+ target/riscv/kvm.c       | 14 ++++++++++++++
+ target/riscv/kvm_riscv.h | 24 ++++++++++++++++++++++++
+ 5 files changed, 58 insertions(+), 3 deletions(-)
+ create mode 100644 target/riscv/kvm_riscv.h
 
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index 85ec9e22aa..d72eb782e4 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -42,6 +42,7 @@
+ #include "exec/address-spaces.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci-host/gpex.h"
++#include "sysemu/kvm.h"
+ 
+ #include <libfdt.h>
+ 
+@@ -480,6 +481,9 @@ static void riscv_virt_board_init(MachineState *machine)
+     target_ulong start_addr = memmap[VIRT_DRAM].base;
+     int i;
+     unsigned int smp_cpus = machine->smp.cpus;
++    uint64_t kernel_entry = 0;
++    hwaddr start_fdt;
++    CPUState *cs;
+ 
+     /* Initialize SOC */
+     object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+@@ -510,8 +514,7 @@ static void riscv_virt_board_init(MachineState *machine)
+                                  memmap[VIRT_DRAM].base);
+ 
+     if (machine->kernel_filename) {
+-        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
+-                                                  NULL);
++        kernel_entry = riscv_load_kernel(machine->kernel_filename, NULL);
+ 
+         if (machine->initrd_filename) {
+             hwaddr start;
+@@ -564,10 +567,17 @@ static void riscv_virt_board_init(MachineState *machine)
+         exit(1);
+     }
+     qemu_fdt_dumpdtb(s->fdt, fdt_totalsize(s->fdt));
++    start_fdt = memmap[VIRT_MROM].base + sizeof(reset_vec);
+     rom_add_blob_fixed_as("mrom.fdt", s->fdt, fdt_totalsize(s->fdt),
+-                          memmap[VIRT_MROM].base + sizeof(reset_vec),
++                          start_fdt,
+                           &address_space_memory);
+ 
++    for (cs = first_cpu; cs; cs = CPU_NEXT(cs)) {
++        RISCVCPU *riscv_cpu = RISCV_CPU(cs);
++        riscv_cpu->env.loader_start = kernel_entry;
++        riscv_cpu->env.fdt_start = start_fdt;
++    }
++
+     /* create PLIC hart topology configuration string */
+     plic_hart_config_len = (strlen(VIRT_PLIC_HART_CONFIG) + 1) * smp_cpus;
+     plic_hart_config = g_malloc0(plic_hart_config_len);
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 4e578239d3..6a6af13ab9 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -28,6 +28,7 @@
+ #include "hw/qdev-properties.h"
+ #include "migration/vmstate.h"
+ #include "fpu/softfloat-helpers.h"
++#include "kvm_riscv.h"
+ 
+ /* RISC-V CPU definitions */
+ 
+@@ -347,6 +348,9 @@ static void riscv_cpu_reset(DeviceState *dev)
+     cs->exception_index = EXCP_NONE;
+     env->load_res = -1;
+     set_default_nan_mode(1, &env->fp_status);
++#ifdef CONFIG_KVM
++    kvm_riscv_reset_vcpu(cpu);
++#endif
+ }
+ 
+ static void riscv_cpu_disas_set_info(CPUState *s, disassemble_info *info)
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 7d21addbab..dcff112c5f 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -213,6 +213,9 @@ struct CPURISCVState {
+ 
+     /* Fields from here on are preserved across CPU reset. */
+     QEMUTimer *timer; /* Internal timer */
++
++    hwaddr loader_start;
++    hwaddr fdt_start;
+ };
+ 
+ #define RISCV_CPU_CLASS(klass) \
 diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-index 0f429fd802..ff6ea7816e 100644
+index 6dffda36bb..b9aec66b69 100644
 --- a/target/riscv/kvm.c
 +++ b/target/riscv/kvm.c
-@@ -38,6 +38,8 @@
+@@ -37,6 +37,7 @@
+ #include "hw/irq.h"
  #include "qemu/log.h"
  #include "hw/loader.h"
- #include "kvm_riscv.h"
-+#include "sbi_ecall_interface.h"
-+#include "chardev/char-fe.h"
++#include "kvm_riscv.h"
  
  static __u64 kvm_riscv_reg_id(__u64 type, __u64 idx)
  {
-@@ -423,9 +425,47 @@ bool kvm_arch_stop_on_emulation_error(CPUState *cs)
-     return true;
+@@ -426,3 +427,16 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+ {
+     return 0;
  }
- 
-+static int kvm_riscv_handle_sbi(struct kvm_run *run)
++
++void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
 +{
-+    int ret = 0;
-+    unsigned char ch;
-+    switch (run->riscv_sbi.extension_id) {
-+    case SBI_EXT_0_1_CONSOLE_PUTCHAR:
-+        ch = run->riscv_sbi.args[0];
-+        qemu_chr_fe_write(serial_hd(0)->be, &ch, sizeof(ch));
-+        break;
-+    case SBI_EXT_0_1_CONSOLE_GETCHAR:
-+        ret = qemu_chr_fe_read_all(serial_hd(0)->be, &ch, sizeof(ch));
-+        if (ret == sizeof(ch)) {
-+            run->riscv_sbi.args[0] = ch;
-+        } else {
-+            run->riscv_sbi.args[0] = -1;
-+        }
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP,
-+                      "%s: un-handled SBI EXIT, specific reasons is %lu\n",
-+                      __func__, run->riscv_sbi.extension_id);
-+        ret = -1;
-+        break;
++    CPURISCVState *env = &cpu->env;
++
++    if (!kvm_enabled()) {
++        return;
 +    }
-+    return ret;
++    env->pc = cpu->env.loader_start;
++    env->gpr[10] = kvm_arch_vcpu_id(CPU(cpu)); /* a0 */
++    env->gpr[11] = cpu->env.fdt_start;         /* a1 */
 +}
 +
- int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
- {
--    return 0;
-+    int ret = 0;
-+    switch (run->exit_reason) {
-+    case KVM_EXIT_RISCV_SBI:
-+        ret = kvm_riscv_handle_sbi(run);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
-+                      __func__, run->exit_reason);
-+        ret = -1;
-+        break;
-+    }
-+    return ret;
- }
- 
- void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
-diff --git a/target/riscv/sbi_ecall_interface.h b/target/riscv/sbi_ecall_interface.h
+diff --git a/target/riscv/kvm_riscv.h b/target/riscv/kvm_riscv.h
 new file mode 100644
-index 0000000000..225dcd42b1
+index 0000000000..f38c82bf59
 --- /dev/null
-+++ b/target/riscv/sbi_ecall_interface.h
-@@ -0,0 +1,72 @@
++++ b/target/riscv/kvm_riscv.h
+@@ -0,0 +1,24 @@
 +/*
-+ * SPDX-License-Identifier: BSD-2-Clause
++ * QEMU KVM support -- RISC-V specific functions.
 + *
-+ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
++ * Copyright (c) 2020 Huawei Technologies Co., Ltd
 + *
-+ * Authors:
-+ *   Anup Patel <anup.patel@wdc.com>
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef __SBI_ECALL_INTERFACE_H__
-+#define __SBI_ECALL_INTERFACE_H__
++#ifndef QEMU_KVM_RISCV_H
++#define QEMU_KVM_RISCV_H
 +
-+/* clang-format off */
-+
-+/* SBI Extension IDs */
-+#define	SBI_EXT_0_1_SET_TIMER			0x0
-+#define SBI_EXT_0_1_CONSOLE_PUTCHAR		0x1
-+#define SBI_EXT_0_1_CONSOLE_GETCHAR		0x2
-+#define SBI_EXT_0_1_CLEAR_IPI			0x3
-+#define SBI_EXT_0_1_SEND_IPI			0x4
-+#define SBI_EXT_0_1_REMOTE_FENCE_I		0x5
-+#define SBI_EXT_0_1_REMOTE_SFENCE_VMA		0x6
-+#define SBI_EXT_0_1_REMOTE_SFENCE_VMA_ASID	0x7
-+#define SBI_EXT_0_1_SHUTDOWN			0x8
-+#define SBI_EXT_BASE				0x10
-+#define SBI_EXT_TIME				0x54494D45
-+#define SBI_EXT_IPI				0x735049
-+#define SBI_EXT_RFENCE				0x52464E43
-+#define SBI_EXT_HSM				0x48534D
-+
-+/* SBI function IDs for BASE extension*/
-+#define SBI_EXT_BASE_GET_SPEC_VERSION		0x0
-+#define SBI_EXT_BASE_GET_IMP_ID			0x1
-+#define SBI_EXT_BASE_GET_IMP_VERSION		0x2
-+#define SBI_EXT_BASE_PROBE_EXT			0x3
-+#define SBI_EXT_BASE_GET_MVENDORID		0x4
-+#define SBI_EXT_BASE_GET_MARCHID		0x5
-+#define SBI_EXT_BASE_GET_MIMPID			0x6
-+
-+/* SBI function IDs for TIME extension*/
-+#define SBI_EXT_TIME_SET_TIMER			0x0
-+
-+/* SBI function IDs for IPI extension*/
-+#define SBI_EXT_IPI_SEND_IPI			0x0
-+
-+/* SBI function IDs for RFENCE extension*/
-+#define SBI_EXT_RFENCE_REMOTE_FENCE_I		0x0
-+#define SBI_EXT_RFENCE_REMOTE_SFENCE_VMA	0x1
-+#define SBI_EXT_RFENCE_REMOTE_SFENCE_VMA_ASID	0x2
-+#define SBI_EXT_RFENCE_REMOTE_HFENCE_GVMA	0x3
-+#define SBI_EXT_RFENCE_REMOTE_HFENCE_GVMA_VMID	0x4
-+#define SBI_EXT_RFENCE_REMOTE_HFENCE_VVMA	0x5
-+#define SBI_EXT_RFENCE_REMOTE_HFENCE_VVMA_ASID	0x6
-+
-+/* SBI function IDs for HSM extension */
-+#define SBI_EXT_HSM_HART_START			0x0
-+#define SBI_EXT_HSM_HART_STOP			0x1
-+#define SBI_EXT_HSM_HART_GET_STATUS		0x2
-+
-+#define SBI_HSM_HART_STATUS_STARTED		0x0
-+#define SBI_HSM_HART_STATUS_STOPPED		0x1
-+#define SBI_HSM_HART_STATUS_START_PENDING	0x2
-+#define SBI_HSM_HART_STATUS_STOP_PENDING	0x3
-+
-+#define SBI_SPEC_VERSION_MAJOR_OFFSET		24
-+#define SBI_SPEC_VERSION_MAJOR_MASK		0x7f
-+#define SBI_SPEC_VERSION_MINOR_MASK		0xffffff
-+#define SBI_EXT_VENDOR_START			0x09000000
-+#define SBI_EXT_VENDOR_END			0x09FFFFFF
-+/* clang-format on */
++void kvm_riscv_reset_vcpu(RISCVCPU *cpu);
 +
 +#endif
 -- 
