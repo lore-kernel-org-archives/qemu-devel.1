@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B317C2BA19
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 04:18:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BBD7C2BBC7
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 04:18:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C3692078E
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 04:18:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C3692078E
+	by mail.kernel.org (Postfix) with ESMTPS id 31B1C2078E
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 04:18:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31B1C2078E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jN7bU-0004iR-GX
-	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 00:18:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47115)
+	id 1jN7bW-0004mG-Dc
+	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 00:18:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47112)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiangyifei@huawei.com>) id 1jN7ZZ-0000GT-Tv
- for qemu-devel@nongnu.org; Sat, 11 Apr 2020 00:16:51 -0400
+ (envelope-from <jiangyifei@huawei.com>) id 1jN7ZZ-0000GN-Se
+ for qemu-devel@nongnu.org; Sat, 11 Apr 2020 00:16:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiangyifei@huawei.com>) id 1jN7ZY-0006VR-Qs
+ (envelope-from <jiangyifei@huawei.com>) id 1jN7ZY-0006Um-HE
  for qemu-devel@nongnu.org; Sat, 11 Apr 2020 00:16:49 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:43826 helo=huawei.com)
+Received: from szxga06-in.huawei.com ([45.249.212.32]:43780 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jiangyifei@huawei.com>)
- id 1jN7ZY-0006OO-FO; Sat, 11 Apr 2020 00:16:48 -0400
+ id 1jN7ZY-0006ON-5X; Sat, 11 Apr 2020 00:16:48 -0400
 Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 7F044A2A2B3C4F1BD898;
+ by Forcepoint Email with ESMTP id 785A0AB817DB17D5CBE4;
  Sat, 11 Apr 2020 12:16:45 +0800 (CST)
 Received: from huawei.com (10.173.222.107) by DGGEMS408-HUB.china.huawei.com
  (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Sat, 11 Apr 2020
- 12:16:39 +0800
+ 12:16:36 +0800
 From: Yifei Jiang <jiangyifei@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
-Subject: [PATCH RFC v2 9/9] target/riscv: add host cpu type
-Date: Sat, 11 Apr 2020 12:14:27 +0800
-Message-ID: <20200411041427.14828-10-jiangyifei@huawei.com>
+Subject: [PATCH RFC v2 5/9] target/riscv: Implement kvm_arch_put_registers
+Date: Sat, 11 Apr 2020 12:14:23 +0800
+Message-ID: <20200411041427.14828-6-jiangyifei@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20200411041427.14828-1-jiangyifei@huawei.com>
 References: <20200411041427.14828-1-jiangyifei@huawei.com>
@@ -73,58 +73,182 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, host cpu is inherited simply.
+Put GPR CSR and FP registers to kvm by KVM_SET_ONE_REG ioctl
 
 Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
 Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
 ---
- target/riscv/cpu.c | 6 ++++++
- target/riscv/cpu.h | 1 +
- 2 files changed, 7 insertions(+)
+ target/riscv/kvm.c | 136 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 135 insertions(+), 1 deletion(-)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 6a6af13ab9..e5b42c3a54 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -203,6 +203,10 @@ static void rv64imacu_nommu_cpu_init(Object *obj)
-     set_feature(env, RISCV_FEATURE_PMP);
+diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
+index 8d5069b9e9..6dffda36bb 100644
+--- a/target/riscv/kvm.c
++++ b/target/riscv/kvm.c
+@@ -85,6 +85,31 @@ static int kvm_riscv_get_regs_core(CPUState *cs)
+     return ret;
  }
  
-+static void riscv_host_cpu_init(Object *obj)
++static int kvm_riscv_put_regs_core(CPUState *cs)
 +{
++    int ret = 0;
++    int i;
++    uint64_t reg;
++    CPURISCVState *env = &RISCV_CPU(cs)->env;
++
++    reg = env->pc;
++    ret = kvm_set_one_reg(cs, RISCV_CORE_REG(regs.pc), &reg);
++    if (ret) {
++        return ret;
++    }
++
++    for (i = 1; i < 32; i++) {
++        __u64 id = kvm_riscv_reg_id(KVM_REG_RISCV_CORE, i);
++        reg = env->gpr[i];
++        ret = kvm_set_one_reg(cs, id, &reg);
++        if (ret) {
++            return ret;
++        }
++    }
++
++    return ret;
 +}
 +
- #endif
+ static int kvm_riscv_get_regs_csr(CPUState *cs)
+ {
+     int ret = 0;
+@@ -142,6 +167,64 @@ static int kvm_riscv_get_regs_csr(CPUState *cs)
+     return ret;
+ }
  
- static ObjectClass *riscv_cpu_class_by_name(const char *cpu_model)
-@@ -615,6 +619,7 @@ static const TypeInfo riscv_cpu_type_infos[] = {
-     DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base32_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_HOST,             riscv_host_cpu_init),
-     /* Depreacted */
-     DEFINE_CPU(TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_09_1, rv32gcsu_priv1_09_1_cpu_init),
-@@ -623,6 +628,7 @@ static const TypeInfo riscv_cpu_type_infos[] = {
-     DEFINE_CPU(TYPE_RISCV_CPU_BASE64,           riscv_base64_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51,       rv64imacu_nommu_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rv64gcsu_priv1_10_0_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_HOST,             riscv_host_cpu_init),
-     /* Deprecated */
-     DEFINE_CPU(TYPE_RISCV_CPU_RV64IMACU_NOMMU,  rv64imacu_nommu_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_09_1, rv64gcsu_priv1_09_1_cpu_init),
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index dcff112c5f..4901fd8061 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -39,6 +39,7 @@
- #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e51")
- #define TYPE_RISCV_CPU_SIFIVE_U34       RISCV_CPU_TYPE_NAME("sifive-u34")
- #define TYPE_RISCV_CPU_SIFIVE_U54       RISCV_CPU_TYPE_NAME("sifive-u54")
-+#define TYPE_RISCV_CPU_HOST             RISCV_CPU_TYPE_NAME("host")
- /* Deprecated */
- #define TYPE_RISCV_CPU_RV32IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv32imacu-nommu")
- #define TYPE_RISCV_CPU_RV32GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.9.1")
++static int kvm_riscv_put_regs_csr(CPUState *cs)
++{
++    int ret = 0;
++    uint64_t reg;
++    CPURISCVState *env = &RISCV_CPU(cs)->env;
++
++    reg = env->mstatus;
++    ret = kvm_set_one_reg(cs, RISCV_CSR_REG(sstatus), &reg);
++    if (ret) {
++        return ret;
++    }
++
++    reg = env->mie;
++    ret = kvm_set_one_reg(cs, RISCV_CSR_REG(sie), &reg);
++    if (ret) {
++        return ret;
++    }
++
++    reg = env->stvec;
++    ret = kvm_set_one_reg(cs, RISCV_CSR_REG(stvec), &reg);
++    if (ret) {
++        return ret;
++    }
++
++    reg = env->sscratch;
++    ret = kvm_set_one_reg(cs, RISCV_CSR_REG(sscratch), &reg);
++    if (ret) {
++        return ret;
++    }
++
++    reg = env->sepc;
++    ret = kvm_set_one_reg(cs, RISCV_CSR_REG(sepc), &reg);
++    if (ret) {
++        return ret;
++    }
++
++    reg = env->scause;
++    ret = kvm_set_one_reg(cs, RISCV_CSR_REG(scause), &reg);
++    if (ret) {
++        return ret;
++    }
++
++    reg = env->mip;
++    ret = kvm_set_one_reg(cs, RISCV_CSR_REG(sip), &reg);
++    if (ret) {
++        return ret;
++    }
++
++    reg = env->satp;
++    ret = kvm_set_one_reg(cs, RISCV_CSR_REG(sstatus), &reg);
++    if (ret) {
++        return ret;
++    }
++
++    return ret;
++}
++
++
+ static int kvm_riscv_get_regs_fp(CPUState *cs)
+ {
+     int ret = 0;
+@@ -175,6 +258,40 @@ static int kvm_riscv_get_regs_fp(CPUState *cs)
+     return ret;
+ }
+ 
++static int kvm_riscv_put_regs_fp(CPUState *cs)
++{
++    int ret = 0;
++    int i;
++    CPURISCVState *env = &RISCV_CPU(cs)->env;
++
++    if (riscv_has_ext(env, RVD)) {
++        uint64_t reg;
++        for (i = 0; i < 32; i++) {
++            reg = env->fpr[i];
++            ret = kvm_set_one_reg(cs, RISCV_FP_D_REG(i), &reg);
++            if (ret) {
++                return ret;
++            }
++        }
++        return ret;
++    }
++
++    if (riscv_has_ext(env, RVF)) {
++        uint32_t reg;
++        for (i = 0; i < 32; i++) {
++            reg = env->fpr[i];
++            ret = kvm_set_one_reg(cs, RISCV_FP_F_REG(i), &reg);
++            if (ret) {
++                return ret;
++            }
++        }
++        return ret;
++    }
++
++    return ret;
++}
++
++
+ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+     KVM_CAP_LAST_INFO
+ };
+@@ -203,7 +320,24 @@ int kvm_arch_get_registers(CPUState *cs)
+ 
+ int kvm_arch_put_registers(CPUState *cs, int level)
+ {
+-    return 0;
++    int ret = 0;
++
++    ret = kvm_riscv_put_regs_core(cs);
++    if (ret) {
++        return ret;
++    }
++
++    ret = kvm_riscv_put_regs_csr(cs);
++    if (ret) {
++        return ret;
++    }
++
++    ret = kvm_riscv_put_regs_fp(cs);
++    if (ret) {
++        return ret;
++    }
++
++    return ret;
+ }
+ 
+ int kvm_arch_release_virq_post(int virq)
 -- 
 2.19.1
 
