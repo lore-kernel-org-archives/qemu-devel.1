@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F740C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 09:16:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDFF2C2BBC7
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 09:17:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E17D20857
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 09:16:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9BA7E20857
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 09:17:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IpVlLhWw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E17D20857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G9hQChXI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BA7E20857
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNCFI-0006ff-AF
-	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 05:16:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38333)
+	id 1jNCGN-0008Eo-QX
+	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 05:17:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38350)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNCEB-0005VH-NR
- for qemu-devel@nongnu.org; Sat, 11 Apr 2020 05:15:05 -0400
+ id 1jNCED-0005VN-4n
+ for qemu-devel@nongnu.org; Sat, 11 Apr 2020 05:15:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNCEA-0005aW-14
- for qemu-devel@nongnu.org; Sat, 11 Apr 2020 05:15:03 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:36845)
+ id 1jNCEB-0005cX-RY
+ for qemu-devel@nongnu.org; Sat, 11 Apr 2020 05:15:05 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43200)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNCE9-0005a8-RQ; Sat, 11 Apr 2020 05:15:01 -0400
-Received: by mail-wr1-x433.google.com with SMTP id u13so4251354wrp.3;
- Sat, 11 Apr 2020 02:15:01 -0700 (PDT)
+ id 1jNCEB-0005c2-LQ; Sat, 11 Apr 2020 05:15:03 -0400
+Received: by mail-wr1-x441.google.com with SMTP id i10so4704774wrv.10;
+ Sat, 11 Apr 2020 02:15:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=NjdvKrAHp3uRuP1Lr8qH05RaCpkw8jwbaOYNARGlieo=;
- b=IpVlLhWwr9GBCWcs1wVn9jFgy+ngvzuSLdtvUUrK3upHDy57uYMS+HdE8R9oHx2NBm
- pFTeXYS+xL8N37C4ICX14pvmeTz5cLq1IcdTNcvQ2fOMxLnOsGmXlW645wQaoTVco90v
- Hq/4XJ3OPiX3hqUMKtglx30sFxq7AY34veixwMlCS11XkRMkH5P1V66cxd1rlHt9/bEj
- mAxJV5ufHvoMdRRk/DjYIesEowu966Bs6cI3DX6b8DUa9qVliExkdvTq3R1nybSEXGzU
- lZ7cnXVNg9n7Zrr2FyhYyqAHLkK2mk7/jovp4m5HHDtoC68/2wzFXz29suknpVfIihIx
- NVig==
+ bh=VNJuqR9RvHlYF2029BwTSqDJA9AO9s7mV7e8lqyUNrg=;
+ b=G9hQChXI9BfNwiSIf36B507V4ZB8zQt1Ids3Vbgp/n+IerhmalO4v0/eakNVEbQfCs
+ wluzVcUaj/YOlL/M2ckM+betC/Fdt0QYY4OMogyr78F2sW+T5pAEudnF99hvhmqBpuO8
+ AnvPy1GAbF72gqoxSl4svAPdv3I04Jbm4Zobv4yogkk1HpRr5GBD4OIi5Wt9w+YAmmBc
+ cmlxTsqLPLvgTV/tSjxVSbubAjBmYkU96DJQgdYwQG1wUkEIfgPDu8Xxcc56lYvH8NN8
+ jiiVUIuKjOh7PvVxh4VvfBGcixvP3nvONmeLVQ6jDNOlqihC93KDSrU9q4W58Jb4Xksm
+ QuOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=NjdvKrAHp3uRuP1Lr8qH05RaCpkw8jwbaOYNARGlieo=;
- b=ZvRoc7NzIjjjxvtKH8PHOoi9HV9zAg18ssjTHLtxXeOrmKqA5D8dHaqiC5/pUkS2Lb
- py3k1zXJ8adtQmbEzjLartRqmNPYWMQBO7rYvnhH0VdPZdX11bSo7wH7i9TcHkN6FSNq
- gAQiTnNlJhQIk4No4OmsxOsIc6M6Anii9HjM3ZtYezwOa357kUd49Y8moSIHfeTQ4TS3
- RlurAmvyvFdDVRyuAsPMBus/yDJDXdcezw+AnJtNZV7ZjBbDYVzpdYiThYKJDI6nh4kH
- L6+hoJCtImWMqY2KBPgvw3g5UkLBss/glFNCfahlddDypSF6X7U2/EbEv7umCUnAuuVI
- forg==
-X-Gm-Message-State: AGi0PuYpbcmkp8jguedJNe3FuYwBFRjP1bsULMaYre+6Cyn6RGAnHvc/
- QrGb100mncaA42WW++CSgM7O+ZyVoaU=
-X-Google-Smtp-Source: APiQypItl2PCiCV+lsrQsg1Mj1IS3xu4Gt1TLJhp2F3IOtJ0t3/5wSd3YWL+L7FZS9m8r6D46iu5Yg==
-X-Received: by 2002:adf:f34e:: with SMTP id e14mr8962197wrp.80.1586596500339; 
- Sat, 11 Apr 2020 02:15:00 -0700 (PDT)
+ bh=VNJuqR9RvHlYF2029BwTSqDJA9AO9s7mV7e8lqyUNrg=;
+ b=eyyBl8UKbk6b+rL+F/yT0nfBDLO4miCTH22QD4MDyCpt9Iod0cgDd+EYLo3VMb0na1
+ Vj9vt3bPCjIqmSbF8P59p+0S6Tjl+jLoFcKJBF0hB1vBMp38jM4ect5HE5hLw4w5S0dc
+ KJyaZxhM2t9e6fCDTZIlfx+zl033l5FnDnoKg4qj3qQ5uOwSEHLEkvNpzfDCLMOcv8zC
+ 0lENxdyO7/sbomgXjzVg4IOlJMv0jmU50oIC/TnKTf3t8L/RLqG+pOAfthXA9rh+Umye
+ +XyjinpqL/+O/d+XCGXJRHAyR2PUT6/BxRKoWks8n1M35GCpohjFz5jq9GI8/n1eAF8V
+ MJGQ==
+X-Gm-Message-State: AGi0Puayf8YDdvMQ3GXhmSR5s7X7dhzV9JEw12Pnz84l7jDE0lN/PCDi
+ XLQqOHF+BxN7IIqtP00h7dX8oZdjrvM=
+X-Google-Smtp-Source: APiQypJLn4aCqT41mBnZdRgvns5KYN96zGwimprMWbltkBOB+VC6xkNCEStlkYNY9XtwcQYhaFp7xQ==
+X-Received: by 2002:adf:ef8d:: with SMTP id d13mr8819643wro.197.1586596502238; 
+ Sat, 11 Apr 2020 02:15:02 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id f83sm6073301wmf.42.2020.04.11.02.14.58
+ by smtp.gmail.com with ESMTPSA id f83sm6073301wmf.42.2020.04.11.02.15.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 11 Apr 2020 02:14:59 -0700 (PDT)
+ Sat, 11 Apr 2020 02:15:01 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH-for-5.0 1/2] hw/display/sm501: Avoid heap overflow in
- sm501_2d_operation()
-Date: Sat, 11 Apr 2020 11:14:52 +0200
-Message-Id: <20200411091453.30371-2-f4bug@amsat.org>
+Subject: [PATCH-for-5.0 2/2] qtest: Test the Drawing Engine of the SM501
+ companion
+Date: Sat, 11 Apr 2020 11:14:53 +0200
+Message-Id: <20200411091453.30371-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200411091453.30371-1-f4bug@amsat.org>
 References: <20200411091453.30371-1-f4bug@amsat.org>
@@ -86,7 +86,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::433
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,92 +107,155 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Zhang Zi Ming reported a heap overflow in the Drawing Engine of
-the SM501 companion chip model, in particular in the COPY_AREA()
-macro in sm501_2d_operation().
+Run some PCI commands to call the COPY_AREA() macro in
+sm501_2d_operation(), and verify that there is no more
+overflow as reported in BZ#1786026 [*].
 
-As I have no idea what this code is supposed to do, add a simple
-check to avoid the heap overflow. This fixes:
+The SM501 is used by the R2D-PLUS and aCube Sam460ex
+machines, but since it is a PCI card and we already have
+an easy way to test PCI daughter cards on the sPAPR
+machine, test it there.
 
-  =================================================================
-  ==20518==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x7f6f4c3fffff at pc 0x55b1e1d358f0 bp 0x7ffce464dfb0 sp 0x7ffce464dfa8
-  READ of size 1 at 0x7f6f4c3fffff thread T0
-      #0 0x55b1e1d358ef in sm501_2d_operation hw/display/sm501.c:788:13
-      #1 0x55b1e1d32c38 in sm501_2d_engine_write hw/display/sm501.c:1466:13
-      #2 0x55b1e0cd19d8 in memory_region_write_accessor memory.c:483:5
-      #3 0x55b1e0cd1404 in access_with_adjusted_size memory.c:544:18
-      #4 0x55b1e0ccfb9d in memory_region_dispatch_write memory.c:1476:16
-      #5 0x55b1e0ae55a8 in flatview_write_continue exec.c:3125:23
-      #6 0x55b1e0ad3e87 in flatview_write exec.c:3165:14
-      #7 0x55b1e0ad3a24 in address_space_write exec.c:3256:18
-
-  0x7f6f4c3fffff is located 4194303 bytes to the right of 4194304-byte region [0x7f6f4bc00000,0x7f6f4c000000)
-  allocated by thread T0 here:
-      #0 0x55b1e0a6e715 in __interceptor_posix_memalign (ppc64-softmmu/qemu-system-ppc64+0x19c0715)
-      #1 0x55b1e31c1482 in qemu_try_memalign util/oslib-posix.c:189:11
-      #2 0x55b1e31c168c in qemu_memalign util/oslib-posix.c:205:27
-      #3 0x55b1e11a00b3 in spapr_reallocate_hpt hw/ppc/spapr.c:1560:23
-      #4 0x55b1e11a0ce4 in spapr_setup_hpt hw/ppc/spapr.c:1593:5
-      #5 0x55b1e11c2fba in spapr_machine_reset hw/ppc/spapr.c:1644:9
-      #6 0x55b1e1368b01 in qemu_system_reset softmmu/vl.c:1391:9
-      #7 0x55b1e1375af3 in qemu_init softmmu/vl.c:4436:5
-      #8 0x55b1e2fc8a59 in main softmmu/main.c:48:5
-      #9 0x7f6f8150bf42 in __libc_start_main (/lib64/libc.so.6+0x23f42)
-
-  SUMMARY: AddressSanitizer: heap-buffer-overflow hw/display/sm501.c:788:13 in sm501_2d_operation
-  Shadow bytes around the buggy address:
-    0x0fee69877fa0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-    0x0fee69877fb0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-    0x0fee69877fc0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-    0x0fee69877fd0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-    0x0fee69877fe0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  =>0x0fee69877ff0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa[fa]
-    0x0fee69878000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    0x0fee69878010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    0x0fee69878020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    0x0fee69878030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    0x0fee69878040: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  Shadow byte legend (one shadow byte represents 8 application bytes):
-    Addressable:           00
-    Partially addressable: 01 02 03 04 05 06 07
-    Heap left redzone:       fa
-    Freed heap region:       fd
-    Poisoned by user:        f7
-    ASan internal:           fe
-  ==20518==ABORTING
-
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1786026
-Reported-by: Zhang Zi Ming <1015138407@qq.com>
+[*] https://bugzilla.redhat.com/show_bug.cgi?id=1786026
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-Per the links on
-https://bugzilla.redhat.com/show_bug.cgi?id=1808510 there is probably
-a CVE assigned to this, but I don't have access to the information,
-https://bugzilla.redhat.com/show_bug.cgi?id=1786593 only show:
+ tests/qtest/sm501-test.c     | 106 +++++++++++++++++++++++++++++++++++
+ tests/qtest/Makefile.include |   2 +
+ 2 files changed, 108 insertions(+)
+ create mode 100644 tests/qtest/sm501-test.c
 
-  You are not authorized to access bug #1786593.
-  Most likely the bug has been restricted for internal development processes and we cannot grant access.
----
- hw/display/sm501.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index de0ab9d977..902acb3875 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -726,6 +726,12 @@ static void sm501_2d_operation(SM501State *s)
-     int crt = (s->dc_crt_control & SM501_DC_CRT_CONTROL_SEL) ? 1 : 0;
-     int fb_len = get_width(s, crt) * get_height(s, crt) * get_bpp(s, crt);
- 
-+    if (rtl && (src_x < operation_width || src_y < operation_height)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "sm501: Illegal RTL address (%i, %i)\n",
-+                      src_x, src_y);
-+        return;
+diff --git a/tests/qtest/sm501-test.c b/tests/qtest/sm501-test.c
+new file mode 100644
+index 0000000000..79bf7c2c21
+--- /dev/null
++++ b/tests/qtest/sm501-test.c
+@@ -0,0 +1,106 @@
++/*
++ * QEMU test for the SM501 companion
++ *
++ * SPDX-FileCopyrightText: 2020 Philippe Mathieu-Daudé <f4bug@amsat.org>
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#include "qemu/osdep.h"
++#include "qemu/units.h"
++#include "qemu-common.h"
++#include "libqtest.h"
++#include "libqos/libqos-spapr.h"
++#include "hw/pci/pci_ids.h"
++
++typedef struct {
++    QOSState *qs;
++    QPCIDevice *dev;
++    QPCIBar bar;
++} PciSm501State;
++
++static void save_fn(QPCIDevice *dev, int devfn, void *data)
++{
++    *((QPCIDevice **)data) = dev;
++}
++
++static void sm501_init(PciSm501State *s)
++{
++    uint64_t barsize;
++
++    s->dev = NULL;
++    qpci_device_foreach(s->qs->pcibus, PCI_VENDOR_ID_SILICON_MOTION,
++                        PCI_DEVICE_ID_SM501, save_fn, &s->dev);
++    g_assert(s->dev != NULL);
++
++    qpci_device_enable(s->dev);
++
++    /* BAR#0: VRAM, BAR#1: MMIO registers */
++    s->bar = qpci_iomap(s->dev, 1, &barsize);
++    g_assert_cmpuint(barsize, ==, 2 * MiB);
++}
++
++static void sm501_deinit(PciSm501State *s)
++{
++    g_free(s->dev);
++}
++
++static uint32_t sm501_read(PciSm501State *s, uint64_t off)
++{
++    uint32_t val;
++
++    s->dev->bus->memread(s->dev->bus, s->bar.addr + off, &val, sizeof(val));
++
++    return val;
++}
++
++static void sm501_write(PciSm501State *s, uint64_t off, uint32_t val)
++{
++    s->dev->bus->memwrite(s->dev->bus, s->bar.addr + off, &val, sizeof(val));
++}
++
++static void sm501_check_device_id(PciSm501State *s)
++{
++    g_assert_cmphex(sm501_read(s, 0x60) >> 16, ==, 0x501); /* DEVICEID reg */
++}
++
++/*
++ * Try to reproduce the heap overflow reported in
++ * https://bugzilla.redhat.com/show_bug.cgi?id=1786026
++ */
++static void test_sm501_2d_drawing_engine_op(void)
++{
++    PciSm501State s;
++
++    s.qs = qtest_spapr_boot("-machine pseries -device sm501");
++
++    sm501_init(&s);
++    sm501_check_device_id(&s);
++
++    /*
++     * Commands listed in BZ#1786026 to access
++     * COPY_AREA() in sm501_2d_operation().
++     */
++    sm501_write(&s, 0x100000,        0x0);  /* src: (x, y) = (0, 0) */
++    sm501_write(&s, 0x100004,        0x0);  /* dst: (x, y) = (0, 0) */
++    sm501_write(&s, 0x100008, 0x00100010);  /* dim: height = width = 16 */
++    sm501_write(&s, 0x100010, 0x00100010);  /* pitch: height = width = 16 */
++    sm501_write(&s, 0x10000c, 0xcc000088);  /* ctrl: op = copy area, RTL */
++
++    /* If the overflow occured, the next call will fail. */
++    sm501_check_device_id(&s);
++
++    sm501_deinit(&s);
++
++    qtest_shutdown(s.qs);
++}
++
++int main(int argc, char *argv[])
++{
++    g_test_init(&argc, &argv, NULL);
++
++    if (!strcmp(qtest_get_arch(), "ppc64")) {
++        qtest_add_func("spapr/sm501_2d_op", test_sm501_2d_drawing_engine_op);
 +    }
 +
-     if (addressing != 0x0) {
-         printf("%s: only XY addressing is supported.\n", __func__);
-         abort();
++    return g_test_run();
++}
+diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+index 9e5a51d033..7ec894a7a9 100644
+--- a/tests/qtest/Makefile.include
++++ b/tests/qtest/Makefile.include
+@@ -109,6 +109,7 @@ check-qtest-ppc64-$(CONFIG_VGA) += display-vga-test
+ check-qtest-ppc64-y += numa-test
+ check-qtest-ppc64-$(CONFIG_IVSHMEM_DEVICE) += ivshmem-test
+ check-qtest-ppc64-y += cpu-plug-test
++check-qtest-ppc64-$(CONFIG_SM501) += sm501-test
+ 
+ check-qtest-sh4-$(CONFIG_ISA_TESTDEV) = endianness-test
+ 
+@@ -253,6 +254,7 @@ tests/qtest/pflash-cfi02$(EXESUF): tests/qtest/pflash-cfi02-test.o
+ tests/qtest/endianness-test$(EXESUF): tests/qtest/endianness-test.o
+ tests/qtest/prom-env-test$(EXESUF): tests/qtest/prom-env-test.o $(libqos-obj-y)
+ tests/qtest/rtas-test$(EXESUF): tests/qtest/rtas-test.o $(libqos-spapr-obj-y)
++tests/qtest/sm501-test$(EXESUF): tests/qtest/sm501-test.o $(libqos-spapr-obj-y)
+ tests/qtest/fdc-test$(EXESUF): tests/qtest/fdc-test.o
+ tests/qtest/ide-test$(EXESUF): tests/qtest/ide-test.o $(libqos-pc-obj-y)
+ tests/qtest/ahci-test$(EXESUF): tests/qtest/ahci-test.o $(libqos-pc-obj-y) qemu-img$(EXESUF)
 -- 
 2.21.1
 
