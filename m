@@ -2,85 +2,73 @@ Return-Path: <SRS0=9/5m=53=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC14C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 11:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DC2CC2BBFD
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 12:26:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D219D2084D
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 11:20:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oMfuiDkJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D219D2084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 549C420692
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 12:26:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 549C420692
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNEBB-0004YH-Uo
-	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 07:20:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47954)
+	id 1jNFDW-0001xP-Dw
+	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 08:26:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57934)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dnbrdsky@gmail.com>) id 1jNEAS-00043T-TW
- for qemu-devel@nongnu.org; Sat, 11 Apr 2020 07:19:21 -0400
+ (envelope-from <bounces@canonical.com>) id 1jNFCv-0001Y8-LB
+ for qemu-devel@nongnu.org; Sat, 11 Apr 2020 08:25:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dnbrdsky@gmail.com>) id 1jNEAR-0006hx-9B
- for qemu-devel@nongnu.org; Sat, 11 Apr 2020 07:19:20 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:34947)
+ (envelope-from <bounces@canonical.com>) id 1jNFCt-0004rm-OT
+ for qemu-devel@nongnu.org; Sat, 11 Apr 2020 08:25:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42294)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dnbrdsky@gmail.com>)
- id 1jNEAR-0006hH-20; Sat, 11 Apr 2020 07:19:19 -0400
-Received: by mail-pl1-x641.google.com with SMTP id y12so1237681pll.2;
- Sat, 11 Apr 2020 04:19:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Zxr9acLS1kIsvx6fJUrku+NbDXqC+0CqEQEoiMrJtMc=;
- b=oMfuiDkJUJ+9qQ6JBhagS/7kXQThaqEd5YEOTw4kgCe/+OaIohk9g3b/D7hiEUXNbB
- rucfzX5jbOrzsiVe9oDKykXyzuCp1Lky+AO634ZVukHuV4gLOkb4sy/gBZXbgOm3XWMK
- 9oNRh6y9Z72h9D3NKOjxu6q+DWoGHqO8j6J79qA1sx9iLG6jdLhyxJEqmsQjDU2hbmB9
- x6A2B49o4huS1F5XRrNZ8G/b6/PF8u0sKvfbGy13BbLXuWrAlyR9te5wE5mNDt3JoIHn
- Z3sspjQx+xRsNQgSsbwlygs1YsS7C6Tw4grIV2jSyj+Q1GSVWU8E7nO4XX2aZvK32sXP
- UePA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Zxr9acLS1kIsvx6fJUrku+NbDXqC+0CqEQEoiMrJtMc=;
- b=pwpOrld5G15V6l7vg+3Ki3dH+FJItLH3Z4O/nTy4C+m9rVozLgzk3+Qy4qGy8G2Aid
- HrUs2Wi++8hqOy4hhVVENzjskTE9O1yozAeO46pM+dFbU8KWdse6/OBpq3ghP3HtUxQU
- xPUM7ITvGVlGbmpgwrf8OKoJa7eImJRsgMBfwHOL/T8N6irKUJiEvJfD46T71wZBFibf
- uwfDKQSbJvydzyU/mj0yoA6HpuAWsd1CyF/nN1RlPzSxv8BuRijS8g8JopKG0a1HyqxQ
- K7+7tyDKkmvWjFbeuEgeC3PNyHdIogkHCwKQHLDUMNCeOEJS+N+PmTzUHzctUirksNGk
- stoQ==
-X-Gm-Message-State: AGi0PuZycEKKJ0ILTVxy1N+TnfuutXnVMTzTU8mlsXmGvXiO1w350z+t
- Xdof8ujQKV1rEwlyA/B2BmMljF+8aJCE+XOQ760=
-X-Google-Smtp-Source: APiQypKtuND1T6Ai6yXSOUP1mrKcbQqsBAkkY+wEnLLa1r3cZNXFZFZkgrBSN+/9ID3h/TRV89Uc7+cKZ7Wytpb9LyU=
-X-Received: by 2002:a17:902:7288:: with SMTP id
- d8mr8346782pll.52.1586603957546; 
- Sat, 11 Apr 2020 04:19:17 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jNFCt-0004ra-6p
+ for qemu-devel@nongnu.org; Sat, 11 Apr 2020 08:25:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jNFCq-0007ip-Mr
+ for <qemu-devel@nongnu.org>; Sat, 11 Apr 2020 12:25:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id AAE792E8107
+ for <qemu-devel@nongnu.org>; Sat, 11 Apr 2020 12:25:52 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200404042108.389635-1-dnbrdsky@gmail.com>
- <20200404042108.389635-3-dnbrdsky@gmail.com>
-In-Reply-To: <20200404042108.389635-3-dnbrdsky@gmail.com>
-From: Daniel Brodsky <dnbrdsky@gmail.com>
-Date: Sat, 11 Apr 2020 04:19:06 -0700
-Message-ID: <CA+ZmoZVJhyuXbbUJHTQdFZKA6+WqYUgnxEXF0y-nq0=aK4cpww@mail.gmail.com>
-Subject: Re: [PATCH v5 2/2] lockable: replaced locks with lock guard macros
- where appropriate
-To: danbrodsky <dnbrdsky@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 11 Apr 2020 12:18:58 -0000
+From: Thomas Huth <1863441@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Won't Fix; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fysnet jnsnow
+X-Launchpad-Bug-Reporter: Benjamin David Lunt (fysnet)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <158179973601.15520.14709037359293558924.malonedeb@soybean.canonical.com>
+Message-Id: <158660753979.28111.9893565524056330200.launchpad@gac.canonical.com>
+Subject: [Bug 1863441] Re: cmd_mode_sense always reports 0x70, no CDROM present
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a1617dae2d8e7b427829f215f129fac9e8205f9f
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,44 +77,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- "open list:iSCSI" <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, Peter Lieven <pl@kamp.de>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Alex Williamson <alex.williamson@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1863441 <1863441@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Apr 3, 2020 at 9:21 PM <dnbrdsky@gmail.com> wrote:
->
-> From: Daniel Brodsky <dnbrdsky@gmail.com>
->
-> - ran regexp "qemu_mutex_lock\(.*\).*\n.*if" to find targets
-> - replaced result with QEMU_LOCK_GUARD if all unlocks at function end
-> - replaced result with WITH_QEMU_LOCK_GUARD if unlock not at end
->
-> Signed-off-by: Daniel Brodsky <dnbrdsky@gmail.com>
-> ---
->  block/iscsi.c         |  7 ++----
->  block/nfs.c           | 51 ++++++++++++++++++++-----------------------
->  cpus-common.c         | 14 +++++-------
->  hw/display/qxl.c      | 43 +++++++++++++++++-------------------
->  hw/vfio/platform.c    |  5 ++---
->  migration/migration.c |  3 +--
->  migration/multifd.c   |  8 +++----
->  migration/ram.c       |  3 +--
->  monitor/misc.c        |  4 +---
->  ui/spice-display.c    | 14 ++++++------
->  util/log.c            |  4 ++--
->  util/qemu-timer.c     | 17 +++++++--------
->  util/rcu.c            |  8 +++----
->  util/thread-pool.c    |  3 +--
->  util/vfio-helpers.c   |  5 ++---
+** Changed in: qemu
+       Status: New =3D> Won't Fix
 
-Just making sure this patch didn't get lost.
-ping http://patchwork.ozlabs.org/patch/1266336/
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1863441
+
+Title:
+  cmd_mode_sense always reports 0x70, no CDROM present
+
+Status in QEMU:
+  Won't Fix
+
+Bug description:
+  cmd_mode_sense
+    https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/ide/atapi.c;hb=3Dref=
+s/heads/master#l852
+  always reports 0x70 in byte 2 returned, indicating no CD-ROM present.
+
+  If CD-ROM is present, should report 0x01 (or 0x11).
+  If CD-ROM absent, should report 0x70.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1863441/+subscriptions
 
