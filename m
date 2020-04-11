@@ -2,98 +2,83 @@ Return-Path: <SRS0=9/5m=53=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA99C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 05:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15335C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 06:26:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F0C02078E
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 05:49:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2B0820757
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Apr 2020 06:26:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I5QzL3Fj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F0C02078E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ejgvmyD1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2B0820757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jN91f-0002t2-Rp
-	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 01:49:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53451)
+	id 1jN9af-0000ge-0E
+	for qemu-devel@archiver.kernel.org; Sat, 11 Apr 2020 02:26:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56391)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jN911-0002SU-Db
- for qemu-devel@nongnu.org; Sat, 11 Apr 2020 01:49:16 -0400
+ (envelope-from <catherine.hecx@gmail.com>) id 1jN9Zt-00008W-Jv
+ for qemu-devel@nongnu.org; Sat, 11 Apr 2020 02:25:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jN90z-0007cI-Sg
- for qemu-devel@nongnu.org; Sat, 11 Apr 2020 01:49:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25519
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jN90z-0007bg-Nh
- for qemu-devel@nongnu.org; Sat, 11 Apr 2020 01:49:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586584152;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PSbWeZHGFb8AvavgwGG6WPziuwKHPEwDKb1W+9wOOhI=;
- b=I5QzL3FjLubpe/6sSmnkUMVHF1/p2JhH5Tb7L7efDKs4DlF+88jJZIH2Tb3jlAwp4nT4l/
- r2nfNFyIdi2kE0yuCV5MPCqt58WxJ4vwlg4wllZAPH0JE1Kd5/xCwNVaVZ94ZGJztPMDGB
- oJde1vbfKzNZ19HFiBJ+6Y9DDcHvUcs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-UvXrPHNNNFuhs-Amanuhyw-1; Sat, 11 Apr 2020 01:49:10 -0400
-X-MC-Unique: UvXrPHNNNFuhs-Amanuhyw-1
-Received: by mail-wr1-f70.google.com with SMTP id d4so2691441wrq.10
- for <qemu-devel@nongnu.org>; Fri, 10 Apr 2020 22:49:10 -0700 (PDT)
+ (envelope-from <catherine.hecx@gmail.com>) id 1jN9Zs-0000G5-Jw
+ for qemu-devel@nongnu.org; Sat, 11 Apr 2020 02:25:17 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:46361)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
+ id 1jN9Zs-0000Fa-AQ
+ for qemu-devel@nongnu.org; Sat, 11 Apr 2020 02:25:16 -0400
+Received: by mail-qk1-x743.google.com with SMTP id g74so4253415qke.13
+ for <qemu-devel@nongnu.org>; Fri, 10 Apr 2020 23:25:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=GzzuzoJO5dzeQyXnKq8icvH6vIhlp30+SlHLfpaP/gY=;
+ b=ejgvmyD1JskgBcdZLwwxIqtwFHZ7rC+vPsOEso4o8uMEiATvBZCRcZqOMZTi4EqMjh
+ 9L9Aq4efvBJvxW3TEXrXbew+kQ3TAeTkJIKZtaDuRFisdI9UrR1G3smNIfR7RRP5s0n6
+ UlFdPinTpt5mvUZG15qm6jz1CCpGARjWgiKU+RDU+qSmcOUZC1RJjPBVBEfL3dk0/s7Z
+ PgYhp7Hp8pHTsVr9feK7giK4JXGCbqBZB9psCXXkCkgZbc9YkQP2Ebmt9VxuXYo5iMY2
+ NttClR1uptGwOywEc1IaAdP4AfVZBj1IPcI5r5ilHvwCbQt5AyB6xO6+BDmbFEJ6rTaE
+ RZeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=PSbWeZHGFb8AvavgwGG6WPziuwKHPEwDKb1W+9wOOhI=;
- b=O6Ys/sTAQ1NlRNHFg2SuFh1vpA0HSKcqay8LeRTRjAsflgFKiZ90FSCfrkG9dgRPez
- VoQVNLgyOKb9GUsWA7J/XJ+p9qEnQJluW3n7WtkHPslnw5TreG+HaxrfMmoYoZiOpDdP
- rteo7mCjZe7zbZBYvwypIXlcFHW64ZCHjpDf4kAhZn7UiSQdRpNE354Jwws1JvGgE/+o
- 9z2FsTz/sa4D1sSwr+1pbhPrQpCgZ1ebAqG6+y6lrRHUfBR++Y/lVlxoxvwvWXybAfij
- PwfMOHqevjxhCha/7MkJcQE3RzI1/JG+ejekpdVhPt8LkuM7I4t3BtUXEHl270A0+DGm
- gvZQ==
-X-Gm-Message-State: AGi0PubYj60f13OMJsqR2UKn+jklxl5fkzHuNkXkC7tmaQrnP7F8n4kq
- iglW68Qj6gFv1xs94zAKCEOp+gmb0Cz3FFg1BiaH0kfS7xjkYd8bsU2NN8fQOAKR2j//9H34SiP
- VKPZ2vYOjyf80Dxs=
-X-Received: by 2002:a1c:1d84:: with SMTP id d126mr8239924wmd.119.1586584149752; 
- Fri, 10 Apr 2020 22:49:09 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLs//gzMIrAOeRUFLoJwzMUiWvn4/rBJw4g5FfNB9KSZ0hVIO7DKDe4jPKpHnU+OUvgaEsaFw==
-X-Received: by 2002:a1c:1d84:: with SMTP id d126mr8239910wmd.119.1586584149519; 
- Fri, 10 Apr 2020 22:49:09 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c938:f991:b948:b0ca?
- ([2001:b07:6468:f312:c938:f991:b948:b0ca])
- by smtp.gmail.com with ESMTPSA id u16sm5598332wro.23.2020.04.10.22.49.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 10 Apr 2020 22:49:09 -0700 (PDT)
-Subject: Re: [PATCH] module: increase dirs array size by one
-To: Bruce Rogers <brogers@suse.com>, qemu-devel@nongnu.org
-References: <20200411010746.472295-1-brogers@suse.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <66713300-eebd-d9a4-62fd-f355e6ca4e07@redhat.com>
-Date: Sat, 11 Apr 2020 07:49:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200411010746.472295-1-brogers@suse.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=GzzuzoJO5dzeQyXnKq8icvH6vIhlp30+SlHLfpaP/gY=;
+ b=jVVn7nz1kIiTGNxMTnlrnahL1aULTDP+Hgi40+6GaxijQKgrL0a2NP2cEfsdNC9Fq7
+ F74XApy5rDP284C61uWZK/Fbw0lgmBEfeEf98LKip+3+hPjqrXubjcyskCgKTV5uPdZu
+ wZ4sxjRA0/uKwvy4p9xbB3yKTSin96WG8D4Elg3NByLLFH0fU2aCPTV5yMC/bxOLLr/A
+ y5ZhdRb8QIsPv1wR1+ZwVAgifmyCe6dfnxk+CUhWT2HnAxaPNQgaObD5c/59B3NWc7qr
+ WxiyVxkIpYi+2vnlGKPTRAKxLvX+wGPQ05So3If6Ll3rwoF0rmulSKlMWmFozZxpocds
+ NgJQ==
+X-Gm-Message-State: AGi0PuaPsKFGH7gJUOpmI6CuIMhaA52dTQVOgJtUghmc69diPdLW3I1q
+ 25YHk584aKdJMlUykrB/W5g=
+X-Google-Smtp-Source: APiQypKZCEhKj1pPo6WtNY5eaf61hSrM/8cGaXWWAEXHqsYUv7sqoKKdPcDRYXmsA8ufAxi29CIFNQ==
+X-Received: by 2002:a05:620a:15f4:: with SMTP id
+ p20mr7058116qkm.496.1586586315225; 
+ Fri, 10 Apr 2020 23:25:15 -0700 (PDT)
+Received: from host.localdomain ([104.129.187.94])
+ by smtp.gmail.com with ESMTPSA id z18sm3432044qtz.77.2020.04.10.23.25.14
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 10 Apr 2020 23:25:14 -0700 (PDT)
+From: Catherine Ho <catherine.hecx@gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Subject: [PATCH] virtiofsd/passthrough_ll: don't remove O_DIRECT when
+ cache=none
+Date: Sat, 11 Apr 2020 02:19:57 -0400
+Message-Id: <1586585997-24446-1-git-send-email-catherine.hecx@gmail.com>
+X-Mailer: git-send-email 1.7.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::743
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,39 +90,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, christian.ehrhardt@canonical.com
+Cc: Catherine Ho <catherine.hecx@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/04/20 03:07, Bruce Rogers wrote:
-> With the module upgrades code change, the statically sized dirs array
-> can now overflow. Increase it's size by one, according to the new
-> maximum possible usage.
-> 
-> Fixes: bd83c861c0 ("modules: load modules from versioned /var/run dir")
-> Signed-off-by: Bruce Rogers <brogers@suse.com>
-> ---
->  util/module.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/util/module.c b/util/module.c
-> index 5f7896870a..e48d9aacc0 100644
-> --- a/util/module.c
-> +++ b/util/module.c
-> @@ -177,7 +177,7 @@ bool module_load_one(const char *prefix, const char *lib_name)
->      char *version_dir;
->  #endif
->      const char *search_dir;
-> -    char *dirs[4];
-> +    char *dirs[5];
->      char *module_name;
->      int i = 0, n_dirs = 0;
->      int ret;
-> 
+cache=none means to bypass host cache. So we can't remove O_DIRECT flag in
+unconditionally in update_open_flags();
 
-Queued, thanks.
+Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+---
+ tools/virtiofsd/passthrough_ll.c |   16 ++++++++++------
+ 1 files changed, 10 insertions(+), 6 deletions(-)
 
-Paolo
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+index 4c35c95..889e144 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -1677,7 +1677,8 @@ static void lo_releasedir(fuse_req_t req, fuse_ino_t ino,
+     fuse_reply_err(req, 0);
+ }
+ 
+-static void update_open_flags(int writeback, struct fuse_file_info *fi)
++static void update_open_flags(int writeback, int cache_mode,
++                              struct fuse_file_info *fi)
+ {
+     /*
+      * With writeback cache, kernel may send read requests even
+@@ -1702,10 +1703,13 @@ static void update_open_flags(int writeback, struct fuse_file_info *fi)
+ 
+     /*
+      * O_DIRECT in guest should not necessarily mean bypassing page
+-     * cache on host as well. If somebody needs that behavior, it
+-     * probably should be a configuration knob in daemon.
++     * cache on host as well. If cache=none, set the flag to O_DIRECT
+      */
+-    fi->flags &= ~O_DIRECT;
++    if (cache_mode == CACHE_NONE) {
++        fi->flags |= O_DIRECT;
++    } else {
++        fi->flags &= ~O_DIRECT;
++    }
+ }
+ 
+ static void lo_create(fuse_req_t req, fuse_ino_t parent, const char *name,
+@@ -1737,7 +1741,7 @@ static void lo_create(fuse_req_t req, fuse_ino_t parent, const char *name,
+         goto out;
+     }
+ 
+-    update_open_flags(lo->writeback, fi);
++    update_open_flags(lo->writeback, lo->cache, fi);
+ 
+     fd = openat(parent_inode->fd, name, (fi->flags | O_CREAT) & ~O_NOFOLLOW,
+                 mode);
+@@ -1947,7 +1951,7 @@ static void lo_open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
+     fuse_log(FUSE_LOG_DEBUG, "lo_open(ino=%" PRIu64 ", flags=%d)\n", ino,
+              fi->flags);
+ 
+-    update_open_flags(lo->writeback, fi);
++    update_open_flags(lo->writeback, lo->cache, fi);
+ 
+     sprintf(buf, "%i", lo_fd(req, ino));
+     fd = openat(lo->proc_self_fd, buf, fi->flags & ~O_NOFOLLOW);
+-- 
+1.7.1
 
 
