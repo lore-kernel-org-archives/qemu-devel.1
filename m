@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CF4BC2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8623C2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:50:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 248C720678
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:49:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8B7E320692
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:50:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sJ/YqrK5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 248C720678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BYyCk3ys"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B7E320692
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlPg-0005VT-9d
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:49:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47600)
+	id 1jNlQj-00080u-J6
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:50:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDp-00069U-1b
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:02 -0400
+ id 1jNlEP-0007ip-QF
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDo-0002fq-0e
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:00 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36717)
+ id 1jNlEO-00037N-Qm
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:37 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40811)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDn-0002fI-Qo; Sun, 12 Apr 2020 18:36:59 -0400
-Received: by mail-wr1-x443.google.com with SMTP id u13so8049446wrp.3;
- Sun, 12 Apr 2020 15:36:59 -0700 (PDT)
+ id 1jNlEO-00036r-L8; Sun, 12 Apr 2020 18:37:36 -0400
+Received: by mail-wm1-x341.google.com with SMTP id a81so8356808wmf.5;
+ Sun, 12 Apr 2020 15:37:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=s0AvIH4tmhY8dJIWOooS3DYC6YTsxY1MNRofHTiR85M=;
- b=sJ/YqrK5TugYkQl5sc0s15+oijPE5rmDui2mmm426O3nS20g7Iqp2ltIuK0f0PBihj
- zN6rI0IbarDeMJvzhgzN9dAl5a89IN8iFLiBum11DWPxCw34nwRQPRZzxNHaNfKXKlW2
- 3taNV/vYtbmHh/XkeiuNMqVZjraJ3zIsdVqLGCmZTcQyZKjdTiOL9h1wbUaVF+0ZIM/L
- DGJBtNsbKlG1iR82A/FsRGmUt7tk4ZuyMSaghR9c+hSJ9RlLPWMs8rR5eKpmHlnr17Qc
- Ivmo5Ie0zkDMFGMzDIuZpSKSnvsu/cAiaozPT7HkKGLTxUzqrHA8VBE9EqiE6ToGqcz2
- mB8Q==
+ bh=hYB5vJlsKA+XSoc5iK2InUvEzWA5ZYFw0I+M2ardO5E=;
+ b=BYyCk3ysLTDOxvtJ73/q5WWa8lxptRXaEql9KyX9gVYciRP/cpSDx11z3VBLqHevGi
+ ykC7mEJ03yLE/tNA/itYzDSffQy6jbRPpseuo4UqzJ1uwsRXkn18iaqw/MgWpta6rCaT
+ Vf1xxjmga+cOmGjRjidRgWAANClD4FNUO7tM8ku5pWUsQgEUGow0aQYZLEoTR2w68m3q
+ HKsUCKIUSPXFhNMA6/3dH1nAmCg56ltQs5nmbsUpxZuOsveyypf7KtCiqet1I8wUDQ45
+ Rfxiy1kXt4i6mFRQRkSwWLB7gmGiq1RQeinPvKQFwAcfef+hzWeAFiyqMP0WeCAZKQuX
+ bfWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=s0AvIH4tmhY8dJIWOooS3DYC6YTsxY1MNRofHTiR85M=;
- b=ikRldUAQPJNeIMPDLYBR9S+CYksDluwOWCm0HWTT9e+OTuxe7vxJAOixuElaU61a+i
- tgAd0Zk3YVWbxV7Q7qkWdgTmQmgQtuk3X1NZ/yQRPSpoSH+h9bajhxCkGPnv5q8QRddU
- H5KUNFjGwxTNCxsRCekD4caVqRAsbGMiUc3PUUkcDYfNz0ruXTn2i/ZiqjYKZJTEDJSz
- ypfOGPSjTPOZ4ZxEW67pJxu7xGhNHeOi9kDEGJVC7W/T8Yyt9Rp92jcsxjECszzo1mJS
- tKAMkrhN8Z2CbFeg/wTle6MuL3/NPIQKj+U2GZK9i3JJmjgfWsw5om5DJj9hfiibEftM
- Nw6w==
-X-Gm-Message-State: AGi0PuZAcdWTnR6YwJ5TYAlekcq7UeW6/dzqkm01oSkm3WFMB1kLJNci
- OTtOIxHOs3DY26EKrsBkweKVyfYGmTZNTA==
-X-Google-Smtp-Source: APiQypLXH/6sQRIVIVNKxcaxLPq1HWiNj+xu9u69ExZwdmp1hQGbfDARpX36GS/jz/BXjj5w6OycLg==
-X-Received: by 2002:adf:ee12:: with SMTP id y18mr15131900wrn.289.1586731018704; 
- Sun, 12 Apr 2020 15:36:58 -0700 (PDT)
+ bh=hYB5vJlsKA+XSoc5iK2InUvEzWA5ZYFw0I+M2ardO5E=;
+ b=BhfuFYmKdKk7xTqNzY/0sF5KxbdjTul577k9LuCiZMAG0Mlv+fZ1ZItBEgy1FZ6zUg
+ m6Hz/Hf+MkODf9BA0sUFv+uEfq/6uintFPhJaLdmX9X0hQurFygsiGSLs69katCwmMD5
+ d5dqRW16L2eve7NqiR5SzeoUvP29U+os9AmZxrmwvMUXSu4u8hcHaSKHkKXkH6++WWEe
+ gCuv6nM5TruwbAnkGakg2W81McT62a1lWg3RXX5F9OCrySGqLQxZ+29Q1OkHHQ6lz1N4
+ i5Sd3XSVB2ITAy2oFGvZa3ScJpnl9blEvT8NxDIKQvQa13QZi7km4ihaXymJEcjIZ+56
+ qVGg==
+X-Gm-Message-State: AGi0PuZwRNVBDikrKfx48MNd8ye6KK6obBExxz5mXJuqwgS47CRXGMqs
+ utMovFcnFCVRxiN0ZVz8Nqsfe5hnG28yKg==
+X-Google-Smtp-Source: APiQypKljnwa59JiW3WSGCMMentFT30+ckG5mxUcJQUjQFWIdEJUCrFL68+FcSlCzYIkbBjcw+shKw==
+X-Received: by 2002:a7b:c959:: with SMTP id i25mr15552087wml.20.1586731055515; 
+ Sun, 12 Apr 2020 15:37:35 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.36.55
+ by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.37.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:36:58 -0700 (PDT)
+ Sun, 12 Apr 2020 15:37:35 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 10/24] hw/arm/fsl-imx31: Move some code from
+Subject: [PATCH-for-5.1 v3 21/24] hw/riscv/sifive_u: Move some code from
  realize() to init()
-Date: Mon, 13 Apr 2020 00:36:05 +0200
-Message-Id: <20200412223619.11284-11-f4bug@amsat.org>
+Date: Mon, 13 Apr 2020 00:36:16 +0200
+Message-Id: <20200412223619.11284-22-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200412223619.11284-1-f4bug@amsat.org>
 References: <20200412223619.11284-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,8 +130,8 @@ Coccinelle reported:
 
   $ spatch ... --timeout 60 --sp-file \
     scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-  HANDLING: hw/arm/fsl-imx31.c
-  >>> possible moves from fsl_imx31_init() to fsl_imx31_realize() in hw/arm/fsl-imx31.c:68
+  HANDLING: ./hw/riscv/sifive_u.c
+  >>> possible moves from riscv_sifive_u_soc_init() to riscv_sifive_u_soc_realize() in ./hw/riscv/sifive_u.c:473
 
 Move the calls using &error_abort which don't depend on input
 updated before realize() to init().
@@ -140,31 +140,31 @@ Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
 v3: Typo 'depend of' -> 'depend on' (eblake)
 ---
- hw/arm/fsl-imx31.c | 4 ++--
+ hw/riscv/sifive_u.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/fsl-imx31.c b/hw/arm/fsl-imx31.c
-index 8472d2e911..61287e24f6 100644
---- a/hw/arm/fsl-imx31.c
-+++ b/hw/arm/fsl-imx31.c
-@@ -62,6 +62,8 @@ static void fsl_imx31_init(Object *obj)
-     for (i = 0; i < FSL_IMX31_NUM_GPIOS; i++) {
-         sysbus_init_child_obj(obj, "gpio[*]", &s->gpio[i], sizeof(s->gpio[i]),
-                               TYPE_IMX_GPIO);
-+        object_property_set_bool(OBJECT(&s->gpio[i]), false, "has-edge-sel",
-+                                 &error_abort);
-     }
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 9c90c94c33..754af19eef 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -441,6 +441,8 @@ static void riscv_sifive_u_soc_init(Object *obj)
+     qdev_prop_set_uint32(DEVICE(&s->otp), "serial", OTP_SERIAL);
+     sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
+                           TYPE_CADENCE_GEM);
++    object_property_set_int(OBJECT(&s->gem), GEM_REVISION, "revision",
++                            &error_abort);
  }
  
-@@ -191,8 +193,6 @@ static void fsl_imx31_realize(DeviceState *dev, Error **errp)
-             { FSL_IMX31_GPIO3_ADDR, FSL_IMX31_GPIO3_IRQ }
-         };
- 
--        object_property_set_bool(OBJECT(&s->gpio[i]), false, "has-edge-sel",
--                                 &error_abort);
-         object_property_set_bool(OBJECT(&s->gpio[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
+ static bool sifive_u_get_start_in_flash(Object *obj, Error **errp)
+@@ -569,8 +571,6 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+         qemu_check_nic_model(nd, TYPE_CADENCE_GEM);
+         qdev_set_nic_properties(DEVICE(&s->gem), nd);
+     }
+-    object_property_set_int(OBJECT(&s->gem), GEM_REVISION, "revision",
+-                            &error_abort);
+     object_property_set_bool(OBJECT(&s->gem), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
 -- 
 2.21.1
 
