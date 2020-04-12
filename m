@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E35BC2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:40:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A69F0C2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:41:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27A3C206E5
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:40:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71D7D206E5
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:41:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yms+dVno"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A3C206E5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jTYU73qG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D7D206E5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlHV-0005hF-9S
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:40:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47674)
+	id 1jNlHt-0006U2-K3
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:41:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47146)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDs-0006JD-EZ
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:05 -0400
+ id 1jNlDS-00057H-P2
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDr-0002jG-BG
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:04 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39444)
+ id 1jNlDR-00022B-II
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:38 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34236)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDr-0002id-4d; Sun, 12 Apr 2020 18:37:03 -0400
-Received: by mail-wr1-x441.google.com with SMTP id p10so8517155wrt.6;
- Sun, 12 Apr 2020 15:37:03 -0700 (PDT)
+ id 1jNlDR-0001zl-Aq; Sun, 12 Apr 2020 18:36:37 -0400
+Received: by mail-wr1-x443.google.com with SMTP id 65so8549525wrl.1;
+ Sun, 12 Apr 2020 15:36:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=rNOvzQC0gAZiW9IjgvdXICw1FeldG6faD6QdyriSpSA=;
- b=Yms+dVnobgL/uTyskm/CPmGVpuY5K7rRdl/y/Xcw36vwxQ4cXdVkaf3wqlD8Za79ok
- U/eQ0KdvGCCuYFZ6RYlgmadQw237gtmd5zOSr/E+aphrQk0rOZiAm1wPzlXJDvs9JINY
- 8VnhhvZP4diyOC0umPSzp9tvtLp/ucbCoD6izhWzKJqtl71n/GtUO9MS/z+54RzS5EuG
- TpszyNIilI0JzZmpURO6BKGFuZItPz4l9BMi0zWjeYqESlxn0f+uC1hL/8ZpSj+eM+4R
- oE/CzP/7uRejFlskPIu9dMheg0X2Cma9G7Y8Fnm3Aj7SCBA5yxD6SJn6AeZN8ankWpGb
- Xe7A==
+ bh=0L3GtgkM+tHAsomgjJ+0n9R4GwoMloXQteUzufC2V7I=;
+ b=jTYU73qGqVFddr8pLnVQpLbF5W2VR27kMU7rzfTogZDI+MLQvq0BoNDP7FDEEvSRBX
+ 0ZNK4KsvD2fjIjLEu7ZM4UXndxYQ6owfy2j6Ifdfg68yAYMy7FOK7okPnY1OQ1l3M2Mw
+ uLMFStGPYm5v+vCENxCdqkSYFw3+z0vBvc7LR3+wPtpgOEAGG4M6thP4q+rPL/C/+IlQ
+ tJ2MpkbjbvVZPc2Yx42MoILUTLS7bq5Rqf29jIcEfLLWsMcqnZdsRahPVkGNx1t2shat
+ ud7bFgG/ceAmbWp/JuEKJsOeHmcHTKgWEg1r2TXfNTdtd8AKLbcjAPHnMN+e7iRjm2EE
+ /1Ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=rNOvzQC0gAZiW9IjgvdXICw1FeldG6faD6QdyriSpSA=;
- b=gSGniEl22W1ter74CjmVc3KYe9zSvzn8Ksi3aFaV5/Bj9NbFZBVj4lUEews8eICEzw
- bIHSRWnDtViC0op4xQRxiZX0Y2qBn9NXqsnF7UddayAQtfmHCYaibWOdyhbzpaz7BnDk
- /GL5iBb4NVq6U+499SblbENep/l9adNiw92XjTYxekSEnsBMHTG46NhztrmY4FUNMXnx
- b8iCy0eRlC/x824tz4yMgqyBj38KW3qYT6oJOqCoRJFySFcLPrE6Y+vjMGbv6LtdyNiJ
- gUuyE6kCqovhaCSxs39AZEtjrexBg2XRcuEtNs9MFL204NN5yO36uiv36FgkRhRqo1rM
- fmbw==
-X-Gm-Message-State: AGi0PuZN0OCL7fDqB3ZhxvdLvqenrfR84NwbpIGko/tH9H3jirCw5Utn
- VDOaTMxoZ1AlPcPEA10N0VGyAbnQaGGP/w==
-X-Google-Smtp-Source: APiQypLDnd72DBOXRbnDuWWsEfUNONBBfh/ms5TeKXv3Kg76nSxYgcVFqpN2VUF98/bEvc0lFqt5UQ==
-X-Received: by 2002:adf:ee06:: with SMTP id y6mr16579217wrn.187.1586731021977; 
- Sun, 12 Apr 2020 15:37:01 -0700 (PDT)
+ bh=0L3GtgkM+tHAsomgjJ+0n9R4GwoMloXQteUzufC2V7I=;
+ b=TiDvkiBEgSH5ngW+qv81Ud9AYCGrqSZYaCdSsBEwcjvMTcGAJHDT7Gs9EzbDvAcGiZ
+ 4y0Ivx4gNnLP9IS5YNlsSGS+bsGyJTYST/Dlv6OriGmKwCc4+d4g5wn4SA6xq7K4+6q7
+ UqnBrKTT1HwoTpLMmJ/XoqBuWGdbj4fytEYB1VC85Ruhn+WmMu+pfx97gKHCKW1hHO9s
+ f/i++3CUYU8nvmCoew4M9maWy3A9YzOjh32ulKEnMCrtA8jLTtpcaJEa1kymlWRn9rhz
+ f+VvH3pqJ7IxKSp4AK9gJPoePmzAKXkG9BmFHyUvrZsfX5nhj/i2E2n35DQ7d18TLkU2
+ 5vSg==
+X-Gm-Message-State: AGi0PubLTWsdERrkaN1Wuwup/DbP9MGysFwDdVs9EokZpmrp0JsXstD5
+ /ieyPzU285a+bmiogRs3plJJaG2R2qiEGg==
+X-Google-Smtp-Source: APiQypKbvGTU4Pf9Pr1DbRq3aUYFhdoJtit2q5Q3w5auGE9iEbijWU1OypoPSTTdWhJUNH+wBlYysQ==
+X-Received: by 2002:a5d:53ce:: with SMTP id a14mr15422281wrw.129.1586730995171; 
+ Sun, 12 Apr 2020 15:36:35 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.36.58
+ by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.36.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:37:01 -0700 (PDT)
+ Sun, 12 Apr 2020 15:36:34 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 11/24] hw/arm/msf2-soc: Store MemoryRegion in
- MSF2State
-Date: Mon, 13 Apr 2020 00:36:06 +0200
-Message-Id: <20200412223619.11284-12-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v3 03/24] hw/arm/allwinner-a10: Move some code from
+ realize() to init()
+Date: Mon, 13 Apr 2020 00:35:58 +0200
+Message-Id: <20200412223619.11284-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200412223619.11284-1-f4bug@amsat.org>
 References: <20200412223619.11284-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,75 +130,88 @@ Coccinelle reported:
 
   $ spatch ... --timeout 60 --sp-file \
     scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-  HANDLING: ./hw/arm/msf2-soc.c
-  >>> possible moves from m2sxxx_soc_initfn() to m2sxxx_soc_realize() in ./hw/arm/msf2-soc.c:86
+  HANDLING: ./hw/arm/allwinner-a10.c
+  >>> possible moves from aw_a10_init() to aw_a10_realize() in ./hw/arm/allwinner-a10.c:77
 
-While reviewing we notice storing the MemoryRegion in the device
-state, we'll be able to later automatically simplify the error
-propagation calls.
+Move the calls using &error_fatal which don't depend on input
+updated before realize() to init().
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/arm/msf2-soc.h |  4 ++++
- hw/arm/msf2-soc.c         | 18 +++++++-----------
- 2 files changed, 11 insertions(+), 11 deletions(-)
+v3: Typo 'depend of' -> 'depend on' (eblake)
+---
+ hw/arm/allwinner-a10.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/include/hw/arm/msf2-soc.h b/include/hw/arm/msf2-soc.h
-index 3cfe5c76ee..e4c5110036 100644
---- a/include/hw/arm/msf2-soc.h
-+++ b/include/hw/arm/msf2-soc.h
-@@ -50,6 +50,10 @@ typedef struct MSF2State {
+diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
+index 62a67a3e1a..f41395734a 100644
+--- a/hw/arm/allwinner-a10.c
++++ b/hw/arm/allwinner-a10.c
+@@ -60,10 +60,18 @@ static void aw_a10_init(Object *obj)
+         int i;
  
-     ARMv7MState armv7m;
- 
-+    MemoryRegion sram;
-+    MemoryRegion nvm;
-+    MemoryRegion nvm_alias;
+         for (i = 0; i < AW_A10_NUM_USB; i++) {
++            char bus[16];
 +
-     char *cpu_type;
-     char *part_name;
-     uint64_t envm_size;
-diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
-index 588d643b8d..e448b0ab74 100644
---- a/hw/arm/msf2-soc.c
-+++ b/hw/arm/msf2-soc.c
-@@ -90,13 +90,9 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
-     SysBusDevice *busdev;
-     Error *err = NULL;
-     int i;
+             sysbus_init_child_obj(obj, "ehci[*]", OBJECT(&s->ehci[i]),
+                                   sizeof(s->ehci[i]), TYPE_PLATFORM_EHCI);
+             sysbus_init_child_obj(obj, "ohci[*]", OBJECT(&s->ohci[i]),
+                                   sizeof(s->ohci[i]), TYPE_SYSBUS_OHCI);
++            object_property_set_bool(OBJECT(&s->ehci[i]), true,
++                                     "companion-enable", &error_fatal);
++
++            sprintf(bus, "usb-bus.%d", i);
++            object_property_set_str(OBJECT(&s->ohci[i]), bus, "masterbus",
++                                    &error_fatal);
+         }
+     }
+ 
+@@ -72,6 +80,11 @@ static void aw_a10_init(Object *obj)
+ 
+     sysbus_init_child_obj(obj, "rtc", &s->rtc, sizeof(s->rtc),
+                           TYPE_AW_RTC_SUN4I);
++
++    memory_region_init_ram(&s->sram_a, obj, "sram A", 48 * KiB,
++                           &error_fatal);
++    memory_region_add_subregion(get_system_memory(), 0x00000000, &s->sram_a);
++    create_unimplemented_device("a10-sram-ctrl", 0x01c00000, 4 * KiB);
+ }
+ 
+ static void aw_a10_realize(DeviceState *dev, Error **errp)
+@@ -113,11 +126,6 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
+     sysbus_connect_irq(sysbusdev, 4, qdev_get_gpio_in(dev, 67));
+     sysbus_connect_irq(sysbusdev, 5, qdev_get_gpio_in(dev, 68));
+ 
+-    memory_region_init_ram(&s->sram_a, OBJECT(dev), "sram A", 48 * KiB,
+-                           &error_fatal);
+-    memory_region_add_subregion(get_system_memory(), 0x00000000, &s->sram_a);
+-    create_unimplemented_device("a10-sram-ctrl", 0x01c00000, 4 * KiB);
 -
-     MemoryRegion *system_memory = get_system_memory();
--    MemoryRegion *nvm = g_new(MemoryRegion, 1);
--    MemoryRegion *nvm_alias = g_new(MemoryRegion, 1);
--    MemoryRegion *sram = g_new(MemoryRegion, 1);
+     /* FIXME use qdev NIC properties instead of nd_table[] */
+     if (nd_table[0].used) {
+         qemu_check_nic_model(&nd_table[0], TYPE_AW_EMAC);
+@@ -149,12 +157,6 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
+         int i;
  
--    memory_region_init_rom(nvm, OBJECT(dev_soc), "MSF2.eNVM", s->envm_size,
-+    memory_region_init_rom(&s->nvm, OBJECT(dev_soc), "MSF2.eNVM", s->envm_size,
-                            &error_fatal);
-     /*
-      * On power-on, the eNVM region 0x60000000 is automatically
-@@ -104,15 +100,15 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
-      * start address (0x0). We do not support remapping other eNVM,
-      * eSRAM and DDR regions by guest(via Sysreg) currently.
-      */
--    memory_region_init_alias(nvm_alias, OBJECT(dev_soc), "MSF2.eNVM", nvm, 0,
--                             s->envm_size);
-+    memory_region_init_alias(&s->nvm_alias, OBJECT(dev_soc), "MSF2.eNVM",
-+                             &s->nvm, 0, s->envm_size);
+         for (i = 0; i < AW_A10_NUM_USB; i++) {
+-            char bus[16];
+-
+-            sprintf(bus, "usb-bus.%d", i);
+-
+-            object_property_set_bool(OBJECT(&s->ehci[i]), true,
+-                                     "companion-enable", &error_fatal);
+             object_property_set_bool(OBJECT(&s->ehci[i]), true, "realized",
+                                      &error_fatal);
+             sysbus_mmio_map(SYS_BUS_DEVICE(&s->ehci[i]), 0,
+@@ -162,8 +164,6 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
+             sysbus_connect_irq(SYS_BUS_DEVICE(&s->ehci[i]), 0,
+                                qdev_get_gpio_in(dev, 39 + i));
  
--    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm);
--    memory_region_add_subregion(system_memory, 0, nvm_alias);
-+    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, &s->nvm);
-+    memory_region_add_subregion(system_memory, 0, &s->nvm_alias);
- 
--    memory_region_init_ram(sram, NULL, "MSF2.eSRAM", s->esram_size,
-+    memory_region_init_ram(&s->sram, NULL, "MSF2.eSRAM", s->esram_size,
-                            &error_fatal);
--    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
-+    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, &s->sram);
- 
-     armv7m = DEVICE(&s->armv7m);
-     qdev_prop_set_uint32(armv7m, "num-irq", 81);
+-            object_property_set_str(OBJECT(&s->ohci[i]), bus, "masterbus",
+-                                    &error_fatal);
+             object_property_set_bool(OBJECT(&s->ohci[i]), true, "realized",
+                                      &error_fatal);
+             sysbus_mmio_map(SYS_BUS_DEVICE(&s->ohci[i]), 0,
 -- 
 2.21.1
 
