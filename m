@@ -2,118 +2,86 @@ Return-Path: <SRS0=Byls=54=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8C9C2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:29:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6912DC2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:37:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D54E206E5
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:29:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 269C1206E5
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:37:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GSCKizLV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D54E206E5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcKgdj2G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 269C1206E5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNl6x-0002mS-EY
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:29:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46579)
+	id 1jNlEK-0006p6-8i
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:37:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47069)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNl65-0001w8-8y
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:29:02 -0400
+ id 1jNlDK-0004tM-6U
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNl64-0006s9-BZ
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:29:01 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36661)
+ id 1jNlDI-0001mG-5u
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:30 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36397)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNl62-0006r5-2X; Sun, 12 Apr 2020 18:28:58 -0400
-Received: by mail-wr1-x442.google.com with SMTP id u13so8035087wrp.3;
- Sun, 12 Apr 2020 15:28:58 -0700 (PDT)
+ id 1jNlDH-0001l8-J0; Sun, 12 Apr 2020 18:36:28 -0400
+Received: by mail-wm1-x342.google.com with SMTP id a201so8009293wme.1;
+ Sun, 12 Apr 2020 15:36:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=sender:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=tYOyvpY04MQytp/PzUIeQIoO+hm2K7ukKlxR4Ob5jog=;
- b=GSCKizLVdfNtqpHraeuTW98sCWlvDaanoZN8nPD00NuHtKHBgwwB2c5lU1qQg7MaVh
- luN/1TnsDiT2BZtg3l0MI7P3sZhMLitqjrBKOFe5NM5YHd5XmDQe+/4Qq2j99O8JoerS
- IQAr8OSX1E3rY/m6GnTe2ou/DUOTnv9FJ/ndsaH94kWiXw1seJXEDXRdbynKQDMG9IPi
- 5/AXbB84RjDM9bi3fee/dX77xiDU5LR0JuPb3EG111mrwH4cySJf/aAmfpH3b+AbH32Q
- GGuWb7FfvG2+0j0jzTlCqWEzMKaqPxz5Up6r3aEnj1qNzhbVUFZVDMIu/qs/FIkjXz9U
- +wfw==
+ bh=O9DVxnJIdTKjCwxywR9qxji3Q0BtyKw5Rq6FDdEjMX4=;
+ b=bcKgdj2G5dcGHI/taGqt6SJmDDHYp8NjlA/n51/kci3Ejs50CU02jtQQmxvBUHJ5Xy
+ g1r5E+oSMSNlwg/9QWbuZwE/lY5KgAv1FINYhiKFl5f0Kclg0hZnYUtJAk7PhL4uLeo5
+ 5NuKeq9oUQ5hVjSqcOQn7wjVbqpTViGYAOI3PempLhSif4hlNORocx08xlbtnLEzv8Iy
+ xhqV2DPXcbrA3f1rTs32egW8cMGqhBgrx17c/nOHDLFjTlXH2sVhpFpVCxHlOUSB8fZJ
+ pbKqoETm/J5XUHsCsLHihpsRS05/a01GS10LUxJ+9xp7A+yJ10yabcgUlm4AGm2PgA+y
+ pkTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=tYOyvpY04MQytp/PzUIeQIoO+hm2K7ukKlxR4Ob5jog=;
- b=AxIgNhKDARuG3cd6Z0YHU6I5Lb0BX7Y53WVxNeQnHsitzPghb8s4T+PzGFM0bc/1P8
- JB0JQPk3T4U7bOSvuQAwufhebH9yP/DR5OyTb9e8P5Tl9pPk2kgapzkEH23g4FwAh+sF
- a9tDpXj1p6ZW6wqJ/4+iKU9tYtnNWMKvrG4gGUgF4PncM4tUkRtAncCgBkrwY2ZBzGDu
- ictA1FNuvnb6OudDmsUXo516dNf63v9QzTnhi56N5vtFjtSi+COWhG+68bIjVsR4rZSm
- 7tarY9JnquoMlgRtTMiG2WG5plxz0odWtpKZzgKgZxmMx/pF3gId9SwDL7HgvKroYv2/
- um3Q==
-X-Gm-Message-State: AGi0PubV+BvUXAd/HPWGPE3h9l72bASTZYYMumpc5+DRkIBv6NOn66u/
- TCwXRLQ/2A8QNf8KLWNIfPYgo6d0Z+g=
-X-Google-Smtp-Source: APiQypJ0Hw0KN6u1o0Qyg+qNNw1QKxAx8aaEiaytyQlzx84xdLX7w0LqR97fckYs26Gy6UjpBpE8dw==
-X-Received: by 2002:adf:f88b:: with SMTP id u11mr15492253wrp.84.1586730536833; 
- Sun, 12 Apr 2020 15:28:56 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=O9DVxnJIdTKjCwxywR9qxji3Q0BtyKw5Rq6FDdEjMX4=;
+ b=G4UG8nEYoprHURVLWz79ezlAq2TAQUSRpXilI9BjdVKp6ZEmBw+C3SgeEYJwm7w612
+ jgVt9BCyJrmVC2iGepNW/2qp1TaFB9bRS5lBfFBJUzmpizoBEbAFqlKofGqWE2chTj0Z
+ oAsnDlqeLlckjfqL6mrIgRoXkJVvychG04+tkXp6Zi2jGkMUh7rSx01fAPLwT0BuKdvI
+ IIcIXxOdVvXbmXFcpmud92s7ME8dLUOcETNnGXnYvj2drokfQZfWLeHZYUKcZsaKQ+sX
+ 8aw3W0/Mg1nTTBBuSGHSMfF8bf7Qb6CppKq2RlkCXHoDSy7Qwi6qKMoxO8POpcji0krY
+ 2wlw==
+X-Gm-Message-State: AGi0PuaR10BpGOaoPs4JLjgvx4z57PK+1c0dQzdtlSsS6ipZokEa2D8z
+ 3xLuVLc912nHJPp/T29IxlPG/qUvIuogUQ==
+X-Google-Smtp-Source: APiQypJvvtcUJDqdYeNSOxHeoHZ059BKv4U4AQaaG1JUVHscWMaZJzol3gpsvjuVDmfwxlJpd4rRPw==
+X-Received: by 2002:a1c:7ed7:: with SMTP id z206mr14925481wmc.64.1586730984452; 
+ Sun, 12 Apr 2020 15:36:24 -0700 (PDT)
+Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id 5sm12020700wmg.34.2020.04.12.15.28.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 12 Apr 2020 15:28:56 -0700 (PDT)
-Subject: Re: [PATCH-for-5.1 v2 03/54] hw/arm/allwinner-a10: Move some code
- from realize() to init()
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
-References: <20200406174743.16956-1-f4bug@amsat.org>
- <20200406174743.16956-4-f4bug@amsat.org>
- <e9eb76ff-b81b-91ad-55c1-62da93ca8cf4@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <ce641aca-062f-b765-d1ac-e176c0c2cdb2@amsat.org>
-Date: Mon, 13 Apr 2020 00:28:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.36.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 12 Apr 2020 15:36:23 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.1 v3 00/24] various: Fix error-propagation with
+ Coccinelle scripts (part 1)
+Date: Mon, 13 Apr 2020 00:35:55 +0200
+Message-Id: <20200412223619.11284-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <e9eb76ff-b81b-91ad-55c1-62da93ca8cf4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,37 +93,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beniamino Galvani <b.galvani@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "open list:Allwinner-a10" <qemu-arm@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-riscv@nongnu.org, Andrew Jeffery <andrew@aj.id.au>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-ppc@nongnu.org,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/6/20 8:00 PM, Eric Blake wrote:
-> On 4/6/20 12:46 PM, Philippe Mathieu-Daudé wrote:
->> Coccinelle reported:
->>
->>    $ spatch ... --timeout 60 --sp-file \
->>      scripts/coccinelle/simplify-init-realize-error_propagate.cocci
->>    HANDLING: ./hw/arm/allwinner-a10.c
->>    >>> possible moves from aw_a10_init() to aw_a10_realize() in
->> ./hw/arm/allwinner-a10.c:77
->>
->> Move the calls using &error_fatal which don't depend of input
-> 
-> s/of/on/ (here, and in many subsequent messages in the series)
+This series is inspired of Peter Maydell fix [1]:
+"hw/arm/xlnx-zynqmp.c: fix some error-handling code",
+but grew after v1 [2] review :/
 
-Thanks!
+Markus: I added the cocci patches to your Error section, I hope
+that's fine :)
 
-> 
->> updated before realize() to init().
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   hw/arm/allwinner-a10.c | 26 +++++++++++++-------------
->>   1 file changed, 13 insertions(+), 13 deletions(-)
->>
-> 
+Part 1: Simplify error propagation by moving some code from
+        DeviceClass::realize() to DeviceClass:initfn().
+
+Regards,
+
+Phil.
+
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg691636.html
+[2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg692155.html
+Supersedes: <20200406174743.16956-1-f4bug@amsat.org>
+
+Philippe Mathieu-Daud=C3=A9 (24):
+  various: Remove suspicious '\' character outside of #define in C code
+  scripts/coccinelle: Script to simplify DeviceClass error propagation
+  hw/arm/allwinner-a10: Move some code from realize() to init()
+  hw/arm/aspeed_ast2600: Simplify use of Error*
+  hw/arm/aspeed_ast2600: Move some code from realize() to init()
+  hw/arm/aspeed_soc: Move some code from realize() to init()
+  hw/arm/aspeed_soc: Simplify use of Error*
+  hw/arm/fsl-imx6: Simplify checks on 'smp_cpus' count
+  hw/arm/fsl-imx6: Move some code from realize() to init()
+  hw/arm/fsl-imx31: Move some code from realize() to init()
+  hw/arm/msf2-soc: Store MemoryRegion in MSF2State
+  hw/arm/stm32f205_soc: Store MemoryRegion in STM32F205State
+  hw/arm/stm32f205_soc: Move some code from realize() to init()
+  hw/arm/xlnx-zynqmp: Use single propagate_error() call
+  hw/arm/xlnx-zynqmp: Split xlnx_zynqmp_create_rpu() as init + realize
+  hw/arm/xlnx-zynqmp: Move some code from realize() to init()
+  hw/microblaze/xlnx-zynqmp-pmu: Move some code from realize() to init()
+  hw/pci-host/pnv_phb3: Move some code from realize() to init()
+  hw/riscv/sifive_e: Move some code from realize() to init()
+  hw/riscv/sifive_u: Use single type_init()
+  hw/riscv/sifive_u: Move some code from realize() to init()
+  hw/riscv/sifive_u: Store MemoryRegion in SiFiveUSoCState
+  hw/riscv/sifive_u: Move some code from realize() to init()
+  hw/riscv/sifive_u: Rename MachineClass::init()
+
+ ...implify-init-realize-error_propagate.cocci |  69 ++++++++++
+ include/hw/arm/msf2-soc.h                     |   4 +
+ include/hw/arm/stm32f205_soc.h                |   4 +
+ include/hw/riscv/sifive_u.h                   |   2 +
+ block/replication.c                           |   4 +-
+ block/vhdx.c                                  |   8 +-
+ dump/dump.c                                   |   2 +-
+ hw/arm/allwinner-a10.c                        |  26 ++--
+ hw/arm/aspeed_ast2600.c                       |  61 +++++----
+ hw/arm/aspeed_soc.c                           |  19 +--
+ hw/arm/fsl-imx31.c                            |   4 +-
+ hw/arm/fsl-imx6.c                             |  55 ++++----
+ hw/arm/msf2-soc.c                             |  18 +--
+ hw/arm/stm32f205_soc.c                        |  28 ++--
+ hw/arm/xlnx-zynqmp.c                          | 126 +++++++++---------
+ hw/microblaze/xlnx-zynqmp-pmu.c               |  46 +++----
+ hw/net/virtio-net.c                           |   2 +-
+ hw/pci-host/pnv_phb3.c                        |   8 +-
+ hw/riscv/sifive_e.c                           |  26 ++--
+ hw/riscv/sifive_u.c                           |  66 +++++----
+ hw/scsi/scsi-disk.c                           |   2 +-
+ hw/sd/sdhci.c                                 |   2 +-
+ target/i386/cpu.c                             |  18 +--
+ target/microblaze/cpu.c                       |  14 +-
+ target/ppc/translate_init.inc.c               |   4 +-
+ MAINTAINERS                                   |   1 +
+ 26 files changed, 342 insertions(+), 277 deletions(-)
+ create mode 100644 scripts/coccinelle/simplify-init-realize-error_propagate.=
+cocci
+
+--=20
+2.21.1
+
 
