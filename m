@@ -1,74 +1,89 @@
 Return-Path: <SRS0=Byls=54=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05EC5C2D0EC
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 04:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D37C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 09:16:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7F3220578
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 04:28:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7F3220578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 20870206DA
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 09:16:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lcwjimPZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20870206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNUEA-00029m-17
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 00:28:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53912)
+	id 1jNYih-0007Vl-82
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 05:16:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40124)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jNUBy-0008Il-Ir
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 00:25:59 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1jNYi1-0006yx-8q
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 05:15:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jNUBx-0001FH-EX
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 00:25:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43914)
+ (envelope-from <mrolnik@gmail.com>) id 1jNYi0-0005St-4U
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 05:15:21 -0400
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:36909)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jNUBx-0001Et-9i
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 00:25:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jNUBw-0006Ed-5o
- for <qemu-devel@nongnu.org>; Sun, 12 Apr 2020 04:25:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 272AD2E810E
- for <qemu-devel@nongnu.org>; Sun, 12 Apr 2020 04:25:56 +0000 (UTC)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1jNYi0-0005Sb-0c
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 05:15:20 -0400
+Received: by mail-qt1-x841.google.com with SMTP id q17so4697987qtp.4
+ for <qemu-devel@nongnu.org>; Sun, 12 Apr 2020 02:15:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=3U1qj3o6QEsmXuWh3a8R+Av6avW64WyTo3s6lImj8xs=;
+ b=lcwjimPZssusqwzrG48fPDY+9gGQ23X+qtyWagDWXl20a/cVXYzQF1Dvzn8pfZQybZ
+ 6HwkjCM4jon1ICTTPALqBX38K0pNgvWJ0mkslycxw3LE5kueaXOta2x/wnyLeucjHEWC
+ sz/j4uLM5wtwaQLgkHzhVGwBYcjDf9kEwOkjbSusnZUh7fxa57zoafpqv7hTrlCpUY3W
+ CMWkCi/K5KZUlpTOjd76I582dE6dL32reJA/c+deCGTzuEID1JTgh7l3DqOJPTo8ARt+
+ f4yftpNCSE0Y3qCgc9X7NOGCYuNU8vsJTSHDrJRKY/2ZcNWA9oT3O7KpfFEBof2GLs6S
+ snfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=3U1qj3o6QEsmXuWh3a8R+Av6avW64WyTo3s6lImj8xs=;
+ b=HbQp5Ra9hyafZHMr9Ims7Es2ocf1E/4Nae5Q3mS+fwqnzYQydkklYu907IYr+t1VM9
+ 3cvYgtItU0eURrIUHJVTYxwWKEuOv3/+8FbWUKWROqpb4hF0d00iA9DZ8NIsWu6zCiSB
+ eCPD/PwCNj6eQ4ai9ifPiDLZ5vl+DJXobpRrUxPUqAhVc0breat8w19Hgb+jmdTt2jqg
+ Vm5YJxG2okYjiOogdVGiQ5+x+QSgV+KVNdcQCdlJVprrMu5GKCu+DbXqeQquS2Xf2qSF
+ GJ0Dxh/0San8aqPeamtRGDSVy1TeTAWNF9EbmzL43K5wFBUitq/cgizkphJyLosr2MEJ
+ NQFQ==
+X-Gm-Message-State: AGi0PubIA1Qu9Ovi9T7sMIN+wiZNyO0Wi5Xj1s9N23Om2URGpQxWoApt
+ R677M2XOaKnJWJ6T/GaXewiea64kj2a0BgABVtU=
+X-Google-Smtp-Source: APiQypIlZ60AEi541/pXL+KUiVdfjWkR2DyBJXG2o+712jsRjmsLpjgNvxNq2MicD1ay50IR5QJH3o1hXsSJn/xba58=
+X-Received: by 2002:ac8:4f03:: with SMTP id b3mr6537717qte.282.1586682919047; 
+ Sun, 12 Apr 2020 02:15:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 12 Apr 2020 04:17:32 -0000
-From: Launchpad Bug Tracker <1649040@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor lpnow th-huth
-X-Launchpad-Bug-Reporter: LPNow (lpnow)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <20161211031531.25603.88090.malonedeb@gac.canonical.com>
-Message-Id: <158666505222.12794.14287018764333485485.malone@loganberry.canonical.com>
-Subject: [Bug 1649040] Re: Ubuntu 16.04.1 Grub Splash Doesn't Appear
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8ebf28f45a01ef2c2d90e76b544e2bcd1b3affc0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+References: <20200118191416.19934-1-mrolnik@gmail.com>
+ <20200118191416.19934-2-mrolnik@gmail.com>
+ <80141c57-7fb7-6e95-4070-54f7cc23e166@redhat.com>
+ <CAK4993ie33Awp=sqUOcubqCLFqTd5mTPAkWQfhh3zvorMwnSig@mail.gmail.com>
+ <8ac9a03a-a02f-1b48-c75d-77e4b8aea9ef@linaro.org>
+ <45d68295-416b-b6d2-a512-86f6120432f0@redhat.com>
+ <CAK4993iVT358BOU9gQKcNEDLw_smTfvzm0ePDO1WLubtGx_Mvw@mail.gmail.com>
+In-Reply-To: <CAK4993iVT358BOU9gQKcNEDLw_smTfvzm0ePDO1WLubtGx_Mvw@mail.gmail.com>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Sun, 12 Apr 2020 12:14:33 +0300
+Message-ID: <CAK4993ignoQ2c8hz7WSYVORTmmzrFaLM+XB-yczSAaTcyVs8Dw@mail.gmail.com>
+Subject: Re: [PATCH v41 01/21] target/avr: Add outward facing interfaces and
+ core CPU logic
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000c2d70205a3146786"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::841
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,94 +92,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1649040 <1649040@bugs.launchpad.net>
+Cc: Thomas Huth <thuth@redhat.com>, Sarah Harris <S.E.Harris@kent.ac.uk>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+--000000000000c2d70205a3146786
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+hi all.
 
--- =
+are there any news / updates about AVR support?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1649040
+On Mon, Mar 23, 2020 at 10:14 PM Michael Rolnik <mrolnik@gmail.com> wrote:
 
-Title:
-  Ubuntu 16.04.1 Grub Splash Doesn't Appear
+> thanks Philippe.
+>
+> On Mon, Mar 23, 2020 at 9:20 PM Philippe Mathieu-Daud=C3=A9 <philmd@redha=
+t.com>
+> wrote:
+>
+>> On 3/23/20 7:03 PM, Richard Henderson wrote:
+>> > On 3/23/20 10:03 AM, Michael Rolnik wrote:
+>> >> Hi Philippe.
+>> >>
+>> >> It's been a while. let me think about it and get back to you. what is
+>> your
+>> >> concern ?
+>>
+>> We are using this series with Joaquin for a Google Summit of Code
+>> project, so we are noticing some bugs and fixing them.
+>> As it has not been merged, we work in a fork.
+>> Since it was posted on the list, I prefer to ask on the list than
+>> directly to you.
+>>
+>> >
+>> > It shouldn't be there.  See commit 1f5c00cfdb81.
+>>
+>> Ah it has been moved to cpu_common_reset, thanks :)
+>> I suppose it is because this port is based on some quite old work.
+>>
+>> >
+>> >>      > +    memset(env->r, 0, sizeof(env->r));
+>> >>      > +
+>> >>      > +    tlb_flush(cs);
+>> >>
+>> >>      Why are you calling tlb_flush() here?
+>> >
+>> >
+>> > r~
+>> >
+>>
+>>
+>
+> --
+> Best Regards,
+> Michael Rolnik
+>
 
-Status in QEMU:
-  Expired
 
-Bug description:
-  My Specs:
+--=20
+Best Regards,
+Michael Rolnik
 
-  Slackware 14.2 x86_64 > Host
-  QEMU 2.7.0
+--000000000000c2d70205a3146786
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Ubuntu 16.04.1 x86_64 > Guest
+<div dir=3D"ltr">hi all.<div><br></div><div>are there any news / updates ab=
+out AVR support?</div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr"=
+ class=3D"gmail_attr">On Mon, Mar 23, 2020 at 10:14 PM Michael Rolnik &lt;<=
+a href=3D"mailto:mrolnik@gmail.com">mrolnik@gmail.com</a>&gt; wrote:<br></d=
+iv><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bord=
+er-left:1px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"ltr">thank=
+s Philippe.</div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"g=
+mail_attr">On Mon, Mar 23, 2020 at 9:20 PM Philippe Mathieu-Daud=C3=A9 &lt;=
+<a href=3D"mailto:philmd@redhat.com" target=3D"_blank">philmd@redhat.com</a=
+>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
+ 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On =
+3/23/20 7:03 PM, Richard Henderson wrote:<br>
+&gt; On 3/23/20 10:03 AM, Michael Rolnik wrote:<br>
+&gt;&gt; Hi Philippe.<br>
+&gt;&gt;<br>
+&gt;&gt; It&#39;s been a while. let me think about it=C2=A0and get back to =
+you. what is your<br>
+&gt;&gt; concern ?<br>
+<br>
+We are using this series with Joaquin for a Google Summit of Code <br>
+project, so we are noticing some bugs and fixing them.<br>
+As it has not been merged, we work in a fork.<br>
+Since it was posted on the list, I prefer to ask on the list than <br>
+directly to you.<br>
+<br>
+&gt; <br>
+&gt; It shouldn&#39;t be there.=C2=A0 See commit 1f5c00cfdb81.<br>
+<br>
+Ah it has been moved to cpu_common_reset, thanks :)<br>
+I suppose it is because this port is based on some quite old work.<br>
+<br>
+&gt; <br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 memset(env-&gt;r, 0, sizeo=
+f(env-&gt;r));<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 tlb_flush(cs);<br>
+&gt;&gt;<br>
+&gt;&gt;=C2=A0 =C2=A0 =C2=A0 Why are you calling tlb_flush() here?<br>
+&gt; <br>
+&gt; <br>
+&gt; r~<br>
+&gt; <br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+>Best Regards,<br>Michael Rolnik</div>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">Best Regards,<br>Michael Rolnik</div>
 
-  Start options for Ubuntu:
-
-  qemu-system-x86_64 -drive format=3Draw,file=3Dubuntu.img \
-  -cpu host \
-  --enable-kvm \
-  -smp 2 \
-  -m 4096 \
-  -vga vmware \
-  -soundhw ac97 \
-  -usbdevice tablet \
-  -rtc base=3Dlocaltime \
-  -usbdevice host:0781:5575
-
-  I've started Ubuntu around 6-8 times, and I have only see the Grub
-  Boot Splash appear twice, so pretty much without fail it typically
-  boots past the grub splash and automatically boots...
-
-  These are the /etc/default/grub settings; (I only changed these
-  options GRUB_TIMEOUT=3D15 and GRUB_GFXMODE=3D1440x900)
-
-  # If you change this file, run 'update-grub' afterwards to update
-  # /boot/grub/grub.cfg.
-  # For full documentation of the options in this file, see:
-  #   info -f grub -n 'Simple configuration'
-
-  GRUB_DEFAULT=3D0
-  GRUB_HIDDEN_TIMEOUT=3D0
-  GRUB_HIDDEN_TIMEOUT_QUIET=3Dtrue
-  GRUB_TIMEOUT=3D15
-  GRUB_DISTRIBUTOR=3D`lsb_release -i -s 2> /dev/null || echo Debian`
-  GRUB_CMDLINE_LINUX_DEFAULT=3D"quiet splash"
-  GRUB_CMDLINE_LINUX=3D""
-
-  # Uncomment to enable BadRAM filtering, modify to suit your needs
-  # This works with Linux (no patch required) and with any kernel that obta=
-ins
-  # the memory map information from GRUB (GNU Mach, kernel of FreeBSD ...)
-  #GRUB_BADRAM=3D"0x01234567,0xfefefefe,0x89abcdef,0xefefefef"
-
-  # Uncomment to disable graphical terminal (grub-pc only)
-  #GRUB_TERMINAL=3Dconsole
-
-  # The resolution used on graphical terminal
-  # note that you can use only modes which your graphic card supports via V=
-BE
-  # you can see them in real GRUB with the command `vbeinfo'
-  GRUB_GFXMODE=3D1440x900
-
-  # Uncomment if you don't want GRUB to pass "root=3DUUID=3Dxxx" parameter =
-to Linux
-  #GRUB_DISABLE_LINUX_UUID=3Dtrue
-
-  # Uncomment to disable generation of recovery mode menu entries
-  #GRUB_DISABLE_RECOVERY=3D"true"
-
-  # Uncomment to get a beep at grub start
-  #GRUB_INIT_TUNE=3D"480 440 1"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1649040/+subscriptions
+--000000000000c2d70205a3146786--
 
