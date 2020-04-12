@@ -2,86 +2,90 @@ Return-Path: <SRS0=Byls=54=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6912DC2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:37:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB97C2BB86
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:37:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 269C1206E5
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:37:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9747206E5
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:37:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcKgdj2G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 269C1206E5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o4Ei/9dO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9747206E5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlEK-0006p6-8i
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:37:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47069)
+	id 1jNlEN-0006xF-RZ
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:37:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47094)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDK-0004tM-6U
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:31 -0400
+ id 1jNlDN-0004vF-US
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDI-0001mG-5u
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:30 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36397)
+ id 1jNlDM-0001sg-Ht
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:33 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:41592)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDH-0001l8-J0; Sun, 12 Apr 2020 18:36:28 -0400
-Received: by mail-wm1-x342.google.com with SMTP id a201so8009293wme.1;
- Sun, 12 Apr 2020 15:36:26 -0700 (PDT)
+ id 1jNlDM-0001rA-Bo; Sun, 12 Apr 2020 18:36:32 -0400
+Received: by mail-wr1-x435.google.com with SMTP id h9so8522755wrc.8;
+ Sun, 12 Apr 2020 15:36:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=O9DVxnJIdTKjCwxywR9qxji3Q0BtyKw5Rq6FDdEjMX4=;
- b=bcKgdj2G5dcGHI/taGqt6SJmDDHYp8NjlA/n51/kci3Ejs50CU02jtQQmxvBUHJ5Xy
- g1r5E+oSMSNlwg/9QWbuZwE/lY5KgAv1FINYhiKFl5f0Kclg0hZnYUtJAk7PhL4uLeo5
- 5NuKeq9oUQ5hVjSqcOQn7wjVbqpTViGYAOI3PempLhSif4hlNORocx08xlbtnLEzv8Iy
- xhqV2DPXcbrA3f1rTs32egW8cMGqhBgrx17c/nOHDLFjTlXH2sVhpFpVCxHlOUSB8fZJ
- pbKqoETm/J5XUHsCsLHihpsRS05/a01GS10LUxJ+9xp7A+yJ10yabcgUlm4AGm2PgA+y
- pkTg==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=jlN4N/MyMKxw+6nyYt6mkHcMTTQwBCWy2vUqlxSx8T0=;
+ b=o4Ei/9dOSd+pb+KfYpGct9KChO9QJ8t3INjgvz03nHbKqV9fZslP8Ow2/fLlWvdpC8
+ WIhjv+vxJ9nJo2tS/+cKXe2J7n+38whRwAG3PNDX1El80psE7eA9GIRAsE8QunMWfQ35
+ ov6JaB/4LnFtNr1sK+3BMa9KlLFht2LQwx0yp8L2QRFMI2yy3mCfRh7N30QhG4TjrMZD
+ uK9tf4jiBaCdyf6sUGrEI0WBXGmtaM53z870M6kVKPdvKHq+1yVqV3H0yMCmx7zPgUhN
+ djdaWnc7dAvHxRzPHzBMABbhZKQvHshfp9gO2KcPZrhFqQV2IYcha8XeezZPKGcTwnTC
+ UvPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=O9DVxnJIdTKjCwxywR9qxji3Q0BtyKw5Rq6FDdEjMX4=;
- b=G4UG8nEYoprHURVLWz79ezlAq2TAQUSRpXilI9BjdVKp6ZEmBw+C3SgeEYJwm7w612
- jgVt9BCyJrmVC2iGepNW/2qp1TaFB9bRS5lBfFBJUzmpizoBEbAFqlKofGqWE2chTj0Z
- oAsnDlqeLlckjfqL6mrIgRoXkJVvychG04+tkXp6Zi2jGkMUh7rSx01fAPLwT0BuKdvI
- IIcIXxOdVvXbmXFcpmud92s7ME8dLUOcETNnGXnYvj2drokfQZfWLeHZYUKcZsaKQ+sX
- 8aw3W0/Mg1nTTBBuSGHSMfF8bf7Qb6CppKq2RlkCXHoDSy7Qwi6qKMoxO8POpcji0krY
- 2wlw==
-X-Gm-Message-State: AGi0PuaR10BpGOaoPs4JLjgvx4z57PK+1c0dQzdtlSsS6ipZokEa2D8z
- 3xLuVLc912nHJPp/T29IxlPG/qUvIuogUQ==
-X-Google-Smtp-Source: APiQypJvvtcUJDqdYeNSOxHeoHZ059BKv4U4AQaaG1JUVHscWMaZJzol3gpsvjuVDmfwxlJpd4rRPw==
-X-Received: by 2002:a1c:7ed7:: with SMTP id z206mr14925481wmc.64.1586730984452; 
- Sun, 12 Apr 2020 15:36:24 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=jlN4N/MyMKxw+6nyYt6mkHcMTTQwBCWy2vUqlxSx8T0=;
+ b=jwSeh5/l5DSzlmbWmP00SAfWvD+c95FQCmXw7PQWLTqXvovg57KFyHcKDGq/Pg4R4u
+ RL6Sb1kHjwjngBo3OlIEaHOTUQvHW+EkqVZAomNuOo0Xy9qHaimPcNvN4xY3mJ88xonY
+ sajq21MfzmWbFaIkkLhQ7JMCdJZJI471pR4cPf7EJ5hBmsP+u79X0lkqJPnWz8F9Pt9y
+ Jo2cTdMCvpQb/dgl7/f6+3L3gvoIcuz+2V7CrNlvurBIeWgCxpnL49bre4wFfPb03N0m
+ zTjX1WXwTonlelqrXSvOfql1/xSLrH8nojYY2nwrCCxe0dP2ir5d9YNBaUl5ffTbMIh4
+ mkWQ==
+X-Gm-Message-State: AGi0Pubi7CYfgefR1nDlg4tDGqsKQ/WKFcNzpuj9LVfm6f5t1P2UBO5j
+ HAoYAvz9DL5FxeZN3xalWoyf2TCg5QOG2A==
+X-Google-Smtp-Source: APiQypISyMaT/TEYDulrWCp1xfABa0NvDX/ISMcM9WlX6BfAJqa64wFywZotnnQ2RAljUAl7aZ359A==
+X-Received: by 2002:a5d:694a:: with SMTP id r10mr15903243wrw.228.1586730991085; 
+ Sun, 12 Apr 2020 15:36:31 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.36.20
+ by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.36.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:36:23 -0700 (PDT)
+ Sun, 12 Apr 2020 15:36:30 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 00/24] various: Fix error-propagation with
- Coccinelle scripts (part 1)
-Date: Mon, 13 Apr 2020 00:35:55 +0200
-Message-Id: <20200412223619.11284-1-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v3 02/24] scripts/coccinelle: Script to simplify
+ DeviceClass error propagation
+Date: Mon, 13 Apr 2020 00:35:57 +0200
+Message-Id: <20200412223619.11284-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200412223619.11284-1-f4bug@amsat.org>
+References: <20200412223619.11284-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::435
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,81 +126,105 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series is inspired of Peter Maydell fix [1]:
-"hw/arm/xlnx-zynqmp.c: fix some error-handling code",
-but grew after v1 [2] review :/
+When a device uses an Error* with data not modified before realize(),
+this call can be moved to init(). Add a Coccinelle patch to find such
+uses.
 
-Markus: I added the cocci patches to your Error section, I hope
-that's fine :)
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ ...implify-init-realize-error_propagate.cocci | 69 +++++++++++++++++++
+ MAINTAINERS                                   |  1 +
+ 2 files changed, 70 insertions(+)
+ create mode 100644 scripts/coccinelle/simplify-init-realize-error_propagate.cocci
 
-Part 1: Simplify error propagation by moving some code from
-        DeviceClass::realize() to DeviceClass:initfn().
-
-Regards,
-
-Phil.
-
-[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg691636.html
-[2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg692155.html
-Supersedes: <20200406174743.16956-1-f4bug@amsat.org>
-
-Philippe Mathieu-Daud=C3=A9 (24):
-  various: Remove suspicious '\' character outside of #define in C code
-  scripts/coccinelle: Script to simplify DeviceClass error propagation
-  hw/arm/allwinner-a10: Move some code from realize() to init()
-  hw/arm/aspeed_ast2600: Simplify use of Error*
-  hw/arm/aspeed_ast2600: Move some code from realize() to init()
-  hw/arm/aspeed_soc: Move some code from realize() to init()
-  hw/arm/aspeed_soc: Simplify use of Error*
-  hw/arm/fsl-imx6: Simplify checks on 'smp_cpus' count
-  hw/arm/fsl-imx6: Move some code from realize() to init()
-  hw/arm/fsl-imx31: Move some code from realize() to init()
-  hw/arm/msf2-soc: Store MemoryRegion in MSF2State
-  hw/arm/stm32f205_soc: Store MemoryRegion in STM32F205State
-  hw/arm/stm32f205_soc: Move some code from realize() to init()
-  hw/arm/xlnx-zynqmp: Use single propagate_error() call
-  hw/arm/xlnx-zynqmp: Split xlnx_zynqmp_create_rpu() as init + realize
-  hw/arm/xlnx-zynqmp: Move some code from realize() to init()
-  hw/microblaze/xlnx-zynqmp-pmu: Move some code from realize() to init()
-  hw/pci-host/pnv_phb3: Move some code from realize() to init()
-  hw/riscv/sifive_e: Move some code from realize() to init()
-  hw/riscv/sifive_u: Use single type_init()
-  hw/riscv/sifive_u: Move some code from realize() to init()
-  hw/riscv/sifive_u: Store MemoryRegion in SiFiveUSoCState
-  hw/riscv/sifive_u: Move some code from realize() to init()
-  hw/riscv/sifive_u: Rename MachineClass::init()
-
- ...implify-init-realize-error_propagate.cocci |  69 ++++++++++
- include/hw/arm/msf2-soc.h                     |   4 +
- include/hw/arm/stm32f205_soc.h                |   4 +
- include/hw/riscv/sifive_u.h                   |   2 +
- block/replication.c                           |   4 +-
- block/vhdx.c                                  |   8 +-
- dump/dump.c                                   |   2 +-
- hw/arm/allwinner-a10.c                        |  26 ++--
- hw/arm/aspeed_ast2600.c                       |  61 +++++----
- hw/arm/aspeed_soc.c                           |  19 +--
- hw/arm/fsl-imx31.c                            |   4 +-
- hw/arm/fsl-imx6.c                             |  55 ++++----
- hw/arm/msf2-soc.c                             |  18 +--
- hw/arm/stm32f205_soc.c                        |  28 ++--
- hw/arm/xlnx-zynqmp.c                          | 126 +++++++++---------
- hw/microblaze/xlnx-zynqmp-pmu.c               |  46 +++----
- hw/net/virtio-net.c                           |   2 +-
- hw/pci-host/pnv_phb3.c                        |   8 +-
- hw/riscv/sifive_e.c                           |  26 ++--
- hw/riscv/sifive_u.c                           |  66 +++++----
- hw/scsi/scsi-disk.c                           |   2 +-
- hw/sd/sdhci.c                                 |   2 +-
- target/i386/cpu.c                             |  18 +--
- target/microblaze/cpu.c                       |  14 +-
- target/ppc/translate_init.inc.c               |   4 +-
- MAINTAINERS                                   |   1 +
- 26 files changed, 342 insertions(+), 277 deletions(-)
- create mode 100644 scripts/coccinelle/simplify-init-realize-error_propagate.=
-cocci
-
---=20
+diff --git a/scripts/coccinelle/simplify-init-realize-error_propagate.cocci b/scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+new file mode 100644
+index 0000000000..2e3ec4d98a
+--- /dev/null
++++ b/scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+@@ -0,0 +1,69 @@
++// Find error-propagation calls that don't need to be in DeviceClass::realize()
++// because they don't use information user can change before calling realize(),
++// so they can be moved to DeviceClass:initfn() where error propagation is not
++// needed.
++//
++// Copyright: (C) 2020 Philippe Mathieu-Daudé
++// This work is licensed under the terms of the GNU GPLv2 or later.
++//
++// spatch \
++//  --macro-file scripts/cocci-macro-file.h \
++//  --sp-file \
++//    scripts/coccinelle/simplify-init-realize-error_propagate.cocci \
++//  --timeout 60
++//
++// Inspired by https://www.mail-archive.com/qemu-devel@nongnu.org/msg692500.html
++
++
++@ match_class_init @
++TypeInfo info;
++identifier class_initfn;
++@@
++    info.class_init = class_initfn;
++
++
++@ match_instance_init @
++TypeInfo info;
++identifier instance_initfn;
++@@
++    info.instance_init = instance_initfn;
++
++
++@ match_realize @
++identifier match_class_init.class_initfn;
++DeviceClass *dc;
++identifier realizefn;
++@@
++void class_initfn(...)
++{
++    ...
++    dc->realize = realizefn;
++    ...
++}
++
++
++@ propagate_in_realize @
++identifier match_realize.realizefn;
++identifier err;
++identifier errp;
++identifier func_with_errp =~ "(?!object_property_set_link)";
++symbol error_abort, error_fatal;
++position pos;
++@@
++void realizefn@pos(..., Error **errp)
++{
++    ...
++    Error *err = NULL;
++    <+...
++    func_with_errp(..., \(&error_abort\|&error_fatal\));
++    ...+>
++}
++
++
++@ script:python @
++initfn << match_instance_init.instance_initfn;
++realizefn << match_realize.realizefn;
++p << propagate_in_realize.pos;
++@@
++print('>>> possible moves from {}() to {}() in {}:{}'
++      .format(initfn, realizefn, p[0].file, p[0].line))
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 642c8e0b6b..6203543ec0 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2058,6 +2058,7 @@ F: scripts/coccinelle/err-bad-newline.cocci
+ F: scripts/coccinelle/error-use-after-free.cocci
+ F: scripts/coccinelle/error_propagate_null.cocci
+ F: scripts/coccinelle/remove_local_err.cocci
++F: scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+ F: scripts/coccinelle/use-error_fatal.cocci
+ 
+ GDB stub
+-- 
 2.21.1
 
 
