@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C26C2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E35BC2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:40:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECCD6206E5
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:40:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27A3C206E5
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:40:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eFlUd8YE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECCD6206E5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yms+dVno"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A3C206E5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlHI-00053o-WB
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:40:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47537)
+	id 1jNlHV-0005hF-9S
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:40:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47674)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDm-00060A-1j
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:59 -0400
+ id 1jNlDs-0006JD-EZ
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDk-0002as-RW
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:57 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40094)
+ id 1jNlDr-0002jG-BG
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:04 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39444)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDk-0002a4-Kj; Sun, 12 Apr 2020 18:36:56 -0400
-Received: by mail-wr1-x441.google.com with SMTP id s8so8515793wrt.7;
- Sun, 12 Apr 2020 15:36:56 -0700 (PDT)
+ id 1jNlDr-0002id-4d; Sun, 12 Apr 2020 18:37:03 -0400
+Received: by mail-wr1-x441.google.com with SMTP id p10so8517155wrt.6;
+ Sun, 12 Apr 2020 15:37:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=6j0bhZZ4DXOIthIvcH8V/7teI/2Tb9x+JKEVdKazvPI=;
- b=eFlUd8YEqZR/79bEwbmGKECR8/EG2M4YzFCWq3LM08R0hHAPy+gzaCZAV03gn6/lAY
- jn+9+rtK4Xfimpyr4E8Qx9FsPUwPLRLggGi00zgpDTEL7bwTiDZhZ0em9A5UbtxwpSpj
- FZLJZXEE1waHPMxAD+KhRXVHtn7aoXnJbrm8Wts4dZ3xKncTCQWBTaiT3v8idWJBSlNJ
- tuv/tGTzoxre+aNodrp5aya19i1uidhDFCw7d/rMaI6xdgo/mwru/10anjgfsQJ8jPsj
- HxyKqY/GZMcHFK8a+XS3ET6vbx/itFfEcCNOreDuV7LSYsosLtYgGEXzX0kFpMDK2iVP
- YNZw==
+ bh=rNOvzQC0gAZiW9IjgvdXICw1FeldG6faD6QdyriSpSA=;
+ b=Yms+dVnobgL/uTyskm/CPmGVpuY5K7rRdl/y/Xcw36vwxQ4cXdVkaf3wqlD8Za79ok
+ U/eQ0KdvGCCuYFZ6RYlgmadQw237gtmd5zOSr/E+aphrQk0rOZiAm1wPzlXJDvs9JINY
+ 8VnhhvZP4diyOC0umPSzp9tvtLp/ucbCoD6izhWzKJqtl71n/GtUO9MS/z+54RzS5EuG
+ TpszyNIilI0JzZmpURO6BKGFuZItPz4l9BMi0zWjeYqESlxn0f+uC1hL/8ZpSj+eM+4R
+ oE/CzP/7uRejFlskPIu9dMheg0X2Cma9G7Y8Fnm3Aj7SCBA5yxD6SJn6AeZN8ankWpGb
+ Xe7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=6j0bhZZ4DXOIthIvcH8V/7teI/2Tb9x+JKEVdKazvPI=;
- b=VEUEbUW/dC3w9XR+l93hEQJpl0D2iFWIQQLyG3rx+UPCqUiFhp5aJdE3ZulKg0z0fT
- A04go+1FnPa5sMj6WrEnFRYoIfJP52f0x8b82AS0sudMSF6K6k6WgHYLxec3YkkUiSA0
- g7Zxv94Gip+g3m2Ts199n/FKxSEGuIkZ/IP478QL6cMbFDSpYBMxFRuTxsSzzuSOoe/1
- p6iVhbTva5x9gl/WR1u24tJPXO5UJ7GuAhHk5x1FOHvCHKPADC2y/blKOOiueptKogB4
- PUWdgMT10o/0VdTxHWlh+JriO+2E4AK2+OP7RosFYutdGR1BM1mFJr4JnG3hT5m256NT
- AFiw==
-X-Gm-Message-State: AGi0PuZFFm/50NMuNlgdTggoERF2fW0Ppn28oyBRtPPdOiZhNfvxosrv
- i2a2U1V1Xs99s2PHBHLu7E7PSYWKxaqf4w==
-X-Google-Smtp-Source: APiQypKEjrLxX9i3bDjxv2a41yRjAhO0grt5Neq8gfpVkF/6bV2sC/1Y2A4snIazbnU+Ux5llElkPA==
-X-Received: by 2002:a05:6000:370:: with SMTP id
- f16mr16595619wrf.9.1586731015348; 
- Sun, 12 Apr 2020 15:36:55 -0700 (PDT)
+ bh=rNOvzQC0gAZiW9IjgvdXICw1FeldG6faD6QdyriSpSA=;
+ b=gSGniEl22W1ter74CjmVc3KYe9zSvzn8Ksi3aFaV5/Bj9NbFZBVj4lUEews8eICEzw
+ bIHSRWnDtViC0op4xQRxiZX0Y2qBn9NXqsnF7UddayAQtfmHCYaibWOdyhbzpaz7BnDk
+ /GL5iBb4NVq6U+499SblbENep/l9adNiw92XjTYxekSEnsBMHTG46NhztrmY4FUNMXnx
+ b8iCy0eRlC/x824tz4yMgqyBj38KW3qYT6oJOqCoRJFySFcLPrE6Y+vjMGbv6LtdyNiJ
+ gUuyE6kCqovhaCSxs39AZEtjrexBg2XRcuEtNs9MFL204NN5yO36uiv36FgkRhRqo1rM
+ fmbw==
+X-Gm-Message-State: AGi0PuZN0OCL7fDqB3ZhxvdLvqenrfR84NwbpIGko/tH9H3jirCw5Utn
+ VDOaTMxoZ1AlPcPEA10N0VGyAbnQaGGP/w==
+X-Google-Smtp-Source: APiQypLDnd72DBOXRbnDuWWsEfUNONBBfh/ms5TeKXv3Kg76nSxYgcVFqpN2VUF98/bEvc0lFqt5UQ==
+X-Received: by 2002:adf:ee06:: with SMTP id y6mr16579217wrn.187.1586731021977; 
+ Sun, 12 Apr 2020 15:37:01 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.36.52
+ by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.36.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:36:54 -0700 (PDT)
+ Sun, 12 Apr 2020 15:37:01 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 09/24] hw/arm/fsl-imx6: Move some code from
- realize() to init()
-Date: Mon, 13 Apr 2020 00:36:04 +0200
-Message-Id: <20200412223619.11284-10-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v3 11/24] hw/arm/msf2-soc: Store MemoryRegion in
+ MSF2State
+Date: Mon, 13 Apr 2020 00:36:06 +0200
+Message-Id: <20200412223619.11284-12-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200412223619.11284-1-f4bug@amsat.org>
 References: <20200412223619.11284-1-f4bug@amsat.org>
@@ -127,114 +126,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coccinelle failed at processing this file:
+Coccinelle reported:
 
   $ spatch ... --timeout 60 --sp-file \
     scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-  HANDLING: ./hw/arm/fsl-imx6.c
-  Fatal error: exception Coccinelle_modules.Common.Timeout
+  HANDLING: ./hw/arm/msf2-soc.c
+  >>> possible moves from m2sxxx_soc_initfn() to m2sxxx_soc_realize() in ./hw/arm/msf2-soc.c:86
 
-While reviewing we noticed some functions can be called at
-init() time, reducing the need to add extra Error checks at
-realize() time. Move them. The coccinelle script succeeds
-after this.
+While reviewing we notice storing the MemoryRegion in the device
+state, we'll be able to later automatically simplify the error
+propagation calls.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/fsl-imx6.c | 47 +++++++++++++++++++++++------------------------
- 1 file changed, 23 insertions(+), 24 deletions(-)
+ include/hw/arm/msf2-soc.h |  4 ++++
+ hw/arm/msf2-soc.c         | 18 +++++++-----------
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index 3d37352b08..6bf8aa0404 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -48,11 +48,30 @@ static void fsl_imx6_init(Object *obj)
-         object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
-                                 ARM_CPU_TYPE_NAME("cortex-a9"),
-                                 &error_abort, NULL);
+diff --git a/include/hw/arm/msf2-soc.h b/include/hw/arm/msf2-soc.h
+index 3cfe5c76ee..e4c5110036 100644
+--- a/include/hw/arm/msf2-soc.h
++++ b/include/hw/arm/msf2-soc.h
+@@ -50,6 +50,10 @@ typedef struct MSF2State {
+ 
+     ARMv7MState armv7m;
+ 
++    MemoryRegion sram;
++    MemoryRegion nvm;
++    MemoryRegion nvm_alias;
 +
-+        /* On uniprocessor, the CBAR is set to 0 */
-+        if (smp_cpus > 1) {
-+            object_property_set_int(OBJECT(&s->cpu[i]), FSL_IMX6_A9MPCORE_ADDR,
-+                                    "reset-cbar", &error_abort);
-+        }
-+
-+        /* All CPU but CPU 0 start in power off mode */
-+        if (i) {
-+            object_property_set_bool(OBJECT(&s->cpu[i]), true,
-+                                     "start-powered-off", &error_abort);
-+        }
-     }
- 
-     sysbus_init_child_obj(obj, "a9mpcore", &s->a9mpcore, sizeof(s->a9mpcore),
-                           TYPE_A9MPCORE_PRIV);
- 
-+    object_property_set_int(OBJECT(&s->a9mpcore), smp_cpus, "num-cpu",
-+                            &error_abort);
-+
-+    object_property_set_int(OBJECT(&s->a9mpcore),
-+                            FSL_IMX6_MAX_IRQ + GIC_INTERNAL, "num-irq",
-+                            &error_abort);
-+
-     sysbus_init_child_obj(obj, "ccm", &s->ccm, sizeof(s->ccm), TYPE_IMX6_CCM);
- 
-     sysbus_init_child_obj(obj, "src", &s->src, sizeof(s->src), TYPE_IMX6_SRC);
-@@ -81,6 +100,10 @@ static void fsl_imx6_init(Object *obj)
-         snprintf(name, NAME_SIZE, "gpio%d", i + 1);
-         sysbus_init_child_obj(obj, name, &s->gpio[i], sizeof(s->gpio[i]),
-                               TYPE_IMX_GPIO);
-+        object_property_set_bool(OBJECT(&s->gpio[i]), true, "has-edge-sel",
-+                                 &error_abort);
-+        object_property_set_bool(OBJECT(&s->gpio[i]), true, "has-upper-pin-irq",
-+                                 &error_abort);
-     }
- 
-     for (i = 0; i < FSL_IMX6_NUM_ESDHCS; i++) {
-@@ -124,19 +147,6 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-     unsigned int smp_cpus = ms->smp.cpus;
- 
-     for (i = 0; i < smp_cpus; i++) {
+     char *cpu_type;
+     char *part_name;
+     uint64_t envm_size;
+diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
+index 588d643b8d..e448b0ab74 100644
+--- a/hw/arm/msf2-soc.c
++++ b/hw/arm/msf2-soc.c
+@@ -90,13 +90,9 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
+     SysBusDevice *busdev;
+     Error *err = NULL;
+     int i;
 -
--        /* On uniprocessor, the CBAR is set to 0 */
--        if (smp_cpus > 1) {
--            object_property_set_int(OBJECT(&s->cpu[i]), FSL_IMX6_A9MPCORE_ADDR,
--                                    "reset-cbar", &error_abort);
--        }
--
--        /* All CPU but CPU 0 start in power off mode */
--        if (i) {
--            object_property_set_bool(OBJECT(&s->cpu[i]), true,
--                                     "start-powered-off", &error_abort);
--        }
--
-         object_property_set_bool(OBJECT(&s->cpu[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-@@ -144,13 +154,6 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-         }
-     }
+     MemoryRegion *system_memory = get_system_memory();
+-    MemoryRegion *nvm = g_new(MemoryRegion, 1);
+-    MemoryRegion *nvm_alias = g_new(MemoryRegion, 1);
+-    MemoryRegion *sram = g_new(MemoryRegion, 1);
  
--    object_property_set_int(OBJECT(&s->a9mpcore), smp_cpus, "num-cpu",
--                            &error_abort);
--
--    object_property_set_int(OBJECT(&s->a9mpcore),
--                            FSL_IMX6_MAX_IRQ + GIC_INTERNAL, "num-irq",
--                            &error_abort);
--
-     object_property_set_bool(OBJECT(&s->a9mpcore), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-@@ -310,10 +313,6 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-             },
-         };
+-    memory_region_init_rom(nvm, OBJECT(dev_soc), "MSF2.eNVM", s->envm_size,
++    memory_region_init_rom(&s->nvm, OBJECT(dev_soc), "MSF2.eNVM", s->envm_size,
+                            &error_fatal);
+     /*
+      * On power-on, the eNVM region 0x60000000 is automatically
+@@ -104,15 +100,15 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
+      * start address (0x0). We do not support remapping other eNVM,
+      * eSRAM and DDR regions by guest(via Sysreg) currently.
+      */
+-    memory_region_init_alias(nvm_alias, OBJECT(dev_soc), "MSF2.eNVM", nvm, 0,
+-                             s->envm_size);
++    memory_region_init_alias(&s->nvm_alias, OBJECT(dev_soc), "MSF2.eNVM",
++                             &s->nvm, 0, s->envm_size);
  
--        object_property_set_bool(OBJECT(&s->gpio[i]), true, "has-edge-sel",
--                                 &error_abort);
--        object_property_set_bool(OBJECT(&s->gpio[i]), true, "has-upper-pin-irq",
--                                 &error_abort);
-         object_property_set_bool(OBJECT(&s->gpio[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
+-    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm);
+-    memory_region_add_subregion(system_memory, 0, nvm_alias);
++    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, &s->nvm);
++    memory_region_add_subregion(system_memory, 0, &s->nvm_alias);
+ 
+-    memory_region_init_ram(sram, NULL, "MSF2.eSRAM", s->esram_size,
++    memory_region_init_ram(&s->sram, NULL, "MSF2.eSRAM", s->esram_size,
+                            &error_fatal);
+-    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
++    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, &s->sram);
+ 
+     armv7m = DEVICE(&s->armv7m);
+     qdev_prop_set_uint32(armv7m, "num-irq", 81);
 -- 
 2.21.1
 
