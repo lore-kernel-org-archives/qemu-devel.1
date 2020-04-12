@@ -7,85 +7,86 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8623C2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 845C2C2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:50:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B7E320692
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:50:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E59320692
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:50:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BYyCk3ys"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B7E320692
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ff51tXSF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E59320692
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlQj-00080u-J6
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:50:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48316)
+	id 1jNlR7-0000cU-Fh
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:50:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49182)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlEP-0007ip-QF
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:38 -0400
+ id 1jNlIc-0000HI-SG
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:41:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlEO-00037N-Qm
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:37 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40811)
+ id 1jNlIb-0005bL-R4
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:41:58 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:36266)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlEO-00036r-L8; Sun, 12 Apr 2020 18:37:36 -0400
-Received: by mail-wm1-x341.google.com with SMTP id a81so8356808wmf.5;
- Sun, 12 Apr 2020 15:37:36 -0700 (PDT)
+ id 1jNlIb-0005ag-LN; Sun, 12 Apr 2020 18:41:57 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id a201so8022464wme.1;
+ Sun, 12 Apr 2020 15:41:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=hYB5vJlsKA+XSoc5iK2InUvEzWA5ZYFw0I+M2ardO5E=;
- b=BYyCk3ysLTDOxvtJ73/q5WWa8lxptRXaEql9KyX9gVYciRP/cpSDx11z3VBLqHevGi
- ykC7mEJ03yLE/tNA/itYzDSffQy6jbRPpseuo4UqzJ1uwsRXkn18iaqw/MgWpta6rCaT
- Vf1xxjmga+cOmGjRjidRgWAANClD4FNUO7tM8ku5pWUsQgEUGow0aQYZLEoTR2w68m3q
- HKsUCKIUSPXFhNMA6/3dH1nAmCg56ltQs5nmbsUpxZuOsveyypf7KtCiqet1I8wUDQ45
- Rfxiy1kXt4i6mFRQRkSwWLB7gmGiq1RQeinPvKQFwAcfef+hzWeAFiyqMP0WeCAZKQuX
- bfWQ==
+ bh=LZt0wKgOcXbd9J2Y1x7+Xq5w37mnJzb6ovGxsczGG64=;
+ b=Ff51tXSFzMGTVB6OFe8osL8ONzouppYDRkA2PIv3gsEFbZbh7q8ABs7ytxaJIG5bbl
+ SaeJtifskcrkTRvldi2nu7JOj/G4UcSLaf9/ndJ1pJfvdSERV6BQfA75byp+mF6y7ASz
+ gCTdoWdE686ZrX05sirXkyRY3oos7DODVumfnk8QpvNUGUXQRLrb6NYO9McQKJXnymy2
+ f52qr55WLRuifIiwUdlcd1pq7FwLSH15YMqbRtbBdqzlBN5fFhP2pTRiTGry+FUQVQEQ
+ eef+vFNbz+swgk4Mz7sg/TXs4q+tKZ6oCpJ62G7WbY8Y1YDssqlqMgpZX9hd9tkLQ3Ja
+ 3GfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=hYB5vJlsKA+XSoc5iK2InUvEzWA5ZYFw0I+M2ardO5E=;
- b=BhfuFYmKdKk7xTqNzY/0sF5KxbdjTul577k9LuCiZMAG0Mlv+fZ1ZItBEgy1FZ6zUg
- m6Hz/Hf+MkODf9BA0sUFv+uEfq/6uintFPhJaLdmX9X0hQurFygsiGSLs69katCwmMD5
- d5dqRW16L2eve7NqiR5SzeoUvP29U+os9AmZxrmwvMUXSu4u8hcHaSKHkKXkH6++WWEe
- gCuv6nM5TruwbAnkGakg2W81McT62a1lWg3RXX5F9OCrySGqLQxZ+29Q1OkHHQ6lz1N4
- i5Sd3XSVB2ITAy2oFGvZa3ScJpnl9blEvT8NxDIKQvQa13QZi7km4ihaXymJEcjIZ+56
- qVGg==
-X-Gm-Message-State: AGi0PuZwRNVBDikrKfx48MNd8ye6KK6obBExxz5mXJuqwgS47CRXGMqs
- utMovFcnFCVRxiN0ZVz8Nqsfe5hnG28yKg==
-X-Google-Smtp-Source: APiQypKljnwa59JiW3WSGCMMentFT30+ckG5mxUcJQUjQFWIdEJUCrFL68+FcSlCzYIkbBjcw+shKw==
-X-Received: by 2002:a7b:c959:: with SMTP id i25mr15552087wml.20.1586731055515; 
- Sun, 12 Apr 2020 15:37:35 -0700 (PDT)
+ bh=LZt0wKgOcXbd9J2Y1x7+Xq5w37mnJzb6ovGxsczGG64=;
+ b=Tk7Gm0L16z/EsYGQHEIEL66TYQg3iSFoOiXPwus5jKz+RcUuxYSw5FhDrt5ljcpjXe
+ 9jk1PDBwPq6jOaW2J/wT0URj1OaHg3P7pyj7QOU5hoWKEtzzLvhCAt61hzIE6oIh1lB9
+ EXfi4+T3t9ZuzGt1NjKbu0H3r9EJjWb3k+7nW46BGgfJp3CaZ58z+004AyWI1QXph/rF
+ prLbxFL3fhFjqCRwIt9QbI2N59AvIbf4IMlPRQYRL12VJHUd+sMasNEe0Uyd2t8AjOxH
+ gDLMfbEte16aBSGoRRIzIuljmtkZE4ElN3H97INFFmydp/PuuqPojP0VGMs5hUyCFKbo
+ TOXg==
+X-Gm-Message-State: AGi0PubCiH1PKtgA6zKfIsgXXQcfFsWgd1CHrURFVTiNhOcpYImzfDDG
+ i6XCNankBCAN/58+A1/wOT4vyyNJ/T5nSw==
+X-Google-Smtp-Source: APiQypL/eTMuhBIW7cJJft81oZJNUAucSomY9Qu5NwW35Awp1q6yAaZ8cPQZMSNMkHpIPuRZhpyEJA==
+X-Received: by 2002:a05:600c:224a:: with SMTP id
+ a10mr16506355wmm.174.1586731316198; 
+ Sun, 12 Apr 2020 15:41:56 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.37.32
+ by smtp.gmail.com with ESMTPSA id f63sm12083825wma.47.2020.04.12.15.41.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:37:35 -0700 (PDT)
+ Sun, 12 Apr 2020 15:41:55 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 21/24] hw/riscv/sifive_u: Move some code from
- realize() to init()
-Date: Mon, 13 Apr 2020 00:36:16 +0200
-Message-Id: <20200412223619.11284-22-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v3 02/23] hw/arm/fsl-imx: Add missing
+ error-propagation code
+Date: Mon, 13 Apr 2020 00:41:23 +0200
+Message-Id: <20200412224144.12205-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200412223619.11284-1-f4bug@amsat.org>
-References: <20200412223619.11284-1-f4bug@amsat.org>
+In-Reply-To: <20200412224144.12205-1-f4bug@amsat.org>
+References: <20200412224144.12205-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::32b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,74 +98,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
  "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
  Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Joel Stanley <joel@jms.id.au>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>,
+ Markus Armbruster <armbru@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Max Reitz <mreitz@redhat.com>, Joel Stanley <joel@jms.id.au>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>,
  Alistair Francis <alistair@alistair23.me>,
  Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
- Peter Chubb <peter.chubb@nicta.com.au>,
  =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
  qemu-riscv@nongnu.org, Andrew Jeffery <andrew@aj.id.au>,
- Wen Congyang <wencongyang2@huawei.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-ppc@nongnu.org,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Paolo Bonzini <pbonzini@redhat.com>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>, Michael Walle <michael@walle.cc>,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coccinelle reported:
+Patch created mechanically by running:
 
-  $ spatch ... --timeout 60 --sp-file \
-    scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-  HANDLING: ./hw/riscv/sifive_u.c
-  >>> possible moves from riscv_sifive_u_soc_init() to riscv_sifive_u_soc_realize() in ./hw/riscv/sifive_u.c:473
+  $ spatch \
+    --macro-file scripts/cocci-macro-file.h --include-headers \
+    --sp-file scripts/coccinelle/use-error_propagate-in-realize.cocci \
+    --keep-comments --smpl-spacing --in-place --dir hw
 
-Move the calls using &error_abort which don't depend on input
-updated before realize() to init().
-
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v3: Typo 'depend of' -> 'depend on' (eblake)
----
- hw/riscv/sifive_u.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/arm/fsl-imx25.c |  6 +++++-
+ hw/arm/fsl-imx6.c  | 18 +++++++++++++++---
+ 2 files changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 9c90c94c33..754af19eef 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -441,6 +441,8 @@ static void riscv_sifive_u_soc_init(Object *obj)
-     qdev_prop_set_uint32(DEVICE(&s->otp), "serial", OTP_SERIAL);
-     sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
-                           TYPE_CADENCE_GEM);
-+    object_property_set_int(OBJECT(&s->gem), GEM_REVISION, "revision",
-+                            &error_abort);
- }
+diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
+index 6f1a82ce3d..3d87fe867e 100644
+--- a/hw/arm/fsl-imx25.c
++++ b/hw/arm/fsl-imx25.c
+@@ -295,7 +295,11 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
+         };
  
- static bool sifive_u_get_start_in_flash(Object *obj, Error **errp)
-@@ -569,8 +571,6 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-         qemu_check_nic_model(nd, TYPE_CADENCE_GEM);
-         qdev_set_nic_properties(DEVICE(&s->gem), nd);
+         object_property_set_bool(OBJECT(&s->usb[i]), true, "realized",
+-                                 &error_abort);
++                                 &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->usb[i]), 0, usb_table[i].addr);
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->usb[i]), 0,
+                            qdev_get_gpio_in(DEVICE(&s->avic),
+diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
+index 6bf8aa0404..b3cef5bb57 100644
+--- a/hw/arm/fsl-imx6.c
++++ b/hw/arm/fsl-imx6.c
+@@ -359,7 +359,11 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
+     /* USB */
+     for (i = 0; i < FSL_IMX6_NUM_USB_PHYS; i++) {
+         object_property_set_bool(OBJECT(&s->usbphy[i]), true, "realized",
+-                                 &error_abort);
++                                 &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->usbphy[i]), 0,
+                         FSL_IMX6_USBPHY1_ADDR + i * 0x1000);
      }
--    object_property_set_int(OBJECT(&s->gem), GEM_REVISION, "revision",
--                            &error_abort);
-     object_property_set_bool(OBJECT(&s->gem), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
+@@ -372,7 +376,11 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
+         };
+ 
+         object_property_set_bool(OBJECT(&s->usb[i]), true, "realized",
+-                                 &error_abort);
++                                 &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->usb[i]), 0,
+                         FSL_IMX6_USBOH3_USB_ADDR + i * 0x200);
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->usb[i]), 0,
+@@ -430,7 +438,11 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
+         };
+ 
+         object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized",
+-                                 &error_abort);
++                                 &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
+ 
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0, FSL_IMX6_WDOGn_ADDR[i]);
+     }
 -- 
 2.21.1
 
