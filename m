@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B30C8C2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB5EC2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:47:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 371B520678
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:47:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DAE4E20678
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:47:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZopGHA5h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 371B520678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fhUjf2lC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAE4E20678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlNt-0001hp-1C
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:47:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47464)
+	id 1jNlOK-0002Pm-UO
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:47:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47951)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDi-0005pD-Dx
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:56 -0400
+ id 1jNlE7-0006vf-Ha
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDh-0002WX-Ep
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:54 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:39217)
+ id 1jNlE5-0002vL-A7
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:19 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:55732)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDh-0002VS-9D; Sun, 12 Apr 2020 18:36:53 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id y24so8373506wma.4;
- Sun, 12 Apr 2020 15:36:53 -0700 (PDT)
+ id 1jNlE5-0002uo-3k; Sun, 12 Apr 2020 18:37:17 -0400
+Received: by mail-wm1-x331.google.com with SMTP id e26so7922203wmk.5;
+ Sun, 12 Apr 2020 15:37:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=8naS2wy7z7r5ZHMslOR/F6A89KH9g2Da3djfcOFUQbw=;
- b=ZopGHA5hPnTx8sNF2c5SGckaNTBGwPnkbtYAxja2/xP+2Q1PskQL6Z0KC9zTeVmVp2
- J5vV0yzKRL+S29+OMS63qITufgzDCbChemcpzgPth3HYg1iEOasTt5FAIV6lMHp8Ymcs
- +qywRHXNlgawOIU3WMzs5t/XjiKywX00cPzZDs9ckHENzcnMl6KrvQQ4C5y/O4CpB6cz
- 7+EQMfUCWq2xGbsT+bt3dh+71+7dFFfSSrpWrlEx6AWXwxPIPRWLEoCkHVe9kPMK/zqP
- mSAKbIl2mFbkK/0udjP3UNoFTLFDdQrXnzwTLEf3L9ErgUZCOWYuwgohv2DRDoVvb6/F
- b2uw==
+ bh=cLajudUBTjPPEHDWHNc0MGZvDpG60cDj46wJF9MFpFg=;
+ b=fhUjf2lC31hWvhQc0jfLtI9F/BIZ5VIR2Wq6tohOk81zDbrOll+RxbdwOLBS8vjr5k
+ yG/GeGp43DkcM1phJoDP23wccdizGpVjXQYiuhJSdAUD3VJTPcojeJuatp9RBnozjK/E
+ fZ6U9XKVSWbBn40dI3QcxHpKHmfd3bvnUkJuh6wqttFw8RyUoemfeweYSb8ONBk8idkA
+ iO4Vx2BLKOAcUFyuqoK1aNXDP3nt6U21iiTkJXT63QNjRIuY4BeNp9b4sCuPIUyNULcz
+ swsGBRjHj6dOXWrT856nZoeLpI59WFK5Iiw8eVsD12GDDMh/4gOeacBZDrngXmrHXR6D
+ Kkvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=8naS2wy7z7r5ZHMslOR/F6A89KH9g2Da3djfcOFUQbw=;
- b=BW/9bbpnHjhCmTWMo149N8u+u0/AblYs9YC5zfpcDD/DXlm160Mkj2JKS0mguo+Bat
- NSo0PZePQDl3ENNVMAzP++NvqKaL6Jeb4r7p66W8Ue4FRqGM+aPOTUA6DhNk1YEet+4I
- vWR2Z5R8yap5BP3WabhDoZG9UGMjyMP1Y0Wr1DofkXzYeasy/iYZtzifb8DseYGyH0mn
- 1LI6nt4isUziwGivCxjkQfedZr/uhQm0xYV9//PquQHuXn9EXbylz3nwVaOuzEsgDlgU
- vz91efiiQVTgTBy0mkvZCbLzaZG9SOVUhuaSwzTQZYLWB+Qkc8ybhD9lNAgHN7yXTLT1
- H0Bg==
-X-Gm-Message-State: AGi0PubhXiL4Fs5CWikhLb/unci88MjtFyUiMW4CXuMb5yH+XAHd64Mh
- CslBltCx0/lBfi4F9ILSbTEqu4dtC/m9BQ==
-X-Google-Smtp-Source: APiQypITIU1SGXv9LAb/QbjgOxcr7y3t4yFZ/GEmLkLTGEvMgpnkh3C1JgSsB2ZOd8k+faPChLRKMg==
-X-Received: by 2002:a1c:195:: with SMTP id 143mr15945607wmb.0.1586731012068;
- Sun, 12 Apr 2020 15:36:52 -0700 (PDT)
+ bh=cLajudUBTjPPEHDWHNc0MGZvDpG60cDj46wJF9MFpFg=;
+ b=mci4jD2MoHTLyfMt653Zq+LYIZ+c03O8uP9bRXWpyDfQca6PdUbEI8wl+nMECYqWbZ
+ B9pzsArkvOQaWQSyN9xXO5vzenllhE+jz50nmjc+dBlSco9G2xk/Z6vdptetZmbM0cnP
+ 7XIhiQnsXk+LO0SM7vn769fLlE7q7aZPELL14z/qgSzAxtNESQelPGszauONssrAmZ+K
+ Ov0Zl6Pq9HY//IHVP+edwF9xELZ0fAXhMiERbDJtyCk/IlYtfR1OBGbOyA8GeQqrU/pg
+ L3hoDbPGxFQVq3ZkPUPq5pIeesUEFQY4OLKeDacute9z1XQ7+e+4ddHR2L1Zm4LhZZY2
+ dpqA==
+X-Gm-Message-State: AGi0PuaPiGqQ4DUBYcIEtdHqBhcxktkenghg1VzopcfA0b9YDLe38DBy
+ 47M4mFPWkgx8xq4wlWHNlXxMcHs+4+TYeQ==
+X-Google-Smtp-Source: APiQypKWzqoDEL0XMAg15Qo6HwT/t7hmIuiC1g78CIeCyAqNrwg049tayE2VNwVBP5Qtls+8mUxBkA==
+X-Received: by 2002:a1c:3c08:: with SMTP id j8mr13491389wma.30.1586731035721; 
+ Sun, 12 Apr 2020 15:37:15 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.36.48
+ by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.37.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:36:51 -0700 (PDT)
+ Sun, 12 Apr 2020 15:37:15 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 08/24] hw/arm/fsl-imx6: Simplify checks on
- 'smp_cpus' count
-Date: Mon, 13 Apr 2020 00:36:03 +0200
-Message-Id: <20200412223619.11284-9-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v3 15/24] hw/arm/xlnx-zynqmp: Split
+ xlnx_zynqmp_create_rpu() as init + realize
+Date: Mon, 13 Apr 2020 00:36:10 +0200
+Message-Id: <20200412223619.11284-16-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200412223619.11284-1-f4bug@amsat.org>
 References: <20200412223619.11284-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32d
+X-Received-From: 2a00:1450:4864:20::331
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,55 +130,124 @@ Coccinelle failed at processing this file:
 
   $ spatch ... --timeout 60 --sp-file \
     scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-  HANDLING: ./hw/arm/fsl-imx6.c
-  Fatal error: exception Coccinelle_modules.Common.Timeout
+  HANDLING: ./hw/arm/xlnx-zynqmp.c
+  EXN: Coccinelle_modules.Common.Timeout
 
-While reviewing we notice the smp_cpus count is already limited
-by MachineClass::max_cpus:
-
-  static void sabrelite_machine_init(MachineClass *mc)
-  {
-      mc->max_cpus = FSL_IMX6_NUM_CPUS;
-      ...
-  }
-
-So remove the check in realize(), but still assert in init().
+We are going to manually add the missing propagate_error() calls.
+Some functions can be called at init() time, reducing the need
+to add extra Error checks at realize() time. Split create_rpu()
+in init() and realize().
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/fsl-imx6.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ hw/arm/xlnx-zynqmp.c | 45 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 28 insertions(+), 17 deletions(-)
 
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index 13f1bf23a6..3d37352b08 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -37,10 +37,12 @@
- static void fsl_imx6_init(Object *obj)
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 43d57fa7de..457057198a 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -173,18 +173,9 @@ static inline int arm_gic_ppi_index(int cpu_nr, int ppi_index)
+     return GIC_NUM_SPI_INTR + cpu_nr * GIC_INTERNAL + ppi_index;
+ }
+ 
+-static void xlnx_zynqmp_create_rpu(MachineState *ms, XlnxZynqMPState *s,
+-                                   const char *boot_cpu, Error **errp)
++static void xlnx_zynqmp_rpu_init(XlnxZynqMPState *s, int num_rpus)
  {
-     MachineState *ms = MACHINE(qdev_get_machine());
-+    unsigned int smp_cpus = ms->smp.cpus;
-     FslIMX6State *s = FSL_IMX6(obj);
-     char name[NAME_SIZE];
+-    Error *err = NULL;
      int i;
- 
-+    assert(smp_cpus <= FSL_IMX6_NUM_CPUS);
-     for (i = 0; i < MIN(ms->smp.cpus, FSL_IMX6_NUM_CPUS); i++) {
-         snprintf(name, NAME_SIZE, "cpu%d", i);
-         object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
-@@ -121,12 +123,6 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-     Error *err = NULL;
-     unsigned int smp_cpus = ms->smp.cpus;
- 
--    if (smp_cpus > FSL_IMX6_NUM_CPUS) {
--        error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
--                   TYPE_FSL_IMX6, FSL_IMX6_NUM_CPUS, smp_cpus);
+-    int num_rpus = MIN(ms->smp.cpus - XLNX_ZYNQMP_NUM_APU_CPUS,
+-                       XLNX_ZYNQMP_NUM_RPU_CPUS);
+-
+-    if (num_rpus <= 0) {
+-        /* Don't create rpu-cluster object if there's nothing to put in it */
 -        return;
 -    }
--
-     for (i = 0; i < smp_cpus; i++) {
  
-         /* On uniprocessor, the CBAR is set to 0 */
+     object_initialize_child(OBJECT(s), "rpu-cluster", &s->rpu_cluster,
+                             sizeof(s->rpu_cluster), TYPE_CPU_CLUSTER,
+@@ -192,13 +183,25 @@ static void xlnx_zynqmp_create_rpu(MachineState *ms, XlnxZynqMPState *s,
+     qdev_prop_set_uint32(DEVICE(&s->rpu_cluster), "cluster-id", 1);
+ 
+     for (i = 0; i < num_rpus; i++) {
+-        char *name;
+-
+         object_initialize_child(OBJECT(&s->rpu_cluster), "rpu-cpu[*]",
+                                 &s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
+                                 ARM_CPU_TYPE_NAME("cortex-r5f"),
+                                 &error_abort, NULL);
+ 
++        object_property_set_bool(OBJECT(&s->rpu_cpu[i]), true, "reset-hivecs",
++                                 &error_abort);
++    }
++}
++
++static void xlnx_zynqmp_rpu_realize(XlnxZynqMPState *s, int num_rpus,
++                                    const char *boot_cpu, Error **errp)
++{
++    Error *err = NULL;
++    int i;
++
++    for (i = 0; i < num_rpus; i++) {
++        char *name;
++
+         name = object_get_canonical_path_component(OBJECT(&s->rpu_cpu[i]));
+         if (strcmp(name, boot_cpu)) {
+             /* Secondary CPUs start in PSCI powered-down state */
+@@ -209,8 +212,6 @@ static void xlnx_zynqmp_create_rpu(MachineState *ms, XlnxZynqMPState *s,
+         }
+         g_free(name);
+ 
+-        object_property_set_bool(OBJECT(&s->rpu_cpu[i]), true, "reset-hivecs",
+-                                 &error_abort);
+         object_property_set_bool(OBJECT(&s->rpu_cpu[i]), true, "realized",
+                                  &err);
+         if (err) {
+@@ -228,6 +229,8 @@ static void xlnx_zynqmp_init(Object *obj)
+     XlnxZynqMPState *s = XLNX_ZYNQMP(obj);
+     int i;
+     int num_apus = MIN(ms->smp.cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
++    int num_rpus = MIN(ms->smp.cpus - XLNX_ZYNQMP_NUM_APU_CPUS,
++                       XLNX_ZYNQMP_NUM_RPU_CPUS);
+ 
+     object_initialize_child(obj, "apu-cluster", &s->apu_cluster,
+                             sizeof(s->apu_cluster), TYPE_CPU_CLUSTER,
+@@ -290,6 +293,10 @@ static void xlnx_zynqmp_init(Object *obj)
+         sysbus_init_child_obj(obj, "adma[*]", &s->adma[i], sizeof(s->adma[i]),
+                               TYPE_XLNX_ZDMA);
+     }
++
++    if (num_rpus > 0) {
++        xlnx_zynqmp_rpu_init(s, num_rpus);
++    }
+ }
+ 
+ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+@@ -300,6 +307,8 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+     uint8_t i;
+     uint64_t ram_size;
+     int num_apus = MIN(ms->smp.cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
++    int num_rpus = MIN(ms->smp.cpus - XLNX_ZYNQMP_NUM_APU_CPUS,
++                       XLNX_ZYNQMP_NUM_RPU_CPUS);
+     const char *boot_cpu = s->boot_cpu ? s->boot_cpu : "apu-cpu[0]";
+     ram_addr_t ddr_low_size, ddr_high_size;
+     qemu_irq gic_spi[GIC_NUM_SPI_INTR];
+@@ -458,9 +467,11 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+                     "RPUs just use -smp 6.");
+     }
+ 
+-    xlnx_zynqmp_create_rpu(ms, s, boot_cpu, &err);
+-    if (err) {
+-        goto out_propagate_error;
++    if (num_rpus > 0) {
++        xlnx_zynqmp_rpu_realize(s, num_rpus, boot_cpu, &err);
++        if (err) {
++            goto out_propagate_error;
++        }
+     }
+ 
+     if (!s->boot_cpu_ptr) {
 -- 
 2.21.1
 
