@@ -1,120 +1,77 @@
 Return-Path: <SRS0=Byls=54=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A034C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 18:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85E5BC2D0EC
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 20:46:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2465206DA
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 18:03:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51595206A1
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 20:46:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uDzBSvjr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2465206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YLCJKH+2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51595206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNgxR-0004TP-Nh
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 14:03:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52299)
+	id 1jNjUq-0003vD-FA
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 16:46:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38641)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNgwX-0003hX-8D
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 14:02:54 -0400
+ (envelope-from <adultjiuice@gmail.com>) id 1jNjU9-0003V5-5m
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 16:45:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNgwW-00082Y-45
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 14:02:53 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45216)
+ (envelope-from <adultjiuice@gmail.com>) id 1jNjU7-0003cN-33
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 16:45:44 -0400
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:40564)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNgwT-0007zV-KU; Sun, 12 Apr 2020 14:02:49 -0400
-Received: by mail-wr1-x443.google.com with SMTP id v5so8056059wrp.12;
- Sun, 12 Apr 2020 11:02:49 -0700 (PDT)
+ (Exim 4.71) (envelope-from <adultjiuice@gmail.com>)
+ id 1jNjU6-0003by-95
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 16:45:42 -0400
+Received: by mail-ot1-x330.google.com with SMTP id i27so4403819ota.7
+ for <qemu-devel@nongnu.org>; Sun, 12 Apr 2020 13:45:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mnDmOQ5tHlp9o1eeZyM24TPzDLGHbt/uk6poZPWdH1c=;
- b=uDzBSvjrQq81UL487+tHf2PFlll6GsH1o5B4VXWjHzSS2Krp+7w8ULlGnBNvRe59hj
- mNbsRXQ4khX98obRxvBW/4BSMErAHLeOWJLOaggoKPQwgpMIy+7OW6j6pTqbycMXrh01
- TF0Cyph0lnpEMrLTu1iPgpXs6qC0WimmeBI0lA8exuHRe/iaDozYr3tXCLhN4dwFHCHV
- BsJRJedcp/57mexEE1h9EkAOBR/8YwnBLjSAWviH+SbSq4AJrKWWALlJVqNR/ijz0RHA
- AJKEHvrd3QQx2lS/xORtL7ts8HU3h3MvaylEby7phjAs+3jMTlkx+u+MR3TdOzRiKs6o
- XQxA==
+ h=mime-version:from:date:message-id:subject:to;
+ bh=TnFsQ0ytp3EN8gHl04Jp/OvEkW7WYmZ1QKE98tnKEd8=;
+ b=YLCJKH+2UiOm1D/GCOPWPr/qQOjkAvfcgy6J4zJGk6wO5bO65uDFspa8KeLdWp1L7F
+ V89guoFRMR+CCiS7WJkq0nuRWzVNqUR+az2o20mcyKWuWEKrItHK+pN7p2RZvhWymwTc
+ 951i6/qE0j0AgPN54dox1aq+nM0vIVXYIJ6I9VBTQ31xPPt9WOMjbC29jDbKG7EQ3Qd0
+ 2Q4/h+2qDQlf1hiTQe23UVhkrYmiCqL4HwcqZ20sn7KnoUJCFIgc0TB5pXkHpoL8d/dO
+ HzHdmRS2QvCEICIzBNQ08pBqLyEcobG3JJabPBC+ChYao4jXXpzlLSNNlKcvSRixxUgJ
+ OWcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=mnDmOQ5tHlp9o1eeZyM24TPzDLGHbt/uk6poZPWdH1c=;
- b=AgficWI1VcVlVxt5kbwbNejAnACgLMtkk3jlCESq7fcEiAZ9goTR3EZq5SHZ3bGmge
- usmQ5+hQrkEc0A+hM5CroCbSyjGxxdOWGHgq/j9RY2HCT7H4VEwxxQuK56gqDPDsMnZE
- ZXHUCeIPB7YUMa3CilCrhUt5/V5fxkeGzMbPEZOVsNKORBcBuuQKLcSsKO80CrD//TNn
- lS9tvXEHXUGX9PNuT+RB9FNwRsSkTYEA+iU415xXkQwMpP7Dku8g4qbjDNaJ3dr4+/db
- kwmQKqdqI1NaTca3yeCSAN3zWF2QyH9Ttc34OZ3wfYlxS7xAQ6eVmEtjq0cgR5m0IOrz
- m+GA==
-X-Gm-Message-State: AGi0PuaysLMTRWFKwgNCTwT3r6DuaGraz1ZUnb5XvA+rYWO737J6G8GY
- 8z2SPegQk3jSRiA1YM1ULLi9r9+xLS4=
-X-Google-Smtp-Source: APiQypJw8xciIw4sDDKcSJaqidOnjhntQ20SqFW7jSetB21u/YUqKKFGzMjQOost01bpjIMP8UXzDw==
-X-Received: by 2002:a05:6000:143:: with SMTP id
- r3mr14323266wrx.279.1586714568238; 
- Sun, 12 Apr 2020 11:02:48 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id q19sm11665867wra.38.2020.04.12.11.02.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 12 Apr 2020 11:02:47 -0700 (PDT)
-Subject: Re: [Qemu devel PATCH v4 3/3] tests/boot_linux_console: Add ethernet
- test to SmartFusion2
-To: sundeep.lkml@gmail.com, jasowang@redhat.com, peter.maydell@linaro.org,
- philmd@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-References: <1586529926-11441-1-git-send-email-sundeep.lkml@gmail.com>
- <1586529926-11441-4-git-send-email-sundeep.lkml@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <b3d5a33f-150c-bfd8-ee78-40738ffe6b65@amsat.org>
-Date: Sun, 12 Apr 2020 20:02:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=TnFsQ0ytp3EN8gHl04Jp/OvEkW7WYmZ1QKE98tnKEd8=;
+ b=sY/jaWeDSgaR8xGASI53BX4MLkS/BF2AsyKzmii2Dxw++ryN1zgWnnM1Hm8SlnZc1i
+ qmkNgQlx4v0LF4Gbmtqh8dTpZ1OieS4rxrMlaZ4hPJc4EFbxvVE4Wbv5JlXdLGiVRopV
+ C4+MK6Ib5YmWQ1ma/Qh2T/5j2XkoCXZ/rSRuFuqj4Pl/60meFuYd6mIdd7vpkhxDI0yb
+ aKFwgHYDbczQDuOu/+kEE4+qCWcP90DoCeCgUug2oydgTyA6n/qM9INtIdd6NV2uBozq
+ IiGdIw8FTKkXx5TycRFMjSPu4ltruwmJX17m/TKKih29q3+cIGAJbZ2GikvDYmR5xD+R
+ CpVQ==
+X-Gm-Message-State: AGi0PubterzlvdWUDi8xM5J8XERJdN1R+BAlLvyq0lEkVS409zmCWPb/
+ G0Kx4jYbodlf6+emOSkqFxxpPLdM+WngxDuI55dKBDbQ
+X-Google-Smtp-Source: APiQypIih9FhR2EsA1pCqm0O18HMo0XdSmCwxLQ313IKUsa3b9YY8xGxyLS83cK5w0NRvoZ+VqxmYyReiRLMOAMJ2uE=
+X-Received: by 2002:a9d:6e81:: with SMTP id a1mr11753718otr.360.1586724338965; 
+ Sun, 12 Apr 2020 13:45:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1586529926-11441-4-git-send-email-sundeep.lkml@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+From: Oliver Christopher <adultjiuice@gmail.com>
+Date: Sun, 12 Apr 2020 16:45:28 -0400
+Message-ID: <CAJAyOaarDVp_Qaqn45ML+KqfidyCH=wQG36VZn=f1wh1+nBumw@mail.gmail.com>
+Subject: Clarification of above code
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="00000000000094a15005a31e0c54"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::330
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,58 +87,165 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/10/20 4:45 PM, sundeep.lkml@gmail.com wrote:
-> From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> 
-> In addition to simple serial test this patch uses ping
-> to test the ethernet block modelled in SmartFusion2 SoC.
-> 
-> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> ---
->  tests/acceptance/boot_linux_console.py | 15 ++++++++++-----
->  1 file changed, 10 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index f825cd9..c6b06a1 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -336,13 +336,13 @@ class BootLinuxConsole(Test):
->          """
->          uboot_url = ('https://raw.githubusercontent.com/'
->                       'Subbaraya-Sundeep/qemu-test-binaries/'
-> -                     'fa030bd77a014a0b8e360d3b7011df89283a2f0b/u-boot')
-> -        uboot_hash = 'abba5d9c24cdd2d49cdc2a8aa92976cf20737eff'
-> +                     'fe371d32e50ca682391e1e70ab98c2942aeffb01/u-boot')
-> +        uboot_hash = 'cbb8cbab970f594bf6523b9855be209c08374ae2'
->          uboot_path = self.fetch_asset(uboot_url, asset_hash=uboot_hash)
->          spi_url = ('https://raw.githubusercontent.com/'
->                     'Subbaraya-Sundeep/qemu-test-binaries/'
-> -                   'fa030bd77a014a0b8e360d3b7011df89283a2f0b/spi.bin')
-> -        spi_hash = '85f698329d38de63aea6e884a86fbde70890a78a'
-> +                   'fe371d32e50ca682391e1e70ab98c2942aeffb01/spi.bin')
-> +        spi_hash = '65523a1835949b6f4553be96dec1b6a38fb05501'
->          spi_path = self.fetch_asset(spi_url, asset_hash=spi_hash)
->  
->          self.vm.set_console()
-> @@ -352,7 +352,12 @@ class BootLinuxConsole(Test):
->                           '-drive', 'file=' + spi_path + ',if=mtd,format=raw',
->                           '-no-reboot')
->          self.vm.launch()
-> -        self.wait_for_console_pattern('init started: BusyBox')
-> +        self.wait_for_console_pattern('Enter \'help\' for a list')
-> +
-> +        exec_command_and_wait_for_pattern(self, 'ifconfig eth0 10.0.2.15',
-> +                                                 'eth0: link becomes ready')
-> +        exec_command_and_wait_for_pattern(self, 'ping -c 3 10.0.2.2',
-> +            '3 packets transmitted, 3 packets received, 0% packet loss')
+--00000000000094a15005a31e0c54
+Content-Type: text/plain; charset="UTF-8"
 
-Very nice (and smart) :)
+/* * We default to false if we know other options have been enabled *
+which are currently incompatible with MTTCG. Otherwise when each *
+guest (target) has been updated to support: *   - atomic instructions
+*   - memory ordering primitives (barriers) * they can set the
+appropriate CONFIG flags in ${target}-softmmu.mak * * Once a guest
+architecture has been converted to the new primitives * there are two
+remaining limitations to check. * * - The guest can't be oversized
+(e.g. 64 bit guest on 32 bit host) * - The host must have a stronger
+memory order than the guest * * It may be possible in future to
+support strong guests on weak hosts * but that will require tagging
+all load/stores in a guest with their * implicit memory order
+requirements which would likely slow things * down a lot. */
+static bool check_tcg_memory_orders_compatible(void)
+{
+#if defined(TCG_GUEST_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
+    return (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
+#else
+    return false;
+#endif
+}
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+That function will return false for x86_64 on ARM64.
 
->  
->      def do_test_arm_raspi2(self, uart_id):
->          """
-> 
+On tcg/aarch64/tcg-target.h
+
+#define TCG_TARGET_DEFAULT_MO (0)
+
+On target/i386/cpu.h
+
+/* The x86 has a strong memory model with some store-after-load re-ordering */
+#define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
+
+I am asking for clarification because the above code will default x86 on
+ARM64 to disable MTTCG.
+
+--00000000000094a15005a31e0c54
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<span style=3D"color:rgb(36,41,46);font-family:-apple-system,BlinkMacSystem=
+Font,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color Emoj=
+i&quot;,&quot;Segoe UI Emoji&quot;;font-size:14px;background-color:rgb(255,=
+255,255)"><div dir=3D"auto"><div class=3D"highlight highlight-source-c" sty=
+le=3D"box-sizing:border-box;margin-bottom:16px;overflow:visible!important" =
+dir=3D"auto"><pre style=3D"box-sizing:border-box;font-family:SFMono-Regular=
+,Consolas,&quot;Liberation Mono&quot;,Menlo,monospace;font-size:11.89999961=
+8530273px;margin-top:0px;margin-bottom:0px;word-wrap:normal;padding:16px;ov=
+erflow:auto;line-height:1.45;background-color:rgb(246,248,250);border-top-l=
+eft-radius:3px;border-top-right-radius:3px;border-bottom-right-radius:3px;b=
+order-bottom-left-radius:3px;word-break:normal"><span class=3D"pl-c" style=
+=3D"box-sizing:border-box;color:rgb(106,115,125)">/*</span>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> * We default to false if we know other options have been enabled</span>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> * which are currently incompatible with MTTCG. Otherwise when each</span>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> * guest (target) has been updated to support:</span>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> *   - atomic instructions</span>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> *   - memory ordering primitives (barriers)</span>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> * they can set the appropriate CONFIG flags in ${target}-softmmu.mak</spa=
+n>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> *</span>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> * Once a guest architecture has been converted to the new primitives</spa=
+n>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> * there are two remaining limitations to check.</span>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> *</span>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> * - The guest can&#39;t be oversized (e.g. 64 bit guest on 32 bit host)</=
+span>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> * - The host must have a stronger memory order than the guest</span>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> *</span>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> * It may be possible in future to support strong guests on weak hosts</sp=
+an>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> * but that will require tagging all load/stores in a guest with their</sp=
+an>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> * implicit memory order requirements which would likely slow things</span=
+>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> * down a lot.</span>
+<span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)"=
+> <span class=3D"pl-c" style=3D"box-sizing:border-box">*/</span></span>
+
+<span class=3D"pl-k" style=3D"box-sizing:border-box;color:rgb(215,58,73)">s=
+tatic</span> <span class=3D"pl-k" style=3D"box-sizing:border-box;color:rgb(=
+215,58,73)">bool</span> <span class=3D"pl-en" style=3D"box-sizing:border-bo=
+x;color:rgb(111,66,193)">check_tcg_memory_orders_compatible</span>(<span cl=
+ass=3D"pl-k" style=3D"box-sizing:border-box;color:rgb(215,58,73)">void</spa=
+n>)
+{
+#<span class=3D"pl-k" style=3D"box-sizing:border-box;color:rgb(215,58,73)">=
+if</span> defined(TCG_GUEST_DEFAULT_MO) &amp;&amp; defined(TCG_TARGET_DEFAU=
+LT_MO)
+    <span class=3D"pl-k" style=3D"box-sizing:border-box;color:rgb(215,58,73=
+)">return</span> (TCG_GUEST_DEFAULT_MO &amp; ~TCG_TARGET_DEFAULT_MO) =3D=3D=
+ <span class=3D"pl-c1" style=3D"box-sizing:border-box;color:rgb(0,92,197)">=
+0</span>;
+#<span class=3D"pl-k" style=3D"box-sizing:border-box;color:rgb(215,58,73)">=
+else</span>
+    <span class=3D"pl-k" style=3D"box-sizing:border-box;color:rgb(215,58,73=
+)">return</span> <span class=3D"pl-c1" style=3D"box-sizing:border-box;color=
+:rgb(0,92,197)">false</span>;
+#<span class=3D"pl-k" style=3D"box-sizing:border-box;color:rgb(215,58,73)">=
+endif</span>
+}</pre></div><p style=3D"box-sizing:border-box;margin-top:0px;margin-bottom=
+:16px">That function will return false for x86_64 on ARM64.</p><p style=3D"=
+box-sizing:border-box;margin-top:0px;margin-bottom:16px">On=C2=A0<code styl=
+e=3D"box-sizing:border-box;font-family:SFMono-Regular,Consolas,&quot;Libera=
+tion Mono&quot;,Menlo,monospace;font-size:11.899999618530273px;padding:0.2e=
+m 0.4em;margin:0px;background-color:rgba(27,31,35,0.05);border-top-left-rad=
+ius:3px;border-top-right-radius:3px;border-bottom-right-radius:3px;border-b=
+ottom-left-radius:3px">tcg/aarch64/tcg-target.h</code></p><div class=3D"hig=
+hlight highlight-source-c" style=3D"box-sizing:border-box;margin-bottom:16p=
+x;overflow:visible!important" dir=3D"auto"><pre style=3D"box-sizing:border-=
+box;font-family:SFMono-Regular,Consolas,&quot;Liberation Mono&quot;,Menlo,m=
+onospace;font-size:11.899999618530273px;margin-top:0px;margin-bottom:0px;wo=
+rd-wrap:normal;padding:16px;overflow:auto;line-height:1.45;background-color=
+:rgb(246,248,250);border-top-left-radius:3px;border-top-right-radius:3px;bo=
+rder-bottom-right-radius:3px;border-bottom-left-radius:3px;word-break:norma=
+l">#<span class=3D"pl-k" style=3D"box-sizing:border-box;color:rgb(215,58,73=
+)">define</span> <span class=3D"pl-en" style=3D"box-sizing:border-box;color=
+:rgb(111,66,193)">TCG_TARGET_DEFAULT_MO</span> (<span class=3D"pl-c1" style=
+=3D"box-sizing:border-box;color:rgb(0,92,197)">0</span>)</pre></div><p styl=
+e=3D"box-sizing:border-box;margin-top:0px;margin-bottom:16px">On=C2=A0<code=
+ style=3D"box-sizing:border-box;font-family:SFMono-Regular,Consolas,&quot;L=
+iberation Mono&quot;,Menlo,monospace;font-size:11.899999618530273px;padding=
+:0.2em 0.4em;margin:0px;background-color:rgba(27,31,35,0.05);border-top-lef=
+t-radius:3px;border-top-right-radius:3px;border-bottom-right-radius:3px;bor=
+der-bottom-left-radius:3px">target/i386/cpu.h</code></p><div class=3D"highl=
+ight highlight-source-c" style=3D"box-sizing:border-box;margin-bottom:16px;=
+overflow:visible!important" dir=3D"auto"><pre style=3D"box-sizing:border-bo=
+x;font-family:SFMono-Regular,Consolas,&quot;Liberation Mono&quot;,Menlo,mon=
+ospace;font-size:11.899999618530273px;margin-top:0px;margin-bottom:0px;word=
+-wrap:normal;padding:16px;overflow:auto;line-height:1.45;background-color:r=
+gb(246,248,250);border-top-left-radius:3px;border-top-right-radius:3px;bord=
+er-bottom-right-radius:3px;border-bottom-left-radius:3px;word-break:normal"=
+><span class=3D"pl-c" style=3D"box-sizing:border-box;color:rgb(106,115,125)=
+"><span class=3D"pl-c" style=3D"box-sizing:border-box">/*</span> The x86 ha=
+s a strong memory model with some store-after-load re-ordering <span class=
+=3D"pl-c" style=3D"box-sizing:border-box">*/</span></span>
+#<span class=3D"pl-k" style=3D"box-sizing:border-box;color:rgb(215,58,73)">=
+define</span> <span class=3D"pl-en" style=3D"box-sizing:border-box;color:rg=
+b(111,66,193)">TCG_GUEST_DEFAULT_MO</span>      (TCG_MO_ALL &amp; ~TCG_MO_S=
+T_LD)</pre></div></div><div dir=3D"auto">I am asking for clarification beca=
+use the above code will default x86 on ARM64 to disable MTTCG.</div></span>
+
+--00000000000094a15005a31e0c54--
 
