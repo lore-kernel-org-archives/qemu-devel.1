@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 263A5C2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 294C4C2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:42:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E17E2206E5
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:42:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E61CE206E5
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:42:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f4h0TAvN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E17E2206E5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eav2ieLz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E61CE206E5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlJ3-0000fj-20
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:42:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47985)
+	id 1jNlJS-000183-UW
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:42:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47741)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlE9-0006zj-N9
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:22 -0400
+ id 1jNlDw-0006VH-CD
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlE8-0002wz-EI
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:21 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54908)
+ id 1jNlDv-0002o1-8J
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:08 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39096)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlE8-0002wl-7x; Sun, 12 Apr 2020 18:37:20 -0400
-Received: by mail-wm1-x341.google.com with SMTP id h2so7914546wmb.4;
- Sun, 12 Apr 2020 15:37:20 -0700 (PDT)
+ id 1jNlDv-0002nZ-28; Sun, 12 Apr 2020 18:37:07 -0400
+Received: by mail-wm1-x344.google.com with SMTP id y24so8373979wma.4;
+ Sun, 12 Apr 2020 15:37:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=VuVWzBfpjz6H0HCIF1s/Heqg2exv+JQ+H2vwU4p06Wo=;
- b=f4h0TAvNfsqrudSKvetIzFeOKI3Mm7ul8tSs4BXylq9EZam7VrYgdFSM23ZR9dmCZO
- JjXMx0CoZPEF7YgSs7zcsr5gkYxxzslClRq2JI+9syCPg2cgo+jDd1O0Ilx9bLmh4yPU
- Cp4FZJulgOMk/IAKxOb154sBFRa0U1Jr7NKtRaloX4nAQPnMdXa8ufRESoX3N2HX9oT0
- ph/JhnkcOIQ8seDCKhaW7spnYVy19Y80OO8QyZUDfDpiBolKDNZXWDdxi0j1jh3P74kN
- 08nXKIiYlj4p4CCPC+iwlXC6/WzeewZff3mj+lwKdRdEzXMI3WwX6ZAL4s48xtsVqzmK
- OWvQ==
+ bh=ACqwWM6q3w6eeeLf6eS/r0Fpb4qEkaBMb1O9yAVXZQo=;
+ b=Eav2ieLzABrzdmyoyQLXT0s+gUm8FmjTYgeO1M9o97/Eye7qBD+gvSslPT2P3Pc+Ud
+ ggZsT5Idy3aq0F6f7iMv6LebW8kajzKG3N/SlidMBZswf32BI6fW0kJaIQDGS143rcGj
+ zZ6bzwJ0+d8QdTt75WYP1CmcW7bEo7TimspI9bI9niKWcTGEvwF95gYWNQKngztxv3FU
+ jPoK5/Rvzhk+zVpLplUk9WfD71g8IeIEO9JbPifkaZRzTLWLJK1VWjR9cRnqnuZDatIs
+ q/TcdZtepwLzIDJkt7aukefK6IWzO+SE9YK9qAAJnLD43cAzvWczyhcMFsqogOTrDqtE
+ FqOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=VuVWzBfpjz6H0HCIF1s/Heqg2exv+JQ+H2vwU4p06Wo=;
- b=SfQcUDv0R+Z6MW7BDxwsGiaXiSJ7mRnIpkJFBIu4QKdQIHWhBPaa/R6Nl1+GBM7CVN
- Gjc6aS44V6A1GevznMLacufDML1hDHMZUpyl7ooXKhEeGk0fxkBTefe25LWDumuZ++u3
- xhZTBuZrrpYkJ5ZCT/G+k4vdUmQEjKEzK/eY1osrOkGg3ZnUi8TXBs8lFH+30ngWrFKo
- 5qm/rGlvosnQmUpmQRep5rg7833R7WMc/9HcP1CJOTN0VFIcZWpiJUG3ptmftVlbzdjv
- kYxMGYpokNZZnqDSxL+laB4obPWlfz+fqTwdblsWomemxpD4aHeAs1fqIcH2ERJ3RY9w
- EG5w==
-X-Gm-Message-State: AGi0PuYWoAxD/TUvigrACX59U2QPSqJhm3Pym7TbqRDXeHV7E128swGj
- lJcNRNFRIZK5yzn/vbyRxyN1ytHFcY3fNg==
-X-Google-Smtp-Source: APiQypK6lOUi3RaPIYFNsB3DpYTZGpWRBCr/hmLS1rLJoGKmpyvdFZraFuIAbo0ecycmXM4x+IQdXw==
-X-Received: by 2002:a1c:3884:: with SMTP id f126mr121709wma.91.1586731039078; 
- Sun, 12 Apr 2020 15:37:19 -0700 (PDT)
+ bh=ACqwWM6q3w6eeeLf6eS/r0Fpb4qEkaBMb1O9yAVXZQo=;
+ b=qDP5Bl8a4gk8Gep+Hq6k/IsmmbrG9+8Hry8cght345lS0ft9aOhvyf5bUmIkjFmdRF
+ /qNcSR1fiWpwj9NUNAMOjNhN+nW9vt5CnMUvySFoA1/Q+gFD7AcDTT1+nbe65oGeBoCh
+ K4aND3VnrFvwtRhVliiL9knFbsPQremeQv0+sP1YqYPPw5RnM420PNtl/kEVAkV425HQ
+ 6AGXHG8+Pe35OOCqDriorjnlOB0qvekg0g3dkkyeVCTLTuoXUSONChXngny9oTkTQz8y
+ F3/kHqFBGxigOfJY6/4dpjMl0WIfQaCifErTmTxuFNA4XZXS1xt41eRcliJakL3aneC8
+ TSvA==
+X-Gm-Message-State: AGi0PuY7p0jJ6tIuEjVKM04MEh2ZEfA4gp/wV7skZyhyKmVD5YsyNqb0
+ SdZWAF/P51SSBDvUkvbqMu4ZjgocEMLpRg==
+X-Google-Smtp-Source: APiQypKttr4FiVT/PS0gYMZsNpgDa0+VuPdUBSHMQiO3U4JSk6VmIIPcdbAkXJDkJo202g4v3HoamA==
+X-Received: by 2002:a7b:cc01:: with SMTP id f1mr16694131wmh.39.1586731025908; 
+ Sun, 12 Apr 2020 15:37:05 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.37.15
+ by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.37.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:37:18 -0700 (PDT)
+ Sun, 12 Apr 2020 15:37:05 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 16/24] hw/arm/xlnx-zynqmp: Move some code from
- realize() to init()
-Date: Mon, 13 Apr 2020 00:36:11 +0200
-Message-Id: <20200412223619.11284-17-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v3 12/24] hw/arm/stm32f205_soc: Store MemoryRegion in
+ STM32F205State
+Date: Mon, 13 Apr 2020 00:36:07 +0200
+Message-Id: <20200412223619.11284-13-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200412223619.11284-1-f4bug@amsat.org>
 References: <20200412223619.11284-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,98 +126,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coccinelle failed at processing this file:
+Coccinelle reported:
 
   $ spatch ... --timeout 60 --sp-file \
     scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-  HANDLING: ./hw/arm/xlnx-zynqmp.c
-  EXN: Coccinelle_modules.Common.Timeout
+  HANDLING: ./hw/arm/stm32f205_soc.c
+  >>> possible moves from stm32f205_soc_initfn() to stm32f205_soc_realize() in ./hw/arm/stm32f205_soc.c:83
 
-Move the calls using &error_abort which don't depend on input
-updated before realize() to init().
+While reviewing we notice storing the MemoryRegion in the device
+state, we'll be able to later automatically simplify the error
+propagation calls.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v3: Typo 'depend of' -> 'depend on' (eblake)
----
- hw/arm/xlnx-zynqmp.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ include/hw/arm/stm32f205_soc.h |  4 ++++
+ hw/arm/stm32f205_soc.c         | 18 +++++++-----------
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 457057198a..5ec9c24ee7 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -242,6 +242,11 @@ static void xlnx_zynqmp_init(Object *obj)
-                                 &s->apu_cpu[i], sizeof(s->apu_cpu[i]),
-                                 ARM_CPU_TYPE_NAME("cortex-a53"),
-                                 &error_abort, NULL);
+diff --git a/include/hw/arm/stm32f205_soc.h b/include/hw/arm/stm32f205_soc.h
+index 922a733f88..63e7e7c825 100644
+--- a/include/hw/arm/stm32f205_soc.h
++++ b/include/hw/arm/stm32f205_soc.h
+@@ -56,6 +56,10 @@ typedef struct STM32F205State {
+ 
+     ARMv7MState armv7m;
+ 
++    MemoryRegion sram;
++    MemoryRegion flash;
++    MemoryRegion flash_alias;
 +
-+        object_property_set_int(OBJECT(&s->apu_cpu[i]), QEMU_PSCI_CONDUIT_SMC,
-+                                "psci-conduit", &error_abort);
-+        object_property_set_int(OBJECT(&s->apu_cpu[i]), GIC_BASE_ADDR,
-+                                "reset-cbar", &error_abort);
-     }
- 
-     sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
-@@ -250,6 +255,10 @@ static void xlnx_zynqmp_init(Object *obj)
-     for (i = 0; i < XLNX_ZYNQMP_NUM_GEMS; i++) {
-         sysbus_init_child_obj(obj, "gem[*]", &s->gem[i], sizeof(s->gem[i]),
-                               TYPE_CADENCE_GEM);
-+        object_property_set_int(OBJECT(&s->gem[i]), GEM_REVISION, "revision",
-+                                &error_abort);
-+        object_property_set_int(OBJECT(&s->gem[i]), 2, "num-priority-queues",
-+                                &error_abort);
-     }
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_UARTS; i++) {
-@@ -259,6 +268,8 @@ static void xlnx_zynqmp_init(Object *obj)
- 
-     sysbus_init_child_obj(obj, "sata", &s->sata, sizeof(s->sata),
-                           TYPE_SYSBUS_AHCI);
-+    object_property_set_int(OBJECT(&s->sata), SATA_NUM_PORTS, "num-ports",
-+                            &error_abort);
- 
-     for (i = 0; i < XLNX_ZYNQMP_NUM_SDHCI; i++) {
-         sysbus_init_child_obj(obj, "sdhci[*]", &s->sdhci[i],
-@@ -370,9 +381,6 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-     for (i = 0; i < num_apus; i++) {
-         char *name;
- 
--        object_property_set_int(OBJECT(&s->apu_cpu[i]), QEMU_PSCI_CONDUIT_SMC,
--                                "psci-conduit", &error_abort);
+     STM32F2XXSyscfgState syscfg;
+     STM32F2XXUsartState usart[STM_NUM_USARTS];
+     STM32F2XXTimerState timer[STM_NUM_TIMERS];
+diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+index 118c342559..42f4e44134 100644
+--- a/hw/arm/stm32f205_soc.c
++++ b/hw/arm/stm32f205_soc.c
+@@ -87,23 +87,19 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+     SysBusDevice *busdev;
+     Error *err = NULL;
+     int i;
 -
-         name = object_get_canonical_path_component(OBJECT(&s->apu_cpu[i]));
-         if (strcmp(name, boot_cpu)) {
-             /* Secondary CPUs start in PSCI powered-down state */
-@@ -387,8 +395,6 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-                                  s->secure, "has_el3", NULL);
-         object_property_set_bool(OBJECT(&s->apu_cpu[i]),
-                                  s->virt, "has_el2", NULL);
--        object_property_set_int(OBJECT(&s->apu_cpu[i]), GIC_BASE_ADDR,
--                                "reset-cbar", &error_abort);
-         object_property_set_int(OBJECT(&s->apu_cpu[i]), num_apus,
-                                 "core-count", &error_abort);
-         object_property_set_bool(OBJECT(&s->apu_cpu[i]), true, "realized",
-@@ -490,10 +496,6 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-             qemu_check_nic_model(nd, TYPE_CADENCE_GEM);
-             qdev_set_nic_properties(DEVICE(&s->gem[i]), nd);
-         }
--        object_property_set_int(OBJECT(&s->gem[i]), GEM_REVISION, "revision",
--                                &error_abort);
--        object_property_set_int(OBJECT(&s->gem[i]), 2, "num-priority-queues",
--                                &error_abort);
-         object_property_set_bool(OBJECT(&s->gem[i]), true, "realized", &err);
-         if (err) {
-             goto out_propagate_error;
-@@ -514,8 +516,6 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-                            gic_spi[uart_intr[i]]);
-     }
+     MemoryRegion *system_memory = get_system_memory();
+-    MemoryRegion *sram = g_new(MemoryRegion, 1);
+-    MemoryRegion *flash = g_new(MemoryRegion, 1);
+-    MemoryRegion *flash_alias = g_new(MemoryRegion, 1);
  
--    object_property_set_int(OBJECT(&s->sata), SATA_NUM_PORTS, "num-ports",
--                            &error_abort);
-     object_property_set_bool(OBJECT(&s->sata), true, "realized", &err);
-     if (err) {
-         goto out_propagate_error;
+-    memory_region_init_rom(flash, OBJECT(dev_soc), "STM32F205.flash",
++    memory_region_init_rom(&s->flash, OBJECT(dev_soc), "STM32F205.flash",
+                            FLASH_SIZE, &error_fatal);
+-    memory_region_init_alias(flash_alias, OBJECT(dev_soc),
+-                             "STM32F205.flash.alias", flash, 0, FLASH_SIZE);
++    memory_region_init_alias(&s->flash_alias, OBJECT(dev_soc),
++                             "STM32F205.flash.alias", &s->flash, 0, FLASH_SIZE);
+ 
+-    memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, flash);
+-    memory_region_add_subregion(system_memory, 0, flash_alias);
++    memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, &s->flash);
++    memory_region_add_subregion(system_memory, 0, &s->flash_alias);
+ 
+-    memory_region_init_ram(sram, NULL, "STM32F205.sram", SRAM_SIZE,
++    memory_region_init_ram(&s->sram, NULL, "STM32F205.sram", SRAM_SIZE,
+                            &error_fatal);
+-    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
++    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, &s->sram);
+ 
+     armv7m = DEVICE(&s->armv7m);
+     qdev_prop_set_uint32(armv7m, "num-irq", 96);
 -- 
 2.21.1
 
