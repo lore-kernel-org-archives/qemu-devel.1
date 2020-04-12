@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34093C2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:57:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC8C8C2BB86
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:57:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDCA920692
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:57:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7BB1E20692
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:57:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JghYvfP+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDCA920692
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dPCfqUi+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BB1E20692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlXV-00058b-07
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:57:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49666)
+	id 1jNlXX-0005Eh-L6
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:57:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49873)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlJ0-0001F3-7j
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:42:23 -0400
+ id 1jNlJE-0001fe-PV
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:42:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlIz-00061H-7Y
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:42:22 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41674)
+ id 1jNlJD-00068W-Eo
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:42:36 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44377)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlIz-00060p-1b; Sun, 12 Apr 2020 18:42:21 -0400
-Received: by mail-wr1-x442.google.com with SMTP id h9so8535752wrc.8;
- Sun, 12 Apr 2020 15:42:20 -0700 (PDT)
+ id 1jNlJD-000686-9L; Sun, 12 Apr 2020 18:42:35 -0400
+Received: by mail-wr1-x444.google.com with SMTP id d17so1634792wrg.11;
+ Sun, 12 Apr 2020 15:42:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+O8FSNw/XveJvWULa4+Jfl3G5r6TBg2LXwiWGWDolCA=;
- b=JghYvfP+OE/gAaq/k+cmw+2Cnl+0TTmOt8CBP/wmQxsJlyVf0LD4yuAuTnaqH7E3sh
- gKBJK18MKq1hOPHqbQ0z7G/6xjnUF4pOu1jZ31vWP42WkDuXGr7qkK5H80E0okppPU9h
- OGjA2noOGYb3H02VQ6W3c0xiC6X/ZCopm23cocS/K+EjZS/Wu3Y36MZ6rmY/uLJruDTA
- HqB5DGm7XAYgoUzcZ/ktwSnoDBzVd7qHbPLnMcuq75XMeULNER7wyhfm38wDttEL/mqW
- bRQetBsR+Sj2uPvuStv3YPCwtPkJ1L2vY49CDQdOTLjnr7fYgq8kmnt8Rjdn1IQ+ToNZ
- YrHw==
+ bh=74G8KHhadiGPyGitkFydcSDSAs1meyukZBFpYk9pD6I=;
+ b=dPCfqUi+fQcBEG3K/WPUk56J0LAaObHIxDG46h8wY4ZNxJLUwgj0NWwAwtUyFExGA5
+ r5+4rSPzbfX1aAnLWCYcyKaohy7boPLvXOAepLJ662xZIblElg2FuJbH9ri897tTWZt6
+ 6dX5pQ1pFJrNZCtU/FRBwVhqd3WEKQzg34n135qBqGR6o/WT66bm/AhG31Mp2g7nVTy1
+ SFvZGg+UwXBXaJM28hgts6+00mKiW6O1ivAvRJWYTbL2x/xGQq/FTarhAjFQggLC9JcG
+ E1hW5iuN9t/c0S+zX8j1T48TCU8lERf/8j3iJAPh68RiIHQKW1o0OtQD+wO7zRQZOinH
+ ipyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=+O8FSNw/XveJvWULa4+Jfl3G5r6TBg2LXwiWGWDolCA=;
- b=edadRrr9M6/DhanRZYuU3zSM9ckRcRaQX4oiF1raFLlRmGGb/uQXQmdxPWS3bFxDDI
- qgK3+kmpzcmG17OkPV1UMMvIOSa+TFHUcNZASlkQFcffaVn/89qO/xd8eqKhB8/4ZHDB
- uKkrGsw2B8CTTOnhXKjoQmR42BDVlMG/8a95sew+MQYdh4vdcRcUTcjyZvjVk18tIepW
- MZgKMG7M6udegEUeLJCPhQRZNU56JhAKTiXkIKF09uP9NgDFZv3i+7btGvfR4xp2NAIm
- ZRXvO1byV6AGE1tY3n/50CmlZnT+qAKxycAH+LES2dfbUNJ0qHgAI7S7qzQT5INy6633
- o7vw==
-X-Gm-Message-State: AGi0PubWAbBPIOWh9ev+NGFju3hV+ebLyrfvGKL697az+MaBtHGVcKxQ
- 3QtUNcSeIFbMTxacSVGFrzU/g4OEgXL+Hw==
-X-Google-Smtp-Source: APiQypLZ1NMTXnAZenGdHIyB5P9HdjI1CtfX+Kh+BXtTBW28G1YeRa6BQP108OKwa/7Ig8phtUvQ9A==
-X-Received: by 2002:adf:904e:: with SMTP id h72mr15645835wrh.367.1586731339864; 
- Sun, 12 Apr 2020 15:42:19 -0700 (PDT)
+ bh=74G8KHhadiGPyGitkFydcSDSAs1meyukZBFpYk9pD6I=;
+ b=f772oGezS01RVlhSF2S1PMy8ic33QAldzotRBNvP+GFoFMN+ozuJrnXwSj3nVmHTr7
+ ZnBFtSRCaGs08sJRJFW2z6jpHeQSIjKcyTE+8ZU1CYN2WccB0jsHElf2L4Bi0oqczUrx
+ agOXqU77uLNMW/9NUAYdJPkNyaxZzufHCPLBlmDTgZ3LjTFCgWo5rnotOtLRgj0q2aD4
+ 3HMl2JpS36Lr7h7MbqniK1Uow47OkDLszbio4AO8uTiijP0lKUqd1j+6pjTjMUTuDD5W
+ 3ommnp8/IJ84YS7y7PqLrB6zlqDo+q1AzUwxd1A6M1nTHG/dRIsAST7On7O0wS7F+G6d
+ bNIQ==
+X-Gm-Message-State: AGi0PuZ+kFCw8pkKLWlEwrYmVYxBu40oG60WuzXIZWQrfFbX8TxEWGGI
+ UviXaCoHSmmY80ID6CC/wUGR0S7qxqFj1g==
+X-Google-Smtp-Source: APiQypKKinuxHdn5Rjo88Tjskg/kBYuSqrEjj1TM/hyqysUwAmGJpRRx5J4iHdFvz55iPD19d4CKUA==
+X-Received: by 2002:adf:9441:: with SMTP id 59mr15577538wrq.211.1586731353887; 
+ Sun, 12 Apr 2020 15:42:33 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id f63sm12083825wma.47.2020.04.12.15.42.16
+ by smtp.gmail.com with ESMTPSA id f63sm12083825wma.47.2020.04.12.15.42.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:42:19 -0700 (PDT)
+ Sun, 12 Apr 2020 15:42:33 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 09/23] hw/intc/arm_gicv3_its_kvm: Add missing
+Subject: [PATCH-for-5.1 v3 12/23] hw/block/onenand: Add missing
  error-propagation code
-Date: Mon, 13 Apr 2020 00:41:30 +0200
-Message-Id: <20200412224144.12205-10-f4bug@amsat.org>
+Date: Mon, 13 Apr 2020 00:41:33 +0200
+Message-Id: <20200412224144.12205-13-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200412224144.12205-1-f4bug@amsat.org>
 References: <20200412224144.12205-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -136,26 +136,26 @@ Patch created mechanically by running:
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/intc/arm_gicv3_its_kvm.c | 6 +++++-
+ hw/block/onenand.c | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index ad0ebabc87..3d2c4e22f5 100644
---- a/hw/intc/arm_gicv3_its_kvm.c
-+++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -101,7 +101,11 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
- 
-     /* explicit init of the ITS */
-     kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
--                      KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true, &error_abort);
-+                      KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true, &local_err);
+diff --git a/hw/block/onenand.c b/hw/block/onenand.c
+index 898ac563a3..1f68dba28b 100644
+--- a/hw/block/onenand.c
++++ b/hw/block/onenand.c
+@@ -810,7 +810,11 @@ static void onenand_realize(DeviceState *dev, Error **errp)
+     s->otp = memset(g_malloc((64 + 2) << PAGE_SHIFT),
+                     0xff, (64 + 2) << PAGE_SHIFT);
+     memory_region_init_ram_nomigrate(&s->ram, OBJECT(s), "onenand.ram",
+-                           0xc000 << s->shift, &error_fatal);
++                           0xc000 << s->shift, &local_err);
 +    if (local_err) {
 +        error_propagate(errp, local_err);
 +        return;
 +    }
- 
-     /* register the base address */
-     kvm_arm_register_device(&s->iomem_its_cntrl, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
+     vmstate_register_ram_global(&s->ram);
+     ram = memory_region_get_ram_ptr(&s->ram);
+     s->boot[0] = ram + (0x0000 << s->shift);
 -- 
 2.21.1
 
