@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B59C2BB86
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:45:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7838C2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:45:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 409F720678
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:45:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 923C220678
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:45:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mq797QED"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 409F720678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FiPl+xfI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 923C220678
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlMC-0006SD-A2
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:45:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47434)
+	id 1jNlMK-0006t9-LL
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:45:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47877)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDg-0005ll-Co
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:54 -0400
+ id 1jNlE3-0006kv-G5
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDf-0002UU-B3
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:52 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36399)
+ id 1jNlE1-0002s1-Ry
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:15 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:56094)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDf-0002SW-57; Sun, 12 Apr 2020 18:36:51 -0400
-Received: by mail-wm1-x341.google.com with SMTP id a201so8010380wme.1;
- Sun, 12 Apr 2020 15:36:50 -0700 (PDT)
+ id 1jNlE1-0002rQ-Lg; Sun, 12 Apr 2020 18:37:13 -0400
+Received: by mail-wm1-x342.google.com with SMTP id e26so7922076wmk.5;
+ Sun, 12 Apr 2020 15:37:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GiwJ4gTZC8RX41lgDmd3v75v+8FpbTkDx97eHKIDhQk=;
- b=Mq797QEDhRzAek9t4CjQkFwSgRFmMI4IZkDmNnSk2RGLFR7FblrPehzgX4xfKOdL9U
- /oohG/hJdPCpZbJc4gyMfvGoYu03fyun2A34w7ddDHMrji3JdYAO5h1l4SOsZh6romXL
- /D78Op7QyfJcr/rRUsGK5Ns96bm1Ks6dnB+qMCd+I+lc3PQH0sbPofP+SQ5ke2B1xR6l
- wVNyB+8U+7OCRqRwjpGXSse2INskpTqbPVB6eVp7KliYaT1yRvQl99ft5IqsDwe6gIIp
- ZLHLdGfb5Ph69ogAChQVeJ8El1KJTk8R6pJalWlCTddiESdrrne7lEmxefjrHOz8LnFz
- pprA==
+ bh=4j3n0ZN8lrQk9Ox5ZI487lTmFghYMiP7ZCOjQ+gtTO0=;
+ b=FiPl+xfImHl2GpHUMPv7DS3HnCGs7y5Yv7rRAWLbBxSA+Zejhz/zl3dYLZFx9NwO3C
+ ruBIj4ErorNm/wEEEwmAZQN7jz+KhLLNa3qUtc6sXdKd0t4oGGLXPCHrZDaqFOt7+heG
+ akctvFAf/HakBv2w5G3h7MQwU/7e8gmOEEk6Z3+IDI0ZJ8CQnO1vrHu4pMgXZE7FtJ37
+ +V2y1Eimw56yRDBdiaV3zqgFJs1xlb2++xZYHy83WCjNnfGmjYL3b+tsJbkPb0JXPjQ6
+ mm7I3D/7KEPFhiTmxZNJOmqeOOKBoCVRVDbYfbGEZ4JPJvWn79ulzvCvctV9S8Op08JM
+ 6KXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=GiwJ4gTZC8RX41lgDmd3v75v+8FpbTkDx97eHKIDhQk=;
- b=rDL7yLOUAgzNF6XzG0v1rL1koniUapbuqCVntlC/lZWYhfk3Egi+55XI9z9s0UYeg8
- 4Ez2tcd3Xb8xBermtj2y5o3h3LGzQve8nbx5SpQu6NCwz8YDfvDN1489gjI8cPUh8a5G
- Lt+e6bK62TThgJ0SWkRJrl0P1blpgl0OF4lGBOC7sc6uyM5JbZPJq43GNJmUN+izkeHa
- vz0VkX5HtoZl/58E/CFX5vF7B3kI1w+66fYAkc02EuBNxJcsXhw+wd+6DlGxjdXUaQbr
- Qi9Ms3zxMmSyeLWjoGr9tTLMWslNwsyta4x859GugJ7zH94frMFcxScdR4R4FGrEnVD+
- JDPg==
-X-Gm-Message-State: AGi0PuYFqwejdl1Eu0OrUNCRxWWCJq8ir39qdxo4LgLB0dZjJSCl6faU
- PsMppm9H4Xu4iCQq5jVJKg6wzJjur6seIQ==
-X-Google-Smtp-Source: APiQypI+oNcWVnGLSgc9gRiJhlI6kxXPyrmsIuexF7v91PJEZXkcFN2CKnqRme5IVVcaZ6zCmtaX5g==
-X-Received: by 2002:a1c:3b09:: with SMTP id i9mr15471185wma.19.1586731008786; 
- Sun, 12 Apr 2020 15:36:48 -0700 (PDT)
+ bh=4j3n0ZN8lrQk9Ox5ZI487lTmFghYMiP7ZCOjQ+gtTO0=;
+ b=NDk6OdbEfQIzD4f7kNQB7TtSmI+3GaowfGPmWcuE6OI+tVK6TpDsiqd0UGQK2qnmmh
+ BejAKN8SjEfqTt6MKwJQ/jmGEvgxBuADzg9jJEVZmJWGDUGdvo23pDosPNDPX4hBpFc0
+ 5rJdsy54zyCp0ftdmQRZk6rXCM8JFT74GU4ogCiCrrCv0X022bl69rCCHzYsTK/t544E
+ ajb4NMgmE0beHEz2alF3agWFSVgxVuOPDPZeMqBAjCWJntVlsi1oE42viY0zd/tXIjzR
+ 56cFgRnqwKZyIYH9gmPQhVOkd08QDJDdkRQ3gIvkSJ9jZgdU6Fv+PXCypPY8qNuMvJGd
+ v/bw==
+X-Gm-Message-State: AGi0PuaR+VGZEmMahti7aVPdm9EfelZQh4tMBfAdAzgpwydSx+PQynl9
+ Qv0XVETGASH50VnzAxhayImVmyVveln+WQ==
+X-Google-Smtp-Source: APiQypKQ+yRJxYVK62KIGa19FQEaCOa3lcvmah3jW7keXINk4PdHa+2g4NBI/LDjsNJ8Vg5U1+YoBA==
+X-Received: by 2002:a1c:7301:: with SMTP id d1mr16763598wmb.26.1586731032454; 
+ Sun, 12 Apr 2020 15:37:12 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.36.45
+ by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.37.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:36:48 -0700 (PDT)
+ Sun, 12 Apr 2020 15:37:11 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 07/24] hw/arm/aspeed_soc: Simplify use of Error*
-Date: Mon, 13 Apr 2020 00:36:02 +0200
-Message-Id: <20200412223619.11284-8-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v3 14/24] hw/arm/xlnx-zynqmp: Use single
+ propagate_error() call
+Date: Mon, 13 Apr 2020 00:36:09 +0200
+Message-Id: <20200412223619.11284-15-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200412223619.11284-1-f4bug@amsat.org>
 References: <20200412223619.11284-1-f4bug@amsat.org>
@@ -84,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,50 +126,206 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the previous commit we noticed we don't need two different
-Error*, drop the one less used.
+Coccinelle failed at processing this file:
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+  $ spatch ... --timeout 60 --sp-file \
+    scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+  HANDLING: ./hw/arm/xlnx-zynqmp.c
+  EXN: Coccinelle_modules.Common.Timeout
+
+We are going to manually add the missing propagate_error() calls.
+As there are many Error* calls used, simplify by using an unique
+call to propagate_error().
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v3: Indent 'return'
----
- hw/arm/aspeed_soc.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ hw/arm/xlnx-zynqmp.c | 61 +++++++++++++++++---------------------------
+ 1 file changed, 23 insertions(+), 38 deletions(-)
 
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index debd7c8faa..4ee991ec16 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -234,7 +234,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     int i;
-     AspeedSoCState *s = ASPEED_SOC(dev);
-     AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
--    Error *err = NULL, *local_err = NULL;
-+    Error *err = NULL;
- 
-     /* IO space */
-     create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOMEM],
-@@ -413,12 +413,15 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-         qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
-         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index b84d153d56..43d57fa7de 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -385,15 +385,13 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+         object_property_set_bool(OBJECT(&s->apu_cpu[i]), true, "realized",
                                   &err);
--        object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realized",
--                                 &local_err);
--        error_propagate(&err, local_err);
          if (err) {
-             error_propagate(errp, err);
--           return;
-+            return;
-+        }
-+        object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realized",
-+                                 &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
+-            error_propagate(errp, err);
+-            return;
++            goto out_propagate_error;
          }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
-                         sc->memmap[ASPEED_ETH1 + i]);
+     }
+ 
+     object_property_set_bool(OBJECT(&s->gic), true, "realized", &err);
+     if (err) {
+-        error_propagate(errp, err);
+-        return;
++        goto out_propagate_error;
+     }
+ 
+     assert(ARRAY_SIZE(xlnx_zynqmp_gic_regions) == XLNX_ZYNQMP_GIC_REGIONS);
+@@ -462,8 +460,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+ 
+     xlnx_zynqmp_create_rpu(ms, s, boot_cpu, &err);
+     if (err) {
+-        error_propagate(errp, err);
+-        return;
++        goto out_propagate_error;
+     }
+ 
+     if (!s->boot_cpu_ptr) {
+@@ -488,8 +485,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+                                 &error_abort);
+         object_property_set_bool(OBJECT(&s->gem[i]), true, "realized", &err);
+         if (err) {
+-            error_propagate(errp, err);
+-            return;
++            goto out_propagate_error;
+         }
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->gem[i]), 0, gem_addr[i]);
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->gem[i]), 0,
+@@ -500,8 +496,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+         qdev_prop_set_chr(DEVICE(&s->uart[i]), "chardev", serial_hd(i));
+         object_property_set_bool(OBJECT(&s->uart[i]), true, "realized", &err);
+         if (err) {
+-            error_propagate(errp, err);
+-            return;
++            goto out_propagate_error;
+         }
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->uart[i]), 0, uart_addr[i]);
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart[i]), 0,
+@@ -512,8 +507,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+                             &error_abort);
+     object_property_set_bool(OBJECT(&s->sata), true, "realized", &err);
+     if (err) {
+-        error_propagate(errp, err);
+-        return;
++        goto out_propagate_error;
+     }
+ 
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->sata), 0, SATA_ADDR);
+@@ -531,23 +525,19 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+          */
+         object_property_set_uint(sdhci, 3, "sd-spec-version", &err);
+         if (err) {
+-            error_propagate(errp, err);
+-            return;
++            goto out_propagate_error;
+         }
+         object_property_set_uint(sdhci, SDHCI_CAPABILITIES, "capareg", &err);
+         if (err) {
+-            error_propagate(errp, err);
+-            return;
++            goto out_propagate_error;
+         }
+         object_property_set_uint(sdhci, UHS_I, "uhs", &err);
+         if (err) {
+-            error_propagate(errp, err);
+-            return;
++            goto out_propagate_error;
+         }
+         object_property_set_bool(sdhci, true, "realized", &err);
+         if (err) {
+-            error_propagate(errp, err);
+-            return;
++            goto out_propagate_error;
+         }
+         sysbus_mmio_map(sbd, 0, sdhci_addr[i]);
+         sysbus_connect_irq(sbd, 0, gic_spi[sdhci_intr[i]]);
+@@ -564,8 +554,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+ 
+         object_property_set_bool(OBJECT(&s->spi[i]), true, "realized", &err);
+         if (err) {
+-            error_propagate(errp, err);
+-            return;
++            goto out_propagate_error;
+         }
+ 
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 0, spi_addr[i]);
+@@ -582,8 +571,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+ 
+     object_property_set_bool(OBJECT(&s->qspi), true, "realized", &err);
+     if (err) {
+-        error_propagate(errp, err);
+-        return;
++        goto out_propagate_error;
+     }
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 0, QSPI_ADDR);
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->qspi), 1, LQSPI_ADDR);
+@@ -605,16 +593,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+ 
+     object_property_set_bool(OBJECT(&s->dp), true, "realized", &err);
+     if (err) {
+-        error_propagate(errp, err);
+-        return;
++        goto out_propagate_error;
+     }
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->dp), 0, DP_ADDR);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->dp), 0, gic_spi[DP_IRQ]);
+ 
+     object_property_set_bool(OBJECT(&s->dpdma), true, "realized", &err);
+     if (err) {
+-        error_propagate(errp, err);
+-        return;
++        goto out_propagate_error;
+     }
+     object_property_set_link(OBJECT(&s->dp), OBJECT(&s->dpdma), "dpdma",
+                              &error_abort);
+@@ -623,16 +609,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+ 
+     object_property_set_bool(OBJECT(&s->ipi), true, "realized", &err);
+     if (err) {
+-        error_propagate(errp, err);
+-        return;
++        goto out_propagate_error;
+     }
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->ipi), 0, IPI_ADDR);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->ipi), 0, gic_spi[IPI_IRQ]);
+ 
+     object_property_set_bool(OBJECT(&s->rtc), true, "realized", &err);
+     if (err) {
+-        error_propagate(errp, err);
+-        return;
++        goto out_propagate_error;
+     }
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->rtc), 0, RTC_ADDR);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->rtc), 0, gic_spi[RTC_IRQ]);
+@@ -640,13 +624,11 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i < XLNX_ZYNQMP_NUM_GDMA_CH; i++) {
+         object_property_set_uint(OBJECT(&s->gdma[i]), 128, "bus-width", &err);
+         if (err) {
+-            error_propagate(errp, err);
+-            return;
++            goto out_propagate_error;
+         }
+         object_property_set_bool(OBJECT(&s->gdma[i]), true, "realized", &err);
+         if (err) {
+-            error_propagate(errp, err);
+-            return;
++            goto out_propagate_error;
+         }
+ 
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->gdma[i]), 0, gdma_ch_addr[i]);
+@@ -657,14 +639,17 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i < XLNX_ZYNQMP_NUM_ADMA_CH; i++) {
+         object_property_set_bool(OBJECT(&s->adma[i]), true, "realized", &err);
+         if (err) {
+-            error_propagate(errp, err);
+-            return;
++            goto out_propagate_error;
+         }
+ 
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->adma[i]), 0, adma_ch_addr[i]);
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->adma[i]), 0,
+                            gic_spi[adma_ch_intr[i]]);
+     }
++    return;
++
++out_propagate_error:
++    error_propagate(errp, err);
+ }
+ 
+ static Property xlnx_zynqmp_props[] = {
 -- 
 2.21.1
 
