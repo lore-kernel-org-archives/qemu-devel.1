@@ -2,80 +2,80 @@ Return-Path: <SRS0=Byls=54=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9275CC2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:46:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B30C8C2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:47:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B66420678
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:46:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 371B520678
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:47:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JvMtQoy5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B66420678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZopGHA5h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 371B520678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlNE-0000dh-F4
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:46:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48202)
+	id 1jNlNt-0001hp-1C
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:47:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47464)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlEJ-0007Qh-U8
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:33 -0400
+ id 1jNlDi-0005pD-Dx
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlEI-00033S-KY
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:31 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46748)
+ id 1jNlDh-0002WX-Ep
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:54 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:39217)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlEI-00032n-EP; Sun, 12 Apr 2020 18:37:30 -0400
-Received: by mail-wr1-x444.google.com with SMTP id f13so8492739wrm.13;
- Sun, 12 Apr 2020 15:37:30 -0700 (PDT)
+ id 1jNlDh-0002VS-9D; Sun, 12 Apr 2020 18:36:53 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id y24so8373506wma.4;
+ Sun, 12 Apr 2020 15:36:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=BasB+g8nzHU9NqlorXFhvA0RjIUcriXJQANOu1FTC+I=;
- b=JvMtQoy5jGVm+8GTmlMuiC1ueHzc7rwT5p0KjyN+hsDtCP4Cn/JcNRjyihyWdj1Xss
- dtTI7Fv3AEEkUCxM+MBsr8py6lEmOfl88MiFeO/9zQb/EyYfaYfoCy6GWOS1uPW4/k7Y
- ytJwyS6D3FPLDQoAuwh+9v1qQjJEv+RlWs6ZB3SigBk8RzVjtqOYmZzrGu/5PW1uyLWB
- 8oEd5a2rHSAe48/FO0M0iiZchZXc20+ui+IDOBXDnkBiARaT4gt5hXqcgdCwCBac3SVL
- JZ2STQPPOH3UJiG8R3nbAuw90HN5yYwEBUy9ARd1rv71Sg3xu0pVpJzxlcPyhOGL9pmp
- 91Vw==
+ bh=8naS2wy7z7r5ZHMslOR/F6A89KH9g2Da3djfcOFUQbw=;
+ b=ZopGHA5hPnTx8sNF2c5SGckaNTBGwPnkbtYAxja2/xP+2Q1PskQL6Z0KC9zTeVmVp2
+ J5vV0yzKRL+S29+OMS63qITufgzDCbChemcpzgPth3HYg1iEOasTt5FAIV6lMHp8Ymcs
+ +qywRHXNlgawOIU3WMzs5t/XjiKywX00cPzZDs9ckHENzcnMl6KrvQQ4C5y/O4CpB6cz
+ 7+EQMfUCWq2xGbsT+bt3dh+71+7dFFfSSrpWrlEx6AWXwxPIPRWLEoCkHVe9kPMK/zqP
+ mSAKbIl2mFbkK/0udjP3UNoFTLFDdQrXnzwTLEf3L9ErgUZCOWYuwgohv2DRDoVvb6/F
+ b2uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=BasB+g8nzHU9NqlorXFhvA0RjIUcriXJQANOu1FTC+I=;
- b=YyzVNNnS+e9uLAiKw9pXEB9e+K0RjnW8ZbKsiLNJ9TiBvUrC+IwGx9vheAyngQTJgX
- MOZpM5oWD5m+rbEy0xLPK5i1dKdfzsLh7m03lxe7oo49uFHNqzBcnS+YvhdFX/VgyBB3
- 5BRf1g1Q1vhiLl0B2sAF5pFruIdEmUbtLts7L4BYy0GonX0P4aLq+s2Ki1aMxdGeyWsL
- h6ukY8phJDqgKjttlMcQIM6i9JKSDzii2Sb1bl+5PX6OwVow5XJIW7c981M3yL1vm2mz
- gD/OnC1hP8iFlKGBtXKogprputafQzcULwsvydFaQG1HcCDkkJn5KEwLRXEMt+suOIpX
- ucCA==
-X-Gm-Message-State: AGi0Puaa7CY8uWUPXwxBqTxkGQ6CloHONXt2urQYs2aD539viAg2UPtf
- /0Mg94zWmzCr9AiZy90nfOp4yg/RhcuDmg==
-X-Google-Smtp-Source: APiQypLA5twQlR1QLyc7VGDBinqgnLuFOZKnSZQ7eellH4Zuc9qupRB7hrNAyIMdmkRXKazdyeiW8A==
-X-Received: by 2002:a5d:4b49:: with SMTP id w9mr15981211wrs.359.1586731049029; 
- Sun, 12 Apr 2020 15:37:29 -0700 (PDT)
+ bh=8naS2wy7z7r5ZHMslOR/F6A89KH9g2Da3djfcOFUQbw=;
+ b=BW/9bbpnHjhCmTWMo149N8u+u0/AblYs9YC5zfpcDD/DXlm160Mkj2JKS0mguo+Bat
+ NSo0PZePQDl3ENNVMAzP++NvqKaL6Jeb4r7p66W8Ue4FRqGM+aPOTUA6DhNk1YEet+4I
+ vWR2Z5R8yap5BP3WabhDoZG9UGMjyMP1Y0Wr1DofkXzYeasy/iYZtzifb8DseYGyH0mn
+ 1LI6nt4isUziwGivCxjkQfedZr/uhQm0xYV9//PquQHuXn9EXbylz3nwVaOuzEsgDlgU
+ vz91efiiQVTgTBy0mkvZCbLzaZG9SOVUhuaSwzTQZYLWB+Qkc8ybhD9lNAgHN7yXTLT1
+ H0Bg==
+X-Gm-Message-State: AGi0PubhXiL4Fs5CWikhLb/unci88MjtFyUiMW4CXuMb5yH+XAHd64Mh
+ CslBltCx0/lBfi4F9ILSbTEqu4dtC/m9BQ==
+X-Google-Smtp-Source: APiQypITIU1SGXv9LAb/QbjgOxcr7y3t4yFZ/GEmLkLTGEvMgpnkh3C1JgSsB2ZOd8k+faPChLRKMg==
+X-Received: by 2002:a1c:195:: with SMTP id 143mr15945607wmb.0.1586731012068;
+ Sun, 12 Apr 2020 15:36:52 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.37.25
+ by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.36.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:37:28 -0700 (PDT)
+ Sun, 12 Apr 2020 15:36:51 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 19/24] hw/riscv/sifive_e: Move some code from
- realize() to init()
-Date: Mon, 13 Apr 2020 00:36:14 +0200
-Message-Id: <20200412223619.11284-20-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v3 08/24] hw/arm/fsl-imx6: Simplify checks on
+ 'smp_cpus' count
+Date: Mon, 13 Apr 2020 00:36:03 +0200
+Message-Id: <20200412223619.11284-9-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200412223619.11284-1-f4bug@amsat.org>
 References: <20200412223619.11284-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,82 +126,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coccinelle reported:
+Coccinelle failed at processing this file:
 
   $ spatch ... --timeout 60 --sp-file \
     scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-  HANDLING: ./hw/riscv/sifive_e.c
-  >>> possible moves from riscv_sifive_e_soc_init() to riscv_sifive_e_soc_realize() in ./hw/riscv/sifive_e.c:135
+  HANDLING: ./hw/arm/fsl-imx6.c
+  Fatal error: exception Coccinelle_modules.Common.Timeout
 
-Move the calls using &error_fatal which don't depend on input
-updated before realize() to init().
+While reviewing we notice the smp_cpus count is already limited
+by MachineClass::max_cpus:
+
+  static void sabrelite_machine_init(MachineClass *mc)
+  {
+      mc->max_cpus = FSL_IMX6_NUM_CPUS;
+      ...
+  }
+
+So remove the check in realize(), but still assert in init().
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v3: Typo 'depend of' -> 'depend on' (eblake)
----
- hw/riscv/sifive_e.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+ hw/arm/fsl-imx6.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 646553a7c3..0be8b52147 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -118,7 +118,9 @@ static void riscv_sifive_e_init(MachineState *machine)
- static void riscv_sifive_e_soc_init(Object *obj)
+diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
+index 13f1bf23a6..3d37352b08 100644
+--- a/hw/arm/fsl-imx6.c
++++ b/hw/arm/fsl-imx6.c
+@@ -37,10 +37,12 @@
+ static void fsl_imx6_init(Object *obj)
  {
      MachineState *ms = MACHINE(qdev_get_machine());
-+    const struct MemmapEntry *memmap = sifive_e_memmap;
-     SiFiveESoCState *s = RISCV_E_SOC(obj);
-+    MemoryRegion *sys_mem = get_system_memory();
++    unsigned int smp_cpus = ms->smp.cpus;
+     FslIMX6State *s = FSL_IMX6(obj);
+     char name[NAME_SIZE];
+     int i;
  
-     object_initialize_child(obj, "cpus", &s->cpus,
-                             sizeof(s->cpus), TYPE_RISCV_HART_ARRAY,
-@@ -130,6 +132,18 @@ static void riscv_sifive_e_soc_init(Object *obj)
-     sysbus_init_child_obj(obj, "riscv.sifive.e.gpio0",
-                           &s->gpio, sizeof(s->gpio),
-                           TYPE_SIFIVE_GPIO);
-+
-+    /* Mask ROM */
-+    memory_region_init_rom(&s->mask_rom, obj, "riscv.sifive.e.mrom",
-+                           memmap[SIFIVE_E_MROM].size, &error_fatal);
-+    memory_region_add_subregion(sys_mem,
-+        memmap[SIFIVE_E_MROM].base, &s->mask_rom);
-+
-+    /* Flash memory */
-+    memory_region_init_rom(&s->xip_mem, obj, "riscv.sifive.e.xip",
-+                           memmap[SIFIVE_E_XIP].size, &error_fatal);
-+    memory_region_add_subregion(sys_mem, memmap[SIFIVE_E_XIP].base,
-+        &s->xip_mem);
- }
++    assert(smp_cpus <= FSL_IMX6_NUM_CPUS);
+     for (i = 0; i < MIN(ms->smp.cpus, FSL_IMX6_NUM_CPUS); i++) {
+         snprintf(name, NAME_SIZE, "cpu%d", i);
+         object_initialize_child(obj, name, &s->cpu[i], sizeof(s->cpu[i]),
+@@ -121,12 +123,6 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
+     Error *err = NULL;
+     unsigned int smp_cpus = ms->smp.cpus;
  
- static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
-@@ -144,12 +158,6 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
-     object_property_set_bool(OBJECT(&s->cpus), true, "realized",
-                             &error_abort);
- 
--    /* Mask ROM */
--    memory_region_init_rom(&s->mask_rom, OBJECT(dev), "riscv.sifive.e.mrom",
--                           memmap[SIFIVE_E_MROM].size, &error_fatal);
--    memory_region_add_subregion(sys_mem,
--        memmap[SIFIVE_E_MROM].base, &s->mask_rom);
+-    if (smp_cpus > FSL_IMX6_NUM_CPUS) {
+-        error_setg(errp, "%s: Only %d CPUs are supported (%d requested)",
+-                   TYPE_FSL_IMX6, FSL_IMX6_NUM_CPUS, smp_cpus);
+-        return;
+-    }
 -
-     /* MMIO */
-     s->plic = sifive_plic_create(memmap[SIFIVE_E_PLIC].base,
-         (char *)SIFIVE_E_PLIC_HART_CONFIG,
-@@ -206,12 +214,6 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
-         memmap[SIFIVE_E_QSPI2].base, memmap[SIFIVE_E_QSPI2].size);
-     create_unimplemented_device("riscv.sifive.e.pwm2",
-         memmap[SIFIVE_E_PWM2].base, memmap[SIFIVE_E_PWM2].size);
--
--    /* Flash memory */
--    memory_region_init_rom(&s->xip_mem, OBJECT(dev), "riscv.sifive.e.xip",
--                           memmap[SIFIVE_E_XIP].size, &error_fatal);
--    memory_region_add_subregion(sys_mem, memmap[SIFIVE_E_XIP].base,
--        &s->xip_mem);
- }
+     for (i = 0; i < smp_cpus; i++) {
  
- static void riscv_sifive_e_machine_init(MachineClass *mc)
+         /* On uniprocessor, the CBAR is set to 0 */
 -- 
 2.21.1
 
