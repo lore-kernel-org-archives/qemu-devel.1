@@ -7,76 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A39CFC2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B59C2BB86
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:45:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B0E220678
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:45:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 409F720678
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:45:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MsQvQjdO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B0E220678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mq797QED"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 409F720678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlM9-0006L9-HF
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:45:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48100)
+	id 1jNlMC-0006SD-A2
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:45:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47434)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlEG-0007En-0N
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:29 -0400
+ id 1jNlDg-0005ll-Co
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlEE-00030k-Ra
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:27 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38751)
+ id 1jNlDf-0002UU-B3
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:52 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36399)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlEE-00030C-Kp; Sun, 12 Apr 2020 18:37:26 -0400
-Received: by mail-wm1-x342.google.com with SMTP id g12so530137wmh.3;
- Sun, 12 Apr 2020 15:37:26 -0700 (PDT)
+ id 1jNlDf-0002SW-57; Sun, 12 Apr 2020 18:36:51 -0400
+Received: by mail-wm1-x341.google.com with SMTP id a201so8010380wme.1;
+ Sun, 12 Apr 2020 15:36:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=6EG1vhq7sjTB9ZSXWfgY7jLuzjsnK7wuhdMzV+BgTOM=;
- b=MsQvQjdOJctQaymMWzuHiIEE+lE19kYquiqYVPI8ArMQyMfUER4XHw9x6BuSyOtNKf
- lA/5a8DhdoV5UNUtzgCep+8KE8mnzFH9fThKoND+pqiF7rRm9vc0Emwo62vxbEmp4qkv
- Jk6v8A6jQHxVB0IseXpPtlnCeqj8194nNLq4BMLAVJ7XIR8RAOh0ZNgmi/NYXfQ5RVu5
- WQbnkElC2a4G+SJ2xRVbwKuokBS06ka+XYcwMunG53+1xCIM8EluyfK11rvsgbD7rmgj
- OJtcJxK6F9aKsAAA5PCU9ov1lOHTmUfxBulafyYFH06Xgvq60924wzckwO22Rt9vgUmQ
- ASdw==
+ bh=GiwJ4gTZC8RX41lgDmd3v75v+8FpbTkDx97eHKIDhQk=;
+ b=Mq797QEDhRzAek9t4CjQkFwSgRFmMI4IZkDmNnSk2RGLFR7FblrPehzgX4xfKOdL9U
+ /oohG/hJdPCpZbJc4gyMfvGoYu03fyun2A34w7ddDHMrji3JdYAO5h1l4SOsZh6romXL
+ /D78Op7QyfJcr/rRUsGK5Ns96bm1Ks6dnB+qMCd+I+lc3PQH0sbPofP+SQ5ke2B1xR6l
+ wVNyB+8U+7OCRqRwjpGXSse2INskpTqbPVB6eVp7KliYaT1yRvQl99ft5IqsDwe6gIIp
+ ZLHLdGfb5Ph69ogAChQVeJ8El1KJTk8R6pJalWlCTddiESdrrne7lEmxefjrHOz8LnFz
+ pprA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=6EG1vhq7sjTB9ZSXWfgY7jLuzjsnK7wuhdMzV+BgTOM=;
- b=TU1a1j5JI2JI1hO5NRdZ/jwAX9XSxcOGlwea1xc7vtr9sdnsfVDrISh6KqGufB6Y67
- BtH8H/1d+Tv2P85XwIWCU5ewlk5qGdV5w0ZKPaRJ5gPJ9qAKrEJGJ9XJyazFsLjUtPEE
- haZOqcwBeWLe3gIft9jMcrYDPr+ygqAMoas1K3clS6shiOMN7TX+T9OSyk6O2GAvFsfe
- pYqu2Bg2muRM3eBdGRqGNag647/wD83QWp3uTeTmcgFUN1PKPRh83zLCEaAW764fxvR6
- JShFOvEAPnn0QLBchJiYPkjRHUURXuACEa/BPYpDxt4rgQ2hT8YuWB3KbM8luK3QPfvf
- xFYw==
-X-Gm-Message-State: AGi0PuYBjH/mBsCdf2uc/Xp9Wfaz7edKJD3axFJ560p12z5NmB6TfGTV
- dsH7yAgOOWejcnTmtEE04lQnLsxh7W+r8Q==
-X-Google-Smtp-Source: APiQypJlLltEQFNE2vqF8ExiHlmy6ahTplWoe0ijPErKx9YJP0u0OJAAKYllEE0ddjztCeFBlLUyaA==
-X-Received: by 2002:a1c:43c6:: with SMTP id
- q189mr15130503wma.115.1586731045453; 
- Sun, 12 Apr 2020 15:37:25 -0700 (PDT)
+ bh=GiwJ4gTZC8RX41lgDmd3v75v+8FpbTkDx97eHKIDhQk=;
+ b=rDL7yLOUAgzNF6XzG0v1rL1koniUapbuqCVntlC/lZWYhfk3Egi+55XI9z9s0UYeg8
+ 4Ez2tcd3Xb8xBermtj2y5o3h3LGzQve8nbx5SpQu6NCwz8YDfvDN1489gjI8cPUh8a5G
+ Lt+e6bK62TThgJ0SWkRJrl0P1blpgl0OF4lGBOC7sc6uyM5JbZPJq43GNJmUN+izkeHa
+ vz0VkX5HtoZl/58E/CFX5vF7B3kI1w+66fYAkc02EuBNxJcsXhw+wd+6DlGxjdXUaQbr
+ Qi9Ms3zxMmSyeLWjoGr9tTLMWslNwsyta4x859GugJ7zH94frMFcxScdR4R4FGrEnVD+
+ JDPg==
+X-Gm-Message-State: AGi0PuYFqwejdl1Eu0OrUNCRxWWCJq8ir39qdxo4LgLB0dZjJSCl6faU
+ PsMppm9H4Xu4iCQq5jVJKg6wzJjur6seIQ==
+X-Google-Smtp-Source: APiQypI+oNcWVnGLSgc9gRiJhlI6kxXPyrmsIuexF7v91PJEZXkcFN2CKnqRme5IVVcaZ6zCmtaX5g==
+X-Received: by 2002:a1c:3b09:: with SMTP id i9mr15471185wma.19.1586731008786; 
+ Sun, 12 Apr 2020 15:36:48 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.37.22
+ by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.36.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:37:24 -0700 (PDT)
+ Sun, 12 Apr 2020 15:36:48 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 18/24] hw/pci-host/pnv_phb3: Move some code from
- realize() to init()
-Date: Mon, 13 Apr 2020 00:36:13 +0200
-Message-Id: <20200412223619.11284-19-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v3 07/24] hw/arm/aspeed_soc: Simplify use of Error*
+Date: Mon, 13 Apr 2020 00:36:02 +0200
+Message-Id: <20200412223619.11284-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200412223619.11284-1-f4bug@amsat.org>
 References: <20200412223619.11284-1-f4bug@amsat.org>
@@ -86,7 +84,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,63 +125,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coccinelle reported:
+In the previous commit we noticed we don't need two different
+Error*, drop the one less used.
 
-  $ spatch ... --timeout 60 --sp-file \
-    scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-  HANDLING: ./hw/pci-host/pnv_phb3.c
-  >>> possible moves from pnv_phb3_instance_init() to pnv_phb3_realize() in ./hw/pci-host/pnv_phb3.c:992
-
-Move the calls using &error_abort which don't depend on input
-updated before realize() to init().
-
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v3: Typo 'depend of' -> 'depend on' (eblake)
+v3: Indent 'return'
 ---
- hw/pci-host/pnv_phb3.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/arm/aspeed_soc.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c
-index 74618fadf0..57d717ed23 100644
---- a/hw/pci-host/pnv_phb3.c
-+++ b/hw/pci-host/pnv_phb3.c
-@@ -970,6 +970,8 @@ static void pnv_phb3_instance_init(Object *obj)
-     /* LSI sources */
-     object_initialize_child(obj, "lsi", &phb->lsis, sizeof(phb->lsis),
-                              TYPE_ICS, &error_abort, NULL);
-+    object_property_set_int(OBJECT(&phb->lsis), PNV_PHB3_NUM_LSI, "nr-irqs",
-+                            &error_abort);
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index debd7c8faa..4ee991ec16 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -234,7 +234,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+     int i;
+     AspeedSoCState *s = ASPEED_SOC(dev);
+     AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
+-    Error *err = NULL, *local_err = NULL;
++    Error *err = NULL;
  
-     /* Default init ... will be fixed by HW inits */
-     phb->lsis.offset = 0;
-@@ -977,6 +979,8 @@ static void pnv_phb3_instance_init(Object *obj)
-     /* MSI sources */
-     object_initialize_child(obj, "msi", &phb->msis, sizeof(phb->msis),
-                             TYPE_PHB3_MSI, &error_abort, NULL);
-+    object_property_set_int(OBJECT(&phb->msis), PHB3_MAX_MSI, "nr-irqs",
-+                            &error_abort);
- 
-     /* Power Bus Common Queue */
-     object_initialize_child(obj, "pbcq", &phb->pbcq, sizeof(phb->pbcq),
-@@ -1005,8 +1009,6 @@ static void pnv_phb3_realize(DeviceState *dev, Error **errp)
-     /* LSI sources */
-     object_property_set_link(OBJECT(&phb->lsis), OBJECT(pnv), "xics",
-                                    &error_abort);
--    object_property_set_int(OBJECT(&phb->lsis), PNV_PHB3_NUM_LSI, "nr-irqs",
--                            &error_abort);
-     object_property_set_bool(OBJECT(&phb->lsis), true, "realized", &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-@@ -1024,8 +1026,6 @@ static void pnv_phb3_realize(DeviceState *dev, Error **errp)
-                                    &error_abort);
-     object_property_set_link(OBJECT(&phb->msis), OBJECT(pnv), "xics",
-                                    &error_abort);
--    object_property_set_int(OBJECT(&phb->msis), PHB3_MAX_MSI, "nr-irqs",
--                            &error_abort);
-     object_property_set_bool(OBJECT(&phb->msis), true, "realized", &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
+     /* IO space */
+     create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOMEM],
+@@ -413,12 +413,15 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+         qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i]);
+         object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "aspeed",
+                                  &err);
+-        object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realized",
+-                                 &local_err);
+-        error_propagate(&err, local_err);
+         if (err) {
+             error_propagate(errp, err);
+-           return;
++            return;
++        }
++        object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "realized",
++                                 &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
+         }
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
+                         sc->memmap[ASPEED_ETH1 + i]);
 -- 
 2.21.1
 
