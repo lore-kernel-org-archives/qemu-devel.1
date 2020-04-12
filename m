@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4BD4C2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 23:02:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E3A7C2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 23:05:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 713A820708
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 23:02:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0075B20656
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 23:05:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OB+27OH3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 713A820708
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KLQmRGMv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0075B20656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlcw-0007hm-Jk
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 19:02:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49982)
+	id 1jNlfE-0003gd-4v
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 19:05:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50407)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlJP-0001mW-Nk
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:42:48 -0400
+ id 1jNlJm-0002mL-6o
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:43:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlJO-0006Cn-Ln
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:42:47 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42345)
+ id 1jNlJl-0006Qn-7P
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:43:10 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36768)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlJO-0006C0-8l; Sun, 12 Apr 2020 18:42:46 -0400
-Received: by mail-wr1-x441.google.com with SMTP id j2so8531138wrs.9;
- Sun, 12 Apr 2020 15:42:45 -0700 (PDT)
+ id 1jNlJl-0006Pd-1m; Sun, 12 Apr 2020 18:43:09 -0400
+Received: by mail-wr1-x443.google.com with SMTP id u13so8063113wrp.3;
+ Sun, 12 Apr 2020 15:43:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=tmj0eQ/jXEgx8kgOc8dKTvgUtekWQN1v/ToBNcJYlPA=;
- b=OB+27OH38nTPemyz5GLpHLn+gLiy1+2phP1VkwRHRb9clpZasalIFwXgdCZOiG0T1S
- kXDxK6p7cs6uKkmwWbFOZ2JVfZS0c+DAdojdrDHkU+IyGLMwlbhRK4D+un6iFEqe+UL1
- Uw1oxQvhYTBMtYkub0PXN8BOYbT3KmUqOEJCl75A3lfl1wgU3rkCLmeY40D02nlC1rM5
- nroWb2zoX44Zf/9KZZg+ndGUb2zkr0ZniUbtY7LAFB+DveoI/HXephWZN/Huw3sqDUMJ
- UPNJRgYquq4hoSNevkYSB19Akbxkj/qWFb0MAbDHU3LGtzdFguVgqcgD7QY7EB4VgqRD
- GwJQ==
+ bh=YaIevl7FVZKJyC7g4Goc3D0dFDZM5MSezImTR0wlSxA=;
+ b=KLQmRGMv9CBAmo9FgoPduo/o5yFTRq3Q/zNf9FvQhsCGWSXGbj7G+c94b/752CchlW
+ kVExzxUSiXMi3kLyE9vx2TZULs5AlKXzUv8vN3yDlwmRqLnN0Q38Oqs5BCJpvcw2IwKV
+ fwi6RxAppYm2TWS34f6h4EzVxlY9GFo1l5C8KeZF8vNCGjacR45bBcGVIQB9t602xZi7
+ g3mhr62nIX5VW0dd/+o+2ASh733MJ4ZgjHxe6MXB0viUC9Y62fJcwS/1DLt3PnYwgpVO
+ rBz3FY5tTY20jX0VemWik/fUmef3g0VoVc6hUm/dxb64YA24l85dPIoCBGZ9JzIf/5OJ
+ j50A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=tmj0eQ/jXEgx8kgOc8dKTvgUtekWQN1v/ToBNcJYlPA=;
- b=Jq+/vyxzJaNnMARJnsTzPywNAyxnfrXMrGNlkL3Mm1Q7kkuJIhKhwvdOGagDoVxKzx
- DkfTh81gAkW77Yz4c0kcCcXQmbXR/rGxFxpr9SIe2mf0+ePos86n1fYPifTz7VNjX3XF
- 8V1nDK6CQmZwzCCxDH+XR4cc/I8ge38UeB4ri8ZLUqfAxxVTY5+8XGt68hSUDtla5UUV
- F43Xv+x4y51cadFUNINAfW6DwniehbDj6tuUIqKtidHWu/mDyg+iQxOGc2TjCby8WAQ/
- 9Gw3u4x/61Fh2xQU3X5qCT3QcP+5fBDJR707XoF03EDbvGTBhptJgcU1RuQpcxRInLAb
- ES5g==
-X-Gm-Message-State: AGi0PuZQSKe4V1s5nJRqzd3HAx/H3Ia/Z/Re/tGuPobrx2BN+RYStsrP
- BkgICM7suxfRU97GbrsvdYo5J31mWxOL0g==
-X-Google-Smtp-Source: APiQypLbgIM799geoIA/qmOY2jB+pRTLyHqEoJQfrLFQByCZGICQUV3OHdnSoDGHCBXm9lNMXkBquA==
-X-Received: by 2002:adf:b1c8:: with SMTP id r8mr15633926wra.218.1586731364735; 
- Sun, 12 Apr 2020 15:42:44 -0700 (PDT)
+ bh=YaIevl7FVZKJyC7g4Goc3D0dFDZM5MSezImTR0wlSxA=;
+ b=qamHqZRGBbYxZiZDIESfdH01LsrQC+aQdm0buyatfSaEU3pOapRJbBOud1Qt1MNNkG
+ zMaQGjzIK3KT5yyqdZ4uEQMK+327qLLaXRp0X8b6ay1TL8B5f963FoW/Xh88tIVAk3OM
+ 4YB1MPTPOIU/j7JV51LxX6ZKBOLZ54OKiGL6uJiIFAckooiZdw7T1YePG2NHoDLfBc0+
+ aaufbpF2TFq2VZhliU3C6iQCrxUmlSb4zK3kZe6GkyhNC2i4oUZzr8zVwVFAIy9Tzv3b
+ 9OQWR8XcxWK4ms5A6gTMgSi2IGFiPjL6A9BWaGa7tNgh7CmDpRhVt1iXCOctrC6CMY1j
+ 0fKA==
+X-Gm-Message-State: AGi0PuZttJjVwLvlfaHMsLjf1Iwd4+y0IRgafDX8Jfv3RWhKvPouivZM
+ BLr0WcsFNmcInIJaPBX8jlYx/AuP11aRmA==
+X-Google-Smtp-Source: APiQypK3wbVqFp12RkLXnY0cvq25zVcj3FGA38RCTfnrO0eVTVMXEpl9oAK0HxFoDHNxszj3ZRBkGQ==
+X-Received: by 2002:a5d:460b:: with SMTP id t11mr13300743wrq.319.1586731385949; 
+ Sun, 12 Apr 2020 15:43:05 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id f63sm12083825wma.47.2020.04.12.15.42.41
+ by smtp.gmail.com with ESMTPSA id f63sm12083825wma.47.2020.04.12.15.43.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:42:44 -0700 (PDT)
+ Sun, 12 Apr 2020 15:43:05 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 15/23] hw/arm/fsl-imx: Add missing
+Subject: [PATCH-for-5.1 v3 21/23] hw/net/xilinx_axienet: Add missing
  error-propagation code
-Date: Mon, 13 Apr 2020 00:41:36 +0200
-Message-Id: <20200412224144.12205-16-f4bug@amsat.org>
+Date: Mon, 13 Apr 2020 00:41:42 +0200
+Message-Id: <20200412224144.12205-22-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200412224144.12205-1-f4bug@amsat.org>
 References: <20200412224144.12205-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,7 +101,7 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>,
  "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Alistair Francis <Alistair.Francis@wdc.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
  "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
  Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-block@nongnu.org,
  Markus Armbruster <armbru@redhat.com>,
@@ -132,57 +132,45 @@ Patch created mechanically by running:
   $ spatch \
     --macro-file scripts/cocci-macro-file.h --include-headers \
     --sp-file scripts/coccinelle/add-missing-error_propagate.cocci \
-    --keep-comments --smpl-spacing --in-place --dir hw
+    --keep-comments --smpl-spacing --dir hw
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Then review showed this file has a 'xilinx_enet_realize_fail'
+label that calls error_propagate(). Updated the patch to use
+the label.
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/fsl-imx25.c | 8 ++++++++
- hw/arm/fsl-imx6.c  | 8 ++++++++
- 2 files changed, 16 insertions(+)
+v2: New cocci patch generated both transformations
+    (Peter noticed v1 only catched one)
+---
+ hw/net/xilinx_axienet.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index 3d87fe867e..69d8645dcd 100644
---- a/hw/arm/fsl-imx25.c
-+++ b/hw/arm/fsl-imx25.c
-@@ -271,8 +271,16 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
- 
-         object_property_set_uint(OBJECT(&s->esdhc[i]), 2, "sd-spec-version",
-                                  &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         object_property_set_uint(OBJECT(&s->esdhc[i]), IMX25_ESDHC_CAPABILITIES,
-                                  "capareg", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         object_property_set_bool(OBJECT(&s->esdhc[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index b3cef5bb57..c254294a70 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -343,8 +343,16 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-         /* UHS-I SDIO3.0 SDR104 1.8V ADMA */
-         object_property_set_uint(OBJECT(&s->esdhc[i]), 3, "sd-spec-version",
-                                  &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         object_property_set_uint(OBJECT(&s->esdhc[i]), IMX6_ESDHC_CAPABILITIES,
-                                  "capareg", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         object_property_set_bool(OBJECT(&s->esdhc[i]), true, "realized", &err);
-         if (err) {
-             error_propagate(errp, err);
+diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
+index 704788811a..db2c675b16 100644
+--- a/hw/net/xilinx_axienet.c
++++ b/hw/net/xilinx_axienet.c
+@@ -958,6 +958,9 @@ static void xilinx_enet_realize(DeviceState *dev, Error **errp)
+                              object_property_allow_set_link,
+                              OBJ_PROP_LINK_STRONG,
+                              &local_err);
++    if (local_err) {
++        goto xilinx_enet_realize_fail;
++    }
+     object_property_add_link(OBJECT(cs), "enet", "xlnx.axi-ethernet",
+                              (Object **) &cs->enet,
+                              object_property_allow_set_link,
+@@ -967,6 +970,9 @@ static void xilinx_enet_realize(DeviceState *dev, Error **errp)
+         goto xilinx_enet_realize_fail;
+     }
+     object_property_set_link(OBJECT(ds), OBJECT(s), "enet", &local_err);
++    if (local_err) {
++        goto xilinx_enet_realize_fail;
++    }
+     object_property_set_link(OBJECT(cs), OBJECT(s), "enet", &local_err);
+     if (local_err) {
+         goto xilinx_enet_realize_fail;
 -- 
 2.21.1
 
