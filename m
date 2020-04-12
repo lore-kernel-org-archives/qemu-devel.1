@@ -2,91 +2,87 @@ Return-Path: <SRS0=Byls=54=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 845C2C2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 608BAC2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:51:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E59320692
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:50:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B7E520692
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:51:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ff51tXSF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E59320692
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R8Intnu5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B7E520692
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlR7-0000cU-Fh
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:50:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49182)
+	id 1jNlRM-0001Fr-Ac
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:51:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49123)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlIc-0000HI-SG
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:41:59 -0400
+ id 1jNlIV-0008Pl-SW
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:41:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlIb-0005bL-R4
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:41:58 -0400
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:36266)
+ id 1jNlIU-0005Y9-Jd
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:41:51 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40126)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlIb-0005ag-LN; Sun, 12 Apr 2020 18:41:57 -0400
-Received: by mail-wm1-x32b.google.com with SMTP id a201so8022464wme.1;
- Sun, 12 Apr 2020 15:41:57 -0700 (PDT)
+ id 1jNlIU-0005Wz-D9; Sun, 12 Apr 2020 18:41:50 -0400
+Received: by mail-wr1-x444.google.com with SMTP id s8so8526750wrt.7;
+ Sun, 12 Apr 2020 15:41:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=LZt0wKgOcXbd9J2Y1x7+Xq5w37mnJzb6ovGxsczGG64=;
- b=Ff51tXSFzMGTVB6OFe8osL8ONzouppYDRkA2PIv3gsEFbZbh7q8ABs7ytxaJIG5bbl
- SaeJtifskcrkTRvldi2nu7JOj/G4UcSLaf9/ndJ1pJfvdSERV6BQfA75byp+mF6y7ASz
- gCTdoWdE686ZrX05sirXkyRY3oos7DODVumfnk8QpvNUGUXQRLrb6NYO9McQKJXnymy2
- f52qr55WLRuifIiwUdlcd1pq7FwLSH15YMqbRtbBdqzlBN5fFhP2pTRiTGry+FUQVQEQ
- eef+vFNbz+swgk4Mz7sg/TXs4q+tKZ6oCpJ62G7WbY8Y1YDssqlqMgpZX9hd9tkLQ3Ja
- 3GfQ==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=l6ERQM2wlsm2R7+WyxTeuOpkEQJddlJatKjqfQ/284o=;
+ b=R8Intnu5zIBcNcExQIxzWgI0A29X6/izJd0hO4oWzjucOYuXUOcDPyjEiGwwHGlLb1
+ 8afiU4B0+nIUYpjXIHMNCzcFUBjYKk4QKNlId/bfJ5gWFNPaKTE06Z1pXaBxRpshoV/W
+ 90YDlUt2cviqVraB0+HjVshWsZzsOf5w+F0n1+Vo2nv5EG+yYLVpCtgS+LYGLF03f07l
+ qO81GcuAQoxjZ7IHNoekRdHk/NoprKmMuuoztrVbeIG8sHzxgWds9RDebKy+/hnDsRHo
+ jz5+4ZUcSCdip4cHKwl8sMp7vQ3wuJSSjn4U5Yho5AJ5bdjU2aIPG8Z+ZYGQ0FX/+CoN
+ KrCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=LZt0wKgOcXbd9J2Y1x7+Xq5w37mnJzb6ovGxsczGG64=;
- b=Tk7Gm0L16z/EsYGQHEIEL66TYQg3iSFoOiXPwus5jKz+RcUuxYSw5FhDrt5ljcpjXe
- 9jk1PDBwPq6jOaW2J/wT0URj1OaHg3P7pyj7QOU5hoWKEtzzLvhCAt61hzIE6oIh1lB9
- EXfi4+T3t9ZuzGt1NjKbu0H3r9EJjWb3k+7nW46BGgfJp3CaZ58z+004AyWI1QXph/rF
- prLbxFL3fhFjqCRwIt9QbI2N59AvIbf4IMlPRQYRL12VJHUd+sMasNEe0Uyd2t8AjOxH
- gDLMfbEte16aBSGoRRIzIuljmtkZE4ElN3H97INFFmydp/PuuqPojP0VGMs5hUyCFKbo
- TOXg==
-X-Gm-Message-State: AGi0PubCiH1PKtgA6zKfIsgXXQcfFsWgd1CHrURFVTiNhOcpYImzfDDG
- i6XCNankBCAN/58+A1/wOT4vyyNJ/T5nSw==
-X-Google-Smtp-Source: APiQypL/eTMuhBIW7cJJft81oZJNUAucSomY9Qu5NwW35Awp1q6yAaZ8cPQZMSNMkHpIPuRZhpyEJA==
-X-Received: by 2002:a05:600c:224a:: with SMTP id
- a10mr16506355wmm.174.1586731316198; 
- Sun, 12 Apr 2020 15:41:56 -0700 (PDT)
+ :mime-version:content-transfer-encoding;
+ bh=l6ERQM2wlsm2R7+WyxTeuOpkEQJddlJatKjqfQ/284o=;
+ b=XNwDILTrHxgjahTdF8dL3T+Zzr6SBY6ke2wFLA7qd2vyYRWyqUrLxg9kJqWSZNcQH8
+ 6hEGcyI/wif2WWfo1D8Ha9Z/5BdCL0hlPu/pT/QT6YMauwck2OKK95v9GDLylwxN0XUK
+ 2Ko34IFDlRXB+pj/fGCNCdm0MnOCLTTgFTcSdHgM3gHm+LDTW+z3RwJTu7RjuZvSTxa/
+ Z+DVBWYvGNrBkirO4mrYoIXTFrWR03ASrhMjA/M4m3yV4GiBTWwYGXA8ViXAf2Mg60uJ
+ epDH4mCdEcdFdNvS6JD4Rd4KzARW2AEaAmAdnzev/qIRxJb695vE5QL/LEzJA3DsfbqN
+ AEUw==
+X-Gm-Message-State: AGi0PuZ86CSuqWE2zK/l8muvaGRp8toEk0hzyYyvURr08KfuG8WOReyt
+ 4xiV6w9Nk2s+4oCpju/plQuG43aSgzwxTA==
+X-Google-Smtp-Source: APiQypKpwsJXOAfSA4FazqkrAMrJI1xCSGGoAX22SuUNa4mTwgEOF2leXzkFQhSjJayUy+SPExSddw==
+X-Received: by 2002:adf:916f:: with SMTP id
+ j102mr15314870wrj.335.1586731308843; 
+ Sun, 12 Apr 2020 15:41:48 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id f63sm12083825wma.47.2020.04.12.15.41.52
+ by smtp.gmail.com with ESMTPSA id f63sm12083825wma.47.2020.04.12.15.41.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:41:55 -0700 (PDT)
+ Sun, 12 Apr 2020 15:41:48 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 02/23] hw/arm/fsl-imx: Add missing
- error-propagation code
-Date: Mon, 13 Apr 2020 00:41:23 +0200
-Message-Id: <20200412224144.12205-3-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v3 00/23] various: Fix error-propagation with
+ Coccinelle scripts (part 2)
+Date: Mon, 13 Apr 2020 00:41:21 +0200
+Message-Id: <20200412224144.12205-1-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200412224144.12205-1-f4bug@amsat.org>
-References: <20200412224144.12205-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32b
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,80 +124,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Patch created mechanically by running:
+This series is inspired of Peter Maydell fix [1]:
+"hw/arm/xlnx-zynqmp.c: fix some error-handling code",
+but grew after v1 [2] review :/
 
-  $ spatch \
-    --macro-file scripts/cocci-macro-file.h --include-headers \
-    --sp-file scripts/coccinelle/use-error_propagate-in-realize.cocci \
-    --keep-comments --smpl-spacing --in-place --dir hw
+Markus: I added the cocci patches to your Error section, I hope
+that's fine :)
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/fsl-imx25.c |  6 +++++-
- hw/arm/fsl-imx6.c  | 18 +++++++++++++++---
- 2 files changed, 20 insertions(+), 4 deletions(-)
+Part 2: Add missing error_propagate() calls in DeviceClass::realize().
 
-diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index 6f1a82ce3d..3d87fe867e 100644
---- a/hw/arm/fsl-imx25.c
-+++ b/hw/arm/fsl-imx25.c
-@@ -295,7 +295,11 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
-         };
- 
-         object_property_set_bool(OBJECT(&s->usb[i]), true, "realized",
--                                 &error_abort);
-+                                 &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->usb[i]), 0, usb_table[i].addr);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->usb[i]), 0,
-                            qdev_get_gpio_in(DEVICE(&s->avic),
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index 6bf8aa0404..b3cef5bb57 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -359,7 +359,11 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-     /* USB */
-     for (i = 0; i < FSL_IMX6_NUM_USB_PHYS; i++) {
-         object_property_set_bool(OBJECT(&s->usbphy[i]), true, "realized",
--                                 &error_abort);
-+                                 &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->usbphy[i]), 0,
-                         FSL_IMX6_USBPHY1_ADDR + i * 0x1000);
-     }
-@@ -372,7 +376,11 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-         };
- 
-         object_property_set_bool(OBJECT(&s->usb[i]), true, "realized",
--                                 &error_abort);
-+                                 &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->usb[i]), 0,
-                         FSL_IMX6_USBOH3_USB_ADDR + i * 0x200);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->usb[i]), 0,
-@@ -430,7 +438,11 @@ static void fsl_imx6_realize(DeviceState *dev, Error **errp)
-         };
- 
-         object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized",
--                                 &error_abort);
-+                                 &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
- 
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0, FSL_IMX6_WDOGn_ADDR[i]);
-     }
+Regards,
+
+Phil.
+
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg691636.html
+[2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg692155.html
+Based-on: <20200412223619.11284-1-f4bug@amsat.org>
+
+Philippe Mathieu-Daudé (23):
+  scripts/coccinelle: Catch missing error_propagate() calls in realize()
+  hw/arm/fsl-imx: Add missing error-propagation code
+  hw/arm/stm32f*05_soc: Add missing error-propagation code
+  hw/arm/aspeed: Add missing error-propagation code
+  hw/arm/allwinner-a10: Add missing error-propagation code
+  hw/arm/msf2-soc: Add missing error-propagation code
+  hw/riscv/sifive: Add missing error-propagation code
+  hw/arm/armv7m: Add missing error-propagation code
+  hw/intc/arm_gicv3_its_kvm: Add missing error-propagation code
+  hw/microblaze/xlnx-zynqmp-pmu: Add missing error-propagation code
+  hw/pci-host/pnv_phb3: Add missing error-propagation code
+  hw/block/onenand: Add missing error-propagation code
+  scripts/coccinelle: Add script to catch missing error_propagate()
+    calls
+  hw/arm/bcm2835_peripherals: Add missing error-propagation code
+  hw/arm/fsl-imx: Add missing error-propagation code
+  hw/arm/stm32fx05_soc: Add missing error-propagation code
+  hw/dma/xilinx_axidma: Add missing error-propagation code
+  hw/i386/x86: Add missing error-propagation code
+  hw/mips/cps: Add missing error-propagation code
+  hw/misc/macio/macio: Add missing error-propagation code
+  hw/net/xilinx_axienet: Add missing error-propagation code
+  hw/riscv/sifive_u: Add missing error-propagation code
+  hw/sd/milkymist-memcard: Add missing error-propagation code
+
+ .../add-missing-error_propagate.cocci         | 30 +++++++++++
+ .../use-error_propagate-in-realize.cocci      | 54 +++++++++++++++++++
+ hw/arm/allwinner-a10.c                        | 18 +++++--
+ hw/arm/armv7m.c                               | 12 ++++-
+ hw/arm/aspeed_ast2600.c                       | 36 ++++++++++---
+ hw/arm/aspeed_soc.c                           | 12 ++++-
+ hw/arm/bcm2835_peripherals.c                  |  8 +++
+ hw/arm/fsl-imx25.c                            | 14 ++++-
+ hw/arm/fsl-imx6.c                             | 26 +++++++--
+ hw/arm/msf2-soc.c                             | 24 +++++++--
+ hw/arm/stm32f205_soc.c                        | 10 +++-
+ hw/arm/stm32f405_soc.c                        | 10 +++-
+ hw/block/onenand.c                            |  6 ++-
+ hw/dma/xilinx_axidma.c                        |  6 +++
+ hw/i386/x86.c                                 |  4 ++
+ hw/intc/arm_gicv3_its_kvm.c                   |  6 ++-
+ hw/microblaze/xlnx-zynqmp-pmu.c               |  6 ++-
+ hw/mips/cps.c                                 | 48 +++++++++++++++++
+ hw/misc/macio/macio.c                         |  4 ++
+ hw/net/xilinx_axienet.c                       |  6 +++
+ hw/pci-host/pnv_phb3.c                        | 24 +++++++--
+ hw/riscv/sifive_e.c                           |  6 ++-
+ hw/riscv/sifive_u.c                           | 32 +++++++++--
+ hw/sd/milkymist-memcard.c                     |  4 ++
+ MAINTAINERS                                   |  2 +
+ 25 files changed, 373 insertions(+), 35 deletions(-)
+ create mode 100644 scripts/coccinelle/add-missing-error_propagate.cocci
+ create mode 100644 scripts/coccinelle/use-error_propagate-in-realize.cocci
+
 -- 
 2.21.1
 
