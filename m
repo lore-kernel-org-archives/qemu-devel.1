@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 358BBC2D0EC
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 21:13:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23198C2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 21:13:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDEB0206E5
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 21:13:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E26A8206E5
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 21:13:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cU4DzG8k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDEB0206E5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F6MwD2LX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E26A8206E5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNjuw-0004fy-1S
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 17:13:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41064)
+	id 1jNjux-0004g8-3X
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 17:13:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41018)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNjrp-0008SX-MA
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 17:10:15 -0400
+ id 1jNjrm-0008JY-4s
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 17:10:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNjro-00059Q-0n
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 17:10:13 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38027)
+ id 1jNjrk-00057e-PW
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 17:10:10 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39879)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNjrn-00058n-QE; Sun, 12 Apr 2020 17:10:11 -0400
-Received: by mail-wm1-x343.google.com with SMTP id g12so406744wmh.3;
- Sun, 12 Apr 2020 14:10:11 -0700 (PDT)
+ id 1jNjrk-00057D-Id; Sun, 12 Apr 2020 17:10:08 -0400
+Received: by mail-wr1-x444.google.com with SMTP id p10so8395505wrt.6;
+ Sun, 12 Apr 2020 14:10:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=WI0uWQVZOcYqeJp2uBcJ0303+lu8M+R0XXUdzA9Q1p0=;
- b=cU4DzG8kqqs2TjXHLis6XOLzgrHN02vjMnOKSSYfhhMP5l2oHzFAmyge2FXQqc0/1i
- N6yLdtTkguIoUJcfLqkaoRKNXonCZ8hf4DgB1/xooDdxVwjG6CPclbRsrHZRtqVI87sR
- tCXasUn8FS1JgRT+D72CoZgi/gx/QS7dzvZkJNQ6zgX06fXEFNAcWY2tqCfVvh5rRXnB
- VRgijZIy9TYGoUwOZnZwFAwJs+W/cdTZqJpo1FCu2F4tdTKGNfSl++HIcDcanPqtqOhz
- 2GzCk4XvwggWeph1f0Se74nYxhgV2VuJ8WTt09Upfu813qdRiWl+q6FS8CL78q2yO/Wr
- x6NQ==
+ bh=gsYbEjd4TD9Bp8EbfBEbuZbEWy++c7aKNJLdJ3YG81s=;
+ b=F6MwD2LXNz5qSiQ9U7sN6titbvBTVPwW+WPnxAgReHxGMCEM+dPMLI2rDyI1SBuexA
+ 8X4en7LsPicU3CvVdJfUwpaYkWQJx/9JDE36m/vCG9tt4oNnclZvSGLtxDh9g2nqvVen
+ egUlGG7jm5W4bkUTTQyk2IrVD5095MR2BaBB1nrA2tWvi4Uo2j7P5Aid8G1fMkGhrHgp
+ 3JcUjkFFHKzGHqOa5WPhvPjQa5uJtWQqbZ7u6YajqffuNp4Y4eS18QQqe3TejYDaLL/v
+ NSSfd4k/Trj0zKPV1XsX0isvHEDohvQeLjdKEdbJp37tNHLfgAKiMGDBvJ9cRKFn6wia
+ 3pRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=WI0uWQVZOcYqeJp2uBcJ0303+lu8M+R0XXUdzA9Q1p0=;
- b=JTZVblf85vXiNEg6mwoouiXue/I3GW5EjuAHH3eRJ/tFpQT46EkEpHJj4g5n//pIOL
- uApZo3Idm+Dlj2KaCRBswKi630oxnQ83gy6IFUMW4U7ghziAVKRqVVOOiW3KD9zbvxJk
- dZ/OtcOtm+S60iHtzNrznak8ewnhmDUAcJDZMKuTcwv7cUL6Jdi9hYR6RYrIFIFjHA1J
- 7la0W9eB51SoC+QmL5yGIRZ0cqh4uYLIY0BL18nmYzI37veLd6nMQgujFgrIoDSYxTEd
- Ny6u6NslXim2e5rFkNUZq2ZVhiuNTYnlsDbk1fMjvKsm+pSRpMbkrk+QGA/xC11mbxs6
- rfjA==
-X-Gm-Message-State: AGi0PuZwOScgqyinBPmgoMsD/P9TJIShBPR3SC7ECR8+ZPJQhqi1cSKK
- /NBjzCrtSHDZrJOuzDHVQpBj4acBTm4=
-X-Google-Smtp-Source: APiQypIrq14R99vJly/PYAexLmQqsxEa8wp1zM7rRr5lpI2rH6ZjOKGWrjdugVpiztcSWyteedvnlA==
-X-Received: by 2002:a1c:1904:: with SMTP id 4mr15496465wmz.21.1586725809996;
- Sun, 12 Apr 2020 14:10:09 -0700 (PDT)
+ bh=gsYbEjd4TD9Bp8EbfBEbuZbEWy++c7aKNJLdJ3YG81s=;
+ b=ArWyfHRZPAWK9h68e1cyJtyuxs3WN0twd0bVZ6SJ0DsusELTLoaK2eVoFoi4ye0M/3
+ HoMR/rZaxM0svsmG9axEJgdKYcmrTSSFRn1KFYCj9p/oRcUY6joEW8bpuI9YxsalDrQZ
+ vl6we4kfIgnyCLXGNXHnWV74ELBik2m90HpDa+Y34RH4+gPYrjrIiZ44XmLAvykvtCEA
+ v+d5sJ108/8kLvgB0be6jATURXYfN2U1b2I1TTa1TSvHzOc2Spt1ccARSSGKIKqNo+Im
+ 0Ihjpjqk/oooHKczmTEg46N4R4pTtsEPG5wqVP5useK5LXBdbbydKCtqGDrD+OdmLRpk
+ tYig==
+X-Gm-Message-State: AGi0PualaK9JG7tpUVY5zswJBLy8zZT4MCZaS2hyd9drKVYDhunYgGdF
+ txNXMp6tAM1ZMwNwJtlahvALPwtPRh8=
+X-Google-Smtp-Source: APiQypIWuuzEDhgrL5dFuOMcEExPN7XGYetuwcVi65TL0H1PSMXhw1g00339hVtTvTn98WKI8byMwQ==
+X-Received: by 2002:a5d:69c9:: with SMTP id s9mr15764392wrw.307.1586725806483; 
+ Sun, 12 Apr 2020 14:10:06 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id o16sm12553602wrs.44.2020.04.12.14.10.06
+ by smtp.gmail.com with ESMTPSA id o16sm12553602wrs.44.2020.04.12.14.10.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 14:10:09 -0700 (PDT)
+ Sun, 12 Apr 2020 14:10:05 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 3/3] hw: Remove unnecessary DEVICE() cast
-Date: Sun, 12 Apr 2020 23:09:54 +0200
-Message-Id: <20200412210954.32313-4-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 2/3] various: Remove unnecessary OBJECT() cast
+Date: Sun, 12 Apr 2020 23:09:53 +0200
+Message-Id: <20200412210954.32313-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200412210954.32313-1-f4bug@amsat.org>
 References: <20200412210954.32313-1-f4bug@amsat.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,253 +123,148 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The DEVICE() macro is defined as:
+The OBJECT() macro is defined as:
 
-  #define DEVICE(obj) OBJECT_CHECK(DeviceState, (obj), TYPE_DEVICE)
+  #define OBJECT(obj) ((Object *)(obj))
 
-Remove unnecessary DEVICE() casts.
+Remove unnecessary OBJECT() casts.
 
 Patch created mechanically using spatch with this script:
 
   @@
-  typedef DeviceState;
-  DeviceState *s;
+  typedef Object;
+  Object *o;
   @@
-  -   DEVICE(s)
-  +   s
+  -   OBJECT(o)
+  +   o
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/display/artist.c         | 2 +-
- hw/display/cg3.c            | 2 +-
- hw/display/sm501.c          | 2 +-
- hw/display/tcx.c            | 4 ++--
- hw/display/vga-isa.c        | 2 +-
- hw/i2c/imx_i2c.c            | 2 +-
- hw/i2c/mpc_i2c.c            | 2 +-
- hw/ide/piix.c               | 2 +-
- hw/misc/macio/pmu.c         | 2 +-
- hw/net/ftgmac100.c          | 3 +--
- hw/net/imx_fec.c            | 2 +-
- hw/nubus/nubus-device.c     | 2 +-
- hw/pci-host/bonito.c        | 2 +-
- hw/ppc/spapr.c              | 2 +-
- hw/sh4/sh_pci.c             | 2 +-
- hw/xen/xen-legacy-backend.c | 2 +-
- 16 files changed, 17 insertions(+), 18 deletions(-)
+ hw/core/bus.c                       | 2 +-
+ hw/ide/ahci-allwinner.c             | 2 +-
+ hw/ipmi/smbus_ipmi.c                | 2 +-
+ hw/microblaze/petalogix_ml605_mmu.c | 8 ++++----
+ hw/s390x/sclp.c                     | 2 +-
+ monitor/misc.c                      | 3 +--
+ qom/object.c                        | 4 ++--
+ 7 files changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/hw/display/artist.c b/hw/display/artist.c
-index 753dbb9a77..7e2a4556bd 100644
---- a/hw/display/artist.c
-+++ b/hw/display/artist.c
-@@ -1353,7 +1353,7 @@ static void artist_realizefn(DeviceState *dev, Error **errp)
-     s->cursor_height = 32;
-     s->cursor_width = 32;
+diff --git a/hw/core/bus.c b/hw/core/bus.c
+index 3dc0a825f0..4ea5870de8 100644
+--- a/hw/core/bus.c
++++ b/hw/core/bus.c
+@@ -25,7 +25,7 @@
  
--    s->con = graphic_console_init(DEVICE(dev), 0, &artist_ops, s);
-+    s->con = graphic_console_init(dev, 0, &artist_ops, s);
-     qemu_console_resize(s->con, s->width, s->height);
+ void qbus_set_hotplug_handler(BusState *bus, Object *handler, Error **errp)
+ {
+-    object_property_set_link(OBJECT(bus), OBJECT(handler),
++    object_property_set_link(OBJECT(bus), handler,
+                              QDEV_HOTPLUG_HANDLER_PROPERTY, errp);
  }
  
-diff --git a/hw/display/cg3.c b/hw/display/cg3.c
-index a1ede10394..f7f1c199ce 100644
---- a/hw/display/cg3.c
-+++ b/hw/display/cg3.c
-@@ -321,7 +321,7 @@ static void cg3_realizefn(DeviceState *dev, Error **errp)
+diff --git a/hw/ide/ahci-allwinner.c b/hw/ide/ahci-allwinner.c
+index bb8393d2b6..8536b9eb5a 100644
+--- a/hw/ide/ahci-allwinner.c
++++ b/hw/ide/ahci-allwinner.c
+@@ -90,7 +90,7 @@ static void allwinner_ahci_init(Object *obj)
+     SysbusAHCIState *s = SYSBUS_AHCI(obj);
+     AllwinnerAHCIState *a = ALLWINNER_AHCI(obj);
  
-     sysbus_init_irq(sbd, &s->irq);
+-    memory_region_init_io(&a->mmio, OBJECT(obj), &allwinner_ahci_mem_ops, a,
++    memory_region_init_io(&a->mmio, obj, &allwinner_ahci_mem_ops, a,
+                           "allwinner-ahci", ALLWINNER_AHCI_MMIO_SIZE);
+     memory_region_add_subregion(&s->ahci.mem, ALLWINNER_AHCI_MMIO_OFF,
+                                 &a->mmio);
+diff --git a/hw/ipmi/smbus_ipmi.c b/hw/ipmi/smbus_ipmi.c
+index 2a9470d9df..f1a0148755 100644
+--- a/hw/ipmi/smbus_ipmi.c
++++ b/hw/ipmi/smbus_ipmi.c
+@@ -329,7 +329,7 @@ static void smbus_ipmi_init(Object *obj)
+ {
+     SMBusIPMIDevice *sid = SMBUS_IPMI(obj);
  
--    s->con = graphic_console_init(DEVICE(dev), 0, &cg3_ops, s);
-+    s->con = graphic_console_init(dev, 0, &cg3_ops, s);
-     qemu_console_resize(s->con, s->width, s->height);
+-    ipmi_bmc_find_and_link(OBJECT(obj), (Object **) &sid->bmc);
++    ipmi_bmc_find_and_link(obj, (Object **) &sid->bmc);
  }
  
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index de0ab9d977..2a564889bd 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -1839,7 +1839,7 @@ static void sm501_init(SM501State *s, DeviceState *dev,
-                                 &s->twoD_engine_region);
+ static void smbus_ipmi_get_fwinfo(struct IPMIInterface *ii, IPMIFwInfo *info)
+diff --git a/hw/microblaze/petalogix_ml605_mmu.c b/hw/microblaze/petalogix_ml605_mmu.c
+index 0a2640c40b..52dcea9abd 100644
+--- a/hw/microblaze/petalogix_ml605_mmu.c
++++ b/hw/microblaze/petalogix_ml605_mmu.c
+@@ -150,9 +150,9 @@ petalogix_ml605_init(MachineState *machine)
+     qdev_set_nic_properties(eth0, &nd_table[0]);
+     qdev_prop_set_uint32(eth0, "rxmem", 0x1000);
+     qdev_prop_set_uint32(eth0, "txmem", 0x1000);
+-    object_property_set_link(OBJECT(eth0), OBJECT(ds),
++    object_property_set_link(OBJECT(eth0), ds,
+                              "axistream-connected", &error_abort);
+-    object_property_set_link(OBJECT(eth0), OBJECT(cs),
++    object_property_set_link(OBJECT(eth0), cs,
+                              "axistream-control-connected", &error_abort);
+     qdev_init_nofail(eth0);
+     sysbus_mmio_map(SYS_BUS_DEVICE(eth0), 0, AXIENET_BASEADDR);
+@@ -163,9 +163,9 @@ petalogix_ml605_init(MachineState *machine)
+     cs = object_property_get_link(OBJECT(eth0),
+                                   "axistream-control-connected-target", NULL);
+     qdev_prop_set_uint32(dma, "freqhz", 100 * 1000000);
+-    object_property_set_link(OBJECT(dma), OBJECT(ds),
++    object_property_set_link(OBJECT(dma), ds,
+                              "axistream-connected", &error_abort);
+-    object_property_set_link(OBJECT(dma), OBJECT(cs),
++    object_property_set_link(OBJECT(dma), cs,
+                              "axistream-control-connected", &error_abort);
+     qdev_init_nofail(dma);
+     sysbus_mmio_map(SYS_BUS_DEVICE(dma), 0, AXIDMA_BASEADDR);
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index f0c35aa57a..bae9d2350f 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -288,7 +288,7 @@ void s390_sclp_init(void)
  
-     /* create qemu graphic console */
--    s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
-+    s->con = graphic_console_init(dev, 0, &sm501_ops, s);
+     object_property_add_child(qdev_get_machine(), TYPE_SCLP, new,
+                               NULL);
+-    object_unref(OBJECT(new));
++    object_unref(new);
+     qdev_init_nofail(DEVICE(new));
  }
  
- static const VMStateDescription vmstate_sm501_state = {
-diff --git a/hw/display/tcx.c b/hw/display/tcx.c
-index 76de16e8ea..1fb45b1aab 100644
---- a/hw/display/tcx.c
-+++ b/hw/display/tcx.c
-@@ -868,9 +868,9 @@ static void tcx_realizefn(DeviceState *dev, Error **errp)
-     sysbus_init_irq(sbd, &s->irq);
+diff --git a/monitor/misc.c b/monitor/misc.c
+index 6c45fa490f..57af5fa5a4 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -1839,8 +1839,7 @@ void object_add_completion(ReadLineState *rs, int nb_args, const char *str)
+ static int qdev_add_hotpluggable_device(Object *obj, void *opaque)
+ {
+     GSList **list = opaque;
+-    DeviceState *dev = (DeviceState *)object_dynamic_cast(OBJECT(obj),
+-                                                          TYPE_DEVICE);
++    DeviceState *dev = (DeviceState *)object_dynamic_cast(obj, TYPE_DEVICE);
  
-     if (s->depth == 8) {
--        s->con = graphic_console_init(DEVICE(dev), 0, &tcx_ops, s);
-+        s->con = graphic_console_init(dev, 0, &tcx_ops, s);
-     } else {
--        s->con = graphic_console_init(DEVICE(dev), 0, &tcx24_ops, s);
-+        s->con = graphic_console_init(dev, 0, &tcx24_ops, s);
-     }
-     s->thcmisc = 0;
- 
-diff --git a/hw/display/vga-isa.c b/hw/display/vga-isa.c
-index 0633ed382c..3aaeeeca1e 100644
---- a/hw/display/vga-isa.c
-+++ b/hw/display/vga-isa.c
-@@ -74,7 +74,7 @@ static void vga_isa_realizefn(DeviceState *dev, Error **errp)
-                                         0x000a0000,
-                                         vga_io_memory, 1);
-     memory_region_set_coalescing(vga_io_memory);
--    s->con = graphic_console_init(DEVICE(dev), 0, s->hw_ops, s);
-+    s->con = graphic_console_init(dev, 0, s->hw_ops, s);
- 
-     memory_region_add_subregion(isa_address_space(isadev),
-                                 VBE_DISPI_LFB_PHYSICAL_ADDRESS,
-diff --git a/hw/i2c/imx_i2c.c b/hw/i2c/imx_i2c.c
-index 30b9aea247..2e02e1c4fa 100644
---- a/hw/i2c/imx_i2c.c
-+++ b/hw/i2c/imx_i2c.c
-@@ -305,7 +305,7 @@ static void imx_i2c_realize(DeviceState *dev, Error **errp)
-                           IMX_I2C_MEM_SIZE);
-     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
-     sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq);
--    s->bus = i2c_init_bus(DEVICE(dev), NULL);
-+    s->bus = i2c_init_bus(dev, NULL);
- }
- 
- static void imx_i2c_class_init(ObjectClass *klass, void *data)
-diff --git a/hw/i2c/mpc_i2c.c b/hw/i2c/mpc_i2c.c
-index 0aa1be3ce7..9a724f3a3e 100644
---- a/hw/i2c/mpc_i2c.c
-+++ b/hw/i2c/mpc_i2c.c
-@@ -332,7 +332,7 @@ static void mpc_i2c_realize(DeviceState *dev, Error **errp)
-     memory_region_init_io(&i2c->iomem, OBJECT(i2c), &i2c_ops, i2c,
-                           "mpc-i2c", 0x14);
-     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &i2c->iomem);
--    i2c->bus = i2c_init_bus(DEVICE(dev), "i2c");
-+    i2c->bus = i2c_init_bus(dev, "i2c");
- }
- 
- static void mpc_i2c_class_init(ObjectClass *klass, void *data)
-diff --git a/hw/ide/piix.c b/hw/ide/piix.c
-index 3b2de4c312..b402a93636 100644
---- a/hw/ide/piix.c
-+++ b/hw/ide/piix.c
-@@ -193,7 +193,7 @@ int pci_piix3_xen_ide_unplug(DeviceState *dev, bool aux)
-             blk_unref(blk);
+     if (dev == NULL) {
+         return 0;
+diff --git a/qom/object.c b/qom/object.c
+index 1812f79224..9893cc5459 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -762,7 +762,7 @@ Object *object_new_with_propv(const char *typename,
          }
      }
--    qdev_reset_all(DEVICE(dev));
-+    qdev_reset_all(dev);
-     return 0;
- }
  
-diff --git a/hw/misc/macio/pmu.c b/hw/misc/macio/pmu.c
-index b8466a4a3f..4b7def9096 100644
---- a/hw/misc/macio/pmu.c
-+++ b/hw/misc/macio/pmu.c
-@@ -758,7 +758,7 @@ static void pmu_realize(DeviceState *dev, Error **errp)
+-    object_unref(OBJECT(obj));
++    object_unref(obj);
+     return obj;
  
-     if (s->has_adb) {
-         qbus_create_inplace(&s->adb_bus, sizeof(s->adb_bus), TYPE_ADB_BUS,
--                            DEVICE(dev), "adb.0");
-+                            dev, "adb.0");
-         s->adb_poll_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, pmu_adb_poll, s);
-         s->adb_poll_mask = 0xffff;
-         s->autopoll_rate_ms = 20;
-diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-index 041ed21017..25ebee7ec2 100644
---- a/hw/net/ftgmac100.c
-+++ b/hw/net/ftgmac100.c
-@@ -1035,8 +1035,7 @@ static void ftgmac100_realize(DeviceState *dev, Error **errp)
-     qemu_macaddr_default_if_unset(&s->conf.macaddr);
- 
-     s->nic = qemu_new_nic(&net_ftgmac100_info, &s->conf,
--                          object_get_typename(OBJECT(dev)), DEVICE(dev)->id,
--                          s);
-+                          object_get_typename(OBJECT(dev)), dev->id, s);
-     qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
- }
- 
-diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-index a35c33683e..7adcc9df65 100644
---- a/hw/net/imx_fec.c
-+++ b/hw/net/imx_fec.c
-@@ -1323,7 +1323,7 @@ static void imx_eth_realize(DeviceState *dev, Error **errp)
- 
-     s->nic = qemu_new_nic(&imx_eth_net_info, &s->conf,
-                           object_get_typename(OBJECT(dev)),
--                          DEVICE(dev)->id, s);
-+                          dev->id, s);
- 
-     qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
- }
-diff --git a/hw/nubus/nubus-device.c b/hw/nubus/nubus-device.c
-index 01ccad9e8e..ffe78a8823 100644
---- a/hw/nubus/nubus-device.c
-+++ b/hw/nubus/nubus-device.c
-@@ -156,7 +156,7 @@ void nubus_register_rom(NubusDevice *dev, const uint8_t *rom, uint32_t size,
- 
- static void nubus_device_realize(DeviceState *dev, Error **errp)
- {
--    NubusBus *nubus = NUBUS_BUS(qdev_get_parent_bus(DEVICE(dev)));
-+    NubusBus *nubus = NUBUS_BUS(qdev_get_parent_bus(dev));
-     NubusDevice *nd = NUBUS_DEVICE(dev);
-     char *name;
-     hwaddr slot_offset;
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index cc6545c8a8..f212796044 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -606,7 +606,7 @@ static void bonito_pcihost_realize(DeviceState *dev, Error **errp)
-     BonitoState *bs = BONITO_PCI_HOST_BRIDGE(dev);
- 
-     memory_region_init(&bs->pci_mem, OBJECT(dev), "pci.mem", BONITO_PCILO_SIZE);
--    phb->bus = pci_register_root_bus(DEVICE(dev), "pci",
-+    phb->bus = pci_register_root_bus(dev, "pci",
-                                      pci_bonito_set_irq, pci_bonito_map_irq,
-                                      dev, &bs->pci_mem, get_system_io(),
-                                      0x28, 32, TYPE_PCI_BUS);
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 9a2bd501aa..3337f5e79c 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4031,7 +4031,7 @@ static void spapr_phb_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     /* hotplug hooks should check it's enabled before getting this far */
-     assert(drc);
- 
--    spapr_drc_attach(drc, DEVICE(dev), &local_err);
-+    spapr_drc_attach(drc, dev, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
+  error:
+@@ -1689,7 +1689,7 @@ void object_property_add_child(Object *obj, const char *name,
          return;
-diff --git a/hw/sh4/sh_pci.c b/hw/sh4/sh_pci.c
-index 08f2fc1dde..0a3e86f949 100644
---- a/hw/sh4/sh_pci.c
-+++ b/hw/sh4/sh_pci.c
-@@ -129,7 +129,7 @@ static void sh_pci_device_realize(DeviceState *dev, Error **errp)
-     for (i = 0; i < 4; i++) {
-         sysbus_init_irq(sbd, &s->irq[i]);
      }
--    phb->bus = pci_register_root_bus(DEVICE(dev), "pci",
-+    phb->bus = pci_register_root_bus(dev, "pci",
-                                      sh_pci_set_irq, sh_pci_map_irq,
-                                      s->irq,
-                                      get_system_memory(),
-diff --git a/hw/xen/xen-legacy-backend.c b/hw/xen/xen-legacy-backend.c
-index 4a373b2373..f9d013811a 100644
---- a/hw/xen/xen-legacy-backend.c
-+++ b/hw/xen/xen-legacy-backend.c
-@@ -705,7 +705,7 @@ int xen_be_init(void)
  
-     xen_sysdev = qdev_create(NULL, TYPE_XENSYSDEV);
-     qdev_init_nofail(xen_sysdev);
--    xen_sysbus = qbus_create(TYPE_XENSYSBUS, DEVICE(xen_sysdev), "xen-sysbus");
-+    xen_sysbus = qbus_create(TYPE_XENSYSBUS, xen_sysdev, "xen-sysbus");
-     qbus_set_bus_hotplug_handler(xen_sysbus, &error_abort);
+-    type = g_strdup_printf("child<%s>", object_get_typename(OBJECT(child)));
++    type = g_strdup_printf("child<%s>", object_get_typename(child));
  
-     return 0;
+     op = object_property_add(obj, name, type, object_get_child_property, NULL,
+                              object_finalize_child_property, child, &local_err);
 -- 
 2.21.1
 
