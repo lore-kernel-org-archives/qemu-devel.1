@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A69F0C2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:41:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 263A5C2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:42:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71D7D206E5
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:41:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E17E2206E5
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:42:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jTYU73qG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D7D206E5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f4h0TAvN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E17E2206E5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlHt-0006U2-K3
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:41:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47146)
+	id 1jNlJ3-0000fj-20
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:42:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47985)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDS-00057H-P2
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:39 -0400
+ id 1jNlE9-0006zj-N9
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDR-00022B-II
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:36:38 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34236)
+ id 1jNlE8-0002wz-EI
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:21 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54908)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlDR-0001zl-Aq; Sun, 12 Apr 2020 18:36:37 -0400
-Received: by mail-wr1-x443.google.com with SMTP id 65so8549525wrl.1;
- Sun, 12 Apr 2020 15:36:36 -0700 (PDT)
+ id 1jNlE8-0002wl-7x; Sun, 12 Apr 2020 18:37:20 -0400
+Received: by mail-wm1-x341.google.com with SMTP id h2so7914546wmb.4;
+ Sun, 12 Apr 2020 15:37:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=0L3GtgkM+tHAsomgjJ+0n9R4GwoMloXQteUzufC2V7I=;
- b=jTYU73qGqVFddr8pLnVQpLbF5W2VR27kMU7rzfTogZDI+MLQvq0BoNDP7FDEEvSRBX
- 0ZNK4KsvD2fjIjLEu7ZM4UXndxYQ6owfy2j6Ifdfg68yAYMy7FOK7okPnY1OQ1l3M2Mw
- uLMFStGPYm5v+vCENxCdqkSYFw3+z0vBvc7LR3+wPtpgOEAGG4M6thP4q+rPL/C/+IlQ
- tJ2MpkbjbvVZPc2Yx42MoILUTLS7bq5Rqf29jIcEfLLWsMcqnZdsRahPVkGNx1t2shat
- ud7bFgG/ceAmbWp/JuEKJsOeHmcHTKgWEg1r2TXfNTdtd8AKLbcjAPHnMN+e7iRjm2EE
- /1Ag==
+ bh=VuVWzBfpjz6H0HCIF1s/Heqg2exv+JQ+H2vwU4p06Wo=;
+ b=f4h0TAvNfsqrudSKvetIzFeOKI3Mm7ul8tSs4BXylq9EZam7VrYgdFSM23ZR9dmCZO
+ JjXMx0CoZPEF7YgSs7zcsr5gkYxxzslClRq2JI+9syCPg2cgo+jDd1O0Ilx9bLmh4yPU
+ Cp4FZJulgOMk/IAKxOb154sBFRa0U1Jr7NKtRaloX4nAQPnMdXa8ufRESoX3N2HX9oT0
+ ph/JhnkcOIQ8seDCKhaW7spnYVy19Y80OO8QyZUDfDpiBolKDNZXWDdxi0j1jh3P74kN
+ 08nXKIiYlj4p4CCPC+iwlXC6/WzeewZff3mj+lwKdRdEzXMI3WwX6ZAL4s48xtsVqzmK
+ OWvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=0L3GtgkM+tHAsomgjJ+0n9R4GwoMloXQteUzufC2V7I=;
- b=TiDvkiBEgSH5ngW+qv81Ud9AYCGrqSZYaCdSsBEwcjvMTcGAJHDT7Gs9EzbDvAcGiZ
- 4y0Ivx4gNnLP9IS5YNlsSGS+bsGyJTYST/Dlv6OriGmKwCc4+d4g5wn4SA6xq7K4+6q7
- UqnBrKTT1HwoTpLMmJ/XoqBuWGdbj4fytEYB1VC85Ruhn+WmMu+pfx97gKHCKW1hHO9s
- f/i++3CUYU8nvmCoew4M9maWy3A9YzOjh32ulKEnMCrtA8jLTtpcaJEa1kymlWRn9rhz
- f+VvH3pqJ7IxKSp4AK9gJPoePmzAKXkG9BmFHyUvrZsfX5nhj/i2E2n35DQ7d18TLkU2
- 5vSg==
-X-Gm-Message-State: AGi0PubLTWsdERrkaN1Wuwup/DbP9MGysFwDdVs9EokZpmrp0JsXstD5
- /ieyPzU285a+bmiogRs3plJJaG2R2qiEGg==
-X-Google-Smtp-Source: APiQypKbvGTU4Pf9Pr1DbRq3aUYFhdoJtit2q5Q3w5auGE9iEbijWU1OypoPSTTdWhJUNH+wBlYysQ==
-X-Received: by 2002:a5d:53ce:: with SMTP id a14mr15422281wrw.129.1586730995171; 
- Sun, 12 Apr 2020 15:36:35 -0700 (PDT)
+ bh=VuVWzBfpjz6H0HCIF1s/Heqg2exv+JQ+H2vwU4p06Wo=;
+ b=SfQcUDv0R+Z6MW7BDxwsGiaXiSJ7mRnIpkJFBIu4QKdQIHWhBPaa/R6Nl1+GBM7CVN
+ Gjc6aS44V6A1GevznMLacufDML1hDHMZUpyl7ooXKhEeGk0fxkBTefe25LWDumuZ++u3
+ xhZTBuZrrpYkJ5ZCT/G+k4vdUmQEjKEzK/eY1osrOkGg3ZnUi8TXBs8lFH+30ngWrFKo
+ 5qm/rGlvosnQmUpmQRep5rg7833R7WMc/9HcP1CJOTN0VFIcZWpiJUG3ptmftVlbzdjv
+ kYxMGYpokNZZnqDSxL+laB4obPWlfz+fqTwdblsWomemxpD4aHeAs1fqIcH2ERJ3RY9w
+ EG5w==
+X-Gm-Message-State: AGi0PuYWoAxD/TUvigrACX59U2QPSqJhm3Pym7TbqRDXeHV7E128swGj
+ lJcNRNFRIZK5yzn/vbyRxyN1ytHFcY3fNg==
+X-Google-Smtp-Source: APiQypK6lOUi3RaPIYFNsB3DpYTZGpWRBCr/hmLS1rLJoGKmpyvdFZraFuIAbo0ecycmXM4x+IQdXw==
+X-Received: by 2002:a1c:3884:: with SMTP id f126mr121709wma.91.1586731039078; 
+ Sun, 12 Apr 2020 15:37:19 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.36.31
+ by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.37.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:36:34 -0700 (PDT)
+ Sun, 12 Apr 2020 15:37:18 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 03/24] hw/arm/allwinner-a10: Move some code from
+Subject: [PATCH-for-5.1 v3 16/24] hw/arm/xlnx-zynqmp: Move some code from
  realize() to init()
-Date: Mon, 13 Apr 2020 00:35:58 +0200
-Message-Id: <20200412223619.11284-4-f4bug@amsat.org>
+Date: Mon, 13 Apr 2020 00:36:11 +0200
+Message-Id: <20200412223619.11284-17-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200412223619.11284-1-f4bug@amsat.org>
 References: <20200412223619.11284-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,92 +126,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coccinelle reported:
+Coccinelle failed at processing this file:
 
   $ spatch ... --timeout 60 --sp-file \
     scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-  HANDLING: ./hw/arm/allwinner-a10.c
-  >>> possible moves from aw_a10_init() to aw_a10_realize() in ./hw/arm/allwinner-a10.c:77
+  HANDLING: ./hw/arm/xlnx-zynqmp.c
+  EXN: Coccinelle_modules.Common.Timeout
 
-Move the calls using &error_fatal which don't depend on input
+Move the calls using &error_abort which don't depend on input
 updated before realize() to init().
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
 v3: Typo 'depend of' -> 'depend on' (eblake)
 ---
- hw/arm/allwinner-a10.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ hw/arm/xlnx-zynqmp.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index 62a67a3e1a..f41395734a 100644
---- a/hw/arm/allwinner-a10.c
-+++ b/hw/arm/allwinner-a10.c
-@@ -60,10 +60,18 @@ static void aw_a10_init(Object *obj)
-         int i;
- 
-         for (i = 0; i < AW_A10_NUM_USB; i++) {
-+            char bus[16];
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 457057198a..5ec9c24ee7 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -242,6 +242,11 @@ static void xlnx_zynqmp_init(Object *obj)
+                                 &s->apu_cpu[i], sizeof(s->apu_cpu[i]),
+                                 ARM_CPU_TYPE_NAME("cortex-a53"),
+                                 &error_abort, NULL);
 +
-             sysbus_init_child_obj(obj, "ehci[*]", OBJECT(&s->ehci[i]),
-                                   sizeof(s->ehci[i]), TYPE_PLATFORM_EHCI);
-             sysbus_init_child_obj(obj, "ohci[*]", OBJECT(&s->ohci[i]),
-                                   sizeof(s->ohci[i]), TYPE_SYSBUS_OHCI);
-+            object_property_set_bool(OBJECT(&s->ehci[i]), true,
-+                                     "companion-enable", &error_fatal);
-+
-+            sprintf(bus, "usb-bus.%d", i);
-+            object_property_set_str(OBJECT(&s->ohci[i]), bus, "masterbus",
-+                                    &error_fatal);
-         }
++        object_property_set_int(OBJECT(&s->apu_cpu[i]), QEMU_PSCI_CONDUIT_SMC,
++                                "psci-conduit", &error_abort);
++        object_property_set_int(OBJECT(&s->apu_cpu[i]), GIC_BASE_ADDR,
++                                "reset-cbar", &error_abort);
      }
  
-@@ -72,6 +80,11 @@ static void aw_a10_init(Object *obj)
+     sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
+@@ -250,6 +255,10 @@ static void xlnx_zynqmp_init(Object *obj)
+     for (i = 0; i < XLNX_ZYNQMP_NUM_GEMS; i++) {
+         sysbus_init_child_obj(obj, "gem[*]", &s->gem[i], sizeof(s->gem[i]),
+                               TYPE_CADENCE_GEM);
++        object_property_set_int(OBJECT(&s->gem[i]), GEM_REVISION, "revision",
++                                &error_abort);
++        object_property_set_int(OBJECT(&s->gem[i]), 2, "num-priority-queues",
++                                &error_abort);
+     }
  
-     sysbus_init_child_obj(obj, "rtc", &s->rtc, sizeof(s->rtc),
-                           TYPE_AW_RTC_SUN4I);
-+
-+    memory_region_init_ram(&s->sram_a, obj, "sram A", 48 * KiB,
-+                           &error_fatal);
-+    memory_region_add_subregion(get_system_memory(), 0x00000000, &s->sram_a);
-+    create_unimplemented_device("a10-sram-ctrl", 0x01c00000, 4 * KiB);
- }
+     for (i = 0; i < XLNX_ZYNQMP_NUM_UARTS; i++) {
+@@ -259,6 +268,8 @@ static void xlnx_zynqmp_init(Object *obj)
  
- static void aw_a10_realize(DeviceState *dev, Error **errp)
-@@ -113,11 +126,6 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
-     sysbus_connect_irq(sysbusdev, 4, qdev_get_gpio_in(dev, 67));
-     sysbus_connect_irq(sysbusdev, 5, qdev_get_gpio_in(dev, 68));
+     sysbus_init_child_obj(obj, "sata", &s->sata, sizeof(s->sata),
+                           TYPE_SYSBUS_AHCI);
++    object_property_set_int(OBJECT(&s->sata), SATA_NUM_PORTS, "num-ports",
++                            &error_abort);
  
--    memory_region_init_ram(&s->sram_a, OBJECT(dev), "sram A", 48 * KiB,
--                           &error_fatal);
--    memory_region_add_subregion(get_system_memory(), 0x00000000, &s->sram_a);
--    create_unimplemented_device("a10-sram-ctrl", 0x01c00000, 4 * KiB);
+     for (i = 0; i < XLNX_ZYNQMP_NUM_SDHCI; i++) {
+         sysbus_init_child_obj(obj, "sdhci[*]", &s->sdhci[i],
+@@ -370,9 +381,6 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i < num_apus; i++) {
+         char *name;
+ 
+-        object_property_set_int(OBJECT(&s->apu_cpu[i]), QEMU_PSCI_CONDUIT_SMC,
+-                                "psci-conduit", &error_abort);
 -
-     /* FIXME use qdev NIC properties instead of nd_table[] */
-     if (nd_table[0].used) {
-         qemu_check_nic_model(&nd_table[0], TYPE_AW_EMAC);
-@@ -149,12 +157,6 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
-         int i;
+         name = object_get_canonical_path_component(OBJECT(&s->apu_cpu[i]));
+         if (strcmp(name, boot_cpu)) {
+             /* Secondary CPUs start in PSCI powered-down state */
+@@ -387,8 +395,6 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+                                  s->secure, "has_el3", NULL);
+         object_property_set_bool(OBJECT(&s->apu_cpu[i]),
+                                  s->virt, "has_el2", NULL);
+-        object_property_set_int(OBJECT(&s->apu_cpu[i]), GIC_BASE_ADDR,
+-                                "reset-cbar", &error_abort);
+         object_property_set_int(OBJECT(&s->apu_cpu[i]), num_apus,
+                                 "core-count", &error_abort);
+         object_property_set_bool(OBJECT(&s->apu_cpu[i]), true, "realized",
+@@ -490,10 +496,6 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+             qemu_check_nic_model(nd, TYPE_CADENCE_GEM);
+             qdev_set_nic_properties(DEVICE(&s->gem[i]), nd);
+         }
+-        object_property_set_int(OBJECT(&s->gem[i]), GEM_REVISION, "revision",
+-                                &error_abort);
+-        object_property_set_int(OBJECT(&s->gem[i]), 2, "num-priority-queues",
+-                                &error_abort);
+         object_property_set_bool(OBJECT(&s->gem[i]), true, "realized", &err);
+         if (err) {
+             goto out_propagate_error;
+@@ -514,8 +516,6 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+                            gic_spi[uart_intr[i]]);
+     }
  
-         for (i = 0; i < AW_A10_NUM_USB; i++) {
--            char bus[16];
--
--            sprintf(bus, "usb-bus.%d", i);
--
--            object_property_set_bool(OBJECT(&s->ehci[i]), true,
--                                     "companion-enable", &error_fatal);
-             object_property_set_bool(OBJECT(&s->ehci[i]), true, "realized",
-                                      &error_fatal);
-             sysbus_mmio_map(SYS_BUS_DEVICE(&s->ehci[i]), 0,
-@@ -162,8 +164,6 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
-             sysbus_connect_irq(SYS_BUS_DEVICE(&s->ehci[i]), 0,
-                                qdev_get_gpio_in(dev, 39 + i));
- 
--            object_property_set_str(OBJECT(&s->ohci[i]), bus, "masterbus",
--                                    &error_fatal);
-             object_property_set_bool(OBJECT(&s->ohci[i]), true, "realized",
-                                      &error_fatal);
-             sysbus_mmio_map(SYS_BUS_DEVICE(&s->ohci[i]), 0,
+-    object_property_set_int(OBJECT(&s->sata), SATA_NUM_PORTS, "num-ports",
+-                            &error_abort);
+     object_property_set_bool(OBJECT(&s->sata), true, "realized", &err);
+     if (err) {
+         goto out_propagate_error;
 -- 
 2.21.1
 
