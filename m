@@ -1,86 +1,87 @@
 Return-Path: <SRS0=Byls=54=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D37C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 09:16:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B94B7C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 10:45:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20870206DA
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 09:16:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 81180206DA
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 10:45:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lcwjimPZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20870206DA
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M1Yif6eg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81180206DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNYih-0007Vl-82
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 05:16:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40124)
+	id 1jNa7f-0004Su-MU
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 06:45:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1jNYi1-0006yx-8q
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 05:15:22 -0400
+ (envelope-from <changbin.du@gmail.com>) id 1jNa6T-0003ou-Kr
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 06:44:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1jNYi0-0005St-4U
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 05:15:21 -0400
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:36909)
+ (envelope-from <changbin.du@gmail.com>) id 1jNa6S-0004FZ-Fx
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 06:44:41 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:42663)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1jNYi0-0005Sb-0c
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 05:15:20 -0400
-Received: by mail-qt1-x841.google.com with SMTP id q17so4697987qtp.4
- for <qemu-devel@nongnu.org>; Sun, 12 Apr 2020 02:15:19 -0700 (PDT)
+ (Exim 4.71) (envelope-from <changbin.du@gmail.com>)
+ id 1jNa6S-0004F5-8f
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 06:44:40 -0400
+Received: by mail-pl1-x641.google.com with SMTP id v2so2383291plp.9
+ for <qemu-devel@nongnu.org>; Sun, 12 Apr 2020 03:44:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=3U1qj3o6QEsmXuWh3a8R+Av6avW64WyTo3s6lImj8xs=;
- b=lcwjimPZssusqwzrG48fPDY+9gGQ23X+qtyWagDWXl20a/cVXYzQF1Dvzn8pfZQybZ
- 6HwkjCM4jon1ICTTPALqBX38K0pNgvWJ0mkslycxw3LE5kueaXOta2x/wnyLeucjHEWC
- sz/j4uLM5wtwaQLgkHzhVGwBYcjDf9kEwOkjbSusnZUh7fxa57zoafpqv7hTrlCpUY3W
- CMWkCi/K5KZUlpTOjd76I582dE6dL32reJA/c+deCGTzuEID1JTgh7l3DqOJPTo8ARt+
- f4yftpNCSE0Y3qCgc9X7NOGCYuNU8vsJTSHDrJRKY/2ZcNWA9oT3O7KpfFEBof2GLs6S
- snfg==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=P/BkFFFE0kL0UxA6yxiSebZm+uJIjXAGvFH5F/PCQ18=;
+ b=M1Yif6egcr3WpMikWyBTKh+tvgWEQrmO85kdpwg/GgIBAY8urGz0OZOeZrDSCMMkwm
+ ibArNDAnwRbeTM13Z1m7ptFo74Vod+FQHT67P2r7qikYM2Mx/mBfssIdxJwIRA0gg6hT
+ ZyUXs94wogRI2tcCWt9nT7aWHKd9xM+/M34NOCcBNxRAuVejPGLafb02/Qs8j0nhi5PX
+ kvp/UqboBDlVQ65zXvuH3jpNn/2ted8CqiFUO54Hh3HU54bCdD3XL1/1PIUC1i0CRjDA
+ +hUOtc6DvtI6fwGXhhhBvvPyf5xN1EmtIcKMv5HVHj7SEtCqLtn+SUZ//+3DEAWq2+ad
+ rBKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=3U1qj3o6QEsmXuWh3a8R+Av6avW64WyTo3s6lImj8xs=;
- b=HbQp5Ra9hyafZHMr9Ims7Es2ocf1E/4Nae5Q3mS+fwqnzYQydkklYu907IYr+t1VM9
- 3cvYgtItU0eURrIUHJVTYxwWKEuOv3/+8FbWUKWROqpb4hF0d00iA9DZ8NIsWu6zCiSB
- eCPD/PwCNj6eQ4ai9ifPiDLZ5vl+DJXobpRrUxPUqAhVc0breat8w19Hgb+jmdTt2jqg
- Vm5YJxG2okYjiOogdVGiQ5+x+QSgV+KVNdcQCdlJVprrMu5GKCu+DbXqeQquS2Xf2qSF
- GJ0Dxh/0San8aqPeamtRGDSVy1TeTAWNF9EbmzL43K5wFBUitq/cgizkphJyLosr2MEJ
- NQFQ==
-X-Gm-Message-State: AGi0PubIA1Qu9Ovi9T7sMIN+wiZNyO0Wi5Xj1s9N23Om2URGpQxWoApt
- R677M2XOaKnJWJ6T/GaXewiea64kj2a0BgABVtU=
-X-Google-Smtp-Source: APiQypIlZ60AEi541/pXL+KUiVdfjWkR2DyBJXG2o+712jsRjmsLpjgNvxNq2MicD1ay50IR5QJH3o1hXsSJn/xba58=
-X-Received: by 2002:ac8:4f03:: with SMTP id b3mr6537717qte.282.1586682919047; 
- Sun, 12 Apr 2020 02:15:19 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=P/BkFFFE0kL0UxA6yxiSebZm+uJIjXAGvFH5F/PCQ18=;
+ b=VLnVrDPimVWWbb82sR6OgvpkxrNAzmcZGppQawjmqxfL71SD+/XrmU4TTNAa1Q18vi
+ Xtqzf1bwFz/aXu/JuWWfOfPfg3e8fvpn85VE7mnmZOOcKxthpRs+JU+APT8PotOXrAyy
+ 416TU9VElYBXLWQHOtor4k9Yo/v8ci3jSpo8ezzmo/LzPGslIvlXJxWzM5o6VaGJKFNV
+ Uzu9rg5/mfMrGkFq0DVSm5SHh0sJPTPV8F+0Ib1UkVPk5146i/CmSereH3kj0bnEra4n
+ IoLUV9X/hO0v+AhQbBJRBORtycp95TVZyXh9oVB6e4QZW/CrVXS0n4+kdaGSKllSK/u2
+ I4MQ==
+X-Gm-Message-State: AGi0PuY16qmpSPlhURsaxi4NGoQkjcSZPmErRKopEXb/QCLDOFewACCM
+ N59TpJInExTVB6wfWuD021A=
+X-Google-Smtp-Source: APiQypL+V8lBoSbP/t0iBRywE0BL5tpDIO6Nwi1aGtoSIbu+3cSuXWUNNxDdaj0dFGeBYfK8EHLmaw==
+X-Received: by 2002:a17:90a:757:: with SMTP id
+ s23mr15556873pje.166.1586688278582; 
+ Sun, 12 Apr 2020 03:44:38 -0700 (PDT)
+Received: from vultr.guest ([149.248.10.52])
+ by smtp.gmail.com with ESMTPSA id 63sm6029985pfe.96.2020.04.12.03.44.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 12 Apr 2020 03:44:37 -0700 (PDT)
+From: Changbin Du <changbin.du@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <laurent@vivier.eu>
+Subject: [PATCH] gdbstub: Fix segment fault for i386 and m68k
+Date: Sun, 12 Apr 2020 18:44:21 +0800
+Message-Id: <20200412104421.77975-1-changbin.du@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20200118191416.19934-1-mrolnik@gmail.com>
- <20200118191416.19934-2-mrolnik@gmail.com>
- <80141c57-7fb7-6e95-4070-54f7cc23e166@redhat.com>
- <CAK4993ie33Awp=sqUOcubqCLFqTd5mTPAkWQfhh3zvorMwnSig@mail.gmail.com>
- <8ac9a03a-a02f-1b48-c75d-77e4b8aea9ef@linaro.org>
- <45d68295-416b-b6d2-a512-86f6120432f0@redhat.com>
- <CAK4993iVT358BOU9gQKcNEDLw_smTfvzm0ePDO1WLubtGx_Mvw@mail.gmail.com>
-In-Reply-To: <CAK4993iVT358BOU9gQKcNEDLw_smTfvzm0ePDO1WLubtGx_Mvw@mail.gmail.com>
-From: Michael Rolnik <mrolnik@gmail.com>
-Date: Sun, 12 Apr 2020 12:14:33 +0300
-Message-ID: <CAK4993ignoQ2c8hz7WSYVORTmmzrFaLM+XB-yczSAaTcyVs8Dw@mail.gmail.com>
-Subject: Re: [PATCH v41 01/21] target/avr: Add outward facing interfaces and
- core CPU logic
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000c2d70205a3146786"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::841
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,126 +93,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Sarah Harris <S.E.Harris@kent.ac.uk>,
- Joaquin de Andres <me@xcancerberox.com.ar>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- Igor Mammedov <imammedo@redhat.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: qemu-devel@nongnu.org, Changbin Du <changbin.du@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000c2d70205a3146786
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+With GByteArray, we should pass the object itself but not to plus an offset.
 
-hi all.
+gdb log:
+Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+__memmove_avx_unaligned_erms () at ../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:384
+384	../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S: No such file or directory.
 
-are there any news / updates about AVR support?
+Fixes: a010bdbe71 ("gdbstub: extend GByteArray to read register helpers")
+Signed-off-by: Changbin Du <changbin.du@gmail.com>
+---
+ target/i386/gdbstub.c | 2 +-
+ target/m68k/helper.c  | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-On Mon, Mar 23, 2020 at 10:14 PM Michael Rolnik <mrolnik@gmail.com> wrote:
+diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c
+index f3d23b614e..b98a99500a 100644
+--- a/target/i386/gdbstub.c
++++ b/target/i386/gdbstub.c
+@@ -106,7 +106,7 @@ int x86_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+     } else if (n >= IDX_FP_REGS && n < IDX_FP_REGS + 8) {
+         floatx80 *fp = (floatx80 *) &env->fpregs[n - IDX_FP_REGS];
+         int len = gdb_get_reg64(mem_buf, cpu_to_le64(fp->low));
+-        len += gdb_get_reg16(mem_buf + len, cpu_to_le16(fp->high));
++        len += gdb_get_reg16(mem_buf, cpu_to_le16(fp->high));
+         return len;
+     } else if (n >= IDX_XMM_REGS && n < IDX_XMM_REGS + CPU_NB_REGS) {
+         n -= IDX_XMM_REGS;
+diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+index 014657c637..cad4083895 100644
+--- a/target/m68k/helper.c
++++ b/target/m68k/helper.c
+@@ -109,8 +109,8 @@ static int m68k_fpu_gdb_get_reg(CPUM68KState *env, GByteArray *mem_buf, int n)
+ {
+     if (n < 8) {
+         int len = gdb_get_reg16(mem_buf, env->fregs[n].l.upper);
+-        len += gdb_get_reg16(mem_buf + len, 0);
+-        len += gdb_get_reg64(mem_buf + len, env->fregs[n].l.lower);
++        len += gdb_get_reg16(mem_buf, 0);
++        len += gdb_get_reg64(mem_buf, env->fregs[n].l.lower);
+         return len;
+     }
+     switch (n) {
+-- 
+2.25.1
 
-> thanks Philippe.
->
-> On Mon, Mar 23, 2020 at 9:20 PM Philippe Mathieu-Daud=C3=A9 <philmd@redha=
-t.com>
-> wrote:
->
->> On 3/23/20 7:03 PM, Richard Henderson wrote:
->> > On 3/23/20 10:03 AM, Michael Rolnik wrote:
->> >> Hi Philippe.
->> >>
->> >> It's been a while. let me think about it and get back to you. what is
->> your
->> >> concern ?
->>
->> We are using this series with Joaquin for a Google Summit of Code
->> project, so we are noticing some bugs and fixing them.
->> As it has not been merged, we work in a fork.
->> Since it was posted on the list, I prefer to ask on the list than
->> directly to you.
->>
->> >
->> > It shouldn't be there.  See commit 1f5c00cfdb81.
->>
->> Ah it has been moved to cpu_common_reset, thanks :)
->> I suppose it is because this port is based on some quite old work.
->>
->> >
->> >>      > +    memset(env->r, 0, sizeof(env->r));
->> >>      > +
->> >>      > +    tlb_flush(cs);
->> >>
->> >>      Why are you calling tlb_flush() here?
->> >
->> >
->> > r~
->> >
->>
->>
->
-> --
-> Best Regards,
-> Michael Rolnik
->
-
-
---=20
-Best Regards,
-Michael Rolnik
-
---000000000000c2d70205a3146786
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">hi all.<div><br></div><div>are there any news / updates ab=
-out AVR support?</div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr"=
- class=3D"gmail_attr">On Mon, Mar 23, 2020 at 10:14 PM Michael Rolnik &lt;<=
-a href=3D"mailto:mrolnik@gmail.com">mrolnik@gmail.com</a>&gt; wrote:<br></d=
-iv><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bord=
-er-left:1px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"ltr">thank=
-s Philippe.</div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"g=
-mail_attr">On Mon, Mar 23, 2020 at 9:20 PM Philippe Mathieu-Daud=C3=A9 &lt;=
-<a href=3D"mailto:philmd@redhat.com" target=3D"_blank">philmd@redhat.com</a=
->&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
- 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On =
-3/23/20 7:03 PM, Richard Henderson wrote:<br>
-&gt; On 3/23/20 10:03 AM, Michael Rolnik wrote:<br>
-&gt;&gt; Hi Philippe.<br>
-&gt;&gt;<br>
-&gt;&gt; It&#39;s been a while. let me think about it=C2=A0and get back to =
-you. what is your<br>
-&gt;&gt; concern ?<br>
-<br>
-We are using this series with Joaquin for a Google Summit of Code <br>
-project, so we are noticing some bugs and fixing them.<br>
-As it has not been merged, we work in a fork.<br>
-Since it was posted on the list, I prefer to ask on the list than <br>
-directly to you.<br>
-<br>
-&gt; <br>
-&gt; It shouldn&#39;t be there.=C2=A0 See commit 1f5c00cfdb81.<br>
-<br>
-Ah it has been moved to cpu_common_reset, thanks :)<br>
-I suppose it is because this port is based on some quite old work.<br>
-<br>
-&gt; <br>
-&gt;&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 memset(env-&gt;r, 0, sizeo=
-f(env-&gt;r));<br>
-&gt;&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +<br>
-&gt;&gt;=C2=A0 =C2=A0 =C2=A0 &gt; +=C2=A0 =C2=A0 tlb_flush(cs);<br>
-&gt;&gt;<br>
-&gt;&gt;=C2=A0 =C2=A0 =C2=A0 Why are you calling tlb_flush() here?<br>
-&gt; <br>
-&gt; <br>
-&gt; r~<br>
-&gt; <br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
->Best Regards,<br>Michael Rolnik</div>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">Best Regards,<br>Michael Rolnik</div>
-
---000000000000c2d70205a3146786--
 
