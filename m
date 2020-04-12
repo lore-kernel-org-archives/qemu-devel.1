@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB5EC2BB85
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:47:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2525C2BB85
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:48:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAE4E20678
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:47:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D5B120678
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Apr 2020 22:48:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fhUjf2lC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAE4E20678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eziZT5VR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D5B120678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNlOK-0002Pm-UO
-	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:47:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47951)
+	id 1jNlP8-0004Am-MW
+	for qemu-devel@archiver.kernel.org; Sun, 12 Apr 2020 18:48:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48252)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlE7-0006vf-Ha
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:20 -0400
+ id 1jNlEM-0007Yt-Jn
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlE5-0002vL-A7
- for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:19 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:55732)
+ id 1jNlEL-00035N-Jh
+ for qemu-devel@nongnu.org; Sun, 12 Apr 2020 18:37:34 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34244)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jNlE5-0002uo-3k; Sun, 12 Apr 2020 18:37:17 -0400
-Received: by mail-wm1-x331.google.com with SMTP id e26so7922203wmk.5;
- Sun, 12 Apr 2020 15:37:16 -0700 (PDT)
+ id 1jNlEL-00034z-Dw; Sun, 12 Apr 2020 18:37:33 -0400
+Received: by mail-wr1-x444.google.com with SMTP id 65so8551368wrl.1;
+ Sun, 12 Apr 2020 15:37:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=cLajudUBTjPPEHDWHNc0MGZvDpG60cDj46wJF9MFpFg=;
- b=fhUjf2lC31hWvhQc0jfLtI9F/BIZ5VIR2Wq6tohOk81zDbrOll+RxbdwOLBS8vjr5k
- yG/GeGp43DkcM1phJoDP23wccdizGpVjXQYiuhJSdAUD3VJTPcojeJuatp9RBnozjK/E
- fZ6U9XKVSWbBn40dI3QcxHpKHmfd3bvnUkJuh6wqttFw8RyUoemfeweYSb8ONBk8idkA
- iO4Vx2BLKOAcUFyuqoK1aNXDP3nt6U21iiTkJXT63QNjRIuY4BeNp9b4sCuPIUyNULcz
- swsGBRjHj6dOXWrT856nZoeLpI59WFK5Iiw8eVsD12GDDMh/4gOeacBZDrngXmrHXR6D
- Kkvw==
+ bh=f8mojAlRUdlR/2NknA9ZDyMqw2xlNW4cv+f7vBTxHaE=;
+ b=eziZT5VRpWIAND8SYyKHzijX/5xYTrfYTlPUcRQYAPxRa668XdW0jOPhlDojMaEV7p
+ 2SP40m65aD/PN6dmSemcJ7snSHqvPG9wmFxqxY8hyI5zgQ4k72U2AeornVZbDxNouSXv
+ 9xdN8ssu/gHRojGMjx8NOoCJBpooHyRNeJqiteQGn/Eod7g0lVyZPIM4yHq+JuX7OBfQ
+ UV/PEndKzXUXZ7dV+b3VbzDM3h4pkRHPES4yayiu+nHUXwXP8Az/e7+dvpQtYLNc4W+H
+ Xj3j1Bk9tLBdrhBoI7fUtJ1OAw9khMjV+azIuUu+HM+x4Pby7/hWOLjdLX5iVE0RkN90
+ JtwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=cLajudUBTjPPEHDWHNc0MGZvDpG60cDj46wJF9MFpFg=;
- b=mci4jD2MoHTLyfMt653Zq+LYIZ+c03O8uP9bRXWpyDfQca6PdUbEI8wl+nMECYqWbZ
- B9pzsArkvOQaWQSyN9xXO5vzenllhE+jz50nmjc+dBlSco9G2xk/Z6vdptetZmbM0cnP
- 7XIhiQnsXk+LO0SM7vn769fLlE7q7aZPELL14z/qgSzAxtNESQelPGszauONssrAmZ+K
- Ov0Zl6Pq9HY//IHVP+edwF9xELZ0fAXhMiERbDJtyCk/IlYtfR1OBGbOyA8GeQqrU/pg
- L3hoDbPGxFQVq3ZkPUPq5pIeesUEFQY4OLKeDacute9z1XQ7+e+4ddHR2L1Zm4LhZZY2
- dpqA==
-X-Gm-Message-State: AGi0PuaPiGqQ4DUBYcIEtdHqBhcxktkenghg1VzopcfA0b9YDLe38DBy
- 47M4mFPWkgx8xq4wlWHNlXxMcHs+4+TYeQ==
-X-Google-Smtp-Source: APiQypKWzqoDEL0XMAg15Qo6HwT/t7hmIuiC1g78CIeCyAqNrwg049tayE2VNwVBP5Qtls+8mUxBkA==
-X-Received: by 2002:a1c:3c08:: with SMTP id j8mr13491389wma.30.1586731035721; 
- Sun, 12 Apr 2020 15:37:15 -0700 (PDT)
+ bh=f8mojAlRUdlR/2NknA9ZDyMqw2xlNW4cv+f7vBTxHaE=;
+ b=UikYRy83umpNf4liS/lKHGa8vzkg1YjHPm0UkqGSbUDSWsigDlOSu2JQEogmZvKA9d
+ DsAHwEahXPNZ+yrSeJa3Pi+n8lYPkHSU0McD2NyyrF8MRldN1IdFCX+3ovBiL1LecFXU
+ PlGZEgA9+MX/kFr76efk+vLf7UGMysOP8C6rjObmS6x3kpa8qBxQVSUsvqsg07+JU2J2
+ bTSUdVObLoNPWKISkrHJ7kP5WxO9NEHBAWUZdEti7BvhnwY3KtvQiUWu/03APQpHDiDe
+ aTwz/7GA71F/rIYuy0t2uqHidFI4eemM8dvvdD5XY1dYB8Ct49dXFw5tKGGo2ppDKuoP
+ 6kYA==
+X-Gm-Message-State: AGi0Pua33YqZbxZi/gsZIW/j31h4sAdL/uGHXg84Wx91HE9clL8GFvNJ
+ xGEtdJVnnTX/2U1tfCirnzF8I8O3Vm0tig==
+X-Google-Smtp-Source: APiQypKhADx8IsEhdzPX+miCokTZ08hDMUeYWbAJvUHG+uHvi03tXxbe6BnsWTdx9nq8xzvRWtrlww==
+X-Received: by 2002:adf:a345:: with SMTP id d5mr12993154wrb.23.1586731052287; 
+ Sun, 12 Apr 2020 15:37:32 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.37.12
+ by smtp.gmail.com with ESMTPSA id d13sm12563559wrv.34.2020.04.12.15.37.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Apr 2020 15:37:15 -0700 (PDT)
+ Sun, 12 Apr 2020 15:37:31 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v3 15/24] hw/arm/xlnx-zynqmp: Split
- xlnx_zynqmp_create_rpu() as init + realize
-Date: Mon, 13 Apr 2020 00:36:10 +0200
-Message-Id: <20200412223619.11284-16-f4bug@amsat.org>
+Subject: [PATCH-for-5.1 v3 20/24] hw/riscv/sifive_u: Use single type_init()
+Date: Mon, 13 Apr 2020 00:36:15 +0200
+Message-Id: <20200412223619.11284-21-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200412223619.11284-1-f4bug@amsat.org>
 References: <20200412223619.11284-1-f4bug@amsat.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::331
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,128 +125,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coccinelle failed at processing this file:
-
-  $ spatch ... --timeout 60 --sp-file \
-    scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-  HANDLING: ./hw/arm/xlnx-zynqmp.c
-  EXN: Coccinelle_modules.Common.Timeout
-
-We are going to manually add the missing propagate_error() calls.
-Some functions can be called at init() time, reducing the need
-to add extra Error checks at realize() time. Split create_rpu()
-in init() and realize().
+We can use a single type_init() to call multiple type_register*().
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/xlnx-zynqmp.c | 45 +++++++++++++++++++++++++++-----------------
- 1 file changed, 28 insertions(+), 17 deletions(-)
+ hw/riscv/sifive_u.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 43d57fa7de..457057198a 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -173,18 +173,9 @@ static inline int arm_gic_ppi_index(int cpu_nr, int ppi_index)
-     return GIC_NUM_SPI_INTR + cpu_nr * GIC_INTERNAL + ppi_index;
- }
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 998666c91f..9c90c94c33 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -601,13 +601,6 @@ static const TypeInfo riscv_sifive_u_soc_type_info = {
+     .class_init = riscv_sifive_u_soc_class_init,
+ };
  
--static void xlnx_zynqmp_create_rpu(MachineState *ms, XlnxZynqMPState *s,
--                                   const char *boot_cpu, Error **errp)
-+static void xlnx_zynqmp_rpu_init(XlnxZynqMPState *s, int num_rpus)
+-static void riscv_sifive_u_soc_register_types(void)
+-{
+-    type_register_static(&riscv_sifive_u_soc_type_info);
+-}
+-
+-type_init(riscv_sifive_u_soc_register_types)
+-
+ static void riscv_sifive_u_machine_class_init(ObjectClass *oc, void *data)
  {
--    Error *err = NULL;
-     int i;
--    int num_rpus = MIN(ms->smp.cpus - XLNX_ZYNQMP_NUM_APU_CPUS,
--                       XLNX_ZYNQMP_NUM_RPU_CPUS);
--
--    if (num_rpus <= 0) {
--        /* Don't create rpu-cluster object if there's nothing to put in it */
--        return;
--    }
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -627,9 +620,10 @@ static const TypeInfo riscv_sifive_u_machine_typeinfo = {
+     .instance_size = sizeof(SiFiveUState),
+ };
  
-     object_initialize_child(OBJECT(s), "rpu-cluster", &s->rpu_cluster,
-                             sizeof(s->rpu_cluster), TYPE_CPU_CLUSTER,
-@@ -192,13 +183,25 @@ static void xlnx_zynqmp_create_rpu(MachineState *ms, XlnxZynqMPState *s,
-     qdev_prop_set_uint32(DEVICE(&s->rpu_cluster), "cluster-id", 1);
- 
-     for (i = 0; i < num_rpus; i++) {
--        char *name;
--
-         object_initialize_child(OBJECT(&s->rpu_cluster), "rpu-cpu[*]",
-                                 &s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
-                                 ARM_CPU_TYPE_NAME("cortex-r5f"),
-                                 &error_abort, NULL);
- 
-+        object_property_set_bool(OBJECT(&s->rpu_cpu[i]), true, "reset-hivecs",
-+                                 &error_abort);
-+    }
-+}
-+
-+static void xlnx_zynqmp_rpu_realize(XlnxZynqMPState *s, int num_rpus,
-+                                    const char *boot_cpu, Error **errp)
-+{
-+    Error *err = NULL;
-+    int i;
-+
-+    for (i = 0; i < num_rpus; i++) {
-+        char *name;
-+
-         name = object_get_canonical_path_component(OBJECT(&s->rpu_cpu[i]));
-         if (strcmp(name, boot_cpu)) {
-             /* Secondary CPUs start in PSCI powered-down state */
-@@ -209,8 +212,6 @@ static void xlnx_zynqmp_create_rpu(MachineState *ms, XlnxZynqMPState *s,
-         }
-         g_free(name);
- 
--        object_property_set_bool(OBJECT(&s->rpu_cpu[i]), true, "reset-hivecs",
--                                 &error_abort);
-         object_property_set_bool(OBJECT(&s->rpu_cpu[i]), true, "realized",
-                                  &err);
-         if (err) {
-@@ -228,6 +229,8 @@ static void xlnx_zynqmp_init(Object *obj)
-     XlnxZynqMPState *s = XLNX_ZYNQMP(obj);
-     int i;
-     int num_apus = MIN(ms->smp.cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
-+    int num_rpus = MIN(ms->smp.cpus - XLNX_ZYNQMP_NUM_APU_CPUS,
-+                       XLNX_ZYNQMP_NUM_RPU_CPUS);
- 
-     object_initialize_child(obj, "apu-cluster", &s->apu_cluster,
-                             sizeof(s->apu_cluster), TYPE_CPU_CLUSTER,
-@@ -290,6 +293,10 @@ static void xlnx_zynqmp_init(Object *obj)
-         sysbus_init_child_obj(obj, "adma[*]", &s->adma[i], sizeof(s->adma[i]),
-                               TYPE_XLNX_ZDMA);
-     }
-+
-+    if (num_rpus > 0) {
-+        xlnx_zynqmp_rpu_init(s, num_rpus);
-+    }
+-static void riscv_sifive_u_machine_init_register_types(void)
++static void riscv_sifive_u_register_types(void)
+ {
++    type_register_static(&riscv_sifive_u_soc_type_info);
+     type_register_static(&riscv_sifive_u_machine_typeinfo);
  }
  
- static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-@@ -300,6 +307,8 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-     uint8_t i;
-     uint64_t ram_size;
-     int num_apus = MIN(ms->smp.cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
-+    int num_rpus = MIN(ms->smp.cpus - XLNX_ZYNQMP_NUM_APU_CPUS,
-+                       XLNX_ZYNQMP_NUM_RPU_CPUS);
-     const char *boot_cpu = s->boot_cpu ? s->boot_cpu : "apu-cpu[0]";
-     ram_addr_t ddr_low_size, ddr_high_size;
-     qemu_irq gic_spi[GIC_NUM_SPI_INTR];
-@@ -458,9 +467,11 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-                     "RPUs just use -smp 6.");
-     }
- 
--    xlnx_zynqmp_create_rpu(ms, s, boot_cpu, &err);
--    if (err) {
--        goto out_propagate_error;
-+    if (num_rpus > 0) {
-+        xlnx_zynqmp_rpu_realize(s, num_rpus, boot_cpu, &err);
-+        if (err) {
-+            goto out_propagate_error;
-+        }
-     }
- 
-     if (!s->boot_cpu_ptr) {
+-type_init(riscv_sifive_u_machine_init_register_types)
++type_init(riscv_sifive_u_register_types)
 -- 
 2.21.1
 
