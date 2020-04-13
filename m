@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D72E1C2BBFD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 16:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F1FC2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 16:21:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3F0520732
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 16:19:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C87B2072C
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 16:21:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BxSh0R4y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3F0520732
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aU72Uekj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C87B2072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jO1o0-00030P-Rz
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 12:19:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60565)
+	id 1jO1qC-0005aQ-HN
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 12:21:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60881)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent.desnogues@gmail.com>) id 1jO1nG-0002X7-Is
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 12:18:43 -0400
+ (envelope-from <laurent.desnogues@gmail.com>) id 1jO1p4-0004R5-By
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 12:20:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent.desnogues@gmail.com>) id 1jO1n2-0000jG-8Z
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 12:18:33 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:40278)
+ (envelope-from <laurent.desnogues@gmail.com>) id 1jO1p3-0002Gy-Aa
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 12:20:34 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:46055)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
- id 1jO1n2-0000ia-0i; Mon, 13 Apr 2020 12:18:28 -0400
-Received: by mail-io1-xd44.google.com with SMTP id w1so9885768iot.7;
- Mon, 13 Apr 2020 09:18:27 -0700 (PDT)
+ id 1jO1p3-0002G8-5p; Mon, 13 Apr 2020 12:20:33 -0400
+Received: by mail-il1-x141.google.com with SMTP id i2so8124095ils.12;
+ Mon, 13 Apr 2020 09:20:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mzPHCw6k3Pu8SILTY74WR97yZG/8zldYlE/UmI9Oxfw=;
- b=BxSh0R4ypxaasNyCRZSHTvLhTLpjwkOWU6zR2afdxlsp9H8sATX2DEFIHIphpjPVJd
- 1isTPCAYW9/N46CnT7bQovV4W/Z9DzViiJQRPwUQ1Lx7Wd4vANHuHxcZYM6EMHj3842T
- D3CpLNcsFvDb9E5M90AAKy9/Q1BrHIF6w+UZOmGgyiOKbmgbnAOqv8+Cw9MNVAR5Kgb5
- lr8T3SQK/D5YOEYjFHyRab5N9I0tMt+sjcT4KbfMlbEZbOlwY8xSyM4FlMTjpHPyZN5t
- zT0WL8iY/St82s0/QfabhbAt2qUuih3UjCenFdtoGkf9+7i00oRBnpc0fH/zg9KwYIXp
- ZXeQ==
+ :cc; bh=FrlZ2Og4Gk2rDGcvN4xoQ+RCSEwEyV8v9+mVj65fNVY=;
+ b=aU72UekjHI2jP8suG7Hx2B+ZZYabYxmgjehwnc45drjHkuZmnm+ckS7gc/MSLOlKnY
+ XzhRrK/D0rvvU/19gqmrEC0lCf2QTVr69rpXMeKqf5U4xTUMiUFxHyi2mSTnevWMcDFU
+ HcgCkgZx9XF3xR+e/v1opxesxSeZcCTYTHVBsOxXKqz86DPpSdgKDtuy9tQge4mK166b
+ 8d59wHiMTCGW1UWmaT63U/3yFIgaCmBFHvBxHX6JItI4cS5jMrzQ0oVuzpXT0MVNxEGi
+ zraJRyx04Ix0/XW2vaNjzhaOdvErCqL5oRBBDMMyHk2WqwRFrN/SLelllnMEWWcGfggj
+ fF0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=mzPHCw6k3Pu8SILTY74WR97yZG/8zldYlE/UmI9Oxfw=;
- b=P5FMGnUmFe7luvJ2S0rdG6U53uoqKmRrBGpHdi//34Uje0N+yuo2HNwUJh2D3cKUSK
- R4JHPt6dWGYydM4ftQuwbgVkmD7TPI1G+DHHP9xBw3PZZxKCx/R3B3pjoCH+C/BFgeao
- +6JPKwsdTbUYHCUCaPTXy6HNIAqutwiL5Uu8XpGGAa4sXJK1FKmcSfyq5oRrjYTQGSET
- rWKcyeG7PYwu8UUVBuCjwcRzzqzOqYoQDYG2mRyqMpHX+LRqyoY8ujKzqU0BTjxao7EP
- k1M7yAY0jMqhLN0731g+8CU11UMSwAPUtjwCuBA7epAcxWygV0h3kLlUC+Od26GgPwI+
- k3hA==
-X-Gm-Message-State: AGi0PuZKxnm116HaycR5aD2apmJrnMpewaLRqkoy51rmFv5Qe1MKgfCR
- NdBOqogdSxiS2wMD2mtltTtUv+ZTv3arqpM7tUgb1fN1IHE=
-X-Google-Smtp-Source: APiQypKq45FTmSYWlNHE3GiBs0EYMUYz3pj1XwmEfghVLI9laq/vE1/M2JdFTRj6QX5H6K2GqkhdN7cZlr09krV0qZ4=
-X-Received: by 2002:a6b:148:: with SMTP id 69mr16744386iob.189.1586794707213; 
- Mon, 13 Apr 2020 09:18:27 -0700 (PDT)
+ bh=FrlZ2Og4Gk2rDGcvN4xoQ+RCSEwEyV8v9+mVj65fNVY=;
+ b=q6V1plYVtALD6rpYmRIgwEv0RAE4qTGoIT9giTnd2B2dtYDd2KeimSvpGQav2sVdFZ
+ JEmMnzEBhRu+SIjz1OPJC4nKtoZhcWei42ESZxcR3Qd1JB1/na0apW95Rk3U5I3sqLzV
+ vv/rOaVcFydsfTXYpEr3WGCanTqP4cqoPkR2U0w0XIt7w+ofevG/nc4Gx1GWH1q3eUx3
+ cUQxrDa1BwQQo0npTSzTSKf6RYPPwkT4E+XKmMfvB8B5wEZvERxrufcmmV0N47t6vHq3
+ O3Qmw2bDTguVd8Q8MHrDsIwZh6orQTHw+D2uZ4WQ3vHjYAJLaVYgrirOVBi9zh3g5d1h
+ oPOQ==
+X-Gm-Message-State: AGi0PuZV9dhEKA+sl/7++gLZluySvrIZfg/U08KZdi/+486gyVsO+hdL
+ 6by///NsdxtPJ98Bv2UCQ0CqJlkQwJX3r1Lo//8=
+X-Google-Smtp-Source: APiQypKQnFgaXtpfumW2EzJFsw/PIzskLTc81E0dFA9H49pwR3fvYCh3kTc2ToX/EaD+fUXQQYuhBsivPT+csy0O9Qw=
+X-Received: by 2002:a92:da8a:: with SMTP id u10mr18738648iln.241.1586794832022; 
+ Mon, 13 Apr 2020 09:20:32 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200326230838.31112-1-richard.henderson@linaro.org>
- <20200326230838.31112-23-richard.henderson@linaro.org>
-In-Reply-To: <20200326230838.31112-23-richard.henderson@linaro.org>
+ <20200326230838.31112-21-richard.henderson@linaro.org>
+In-Reply-To: <20200326230838.31112-21-richard.henderson@linaro.org>
 From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Mon, 13 Apr 2020 18:18:23 +0200
-Message-ID: <CABoDooN62TE-g69wZSz8ky9NOdEgRJS7FiH9q+Q5auwL-464MA@mail.gmail.com>
-Subject: Re: [PATCH 22/31] target/arm: Implement SVE2 integer add/subtract
- long with carry
+Date: Mon, 13 Apr 2020 18:20:27 +0200
+Message-ID: <CABoDooNtOgV=gWGVpo6OJppiLtJWFhEpWsvU5rqw68MZP1Sorg@mail.gmail.com>
+Subject: Re: [PATCH 20/31] target/arm: Implement SVE2 complex integer add
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d44
+X-Received-From: 2607:f8b0:4864:20::141
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,32 +92,48 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 27, 2020 at 12:17 AM Richard Henderson
+On Fri, Mar 27, 2020 at 12:20 AM Richard Henderson
 <richard.henderson@linaro.org> wrote:
 [...]
 > diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-> index a0995d95c7..aa330f75c3 100644
+> index b5afa34efe..a3653007ac 100644
 > --- a/target/arm/sve_helper.c
 > +++ b/target/arm/sve_helper.c
-[...]
-> +void HELPER(sve2_adcl_d)(void *vd, void *va, void *vn, void *vm, uint32_t desc)
-> +{
-> +    intptr_t i, opr_sz = simd_oprsz(desc);
-> +    int sel = extract32(desc, SIMD_DATA_SHIFT, 1) * 32;
-> +    uint64_t inv = -(uint64_t)extract32(desc, SIMD_DATA_SHIFT + 1, 1);
-> +    uint64_t *d = vd, *a = va, *n = vn, *m = vm;
-> +
-> +    for (i = 0; i < opr_sz / 8; i += 2) {
-> +        Int128 e1 = int128_make64(a[i]);
-> +        Int128 e2 = int128_make64(n[i + sel] ^ inv);
-> +        Int128 c = int128_make64(m[i + 1] & 1);
-> +        Int128 r = int128_add(int128_add(e1, e2), c);
-> +        d[i + 0] = int128_getlo(r);
-> +        d[i + 1] = int128_gethi(r);
-> +    }
+> @@ -1289,6 +1289,48 @@ DO_BITPERM(sve2_bgrp_d, uint64_t, bitgroup)
+>
+>  #undef DO_BITPERM
+>
+> +#define DO_CADD(NAME, TYPE, H, ADD_OP, SUB_OP)                  \
+> +void HELPER(NAME)(void *vd, void *vn, void *vm, uint32_t desc)  \
+> +{                                                               \
+> +    intptr_t i, opr_sz = simd_oprsz(desc);                      \
+> +    int sub_r = simd_data(desc);                                \
+> +    if (sub_r) {                                                \
+> +        for (i = 0; i < opr_sz; i += 2 * sizeof(TYPE)) {        \
+> +            TYPE acc_r = *(TYPE *)(vn + H(i));                  \
+> +            TYPE acc_i = *(TYPE *)(vn + H(i + sizeof(TYPE)));   \
+> +            TYPE el2_r = *(TYPE *)(vm + H(i));                  \
+> +            TYPE el2_i = *(TYPE *)(vm + H(i + sizeof(TYPE)));   \
+> +            acc_r = SUB_OP(acc_r, el2_i);                       \
+> +            acc_i = ADD_OP(acc_i, el2_r);                       \
+> +            *(TYPE *)(vd + H(i)) = acc_r;                       \
+> +            *(TYPE *)(vd + H(i + sizeof(TYPE))) = acc_i;        \
+> +        }                                                       \
+> +    } else {                                                    \
+> +        for (i = 0; i < opr_sz; i += 2 * sizeof(TYPE)) {        \
+> +            TYPE acc_r = *(TYPE *)(vn + H(i));                  \
+> +            TYPE acc_i = *(TYPE *)(vn + H(i + sizeof(TYPE)));   \
+> +            TYPE el2_r = *(TYPE *)(vm + H(i));                  \
+> +            TYPE el2_i = *(TYPE *)(vm + H(i + sizeof(TYPE)));   \
+> +            acc_r = ADD_OP(acc_r, el2_i);                       \
+> +            acc_i = SUB_OP(acc_i, el2_r);                       \
+> +            *(TYPE *)(vd + H(i)) = acc_r;                       \
+> +            *(TYPE *)(vd + H(i + sizeof(TYPE))) = acc_i;        \
+> +        }                                                       \
+> +    }                                                           \
 > +}
 
-sel should not be multiplied by 32.
+The then/else branches of if (sub_r) are swapped.
 
 Laurent
 
