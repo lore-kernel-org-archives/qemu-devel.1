@@ -2,98 +2,81 @@ Return-Path: <SRS0=kd+i=55=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3324BC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 07:14:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26CD9C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 07:22:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3D8E20678
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 07:14:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DCD262076A
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 07:22:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fDdgMAJg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3D8E20678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k6qWBGXU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCD262076A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lemote.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNtIl-0008Gm-3Z
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 03:14:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36375)
+	id 1jNtQU-0002oC-07
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 03:22:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36919)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jNtHv-0007qj-KX
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 03:13:48 -0400
+ (envelope-from <chenhuacai@gmail.com>) id 1jNtPl-0002Br-Ov
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 03:21:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jNtHu-0002OO-Jn
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 03:13:47 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31186
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jNtHu-0002OC-GM
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 03:13:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586762025;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=i8v6iWYUxruV0FiQDfZ8Sb9lr2g6nJHeQ7fHb3n5J/A=;
- b=fDdgMAJgM0W1NpoC7g5h4iR7oqYmOcU4apqaKOjPFtF6jLrkGF5VnaURO34k7kGZCXbDqB
- EpliaairAzozIcnqIxDHhTWR75I1kIkKcWPB55ChFFK6ZnG8lv8/RYy/jdQDxrZIzGVQgh
- kluPfnibtMS0VVFZ+NryqZhlHAHoZyw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-454-vV57QdQDO7O05CJyEawAgg-1; Mon, 13 Apr 2020 03:13:43 -0400
-X-MC-Unique: vV57QdQDO7O05CJyEawAgg-1
-Received: by mail-wr1-f70.google.com with SMTP id h14so6276705wrr.12
- for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 00:13:43 -0700 (PDT)
+ (envelope-from <chenhuacai@gmail.com>) id 1jNtPk-0005wX-AW
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 03:21:53 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:45884)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <chenhuacai@gmail.com>)
+ id 1jNtPk-0005w9-5Q
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 03:21:52 -0400
+Received: by mail-pf1-x444.google.com with SMTP id r14so4137379pfl.12
+ for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 00:21:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id;
+ bh=t2sALsyCMMNQl+/8FmLCPuHasRrqoSojD5dypqshy1s=;
+ b=k6qWBGXUMQGdG4L801yUD0CBa9KUZWJQCLwsgGPYl/I2VJjZ4q+nrmBR9MLWNt1Gjd
+ 1TiOACf0dKTBjQqemktNCtQ0HdOLjV0nbkeTWg7IDclXU8YvNE2UQazw14m6AGOUROyR
+ RpXuV5GJz3e6PeImUS0fjZ5XTORTAzUqKUUAsvFY6JYby8LTKcdlASVGp91STYo1v8ct
+ YLGaHQfy0JJx1n35AIKm3McnOH5Tyb2Q4r+qP+Vu5utdX2QOwPy1qOjZtqEVCIqkZUja
+ Z8/b8qu/BwnvUeNTxUGrhOtbhZHcLPPKvPWgaaIFfLtZdxpQyA272eP4fSG4dK9cx04y
+ DE8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=i8v6iWYUxruV0FiQDfZ8Sb9lr2g6nJHeQ7fHb3n5J/A=;
- b=M4hUI9TsfCHmBt+AzkgX09bxY1HMHnxKSE+0Hrn728WvfCdgXrvIGYyHNSfmkFmYJx
- PKJ065aafK/d8EEnXAy4QgMYaXKvQsGakA5+fHERJ+Q8v8cKIfOG1YS3ROsYmUYsXaUx
- gdlabGu1zV9HuWkwSGHb5Ky7w1Qyjv52huXB2Vk0rdlsV+FN2Al5Ei3JhZ4PxtfxD7IN
- /el4HwUsNa7V/LfmWe175LWqwHcaT7zcBwfezf7OnXnvW3tMTsN31knYP/0VheMxMrpd
- M8YxEAl5Ws544iIZfdpC5Aun+/AZ6UQ4mujWm+GjuEnPtEzREryrVdN/dk6LaXVPzx5V
- axZg==
-X-Gm-Message-State: AGi0PubRIdbkPadG3FjlKlzP3Dz/f7qHi0B0rWbSM3n2ko3elMLNQ0L8
- Q9snXJovfx7VhFv+iKLA3mlo8ooop8PnGiWWlKPnMGECCt+1hJLiYbON9bTKZvWmT/1M+KQs43l
- 2cJZMAXEz7UJ9JNg=
-X-Received: by 2002:a5d:4746:: with SMTP id o6mr17294740wrs.304.1586762022235; 
- Mon, 13 Apr 2020 00:13:42 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJJnDMTS/FPPnJtMdRQG/zdQzMHCbSc0ZpJgL0s5JH4e81aOWpf+GAkj8GPLHjRYUp4UBgC1Q==
-X-Received: by 2002:a5d:4746:: with SMTP id o6mr17294722wrs.304.1586762021952; 
- Mon, 13 Apr 2020 00:13:41 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:f95d:5f37:e378:f48d?
- ([2001:b07:6468:f312:f95d:5f37:e378:f48d])
- by smtp.gmail.com with ESMTPSA id c11sm13947940wrt.24.2020.04.13.00.13.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 13 Apr 2020 00:13:41 -0700 (PDT)
-Subject: Re: [PATCH for-5.0? 0/3] Make docs build work with Sphinx 3
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20200411182934.28678-1-peter.maydell@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8bc506e7-e0de-9e12-cc47-a2d86291b876@redhat.com>
-Date: Mon, 13 Apr 2020 09:13:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200411182934.28678-1-peter.maydell@linaro.org>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+ bh=t2sALsyCMMNQl+/8FmLCPuHasRrqoSojD5dypqshy1s=;
+ b=EJrwlB63XKiF7LH201+COtRIsfy098S/9IttsOxZ+gb2bY1jcbEy0ckVVBciqyhJ2M
+ jtLZH0ojBtvksEsrvF5OYtjsL3+HfqEiQur9lMzUNS3c0egjsGa/W3HASyVIBRRWfajv
+ ZY3Xh26taf1een8SPSxE0PkOwK+1vLkOR+1V/OtfkPwy5lnpdzm4f4s47CY4MiRY7puF
+ pdHknJr80vMLC4K/I0NUy7liPvgnQR530q9fPLZ5NOWwSXEubhmXj1vEZ/eYzmK2husl
+ wNphj0kL+vOXJD/4oCWyJeR1947Ovp0SdH6yhH31kDjQuS70ESyiAjksmTV1g+Z5y1a/
+ pfSw==
+X-Gm-Message-State: AGi0PuaDUgw/SEZbFyk2GbkzI7V9n7xH9MoSq+fxS24/7P+PdVeYiz1w
+ 9IJG0aN6TDcpjfbKmPCCNzA=
+X-Google-Smtp-Source: APiQypLOMSAvZAOVmdTh3/xVhGIylyDIoCT43TP1W6oweKMcx07p6DU4u4BAs3R3Egz33M4rokbdUQ==
+X-Received: by 2002:a63:c20:: with SMTP id b32mr164314pgl.75.1586762510767;
+ Mon, 13 Apr 2020 00:21:50 -0700 (PDT)
+Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
+ [34.92.144.28])
+ by smtp.gmail.com with ESMTPSA id u8sm7241341pgl.19.2020.04.13.00.21.48
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 13 Apr 2020 00:21:50 -0700 (PDT)
+From: Huacai Chen <chenhc@lemote.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Subject: [PATCH 0/15] KVM: MIPS: Add Loongson-3 support (Host Side)
+Date: Mon, 13 Apr 2020 15:30:09 +0800
+Message-Id: <1586763024-12197-1-git-send-email-chenhc@lemote.com>
+X-Mailer: git-send-email 2.7.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,33 +88,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kvm@vger.kernel.org, Huacai Chen <chenhuacai@gmail.com>,
+ qemu-devel@nongnu.org, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ linux-mips@vger.kernel.org, Fuxin Zhang <zhangfx@lemote.com>,
+ Huacai Chen <chenhc@lemote.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/04/20 20:29, Peter Maydell wrote:
-> 
-> I've marked this up as 'for-5.0?' because I think it would be
-> nice if at least patch 1 went in. Patch 2 seems uncontroversial
-> (though I guess we should forward it up to the kernel folks
-> since kernel-doc is from them originally). Patch 3 is the
-> expedient change, but you could argue about whether this is
-> the best way to tell kernel-doc what to do.
+We are preparing to add KVM support for Loongson-3. VZ extension is
+fully supported in Loongson-3A R4+, and we will not care about old CPUs
+(at least now). We already have a full functional Linux kernel (based
+on Linux-5.4.x LTS) and QEMU (based on 5.0.0-rc2) and their git
+repositories are here:
 
-I agree---I would say this is ok for 5.0 as long as the last two patches
-are forwarded to the kernel and any changes integrated back.
+QEMU: https://github.com/chenhuacai/qemu
+Kernel: https://github.com/chenhuacai/linux
 
-Patch 1 is clever. :)
+Of course these two repositories need to be rework and not suitable for
+upstream (especially the commits need to be splitted). We show them here
+is just to tell others what we have done, and how KVM/Loongson will look
+like.
 
-Paolo
+Our plan is make the KVM host side be upstream first, and after that,
+we will make the KVM guest side and QEMU emulator be upstream.
 
-> 
-> thanks
-> -- PMM
-> 
-> Peter Maydell (3):
->   configure: Honour --disable-werror for Sphinx
->   scripts/kernel-doc: Add missing close-paren in c:function directives
->   kernel-doc: Use c:struct for Sphinx 3.0 and later
+Mike Rapoport(1):
+ mips: define pud_index() regardless of page table folding
 
+Xing Li(2):
+ KVM: MIPS: Define KVM_ENTRYHI_ASID to cpu_asid_mask(&boot_cpu_data)
+ KVM: MIPS: Fix VPN2_MASK definition for variable cpu_vmbits
+
+Huacai Chen(12):
+ KVM: MIPS: Increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16
+ KVM: MIPS: Add EVENTFD support which is needed by VHOST
+ KVM: MIPS: Use lddir/ldpte instructions to lookup gpa_mm.pgd
+ KVM: MIPS: Introduce and use cpu_guest_has_ldpte
+ KVM: MIPS: Use root tlb to control guest's CCA for Loongson-3
+ KVM: MIPS: Let indexed cacheops cause guest exit on Loongson-3
+ KVM: MIPS: Add more types of virtual interrupts
+ KVM: MIPS: Add Loongson-3 Virtual IPI interrupt support
+ KVM: MIPS: Add CPUCFG emulation for Loongson-3
+ KVM: MIPS: Add CONFIG6 and DIAG registers emulation
+ KVM: MIPS: Add more MMIO load/store instructions emulation
+ KVM: MIPS: Enable KVM support for Loongson-3
+
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+---
+ arch/mips/Kconfig                    |   1 +
+ arch/mips/include/asm/cpu-features.h |   3 +
+ arch/mips/include/asm/kvm_host.h     |  50 +++-
+ arch/mips/include/asm/mipsregs.h     |   7 +
+ arch/mips/include/asm/pgtable-64.h   |   4 +-
+ arch/mips/include/uapi/asm/inst.h    |  11 +
+ arch/mips/kernel/cpu-probe.c         |   2 +
+ arch/mips/kvm/Kconfig                |   1 +
+ arch/mips/kvm/Makefile               |   5 +-
+ arch/mips/kvm/emulate.c              | 461 ++++++++++++++++++++++++++++++++++-
+ arch/mips/kvm/entry.c                |  19 +-
+ arch/mips/kvm/interrupt.c            |  93 +------
+ arch/mips/kvm/interrupt.h            |  14 +-
+ arch/mips/kvm/loongson_ipi.c         | 215 ++++++++++++++++
+ arch/mips/kvm/mips.c                 |  49 +++-
+ arch/mips/kvm/tlb.c                  |  39 +++
+ arch/mips/kvm/trap_emul.c            |   3 +
+ arch/mips/kvm/vz.c                   | 204 +++++++++++-----
+ 18 files changed, 1013 insertions(+), 168 deletions(-)
+ create mode 100644 arch/mips/kvm/loongson_ipi.c
+--
+2.7.0
 
