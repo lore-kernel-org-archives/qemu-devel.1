@@ -2,68 +2,80 @@ Return-Path: <SRS0=kd+i=55=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8435DC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 09:14:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6114AC2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 09:16:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 515BB206E9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 09:14:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 515BB206E9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lemote.com
+	by mail.kernel.org (Postfix) with ESMTPS id 14688206E9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 09:16:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ot1KbWz4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14688206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNvAp-0005oz-Ap
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 05:14:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46330)
+	id 1jNvCt-0007LX-1x
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 05:16:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46546)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chenhuacai@gmail.com>) id 1jNv9b-0004wa-KV
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 05:13:21 -0400
+ (envelope-from <yuval.shaia.ml@gmail.com>) id 1jNvB1-00067L-0t
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 05:14:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chenhuacai@gmail.com>) id 1jNv9a-0002fG-3j
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 05:13:19 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:39347)
+ (envelope-from <yuval.shaia.ml@gmail.com>) id 1jNvAy-0003Q2-KD
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 05:14:46 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40742)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chenhuacai@gmail.com>)
- id 1jNv9Z-0002f1-VN
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 05:13:18 -0400
-Received: by mail-io1-f68.google.com with SMTP id m4so8686871ioq.6
- for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 02:13:17 -0700 (PDT)
+ (Exim 4.71) (envelope-from <yuval.shaia.ml@gmail.com>)
+ id 1jNvAy-0003OA-E1
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 05:14:44 -0400
+Received: by mail-ot1-x342.google.com with SMTP id i27so5561089ota.7
+ for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 02:14:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=kYAM7PlZDHl7Wwe2gCX+OZrDZmyk/z/ltRLBPUWK0sw=;
+ b=Ot1KbWz4Qnj99WoL9dmaqF0JZBRI8kpYViG6/K5qBlOeWxVMtDWFxtltnVg+60OZ4f
+ frrVFBtHqVN3zdl3QLMRsdOKJEMBmymgP0og813H0k0+U7xKsEvzEyxjSlDIyfdzfPZw
+ g2BToKn+2fWZ4cESM9+OsuGC8IwgxqhHDLJmBN1gFXtRfBbQoJKQxEpHlLxCNs5+9V/Z
+ FXCyrfZQkgter+EVAgjDag9BgxeR5RT0v6pclYEcHQldZ+oHFeex+TqlIlkQS9AHNC2C
+ Zi3yD93XoCUmUVLvDfnLtBA4b2h8ksNekBJYBh+aZSWfjrfOJ3topEXQ449xCnDf7DdB
+ 60Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=v+Skmoxt5MI5HXvfLUf4druORyMZBVzf5KJrih23ccU=;
- b=hZspW5/UOmoYQq/Uoq4QGSEQCH6pHDoLzsRfY3ceeR0HUbCFWmoVNL0TPpn2EogP/J
- XlG3D6LHnn8Zu/GYi4k4r2uziiOb8qlhUknpnSjQez4MYo+gzllpQfMw/3K0BCGQRf7w
- Apq26s/zDOL6tepEY6dugGIMIfw7aHPyak9GbQvpGi+dh4/vAuJm5bk1wm81ZocqCDZb
- 4N3AYN1iINsKHkGbYvXlYvjv5XG8hQgthbpOaADA/lcftu4V9IGO/gAYZGA1EG14NTz6
- pMrB4zHP/KdtaGcgkoX2oA7fDTvr7gg2No3w0ueeWpcDVZ6YHcV68s/wMpVryGIL43eu
- ZfvA==
-X-Gm-Message-State: AGi0PuZ7I82aXyuwwVFu0P9Co4TLhdK1iixqI6BugVlwiCLSZqmkjmqh
- RUT6gvLs8JSUHU7UkfRXI8MEwumc7f3iu5RahxA=
-X-Google-Smtp-Source: APiQypKBH3KZtdNrHmV1/kgu47YGEODs/VxE3gNQeAODVmlqj9hysfzpPU9zGmyEV8ESs72m5RhUyLJM/N2cuoZ4iNI=
-X-Received: by 2002:a6b:8b4b:: with SMTP id n72mr15497824iod.72.1586769196934; 
- Mon, 13 Apr 2020 02:13:16 -0700 (PDT)
+ bh=kYAM7PlZDHl7Wwe2gCX+OZrDZmyk/z/ltRLBPUWK0sw=;
+ b=nc7o7WLuAVF99YhVBjCDQYdIwY2LLJQc14tx9U2SvAMlYSv1eldXwZvlS+5Vqo/AS2
+ ZIhIODOlOWQP/jxHGzrqLItBQT5hi44eLGzA79cXGYiSd2RGRXYCqEZq0fsfhjAx28Qf
+ FhzcZBaBQvevVlWN6/h/a4DIl0sdvi4kMm7RejbJXNFN2v/diAH/ryiv9s5R/sEd2hkK
+ EAro5J9T1bU9gcDmtNz7CC3Lq9pnwwownMkLeUWMPw+CpY0DdN3GV206n6wfUmV7ooAj
+ xz15ViY5KQ3ICvsiIbSOJGX8hwpl1PjD3ozI10ucjxirmZyLvIGnX8ufcaYSXKigAWxL
+ eFyw==
+X-Gm-Message-State: AGi0PubaQ29NGgJVrqPJ6IWY56IfPDx/r9i6EBmYXI4ZM986Q0hB6PVq
+ EPqFmzmytt2lr/p5IaSVfFkfORKnsI/6frOOHNw=
+X-Google-Smtp-Source: APiQypIkoQEcYlO0UjnRJvXQZ+zeNfUW2+E3agHSInJhRLCmjcPabGlyXE7shGk9UVOzGl9xpzsHmoIB2s5Mbs93QgY=
+X-Received: by 2002:a9d:423:: with SMTP id 32mr4046461otc.334.1586769281744;
+ Mon, 13 Apr 2020 02:14:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <1586763024-12197-1-git-send-email-chenhc@lemote.com>
- <20200413161842.57ad8be4@flygoat-x1e>
-In-Reply-To: <20200413161842.57ad8be4@flygoat-x1e>
-From: Huacai Chen <chenhc@lemote.com>
-Date: Mon, 13 Apr 2020 17:20:27 +0800
-Message-ID: <CAAhV-H5+3cKtCH=h=kprfYbbcT-3YcwqCD-tE1E7VB0NZnfnjQ@mail.gmail.com>
-Subject: Re: [PATCH 0/15] KVM: MIPS: Add Loongson-3 support (Host Side)
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.166.68
+References: <20200401162023.GA15912@simran-Inspiron-5558>
+In-Reply-To: <20200401162023.GA15912@simran-Inspiron-5558>
+From: Yuval Shaia <yuval.shaia.ml@gmail.com>
+Date: Mon, 13 Apr 2020 12:14:30 +0300
+Message-ID: <CAMPkWoMNjWuVKtHsk3s6S=EXdQZ_LmdsAi4xSbjUQcyN1oLDkA@mail.gmail.com>
+Subject: Re: [PATCH] lockable: Replace locks with lock guard macros
+To: Simran Singhal <singhalsimran0@gmail.com>
+Content-Type: multipart/alternative; boundary="00000000000061046c05a32883dc"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,140 +87,537 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>, kvm@vger.kernel.org,
- QEMU Developers <qemu-devel@nongnu.org>,
- "open list:MIPS" <linux-mips@vger.kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Fuxin Zhang <zhangfx@lemote.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Julia Suvorova <jusual@mail.ru>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Jiaxun,
+--00000000000061046c05a32883dc
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Apr 13, 2020 at 4:19 PM Jiaxun Yang <jiaxun.yang@flygoat.com> wrote:
->
-> On Mon, 13 Apr 2020 15:30:09 +0800
-> Huacai Chen <chenhc@lemote.com> wrote:
->
-> > We are preparing to add KVM support for Loongson-3. VZ extension is
-> > fully supported in Loongson-3A R4+, and we will not care about old
-> > CPUs (at least now). We already have a full functional Linux kernel
-> > (based on Linux-5.4.x LTS) and QEMU (based on 5.0.0-rc2) and their git
-> > repositories are here:
-> >
-> > QEMU: https://github.com/chenhuacai/qemu
-> > Kernel: https://github.com/chenhuacai/linux
-> >
-> > Of course these two repositories need to be rework and not suitable
-> > for upstream (especially the commits need to be splitted). We show
-> > them here is just to tell others what we have done, and how
-> > KVM/Loongson will look like.
-> >
-> > Our plan is make the KVM host side be upstream first, and after that,
-> > we will make the KVM guest side and QEMU emulator be upstream.
->
-> + Aleksandar as QEMU/MIPS mainatiner
->
-> I was involved in KVM/Loongson development a bit and also intend to
-> help with mainline these works.
->
-> After dealing with basic LS7A PCH kernel support, I'm going to
-> cooperate with Huacai and anyone who interested in to deal with
-> following stuff:
->
-> - Basic QEMU/TCG support for Loongson64 instructions.
->         Well, it seems unrelated with KVM, but that would make
->         development easier with cross ISA emulation. I'm not going to
->         implement all the features like Loongson's page table fast walk
->         extension and binary translation extension but I'll ensure any
->         binary compiled with march=loongson3a can run flawlessly on
->         TCG.
->
-> - Design of Loongson-VIRT QEMU machine
->         It is nearly impossible to bring a real Loongson system into
->         QEMU. Both RS780E and LS7A PCH have tons of unreasonable design
->         that would make the emulation extremely complex, Loongson
->         company's KVM implementation[1] has already proofed that,
->         thay're now in the hell. So we all agreed that we should build
->         a machine from draft. I think we should reuse existing infra as
->         far as possible to reduce our work load. I'm planing to use
->         pci-host-cam-generic together with VIRTIO PCI devices and a
->         a strip down version of loongson,liointc-1.0a to build a pure
->         PCI based system. But if any one have better idea please just
->         tell us, I'm still considering how to implement SMP-IPI and ACPI
->         stuff.
->
-> - BIOS in VM
->         This has a lower priority. But BIOS is required to make a
->         emulated machine looks like a real machine. Loongson have their
->         open-sourced PMON and close-sourced UEFI(Based on tianocore).
->         I'd really with Loongson or Lemote will open-source their UEFI
->         but PMON is also a option.
-There will be an open source BIOS, we have completed 98%.
+For the hw/rdma stuff:
 
->
-> Any kind of feedback is appreciated.
->
-> Thanks.
->
-> Wish you good health :-)
->
->
-> [1]: http://cgit.loongnix.org/cgit/linux-3.10/ &
-> http://cgit.loongnix.org/cgit/qemu-2.7.0/
->
-> Btw: I think Cc qemu-devel for the whole series is a little bit
-> disturb, probably we should only Cc qemu-devel for the cover letter.
-Sorrry, its my mistake.
+Reviewed-by: Yuval Shaia <yuval.shaia.ml@gmail.com>
+Tested-by: Yuval Shaia <yuval.shaia.ml@gmail.com>
 
+Thanks,
+Yuval
+
+On Wed, 1 Apr 2020 at 19:20, Simran Singhal <singhalsimran0@gmail.com>
+wrote:
+
+> Replace manual lock()/unlock() calls with lock guard macros
+> (QEMU_LOCK_GUARD/WITH_QEMU_LOCK_GUARD).
 >
-> >
-> > Mike Rapoport(1):
-> >  mips: define pud_index() regardless of page table folding
-> >
-> > Xing Li(2):
-> >  KVM: MIPS: Define KVM_ENTRYHI_ASID to cpu_asid_mask(&boot_cpu_data)
-> >  KVM: MIPS: Fix VPN2_MASK definition for variable cpu_vmbits
-> >
-> > Huacai Chen(12):
-> >  KVM: MIPS: Increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16
-> >  KVM: MIPS: Add EVENTFD support which is needed by VHOST
-> >  KVM: MIPS: Use lddir/ldpte instructions to lookup gpa_mm.pgd
-> >  KVM: MIPS: Introduce and use cpu_guest_has_ldpte
-> >  KVM: MIPS: Use root tlb to control guest's CCA for Loongson-3
-> >  KVM: MIPS: Let indexed cacheops cause guest exit on Loongson-3
-> >  KVM: MIPS: Add more types of virtual interrupts
-> >  KVM: MIPS: Add Loongson-3 Virtual IPI interrupt support
-> >  KVM: MIPS: Add CPUCFG emulation for Loongson-3
-> >  KVM: MIPS: Add CONFIG6 and DIAG registers emulation
-> >  KVM: MIPS: Add more MMIO load/store instructions emulation
-> >  KVM: MIPS: Enable KVM support for Loongson-3
-> >
-> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > ---
-> >  arch/mips/Kconfig                    |   1 +
-> >  arch/mips/include/asm/cpu-features.h |   3 +
-> >  arch/mips/include/asm/kvm_host.h     |  50 +++-
-> >  arch/mips/include/asm/mipsregs.h     |   7 +
-> >  arch/mips/include/asm/pgtable-64.h   |   4 +-
-> >  arch/mips/include/uapi/asm/inst.h    |  11 +
-> >  arch/mips/kernel/cpu-probe.c         |   2 +
-> >  arch/mips/kvm/Kconfig                |   1 +
-> >  arch/mips/kvm/Makefile               |   5 +-
-> >  arch/mips/kvm/emulate.c              | 461
-> > ++++++++++++++++++++++++++++++++++- arch/mips/kvm/entry.c
-> >    |  19 +- arch/mips/kvm/interrupt.c            |  93 +------
-> >  arch/mips/kvm/interrupt.h            |  14 +-
-> >  arch/mips/kvm/loongson_ipi.c         | 215 ++++++++++++++++
-> >  arch/mips/kvm/mips.c                 |  49 +++-
-> >  arch/mips/kvm/tlb.c                  |  39 +++
-> >  arch/mips/kvm/trap_emul.c            |   3 +
-> >  arch/mips/kvm/vz.c                   | 204 +++++++++++-----
-> >  18 files changed, 1013 insertions(+), 168 deletions(-)
-> >  create mode 100644 arch/mips/kvm/loongson_ipi.c
-> > --
-> > 2.7.0
+> Signed-off-by: Simran Singhal <singhalsimran0@gmail.com>
+> ---
+>  hw/hyperv/hyperv.c     | 15 ++++++-------
+>  hw/rdma/rdma_backend.c | 50 +++++++++++++++++++++---------------------
+>  hw/rdma/rdma_rm.c      |  3 +--
+>  hw/rdma/rdma_utils.c   | 15 +++++--------
+>  4 files changed, 39 insertions(+), 44 deletions(-)
 >
-Huacai
+> diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
+> index 8ca3706f5b..4ddafe1de1 100644
+> --- a/hw/hyperv/hyperv.c
+> +++ b/hw/hyperv/hyperv.c
+> @@ -15,6 +15,7 @@
+>  #include "sysemu/kvm.h"
+>  #include "qemu/bitops.h"
+>  #include "qemu/error-report.h"
+> +#include "qemu/lockable.h"
+>  #include "qemu/queue.h"
+>  #include "qemu/rcu.h"
+>  #include "qemu/rcu_queue.h"
+> @@ -491,7 +492,7 @@ int hyperv_set_msg_handler(uint32_t conn_id,
+> HvMsgHandler handler, void *data)
+>      int ret;
+>      MsgHandler *mh;
+>
+> -    qemu_mutex_lock(&handlers_mutex);
+> +    QEMU_LOCK_GUARD(&handlers_mutex);
+>      QLIST_FOREACH(mh, &msg_handlers, link) {
+>          if (mh->conn_id == conn_id) {
+>              if (handler) {
+> @@ -501,7 +502,7 @@ int hyperv_set_msg_handler(uint32_t conn_id,
+> HvMsgHandler handler, void *data)
+>                  g_free_rcu(mh, rcu);
+>                  ret = 0;
+>              }
+> -            goto unlock;
+> +            return ret;
+>          }
+>      }
+>
+> @@ -515,8 +516,7 @@ int hyperv_set_msg_handler(uint32_t conn_id,
+> HvMsgHandler handler, void *data)
+>      } else {
+>          ret = -ENOENT;
+>      }
+> -unlock:
+> -    qemu_mutex_unlock(&handlers_mutex);
+> +
+>      return ret;
+>  }
+>
+> @@ -565,7 +565,7 @@ static int set_event_flag_handler(uint32_t conn_id,
+> EventNotifier *notifier)
+>      int ret;
+>      EventFlagHandler *handler;
+>
+> -    qemu_mutex_lock(&handlers_mutex);
+> +    QEMU_LOCK_GUARD(&handlers_mutex);
+>      QLIST_FOREACH(handler, &event_flag_handlers, link) {
+>          if (handler->conn_id == conn_id) {
+>              if (notifier) {
+> @@ -575,7 +575,7 @@ static int set_event_flag_handler(uint32_t conn_id,
+> EventNotifier *notifier)
+>                  g_free_rcu(handler, rcu);
+>                  ret = 0;
+>              }
+> -            goto unlock;
+> +            return ret;
+>          }
+>      }
+>
+> @@ -588,8 +588,7 @@ static int set_event_flag_handler(uint32_t conn_id,
+> EventNotifier *notifier)
+>      } else {
+>          ret = -ENOENT;
+>      }
+> -unlock:
+> -    qemu_mutex_unlock(&handlers_mutex);
+> +
+>      return ret;
+>  }
+>
+> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> index 3dd39fe1a7..db7e5c8be5 100644
+> --- a/hw/rdma/rdma_backend.c
+> +++ b/hw/rdma/rdma_backend.c
+> @@ -95,36 +95,36 @@ static int rdma_poll_cq(RdmaDeviceResources
+> *rdma_dev_res, struct ibv_cq *ibcq)
+>      struct ibv_wc wc[2];
+>      RdmaProtectedGSList *cqe_ctx_list;
+>
+> -    qemu_mutex_lock(&rdma_dev_res->lock);
+> -    do {
+> -        ne = ibv_poll_cq(ibcq, ARRAY_SIZE(wc), wc);
+> +    WITH_QEMU_LOCK_GUARD(&rdma_dev_res->lock) {
+> +        do {
+> +            ne = ibv_poll_cq(ibcq, ARRAY_SIZE(wc), wc);
+>
+> -        trace_rdma_poll_cq(ne, ibcq);
+> +            trace_rdma_poll_cq(ne, ibcq);
+>
+> -        for (i = 0; i < ne; i++) {
+> -            bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, wc[i].wr_id);
+> -            if (unlikely(!bctx)) {
+> -                rdma_error_report("No matching ctx for req %"PRId64,
+> -                                  wc[i].wr_id);
+> -                continue;
+> -            }
+> +            for (i = 0; i < ne; i++) {
+> +                bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, wc[i].wr_id);
+> +                if (unlikely(!bctx)) {
+> +                    rdma_error_report("No matching ctx for req %"PRId64,
+> +                                      wc[i].wr_id);
+> +                    continue;
+> +                }
+>
+> -            comp_handler(bctx->up_ctx, &wc[i]);
+> +                comp_handler(bctx->up_ctx, &wc[i]);
+>
+> -            if (bctx->backend_qp) {
+> -                cqe_ctx_list = &bctx->backend_qp->cqe_ctx_list;
+> -            } else {
+> -                cqe_ctx_list = &bctx->backend_srq->cqe_ctx_list;
+> -            }
+> +                if (bctx->backend_qp) {
+> +                    cqe_ctx_list = &bctx->backend_qp->cqe_ctx_list;
+> +                } else {
+> +                    cqe_ctx_list = &bctx->backend_srq->cqe_ctx_list;
+> +                }
+>
+> -            rdma_protected_gslist_remove_int32(cqe_ctx_list, wc[i].wr_id);
+> -            rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
+> -            g_free(bctx);
+> -        }
+> -        total_ne += ne;
+> -    } while (ne > 0);
+> -    atomic_sub(&rdma_dev_res->stats.missing_cqe, total_ne);
+> -    qemu_mutex_unlock(&rdma_dev_res->lock);
+> +                rdma_protected_gslist_remove_int32(cqe_ctx_list,
+> wc[i].wr_id);
+> +                rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
+> +                g_free(bctx);
+> +            }
+> +            total_ne += ne;
+> +        } while (ne > 0);
+> +        atomic_sub(&rdma_dev_res->stats.missing_cqe, total_ne);
+> +    }
+>
+>      if (ne < 0) {
+>          rdma_error_report("ibv_poll_cq fail, rc=%d, errno=%d", ne, errno);
+> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+> index 7e9ea283c9..60957f88db 100644
+> --- a/hw/rdma/rdma_rm.c
+> +++ b/hw/rdma/rdma_rm.c
+> @@ -147,14 +147,13 @@ static inline void rdma_res_tbl_dealloc(RdmaRmResTbl
+> *tbl, uint32_t handle)
+>  {
+>      trace_rdma_res_tbl_dealloc(tbl->name, handle);
+>
+> -    qemu_mutex_lock(&tbl->lock);
+> +    QEMU_LOCK_GUARD(&tbl->lock);
+>
+>      if (handle < tbl->tbl_sz) {
+>          clear_bit(handle, tbl->bitmap);
+>          tbl->used--;
+>      }
+>
+> -    qemu_mutex_unlock(&tbl->lock);
+>  }
+>
+>  int rdma_rm_alloc_pd(RdmaDeviceResources *dev_res, RdmaBackendDev
+> *backend_dev,
+> diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c
+> index 73f279104c..ef43606c84 100644
+> --- a/hw/rdma/rdma_utils.c
+> +++ b/hw/rdma/rdma_utils.c
+> @@ -71,18 +71,17 @@ void rdma_protected_qlist_destroy(RdmaProtectedQList
+> *list)
+>
+>  void rdma_protected_qlist_append_int64(RdmaProtectedQList *list, int64_t
+> value)
+>  {
+> -    qemu_mutex_lock(&list->lock);
+> +    QEMU_LOCK_GUARD(&list->lock);
+>      qlist_append_int(list->list, value);
+> -    qemu_mutex_unlock(&list->lock);
+>  }
+>
+>  int64_t rdma_protected_qlist_pop_int64(RdmaProtectedQList *list)
+>  {
+>      QObject *obj;
+>
+> -    qemu_mutex_lock(&list->lock);
+> -    obj = qlist_pop(list->list);
+> -    qemu_mutex_unlock(&list->lock);
+> +    WITH_QEMU_LOCK_GUARD(&list->lock) {
+> +        obj = qlist_pop(list->list);
+> +    }
+>
+>      if (!obj) {
+>          return -ENOENT;
+> @@ -107,15 +106,13 @@ void
+> rdma_protected_gslist_destroy(RdmaProtectedGSList *list)
+>  void rdma_protected_gslist_append_int32(RdmaProtectedGSList *list,
+>                                          int32_t value)
+>  {
+> -    qemu_mutex_lock(&list->lock);
+> +    QEMU_LOCK_GUARD(&list->lock);
+>      list->list = g_slist_prepend(list->list, GINT_TO_POINTER(value));
+> -    qemu_mutex_unlock(&list->lock);
+>  }
+>
+>  void rdma_protected_gslist_remove_int32(RdmaProtectedGSList *list,
+>                                          int32_t value)
+>  {
+> -    qemu_mutex_lock(&list->lock);
+> +    QEMU_LOCK_GUARD(&list->lock);
+>      list->list = g_slist_remove(list->list, GINT_TO_POINTER(value));
+> -    qemu_mutex_unlock(&list->lock);
+>  }
+> --
+> 2.17.1
+>
+>
+
+--00000000000061046c05a32883dc
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">For the hw/rdma stuff:<div><br></div><div=
+>Reviewed-by: Yuval Shaia &lt;<a href=3D"mailto:yuval.shaia.ml@gmail.com">y=
+uval.shaia.ml@gmail.com</a>&gt;</div><div>Tested-by: Yuval Shaia &lt;<a hre=
+f=3D"mailto:yuval.shaia.ml@gmail.com">yuval.shaia.ml@gmail.com</a>&gt;=C2=
+=A0<br></div></div><div><br></div><div>Thanks,</div><div>Yuval</div><br><di=
+v class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, 1 Apr=
+ 2020 at 19:20, Simran Singhal &lt;<a href=3D"mailto:singhalsimran0@gmail.c=
+om">singhalsimran0@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"g=
+mail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204=
+,204,204);padding-left:1ex">Replace manual lock()/unlock() calls with lock =
+guard macros<br>
+(QEMU_LOCK_GUARD/WITH_QEMU_LOCK_GUARD).<br>
+<br>
+Signed-off-by: Simran Singhal &lt;<a href=3D"mailto:singhalsimran0@gmail.co=
+m" target=3D"_blank">singhalsimran0@gmail.com</a>&gt;<br>
+---<br>
+=C2=A0hw/hyperv/hyperv.c=C2=A0 =C2=A0 =C2=A0| 15 ++++++-------<br>
+=C2=A0hw/rdma/rdma_backend.c | 50 +++++++++++++++++++++--------------------=
+-<br>
+=C2=A0hw/rdma/rdma_rm.c=C2=A0 =C2=A0 =C2=A0 |=C2=A0 3 +--<br>
+=C2=A0hw/rdma/rdma_utils.c=C2=A0 =C2=A0| 15 +++++--------<br>
+=C2=A04 files changed, 39 insertions(+), 44 deletions(-)<br>
+<br>
+diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c<br>
+index 8ca3706f5b..4ddafe1de1 100644<br>
+--- a/hw/hyperv/hyperv.c<br>
++++ b/hw/hyperv/hyperv.c<br>
+@@ -15,6 +15,7 @@<br>
+=C2=A0#include &quot;sysemu/kvm.h&quot;<br>
+=C2=A0#include &quot;qemu/bitops.h&quot;<br>
+=C2=A0#include &quot;qemu/error-report.h&quot;<br>
++#include &quot;qemu/lockable.h&quot;<br>
+=C2=A0#include &quot;qemu/queue.h&quot;<br>
+=C2=A0#include &quot;qemu/rcu.h&quot;<br>
+=C2=A0#include &quot;qemu/rcu_queue.h&quot;<br>
+@@ -491,7 +492,7 @@ int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandl=
+er handler, void *data)<br>
+=C2=A0 =C2=A0 =C2=A0int ret;<br>
+=C2=A0 =C2=A0 =C2=A0MsgHandler *mh;<br>
+<br>
+-=C2=A0 =C2=A0 qemu_mutex_lock(&amp;handlers_mutex);<br>
++=C2=A0 =C2=A0 QEMU_LOCK_GUARD(&amp;handlers_mutex);<br>
+=C2=A0 =C2=A0 =C2=A0QLIST_FOREACH(mh, &amp;msg_handlers, link) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (mh-&gt;conn_id =3D=3D conn_id) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (handler) {<br>
+@@ -501,7 +502,7 @@ int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandl=
+er handler, void *data)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0g_free_rcu(mh=
+, rcu);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ret =3D 0;<br=
+>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto unlock;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ret;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+@@ -515,8 +516,7 @@ int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandl=
+er handler, void *data)<br>
+=C2=A0 =C2=A0 =C2=A0} else {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ret =3D -ENOENT;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+-unlock:<br>
+-=C2=A0 =C2=A0 qemu_mutex_unlock(&amp;handlers_mutex);<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0return ret;<br>
+=C2=A0}<br>
+<br>
+@@ -565,7 +565,7 @@ static int set_event_flag_handler(uint32_t conn_id, Eve=
+ntNotifier *notifier)<br>
+=C2=A0 =C2=A0 =C2=A0int ret;<br>
+=C2=A0 =C2=A0 =C2=A0EventFlagHandler *handler;<br>
+<br>
+-=C2=A0 =C2=A0 qemu_mutex_lock(&amp;handlers_mutex);<br>
++=C2=A0 =C2=A0 QEMU_LOCK_GUARD(&amp;handlers_mutex);<br>
+=C2=A0 =C2=A0 =C2=A0QLIST_FOREACH(handler, &amp;event_flag_handlers, link) =
+{<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (handler-&gt;conn_id =3D=3D conn_id) {=
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (notifier) {<br>
+@@ -575,7 +575,7 @@ static int set_event_flag_handler(uint32_t conn_id, Eve=
+ntNotifier *notifier)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0g_free_rcu(ha=
+ndler, rcu);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ret =3D 0;<br=
+>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto unlock;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ret;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+@@ -588,8 +588,7 @@ static int set_event_flag_handler(uint32_t conn_id, Eve=
+ntNotifier *notifier)<br>
+=C2=A0 =C2=A0 =C2=A0} else {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ret =3D -ENOENT;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+-unlock:<br>
+-=C2=A0 =C2=A0 qemu_mutex_unlock(&amp;handlers_mutex);<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0return ret;<br>
+=C2=A0}<br>
+<br>
+diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c<br>
+index 3dd39fe1a7..db7e5c8be5 100644<br>
+--- a/hw/rdma/rdma_backend.c<br>
++++ b/hw/rdma/rdma_backend.c<br>
+@@ -95,36 +95,36 @@ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_r=
+es, struct ibv_cq *ibcq)<br>
+=C2=A0 =C2=A0 =C2=A0struct ibv_wc wc[2];<br>
+=C2=A0 =C2=A0 =C2=A0RdmaProtectedGSList *cqe_ctx_list;<br>
+<br>
+-=C2=A0 =C2=A0 qemu_mutex_lock(&amp;rdma_dev_res-&gt;lock);<br>
+-=C2=A0 =C2=A0 do {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 ne =3D ibv_poll_cq(ibcq, ARRAY_SIZE(wc), wc);<=
+br>
++=C2=A0 =C2=A0 WITH_QEMU_LOCK_GUARD(&amp;rdma_dev_res-&gt;lock) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 do {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ne =3D ibv_poll_cq(ibcq, ARRAY_S=
+IZE(wc), wc);<br>
+<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 trace_rdma_poll_cq(ne, ibcq);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 trace_rdma_poll_cq(ne, ibcq);<br=
+>
+<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 for (i =3D 0; i &lt; ne; i++) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 bctx =3D rdma_rm_get_cqe_ctx(rdm=
+a_dev_res, wc[i].wr_id);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (unlikely(!bctx)) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rdma_error_report(=
+&quot;No matching ctx for req %&quot;PRId64,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 wc[i].wr_id);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 continue;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 for (i =3D 0; i &lt; ne; i++) {<=
+br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 bctx =3D rdma_rm_g=
+et_cqe_ctx(rdma_dev_res, wc[i].wr_id);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (unlikely(!bctx=
+)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rdma=
+_error_report(&quot;No matching ctx for req %&quot;PRId64,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 wc[i].wr_id);<b=
+r>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cont=
+inue;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 comp_handler(bctx-&gt;up_ctx, &a=
+mp;wc[i]);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 comp_handler(bctx-=
+&gt;up_ctx, &amp;wc[i]);<br>
+<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (bctx-&gt;backend_qp) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cqe_ctx_list =3D &=
+amp;bctx-&gt;backend_qp-&gt;cqe_ctx_list;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cqe_ctx_list =3D &=
+amp;bctx-&gt;backend_srq-&gt;cqe_ctx_list;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (bctx-&gt;backe=
+nd_qp) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cqe_=
+ctx_list =3D &amp;bctx-&gt;backend_qp-&gt;cqe_ctx_list;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cqe_=
+ctx_list =3D &amp;bctx-&gt;backend_srq-&gt;cqe_ctx_list;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rdma_protected_gslist_remove_int=
+32(cqe_ctx_list, wc[i].wr_id);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rdma_rm_dealloc_cqe_ctx(rdma_dev=
+_res, wc[i].wr_id);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 g_free(bctx);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 total_ne +=3D ne;<br>
+-=C2=A0 =C2=A0 } while (ne &gt; 0);<br>
+-=C2=A0 =C2=A0 atomic_sub(&amp;rdma_dev_res-&gt;stats.missing_cqe, total_ne=
+);<br>
+-=C2=A0 =C2=A0 qemu_mutex_unlock(&amp;rdma_dev_res-&gt;lock);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rdma_protected_gsl=
+ist_remove_int32(cqe_ctx_list, wc[i].wr_id);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rdma_rm_dealloc_cq=
+e_ctx(rdma_dev_res, wc[i].wr_id);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 g_free(bctx);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 total_ne +=3D ne;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 } while (ne &gt; 0);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_sub(&amp;rdma_dev_res-&gt;stats.missing=
+_cqe, total_ne);<br>
++=C2=A0 =C2=A0 }<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0if (ne &lt; 0) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rdma_error_report(&quot;ibv_poll_cq fail,=
+ rc=3D%d, errno=3D%d&quot;, ne, errno);<br>
+diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c<br>
+index 7e9ea283c9..60957f88db 100644<br>
+--- a/hw/rdma/rdma_rm.c<br>
++++ b/hw/rdma/rdma_rm.c<br>
+@@ -147,14 +147,13 @@ static inline void rdma_res_tbl_dealloc(RdmaRmResTbl =
+*tbl, uint32_t handle)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0trace_rdma_res_tbl_dealloc(tbl-&gt;name, handle);<br>
+<br>
+-=C2=A0 =C2=A0 qemu_mutex_lock(&amp;tbl-&gt;lock);<br>
++=C2=A0 =C2=A0 QEMU_LOCK_GUARD(&amp;tbl-&gt;lock);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0if (handle &lt; tbl-&gt;tbl_sz) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0clear_bit(handle, tbl-&gt;bitmap);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tbl-&gt;used--;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-=C2=A0 =C2=A0 qemu_mutex_unlock(&amp;tbl-&gt;lock);<br>
+=C2=A0}<br>
+<br>
+=C2=A0int rdma_rm_alloc_pd(RdmaDeviceResources *dev_res, RdmaBackendDev *ba=
+ckend_dev,<br>
+diff --git a/hw/rdma/rdma_utils.c b/hw/rdma/rdma_utils.c<br>
+index 73f279104c..ef43606c84 100644<br>
+--- a/hw/rdma/rdma_utils.c<br>
++++ b/hw/rdma/rdma_utils.c<br>
+@@ -71,18 +71,17 @@ void rdma_protected_qlist_destroy(RdmaProtectedQList *l=
+ist)<br>
+<br>
+=C2=A0void rdma_protected_qlist_append_int64(RdmaProtectedQList *list, int6=
+4_t value)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 qemu_mutex_lock(&amp;list-&gt;lock);<br>
++=C2=A0 =C2=A0 QEMU_LOCK_GUARD(&amp;list-&gt;lock);<br>
+=C2=A0 =C2=A0 =C2=A0qlist_append_int(list-&gt;list, value);<br>
+-=C2=A0 =C2=A0 qemu_mutex_unlock(&amp;list-&gt;lock);<br>
+=C2=A0}<br>
+<br>
+=C2=A0int64_t rdma_protected_qlist_pop_int64(RdmaProtectedQList *list)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0QObject *obj;<br>
+<br>
+-=C2=A0 =C2=A0 qemu_mutex_lock(&amp;list-&gt;lock);<br>
+-=C2=A0 =C2=A0 obj =3D qlist_pop(list-&gt;list);<br>
+-=C2=A0 =C2=A0 qemu_mutex_unlock(&amp;list-&gt;lock);<br>
++=C2=A0 =C2=A0 WITH_QEMU_LOCK_GUARD(&amp;list-&gt;lock) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 obj =3D qlist_pop(list-&gt;list);<br>
++=C2=A0 =C2=A0 }<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0if (!obj) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return -ENOENT;<br>
+@@ -107,15 +106,13 @@ void rdma_protected_gslist_destroy(RdmaProtectedGSLis=
+t *list)<br>
+=C2=A0void rdma_protected_gslist_append_int32(RdmaProtectedGSList *list,<br=
+>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0in=
+t32_t value)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 qemu_mutex_lock(&amp;list-&gt;lock);<br>
++=C2=A0 =C2=A0 QEMU_LOCK_GUARD(&amp;list-&gt;lock);<br>
+=C2=A0 =C2=A0 =C2=A0list-&gt;list =3D g_slist_prepend(list-&gt;list, GINT_T=
+O_POINTER(value));<br>
+-=C2=A0 =C2=A0 qemu_mutex_unlock(&amp;list-&gt;lock);<br>
+=C2=A0}<br>
+<br>
+=C2=A0void rdma_protected_gslist_remove_int32(RdmaProtectedGSList *list,<br=
+>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0in=
+t32_t value)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 qemu_mutex_lock(&amp;list-&gt;lock);<br>
++=C2=A0 =C2=A0 QEMU_LOCK_GUARD(&amp;list-&gt;lock);<br>
+=C2=A0 =C2=A0 =C2=A0list-&gt;list =3D g_slist_remove(list-&gt;list, GINT_TO=
+_POINTER(value));<br>
+-=C2=A0 =C2=A0 qemu_mutex_unlock(&amp;list-&gt;lock);<br>
+=C2=A0}<br>
+-- <br>
+2.17.1<br>
+<br>
+</blockquote></div></div>
+
+--00000000000061046c05a32883dc--
 
