@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A7FDC2BA2B
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:22:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0785EC2BA2B
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:22:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DDC220678
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:22:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2C3F20678
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:22:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oBxFEfmD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DDC220678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cm5P/Kbz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2C3F20678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jO7TP-0008M8-I1
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 18:22:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46094)
+	id 1jO7Tl-0000cv-Ul
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 18:22:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46140)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jO7SN-0007AF-Gy
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:21:32 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jO7Sm-0007bZ-Qt
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:21:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jO7SM-0005rc-6B
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:21:31 -0400
-Received: from mail-vs1-xe42.google.com ([2607:f8b0:4864:20::e42]:40620)
+ (envelope-from <alistair23@gmail.com>) id 1jO7Sl-0005wg-Qt
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:21:56 -0400
+Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:37486)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jO7SM-0005rX-2R; Mon, 13 Apr 2020 18:21:30 -0400
-Received: by mail-vs1-xe42.google.com with SMTP id w14so6455921vsf.7;
- Mon, 13 Apr 2020 15:21:30 -0700 (PDT)
+ id 1jO7Sl-0005vo-N4; Mon, 13 Apr 2020 18:21:55 -0400
+Received: by mail-vs1-xe43.google.com with SMTP id o3so6492710vsd.4;
+ Mon, 13 Apr 2020 15:21:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=SbNBfhARuQLgKSpV0J3PH1BPOWfqYuX7NtoF2hBsegU=;
- b=oBxFEfmDmBc9+LiwubThK+mMJBX//hrWF/vZBxE1UeYQ/urze8rq71T62fReoKAy1O
- 4NiWN4LdMmQ1z2bSSyjjM+76ovSSdaVUDThpn8C9CALzWGhFv9HAF1jusP4yPUVG4gn7
- NlUbpCLsuVU34ERoM9SdEBO5QLuaC8orLD6A2BgvtyQ0HvcC6CNiNculuXHh75rMO1jq
- aJS0xnLTZrKCuwzp4OVnBNe9GudLZEP9NlKQQA47Jf/KG8Prx0iYxMigvaCDFcAmun8W
- T57hvp7lyZMi2HDodlieGqckPQ0aDOx+Hqwy7tywni4QL07GmZPjYq7L9cDJSLsRgBEB
- /NAQ==
+ bh=v0jThFdD3YVZ/w6qPk+uCkOCoUfxMusuJ3Be9Jn1344=;
+ b=Cm5P/KbzbJd7oqOLaztSdQIm99FCsdFv8TiABQDJ0oUFnDYLg4Kyiy42JquV/P86Fr
+ 64eTJYO9Y7ms0PuHrq0LJfcMZ2DGScEVH5wEgxp7VkFuFPF8uFUiIA0Ap51Qto1Ahvr6
+ KSy8/TzOPfxFeGr6Fb18+1mgMnsLfHSFNDnmQeBf6ID4c4ZFqE+CJAqiRygGYJ+rB5MC
+ N1OLF82tGDOF+FaR9jUwLUNvo8CPIq0hkR4FZTfufQajBcK7bS6EDfDfJCVEcegXMEfe
+ cTl+otnt4zjQYxoHdGPhFb9yW36SQmwrn5wtMhHYg2efSv1xp6UlfI+3T4HfAoclKJ9q
+ sFWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=SbNBfhARuQLgKSpV0J3PH1BPOWfqYuX7NtoF2hBsegU=;
- b=HDHIOcCL5M6f5M5LJFkxVsi3t5tSAOanf9KlsiMeOZlhK+P2OvklpCKLkG/mmasnFG
- Iq3gUTM+vZRvV2H/ZfOdznOH8bUcAHSIgA2Eoew/nwNEK8iig1VSA/uppgSCe6ZMQG8h
- 5y3G2Nd3J7dAHynWuVwnMf/vr85N9HDQBWsLU7KmJhi96KbHgP2IkwU5X3ZyoB0xR4Tc
- MnmT7gmRDRJKtcMEeybx0lZlZHu+RY5stZMjyBqkJ4KkKPkT6i6DmVk7VTRVEKk7kv4l
- OvkgjXhACl9Xh9rv6nWcU8Rlovu2PcK1Yh3IXW4RIxCF9uoOUe1hIa8/G97C/x9tmfae
- uStg==
-X-Gm-Message-State: AGi0PuZeBbJOnSys2DrRSOovTHXj3q1GncXRClkZRz8NThYnpavO7G8l
- anHkSJkny61Pp52MCX082GiqSck89PCde0euYCs=
-X-Google-Smtp-Source: APiQypL2cecwXlN0h5Kl5qTI+prGN1DJy4d20hu/qS0PYTURIt73fhkq6Zr418FjgKeuf3Q8EeI9BFzJFwypXmIpUxo=
-X-Received: by 2002:a67:902:: with SMTP id 2mr14873582vsj.133.1586816489539;
- Mon, 13 Apr 2020 15:21:29 -0700 (PDT)
+ bh=v0jThFdD3YVZ/w6qPk+uCkOCoUfxMusuJ3Be9Jn1344=;
+ b=q6JihgV4viyZqDGFhicefQFkAfEaZZ1AfEPmlkmgtJYG9KKbX0abHZ43yTqYNOmhG7
+ Lmlg4ExX61Jzbz28+Q7hMyvG4wz2Dq8nTR84OFWt/6rJcR6BaVhOQfBAYqqAV/1zNdzN
+ CoiY7gYGyv74xrWOPYaTJRD3y6oO6EYD7SPEdP9PXijstLIgjOCMPh4QBRflmGnUN9gK
+ BN1Tb9FybzGs+TSn9feuOJcPbncb4VulKCXDLLbhgsY6/zjgFUqJrldnBZPVrOQcMjej
+ VqpOe8tNgwZEyGL7wau/xLfJr+w+03ePqtFydqbthQU3d4pYEOLCe6DzVYJbW+Nv3BRl
+ Lv7Q==
+X-Gm-Message-State: AGi0PuZNVlbnU+3g45nOvjMPM85/3BKRyucIipYVZcPDxEMBrhVT5DPL
+ dZbA/mAmkEXXjcB9nI1kKsQwLbcvE40PF1mK8z8=
+X-Google-Smtp-Source: APiQypJEDRlNQT/C43oFGRNuua/kx8l092CfOoAQa9HHRf7qUUlUMYp1enTXj7oKdDgmdsEHCTQTZIuxEsqXx4b+y7E=
+X-Received: by 2002:a67:e2d5:: with SMTP id i21mr4717956vsm.151.1586816513982; 
+ Mon, 13 Apr 2020 15:21:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200412212943.4117-1-f4bug@amsat.org>
- <20200412212943.4117-2-f4bug@amsat.org>
-In-Reply-To: <20200412212943.4117-2-f4bug@amsat.org>
+References: <20200412224144.12205-1-f4bug@amsat.org>
+ <20200412224144.12205-11-f4bug@amsat.org>
+In-Reply-To: <20200412224144.12205-11-f4bug@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 13 Apr 2020 15:13:13 -0700
-Message-ID: <CAKmqyKNP73-h02ubQaFvMC4UyhCjbLmRVPmC8OQ7NRJgyL4zBQ@mail.gmail.com>
-Subject: Re: [PATCH-for-5.1 1/3] hw/ide/ahci: Use qdev gpio rather than
- qemu_allocate_irqs()
+Date: Mon, 13 Apr 2020 15:13:37 -0700
+Message-ID: <CAKmqyKMzVTexQcri0t62fdZnU-cxYPNH-vN1xDT5T4CN+3Y64Q@mail.gmail.com>
+Subject: Re: [PATCH-for-5.1 v3 10/23] hw/microblaze/xlnx-zynqmp-pmu: Add
+ missing error-propagation code
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::e42
+X-Received-From: 2607:f8b0:4864:20::e43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,42 +90,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Qemu-block <qemu-block@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Stafford Horne <shorne@gmail.com>, John Snow <jsnow@redhat.com>,
+ Joel Stanley <joel@jms.id.au>, "open list:New World" <qemu-ppc@nongnu.org>,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Alistair Francis <alistair@alistair23.me>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>, Michael Walle <michael@walle.cc>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Apr 12, 2020 at 2:29 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+On Sun, Apr 12, 2020 at 3:58 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
 g> wrote:
 >
-> Switch to using the qdev gpio API which is preferred over
-> qemu_allocate_irqs(). One step to eventually deprecate and
-> remove qemu_allocate_irqs() one day.
+> Patch created mechanically by running:
 >
-> Patch created mechanically using spatch with this script
-> inspired from commit d6ef883d9d7:
+>   $ spatch \
+>     --macro-file scripts/cocci-macro-file.h --include-headers \
+>     --sp-file scripts/coccinelle/use-error_propagate-in-realize.cocci \
+>     --keep-comments --smpl-spacing --in-place --dir hw
 >
->   @@
->   typedef qemu_irq;
->   identifier irqs, handler;
->   expression opaque, count, i;
->   @@
->   -   qemu_irq *irqs;
->       ...
->   -   irqs =3D qemu_allocate_irqs(handler, opaque, count);
->   +   qdev_init_gpio_in(DEVICE(opaque), handler, count);
->       <+...
->   -   irqs[i]
->   +   qdev_get_gpio_in(DEVICE(opaque), i)
->       ...+>
->   ?-  g_free(irqs);
->
-> Inspired-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
@@ -133,45 +135,29 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/ide/ahci.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+>  hw/microblaze/xlnx-zynqmp-pmu.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-> index 13d91e109a..ef0a0a22ee 100644
-> --- a/hw/ide/ahci.c
-> +++ b/hw/ide/ahci.c
-> @@ -1534,19 +1534,18 @@ void ahci_init(AHCIState *s, DeviceState *qdev)
->
->  void ahci_realize(AHCIState *s, DeviceState *qdev, AddressSpace *as, int=
- ports)
->  {
-> -    qemu_irq *irqs;
->      int i;
->
->      s->as =3D as;
->      s->ports =3D ports;
->      s->dev =3D g_new0(AHCIDevice, ports);
->      ahci_reg_init(s);
-> -    irqs =3D qemu_allocate_irqs(ahci_irq_set, s, s->ports);
-> +    qdev_init_gpio_in(DEVICE(s), ahci_irq_set, s->ports);
->      for (i =3D 0; i < s->ports; i++) {
->          AHCIDevice *ad =3D &s->dev[i];
->
->          ide_bus_new(&ad->port, sizeof(ad->port), qdev, i, 1);
-> -        ide_init2(&ad->port, irqs[i]);
-> +        ide_init2(&ad->port, qdev_get_gpio_in(DEVICE(s), i));
->
->          ad->hba =3D s;
->          ad->port_no =3D i;
-> @@ -1554,7 +1553,6 @@ void ahci_realize(AHCIState *s, DeviceState *qdev, =
-AddressSpace *as, int ports)
->          ad->port.dma->ops =3D &ahci_dma_ops;
->          ide_register_restart_cb(&ad->port);
->      }
-> -    g_free(irqs);
->  }
->
->  void ahci_uninit(AHCIState *s)
+> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-=
+pmu.c
+> index 2aa602cf85..4ecbea7fdc 100644
+> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
+> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+> @@ -123,7 +123,11 @@ static void xlnx_zynqmp_pmu_soc_realize(DeviceState =
+*dev, Error **errp)
+>      /* Connect the IPI device */
+>      for (int i =3D 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
+>          object_property_set_bool(OBJECT(&s->ipi[i]), true, "realized",
+> -                                 &error_abort);
+> +                                 &err);
+> +        if (err) {
+> +            error_propagate(errp, err);
+> +            return;
+> +        }
+>          sysbus_mmio_map(SYS_BUS_DEVICE(&s->ipi[i]), 0, ipi_addr[i]);
+>          sysbus_connect_irq(SYS_BUS_DEVICE(&s->ipi[i]), 0,
+>                             qdev_get_gpio_in(DEVICE(&s->intc), ipi_irq[i]=
+));
 > --
 > 2.21.1
 >
