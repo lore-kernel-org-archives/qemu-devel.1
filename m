@@ -2,68 +2,57 @@ Return-Path: <SRS0=kd+i=55=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8597C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 10:13:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC82C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 10:18:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94DBD206E9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 10:13:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94DBD206E9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
+	by mail.kernel.org (Postfix) with ESMTPS id B9FD220678
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 10:18:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9FD220678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNw6E-0004It-N0
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 06:13:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53701)
+	id 1jNwB5-0007Fq-Nu
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 06:18:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54186)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frederic.konrad@adacore.com>) id 1jNw58-0003Ov-5Y
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 06:12:47 -0400
+ (envelope-from <zhukeqian1@huawei.com>) id 1jNwA1-0006j6-N0
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 06:17:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frederic.konrad@adacore.com>) id 1jNw57-00063g-4u
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 06:12:46 -0400
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:60299
- helo=smtp.eu.adacore.com)
+ (envelope-from <zhukeqian1@huawei.com>) id 1jNw9z-0007oN-Tt
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 06:17:49 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:38954 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
- id 1jNw56-00062x-Vm
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 06:12:45 -0400
-Received: from localhost (localhost [127.0.0.1])
- by filtered-smtp.eu.adacore.com (Postfix) with ESMTP id 67C3E8139C;
- Mon, 13 Apr 2020 12:12:42 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at eu.adacore.com
-Received: from smtp.eu.adacore.com ([127.0.0.1])
- by localhost (smtp.eu.adacore.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qVRjDs1v3Q6l; Mon, 13 Apr 2020 12:12:42 +0200 (CEST)
-Received: from localhost.localdomain (lfbn-tou-1-1471-22.w90-89.abo.wanadoo.fr
- [90.89.4.22])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by smtp.eu.adacore.com (Postfix) with ESMTPSA id 6BE8C81395;
- Mon, 13 Apr 2020 12:12:41 +0200 (CEST)
-Subject: Re: [PATCH 0/7] hw/sparc/leon3: Few fixes and disable HelenOS test
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200331105048.27989-1-f4bug@amsat.org>
- <81737d76-06c6-4c83-1287-b0d14db4ce2f@amsat.org>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <989bf2f5-0e23-f9c3-e9e1-0bd8c03f3231@adacore.com>
-Date: Mon, 13 Apr 2020 12:12:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.71) (envelope-from <zhukeqian1@huawei.com>)
+ id 1jNw9n-0007gp-25; Mon, 13 Apr 2020 06:17:37 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 978F240315464F5E7FE3;
+ Mon, 13 Apr 2020 18:17:29 +0800 (CST)
+Received: from linux-kDCJWP.huawei.com (10.175.104.212) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 13 Apr 2020 18:17:21 +0800
+From: Keqian Zhu <zhukeqian1@huawei.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH v3] migration/throttle: Add cpu-throttle-tailslow migration
+ parameter
+Date: Mon, 13 Apr 2020 18:15:08 +0800
+Message-ID: <20200413101508.54793-1-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-In-Reply-To: <81737d76-06c6-4c83-1287-b0d14db4ce2f@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.212]
+X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 2a02:2ab8:224:1::a0a:d2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,47 +64,317 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Jiri Gaisler <jiri@gaisler.se>, Fabien Chouteau <chouteau@adacore.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Juan Quintela <quintela@redhat.com>, "Dr. David
+ Alan Gilbert" <dgilbert@redhat.com>, Markus
+ Armbruster <armbru@redhat.com>, qemu-arm@nongnu.org, wanghaibin.wang@huawei.com,
+ Keqian Zhu <zhukeqian1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+At the tail stage of throttling, the Guest is very sensitive to
+CPU percentage while the @cpu-throttle-increment is excessive
+usually at tail stage.
 
+If this parameter is true, we will compute the ideal CPU percentage
+used by the Guest, which may exactly make the dirty rate match the
+dirty rate threshold. Then we will choose a smaller throttle increment
+between the one specified by @cpu-throttle-increment and the one
+generated by ideal CPU percentage.
 
-Le 4/11/20 =C3=A0 7:30 PM, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=A0=
-:
-> On 3/31/20 12:50 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Philippe Mathieu-Daud=C3=A9 (7):
->>    hw/misc/grlib_ahb_apb_pnp: Avoid crash when writing to AHB PnP
->>      registers
->>    hw/misc/grlib_ahb_apb_pnp: Fix AHB PnP 8-bit accesses
->=20
-> Ping ^^^ for 5.0?
+Therefore, it is compatible to traditional throttling, meanwhile
+the throttle increment won't be excessive at tail stage. This may
+make migration time longer, and is disabled by default.
 
-Hi Philippe,
+Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+---
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+---
+ migration/migration.c | 13 ++++++++++++
+ migration/ram.c       | 25 +++++++++++++++++-----
+ monitor/hmp-cmds.c    |  8 ++++++++
+ qapi/migration.json   | 48 +++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 89 insertions(+), 5 deletions(-)
 
-You already have my rb tag for those one, and IMHO they should be good ca=
-ndidate
-for 5.0 (if it's not too late).
+diff --git a/migration/migration.c b/migration/migration.c
+index 187ac0410c..d478a87290 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -785,6 +785,8 @@ MigrationParameters *qmp_query_migrate_parameters(Err=
+or **errp)
+     params->cpu_throttle_initial =3D s->parameters.cpu_throttle_initial;
+     params->has_cpu_throttle_increment =3D true;
+     params->cpu_throttle_increment =3D s->parameters.cpu_throttle_increm=
+ent;
++    params->has_cpu_throttle_tailslow =3D true;
++    params->cpu_throttle_tailslow =3D s->parameters.cpu_throttle_tailslo=
+w;
+     params->has_tls_creds =3D true;
+     params->tls_creds =3D g_strdup(s->parameters.tls_creds);
+     params->has_tls_hostname =3D true;
+@@ -1324,6 +1326,10 @@ static void migrate_params_test_apply(MigrateSetPa=
+rameters *params,
+         dest->cpu_throttle_increment =3D params->cpu_throttle_increment;
+     }
+=20
++    if (params->has_cpu_throttle_tailslow) {
++        dest->cpu_throttle_tailslow =3D params->cpu_throttle_tailslow;
++    }
++
+     if (params->has_tls_creds) {
+         assert(params->tls_creds->type =3D=3D QTYPE_QSTRING);
+         dest->tls_creds =3D g_strdup(params->tls_creds->u.s);
+@@ -1412,6 +1418,10 @@ static void migrate_params_apply(MigrateSetParamet=
+ers *params, Error **errp)
+         s->parameters.cpu_throttle_increment =3D params->cpu_throttle_in=
+crement;
+     }
+=20
++    if (params->has_cpu_throttle_tailslow) {
++        s->parameters.cpu_throttle_tailslow =3D params->cpu_throttle_tai=
+lslow;
++    }
++
+     if (params->has_tls_creds) {
+         g_free(s->parameters.tls_creds);
+         assert(params->tls_creds->type =3D=3D QTYPE_QSTRING);
+@@ -3594,6 +3604,8 @@ static Property migration_properties[] =3D {
+     DEFINE_PROP_UINT8("x-cpu-throttle-increment", MigrationState,
+                       parameters.cpu_throttle_increment,
+                       DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT),
++    DEFINE_PROP_BOOL("x-cpu-throttle-tailslow", MigrationState,
++                      parameters.cpu_throttle_tailslow, false),
+     DEFINE_PROP_SIZE("x-max-bandwidth", MigrationState,
+                       parameters.max_bandwidth, MAX_THROTTLE),
+     DEFINE_PROP_UINT64("x-downtime-limit", MigrationState,
+@@ -3700,6 +3712,7 @@ static void migration_instance_init(Object *obj)
+     params->has_throttle_trigger_threshold =3D true;
+     params->has_cpu_throttle_initial =3D true;
+     params->has_cpu_throttle_increment =3D true;
++    params->has_cpu_throttle_tailslow =3D true;
+     params->has_max_bandwidth =3D true;
+     params->has_downtime_limit =3D true;
+     params->has_x_checkpoint_delay =3D true;
+diff --git a/migration/ram.c b/migration/ram.c
+index 04f13feb2e..3317c99786 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -616,20 +616,34 @@ static size_t save_page_header(RAMState *rs, QEMUFi=
+le *f,  RAMBlock *block,
+  * able to complete migration. Some workloads dirty memory way too
+  * fast and will not effectively converge, even with auto-converge.
+  */
+-static void mig_throttle_guest_down(void)
++static void mig_throttle_guest_down(uint64_t bytes_dirty_period,
++                                    uint64_t bytes_dirty_threshold)
+ {
+     MigrationState *s =3D migrate_get_current();
+     uint64_t pct_initial =3D s->parameters.cpu_throttle_initial;
+-    uint64_t pct_icrement =3D s->parameters.cpu_throttle_increment;
++    uint64_t pct_increment =3D s->parameters.cpu_throttle_increment;
++    bool pct_tailslow =3D s->parameters.cpu_throttle_tailslow;
+     int pct_max =3D s->parameters.max_cpu_throttle;
+=20
++    uint64_t throttle_now =3D cpu_throttle_get_percentage();
++    uint64_t cpu_now, cpu_ideal, throttle_inc;
++
+     /* We have not started throttling yet. Let's start it. */
+     if (!cpu_throttle_active()) {
+         cpu_throttle_set(pct_initial);
+     } else {
+         /* Throttling already on, just increase the rate */
+-        cpu_throttle_set(MIN(cpu_throttle_get_percentage() + pct_icremen=
+t,
+-                         pct_max));
++        if (!pct_tailslow) {
++            throttle_inc =3D pct_increment;
++        } else {
++            /* Compute the ideal CPU percentage used by Guest, which may
++             * make the dirty rate match the dirty rate threshold. */
++            cpu_now =3D 100 - throttle_now;
++            cpu_ideal =3D cpu_now * (bytes_dirty_threshold * 1.0 /
++                        bytes_dirty_period);
++            throttle_inc =3D MIN(cpu_now - cpu_ideal, pct_increment);
++        }
++        cpu_throttle_set(MIN(throttle_now + throttle_inc, pct_max));
+     }
+ }
+=20
+@@ -919,7 +933,8 @@ static void migration_trigger_throttle(RAMState *rs)
+             (++rs->dirty_rate_high_cnt >=3D 2)) {
+             trace_migration_throttle();
+             rs->dirty_rate_high_cnt =3D 0;
+-            mig_throttle_guest_down();
++            mig_throttle_guest_down(bytes_dirty_period,
++                                    bytes_dirty_threshold);
+         }
+     }
+ }
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 9b94e67879..acd7539273 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -419,6 +419,10 @@ void hmp_info_migrate_parameters(Monitor *mon, const=
+ QDict *qdict)
+         monitor_printf(mon, "%s: %u\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_CPU_THROTTLE_INCR=
+EMENT),
+             params->cpu_throttle_increment);
++        assert(params->has_cpu_throttle_tailslow);
++        monitor_printf(mon, "%s: %s\n",
++            MigrationParameter_str(MIGRATION_PARAMETER_CPU_THROTTLE_TAIL=
+SLOW),
++            params->cpu_throttle_tailslow ? "on" : "off");
+         assert(params->has_max_cpu_throttle);
+         monitor_printf(mon, "%s: %u\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_MAX_CPU_THROTTLE)=
+,
+@@ -1271,6 +1275,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const=
+ QDict *qdict)
+         p->has_cpu_throttle_increment =3D true;
+         visit_type_int(v, param, &p->cpu_throttle_increment, &err);
+         break;
++    case MIGRATION_PARAMETER_CPU_THROTTLE_TAILSLOW:
++        p->has_cpu_throttle_tailslow =3D true;
++        visit_type_bool(v, param, &p->cpu_throttle_tailslow, &err);
++        break;
+     case MIGRATION_PARAMETER_MAX_CPU_THROTTLE:
+         p->has_max_cpu_throttle =3D true;
+         visit_type_int(v, param, &p->max_cpu_throttle, &err);
+diff --git a/qapi/migration.json b/qapi/migration.json
+index eca2981d0a..ee6c5a0cae 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -552,6 +552,21 @@
+ #                          auto-converge detects that migration is not m=
+aking
+ #                          progress. The default value is 10. (Since 2.7=
+)
+ #
++# @cpu-throttle-tailslow: Make CPU throttling slower at tail stage
++#                         At the tail stage of throttling, the Guest is =
+very
++#                         sensitive to CPU percentage while the @cpu-thr=
+ottle
++#                         -increment is excessive usually at tail stage.
++#                         If this parameter is true, we will compute the=
+ ideal
++#                         CPU percentage used by the Guest, which may ex=
+actly make
++#                         the dirty rate match the dirty rate threshold.=
+ Then we
++#                         will choose a smaller throttle increment betwe=
+en the
++#                         one specified by @cpu-throttle-increment and t=
+he one
++#                         generated by ideal CPU percentage.
++#                         Therefore, it is compatible to traditional thr=
+ottling,
++#                         meanwhile the throttle increment won't be exce=
+ssive
++#                         at tail stage.
++#                         The default value is false. (Since 5.1)
++#
+ # @tls-creds: ID of the 'tls-creds' object that provides credentials for
+ #             establishing a TLS connection over the migration data chan=
+nel.
+ #             On the outgoing side of the migration, the credentials mus=
+t
+@@ -631,6 +646,7 @@
+            'compress-level', 'compress-threads', 'decompress-threads',
+            'compress-wait-thread', 'throttle-trigger-threshold',
+            'cpu-throttle-initial', 'cpu-throttle-increment',
++           'cpu-throttle-tailslow',
+            'tls-creds', 'tls-hostname', 'tls-authz', 'max-bandwidth',
+            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+            'multifd-channels',
+@@ -676,6 +692,21 @@
+ #                          auto-converge detects that migration is not m=
+aking
+ #                          progress. The default value is 10. (Since 2.7=
+)
+ #
++# @cpu-throttle-tailslow: Make CPU throttling slower at tail stage
++#                         At the tail stage of throttling, the Guest is =
+very
++#                         sensitive to CPU percentage while the @cpu-thr=
+ottle
++#                         -increment is excessive usually at tail stage.
++#                         If this parameter is true, we will compute the=
+ ideal
++#                         CPU percentage used by the Guest, which may ex=
+actly make
++#                         the dirty rate match the dirty rate threshold.=
+ Then we
++#                         will choose a smaller throttle increment betwe=
+en the
++#                         one specified by @cpu-throttle-increment and t=
+he one
++#                         generated by ideal CPU percentage.
++#                         Therefore, it is compatible to traditional thr=
+ottling,
++#                         meanwhile the throttle increment won't be exce=
+ssive
++#                         at tail stage.
++#                         The default value is false. (Since 5.1)
++#
+ # @tls-creds: ID of the 'tls-creds' object that provides credentials
+ #             for establishing a TLS connection over the migration data
+ #             channel. On the outgoing side of the migration, the creden=
+tials
+@@ -763,6 +794,7 @@
+             '*throttle-trigger-threshold': 'int',
+             '*cpu-throttle-initial': 'int',
+             '*cpu-throttle-increment': 'int',
++            '*cpu-throttle-tailslow': 'bool',
+             '*tls-creds': 'StrOrNull',
+             '*tls-hostname': 'StrOrNull',
+             '*tls-authz': 'StrOrNull',
+@@ -834,6 +866,21 @@
+ #                          auto-converge detects that migration is not m=
+aking
+ #                          progress. (Since 2.7)
+ #
++# @cpu-throttle-tailslow: Make CPU throttling slower at tail stage
++#                         At the tail stage of throttling, the Guest is =
+very
++#                         sensitive to CPU percentage while the @cpu-thr=
+ottle
++#                         -increment is excessive usually at tail stage.
++#                         If this parameter is true, we will compute the=
+ ideal
++#                         CPU percentage used by the Guest, which may ex=
+actly make
++#                         the dirty rate match the dirty rate threshold.=
+ Then we
++#                         will choose a smaller throttle increment betwe=
+en the
++#                         one specified by @cpu-throttle-increment and t=
+he one
++#                         generated by ideal CPU percentage.
++#                         Therefore, it is compatible to traditional thr=
+ottling,
++#                         meanwhile the throttle increment won't be exce=
+ssive
++#                         at tail stage.
++#                         The default value is false. (Since 5.1)
++#
+ # @tls-creds: ID of the 'tls-creds' object that provides credentials
+ #             for establishing a TLS connection over the migration data
+ #             channel. On the outgoing side of the migration, the creden=
+tials
+@@ -921,6 +968,7 @@
+             '*throttle-trigger-threshold': 'uint8',
+             '*cpu-throttle-initial': 'uint8',
+             '*cpu-throttle-increment': 'uint8',
++            '*cpu-throttle-tailslow': 'bool',
+             '*tls-creds': 'str',
+             '*tls-hostname': 'str',
+             '*tls-authz': 'str',
+--=20
+2.19.1
 
-Cheers,
-Fred
-
->=20
->>    hw/misc/grlib_ahb_apb_pnp: Add trace events on read accesses
->>    hw/timer/grlib_gptimer: Display frequency in decimal
->>    target/sparc/int32_helper: Remove DEBUG_PCALL definition
->>    target/sparc/int32_helper: Extract and use excp_name_str()
->>
->>   hw/misc/grlib_ahb_apb_pnp.c             | 24 ++++++++++++++++++++++-=
--
->>   target/sparc/int32_helper.c             | 23 ++++++++++++-----------
->>   hw/misc/trace-events                    |  4 ++++
->>   hw/timer/trace-events                   |  2 +-
->>   tests/acceptance/machine_sparc_leon3.py |  4 ++++
->>   5 files changed, 43 insertions(+), 14 deletions(-)
->>
 
