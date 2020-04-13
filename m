@@ -2,78 +2,117 @@ Return-Path: <SRS0=kd+i=55=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B390AC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 12:14:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 339D5C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 12:28:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B5F2206DA
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 12:14:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8646206DA
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 12:28:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QCQYcSTB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B5F2206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="MNHvTjlB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8646206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNxyo-0007m9-L1
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 08:14:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35893)
+	id 1jNyCw-0004Zp-1N
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 08:28:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37235)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jNxxw-00074G-RS
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 08:13:30 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jNyC8-0003yX-RF
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 08:28:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jNxxu-0002Ae-Cq
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 08:13:27 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45468)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jNxxu-00029I-8Y
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 08:13:26 -0400
-Received: by mail-oi1-x243.google.com with SMTP id k133so6460980oih.12
- for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 05:13:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=olI+YPD6mi92z78Q81KvS8X94md8O4xm5vOjWV+LC/w=;
- b=QCQYcSTBYwnLh2l5hI9KIjwQiuM1IW/dDwF9tlXJcadkbYf2qjwlWeIh7teReG4vXT
- r4SLxb08ABaaYcyQ5ZmnGO5MEwSf2x3GQP8gS/Pg4p4DDF2PYIQGgrbpjsEaMugM1AfJ
- zZ2ql4Kq7gt4599SxhXtmpPb941UsKaOHsfzynIZtp5pIjwSOYVePGRMS9S7vlidjREt
- nG1+MRVfVToa9XYH+MrUiIHGQbbJmGq/zf0e+OIRiZL2Df+MiFlAstXDlkLd3mvImBov
- kRvLL0ODHR9wVstjARejjmQH79JLFriCYgxpyfl9ZgKxiNl2kYFzmVPTFxGi35LjXCik
- bVvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=olI+YPD6mi92z78Q81KvS8X94md8O4xm5vOjWV+LC/w=;
- b=DKkVcZeX7P6WomPz3m61wNG1x9fiFQBSIKdMebb9RTra/8w4EWcAPt/zNPy+jWHbvj
- xZxn08ZfyodTPU3zsL/PcqscqheyRWLJ/3/tdk6wyyCs6CsdZu/bZdNtwGBDXvMWU7zn
- Nv/XHDRCV5yT9LgZUB1VxYOSZeXoSNA42BE08UTvR5m8Bks0cDY7IbQt/+blXcIbsYWe
- 2EhAcu2SI5QqGhyE5ydUs+nTdkw0euq+86wTgvzBq7H3HG5lr3EQQnmnRV0eQsF6i5c2
- C0rgkPBIEir+uetlm2KrKDHSR8+9d9XPBeH9TvyYhoVv+JkzijhtfnPCmwRnTdJ/YZ0I
- QjMw==
-X-Gm-Message-State: AGi0PuYa+JwaVlJbI+kAoVxAFcjvmVk/krI4FOBTNubJsIqWC9duz59J
- DgTLLi5jeLFwiacA7p1FKo+2FdFAYswyKII/MLnXJAZVvBw=
-X-Google-Smtp-Source: APiQypKIH4qKf22X1iODAiPXmUzJh8t+L8giC0GXB1dsd6tyBAdvJ85tXqKAEX8xUHfaoCaxtTJa9/AwE09g42UNunI=
-X-Received: by 2002:aca:f3c2:: with SMTP id r185mr523691oih.163.1586780004131; 
- Mon, 13 Apr 2020 05:13:24 -0700 (PDT)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jNyC7-0004rR-Db
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 08:28:08 -0400
+Received: from mail-eopbgr50134.outbound.protection.outlook.com
+ ([40.107.5.134]:33211 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jNyC3-0004kS-4t; Mon, 13 Apr 2020 08:28:03 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l0dYX9inYypD7btEDLu5mhq/e9uo535uWP8UucbBf1LDeCfTqARXPdGHagQKVoYowB/NLS0+P2DIqtrf+wqCuuL6O7hI5GuziTknMH6PhMqatu5iBBQE+lLRKNqx6iyLQTmj+/TEDeLRBGx5cKtbSQ7aDS95uSg+83jHK4XUh6tI9u8ZLq343PeXpWQW+6OAUuEBcUAbOtgmqXSLshEyQIx1zPpDUys54LW4agZOOqonEy6PLUPn5GAAfZraCq6Z+Vy7Xuq3GmjNVhf/iLo3r0PE5Zk+bOlWjzfJYHLdS7fN395+2hfFZTOm4QJX5M1k/bdUvcvdVJ8FCSSEBsOkxA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/Db4sKwJFjMDOQ44IIF0sXzVsnKjVB2aW+4o31xwEtA=;
+ b=ZDTpbZNSgpAB7CKzRYFQ+iNG1XjzH5RGuFlL1FIeaUW8OiN43oeerLp1BkR/azX5tWxsu/XZCfBD2QEvX6lFpIDxb7Ojuq0VV4ZKaOnBLmvHz0WBBzFpGQob60lxS/nAZv3NOoPE1DbhCuOdDor6V226xvnZ19d6VYO023vdCMsDWtFyKhmiCdx9z23XssnMN8rlVCkplVZ+y4sA13KvbDJ744vz/Y8uIxSJmqnCcH391IUjrXbBPsuXynRSyx2sEfuLmo4a6Oq1uYH8/qUgWrJLKZig1/HzdSADdw5WpWNIXiUQDWzQ4pdM7pllElSLLYLnfWZtv3T3HqiPUwjMuQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/Db4sKwJFjMDOQ44IIF0sXzVsnKjVB2aW+4o31xwEtA=;
+ b=MNHvTjlBBlPHj7GKzVDWupeYvTRX+r7ZpyrhsHKRAKjkh9qlfHOWr1QyKxqQwQrHb5DiqFW8brcctDAbh2HEwEAafpHvfLpO23boNlMQksS9podtNvo77UwTV1y6IYHrzcmvv2dgx6UL1Nb50RB+KFursYg7ji8Fhg85ZbakV8g=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=dplotnikov@virtuozzo.com; 
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (2603:10a6:208:ff::27)
+ by AM0PR08MB4113.eurprd08.prod.outlook.com (2603:10a6:208:129::20)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.20; Mon, 13 Apr
+ 2020 12:27:59 +0000
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::95e6:1da8:1244:d16f]) by AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::95e6:1da8:1244:d16f%4]) with mapi id 15.20.2900.028; Mon, 13 Apr 2020
+ 12:27:59 +0000
+Subject: Re: [PATCH v18 0/4] qcow2: Implement zstd cluster compression method
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+References: <20200402063645.23685-1-dplotnikov@virtuozzo.com>
+Message-ID: <6ca66868-04ed-9e41-71ed-57de99a31f03@virtuozzo.com>
+Date: Mon, 13 Apr 2020 15:27:57 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <20200402063645.23685-1-dplotnikov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: AM0PR01CA0125.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:168::30) To AM0PR08MB3745.eurprd08.prod.outlook.com
+ (2603:10a6:208:ff::27)
 MIME-Version: 1.0
-References: <20200319193323.2038-1-peter.maydell@linaro.org>
-In-Reply-To: <20200319193323.2038-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 Apr 2020 13:13:12 +0100
-Message-ID: <CAFEAcA_PJPm+CciSEhXt+JMV+P55EqHYd4S8ehBC6HYqzJ_ZBQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/6] Automation of Coverity Scan uploads (via Docker)
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.64] (178.34.160.244) by
+ AM0PR01CA0125.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::30) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.15 via Frontend
+ Transport; Mon, 13 Apr 2020 12:27:58 +0000
+X-Originating-IP: [178.34.160.244]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b9d053a9-e415-4ceb-1e75-08d7dfa61a48
+X-MS-TrafficTypeDiagnostic: AM0PR08MB4113:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM0PR08MB4113A6ECDB65C8BC61087CF0CFDD0@AM0PR08MB4113.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2803;
+X-Forefront-PRVS: 037291602B
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM0PR08MB3745.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(366004)(136003)(39840400004)(346002)(376002)(396003)(6486002)(107886003)(8676002)(81156014)(66556008)(66476007)(2616005)(956004)(478600001)(31686004)(66946007)(8936002)(6916009)(5660300002)(31696002)(16576012)(16526019)(52116002)(86362001)(2906002)(186003)(53546011)(26005)(4326008)(36756003)(316002);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: VjawVAHtPcpR3BBFFeFPAaDyE8Wr7H6lf97z2Gbzu4l8Bn962vc32mvIPvzywFONX/Sw7Vfw15xdLpItDZdrmmH56MHJeJuRGltOgOMBbOBsfbEqQPi2VHE/QLGC8609ko+QKBW6txleyzeap2gfmNATtL1wBP0Nrm7PSdPa6bBJV+43DQ0PiHHm1lmfgcYHIufa8M4Px/cScXP2qK8osndN5PMkoznIirwUVlMoBFsYkMrNgNoaX9Z1aJxEuZSnEk0p9UwJqtnqz0oh46C3RYWafGWLg4pe8/INDTAcM+Pdx6+o8B4lVl5WtNOp7C8/BTKBd7LbReJxLJ1XIJJ05qsX2P8hWpUbMKZ0u3KrsScbu2ulOc9uHcIf4hIszFmkt22myO8yqUEu+AmEfxr6cNjyC2B/l8AdY3lvC2lV49O7HkBz0b2kivI3PSE7Lh/q
+X-MS-Exchange-AntiSpam-MessageData: 933W9Bk4nnu+kXZ7p81AqI+NiBwMWNaSrGZppd49SnyDbynZqeNTmwpVdBtuOJwaucTeHlEZqpXPkzO+WPU4SMY6eB9d72ZJB9GbwJjMTFA9NBTFpXCM1MMfS0Bag/y/+M8G/YPRxG1VeZswIJ2zSQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b9d053a9-e415-4ceb-1e75-08d7dfa61a48
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Apr 2020 12:27:59.6552 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZmOyZiG5MdbbFXJvtAnSryQxqUyT5ewNqKy1bBTjtumd4YN0XCm+fcG+cjgJQy0rW37pMrBlAvce7OhtFxR5YpCpc3augbL8CXJaITjeiLM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4113
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.5.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,90 +124,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-What's your view on this series, Paolo? Personally I'd like
-to put it into master, because at least then we have something
-that we can do Coverity runs on, whereas AIUI at the moment
-we don't. But I'd rather not put it in after rc3, which is
-tomorrow...
+Ping! Is there something to be fixed in the series?
 
-thanks
--- PMM
+Thanks,
+Denis
 
-On Thu, 19 Mar 2020 at 19:33, Peter Maydell <peter.maydell@linaro.org> wrote:
+On 02.04.2020 09:36, Denis Plotnikov wrote:
+> v18:
+>     * 04: add quotes to all file name variables [Vladimir]
+>     * 04: add Vladimir's comment according to "qemu-io write -s"
+>           option issue.
 >
-> v1 of this series was over a year ago:
-> https://patchew.org/QEMU/20181113184641.4492-1-peter.maydell@linaro.org/
+> v17:
+>     * 03: remove incorrect comment in zstd decompress [Vladimir]
+>     * 03: remove "paraniod" and rewrite the comment on decompress [Vladimir]
+>     * 03: fix dead assignment [Vladimir]
+>     * 04: add and remove quotes [Vladimir]
+>     * 04: replace long offset form with the short one [Vladimir]
 >
-> I dusted it off and fixed some stuff because Paolo reports that the
-> machine he was previously using for uploads can't run the Coverity
-> tools any more.
+> v16:
+>     * 03: ssize_t for ret, size_t for zstd_ret [Vladimir]
+>     * 04: small fixes according to the comments [Vladimir]
 >
-> The first four patches are fixes for problems that cause the Coverity
-> tool not to be able to scan everything.  The first one in particular
-> meant that every compilation unit failed, which would block uploads.
-> The other 3 would reduce the scan coverage but weren't fatal.  (The
-> only remaining warnings in the log are where Coverity complains about
-> asm intrinsics system headers.)
+> v15:
+>     * 01: aiming qemu 5.1 [Eric]
+>     * 03: change zstd_res definition place [Vladimir]
+>     * 04: add two new test cases [Eric]
+>           1. test adjacent cluster compression with zstd
+>           2. test incompressible cluster processing
+>     * 03, 04: many rewording and gramma fixing [Eric]
 >
-> With these scripts you can do an upload with
-> COVERITY_TOKEN=nnnnnnnnn ./scripts/coverity-scan/run-coverity-scan --docker
-> (where nnnnnnnn is the project's secret token which admins can
-> get from the Coverity web UI).
+> v14:
+>     * fix bug on compression - looping until compress == 0 [Me]
+>     * apply reworked Vladimir's suggestions:
+>        1. not mixing ssize_t with size_t
+>        2. safe check for ENOMEM in compression part - avoid overflow
+>        3. tolerate sanity check allow zstd to make progress only
+>           on one of the buffers
+> v13:
+>     * 03: add progress sanity check to decompression loop [Vladimir]
+>       03: add successful decompression check [Me]
 >
-> I did in fact do an upload to test it, so the currently visible
-> results on the website are the result of a scan on ce73691e258 plus
-> this series.
+> v12:
+>     * 03: again, rework compression and decompression loops
+>           to make them more correct [Vladimir]
+>       03: move assert in compression to more appropriate place
+>               [Vladimir]
+> v11:
+>     * 03: the loops don't need "do{}while" form anymore and
+>           the they were buggy (missed "do" in the beginning)
+>           replace them with usual "while(){}" loops [Vladimir]
+> v10:
+>     * 03: fix zstd (de)compressed loops for multi-frame
+>           cases [Vladimir]
+> v9:
+>     * 01: fix error checking and reporting in qcow2_amend compression type part [Vladimir]
+>     * 03: replace asserts with -EIO in qcow2_zstd_decompression [Vladimir, Alberto]
+>     * 03: reword/amend/add comments, fix typos [Vladimir]
 >
-> The new upload has +112 defects, which is quite a lot, but I don't
-> think it's so many that it is "defects we rejected as false positives
-> coming back again"; my guess is a combination of the fixes in the
-> first 4 patches increasing coverage plus we haven't run a test in a
-> while plus maybe the script has some more config options enabled that
-> Paolo's box did not.  (In the web UI defects that were dismissed as
-> FPs seem still to be considered present-but-dismissed, so I think
-> that's OK.)
+> v8:
+>     * 03: switch zstd API from simple to stream [Eric]
+>           No need to state a special cluster layout for zstd
+>           compressed clusters.
+> v7:
+>     * use qapi_enum_parse instead of the open-coding [Eric]
+>     * fix wording, typos and spelling [Eric]
 >
-> Not much has changed since v1; I didn't get very much feedback
-> the first time around[*]. Docker still seems to do the "download
-> the Coverity tools" part more often than I expect. On the other
-> hand "actually automated with a script in the tree" beats "not
-> automated and currently broken" so maybe this patchset as it
-> stands is good enough, given that basically 1 or 2 people ever
-> will be running the script ?
+> v6:
+>     * "block/qcow2-threads: fix qcow2_decompress" is removed from the series
+>        since it has been accepted by Max already
+>     * add compile time checking for Qcow2Header to be a multiple of 8 [Max, Alberto]
+>     * report error on qcow2 amending when the compression type is actually chnged [Max]
+>     * remove the extra space and the extra new line [Max]
+>     * re-arrange acks and signed-off-s [Vladimir]
 >
-> [*] Eric will note that yes, the script still uses set -e.
+> v5:
+>     * replace -ENOTSUP with abort in qcow2_co_decompress [Vladimir]
+>     * set cluster size for all test cases in the beginning of the 287 test
 >
-> (Like v1 this doesn't try to tie it into Travis, but we could
-> in theory do that some day, or have some other automated once
-> a week run of the script.)
+> v4:
+>     * the series is rebased on top of 01 "block/qcow2-threads: fix qcow2_decompress"
+>     * 01 is just a no-change resend to avoid extra dependencies. Still, it may be merged in separate
 >
-> thanks
-> -- PMM
+> v3:
+>     * remove redundant max compression type value check [Vladimir, Eric]
+>       (the switch below checks everything)
+>     * prevent compression type changing on "qemu-img amend" [Vladimir]
+>     * remove zstd config setting, since it has been added already by
+>       "migration" patches [Vladimir]
+>     * change the compression type error message [Vladimir]
+>     * fix alignment and 80-chars exceeding [Vladimir]
 >
-> Peter Maydell (6):
->   osdep.h: Drop no-longer-needed Coverity workarounds
->   thread.h: Fix Coverity version of qemu_cond_timedwait()
->   thread.h: Remove trailing semicolons from Coverity qemu_mutex_lock()
->     etc
->   linux-user/flatload.c: Use "" for include of QEMU header target_flat.h
->   scripts/run-coverity-scan: Script to run Coverity Scan build
->   scripts/coverity-scan: Add Docker support
+> v2:
+>     * rework compression type setting [Vladimir]
+>     * squash iotest changes to the compression type introduction patch [Vladimir, Eric]
+>     * fix zstd availability checking in zstd iotest [Vladimir]
+>     * remove unnecessry casting [Eric]
+>     * remove rudundant checks [Eric]
+>     * fix compressed cluster layout in qcow2 spec [Vladimir]
+>     * fix wording [Eric, Vladimir]
+>     * fix compression type filtering in iotests [Eric]
 >
->  include/qemu/osdep.h                       |  14 -
->  include/qemu/thread.h                      |  12 +-
->  linux-user/flatload.c                      |   2 +-
->  MAINTAINERS                                |   5 +
->  scripts/coverity-scan/coverity-scan.docker | 131 +++++++
->  scripts/coverity-scan/run-coverity-scan    | 401 +++++++++++++++++++++
->  6 files changed, 544 insertions(+), 21 deletions(-)
->  create mode 100644 scripts/coverity-scan/coverity-scan.docker
->  create mode 100755 scripts/coverity-scan/run-coverity-scan
+> v1:
+>     the initial series
 >
-> --
-> 2.20.1
+>
+>
+> Denis Plotnikov (4):
+>    qcow2: introduce compression type feature
+>    qcow2: rework the cluster compression routine
+>    qcow2: add zstd cluster compression
+>    iotests: 287: add qcow2 compression type test
+>
+>   docs/interop/qcow2.txt           |   1 +
+>   configure                        |   2 +-
+>   qapi/block-core.json             |  23 +++-
+>   block/qcow2.h                    |  20 ++-
+>   include/block/block_int.h        |   1 +
+>   block/qcow2-threads.c            | 228 +++++++++++++++++++++++++++++--
+>   block/qcow2.c                    | 120 ++++++++++++++++
+>   tests/qemu-iotests/031.out       |  14 +-
+>   tests/qemu-iotests/036.out       |   4 +-
+>   tests/qemu-iotests/049.out       | 102 +++++++-------
+>   tests/qemu-iotests/060.out       |   1 +
+>   tests/qemu-iotests/061.out       |  34 +++--
+>   tests/qemu-iotests/065           |  28 ++--
+>   tests/qemu-iotests/080           |   2 +-
+>   tests/qemu-iotests/144.out       |   4 +-
+>   tests/qemu-iotests/182.out       |   2 +-
+>   tests/qemu-iotests/242.out       |   5 +
+>   tests/qemu-iotests/255.out       |   8 +-
+>   tests/qemu-iotests/287           | 167 ++++++++++++++++++++++
+>   tests/qemu-iotests/287.out       |  70 ++++++++++
+>   tests/qemu-iotests/common.filter |   3 +-
+>   tests/qemu-iotests/group         |   1 +
+>   22 files changed, 732 insertions(+), 108 deletions(-)
+>   create mode 100755 tests/qemu-iotests/287
+>   create mode 100644 tests/qemu-iotests/287.out
+>
+
 
