@@ -2,68 +2,80 @@ Return-Path: <SRS0=kd+i=55=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42A61C2BBC7
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 13:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2170CC2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 14:43:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18BC52075E
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 13:52:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18BC52075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E0A4A2072C
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 14:43:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="faUxIgqi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0A4A2072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNzVp-0006hc-9Q
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 09:52:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45332)
+	id 1jO0J6-0001LT-Vc
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 10:43:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50207)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jNzV7-00065q-Gt
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 09:51:50 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jO0IJ-0000dr-5Q
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 10:42:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jNzV5-00058H-V4
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 09:51:49 -0400
-Resent-Date: Mon, 13 Apr 2020 09:51:49 -0400
-Resent-Message-Id: <E1jNzV5-00058H-V4@eggs.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21358)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jNzV5-00056s-Ml
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 09:51:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1586785894; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Emmdh79IxNiREF8ZiWA+s+dSuo5EAU6liaCHnPvmfaQHIbN83oCIwzzTcZ+36iobeniyUzeWPX29tlbU1JeTOxPXngDYKV7vTnKzgoeAqg+MyA62Q2mhwXu44FclDK/J7WEM3HsiyKEug18WiEz8NytP3YymXPBQ6MkQTg71IKA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1586785894;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=jQxzJzfzKuzRP4R2P/F+AyzRd9qP0j8vzIo7TgzBnUo=; 
- b=TzLRY5TEqYolW9QBXJ8HcGPWhK0xXA8kX1dqBM6BsjEnmj+wSFjjz/XEGg5yPMwNY9p4wxHFoss5fpQr7T8bQ2cvqMosPmhrSU5Sj7Yp3ZyTy/17MSThMAIN0IbLo6LCct/XpyYLrLSmPOMw/j7efhbzESktjt8a3gLt0/xoAYw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1586785891654924.8306588791146;
- Mon, 13 Apr 2020 06:51:31 -0700 (PDT)
-In-Reply-To: <1586776334-641239-1-git-send-email-dplotnikov@virtuozzo.com>
-Subject: Re: [RFC patch v1 0/3] qemu-file writing performance improving
-Message-ID: <158678589039.27250.14048005066509196338@39012742ff91>
+ (envelope-from <peter.maydell@linaro.org>) id 1jO0IH-0007NC-N0
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 10:42:38 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36863)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jO0IH-0007Ms-I4
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 10:42:37 -0400
+Received: by mail-ot1-x341.google.com with SMTP id b13so5032179oti.3
+ for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 07:42:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Pjn9WDuOX/qY2/mcAo4bDjO0tx5qMy3CwlH2uDzsLQ8=;
+ b=faUxIgqi3MU/dGS2fjLFuczlBxjj+uzxDiJT+wcWtzCP4qhJQkqfL6PgsJ/ZvyupOn
+ RjEsKLqZYTpR3OJ/ceUaKFb66CEeSUxyMOgbDo5oFkBjDSrw4B/8YKxDFU/jK49xgt8K
+ gFRBVn9fbsbavvTZL+p03m9IRbIaR1Kb0M0xd48+lD2RbrLpAjYKWZ53zsOBFYbHJyDG
+ zPyBLXhDPPMGQte/Obwkh4bVXTCOzn2U/Lwnvnbe0NawgVOjGW3vn7rckZsitB06dJcK
+ 3SIoShEzWX6GzUYtrR3crWUsHEq0uSGVukHMyvdvQry5gFaWzR0G+QumjO+ZwuJGrdbp
+ xKWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Pjn9WDuOX/qY2/mcAo4bDjO0tx5qMy3CwlH2uDzsLQ8=;
+ b=IDGkEBuuQdZhV9XljU8HvAVka4FwY9V6qgBVJgdOz6g/fltAChY0nuOUlLpa87jd1+
+ R5zE5l2jNIFUC0E/cAUX7gouJ2PU617WzKDDWdYLARyh57LBDL+wyrkIJ9lKMtQUtqXs
+ +f3AMeL1xehNjnWWtD0eNRGlVUb1yy72IYyxzPNRnxxIR29ZZChnsI41mURX+hjj8n0V
+ YjfIsvHBKLPDF0FsKUaeZdSghippepqtCZ4PcN1NDsy/XmwGi7RVXEFC8A8TK/N/RwNw
+ RNeIQaspOkjcXEHPmsw2PIFEQdeo1SrL0nYBnsI9F3YhaUq2uspNt9+c4XRSIBnLSfyM
+ tpEQ==
+X-Gm-Message-State: AGi0PuYyQAWqxqqn8WZ6NpU2U5QHOIFmL6cQ/1y7xa1IPpnCi9/vQQ+a
+ lFYg39ma0Lu/SWfaG0zVsa3B06dmgnYs7SnPnevmhg==
+X-Google-Smtp-Source: APiQypIJC+hcMqchw4bHILr0BqZ307pxnKSImw4pFSATq9GzXVcMZdWbFMefUKEZ4sCQVPhp/cmpfkych1/hacFoHwU=
+X-Received: by 2002:a05:6830:11d5:: with SMTP id
+ v21mr4843687otq.91.1586788956365; 
+ Mon, 13 Apr 2020 07:42:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: dplotnikov@virtuozzo.com
-Date: Mon, 13 Apr 2020 06:51:31 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.53
+References: <20200413070457.25499-1-pbonzini@redhat.com>
+In-Reply-To: <20200413070457.25499-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 Apr 2020 15:42:25 +0100
+Message-ID: <CAFEAcA_izEV-YahmTXNbC5fSdYF37ZD1CUiWdNPpQcgyZZc4kQ@mail.gmail.com>
+Subject: Re: [PULL v2 0/8] Misc patches for QEMU 5.0-rc3
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,51 +87,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: den@openvz.org, quintela@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTg2Nzc2MzM0LTY0MTIzOS0x
-LWdpdC1zZW5kLWVtYWlsLWRwbG90bmlrb3ZAdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNl
-cmllcyBmYWlsZWQgdGhlIGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rpbmcg
-Y29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3Rh
-bGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2Vy
-LWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0Bm
-ZWRvcmEgVEFSR0VUX0xJU1Q9eDg2XzY0LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1Qg
-U0NSSVBUIEVORCA9PT0KCi90bXAvcWVtdS10ZXN0L3NyYy9taWdyYXRpb24vcWVtdS1maWxlLmM6
-NDE1OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBhaW9fdGFza19wb29sX3N0YXJ0X3Rhc2snCi91
-c3IvYmluL2xkOiBtaWdyYXRpb24vcWVtdS1maWxlLm86IGluIGZ1bmN0aW9uIGBxZW11X2ZpbGVf
-c3dpdGNoX2N1cnJlbnRfYnVmJzoKL3RtcC9xZW11LXRlc3Qvc3JjL21pZ3JhdGlvbi9xZW11LWZp
-bGUuYzozODA6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYGFpb190YXNrX3Bvb2xfd2FpdF9zbG90
-JwpjbGFuZy04OiBlcnJvcjogbGlua2VyIGNvbW1hbmQgZmFpbGVkIHdpdGggZXhpdCBjb2RlIDEg
-KHVzZSAtdiB0byBzZWUgaW52b2NhdGlvbikKbWFrZTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMv
-cnVsZXMubWFrOjEyNDogdGVzdHMvdGVzdC12bXN0YXRlXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0
-aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBs
-YXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2NCwgaW4gPG1v
-ZHVsZT4KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJw
-cm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tl
-cicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTMwNTU0OGU5YmU0
-MzRkZGViM2EwNmM3MDZlOWRhYjFhJywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAn
-c2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9eDg2XzY0LXNv
-ZnRtbXUnLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywg
-J0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVf
-RElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRv
-Y2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10
-ZXN0ZXItdG1wLWFvdW56a29rL3NyYy9kb2NrZXItc3JjLjIwMjAtMDQtMTMtMDkuNDQuNTAuMjcw
-MzU6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVu
-JywgJ3Rlc3QtZGVidWcnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVy
-PS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MzA1NTQ4ZTliZTQzNGRkZWIz
-YTA2YzcwNmU5ZGFiMWEKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06
-IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtYW91bnprb2sv
-c3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1kZWJ1Z0BmZWRvcmFdIEVycm9yIDIKCnJl
-YWwgICAgNm0zOS40MDNzCnVzZXIgICAgMG05LjA2OXMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxh
-YmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1ODY3NzYzMzQtNjQxMjM5LTEtZ2l0LXNl
-bmQtZW1haWwtZHBsb3RuaWtvdkB2aXJ0dW96em8uY29tL3Rlc3RpbmcuYXNhbi8/dHlwZT1tZXNz
-YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
-Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
-ZWxAcmVkaGF0LmNvbQ==
+On Mon, 13 Apr 2020 at 08:05, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The following changes since commit 53ef8a92eb04ee19640f5aad3bff36cd4a36c250:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200406' into staging (2020-04-06 12:36:45 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 267514b33ffa3f315adc26fc14d89f92e90840f5:
+>
+>   module: increase dirs array size by one (2020-04-13 02:56:18 -0400)
+>
+> ----------------------------------------------------------------
+> Bugfixes, and reworking of the atomics documentation.
+>
+> ----------------------------------------------------------------
+
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
+
+-- PMM
 
