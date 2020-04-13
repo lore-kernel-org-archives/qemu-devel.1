@@ -2,70 +2,73 @@ Return-Path: <SRS0=kd+i=55=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0169C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 17:18:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57770C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 17:21:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0BE420735
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 17:18:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Q6vVi0MD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0BE420735
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1897A2072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 17:21:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1897A2072D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jO2ij-0001EM-S5
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 13:18:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41250)
+	id 1jO2m4-00031B-9g
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 13:21:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41699)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1jO2hs-0000iI-IU
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 13:17:13 -0400
+ (envelope-from <bounces@canonical.com>) id 1jO2lM-0002LZ-Uo
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 13:20:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1jO2hr-0000lt-Fa
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 13:17:12 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:58015)
+ (envelope-from <bounces@canonical.com>) id 1jO2lK-0003vp-PO
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 13:20:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48456)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1jO2hq-0000Xt-TM; Mon, 13 Apr 2020 13:17:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=zy4Qk2PrHlQZCSGSbGjPaNsMasjSKFuHJ+FQTllXymg=; 
- b=Q6vVi0MD3B1tk34Fj0RkH3vgwDcf2N5aCEDS01DSqdgOfuM87VVmtQYKOZJODaN4u7qgDAR/G1Z4Wp4E6CtRBvsAteG9zAwxre90q1jQF4AsXgZJq+kbXPR99m397SjqEWE7XXicmfayvC5hgkCk5oFTa5XuFGRzoakLD/vHloNlwCrrjiJr/9HISNUwcc/YecLPYHgVurofmtQY9Oakw5kp5kjEO9MwVstMzv/HAmmG8qDqFSOeWSAJGMwAuDDhLekjhfdgTVknstnMb+uHGh3WMRN3QLkMJT3EtRUMg9ZkV25TxW7VB6Q83t1RT5xmOPQdPqDYsh2z7b/ED0EdaA==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1jO2hU-0001G6-NK; Mon, 13 Apr 2020 19:16:48 +0200
-Received: from berto by mail.igalia.com with local (Exim)
- id 1jO2hU-0003zg-Dh; Mon, 13 Apr 2020 19:16:48 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v4 30/30] iotests: Add tests for qcow2 images with
- extended L2 entries
-In-Reply-To: <3684cc01-3082-c52a-bd58-49300244a6eb@redhat.com>
-References: <cover.1584468723.git.berto@igalia.com>
- <420b76fbe25d5e2eeda53490a1c646935dab61c4.1584468724.git.berto@igalia.com>
- <3684cc01-3082-c52a-bd58-49300244a6eb@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Mon, 13 Apr 2020 19:16:48 +0200
-Message-ID: <w51tv1ni9vj.fsf@maestria.local.igalia.com>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jO2lJ-0003qI-DA
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 13:20:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jO2lH-00088e-E8
+ for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 17:20:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 690892E8104
+ for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 17:20:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+Date: Mon, 13 Apr 2020 17:14:51 -0000
+From: Bryan Cantrill <1872237@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bcantrill pmaydell
+X-Launchpad-Bug-Reporter: Bryan Cantrill (bcantrill)
+X-Launchpad-Bug-Modifier: Bryan Cantrill (bcantrill)
+References: <158663515939.5446.1890827991506574310.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158679809204.12583.8116727782460853834.malone@soybean.canonical.com>
+Subject: [Bug 1872237] Re: SysTick reload behavior emulated incorrectly
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 7888f0ee9f7984c083bb3aa1a40faf39d35f8f50
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,67 +77,306 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
+Reply-To: Bug 1872237 <1872237@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu 09 Apr 2020 02:22:37 PM CEST, Max Reitz wrote:
->> +    ### Write subcluster #31-#34 (cluster overlap) ###
->
-> #31-#34, I think.
+@pmaydell: Thanks for the quick response!  For whatever it's worth, I think
+that there's definitely a bunch of interest in the M-profile work:  in the
+embedded Rust space (for example) Cortex-M is very much the reference =
 
-That's what I wrote :-?
+platform.  Viz. the Embedded Rust Book:
 
->> +    ### Partially zeroize an unallocated cluster (#3)
->> +    if [ "$use_backing_file" =3D "yes" ]; then
->> +        alloc=3D"`seq 0 15`"; zero=3D""
->
-> Isn=E2=80=99t this a TODO?  (I.e., ideally we=E2=80=99d want the first 16=
- subclusters
-> to be zero, and the last 16 subclusters to be unallocated, right?)
->
-> (I=E2=80=99m asking because you did raise a TODO for the =E2=80=9CZero su=
-bcluster #1=E2=80=9D
-> test)
+  https://rust-embedded.github.io/book/
 
-Maybe, but I just implemented zeroize at the subcluster level :-) Wait
-for the next version of the series.
+For this, we have been using an xPack QEMU fork:
 
->> +    echo
->> +    echo "### Compressed cluster with subcluster bitmap !=3D 0 - $corru=
-ption_test_cmd test ###"
->> +    echo
->> +    # We actually don't consider this a corrupted image.
->> +    # The bitmap in compressed clusters is unused so QEMU should just i=
-gnore it.
->> +    _make_test_img 1M
->> +    $QEMU_IO -c 'write -q -P 11 -c 0 64k' "$TEST_IMG"
->> +    poke_file "$TEST_IMG" $(($l2_offset+11)) "\x01\x01"
->> +    alloc=3D"24"; zero=3D"0"
->> +    _verify_l2_bitmap 0 "$alloc" "$zero"
->> +    $QEMU_IO -c "$corruption_test_cmd -P 11 0 64k" "$TEST_IMG" | _filte=
-r_qemu_io
->
-> It might be interesting to see the bitmap after the write, i.e., that
-> it=E2=80=99s just been ignored.
+  https://github.com/xpack-dev-tools/qemu-arm-xpack
 
-Yeah, why not.
+Having a QEMU that had first-class support for a widely-available developme=
+nt
+platform (e.g., the STM32F Discovery) would be of great interest to this
+community -- and I'm sure many others!
 
->> +echo "# 16K clusters, 64GB, extended_l2=3Doff" # This needs one L1 table
->
-> You mean one full L1 table cluster?
->
->> +$QEMU_IMG measure --size 64G -O qcow2 -o cluster_size=3D16k,extended_l2=
-=3Doff
->> +echo "# 16K clusters, 64GB, extended_l2=3Don"  # This needs two L2 tabl=
+To prevent filing of issues that are already known:  is there a list of
+known issues with the M-profile with QEMU?
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1872237
+
+Title:
+  SysTick reload behavior emulated incorrectly
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU's emuation of SysTick on ARM is incorrect with respect to reload
+  behavior.  This issue is described here, and also in a repository
+  dedicated to the issue:
+
+    https://github.com/oxidecomputer/qemu-systick-bug
+
+  =
+
+  (What follows is in Markdown, which I understand that Launchpad does
+  not support; see the repository linked above for a rendering of it.)
+
+  Take this Rust program:
+
+  ```rust
+  #![no_std]
+  #![no_main]
+
+  extern crate panic_semihosting;
+
+  use cortex_m_rt::entry;
+  use cortex_m_semihosting::hprintln;
+  use cortex_m::peripheral::syst::SystClkSource;
+  use cortex_m::peripheral::SYST;
+
+  fn delay(syst: &mut cortex_m::peripheral::SYST, ms: u32)
+  {
+      /*
+       * Configured for the LM3S6965, which has a default CPU clock of 12 M=
+hz
+       */
+      let reload =3D 12_000 * ms;
+
+      syst.set_reload(reload);
+      syst.clear_current();
+      syst.enable_counter();
+
+      hprintln!("waiting for {} ms (SYST_CVR=3D{}) ...",
+          ms, SYST::get_current()
+      ).unwrap();
+
+      while !syst.has_wrapped() {}
+
+      hprintln!("  ... done (SYST_CVR=3D{})\n",
+  SYST::get_current()).unwrap();
+
+      syst.disable_counter();
+  }
+
+  #[entry]
+  fn main() -> ! {
+      let p =3D cortex_m::Peripherals::take().unwrap();
+      let mut syst =3D p.SYST;
+
+      syst.set_clock_source(SystClkSource::Core);
+
+      loop {
+          delay(&mut syst, 1000);
+          delay(&mut syst, 100);
+      }
+  }
+  ```
+
+  This program should oscillate between waiting for one second and waiting
+  for 100 milliseconds.  Under hardware, this is more or less what it does
+  (depending on core clock frequency); e.g., from an STM32F4107 (connected =
+via
+  OCD and with semi-hosting enabled):
+
+  ```
+  waiting for 1000 ms (SYST_CVR=3D11999949) ...
+    ... done (SYST_CVR=3D11999902)
+
+  waiting for 100 ms (SYST_CVR=3D1199949) ...
+    ... done (SYST_CVR=3D1199897)
+
+  waiting for 1000 ms (SYST_CVR=3D11999949) ...
+    ... done (SYST_CVR=3D11999885)
+
+  waiting for 100 ms (SYST_CVR=3D1199949) ...
+    ... done (SYST_CVR=3D1199897)
+
+  waiting for 1000 ms (SYST_CVR=3D11999949) ...
+    ... done (SYST_CVR=3D11999885)
+
+  ```
+
+  Under QEMU, however, its behavior is quite different:
+
+  ```
+  $ cargo run
+      Finished dev [unoptimized + debuginfo] target(s) in 0.03s
+       Running `qemu-system-arm -cpu cortex-m3 -machine lm3s6965evb -nograp=
+hic -semihosting-config enable=3Don,target=3Dnative -kernel target/thumbv7m=
+-none-eabi/debug/qemu-systick-bug`
+  waiting for 1000 ms (SYST_CVR=3D11999658) ...
+    ... done (SYST_CVR=3D11986226)
+
+  waiting for 100 ms (SYST_CVR=3D0) ...
+    ... done (SYST_CVR=3D1186560)
+
+  waiting for 1000 ms (SYST_CVR=3D1185996) ...
+    ... done (SYST_CVR=3D11997350)
+
+  waiting for 100 ms (SYST_CVR=3D0) ...
+    ... done (SYST_CVR=3D1186581)
+  ```
+
+  In addition to the values being strangely wrong, the behavior is wrong:
+  the first wait correctly waits for 1000 ms -- but the subsequent wait
+  (which should be for 100 ms) is in fact 1000 ms, and the next wait (which
+  should be for 1000 ms) is in fact 100 ms.  (That is, it appears as if
+  the periods of the two delays have been switched.)
+
+  The problems is that the QEMU ARM emulation code does not reload SYST_CVR=
+ from
+  SYST_RVR if SYST_CSR.ENABLE is not set -- and moreover, that SYST_CVR is
+  not reloaded from SYST_RVR even when SYST_CSR.ENABLE becomes set.  This is
+  very explicit; from
+  <a
+  href=3D"https://github.com/qemu/qemu/blob/8bac3ba57eecc466b7e73dabf7d1932=
+8a59f684e/hw/timer/armv7m_systick.c#L42-L60">hw/timer/armv7m_systick.c</a>:
+
+  ```c
+  static void systick_reload(SysTickState *s, int reset)
+  {
+      /* The Cortex-M3 Devices Generic User Guide says that "When the
+       * ENABLE bit is set to 1, the counter loads the RELOAD value from the
+       * SYST RVR register and then counts down". So, we need to check the
+       * ENABLE bit before reloading the value.
+       */
+      trace_systick_reload();
+
+      if ((s->control & SYSTICK_ENABLE) =3D=3D 0) {
+          return;
+      }
+
+      if (reset) {
+          s->tick =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+      }
+      s->tick +=3D (s->reload + 1) * systick_scale(s);
+      timer_mod(s->timer, s->tick);
+  }
+  ```
+
+  The statement in the code is stronger than the statement in the
+  <a href=3D"https://static.docs.arm.com/ddi0403/eb/DDI0403E_B_armv7m_arm.p=
+df">ARMv7-M Architecture Reference Manual</a> (sec B3.3.1):
+
+  > Writing to SYST_CVR clears both the register and the COUNTFLAG status
+  > bit to zero. This causes the SysTick logic to reload SYST_CVR from SYST=
+_RVR
+  > on the next timer clock. A write to SYST_CVR does not trigger the
+  > SysTick exception logic.
+
+  Note that this does not mention the behavior on a write to SYST_CVR when
+  SYST_CSR.ENABLE is not set -- and in particular, does *not* say that writ=
+es to
+  SYST_CVR will be ignored if SYST_CSR.ENABLE is not set.
+
+  Section 3.3.1 does go on to say:
+
+  > The SYST_CVR value is UNKNOWN on reset. Before enabling the SysTick cou=
+nter,u
+  > software must write the required counter value to SYST_RVR, and then wr=
+ite
+  > to SYST_CVR. This clears SYST_CVR to zero. When enabled, the counter =
+
+  > reloads the value from SYST_RVR, and counts down from that value, rathe=
+r]
+  > than from an arbitrary value.
+
+  (This is more or less what has been quoted in the implementation of
+  `systick_reload`, above.)  This note does **not** say, however, that writ=
 es
->
-> And two full L1 table clusters?
+  to SYST_CVR will be discarded when not enabled, but rather that the count=
+ing
+  will only begin (and the value in SYST_RVR loaded or reloaded) when
+  SYST_CSR.ENABLE becomes set.
 
-You're right, I'll correct that.
+  While QEMU's behavior does not match that of the hardware (and is therefo=
+re
+  at some level malfunctioning), there is additional behavior that is very
+  clearly incorrect: once SYST_CSR.ENABLE is set, not only will SYST_CVR
+  continue to return 0 (that is, the counter will not be enabled),
+  SYST_CSR.COUNTFLAG will become set when the *old* value of SYST_RVR ticks
+  have elapsed!  This is wrong in both regards: if SYST_CVR is not counting
+  down, SYST_CSR.COUNTFLAG should never become set -- and it certainly
+  shouldn't match a value of SYST_RVR that has been overwritten in the
+  interim!
 
-Berto
+  In terms of fixing this, it's helpful to understand the
+  <a
+  href=3D"https://lists.gnu.org/archive/html/qemu-devel/2015-05/msg01217.ht=
+ml">context
+  around this change</a>:
+
+  > Consider the following pseudo code to configure SYSTICK (The
+  > recommended programming sequence from "the definitive guide to the
+  > arm cortex-m3"):
+  >    SYSTICK Reload Value Register =3D 0xffff
+  >    SYSTICK Current Value Register =3D 0
+  >    SYSTICK Control and Status Register =3D 0x7
+  >
+  > The pseudo code "SYSTICK Current Value Register =3D 0" leads to invoking
+  > systick_reload(). As a consequence, the systick.tick member is updated
+  > and the systick timer starts to count down when the ENABLE bit of
+  > SYSTICK Control and Status Register is cleared.
+  >
+  > The worst case is that: during the system initialization, the reset
+  > value of the SYSTICK Control and Status Register is 0x00000000. =
+
+  > When the code "SYSTICK Current Value Register =3D 0" is executed, the
+  > systick.tick member is accumulated with "(s->systick.reload + 1) *
+  > systick_scale(s)". The systick_scale() gets the external_ref_clock
+  > scale because the CLKSOURCE bit of the SYSTICK Control and Status
+  > Register is cleared. This is the incorrect behavior because of the
+  > code "SYSTICK Control and Status Register =3D 0x7". Actually, we want
+  > the processor clock instead of the external reference clock.
+  >
+  > This incorrect behavior defers the generation of the first interrupt. =
+
+  >
+  > The patch fixes the above-mentioned issue by setting the systick.tick
+  > member and modifying the systick timer only if the ENABLE bit of
+  > the SYSTICK Control and Status Register is set.
+  >
+  > In addition, the Cortex-M3 Devices Generic User Guide mentioned that
+  > "When ENABLE is set to 1, the counter loads the RELOAD value from the
+  > SYST RVR register and then counts down". This patch adheres to the
+  > statement of the user guide.
+
+  This fix is simply incorrect -- or at the least, incomplete:
+  a write to SYST_CVR must clear any cached state
+  such that a subsequent write to SYST_CSR.ENABLE will correctly cause
+  a reload.  Here is a diff that solves the problem without re-introducing
+  the behavior that the original fix was trying to correct:
+
+  ```diff
+  diff --git a/hw/timer/armv7m_systick.c b/hw/timer/armv7m_systick.c
+  index 74c58bcf24..3f7b267c2d 100644
+  --- a/hw/timer/armv7m_systick.c
+  +++ b/hw/timer/armv7m_systick.c
+  @@ -181,6 +181,15 @@ static MemTxResult systick_write(void *opaque, hwadd=
+r addr,
+           break;
+       case 0x8: /* SysTick Current Value.  Writes reload the timer.  */
+           systick_reload(s, 1);
+  +
+  +        if ((s->control & SYSTICK_ENABLE) =3D=3D 0) {
+  +            /*
+  +             * If we're not enabled, explicitly clear our tick value to
+  +             * assure that when we do become enabled, we correctly reloa=
+d.
+  +             */
+  +            s->tick =3D 0;
+  +        }
+  +
+           s->control &=3D ~SYSTICK_COUNTFLAG;
+           break;
+       default:
+  ```
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1872237/+subscriptions
 
