@@ -2,75 +2,98 @@ Return-Path: <SRS0=kd+i=55=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BBCAC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 07:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3324BC2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 07:14:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61533206A1
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 07:05:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3D8E20678
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 07:14:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SsOzjN7c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61533206A1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fDdgMAJg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3D8E20678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNtAG-0005i2-Mv
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 03:05:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35673)
+	id 1jNtIl-0008Gm-3Z
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 03:14:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36375)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jNt9U-0004xO-Pf
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 03:05:05 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jNtHv-0007qj-KX
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 03:13:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jNt9T-0007z4-Ch
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 03:05:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29369
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1jNtHu-0002OO-Jn
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 03:13:47 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31186
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jNt9T-0007yg-6H
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 03:05:03 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jNtHu-0002OC-GM
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 03:13:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586761502;
+ s=mimecast20190719; t=1586762025;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=RZCKbBLiuFnZdCNkCVsECS8lV70QZ6GPa9l2d2OloCs=;
- b=SsOzjN7c4DrVTnZTBexwhSasjUHnKASESFCYtHX4SBvwVgwWV7fzjvFx51SQMs+h8nFYtU
- y8OIg2vRrB8grMx9VfpsK2TP5eZEBevAJG6jYOzpFlg8W+r7uJ94q8k9NFMENngBUQcaYA
- fR1vp4sYfUfbn97Zcpoky9ptoeFRImA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-G1Mlc2UKPQiUk32VzT3Jmg-1; Mon, 13 Apr 2020 03:04:59 -0400
-X-MC-Unique: G1Mlc2UKPQiUk32VzT3Jmg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C335118B5FA0
- for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 07:04:58 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7EA555D9C9
- for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 07:04:58 +0000 (UTC)
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=i8v6iWYUxruV0FiQDfZ8Sb9lr2g6nJHeQ7fHb3n5J/A=;
+ b=fDdgMAJgM0W1NpoC7g5h4iR7oqYmOcU4apqaKOjPFtF6jLrkGF5VnaURO34k7kGZCXbDqB
+ EpliaairAzozIcnqIxDHhTWR75I1kIkKcWPB55ChFFK6ZnG8lv8/RYy/jdQDxrZIzGVQgh
+ kluPfnibtMS0VVFZ+NryqZhlHAHoZyw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-454-vV57QdQDO7O05CJyEawAgg-1; Mon, 13 Apr 2020 03:13:43 -0400
+X-MC-Unique: vV57QdQDO7O05CJyEawAgg-1
+Received: by mail-wr1-f70.google.com with SMTP id h14so6276705wrr.12
+ for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 00:13:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=i8v6iWYUxruV0FiQDfZ8Sb9lr2g6nJHeQ7fHb3n5J/A=;
+ b=M4hUI9TsfCHmBt+AzkgX09bxY1HMHnxKSE+0Hrn728WvfCdgXrvIGYyHNSfmkFmYJx
+ PKJ065aafK/d8EEnXAy4QgMYaXKvQsGakA5+fHERJ+Q8v8cKIfOG1YS3ROsYmUYsXaUx
+ gdlabGu1zV9HuWkwSGHb5Ky7w1Qyjv52huXB2Vk0rdlsV+FN2Al5Ei3JhZ4PxtfxD7IN
+ /el4HwUsNa7V/LfmWe175LWqwHcaT7zcBwfezf7OnXnvW3tMTsN31knYP/0VheMxMrpd
+ M8YxEAl5Ws544iIZfdpC5Aun+/AZ6UQ4mujWm+GjuEnPtEzREryrVdN/dk6LaXVPzx5V
+ axZg==
+X-Gm-Message-State: AGi0PubRIdbkPadG3FjlKlzP3Dz/f7qHi0B0rWbSM3n2ko3elMLNQ0L8
+ Q9snXJovfx7VhFv+iKLA3mlo8ooop8PnGiWWlKPnMGECCt+1hJLiYbON9bTKZvWmT/1M+KQs43l
+ 2cJZMAXEz7UJ9JNg=
+X-Received: by 2002:a5d:4746:: with SMTP id o6mr17294740wrs.304.1586762022235; 
+ Mon, 13 Apr 2020 00:13:42 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJJnDMTS/FPPnJtMdRQG/zdQzMHCbSc0ZpJgL0s5JH4e81aOWpf+GAkj8GPLHjRYUp4UBgC1Q==
+X-Received: by 2002:a5d:4746:: with SMTP id o6mr17294722wrs.304.1586762021952; 
+ Mon, 13 Apr 2020 00:13:41 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:f95d:5f37:e378:f48d?
+ ([2001:b07:6468:f312:f95d:5f37:e378:f48d])
+ by smtp.gmail.com with ESMTPSA id c11sm13947940wrt.24.2020.04.13.00.13.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 13 Apr 2020 00:13:41 -0700 (PDT)
+Subject: Re: [PATCH for-5.0? 0/3] Make docs build work with Sphinx 3
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20200411182934.28678-1-peter.maydell@linaro.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 0/8] Misc patches for QEMU 5.0-rc3
-Date: Mon, 13 Apr 2020 03:04:57 -0400
-Message-Id: <20200413070457.25499-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Message-ID: <8bc506e7-e0de-9e12-cc47-a2d86291b876@redhat.com>
+Date: Mon, 13 Apr 2020 09:13:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <20200411182934.28678-1-peter.maydell@linaro.org>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,64 +109,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 53ef8a92eb04ee19640f5aad3bff36cd4a36c250=
-:
+On 11/04/20 20:29, Peter Maydell wrote:
+> 
+> I've marked this up as 'for-5.0?' because I think it would be
+> nice if at least patch 1 went in. Patch 2 seems uncontroversial
+> (though I guess we should forward it up to the kernel folks
+> since kernel-doc is from them originally). Patch 3 is the
+> expedient change, but you could argue about whether this is
+> the best way to tell kernel-doc what to do.
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200=
-406' into staging (2020-04-06 12:36:45 +0100)
+I agree---I would say this is ok for 5.0 as long as the last two patches
+are forwarded to the kernel and any changes integrated back.
 
-are available in the Git repository at:
+Patch 1 is clever. :)
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
+Paolo
 
-for you to fetch changes up to 267514b33ffa3f315adc26fc14d89f92e90840f5:
-
-  module: increase dirs array size by one (2020-04-13 02:56:18 -0400)
-
-----------------------------------------------------------------
-Bugfixes, and reworking of the atomics documentation.
-
-----------------------------------------------------------------
-
-v1->v2: remove stray roms/SLOF change
-
-Alexander Duyck (1):
-      memory: Do not allow direct write access to rom_device regions
-
-Bauerchen (1):
-      oslib-posix: take lock before qemu_cond_broadcast
-
-Bruce Rogers (1):
-      module: increase dirs array size by one
-
-Igor Mammedov (1):
-      vl.c: error out if -mem-path is used together with -M memory-backend
-
-Olaf Hering (1):
-      piix: fix xenfv regression, add compat machine xenfv-4.2
-
-Paolo Bonzini (3):
-      atomics: convert to reStructuredText
-      atomics: update documentation
-      rcu: do not mention atomic_mb_read/set in documentation
-
- docs/devel/atomics.rst               | 507 +++++++++++++++++++++++++++++++=
-++++
- docs/devel/atomics.txt               | 403 ----------------------------
- docs/devel/index.rst                 |   1 +
- docs/devel/rcu.txt                   |   4 +-
- hw/i386/pc_piix.c                    |  19 +-
- include/exec/memory.h                |   4 +-
- softmmu/vl.c                         |   5 +
- tests/qtest/device-introspect-test.c |   2 +-
- tests/qtest/qom-test.c               |  42 +--
- tests/qtest/test-hmp.c               |   2 +-
- util/module.c                        |   2 +-
- util/oslib-posix.c                   |   3 +
- 12 files changed, 547 insertions(+), 447 deletions(-)
- create mode 100644 docs/devel/atomics.rst
- delete mode 100644 docs/devel/atomics.txt
---=20
-2.18.2
+> 
+> thanks
+> -- PMM
+> 
+> Peter Maydell (3):
+>   configure: Honour --disable-werror for Sphinx
+>   scripts/kernel-doc: Add missing close-paren in c:function directives
+>   kernel-doc: Use c:struct for Sphinx 3.0 and later
 
 
