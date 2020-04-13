@@ -2,97 +2,49 @@ Return-Path: <SRS0=kd+i=55=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1A7CC2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 11:13:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29CE2C2BBC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 11:13:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B69732072C
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 11:13:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ecSuo+Np"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B69732072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 011702072C
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 11:13:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 011702072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNx1f-0004Dd-TP
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 07:13:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58801)
+	id 1jNx1h-0004Hk-6J
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 07:13:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58843)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jNx0W-0002P5-GU
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 07:12:06 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jNx0t-0002ic-So
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 07:12:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jNx0V-0000SJ-3F
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 07:12:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50586
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jNx0s-0000iQ-Jr
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 07:12:27 -0400
+Received: from relay.sw.ru ([185.231.240.75]:40336)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jNx0U-0000S1-VJ
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 07:12:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586776322;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hngf1T4xIdGtDUWQBKvLGu7Vp96xshofitGMfLmzyhs=;
- b=ecSuo+Npn26+hVjgPWj9BwlxsFNKoi4ifRp639Avrw916ml5fJdtVn4KImX727/1Gj83P6
- kKXizmkW+2wAGd66k+cVasW8tjuPO2j94r2V1fmIOTngUMsky+zMXDL4kVt9fAUkyruIA7
- 8+dlt3hcv1yGEQSJqD1Dl+542LNirPQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215--UlO8VCTN_uc5tA7jtAbkw-1; Mon, 13 Apr 2020 07:09:16 -0400
-X-MC-Unique: -UlO8VCTN_uc5tA7jtAbkw-1
-Received: by mail-wm1-f70.google.com with SMTP id o5so2542005wmo.6
- for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 04:09:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=b47iFwMVN9QYq3a/PDcTMzVV7TwuVWttbtbEsjdpn3s=;
- b=jPeWiVDigDliFfpLj4EBsyn+ciD9s1NnDQR2ezfwNK7WZUNHodl9ENPexdpsmNVprd
- 35qpdMzumLKdIavVANPJcM6YolZYkJ7Aps847jcH+ykNRMryvEcoAE7PnpB0vvoWovrE
- Jwwywpo18i4wNiUWez8Yq2sxQWVMSmwukPN5M9J/pRJaKv13CYD0aK8EXLmZRtqU9vO4
- RLpgU5RAk1vSed5f10mtK72aZa/UzzFDDAnCvITpKF3uwDLCF1PNWjGF9hN5+wSuFogq
- U3zt2Fgfbb9/154lU6E7Bnqg5TuxQMys7rWe/NZ607lbG4UZvf510mFiiK/kSp6oDuUh
- nihA==
-X-Gm-Message-State: AGi0PuZ/xTa3FmviKZMxv88zfpgNjGS6JxV7fhMtvS8abYcbetdAW3f2
- 4n1CT0gHpprX2KGKd71MZyCWP1JV4msnG5aHnpJHamJ/w2M0XkSuvoknVSesQMrA3X561BOQq/I
- GbvHKs8YmOk1jtT4=
-X-Received: by 2002:a7b:c401:: with SMTP id k1mr17855158wmi.152.1586776155097; 
- Mon, 13 Apr 2020 04:09:15 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJNKQcsJndV9iBW/kyN6EB4g11EndmI5RNXV9yF8WAcQkkjAjqLwmWbDO8eLpjLV+XckcJXwQ==
-X-Received: by 2002:a7b:c401:: with SMTP id k1mr17855132wmi.152.1586776154800; 
- Mon, 13 Apr 2020 04:09:14 -0700 (PDT)
-Received: from redhat.com ([185.107.45.41])
- by smtp.gmail.com with ESMTPSA id h2sm14512643wmf.34.2020.04.13.04.09.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Apr 2020 04:09:14 -0700 (PDT)
-Date: Mon, 13 Apr 2020 07:09:12 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jNx0s-0000g1-Ck
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 07:12:26 -0400
+Received: from vgpu0.qa.sw.ru ([10.94.1.107])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jNx0h-0002VQ-4V; Mon, 13 Apr 2020 14:12:15 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 4/4] exec: Fix for qemu_ram_resize() callback
-Message-ID: <20200413110838.151374-5-mst@redhat.com>
-References: <20200413110838.151374-1-mst@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <20200413110838.151374-1-mst@redhat.com>
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Subject: [RFC patch v1 0/3] qemu-file writing performance improving
+Date: Mon, 13 Apr 2020 14:12:11 +0300
+Message-Id: <1586776334-641239-1-git-send-email-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,91 +56,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Hildenbrand <david@redhat.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: den@openvz.org, dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+Problem description: qcow2 internal snapshot saving time is too big on HDD ~ 25 sec
 
-Summarizing the issue:
-1. Memory regions contain ram blocks with a different size,  if the
-   size is  not properly aligned. While memory regions can have an
-   unaligned size, ram blocks can't. This is true when creating
-   resizable memory region with  an unaligned size.
-2. When resizing a ram block/memory region, the size of the memory
-   region  is set to the aligned size. The callback is called with
-   the aligned size. The unaligned piece is lost.
+When a qcow2 image is placed on a regular HDD and the image is openned with
+O_DIRECT the snapshot saving time is around 26 sec.
+The snapshot saving time can be 4 times sorter.
+The patch series propose the way to achive that. 
 
-Because of the above, if ACPI blob length modifications happens
-after the initial virt_acpi_build() call, and the changed blob
-length is within the PAGE size boundary, then the revised size
-is not seen by the firmware on Guest reboot.
+Why is the saving time = ~25 sec?
 
-Hence make sure callback is called if memory region size is changed,
-irrespective of aligned or not.
+There are three things:
+1. qemu-file iov limit (currently 64)
+2. direct qemu_fflush calls, inducing disk writings
+3. ram data copying and synchronous disk wrtings
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
-[Shameer: added commit log]
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <20200403101827.30664-4-shameerali.kolothum.thodi@huawei.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- exec.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+When 1, 2 are quite clear, the 3rd needs some explaination:
 
-diff --git a/exec.c b/exec.c
-index de9d949902..2874bb5088 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2074,11 +2074,23 @@ static int memory_try_enable_merging(void *addr, si=
-ze_t len)
-  */
- int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp)
- {
-+    const ram_addr_t unaligned_size =3D newsize;
-+
-     assert(block);
-=20
-     newsize =3D HOST_PAGE_ALIGN(newsize);
-=20
-     if (block->used_length =3D=3D newsize) {
-+        /*
-+         * We don't have to resize the ram block (which only knows aligned
-+         * sizes), however, we have to notify if the unaligned size change=
-d.
-+         */
-+        if (unaligned_size !=3D memory_region_size(block->mr)) {
-+            memory_region_set_size(block->mr, unaligned_size);
-+            if (block->resized) {
-+                block->resized(block->idstr, unaligned_size, block->host);
-+            }
-+        }
-         return 0;
-     }
-=20
-@@ -2102,9 +2114,9 @@ int qemu_ram_resize(RAMBlock *block, ram_addr_t newsi=
-ze, Error **errp)
-     block->used_length =3D newsize;
-     cpu_physical_memory_set_dirty_range(block->offset, block->used_length,
-                                         DIRTY_CLIENTS_ALL);
--    memory_region_set_size(block->mr, newsize);
-+    memory_region_set_size(block->mr, unaligned_size);
-     if (block->resized) {
--        block->resized(block->idstr, newsize, block->host);
-+        block->resized(block->idstr, unaligned_size, block->host);
-     }
-     return 0;
- }
---=20
-MST
+Internal snapshot uses qemu-file as an interface to store the data with
+stream semantics.
+qemu-file avoids data coping when possible (mostly for ram data)
+and use iovectors to propagate the data to an undelying block driver state.
+In the case when qcow2 openned with O_DIRECT it is suboptimal.
+
+This is what happens: on writing, when the iovectors query goes from qemu-file
+to bdrv (here and further by brdv I mean qcow2 with posix O_DIRECT openned backend),
+the brdv checks all iovectors to be base and size aligned, if it's not the case,
+the data copied to an internal buffer and synchronous pwrite is called.
+If the iovectors are aligned, io_submit is called.
+
+In our case, snapshot almost always induces pwrite, since we never have all
+the iovectors aligned in the query, because of frequent adding a short iovector:
+8 byte ram-page delimiters, after adding each ram page iovector.
+
+So the qemu-file code in this case:
+1. doesn't aviod ram copying
+2. works fully synchronously
+
+How to improve the snapshot time:
+
+1. easy way: to increase iov limit to IOV_MAX (1024).
+This will reduce synchronous writing frequency.
+My test revealed that with iov limit = IOV_MAX the snapshot time *~12 sec*.
+
+2. complex way: do writings asynchronously.
+Introduce both base- and size-aligned buffer, write the data only when
+the buffer is full, write the buffer asynchronously, meanwhile filling another
+buffer with snapshot data.
+My test revealed that this complex way provides the snapshot time *~6 sec*,
+2 times better than just iov limit increasing.
+
+The patch proposes how to improve the snapshot performance in the complex way,
+allowing to use the asyncronous writings when needed.
+
+This is an RFC series, as I didn't confident that I fully understand all
+qemu-file use cases. I tried to make the series in a safe way to not break
+anything related to qemu-file using in other places, like migration.
+
+All comments are *VERY* appriciated!
+
+Thanks,
+Denis
+
+Denis Plotnikov (3):
+  qemu-file: introduce current buffer
+  qemu-file: add buffered mode
+  migration/savevm: use qemu-file buffered mode for non-cached bdrv
+
+ include/qemu/typedefs.h |   2 +
+ migration/qemu-file.c   | 479 +++++++++++++++++++++++++++++++++++++++++-------
+ migration/qemu-file.h   |   9 +
+ migration/savevm.c      |  38 +++-
+ 4 files changed, 456 insertions(+), 72 deletions(-)
+
+-- 
+1.8.3.1
 
 
