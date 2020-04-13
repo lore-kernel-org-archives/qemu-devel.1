@@ -2,122 +2,82 @@ Return-Path: <SRS0=kd+i=55=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B75EC2BA2B
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:06:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F38BCC2BA2B
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:08:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 221B120663
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:06:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B39FC20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:08:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aZt4UZ0t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 221B120663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Soz/lluK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B39FC20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jO7E7-00027T-CH
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 18:06:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44144)
+	id 1jO7Fs-0003Fy-Uz
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 18:08:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44320)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jO7DX-0001ht-3v
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:06:12 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jO7FI-0002ej-8l
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:08:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jO7DV-0002Ll-1N
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:06:10 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44747)
+ (envelope-from <alistair23@gmail.com>) id 1jO7FG-0003TP-VO
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:08:00 -0400
+Received: from mail-vs1-xe41.google.com ([2607:f8b0:4864:20::e41]:33841)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jO7DU-0002Lc-PW
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:06:08 -0400
-Received: by mail-wr1-x442.google.com with SMTP id d17so5032882wrg.11
- for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 15:06:08 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1jO7FG-0003P4-RZ; Mon, 13 Apr 2020 18:07:58 -0400
+Received: by mail-vs1-xe41.google.com with SMTP id b5so6498830vsb.1;
+ Mon, 13 Apr 2020 15:07:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9bfTY167sjqKg0j7diQOa4rjBTWcdaFc9b+SRgfV2hU=;
- b=aZt4UZ0t1AVfMlIDatV5vi1aCOl5hqdvSlO1cm+3X6HEHiZmtaX5MZ7WaRDPUXJNXh
- tEtnFdvHN7sYoqoo/WhdG1o0r9K7SrLxSIQchuSkgkk7uW7nZf595VVG7kxp8p4nIOXz
- cvK2QH6lh7WTBzik/WK4h9WPUFZDuHYPViBpK8HDYG0NQCaOP3e3H3G+iVz3MbEIIIrq
- JxFDxiH+EAUKTkBoqZrCcLX8fw81SIHnzIfpYD/HZpn673N6SZ/e7xoxoAcNSCzO6Lgz
- OOGxfcIw4C4qaACgGOhF8+nkKtZS7k7uWhfHs/xu8sSwFyww4RIjfb1a0NXbi2yw7AkE
- +f9A==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=43BfZE9uxQlRypiXVLawqDbuwTbqxgiL7O2TCDlfh/g=;
+ b=Soz/lluK+rYgW7TNHkF/fmsFqes4CsWM+/+cQedeyb8GyB2+WFvbgbg6SugVUl+9ja
+ /Kt7OEmXq05rLhrb0rKqY8+QhlqDTY7niiQK01EFqM/QtBPC1bJU9LrVRszWds7M7C+l
+ qc2aGPrU+hgXn2KBEnxwTrArE64rVM3nU+fxboY3rBqgkdYCsFuxo9V1LJZnnphLThw7
+ XhadXRqhphrsA5bJj865JBOURPbtrxWXJVKtyfSaVDKWVW2aPJqkXo5+JCU2181tihq/
+ gsIigC0ob8Sek8ChSSCLEz5dwRjfL6994LUZr8xd/rGpw6Z3cE8ZP4nq4yTRhCPRsAAp
+ JMdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=9bfTY167sjqKg0j7diQOa4rjBTWcdaFc9b+SRgfV2hU=;
- b=O1I2DtSvex2jN93m7KU+2AsTp8sUyAWzM4dhhWtlsuzOiZEDQcKu9+c8lgO9FaGMs5
- VLrXJmjt10mNqErM8k3TqgQgUeOWMq0u5FSGvEBvD7gkMx1xS0Svz+XABTDo+LkctVN7
- EtcN4vzfuZg4F3MmBB23vR23+aHSldax0bYuhcRiE/SCmzlmCqeL6HavW0OmJtM52DqW
- DGz/2IlZ6k4nIMJ58YFj79HNlxuy8vHoB6s4PUQCr8imLFmV3r6zsLo7RLdYX+g1tGEj
- +tepYq0E77VImuMqIiP9je21Khl+haCjqp7EpEF8a2LyZBo2bRToG+BIrf/8z3QFQRGS
- UYCA==
-X-Gm-Message-State: AGi0PuY3RTXLrpYZgMqRBYHNRjrVIhHEiaJxzfOCIWIqDndI7HMBJJs0
- zFHn0AZbGvcBye5rrkfAXFg=
-X-Google-Smtp-Source: APiQypKNCjM8knpi+73akKW+WqsoXHXA+wU4vlxlt9kqSImXkRtt9gIOnbYHvtiyMuRH52c9+Nn24g==
-X-Received: by 2002:a5d:494a:: with SMTP id r10mr22158368wrs.302.1586815567546; 
- Mon, 13 Apr 2020 15:06:07 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id v16sm16185569wml.30.2020.04.13.15.06.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 13 Apr 2020 15:06:06 -0700 (PDT)
-Subject: Re: [PATCH 3/3] MAINTAINERS: Add myself as fulong2e co-maintainer
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>
-References: <1586337380-25217-1-git-send-email-chenhc@lemote.com>
- <1586337380-25217-3-git-send-email-chenhc@lemote.com>
- <CAHiYmc61GZSvvwhCaC0B5q0GrEUN3CevDvNTEEWLE9PCJqVbvw@mail.gmail.com>
- <CAAhV-H5moZ8kD5WAM1GvLRmg9spO7m=2DZZL+uUXAoo4iWZyVg@mail.gmail.com>
- <20200409103844.1591548c@flygoat-x1e>
- <CAHiYmc71dZK9bYOWCQ4aA4_wTnicrpCGkuNp+h5umOwP6Q1xiA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <21fee195-29d6-706e-144d-d06ad76a0869@amsat.org>
-Date: Tue, 14 Apr 2020 00:06:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=43BfZE9uxQlRypiXVLawqDbuwTbqxgiL7O2TCDlfh/g=;
+ b=olW31riyxdUL3wOLi0mVzGxFn8Y9a/YJvk/EVl5Xw/uMW/lkDXm5PP70Zjq2/RJsyl
+ V0w7ffA9QU7wXqy8TNQi36/XoMEaWkf4EWpx06yLVBxSH3xYNAiB8I1GMBChf4sGHIyu
+ baSKoXwE5hzJzXOHmD7CYsS5kM2Xn9153ShBJldHK/thGphGtBCOIotyicBH7eo7rEIq
+ UzvR2K7W3O4m6jypfFS//lLKKf4eG6Q4FTF3pIRmEGoTeLDXZkULmQ/KdFxJ7Gr51myl
+ Dui+fh/hZYCZLZG8nR05Ys9gQpRo/Tg9v8hKx6tKuqsP5osS2KkrWRK7/T1tXEzvCAkV
+ qIwg==
+X-Gm-Message-State: AGi0PuaEtoLcGpje0uKV7Jrf8dTepAv/C5FpJLoNF81X5YJZu1mG3IEa
+ Y5e4lo7KbCHKve1x2IAEFNPEuU+4tt1kmNEFvOA=
+X-Google-Smtp-Source: APiQypJXJu8RS2a8EA2WZ4sRmnHeppOg+jK3niFqdqiVH7okRCgERTN4WzyiM4Z9fC/AqASKYb0kN9ibRcqbxqmEtvI=
+X-Received: by 2002:a67:902:: with SMTP id 2mr14829949vsj.133.1586815677800;
+ Mon, 13 Apr 2020 15:07:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAHiYmc71dZK9bYOWCQ4aA4_wTnicrpCGkuNp+h5umOwP6Q1xiA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200412223619.11284-1-f4bug@amsat.org>
+ <20200412223619.11284-12-f4bug@amsat.org>
+In-Reply-To: <20200412223619.11284-12-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 13 Apr 2020 14:59:41 -0700
+Message-ID: <CAKmqyKPpjifNG575VVbfKk1h7+v1XK9YMs44nG2rY=Z3=HDkbg@mail.gmail.com>
+Subject: Re: [PATCH-for-5.1 v3 11/24] hw/arm/msf2-soc: Store MemoryRegion in
+ MSF2State
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2607:f8b0:4864:20::e41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,119 +89,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhc@lemote.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Aurelien Jarno <aurelien@aurel32.net>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
+ Jason Wang <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ "open list:New World" <qemu-ppc@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/10/20 4:37 PM, Aleksandar Markovic wrote:
-> 04:39 Čet, 09.04.2020. Jiaxun Yang <jiaxun.yang@flygoat.com
-> <mailto:jiaxun.yang@flygoat.com>> је написао/ла:
->>
->> On Thu, 9 Apr 2020 10:17:46 +0800
->> Huacai Chen <chenhc@lemote.com <mailto:chenhc@lemote.com>> wrote:
->>
->> > Hi, Aleksandar,
->> >
->> > On Wed, Apr 8, 2020 at 11:30 PM Aleksandar Markovic
->> > <aleksandar.qemu.devel@gmail.com
-> <mailto:aleksandar.qemu.devel@gmail.com>> wrote:
->> > >
->> > > 11:08 Sre, 08.04.2020. Huacai Chen <chenhc@lemote.com
-> <mailto:chenhc@lemote.com>> је
->> > > написао/ла: 
->> > > >
->> > > > I submitted the MIPS/fulong2e support about ten years ago, and
->> > > > after that I became a MIPS kernel developer. Last year, Philippe
->> > > > Mathieu- Daudé asked me that whether I can be a reviewer of
->> > > > MIPS/fulong2e, and I promised that I will do some QEMU work in
->> > > > the next year (i.e., 2020 and later). I think now (and also in
->> > > > future) I can have some spare time, so I can finally do some real
->> > > > work on QEMU/MIPS. And if possible, I hope I can be a
->> > > > co-maintainer of MIPS/fulong2e.
->> > > >
->> > > > Cc: Jiaxun Yang <jiaxun.yang@flygoat.com
-> <mailto:jiaxun.yang@flygoat.com>>
->> > > > Signed-off-by: Huacai Chen <chenhc@lemote.com
-> <mailto:chenhc@lemote.com>>
->> > > > ---
->> > > >  MAINTAINERS | 1 +
->> > > >  1 file changed, 1 insertion(+)
->> > > >
->> > > > diff --git a/MAINTAINERS b/MAINTAINERS
->> > > > index 642c8e0..3281ff2 100644
->> > > > --- a/MAINTAINERS
->> > > > +++ b/MAINTAINERS
->> > > > @@ -1073,6 +1073,7 @@ F: hw/mips/mips_r4k.c
->> > > >  Fulong 2E
->> > > >  M: Philippe Mathieu-Daudé <f4bug@amsat.org
-> <mailto:f4bug@amsat.org>>
->> > > >  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com
-> <mailto:aleksandar.qemu.devel@gmail.com>>
->> > > > +M: Huacai Chen <chenhc@lemote.com <mailto:chenhc@lemote.com>>
->> > > >  S: Odd Fixes
->> > > >  F: hw/mips/mips_fulong2e.c
->> > > >  F: hw/isa/vt82c686.c
->> > > > --
->> > > > 2.7.0
->> > > > 
->> > >
->> > > First of all, I want to express great pleasure and delight seing
->> > > your series, and this patch in particular.
->> > >
->> > > A warm welcome to QEMU developers communities!
->> > >
->> > > We are currenyly very busy preparing QEMU 5.0 release, and
->> > > additionaly, Easter holidays are in next few days or week
->> > > (different parts od Christian world have different calendars), so,
->> > > fot thay and other reasons, don't expect promot replies from us.
->> > >
->> > > I would also like to see Jiaxng at least having official reviewer
->> > > status, but, of course, only if he wants that. 
->> > Thank you for your best wishes, I'm also very glad to see Jiaxun be
->> > an reviewer.
->>
->> Thanks, but I was a primary school student at Loongson-2E's era, so I
->> can do nothing with 2E.
->>
->> My experience with Loongson starts from 2F. And I'm more familiar with
->> 2K and 3A.
+On Sun, Apr 12, 2020 at 3:40 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> Coccinelle reported:
+>
+>   $ spatch ... --timeout 60 --sp-file \
+>     scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+>   HANDLING: ./hw/arm/msf2-soc.c
+>   >>> possible moves from m2sxxx_soc_initfn() to m2sxxx_soc_realize() in =
+./hw/arm/msf2-soc.c:86
+>
+> While reviewing we notice storing the MemoryRegion in the device
+> state, we'll be able to later automatically simplify the error
+> propagation calls.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Thank you both of you, your help is very welcome :)
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-I have a simple series renaming "fulo[o]ng" I plan to send when the 5.1
-development window opens, I'll include your patch.
+Alistair
 
->>
-> 
-> OK, it makes sense. But, if you ever become wanting to be a reviewer for
-> Foolong 2e, just give me an email.
-> 
->> I'm happy to contribute QEMU support for these platforms.
->>
-> 
-> I am happy as well.
-> 
-> Best wishes and best health to you, people from China, and the whole
-> region!!
-> 
-> Yours,
-> Aleksandar
-> 
->> Thanks.
->>
->> >
->> > Regards,
->> > Huacai
->> > >
->> > > Yours,
->> > > and wishing you and all people from China best health!
->> > >
->> > > Aleksandar 
->>
->> --
->> Jiaxun Yang
-> 
+> ---
+>  include/hw/arm/msf2-soc.h |  4 ++++
+>  hw/arm/msf2-soc.c         | 18 +++++++-----------
+>  2 files changed, 11 insertions(+), 11 deletions(-)
+>
+> diff --git a/include/hw/arm/msf2-soc.h b/include/hw/arm/msf2-soc.h
+> index 3cfe5c76ee..e4c5110036 100644
+> --- a/include/hw/arm/msf2-soc.h
+> +++ b/include/hw/arm/msf2-soc.h
+> @@ -50,6 +50,10 @@ typedef struct MSF2State {
+>
+>      ARMv7MState armv7m;
+>
+> +    MemoryRegion sram;
+> +    MemoryRegion nvm;
+> +    MemoryRegion nvm_alias;
+> +
+>      char *cpu_type;
+>      char *part_name;
+>      uint64_t envm_size;
+> diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
+> index 588d643b8d..e448b0ab74 100644
+> --- a/hw/arm/msf2-soc.c
+> +++ b/hw/arm/msf2-soc.c
+> @@ -90,13 +90,9 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, E=
+rror **errp)
+>      SysBusDevice *busdev;
+>      Error *err =3D NULL;
+>      int i;
+> -
+>      MemoryRegion *system_memory =3D get_system_memory();
+> -    MemoryRegion *nvm =3D g_new(MemoryRegion, 1);
+> -    MemoryRegion *nvm_alias =3D g_new(MemoryRegion, 1);
+> -    MemoryRegion *sram =3D g_new(MemoryRegion, 1);
+>
+> -    memory_region_init_rom(nvm, OBJECT(dev_soc), "MSF2.eNVM", s->envm_si=
+ze,
+> +    memory_region_init_rom(&s->nvm, OBJECT(dev_soc), "MSF2.eNVM", s->env=
+m_size,
+>                             &error_fatal);
+>      /*
+>       * On power-on, the eNVM region 0x60000000 is automatically
+> @@ -104,15 +100,15 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc=
+, Error **errp)
+>       * start address (0x0). We do not support remapping other eNVM,
+>       * eSRAM and DDR regions by guest(via Sysreg) currently.
+>       */
+> -    memory_region_init_alias(nvm_alias, OBJECT(dev_soc), "MSF2.eNVM", nv=
+m, 0,
+> -                             s->envm_size);
+> +    memory_region_init_alias(&s->nvm_alias, OBJECT(dev_soc), "MSF2.eNVM"=
+,
+> +                             &s->nvm, 0, s->envm_size);
+>
+> -    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm);
+> -    memory_region_add_subregion(system_memory, 0, nvm_alias);
+> +    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, &s->nv=
+m);
+> +    memory_region_add_subregion(system_memory, 0, &s->nvm_alias);
+>
+> -    memory_region_init_ram(sram, NULL, "MSF2.eSRAM", s->esram_size,
+> +    memory_region_init_ram(&s->sram, NULL, "MSF2.eSRAM", s->esram_size,
+>                             &error_fatal);
+> -    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
+> +    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, &s->sr=
+am);
+>
+>      armv7m =3D DEVICE(&s->armv7m);
+>      qdev_prop_set_uint32(armv7m, "num-irq", 81);
+> --
+> 2.21.1
+>
+>
 
