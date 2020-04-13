@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A15C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68A6CC2BA2B
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:19:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E3DC20735
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:15:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2EBA320678
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:19:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TI0Calf2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E3DC20735
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vs//LplS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EBA320678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jO7Mp-0002A1-9i
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 18:15:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45202)
+	id 1jO7Qr-0004me-Bd
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 18:19:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45677)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jO7Lo-00010N-8b
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:14:45 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jO7PT-0003Aa-3c
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:18:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jO7Ln-0004in-00
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:14:44 -0400
-Received: from mail-vs1-xe42.google.com ([2607:f8b0:4864:20::e42]:35817)
+ (envelope-from <alistair23@gmail.com>) id 1jO7PS-0005LF-46
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:18:30 -0400
+Received: from mail-vk1-xa43.google.com ([2607:f8b0:4864:20::a43]:35058)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jO7Lk-0004ia-2F; Mon, 13 Apr 2020 18:14:42 -0400
-Received: by mail-vs1-xe42.google.com with SMTP id r7so3550196vso.2;
- Mon, 13 Apr 2020 15:14:40 -0700 (PDT)
+ id 1jO7PS-0005L9-0M; Mon, 13 Apr 2020 18:18:30 -0400
+Received: by mail-vk1-xa43.google.com with SMTP id u8so2333827vkl.2;
+ Mon, 13 Apr 2020 15:18:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=5eB1z8c5kK9kvW0a6iujT6vXRX9S8fGFoN6RJDHnU2g=;
- b=TI0Calf2IxOfsyHK2xiLLnkprfuUQZ3rec4E0Pkows5wNSZzE+kFamJx03TcD8yytM
- +PmQUcTuSLU/Ujb1i8o6P54jgreamUbYltgTg6N8mLPZWQ/+phGZ3MJ/5beryeROv6Wq
- MeVe3ia9ChISGinAPI3RoLam/Ohz1Z2KxvaWL0A+Lv0rWruY1J3gsD24+ETUVUCjZw79
- kOtB3XMkAeKNnOgRFbwVgzZBdYbMxasyFTEUt51C1fESqQPUoGLFEDn2ZJVo9DMFJoVp
- 9CLusdX3k8qPVNGNG2biM+CHwoDwc9toaZz3qTyOQv4oP6jwl7FgdO+it01nV0kzIYfl
- q/BA==
+ bh=Xqfg2UOfrtjX2QlezANpKbA9eU75rpqm2Ozq/7avSc0=;
+ b=Vs//LplSMj0jTGSs5BBPfQYKXoe29gtamnOyzQ4O/v6WMfhH697NVZas1W6B7Bn9ty
+ jpuGSfa2f/RoEUv/DB/BZtqU3RszXNBuQ5elO4bjkiUiJWaYQp4eoPKuLFM0IyRcTZLW
+ 5SENLTIgkOq3ISDdw7Iw5Gf/wo9XHz2x7aIOZEPUZm7BWpRud5nRgrwoCEjIbHVyTn/S
+ K8d+ONFaKXvTpgOW/t92TM1A0q31JNhkMAKzbkmUt6UChB1jGRNZNC/9Htx1FCgb4C2G
+ 9+L/QdbjHZQxNOAAR3n+I75wQ+u+QTRUyJpEm7Iu9PI38FHalHlWgNsXHORsL3IxggVu
+ o1gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=5eB1z8c5kK9kvW0a6iujT6vXRX9S8fGFoN6RJDHnU2g=;
- b=f5zRKLB7jWSUZZaSvbCEaP+1b462nZA2CegQR/bcZ9c8iwqKyJWZtXFLrh2S9YTm0E
- lL2XFujgVM1G3DCRCrojIUrzgozpK/ccayRq3LF3z5M+FoaelzBvvrgmUBVxmpnCAkff
- Q2rm0WRBQjgyA3OASCUQS/ev9oi6m6YJRhNmVT5tgrLuPh1TgCVXMtPJjSDd55ql3tRI
- 8eh0uuvduLvWB0kxbTXDXGyfF866WQTptybe6LdkelmzFVKnTCkX7D5lXID6D2l5r4XC
- U4YsUtwm0tn+uDJzJLOWOHifocUCYeQM0atd9qsGWL+gQvQqBh6A8vDcgjnK6jfoAVYX
- Tzog==
-X-Gm-Message-State: AGi0PuYhU9dTS4e5IRbr8mMKS6cM4sbNOVcvbIYwAW4hkzMoqNdmmPBw
- H6JLeIpQh+lE/PZ5DuHzQ8J+fFGZ/NB5RMSF+e4=
-X-Google-Smtp-Source: APiQypLObMJB5KGfvx8eqmUvlJyWtzXJPVcel83Hl2IydFW0aD/us9mAT8+du+g1gFIylr5J/S0ETsQkcTdu9h5BKx4=
-X-Received: by 2002:a67:902:: with SMTP id 2mr14851445vsj.133.1586816079263;
- Mon, 13 Apr 2020 15:14:39 -0700 (PDT)
+ bh=Xqfg2UOfrtjX2QlezANpKbA9eU75rpqm2Ozq/7avSc0=;
+ b=ljDH6ZR5ECjFn28Lz/xIXEtsfwrGkd0NhhUL9IaXsK40vJF5jSUxg/mcpVdXqCPYAx
+ tEl6UHGx/FoabaUqbW3bUhgfx47l3/a+YbllJqHkWbV/H0sRn4w8bzdudddCIauzgVxP
+ en0fSOwY6Lf23Vknl8EhCLYolFI7cXZJ3M+J+x3X0454+GL60utc6etGew0dgoWM6Fb2
+ aGjQBmyBqE5TSdedXptZ4wibsvysxVXw3JSqkkV1btzdci3kCCpb4ywJfXL/lF1prclI
+ XxMGTimqRLbGpwakVyt7S2dPbd9H429kmYPTPWtqEhyK7cFXV2mWrjc98l/QVpVXtwAp
+ 32Hw==
+X-Gm-Message-State: AGi0PuZrvT4TyzjNo9ATCkUyhCvSwHhkK8fTpGMnjXg0FsOw8VYHjmsh
+ kWb4kdH2SszMDUZG7EHyjkh85gtnJ+L1jXnBuDA=
+X-Google-Smtp-Source: APiQypLzyDOBZozL608qupMxkepFwn/QSjcZy6zpv0qEom/nVYwT8W3kwfR2k1SkAxdgL4UMznqQlNQeIEYH1doqnpc=
+X-Received: by 2002:a1f:2e8c:: with SMTP id u134mr13016321vku.16.1586816309527; 
+ Mon, 13 Apr 2020 15:18:29 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200412223619.11284-1-f4bug@amsat.org>
- <20200412223619.11284-17-f4bug@amsat.org>
-In-Reply-To: <20200412223619.11284-17-f4bug@amsat.org>
+ <20200412223619.11284-21-f4bug@amsat.org>
+In-Reply-To: <20200412223619.11284-21-f4bug@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 13 Apr 2020 15:06:22 -0700
-Message-ID: <CAKmqyKN=2tkTyPY6d5a_T1Lnd0-m6tFPw2fdes2a0C+_erYXeQ@mail.gmail.com>
-Subject: Re: [PATCH-for-5.1 v3 16/24] hw/arm/xlnx-zynqmp: Move some code from
- realize() to init()
+Date: Mon, 13 Apr 2020 15:10:13 -0700
+Message-ID: <CAKmqyKN6uKZkkutqeeMGQBgCq8sg_wfRjOM3RvMfDi13b7RbvA@mail.gmail.com>
+Subject: Re: [PATCH-for-5.1 v3 20/24] hw/riscv/sifive_u: Use single type_init()
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::e42
+X-Received-From: 2607:f8b0:4864:20::a43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,18 +119,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Apr 12, 2020 at 3:41 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+On Sun, Apr 12, 2020 at 3:48 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
 g> wrote:
 >
-> Coccinelle failed at processing this file:
->
->   $ spatch ... --timeout 60 --sp-file \
->     scripts/coccinelle/simplify-init-realize-error_propagate.cocci
->   HANDLING: ./hw/arm/xlnx-zynqmp.c
->   EXN: Coccinelle_modules.Common.Timeout
->
-> Move the calls using &error_abort which don't depend on input
-> updated before realize() to init().
+> We can use a single type_init() to call multiple type_register*().
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
@@ -140,102 +131,43 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
-> v3: Typo 'depend of' -> 'depend on' (eblake)
-> ---
->  hw/arm/xlnx-zynqmp.c | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
+>  hw/riscv/sifive_u.c | 12 +++---------
+>  1 file changed, 3 insertions(+), 9 deletions(-)
 >
-> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> index 457057198a..5ec9c24ee7 100644
-> --- a/hw/arm/xlnx-zynqmp.c
-> +++ b/hw/arm/xlnx-zynqmp.c
-> @@ -242,6 +242,11 @@ static void xlnx_zynqmp_init(Object *obj)
->                                  &s->apu_cpu[i], sizeof(s->apu_cpu[i]),
->                                  ARM_CPU_TYPE_NAME("cortex-a53"),
->                                  &error_abort, NULL);
-> +
-> +        object_property_set_int(OBJECT(&s->apu_cpu[i]), QEMU_PSCI_CONDUI=
-T_SMC,
-> +                                "psci-conduit", &error_abort);
-> +        object_property_set_int(OBJECT(&s->apu_cpu[i]), GIC_BASE_ADDR,
-> +                                "reset-cbar", &error_abort);
->      }
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 998666c91f..9c90c94c33 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -601,13 +601,6 @@ static const TypeInfo riscv_sifive_u_soc_type_info =
+=3D {
+>      .class_init =3D riscv_sifive_u_soc_class_init,
+>  };
 >
->      sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
-> @@ -250,6 +255,10 @@ static void xlnx_zynqmp_init(Object *obj)
->      for (i =3D 0; i < XLNX_ZYNQMP_NUM_GEMS; i++) {
->          sysbus_init_child_obj(obj, "gem[*]", &s->gem[i], sizeof(s->gem[i=
-]),
->                                TYPE_CADENCE_GEM);
-> +        object_property_set_int(OBJECT(&s->gem[i]), GEM_REVISION, "revis=
-ion",
-> +                                &error_abort);
-> +        object_property_set_int(OBJECT(&s->gem[i]), 2, "num-priority-que=
-ues",
-> +                                &error_abort);
->      }
->
->      for (i =3D 0; i < XLNX_ZYNQMP_NUM_UARTS; i++) {
-> @@ -259,6 +268,8 @@ static void xlnx_zynqmp_init(Object *obj)
->
->      sysbus_init_child_obj(obj, "sata", &s->sata, sizeof(s->sata),
->                            TYPE_SYSBUS_AHCI);
-> +    object_property_set_int(OBJECT(&s->sata), SATA_NUM_PORTS, "num-ports=
-",
-> +                            &error_abort);
->
->      for (i =3D 0; i < XLNX_ZYNQMP_NUM_SDHCI; i++) {
->          sysbus_init_child_obj(obj, "sdhci[*]", &s->sdhci[i],
-> @@ -370,9 +381,6 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Err=
-or **errp)
->      for (i =3D 0; i < num_apus; i++) {
->          char *name;
->
-> -        object_property_set_int(OBJECT(&s->apu_cpu[i]), QEMU_PSCI_CONDUI=
-T_SMC,
-> -                                "psci-conduit", &error_abort);
+> -static void riscv_sifive_u_soc_register_types(void)
+> -{
+> -    type_register_static(&riscv_sifive_u_soc_type_info);
+> -}
 > -
->          name =3D object_get_canonical_path_component(OBJECT(&s->apu_cpu[=
-i]));
->          if (strcmp(name, boot_cpu)) {
->              /* Secondary CPUs start in PSCI powered-down state */
-> @@ -387,8 +395,6 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Err=
-or **errp)
->                                   s->secure, "has_el3", NULL);
->          object_property_set_bool(OBJECT(&s->apu_cpu[i]),
->                                   s->virt, "has_el2", NULL);
-> -        object_property_set_int(OBJECT(&s->apu_cpu[i]), GIC_BASE_ADDR,
-> -                                "reset-cbar", &error_abort);
->          object_property_set_int(OBJECT(&s->apu_cpu[i]), num_apus,
->                                  "core-count", &error_abort);
->          object_property_set_bool(OBJECT(&s->apu_cpu[i]), true, "realized=
-",
-> @@ -490,10 +496,6 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Er=
-ror **errp)
->              qemu_check_nic_model(nd, TYPE_CADENCE_GEM);
->              qdev_set_nic_properties(DEVICE(&s->gem[i]), nd);
->          }
-> -        object_property_set_int(OBJECT(&s->gem[i]), GEM_REVISION, "revis=
-ion",
-> -                                &error_abort);
-> -        object_property_set_int(OBJECT(&s->gem[i]), 2, "num-priority-que=
-ues",
-> -                                &error_abort);
->          object_property_set_bool(OBJECT(&s->gem[i]), true, "realized", &=
-err);
->          if (err) {
->              goto out_propagate_error;
-> @@ -514,8 +516,6 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Err=
-or **errp)
->                             gic_spi[uart_intr[i]]);
->      }
+> -type_init(riscv_sifive_u_soc_register_types)
+> -
+>  static void riscv_sifive_u_machine_class_init(ObjectClass *oc, void *dat=
+a)
+>  {
+>      MachineClass *mc =3D MACHINE_CLASS(oc);
+> @@ -627,9 +620,10 @@ static const TypeInfo riscv_sifive_u_machine_typeinf=
+o =3D {
+>      .instance_size =3D sizeof(SiFiveUState),
+>  };
 >
-> -    object_property_set_int(OBJECT(&s->sata), SATA_NUM_PORTS, "num-ports=
-",
-> -                            &error_abort);
->      object_property_set_bool(OBJECT(&s->sata), true, "realized", &err);
->      if (err) {
->          goto out_propagate_error;
+> -static void riscv_sifive_u_machine_init_register_types(void)
+> +static void riscv_sifive_u_register_types(void)
+>  {
+> +    type_register_static(&riscv_sifive_u_soc_type_info);
+>      type_register_static(&riscv_sifive_u_machine_typeinfo);
+>  }
+>
+> -type_init(riscv_sifive_u_machine_init_register_types)
+> +type_init(riscv_sifive_u_register_types)
 > --
 > 2.21.1
 >
