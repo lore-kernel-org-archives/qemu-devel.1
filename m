@@ -2,83 +2,82 @@ Return-Path: <SRS0=kd+i=55=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1869C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:23:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4987C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:24:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4DB620678
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:23:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9866820678
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 22:24:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dpignNU7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4DB620678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VJB4c5T5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9866820678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jO7Uc-0001tC-OE
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 18:23:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46215)
+	id 1jO7VS-0003O5-QU
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 18:24:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46350)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jO7TO-0000IA-Cw
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:22:35 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jO7Ty-0001Yj-4v
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:23:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jO7TN-00062n-E2
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:22:34 -0400
-Received: from mail-ua1-x941.google.com ([2607:f8b0:4864:20::941]:36451)
+ (envelope-from <alistair23@gmail.com>) id 1jO7Tw-0006Ax-U9
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 18:23:10 -0400
+Received: from mail-ua1-x944.google.com ([2607:f8b0:4864:20::944]:36454)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jO7TN-00062c-9p; Mon, 13 Apr 2020 18:22:33 -0400
-Received: by mail-ua1-x941.google.com with SMTP id m15so3732258uao.3;
- Mon, 13 Apr 2020 15:22:33 -0700 (PDT)
+ id 1jO7Tw-0006An-QA; Mon, 13 Apr 2020 18:23:08 -0400
+Received: by mail-ua1-x944.google.com with SMTP id m15so3732718uao.3;
+ Mon, 13 Apr 2020 15:23:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=YzMwyUxjG9VjYUhzYdWXMKxuI7FUnl5tFZL2IUdOTm8=;
- b=dpignNU7ncFb7s4gJxsqDp964C4u1fm8PFQTs7wsS/Ko6GVjwhgPPIW3qLZca7/c1l
- oxVdZEl3ZPQKyv8VPVYF6YSClTiReCv6v0oGjEEQ7exzKtfIOaMnvIHxfgBPu4eTSX30
- KXenLuN8g6q2QmHLMgbYvQIteKyhdqhKE9fvfP5t3P73AjQMtsPMDo/AgLijqij2c0ES
- 2vBxww5h+3O5V/Ie7oh/UD9k9nIFMr82/B+wlNRYReJM8c28lPI8LcE9dNwfqwH9+4f+
- P+P+0uKat6NvQRAmZv886vWTe4bx5TjkTVNoMgJYyUwZZSKYdZjUVlf+9dyW8okqShvE
- 2VBQ==
+ bh=gEKohtwFE3SQeQe0CuNpY6V0C6EIim4ono+ZvepKLzU=;
+ b=VJB4c5T5N3hdsN16C1+Toc3Wt7t/5PLQgT1dit/2xFRajjoJ2JrDb+cGACNa3DHICL
+ kBlkEfsQOz+Mr81hvnXWs4jptW3BHJew+b0M3jnnG9yvmyvWPH7lMIbsNv25y9Rk1Kxm
+ 5Dt1ic6gtHOOMDS2UGHFInFqWFQBw7v7Sv6gdGe4EFkqHRCGTlw5nmVhCoAcT0LeNEBi
+ nP0tth8vaLJu86htyafrNDVkRsn9qtWmmuhOUy3PPG7/hcb30GAQE7WIMOn2QxS8ArLO
+ 9mIhQfHU5a0YApku0bKnqGRTAo8XP9d3QIcyDqsLDgZ1PVVDhLGEsriE7I/3LWEUsgfo
+ ruTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=YzMwyUxjG9VjYUhzYdWXMKxuI7FUnl5tFZL2IUdOTm8=;
- b=UqSjcG8accLMrXDcuSG4ffYC0gB7mx/QXW19DMjMuA+1q922bVj0mygWQS4VZ/IL6b
- UZMoZGjsOuYmXIKOuTumqcfQjacGNXuh4QYQu4Jsi9yvWcNyvvGsqMN1gdp7jplX1XZK
- JvAIFpnK6Bb9xhbOxFtkT9v86TTgVCHXVLgukzgq9Cpi8P26T/V5zDCbbze4oUEl9jIj
- JCf/P2vwPDQEkzfml+L44VUOONSt2JS4lYipWozVTjWmn9q4gAo9yZSRmCQNbR+0vso8
- opJC3JUHXr5NiZwN1w0QoEdxJYtYCjJ1Rcoo1CAZV7voxJMIY+K9A1qrcDXMtJpU/f0V
- 8f7Q==
-X-Gm-Message-State: AGi0PuaZ5+SGEixCLLSPefRUb76i+VHKUbIgEjNwiF6wSQrxZeAyl2Mq
- R0SV9oiHqXJPAYikhjjjdvBs3hHOUq5frG30MDk=
-X-Google-Smtp-Source: APiQypIqN5k/MQVlOi3FgEymp/5vB6DR/mb7e8jW0DqPuw2/0Xu2EeD+mIEn4zRoJsYVz7l14DRluQDMZGhLV4MDEP0=
-X-Received: by 2002:a9f:2964:: with SMTP id t91mr12504390uat.21.1586816552774; 
- Mon, 13 Apr 2020 15:22:32 -0700 (PDT)
+ bh=gEKohtwFE3SQeQe0CuNpY6V0C6EIim4ono+ZvepKLzU=;
+ b=AYf5JoByb+EkUrOTy8yv++Q7amXHI+LQdSdYqk7EDrbCCkN6X6Uusal3JUh+obCOZ8
+ 0RX4AoXMLEhlr35M/fawHNBA+pXhDzVGpcat95j78vRBhUGDksNeLuNFreC7ObCMZHrR
+ wjqVXwnolynHFMi/8/NcBDG9DzoXCYAHJlDJF5a52hE68C+AxyZAZyHu1l77Sna2f7W6
+ ArqT6ZmAERlw3eJypY8ImRbpaNxT6cyQEjrt18pkxW7nFAy8kTeiNmfSNvcTfM+glLlV
+ kkIByezr5vUIi8BT96LQa6bDJkFureSxN5z+CGbtrS9OyoJ6fWIIAvj6Jra4tGktnYiV
+ cGqw==
+X-Gm-Message-State: AGi0PuYrulovt8YCSsrHeUJLJ65H221coxe5IEeSKexcqd4EBhRfK4UD
+ 74Vw4Frr7wb2sbo/keKkUtYXPE+kDETeBxE189g=
+X-Google-Smtp-Source: APiQypKW+LGJyMN2AQQBOOaMGrVmWStW0yUDspSnX9w4OhEvQa9sFZCIWMPZ55dV5QuosV//eiHyByXK9cFMu29fPPA=
+X-Received: by 2002:ab0:6946:: with SMTP id c6mr5308103uas.85.1586816588194;
+ Mon, 13 Apr 2020 15:23:08 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200412223619.11284-1-f4bug@amsat.org>
- <20200412223619.11284-25-f4bug@amsat.org>
-In-Reply-To: <20200412223619.11284-25-f4bug@amsat.org>
+ <20200412223619.11284-23-f4bug@amsat.org>
+In-Reply-To: <20200412223619.11284-23-f4bug@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 13 Apr 2020 15:14:16 -0700
-Message-ID: <CAKmqyKPV-BLHoic+y7W_j4E2WWkmgtOxiTS68z4G_34DtcTXpQ@mail.gmail.com>
-Subject: Re: [PATCH-for-5.1 v3 24/24] hw/riscv/sifive_u: Rename
- MachineClass::init()
+Date: Mon, 13 Apr 2020 15:14:52 -0700
+Message-ID: <CAKmqyKNpyobujx0_piqmuBf40MLspKjkX64QVenAz6pSEN1uHw@mail.gmail.com>
+Subject: Re: [PATCH-for-5.1 v3 22/24] hw/riscv/sifive_u: Store MemoryRegion in
+ SiFiveUSoCState
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::941
+X-Received-From: 2607:f8b0:4864:20::944
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,11 +120,20 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Apr 12, 2020 at 3:54 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+On Sun, Apr 12, 2020 at 3:52 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
 g> wrote:
 >
-> As there already is the riscv_sifive_u_soc_init() method,
-> rename riscv_sifive_u_init() as riscv_sifive_u_machine_init().
+> Coccinelle reported:
+>
+>   $ spatch ... --timeout 60 --sp-file \
+>     scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+>   HANDLING: ./hw/riscv/sifive_u.c
+>   >>> possible moves from riscv_sifive_u_soc_init() to riscv_sifive_u_soc=
+_realize() in ./hw/riscv/sifive_u.c:473
+>
+> While reviewing we notice storing the MemoryRegion in the device
+> state, we'll be able to later automatically simplify the error
+> propagation calls.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
@@ -134,34 +142,69 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/riscv/sifive_u.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  include/hw/riscv/sifive_u.h |  2 ++
+>  hw/riscv/sifive_u.c         | 10 ++++------
+>  2 files changed, 6 insertions(+), 6 deletions(-)
 >
+> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> index 82667b5746..254c6a64f8 100644
+> --- a/include/hw/riscv/sifive_u.h
+> +++ b/include/hw/riscv/sifive_u.h
+> @@ -42,6 +42,8 @@ typedef struct SiFiveUSoCState {
+>      SiFiveUPRCIState prci;
+>      SiFiveUOTPState otp;
+>      CadenceGEMState gem;
+> +    MemoryRegion mask_rom;
+> +    MemoryRegion l2lim_mem;
+>  } SiFiveUSoCState;
+>
+>  #define TYPE_RISCV_U_MACHINE MACHINE_TYPE_NAME("sifive_u")
 > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 7bf1f30a35..e13ab34de4 100644
+> index 754af19eef..96177c1977 100644
 > --- a/hw/riscv/sifive_u.c
 > +++ b/hw/riscv/sifive_u.c
-> @@ -312,7 +312,7 @@ static void create_fdt(SiFiveUState *s, const struct =
-MemmapEntry *memmap,
->      g_free(nodename);
->  }
->
-> -static void riscv_sifive_u_init(MachineState *machine)
-> +static void riscv_sifive_u_machine_init(MachineState *machine)
->  {
+> @@ -478,8 +478,6 @@ static void riscv_sifive_u_soc_realize(DeviceState *d=
+ev, Error **errp)
+>      SiFiveUSoCState *s =3D RISCV_U_SOC(dev);
 >      const struct MemmapEntry *memmap =3D sifive_u_memmap;
->      SiFiveUState *s =3D RISCV_U_MACHINE(machine);
-> @@ -606,7 +606,7 @@ static void riscv_sifive_u_machine_class_init(ObjectC=
-lass *oc, void *data)
->      MachineClass *mc =3D MACHINE_CLASS(oc);
+>      MemoryRegion *system_memory =3D get_system_memory();
+> -    MemoryRegion *mask_rom =3D g_new(MemoryRegion, 1);
+> -    MemoryRegion *l2lim_mem =3D g_new(MemoryRegion, 1);
+>      qemu_irq plic_gpios[SIFIVE_U_PLIC_NUM_SOURCES];
+>      char *plic_hart_config;
+>      size_t plic_hart_config_len;
+> @@ -503,10 +501,10 @@ static void riscv_sifive_u_soc_realize(DeviceState =
+*dev, Error **errp)
+>                               &error_abort);
 >
->      mc->desc =3D "RISC-V Board compatible with SiFive U SDK";
-> -    mc->init =3D riscv_sifive_u_init;
-> +    mc->init =3D riscv_sifive_u_machine_init;
->      mc->max_cpus =3D SIFIVE_U_MANAGEMENT_CPU_COUNT + SIFIVE_U_COMPUTE_CP=
-U_COUNT;
->      mc->min_cpus =3D SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
->      mc->default_cpus =3D mc->min_cpus;
+>      /* boot rom */
+> -    memory_region_init_rom(mask_rom, OBJECT(dev), "riscv.sifive.u.mrom",
+> +    memory_region_init_rom(&s->mask_rom, OBJECT(dev), "riscv.sifive.u.mr=
+om",
+>                             memmap[SIFIVE_U_MROM].size, &error_fatal);
+>      memory_region_add_subregion(system_memory, memmap[SIFIVE_U_MROM].bas=
+e,
+> -                                mask_rom);
+> +                                &s->mask_rom);
+>
+>      /*
+>       * Add L2-LIM at reset size.
+> @@ -517,10 +515,10 @@ static void riscv_sifive_u_soc_realize(DeviceState =
+*dev, Error **errp)
+>       * leave it enabled all the time. This won't break anything, but wil=
+l be
+>       * too generous to misbehaving guests.
+>       */
+> -    memory_region_init_ram(l2lim_mem, NULL, "riscv.sifive.u.l2lim",
+> +    memory_region_init_ram(&s->l2lim_mem, NULL, "riscv.sifive.u.l2lim",
+>                             memmap[SIFIVE_U_L2LIM].size, &error_fatal);
+>      memory_region_add_subregion(system_memory, memmap[SIFIVE_U_L2LIM].ba=
+se,
+> -                                l2lim_mem);
+> +                                &s->l2lim_mem);
+>
+>      /* create PLIC hart topology configuration string */
+>      plic_hart_config_len =3D (strlen(SIFIVE_U_PLIC_HART_CONFIG) + 1) *
 > --
 > 2.21.1
 >
