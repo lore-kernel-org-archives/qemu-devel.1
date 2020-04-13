@@ -2,68 +2,118 @@ Return-Path: <SRS0=kd+i=55=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73CF6C2BA19
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 11:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F53C2BA19
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 12:12:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39B5320732
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 11:21:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AAE720732
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 12:12:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="nI9oLpWi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39B5320732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="To/Pl0Lh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AAE720732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jNx9A-0000dS-Ec
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 07:21:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59401)
+	id 1jNxwk-0004wQ-NE
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 08:12:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35681)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jNx7n-000077-0c
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 07:19:36 -0400
+ (envelope-from <den@virtuozzo.com>) id 1jNxvO-0004PQ-Et
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 08:10:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jNx7k-0003sn-C3
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 07:19:33 -0400
-Received: from vultr.net.flygoat.com
- ([2001:19f0:6001:3633:5400:2ff:fe8c:553]:33208)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jNx7k-0003rJ-4k
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 07:19:32 -0400
-Received: from flygoat-x1e (unknown [IPv6:240e:390:49e:92c0::d68])
- by vultr.net.flygoat.com (Postfix) with ESMTPSA id 88A9020CF7;
- Mon, 13 Apr 2020 11:19:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com; s=vultr;
- t=1586776769; bh=UXhLwWCtxUcz+mKOYtgex60WB9mqNaOsxhp6uoAkwDQ=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=nI9oLpWikjHYtk1zNWU+DAzDzaMZA5aGVQ5Y+oRg9DRD1x6X3g0D3C+3rJeKzCnDY
- 0LiOvuPyh3RbzyG96fPZrV6B9+gDU6G9gwzcjPtHW2OP9CJCknU8JbxFESB8MPItu4
- Tdqs8cdoy0aihdmxQsH6kDVITEUyE7DTdYVP2uSLmWuPIucmzFnSW2/vmg2jkw1cfP
- 5ycXxy570mDfm9CY0u/GM9PONSQGylnb3PLtSvHp1/k+dx06VG1GoIiZONVyIzWgyh
- owu3dZOIlrVo5Upn01hkd5VLu09QdGgHOeww2BzGnnOMJZ6XB3alzQrUHS3ob1gd5W
- pbhH302tpwGBw==
-Date: Mon, 13 Apr 2020 19:19:09 +0800
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-To: Huacai Chen <chenhc@lemote.com>
-Subject: Re: [PATCH 13/15] KVM: MIPS: Add CONFIG6 and DIAG registers emulation
-Message-ID: <20200413191909.4e776272@flygoat-x1e>
-In-Reply-To: <1586763024-12197-14-git-send-email-chenhc@lemote.com>
-References: <1586763024-12197-1-git-send-email-chenhc@lemote.com>
- <1586763024-12197-14-git-send-email-chenhc@lemote.com>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+ (envelope-from <den@virtuozzo.com>) id 1jNxv8-0008VC-VU
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 08:10:49 -0400
+Received: from mail-vi1eur05on2094.outbound.protection.outlook.com
+ ([40.107.21.94]:29537 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1jNxv8-0008SW-CN
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 08:10:34 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EVL46JJYOBUxIilPKtc7Db5hq9YlmdoY9wmjWYHbFYYupq2QOzQFSVobbrwLUJICsqD5s4dbYphZz15RwugJXRgXBr4Qy4dojQJleux8fmz3Axf/fbjhW4gnrodlOMxj0BfUNpM3+Ij0HefVegkzRtfPFQwuD/AuMFNUJLmqPDJK+Mpd6eY5zYqgJVaTQlq3SdFTDBZw4suCRSlt1B11abpiPVUOvERQDlAdF790L00s4aeozn4fYlM/z197RuOeP8B4uvM1GmKS+xwgb8d+C4gxxvuaR29CllK+QlVT9LxY0bphpAcNCO3/4TnlPuoPrI4ykfI6pMNBkIAhWsBBIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YUuYYgMtgcqqVZ52qXImoxJ4JxEKfbm1u79olU5mPxc=;
+ b=hxBtPw9ZyRC81Xs6GhFS6aqfp2H7KpJKv7Oo/PlV1nD33DgYXOC36bADD3cm+H1EY0k4d0A00zMLxAmh1dxtUo9U7z4RSdcjksfeVNK0/AEelrYEdYtT5lZepl3z+S4DDkxwIsfm5cFm4g0zFCiuykMWhYN4h6RbiXFWRoDHKhTR7dCzmeb5g2q5E4stYQj/6tNv6MoqkDLgp8trUzLXtJTZvFQKqf0Sp0tvbdqNylDjgnY12QPXGmQi3WrVGGe2z0XF33qhmFWQaadSIFRmrdLw1Td3rqkf9XVlqMDHHZgK8Uty9XssbPsFF/6hhrL+CAO+0dGBuc121p+IKi4I6Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none header.from=openvz.org;
+ dkim=pass header.d=openvz.org; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YUuYYgMtgcqqVZ52qXImoxJ4JxEKfbm1u79olU5mPxc=;
+ b=To/Pl0LhF8RngXakU1BXaNjW78+5RYBVYnjkiCWXENk1jOzYzUax43PEUIY4g3HqGI7dhjokYqKzzc62RN0VnK/ERQRvaComsvQYVFhEf7oK+6qoLZgjvekgZdHHEi+OOlGAwuj1k/eCcLnH8D4nSLZePjy8Jl32CMhB2suMb18=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=den@virtuozzo.com; 
+Received: from AM0PR08MB5268.eurprd08.prod.outlook.com (2603:10a6:208:155::29)
+ by AM0PR08MB3379.eurprd08.prod.outlook.com (2603:10a6:208:dd::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.26; Mon, 13 Apr
+ 2020 12:10:30 +0000
+Received: from AM0PR08MB5268.eurprd08.prod.outlook.com
+ ([fe80::20c6:8b78:b40c:283e]) by AM0PR08MB5268.eurprd08.prod.outlook.com
+ ([fe80::20c6:8b78:b40c:283e%5]) with mapi id 15.20.2900.028; Mon, 13 Apr 2020
+ 12:10:30 +0000
+Subject: Re: [RFC patch v1 0/3] qemu-file writing performance improving
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
+References: <1586776334-641239-1-git-send-email-dplotnikov@virtuozzo.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <e4709bce-7053-a37f-1bcf-e3af1d241197@openvz.org>
+Date: Mon, 13 Apr 2020 15:10:29 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <1586776334-641239-1-git-send-email-dplotnikov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:19f0:6001:3633:5400:2ff:fe8c:553
+Content-Language: en-US
+X-ClientProxiedBy: AM4PR0501CA0058.eurprd05.prod.outlook.com
+ (2603:10a6:200:68::26) To AM0PR08MB5268.eurprd08.prod.outlook.com
+ (2603:10a6:208:155::29)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.45] (31.148.204.195) by
+ AM4PR0501CA0058.eurprd05.prod.outlook.com (2603:10a6:200:68::26) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.17 via Frontend
+ Transport; Mon, 13 Apr 2020 12:10:30 +0000
+X-Originating-IP: [31.148.204.195]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d922ef28-e769-4454-cb58-08d7dfa3a915
+X-MS-TrafficTypeDiagnostic: AM0PR08MB3379:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM0PR08MB3379263208AFB24A6CE4949AB6DD0@AM0PR08MB3379.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 037291602B
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM0PR08MB5268.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(39840400004)(376002)(136003)(346002)(366004)(396003)(8936002)(81156014)(31696002)(956004)(42882007)(52116002)(4326008)(8676002)(6486002)(36756003)(53546011)(66476007)(66946007)(478600001)(16576012)(2906002)(31686004)(2616005)(316002)(66556008)(16526019)(26005)(186003)(5660300002);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 27czmmqrpjsAK1Z8VkbprkKiOqmyuDe4yA7Dseq3x54hamwmfRea2HBTouRYigvwg2hj4GUiEt1+I4cjKfA2APJZ4LwKDo0QfuZFdjpT4lhddfP3pctVFDagYe12QeyxTd2TQcBRPQFJlmQ5lFKvKh9gx9Jt/YFfTrAo3UiP3fI2AF2c+oi2e4uym++mWApk8Q25dZjT+28rF8f0n/BfntBDrD4YmVk4qd2XD9ZxudJvj+Ei0pBDXquQnbA7eXUpLxJsTxaInuYfradQ9LX5I2omOJ+x3uiXcEEd+gGsB6aTDx23XjHjJCrO6aa+8BlWf1fmVjAONnMyIJW00M9n2z6MpdeIDunzVvH1PA4xe81Mnk/6T8iqk7jGFp+WY/OCDbUFYB70Jumuuy9WdoHJwILc9pVTuk0WJ1dvalf6RaEAOIpGWzQK+G4TEiSXvPC5
+X-MS-Exchange-AntiSpam-MessageData: m5qI7yhRDmIa2iTxdvhD1P/t5mhpW+TGU6UX8jZpEOMETUaencKo+Akgxm5EFj6cZAY/NEZBH6XhHb9sw76+xX3SlIvNTwPZt+EA4hOKyH0vuuuSMyWMk+qsni+2PFToox3rIkjESYO1kr7hgpbYfA==
+X-OriginatorOrg: openvz.org
+X-MS-Exchange-CrossTenant-Network-Message-Id: d922ef28-e769-4454-cb58-08d7dfa3a915
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Apr 2020 12:10:30.7284 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3Yr1UU14ds6bZTSGdl07LLs31GeO1YXP+yxaF3YWWiM3FTsIU7tV5upTQyG/g/ucehTZrVi5jec+ls+Q4UiisQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3379
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.21.94
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,289 +125,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>, kvm@vger.kernel.org,
- Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
- linux-mips@vger.kernel.org, Fuxin Zhang <zhangfx@lemote.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 Apr 2020 15:30:22 +0800
-Huacai Chen <chenhc@lemote.com> wrote:
+On 4/13/20 2:12 PM, Denis Plotnikov wrote:
+> Problem description: qcow2 internal snapshot saving time is too big on HDD ~ 25 sec
+>
+> When a qcow2 image is placed on a regular HDD and the image is openned with
+> O_DIRECT the snapshot saving time is around 26 sec.
+> The snapshot saving time can be 4 times sorter.
+> The patch series propose the way to achive that. 
+>
+> Why is the saving time = ~25 sec?
+>
+> There are three things:
+> 1. qemu-file iov limit (currently 64)
+> 2. direct qemu_fflush calls, inducing disk writings
+in a non-aligned way, which results further in READ-MODIFY-WRITE
+operations at the beginning and at the end of the writing data.
+Within synchronous operations this slow-downs the process a lot!
 
-> Loongson-3 has CONFIG6 and DIAG registers which need to be emulate.
-> CONFIG6 is mostly used to enable/disable FTLB and SFB, while DIAG is
-> mostly used to flush BTB, ITLB, DTLB, VTLB and FTLB.
-> 
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> 3. ram data copying and synchronous disk wrtings
+>
+> When 1, 2 are quite clear, the 3rd needs some explaination:
+>
+> Internal snapshot uses qemu-file as an interface to store the data with
+> stream semantics.
+> qemu-file avoids data coping when possible (mostly for ram data)
+> and use iovectors to propagate the data to an undelying block driver state.
+> In the case when qcow2 openned with O_DIRECT it is suboptimal.
+>
+> This is what happens: on writing, when the iovectors query goes from qemu-file
+> to bdrv (here and further by brdv I mean qcow2 with posix O_DIRECT openned backend),
+> the brdv checks all iovectors to be base and size aligned, if it's not the case,
+> the data copied to an internal buffer and synchronous pwrite is called.
+> If the iovectors are aligned, io_submit is called.
+>
+> In our case, snapshot almost always induces pwrite, since we never have all
+> the iovectors aligned in the query, because of frequent adding a short iovector:
+> 8 byte ram-page delimiters, after adding each ram page iovector.
+>
+> So the qemu-file code in this case:
+> 1. doesn't aviod ram copying
+> 2. works fully synchronously
+>
+> How to improve the snapshot time:
+>
+> 1. easy way: to increase iov limit to IOV_MAX (1024).
+> This will reduce synchronous writing frequency.
+> My test revealed that with iov limit = IOV_MAX the snapshot time *~12 sec*.
+>
+> 2. complex way: do writings asynchronously.
+> Introduce both base- and size-aligned buffer, write the data only when
+> the buffer is full, write the buffer asynchronously, meanwhile filling another
+> buffer with snapshot data.
+> My test revealed that this complex way provides the snapshot time *~6 sec*,
+> 2 times better than just iov limit increasing.
 
-It should be guarded by CONFIG_CPU_LOONGSON64 as well.
+We also align written data as flush operations over the disk
+are not mandatory.
 
-Thanks.
-
-> ---
->  arch/mips/include/asm/kvm_host.h |  5 ++++
->  arch/mips/include/asm/mipsregs.h |  7 +++++
->  arch/mips/kvm/tlb.c              | 39 +++++++++++++++++++++++++++
->  arch/mips/kvm/vz.c               | 58
-> +++++++++++++++++++++++++++++++++++++++- 4 files changed, 108
-> insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/mips/include/asm/kvm_host.h
-> b/arch/mips/include/asm/kvm_host.h index c291767..3ef6ca8 100644
-> --- a/arch/mips/include/asm/kvm_host.h
-> +++ b/arch/mips/include/asm/kvm_host.h
-> @@ -68,9 +68,11 @@
->  #define KVM_REG_MIPS_CP0_CONFIG3	MIPS_CP0_32(16, 3)
->  #define KVM_REG_MIPS_CP0_CONFIG4	MIPS_CP0_32(16, 4)
->  #define KVM_REG_MIPS_CP0_CONFIG5	MIPS_CP0_32(16, 5)
-> +#define KVM_REG_MIPS_CP0_CONFIG6	MIPS_CP0_32(16, 6)
->  #define KVM_REG_MIPS_CP0_CONFIG7	MIPS_CP0_32(16, 7)
->  #define KVM_REG_MIPS_CP0_MAARI		MIPS_CP0_64(17, 2)
->  #define KVM_REG_MIPS_CP0_XCONTEXT	MIPS_CP0_64(20, 0)
-> +#define KVM_REG_MIPS_CP0_DIAG		MIPS_CP0_32(22, 0)
->  #define KVM_REG_MIPS_CP0_ERROREPC	MIPS_CP0_64(30, 0)
->  #define KVM_REG_MIPS_CP0_KSCRATCH1	MIPS_CP0_64(31, 2)
->  #define KVM_REG_MIPS_CP0_KSCRATCH2	MIPS_CP0_64(31, 3)
-> @@ -256,6 +258,7 @@ struct mips_coproc {
->  #define MIPS_CP0_WATCH_LO	18
->  #define MIPS_CP0_WATCH_HI	19
->  #define MIPS_CP0_TLB_XCONTEXT	20
-> +#define MIPS_CP0_DIAG		22
->  #define MIPS_CP0_ECC		26
->  #define MIPS_CP0_CACHE_ERR	27
->  #define MIPS_CP0_TAG_LO		28
-> @@ -927,6 +930,8 @@ void kvm_vz_save_guesttlb(struct kvm_mips_tlb
-> *buf, unsigned int index, unsigned int count);
->  void kvm_vz_load_guesttlb(const struct kvm_mips_tlb *buf, unsigned
-> int index, unsigned int count);
-> +void kvm_loongson_clear_guest_vtlb(void);
-> +void kvm_loongson_clear_guest_ftlb(void);
->  #endif
->  
->  void kvm_mips_suspend_mm(int cpu);
-> diff --git a/arch/mips/include/asm/mipsregs.h
-> b/arch/mips/include/asm/mipsregs.h index 796fe47..ce40fbf 100644
-> --- a/arch/mips/include/asm/mipsregs.h
-> +++ b/arch/mips/include/asm/mipsregs.h
-> @@ -674,6 +674,9 @@
->  #define MIPS_CONF5_CV		(_ULCAST_(1) << 29)
->  #define MIPS_CONF5_K		(_ULCAST_(1) << 30)
->  
-> +#define MIPS_CONF6_INTIMER	(_ULCAST_(1) << 6)
-> +#define MIPS_CONF6_EXTIMER	(_ULCAST_(1) << 7)
-> +#define MIPS_CONF6_SFBEN	(_ULCAST_(1) << 8)
->  #define MIPS_CONF6_SYND		(_ULCAST_(1) << 13)
->  /* proAptiv FTLB on/off bit */
->  #define MIPS_CONF6_FTLBEN	(_ULCAST_(1) << 15)
-> @@ -993,6 +996,8 @@
->  /* Disable Branch Return Cache */
->  #define R10K_DIAG_D_BRC		(_ULCAST_(1) << 22)
->  
-> +/* Flush BTB */
-> +#define LOONGSON_DIAG_BTB	(_ULCAST_(1) << 1)
->  /* Flush ITLB */
->  #define LOONGSON_DIAG_ITLB	(_ULCAST_(1) << 2)
->  /* Flush DTLB */
-> @@ -2825,7 +2830,9 @@ __BUILD_SET_C0(status)
->  __BUILD_SET_C0(cause)
->  __BUILD_SET_C0(config)
->  __BUILD_SET_C0(config5)
-> +__BUILD_SET_C0(config6)
->  __BUILD_SET_C0(config7)
-> +__BUILD_SET_C0(diag)
->  __BUILD_SET_C0(intcontrol)
->  __BUILD_SET_C0(intctl)
->  __BUILD_SET_C0(srsmap)
-> diff --git a/arch/mips/kvm/tlb.c b/arch/mips/kvm/tlb.c
-> index 7cd9216..1efb9a0 100644
-> --- a/arch/mips/kvm/tlb.c
-> +++ b/arch/mips/kvm/tlb.c
-> @@ -20,6 +20,7 @@
->  
->  #include <asm/cpu.h>
->  #include <asm/bootinfo.h>
-> +#include <asm/mipsregs.h>
->  #include <asm/mmu_context.h>
->  #include <asm/pgtable.h>
->  #include <asm/cacheflush.h>
-> @@ -622,6 +623,44 @@ void kvm_vz_load_guesttlb(const struct
-> kvm_mips_tlb *buf, unsigned int index, }
->  EXPORT_SYMBOL_GPL(kvm_vz_load_guesttlb);
->  
-> +void kvm_loongson_clear_guest_vtlb(void)
-> +{
-> +	int idx = read_gc0_index();
-> +
-> +	/* Set root GuestID for root probe and write of guest TLB
-> entry */
-> +	set_root_gid_to_guest_gid();
-> +
-> +	write_gc0_index(0);
-> +	guest_tlbinvf();
-> +	write_gc0_index(idx);
-> +
-> +	clear_root_gid();
-> +	set_c0_diag(LOONGSON_DIAG_ITLB | LOONGSON_DIAG_DTLB);
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_loongson_clear_guest_vtlb);
-> +
-> +void kvm_loongson_clear_guest_ftlb(void)
-> +{
-> +	int i;
-> +	int idx = read_gc0_index();
-> +
-> +	/* Set root GuestID for root probe and write of guest TLB
-> entry */
-> +	set_root_gid_to_guest_gid();
-> +
-> +	for (i = current_cpu_data.tlbsizevtlb;
-> +	     i < (current_cpu_data.tlbsizevtlb +
-> +		     current_cpu_data.tlbsizeftlbsets);
-> +	     i++) {
-> +		write_gc0_index(i);
-> +		guest_tlbinvf();
-> +	}
-> +	write_gc0_index(idx);
-> +
-> +	clear_root_gid();
-> +	set_c0_diag(LOONGSON_DIAG_ITLB | LOONGSON_DIAG_DTLB);
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_loongson_clear_guest_ftlb);
-> +
->  #endif
->  
->  /**
-> diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
-> index 0772565..2ea1f13 100644
-> --- a/arch/mips/kvm/vz.c
-> +++ b/arch/mips/kvm/vz.c
-> @@ -127,6 +127,11 @@ static inline unsigned int
-> kvm_vz_config5_guest_wrmask(struct kvm_vcpu *vcpu) return mask;
->  }
->  
-> +static inline unsigned int kvm_vz_config6_guest_wrmask(struct
-> kvm_vcpu *vcpu) +{
-> +	return MIPS_CONF6_INTIMER | MIPS_CONF6_EXTIMER |
-> MIPS_CONF6_SYND; +}
-> +
->  /*
->   * VZ optionally allows these additional Config bits to be written
-> by root:
->   * Config:	M, [MT]
-> @@ -181,6 +186,12 @@ static inline unsigned int
-> kvm_vz_config5_user_wrmask(struct kvm_vcpu *vcpu) return
-> kvm_vz_config5_guest_wrmask(vcpu) | MIPS_CONF5_MRP; }
->  
-> +static inline unsigned int kvm_vz_config6_user_wrmask(struct
-> kvm_vcpu *vcpu) +{
-> +	return kvm_vz_config6_guest_wrmask(vcpu) |
-> +		MIPS_CONF6_SFBEN | MIPS_CONF6_FTLBEN |
-> MIPS_CONF6_FTLBDIS; +}
-> +
->  static gpa_t kvm_vz_gva_to_gpa_cb(gva_t gva)
->  {
->  	/* VZ guest has already converted gva to gpa */
-> @@ -930,7 +941,8 @@ static enum emulation_result
-> kvm_vz_gpsi_cop0(union mips_instruction inst, (sel == 2 ||	/*
-> SRSCtl */ sel == 3)) ||	/* SRSMap */
->  				   (rd == MIPS_CP0_CONFIG &&
-> -				    (sel == 7)) ||	/* Config7
-> */
-> +				    (sel == 6 ||	/* Config6 */
-> +				     sel == 7)) ||	/* Config7
-> */ (rd == MIPS_CP0_LLADDR &&
->  				    (sel == 2) &&	/* MAARI */
->  				    cpu_guest_has_maar &&
-> @@ -938,6 +950,9 @@ static enum emulation_result
-> kvm_vz_gpsi_cop0(union mips_instruction inst, (rd == MIPS_CP0_ERRCTL
-> && (sel == 0))) {	/* ErrCtl */
->  				val = cop0->reg[rd][sel];
-> +			} else if (rd == MIPS_CP0_DIAG &&
-> +				   (sel == 0)) {	/* Diag */
-> +				val = cop0->reg[rd][sel];
->  			} else {
->  				val = 0;
->  				er = EMULATE_FAIL;
-> @@ -1000,9 +1015,38 @@ static enum emulation_result
-> kvm_vz_gpsi_cop0(union mips_instruction inst, cpu_guest_has_maar &&
->  				   !cpu_guest_has_dyn_maar) {
->  				kvm_write_maari(vcpu, val);
-> +			} else if (rd == MIPS_CP0_CONFIG &&
-> +				   (sel == 6)) {
-> +				cop0->reg[rd][sel] = (int)val;
->  			} else if (rd == MIPS_CP0_ERRCTL &&
->  				   (sel == 0)) {	/* ErrCtl */
->  				/* ignore the written value */
-> +			} else if (rd == MIPS_CP0_DIAG &&
-> +				   (sel == 0)) {	/* Diag */
-> +				unsigned long flags;
-> +
-> +				local_irq_save(flags);
-> +				if (val & LOONGSON_DIAG_BTB) {
-> +					/* Flush BTB */
-> +
-> set_c0_diag(LOONGSON_DIAG_BTB);
-> +				}
-> +				if (val & LOONGSON_DIAG_ITLB) {
-> +					/* Flush ITLB */
-> +
-> set_c0_diag(LOONGSON_DIAG_ITLB);
-> +				}
-> +				if (val & LOONGSON_DIAG_DTLB) {
-> +					/* Flush DTLB */
-> +
-> set_c0_diag(LOONGSON_DIAG_DTLB);
-> +				}
-> +				if (val & LOONGSON_DIAG_VTLB) {
-> +					/* Flush VTLB */
-> +
-> kvm_loongson_clear_guest_vtlb();
-> +				}
-> +				if (val & LOONGSON_DIAG_FTLB) {
-> +					/* Flush FTLB */
-> +
-> kvm_loongson_clear_guest_ftlb();
-> +				}
-> +				local_irq_restore(flags);
->  			} else {
->  				er = EMULATE_FAIL;
->  			}
-> @@ -1665,6 +1709,7 @@ static u64 kvm_vz_get_one_regs[] = {
->  	KVM_REG_MIPS_CP0_CONFIG3,
->  	KVM_REG_MIPS_CP0_CONFIG4,
->  	KVM_REG_MIPS_CP0_CONFIG5,
-> +	KVM_REG_MIPS_CP0_CONFIG6,
->  #ifdef CONFIG_64BIT
->  	KVM_REG_MIPS_CP0_XCONTEXT,
->  #endif
-> @@ -1992,6 +2037,9 @@ static int kvm_vz_get_one_reg(struct kvm_vcpu
-> *vcpu, return -EINVAL;
->  		*v = read_gc0_config5();
->  		break;
-> +	case KVM_REG_MIPS_CP0_CONFIG6:
-> +		*v = kvm_read_sw_gc0_config6(cop0);
-> +		break;
->  	case KVM_REG_MIPS_CP0_MAAR(0) ...
-> KVM_REG_MIPS_CP0_MAAR(0x3f): if (!cpu_guest_has_maar ||
-> cpu_guest_has_dyn_maar) return -EINVAL;
-> @@ -2261,6 +2309,14 @@ static int kvm_vz_set_one_reg(struct kvm_vcpu
-> *vcpu, write_gc0_config5(v);
->  		}
->  		break;
-> +	case KVM_REG_MIPS_CP0_CONFIG6:
-> +		cur = kvm_read_sw_gc0_config6(cop0);
-> +		change = (cur ^ v) &
-> kvm_vz_config6_user_wrmask(vcpu);
-> +		if (change) {
-> +			v = cur ^ change;
-> +			kvm_write_sw_gc0_config6(cop0, (int)v);
-> +		}
-> +		break;
->  	case KVM_REG_MIPS_CP0_MAAR(0) ...
-> KVM_REG_MIPS_CP0_MAAR(0x3f): if (!cpu_guest_has_maar ||
-> cpu_guest_has_dyn_maar) return -EINVAL;
+> The patch proposes how to improve the snapshot performance in the complex way,
+> allowing to use the asyncronous writings when needed.
+>
+> This is an RFC series, as I didn't confident that I fully understand all
+> qemu-file use cases. I tried to make the series in a safe way to not break
+> anything related to qemu-file using in other places, like migration.
+>
+> All comments are *VERY* appriciated!
+>
+> Thanks,
+> Denis
+>
+> Denis Plotnikov (3):
+>   qemu-file: introduce current buffer
+>   qemu-file: add buffered mode
+>   migration/savevm: use qemu-file buffered mode for non-cached bdrv
+>
+>  include/qemu/typedefs.h |   2 +
+>  migration/qemu-file.c   | 479 +++++++++++++++++++++++++++++++++++++++++-------
+>  migration/qemu-file.h   |   9 +
+>  migration/savevm.c      |  38 +++-
+>  4 files changed, 456 insertions(+), 72 deletions(-)
+>
 
 
