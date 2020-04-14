@@ -2,108 +2,85 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB59C2BBC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 10:15:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0C9DC2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 10:17:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BC0920644
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 10:15:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9963E20644
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 10:17:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Des+nPjY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BC0920644
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tid2rm+Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9963E20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOIbM-00016i-IP
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 06:15:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36045)
+	id 1jOIdF-0002WB-Nw
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 06:17:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36287)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jOIaX-0008Sq-8E
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:14:43 -0400
+ (envelope-from <armbru@redhat.com>) id 1jOIcX-0001pC-Ez
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:16:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jOIaU-00008l-BK
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:14:41 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30027
+ (envelope-from <armbru@redhat.com>) id 1jOIcW-0001C0-B4
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:16:45 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39552
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jOIaU-000084-6b
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:14:38 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOIcW-0001Bo-7T
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:16:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586859277;
+ s=mimecast20190719; t=1586859403;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=chQYayxWk6V931eDiG8535byqvYXXCB4vc0IQDvjQCs=;
- b=Des+nPjYizXlge3C+uRHA/nr/0FgC9e1g0z4ZIrPDsbqxnp6V6UB2eI2oJHRiyFp4Hyptv
- KBN/3hAw5i8tq+s7yzPJxWy4hajZl1rs2ZZWnSmpVbeava//54OnD35Gz46XU8pI4TNFP6
- uw/R0Uq32jOy+zoSKYxVvZ9bUrtSZWI=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=IQm+PuEEDfDhtjQ7pcJrViSysq8W7W9ZDHzW2uWZOPg=;
+ b=Tid2rm+YYT7b679bzrgjBSRfyXQIHNvcPpjeQiZCXZS+Pn/xed9sfLnAwmBxk4OFaZaIYs
+ XNrXXYyN5gZqF0eEygAMibJkFQO4OumlHoU9xjPOWXPRmn7gyZ6KWhaoOr6CzAxpL3Skgf
+ vtdaQTSWKG03uQUMAcQyjqH1fxZ1zOQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-484-msIq-5X9ND2BW2610HBLkw-1; Tue, 14 Apr 2020 06:14:35 -0400
-X-MC-Unique: msIq-5X9ND2BW2610HBLkw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-199-Gda0uWbTNXisq4ruLY58AQ-1; Tue, 14 Apr 2020 06:16:42 -0400
+X-MC-Unique: Gda0uWbTNXisq4ruLY58AQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E972802560;
- Tue, 14 Apr 2020 10:14:34 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-186.ams2.redhat.com
- [10.36.114.186])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D69460BF7;
- Tue, 14 Apr 2020 10:14:31 +0000 (UTC)
-Subject: Re: [PATCH v4 30/30] iotests: Add tests for qcow2 images with
- extended L2 entries
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1584468723.git.berto@igalia.com>
- <420b76fbe25d5e2eeda53490a1c646935dab61c4.1584468724.git.berto@igalia.com>
- <3684cc01-3082-c52a-bd58-49300244a6eb@redhat.com>
- <w51tv1ni9vj.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <60e98587-b4d3-4a50-b4c2-da73084f55bd@redhat.com>
-Date: Tue, 14 Apr 2020 12:14:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F1A618C35A3;
+ Tue, 14 Apr 2020 10:16:41 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
+ [10.36.113.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DE721036B21;
+ Tue, 14 Apr 2020 10:16:41 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 9A42B11385C8; Tue, 14 Apr 2020 12:16:39 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH for-5.1 5/8] qemu-option: Fix has_help_option()'s sloppy
+ parsing
+References: <20200409153041.17576-1-armbru@redhat.com>
+ <20200409153041.17576-6-armbru@redhat.com>
+ <4e7c8e64-b5fe-4b8c-70d4-f6b2ea527e6a@redhat.com>
+Date: Tue, 14 Apr 2020 12:16:39 +0200
+In-Reply-To: <4e7c8e64-b5fe-4b8c-70d4-f6b2ea527e6a@redhat.com> (Eric Blake's
+ message of "Thu, 9 Apr 2020 13:10:24 -0500")
+Message-ID: <87o8ruv0c8.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <w51tv1ni9vj.fsf@maestria.local.igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="YXMoiLfeu40aAFuyxFzjV4ASpvCJd1RJU"
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,71 +92,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YXMoiLfeu40aAFuyxFzjV4ASpvCJd1RJU
-Content-Type: multipart/mixed; boundary="a5bwOBuELeIGDoqBt2VcAFUqA1tLYl9Mk"
+Eric Blake <eblake@redhat.com> writes:
 
---a5bwOBuELeIGDoqBt2VcAFUqA1tLYl9Mk
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 13.04.20 19:16, Alberto Garcia wrote:
-> On Thu 09 Apr 2020 02:22:37 PM CEST, Max Reitz wrote:
->>> +    ### Write subcluster #31-#34 (cluster overlap) ###
+> On 4/9/20 10:30 AM, Markus Armbruster wrote:
+>> has_help_option() uses its own parser.  It's inconsistent with
+>> qemu_opts_parse(), as demonstrated by test-qemu-opts case
+>> /qemu-opts/has_help_option.  Fix by reusing the common parser.
 >>
->> #31-#34, I think.
->=20
-> That's what I wrote :-?
-
-Errrrr #31-#33.
-
->>> +    ### Partially zeroize an unallocated cluster (#3)
->>> +    if [ "$use_backing_file" =3D "yes" ]; then
->>> +        alloc=3D"`seq 0 15`"; zero=3D""
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   tests/test-qemu-opts.c |  2 +-
+>>   util/qemu-option.c     | 39 +++++++++++++++++++--------------------
+>>   2 files changed, 20 insertions(+), 21 deletions(-)
 >>
->> Isn=E2=80=99t this a TODO?  (I.e., ideally we=E2=80=99d want the first 1=
-6 subclusters
->> to be zero, and the last 16 subclusters to be unallocated, right?)
->>
->> (I=E2=80=99m asking because you did raise a TODO for the =E2=80=9CZero s=
-ubcluster #1=E2=80=9D
->> test)
->=20
-> Maybe, but I just implemented zeroize at the subcluster level :-) Wait
-> for the next version of the series.
+>> diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
+>> index 27c24bb1a2..58a4ea2408 100644
+>> --- a/tests/test-qemu-opts.c
+>> +++ b/tests/test-qemu-opts.c
+>> @@ -744,7 +744,7 @@ static void test_has_help_option(void)
+>>           { "a,help", true, true, true },
+>>           { "a=3D0,help,b", true, true, true },
+>>           { "help,b=3D1", true, true, false },
+>> -        { "a,b,,help", false /* BUG */, true, true },
+>> +        { "a,b,,help", true, true, true },
+>
+> Okay, this revisits my question from 1/8.
+>
+> I guess the argument is that since 'b,help' is NOT a valid option name
+> (only as an option value), that we are instead parsing three separate
+> options 'b', '', and 'help', and whether or not the empty option is
+> valid, the face that 'help' is valid is what makes this return true?
 
-OK :)
+Parsing is oblivious of which option names are valid.  It's actually
+oblivious of the entire QemuOpts definition.
 
-Max
+Desugaring may depend on the QemuOpts definition, however.
 
+"a,b,,help" gets parsed as four option parameters:
 
---a5bwOBuELeIGDoqBt2VcAFUqA1tLYl9Mk--
+    "a",    which gets desugared to either "a=3Don" or "firstname=3Da"
+    "b",    which gets desugared to "b=3Don"
+    "" ,    which gets desugared to "=3Don"
+    "help", which gets desugared to "help=3Don"
 
---YXMoiLfeu40aAFuyxFzjV4ASpvCJd1RJU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+A user of the parse that supports help should clue on the last one,
+throw away the parse, and provide help.
 
------BEGIN PGP SIGNATURE-----
+The first desugaring is one that depends on the QemuOpts definition.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6VjQYACgkQ9AfbAGHV
-z0B80ggAlOmaGC9k3Tb5f+4qpEQuW9t1xU+oxBIvN7m3d5vzXpj7xIcysWm+zxwA
-KjBFMsm8hryTR4c6LOxIiZJ/HCrHZ/+sgY+zevGR8qqfP77KB9+XalCagNrLkfpj
-42EhfFHPPxJ1K50MZ59yYGEV/3Bd9hrmmpFVOI3f+O/Rnz1A1gvuxKvqhK+nnZ04
-P1hZz+LkQB56Fy4DjILA9phjfjKDK9zpmTfUpScq+iKgQFIzlUBrrna7vz667OhK
-pwKvD6QHkbo0UuVbp+iU4Zi5N0q3maZNHKP8obySfluxIU8/XeMSjl92HxOUocMj
-eqiVWkv1KVjgUIW+GsyEyoC3aIHQqw==
-=8MMM
------END PGP SIGNATURE-----
+>> +++ b/util/qemu-option.c
+>> @@ -165,26 +165,6 @@ void parse_option_size(const char *name, const char=
+ *value,
+>>       *ret =3D size;
+>>   }
+>>   -bool has_help_option(const char *param)
+>> -{
+>> -    const char *p =3D param;
+>> -    bool result =3D false;
+>> -
+>> -    while (*p && !result) {
+>> -        char *value;
+>> -
+>> -        p =3D get_opt_value(p, &value);
+>> -        if (*p) {
+>> -            p++;
+>> -        }
+>> -
+>> -        result =3D is_help_option(value);
+>
+> Old code: both 'help' and '?' are accepted.
+>
+>> +bool has_help_option(const char *params)
+>> +{
+>> +    const char *p;
+>> +    char *name, *value;
+>> +    bool ret;
+>> +
+>> +    for (p =3D params; *p;) {
+>> +        p =3D get_opt_name_value(p, NULL, &name, &value);
+>> +        ret =3D !strcmp(name, "help");
+>
+> New code: only 'help' is accepted.  Is the loss of '?' intentional?
 
---YXMoiLfeu40aAFuyxFzjV4ASpvCJd1RJU--
+No.  Will fix, thanks!
 
 
