@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11342C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 10:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB59C2BBC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 10:15:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C699920644
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 10:14:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BC0920644
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 10:15:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I/8PXMxJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C699920644
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Des+nPjY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BC0920644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOIa8-0007pz-0c
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 06:14:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35902)
+	id 1jOIbM-00016i-IP
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 06:15:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jOIZI-0007L1-KO
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:13:25 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jOIaX-0008Sq-8E
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:14:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jOIZG-0007sT-De
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:13:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24089
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1jOIaU-00008l-BK
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:14:41 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30027
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jOIZG-0007s4-7K
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:13:22 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jOIaU-000084-6b
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:14:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586859201;
+ s=mimecast20190719; t=1586859277;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Y8GRkFNFkAqN8Im08tlNdelYZf0HImJRdIMRifPfXAs=;
- b=I/8PXMxJYAXYz0rNq+fwOVInIl+CB/Cgzj3AZls5HN3Q/J0rn8njsVSab3qsgMuhZaDbh5
- kE1UhKIPzkGKcrGfp6n69cTDAhRJ5DMuExFxHdc1a4Wk1n8YCrp2O338erl9sEsaHA88Cp
- zrlZPcSn2Cg4MEAcqCtmh5O9t4ClC0s=
+ bh=chQYayxWk6V931eDiG8535byqvYXXCB4vc0IQDvjQCs=;
+ b=Des+nPjYizXlge3C+uRHA/nr/0FgC9e1g0z4ZIrPDsbqxnp6V6UB2eI2oJHRiyFp4Hyptv
+ KBN/3hAw5i8tq+s7yzPJxWy4hajZl1rs2ZZWnSmpVbeava//54OnD35Gz46XU8pI4TNFP6
+ uw/R0Uq32jOy+zoSKYxVvZ9bUrtSZWI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-qHRMyVgXO8Wf1oUNLH5ozA-1; Tue, 14 Apr 2020 06:13:16 -0400
-X-MC-Unique: qHRMyVgXO8Wf1oUNLH5ozA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-484-msIq-5X9ND2BW2610HBLkw-1; Tue, 14 Apr 2020 06:14:35 -0400
+X-MC-Unique: msIq-5X9ND2BW2610HBLkw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7881800D53;
- Tue, 14 Apr 2020 10:13:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E972802560;
+ Tue, 14 Apr 2020 10:14:34 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-114-186.ams2.redhat.com
  [10.36.114.186])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DA6010016DA;
- Tue, 14 Apr 2020 10:13:11 +0000 (UTC)
-Subject: Re: [PATCH v4 20/30] qcow2: Add subcluster support to
- discard_in_l2_slice()
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D69460BF7;
+ Tue, 14 Apr 2020 10:14:31 +0000 (UTC)
+Subject: Re: [PATCH v4 30/30] iotests: Add tests for qcow2 images with
+ extended L2 entries
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 References: <cover.1584468723.git.berto@igalia.com>
- <99b45e3beb4a38b17eb50fcde1e09cdefdb99724.1584468723.git.berto@igalia.com>
- <4b3b1ef4-2f8b-b16f-3c48-2ba6137763e4@redhat.com>
- <w51k12n5wyp.fsf@maestria.local.igalia.com>
+ <420b76fbe25d5e2eeda53490a1c646935dab61c4.1584468724.git.berto@igalia.com>
+ <3684cc01-3082-c52a-bd58-49300244a6eb@redhat.com>
+ <w51tv1ni9vj.fsf@maestria.local.igalia.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -90,20 +90,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <58cf9489-057d-429a-8445-cfdffadfa4af@redhat.com>
-Date: Tue, 14 Apr 2020 12:13:09 +0200
+Message-ID: <60e98587-b4d3-4a50-b4c2-da73084f55bd@redhat.com>
+Date: Tue, 14 Apr 2020 12:14:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <w51k12n5wyp.fsf@maestria.local.igalia.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <w51tv1ni9vj.fsf@maestria.local.igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="PzX1DbnhCrEYQUD0b3DWgzXplC7ZKAP5F"
+ boundary="YXMoiLfeu40aAFuyxFzjV4ASpvCJd1RJU"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,76 +123,63 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PzX1DbnhCrEYQUD0b3DWgzXplC7ZKAP5F
-Content-Type: multipart/mixed; boundary="OgAnbGdHtoUU1o7iYoXCBEbiMDcSi80Xz"
+--YXMoiLfeu40aAFuyxFzjV4ASpvCJd1RJU
+Content-Type: multipart/mixed; boundary="a5bwOBuELeIGDoqBt2VcAFUqA1tLYl9Mk"
 
---OgAnbGdHtoUU1o7iYoXCBEbiMDcSi80Xz
+--a5bwOBuELeIGDoqBt2VcAFUqA1tLYl9Mk
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 10.04.20 14:47, Alberto Garcia wrote:
-> On Thu 09 Apr 2020 12:05:12 PM CEST, Max Reitz wrote:
->>>          switch (qcow2_get_cluster_type(bs, old_l2_entry)) {
->>>          case QCOW2_CLUSTER_UNALLOCATED:
->>> -            if (full_discard || !bs->backing) {
->>> +            if (full_discard) {
->>> +                /* If the image has extended L2 entries we can only
->>> +                 * skip this operation if the L2 bitmap is zero. */
->>> +                uint64_t bitmap =3D has_subclusters(s) ?
->>> +                    get_l2_bitmap(s, l2_slice, l2_index + i) : 0;
+On 13.04.20 19:16, Alberto Garcia wrote:
+> On Thu 09 Apr 2020 02:22:37 PM CEST, Max Reitz wrote:
+>>> +    ### Write subcluster #31-#34 (cluster overlap) ###
 >>
->> Isn=E2=80=99t this bitmap only valid for standard clusters?  In this cas=
-e, the
->> whole cluster is unallocated, so the bitmap shouldn=E2=80=99t be relevan=
-t,
->> AFAIU.
+>> #31-#34, I think.
 >=20
-> I'm not sure if I follow you.
+> That's what I wrote :-?
+
+Errrrr #31-#33.
+
+>>> +    ### Partially zeroize an unallocated cluster (#3)
+>>> +    if [ "$use_backing_file" =3D "yes" ]; then
+>>> +        alloc=3D"`seq 0 15`"; zero=3D""
+>>
+>> Isn=E2=80=99t this a TODO?  (I.e., ideally we=E2=80=99d want the first 1=
+6 subclusters
+>> to be zero, and the last 16 subclusters to be unallocated, right?)
+>>
+>> (I=E2=80=99m asking because you did raise a TODO for the =E2=80=9CZero s=
+ubcluster #1=E2=80=9D
+>> test)
 >=20
-> An unallocated cluster can still have QCOW_OFLAG_SUB_ZERO set in some of
-> its subclusters. Those read as zeroes and the rest go to the backing
-> file.
+> Maybe, but I just implemented zeroize at the subcluster level :-) Wait
+> for the next version of the series.
 
-Hm, right, this is the only way to have non-preallocated zero clusters
-after all.
+OK :)
 
-I suppose I read the spec wrong and assumed somehow that unallocated
-clusters don=E2=80=99t use =E2=80=9Cstandard cluster descriptors=E2=80=9D, =
-so their bitmap usage
-would be undefined.  Don=E2=80=99t know how that happened.
-
-> After a full discard all subclusters should be completely deallocated so
-> those bits should be cleared.
->=20
-> If the bitmap is already 0 (the whole cluster is already unallocated) or
-> if the image does not have extended L2 entries (which also means that
-> the whole cluster is already unallocated) then we can skip the discard.
-
-Yep, seems right.
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Max
 
 
---OgAnbGdHtoUU1o7iYoXCBEbiMDcSi80Xz--
+--a5bwOBuELeIGDoqBt2VcAFUqA1tLYl9Mk--
 
---PzX1DbnhCrEYQUD0b3DWgzXplC7ZKAP5F
+--YXMoiLfeu40aAFuyxFzjV4ASpvCJd1RJU
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6VjLUACgkQ9AfbAGHV
-z0AmHAf/Qm/cktZ7C4ETFe3osU2oHgTs1oQvfXFxt39VBOdFetsXhSXm1wwOOBUL
-BDzxBEtFICOQ+uNSo7+BYv0P+V2lRMVtKouTDvY5+eWwCjxJHxsK9V2R6keMzrZr
-FURdr60mXKElOBpMJIldKbHOzc+NmhSaBcfEYGyIeUGpsezsdXAurjAw6sb5dPaP
-lKKjriKF7pIdaOMjEcJ44i46vRdS4poK0Gs/Z8H9FVMnSivEdP3e0UWHxw5SzANF
-NJ/baEm/aGQbd2YPX8wLOwm9t2fpRPcH2j+5bADdgcNx7o2/mazQAlOXoUCSD0HG
-avYPaXlLZVCz0X8lBUDWh2hlwwlNrg==
-=y6GW
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6VjQYACgkQ9AfbAGHV
+z0B80ggAlOmaGC9k3Tb5f+4qpEQuW9t1xU+oxBIvN7m3d5vzXpj7xIcysWm+zxwA
+KjBFMsm8hryTR4c6LOxIiZJ/HCrHZ/+sgY+zevGR8qqfP77KB9+XalCagNrLkfpj
+42EhfFHPPxJ1K50MZ59yYGEV/3Bd9hrmmpFVOI3f+O/Rnz1A1gvuxKvqhK+nnZ04
+P1hZz+LkQB56Fy4DjILA9phjfjKDK9zpmTfUpScq+iKgQFIzlUBrrna7vz667OhK
+pwKvD6QHkbo0UuVbp+iU4Zi5N0q3maZNHKP8obySfluxIU8/XeMSjl92HxOUocMj
+eqiVWkv1KVjgUIW+GsyEyoC3aIHQqw==
+=8MMM
 -----END PGP SIGNATURE-----
 
---PzX1DbnhCrEYQUD0b3DWgzXplC7ZKAP5F--
+--YXMoiLfeu40aAFuyxFzjV4ASpvCJd1RJU--
 
 
