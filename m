@@ -2,98 +2,85 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B3BDC2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:03:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31DC8C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:04:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6F1A20678
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:03:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0C9320678
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:04:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gRuTmzrl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6F1A20678
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fv2EqRUJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0C9320678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOOxp-0000Wn-Tn
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 13:03:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39092)
+	id 1jOOyu-0002Tm-Qr
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 13:04:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32838)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jOOvy-0006yU-7d
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:01:17 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jOOjh-0003Xm-Oz
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:48:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jOOvt-0002KY-GO
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:01:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43066
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1jOOjd-0001Ql-RT
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:48:33 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46355
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOLfK-0008MU-3t
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:31:50 -0400
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jONCe-0005VY-OT
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 11:10:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586871109;
+ s=mimecast20190719; t=1586877020;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5F5VGUrhvJ/6dwp4oORH6NykPEQT94CUfCEwFf8jKAI=;
- b=gRuTmzrlipJ+G0VE/i9jILhxh4/WUuefnDmrs1cg4WJosgegZGxzsarSwjJGSclsYu6Vab
- U6TL1mx4a1kViSdS2eQDQ0FiI4wR1S3EP7eJsm1u0Lgi0VKreK3JMzPb5sGfcWeZqsxKr/
- DcCKc6jy7QL2iKUzgnO2Qc8cY7RC6RY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-j-iFQrp8NIuLMlyoDjyX-A-1; Tue, 14 Apr 2020 09:31:44 -0400
-X-MC-Unique: j-iFQrp8NIuLMlyoDjyX-A-1
-Received: by mail-wm1-f69.google.com with SMTP id n127so3769576wme.4
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 06:31:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=TyZlA8S5K4aOaRBq4xW9gDApmrrmteGX4XubxYmsTLk=;
- b=L+4DzkCE+sYx2MXMIBFQPPWYx5DNX81I6uTbu8U2RzoLIGpOOwMYn6S19TpWp6di/2
- N0dl9RY3Dibm1r0YS2ZxyqfE18OFXrlv8osX8spXdc/QsqVFsy45dHj9mCnT04Yayu2G
- 7YdqxD4Ho1MWCIhCo9mkb5FIM+Hm8DJQ/F+fHoT7HWBM8oRhWhdajEXQviPr8MiO3a20
- kVEMGdM9s4tRvQthc4dl7w2UbKmOOqsg7R9p5Fen7yZfhg85LK/ETbJjvpUmJM7bNsmY
- Hz6RegsMYAbQDl00mgOMhs/AEI7RdpGotQUSURAvXQ3ZaOubDBYgj7uqwpjVO5lBnzj6
- bXuw==
-X-Gm-Message-State: AGi0PuZtO6YSssKFGKQ9+xPpi6Y5nY7/H/qCONYIJ2aGxqBENAiiPuMB
- DH+WIpvRVPpi+7aYZFlsiulDyOc0PBQg61I2IGc3J5BLnW3eptJtQVXhhSdiqUHYF1QUVJuCijh
- JhHbMUxliip62bxI=
-X-Received: by 2002:adf:f1c2:: with SMTP id z2mr25296875wro.40.1586871101510; 
- Tue, 14 Apr 2020 06:31:41 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJP6fHl4xNW7Nqa11UFZNTCw4vVRGUyy4CcjNllaD1Gvcu9E5d3AraZgLgF6aFxBzGxafB78g==
-X-Received: by 2002:adf:f1c2:: with SMTP id z2mr25296846wro.40.1586871101209; 
- Tue, 14 Apr 2020 06:31:41 -0700 (PDT)
-Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id j68sm19680265wrj.32.2020.04.14.06.31.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Apr 2020 06:31:40 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0 09/12] hw/display/sm501: Avoid heap overflow in
- sm501_2d_operation()
-Date: Tue, 14 Apr 2020 15:30:49 +0200
-Message-Id: <20200414133052.13712-10-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200414133052.13712-1-philmd@redhat.com>
-References: <20200414133052.13712-1-philmd@redhat.com>
+ bh=mHjDn7GVjkKmjZF0kyX6Ab2OXXDLE9a22KNo8L8ZMHw=;
+ b=Fv2EqRUJs6HDDQd4NjZEDQz5pZgAvRE6RPd/M2yTnpNr/nWqK1MqrTDgiAWcX3WEW8hQCQ
+ kdLU6H+4FrzPsCjAA3f/1sZ2m8604ri6MGpjJd8AopqgTQmzPopVhxDON5gXXb8iP7MIcT
+ rDibYKYzu/PnaPAtukYt1MsN7MD1XaU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-zZlt4Md7NZmk3ug6P-SKmQ-1; Tue, 14 Apr 2020 11:10:18 -0400
+X-MC-Unique: zZlt4Md7NZmk3ug6P-SKmQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A7F613F8;
+ Tue, 14 Apr 2020 15:10:17 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-1.ams2.redhat.com [10.36.114.1])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 366C919C69;
+ Tue, 14 Apr 2020 15:10:16 +0000 (UTC)
+Date: Tue, 14 Apr 2020 17:10:14 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH for-5.1 8/8] qemu-option: Move is_valid_option_list() to
+ qemu-img.c and rewrite
+Message-ID: <20200414151014.GM7747@linux.fritz.box>
+References: <20200409153041.17576-1-armbru@redhat.com>
+ <20200409153041.17576-9-armbru@redhat.com>
+ <e3d05915-268f-0d1a-e760-723a10807d16@redhat.com>
+ <87k12ixxlb.fsf@dusky.pond.sub.org>
+ <87blnup257.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
+In-Reply-To: <87blnup257.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,117 +92,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Fabien Chouteau <chouteau@adacore.com>, Zhang Zi Ming <1015138407@qq.com>,
- Max Filippov <jcmvbkbc@gmail.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Stafford Horne <shorne@gmail.com>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Am 14.04.2020 um 16:34 hat Markus Armbruster geschrieben:
+> Markus Armbruster <armbru@redhat.com> writes:
+>=20
+> > Eric Blake <eblake@redhat.com> writes:
+> >
+> >> On 4/9/20 10:30 AM, Markus Armbruster wrote:
+> >>> is_valid_option_list()'s purpose is ensuring qemu-img.c's can safely
+> >>> join multiple parameter strings separated by ',' like this:
+> >>>
+> >>>          g_strdup_printf("%s,%s", params1, params2);
+> >>>
+> >>> How it does that is anything but obvious.  A close reading of the cod=
+e
+> >>> reveals that it fails exactly when its argument starts with ',' or
+> >>> ends with an odd number of ','.  Makes sense, actually, because when
+> >>> the argument starts with ',', a separating ',' preceding it would get
+> >>> escaped, and when it ends with an odd number of ',', a separating ','
+> >>> following it would get escaped.
+> >>>
+> >>> Move it to qemu-img.c and rewrite it the obvious way.
+> >>>
+> >>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >>> ---
+> >>>   include/qemu/option.h |  1 -
+> >>>   qemu-img.c            | 26 ++++++++++++++++++++++++++
+> >>>   util/qemu-option.c    | 22 ----------------------
+> >>>   3 files changed, 26 insertions(+), 23 deletions(-)
+> >>>
+> >>
+> >>> +++ b/qemu-img.c
+> >>> @@ -223,6 +223,32 @@ static bool qemu_img_object_print_help(const cha=
+r *type, QemuOpts *opts)
+> >>>       return true;
+> >>>   }
+> >>>   +/*
+> >>> + * Is @optarg safe for accumulate_options()?
+> >>> + * It is when multiple of them can be joined together separated by '=
+,'.
+> >>> + * To make that work, @optarg must not start with ',' (or else a
+> >>> + * separating ',' preceding it gets escaped), and it must not end wi=
+th
+> >>> + * an odd number of ',' (or else a separating ',' following it gets
+> >>> + * escaped).
+> >>> + */
+> >>> +static bool is_valid_option_list(const char *optarg)
+> >>> +{
+> >>> +    size_t len =3D strlen(optarg);
+> >>> +    size_t i;
+> >>> +
+> >>> +    if (optarg[0] =3D=3D ',') {
+> >>> +        return false;
+> >>> +    }
+> >>> +
+> >>> +    for (i =3D len; i > 0 && optarg[i - 1] =3D=3D ','; i--) {
+> >>> +    }
+> >>> +    if ((len - i) % 2) {
+> >>> +        return false;
+> >>> +    }
+> >>> +
+> >>> +    return true;
+> >>
+> >> Okay, that's easy to read.  Note that is_valid_option_list("") returns
+> >> true.
+> >
+> > Hmm, that's a bug:
+> >
+> >     $ qemu-img create -f qcow2 -o backing_file=3Da -o "" -o backing_fmt=
+=3Draw,size=3D1M new.qcow2
+> >     qemu-img: warning: Could not verify backing image. This may become =
+an error in future versions.
+> >     Could not open 'a,backing_fmt=3Draw': No such file or directory
+> >     Formatting 'new.qcow2', fmt=3Dqcow2 size=3D1048576 backing_file=3Da=
+,,backing_fmt=3Draw cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=
+=3D16
+> >     $ qemu-img info new.qcow2=20
+> >     image: new.qcow2
+> >     file format: qcow2
+> >     virtual size: 1 MiB (1048576 bytes)
+> >     disk size: 196 KiB
+> >     cluster_size: 65536
+> > --> backing file: a,backing_fmt=3Draw
+> >     Format specific information:
+> >         compat: 1.1
+> >         lazy refcounts: false
+> >         refcount bits: 16
+> >         corrupt: false
+> >
+> > My rewrite preserves this bug.  Will fix in v2.
+>=20
+> Kevin, two obvious fixes:
+>=20
+> * Make is_valid_option_list() reject -o ""
+>=20
+> * Make accumulate_options(options, "") return options.
+>=20
+> Got a preference?
 
-Zhang Zi Ming reported a heap overflow in the Drawing Engine of
-the SM501 companion chip model, in particular in the COPY_AREA()
-macro in sm501_2d_operation().
+In other words, the choice is between reporting an error and ignoring it
+silently. I think reporting an error makes more sense.
 
-Add a simple check to avoid the heap overflow.
-
-This fixes:
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  =3D=3D20518=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on address=
- 0x7f6f4c3fffff at pc 0x55b1e1d358f0 bp 0x7ffce464dfb0 sp 0x7ffce464dfa8
-  READ of size 1 at 0x7f6f4c3fffff thread T0
-      #0 0x55b1e1d358ef in sm501_2d_operation hw/display/sm501.c:788:13
-      #1 0x55b1e1d32c38 in sm501_2d_engine_write hw/display/sm501.c:1466:13
-      #2 0x55b1e0cd19d8 in memory_region_write_accessor memory.c:483:5
-      #3 0x55b1e0cd1404 in access_with_adjusted_size memory.c:544:18
-      #4 0x55b1e0ccfb9d in memory_region_dispatch_write memory.c:1476:16
-      #5 0x55b1e0ae55a8 in flatview_write_continue exec.c:3125:23
-      #6 0x55b1e0ad3e87 in flatview_write exec.c:3165:14
-      #7 0x55b1e0ad3a24 in address_space_write exec.c:3256:18
-
-  0x7f6f4c3fffff is located 4194303 bytes to the right of 4194304-byte regi=
-on [0x7f6f4bc00000,0x7f6f4c000000)
-  allocated by thread T0 here:
-      #0 0x55b1e0a6e715 in __interceptor_posix_memalign (ppc64-softmmu/qemu=
--system-ppc64+0x19c0715)
-      #1 0x55b1e31c1482 in qemu_try_memalign util/oslib-posix.c:189:11
-      #2 0x55b1e31c168c in qemu_memalign util/oslib-posix.c:205:27
-      #3 0x55b1e11a00b3 in spapr_reallocate_hpt hw/ppc/spapr.c:1560:23
-      #4 0x55b1e11a0ce4 in spapr_setup_hpt hw/ppc/spapr.c:1593:5
-      #5 0x55b1e11c2fba in spapr_machine_reset hw/ppc/spapr.c:1644:9
-      #6 0x55b1e1368b01 in qemu_system_reset softmmu/vl.c:1391:9
-      #7 0x55b1e1375af3 in qemu_init softmmu/vl.c:4436:5
-      #8 0x55b1e2fc8a59 in main softmmu/main.c:48:5
-      #9 0x7f6f8150bf42 in __libc_start_main (/lib64/libc.so.6+0x23f42)
-
-  SUMMARY: AddressSanitizer: heap-buffer-overflow hw/display/sm501.c:788:13=
- in sm501_2d_operation
-  Shadow bytes around the buggy address:
-    0x0fee69877fa0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-    0x0fee69877fb0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-    0x0fee69877fc0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-    0x0fee69877fd0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-    0x0fee69877fe0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
-  =3D>0x0fee69877ff0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa[fa]
-    0x0fee69878000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    0x0fee69878010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    0x0fee69878020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    0x0fee69878030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    0x0fee69878040: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  Shadow byte legend (one shadow byte represents 8 application bytes):
-    Addressable:           00
-    Partially addressable: 01 02 03 04 05 06 07
-    Heap left redzone:       fa
-    Freed heap region:       fd
-    Poisoned by user:        f7
-    ASan internal:           fe
-  =3D=3D20518=3D=3DABORTING
-
-Cc: qemu-stable@nongnu.org
-Fixes: 07d8a50cb0e ("sm501: add 2D engine copyrect support")
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1786026
-Reported-by: Zhang Zi Ming <1015138407@qq.com>
-Acked-by: BALATON Zoltan <balaton@eik.bme.hu>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20200413220100.18628-1-f4bug@amsat.org>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/display/sm501.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index de0ab9d977..902acb3875 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -726,6 +726,12 @@ static void sm501_2d_operation(SM501State *s)
-     int crt =3D (s->dc_crt_control & SM501_DC_CRT_CONTROL_SEL) ? 1 : 0;
-     int fb_len =3D get_width(s, crt) * get_height(s, crt) * get_bpp(s, crt=
-);
-=20
-+    if (rtl && (src_x < operation_width || src_y < operation_height)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "sm501: Illegal RTL address (%i, %i=
-)\n",
-+                      src_x, src_y);
-+        return;
-+    }
-+
-     if (addressing !=3D 0x0) {
-         printf("%s: only XY addressing is supported.\n", __func__);
-         abort();
---=20
-2.21.1
+Kevin
 
 
