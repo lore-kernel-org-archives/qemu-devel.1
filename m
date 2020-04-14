@@ -2,76 +2,75 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECB6EC2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:40:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 097ACC2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:40:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B27A2206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:40:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD90F2074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:40:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d5hnBfwI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B27A2206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UZJQxy2q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD90F2074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOOcF-00066M-Py
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 12:40:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56335)
+	id 1jOOcL-0006Ni-QQ
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 12:40:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53498)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jOOb8-0003pI-7u
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:39:43 -0400
+ (envelope-from <devtoe82@gmail.com>) id 1jOOUz-0001Ne-Nz
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:33:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jOOb7-0005H2-93
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:39:42 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34594
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jOOb7-0005Gq-5b
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:39:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586882380;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=qjwYkl3cRbkwG2uxirET7doz0xycLkTnyirONRVyO/M=;
- b=d5hnBfwIG084tnAUpqX1fH13420VMS238gO4klfJv1khXBlmja0lNvMGncoTaLlxXsUjnM
- EeTLPg+0xOmgImIR7/+HItuR3lYohY7dTEq0pBtA0+D7Vd+ieChfHQeGEGzSULh/sT5/Tq
- ZzOKupIeGHfoWBb8W36guKhfILeIi7s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-00T9SOqMPhOkf6uSuNRSiQ-1; Tue, 14 Apr 2020 12:39:39 -0400
-X-MC-Unique: 00T9SOqMPhOkf6uSuNRSiQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CC83102C8BB
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 16:39:38 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 22DCD60BEC
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 16:39:38 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 0/3] More misc patches for QEMU 5.0-rc3
-Date: Tue, 14 Apr 2020 12:39:34 -0400
-Message-Id: <20200414163937.29669-1-pbonzini@redhat.com>
+ (envelope-from <devtoe82@gmail.com>) id 1jOOUy-00021b-Qk
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:33:21 -0400
+Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:42016)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <devtoe82@gmail.com>) id 1jOMfU-0000tD-Jr
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 10:36:04 -0400
+Received: by mail-ot1-x336.google.com with SMTP id l21so7398094otd.9
+ for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 07:36:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=0UKzmnzb24l9+mhQPAfis3S8cu/WolgMuV5WqdYEOGA=;
+ b=UZJQxy2q0zNO8EC6IjCll1cEoGKfoA5X0Va1ynOw5034I7cxqkb7F+BJ62ArX+OvrE
+ bVbJbpD9rbyYg9ydXPw2TwGTmRJjv0tiFeiBCMkCD5FyQ3/S/Q46xfcnQTXetorlHUJ6
+ g2CS4GY6pZP2nwl+BouOOqdyLlTFCcVREaMi5Ai2OJLdpjPiZiptyC1C+cjw2WwDyLCC
+ tDhROTB0jWWtPLcmquBWX6S5KytWeBJV+sjBIBJHWu3QR1A3ZaTbMRMwku8DievCRJLh
+ sOeh0s/5fReKz3S1r2GvcgLj7gBEdPrKcnK9Cr5B8EHWEZC91xlRWqZHBPfpTYg4Xp6V
+ SsVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=0UKzmnzb24l9+mhQPAfis3S8cu/WolgMuV5WqdYEOGA=;
+ b=b8aznwt156khY/nFG4IlnMhFvvgAh/opvT1DDIGrSObXalozpfK7sIxfswfnSnGZXv
+ 3LtZo14f+N+2d0JeTh1AEyc1SnjBtCOwwPI8xVQn6o/uGnrZ5y+euo4sxhKzcYk+UTPN
+ eOYY081zQhhlFldgiFQrKKaMNXq/HNtCgfrAE31tWi261g25eAxmdcNeCAUAvEBUkcpx
+ lKzJym1TLb374xE4Bu2rJjPsAYZEPLhWhJtJ+lR23c+NIyvfUByR5n9ZcWypMhPz9BJY
+ X6hrw6S3VDGsZ5vR6AnqwLLKwL31DpDvms1BcnNm61JObe+9/EXlfD6P/N/AXtXBVXbW
+ nB6A==
+X-Gm-Message-State: AGi0Pubc19TGXnYgvFyrIO29Gawr91U1Gu+A7Iov4ub7sjyHryQ0tEY9
+ k4uhELUQ4quZ1FU0sK9L8T3/A5vRPrtLnuKHu/LoCn3P
+X-Google-Smtp-Source: APiQypInEQimLjb3vS4XBC8tYEgRAVkdunJbMnutNPncbDSPP+0YRoKgx7/6TklzqvykrxjsHtEzH4HzYU3uQXWsS7g=
+X-Received: by 2002:a9d:3a04:: with SMTP id j4mr12111540otc.217.1586874962943; 
+ Tue, 14 Apr 2020 07:36:02 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+From: Toe Dev <devtoe82@gmail.com>
+Date: Tue, 14 Apr 2020 17:35:50 +0300
+Message-ID: <CAN+O=T+bk=hXjPF67R=YHKebcuMP2dGzT_qXPWMUp=RvWOPxOw@mail.gmail.com>
+Subject: cscope redundant chars
+To: qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::336
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,35 +86,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 267514b33ffa3f315adc26fc14d89f92e90840f5=
-:
+add cscope phony(ctags have one) and remove redundancy
 
-  module: increase dirs array size by one (2020-04-13 02:56:18 -0400)
+diff --git a/Makefile b/Makefile
+index 84ef881600..9cf62532f9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1005,16 +1005,18 @@ ctags:
+        rm -f tags
+        find "$(SRC_PATH)" -name '*.[hc]' -exec ctags --append {} +
 
-are available in the Git repository at:
++.PHONY: cscope
++
++cscope:
++       rm -f cscope.*
++       find $(SRC_PATH) -name "*.[chsS]" -print | sed 's,^\./,,' >
+"$(SRC_PATH)/cscope.files"
++       cscope -b -q -k cscope.files
++
+ .PHONY: TAGS
+ TAGS:
+        rm -f TAGS
+        find "$(SRC_PATH)" -name '*.[hc]' -exec etags --append {} +
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
-
-for you to fetch changes up to 9f5a0664187e9411c5c6b7dbd21a1f50922cf698:
-
-  hax: Windows doesn't like posix device names (2020-04-14 10:37:42 -0400)
-
-----------------------------------------------------------------
-Bugfixes, and reworking of the atomics documentation.
-
-----------------------------------------------------------------
-Igor Mammedov (2):
-      hostmem: set default prealloc_threads to valid value
-      tests: numa: test one backend with prealloc enabled
-
-Volker R=C3=BCmelin (1):
-      hax: Windows doesn't like posix device names
-
- backends/hostmem.c        | 1 +
- target/i386/hax-windows.c | 4 ++--
- tests/qtest/numa-test.c   | 2 +-
- 3 files changed, 4 insertions(+), 3 deletions(-)
---=20
-2.18.2
-
+-cscope:
+-       rm -f "$(SRC_PATH)"/cscope.*
+-       find "$(SRC_PATH)/" -name "*.[chsS]" -print | sed 's,^\./,,' >
+"$(SRC_PATH)/cscope.files"
+-       cscope -b -i"$(SRC_PATH)/cscope.files"
+-
 
