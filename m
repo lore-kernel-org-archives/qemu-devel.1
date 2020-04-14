@@ -2,124 +2,87 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06D67C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97EA4C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:41:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3B7B2075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:40:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5EB562075E
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:41:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Uwjj6++E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3B7B2075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aZpD8aRY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EB562075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOKrb-0005AV-0a
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 08:40:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35391)
+	id 1jOKsN-0006Z5-KN
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 08:41:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35635)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jOKqc-0004Kr-Tu
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:39:27 -0400
+ (envelope-from <armbru@redhat.com>) id 1jOKrb-0005N3-Bv
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:40:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jOKqc-0004nr-1O
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:39:26 -0400
-Received: from mail-db3eur04on0700.outbound.protection.outlook.com
- ([2a01:111:f400:fe0c::700]:52803
- helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jOKqY-0004jB-EY; Tue, 14 Apr 2020 08:39:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KDCJe/yrxjlBhGm/Xn1qzjyE7X96ORg37uAUcYqd8XyYQ0eUTIxsGKfm9hHiwN2Xzp4dsW0U0v49tA+GOiyHjlfdWwQMrFgrbw7HCAprm6bocx1foFNhFcKLehoh2/ovU/vb6DAiaGvcwLUJqnywBNkc4DKt692PMGozyNgTrXhH24nxH6rvjWJgS3yrpMMR17ybhYuDYeLQUEtggeJamelp/nz354nt2gMIOZDb4QN1A9007Xg7oK+QgcQTxU81IS5Rlerwzxp6IQghqN+xFDkq+nX/cciaboEpIJzbswzmGuQEbftwO6VGa/yLLN+wDvclFvHvvtWtIa99obrPrg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BrZoHjAIPqgtPK6EuovedyBdDhHTBtInlYizI/otFTA=;
- b=H9H0P0nQ5e/PfiEBGU+x4fJv3rm9q8tlwZxbQOZeHE0eamVxTzACza7SmQmJ6NASihtgYuaotGJoXGbjVDULZpxoBoFST1ZndmTomeooT9UU9jppk5wNB3GPzoE2sYXM4BzKVv7ke8+XJXbGl6dDCemROXNOZIIXb5nsZgIGF9xIJSm6sHRRDE+pQo/+w6FLSFeTx8a6LpxJqTmRU3penfzDvbgSYrUk4L4si0dNtmWumHoSt2JV+671E8N+MhNhPpopNA7f5luUKFZP4lZ9Rwvyc3sHQQZqNR0QlFR6fdyq0mWvZN6pPZakkWpwPt5+2XXaw0A1ccCu+dXlRxGZOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BrZoHjAIPqgtPK6EuovedyBdDhHTBtInlYizI/otFTA=;
- b=Uwjj6++Ep0BRID5RaIJNAC0BV9EXbqyMf/sMNOe3wLIKrQPksCJcszaAU27N50sWpeRNCYqqOs0dxLkaKYu+LmwvuLynt2hW8rCheZV2kb0y5actP7DVoLbk/+4JYFg8hA6EtIOXhmh2GmRQzUnq2Gtn3BzZd6h6nb6oogtbltM=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5447.eurprd08.prod.outlook.com (2603:10a6:20b:10b::18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.24; Tue, 14 Apr
- 2020 12:39:20 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.2900.028; Tue, 14 Apr 2020
- 12:39:20 +0000
-Subject: Re: [PATCH v4 11/30] qcow2: Add l2_entry_size()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1584468723.git.berto@igalia.com>
- <fd0f93353a218ff4518f34ebdbca05c2fc0f1085.1584468723.git.berto@igalia.com>
- <58d1fa17-91ea-9f8d-c39a-4141783d1234@virtuozzo.com>
- <w51y2qy5kd6.fsf@maestria.local.igalia.com>
- <9695a347-b490-12b2-8a01-09ad8bdb8eb9@virtuozzo.com>
- <w51v9m25jrh.fsf@maestria.local.igalia.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200414153918021
-Message-ID: <625013cc-c646-2a7c-283b-ae30e49bb078@virtuozzo.com>
-Date: Tue, 14 Apr 2020 15:39:18 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <w51v9m25jrh.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0003.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a::13) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <armbru@redhat.com>) id 1jOKrZ-0005pY-PY
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:40:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30380
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOKrZ-0005or-LC
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:40:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586868025;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=IfDbAbI4Y3oq3UsZPuy5zvsx0E1roAz+/VG1VOiIdgw=;
+ b=aZpD8aRYHhM3jTDkImfH6tv2Bjvi52HZW/X9SIUL1yHgOzgeqAWlDeJknNvg/QrfD2kgII
+ XxSwxygAs54aUlOu1v+skkvJgxZUnoBP/pWuAKDQ6fq8Tceb4Las35ifuPVLxLGqYeY318
+ CwzmW/eZA6zwdbiIM4VH8Zx51MJI5ic=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-75-scp_bCGFMaafLmEdh6LTug-1; Tue, 14 Apr 2020 08:40:21 -0400
+X-MC-Unique: scp_bCGFMaafLmEdh6LTug-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AF948017F5;
+ Tue, 14 Apr 2020 12:40:17 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
+ [10.36.113.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 19D475DA66;
+ Tue, 14 Apr 2020 12:40:13 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 7C99F11385C8; Tue, 14 Apr 2020 14:40:11 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH-for-5.1 v3 01/23] scripts/coccinelle: Catch missing
+ error_propagate() calls in realize()
+References: <20200412224144.12205-1-f4bug@amsat.org>
+ <20200412224144.12205-2-f4bug@amsat.org>
+Date: Tue, 14 Apr 2020 14:40:11 +0200
+In-Reply-To: <20200412224144.12205-2-f4bug@amsat.org> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 13 Apr 2020 00:41:22
+ +0200")
+Message-ID: <87v9m2s0k4.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.131) by
- FR2P281CA0003.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2900.20 via Frontend Transport; Tue, 14 Apr 2020 12:39:19 +0000
-X-Tagtoolbar-Keys: D20200414153918021
-X-Originating-IP: [185.215.60.131]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b244e74d-5c1e-4baa-e696-08d7e070da2e
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5447:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB54474AAB9E47AEE0AD51E84FC1DA0@AM7PR08MB5447.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4714;
-X-Forefront-PRVS: 0373D94D15
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(39830400003)(376002)(396003)(366004)(346002)(136003)(186003)(316002)(31686004)(4326008)(36756003)(478600001)(16576012)(16526019)(6486002)(2616005)(107886003)(54906003)(956004)(31696002)(2906002)(66946007)(66556008)(5660300002)(66476007)(81156014)(8676002)(8936002)(52116002)(86362001)(26005);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mVnBpjayAOBcsMY6g1VLgf2WL5YucrlMnqWYoWdRE0nMBzc0E33lPLgczUsXSridY5ZKtzDUz9u6VUvPJcfXYppCDdL8RVt/1jxD6RpZb+bR+A8mEs7Wr48/Y+gAEkzlPNpTJD7nxRkeOgkh88AhhcSowS73YYGbTkz6m9u3RmXlm0RyVj6S+WpzumwUgkGddNtoeaZYYBiNz+xH/m/X5rFdzNjnzA/N3Cyom+zpYwAktBEof3x3tn9cHDSEXjL0d4T66VORZAT+DqKiEYc2FEvhwX3zgBKK1PQmlzLEpZpLp2JPET7vZ+QqEH1n1LqKMl0ywOZiGYHH4kk/PYSTxtY2/SmguGo9MjlM79bJ26kMxlYujRsXhrtHCLT1z8cLeR8Mv2mEO7PDdgR0JCg22KMD3kKKt0rsPXmfiwHJs/HFnUaSBGpVH+sVW3DvMnsS
-X-MS-Exchange-AntiSpam-MessageData: od21mNBZNJhiSAdqGEJ/oeSMmiCX0EBpojNvlsLyz4AHKAEh89bu92WtVDXwCTHe9w0BnX6LD1NIHvY+3LGh0kyuWyJ1rOn5hUP3XRiSlfJMBb7TSrU5Rb7ZSUcC8FbEjQcoYPf7IYj2WyY4ELiBbQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b244e74d-5c1e-4baa-e696-08d7e070da2e
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2020 12:39:19.9243 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9n0V/9yL315pOgY7KDVfKYs2DPQ74RklLDz68opCNgclwgc8bivbW6Gd0mdmH4IMdTwrKTZegUNvLycjSn1iV8R//l89a8eH/k65vaYtIlM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5447
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe0c::700
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,47 +94,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-block@nongnu.org, Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Joel Stanley <joel@jms.id.au>, qemu-ppc@nongnu.org,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <rth@twiddle.net>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Alistair Francis <alistair@alistair23.me>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
+ =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-riscv@nongnu.org, Andrew Jeffery <andrew@aj.id.au>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>, Michael Walle <michael@walle.cc>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-14.04.2020 15:33, Alberto Garcia wrote:
-> On Tue 14 Apr 2020 02:29:13 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
->>>> Hmm. How to avoid it? Maybe, at least, refactor the code, to drop all
->>>> sizeof(uint64_t), converting them to L2_ENTRY_SIZE, L1_ENTRY_SIZE,
->>>> REFTABLE_ENTRY_SIZE etc?
->>>
->>> That wouldn't be a bad thing I guess but, again, for a separate patch or
->>> series.
->>>
->>>> And all occurrences of pure '8' (not many of them exist)
->>>
->>> I think most/all nowadays only refer to the number of bits per byte.
->>>
->>> Maybe there's a couple that still need to be fixed, but we have been
->>> removing a lot of numeric literals from the qcow2 code (see for example
->>> b6c246942b, 3afea40243 or a35f87f50d).
->>>
->>
->>
->> git grep '\<8\>' block/qcow2*
->>
->> shows at least
->>
->> qcow2-cluster.c:            s->l1_table_offset + 8 * l1_start_index, bufsize, false);
->> qcow2-cluster.c:                           s->l1_table_offset + 8 * l1_start_index,
-> 
-> I see, worth replacing with L1_ENTRY_SIZE as you suggest. I can take of
-> writing the patches if you want.
-> 
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-That would be great, if not too burdensome :)
+> In some DeviceClass::realize() while we can propagate errors
+> to the caller, we forgot to do so. Add a Coccinelle patch to
+> automatically add the missing code.
+>
+> Inspired-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  .../use-error_propagate-in-realize.cocci      | 54 +++++++++++++++++++
+>  MAINTAINERS                                   |  1 +
+>  2 files changed, 55 insertions(+)
+>  create mode 100644 scripts/coccinelle/use-error_propagate-in-realize.coc=
+ci
+>
+> diff --git a/scripts/coccinelle/use-error_propagate-in-realize.cocci b/sc=
+ripts/coccinelle/use-error_propagate-in-realize.cocci
+> new file mode 100644
+> index 0000000000..7b59277a50
+> --- /dev/null
+> +++ b/scripts/coccinelle/use-error_propagate-in-realize.cocci
+> @@ -0,0 +1,54 @@
+> +// Add missing error-propagation code in DeviceClass::realize()
+> +//
+> +// Copyright: (C) 2020 Philippe Mathieu-Daud=C3=A9
+> +// This work is licensed under the terms of the GNU GPLv2 or later.
+> +//
+> +// spatch \
+> +//  --macro-file scripts/cocci-macro-file.h --include-headers \
+> +//  --sp-file scripts/coccinelle/use-error_abort-in-instance_init.cocci =
+\
+> +//  --keep-comments --timeout 60 --in-place
+> +//
+> +// Inspired by https://www.mail-archive.com/qemu-devel@nongnu.org/msg691=
+638.html
+> +
+> +
+> +@ match_class_init @
+> +TypeInfo info;
+> +identifier class_initfn;
+> +@@
+> +    info.class_init =3D class_initfn;
+> +
+> +
+> +@ match_realize @
+> +identifier match_class_init.class_initfn;
+> +DeviceClass *dc;
+> +identifier realizefn;
+> +@@
+> +void class_initfn(...)
+> +{
+> +    ...
+> +    dc->realize =3D realizefn;
+> +    ...
+> +}
+> +
+> +
+> +@ propagate_in_realize @
+> +identifier match_realize.realizefn;
+> +identifier err;
+> +identifier errp;
+> +identifier func_with_errp;
+> +symbol error_abort, error_fatal;
+> +@@
+> +void realizefn(..., Error **errp)
+> +{
+> +    ...
+> +    Error *err =3D NULL;
+> +    <+...
+> +    func_with_errp(...,
+> +-                      \(&error_abort\|&error_fatal\));
+> ++                      &err);
+> ++   if (err) {
+> ++       error_propagate(errp, err);
+> ++       return;
 
+Issues:
 
--- 
-Best regards,
-Vladimir
+0. The script patches only realize() methods of DeviceClass, not of
+   subclasses, and no helpers.
+
+   Example of a subclass method: see my review of "[PATCH-for-5.1 v3
+   02/24] scripts/coccinelle: Script to simplify DeviceClass error
+   propagation".
+
+   Example of a helper method: pnv_chip_core_realize().
+
+1. When the function can't actually fail, the script adds dead error
+   handling.
+
+2. When the function can fail, it may well add incomplete error
+   handling: it can't add the code needed to revert what has been done
+   so far.
+
+   Example: ivshmem_common_realize() has:
+
+        error_setg(&s->migration_blocker,
+                   "Migration is disabled when using feature 'peer mode' in=
+ device 'ivshmem'");
+        migrate_add_blocker(s->migration_blocker, &err);
+        if (err) {
+            error_propagate(errp, err);
+            error_free(s->migration_blocker);
+            return;
+        }
+
+   If the error handling was missing, the script would fail to add the
+   error_free().
+
+Even imperfect scripts can lead us to code in need of improvement.  But
+you should explain the script's limitations, both in the script and the
+commit message.
+
+> ++   }
+> +    ...+>
+> +}
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 6203543ec0..54e05ecbdf 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2060,6 +2060,7 @@ F: scripts/coccinelle/error_propagate_null.cocci
+>  F: scripts/coccinelle/remove_local_err.cocci
+>  F: scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+>  F: scripts/coccinelle/use-error_fatal.cocci
+> +F: scripts/coccinelle/use-error_propagate-in-realize.cocci
+> =20
+>  GDB stub
+>  M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 
