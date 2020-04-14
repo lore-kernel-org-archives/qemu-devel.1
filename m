@@ -2,90 +2,82 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB150C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE6E0C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:20:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6DF22076D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:20:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 780012075E
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:20:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Czdc7HHo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6DF22076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EzUfGlsF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 780012075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOOIq-0007Y8-Pl
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 12:20:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49805)
+	id 1jOOJ0-0007s9-Kb
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 12:20:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50253)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jOOFO-0004LX-KR
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:17:20 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jOOHQ-0006BQ-NA
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:19:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jOOFI-0004Af-PH
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:17:14 -0400
-Received: from mail-pj1-x1033.google.com ([2607:f8b0:4864:20::1033]:35955)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jOOFI-0004A8-F6
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:17:08 -0400
-Received: by mail-pj1-x1033.google.com with SMTP id nu11so5407767pjb.1
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 09:17:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=BlsWyTDQeAM70thCjj+OJjgFcwUACi951RgMZkbrju8=;
- b=Czdc7HHomzkpHFGi6cpmu+GO01i7hGBlk7M0Pld5ybxKIoTSqCb0V05ulY1bAqt2IO
- cfr2Gt8vo5DB0YC/Im1kaPwKuCP0ptSIFf8QioklDLFaMgGfyFzsOMaB4JFlYVgMW88U
- 4yQyFKvFZ6RUE0gFqkeOFXeG2VlecE05cLTif+Ie8aJj35rfBWUDFuVXhZ4SIzvslgz+
- V+vV1dRwBQpgeEyDIu1PFh7xWHAtHN1mR+fIuTtcgTAtmAJ9aFlu+7MSBaBz1p2zJ8b2
- 2MIXe8vfUP+3xzSfkG6/WNahbPjDVkhDY1yP/msK+NHZXrdV+vBCvQLo9MuV/fNt/4kA
- HOHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=BlsWyTDQeAM70thCjj+OJjgFcwUACi951RgMZkbrju8=;
- b=AzQxUZYU2939sh2catoLIAT3mcp7nAaGEpy98cobGZ4jfpSrB1Lgwkg3mEdYNAKfPC
- 1JUqoBSlF69bKBFf6nTadElAmDTZhavJSvs8uES1JFZWCPo2B5WzrPP9bMzW4JL8PUee
- Yl/tmgeKGfoHarpfC/chsKYUnZn8nYvBBYl2qSXdaSC4GAosG4qmskezIHopg7c1Mbg9
- PReY65UF8CT7yGV9grNF3hL3UKt1TFDdiU1p/zQB0teZOWxvQMfMoxixZTi+kHYQmmwN
- 3EEQl7l3pA51sir6vIwsOFh3ocWxS0LwxrJsJZXanJ/VPVs/9JVMg+nw8/ZnR8JmKXCi
- IoIw==
-X-Gm-Message-State: AGi0PubS/IDJBivmmEB9//jH7cA1YBBk22m3X7yUV/29/rAe8oekbv8/
- 4vuh1SDQWT47Om/FXZZg0IpBBQ==
-X-Google-Smtp-Source: APiQypLd7Zpa6wP0q+oTi6r4vjF7H5A28vXBFMh+ARvGoDApRB2qOlTH5F7vlFoQc/XYQbzKwCxpjw==
-X-Received: by 2002:a17:902:8509:: with SMTP id
- bj9mr748837plb.64.1586881026951; 
- Tue, 14 Apr 2020 09:17:06 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id 6sm10720577pgz.0.2020.04.14.09.17.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 14 Apr 2020 09:17:06 -0700 (PDT)
-Subject: Re: [for-5.0] docs: Require Sphinx 1.6 or better
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20200414124114.5363-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <38a41ebb-c923-5b36-94ae-12456c048f25@linaro.org>
-Date: Tue, 14 Apr 2020 09:17:04 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <kwolf@redhat.com>) id 1jOOHJ-0004s7-W5
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:19:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38898
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jONXB-0001lv-Ak
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 11:31:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586878292;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6yPgsSE4OWXkD6OLed8cp+voX1L86uQXOFF8yFIR+9M=;
+ b=EzUfGlsFEH4fGpvmGf2ocUIiYPdYhvan6xr4o+3BnWJnN+hiRIKsq78GeI8TUeoSSc+FJV
+ lQUM8eUOnHjtR5oeO4Y006NM2vXX0w3rfECAXonWUk25InI25TSeW8COBYWs52bfddvG/E
+ JkLBZbBdVaLfOxHwABSLh8qlwoJpwZo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-481-gAkImttRMmSXb4ULLXDzYA-1; Tue, 14 Apr 2020 11:31:30 -0400
+X-MC-Unique: gAkImttRMmSXb4ULLXDzYA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D558080268C;
+ Tue, 14 Apr 2020 15:31:29 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-1.ams2.redhat.com [10.36.114.1])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 791AA5C1BE;
+ Tue, 14 Apr 2020 15:31:28 +0000 (UTC)
+Date: Tue, 14 Apr 2020 17:31:26 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Subject: Re: [PATCH for-5.0] qcow2: Add incompatibility note between backing
+ files and raw external data files
+Message-ID: <20200414153126.GN7747@linux.fritz.box>
+References: <20200410121816.8334-1-berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200414124114.5363-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1033
+In-Reply-To: <20200410121816.8334-1-berto@igalia.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,55 +89,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/14/20 5:41 AM, Peter Maydell wrote:
-> Versions of Sphinx older than 1.6 can't build all of our documentation,
-> because they are too picky about the syntax of the argument to the
-> option:: directive; see Sphinx bugs #646, #3366:
-> 
->   https://github.com/sphinx-doc/sphinx/issues/646
->   https://github.com/sphinx-doc/sphinx/issues/3366
-> 
-> Trying to build with a 1.4.x Sphinx fails with
->  docs/system/images.rst:4: SEVERE: Duplicate ID: "cmdoption-qcow2-arg-encrypt"
-> and a 1.5.x Sphinx fails with
->  docs/system/invocation.rst:544: WARNING: Malformed option description '[enable=]PATTERN', should look like "opt", "-opt
-> args", "--opt args", "/opt args" or "+opt args"
-> 
-> Update our needs_sphinx setting to indicate that we require at least
-> 1.6.  This will allow configure to fall back to "don't build the
-> docs" rather than causing the build to fail entirely, which is
-> probably what most users building on a host old enough to have such
-> an old Sphinx would want; if they do want the docs then they'll have
-> a useful indication of what they need to do (upgrade Sphinx!) rather
-> than a confusing error message.
-> 
-> In theory our distro support policy would suggest that we should
-> support building on the Sphinx shipped in those distros, but:
->  * EPEL7 has Sphinx 1.2.3 (which we've never supported!)
->  * Debian Stretch has Sphinx 1.4.8
-> 
-> Trying to get our docs to work with Sphinx 1.4 is not tractable
-> for the 5.0 release and I'm not sure it's worthwhile effort anyway;
-> at least with this change the build as a whole now succeeds.
-> 
-> Thanks to John Snow for doing the investigation and testing to
-> confirm what Sphinx versions fail in what ways and what distros
-> shipped what.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  docs/conf.py | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+Am 10.04.2020 um 14:18 hat Alberto Garcia geschrieben:
+> Backing files and raw external data files are mutually exclusive.
+> The documentation of the raw external data bit (in autoclear_features)
+> already indicates that, but we should also mention it on the other
+> side.
+>=20
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Thanks, applied to the block branch.
 
+I don't think this is critical for 5.0, so if I make a pull request for
+other reasons, I'll include it, but if you agree, I won't send one just
+for this patch.
 
-r~
+Kevin
+
 
