@@ -2,89 +2,89 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0E05C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 20:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B31FCC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 20:19:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA09B206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 20:18:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A11F2074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 20:19:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l3SJYTvE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA09B206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E2Q075oa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A11F2074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOS0m-0006cG-Us
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 16:18:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45892)
+	id 1jOS2A-0008Cr-LP
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 16:19:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45442)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jORyh-0003yT-Nc
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 16:16:16 -0400
+ (envelope-from <armbru@redhat.com>) id 1jORx1-0001LQ-0Y
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 16:14:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jORyg-0001hs-GI
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 16:16:15 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:47053)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jORyg-0001h9-A7
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 16:16:14 -0400
-Received: by mail-wr1-x441.google.com with SMTP id f13so16028450wrm.13
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 13:16:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=pXOAgjF0MzY5dkIyjyLAmatYK5vlyk1VB17UWTeSYLg=;
- b=l3SJYTvEgPDRkSatLR4hF7MJ5Msw6QnVdjtiVi20VWWZ/2NEtk2cZuDWDkP0maoeQi
- /htFWipTBa7ExaFfx+BSNLxZmAawvkiskTaJE8mF9aYyi6eM3jWe23IHnpbTxXH/5K30
- 2x1qntg5N8Ho0VyWYIrKSas+gqg1L+dQ0nQjDNfzh1Pa5EmnQvAl/GpW4luueidC5X9M
- LfUv19Yjd0oX8OAlN2isV+h2Ea38wjMTL29JjxnMuwk6xkdlPQHbsN66azMtqlHbjYTN
- Zf8rXDm9NdUdaCiEipH/2O+tzKIjHJxkch8jCgzfHeTSvLt/fPwZd76BmP94BT8a/kB+
- K6jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=pXOAgjF0MzY5dkIyjyLAmatYK5vlyk1VB17UWTeSYLg=;
- b=azXnwoB2lT4uFWzWefGKJbCLggypFpgb6zd20POvMKPFx47cmeOAmiUSoUR0canvDP
- wiIKd6QFgMgJSkXOWtGalft1yc02U2KER+1S+AUdffnjqIu11pxgDVcEpP9jOpgeFwhW
- Vixa4ZA0JPQbcjpcX/jW8pFIcPxbWbYlnTiR47pcoso4DlSamm7DVKYQ9tmwhBOA4M3d
- RxoJkq/cSA3c4NtGobQDb/A7AH+jEPPig14koYGRzKQTHI+f8qU6XzHMyQI8IhcLRPEb
- DcgWEQ6u3fyDHVO26bIIqdWTznaElvd25ttmFcT5OakiTbpparO5tR8my0Jx9iZ7aFwA
- X5Kw==
-X-Gm-Message-State: AGi0PubcaBjsJTG9ReCs9gQppZS0ubbIE0DOf2lwel2m2PAhF1vDp9yu
- 2UMKCy/cYEZdUWwzczypgfAF/Bo8D5U=
-X-Google-Smtp-Source: APiQypLaSu3pKs0nGVbFd13L3R+mqpY2ZGE/dCFEyFZZUsPJG2wAINYZvaofW/JDSphOpNDeQDu6Hg==
-X-Received: by 2002:adf:fe45:: with SMTP id m5mr17771336wrs.124.1586895373108; 
- Tue, 14 Apr 2020 13:16:13 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id p6sm12977676wrt.3.2020.04.14.13.16.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Apr 2020 13:16:11 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 587BD1FF9F;
- Tue, 14 Apr 2020 21:06:34 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 17/17] tests/tcg: add a multiarch linux-user gdb test
-Date: Tue, 14 Apr 2020 21:06:31 +0100
-Message-Id: <20200414200631.12799-18-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200414200631.12799-1-alex.bennee@linaro.org>
-References: <20200414200631.12799-1-alex.bennee@linaro.org>
+ (envelope-from <armbru@redhat.com>) id 1jORwy-0000rX-LY
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 16:14:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24704
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jORwy-0000r4-IM
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 16:14:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586895267;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1GO5pvUc2I7ExFscZ7MkTuU9csC4ae8aPXOk6PsIi5w=;
+ b=E2Q075oaTs3gSz3bR9EuRQTSX4FG4i5iwBoWbBJhZiG8vCRGZVbHnzyit6f8o+LL0qnqcI
+ LRgQYgp+Ozpj4MYOdj9mhBiS3TcC9+r5GgbscH/hCbgcPPN3ESmjRev0YhAWFh3K3++XlV
+ jNqApgCGaFHwFXImZpiliEAS8jlndUg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-182-iIwH4YhsPFSgXToYzmCENA-1; Tue, 14 Apr 2020 16:14:23 -0400
+X-MC-Unique: iIwH4YhsPFSgXToYzmCENA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C72480258A;
+ Tue, 14 Apr 2020 20:13:59 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
+ [10.36.113.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E2022126510;
+ Tue, 14 Apr 2020 20:13:58 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 4DF3211385C8; Tue, 14 Apr 2020 22:13:57 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH for-5.1 1/8] tests-qemu-opts: Cover has_help_option(),
+ qemu_opt_has_help_opt()
+References: <20200409153041.17576-1-armbru@redhat.com>
+ <20200409153041.17576-2-armbru@redhat.com>
+ <8ea167d6-2784-1ab9-cf55-52eb7553cb4d@redhat.com>
+ <878siyxwir.fsf@dusky.pond.sub.org>
+ <20200414131339.GE7747@linux.fritz.box>
+ <87v9m2p4to.fsf@dusky.pond.sub.org>
+ <20200414142954.GH7747@linux.fritz.box>
+Date: Tue, 14 Apr 2020 22:13:57 +0200
+In-Reply-To: <20200414142954.GH7747@linux.fritz.box> (Kevin Wolf's message of
+ "Tue, 14 Apr 2020 16:29:54 +0200")
+Message-ID: <874ktlomey.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,135 +96,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When the gdbstub code was converted to the new API we missed a few
-snafus in the various guests. Add a simple gdb test script which can
-be used on all our linux-user guests to check for obvious failures.
+Kevin Wolf <kwolf@redhat.com> writes:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/tcg/multiarch/Makefile.target | 15 ++++++
- tests/tcg/multiarch/gdbstub/sha1.py | 81 +++++++++++++++++++++++++++++
- 2 files changed, 96 insertions(+)
- create mode 100644 tests/tcg/multiarch/gdbstub/sha1.py
+> Am 14.04.2020 um 15:36 hat Markus Armbruster geschrieben:
+>> Kevin Wolf <kwolf@redhat.com> writes:
+>> > Am 14.04.2020 um 11:10 hat Markus Armbruster geschrieben:
+>> >> Eric Blake <eblake@redhat.com> writes:
+>> >> > On 4/9/20 10:30 AM, Markus Armbruster wrote:
+>> >> >> +        { "helpme", false, false, false },
+>> >> >> +        { "a,help", true, true, true },
+>> >> >> +        { "a=3D0,help,b", true, true, true },
+>> >> >> +        { "help,b=3D1", true, true, false },
+>> >> >> +        { "a,b,,help", false /* BUG */, true, true },
+>> >> >
+>> >> > So which way are you calling the bug?  Without looking at the code =
+but
+>> >> > going off my intuition, I parse this as option 'a' and option
+>> >> > 'b,help'. The latter is not a normal option name because it contain=
+s a
+>> >> > ',', but is a valid option value.
+>> >> >
+>> >> > I agree that we have a bug, but I'm not yet sure in which direction
+>> >> > the bug lies (should has_help_option be fixed to report true, in wh=
+ich
+>> >> > case the substring ",help" has precedence over ',,' escaping; or
+>> >> > should qemu_opt_has_help_opt be fixed to report false, due to treat=
+ing
+>> >> > 'b,help' after ',,' escape removal as an invalid option name).  So =
+the
+>> >> > placement of the /* BUG */ comment matters - where you placed it, I=
+'m
+>> >> > presuming that later in the series you change has_help_option to
+>> >> > return true, even though that goes against my intuitive parse.
+>> >>=20
+>> >> In addition to the canonical QemuOpts parser opts_do_parse(), we have
+>> >> several more, and of course they all differ from the canonical one fo=
+r
+>> >> corner cases.
+>> >>=20
+>> >> I treat the canonical one as correct, and fix the others by eliminati=
+ng
+>> >> the extra parsers.
+>> >>=20
+>> >> The others are:
+>> >>=20
+>> >> * has_help_option()
+>> >>=20
+>> >>   Fixed in PATCH 5 by reusing the guts of opts_do_parse().
+>> >>=20
+>> >> * is_valid_option_list()
+>> >>=20
+>> >>   Fixed in PATCH 8 by not parsing.
+>> >>=20
+>> >> * "id" extraction in opts_parse()
+>> >>=20
+>> >>   Lazy hack.  Fixed in PATCH 3 by reusing the guts of opts_do_parse()=
+.
+>> >>=20
+>> >> Back to your question: the value of has_help_option() differs from th=
+e
+>> >> value of qemu_opt_has_help_opt().  The latter uses the canonical pars=
+er,
+>> >> the former is one of the other parsers.  I therefore judge the latter
+>> >> right and the former wrong.
+>> >
+>> > Shouldn't we also consider what users would reasonably expect?
+>>=20
+>> Of course we should consider reasonable user expectations.
+>>=20
+>> Grumpy aside: when I do, I commonly run into objections that users
+>> reasonably expect things not to change.
+>
+> Fair point. It's not always easy to tell whether something should be
+> considered a bug in the external interface (and consequently be fixed)
+> or just an idiosyncrasy that people may have get used to (and therefore
+> requires deprecation before improving it).
+>
+> In this specific case, I'm not aware of empty option names actually
+> doing anything useful anywhere, so I think it might be clearer in this
+> case that it's indeed a bug.
 
-diff --git a/tests/tcg/multiarch/Makefile.target b/tests/tcg/multiarch/Makefile.target
-index 035b09c8533..47fd675aba5 100644
---- a/tests/tcg/multiarch/Makefile.target
-+++ b/tests/tcg/multiarch/Makefile.target
-@@ -42,5 +42,20 @@ run-test-mmap-%: test-mmap
- 	$(call run-test, test-mmap-$*, $(QEMU) -p $* $<,\
- 		"$< ($* byte pages) on $(TARGET_NAME)")
- 
-+ifneq ($(HAVE_GDB_BIN),)
-+GDB_SCRIPT=$(SRC_PATH)/tests/guest-debug/run-test.py
-+
-+MULTIARCH_TESTS += gdbstub-sha1
-+
-+.PHONY: gdbstub-sha1
-+run-gdbstub-sha1: sha1
-+	$(call run-test, $@, $(GDB_SCRIPT) \
-+		--gdb $(HAVE_GDB_BIN) \
-+		--qemu $(QEMU) --qargs "$(QEMU_OPTS)" \
-+		--bin $< --test $(MULTIARCH_SRC)/gdbstub/sha1.py, \
-+	"basic gdbstub support")
-+endif
-+
-+
- # Update TESTS
- TESTS += $(MULTIARCH_TESTS)
-diff --git a/tests/tcg/multiarch/gdbstub/sha1.py b/tests/tcg/multiarch/gdbstub/sha1.py
-new file mode 100644
-index 00000000000..734553b98bb
---- /dev/null
-+++ b/tests/tcg/multiarch/gdbstub/sha1.py
-@@ -0,0 +1,81 @@
-+from __future__ import print_function
-+#
-+# A very simple smoke test for debugging the SHA1 userspace test on
-+# each target.
-+#
-+# This is launched via tests/guest-debug/run-test.py
-+#
-+
-+import gdb
-+import sys
-+
-+initial_vlen = 0
-+failcount = 0
-+
-+def report(cond, msg):
-+    "Report success/fail of test"
-+    if cond:
-+        print("PASS: %s" % (msg))
-+    else:
-+        print("FAIL: %s" % (msg))
-+        global failcount
-+        failcount += 1
-+
-+def check_break(sym_name):
-+    "Setup breakpoint, continue and check we stopped."
-+    sym, ok = gdb.lookup_symbol(sym_name)
-+    bp = gdb.Breakpoint(sym_name)
-+
-+    gdb.execute("c")
-+
-+    # hopefully we came back
-+    end_pc = gdb.parse_and_eval('$pc')
-+    report(bp.hit_count == 1,
-+           "break @ %s (%s %d hits)" % (end_pc, sym.value(), bp.hit_count))
-+
-+    bp.delete()
-+
-+def run_test():
-+    "Run through the tests one by one"
-+
-+    check_break("SHA1Init")
-+
-+    # check step and inspect values
-+    gdb.execute("next")
-+    val_ctx = gdb.parse_and_eval("context->state[0]")
-+    exp_ctx = 0x67452301
-+    report(int(val_ctx) == exp_ctx, "context->state[0] == %x" % exp_ctx);
-+
-+    gdb.execute("next")
-+    val_ctx = gdb.parse_and_eval("context->state[1]")
-+    exp_ctx = 0xEFCDAB89
-+    report(int(val_ctx) == exp_ctx, "context->state[1] == %x" % exp_ctx);
-+
-+    # finally check we don't barf inspecting registers
-+    gdb.execute("info registers")
-+
-+#
-+# This runs as the script it sourced (via -x, via run-test.py)
-+#
-+try:
-+    inferior = gdb.selected_inferior()
-+    arch = inferior.architecture()
-+    print("ATTACHED: %s" % arch.name())
-+except (gdb.error, AttributeError):
-+    print("SKIPPING (not connected)", file=sys.stderr)
-+    exit(0)
-+
-+try:
-+    # These are not very useful in scripts
-+    gdb.execute("set pagination off")
-+    gdb.execute("set confirm off")
-+
-+    # Run the actual tests
-+    run_test()
-+except (gdb.error):
-+    print ("GDB Exception: %s" % (sys.exc_info()[0]))
-+    failcount += 1
-+    pass
-+
-+print("All tests complete: %d failures" % failcount)
-+exit(failcount)
--- 
-2.20.1
+You're right in that backward compatibility is not a convincing argument
+for stuff that has no known productive uses, and is bonkers to boot.
+
+>> > Getting it parsed as an empty option name (I assume with a default val=
+ue
+>> > of "on"?) certainly looks like something that would surprise most user=
+s
+>> > and, as you can see, even some QEMU developers.
+>>=20
+>> My preferred way to address QemuOpts parsing madness is replacing it
+>> wholesale by keyval.c, but that's some time off, I'm afraid.
+>>=20
+>> This series merely aims for more method to the same old madness.
+>
+> I understand. Though I think replacing with keyval will be potentially
+> less problematic if QemuOpts already behaved more similar.
+>
+> If I were writing the code, I think I would use existing bugs and
+> inconsistencies as an excuse to make QemuOpts behave more like what
+> keyval can easily handle by declaring whatever is closest to keyval as
+> the correct interpretation.
+
+Fair enough.
+
+However,
+
+(1) is_valid_option_list()'s and opts_do_parse()'s parse of "a,b,,help"
+    are equidistant from keyval_parse()'s:
+
+    opts_do_parse() splits it into four parts:
+
+        "a"     (desugared to a=3Don)
+        "b"     (desugared to b=3Don)
+        ""      (desugared to =3Don)
+        "help"  (desugared to help=3Don)
+
+    has_help_option() splits it into two:
+
+        "a"
+        "b,help"
+
+    keyval_parse() fails:
+
+        Expected '=3D' after parameter 'a'
+
+    If I it implemented boolean sugar, then it would fail at the third
+    comma, just like ",help" fails now:
+
+        Invalid parameter ''
+
+    Fails because ",help" does not start with a valid name.
+
+    Thus, the answer to the question which of the two functions covered
+    by the test are wrong would be "both".
+
+(2) This series tries hard not to write QemuOpts parsing code.  It
+    throws away QemuOpts parsing code.
 
 
