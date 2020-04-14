@@ -2,122 +2,102 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3185DC2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 09:50:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC633C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 09:54:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBB4E2072D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 09:50:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5D7A2064A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 09:54:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="jqJpPimf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBB4E2072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QqGCb0vL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5D7A2064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOICe-0006KY-3n
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 05:50:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32971)
+	id 1jOIH2-00007e-W3
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 05:54:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33428)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jOIC1-0005rE-IF
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:49:22 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOIGR-0008AN-G8
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jOIC0-0003Fb-HG
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:49:21 -0400
-Received: from mail-eopbgr130090.outbound.protection.outlook.com
- ([40.107.13.90]:1440 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jOIBy-0003Eg-Ft; Tue, 14 Apr 2020 05:49:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=njghQDsdWCNlub206vVulyxvKAxZzABq/OBbuYifKbzu0L/qvX7cQnC5bZQVX1J05LRcP4B1lk6l/3HoTwVx7gOv8ORzo6W88sTdYMjbGTWN+JwZohvknVE+h30x51Z3QhLKkwInePCqmaWsStmvGNekq05S0KgySUIu1GUMK8lhdC/AzfggaSzhtBgUUUQ+VCgMwrnEQPvXKyOchB2wthsrIs+eR/7v9iGvda26YU5kNaj4ZYkHpJoBqe/dxPXNNOyaFfuu/Z+kn6cFBuK9huK4ZPum4gE5KCICOh/IeUhLhGaykrVqmP9l9dclOxwPHGa8BC87pO10nudTZjlsVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wfrlrtXvjVYu2l2d5u0DZ37xQDeGqOa9liaPteoVYq8=;
- b=AvCmPrKpjSJ17CmQnGAKw8rSSuOoPY3UkSNNKCvysK406ox68haARSjydrfkRVY2s3hvme5DYuwHu3VizFdBTKAxdqfyBlB40KlKz87VD7Hu0ptkOhfPOsuTOMws32R4Mgy7/MJvEAukBJL3yrVgEerqtlbUBRvTN/RWNDoBcUulHLX23va1fvm1ufwmr4o7xY1/tQMkM18D+DGa3dZVF9KlAeb0nOfhgbTgb6qZSkqDB3IGl/vfd2do0B0uNgXOxhKWAh9UZB86hPLXCrfb6dGN+kO2eDijyVhIArDBgimT214a3719Jngdls6cTcoA3YKuNTo9XobLc+juAm1iRQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wfrlrtXvjVYu2l2d5u0DZ37xQDeGqOa9liaPteoVYq8=;
- b=jqJpPimfs/p6XMlgcXxl6+7Wf0S7fGfPu9HTa8gj3OTTuQRRsPJF56HwfJyPp8/IofeG9tTGk+IuWqS/bFrOtCZz4XUiHF5aib7X0RtxDIb2dJ5dbmyi3IB3UvFNJR8/+79A8UInoeHyOy3eYbYTBsN+sCqmuHKEDP/qPdJZAyc=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5429.eurprd08.prod.outlook.com (2603:10a6:20b:107::12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.26; Tue, 14 Apr
- 2020 09:49:15 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.2900.028; Tue, 14 Apr 2020
- 09:49:15 +0000
-Subject: Re: [PATCH v4 12/30] qcow2: Update get/set_l2_entry() and add
- get/set_l2_bitmap()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1584468723.git.berto@igalia.com>
- <c3d6c8e03c353a694b6415d9f6ae253f22a620ea.1584468723.git.berto@igalia.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200414124904047
-Message-ID: <d90d3140-5456-a28c-134c-0beb0b7ea93b@virtuozzo.com>
-Date: Tue, 14 Apr 2020 12:49:04 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <c3d6c8e03c353a694b6415d9f6ae253f22a620ea.1584468723.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR04CA0018.eurprd04.prod.outlook.com
- (2603:10a6:208:122::31) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <philmd@redhat.com>) id 1jOIGQ-0005CB-3y
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:53:55 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26712
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOIGQ-0005Aa-0e
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:53:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586858033;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=voblG5G1PzyqY8sprhCJn2vSX6V/rHSPZTBJgSk7Rp8=;
+ b=QqGCb0vLAnAnLkMrB/swGDK955886l0bUQmQAAaCD+IefMAaqVYD+D6AqkOGQbokXrKn7e
+ ZSWels7WwVdxoZ7ZRbwL79IKJx48Dz37ifPHJw7Zz7TaJVs954pN7hUp7rsoDL03AO8avl
+ E+IggXXQvyHx3MFt47B3eJTWeyuqEfE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-wCdDAvw3NJGVclz2HD0Nbg-1; Tue, 14 Apr 2020 05:53:51 -0400
+X-MC-Unique: wCdDAvw3NJGVclz2HD0Nbg-1
+Received: by mail-wr1-f71.google.com with SMTP id h95so8367615wrh.11
+ for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 02:53:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=teX/v/73gsE/ZTJHvy0RvaRbBnL4fvE8+63ivkMli/8=;
+ b=f6Xr6DCzXgfNO0H5PaMYYPmenhHHuXwqW0oExRhYlFYldcC43FHDL4v0xYLIKxTJ8Z
+ PhpVCHt1ZAPlEWgx+AK7suX2DnRM/YP6MqfoiP7QAZTdbHY/rqf4rexKfd/4b/j2o5dv
+ xGqf9tZFLJHfWQFzxRVumtX1Bt96Vvb/yPwUmbLQ0ragtCzqVzP/hkSS7jKVhqtn/XxP
+ a2090LFGGARN+tTAurrN26h2INtrnaiRNLHINM83sPXFJyVqltZqYnj3fOsilUQGp6H4
+ 2uWbsIyzK7HkmxJLDL3fKjDVT/YxVfhztLoUXV8nX45fg0o5bPUtZZ1DS3N8BI5WFJGK
+ KGUg==
+X-Gm-Message-State: AGi0PuYVt3AqDiDZS/qJ6IZhBGrLghDRPXsOH5of2N0O5tmL2fyJn9hD
+ duhG5lezJHXlnRPa8YzF6WtQSk7Mw1rjVpumLMgNGb5uTbjHPDz2Ce0J72UyEnRbt+owRdgn+cG
+ KGqelgYaNNH9/Y5w=
+X-Received: by 2002:a7b:c3c5:: with SMTP id t5mr21546438wmj.80.1586858029968; 
+ Tue, 14 Apr 2020 02:53:49 -0700 (PDT)
+X-Google-Smtp-Source: APiQypK7mFqcf2/nMIaZmjw3IQBAiWLDbB3qenbfmGkfRfBWefI/SY1O+r0TqYXsc5/JIIGGRV6rGg==
+X-Received: by 2002:a7b:c3c5:: with SMTP id t5mr21546409wmj.80.1586858029616; 
+ Tue, 14 Apr 2020 02:53:49 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id f3sm18505301wmj.24.2020.04.14.02.53.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 14 Apr 2020 02:53:49 -0700 (PDT)
+Subject: Re: [PATCH] .gitignore: include common build sub-directories
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>
+References: <20200413162902.7985-1-alex.bennee@linaro.org>
+ <2c489489-f459-f029-029e-74bfbfc70e49@redhat.com> <87imi38433.fsf@linaro.org>
+ <d97c8034-2a9f-fe26-c70b-49b4d19f800d@redhat.com>
+ <875ze2zed7.fsf@dusky.pond.sub.org> <873696qwrc.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b96c529e-1d17-ff48-da10-eae13a939cbe@redhat.com>
+Date: Tue, 14 Apr 2020 11:53:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.131) by
- AM0PR04CA0018.eurprd04.prod.outlook.com (2603:10a6:208:122::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.15 via Frontend
- Transport; Tue, 14 Apr 2020 09:49:11 +0000
-X-Tagtoolbar-Keys: D20200414124904047
-X-Originating-IP: [185.215.60.131]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1ef098b1-11c2-44a1-3afb-08d7e0591811
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5429:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5429F3BA6C62E2B0724546BCC1DA0@AM7PR08MB5429.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
-X-Forefront-PRVS: 0373D94D15
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(376002)(346002)(136003)(39850400004)(366004)(396003)(2616005)(956004)(16576012)(316002)(26005)(15650500001)(52116002)(4326008)(16526019)(54906003)(66556008)(107886003)(5660300002)(186003)(31686004)(66946007)(66476007)(4744005)(8936002)(8676002)(2906002)(81156014)(36756003)(478600001)(86362001)(31696002)(6486002)(6666004);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Z62hGMeOYitjymLcTo+J3dE4tpp4NVOCm+UUYbzKlTV+Z+6MEGOeR3vN5c3DdzF0qmey0+7GZJ0C+K58/7Fwz8pJZgo4i/7JNspak0OkE3YJYb0qsSKVN+kIC8xqjI1OPA39JFcXVq2aVfuJ57TimIM/7FeIEfm9WPcBfFACuK5eS9pTrJMgZo769UPIXGAUiH9V23rFdiJpxVaMMN5sXZsbugQBKdpaGGWw530WwIdhje29q3FL4G6yrRg+TCLgu92tvdcVIYbg++YJUlq2ndf3v3zP+VxVZQOWdXvo38lcu6lhIx0lDRPHjErW/yYnAd0ZvAd9rrTZxGuaCAP6BrEL7y5S1WRvZkxVGmccTZB3gfAUwKUn701KAeLkfIPuJhwYaLhvYiorBV9W/vKwDsVn0xkklpFnrTNMZI/Y/KpkYc59pKkIP8jDOHGzoAo3
-X-MS-Exchange-AntiSpam-MessageData: liBLdMVYBZN2KJgEspEXzLVU2N8GW+zmzmRXVXHhPZBFNWoHb2xPDy3TSuTZSUrnDVrU9QsFQgxsr3gjc4GMNTocXpZrnVj/7b0DawNAb+jwzcM/5YQUWzNyrBTsFraPx+iRIJw1S3DKkxWAn1IRbA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1ef098b1-11c2-44a1-3afb-08d7e0591811
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2020 09:49:15.8161 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QM5szPvCm7zceuc50is8lybUMCVmrEGvIeC2+nsDm+jEY4XvtWiXoZFNsNiq2XAsvsFVg73UpTlwZmUA7TrKbK+sIMrVAqfr2vEMo24a4uk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5429
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.13.90
+In-Reply-To: <873696qwrc.fsf@linaro.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,33 +109,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-17.03.2020 21:16, Alberto Garcia wrote:
-> Extended L2 entries are 128-bit wide: 64 bits for the entry itself and
-> 64 bits for the subcluster allocation bitmap.
-> 
-> In order to support them correctly get/set_l2_entry() need to be
-> updated so they take the entry width into account in order to
-> calculate the correct offset.
-> 
-> This patch also adds the get/set_l2_bitmap() functions that are
-> used to access the bitmaps. For convenience we allow calling
-> get_l2_bitmap() on images without subclusters, although the caller
-> does not need and should ignore the returned value.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+On 4/14/20 10:47 AM, Alex Benn=C3=A9e wrote:
+>=20
+> Markus Armbruster <armbru@redhat.com> writes:
+>=20
+>> Eric Blake <eblake@redhat.com> writes:
+>>
+>>> On 4/13/20 4:32 PM, Alex Benn=C3=A9e wrote:
+>>>>
+>>>> Eric Blake <eblake@redhat.com> writes:
+>>>>
+>>>>> On 4/13/20 11:29 AM, Alex Benn=C3=A9e wrote:
+>>>>>> As out-of-tree builds become more common (or rather building in a
+>>>>>> subdir) we can add a lot of load to "git ls-files" as it hunts down
+>>>>>> sub-directories that are irrelevant to the source tree. This is
+>>>>>> especially annoying if you have a prompt that attempts to summarise
+>>>>>> the current git status on command completion.
+>>>>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>>>>> ---
+>>>>>>     .gitignore | 2 ++
+>>>>>>     1 file changed, 2 insertions(+)
+>>>>>> diff --git a/.gitignore b/.gitignore
+>>>>>> index 0c5af83aa74..7757dc08a08 100644
+>>>>>> --- a/.gitignore
+>>>>>> +++ b/.gitignore
+>>>>>> @@ -141,6 +141,8 @@ cscope.*
+>>>>>>     tags
+>>>>>>     TAGS
+>>>>>>     docker-src.*
+>>>>>> +build
+>>>>>> +builds
+>>>>>
+>>>>> Would 'build-*' be worth adding as well?
+>>>>
+>>>> Sure - I'll add it to v2.
+>>>
+>>> Or even consolidate it into a single pattern: build* (which would
+>>> allow 'build', 'builds', 'build1', 'build23', 'build-fedora',
+>>> 'build-bug1234', ...)
+>>
+>> The looser the pattern, the higher the risk of unwanted matches.
+>>
+>> Would be less of an issue if we had a cleaner source root directory.
+>=20
+> True but as of now we don't have anything matching bu* so I think build*
+> is fairly safe. I have ran into problems with over lax .gitignore
+> stanzas before but I don't think it's taken too long to figure out what
+> was going on. It's not like having a build subdir isn't a common
+> "out-of-tree" build idiom.
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+We can restrict to directories using "build*/":
 
+GITIGNORE(5)
 
--- 
-Best regards,
-Vladimir
+=C2=B7   If the pattern ends with a slash, it is removed for the
+     purpose of the following description, but it would only
+     find a match with a directory. In other words, foo/ will
+     match a directory foo and paths underneath it, but will
+     not match a regular file or a symbolic link foo (this is
+     consistent with the way how pathspec works in general in
+     Git).
+
 
