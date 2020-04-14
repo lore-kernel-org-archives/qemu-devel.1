@@ -2,68 +2,67 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F33C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 04:46:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C57D8C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 06:26:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 414D5206D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 04:46:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92CA22072D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 06:26:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="KrrJvxQ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 414D5206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="XEQBNgUU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92CA22072D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jODSX-0003qw-Bd
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 00:46:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58497)
+	id 1jOF1q-0007WU-Ox
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 02:26:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37775)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jODRm-0003LS-Ge
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 00:45:20 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jOF17-000717-Ly
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 02:25:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1jODRk-0005gz-Ij
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 00:45:18 -0400
-Received: from vultr.net.flygoat.com ([149.28.68.211]:52048)
+ (envelope-from <dgibson@ozlabs.org>) id 1jOF15-0002jk-Q9
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 02:25:53 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:45895 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1jODRk-0005dc-AH
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 00:45:16 -0400
-Received: from flygoat-x1e (unknown [IPv6:240e:390:49e:92c0::d68])
- by vultr.net.flygoat.com (Postfix) with ESMTPSA id C3D3E20C23;
- Tue, 14 Apr 2020 04:45:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com; s=vultr;
- t=1586839514; bh=fiBXmk7zQ1jWSQ3x6kAoQtu9VO+WgvkkjUzmqBTQUYE=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=KrrJvxQ6GJ/L9QJCz9Dw8SY8+mtDwUMtxRfi3VnNkQFE4K8OiQK0dPRHWtSCny+cA
- AS3l+bzOrUlHXZ5YrAKkFANdGA+hh9cXGknajEk8v4o+cbUv7qKjUg+C57Ewit9wSC
- 4VZi2WIP9ZySxzCaFnLBbe4y1CfnnXWw/5sXXVdjBivnzpc3dmp+njG/nqDNmQn2WH
- xfcJHb9GesmmN2o3j6lMPd3Y/a9QeLsFYVFPuXySOk947xfp9CzpiOvoWJjAPWrV+R
- JZs1gMYKEpBYEibIW+cj/PKQGJPehLPbj00tRau4oCj9nOaDWnfwjm8TdVqZCv+H63
- JcZy+OuK0X1Mw==
-Date: Tue, 14 Apr 2020 12:44:58 +0800
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-To: maobibo <maobibo@loongson.cn>
-Subject: Re: [PATCH 0/15] KVM: MIPS: Add Loongson-3 support (Host Side)
-Message-ID: <20200414124458.4675125b@flygoat-x1e>
-In-Reply-To: <bbbeb507-5692-5969-c320-57d04823edc7@loongson.cn>
-References: <1586763024-12197-1-git-send-email-chenhc@lemote.com>
- <20200413161842.57ad8be4@flygoat-x1e>
- <bbbeb507-5692-5969-c320-57d04823edc7@loongson.cn>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1jOF14-0002iF-N7; Tue, 14 Apr 2020 02:25:51 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 491b8R6PfYz9sSt; Tue, 14 Apr 2020 16:25:43 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1586845543;
+ bh=uEH5LAwtpcdLGU0lKQ8WRrkiPMOAl5BsxGpDf7qHgGo=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=XEQBNgUU5RcPyT3rZM0XykfCiS5hEzP5FE7uvhErC+hI649HnDdaD2b9WTox1r1Oj
+ popVl5Z8csA3Sj0q9haKZre4/klW/JVngFnokTBxRjg/eIkZJXqjKJ3xJ6X2jannkt
+ M0S/nSXgYMxpC6zMm+K4VooTXa62twhBw2EDwEzY=
+Date: Tue, 14 Apr 2020 14:40:10 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Nathan Chancellor <natechancellor@gmail.com>
+Subject: Re: Boot flakiness with QEMU 3.1.0 and Clang built kernels
+Message-ID: <20200414044010.GK48061@umbus.fritz.box>
+References: <20200410205932.GA880@ubuntu-s3-xlarge-x86>
+ <1586564375.zt8lm9finh.astroid@bobo.none>
+ <20200411005354.GA24145@ubuntu-s3-xlarge-x86>
+ <1586597161.xyshvdbjo6.astroid@bobo.none>
+ <1586612535.6kk4az03np.astroid@bobo.none>
+ <20200414020553.GD48061@umbus.fritz.box>
+ <20200414040515.GA22855@ubuntu-s3-xlarge-x86>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 149.28.68.211
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="9JSHP372f+2dzJ8X"
+Content-Disposition: inline
+In-Reply-To: <20200414040515.GA22855@ubuntu-s3-xlarge-x86>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,116 +74,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>, kvm@vger.kernel.org,
- Huacai Chen <chenhuacai@gmail.com>, Fuxin Zhang <zhangfx@lemote.com>,
- linux-mips@vger.kernel.org, qemu-devel@nongnu.org,
- aleksandar.qemu.devel@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- Huacai Chen <chenhc@lemote.com>, lixing@loongson.cn
+Cc: qemu-devel@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
+ clang-built-linux@googlegroups.com,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@fr.ibm.com>, qemu-ppc@nongnu.org,
+ linuxppc-dev@lists.ozlabs.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 14 Apr 2020 09:40:26 +0800
-maobibo <maobibo@loongson.cn> wrote:
 
-> On 04/13/2020 04:18 PM, Jiaxun Yang wrote:
-> > On Mon, 13 Apr 2020 15:30:09 +0800
-> > Huacai Chen <chenhc@lemote.com> wrote:
-> >   
-> >> We are preparing to add KVM support for Loongson-3. VZ extension is
-> >> fully supported in Loongson-3A R4+, and we will not care about old
-> >> CPUs (at least now). We already have a full functional Linux kernel
-> >> (based on Linux-5.4.x LTS) and QEMU (based on 5.0.0-rc2) and their
-> >> git repositories are here:
-> >>
-> >> QEMU: https://github.com/chenhuacai/qemu
-> >> Kernel: https://github.com/chenhuacai/linux
-> >>
-> >> Of course these two repositories need to be rework and not suitable
-> >> for upstream (especially the commits need to be splitted). We show
-> >> them here is just to tell others what we have done, and how
-> >> KVM/Loongson will look like.
-> >>
-> >> Our plan is make the KVM host side be upstream first, and after
-> >> that, we will make the KVM guest side and QEMU emulator be
-> >> upstream.  
-> > 
-> > + Aleksandar as QEMU/MIPS mainatiner
-> > 
-> > I was involved in KVM/Loongson development a bit and also intend to
-> > help with mainline these works.
-> > 
-> > After dealing with basic LS7A PCH kernel support, I'm going to
-> > cooperate with Huacai and anyone who interested in to deal with
-> > following stuff:
-> > 
-> > - Basic QEMU/TCG support for Loongson64 instructions.
-> > 	Well, it seems unrelated with KVM, but that would make
-> > 	development easier with cross ISA emulation. I'm not going
-> > to implement all the features like Loongson's page table fast walk
-> > 	extension and binary translation extension but I'll ensure
-> > any binary compiled with march=loongson3a can run flawlessly on
-> > 	TCG.
-> > 
-> > - Design of Loongson-VIRT QEMU machine
-> > 	It is nearly impossible to bring a real Loongson system into
-> > 	QEMU. Both RS780E and LS7A PCH have tons of unreasonable
-> > design that would make the emulation extremely complex, Loongson
-> > 	company's KVM implementation[1] has already proofed that,
-> > 	thay're now in the hell. So we all agreed that we should
-> > build a machine from draft. I think we should reuse existing infra
-> > as far as possible to reduce our work load. I'm planing to use
-> > 	pci-host-cam-generic together with VIRTIO PCI devices and a
-> > 	a strip down version of loongson,liointc-1.0a to build a
-> > pure PCI based system. But if any one have better idea please just
-> > 	tell us, I'm still considering how to implement SMP-IPI and
-> > ACPI stuff.  
+--9JSHP372f+2dzJ8X
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hi Bibo,
-Thanks for your response.
+On Mon, Apr 13, 2020 at 09:05:15PM -0700, Nathan Chancellor wrote:
+> On Tue, Apr 14, 2020 at 12:05:53PM +1000, David Gibson wrote:
+> > On Sat, Apr 11, 2020 at 11:57:23PM +1000, Nicholas Piggin wrote:
+> > > Nicholas Piggin's on April 11, 2020 7:32 pm:
+> > > > Nathan Chancellor's on April 11, 2020 10:53 am:
+> > > >> The tt.config values are needed to reproduce but I did not verify =
+that
+> > > >> ONLY tt.config was needed. Other than that, no, we are just buildi=
+ng
+> > > >> either pseries_defconfig or powernv_defconfig with those configs a=
+nd
+> > > >> letting it boot up with a simple initramfs, which prints the versi=
+on
+> > > >> string then shuts the machine down.
+> > > >>=20
+> > > >> Let me know if you need any more information, cheers!
+> > > >=20
+> > > > Okay I can reproduce it. Sometimes it eventually recovers after a l=
+ong
+> > > > pause, and some keyboard input often helps it along. So that seems =
+like=20
+> > > > it might be a lost interrupt.
+> > > >=20
+> > > > POWER8 vs POWER9 might just be a timing thing if P9 is still hanging
+> > > > sometimes. I wasn't able to reproduce it with defconfig+tt.config, I
+> > > > needed your other config with various other debug options.
+> > > >=20
+> > > > Thanks for the very good report. I'll let you know what I find.
+> > >=20
+> > > It looks like a qemu bug. Booting with '-d int' shows the decrementer=
+=20
+> > > simply stops firing at the point of the hang, even though MSR[EE]=3D1=
+ and=20
+> > > the DEC register is wrapping. Linux appears to be doing the right thi=
+ng=20
+> > > as far as I can tell (not losing interrupts).
+> > >=20
+> > > This qemu patch fixes the boot hang for me. I don't know that qemu=20
+> > > really has the right idea of "context synchronizing" as defined in the
+> > > powerpc architecture -- mtmsrd L=3D1 is not context synchronizing but=
+ that
+> > > does not mean it can avoid looking at exceptions until the next such
+> > > event. It looks like the decrementer exception goes high but the
+> > > execution of mtmsrd L=3D1 is ignoring it.
+> > >=20
+> > > Prior to the Linux patch 3282a3da25b you bisected to, interrupt replay
+> > > code would return with an 'rfi' instruction as part of interrupt retu=
+rn,
+> > > which probably helped to get things moving along a bit. However it wo=
+uld
+> > > not be foolproof, and Cedric did say he encountered some mysterious
+> > > lockups under load with qemu powernv before that patch was merged, so
+> > > maybe it's the same issue?
+> > >=20
+> > > Thanks,
+> > > Nick
+> > >=20
+> > > The patch is a bit of a hack, but if you can run it and verify it fix=
+es
+> > > your boot hang would be good.
+> >=20
+> > So a bug in this handling wouldn't surprise me at all.  However a
+> > report against QEMU 3.1 isn't particularly useful.
+> >=20
+> >  * Does the problem occur with current upstream master qemu?
+>=20
+> Yes, I can reproduce the hang on 5.0.0-rc2.
 
-+ Xing Li as I heard he is in charge of KVM from Loongson's news post.
+Ok.
 
-> It is a good job to add kvm virtualization support on loongson64
-> platform. I agree that we should define common virt machine hardware
-> system, however the compiled kernel binary should be the same with
-> host system, else it will bring out trouble for customers to
-> differentiate them between guest system and host system.
+Nick, can you polish up your fix shortly and submit upstream in the
+usual fashion?
 
-I'm planing to use DeviceTree to pass device information between QEMU
-and guest kernel. So we can upgrade VM design at any moment without
-breaking Host Guest kernel compatibility.
+> >  * Does the problem occur with qemu-2.12 (a pretty widely deployed
+> >    "stable" qemu, e.g. in RHEL)?
+>=20
+> No idea but I would assume so. I might have time later this week to test
+> but I assume it is kind of irrelevant if it is reproducible at ToT.
+>=20
+> > > ---
+> > >=20
+> > > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> > > index b207fb5386..1d997f5c32 100644
+> > > --- a/target/ppc/translate.c
+> > > +++ b/target/ppc/translate.c
+> > > @@ -4364,12 +4364,21 @@ static void gen_mtmsrd(DisasContext *ctx)
+> > >      if (ctx->opcode & 0x00010000) {
+> > >          /* Special form that does not need any synchronisation */
+> > >          TCGv t0 =3D tcg_temp_new();
+> > > +        TCGv t1 =3D tcg_temp_new();
+> > >          tcg_gen_andi_tl(t0, cpu_gpr[rS(ctx->opcode)],
+> > >                          (1 << MSR_RI) | (1 << MSR_EE));
+> > > -        tcg_gen_andi_tl(cpu_msr, cpu_msr,
+> > > +        tcg_gen_andi_tl(t1, cpu_msr,
+> > >                          ~(target_ulong)((1 << MSR_RI) | (1 << MSR_EE=
+)));
+> > > -        tcg_gen_or_tl(cpu_msr, cpu_msr, t0);
+> > > +        tcg_gen_or_tl(t1, t1, t0);
+> > > +
+> > > +        gen_update_nip(ctx, ctx->base.pc_next);
+> > > +        gen_helper_store_msr(cpu_env, t1);
+> > >          tcg_temp_free(t0);
+> > > +        tcg_temp_free(t1);
+> > > +        /* Must stop the translation as machine state (may have) cha=
+nged */
+> > > +        /* Note that mtmsr is not always defined as context-synchron=
+izing */
+> > > +        gen_stop_exception(ctx);
+> > > +
+> > >      } else {
+> > >          /*
+> > >           * XXX: we need to update nip before the store if we enter
+> > >=20
+> >=20
+>=20
 
- 
-> For pci host bridge emulation, I suggest that gpex pcie host bridge
-> should be used, since it supports pcie hotplug and arm/riscv uses
-> this pcie host bridge.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--9JSHP372f+2dzJ8X
+Content-Type: application/pgp-signature; name="signature.asc"
 
-gpex is basically a pci-host-cam-generic at kernel point of view. I'm
-planing to reuse it too.
+-----BEGIN PGP SIGNATURE-----
 
-> 
-> For virtual interrupt controller, it should support MSI/MSIX
-> interrupt, irqchip in kernel, IRQFD, vhost/vfio etc. I have no idea
-> how to define virtual interrupt controller now.
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6VPqgACgkQbDjKyiDZ
+s5LQ4hAAiszktfJyjf69flxQVUji0VqWbKOgdXpQ56ydhV2HwU5FdLYGC6qyMqjc
+5YGxQ94hXsS3q85Dp6ebQ/YRY0yGWXer1v3vUEbD/Lfb1CNSvGr5fahNiD3hTYxt
+PXa4yyghf0EFaYKOLrbnLKPPYNZoN91gavyFeNRfmYoksOYOesltyT3pEX8bZHdl
+0P50v+DVn/PBir9t3/nAxD4u+Z7uCs0IJAkB8cFQq0G5FMSiAbz7usABiQkQDgJq
+IwzErIPPmjYGZxUTHKorxM0d6Ozcd1wdn27abdkj80N9e6g+MB4oXsRpNlnbEly/
+E2715dEWIZju8PDCO3n/vxJiImPV2OEosAhJUormJbKw/n6B1Ie97tt/zwGP0ghr
+9hJBQXx/MLxQqwPd8Qnp1Fc5FNMKs0iLQ5hI3KvmiHOKPWEYmr+qBCPBxadifD9p
+XdX6Ugfy64WRB1hDEMK44s5NPEx0QXhr1mwb5iaQhgFiw2X12FUJxFUZsQ1ItScT
+Sx9lAziVQZPIgIhmO26vmLG8Y0r64gleKDom/0dAyHYJI+J8aGiXnSBaGC+OYj2W
+DdzQ8X6/DngnkhjB1UrFEgusweBnoKX/V/Fc501cut17ls3ARjdaKBpt0WRzO0iA
+QJWdq27miCREtqphebPNTNAiJYD78OFkRn3mONj6krOEIXPWKHI=
+=0KPK
+-----END PGP SIGNATURE-----
 
-Yes, APIC from x86 and GIC from Arm are all bonded closely with their
-architecture so we can't reuse them. Probably what we need is a
-modified version of EXTIOI from Loongson-3A4000.
-
-Does Loongson have a plan to implement hardware virtual irqchip? If so
-we must align with it's design.
-
-My plan is we can firstly implement a very simple IRQCHIP instead of
-complex one which only handle UART and PCI INTx. That is enough to make
-the system work. After that we can sit and discuss how to implement a
-complicated version to archive more features.
-
-> 
-> 
-> regards
-> bibo,mao
-> 
-[...]
+--9JSHP372f+2dzJ8X--
 
