@@ -2,79 +2,78 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFEC7C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:29:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56161C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:29:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D9B620678
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:29:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DDF620678
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:29:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f/B4EbYe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9B620678
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HOkfzDe9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DDF620678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOOR9-0002Jf-Lr
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 12:29:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51658)
+	id 1jOORG-0002fI-6s
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 12:29:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51703)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jOOOI-00057g-RC
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:26:32 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jOOOQ-0005Ju-6O
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:26:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jOOOD-0007Ah-Bl
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:26:26 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:39641)
+ (envelope-from <peter.maydell@linaro.org>) id 1jOOOK-0007DM-4U
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:26:34 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46994)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jOOOD-0007A4-5q
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:26:21 -0400
-Received: by mail-wr1-x435.google.com with SMTP id b11so3681943wrs.6
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 09:26:21 -0700 (PDT)
+ id 1jOOOJ-0007DA-Uj
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:26:28 -0400
+Received: by mail-wr1-x443.google.com with SMTP id f13so15048008wrm.13
+ for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 09:26:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=xINSNigMYarXwX5/BhM4LUoIhEq1H+iUx4YSxS6L/Cc=;
- b=f/B4EbYeNkIaChrTAPdThS3sNrFdhkrN38rPqJBbHatN1Wi6F8+vr6OSsYRmhTF/Ds
- 7rsVD4+UT9iw0un33x1k4r7H9EdniDZt6uj/+e6BFPBDtECjKSXmNym7Ibf5s6jshK+V
- Fwc3hcZ55CCY6n0a81C7rmuP4CogCw+CeQADabHiPHrgQR9J34xhjT4FjQGJI0fO3BC6
- H75FBpwFferp7lEtxXhgbD9GtNy/icduqJPPwqEOy3pgXpoZhocWb3JJEEKYmiEkF9f7
- 1qfWkaNza53CCHrd/1iTz9Fq0o/Bh3M5RkE1+naQnW6Ung67ikyz8t6ahZdq1SEYmcs3
- ZTGQ==
+ bh=qGeIMQxu3PilBoKo2MoV3NHkvFJQkVL7vf1SB9ePcU4=;
+ b=HOkfzDe9OAZb+EK6qsQwwxdfm54o74IIqr7XfCaFq2v0irBwZZw6Wel1g8Vfvm/9yY
+ ZYs7utHS5Z0D/Z0x/FWQ3OVF/ikVadxpX9fITDrNQ4tHGPFsvdTNXR4cbNaW7Daop3Ta
+ RVeLiu+AUg8EelHyd/QVQSeJ/hL8BxqWjKJr1hLkzjGSZylIEPa5wZATl2Ar+Eo5eAKJ
+ gFxXVvGLne75oHDCmggxY9BnZTJ7pA2TVi7kCIds3O+JyzHpErC+UenE7Kasso/qea3F
+ hsrUhkWNLjIlfbk6hUVzfB74XRquBtPc4eUxQdkNsin34IYDGQORtQxFQRAiY3UTYGR3
+ 3DGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xINSNigMYarXwX5/BhM4LUoIhEq1H+iUx4YSxS6L/Cc=;
- b=rTvK+vd2sFJkyS6hTK05PmaHGuruN3zEWeij76uBS0IEYY4SCv/vmBRs6q4xi0ln7U
- TVbohImOsHaYsHXupsay3sSwV2Q8KQBpUioIEumvgX8y9uUnxMZ2F3Lw9BRXqFFVCk8X
- jmojDm/S7vjThUvBWchJ2fchMY/yzU0jGSWd4vFgTnLNUwJpIfZapqOXUzpCyFfcKYHx
- gl+TAI9AujKyxA3zgH4hA7LGORxnws2Xrc5IsoprRV6pePXwfl3uroPrD8LPXMo0nSQe
- mN5LmNqZV36yNZNv/vh8eVv1X8isDlfXB784UPTLr6DqzqlDsxT5INu+/d+TCkokpCM8
- vucQ==
-X-Gm-Message-State: AGi0Puaq1U5DLxXqkUOWfTP8JwSmxsxMdbBpbFr6Ud1l6K4c/kqqI4C/
- Q4KnW5jkoLDTB3ZVjcyEHAC1RGf/vhdIrA==
-X-Google-Smtp-Source: APiQypLFtUE+gz9YHNidkMdLOBc5U2yNoEB9u6rQPGqufMVJogW0fem6O8xskoHi5gRKEnMxdNjg7Q==
-X-Received: by 2002:adf:e403:: with SMTP id g3mr23992501wrm.121.1586881579945; 
- Tue, 14 Apr 2020 09:26:19 -0700 (PDT)
+ bh=qGeIMQxu3PilBoKo2MoV3NHkvFJQkVL7vf1SB9ePcU4=;
+ b=dAIfHgjDXVv+xIGifx+6Dp7fq2VtfGE+QOLG6txJe/U6VyBDBnK1EkGS+cMcpp8RnV
+ 2mH7c28U3DAfc2/YdH+gBGJk+l2Tl85uSXSK2KCLpFF378HnJKlDPF1dqzRxMcyG2Hd3
+ R/67Rx9vKx/HoPnFoGyjZR9wTv6dsgvu0hFpNYZpXeqGiTlRtn1Tl95ya7nRG7Nd2Sup
+ Q7zFRnXVvWnqismdwZllWtskZGyFYD6deuTgg6ko4IV/NqxOvbuNst0esNDcYmMqAXUX
+ /N5cYuYVu47oO4b1/YZ2qG6RoKsb0vyDcuKKKiIgD8U7ZQ7V+xJbwgzwZxeqbtHSt8G7
+ c65Q==
+X-Gm-Message-State: AGi0PuZY7AlG3GIpgK5qTjPUPWXOQFnsnfyk1LqzgsUfSk/itcJAE3yE
+ GMHeoJPFTQab1KKHxNOyui39iDoQW3sEnQ==
+X-Google-Smtp-Source: APiQypJtGNodIz3H5usVxy9Hg65QLi2sciZR5aAgkbnpeDQrONHrhIrahP/38FvvsMEdUwq2OrDKjQ==
+X-Received: by 2002:a5d:5707:: with SMTP id a7mr24549392wrv.108.1586881586529; 
+ Tue, 14 Apr 2020 09:26:26 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id i129sm20003802wmi.20.2020.04.14.09.26.19
+ by smtp.gmail.com with ESMTPSA id i129sm20003802wmi.20.2020.04.14.09.26.25
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Apr 2020 09:26:19 -0700 (PDT)
+ Tue, 14 Apr 2020 09:26:26 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/12] linux-user/flatload.c: Use "" for include of QEMU header
- target_flat.h
-Date: Tue, 14 Apr 2020 17:26:05 +0100
-Message-Id: <20200414162613.4479-5-peter.maydell@linaro.org>
+Subject: [PULL 10/12] kernel-doc: Use c:struct for Sphinx 3.0 and later
+Date: Tue, 14 Apr 2020 17:26:11 +0100
+Message-Id: <20200414162613.4479-11-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200414162613.4479-1-peter.maydell@linaro.org>
 References: <20200414162613.4479-1-peter.maydell@linaro.org>
@@ -83,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::435
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,39 +98,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The target_flat.h file is a QEMU header, so we should include it using
-quotes, not angle brackets.
+The kernel-doc Sphinx plugin and associated script currently emit
+'c:type' directives for "struct foo" documentation.
 
-Coverity otherwise is unable to find the header:
+Sphinx 3.0 warns about this:
+  /home/petmay01/linaro/qemu-from-laptop/qemu/docs/../include/exec/memory.h:3: WARNING: Type must be either just a name or a typedef-like declaration.
+  If just a name:
+    Error in declarator or parameters
+    Invalid C declaration: Expected identifier in nested name, got keyword: struct [error at 6]
+      struct MemoryListener
+      ------^
+  If typedef-like declaration:
+    Error in declarator or parameters
+    Invalid C declaration: Expected identifier in nested name. [error at 21]
+      struct MemoryListener
+      ---------------------^
 
-"../linux-user/flatload.c", line 40: error #1712: cannot open source file
-          "target_flat.h"
-  #include <target_flat.h>
-                          ^
+because it wants us to use the new-in-3.0 'c:struct' instead.
 
-because the relevant directory is only on the -iquote path, not the -I path.
+Plumb the Sphinx version through to the kernel-doc script
+and use it to select 'c:struct' for newer versions than 3.0.
 
+Fixes: LP:1872113
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20200319193323.2038-5-peter.maydell@linaro.org
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- linux-user/flatload.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ docs/sphinx/kerneldoc.py |  1 +
+ scripts/kernel-doc       | 16 +++++++++++++++-
+ 2 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/flatload.c b/linux-user/flatload.c
-index 0122ab3afe6..66901f39cc5 100644
---- a/linux-user/flatload.c
-+++ b/linux-user/flatload.c
-@@ -37,7 +37,7 @@
+diff --git a/docs/sphinx/kerneldoc.py b/docs/sphinx/kerneldoc.py
+index 1159405cb92..3e879402064 100644
+--- a/docs/sphinx/kerneldoc.py
++++ b/docs/sphinx/kerneldoc.py
+@@ -99,6 +99,7 @@ class KernelDocDirective(Directive):
+                 env.note_dependency(os.path.abspath(f))
+                 cmd += ['-export-file', f]
  
- #include "qemu.h"
- #include "flat.h"
--#include <target_flat.h>
-+#include "target_flat.h"
++        cmd += ['-sphinx-version', sphinx.__version__]
+         cmd += [filename]
  
- //#define DEBUG
+         try:
+diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+index 8dc30e01e58..030b5c8691f 100755
+--- a/scripts/kernel-doc
++++ b/scripts/kernel-doc
+@@ -71,6 +71,8 @@ Output selection (mutually exclusive):
+ 			DOC: sections. May be specified multiple times.
  
+ Output selection modifiers:
++  -sphinx-version VER   Generate rST syntax for the specified Sphinx version.
++                        Only works with reStructuredTextFormat.
+   -no-doc-sections	Do not output DOC: sections.
+   -enable-lineno        Enable output of #define LINENO lines. Only works with
+                         reStructuredText format.
+@@ -286,6 +288,7 @@ use constant {
+ };
+ my $output_selection = OUTPUT_ALL;
+ my $show_not_found = 0;	# No longer used
++my $sphinx_version = "0.0"; # if not specified, assume old
+ 
+ my @export_file_list;
+ 
+@@ -436,6 +439,8 @@ while ($ARGV[0] =~ m/^--?(.*)/) {
+ 	    $enable_lineno = 1;
+     } elsif ($cmd eq 'show-not-found') {
+ 	$show_not_found = 1;  # A no-op but don't fail
++    } elsif ($cmd eq 'sphinx-version') {
++        $sphinx_version = shift @ARGV;
+     } else {
+ 	# Unknown argument
+         usage();
+@@ -963,7 +968,16 @@ sub output_struct_rst(%) {
+     my $oldprefix = $lineprefix;
+     my $name = $args{'type'} . " " . $args{'struct'};
+ 
+-    print "\n\n.. c:type:: " . $name . "\n\n";
++    # Sphinx 3.0 and up will emit warnings for "c:type:: struct Foo".
++    # It wants to see "c:struct:: Foo" (and will add the word 'struct' in
++    # the rendered output).
++    if ((split(/\./, $sphinx_version))[0] >= 3) {
++        my $sname = $name;
++        $sname =~ s/^struct //;
++        print "\n\n.. c:struct:: " . $sname . "\n\n";
++    } else {
++        print "\n\n.. c:type:: " . $name . "\n\n";
++    }
+     print_lineno($declaration_start_line);
+     $lineprefix = "   ";
+     output_highlight_rst($args{'purpose'});
 -- 
 2.20.1
 
