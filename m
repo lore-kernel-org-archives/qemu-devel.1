@@ -2,84 +2,95 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39143C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 11:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91696C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 11:19:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED4E32072D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 11:14:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5AEAD206B6
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 11:19:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IyIzmXDD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED4E32072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GHOsC7AD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AEAD206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOJW2-0001uv-6f
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 07:14:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52847)
+	id 1jOJba-000532-Gi
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 07:19:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53653)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <npiggin@gmail.com>) id 1jOJVM-00019e-6M
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 07:13:25 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOJah-0004dV-SR
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 07:18:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1jOJVK-0001mm-79
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 07:13:24 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:37247)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1jOJVJ-0001l9-VG; Tue, 14 Apr 2020 07:13:22 -0400
-Received: by mail-pl1-x641.google.com with SMTP id m16so4537400pls.4;
- Tue, 14 Apr 2020 04:13:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=JN1UqE6+YpRxsawyrbRFyMn4vRzqFqThSa1A+kyrG+o=;
- b=IyIzmXDDnIi8UmpT6LSqcb6LiMSqzFsL/KxsBAsf0ptE9J9EFJKXnl49SjFGxriGVX
- tjLvXFkdCX0wnI7fe5Gq7UdrG1C19jQDTSqZ6OTlwdxzEkJNPn++LwZKx2Q1vdqdj6d/
- Zy10RKLKk1fKZav9BFvB04dn9AbEROTxP5B5tnNTKZiiIHNZeSFww80O2/Hgy2p4xmFP
- ipb6JDktNwZmlIvdmsW3HUC8gCb2NDSjyKlqB1EvEq9oTPyrwSgKd0g6HrbXC4v8wSD9
- DlUXJmBp8qrCL6ekQqtbG6x6StQTqfPh8shx1qjl4fFLyQp3hUu1uCOMSkmAEA+cneLz
- UbRw==
+ (envelope-from <philmd@redhat.com>) id 1jOJag-0004ab-BR
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 07:18:55 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43862
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOJag-0004Ys-6z
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 07:18:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586863133;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=uSbWWFpCYDQW/mn8qaE3YF/Tqc06dP5p+nRREUUssvg=;
+ b=GHOsC7ADcsUiAN/weQKIf/y2MRtSqlcNjvYlllVy8PxXwCV2/4iTnnH9pdiu1rrMkJS7dr
+ dH2137HeBqZPsFDnApRHpUZK2uBfTvKZ7Oz5JKuln3DWnILeagZzd82pZHszG2kV49rptH
+ 99TbiyXVqn9scUSCGWehk72JajkykNE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-PPO84TuFME6hhkxnyUNZZQ-1; Tue, 14 Apr 2020 07:18:49 -0400
+X-MC-Unique: PPO84TuFME6hhkxnyUNZZQ-1
+Received: by mail-wr1-f69.google.com with SMTP id o12so5436379wra.14
+ for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 04:18:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=JN1UqE6+YpRxsawyrbRFyMn4vRzqFqThSa1A+kyrG+o=;
- b=oybOfjfpUgOha39l5gltL3a79atqRgvl+Axhe6yg0HaKtZQ1DVbfYbjDp4mNtctFnx
- NAT5Vu2pcNris5F0Xks7T0Krp2y0ATRE09F0Vm3gQsrxTsHHEkWb0OPSt7bGyaOqTk31
- Ri+NzOAGrXCzqCq0lUkQbOrR/v3A15W5V044KntY4Kw9YZnC/hQssGEp6qA3PxTgSm/w
- SKNn5m/BNBNi9entH02zf9rSdFXghw6NjP7GQ8GCh2aLOLiwhGoRlUvdbpQcsO9sdPyV
- 6DFhvJLwZmDcP9rNbc3faiOPwvD7EjQLPxLKq4xE2oug7N2uMyXnBimjluBgkRRRw6Y3
- sFVA==
-X-Gm-Message-State: AGi0PuanuRiB4jSi1ccHqFComgFP7GdM7GGYm6UXgmK6NOawe9cKXwGD
- mMFvylxkbCX4YdpiuxGzWmEwazKQirk=
-X-Google-Smtp-Source: APiQypJTyy97hXUH7vlb5EFbV8+CT0KEr49ENndCyCV/dlGiTpAT+FRcLAr9xHW/+45J/ZQYta41kg==
-X-Received: by 2002:a17:90a:d596:: with SMTP id
- v22mr26475077pju.169.1586862800008; 
- Tue, 14 Apr 2020 04:13:20 -0700 (PDT)
-Received: from bobo.ozlabs.ibm.com ([203.18.28.220])
- by smtp.gmail.com with ESMTPSA id u44sm10311030pgn.81.2020.04.14.04.13.09
+ bh=fxPhu/NQir7Rf+ELHL0Z/YidSVTKuDiieyOLHp4ILI8=;
+ b=hlac2rN9BWs9a83Ulid741cgILKnMS2kEXq5J2TRlYs/PZVLWZ8WZA+T6/9j6TgnvL
+ M7GOxz3KwNWKRYI9eeHOa4gRsZ9m9O5muoXREPn0b1FtvYDOlby8Wv66hWtRJ2p6LW1w
+ so8izlLVZjpGNmX9PSYpYyktMLt/kf2yUEAocvZKJu3cCGwJYF1FlQKidQIvGoTx5K4L
+ 4xr62fZjU3ATHHb3aokPiD+fC/mj+LM5e3nHcf6tqG7Ivg3CeUdC21qq3y0B19mxXMCf
+ vFDErOrwWu+7b6EPfbdqnTABQTQrXEKaGFm5MZFuRU0PeKXLnAPQJLBdDhO4MPSpPuaT
+ hDkQ==
+X-Gm-Message-State: AGi0PubnjccrpyrYF8zM62VW7SXATw9JeJptMRr/wkrNLmq756tJPeRE
+ +rgu5gP7fgmaJ+YTlw5x6AngI7wuSF5HqLtIJfFz6cLetNekueZZEDGD9LhFD7qTfNVqBY9Tz/m
+ 6sU1wrAHoo/pAAs8=
+X-Received: by 2002:adf:97cc:: with SMTP id t12mr22076929wrb.261.1586863128241; 
+ Tue, 14 Apr 2020 04:18:48 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKQdk1+3ylNl5G8mUajlUMODYRjk0vdmq5B6g6Q/DWx+/O0R/70havUA9PeqqWLHG3MPEv/XA==
+X-Received: by 2002:adf:97cc:: with SMTP id t12mr22076914wrb.261.1586863127935; 
+ Tue, 14 Apr 2020 04:18:47 -0700 (PDT)
+Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id n124sm18742413wma.11.2020.04.14.04.18.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Apr 2020 04:13:19 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
+ Tue, 14 Apr 2020 04:18:47 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] target/ppc: Fix mtmsr(d) L=1 variant that loses interrupts
-Date: Tue, 14 Apr 2020 21:11:31 +1000
-Message-Id: <20200414111131.465560-1-npiggin@gmail.com>
-X-Mailer: git-send-email 2.23.0
+Subject: [PATCH-for-5.0] gdbstub: Introduce gdb_get_freg32() to get float32
+ registers
+Date: Tue, 14 Apr 2020 13:18:46 +0200
+Message-Id: <20200414111846.27495-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,168 +102,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@fr.ibm.com>, qemu-ppc@nongnu.org,
- Nathan Chancellor <natechancellor@gmail.com>,
- Anton Blanchard <anton@ozlabs.org>, linuxppc-dev@lists.ozlabs.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If mtmsr L=1 sets MSR[EE] while there is a maskable exception pending,
-it does not cause an interrupt. This causes the test case to hang:
+Since we now use a GByteArray, we can not use stfl_p() directly.
+Introduce the gdb_get_freg32() helper to load a float32 register.
 
-https://lists.gnu.org/archive/html/qemu-ppc/2019-10/msg00826.html
-
-More recently, Linux reduced the occurance of operations (e.g., rfi)
-which stop translation and allow pending interrupts to be processed.
-This started causing hangs in Linux boot in long-running kernel tests,
-running with '-d int' shows the decrementer stops firing despite DEC
-wrapping and MSR[EE]=1.
-
-https://lists.ozlabs.org/pipermail/linuxppc-dev/2020-April/208301.html
-
-The cause is the broken mtmsr L=1 behaviour, which is contrary to the
-architecture. From Power ISA v3.0B, p.977, Move To Machine State Register,
-Programming Note states:
-
-    If MSR[EE]=0 and an External, Decrementer, or Performance Monitor
-    exception is pending, executing an mtmsrd instruction that sets
-    MSR[EE] to 1 will cause the interrupt to occur before the next
-    instruction is executed, if no higher priority exception exists
-
-Fix this by handling L=1 exactly the same way as L=0, modulo the MSR
-bits altered.
-
-The confusion arises from L=0 being "context synchronizing" whereas L=1
-is "execution synchronizing", which is a weaker semantic. However this
-is not a relaxation of the requirement that these exceptions cause
-interrupts when MSR[EE]=1 (e.g., when mtmsr executes to completion as
-TCG is doing here), rather it specifies how a pipelined processor can
-have multiple instructions in flight where one may influence how another
-behaves.
-
-Cc: qemu-stable@nongnu.org
-Reported-by: Anton Blanchard <anton@ozlabs.org>
-Reported-by: Nathan Chancellor <natechancellor@gmail.com>
-Tested-by: Nathan Chancellor <natechancellor@gmail.com>
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Fixes: a010bdbe719 ("extend GByteArray to read register helpers")
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-Thanks very much to Nathan for reporting and testing it, I added his
-Tested-by tag despite a more polished patch, as the the basics are 
-still the same (and still fixes his test case here).
+Based-on: <20200414102427.7459-1-philmd@redhat.com>
+---
+ include/exec/gdbstub.h | 12 ++++++++++++
+ target/sh4/gdbstub.c   |  6 ++----
+ 2 files changed, 14 insertions(+), 4 deletions(-)
 
-This bug possibly goes back to early v2.04 / mtmsrd L=1 support around
-2007, and the code has been changed several times since then so may
-require some backporting.
-
-32-bit / mtmsr untested at the moment, I don't have an environment
-handy.
-
- target/ppc/translate.c | 46 +++++++++++++++++++++++++-----------------
- 1 file changed, 27 insertions(+), 19 deletions(-)
-
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index b207fb5386..9959259dba 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -4361,30 +4361,34 @@ static void gen_mtmsrd(DisasContext *ctx)
-     CHK_SV;
- 
- #if !defined(CONFIG_USER_ONLY)
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-     if (ctx->opcode & 0x00010000) {
--        /* Special form that does not need any synchronisation */
-+        /* L=1 form only updates EE and RI */
-         TCGv t0 = tcg_temp_new();
-+        TCGv t1 = tcg_temp_new();
-         tcg_gen_andi_tl(t0, cpu_gpr[rS(ctx->opcode)],
-                         (1 << MSR_RI) | (1 << MSR_EE));
--        tcg_gen_andi_tl(cpu_msr, cpu_msr,
-+        tcg_gen_andi_tl(t1, cpu_msr,
-                         ~(target_ulong)((1 << MSR_RI) | (1 << MSR_EE)));
--        tcg_gen_or_tl(cpu_msr, cpu_msr, t0);
-+        tcg_gen_or_tl(t1, t1, t0);
-+
-+        gen_helper_store_msr(cpu_env, t1);
-         tcg_temp_free(t0);
-+        tcg_temp_free(t1);
-+
-     } else {
-         /*
-          * XXX: we need to update nip before the store if we enter
-          *      power saving mode, we will exit the loop directly from
-          *      ppc_store_msr
-          */
--        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
--            gen_io_start();
--        }
-         gen_update_nip(ctx, ctx->base.pc_next);
-         gen_helper_store_msr(cpu_env, cpu_gpr[rS(ctx->opcode)]);
--        /* Must stop the translation as machine state (may have) changed */
--        /* Note that mtmsr is not always defined as context-synchronizing */
--        gen_stop_exception(ctx);
-     }
-+    /* Must stop the translation as machine state (may have) changed */
-+    gen_stop_exception(ctx);
- #endif /* !defined(CONFIG_USER_ONLY) */
+diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
+index b52d9933ee..52a4a936c6 100644
+--- a/include/exec/gdbstub.h
++++ b/include/exec/gdbstub.h
+@@ -125,6 +125,18 @@ static inline int gdb_get_reg128(GByteArray *buf, uint=
+64_t val_hi,
+     return 16;
  }
- #endif /* defined(TARGET_PPC64) */
-@@ -4394,15 +4398,23 @@ static void gen_mtmsr(DisasContext *ctx)
-     CHK_SV;
- 
- #if !defined(CONFIG_USER_ONLY)
--   if (ctx->opcode & 0x00010000) {
--        /* Special form that does not need any synchronisation */
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-+    if (ctx->opcode & 0x00010000) {
-+        /* L=1 form only updates EE and RI */
-         TCGv t0 = tcg_temp_new();
-+        TCGv t1 = tcg_temp_new();
-         tcg_gen_andi_tl(t0, cpu_gpr[rS(ctx->opcode)],
-                         (1 << MSR_RI) | (1 << MSR_EE));
--        tcg_gen_andi_tl(cpu_msr, cpu_msr,
-+        tcg_gen_andi_tl(t1, cpu_msr,
-                         ~(target_ulong)((1 << MSR_RI) | (1 << MSR_EE)));
--        tcg_gen_or_tl(cpu_msr, cpu_msr, t0);
-+        tcg_gen_or_tl(t1, t1, t0);
+=20
++static inline int gdb_get_freg32(GByteArray *array, float32 val)
++{
++    uint8_t buf[4];
 +
-+        gen_helper_store_msr(cpu_env, t1);
-         tcg_temp_free(t0);
-+        tcg_temp_free(t1);
++    QEMU_BUILD_BUG_ON(sizeof(CPU_FloatU) !=3D sizeof(buf));
 +
-     } else {
-         TCGv msr = tcg_temp_new();
- 
-@@ -4411,9 +4423,6 @@ static void gen_mtmsr(DisasContext *ctx)
-          *      power saving mode, we will exit the loop directly from
-          *      ppc_store_msr
-          */
--        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
--            gen_io_start();
--        }
-         gen_update_nip(ctx, ctx->base.pc_next);
- #if defined(TARGET_PPC64)
-         tcg_gen_deposit_tl(msr, cpu_msr, cpu_gpr[rS(ctx->opcode)], 0, 32);
-@@ -4422,10 +4431,9 @@ static void gen_mtmsr(DisasContext *ctx)
- #endif
-         gen_helper_store_msr(cpu_env, msr);
-         tcg_temp_free(msr);
--        /* Must stop the translation as machine state (may have) changed */
--        /* Note that mtmsr is not always defined as context-synchronizing */
--        gen_stop_exception(ctx);
-     }
-+    /* Must stop the translation as machine state (may have) changed */
-+    gen_stop_exception(ctx);
- #endif
- }
- 
--- 
-2.23.0
++    stfl_p(buf, val);
++    g_byte_array_append(array, buf, sizeof(buf));
++
++    return sizeof(buf);
++}
++
+ static inline int gdb_get_zeroes(GByteArray *array, size_t len)
+ {
+     for (size_t i =3D 0; i < len; i++) {
+diff --git a/target/sh4/gdbstub.c b/target/sh4/gdbstub.c
+index 49fc4a0cc6..da95205889 100644
+--- a/target/sh4/gdbstub.c
++++ b/target/sh4/gdbstub.c
+@@ -58,11 +58,9 @@ int superh_cpu_gdb_read_register(CPUState *cs, GByteArra=
+y *mem_buf, int n)
+         return gdb_get_regl(mem_buf, env->fpscr);
+     case 25 ... 40:
+         if (env->fpscr & FPSCR_FR) {
+-            stfl_p(mem_buf, env->fregs[n - 9]);
+-        } else {
+-            stfl_p(mem_buf, env->fregs[n - 25]);
++            return gdb_get_freg32(mem_buf, env->fregs[n - 9]);
+         }
+-        return 4;
++        return gdb_get_freg32(mem_buf, env->fregs[n - 25]);
+     case 41:
+         return gdb_get_regl(mem_buf, env->ssr);
+     case 42:
+--=20
+2.21.1
 
 
