@@ -2,87 +2,88 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3520BC2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18576C2BB85
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:12:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0183720767
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:11:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB8F520767
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:12:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PrHx0PQ7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0183720767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HlGtoP8h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB8F520767
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOP5k-0005u7-2T
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 13:11:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42308)
+	id 1jOP6Y-0006i9-2g
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 13:12:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41392)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jOP0v-0007Ex-S4
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:06:27 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jOOzY-0003ye-3I
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:04:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jOP0u-0006X3-J7
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:06:21 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40921
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jOMZd-0007hM-68
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 10:30:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586874600;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hXQtC47q0STZGOLZvFnPSNQMBtuugVaAY967ayU1nnw=;
- b=PrHx0PQ7DE1YNl9ABQkJsC7MMGTSjB/peaR3SF0vd5XtEGz7DXvYQEaorbBbfC0CNnM4UW
- s7Kpx0EwTvBvyqw1h2XhVZA08bnR2q0yVuXRazRga2php615T5zSXlyDlEEA0SKTyeN0Ix
- +RIitcJ9se1x5Qe9nvsseFewkmfd7zU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-wvsn2xwEMNW_tqwWpfhS-g-1; Tue, 14 Apr 2020 10:29:58 -0400
-X-MC-Unique: wvsn2xwEMNW_tqwWpfhS-g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CBCD1060DB1;
- Tue, 14 Apr 2020 14:30:02 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-1.ams2.redhat.com [10.36.114.1])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 44CD196B93;
- Tue, 14 Apr 2020 14:29:56 +0000 (UTC)
-Date: Tue, 14 Apr 2020 16:29:54 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH for-5.1 1/8] tests-qemu-opts: Cover has_help_option(),
- qemu_opt_has_help_opt()
-Message-ID: <20200414142954.GH7747@linux.fritz.box>
-References: <20200409153041.17576-1-armbru@redhat.com>
- <20200409153041.17576-2-armbru@redhat.com>
- <8ea167d6-2784-1ab9-cf55-52eb7553cb4d@redhat.com>
- <878siyxwir.fsf@dusky.pond.sub.org>
- <20200414131339.GE7747@linux.fritz.box>
- <87v9m2p4to.fsf@dusky.pond.sub.org>
+ (envelope-from <richard.henderson@linaro.org>) id 1jOOzW-0005L3-Vr
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:04:56 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46889)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jOMql-00047Q-UE
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 10:47:44 -0400
+Received: by mail-pf1-x443.google.com with SMTP id m21so1026pff.13
+ for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 07:47:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=6zBODJds4+fSTJpYuEtmzFzjzEaKbjVXEFHVqO+Gaqo=;
+ b=HlGtoP8hEKRc1QZED6Q1w6frytsbMTjixH+IopFibt8RgaC1filGd/sKRKAJcZEq1D
+ QKmGMitNsZdKOVQuh6pbp6bwGJsk2uRbMqj3+k6tNWR4orp06j91jH+lp8voFltpFZ6e
+ 6WAQc86PX+L9bqBq9ZZ/DNSP/lQXwvrwPnvNv9/gfca4YDpkVQwLH77HV4GI/J4irgcX
+ IhMd9F8CNwwSvimZtUaqq5s7pUOkTeYnsZuD477WAViKyTHWOB3Gl7nOxE83GvbutVqq
+ fXVU5AVIq4edWDIYjY0BNmWzEZ5MozOU478ERX23ecAmyAkknPkxpOlcf3cfauMmiGRp
+ Q/lQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6zBODJds4+fSTJpYuEtmzFzjzEaKbjVXEFHVqO+Gaqo=;
+ b=P6bKnszgJPirQFYWMPqh+xX9CAHo1wP9F8B5xoA+uW1p5D7Qnx4h2biqBRZ1rWqHlZ
+ 7B3RYWW6sPIeUBRC7qIsN5G59JYWLb4b5BVzTIAA1YXUpn/rx0dtE3L+44Txq5SRVy4z
+ coomm8zdZd7dOwkgos1RghRhpOkoBvJ54draQphUY1LneJ53fOZ4/12yyb2/RGfiqD4f
+ zwkwS1x/a1Lrg8gSeU3Qc/fWiRRXcJFobfGmnrtoO+ablIQPH3RgG0DjKX6eJGuhr9r4
+ osj7GjdsR76+9Q2ptAKde55ZREi3qQJeaUZxWRMbG+XMfTh9MN8td112fDHSx82nymup
+ PZvQ==
+X-Gm-Message-State: AGi0PuZk+p73hsudmeho1EheZLFhec4/Lh4+LdYsO93z7k8MCeVolhu7
+ gx0vQJwLX/7v/UbOCjp1U3Yt+w==
+X-Google-Smtp-Source: APiQypJQ4YR2BY2wYRkv2TRiwBc3oA8Ql7QWV/mqQj3xWZApBb8yBWwJPOHPqx3yKuEp0gmsseT/EA==
+X-Received: by 2002:a62:e414:: with SMTP id r20mr22767777pfh.96.1586875662596; 
+ Tue, 14 Apr 2020 07:47:42 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id r28sm5007678pfg.186.2020.04.14.07.47.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 14 Apr 2020 07:47:41 -0700 (PDT)
+Subject: Re: [PATCH RFC] target/arm: Implement SVE2 MATCH, NMATCH
+To: Stephen Long <steplong@quicinc.com>, qemu-devel@nongnu.org
+References: <20200413234224.12005-1-steplong@quicinc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <895cd38f-f957-5328-6b61-c6f2b0d02788@linaro.org>
+Date: Tue, 14 Apr 2020 07:47:39 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <87v9m2p4to.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <20200413234224.12005-1-steplong@quicinc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,104 +95,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: apazos@quicinc.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 14.04.2020 um 15:36 hat Markus Armbruster geschrieben:
-> Kevin Wolf <kwolf@redhat.com> writes:
-> > Am 14.04.2020 um 11:10 hat Markus Armbruster geschrieben:
-> >> Eric Blake <eblake@redhat.com> writes:
-> >> > On 4/9/20 10:30 AM, Markus Armbruster wrote:
-> >> >> +        { "helpme", false, false, false },
-> >> >> +        { "a,help", true, true, true },
-> >> >> +        { "a=3D0,help,b", true, true, true },
-> >> >> +        { "help,b=3D1", true, true, false },
-> >> >> +        { "a,b,,help", false /* BUG */, true, true },
-> >> >
-> >> > So which way are you calling the bug?  Without looking at the code b=
-ut
-> >> > going off my intuition, I parse this as option 'a' and option
-> >> > 'b,help'. The latter is not a normal option name because it contains=
- a
-> >> > ',', but is a valid option value.
-> >> >
-> >> > I agree that we have a bug, but I'm not yet sure in which direction
-> >> > the bug lies (should has_help_option be fixed to report true, in whi=
-ch
-> >> > case the substring ",help" has precedence over ',,' escaping; or
-> >> > should qemu_opt_has_help_opt be fixed to report false, due to treati=
-ng
-> >> > 'b,help' after ',,' escape removal as an invalid option name).  So t=
-he
-> >> > placement of the /* BUG */ comment matters - where you placed it, I'=
-m
-> >> > presuming that later in the series you change has_help_option to
-> >> > return true, even though that goes against my intuitive parse.
-> >>=20
-> >> In addition to the canonical QemuOpts parser opts_do_parse(), we have
-> >> several more, and of course they all differ from the canonical one for
-> >> corner cases.
-> >>=20
-> >> I treat the canonical one as correct, and fix the others by eliminatin=
-g
-> >> the extra parsers.
-> >>=20
-> >> The others are:
-> >>=20
-> >> * has_help_option()
-> >>=20
-> >>   Fixed in PATCH 5 by reusing the guts of opts_do_parse().
-> >>=20
-> >> * is_valid_option_list()
-> >>=20
-> >>   Fixed in PATCH 8 by not parsing.
-> >>=20
-> >> * "id" extraction in opts_parse()
-> >>=20
-> >>   Lazy hack.  Fixed in PATCH 3 by reusing the guts of opts_do_parse().
-> >>=20
-> >> Back to your question: the value of has_help_option() differs from the
-> >> value of qemu_opt_has_help_opt().  The latter uses the canonical parse=
-r,
-> >> the former is one of the other parsers.  I therefore judge the latter
-> >> right and the former wrong.
-> >
-> > Shouldn't we also consider what users would reasonably expect?
->=20
-> Of course we should consider reasonable user expectations.
->=20
-> Grumpy aside: when I do, I commonly run into objections that users
-> reasonably expect things not to change.
+On 4/13/20 4:42 PM, Stephen Long wrote:
+> +#define DO_ZPZZ_CHAR_MATCH(NAME, TYPE, H, EQUALS)                            \
+> +void HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc)     \
+> +{                                                                            \
+> +    intptr_t i, opr_sz = simd_oprsz(desc);                                   \
+> +    for (i = 0; i < opr_sz; i += sizeof(TYPE)) {                             \
+> +        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));                      \
+> +        uint16_t *pd = (uint16_t *)(vd + H1_2(i >> 3));                      \
+> +        *pd = (*pd & ~1) | ((0 & EQUALS) | (1 & !EQUALS));                   \
+> +        if (pg & 1) {                                                        \
 
-Fair point. It's not always easy to tell whether something should be
-considered a bug in the external interface (and consequently be fixed)
-or just an idiosyncrasy that people may have get used to (and therefore
-requires deprecation before improving it).
+The important error here is that the predicate is not always the low bit.  When
+operating on bytes, every bit of the predicate is significant.  When operating
+on halfwords, every even bit of the predicate is significant.  In addition,
+when operating on halfwords, every odd bit of the result predicate must be zero.
 
-In this specific case, I'm not aware of empty option names actually
-doing anything useful anywhere, so I think it might be clearer in this
-case that it's indeed a bug.
+Which is why, generally, I have constructed the output predicate as we go.
+See, for instance, DO_CMP_PPZZ.
 
-> > Getting it parsed as an empty option name (I assume with a default valu=
-e
-> > of "on"?) certainly looks like something that would surprise most users
-> > and, as you can see, even some QEMU developers.
->=20
-> My preferred way to address QemuOpts parsing madness is replacing it
-> wholesale by keyval.c, but that's some time off, I'm afraid.
->=20
-> This series merely aims for more method to the same old madness.
+> +            TYPE nn = *(TYPE *)(vn + H(i));                                  \
+> +            for (intptr_t j = 0; j < 16; j += sizeof(TYPE)) {                \
+> +                TYPE mm = *(TYPE *)(vm + H(i * 16 + j));                     \
 
-I understand. Though I think replacing with keyval will be potentially
-less problematic if QemuOpts already behaved more similar.
+mm needs to start at the beginning of the segment, which in this case is (i &
+-16).  You don't need the elements of mm in any particular order (all of them
+are significant), so you can drop the use of H() here.
 
-If I were writing the code, I think I would use existing bugs and
-inconsistencies as an excuse to make QemuOpts behave more like what
-keyval can easily handle by declaring whatever is closest to keyval as
-the correct interpretation.
+Therefore the indexing for mm should be vm + (i & -16) + j.
 
-Kevin
+> +                bool eq = nn == mm;                                          \
+> +                if ((eq && EQUALS) || (!eq && !EQUALS)) {                    \
+> +                    *pd = (*pd & ~1) | ((1 & EQUALS) | (0 & !EQUALS));       \
+> +                }                                                            \
 
+It might be handy to split out the inner loop to a helper function, as, while
+the basic loop is ok, there are tricks that can improve it, so that we're
+comparing 8 bytes at a time.
+
+
+> +static bool do_sve2_zpzz_char_match(DisasContext *s, arg_rprr_esz *a,
+> +                                    gen_helper_gvec_4 *fn)
+> +{
+> +    if (!dc_isar_feature(aa64_sve2, s)) {
+> +        return false;
+> +    }
+> +    if (fn == NULL) {
+> +        return false;
+> +    }
+> +    if (sve_access_check(s)) {
+> +        unsigned vsz = vec_full_reg_size(s);
+> +        unsigned psz = pred_full_reg_size(s);
+> +        int dofs = pred_full_reg_offset(s, a->rd);
+> +        int nofs = vec_full_reg_offset(s, a->rn);
+> +        int mofs = vec_full_reg_offset(s, a->rm);
+> +        int gofs = pred_full_reg_offset(s, a->pg);
+> +
+> +        /* Save a copy if the destination overwrites the guarding predicate */
+> +        int tofs = gofs;
+> +        if (a->rd == a->pg) {
+> +            tofs = offsetof(CPUARMState, vfp.preg_tmp);
+> +            tcg_gen_gvec_mov(0, tofs, gofs, psz, psz);
+> +        }
+> +
+> +        tcg_gen_gvec_4_ool(dofs, nofs, mofs, gofs, vsz, vsz, 0, fn);
+> +        do_predtest(s, dofs, tofs, psz / 8);
+
+You can avoid the copy and the predtest by using the iter_predtest_* functions
+and returning the flags result directly from the helper.  Again, see DO_CMP_PPZZ.
+
+
+r~
 
