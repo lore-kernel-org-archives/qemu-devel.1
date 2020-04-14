@@ -2,79 +2,86 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35194C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 08:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D4D1C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 09:13:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F25C720578
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 08:59:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 647702063A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 09:13:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="c3IBFCqW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F25C720578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R4gXrqGE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 647702063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOHPi-0002UV-0R
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 04:59:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55386)
+	id 1jOHdO-0007HG-Hq
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 05:13:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57287)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <joel.stan@gmail.com>) id 1jOHN7-0000hN-IY
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 04:56:47 -0400
+ (envelope-from <armbru@redhat.com>) id 1jOHat-00067T-FJ
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:11:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joel.stan@gmail.com>) id 1jOHN6-0006as-9e
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 04:56:45 -0400
-Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:34362)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <joel.stan@gmail.com>) id 1jOHN6-0006af-0K
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 04:56:44 -0400
-Received: by mail-qv1-xf44.google.com with SMTP id s18so5816506qvn.1
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 01:56:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=oXVl7JGM5FgUXAZLpn1J+Gitv8HOpvr8xnI60hThb24=;
- b=c3IBFCqWX+4FDOOQylp75S/WkCp7GPH8BN/pA+EtElvMU8+3Cfey1tbFc9oW+syE5P
- HbGGlt03GHnqMdLvxt66bEmunnkvswfWsAlgJbYmwhJbEPiIgG2P0otqv3ddQwhDn5Ix
- M/ZX8NplU1nDNyGmAbEvuvMaPlW9QQlExmyDw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=oXVl7JGM5FgUXAZLpn1J+Gitv8HOpvr8xnI60hThb24=;
- b=diZZRGow05N5Oum9FCST+RWP1R9CjCZ1r1zUzhKOYxK0sLTaQj9vNi0iJwD6SBDVk8
- 2gC5NifwuZnqNQbcq0cswFAZ7r9K68tcZz/lapuESsCBJ+ltsTnBVA6fcB6sURyoqEjo
- 7cAlS4QpXecVOHBe7jUBmsQ9ycETK4O4x/lkqVVyg+uTyvg2nqBcB04+DMr0OPTILzrl
- OyyvXUvZtizqJcwBC99U+jn4rJYz+5I8pmZzNhWP6TPap6kW6mU3bDayT1RjVb5eawD4
- qlavTnejdDNmXMN/bDNwm4ECOlc+QF3s31CWkEkJjPORkS0xNumK4xBUS6Sd8q1UoWn/
- mj0w==
-X-Gm-Message-State: AGi0Pua6mgeuNZ1+Rcn+9Cl1jGqm8HLdaDULEBENmLCDxbMVCp3rdJtQ
- 2pwXQB9SSNPrT3dQJIEYDSUcm9pEiuO96kRpeKg=
-X-Google-Smtp-Source: APiQypK/iyzXFSoqyVxxI9voiamveWjN5YwFTcgziCRcFDSL36dyuUQnmi6JbN6P+8YAKXiO4GQaXJlBclDZT8UiVkY=
-X-Received: by 2002:a05:6214:40f:: with SMTP id
- z15mr8627296qvx.210.1586854602750; 
- Tue, 14 Apr 2020 01:56:42 -0700 (PDT)
+ (envelope-from <armbru@redhat.com>) id 1jOHar-0002fT-Sp
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:10:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36546
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOHar-0002f7-NH
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:10:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586855456;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Rjim4lb/ADNrO0+52UOe4CpPDmYvuUcle0wR4f8ohgY=;
+ b=R4gXrqGE/ioXGi5L+/80ELTX3PpQAPzZTn5WaCnv9FbJxBS7F30AgOXO4esRSa2p1tfyli
+ bqrDY3FgpTfdiX1JqHkSOFw8Z9BbApY6vmjwMra9befIdxFEgMIDFoiq46jr0y3DhgVMPy
+ S1T+/htuCWOmVLIDjwpia1nPu5rF0Fo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357-Fa173O6xNeyxOsOZNov9Jg-1; Tue, 14 Apr 2020 05:10:55 -0400
+X-MC-Unique: Fa173O6xNeyxOsOZNov9Jg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2460C107B0E1;
+ Tue, 14 Apr 2020 09:10:54 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
+ [10.36.113.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E334410016EB;
+ Tue, 14 Apr 2020 09:10:53 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 4FE8C11385C8; Tue, 14 Apr 2020 11:10:52 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH for-5.1 1/8] tests-qemu-opts: Cover has_help_option(),
+ qemu_opt_has_help_opt()
+References: <20200409153041.17576-1-armbru@redhat.com>
+ <20200409153041.17576-2-armbru@redhat.com>
+ <8ea167d6-2784-1ab9-cf55-52eb7553cb4d@redhat.com>
+Date: Tue, 14 Apr 2020 11:10:52 +0200
+In-Reply-To: <8ea167d6-2784-1ab9-cf55-52eb7553cb4d@redhat.com> (Eric Blake's
+ message of "Thu, 9 Apr 2020 12:50:13 -0500")
+Message-ID: <878siyxwir.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <0b02fe788de99120894f87f6d5c60e15d6a75d85.1586213450.git.dirty@apple.com>
- <6aac0d31-d0a4-d103-e3b5-89feef27c018@redhat.com>
- <BFA58F3C-CA4F-4ADF-854F-2658134D3888@apple.com>
-In-Reply-To: <BFA58F3C-CA4F-4ADF-854F-2658134D3888@apple.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Tue, 14 Apr 2020 08:56:31 +0000
-Message-ID: <CACPK8XfsjYhXPBdUj4=BfKpfRk-na1aetUksSdOZzqpunJaGEQ@mail.gmail.com>
-Subject: Re: [PATCH v1] nrf51: Fix last GPIO CNF address
-To: Cameron Esfahani <dirty@apple.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::f44
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,92 +93,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 7 Apr 2020 at 10:09, Cameron Esfahani <dirty@apple.com> wrote:
->
-> I'm not burying anything.  This patch is stand alone and all the tests do=
- work.  They work with or without Cedric's nee Andrew's patch.  But, if som=
-e derivative of that patch is eventually implemented, something needs to be=
- done for this NRF51 gpio qtest to work.
->
-> There are two possibilities for the following qtest in microbit-test.c:
->
-> >     actual =3D qtest_readl(qts, NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_EN=
-D) & 0x01;
-> >     g_assert_cmpuint(actual, =3D=3D, 0x01);
->
->
-> 1 - The code is purposefully reading 32-bits from an unaligned address wh=
-ich only partially refers to a documented register.  And the only reason th=
-is code works is because that 32-bit value is turned into a 8-bit read.  An=
-d if that's the case, then someone should update a comment in the test to i=
-ndicate that this is being done purposefully.
-> 2 - NRF51_GPIO_REG_CNF_END is incorrectly set to be 0x77F.  Looking at th=
-e documentation for this chip, the last defined CNF register starts at 0x77=
-C.
->
-> The NRF51 doesn't support unaligned accesses, so I assume that possibilit=
-y 1 isn't true.
->
-> So, is NRF51_GPIO_REG_CNF_END supposed to refer to a valid register, or t=
-he end of the implementation space?
->
-> If it's the former, then it should be adjusted to 0x77c and possibly upda=
-te the below code in nrf51_gpio.c (line 156):
->
-> >     case NRF51_GPIO_REG_CNF_START ... NRF51_GPIO_REG_CNF_END:
->
->
-> to become
->
-> >     case NRF51_GPIO_REG_CNF_START ... NRF51_GPIO_REG_CNF_END + 3:
->
-> if unaligned access are expected to work.  But, considering the NRF51 doe=
-sn't support unaligned accesses, I don't think this appropriate.
->
-> If it's the latter, then the test cases in microbit-test.c should be upda=
-ted to something like the following:
->
-> >     actual =3D qtest_readl(qts, NRF51_GPIO_BASE + NRF51_GPIO_REG_CNF_EN=
-D - 3) & 0x01;
-> >     g_assert_cmpuint(actual, =3D=3D, 0x01);
+Eric Blake <eblake@redhat.com> writes:
 
+> On 4/9/20 10:30 AM, Markus Armbruster wrote:
+>> The two turn out to be inconsistent for "a,b,,help".  Test case
+>> marked /* BUG */.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   tests/test-qemu-opts.c | 38 ++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 38 insertions(+)
+>>
+>
+>> +static void test_has_help_option(void)
+>> +{
+>> +    static const struct {
+>> +        const char *params;
+>> +        /* expected value of has_help_option() */
+>> +        bool expect_has_help_option;
+>> +        /* expected value of qemu_opt_has_help_opt() with implied=3Dfal=
+se */
+>> +        bool expect_opt_has_help_opt;
+>> +        /* expected value of qemu_opt_has_help_opt() with implied=3Dtru=
+e */
+>> +        bool expect_opt_has_help_opt_implied;
+>> +    } test[] =3D {
+>> +        { "help", true, true, false },
+>> +        { "helpme", false, false, false },
+>> +        { "a,help", true, true, true },
+>> +        { "a=3D0,help,b", true, true, true },
+>> +        { "help,b=3D1", true, true, false },
+>> +        { "a,b,,help", false /* BUG */, true, true },
+>
+> So which way are you calling the bug?  Without looking at the code but
+> going off my intuition, I parse this as option 'a' and option
+> 'b,help'. The latter is not a normal option name because it contains a
+> ',', but is a valid option value.
+>
+> I agree that we have a bug, but I'm not yet sure in which direction
+> the bug lies (should has_help_option be fixed to report true, in which
+> case the substring ",help" has precedence over ',,' escaping; or
+> should qemu_opt_has_help_opt be fixed to report false, due to treating
+> 'b,help' after ',,' escape removal as an invalid option name).  So the
+> placement of the /* BUG */ comment matters - where you placed it, I'm
+> presuming that later in the series you change has_help_option to
+> return true, even though that goes against my intuitive parse.
 
-Your reasoning is sound, thanks for writing it out. I would be happy
-to see your patch land.
+In addition to the canonical QemuOpts parser opts_do_parse(), we have
+several more, and of course they all differ from the canonical one for
+corner cases.
 
-Reviewed-by: Joel Stanley <joel@jms.id.au>
+I treat the canonical one as correct, and fix the others by eliminating
+the extra parsers.
 
+The others are:
 
->
->
-> Cameron Esfahani
-> dirty@apple.com
->
-> "Americans are very skilled at creating a custom meaning from something t=
-hat's mass-produced."
->
-> Ann Powers
->
->
-> > On Apr 7, 2020, at 1:44 AM, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com> wrote:
-> >
-> >> Considering NRF51 doesn't support unaligned accesses, the simplest fix
-> >> is to actually set NRF51_GPIO_REG_CNF_END to the start of the last val=
-id
-> >> CNF register: 0x77c.
-> >
-> > NAck. You are burying bugs deeper. This test has to work.
-> >
-> > What would be helpful is qtests with unaligned accesses (expected to wo=
-rk) such your USB XHCI VERSION example.
->
+* has_help_option()
+
+  Fixed in PATCH 5 by reusing the guts of opts_do_parse().
+
+* is_valid_option_list()
+
+  Fixed in PATCH 8 by not parsing.
+
+* "id" extraction in opts_parse()
+
+  Lazy hack.  Fixed in PATCH 3 by reusing the guts of opts_do_parse().
+
+Back to your question: the value of has_help_option() differs from the
+value of qemu_opt_has_help_opt().  The latter uses the canonical parser,
+the former is one of the other parsers.  I therefore judge the latter
+right and the former wrong.
+
+Clear now?
+
 
