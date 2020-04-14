@@ -2,82 +2,84 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F315C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 13:14:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA377C352B6
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 13:15:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCC9C2085B
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 13:14:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 773BA2084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 13:15:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UufHc8Ro"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCC9C2085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XxVHPaKR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 773BA2084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOLOG-0005Vl-Sd
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 09:14:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40383)
+	id 1jOLPy-0007Gm-JI
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 09:15:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40419)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jOLNY-0004yp-Cl
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:13:29 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jOLNr-0005JZ-V2
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:13:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jOLNX-0000m8-4n
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:13:28 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:39719)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sundeep.lkml@gmail.com>)
- id 1jOLNX-0000lv-0e; Tue, 14 Apr 2020 09:13:27 -0400
-Received: by mail-io1-xd42.google.com with SMTP id m4so13125008ioq.6;
- Tue, 14 Apr 2020 06:13:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=ECr5QE9/ZG1LP8toqj5wZJNArL3k/t9YUAbsoEu9oI4=;
- b=UufHc8RoT4aVuiwKw0fRk65MSomBZ0Ex2tiNVCBUZ/f9PTowuqh1E4VPJLapjhNVcA
- yk/nkTbFCIdnxCcT+8NKUEAOByEB/UknRdLfXjjdB9cVOTsLfXhbEGXjB56cRp8/lm7O
- lWeqOYfckpEMG9P6VeiF/by/bAQ0ww5FL87OcTseFxmM60i1tdlOJ+PBNrABYswydSGC
- in09vkK+oj9bzQjTa/oUNpm8y2Xm2e+rf6ypzxk41i551luhoJ7rTXr9qJc7n9LDvCar
- zCa8yJwL/cn8/7S2+yuP7ju9vG9JDFbNuVc1nztdrAXGEkzinS7KefXuIiFFTtQdfZy/
- /S0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=ECr5QE9/ZG1LP8toqj5wZJNArL3k/t9YUAbsoEu9oI4=;
- b=knKse2hv5jC3HVNie7bspWyKsay2U0UxhFBc/l2d9mscINYhlOOS+9BBAqlXmesMZM
- kmywThIs7pme/g5vrIcIS7YdlZ68uVs2mYphkCEOMvzLJTw0nBAO/ryHhvZ/sCH0502x
- E/+FMqF6vHbVN6AuEYGP9H+LeNwz3e1EC7r7rFtBibF7KTSrnqc21QrFOmpfeQ0RcThe
- vmzC78jIVbTXn2BTnqi0ZzlF2vtA8AZ44ekIilh4NVnLPydNLvI6yZDe+djnHaQORTZR
- 9mNsVkxetOTcIVO2LoRhevy2jEUtH4vID+EMC3HlvzikqjJfIIRX8Y0fKybhNJeOCsGV
- kFRg==
-X-Gm-Message-State: AGi0Pua/HUEBbZ4z5JaSVl0b7i6ikN5zr8ONreRdALiZFWiANExm0+Xy
- WngDa3YAK6GWtmpjBERsn1AbYAFbr5aIwiDzfbI=
-X-Google-Smtp-Source: APiQypKHrWEDKelV3P79sS0H6HO76GAlPRsYwBR4LQrPd3E6QYiB1dzRlJ3fykSKlGGuKxAL3qJNfD+1Q6RJFRysu98=
-X-Received: by 2002:a5d:9c09:: with SMTP id 9mr7448545ioe.26.1586870006115;
- Tue, 14 Apr 2020 06:13:26 -0700 (PDT)
+ (envelope-from <kwolf@redhat.com>) id 1jOLNq-0000qG-AA
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:13:47 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42296
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jOLNq-0000q3-2t
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:13:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586870025;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dBnnOFBSemn/BN7E0K4FWFIpUV+6Zyn7G1T3/Q72ZTY=;
+ b=XxVHPaKRYnmC7oobupPp9MeiixXkfdpMzeN4xJjtt+F5ObyuritDAenplkZvjkWUNdLg6g
+ joMIKTXBNdm8pV4z0IIUzFCZKpvWRGmBbrYecCJszzrehlrW2pm6tPwH7uet4kidguEOcp
+ FHu27wGuX4pvd7DM21d8330rLN5YI4Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-59-vq8xt5OQN_GBwF538pD1gw-1; Tue, 14 Apr 2020 09:13:42 -0400
+X-MC-Unique: vq8xt5OQN_GBwF538pD1gw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9F4A13F7;
+ Tue, 14 Apr 2020 13:13:41 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-1.ams2.redhat.com [10.36.114.1])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B3CB5D9E2;
+ Tue, 14 Apr 2020 13:13:40 +0000 (UTC)
+Date: Tue, 14 Apr 2020 15:13:39 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH for-5.1 1/8] tests-qemu-opts: Cover has_help_option(),
+ qemu_opt_has_help_opt()
+Message-ID: <20200414131339.GE7747@linux.fritz.box>
+References: <20200409153041.17576-1-armbru@redhat.com>
+ <20200409153041.17576-2-armbru@redhat.com>
+ <8ea167d6-2784-1ab9-cf55-52eb7553cb4d@redhat.com>
+ <878siyxwir.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <1586529926-11441-1-git-send-email-sundeep.lkml@gmail.com>
- <1586529926-11441-3-git-send-email-sundeep.lkml@gmail.com>
- <09d13b7c-7a48-4405-fbcd-558e71871ddf@amsat.org>
-In-Reply-To: <09d13b7c-7a48-4405-fbcd-558e71871ddf@amsat.org>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Tue, 14 Apr 2020 18:43:15 +0530
-Message-ID: <CALHRZuqJMk3BeMhKfjCjuEBqQmSFn=oLgXe=Hn0FPXgq1TbTJw@mail.gmail.com>
-Subject: Re: [Qemu devel PATCH v4 2/3] msf2: Add EMAC block to SmartFusion2 SoC
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <878siyxwir.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d42
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,160 +91,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
+Am 14.04.2020 um 11:10 hat Markus Armbruster geschrieben:
+> Eric Blake <eblake@redhat.com> writes:
+>=20
+> > On 4/9/20 10:30 AM, Markus Armbruster wrote:
+> >> The two turn out to be inconsistent for "a,b,,help".  Test case
+> >> marked /* BUG */.
+> >>
+> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >> ---
+> >>   tests/test-qemu-opts.c | 38 ++++++++++++++++++++++++++++++++++++++
+> >>   1 file changed, 38 insertions(+)
+> >>
+> >
+> >> +static void test_has_help_option(void)
+> >> +{
+> >> +    static const struct {
+> >> +        const char *params;
+> >> +        /* expected value of has_help_option() */
+> >> +        bool expect_has_help_option;
+> >> +        /* expected value of qemu_opt_has_help_opt() with implied=3Df=
+alse */
+> >> +        bool expect_opt_has_help_opt;
+> >> +        /* expected value of qemu_opt_has_help_opt() with implied=3Dt=
+rue */
+> >> +        bool expect_opt_has_help_opt_implied;
+> >> +    } test[] =3D {
+> >> +        { "help", true, true, false },
 
-On Sun, Apr 12, 2020 at 11:28 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
->
-> On 4/10/20 4:45 PM, sundeep.lkml@gmail.com wrote:
-> > From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> >
-> > With SmartFusion2 Ethernet MAC model in
-> > place this patch adds the same to SoC.
-> >
-> > Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> > ---
-> >  hw/arm/msf2-soc.c         | 21 ++++++++++++++++++++-
-> >  include/hw/arm/msf2-soc.h |  3 +++
-> >  2 files changed, 23 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
-> > index 588d643..2f2db6d 100644
-> > --- a/hw/arm/msf2-soc.c
-> > +++ b/hw/arm/msf2-soc.c
-> > @@ -35,6 +35,7 @@
->
-> Maybe you also want:
->
-> - * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> + * Copyright (c) 2017-2020 Subbaraya Sundeep <sundeep.lkml@gmail.com>
->
-Ok.
-> >
-> >  #define MSF2_TIMER_BASE       0x40004000
-> >  #define MSF2_SYSREG_BASE      0x40038000
-> > +#define MSF2_EMAC_BASE        0x40041000
-> >
-> >  #define ENVM_BASE_ADDRESS     0x60000000
-> >
-> > @@ -55,6 +56,7 @@ static const uint32_t uart_addr[MSF2_NUM_UARTS] =3D {=
- 0x40000000 , 0x40010000 };
-> >  static const int spi_irq[MSF2_NUM_SPIS] =3D { 2, 3 };
-> >  static const int uart_irq[MSF2_NUM_UARTS] =3D { 10, 11 };
-> >  static const int timer_irq[MSF2_NUM_TIMERS] =3D { 14, 15 };
-> > +static const int emac_irq[MSF2_NUM_EMACS] =3D { 12 };
->
-> Correct.
->
-> >
-> >  static void do_sys_reset(void *opaque, int n, int level)
-> >  {
-> > @@ -81,6 +83,13 @@ static void m2sxxx_soc_initfn(Object *obj)
-> >          sysbus_init_child_obj(obj, "spi[*]", &s->spi[i], sizeof(s->spi=
-[i]),
-> >                            TYPE_MSS_SPI);
-> >      }
-> > +
-> > +    sysbus_init_child_obj(obj, "eth", &s->emac, sizeof(s->emac),
->
-> "eth" -> "tsemac" (or "emac")?
->
-Will change to emac.
-> > +                          TYPE_MSS_EMAC);
-> > +    if (nd_table[0].used) {
-> > +        qemu_check_nic_model(&nd_table[0], TYPE_MSS_EMAC);
-> > +        qdev_set_nic_properties(DEVICE(&s->emac), &nd_table[0]);
-> > +    }
-> >  }
-> >
-> >  static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
-> > @@ -192,6 +201,17 @@ static void m2sxxx_soc_realize(DeviceState *dev_so=
-c, Error **errp)
-> >          g_free(bus_name);
-> >      }
-> >
-> > +    dev =3D DEVICE(&s->emac);
->
-> Can you pass the DMA memory via a link property please?
->
->        object_property_set_link(OBJECT(&s->emac),
->                                 OBJECT(get_system_memory()),
->                                 "ahb-bus", &error_abort);
->
-Okay.
-> > +    object_property_set_bool(OBJECT(&s->emac), true, "realized", &err)=
-;
-> > +    if (err !=3D NULL) {
-> > +        error_propagate(errp, err);
-> > +        return;
-> > +    }
-> > +    busdev =3D SYS_BUS_DEVICE(dev);
-> > +    sysbus_mmio_map(busdev, 0, MSF2_EMAC_BASE);
-> > +    sysbus_connect_irq(busdev, 0,
-> > +                           qdev_get_gpio_in(armv7m, emac_irq[0]));
->
-> Indentation is off.
->
-Will fix
-> > +
-> >      /* Below devices are not modelled yet. */
-> >      create_unimplemented_device("i2c_0", 0x40002000, 0x1000);
-> >      create_unimplemented_device("dma", 0x40003000, 0x1000);
-> > @@ -202,7 +222,6 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc=
-, Error **errp)
-> >      create_unimplemented_device("can", 0x40015000, 0x1000);
-> >      create_unimplemented_device("rtc", 0x40017000, 0x1000);
-> >      create_unimplemented_device("apb_config", 0x40020000, 0x10000);
-> > -    create_unimplemented_device("emac", 0x40041000, 0x1000);
-> >      create_unimplemented_device("usb", 0x40043000, 0x1000);
-> >  }
-> >
-> > diff --git a/include/hw/arm/msf2-soc.h b/include/hw/arm/msf2-soc.h
-> > index 3cfe5c7..296ed03 100644
-> > --- a/include/hw/arm/msf2-soc.h
-> > +++ b/include/hw/arm/msf2-soc.h
-> > @@ -29,12 +29,14 @@
-> >  #include "hw/timer/mss-timer.h"
-> >  #include "hw/misc/msf2-sysreg.h"
-> >  #include "hw/ssi/mss-spi.h"
-> > +#include "hw/net/msf2-emac.h"
-> >
-> >  #define TYPE_MSF2_SOC     "msf2-soc"
-> >  #define MSF2_SOC(obj)     OBJECT_CHECK(MSF2State, (obj), TYPE_MSF2_SOC=
-)
-> >
-> >  #define MSF2_NUM_SPIS         2
-> >  #define MSF2_NUM_UARTS        2
-> > +#define MSF2_NUM_EMACS        1
-> >
-> >  /*
-> >   * System timer consists of two programmable 32-bit
-> > @@ -62,6 +64,7 @@ typedef struct MSF2State {
-> >      MSF2SysregState sysreg;
-> >      MSSTimerState timer;
-> >      MSSSpiState spi[MSF2_NUM_SPIS];
-> > +    MSF2EmacState emac;
->
-> You used 'emac_irq[MSF2_NUM_EMACS]', either use emac[MSF2_NUM_EMACS]
-> here or drop MSF2_NUM_EMACS?
->
-Will drop MSF2_NUM_EMACS.
+While we're talking about unintuitive, I feel the result for
+implied=3Dtrue is confusing, too. Never noticed it before, but are we
+really sure that it is the best possible behaviour that '-chardev help'
+and '-chardev id=3Dfoo,help' print two entirely different help texts?
 
-> >  } MSF2State;
-> >
-> >  #endif
-> >
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+I'm not requesting to change anything about this in this series, but
+just making the point that maybe sometimes the existing behaviour is
+questionable.
 
-Thank you,
-Sundeep
+> >> +        { "helpme", false, false, false },
+> >> +        { "a,help", true, true, true },
+> >> +        { "a=3D0,help,b", true, true, true },
+> >> +        { "help,b=3D1", true, true, false },
+> >> +        { "a,b,,help", false /* BUG */, true, true },
+> >
+> > So which way are you calling the bug?  Without looking at the code but
+> > going off my intuition, I parse this as option 'a' and option
+> > 'b,help'. The latter is not a normal option name because it contains a
+> > ',', but is a valid option value.
+> >
+> > I agree that we have a bug, but I'm not yet sure in which direction
+> > the bug lies (should has_help_option be fixed to report true, in which
+> > case the substring ",help" has precedence over ',,' escaping; or
+> > should qemu_opt_has_help_opt be fixed to report false, due to treating
+> > 'b,help' after ',,' escape removal as an invalid option name).  So the
+> > placement of the /* BUG */ comment matters - where you placed it, I'm
+> > presuming that later in the series you change has_help_option to
+> > return true, even though that goes against my intuitive parse.
+>=20
+> In addition to the canonical QemuOpts parser opts_do_parse(), we have
+> several more, and of course they all differ from the canonical one for
+> corner cases.
+>=20
+> I treat the canonical one as correct, and fix the others by eliminating
+> the extra parsers.
+>=20
+> The others are:
+>=20
+> * has_help_option()
+>=20
+>   Fixed in PATCH 5 by reusing the guts of opts_do_parse().
+>=20
+> * is_valid_option_list()
+>=20
+>   Fixed in PATCH 8 by not parsing.
+>=20
+> * "id" extraction in opts_parse()
+>=20
+>   Lazy hack.  Fixed in PATCH 3 by reusing the guts of opts_do_parse().
+>=20
+> Back to your question: the value of has_help_option() differs from the
+> value of qemu_opt_has_help_opt().  The latter uses the canonical parser,
+> the former is one of the other parsers.  I therefore judge the latter
+> right and the former wrong.
+
+Shouldn't we also consider what users would reasonably expect?
+
+Getting it parsed as an empty option name (I assume with a default value
+of "on"?) certainly looks like something that would surprise most users
+and, as you can see, even some QEMU developers.
+
+Kevin
+
 
