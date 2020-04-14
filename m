@@ -2,120 +2,101 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C38C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41944C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:33:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B5A8206D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:32:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A887206D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:33:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="aKsYy4zI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B5A8206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F2eFQ/kC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A887206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOKjj-0006g8-CQ
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 08:32:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33851)
+	id 1jOKl2-0007tF-52
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 08:33:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jOKi5-0005ME-R2
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:30:38 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOKhe-0004j4-6D
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:30:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jOKi4-00008a-KH
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:30:37 -0400
-Received: from mail-eopbgr60125.outbound.protection.outlook.com
- ([40.107.6.125]:20128 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jOKi1-00006z-Vh; Tue, 14 Apr 2020 08:30:34 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P3HqN2A3N68vQSWvDqBs8tisbXkMMM/PBtVgQl+uEQXCT83a44cbMAPNlbL+k++n0Gclg+3mq8lG7NX1pWF7J/pzC+oPnXC2J+t1i1N2lGR6NvkMzTkGvj6qnBnwSVJ3MlIkeRD85eglxEOZrz9NtKM6hzkiaNF/A0RuigxXmzmcc3owj8DvlIi6+fXQlTLQ0HYpxMXx+1en2lJr5Rj6Gzj/cZD5GpPQpwXd5UoTGebZeARyDWLChTtiN4cqpvHoQc0e51MR5Ouivgf5naz7b051/k73w6kdg4JfbnG0BRZM4qpV1r0kzu2M2CTGAqEqTsVnMyAyFSsS39gcin8HCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6yfdxGS2onUM0lP77u0GGGzf6WDIWApqBmoHhqZ1aiA=;
- b=b3+3dOsYrMQjnf3uHVHH3eHMhgNmEhecEEBlXKdN+Xs7ATWOEyh9YBZGtUNKBhfFANCa6qE338VgRDJi6lMqwFLXo7Cj5sGdMJbRW2BVLEmNlAj5AKVdqlwZeB35rrWS7SB05KwoBCOBDzdC71xCsM23TZ6oxZuPYOkFbBfDIEhFoToe+v0E8aeei8NWEsuHI24qQVoNnhScJe/81KwRhTzSvLxujgouPe1Ch61m2/Nsmg35RXVx37xT7BBkyVST4rXOnTypdwo8BPR0nuaatF84m1csk4cRql9rEQZqXWMtg37YD2QkK+YE7YrzGLTRw6lM92FDRLD4ARdGz1AJDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6yfdxGS2onUM0lP77u0GGGzf6WDIWApqBmoHhqZ1aiA=;
- b=aKsYy4zI415FasjaYZeP4GKhrdj7E6O/5iRcXLbe7nZHO3uVPk0om4DfvHaDiq2pf2dIEwlJezEMeGiVNhCeSO2gbvtINHtlw04hT+ae1lDYdWE9hE6oyDVUx/htXdDJJZyR6UaLFzn8IG7+QlSJ0A066N/Frk1cx2Vhds/lIn8=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5367.eurprd08.prod.outlook.com (2603:10a6:20b:dd::15)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.15; Tue, 14 Apr
- 2020 12:30:32 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.2900.028; Tue, 14 Apr 2020
- 12:30:32 +0000
-Subject: Re: [PATCH v4 14/30] qcow2: Add cluster type parameter to
- qcow2_get_host_offset()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1584468723.git.berto@igalia.com>
- <348c0b057802b5b35eefe3dc7cc8ef2964024ed5.1584468723.git.berto@igalia.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200414153030110
-Message-ID: <ec5d4b90-b491-4173-a080-7e607a7b9f82@virtuozzo.com>
-Date: Tue, 14 Apr 2020 15:30:30 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <348c0b057802b5b35eefe3dc7cc8ef2964024ed5.1584468723.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR06CA0107.eurprd06.prod.outlook.com
- (2603:10a6:208:fa::48) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <philmd@redhat.com>) id 1jOKhc-0008JT-Jw
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:30:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20053
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOKhc-0008JE-G4
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:30:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586867408;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=mRy3uiNfqn1wYKIgSvGw0/w0aZlVZpMzMPmvZODeLMU=;
+ b=F2eFQ/kCvt3nb0cakpnGhdFHniteHbSOu2vSk3fPI7nK7+TU13ZO4mqYRB2dQPA2DOEdX0
+ vhV2EFxeRPLsDJolQio6tDmhU31KDHf541ncYZ7ORolkwMotCAcdvKV+9cJNg4VMcVXakW
+ 2WwjGTbsZCc3bKqJpe46Ogpzuw76JnY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-_d8jbpChOTGAbtckpBZTMw-1; Tue, 14 Apr 2020 08:30:06 -0400
+X-MC-Unique: _d8jbpChOTGAbtckpBZTMw-1
+Received: by mail-wm1-f71.google.com with SMTP id c129so3689771wme.8
+ for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 05:30:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=89f3HfIxGtyCwGbicp7SH5wF0RbSJiR4Pg4t8CjkheE=;
+ b=ZI4+JPnAtz5k2ZcdPBRAdBq3oSd+eRWqxeAfB2T5YJSrs74JOiE/wN9E2eAqRGJS1n
+ AvqtoDTht1U1HeOk5Q6jUgvYbNIVxJii855qYay5Bi3S8o6TLiSVCHX1UbrN9J2EXCT6
+ 0IwiXHD/GpB9bQeRweat8JtpwjrpNyx2cdgxRpdxMk770aPpimZ1M2VT9jpvwqSI542w
+ Ois4tOtQlBHxAOaVtkGaa002vdj5Ju+VGwRp/ub/Ck4qn0RIR4wlLNyLF53MR70kfSUh
+ z0PC8XvkR4MzdjmTvvM96/CQ0rHhysFRCmxcM9gTDhyS0HmbosittXY0vAAiiH2Wx8K9
+ 3VxA==
+X-Gm-Message-State: AGi0PuZawM2+hflJOiEBYLEqY/6ds5N6rzU8AmWIkaI2gix2UGiakgF1
+ Htu/gkhvQfn5c5MUyHk57NFUETI5EAXePF2ukwswPqr3XUaGj9OqoSZPEkfE32Fbt9itF2Vf4wJ
+ vTwQdGwIgDL76Y2A=
+X-Received: by 2002:adf:e4c5:: with SMTP id v5mr7663261wrm.143.1586867405082; 
+ Tue, 14 Apr 2020 05:30:05 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKSkvSeGEjNJliPtICYSPNogxdsHPBFjxKxE8EijFmahDArIrB3cHQWfl0UKLFkZM4opDF42Q==
+X-Received: by 2002:adf:e4c5:: with SMTP id v5mr7663206wrm.143.1586867404770; 
+ Tue, 14 Apr 2020 05:30:04 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id p5sm20566572wrg.49.2020.04.14.05.30.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 14 Apr 2020 05:30:04 -0700 (PDT)
+Subject: Re: [PATCH-for-5.1 v3 02/24] scripts/coccinelle: Script to simplify
+ DeviceClass error propagation
+To: Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20200412223619.11284-1-f4bug@amsat.org>
+ <20200412223619.11284-3-f4bug@amsat.org> <875ze2tfvc.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <23ad6d04-1f42-29b8-caa6-6506cf1b7422@redhat.com>
+Date: Tue, 14 Apr 2020 14:30:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.131) by
- AM0PR06CA0107.eurprd06.prod.outlook.com (2603:10a6:208:fa::48) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2900.17 via Frontend Transport; Tue, 14 Apr 2020 12:30:31 +0000
-X-Tagtoolbar-Keys: D20200414153030110
-X-Originating-IP: [185.215.60.131]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 83709e35-908c-4ae4-26e7-08d7e06f9f80
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5367:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5367B697E1FABBAB2768BB71C1DA0@AM7PR08MB5367.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:486;
-X-Forefront-PRVS: 0373D94D15
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(136003)(39830400003)(376002)(396003)(366004)(346002)(66946007)(6486002)(478600001)(5660300002)(31686004)(31696002)(8676002)(66556008)(8936002)(81156014)(2906002)(66476007)(16526019)(86362001)(54906003)(52116002)(4326008)(186003)(16576012)(956004)(2616005)(107886003)(316002)(26005)(36756003);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: oFfEzKoWvCCK23mdD+QxBllqCgM3RWeks+8FJYPqzcg7nK0TSLatNu8A63w30wvorsMmitPi2fJfCQHGOcVvu1EIxySlxs7z6hQEVp6GujL5UkmdhpsDeV7Mlz4IG80+COFVXQAIFPbTTFyqLjmCXnWIrw7ychTL0/cZcTOHMXCkpmHt4lwu0MHhGcpSihz1AEnirK7WrJcei5IftpX301yhiH1Vrn+EeXBut9DyDn7cf4z7aywwBATQr9FSIyMZQiGmyQWAYzWnS24x9Ljk1RN/rIwVdfCCvJXnS46AHFSB5AHRL+C7RRDW6uj2XiLjpp/GaJpXtfgzovEtDT/VwfGfgDv1UiDLZRt2hlKEZOak/qj3aiOxnY3Oxq6zja3OQWGhfgc7DIsFDe85cZfQEDtOfk8+G8qCNCSMgwLdESK1iSA/4WsL8Ts22ACWn4Jo
-X-MS-Exchange-AntiSpam-MessageData: XknxvFLvOrpeqIBstlrrGnfQd8r769npcwg8edIHF2VLnZrPDvYuNyqm8wAhbFFm/AnnWVFEJolGKLZnmzL/tNoxVPB3Dj+l9p/QA86AQvLL+lp0dXvRx36YeqXm/ldIvyrNiB5NJCUEoBsS2lpK9g==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 83709e35-908c-4ae4-26e7-08d7e06f9f80
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2020 12:30:31.9327 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WczUL4nVvMEDX6aPhz9Yn+arr04/4HuPcvmFddLtCmI79hMzLCHE+v4jVYS64+IRrqo9aA6kaX4LPD1PCBmjaY5VVkv8zVjeZ8WtTTq200A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5367
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.6.125
+In-Reply-To: <875ze2tfvc.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,99 +108,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-block@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-riscv@nongnu.org, Andrew Jeffery <andrew@aj.id.au>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-17.03.2020 21:16, Alberto Garcia wrote:
-> This function returns an integer that can be either an error code or a
-> cluster type (a value from the QCow2ClusterType enum).
-> 
-> We are going to start using subcluster types instead of cluster types
-> in some functions so it's better to use the exact data types instead
-> of integers for clarity and in order to detect errors more easily.
-> 
-> This patch makes qcow2_get_host_offset() return 0 on success and
-> puts the returned cluster type in a separate parameter. There are no
-> semantic changes.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->   block/qcow2.h         |  3 ++-
->   block/qcow2-cluster.c | 11 +++++++----
->   block/qcow2.c         | 37 ++++++++++++++++++++++---------------
->   3 files changed, 31 insertions(+), 20 deletions(-)
-> 
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index 52865787ee..6b7b286b91 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
+On 4/14/20 2:24 PM, Markus Armbruster wrote:
+> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+>=20
+>> When a device uses an Error* with data not modified before realize(),
+>> this call can be moved to init(). Add a Coccinelle patch to find such
+>> uses.
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>>   ...implify-init-realize-error_propagate.cocci | 69 +++++++++++++++++++
+>>   MAINTAINERS                                   |  1 +
+>>   2 files changed, 70 insertions(+)
+>>   create mode 100644 scripts/coccinelle/simplify-init-realize-error_prop=
+agate.cocci
+>>
+>> diff --git a/scripts/coccinelle/simplify-init-realize-error_propagate.co=
+cci b/scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+>> new file mode 100644
+>> index 0000000000..2e3ec4d98a
+>> --- /dev/null
+>> +++ b/scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+>> @@ -0,0 +1,69 @@
+>> +// Find error-propagation calls that don't need to be in DeviceClass::r=
+ealize()
+>> +// because they don't use information user can change before calling re=
+alize(),
+>> +// so they can be moved to DeviceClass:initfn() where error propagation=
+ is not
+>> +// needed.
+>> +//
+>> +// Copyright: (C) 2020 Philippe Mathieu-Daud=C3=A9
+>> +// This work is licensed under the terms of the GNU GPLv2 or later.
+>> +//
+>> +// spatch \
+>> +//  --macro-file scripts/cocci-macro-file.h \
+>> +//  --sp-file \
+>> +//    scripts/coccinelle/simplify-init-realize-error_propagate.cocci \
+>> +//  --timeout 60
+>> +//
+>> +// Inspired by https://www.mail-archive.com/qemu-devel@nongnu.org/msg69=
+2500.html
+>> +
+>> +
+>> +@ match_class_init @
+>> +TypeInfo info;
+>> +identifier class_initfn;
+>> +@@
+>> +    info.class_init =3D class_initfn;
+>> +
+>> +
+>> +@ match_instance_init @
+>> +TypeInfo info;
+>> +identifier instance_initfn;
+>> +@@
+>> +    info.instance_init =3D instance_initfn;
+>> +
+>> +
+>> +@ match_realize @
+>> +identifier match_class_init.class_initfn;
+>> +DeviceClass *dc;
+>> +identifier realizefn;
+>> +@@
+>> +void class_initfn(...)
+>> +{
+>> +    ...
+>> +    dc->realize =3D realizefn;
+>> +    ...
+>> +}
+>=20
+> I'm afraid this misses realize() methods of DeviceClass subclasses.
+> Consider PCI device "i6300esb" (picked just because it's simple).
+>=20
+> pci_device_class_init() sets DeviceClass method realize() to
+> pci_qdev_realize().  pci_qdev_realize() does the work common to all PCI
+> devices, and calls PCIDeviceClass method realize() for the work specific
+> to the PCI device at hand.
+>=20
+> i6300esb_class_init() sets PCIDeviceClass method realize() to
+> i6300esb_realize().
+>=20
+> Your first rule should match i6300esb_info alright, and thus identify
+> i6300esb_class_init() as a class_init() method.
+>=20
+> But your third rule can't match i6300esb_class_init()'s
+>=20
+>      k->realize =3D i6300esb_realize;
+>=20
+> because @k is a PCIDeviceClass, not a DeviceClass.
+>=20
+> I think it also misses cases that have a realize(), but no
+> instance_init().
+>=20
+> Finding only some instances of an anti-pattern can still be useful.  But
+> you should explain the script's limitations then, both in the script and
+> the commit message.
 
+OK.
 
-[..]
+>=20
+>> +
+>> +
+>> +@ propagate_in_realize @
+>> +identifier match_realize.realizefn;
+>> +identifier err;
+>> +identifier errp;
+>> +identifier func_with_errp =3D~ "(?!object_property_set_link)";
+>=20
+> What are you trying to accomplish with this lookahead assertion?
 
-> @@ -3716,6 +3719,7 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
->       if (head || tail) {
->           uint64_t off;
->           unsigned int nr;
-> +        QCow2ClusterType type;
->   
->           assert(head + bytes <= s->cluster_size);
->   
-> @@ -3731,10 +3735,11 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
->           offset = QEMU_ALIGN_DOWN(offset, s->cluster_size);
->           bytes = s->cluster_size;
->           nr = s->cluster_size;
-> -        ret = qcow2_get_host_offset(bs, offset, &nr, &off);
-> -        if (ret != QCOW2_CLUSTER_UNALLOCATED &&
-> -            ret != QCOW2_CLUSTER_ZERO_PLAIN &&
-> -            ret != QCOW2_CLUSTER_ZERO_ALLOC) {
-> +        ret = qcow2_get_host_offset(bs, offset, &nr, &off, &type);
+"match all func_with_errp() except object_property_set_link()"?
 
-pre-patch, but probably better to return original errno on qcow2_get_host_offset failure, instead of masking it.
+>=20
+>> +symbol error_abort, error_fatal;
+>> +position pos;
+>> +@@
+>> +void realizefn@pos(..., Error **errp)
+>> +{
+>> +    ...
+>> +    Error *err =3D NULL;
+>=20
+> Why is this line required for a match?
 
-> +        if (ret < 0 ||
-> +            (type != QCOW2_CLUSTER_UNALLOCATED &&
-> +             type != QCOW2_CLUSTER_ZERO_PLAIN &&
-> +             type != QCOW2_CLUSTER_ZERO_ALLOC)) {
->               qemu_co_mutex_unlock(&s->lock);
->               return -ENOTSUP;
->           }
-> @@ -3792,16 +3797,18 @@ qcow2_co_copy_range_from(BlockDriverState *bs,
->   
->       while (bytes != 0) {
->           uint64_t copy_offset = 0;
-> +        QCow2ClusterType type;
->           /* prepare next request */
->           cur_bytes = MIN(bytes, INT_MAX);
->           cur_write_flags = write_flags;
->   
-> -        ret = qcow2_get_host_offset(bs, src_offset, &cur_bytes, &copy_offset);
-> +        ret = qcow2_get_host_offset(bs, src_offset, &cur_bytes,
-> +                                    &copy_offset, &type);
->           if (ret < 0) {
->               goto out;
->           }
->   
-> -        switch (ret) {
-> +        switch (type) {
->           case QCOW2_CLUSTER_UNALLOCATED:
->               if (bs->backing && bs->backing->bs) {
->                   int64_t backing_length = bdrv_getlength(bs->backing->bs);
-> 
-Hmm, just noted that in case of bdrv_co_copy_range_from failure below, we do mutex lock/unlock for nothing.
+Hmmm maybe I was expecting a local_err... else a left-over from previous=20
+intents :)
 
-I think, we want mutex lock/unlock just around qcow2_co_preadv_part() call, like in  qcow2_co_preadv_part above().
+>=20
+>> +    <+...
+>> +    func_with_errp(..., \(&error_abort\|&error_fatal\));
+>> +    ...+>
+>> +}
+>> +
+>> +
+>> +@ script:python @
+>> +initfn << match_instance_init.instance_initfn;
+>> +realizefn << match_realize.realizefn;
+>> +p << propagate_in_realize.pos;
+>> +@@
+>> +print('>>> possible moves from {}() to {}() in {}:{}'
+>> +      .format(initfn, realizefn, p[0].file, p[0].line))
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 642c8e0b6b..6203543ec0 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -2058,6 +2058,7 @@ F: scripts/coccinelle/err-bad-newline.cocci
+>>   F: scripts/coccinelle/error-use-after-free.cocci
+>>   F: scripts/coccinelle/error_propagate_null.cocci
+>>   F: scripts/coccinelle/remove_local_err.cocci
+>> +F: scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+>>   F: scripts/coccinelle/use-error_fatal.cocci
+>>  =20
+>>   GDB stub
+>=20
 
-I can send a refactoring patch..
-
-Anyway, patch itself is OK:
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
--- 
-Best regards,
-Vladimir
 
