@@ -2,86 +2,73 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC05C38A2C
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:25:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3033BC2BB86
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:26:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B59B42084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:25:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y5vwu9xu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B59B42084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 07AAD20732
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:26:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07AAD20732
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOKdY-0001gk-TQ
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 08:25:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32833)
+	id 1jOKe1-0002EX-8f
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 08:26:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32898)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jOKc4-0008Oh-N1
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:24:27 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jOKcF-0000C2-QF
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:24:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jOKc3-0004wE-8k
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:24:24 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38654
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOKc3-0004q0-4p
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:24:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586867061;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wXoNTxagrBENC/0KW0iW+MvxrJXef9bprCdqYiXxfTw=;
- b=Y5vwu9xu25aDDIWOGtabikNOBe8IhP1jjlumDbSOXR2f8JLjl6L/L6VriF7LWyN+Lg0ShZ
- eXS4wiulO1lWJaeAhCpiTiULYj4j22pgBn7VaKuaJaH99lDGd0KcAK1P/4r24qWxcByHSB
- DI5Pn1+extfKUFFfYsDZXkwQHB66EgE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-ot-gVnUZMz-i6wegAri9kw-1; Tue, 14 Apr 2020 08:24:13 -0400
-X-MC-Unique: ot-gVnUZMz-i6wegAri9kw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D33FC10509AB;
- Tue, 14 Apr 2020 12:24:09 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
- [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C2E8060BE2;
- Tue, 14 Apr 2020 12:24:08 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 49D4011385C8; Tue, 14 Apr 2020 14:24:07 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH-for-5.1 v3 02/24] scripts/coccinelle: Script to simplify
- DeviceClass error propagation
-References: <20200412223619.11284-1-f4bug@amsat.org>
- <20200412223619.11284-3-f4bug@amsat.org>
-Date: Tue, 14 Apr 2020 14:24:07 +0200
-In-Reply-To: <20200412223619.11284-3-f4bug@amsat.org> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 13 Apr 2020 00:35:57
- +0200")
-Message-ID: <875ze2tfvc.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jOKcD-000561-Um
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:24:35 -0400
+Received: from mail-yb1-f196.google.com ([209.85.219.196]:39988)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jOKcD-00053o-D3; Tue, 14 Apr 2020 08:24:33 -0400
+Received: by mail-yb1-f196.google.com with SMTP id f13so5343713ybk.7;
+ Tue, 14 Apr 2020 05:24:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=EvplgF3+KjWKqP1BAyGxZLksNkOi6W16UFUmN+P+rTw=;
+ b=PuTUcdcrlXlZxgnW8WkEJagGDhLnPO0PvgeRHUrodZVCJ3Ib0sPc8xsG6iX2NBe85C
+ K07KGeX+YXKfc7KSGcN+9RDtPh4JtKuCH/Sxl4Gh2n8mFgPgddJIL3U9SPDoMIrioRAJ
+ D8mNziaZ1sQMey0RvVIAalVW/rcySPocisP0bWkWQPIGDgP+vChmGMCMAvHkPTcsvByN
+ m+254pVknWwnzwFFwS8KbLDMgradrQTnwysCxGpBhczdxoy62PKmIXmXNOFICX+JHEmo
+ pn3yIyBZmjpaQj7GhS60y71sHgfIafflsAAFyZ8kQIaxGv0yP0eLhKsE29a4iGY0WfLU
+ wmqA==
+X-Gm-Message-State: AGi0Pub5VhC6cz5GGsyRGMaCoZwvhaolyqXtoMVdbuW+03OBpaGrqGsO
+ KHWfxk7rFs7LOt6FYeqGopdPSgKdO/MPn+ILdi0=
+X-Google-Smtp-Source: APiQypLH+egm6x4eUDPR2koFJzmqSuZIBARE0XflOzpjOdkwbOEm/3zColNqA/v4em9UcBzkwFPPKfdHKrXV5PBP3zo=
+X-Received: by 2002:a5b:84c:: with SMTP id v12mr22570221ybq.483.1586867072667; 
+ Tue, 14 Apr 2020 05:24:32 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+References: <20200412212943.4117-1-f4bug@amsat.org>
+ <20200412212943.4117-4-f4bug@amsat.org>
+ <20200412233308.GS7926@lianli.shorne-pla.net>
+ <d2e08a54-a020-1d46-fb88-65f5bb78156f@amsat.org>
+In-Reply-To: <d2e08a54-a020-1d46-fb88-65f5bb78156f@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 14 Apr 2020 14:24:21 +0200
+Message-ID: <CAAdtpL7FBjzxr9CSMoGd_q8rzm4tr-BwUp8HmmDjrM1DXPSq8A@mail.gmail.com>
+Subject: Re: [PATCH-for-5.0? 3/3] hw/openrisc/pic_cpu: Use qdev gpio rather
+ than qemu_allocate_irqs()
+To: Stafford Horne <shorne@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 209.85.219.196
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,174 +80,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Max Reitz <mreitz@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Joel Stanley <joel@jms.id.au>,
- =?utf-8?Q?Marc-Andr?= =?utf-8?Q?=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
- Peter Chubb <peter.chubb@nicta.com.au>,
- =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-riscv@nongnu.org, Andrew Jeffery <andrew@aj.id.au>,
- Wen Congyang <wencongyang2@huawei.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>, John Snow <jsnow@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
-
-> When a device uses an Error* with data not modified before realize(),
-> this call can be moved to init(). Add a Coccinelle patch to find such
-> uses.
+On Mon, Apr 13, 2020 at 11:15 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  ...implify-init-realize-error_propagate.cocci | 69 +++++++++++++++++++
->  MAINTAINERS                                   |  1 +
->  2 files changed, 70 insertions(+)
->  create mode 100644 scripts/coccinelle/simplify-init-realize-error_propag=
-ate.cocci
+> Hi Stafford,
 >
-> diff --git a/scripts/coccinelle/simplify-init-realize-error_propagate.coc=
-ci b/scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-> new file mode 100644
-> index 0000000000..2e3ec4d98a
-> --- /dev/null
-> +++ b/scripts/coccinelle/simplify-init-realize-error_propagate.cocci
-> @@ -0,0 +1,69 @@
-> +// Find error-propagation calls that don't need to be in DeviceClass::re=
-alize()
-> +// because they don't use information user can change before calling rea=
-lize(),
-> +// so they can be moved to DeviceClass:initfn() where error propagation =
-is not
-> +// needed.
-> +//
-> +// Copyright: (C) 2020 Philippe Mathieu-Daud=C3=A9
-> +// This work is licensed under the terms of the GNU GPLv2 or later.
-> +//
-> +// spatch \
-> +//  --macro-file scripts/cocci-macro-file.h \
-> +//  --sp-file \
-> +//    scripts/coccinelle/simplify-init-realize-error_propagate.cocci \
-> +//  --timeout 60
-> +//
-> +// Inspired by https://www.mail-archive.com/qemu-devel@nongnu.org/msg692=
-500.html
-> +
-> +
-> +@ match_class_init @
-> +TypeInfo info;
-> +identifier class_initfn;
-> +@@
-> +    info.class_init =3D class_initfn;
-> +
-> +
-> +@ match_instance_init @
-> +TypeInfo info;
-> +identifier instance_initfn;
-> +@@
-> +    info.instance_init =3D instance_initfn;
-> +
-> +
-> +@ match_realize @
-> +identifier match_class_init.class_initfn;
-> +DeviceClass *dc;
-> +identifier realizefn;
-> +@@
-> +void class_initfn(...)
-> +{
-> +    ...
-> +    dc->realize =3D realizefn;
-> +    ...
-> +}
+> On 4/13/20 1:33 AM, Stafford Horne wrote:
+> > On Sun, Apr 12, 2020 at 11:29:43PM +0200, Philippe Mathieu-Daud=C3=A9 w=
+rote:
+> >> Switch to using the qdev gpio API which is preferred over
+> >> qemu_allocate_irqs(). Doing so we also stop leaking the
+> >> allocated memory. One step to eventually deprecate and
+> >> remove qemu_allocate_irqs() one day.
+> >>
+> >> Patch created mechanically using spatch with this script
+> >> inspired from commit d6ef883d9d7:
+> >>
+> >>   @@
+> >>   typedef qemu_irq;
+> >>   identifier irqs, handler;
+> >>   expression opaque, count, i;
+> >>   @@
+> >>   -   qemu_irq *irqs;
+> >>       ...
+> >>   -   irqs =3D qemu_allocate_irqs(handler, opaque, count);
+> >>   +   qdev_init_gpio_in(DEVICE(opaque), handler, count);
+> >>       <+...
+> >>   -   irqs[i]
+> >>   +   qdev_get_gpio_in(DEVICE(opaque), i)
+> >>       ...+>
+> >>   ?-  g_free(irqs);
+> >>
+> >> Inspired-by: Peter Maydell <peter.maydell@linaro.org>
+> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >> ---
+> >>  hw/openrisc/pic_cpu.c | 5 ++---
+> >>  1 file changed, 2 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/hw/openrisc/pic_cpu.c b/hw/openrisc/pic_cpu.c
+> >> index 36f9350830..4b0c92f842 100644
+> >> --- a/hw/openrisc/pic_cpu.c
+> >> +++ b/hw/openrisc/pic_cpu.c
+> >> @@ -52,10 +52,9 @@ static void openrisc_pic_cpu_handler(void *opaque, =
+int irq, int level)
+> >>  void cpu_openrisc_pic_init(OpenRISCCPU *cpu)
+> >>  {
+> >>      int i;
+> >> -    qemu_irq *qi;
+> >> -    qi =3D qemu_allocate_irqs(openrisc_pic_cpu_handler, cpu, NR_IRQS)=
+;
+> >> +    qdev_init_gpio_in(DEVICE(cpu), openrisc_pic_cpu_handler, NR_IRQS)=
+;
+> >>
+> >>      for (i =3D 0; i < NR_IRQS; i++) {
+> >> -        cpu->env.irq[i] =3D qi[i];
+> >> +        cpu->env.irq[i] =3D qdev_get_gpio_in(DEVICE(cpu), i);
+> >>      }
+> >>  }
+> >
+> > This looks fine to me.
+> >
+> > Why do you have the '5.0?' in the subject?
+>
+> Simply because similar commit d6ef883d9d7 was merged in 5.0-rc1 (and it
+> fixes a bug reported by Coverity, I'm not sure why Coverity didn't
+> reported this too).
 
-I'm afraid this misses realize() methods of DeviceClass subclasses.
-Consider PCI device "i6300esb" (picked just because it's simple).
+Actually Coverity reported this issue as CID1421934 "Resource leak" on
+2020-03-19 18:52:20.
 
-pci_device_class_init() sets DeviceClass method realize() to
-pci_qdev_realize().  pci_qdev_realize() does the work common to all PCI
-devices, and calls PCIDeviceClass method realize() for the work specific
-to the PCI device at hand.
+  The system resource will not be reclaimed and reused, reducing the
+future availability of the resource.
+  In cpu_openrisc_pic_init: Leak of memory or pointers to system
+resources (CWE-404)
 
-i6300esb_class_init() sets PCIDeviceClass method realize() to
-i6300esb_realize().
-
-Your first rule should match i6300esb_info alright, and thus identify
-i6300esb_class_init() as a class_init() method.
-
-But your third rule can't match i6300esb_class_init()'s
-
-    k->realize =3D i6300esb_realize;
-
-because @k is a PCIDeviceClass, not a DeviceClass.
-
-I think it also misses cases that have a realize(), but no
-instance_init().
-
-Finding only some instances of an anti-pattern can still be useful.  But
-you should explain the script's limitations then, both in the script and
-the commit message.
-
-> +
-> +
-> +@ propagate_in_realize @
-> +identifier match_realize.realizefn;
-> +identifier err;
-> +identifier errp;
-> +identifier func_with_errp =3D~ "(?!object_property_set_link)";
-
-What are you trying to accomplish with this lookahead assertion?
-
-> +symbol error_abort, error_fatal;
-> +position pos;
-> +@@
-> +void realizefn@pos(..., Error **errp)
-> +{
-> +    ...
-> +    Error *err =3D NULL;
-
-Why is this line required for a match?
-
-> +    <+...
-> +    func_with_errp(..., \(&error_abort\|&error_fatal\));
-> +    ...+>
-> +}
-> +
-> +
-> +@ script:python @
-> +initfn << match_instance_init.instance_initfn;
-> +realizefn << match_realize.realizefn;
-> +p << propagate_in_realize.pos;
-> +@@
-> +print('>>> possible moves from {}() to {}() in {}:{}'
-> +      .format(initfn, realizefn, p[0].file, p[0].line))
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 642c8e0b6b..6203543ec0 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2058,6 +2058,7 @@ F: scripts/coccinelle/err-bad-newline.cocci
->  F: scripts/coccinelle/error-use-after-free.cocci
->  F: scripts/coccinelle/error_propagate_null.cocci
->  F: scripts/coccinelle/remove_local_err.cocci
-> +F: scripts/coccinelle/simplify-init-realize-error_propagate.cocci
->  F: scripts/coccinelle/use-error_fatal.cocci
-> =20
->  GDB stub
-
+>
+> >
+> > -Stafford
+> >
 
