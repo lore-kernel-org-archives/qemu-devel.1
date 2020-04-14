@@ -2,88 +2,82 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18576C2BB85
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72F84C352BE
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:13:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB8F520767
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:12:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4109520767
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:13:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HlGtoP8h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB8F520767
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a25EJJ/e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4109520767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOP6Y-0006i9-2g
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 13:12:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41392)
+	id 1jOP7a-00088k-BH
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 13:13:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41952)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jOOzY-0003ye-3I
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:04:57 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jOP0U-0006My-U5
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jOOzW-0005L3-Vr
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:04:56 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46889)
+ (envelope-from <peter.maydell@linaro.org>) id 1jOP0T-0006AR-Oj
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:05:54 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35317)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jOMql-00047Q-UE
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 10:47:44 -0400
-Received: by mail-pf1-x443.google.com with SMTP id m21so1026pff.13
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 07:47:43 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jONwd-0006dy-2B
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 11:57:52 -0400
+Received: by mail-oi1-x243.google.com with SMTP id b7so8253932oic.2
+ for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 08:57:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6zBODJds4+fSTJpYuEtmzFzjzEaKbjVXEFHVqO+Gaqo=;
- b=HlGtoP8hEKRc1QZED6Q1w6frytsbMTjixH+IopFibt8RgaC1filGd/sKRKAJcZEq1D
- QKmGMitNsZdKOVQuh6pbp6bwGJsk2uRbMqj3+k6tNWR4orp06j91jH+lp8voFltpFZ6e
- 6WAQc86PX+L9bqBq9ZZ/DNSP/lQXwvrwPnvNv9/gfca4YDpkVQwLH77HV4GI/J4irgcX
- IhMd9F8CNwwSvimZtUaqq5s7pUOkTeYnsZuD477WAViKyTHWOB3Gl7nOxE83GvbutVqq
- fXVU5AVIq4edWDIYjY0BNmWzEZ5MozOU478ERX23ecAmyAkknPkxpOlcf3cfauMmiGRp
- Q/lQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=L8FR74iMrVNmAQJ041jH/wKttuH5XlivU6A83idZbXM=;
+ b=a25EJJ/e+cr0CtuOgm9emVAHTSBvgzs4I1BQgbBzn0UkPRdwQuREMLrryfpZSYIa7R
+ muXV5EIUqdDQEW4Iih1xc7ipBAG/q3LwP9akl1UfXTNj7O7ekhYx72yj2YMijtZrmKe5
+ cwqCAjRxgmwzYZOPjbAy71Ho656aClE5Tq+TWhS4uGj7KLIRchKj7BcSAknzYNwvAL9R
+ pBz+kt9zObiYtpoSJW8hoB9eqKgxGPM95ml6jpScTV5QOEb8w3fw0MLwKo2t4wAO7ZPx
+ CEIWLwF473kScQxEwDXCgNwFtYZCmJhROIlLoDx1vN0/IrxS2Ei5fyQVVPzqFsXVDIy/
+ 34Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6zBODJds4+fSTJpYuEtmzFzjzEaKbjVXEFHVqO+Gaqo=;
- b=P6bKnszgJPirQFYWMPqh+xX9CAHo1wP9F8B5xoA+uW1p5D7Qnx4h2biqBRZ1rWqHlZ
- 7B3RYWW6sPIeUBRC7qIsN5G59JYWLb4b5BVzTIAA1YXUpn/rx0dtE3L+44Txq5SRVy4z
- coomm8zdZd7dOwkgos1RghRhpOkoBvJ54draQphUY1LneJ53fOZ4/12yyb2/RGfiqD4f
- zwkwS1x/a1Lrg8gSeU3Qc/fWiRRXcJFobfGmnrtoO+ablIQPH3RgG0DjKX6eJGuhr9r4
- osj7GjdsR76+9Q2ptAKde55ZREi3qQJeaUZxWRMbG+XMfTh9MN8td112fDHSx82nymup
- PZvQ==
-X-Gm-Message-State: AGi0PuZk+p73hsudmeho1EheZLFhec4/Lh4+LdYsO93z7k8MCeVolhu7
- gx0vQJwLX/7v/UbOCjp1U3Yt+w==
-X-Google-Smtp-Source: APiQypJQ4YR2BY2wYRkv2TRiwBc3oA8Ql7QWV/mqQj3xWZApBb8yBWwJPOHPqx3yKuEp0gmsseT/EA==
-X-Received: by 2002:a62:e414:: with SMTP id r20mr22767777pfh.96.1586875662596; 
- Tue, 14 Apr 2020 07:47:42 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id r28sm5007678pfg.186.2020.04.14.07.47.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 14 Apr 2020 07:47:41 -0700 (PDT)
-Subject: Re: [PATCH RFC] target/arm: Implement SVE2 MATCH, NMATCH
-To: Stephen Long <steplong@quicinc.com>, qemu-devel@nongnu.org
-References: <20200413234224.12005-1-steplong@quicinc.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <895cd38f-f957-5328-6b61-c6f2b0d02788@linaro.org>
-Date: Tue, 14 Apr 2020 07:47:39 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=L8FR74iMrVNmAQJ041jH/wKttuH5XlivU6A83idZbXM=;
+ b=KOv82QzwOu8Hs/nV/ZEwzDyc/96eIbB6lrHI1oMC8P2Crt6rp37emYuvrSs0Tlh12D
+ H9xVdLRuaWeGeow+z7ePgKh281VdABRuxoz+ZEBmQLpWsLq2kF51ALqfxOtDNGwkiQUt
+ FfQOjyNecAWUr71In8d/fxWnaF27WmKo9YGLm8PUrGcTyIvZUY5zTsk2HZLQPq3qUmbe
+ tQCP98l17Iz9RVC9BkcWogSEfv3slTTJVJAYo/0kRL6HAI2U2QQt3D1bCCkQ/MswmQ/k
+ i+dGFR2xDq7HPKKHocX+v74MvI/PwO28a+B1xABo3pAO6fbGM4UqRlr/JvYiCA/M7Jmi
+ RIeQ==
+X-Gm-Message-State: AGi0PuYSl3K/y1qWjs7q1MD2O4x/B04iIEKzFjOhseOJTyWhte51lTx4
+ /Z5NfpNckdhHfMwbCj5YnrjzQdhH0vjO7QRYdpa/Cw==
+X-Google-Smtp-Source: APiQypK2Nwh/0pRC13UrnKBEBWv9WeabLbHZANGRvl4gHbQ5pqTRFwO+g40gkr6Jun0URTtsJCakrZnj5lLIaiGPGhU=
+X-Received: by 2002:aca:f3c2:: with SMTP id r185mr5031317oih.163.1586879870030; 
+ Tue, 14 Apr 2020 08:57:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200413234224.12005-1-steplong@quicinc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200411182934.28678-1-peter.maydell@linaro.org>
+ <20200411182934.28678-4-peter.maydell@linaro.org> <871roq9i7k.fsf@linaro.org>
+In-Reply-To: <871roq9i7k.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Apr 2020 16:57:38 +0100
+Message-ID: <CAFEAcA-RuNNOKSKSvWi-uWfPosbqUyipX7fx-_JviFzh+da4+w@mail.gmail.com>
+Subject: Re: [PATCH for-5.0? 3/3] kernel-doc: Use c:struct for Sphinx 3.0 and
+ later
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,80 +89,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: apazos@quicinc.org, qemu-arm@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/13/20 4:42 PM, Stephen Long wrote:
-> +#define DO_ZPZZ_CHAR_MATCH(NAME, TYPE, H, EQUALS)                            \
-> +void HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc)     \
-> +{                                                                            \
-> +    intptr_t i, opr_sz = simd_oprsz(desc);                                   \
-> +    for (i = 0; i < opr_sz; i += sizeof(TYPE)) {                             \
-> +        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));                      \
-> +        uint16_t *pd = (uint16_t *)(vd + H1_2(i >> 3));                      \
-> +        *pd = (*pd & ~1) | ((0 & EQUALS) | (1 & !EQUALS));                   \
-> +        if (pg & 1) {                                                        \
+On Tue, 14 Apr 2020 at 16:54, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+> Looks reasonable although I don't have a way of testing it on my system.
+> Any idea what systems have the latest sphinx 3 on them? I tried fedora
+> but that still has 1.8.4 so it's not that bleeding edge.
 
-The important error here is that the predicate is not always the low bit.  When
-operating on bytes, every bit of the predicate is significant.  When operating
-on halfwords, every even bit of the predicate is significant.  In addition,
-when operating on halfwords, every odd bit of the result predicate must be zero.
+I tested using a sphinx 3 install in a python virtualenv:
 
-Which is why, generally, I have constructed the output predicate as we go.
-See, for instance, DO_CMP_PPZZ.
+ cd
+ python3 -m venv python-env
+ . ~/python-env/bin/activate
+ pip install sphinx
+ deactivate
 
-> +            TYPE nn = *(TYPE *)(vn + H(i));                                  \
-> +            for (intptr_t j = 0; j < 16; j += sizeof(TYPE)) {                \
-> +                TYPE mm = *(TYPE *)(vm + H(i * 16 + j));                     \
+and then tell configure to use ~/python-env/bin/sphinx-build
+(or don't deactivate, and then that will be the first
+sphinx-build on the PATH.)
 
-mm needs to start at the beginning of the segment, which in this case is (i &
--16).  You don't need the elements of mm in any particular order (all of them
-are significant), so you can drop the use of H() here.
-
-Therefore the indexing for mm should be vm + (i & -16) + j.
-
-> +                bool eq = nn == mm;                                          \
-> +                if ((eq && EQUALS) || (!eq && !EQUALS)) {                    \
-> +                    *pd = (*pd & ~1) | ((1 & EQUALS) | (0 & !EQUALS));       \
-> +                }                                                            \
-
-It might be handy to split out the inner loop to a helper function, as, while
-the basic loop is ok, there are tricks that can improve it, so that we're
-comparing 8 bytes at a time.
-
-
-> +static bool do_sve2_zpzz_char_match(DisasContext *s, arg_rprr_esz *a,
-> +                                    gen_helper_gvec_4 *fn)
-> +{
-> +    if (!dc_isar_feature(aa64_sve2, s)) {
-> +        return false;
-> +    }
-> +    if (fn == NULL) {
-> +        return false;
-> +    }
-> +    if (sve_access_check(s)) {
-> +        unsigned vsz = vec_full_reg_size(s);
-> +        unsigned psz = pred_full_reg_size(s);
-> +        int dofs = pred_full_reg_offset(s, a->rd);
-> +        int nofs = vec_full_reg_offset(s, a->rn);
-> +        int mofs = vec_full_reg_offset(s, a->rm);
-> +        int gofs = pred_full_reg_offset(s, a->pg);
-> +
-> +        /* Save a copy if the destination overwrites the guarding predicate */
-> +        int tofs = gofs;
-> +        if (a->rd == a->pg) {
-> +            tofs = offsetof(CPUARMState, vfp.preg_tmp);
-> +            tcg_gen_gvec_mov(0, tofs, gofs, psz, psz);
-> +        }
-> +
-> +        tcg_gen_gvec_4_ool(dofs, nofs, mofs, gofs, vsz, vsz, 0, fn);
-> +        do_predtest(s, dofs, tofs, psz / 8);
-
-You can avoid the copy and the predtest by using the iter_predtest_* functions
-and returning the flags result directly from the helper.  Again, see DO_CMP_PPZZ.
-
-
-r~
+thanks
+-- PMM
 
