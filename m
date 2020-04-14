@@ -2,81 +2,100 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C705C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 10:54:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D50B1C2BBC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 10:55:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25A8C2072D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 10:54:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2695206D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 10:55:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rjF9iL7N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25A8C2072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U+8hNgGA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2695206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOJD9-0001fI-8r
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 06:54:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50559)
+	id 1jOJEN-0002qz-Qi
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 06:55:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50989)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jOJBW-0000Vg-Bi
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:52:55 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jOJD2-0001ou-RK
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:54:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jOJBV-0001M1-3M
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:52:54 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33156)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jOJBU-0001LN-Rc
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:52:53 -0400
-Received: by mail-ot1-x343.google.com with SMTP id 103so12332725otv.0
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 03:52:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=lDt9VI9Dnd04fVhIefsdFc1sEOdwVd9reAGSIgzTGFs=;
- b=rjF9iL7NYcf7se7p5xDSvfP6y5HKpv6lyjwfcEbb7laurEHMI6FdgcfeGc9AIKqj20
- DWE03Ra6JxIANn0IPKdiQ4xan8oWl1ODZ7FzEl5Fp8oNQj8XCkDtANIVFzLETyKFSM/b
- GP81RFy4/4rDAh3ZFq7i8hOVgGzRVeAn6aJENZEMHo55ZDZvGnpyx4pT1JnTEBifagHB
- YhVITsGjk4bVuu24nAWHVytA8rmj0tYIc53m4XisS9MoVrdnaIUgOeDjrTP2GyACFsPs
- XvoAuiAbcy2XJBfOOGqN0de5T/2LZL44EnN6q34Az+v9PnbuhlIBkbbRb8ZBdkrqOqfg
- 8LBA==
+ (envelope-from <pbonzini@redhat.com>) id 1jOJCx-0002UA-DX
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:54:26 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24505)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jOJCx-0002TY-6g
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 06:54:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586861661;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kcBvEz/gcIjry6QgbD6r6ZCvYrqYgRay4MpmDAq0jYQ=;
+ b=U+8hNgGALu7Mk/1YzuvuOjKDrW1YwSwXoEd+QJV435RCGgOrppQg5k7sUaLWmFd0JRa+NV
+ QOLAmtLJgjFmM5nuS3x9E4zmskNKPpWG8PxYmWyk0R2+uOwnBRTeJge758OmNdEG7cpmUs
+ LRztT7LDorQtbBVXElqUYcAa6bf1Lwo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-10-x1NgsTWoNtaOpy5o8B4D_A-1; Tue, 14 Apr 2020 06:54:19 -0400
+X-MC-Unique: x1NgsTWoNtaOpy5o8B4D_A-1
+Received: by mail-wr1-f72.google.com with SMTP id j22so8510213wrb.4
+ for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 03:54:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=lDt9VI9Dnd04fVhIefsdFc1sEOdwVd9reAGSIgzTGFs=;
- b=Lj2l/YwW0QpiW4uldYblm3+kkyqoFFb25CeqivpokHT4HWHuxWJtbVOU2TuXXKKYSE
- wrygNlPdnZtg9Pe7iZO21GNSr9x3vEdWtr/GhI1xXzOhcXL6GDuyh0BdzGP5VZWOUJaN
- s/VAOSqUEGh/DnuGm5tVs/LBYtvjUs+X0ZR4FBxE2iqprjWcxv8Kbv+s1NnULdWDJLWF
- /9Wz5mqTskLMhMS76Y1AbjkvEMso3Is/CpBL4GMhwaC53MSrCd5Aioj6a22Ft+I2Lv8Z
- 0ota2hpUEU3cFdWatU1vOsEzGoCQqEFOFj6Qz+45Kg3PgqcqN+/xHnQzRl9GQ9ltRRgp
- He5g==
-X-Gm-Message-State: AGi0PuZFHLQhD51UPjvycKbu1JjQAnRBtAVjUo5GklRnXPw3KPLWPcc0
- FhJWgc73P3agf/RtGViJFS+A2xseUZvVL0RzqRpBMg==
-X-Google-Smtp-Source: APiQypLXe4Ajktdf9jjEoNIdi5D/8XbfVH/mGE4UnxTVzH2tQuVnxda/cJvv+dOxubXnsS1GL35pGfRbAo8Vxn2Qwpc=
-X-Received: by 2002:a05:6830:1f39:: with SMTP id
- e25mr18413934oth.135.1586861572085; 
- Tue, 14 Apr 2020 03:52:52 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=BXOPiFT8Bm/J9GCfOFyotPt7Zt+/5g3g0aeDp3009U8=;
+ b=IUzk6Ih154HQpcSHovt7fdSLU+YGzxgHgJIj3BiA/ogQYkod9PcD5hcXRhS3IhtxXN
+ 8rbLWeW4sbVVasO4P6XNeKtDZz/RvO/FRzGMXL6EkKrUQvPAunn1jjhQ2VLSf775E3rZ
+ cAYU1cN+37FrAQ66Rc8C2TMtMAk+kFgN2MK5wBVEIw0Q136x+sONoJsgu0UeHI4yqggE
+ uf/ytDZSnclJe1dbCuHs/8iZxeBkIoJ4p0/U4FCiiZbBsXUDBL/lTdFKerabfCJ1/7K7
+ wFWkC5eOdz8h/+/EB/krfoRVxQEIpnXE1NjDGpc3mB8+di1Auby/FURdg/J7q4+kkmCs
+ 4YvA==
+X-Gm-Message-State: AGi0Pubj7BG567IKUZpR0IWvPuqUVfaDW1M4X3iVvgIhuUWCZDX6ReaB
+ vG2rM3TwMd5pKgMiKhr0WUJB1aRmGPc3w/Nby1JrEFQWHQvxyQ0oe/yhIGn5STjyWuoU5XOB7tO
+ 1wDJXA/KsX7QuXBU=
+X-Received: by 2002:a1c:9652:: with SMTP id y79mr22899335wmd.89.1586861658673; 
+ Tue, 14 Apr 2020 03:54:18 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLZC11P0ANwQhQhEyaCTGYsPtYPScqG1YeOM2iXcEbCd0CO1TLSoxLKx+zsWs/eP21+7FyM8A==
+X-Received: by 2002:a1c:9652:: with SMTP id y79mr22899315wmd.89.1586861658386; 
+ Tue, 14 Apr 2020 03:54:18 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:503c:7b97:e286:9d8e?
+ ([2001:b07:6468:f312:503c:7b97:e286:9d8e])
+ by smtp.gmail.com with ESMTPSA id l185sm18248087wml.44.2020.04.14.03.54.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 14 Apr 2020 03:54:17 -0700 (PDT)
+Subject: Re: Replace GSource with AioContext for chardev
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+References: <20200409124601.toh6jpbfcwiwzb6z@r>
+ <CAMxuvayJjHH_dqyoPCweQDysubzv=bKnJqgp9TxZNcNKnLTJhw@mail.gmail.com>
+ <20200409132441.GS1202384@redhat.com> <87imi2zfy1.fsf@dusky.pond.sub.org>
+ <20200414102753.GJ1338838@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <802d831b-e13a-7256-77d8-03c7a064522a@redhat.com>
+Date: Tue, 14 Apr 2020 12:54:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200414102427.7459-1-philmd@redhat.com>
-In-Reply-To: <20200414102427.7459-1-philmd@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Apr 2020 11:52:41 +0100
-Message-ID: <CAFEAcA-PyMisjC25CSGyU5-ASjaAd7gQMabzMCR=uvudSBk-Fw@mail.gmail.com>
-Subject: Re: [PATCH-for-5.0] gdbstub: Do not use memset() on GByteArray
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200414102753.GJ1338838@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,53 +107,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Filippov <jcmvbkbc@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Coiby Xu <coiby.xu@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 14 Apr 2020 at 11:24, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> Introduce gdb_get_zeroes() to fill a GByteArray with zeroes.
->
-> Fixes: a010bdbe719 ("extend GByteArray to read register helpers")
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  include/exec/gdbstub.h  | 9 +++++++++
->  target/arm/gdbstub.c    | 3 +--
->  target/xtensa/gdbstub.c | 6 ++----
->  3 files changed, 12 insertions(+), 6 deletions(-)
->
-> diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
-> index 30b909ebd2..b52d9933ee 100644
-> --- a/include/exec/gdbstub.h
-> +++ b/include/exec/gdbstub.h
-> @@ -125,6 +125,15 @@ static inline int gdb_get_reg128(GByteArray *buf, ui=
-nt64_t val_hi,
->      return 16;
->  }
->
-> +static inline int gdb_get_zeroes(GByteArray *array, size_t len)
-> +{
-> +    for (size_t i =3D 0; i < len; i++) {
-> +        gdb_get_reg8(array, '\0');
-> +    }
-> +
-> +    return len;
-> +}
+On 14/04/20 12:27, Daniel P. Berrang=C3=A9 wrote:
+> Ignoring back compat, what would be our ideal CLI syntax ?
+>=20
+> Current syntax is
+>=20
+>   -chardev socket,id=3Dcharnet1,path=3D/tmp/vhost1.sock
+>   -netdev vhost-user,chardev=3Dcharnet1,id=3Dhostnet1=20
+>=20
+> Should we have an option that expresses a "SocketAddress" struct on the
+> CLI ?
+>=20
+>    -socket type=3Dunix,path=3D/tmp/vhost1.sock,id=3Dsock0
+>    -netdev vhost-user,socket=3Dsock0,id=3Dhostnet1
 
-The other implementation option here would be
+I think this should be just a "-object socket" that under the covers
+creates a QIOChannel.  There are also ideas of switching "-chardev" to
+"-object"; we could do the reverse of Marc-Andr=C3=A9's suggestion, and hav=
+e
+"chardev=3D" take both a "chardev-foo" object or a QIOChannel object
+(converting the latter to a socket-based chardev).
 
-     guint oldlen =3D array->len;
-     g_byte_array_set_size(array, oldlen + len);
-     memset(array->data + oldlen, 0, len);
+IOW, the new "-object socket" QOM type can act as both a chardev or a
+QIOChannel factory.  The C side of that should not be hard.
 
-For length values < 16 my guess is the perf difference is
-not going to be noticeable though.
+Paolo
 
-thanks
--- PMM
+> IIUC, Marc-Andr=C3=A9 is suggesting that we carry on using -chardev, but
+> detect when it is a socket chardev, and then ignore chardev APIs and
+> create a QIOChannel.  I can see some appeal in this as it provides a
+> way to get all existing usage switched over, but I feel uneasy about
+> sticking with -chardev forever, if we're not actually using a chardev.
+>=20
+> We could do the magic -chardev -> -socket conversion though, for a
+> short period of time to ease the transition.
+>=20
+> We would have to
+>=20
+>  1. Introduce the new -socket and add "socket=3D$id" to devices that need=
+ it
+>  2. Deprecate -chardev with type !=3D socket, with no repacement intended
+>  3. Deprecate -chardev with type =3D=3D socket, translating to -socket
+>  ...wait 2 releases...
+>  4. Delete support for "chardev=3D$id" from devices with "socket=3D$id"
+>=20
+> The hardest part is probably deciding exactly which set of devices can
+> be restricted to only sockets, and which must have the full range of
+> chardev backends available.
+>=20
+> Regards,
+> Daniel
+>=20
+
 
