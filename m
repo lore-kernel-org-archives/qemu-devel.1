@@ -2,93 +2,86 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7E0C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 07:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE8AC352B6
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 07:17:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D0E820575
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 07:15:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1721F20575
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 07:17:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cDC/AWhY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D0E820575
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YOVXGakY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1721F20575
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOFms-0002jI-CQ
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 03:15:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42534)
+	id 1jOFop-0004N2-6j
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 03:17:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42793)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <xadimgnik@gmail.com>) id 1jOFmB-0002Ce-6u
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 03:14:32 -0400
+ (envelope-from <armbru@redhat.com>) id 1jOFnn-0003Y2-AF
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 03:16:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <xadimgnik@gmail.com>) id 1jOFmA-00015f-0r
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 03:14:31 -0400
-Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:41926)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <xadimgnik@gmail.com>)
- id 1jOFm4-00013Q-88; Tue, 14 Apr 2020 03:14:24 -0400
-Received: by mail-ed1-x533.google.com with SMTP id v1so15666395edq.8;
- Tue, 14 Apr 2020 00:14:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:reply-to:to:cc:references:in-reply-to:subject:date:message-id
- :mime-version:content-transfer-encoding:content-language
- :thread-index; bh=UPl8Vc08yZvXnj9e+clalIg/qDk+S78wH0kNLz1cnTM=;
- b=cDC/AWhYs8VeclpczMQ+nWKlkHo+6TNqJh0NrHl5/bs0WriSFIdo3XBsaUD7ePRZHe
- NEW9SqTY4oaqIC2Y/EaS4yfPk3Uv4LuVEi3oLJy03dqZVz/J3BrAP3NgBtwgGzUeQlHe
- qQi9H4zrpUQIS9tpRFllWKDfMd6EzHU99W78oJiqDrWWwDyYS5qa0OkpPi8V95m9p8Um
- FHdTbD+1XAY38mrLapjh6w5wbslEhc9mdhUmpcK2hDNeWCgPBLQZWiH9FbWRTdVOOKB9
- dI5qDksUntfo2FUhoDWEi8zY5e4XYPgugP2/Xd7gHznBjNehL1/JodqE67TYC4gr1sw8
- AGrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:reply-to:to:cc:references:in-reply-to
- :subject:date:message-id:mime-version:content-transfer-encoding
- :content-language:thread-index;
- bh=UPl8Vc08yZvXnj9e+clalIg/qDk+S78wH0kNLz1cnTM=;
- b=iJ5KFY5ylSNIEJENYcg6n1/H3d2MM1dNBfzkpddWV0kMWRwy1JprqFSvMtdAirb02b
- RSD4MEo5q6lgIyU1+tBKwLPkNbzWzD6OYKCvLHJmrz5hYPWR0NZ6jglnxCJE+25JlaQs
- wlsFEGe1WNb2hTWWdExY46rUeqRLvQUHRguG3ZEK98E7smRU1Am0QFYG1DVoGWFTAPAI
- XMSeNXyNbsHEyy1/JcAQ6Ub3pXfavn1HI3j6n2WLG9yNHLmPdXnfNb48gF+GESh9qd2B
- 31eg1DtSV2bS+i0zoMhVkCuOPrxWzxBk8MKW2dz/Pw8+R6UOda2rluhZFy7k+D27a9MX
- GZWQ==
-X-Gm-Message-State: AGi0Puahu8ATMpN6xcQyr0k6cYE7r2L85iUPxqk2P11P1uXtrQV2pZLm
- J/l2PihVP2MOkY+52kie+GE=
-X-Google-Smtp-Source: APiQypLHMbamzeoV0tCSAZIWZTN7JIFW698jKJ43W/2gz9gP/YIzqn3fve8VHf/Z7HPLTQ3RWL1aEQ==
-X-Received: by 2002:a17:907:1185:: with SMTP id
- uz5mr19460491ejb.335.1586848462436; 
- Tue, 14 Apr 2020 00:14:22 -0700 (PDT)
-Received: from CBGR90WXYV0 ([54.239.6.185])
- by smtp.gmail.com with ESMTPSA id k33sm1600483edc.18.2020.04.14.00.14.18
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 14 Apr 2020 00:14:21 -0700 (PDT)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: "Paul Durrant" <paul@xen.org>
-To: =?utf-8?Q?'Philippe_Mathieu-Daud=C3=A9'?= <f4bug@amsat.org>,
- <qemu-devel@nongnu.org>
-References: <20200412210954.32313-1-f4bug@amsat.org>
- <20200412210954.32313-4-f4bug@amsat.org>
-In-Reply-To: <20200412210954.32313-4-f4bug@amsat.org>
-Subject: RE: [PATCH-for-5.1 3/3] hw: Remove unnecessary DEVICE() cast
-Date: Tue, 14 Apr 2020 08:14:18 +0100
-Message-ID: <004101d6122c$52094ad0$f61be070$@xen.org>
+ (envelope-from <armbru@redhat.com>) id 1jOFnl-0001iG-60
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 03:16:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33623
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOFnk-0001hv-UN
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 03:16:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586848568;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gIxxP2P7bDv0LyJOEFsSl+b26dNwRkjroj5o9XBzADA=;
+ b=YOVXGakYD9mcV0Ttd8589I0jllkvEtp1HrOx+AMQNsfc9XGNqm0/PWsfr7HLmbytc5IOY/
+ X6EqRt86x6sKBHdcHAmSMh+sjd4BEYJpLRim6gq9czEhNbvl1wirdIFuXNon2VkVv1ZdID
+ lWD9j7HgC9X4hxXKHI7w9kiPwq4z/yI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-VXY0blHTPYSvQf01L1nR-A-1; Tue, 14 Apr 2020 03:16:06 -0400
+X-MC-Unique: VXY0blHTPYSvQf01L1nR-A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F046E108838D;
+ Tue, 14 Apr 2020 07:16:04 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
+ [10.36.113.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 352DC1000325;
+ Tue, 14 Apr 2020 07:16:01 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id A9B7E11385C8; Tue, 14 Apr 2020 09:15:59 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Subject: Re: [PATCH v9 5/9] docs/clocks: add device's clock documentation
+References: <20200406135251.157596-1-damien.hedde@greensocs.com>
+ <20200406135251.157596-6-damien.hedde@greensocs.com>
+ <87pncjzxwc.fsf@dusky.pond.sub.org>
+ <f5556e5f-ee75-10cb-53f3-b249de8a5147@greensocs.com>
+Date: Tue, 14 Apr 2020 09:15:59 +0200
+In-Reply-To: <f5556e5f-ee75-10cb-53f3-b249de8a5147@greensocs.com> (Damien
+ Hedde's message of "Wed, 8 Apr 2020 12:06:10 +0200")
+Message-ID: <87sgh6zgeo.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: en-gb
-Thread-Index: AQLGp+eFp3IRGcFg/miJ8dc6gyP15QIEt8vKpobi2pA=
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::533
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,89 +93,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: paul@xen.org
-Cc: 'Peter Maydell' <peter.maydell@linaro.org>,
- 'David Hildenbrand' <david@redhat.com>, 'Jason Wang' <jasowang@redhat.com>,
- 'Mark Cave-Ayland' <mark.cave-ayland@ilande.co.uk>,
- 'Gerd Hoffmann' <kraxel@redhat.com>,
- "'Edgar E. Iglesias'" <edgar.iglesias@gmail.com>,
- 'Stefano Stabellini' <sstabellini@kernel.org>, qemu-block@nongnu.org,
- 'Markus Armbruster' <armbru@redhat.com>, 'Halil Pasic' <pasic@linux.ibm.com>,
- 'Christian Borntraeger' <borntraeger@de.ibm.com>,
- 'Aleksandar Markovic' <aleksandar.qemu.devel@gmail.com>,
- 'Joel Stanley' <joel@jms.id.au>, 'Anthony Perard' <anthony.perard@citrix.com>,
- xen-devel@lists.xenproject.org, 'David Gibson' <david@gibson.dropbear.id.au>,
- =?utf-8?Q?'Philippe_Mathieu-Daud=C3=A9'?= <philmd@redhat.com>,
- 'Eduardo Habkost' <ehabkost@redhat.com>, 'Corey Minyard' <minyard@acm.org>,
- "'Dr. David Alan Gilbert'" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, 'Peter Chubb' <peter.chubb@nicta.com.au>,
- =?utf-8?Q?'C=C3=A9dric_Le_Goater'?= <clg@kaod.org>,
- 'John Snow' <jsnow@redhat.com>, 'Richard Henderson' <rth@twiddle.net>,
- "=?utf-8?Q?'Daniel_P._Berrang=C3=A9'?=" <berrange@redhat.com>,
- 'Andrew Jeffery' <andrew@aj.id.au>, 'Cornelia Huck' <cohuck@redhat.com>,
- 'Laurent Vivier' <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- 'Paolo Bonzini' <pbonzini@redhat.com>, 'Aurelien Jarno' <aurelien@aurel32.net>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, peter.maydell@linaro.org,
+ berrange@redhat.com, ehabkost@redhat.com, alistair@alistair23.me,
+ mark.burton@greensocs.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>, pbonzini@redhat.com,
+ marcandre.lureau@redhat.com, philmd@redhat.com, edgar.iglesias@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Philippe Mathieu-Daud=C3=A9 <philippe.mathieu.daude@gmail.com> =
-On Behalf Of Philippe Mathieu-Daud=C3=A9
-> Sent: 12 April 2020 22:10
-> To: qemu-devel@nongnu.org
-> Cc: Richard Henderson <rth@twiddle.net>; Halil Pasic =
-<pasic@linux.ibm.com>; Peter Chubb
-> <peter.chubb@nicta.com.au>; C=C3=A9dric Le Goater <clg@kaod.org>; =
-David Gibson
-> <david@gibson.dropbear.id.au>; Eduardo Habkost <ehabkost@redhat.com>; =
-Anthony Perard
-> <anthony.perard@citrix.com>; BALATON Zoltan <balaton@eik.bme.hu>; =
-xen-devel@lists.xenproject.org;
-> Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>; =
-qemu-block@nongnu.org; Corey Minyard
-> <minyard@acm.org>; Daniel P. Berrang=C3=A9 <berrange@redhat.com>; =
-Christian Borntraeger
-> <borntraeger@de.ibm.com>; Philippe Mathieu-Daud=C3=A9 =
-<philmd@redhat.com>; Stefano Stabellini
-> <sstabellini@kernel.org>; Mark Cave-Ayland =
-<mark.cave-ayland@ilande.co.uk>; qemu-arm@nongnu.org; qemu-
-> ppc@nongnu.org; Jason Wang <jasowang@redhat.com>; Markus Armbruster =
-<armbru@redhat.com>; qemu-
-> s390x@nongnu.org; Dr. David Alan Gilbert <dgilbert@redhat.com>; Joel =
-Stanley <joel@jms.id.au>; David
-> Hildenbrand <david@redhat.com>; Aurelien Jarno <aurelien@aurel32.net>; =
-Laurent Vivier
-> <laurent@vivier.eu>; Peter Maydell <peter.maydell@linaro.org>; =
-Cornelia Huck <cohuck@redhat.com>;
-> Paolo Bonzini <pbonzini@redhat.com>; Andrew Jeffery <andrew@aj.id.au>; =
-John Snow <jsnow@redhat.com>;
-> Edgar E. Iglesias <edgar.iglesias@gmail.com>; Gerd Hoffmann =
-<kraxel@redhat.com>; Paul Durrant
-> <paul@xen.org>; Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Subject: [PATCH-for-5.1 3/3] hw: Remove unnecessary DEVICE() cast
->=20
-> The DEVICE() macro is defined as:
->=20
->   #define DEVICE(obj) OBJECT_CHECK(DeviceState, (obj), TYPE_DEVICE)
->=20
-> Remove unnecessary DEVICE() casts.
->=20
-> Patch created mechanically using spatch with this script:
->=20
->   @@
->   typedef DeviceState;
->   DeviceState *s;
->   @@
->   -   DEVICE(s)
->   +   s
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Damien Hedde <damien.hedde@greensocs.com> writes:
 
-Xen part...
+> On 4/7/20 7:07 AM, Markus Armbruster wrote:
+>> Damien Hedde <damien.hedde@greensocs.com> writes:
+>>=20
+>>> Add the documentation about the clock inputs and outputs in devices.
+>>>
+>>> This is based on the original work of Frederic Konrad.
+>>>
+>>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>>> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+>>> ---
+>>> v9:
+>>>  + fix a few typos (Alistair)
+>>>
+>>> v8:
+>>>  + fix list indentation
+>>>  + reduce title size
+>>>
+>>> v7:
+>>>  + update ClockIn/Out types
+>>>  + switch to rst format
+>>> ---
+>>>  docs/devel/clocks.rst | 360 ++++++++++++++++++++++++++++++++++++++++++
+>>>  docs/devel/index.rst  |   1 +
+>>>  2 files changed, 361 insertions(+)
+>>>  create mode 100644 docs/devel/clocks.rst
+>>>
+>>> diff --git a/docs/devel/clocks.rst b/docs/devel/clocks.rst
+>>> new file mode 100644
+>>> index 0000000000..ead9f55561
+>>> --- /dev/null
+>>> +++ b/docs/devel/clocks.rst
+>>> @@ -0,0 +1,360 @@
+>>> +Modeling a clock tree in QEMU
+>>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D
+>>> +
+>>> +What are clocks
+>>> +---------------
+>>> +
+>>> +Clocks are QOM objects developed for the purpose of modeling the
+>>> +distribution of clocks in QEMU.
+>>> +
+>>> +They allow us to model the clock distribution of a platform and detect
+>>> +configuration errors in the clock tree such as badly configured PLL, c=
+lock
+>>> +source selection or disabled clock.
+>>> +
+>>> +The object is *Clock* and its QOM name is ``CLOCK``.
+>>=20
+>> PATCH 1 has
+>>=20
+>>     #define TYPE_CLOCK "clock"
+>>=20
+>> Ignorant question: how is this related to *Clock* and ``CLOCK``?
+>>=20
+>> [...]
+>>=20
+>
+> Hi Markus,
+>
+>
+> *Clock* refer to the C type
+>> typedef struct Clock Clock;
 
-Acked-by: Paul Durrant <paul@xen.org>
+Okay.
 
+> I think I've put ``CLOCK`` in uppercase because, in practical, we only
+> use the upper case macro.
 
+True for internal code, not true at external interfaces.
+
+>> #define TYPE_CLOCK "clock"
+>> #define CLOCK(obj) OBJECT_CHECK(Clock, (obj), TYPE_CLOCK)
+>
+> I'm not sure what is the right terminology here. Maybe I can replace by
+> the following:
+>
+>> The QOM name of a clock is ``"clock"`` (or the macro ``TYPE_CLOCK``).
+> The C type object is *Clock*.
+
+Better.
+
+Maybe (in C, the macro ``TYPE_CLOCK'') or (C macro ``TYPE_CLOCK'').
+Your choice :)
 
 
