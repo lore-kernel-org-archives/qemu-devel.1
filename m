@@ -6,62 +6,79 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF59C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:21:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D6B7C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:23:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 799452075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:21:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 001BB20732
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 12:23:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="J7c2uv9z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 799452075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RcOKD/PE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 001BB20732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOKZe-0005Iu-NK
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 08:21:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60522)
+	id 1jOKbO-00075t-6K
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 08:23:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60788)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1jOKYl-0004oh-Bt
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:21:07 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jOKaT-0006E2-FY
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:22:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1jOKYk-0002V4-7k
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:20:59 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:44690)
+ (envelope-from <peter.maydell@linaro.org>) id 1jOKaS-0003Qo-Eq
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:22:45 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38781)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1jOKYj-0002TW-LV; Tue, 14 Apr 2020 08:20:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=7YZZX1Klg2DDgKOL1XRre7jsECwUz/wwPBkxLXt5PR0=; 
- b=J7c2uv9z/wuGm/Pj8q8JCIXD8nW+zQLjDw0BKxrnKFPVBa4rL+84p/DcaU7scaKx7EuS0AkLmQtQValL32fhc1d5Klg7y4kK51D2SCte7hIeVK3atqIZkz0uLc+Zgjh0/BLAUqGAFlj0THlMlCn7oMlOf+awmv35kIybcXmDtin1QlQnQXQEWOfbIxY2P7JUm3bfFJMi0ku39FYqWo6kAcT5cuqkiwHf+Spi+ptQr/NUj3PKaVh8HOB4dXB0INoChuqF8NNCyE2f0wtlH7offigBvK1ua0NPNlMDjIHfZkUoacbi9ZKNeoGv2Qlvg7WIeHpJdrEWyXvZgSChZtuTiA==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1jOKYf-0003Eh-Fe; Tue, 14 Apr 2020 14:20:53 +0200
-Received: from berto by mail.igalia.com with local (Exim)
- id 1jOKYf-0002B9-6D; Tue, 14 Apr 2020 14:20:53 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Subject: Re: [PATCH v4 11/30] qcow2: Add l2_entry_size()
-In-Reply-To: <58d1fa17-91ea-9f8d-c39a-4141783d1234@virtuozzo.com>
-References: <cover.1584468723.git.berto@igalia.com>
- <fd0f93353a218ff4518f34ebdbca05c2fc0f1085.1584468723.git.berto@igalia.com>
- <58d1fa17-91ea-9f8d-c39a-4141783d1234@virtuozzo.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Tue, 14 Apr 2020 14:20:53 +0200
-Message-ID: <w51y2qy5kd6.fsf@maestria.local.igalia.com>
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jOKaS-0003QZ-5o
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 08:22:44 -0400
+Received: by mail-ot1-x343.google.com with SMTP id k21so1023036otl.5
+ for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 05:22:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=XwFPBNqmtc1cHYX6paJTvA6Lr2EfVZK3kehPui9rTaQ=;
+ b=RcOKD/PEronnwQZjqDhEgsmmi7Cg6RbQuJtEGg0fyO4KSj3SvFjwCmOgBS1WTRyHpy
+ FqmnVAu06P1tAOTV2vTqalwm7XcvRCPBZ0MbjMMYs7Pd821oKBY3hs/tSsH0NpYKVUV/
+ Rr9knVmpe7Ic3ePzsB4D9fkt3d/mPgnBOxsXSzl1lE+Qtguyql0e5misRqXbwgcM5gAr
+ t1d6bdcXSJoNEO+RyTvRVrCm4eREM/NYo/7HrLPkugykBqQUs3au5Atsy2yUZ3FBwloU
+ SkgxcwLmb/pZCzPAi8Zru3xJbJl4oKXsKtkFtRpwideZRIarWeuiNL5J9TVkVbaK8OeT
+ ON3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=XwFPBNqmtc1cHYX6paJTvA6Lr2EfVZK3kehPui9rTaQ=;
+ b=cwRNL+hjKYXzgmWB4R0Fr3njz5MgbRohRk9ttObmll0xtYRbDc3NTGYwJpVcZbAyz8
+ Ut28WSNJ+wgycdO2049dw5otNrEPalSpfZDDDDCE9bhc53+z1yei7KzHdYuWh/BYeXwC
+ fCKI35T9nfw8PE3o5iEOsj6xnR8NNsDuw53ADNOToc7wTLhkiUINsp1VNltpftZQ9cTo
+ o3F433vQskPnJWfuA8vUGhe21ClzJ1CxPA9ooqyxZOKKOp/kk42+8Ua1SUMKIFNl0nlj
+ 4N2FtRxchzGPObvgdTTkeBqMYCyn57cUoglhnyITVmn9XdmW7YW/qXXlgrMveddD7PBI
+ SMfQ==
+X-Gm-Message-State: AGi0PuYaz19xdMuPmWB1eKWPAxXXVJ6dQ0dbxU3B20Lv/TS7Fuy+ksym
+ RJZ0lRThW1b4EPXDopd2r4tlDRzCVFm/mHwAj6Qh6g==
+X-Google-Smtp-Source: APiQypLEDms4PTReOqdGombZAhdDnEo4LYbmM2pO5DlLbcG/M356wg9YjiNmj3v+UvrYInVFa878vNDcKaY8/t57vW4=
+X-Received: by 2002:a4a:4886:: with SMTP id p128mr18294282ooa.63.1586866963256; 
+ Tue, 14 Apr 2020 05:22:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+References: <20200411182934.28678-1-peter.maydell@linaro.org>
+ <4873c74c-f590-62bf-bd64-dd5ab391c252@redhat.com>
+ <CAFEAcA-oRGxEK9xqrU1o88xga-Zn4Xpb5Nr84NhRA=GD2JCoQg@mail.gmail.com>
+In-Reply-To: <CAFEAcA-oRGxEK9xqrU1o88xga-Zn4Xpb5Nr84NhRA=GD2JCoQg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Apr 2020 13:22:32 +0100
+Message-ID: <CAFEAcA_yGgzO2ivkXDZQkcrx2icYtcr+oZZnPsq9M2fG0RivXA@mail.gmail.com>
+Subject: Re: Supported Sphinx Versions (was: Re: [PATCH for-5.0? 0/3] Make
+ docs build work with Sphinx 3)
+To: John Snow <jsnow@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,67 +90,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue 14 Apr 2020 11:44:57 AM CEST, Vladimir Sementsov-Ogievskiy wrote:
->>       /* allocate a new l2 entry */
->>   
->> -    l2_offset = qcow2_alloc_clusters(bs, s->l2_size * sizeof(uint64_t));
->> +    l2_offset = qcow2_alloc_clusters(bs, s->l2_size * l2_entry_size(s));
->
-> hmm. s->l2_size * l2_entry_size, isn't it just s->cluster_size always?
-> Maybe, just refactor these things?
+On Tue, 14 Apr 2020 at 11:28, Peter Maydell <peter.maydell@linaro.org> wrot=
+e:
+> PS: why 1.6.1 and not 1.6.0? You don't list 1.6.0 in your set of
+> things you tested, was it just that you couldn't find it?
 
-I think the patch is simpler to follow if I only do the strictly
-necessary changes and don't mix them with other things.
+Aha, I have just discovered that the Sphinx changelog
+explains that 1.6.0 was "=EF=BB=BF=EF=BB=BFnot released (because of package
+script error)" so 1.6.1 was the first real version in the
+1.6.x series.
 
->>           nb_new_l2_tables = DIV_ROUND_UP(nb_new_data_clusters,
->> -                                        s->cluster_size / sizeof(uint64_t));
->> +                                        s->cluster_size / l2_entry_size(s));
->
-> Isn't it just s->l2_size ?
-
-Yes, same as before.
-
->>           /* The cluster range may not be aligned to L2 boundaries, so add one L2
->>            * table for a potential head/tail */
->>           nb_new_l2_tables++;
->
-> Conversions looks correct, but how to check that we have converted
-> everything?
-
-I went through all cases, I think I didn't miss any!
-
-> I found this not converted chunk:
->
->      /* total size of L2 tables */
->      nl2e = aligned_total_size / cluster_size;
->      nl2e = ROUND_UP(nl2e, cluster_size / sizeof(uint64_t));
->      meta_size += nl2e * sizeof(uint64_t);
-
-This is used by qcow2_measure() and is fixed on a later patch because,
-unlike all other cases, it does not use a BlockDriverState to determine
-the size of an L2 entry.
-
-> Hmm. How to avoid it? Maybe, at least, refactor the code, to drop all
-> sizeof(uint64_t), converting them to L2_ENTRY_SIZE, L1_ENTRY_SIZE,
-> REFTABLE_ENTRY_SIZE etc?
-
-That wouldn't be a bad thing I guess but, again, for a separate patch or
-series.
-
-> And all occurrences of pure '8' (not many of them exist)
-
-I think most/all nowadays only refer to the number of bits per byte.
-
-Maybe there's a couple that still need to be fixed, but we have been
-removing a lot of numeric literals from the qcow2 code (see for example
-b6c246942b, 3afea40243 or a35f87f50d).
-
-Berto
+thanks
+-- PMM
 
