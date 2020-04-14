@@ -2,84 +2,89 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5700C2BBC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 13:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B432DC2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 13:19:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1C232063A
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 13:16:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 779602063A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 13:19:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KIho+dz2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1C232063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AtDW6sxE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 779602063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOLQc-0008GD-QV
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 09:16:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40594)
+	id 1jOLT5-00027H-NV
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 09:19:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41237)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jOLOJ-0005gJ-FQ
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:14:19 -0400
+ (envelope-from <armbru@redhat.com>) id 1jOLRZ-0000kc-RK
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:17:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jOLOH-00014w-5s
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:14:15 -0400
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:36166)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sundeep.lkml@gmail.com>)
- id 1jOLOH-000147-06; Tue, 14 Apr 2020 09:14:13 -0400
-Received: by mail-il1-x144.google.com with SMTP id t8so7199767ilj.3;
- Tue, 14 Apr 2020 06:14:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=sp7hGbvHRsSJq4vwR/WoGaL4OZPwo5wV8RDt+uMdw2E=;
- b=KIho+dz2OXmxMMTYDiZAk5VSian0zqjOQ0vVPiGcYPtUhpF9SHihp366joW+c55lgM
- v3l22IiVq9ZZoqFK8q2WYMztXwX4b2L7E9nGyaeWsvcn9Iu/YTk+0J9QxbqgSatlnOnO
- c5E/Hkws50Mnjg6kheA2gWSgicXJX05N0Dp86QZ4LvxdEHAglrm7FdSd49toQnEYUc18
- oI2CvUR5WQF0uOOgWWi+RpTCADrmsB+maOg0oJ81F7lf2frNKj7us4gaKxyg1cZukE7O
- LjblZsYytwuJeV04KDPQlBvnaRyIk/hT5sMEEDFJqB55Hg2Zb9lLqfdqTyoo98Cy5lXH
- ErjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=sp7hGbvHRsSJq4vwR/WoGaL4OZPwo5wV8RDt+uMdw2E=;
- b=mnCyrRZ1ItaWLxQngpCqA7JHlfdVUrnvFOe7MyddhJrHeP2k6XTOPbTxYqUlkMncIG
- ApBGfwwjPgrfmKGBp9memm9FhUuP4WngTC5SxxKVjhkF479aQfmDObUv4NY8YPh4r3k0
- Lb3vchh2E1ylb0frU0nAftzU/ZbJuJzs9BQ6ZrGTgKS6EL0IO/hV+0i6rid1wormspZ8
- kPQRgVXJz2xEZhOJLPWydOXX9wHGQrq4Y3H8eNsYmMYwpqMjDXb8qO+tGPOZeB1dR0Th
- 2yUvJY2Av/LBlTp56OxuyfznP7VS9EyNvQBWpKyKcorMyVavTaDJWnv0QtTpqWDtYUGJ
- /yKA==
-X-Gm-Message-State: AGi0PubN4fjNVuYu2uIQd3WJqaSAb3X1QNOPzCya+JEqHozQjCpzxg5n
- kLrnQWfDb7i1cCgs/BRn1NknS9nPiWywqh6hwRg=
-X-Google-Smtp-Source: APiQypLLPgIKzOtyEkrBaCrOKIyV7pGqFTXCJfMgsG2Qh+UYxdq7SC/afSq8ILc3VCOJiffLl/+pMQXmyX8wroiXW2Y=
-X-Received: by 2002:a92:aa0f:: with SMTP id j15mr105749ili.211.1586870052227; 
- Tue, 14 Apr 2020 06:14:12 -0700 (PDT)
+ (envelope-from <armbru@redhat.com>) id 1jOLRV-0002d5-6Y
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:17:37 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22534
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOLRV-0002co-3C
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:17:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586870252;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=40pZTXqOqR3NJTgFyI0dYQnA/FRNUIpaOb23dKdgdRM=;
+ b=AtDW6sxEEyseiNu2qmRqdQB8hCtI8+WXTVbqZdJPjYEMTjyXsPHxtIYAVNT8l2hYka0weI
+ cLVTQaNKtJIE1zMQoK4UnjSGHs3ATWTkpCnlVzCcrH4gk5tV4syBZQgL7DdrjrjceX7CcW
+ 2tllY7ZeU6GF5tkMR58jPpEiPbZZArY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-49-dfMXLLbEN_GPfh0ehDzsCQ-1; Tue, 14 Apr 2020 09:17:25 -0400
+X-MC-Unique: dfMXLLbEN_GPfh0ehDzsCQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA1DF107ACC9;
+ Tue, 14 Apr 2020 13:17:21 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
+ [10.36.113.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A01AA5D9E2;
+ Tue, 14 Apr 2020 13:17:15 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 2637811385C8; Tue, 14 Apr 2020 15:17:14 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.1 v3 02/24] scripts/coccinelle: Script to simplify
+ DeviceClass error propagation
+References: <20200412223619.11284-1-f4bug@amsat.org>
+ <20200412223619.11284-3-f4bug@amsat.org>
+ <875ze2tfvc.fsf@dusky.pond.sub.org>
+ <23ad6d04-1f42-29b8-caa6-6506cf1b7422@redhat.com>
+Date: Tue, 14 Apr 2020 15:17:14 +0200
+In-Reply-To: <23ad6d04-1f42-29b8-caa6-6506cf1b7422@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 14 Apr 2020 14:30:01
+ +0200")
+Message-ID: <87k12iqk9x.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <1586529926-11441-1-git-send-email-sundeep.lkml@gmail.com>
- <1586529926-11441-4-git-send-email-sundeep.lkml@gmail.com>
- <b3d5a33f-150c-bfd8-ee78-40738ffe6b65@amsat.org>
-In-Reply-To: <b3d5a33f-150c-bfd8-ee78-40738ffe6b65@amsat.org>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Tue, 14 Apr 2020 18:44:00 +0530
-Message-ID: <CALHRZur9zavhQX_M0Bw0XHJwX8z39btsKgyhyGvDNoeZVdEj4g@mail.gmail.com>
-Subject: Re: [Qemu devel PATCH v4 3/3] tests/boot_linux_console: Add ethernet
- test to SmartFusion2
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::144
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,83 +96,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <codyprime@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-block@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>,
+ =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-riscv@nongnu.org, Andrew Jeffery <andrew@aj.id.au>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-ppc@nongnu.org,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-On Sun, Apr 12, 2020 at 11:32 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
+> On 4/14/20 2:24 PM, Markus Armbruster wrote:
+>> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+>>
+>>> When a device uses an Error* with data not modified before realize(),
+>>> this call can be moved to init(). Add a Coccinelle patch to find such
+>>> uses.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>> ---
+>>>   ...implify-init-realize-error_propagate.cocci | 69 ++++++++++++++++++=
++
+>>>   MAINTAINERS                                   |  1 +
+>>>   2 files changed, 70 insertions(+)
+>>>   create mode 100644 scripts/coccinelle/simplify-init-realize-error_pro=
+pagate.cocci
+>>>
+>>> diff --git a/scripts/coccinelle/simplify-init-realize-error_propagate.c=
+occi b/scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+>>> new file mode 100644
+>>> index 0000000000..2e3ec4d98a
+>>> --- /dev/null
+>>> +++ b/scripts/coccinelle/simplify-init-realize-error_propagate.cocci
+>>> @@ -0,0 +1,69 @@
+>>> +// Find error-propagation calls that don't need to be in DeviceClass::=
+realize()
+>>> +// because they don't use information user can change before calling r=
+ealize(),
+>>> +// so they can be moved to DeviceClass:initfn() where error propagatio=
+n is not
+>>> +// needed.
+>>> +//
+>>> +// Copyright: (C) 2020 Philippe Mathieu-Daud=C3=A9
+>>> +// This work is licensed under the terms of the GNU GPLv2 or later.
+>>> +//
+>>> +// spatch \
+>>> +//  --macro-file scripts/cocci-macro-file.h \
+>>> +//  --sp-file \
+>>> +//    scripts/coccinelle/simplify-init-realize-error_propagate.cocci \
+>>> +//  --timeout 60
+>>> +//
+>>> +// Inspired by https://www.mail-archive.com/qemu-devel@nongnu.org/msg6=
+92500.html
+>>> +
+>>> +
+>>> +@ match_class_init @
+>>> +TypeInfo info;
+>>> +identifier class_initfn;
+>>> +@@
+>>> +    info.class_init =3D class_initfn;
+>>> +
+>>> +
+>>> +@ match_instance_init @
+>>> +TypeInfo info;
+>>> +identifier instance_initfn;
+>>> +@@
+>>> +    info.instance_init =3D instance_initfn;
+>>> +
+>>> +
+>>> +@ match_realize @
+>>> +identifier match_class_init.class_initfn;
+>>> +DeviceClass *dc;
+>>> +identifier realizefn;
+>>> +@@
+>>> +void class_initfn(...)
+>>> +{
+>>> +    ...
+>>> +    dc->realize =3D realizefn;
+>>> +    ...
+>>> +}
+>>
+>> I'm afraid this misses realize() methods of DeviceClass subclasses.
+>> Consider PCI device "i6300esb" (picked just because it's simple).
+>>
+>> pci_device_class_init() sets DeviceClass method realize() to
+>> pci_qdev_realize().  pci_qdev_realize() does the work common to all PCI
+>> devices, and calls PCIDeviceClass method realize() for the work specific
+>> to the PCI device at hand.
+>>
+>> i6300esb_class_init() sets PCIDeviceClass method realize() to
+>> i6300esb_realize().
+>>
+>> Your first rule should match i6300esb_info alright, and thus identify
+>> i6300esb_class_init() as a class_init() method.
+>>
+>> But your third rule can't match i6300esb_class_init()'s
+>>
+>>      k->realize =3D i6300esb_realize;
+>>
+>> because @k is a PCIDeviceClass, not a DeviceClass.
+>>
+>> I think it also misses cases that have a realize(), but no
+>> instance_init().
+>>
+>> Finding only some instances of an anti-pattern can still be useful.  But
+>> you should explain the script's limitations then, both in the script and
+>> the commit message.
 >
-> On 4/10/20 4:45 PM, sundeep.lkml@gmail.com wrote:
-> > From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> >
-> > In addition to simple serial test this patch uses ping
-> > to test the ethernet block modelled in SmartFusion2 SoC.
-> >
-> > Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-> > ---
-> >  tests/acceptance/boot_linux_console.py | 15 ++++++++++-----
-> >  1 file changed, 10 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
-boot_linux_console.py
-> > index f825cd9..c6b06a1 100644
-> > --- a/tests/acceptance/boot_linux_console.py
-> > +++ b/tests/acceptance/boot_linux_console.py
-> > @@ -336,13 +336,13 @@ class BootLinuxConsole(Test):
-> >          """
-> >          uboot_url =3D ('https://raw.githubusercontent.com/'
-> >                       'Subbaraya-Sundeep/qemu-test-binaries/'
-> > -                     'fa030bd77a014a0b8e360d3b7011df89283a2f0b/u-boot'=
-)
-> > -        uboot_hash =3D 'abba5d9c24cdd2d49cdc2a8aa92976cf20737eff'
-> > +                     'fe371d32e50ca682391e1e70ab98c2942aeffb01/u-boot'=
-)
-> > +        uboot_hash =3D 'cbb8cbab970f594bf6523b9855be209c08374ae2'
-> >          uboot_path =3D self.fetch_asset(uboot_url, asset_hash=3Duboot_=
-hash)
-> >          spi_url =3D ('https://raw.githubusercontent.com/'
-> >                     'Subbaraya-Sundeep/qemu-test-binaries/'
-> > -                   'fa030bd77a014a0b8e360d3b7011df89283a2f0b/spi.bin')
-> > -        spi_hash =3D '85f698329d38de63aea6e884a86fbde70890a78a'
-> > +                   'fe371d32e50ca682391e1e70ab98c2942aeffb01/spi.bin')
-> > +        spi_hash =3D '65523a1835949b6f4553be96dec1b6a38fb05501'
-> >          spi_path =3D self.fetch_asset(spi_url, asset_hash=3Dspi_hash)
-> >
-> >          self.vm.set_console()
-> > @@ -352,7 +352,12 @@ class BootLinuxConsole(Test):
-> >                           '-drive', 'file=3D' + spi_path + ',if=3Dmtd,f=
-ormat=3Draw',
-> >                           '-no-reboot')
-> >          self.vm.launch()
-> > -        self.wait_for_console_pattern('init started: BusyBox')
-> > +        self.wait_for_console_pattern('Enter \'help\' for a list')
-> > +
-> > +        exec_command_and_wait_for_pattern(self, 'ifconfig eth0 10.0.2.=
-15',
-> > +                                                 'eth0: link becomes r=
-eady')
-> > +        exec_command_and_wait_for_pattern(self, 'ping -c 3 10.0.2.2',
-> > +            '3 packets transmitted, 3 packets received, 0% packet loss=
-')
+> OK.
 >
-> Very nice (and smart) :)
+>>
+>>> +
+>>> +
+>>> +@ propagate_in_realize @
+>>> +identifier match_realize.realizefn;
+>>> +identifier err;
+>>> +identifier errp;
+>>> +identifier func_with_errp =3D~ "(?!object_property_set_link)";
+>>
+>> What are you trying to accomplish with this lookahead assertion?
 >
+> "match all func_with_errp() except object_property_set_link()"?
 
-Thank you :)
-Sundeep
+What's wrong with
 
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
-> >
-> >      def do_test_arm_raspi2(self, uart_id):
-> >          """
-> >
+    identifier func_with_errp !=3D object_property_set_link
+
+?
+
+[...]
+
 
