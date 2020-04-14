@@ -2,64 +2,91 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B279C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 02:35:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 961D9C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 04:06:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25D312072A
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 02:35:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B316206D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 04:06:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KmAr/GdX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25D312072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a6BlHTzB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B316206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOBQG-00085c-8s
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 22:35:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46836)
+	id 1jOCps-0002Iz-Cu
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 00:06:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55736)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jOBN5-00035p-UZ
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 22:32:21 -0400
+ (envelope-from <natechancellor@gmail.com>) id 1jOCpA-0001UO-Mb
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 00:05:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jOBN3-0003b6-Js
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 22:32:18 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:45881 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jOBMw-0003RC-9w; Mon, 13 Apr 2020 22:32:10 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 491TxN29T5z9sT5; Tue, 14 Apr 2020 12:26:46 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1586831448;
- bh=3/Xw54vw/w/PtyLjYDuN8rCsI7SEMGcyTcOiWJniLyk=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=KmAr/GdXzjCuTn57fzRzIBAEojD+Z8/hJlqKJyA0EfGjbWey8S3NESFLek9Q1JhiU
- M62OWCo0xl/O2s1msbGU1tAzKGcddGGX7CxT8bl4joMZL+ImnUrTut/r7n0SQmTGR2
- DRH3YtzNBzyzqeV/sEKyvT63TgdymX0dlckpPmEI=
-Date: Tue, 14 Apr 2020 12:12:03 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH-for-5.1 v3 11/23] hw/pci-host/pnv_phb3: Add missing
- error-propagation code
-Message-ID: <20200414021203.GI48061@umbus.fritz.box>
-References: <20200412224144.12205-1-f4bug@amsat.org>
- <20200412224144.12205-12-f4bug@amsat.org>
+ (envelope-from <natechancellor@gmail.com>) id 1jOCp9-0005O8-BD
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 00:05:24 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:42917)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <natechancellor@gmail.com>)
+ id 1jOCp5-0005N1-AN; Tue, 14 Apr 2020 00:05:19 -0400
+Received: by mail-oi1-x241.google.com with SMTP id d7so4298499oif.9;
+ Mon, 13 Apr 2020 21:05:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=Tg2WSh831FNsYBv0b1Z6yZuwq3dfkUIjSqBChy52co4=;
+ b=a6BlHTzB/xon0enFlcpOTS6p3YfbVx7JypaA95SnXxU2Lu1SOreC5FpaBfOxQAROmd
+ eFUrJjjN884ladpHMW6BTXf04byhvl2YJ0VsLm1AY1sY5o30F9TOFnm3mAGbahiMyGgn
+ oGBnHB98cOrf0xvGY7bqXx3hZkz0UaSTv1vYPPDEn/V4H9a040qIS8KsbkiagHOvQkjZ
+ 2LAlSH5AJepgCkaNYrZGo65M8atMNYYSqATxso+htzvIRSIwNwfPHymqpmXBraXNFYqA
+ sJnF8771SqUQylWE6HPSynejLmOrtlrWVf7MeLdFPC9bhPnQEJG+PjXF4urmkGefCDUs
+ 2PJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=Tg2WSh831FNsYBv0b1Z6yZuwq3dfkUIjSqBChy52co4=;
+ b=VhwM5CWoPIlDROFIxIUN1y3y5KWoyhg1KwgcVCUSOj6EmFCY+6DImj9g+c3pHwIGPO
+ xtoAeB8HJOXGii1XaD1wdZgfPqVqFUB0DZsI63FSirkwfZyR243dSM1HFm03UAVfDt6x
+ RofHQUyuG98TW4r5io8mIeYnb3ZNLVkTcToCgLMIgILXZ66U0D1hYtK9QmVzZpovFal/
+ uaCtUZw6pyeFKV99b0iPAvP2bXDXWyQXWNVFKPRiEo4WQhPguFS9bjUQKDn3wqRgygU7
+ pkumt00kisepfmgiKnKf/2K1NgGLtBzERErgch6ccedCZDqAhz9llQZ01cdLOTuCTCdf
+ HSkw==
+X-Gm-Message-State: AGi0Pua2pSVKvTutF3ABNkc3SfVmsUXV+VPi57VZDT48jC4e/oZQjRsf
+ u4zHaaj6RnLRC5uZTDe0do0=
+X-Google-Smtp-Source: APiQypLXFqd/qfevw0nE4+wkwvGzhAeOaNcSzuw0BWByzycZA6kckMmKb9Y7k8qKdE7lGqdPGSvEIw==
+X-Received: by 2002:aca:f4c4:: with SMTP id s187mr14254390oih.83.1586837117864; 
+ Mon, 13 Apr 2020 21:05:17 -0700 (PDT)
+Received: from ubuntu-s3-xlarge-x86 ([2604:1380:4111:8b00::3])
+ by smtp.gmail.com with ESMTPSA id u199sm5360896oif.25.2020.04.13.21.05.16
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 13 Apr 2020 21:05:17 -0700 (PDT)
+Date: Mon, 13 Apr 2020 21:05:15 -0700
+From: Nathan Chancellor <natechancellor@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: Boot flakiness with QEMU 3.1.0 and Clang built kernels
+Message-ID: <20200414040515.GA22855@ubuntu-s3-xlarge-x86>
+References: <20200410205932.GA880@ubuntu-s3-xlarge-x86>
+ <1586564375.zt8lm9finh.astroid@bobo.none>
+ <20200411005354.GA24145@ubuntu-s3-xlarge-x86>
+ <1586597161.xyshvdbjo6.astroid@bobo.none>
+ <1586612535.6kk4az03np.astroid@bobo.none>
+ <20200414020553.GD48061@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="BOmey7/79ja+7F5w"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200412224144.12205-12-f4bug@amsat.org>
+In-Reply-To: <20200414020553.GD48061@umbus.fritz.box>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,138 +98,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Max Reitz <mreitz@redhat.com>, Joel Stanley <joel@jms.id.au>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-riscv@nongnu.org, Andrew Jeffery <andrew@aj.id.au>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>, Michael Walle <michael@walle.cc>,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
+ clang-built-linux@googlegroups.com,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@fr.ibm.com>, qemu-ppc@nongnu.org,
+ linuxppc-dev@lists.ozlabs.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Apr 14, 2020 at 12:05:53PM +1000, David Gibson wrote:
+> On Sat, Apr 11, 2020 at 11:57:23PM +1000, Nicholas Piggin wrote:
+> > Nicholas Piggin's on April 11, 2020 7:32 pm:
+> > > Nathan Chancellor's on April 11, 2020 10:53 am:
+> > >> The tt.config values are needed to reproduce but I did not verify that
+> > >> ONLY tt.config was needed. Other than that, no, we are just building
+> > >> either pseries_defconfig or powernv_defconfig with those configs and
+> > >> letting it boot up with a simple initramfs, which prints the version
+> > >> string then shuts the machine down.
+> > >> 
+> > >> Let me know if you need any more information, cheers!
+> > > 
+> > > Okay I can reproduce it. Sometimes it eventually recovers after a long
+> > > pause, and some keyboard input often helps it along. So that seems like 
+> > > it might be a lost interrupt.
+> > > 
+> > > POWER8 vs POWER9 might just be a timing thing if P9 is still hanging
+> > > sometimes. I wasn't able to reproduce it with defconfig+tt.config, I
+> > > needed your other config with various other debug options.
+> > > 
+> > > Thanks for the very good report. I'll let you know what I find.
+> > 
+> > It looks like a qemu bug. Booting with '-d int' shows the decrementer 
+> > simply stops firing at the point of the hang, even though MSR[EE]=1 and 
+> > the DEC register is wrapping. Linux appears to be doing the right thing 
+> > as far as I can tell (not losing interrupts).
+> > 
+> > This qemu patch fixes the boot hang for me. I don't know that qemu 
+> > really has the right idea of "context synchronizing" as defined in the
+> > powerpc architecture -- mtmsrd L=1 is not context synchronizing but that
+> > does not mean it can avoid looking at exceptions until the next such
+> > event. It looks like the decrementer exception goes high but the
+> > execution of mtmsrd L=1 is ignoring it.
+> > 
+> > Prior to the Linux patch 3282a3da25b you bisected to, interrupt replay
+> > code would return with an 'rfi' instruction as part of interrupt return,
+> > which probably helped to get things moving along a bit. However it would
+> > not be foolproof, and Cedric did say he encountered some mysterious
+> > lockups under load with qemu powernv before that patch was merged, so
+> > maybe it's the same issue?
+> > 
+> > Thanks,
+> > Nick
+> > 
+> > The patch is a bit of a hack, but if you can run it and verify it fixes
+> > your boot hang would be good.
+> 
+> So a bug in this handling wouldn't surprise me at all.  However a
+> report against QEMU 3.1 isn't particularly useful.
+> 
+>  * Does the problem occur with current upstream master qemu?
 
---BOmey7/79ja+7F5w
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, I can reproduce the hang on 5.0.0-rc2.
 
-On Mon, Apr 13, 2020 at 12:41:32AM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Patch created mechanically by running:
->=20
->   $ spatch \
->     --macro-file scripts/cocci-macro-file.h --include-headers \
->     --sp-file scripts/coccinelle/use-error_propagate-in-realize.cocci \
->     --keep-comments --smpl-spacing --in-place --dir hw
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>  * Does the problem occur with qemu-2.12 (a pretty widely deployed
+>    "stable" qemu, e.g. in RHEL)?
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+No idea but I would assume so. I might have time later this week to test
+but I assume it is kind of irrelevant if it is reproducible at ToT.
 
-> ---
->  hw/pci-host/pnv_phb3.c | 24 ++++++++++++++++++++----
->  1 file changed, 20 insertions(+), 4 deletions(-)
->=20
-> diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c
-> index 57d717ed23..a9029f5a02 100644
-> --- a/hw/pci-host/pnv_phb3.c
-> +++ b/hw/pci-host/pnv_phb3.c
-> @@ -1008,7 +1008,11 @@ static void pnv_phb3_realize(DeviceState *dev, Err=
-or **errp)
-> =20
->      /* LSI sources */
->      object_property_set_link(OBJECT(&phb->lsis), OBJECT(pnv), "xics",
-> -                                   &error_abort);
-> +                                   &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
->      object_property_set_bool(OBJECT(&phb->lsis), true, "realized", &loca=
-l_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
-> @@ -1023,9 +1027,17 @@ static void pnv_phb3_realize(DeviceState *dev, Err=
-or **errp)
-> =20
->      /* MSI sources */
->      object_property_set_link(OBJECT(&phb->msis), OBJECT(phb), "phb",
-> -                                   &error_abort);
-> +                                   &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
->      object_property_set_link(OBJECT(&phb->msis), OBJECT(pnv), "xics",
-> -                                   &error_abort);
-> +                                   &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
->      object_property_set_bool(OBJECT(&phb->msis), true, "realized", &loca=
-l_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
-> @@ -1034,7 +1046,11 @@ static void pnv_phb3_realize(DeviceState *dev, Err=
-or **errp)
-> =20
->      /* Power Bus Common Queue */
->      object_property_set_link(OBJECT(&phb->pbcq), OBJECT(phb), "phb",
-> -                                   &error_abort);
-> +                                   &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
->      object_property_set_bool(OBJECT(&phb->pbcq), true, "realized", &loca=
-l_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
+> > ---
+> > 
+> > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> > index b207fb5386..1d997f5c32 100644
+> > --- a/target/ppc/translate.c
+> > +++ b/target/ppc/translate.c
+> > @@ -4364,12 +4364,21 @@ static void gen_mtmsrd(DisasContext *ctx)
+> >      if (ctx->opcode & 0x00010000) {
+> >          /* Special form that does not need any synchronisation */
+> >          TCGv t0 = tcg_temp_new();
+> > +        TCGv t1 = tcg_temp_new();
+> >          tcg_gen_andi_tl(t0, cpu_gpr[rS(ctx->opcode)],
+> >                          (1 << MSR_RI) | (1 << MSR_EE));
+> > -        tcg_gen_andi_tl(cpu_msr, cpu_msr,
+> > +        tcg_gen_andi_tl(t1, cpu_msr,
+> >                          ~(target_ulong)((1 << MSR_RI) | (1 << MSR_EE)));
+> > -        tcg_gen_or_tl(cpu_msr, cpu_msr, t0);
+> > +        tcg_gen_or_tl(t1, t1, t0);
+> > +
+> > +        gen_update_nip(ctx, ctx->base.pc_next);
+> > +        gen_helper_store_msr(cpu_env, t1);
+> >          tcg_temp_free(t0);
+> > +        tcg_temp_free(t1);
+> > +        /* Must stop the translation as machine state (may have) changed */
+> > +        /* Note that mtmsr is not always defined as context-synchronizing */
+> > +        gen_stop_exception(ctx);
+> > +
+> >      } else {
+> >          /*
+> >           * XXX: we need to update nip before the store if we enter
+> > 
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---BOmey7/79ja+7F5w
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6VG/MACgkQbDjKyiDZ
-s5Kj5A//flfCOAGrQZ4AQGWz+ImUTGrwmNeULxS4KBuYciYvnReneGKdVyjLIVAM
-knHQZ+iRkW0ceFNvxIsAkfPINl3UHedgkQPAVK0atpWRWdl0T5HFGiBR66OOO5O8
-YVi1+hL3bV5MAyHnZg/J7YdswPuJoJnZdeIQcFqen+5aO6xa+iVNWLi9aM7HwU8E
-ynzoe+ZbxNHzDTxwK+pX6st0eEOzn6+FOlyJLSrbc6lwGVr07ZdBc/aH/eNLgM1C
-lTNLOXiwqAij5U9l3QBfR52WFy/7RepWz+5dHkzgFYRZCF/EeTYNxXwwdRD7aLxR
-O0YFI2VxAXffHEGf9OYELNbYoUO6+IK1YY3Q7U/l2f/MrsTFI0PULQL1LRXKEmsF
-jT5KbYjtgqeezz8Qp9cqWOxVBUUyumXVjZiz7R5J0/OoF8SPidnunDroORf1Q6po
-/1U+DWT8wi/+Z1z+04cW2VwNRbWmbaQgLAPPB3/SL7wvGCTWa7mbdapaVkyEJfHe
-+4q88351waRSlmwFo6YDNTlbiVUdkwZQB3BuBI69OC5wXwWkRcl+bG/M4w09yre/
-MgJWkIi9G1jxVMBVfGB63hfc8D+UiHkf4bUfZONwPFnxXp2gamBBvI7ZkuSzj31t
-SvJD80PaT341DXvDvX30nQ8w3MdWFOwKxn2cBye13CeOLlfVF54=
-=xhgF
------END PGP SIGNATURE-----
-
---BOmey7/79ja+7F5w--
+Cheers,
+Nathan
 
