@@ -2,81 +2,84 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D7CC2BB85
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 19:26:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EECC5C352BE
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 19:32:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A8BA20575
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 19:26:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD4112074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 19:32:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uBz1+el5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A8BA20575
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hgx0G2U1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD4112074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jORCl-0006b5-4e
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 15:26:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39388)
+	id 1jORIg-0000qh-Vs
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 15:32:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39958)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jORBx-00061l-5J
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 15:25:54 -0400
+ (envelope-from <armbru@redhat.com>) id 1jORHN-0000J1-Tf
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 15:31:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jORBw-0008H7-10
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 15:25:52 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:34709)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jORBt-0008Fi-Qg
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 15:25:51 -0400
-Received: by mail-oi1-x243.google.com with SMTP id x10so2042950oie.1
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 12:25:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=ajdhieO/yPSDycoQgMl2LpzqcalPWMGAn/dZc7rhDzk=;
- b=uBz1+el5UNKlTRKfgJtKVWtO7U7a5ioSSbF6helDq1B3vn0jF/niJOUki82R6SdGke
- 3YepVZzkLYANwtFA81FrgIi6WKVmZvixQ8a0nlt3uaeSb6xZJcJj9oij4NVCVDin2ChV
- HHh81QxPbyNVHQSRukrf6Ai0SdFKZ5lXl46D4O8x268cFVOh56qs5qCNXlfVr3GeU18t
- 3tjQAg3WBdhoLMiV/qhATzfoskc+frrLn/rmx1LPEmCQyhOkE3EvcRhJ7gWVw6z+/F2J
- y0IhDkryY5YWkBoTbmv2X9TzPnq4gstLn++bOHWJH7V5y7gQAfq0dKoXfvuBpuP04CBB
- tA5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=ajdhieO/yPSDycoQgMl2LpzqcalPWMGAn/dZc7rhDzk=;
- b=l2J+n8+TM15zL/f0Nq4L9nvNIwrTfNkpaeTLUL+clpl1xKZl1DcXdqI8qWSsDC1WUH
- ZYM0Q3f9/7mrJcqTs7vFATH4WXzRzt6bZgp7389nDrF9daJaIDPDVrc0X1A+FG2A8SlC
- Qd3XtBjPqrFOPzp+0HJXscpUwNYdULQi1VTYXuMjXFRtKG92KYquOV7Cl5bul0G66K3s
- AM5cDbNDuEuZMerKGYRaWtcpN9uQj/Dt0xMS0MVBt8bmzp7dW1LiLy93RkZJA1rlhGrA
- B2KbAKEkTe5Hh1VN3BtTp/xZ0pXEZ4k2bYWHQSkuc3cnOOYPT0JYNnn/KkCFkQms701D
- Vbeg==
-X-Gm-Message-State: AGi0Pub1E10f7J8QTRp0Sc3Po5SE9007NOjvXStB2pxHgjrIA6iq3OwW
- TVbZR4cKWxKLjjSWC6oOk6Ec7hGjAQJEJzBr1ljyGQ==
-X-Google-Smtp-Source: APiQypL2LiJ8pFhcUYZxpI/ReLaVqvf3j9xPuJkq51YazJ2nB//H+PoF2icK+vnEHFy1qf2jtipI+MDnFVdPcAV3Z8w=
-X-Received: by 2002:aca:170e:: with SMTP id j14mr45161oii.163.1586892348919;
- Tue, 14 Apr 2020 12:25:48 -0700 (PDT)
+ (envelope-from <armbru@redhat.com>) id 1jORHM-00022L-FZ
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 15:31:29 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50755
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jORHM-00021r-CG
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 15:31:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586892686;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1bOPVNhGDeFsjF9GoaRwAGC50NrKj6vfJtUdo46MetY=;
+ b=hgx0G2U1LwPNgatunI0DKQwNxDHeM1NPetceHkWqxMyXhepS8Ba4ihmtUGAVIaTo3Mu4pL
+ yW0k+Dq6Obv9/7KAfW1jA3ng+DlASvZS4xImKd9zFcvW1utX3LQX9VOl0j1THRsqbr7PaA
+ EACMvDYK4wy+gNVfgSqeSsWCDVzfx7I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-503-f7Sn0nPLPUavuLFq4dVIcw-1; Tue, 14 Apr 2020 15:31:23 -0400
+X-MC-Unique: f7Sn0nPLPUavuLFq4dVIcw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6268813FC;
+ Tue, 14 Apr 2020 19:31:22 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
+ [10.36.113.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 300902718F;
+ Tue, 14 Apr 2020 19:31:22 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id A906511385C8; Tue, 14 Apr 2020 21:31:20 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Toe Dev <devtoe82@gmail.com>
+Subject: Re: cscope redundant chars
+References: <CAN+O=T+bk=hXjPF67R=YHKebcuMP2dGzT_qXPWMUp=RvWOPxOw@mail.gmail.com>
+Date: Tue, 14 Apr 2020 21:31:20 +0200
+In-Reply-To: <CAN+O=T+bk=hXjPF67R=YHKebcuMP2dGzT_qXPWMUp=RvWOPxOw@mail.gmail.com>
+ (Toe Dev's message of "Tue, 14 Apr 2020 17:35:50 +0300")
+Message-ID: <87ftd5oodz.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200406153326.806024-1-berrange@redhat.com>
-In-Reply-To: <20200406153326.806024-1-berrange@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Apr 2020 20:25:36 +0100
-Message-ID: <CAFEAcA8rXBty2tHZOoqQA+mEcxEYiBntjeKj07-NUiPH+NWxmg@mail.gmail.com>
-Subject: Re: [PATCH v5 for-5.0] configure: warn if not using a separate build
- directory
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,36 +91,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Liviu Ionescu <ilg@livius.net>, QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Michal_Such=C3=A1nek?= <msuchanek@suse.de>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 6 Apr 2020 at 16:33, Daniel P. Berrang=C3=A9 <berrange@redhat.com> =
-wrote:
->
-> Running configure directly from the source directory is a build
-> configuration that will go away in future. It is also not currently
-> covered by any automated testing. Display a deprecation warning if
-> the user attempts to use an in-srcdir build setup, so that they are
-> aware that they're building QEMU in an undesirable manner.
->
-> Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
+Toe Dev <devtoe82@gmail.com> writes:
 
-Given where we are in the release cycle, I think this isn't
-going to go in for 5.0; and it's not really that urgent now
-we've decided we don't want to actually deprecate in-tree builds.
-I've removed the text I put into the changelog about this earlier.
+> add cscope phony(ctags have one) and remove redundancy
+>
+> diff --git a/Makefile b/Makefile
+> index 84ef881600..9cf62532f9 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1005,16 +1005,18 @@ ctags:
+>         rm -f tags
+>         find "$(SRC_PATH)" -name '*.[hc]' -exec ctags --append {} +
+>
+> +.PHONY: cscope
+> +
+> +cscope:
+> +       rm -f cscope.*
+> +       find $(SRC_PATH) -name "*.[chsS]" -print | sed 's,^\./,,' >
+> "$(SRC_PATH)/cscope.files"
+> +       cscope -b -q -k cscope.files
+> +
+>  .PHONY: TAGS
+>  TAGS:
+>         rm -f TAGS
+>         find "$(SRC_PATH)" -name '*.[hc]' -exec etags --append {} +
+>
+> -cscope:
+> -       rm -f "$(SRC_PATH)"/cscope.*
+> -       find "$(SRC_PATH)/" -name "*.[chsS]" -print | sed 's,^\./,,' >
+> "$(SRC_PATH)/cscope.files"
+> -       cscope -b -i"$(SRC_PATH)/cscope.files"
+> -
 
-thanks
--- PMM
+Can you explain why you drop $(SRC_PATH)/ before cscope.* and
+cscope.files?
+
+You also de-quote $(SRC_PATH).  Breaks when $(SRC_PATH) contains funny
+characters like space.  I'm not having funny characters there is a good
+idea, let alone that it works.  Still, I can't see why we should strip
+quotes here.
+
 
