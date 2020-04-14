@@ -1,92 +1,75 @@
-Return-Path: <SRS0=kd+i=55=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAEF1C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 23:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EED6C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 01:44:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D3B120735
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Apr 2020 23:20:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v0X5YBDB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D3B120735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EB46220644
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 01:44:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB46220644
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jO8NT-0007QH-OT
-	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 19:20:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53182)
+	id 1jOAcz-0000KR-Vu
+	for qemu-devel@archiver.kernel.org; Mon, 13 Apr 2020 21:44:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40102)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jO8Mj-0006Z6-SC
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 19:19:46 -0400
+ (envelope-from <maobibo@loongson.cn>) id 1jOAZ9-0001aM-En
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 21:40:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jO8Mi-0002eH-LL
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 19:19:45 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37945)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jO8Mi-0002dc-8l
- for qemu-devel@nongnu.org; Mon, 13 Apr 2020 19:19:44 -0400
-Received: by mail-pg1-x541.google.com with SMTP id p8so5162209pgi.5
- for <qemu-devel@nongnu.org>; Mon, 13 Apr 2020 16:19:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=jY4NloNnYN/xR1cqdj1lfHYLk3Wix42tT4AJJzqRYFc=;
- b=v0X5YBDB3a5m8VUpe4oBCJo30jvsgxYEfohcstDUIHZJsRj3I5s2F9Ge/xXeYa4lfA
- vmgV8q64UNkCEl50KZr1j8XtJ/vqkkg41W7XPsjXGzgQsiha2yRSO9rnfgfJZidCNPze
- b3YR/WFJBeb/XYxNrpJ1Uvu8XrH7wrZ8RvXHvcW4BCeYmFkdTMEjqtvB2cGuQgdMUOv3
- H88KrKs6nnRun8s+FTn8bh7VnaUxpYj4L+k7MTcgIsHmMFS8Y7XinwYHC0IDMp2bsODL
- QMS4JlLu6bcj51vHlefb3KKg5AlXAUiwbWlCGqA7Xa+Oaqq5bgV4FRYIW2Alj8req7sk
- ZluQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=jY4NloNnYN/xR1cqdj1lfHYLk3Wix42tT4AJJzqRYFc=;
- b=cbYthk+cekZIWk1OJ3wBQAbXBeSjHE9CwRN6ISDdbRSJ2Ytx0LcQDwgYIut3x3B0CB
- VYVY4omzoJaDhDYTUZfJi0YAyuUKY9gd+ltwYKbg/BRXJJFVIE3dSDj5q4vy5Rq1POL7
- HntkB1rufeXV/aLWCbucuu7LLY45zT/JiIW5k7NlvikGhUontOJttSiAhvmdyOpJtzkY
- eg1sgEANUYByuX+AmeFucj7YbuYwjoQERaOrEqIAkr5Whf7qNnWgY4mtB9V+qbmWYPKF
- 4rr8RVqst6njBeAP5bXxGlAMgkp1Ebo0HPIA5yxWgjVkwyWgC9XoV9SzqnZ/1oOtKlkX
- 7fvg==
-X-Gm-Message-State: AGi0PubMcE8u31kridszdi7l7uAmUwAR3124/gCfS4+97v/GVMR2F/mI
- Q6TEAos9kVk5DAz6QZqtFmCEZA==
-X-Google-Smtp-Source: APiQypL4goOxENIWFoVMuZDQS13g09Qrf0yzS7OJ+olMbtv1bk34QUIzjeiJpkt8SJiEAdWQqQg3YA==
-X-Received: by 2002:a65:6250:: with SMTP id q16mr19987284pgv.9.1586819982632; 
- Mon, 13 Apr 2020 16:19:42 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id 9sm1647315pfn.204.2020.04.13.16.19.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 13 Apr 2020 16:19:41 -0700 (PDT)
-Subject: Re: [PATCH 21/31] target/arm: Implement SVE2 integer absolute
- difference and accumulate long
-To: Laurent Desnogues <laurent.desnogues@gmail.com>
-References: <20200326230838.31112-1-richard.henderson@linaro.org>
- <20200326230838.31112-22-richard.henderson@linaro.org>
- <CABoDooNE=R_jQjg-dZrdaK-atmuQ4XjMkGjKnmebKvuXcTpDQg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ae2cb680-2200-e9cb-afa1-e55593ef6d6d@linaro.org>
-Date: Mon, 13 Apr 2020 16:19:39 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <maobibo@loongson.cn>) id 1jOAZ7-0001zp-Mv
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 21:40:43 -0400
+Received: from mail.loongson.cn ([114.242.206.163]:37824 helo=loongson.cn)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <maobibo@loongson.cn>) id 1jOAZ7-0001xO-2r
+ for qemu-devel@nongnu.org; Mon, 13 Apr 2020 21:40:41 -0400
+Received: from [10.20.42.25] (unknown [10.20.42.25])
+ by mail.loongson.cn (Coremail) with SMTP id AQAAf9Dxr9qKFJVeT5knAA--.11S3;
+ Tue, 14 Apr 2020 09:40:27 +0800 (CST)
+Subject: Re: [PATCH 0/15] KVM: MIPS: Add Loongson-3 support (Host Side)
+To: Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen <chenhc@lemote.com>
+References: <1586763024-12197-1-git-send-email-chenhc@lemote.com>
+ <20200413161842.57ad8be4@flygoat-x1e>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <bbbeb507-5692-5969-c320-57d04823edc7@loongson.cn>
+Date: Tue, 14 Apr 2020 09:40:26 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
 MIME-Version: 1.0
-In-Reply-To: <CABoDooNE=R_jQjg-dZrdaK-atmuQ4XjMkGjKnmebKvuXcTpDQg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20200413161842.57ad8be4@flygoat-x1e>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+X-CM-TRANSID: AQAAf9Dxr9qKFJVeT5knAA--.11S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxKF47AFy3tF1fXr13Jr43Jrb_yoW7Zr47pa
+ 17C3W3Kr4kGr97Cw1fJw18Wr1aqr95JFyUJwsrt340gF98XF1qvr4IyFWFya47Cr9Yg340
+ qFyFqr1DWa17C3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDU0xBIdaVrnRJUUU9mb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
+ 0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+ A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xII
+ jxv20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4
+ vEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
+ FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
+ 0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY
+ 04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21lc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxC20s
+ 026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+ JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+ v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xva
+ j40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r
+ 1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07beAp5UUUUU=
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 114.242.206.163
+X-Mailman-Approved-At: Mon, 13 Apr 2020 21:41:10 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,48 +81,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: rajav@quicinc.com, qemu-arm <qemu-arm@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, apazos@quicinc.com
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>, kvm@vger.kernel.org,
+ Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
+ linux-mips@vger.kernel.org, aleksandar.qemu.devel@gmail.com,
+ Fuxin Zhang <zhangfx@lemote.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/13/20 9:15 AM, Laurent Desnogues wrote:
-> On Fri, Mar 27, 2020 at 12:18 AM Richard Henderson
-> <richard.henderson@linaro.org> wrote:
-> [...]
->> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
->> index a3653007ac..a0995d95c7 100644
->> --- a/target/arm/sve_helper.c
->> +++ b/target/arm/sve_helper.c
->> @@ -1216,6 +1216,30 @@ DO_ZZZ_NTB(sve2_eoril_d, uint64_t,     , DO_EOR)
->>
->>  #undef DO_ZZZ_NTB
->>
->> +#define DO_ABAL(NAME, TYPE, TYPEN) \
->> +void HELPER(NAME)(void *vd, void *va, void *vn, void *vm, uint32_t desc) \
->> +{                                                              \
->> +    intptr_t i, opr_sz = simd_oprsz(desc);                     \
->> +    int sel1 = (simd_data(desc) & 1) * sizeof(TYPE);           \
->> +    int sel2 = (simd_data(desc) & 2) * (sizeof(TYPE) / 2);     \
->> +    for (i = 0; i < opr_sz; i += sizeof(TYPE)) {               \
->> +        TYPE nn = (TYPEN)(*(TYPE *)(vn + i) >> sel1);          \
->> +        TYPE mm = (TYPEN)(*(TYPE *)(vm + i) >> sel2);          \
->> +        TYPE aa = *(TYPE *)(va + i);                           \
->> +        *(TYPE *)(vd + i) = DO_ABD(nn, mm) + aa;               \
->> +    }                                                          \
->> +}
+
+
+On 04/13/2020 04:18 PM, Jiaxun Yang wrote:
+> On Mon, 13 Apr 2020 15:30:09 +0800
+> Huacai Chen <chenhc@lemote.com> wrote:
 > 
-> ABAL is either top or bottom not a mix of two.  So only sel1 is needed
-> and its multiplicand should be the number of bits of TYPEN.
+>> We are preparing to add KVM support for Loongson-3. VZ extension is
+>> fully supported in Loongson-3A R4+, and we will not care about old
+>> CPUs (at least now). We already have a full functional Linux kernel
+>> (based on Linux-5.4.x LTS) and QEMU (based on 5.0.0-rc2) and their git
+>> repositories are here:
+>>
+>> QEMU: https://github.com/chenhuacai/qemu
+>> Kernel: https://github.com/chenhuacai/linux
+>>
+>> Of course these two repositories need to be rework and not suitable
+>> for upstream (especially the commits need to be splitted). We show
+>> them here is just to tell others what we have done, and how
+>> KVM/Loongson will look like.
+>>
+>> Our plan is make the KVM host side be upstream first, and after that,
+>> we will make the KVM guest side and QEMU emulator be upstream.
+> 
+> + Aleksandar as QEMU/MIPS mainatiner
+> 
+> I was involved in KVM/Loongson development a bit and also intend to
+> help with mainline these works.
+> 
+> After dealing with basic LS7A PCH kernel support, I'm going to
+> cooperate with Huacai and anyone who interested in to deal with
+> following stuff:
+> 
+> - Basic QEMU/TCG support for Loongson64 instructions.
+> 	Well, it seems unrelated with KVM, but that would make
+> 	development easier with cross ISA emulation. I'm not going to
+> 	implement all the features like Loongson's page table fast walk
+> 	extension and binary translation extension but I'll ensure any
+> 	binary compiled with march=loongson3a can run flawlessly on
+> 	TCG.
+> 
+> - Design of Loongson-VIRT QEMU machine
+> 	It is nearly impossible to bring a real Loongson system into
+> 	QEMU. Both RS780E and LS7A PCH have tons of unreasonable design
+> 	that would make the emulation extremely complex, Loongson
+> 	company's KVM implementation[1] has already proofed that,
+> 	thay're now in the hell. So we all agreed that we should build
+> 	a machine from draft. I think we should reuse existing infra as
+> 	far as possible to reduce our work load. I'm planing to use
+> 	pci-host-cam-generic together with VIRTIO PCI devices and a
+> 	a strip down version of loongson,liointc-1.0a to build a pure
+> 	PCI based system. But if any one have better idea please just
+> 	tell us, I'm still considering how to implement SMP-IPI and ACPI
+> 	stuff.
+It is a good job to add kvm virtualization support on loongson64 platform. I agree that we should define common virt machine hardware system, however the compiled kernel binary should be the same with host system, else it will bring out trouble for customers to differentiate them between guest system and host system.
 
-Yep.
+For pci host bridge emulation, I suggest that gpex pcie host bridge should be used, since it supports pcie hotplug and arm/riscv uses this pcie host bridge.
 
-> vd is both a source and a destination so a temporary should be used.
-
-In what way am I not?  Both sources are read before the write.  The operands
-are all in columns of the wide type (unlike the addp case you pointed out).
+For virtual interrupt controller, it should support MSI/MSIX interrupt, irqchip in kernel, IRQFD, vhost/vfio etc. I have no idea how to define virtual interrupt controller now.
 
 
-r~
+regards
+bibo,mao
+
+> 
+> - BIOS in VM
+> 	This has a lower priority. But BIOS is required to make a
+> 	emulated machine looks like a real machine. Loongson have their
+> 	open-sourced PMON and close-sourced UEFI(Based on tianocore).
+> 	I'd really with Loongson or Lemote will open-source their UEFI
+> 	but PMON is also a option.
+> 
+> Any kind of feedback is appreciated.
+> 
+> Thanks.
+> 
+> Wish you good health :-)
+> 
+> 
+> [1]: http://cgit.loongnix.org/cgit/linux-3.10/ &
+> http://cgit.loongnix.org/cgit/qemu-2.7.0/
+> 
+> Btw: I think Cc qemu-devel for the whole series is a little bit
+> disturb, probably we should only Cc qemu-devel for the cover letter.
+> 
+>>
+>> Mike Rapoport(1):
+>>  mips: define pud_index() regardless of page table folding
+>>
+>> Xing Li(2):
+>>  KVM: MIPS: Define KVM_ENTRYHI_ASID to cpu_asid_mask(&boot_cpu_data)
+>>  KVM: MIPS: Fix VPN2_MASK definition for variable cpu_vmbits
+>>
+>> Huacai Chen(12):
+>>  KVM: MIPS: Increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16
+>>  KVM: MIPS: Add EVENTFD support which is needed by VHOST
+>>  KVM: MIPS: Use lddir/ldpte instructions to lookup gpa_mm.pgd
+>>  KVM: MIPS: Introduce and use cpu_guest_has_ldpte
+>>  KVM: MIPS: Use root tlb to control guest's CCA for Loongson-3
+>>  KVM: MIPS: Let indexed cacheops cause guest exit on Loongson-3
+>>  KVM: MIPS: Add more types of virtual interrupts
+>>  KVM: MIPS: Add Loongson-3 Virtual IPI interrupt support
+>>  KVM: MIPS: Add CPUCFG emulation for Loongson-3
+>>  KVM: MIPS: Add CONFIG6 and DIAG registers emulation
+>>  KVM: MIPS: Add more MMIO load/store instructions emulation
+>>  KVM: MIPS: Enable KVM support for Loongson-3
+>>
+>> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+>> ---
+>>  arch/mips/Kconfig                    |   1 +
+>>  arch/mips/include/asm/cpu-features.h |   3 +
+>>  arch/mips/include/asm/kvm_host.h     |  50 +++-
+>>  arch/mips/include/asm/mipsregs.h     |   7 +
+>>  arch/mips/include/asm/pgtable-64.h   |   4 +-
+>>  arch/mips/include/uapi/asm/inst.h    |  11 +
+>>  arch/mips/kernel/cpu-probe.c         |   2 +
+>>  arch/mips/kvm/Kconfig                |   1 +
+>>  arch/mips/kvm/Makefile               |   5 +-
+>>  arch/mips/kvm/emulate.c              | 461
+>> ++++++++++++++++++++++++++++++++++- arch/mips/kvm/entry.c
+>>    |  19 +- arch/mips/kvm/interrupt.c            |  93 +------
+>>  arch/mips/kvm/interrupt.h            |  14 +-
+>>  arch/mips/kvm/loongson_ipi.c         | 215 ++++++++++++++++
+>>  arch/mips/kvm/mips.c                 |  49 +++-
+>>  arch/mips/kvm/tlb.c                  |  39 +++
+>>  arch/mips/kvm/trap_emul.c            |   3 +
+>>  arch/mips/kvm/vz.c                   | 204 +++++++++++-----
+>>  18 files changed, 1013 insertions(+), 168 deletions(-)
+>>  create mode 100644 arch/mips/kvm/loongson_ipi.c
+>> --
+>> 2.7.0
+
 
