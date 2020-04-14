@@ -2,86 +2,56 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D4D1C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 09:13:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B1F0C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 09:27:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 647702063A
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 09:13:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R4gXrqGE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 647702063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E3069206E9
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 09:27:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3069206E9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOHdO-0007HG-Hq
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 05:13:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57287)
+	id 1jOHqu-00036V-42
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 05:27:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59090)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jOHat-00067T-FJ
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:11:09 -0400
+ (envelope-from <balaton@jedlik.phy.bme.hu>) id 1jOHqD-0002cs-ML
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:26:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jOHar-0002fT-Sp
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:10:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36546
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <balaton@jedlik.phy.bme.hu>) id 1jOHqC-00028U-ED
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:26:49 -0400
+Received: from jedlik.phy.bme.hu ([152.66.102.83]:51654)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOHar-0002f7-NH
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:10:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586855456;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Rjim4lb/ADNrO0+52UOe4CpPDmYvuUcle0wR4f8ohgY=;
- b=R4gXrqGE/ioXGi5L+/80ELTX3PpQAPzZTn5WaCnv9FbJxBS7F30AgOXO4esRSa2p1tfyli
- bqrDY3FgpTfdiX1JqHkSOFw8Z9BbApY6vmjwMra9befIdxFEgMIDFoiq46jr0y3DhgVMPy
- S1T+/htuCWOmVLIDjwpia1nPu5rF0Fo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-Fa173O6xNeyxOsOZNov9Jg-1; Tue, 14 Apr 2020 05:10:55 -0400
-X-MC-Unique: Fa173O6xNeyxOsOZNov9Jg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2460C107B0E1;
- Tue, 14 Apr 2020 09:10:54 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
- [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E334410016EB;
- Tue, 14 Apr 2020 09:10:53 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 4FE8C11385C8; Tue, 14 Apr 2020 11:10:52 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH for-5.1 1/8] tests-qemu-opts: Cover has_help_option(),
- qemu_opt_has_help_opt()
-References: <20200409153041.17576-1-armbru@redhat.com>
- <20200409153041.17576-2-armbru@redhat.com>
- <8ea167d6-2784-1ab9-cf55-52eb7553cb4d@redhat.com>
-Date: Tue, 14 Apr 2020 11:10:52 +0200
-In-Reply-To: <8ea167d6-2784-1ab9-cf55-52eb7553cb4d@redhat.com> (Eric Blake's
- message of "Thu, 9 Apr 2020 12:50:13 -0500")
-Message-ID: <878siyxwir.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.71) (envelope-from <balaton@jedlik.phy.bme.hu>)
+ id 1jOHqC-0001qF-4C
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 05:26:48 -0400
+Received: by jedlik.phy.bme.hu (Postfix, from userid 1000)
+ id D8E02A0112; Tue, 14 Apr 2020 11:26:37 +0200 (CEST)
+Date: Tue, 14 Apr 2020 11:26:37 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Alistair Francis <alistair23@gmail.com>
+Subject: Re: [PATCH-for-5.1 1/3] hw/ide/ahci: Use qdev gpio rather than
+ qemu_allocate_irqs()
+In-Reply-To: <CAKmqyKNP73-h02ubQaFvMC4UyhCjbLmRVPmC8OQ7NRJgyL4zBQ@mail.gmail.com>
+Message-ID: <alpine.LMD.2.03.2004141125090.18346@eik.bme.hu>
+References: <20200412212943.4117-1-f4bug@amsat.org>
+ <20200412212943.4117-2-f4bug@amsat.org>
+ <CAKmqyKNP73-h02ubQaFvMC4UyhCjbLmRVPmC8OQ7NRJgyL4zBQ@mail.gmail.com>
+User-Agent: Alpine 2.03 (LMD 1266 2009-07-14)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: MULTIPART/MIXED;
+ BOUNDARY="1117279078-1045050326-1586856397=:18346"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 152.66.102.83
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,84 +63,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- mreitz@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Qemu-block <qemu-block@nongnu.org>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Stafford Horne <shorne@gmail.com>, John Snow <jsnow@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-> On 4/9/20 10:30 AM, Markus Armbruster wrote:
->> The two turn out to be inconsistent for "a,b,,help".  Test case
->> marked /* BUG */.
+--1117279078-1045050326-1586856397=:18346
+Content-Type: TEXT/PLAIN; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+
+On Mon, 13 Apr 2020, Alistair Francis wrote:
+> On Sun, Apr 12, 2020 at 2:29 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
+org> wrote:
+>> Switch to using the qdev gpio API which is preferred over
+>> qemu_allocate_irqs(). One step to eventually deprecate and
+>> remove qemu_allocate_irqs() one day.
+
+Not only that, it also fixes leaking allocated irqs if ahci can be=20
+plugged. (That was the reason for the original patch to fix the leak.)
+
+Regards,
+BALATON Zoltan
+
+>> Patch created mechanically using spatch with this script
+>> inspired from commit d6ef883d9d7:
 >>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>   @@
+>>   typedef qemu_irq;
+>>   identifier irqs, handler;
+>>   expression opaque, count, i;
+>>   @@
+>>   -   qemu_irq *irqs;
+>>       ...
+>>   -   irqs =3D qemu_allocate_irqs(handler, opaque, count);
+>>   +   qdev_init_gpio_in(DEVICE(opaque), handler, count);
+>>       <+...
+>>   -   irqs[i]
+>>   +   qdev_get_gpio_in(DEVICE(opaque), i)
+>>       ...+>
+>>   ?-  g_free(irqs);
+>>
+>> Inspired-by: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>
+> Alistair
+>
 >> ---
->>   tests/test-qemu-opts.c | 38 ++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 38 insertions(+)
+>>  hw/ide/ahci.c | 6 ++----
+>>  1 file changed, 2 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+>> index 13d91e109a..ef0a0a22ee 100644
+>> --- a/hw/ide/ahci.c
+>> +++ b/hw/ide/ahci.c
+>> @@ -1534,19 +1534,18 @@ void ahci_init(AHCIState *s, DeviceState *qdev)
+>>
+>>  void ahci_realize(AHCIState *s, DeviceState *qdev, AddressSpace *as, in=
+t ports)
+>>  {
+>> -    qemu_irq *irqs;
+>>      int i;
+>>
+>>      s->as =3D as;
+>>      s->ports =3D ports;
+>>      s->dev =3D g_new0(AHCIDevice, ports);
+>>      ahci_reg_init(s);
+>> -    irqs =3D qemu_allocate_irqs(ahci_irq_set, s, s->ports);
+>> +    qdev_init_gpio_in(DEVICE(s), ahci_irq_set, s->ports);
+>>      for (i =3D 0; i < s->ports; i++) {
+>>          AHCIDevice *ad =3D &s->dev[i];
+>>
+>>          ide_bus_new(&ad->port, sizeof(ad->port), qdev, i, 1);
+>> -        ide_init2(&ad->port, irqs[i]);
+>> +        ide_init2(&ad->port, qdev_get_gpio_in(DEVICE(s), i));
+>>
+>>          ad->hba =3D s;
+>>          ad->port_no =3D i;
+>> @@ -1554,7 +1553,6 @@ void ahci_realize(AHCIState *s, DeviceState *qdev,=
+ AddressSpace *as, int ports)
+>>          ad->port.dma->ops =3D &ahci_dma_ops;
+>>          ide_register_restart_cb(&ad->port);
+>>      }
+>> -    g_free(irqs);
+>>  }
+>>
+>>  void ahci_uninit(AHCIState *s)
+>> --
+>> 2.21.1
+>>
 >>
 >
->> +static void test_has_help_option(void)
->> +{
->> +    static const struct {
->> +        const char *params;
->> +        /* expected value of has_help_option() */
->> +        bool expect_has_help_option;
->> +        /* expected value of qemu_opt_has_help_opt() with implied=3Dfal=
-se */
->> +        bool expect_opt_has_help_opt;
->> +        /* expected value of qemu_opt_has_help_opt() with implied=3Dtru=
-e */
->> +        bool expect_opt_has_help_opt_implied;
->> +    } test[] =3D {
->> +        { "help", true, true, false },
->> +        { "helpme", false, false, false },
->> +        { "a,help", true, true, true },
->> +        { "a=3D0,help,b", true, true, true },
->> +        { "help,b=3D1", true, true, false },
->> +        { "a,b,,help", false /* BUG */, true, true },
 >
-> So which way are you calling the bug?  Without looking at the code but
-> going off my intuition, I parse this as option 'a' and option
-> 'b,help'. The latter is not a normal option name because it contains a
-> ',', but is a valid option value.
->
-> I agree that we have a bug, but I'm not yet sure in which direction
-> the bug lies (should has_help_option be fixed to report true, in which
-> case the substring ",help" has precedence over ',,' escaping; or
-> should qemu_opt_has_help_opt be fixed to report false, due to treating
-> 'b,help' after ',,' escape removal as an invalid option name).  So the
-> placement of the /* BUG */ comment matters - where you placed it, I'm
-> presuming that later in the series you change has_help_option to
-> return true, even though that goes against my intuitive parse.
-
-In addition to the canonical QemuOpts parser opts_do_parse(), we have
-several more, and of course they all differ from the canonical one for
-corner cases.
-
-I treat the canonical one as correct, and fix the others by eliminating
-the extra parsers.
-
-The others are:
-
-* has_help_option()
-
-  Fixed in PATCH 5 by reusing the guts of opts_do_parse().
-
-* is_valid_option_list()
-
-  Fixed in PATCH 8 by not parsing.
-
-* "id" extraction in opts_parse()
-
-  Lazy hack.  Fixed in PATCH 3 by reusing the guts of opts_do_parse().
-
-Back to your question: the value of has_help_option() differs from the
-value of qemu_opt_has_help_opt().  The latter uses the canonical parser,
-the former is one of the other parsers.  I therefore judge the latter
-right and the former wrong.
-
-Clear now?
-
+--1117279078-1045050326-1586856397=:18346--
 
