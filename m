@@ -2,84 +2,84 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA377C352B6
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 13:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5700C2BBC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 13:16:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 773BA2084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 13:15:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1C232063A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 13:16:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XxVHPaKR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 773BA2084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KIho+dz2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1C232063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOLPy-0007Gm-JI
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 09:15:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40419)
+	id 1jOLQc-0008GD-QV
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 09:16:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40594)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jOLNr-0005JZ-V2
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:13:49 -0400
+ (envelope-from <sundeep.lkml@gmail.com>) id 1jOLOJ-0005gJ-FQ
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:14:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jOLNq-0000qG-AA
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:13:47 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42296
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jOLNq-0000q3-2t
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:13:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586870025;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dBnnOFBSemn/BN7E0K4FWFIpUV+6Zyn7G1T3/Q72ZTY=;
- b=XxVHPaKRYnmC7oobupPp9MeiixXkfdpMzeN4xJjtt+F5ObyuritDAenplkZvjkWUNdLg6g
- joMIKTXBNdm8pV4z0IIUzFCZKpvWRGmBbrYecCJszzrehlrW2pm6tPwH7uet4kidguEOcp
- FHu27wGuX4pvd7DM21d8330rLN5YI4Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-vq8xt5OQN_GBwF538pD1gw-1; Tue, 14 Apr 2020 09:13:42 -0400
-X-MC-Unique: vq8xt5OQN_GBwF538pD1gw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9F4A13F7;
- Tue, 14 Apr 2020 13:13:41 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-1.ams2.redhat.com [10.36.114.1])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B3CB5D9E2;
- Tue, 14 Apr 2020 13:13:40 +0000 (UTC)
-Date: Tue, 14 Apr 2020 15:13:39 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH for-5.1 1/8] tests-qemu-opts: Cover has_help_option(),
- qemu_opt_has_help_opt()
-Message-ID: <20200414131339.GE7747@linux.fritz.box>
-References: <20200409153041.17576-1-armbru@redhat.com>
- <20200409153041.17576-2-armbru@redhat.com>
- <8ea167d6-2784-1ab9-cf55-52eb7553cb4d@redhat.com>
- <878siyxwir.fsf@dusky.pond.sub.org>
+ (envelope-from <sundeep.lkml@gmail.com>) id 1jOLOH-00014w-5s
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:14:15 -0400
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:36166)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <sundeep.lkml@gmail.com>)
+ id 1jOLOH-000147-06; Tue, 14 Apr 2020 09:14:13 -0400
+Received: by mail-il1-x144.google.com with SMTP id t8so7199767ilj.3;
+ Tue, 14 Apr 2020 06:14:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=sp7hGbvHRsSJq4vwR/WoGaL4OZPwo5wV8RDt+uMdw2E=;
+ b=KIho+dz2OXmxMMTYDiZAk5VSian0zqjOQ0vVPiGcYPtUhpF9SHihp366joW+c55lgM
+ v3l22IiVq9ZZoqFK8q2WYMztXwX4b2L7E9nGyaeWsvcn9Iu/YTk+0J9QxbqgSatlnOnO
+ c5E/Hkws50Mnjg6kheA2gWSgicXJX05N0Dp86QZ4LvxdEHAglrm7FdSd49toQnEYUc18
+ oI2CvUR5WQF0uOOgWWi+RpTCADrmsB+maOg0oJ81F7lf2frNKj7us4gaKxyg1cZukE7O
+ LjblZsYytwuJeV04KDPQlBvnaRyIk/hT5sMEEDFJqB55Hg2Zb9lLqfdqTyoo98Cy5lXH
+ ErjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=sp7hGbvHRsSJq4vwR/WoGaL4OZPwo5wV8RDt+uMdw2E=;
+ b=mnCyrRZ1ItaWLxQngpCqA7JHlfdVUrnvFOe7MyddhJrHeP2k6XTOPbTxYqUlkMncIG
+ ApBGfwwjPgrfmKGBp9memm9FhUuP4WngTC5SxxKVjhkF479aQfmDObUv4NY8YPh4r3k0
+ Lb3vchh2E1ylb0frU0nAftzU/ZbJuJzs9BQ6ZrGTgKS6EL0IO/hV+0i6rid1wormspZ8
+ kPQRgVXJz2xEZhOJLPWydOXX9wHGQrq4Y3H8eNsYmMYwpqMjDXb8qO+tGPOZeB1dR0Th
+ 2yUvJY2Av/LBlTp56OxuyfznP7VS9EyNvQBWpKyKcorMyVavTaDJWnv0QtTpqWDtYUGJ
+ /yKA==
+X-Gm-Message-State: AGi0PubN4fjNVuYu2uIQd3WJqaSAb3X1QNOPzCya+JEqHozQjCpzxg5n
+ kLrnQWfDb7i1cCgs/BRn1NknS9nPiWywqh6hwRg=
+X-Google-Smtp-Source: APiQypLLPgIKzOtyEkrBaCrOKIyV7pGqFTXCJfMgsG2Qh+UYxdq7SC/afSq8ILc3VCOJiffLl/+pMQXmyX8wroiXW2Y=
+X-Received: by 2002:a92:aa0f:: with SMTP id j15mr105749ili.211.1586870052227; 
+ Tue, 14 Apr 2020 06:14:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <878siyxwir.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+References: <1586529926-11441-1-git-send-email-sundeep.lkml@gmail.com>
+ <1586529926-11441-4-git-send-email-sundeep.lkml@gmail.com>
+ <b3d5a33f-150c-bfd8-ee78-40738ffe6b65@amsat.org>
+In-Reply-To: <b3d5a33f-150c-bfd8-ee78-40738ffe6b65@amsat.org>
+From: sundeep subbaraya <sundeep.lkml@gmail.com>
+Date: Tue, 14 Apr 2020 18:44:00 +0530
+Message-ID: <CALHRZur9zavhQX_M0Bw0XHJwX8z39btsKgyhyGvDNoeZVdEj4g@mail.gmail.com>
+Subject: Re: [Qemu devel PATCH v4 3/3] tests/boot_linux_console: Add ethernet
+ test to SmartFusion2
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,100 +91,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 14.04.2020 um 11:10 hat Markus Armbruster geschrieben:
-> Eric Blake <eblake@redhat.com> writes:
->=20
-> > On 4/9/20 10:30 AM, Markus Armbruster wrote:
-> >> The two turn out to be inconsistent for "a,b,,help".  Test case
-> >> marked /* BUG */.
-> >>
-> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >> ---
-> >>   tests/test-qemu-opts.c | 38 ++++++++++++++++++++++++++++++++++++++
-> >>   1 file changed, 38 insertions(+)
-> >>
+Hi Philippe,
+
+On Sun, Apr 12, 2020 at 11:32 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+>
+> On 4/10/20 4:45 PM, sundeep.lkml@gmail.com wrote:
+> > From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 > >
-> >> +static void test_has_help_option(void)
-> >> +{
-> >> +    static const struct {
-> >> +        const char *params;
-> >> +        /* expected value of has_help_option() */
-> >> +        bool expect_has_help_option;
-> >> +        /* expected value of qemu_opt_has_help_opt() with implied=3Df=
-alse */
-> >> +        bool expect_opt_has_help_opt;
-> >> +        /* expected value of qemu_opt_has_help_opt() with implied=3Dt=
-rue */
-> >> +        bool expect_opt_has_help_opt_implied;
-> >> +    } test[] =3D {
-> >> +        { "help", true, true, false },
-
-While we're talking about unintuitive, I feel the result for
-implied=3Dtrue is confusing, too. Never noticed it before, but are we
-really sure that it is the best possible behaviour that '-chardev help'
-and '-chardev id=3Dfoo,help' print two entirely different help texts?
-
-I'm not requesting to change anything about this in this series, but
-just making the point that maybe sometimes the existing behaviour is
-questionable.
-
-> >> +        { "helpme", false, false, false },
-> >> +        { "a,help", true, true, true },
-> >> +        { "a=3D0,help,b", true, true, true },
-> >> +        { "help,b=3D1", true, true, false },
-> >> +        { "a,b,,help", false /* BUG */, true, true },
+> > In addition to simple serial test this patch uses ping
+> > to test the ethernet block modelled in SmartFusion2 SoC.
 > >
-> > So which way are you calling the bug?  Without looking at the code but
-> > going off my intuition, I parse this as option 'a' and option
-> > 'b,help'. The latter is not a normal option name because it contains a
-> > ',', but is a valid option value.
+> > Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> > ---
+> >  tests/acceptance/boot_linux_console.py | 15 ++++++++++-----
+> >  1 file changed, 10 insertions(+), 5 deletions(-)
 > >
-> > I agree that we have a bug, but I'm not yet sure in which direction
-> > the bug lies (should has_help_option be fixed to report true, in which
-> > case the substring ",help" has precedence over ',,' escaping; or
-> > should qemu_opt_has_help_opt be fixed to report false, due to treating
-> > 'b,help' after ',,' escape removal as an invalid option name).  So the
-> > placement of the /* BUG */ comment matters - where you placed it, I'm
-> > presuming that later in the series you change has_help_option to
-> > return true, even though that goes against my intuitive parse.
->=20
-> In addition to the canonical QemuOpts parser opts_do_parse(), we have
-> several more, and of course they all differ from the canonical one for
-> corner cases.
->=20
-> I treat the canonical one as correct, and fix the others by eliminating
-> the extra parsers.
->=20
-> The others are:
->=20
-> * has_help_option()
->=20
->   Fixed in PATCH 5 by reusing the guts of opts_do_parse().
->=20
-> * is_valid_option_list()
->=20
->   Fixed in PATCH 8 by not parsing.
->=20
-> * "id" extraction in opts_parse()
->=20
->   Lazy hack.  Fixed in PATCH 3 by reusing the guts of opts_do_parse().
->=20
-> Back to your question: the value of has_help_option() differs from the
-> value of qemu_opt_has_help_opt().  The latter uses the canonical parser,
-> the former is one of the other parsers.  I therefore judge the latter
-> right and the former wrong.
+> > diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
+boot_linux_console.py
+> > index f825cd9..c6b06a1 100644
+> > --- a/tests/acceptance/boot_linux_console.py
+> > +++ b/tests/acceptance/boot_linux_console.py
+> > @@ -336,13 +336,13 @@ class BootLinuxConsole(Test):
+> >          """
+> >          uboot_url =3D ('https://raw.githubusercontent.com/'
+> >                       'Subbaraya-Sundeep/qemu-test-binaries/'
+> > -                     'fa030bd77a014a0b8e360d3b7011df89283a2f0b/u-boot'=
+)
+> > -        uboot_hash =3D 'abba5d9c24cdd2d49cdc2a8aa92976cf20737eff'
+> > +                     'fe371d32e50ca682391e1e70ab98c2942aeffb01/u-boot'=
+)
+> > +        uboot_hash =3D 'cbb8cbab970f594bf6523b9855be209c08374ae2'
+> >          uboot_path =3D self.fetch_asset(uboot_url, asset_hash=3Duboot_=
+hash)
+> >          spi_url =3D ('https://raw.githubusercontent.com/'
+> >                     'Subbaraya-Sundeep/qemu-test-binaries/'
+> > -                   'fa030bd77a014a0b8e360d3b7011df89283a2f0b/spi.bin')
+> > -        spi_hash =3D '85f698329d38de63aea6e884a86fbde70890a78a'
+> > +                   'fe371d32e50ca682391e1e70ab98c2942aeffb01/spi.bin')
+> > +        spi_hash =3D '65523a1835949b6f4553be96dec1b6a38fb05501'
+> >          spi_path =3D self.fetch_asset(spi_url, asset_hash=3Dspi_hash)
+> >
+> >          self.vm.set_console()
+> > @@ -352,7 +352,12 @@ class BootLinuxConsole(Test):
+> >                           '-drive', 'file=3D' + spi_path + ',if=3Dmtd,f=
+ormat=3Draw',
+> >                           '-no-reboot')
+> >          self.vm.launch()
+> > -        self.wait_for_console_pattern('init started: BusyBox')
+> > +        self.wait_for_console_pattern('Enter \'help\' for a list')
+> > +
+> > +        exec_command_and_wait_for_pattern(self, 'ifconfig eth0 10.0.2.=
+15',
+> > +                                                 'eth0: link becomes r=
+eady')
+> > +        exec_command_and_wait_for_pattern(self, 'ping -c 3 10.0.2.2',
+> > +            '3 packets transmitted, 3 packets received, 0% packet loss=
+')
+>
+> Very nice (and smart) :)
+>
 
-Shouldn't we also consider what users would reasonably expect?
+Thank you :)
+Sundeep
 
-Getting it parsed as an empty option name (I assume with a default value
-of "on"?) certainly looks like something that would surprise most users
-and, as you can see, even some QEMU developers.
-
-Kevin
-
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+> >
+> >      def do_test_arm_raspi2(self, uart_id):
+> >          """
+> >
 
