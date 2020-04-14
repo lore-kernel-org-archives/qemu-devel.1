@@ -2,88 +2,97 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15189C2BB85
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:16:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A23FC352BE
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:21:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4CA520678
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:16:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D41D620678
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 17:21:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ihnlJiCa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4CA520678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N+Vob9kr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D41D620678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOPB4-0002bb-To
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 13:16:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42074)
+	id 1jOPFW-0005Zv-Tt
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 13:21:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42513)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jOP0e-0006lE-NN
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:06:05 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOP1L-0007a6-GC
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:06:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sundeep.lkml@gmail.com>) id 1jOP0d-0006JC-DP
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:06:04 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:43869)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sundeep.lkml@gmail.com>)
- id 1jON5R-0003e7-7n; Tue, 14 Apr 2020 11:02:53 -0400
-Received: by mail-pf1-x443.google.com with SMTP id l1so23846pff.10;
- Tue, 14 Apr 2020 08:02:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=gXNblUO4SiKtKIE29/5D+Fmm4HZBRwhfz9A4bbnSMB4=;
- b=ihnlJiCaqcTHchqB2ttsaySfBAA08IHsJ0NEpXxDg2fgeFuRtyoZxzguGPjIxTD9gK
- 5unU4FoyTUTNcHcN63ZNFOI0444P4nig/vEjcy+4XHd1Z+/xfkyRGpxzoSCQCjPYYZuW
- fPlW7Mh5ThMIYYVgKmiBHgyloK1q6duvPRraVQNzgkfoJ24WCrL6kuwq6/OncYxgTqPC
- TkUokb43PsZD70pP9QpU/aMm26qsfnkPWO8YT2cqyiWoqfSCieptDBfBRorD0F9W1OgX
- zbJeKHbcFxoBXuOpxPE8AbeN1PTaqfja0rp0PCzhI0aam8PNGC0PwGAIY4Goho/DJiSK
- YVUA==
+ (envelope-from <philmd@redhat.com>) id 1jOP1K-0006o1-BK
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 13:06:47 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40598
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOLfA-0008Kd-Bi
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:31:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586871100;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=sp8SzHLCDmolhv1WuiLlsIvFgsrHTJti0rZsOPUJPyM=;
+ b=N+Vob9krwCKOimUmtELkT+ceW5juhZCEe8tn455q7ofep3e5aMGFaa5lkcuC2T0ryRNfFs
+ Bc2w6yMUNoUPTDawAWNP3RA3/BtPBKHR2LozuwXDZgNV/jFzxLdwShDT+O/OdWXvPw+w1E
+ bKy/s0iqSx/albh89N7lolzlt/Wv4o8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-352-lhnjZcTPPweyx_9poJXKgA-1; Tue, 14 Apr 2020 09:31:37 -0400
+X-MC-Unique: lhnjZcTPPweyx_9poJXKgA-1
+Received: by mail-wr1-f70.google.com with SMTP id o12so5624730wra.14
+ for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 06:31:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gXNblUO4SiKtKIE29/5D+Fmm4HZBRwhfz9A4bbnSMB4=;
- b=k6dy4LOIrV22s6Uqa9tYufnS2zHAAs4AYt8Vx2HKz/VYDR06K/0AQdxpnY6Oss6w70
- QOBZiIeEKK6+9McuY35C+LKk3Uj3DEv31h5/a29kM6nzCLxpquKMmeEvD4xaYfziQZ5/
- SmIlG+s9wCyTtorRVxhPag9bOQBjQTcWYG212vhOR+S4UBOYlYO1mHc0KRRv+80ZmGCf
- 7mtMa5TybNbFOqF8wcPdo+h7vmHYBWkF5EGY0DK/4E8e8HJ8VntFeBiSqQLGFm0uOzTQ
- u7sHyCfRX1d1cLz/zXYU3Et1ksMe9vM3xMetDX5FJk0qdN1mOknHfRl2zS2reEePZx5I
- 47OQ==
-X-Gm-Message-State: AGi0PuZbtaNxBEpjTRLikFrM4p984OS6Cj+2wX90NuK2Xh7LEjQzMg/N
- xnefXVd6Bti0/Amhdj+ghSqChJ7o1/I=
-X-Google-Smtp-Source: APiQypJ66Dn6kgPMqFzuOKCnNT9aHp0VZP5mPHQNojdGWTVbh17eYfsOTw9HoxVDqhVJ8K9M1D7EFQ==
-X-Received: by 2002:a65:6805:: with SMTP id l5mr21834666pgt.256.1586876572332; 
- Tue, 14 Apr 2020 08:02:52 -0700 (PDT)
-Received: from hyd1358.marvell.com ([115.113.156.2])
- by smtp.googlemail.com with ESMTPSA id f9sm12175240pjt.45.2020.04.14.08.02.49
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 14 Apr 2020 08:02:51 -0700 (PDT)
-From: sundeep.lkml@gmail.com
-To: jasowang@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Subject: [Qemu devel PATCH v5 3/3] tests/boot_linux_console: Add ethernet test
- to SmartFusion2
-Date: Tue, 14 Apr 2020 20:32:31 +0530
-Message-Id: <1586876551-3695-4-git-send-email-sundeep.lkml@gmail.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1586876551-3695-1-git-send-email-sundeep.lkml@gmail.com>
-References: <1586876551-3695-1-git-send-email-sundeep.lkml@gmail.com>
+ bh=tNX3//qXDnRxcPpWRn8QtDnslzojVakNKy5THztVse4=;
+ b=uiy49fAn5d7RVhgC1iZY76apypPNmQ31qu317/C3iMTAXq1DZRHlgWDaW8HpfrOlAC
+ tg/n7n2a6q07mP7vXiIX4PYOFi3OaRiEUH3MUnFHXrR838u8tMMxmr7iDXWtDaUVkGDM
+ EqJB3X2mHXcoEBwU8QBlgCTal20TXEu7Q/Zued1xe6sOgYaskHr672UftS1JwcgwUe/m
+ F5tFAkgQ5TBq/8y/JoLWh7vcgV4dc2xIrQXb1fE63/chfoljrYJuLzJFTFHkcFzeZPsB
+ S26lNvfkLihceBY9PPzs64XGgjGGWN1/kUZHOdCBRVD0dxsHGKci6x7kHzbanscoantq
+ UjbQ==
+X-Gm-Message-State: AGi0PuYaEzYvU7YuLJCEvBYtbPwCx/nPNBGLzI88uSaWNlWs3TUy8wwT
+ t5IZx+XR802w0qZMf+iYtO/9WG9vY0Rtmlbeu9cmXi2/0QDieiUx+/bM5pOvgUq+jmBfj0+4Li4
+ mJ1g3Ons/qxKjT4I=
+X-Received: by 2002:a5d:460b:: with SMTP id t11mr21176976wrq.319.1586871096166; 
+ Tue, 14 Apr 2020 06:31:36 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIv9RBVDEd3xw1GEDZI6IhmUZJUQ1PGjXeX5+q1aweflnJmMAgLsdEz4/QVZsnGZyoClpC5sg==
+X-Received: by 2002:a5d:460b:: with SMTP id t11mr21176965wrq.319.1586871095937; 
+ Tue, 14 Apr 2020 06:31:35 -0700 (PDT)
+Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id t13sm2952131wre.70.2020.04.14.06.31.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 14 Apr 2020 06:31:35 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.0 08/12] hw/misc/grlib_ahb_apb_pnp: Fix AHB PnP 8-bit
+ accesses
+Date: Tue, 14 Apr 2020 15:30:48 +0200
+Message-Id: <20200414133052.13712-9-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200414133052.13712-1-philmd@redhat.com>
+References: <20200414133052.13712-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,60 +104,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Fabien Chouteau <chouteau@adacore.com>, Max Filippov <jcmvbkbc@gmail.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Stafford Horne <shorne@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-In addition to simple serial test this patch uses ping
-to test the ethernet block modelled in SmartFusion2 SoC.
+The Plug & Play region of the AHB/APB bridge can be accessed
+by various word size, however the implementation is clearly
+restricted to 32-bit:
 
-Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+  static uint64_t grlib_ahb_pnp_read(void *opaque, hwaddr offset, unsigned =
+size)
+  {
+      AHBPnp *ahb_pnp =3D GRLIB_AHB_PNP(opaque);
+
+      return ahb_pnp->regs[offset >> 2];
+  }
+
+Similarly to commit 0fbe394a64 with the APB PnP registers,
+set the MemoryRegionOps::impl min/max fields to 32-bit, so
+memory.c::access_with_adjusted_size() can adjust when the
+access is not 32-bit.
+
+Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-Id: <20200331105048.27989-4-f4bug@amsat.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/acceptance/boot_linux_console.py | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ hw/misc/grlib_ahb_apb_pnp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index f825cd9..c6b06a1 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -336,13 +336,13 @@ class BootLinuxConsole(Test):
-         """
-         uboot_url = ('https://raw.githubusercontent.com/'
-                      'Subbaraya-Sundeep/qemu-test-binaries/'
--                     'fa030bd77a014a0b8e360d3b7011df89283a2f0b/u-boot')
--        uboot_hash = 'abba5d9c24cdd2d49cdc2a8aa92976cf20737eff'
-+                     'fe371d32e50ca682391e1e70ab98c2942aeffb01/u-boot')
-+        uboot_hash = 'cbb8cbab970f594bf6523b9855be209c08374ae2'
-         uboot_path = self.fetch_asset(uboot_url, asset_hash=uboot_hash)
-         spi_url = ('https://raw.githubusercontent.com/'
-                    'Subbaraya-Sundeep/qemu-test-binaries/'
--                   'fa030bd77a014a0b8e360d3b7011df89283a2f0b/spi.bin')
--        spi_hash = '85f698329d38de63aea6e884a86fbde70890a78a'
-+                   'fe371d32e50ca682391e1e70ab98c2942aeffb01/spi.bin')
-+        spi_hash = '65523a1835949b6f4553be96dec1b6a38fb05501'
-         spi_path = self.fetch_asset(spi_url, asset_hash=spi_hash)
- 
-         self.vm.set_console()
-@@ -352,7 +352,12 @@ class BootLinuxConsole(Test):
-                          '-drive', 'file=' + spi_path + ',if=mtd,format=raw',
-                          '-no-reboot')
-         self.vm.launch()
--        self.wait_for_console_pattern('init started: BusyBox')
-+        self.wait_for_console_pattern('Enter \'help\' for a list')
-+
-+        exec_command_and_wait_for_pattern(self, 'ifconfig eth0 10.0.2.15',
-+                                                 'eth0: link becomes ready')
-+        exec_command_and_wait_for_pattern(self, 'ping -c 3 10.0.2.2',
-+            '3 packets transmitted, 3 packets received, 0% packet loss')
- 
-     def do_test_arm_raspi2(self, uart_id):
-         """
--- 
-2.7.4
+diff --git a/hw/misc/grlib_ahb_apb_pnp.c b/hw/misc/grlib_ahb_apb_pnp.c
+index 72a8764776..d22ed00206 100644
+--- a/hw/misc/grlib_ahb_apb_pnp.c
++++ b/hw/misc/grlib_ahb_apb_pnp.c
+@@ -146,6 +146,10 @@ static const MemoryRegionOps grlib_ahb_pnp_ops =3D {
+     .read       =3D grlib_ahb_pnp_read,
+     .write      =3D grlib_ahb_pnp_write,
+     .endianness =3D DEVICE_BIG_ENDIAN,
++    .impl =3D {
++        .min_access_size =3D 4,
++        .max_access_size =3D 4,
++    },
+ };
+=20
+ static void grlib_ahb_pnp_realize(DeviceState *dev, Error **errp)
+--=20
+2.21.1
 
 
