@@ -2,113 +2,97 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CC6BC2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:35:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41FE4C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:35:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 359DA20678
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:35:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0901220678
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:35:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T4l3pqAw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 359DA20678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T4MethA7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0901220678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOOWb-0003Qv-AT
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 12:35:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53038)
+	id 1jOOWq-0003iE-6i
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 12:35:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52726)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jOOT4-0006tx-LF
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:31:23 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOOS6-0005Gu-Mk
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:30:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jOOT3-0001Ar-84
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:31:22 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43392)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jOOT3-0001AI-1G
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:31:21 -0400
-Received: by mail-wr1-x444.google.com with SMTP id i10so15080695wrv.10
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 09:31:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:to:cc:from:autocrypt:subject:message-id:date:user-agent
- :mime-version:content-language:content-transfer-encoding;
- bh=bUeQuorw99Ho/BLVjuAYoW2kjbNgVS9ZdntEABl9u38=;
- b=T4l3pqAwQxiQT4ZueS58CMHoSmugytRvcT1KA6yfEM7/IkAQaSXs3P2/szJXba+5W4
- Ezsm3iTGq9RyP/xQb6uJ14mQfi19AR151Rah1GzF3yPh0dFyrBcID0yBlHsfYIpc/DsC
- Ey6vVKtiGpyc2rvdTLcYtleNEw87hiTSjhZ8NTHiJHXRuSK0EGKNgiuDmoHLlSCTRWCE
- mHKUAxZMFZT+BCt1uuTmoA895yINcDybXGe85mlmYEpJ1s93xGO2i+dUmVJYRZvNBLmY
- 8BfDWYJwBBbmanAQnCUeAWS9wws8L2nb5J2sH/FW+Ggqnfd2PsO0B5W1uP/NhVgjqvZY
- CK0w==
+ (envelope-from <philmd@redhat.com>) id 1jOOS4-0000dX-Ex
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:30:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37296
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOLf4-0008JT-In
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:31:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586871094;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YAfEGA4pShKXRTklWkYx1xXMbd4XoGQUU9RSc9eismw=;
+ b=T4MethA7voJWKGjKKYvNPmXRgHLi+tJZ8tSDIvQ4IRKhp6qwvmoBL8dQ/XUL7TGzIivUOS
+ aoie3BKTXd9A31DezrNxGYKBmiMyr32nA+pq9dLat11N7PGahgWvMGDV+j5cH2JQUto0wP
+ Ns2X408AXii0E/QyMt0/iOGLcrg6KcY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-328-EgdhwhkWOzyD8oAqmnu0OA-1; Tue, 14 Apr 2020 09:31:32 -0400
+X-MC-Unique: EgdhwhkWOzyD8oAqmnu0OA-1
+Received: by mail-wr1-f69.google.com with SMTP id m5so5561897wru.15
+ for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 06:31:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:to:cc:from:autocrypt:subject:message-id
- :date:user-agent:mime-version:content-language
- :content-transfer-encoding;
- bh=bUeQuorw99Ho/BLVjuAYoW2kjbNgVS9ZdntEABl9u38=;
- b=ltjtkgGvT0kyIF61vIPPY58hfqiw3Cr3eJm8pD/qeOWmMgsIRdCzd317rO6h2bF3BS
- 4OOC6TcgQ1R3BUDqRsNZ72KSp0oymsYr2L2iZUdCZL+19/+iLSl1GPDvoUCxQ5Scxbck
- 3hWnLoKuEEDcskApWWUF4k6tYZxR+RtMPeuzIeRQEXyg0tyA3vTvpac3yO2OlKK40ZjS
- fzdP3jrRumz/mzk9/Io9jtSq3WcxWyVg4YLH8sgdY7Rd5v0p9hNQb7JWWQIsfCtqzSs3
- D/kYP1OA+KACgi101IKUhQwVEqunyZsuzBax4taMxzqe1Wpa+N/pIjcmDqnZJh4zDMXt
- NO0w==
-X-Gm-Message-State: AGi0PuYg57vNj+yt6Kk3pCPDxzJClNTB3ZBdzVNi6rN9MYZ9UFYL7kfX
- MN2pSGyEVIzNtiRrPBPi1Fo=
-X-Google-Smtp-Source: APiQypLAPd9RHcBo4LeMnBsiaTpQJPBQ3zqsAiDq1/Ae1uV+6znAmrXegvByyGqRjpH59kNcR3ncnw==
-X-Received: by 2002:adf:97d0:: with SMTP id t16mr24720608wrb.343.1586881879298; 
- Tue, 14 Apr 2020 09:31:19 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=R16ilq50Jn1I1kGv3Dmicd9P1j+Zk5asckFlP1ZiX90=;
+ b=BBX2+9wwK7a+doBbpBbwWeT+jZaqV/XZlobUYEqV9wWcqBj87wvM/MpqXxfK4QFdAy
+ sy2gnmGYMp22XBNWnkN3tC7m2eMzynAMwFMn4c/HqGmc+tqjdez1BWRB7fawcBiw46EA
+ cWB3lN9pEFXG1wL5lpldbjkD9fCpG6FJvczFyz5SANMFIECi8ib5MU8YjEqBFi+qnv+J
+ JbGNgbSYSo6WkavhNG4262p5GlPvaAZIwFDokeP7TzxYD96hOOTNzee8er0Okm+PFoba
+ 5jaSHwMfxh1wsQbBfqPfI4JQHI3QvMzDNTlTW9Odj+jRPsgAnshwpNxGvx3am13zU26L
+ 3h5Q==
+X-Gm-Message-State: AGi0PuYxCQfcoq/DnNRQw8Vzgdxr5EL3wzlCAkdyYGUc+kbIQCXRZHLd
+ b/w540cSIpmCZDtxMgqNBwB0kOk4Xj6L6GldkjPQbBIegwUuiIewAEBUBzQV2g2xcgYl2lC24uG
+ RLgjAam3YrOpPf90=
+X-Received: by 2002:a1c:2b06:: with SMTP id r6mr25127865wmr.25.1586871091259; 
+ Tue, 14 Apr 2020 06:31:31 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIKxHy3Uzk8jeWwU9k6qAkmvuC/6JDPqfgkBrtZcfvHkg3qCEUxYyJmOMaSLkPh1mCkZWM9Ww==
+X-Received: by 2002:a1c:2b06:: with SMTP id r6mr25127835wmr.25.1586871091004; 
+ Tue, 14 Apr 2020 06:31:31 -0700 (PDT)
+Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id e5sm20316694wru.92.2020.04.14.09.31.18
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 14 Apr 2020 09:31:18 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Subject: m68k: gdbstub crashing setting float register on cfv4e cpu
-Message-ID: <3be54f78-cf6d-af3b-6e1f-e91d146c6a3a@amsat.org>
-Date: Tue, 14 Apr 2020 18:31:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by smtp.gmail.com with ESMTPSA id b11sm19174133wrq.26.2020.04.14.06.31.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 14 Apr 2020 06:31:30 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.0 07/12] hw/misc/grlib_ahb_apb_pnp: Avoid crash when
+ writing to AHB PnP registers
+Date: Tue, 14 Apr 2020 15:30:47 +0200
+Message-Id: <20200414133052.13712-8-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200414133052.13712-1-philmd@redhat.com>
+References: <20200414133052.13712-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,96 +104,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Fabien Chouteau <chouteau@adacore.com>, Max Filippov <jcmvbkbc@gmail.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Stafford Horne <shorne@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-gdbstub/m68k seems broken with floats, previous to refactor commit
-a010bdbe719 ("extend GByteArray to read register helpers").
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-HEAD at 6fb1603aa2:
+Similarly to commit 158b659451 with the APB PnP registers, guests
+can crash QEMU when writting to the AHB PnP registers:
 
-$ qemu-system-m68k -s -S -cpu cfv4e
+  $ echo 'writeb 0xfffff042 69' | qemu-system-sparc -M leon3_generic -S -bi=
+os /etc/magic -qtest stdio
+  [I 1571938309.932255] OPENED
+  [R +0.063474] writeb 0xfffff042 69
+  Segmentation fault (core dumped)
 
----[GUEST]---
+  (gdb) bt
+  #0  0x0000000000000000 in  ()
+  #1  0x0000562999110df4 in memory_region_write_with_attrs_accessor
+      (mr=3Dmr@entry=3D0x56299aa28ea0, addr=3D66, value=3Dvalue@entry=3D0x7=
+fff6abe13b8, size=3Dsize@entry=3D1, shift=3D<optimized out>, mask=3Dmask@en=
+try=3D255, attrs=3D...) at memory.c:503
+  #2  0x000056299911095e in access_with_adjusted_size
+      (addr=3Daddr@entry=3D66, value=3Dvalue@entry=3D0x7fff6abe13b8, size=
+=3Dsize@entry=3D1, access_size_min=3D<optimized out>, access_size_max=3D<op=
+timized out>, access_fn=3Daccess_fn@entry=3D
+      0x562999110d70 <memory_region_write_with_attrs_accessor>, mr=3D0x5629=
+9aa28ea0, attrs=3D...) at memory.c:539
+  #3  0x0000562999114fba in memory_region_dispatch_write (mr=3Dmr@entry=3D0=
+x56299aa28ea0, addr=3D66, data=3D<optimized out>, op=3D<optimized out>, att=
+rs=3Dattrs@entry=3D...) at memory.c:1482
+  #4  0x00005629990c0860 in flatview_write_continue
+      (fv=3Dfv@entry=3D0x56299aa7d8a0, addr=3Daddr@entry=3D4294963266, attr=
+s=3D..., ptr=3Dptr@entry=3D0x7fff6abe1540, len=3Dlen@entry=3D1, addr1=3D<op=
+timized out>, l=3D<optimized out>, mr=3D0x56299aa28ea0)
+      at include/qemu/host-utils.h:164
+  #5  0x00005629990c0a76 in flatview_write (fv=3D0x56299aa7d8a0, addr=3D429=
+4963266, attrs=3D..., buf=3D0x7fff6abe1540, len=3D1) at exec.c:3165
+  #6  0x00005629990c4c1b in address_space_write (as=3D<optimized out>, addr=
+=3D<optimized out>, attrs=3D..., attrs@entry=3D..., buf=3Dbuf@entry=3D0x7ff=
+f6abe1540, len=3Dlen@entry=3D1) at exec.c:3256
+  #7  0x000056299910f807 in qtest_process_command (chr=3Dchr@entry=3D0x5629=
+995ee920 <qtest_chr>, words=3Dwords@entry=3D0x56299acfcfa0) at qtest.c:437
 
-(gdb) set architecture m68k:cfv4e
-The target architecture is assumed to be m68k:cfv4e
-(gdb) target remote 172.17.0.1:1234
-Remote debugging using 172.17.0.1:1234
-(gdb) info float
-fp0            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
-fp1            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
-fp2            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
-fp3            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
-fp4            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
-fp5            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
-fp6            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
-fp7            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
-fpcontrol      0x0                 0
-fpstatus       0x0                 0
-fpiaddr        0x0                 0x0
-(gdb) set $fp0=1
-Remote communication error.  Target disconnected.: Connection reset by peer.
+Instead of crashing, log the access as unimplemented.
 
----[HOST]---
+Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-Id: <20200331105048.27989-3-f4bug@amsat.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/misc/grlib_ahb_apb_pnp.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-30279@1586881511.897231:gdbstub_io_command Received: P12=000000000000f03f
-30279@1586881511.897293:gdbstub_io_reply Sent: OK
-30279@1586881511.897593:gdbstub_io_got_ack Got ACK
-30279@1586881511.897837:gdbstub_io_command Received: g
-Aborted (core dumped)
+diff --git a/hw/misc/grlib_ahb_apb_pnp.c b/hw/misc/grlib_ahb_apb_pnp.c
+index e230e25363..72a8764776 100644
+--- a/hw/misc/grlib_ahb_apb_pnp.c
++++ b/hw/misc/grlib_ahb_apb_pnp.c
+@@ -136,8 +136,15 @@ static uint64_t grlib_ahb_pnp_read(void *opaque, hwadd=
+r offset, unsigned size)
+     return ahb_pnp->regs[offset >> 2];
+ }
+=20
++static void grlib_ahb_pnp_write(void *opaque, hwaddr addr,
++                                uint64_t val, unsigned size)
++{
++    qemu_log_mask(LOG_UNIMP, "%s not implemented\n", __func__);
++}
++
+ static const MemoryRegionOps grlib_ahb_pnp_ops =3D {
+     .read       =3D grlib_ahb_pnp_read,
++    .write      =3D grlib_ahb_pnp_write,
+     .endianness =3D DEVICE_BIG_ENDIAN,
+ };
+=20
+--=20
+2.21.1
 
-(gdb) bt
-#1  0x00007ffff514e895 in abort () at /lib64/libc.so.6
-#2  0x00005555556a9548 in roundAndPackFloat64 (zSign=0 '\000', zExp=0,
-zSig=0, status=0x7fffffff9b20) at fpu/softfloat.c:3756
-#3  0x00005555556ad2bb in floatx80_to_float64 (a=...,
-status=0x7fffffff9b20) at fpu/softfloat.c:5659
-#4  0x000055555573a6c7 in cf_fpu_gdb_get_reg
-    (env=0x555555fb58d0, mem_buf=0x7fffffff9c7c
-"\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377",
-n=0) at target/m68k/helper.c:75
-#5  0x00005555556bd866 in gdb_read_register
-    (cpu=0x555555fad250, mem_buf=0x7fffffff9c7c
-"\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377",
-reg=18) at gdbstub.c:896
-#6  0x00005555556bf665 in handle_read_all_regs (gdb_ctx=0x7fffffff9c20,
-user_ctx=0x0) at gdbstub.c:1813
-#7  0x00005555556bead0 in process_string_cmd (s=0x5555564bb000,
-user_ctx=0x0, data=0x5555564bb01c "g", cmds=0x555555bf5880
-<read_all_regs_cmd_desc>, num_cmds=1) at gdbstub.c:1477
-#8  0x00005555556beb45 in run_cmd_parser (s=0x5555564bb000,
-data=0x5555564bb01c "g", cmd=0x555555bf5880 <read_all_regs_cmd_desc>) at
-gdbstub.c:1493
-#9  0x00005555556c093a in gdb_handle_packet (s=0x5555564bb000,
-line_buf=0x5555564bb01c "g") at gdbstub.c:2596
-#10 0x00005555556c15b7 in gdb_read_byte (s=0x5555564bb000, ch=55 '7') at
-gdbstub.c:2932
-#11 0x00005555556c17ea in gdb_chr_receive (opaque=0x5555564bb000,
-buf=0x7fffffffbde0 "$g#67", '0' <repeats 12 times>,
-"f03f#5f\347\372\340\366\377\177", size=5) at gdbstub.c:3170
-#12 0x000055555595e986 in qemu_chr_be_write_impl (s=0x55555622eac0,
-buf=0x7fffffffbde0 "$g#67", '0' <repeats 12 times>,
-"f03f#5f\347\372\340\366\377\177", len=5) at chardev/char.c:183
-#13 0x000055555595e9ea in qemu_chr_be_write (s=0x55555622eac0,
-buf=0x7fffffffbde0 "$g#67", '0' <repeats 12 times>,
-"f03f#5f\347\372\340\366\377\177", len=5) at chardev/char.c:195
-#14 0x0000555555967734 in tcp_chr_read (chan=0x555555e21290,
-cond=G_IO_IN, opaque=0x55555622eac0) at chardev/char-socket.c:525
-#15 0x0000555555982fb4 in qio_channel_fd_source_dispatch
-(source=0x555556493200, callback=0x555555967585 <tcp_chr_read>,
-user_data=0x55555622eac0) at io/channel-watch.c:84
-#16 0x00007ffff7c42ecd in g_main_context_dispatch () at
-/lib64/libglib-2.0.so.0
-#17 0x00005555559ec20c in glib_pollfds_poll () at util/main-loop.c:219
-#18 0x00005555559ec286 in os_host_main_loop_wait (timeout=14976775) at
-util/main-loop.c:242
-#19 0x00005555559ec38b in main_loop_wait (nonblocking=0) at
-util/main-loop.c:518
-#20 0x00005555557163dd in qemu_main_loop () at softmmu/vl.c:1665
-#21 0x0000555555988d21 in main (argc=7, argv=0x7fffffffd078,
-envp=0x7fffffffd0b8) at softmmu/main.c:49
 
