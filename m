@@ -2,78 +2,98 @@ Return-Path: <SRS0=m554=56=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5F73C352BE
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63836C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:51:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3DC621556
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:49:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28BD9206E9
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Apr 2020 16:51:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qa47vX2h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3DC621556
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HzO8STMD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28BD9206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOOkU-0004Ui-EU
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 12:49:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56364)
+	id 1jOOmI-0006PA-6p
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 12:51:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57590)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jOOb9-0003tO-O2
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:39:44 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOOdZ-0000wF-N1
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:42:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jOOb8-0005Hg-NK
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:39:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40248
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jOOdY-0006Mo-A0
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:42:13 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23900
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jOOb8-0005HU-JI
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 12:39:42 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOLec-0008CQ-Im
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 09:31:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586882382;
+ s=mimecast20190719; t=1586871066;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=s0m/vE/JDp/YTnEV/4OiBeyYKV7QGW/+0j4jil7uRNo=;
- b=Qa47vX2hbRo72j/ucVH761ASWt5NTL4PpsH0JMxT2micUdqibmEupXhQ5Mozriv1OIEdeL
- kHE8OLITEOdo4ZRY9GtmG22sZrQdF0cXnhSm85tw1eXBnXA+Zh1RbtZC9tjXVUqM7gEqAH
- BIQ0g5wSnekE/kDn8nAZVGx/nEyQf4c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-Ms7C1-KBM3y5zUiJyBeR0w-1; Tue, 14 Apr 2020 12:39:40 -0400
-X-MC-Unique: Ms7C1-KBM3y5zUiJyBeR0w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FD0A1034B42
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 16:39:39 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 790EA60BEC;
- Tue, 14 Apr 2020 16:39:38 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ bh=42lVAfyseGz1VGufIzij+GuSVkOjvcpSK4kWq6V6gmk=;
+ b=HzO8STMDDgZl5dL2Y9vXGJvm/TKx/4/4TO97T/alIxOK00ACgBuNHKJub7/T6sGouLPqEP
+ TxT7h1cJdTZyxmAI2+8fLtqwCds+qSAjIm5JBTEynbB1OVidlwUKxNDrPPOfq2WYFGpu/O
+ pPoxn0+AVNAuXnAPro6Z9wytXk9bY6Q=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-333-8hi55XSEM5WwVFPGRdm9Nw-1; Tue, 14 Apr 2020 09:31:02 -0400
+X-MC-Unique: 8hi55XSEM5WwVFPGRdm9Nw-1
+Received: by mail-wr1-f72.google.com with SMTP id m5so5560435wru.15
+ for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 06:31:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=kGKRmnKwmRxlOxdVqgxjmKtx9Q2hpJOt1NAPPmcNK0Y=;
+ b=ikeU5bX9d8W19zyu85KnMn4Mx0PIIIq0HdRZ/qY3lYAabXGsJJknR/uZ+RsXd/1knY
+ AxYvcloxgA8u9kM0kotDQ/nAQG0G19w2GRb7mw50YUvo2aNBlOp7QgMt7KA3mOvJdcg8
+ ouhDBs8pKfTH5d3UkZTjg6+uwhPeIxxO/GF28vSgDzDpxqkOhmC3yZf1OdFQUYzr6vN1
+ CW2qnu7v9KyLJmn3x291Fog1ptwnQfa7oLMcyAURitg6jq08wQRTrgDOiJDhwUlOuvvp
+ AOxfQHK0rJid3VUsGtrMepoZYJWLIFpWNZ74B/oE9vbFalmF+xMWkFXjzqw7rg3T6slJ
+ mGBg==
+X-Gm-Message-State: AGi0PubfwuUNQCAj5bnz/QcenVYL2CdDPyBo5m3a9aGTrUPH1gKhdbAd
+ 1N/iJ2DR2qA/gBAwUdSwNG/EWmt6HHmI0KN6u2ht9wsxK17INGcNrHf3wqiBrL1H+voOr/uJ5Go
+ upsEdV1BfGb6M7n8=
+X-Received: by 2002:a1c:ed1a:: with SMTP id l26mr23523422wmh.175.1586871060655; 
+ Tue, 14 Apr 2020 06:31:00 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLviEloVTS1cRcyC6vYEbzQ4KMafGY7ljn+PIpkM/EA0pUQsfi5Ks+nCt7hSSsjIbmhL666ZQ==
+X-Received: by 2002:a1c:ed1a:: with SMTP id l26mr23523395wmh.175.1586871060392; 
+ Tue, 14 Apr 2020 06:31:00 -0700 (PDT)
+Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id q8sm18307453wmg.22.2020.04.14.06.30.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 14 Apr 2020 06:30:59 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/3] hostmem: set default prealloc_threads to valid value
-Date: Tue, 14 Apr 2020 12:39:35 -0400
-Message-Id: <20200414163937.29669-2-pbonzini@redhat.com>
-In-Reply-To: <20200414163937.29669-1-pbonzini@redhat.com>
-References: <20200414163937.29669-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Subject: [PATCH-for-5.0 01/12] Revert "prevent crash when executing
+ guest-file-read with large count"
+Date: Tue, 14 Apr 2020 15:30:41 +0200
+Message-Id: <20200414133052.13712-2-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200414133052.13712-1-philmd@redhat.com>
+References: <20200414133052.13712-1-philmd@redhat.com>
+MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,45 +105,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Fabien Chouteau <chouteau@adacore.com>, Max Filippov <jcmvbkbc@gmail.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Stafford Horne <shorne@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+As noted by Daniel Berrang=C3=A9 in [*], the fix from commit 807e2b6fce
+which replaced malloc() by try_malloc() is not enough, the process
+can still run out of memory a few line later:
 
-Commit 4ebc74dbbf removed default prealloc_threads initialization
-by mistake, and that makes QEMU crash with division on zero at
-  numpages_per_thread =3D numpages / memset_num_threads;
-when QEMU is started with following backend
-  -object memory-backend-ram,id=3Dram-node0,prealloc=3Dyes,size=3D128M
+ 346     buf =3D g_try_malloc0(count + 1);
+ 347     if (!buf) {
+ 348         error_setg(errp,
+ 349                    "failed to allocate sufficient memory "
+ 350                    "to complete the requested service");
+ 351         return NULL;
+ 352     }
+ 353     is_ok =3D ReadFile(fh, buf, count, &read_count, NULL);
+ 354     if (!is_ok) {
+ 355         error_setg_win32(errp, GetLastError(), "failed to read file");
+ 356         slog("guest-file-read failed, handle %" PRId64, handle);
+ 357     } else {
+ 358         buf[read_count] =3D 0;
+ 359         read_data =3D g_new0(GuestFileRead, 1);
+                         ^^^^^^
 
-Return back initialization removed by 4ebc74dbbf to fix issue.
+Instead we are going to put a low hard limit on 'count' in the next
+commits. This reverts commit 807e2b6fce022707418bc8f61c069d91c613b3d2.
 
-Fixes: 4ebc74dbbf7ad50e4101629f3f5da5fdc1544051
-Reported-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20200325094423.24293-2-imammedo@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+[*] https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg03471.html
+
+Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- backends/hostmem.c | 1 +
- 1 file changed, 1 insertion(+)
+ qga/commands-win32.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index a70867b255..327f9eebc3 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -280,6 +280,7 @@ static void host_memory_backend_init(Object *obj)
-     /* TODO: convert access to globals to compat properties */
-     backend->merge =3D machine_mem_merge(machine);
-     backend->dump =3D machine_dump_guest_core(machine);
-+    backend->prealloc_threads =3D 1;
- }
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index b49920e201..46cea7d1d9 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -343,13 +343,7 @@ GuestFileRead *qmp_guest_file_read(int64_t handle, boo=
+l has_count,
+     }
 =20
- static void host_memory_backend_post_init(Object *obj)
+     fh =3D gfh->fh;
+-    buf =3D g_try_malloc0(count + 1);
+-    if (!buf) {
+-        error_setg(errp,
+-                   "failed to allocate sufficient memory "
+-                   "to complete the requested service");
+-        return NULL;
+-    }
++    buf =3D g_malloc0(count + 1);
+     is_ok =3D ReadFile(fh, buf, count, &read_count, NULL);
+     if (!is_ok) {
+         error_setg_win32(errp, GetLastError(), "failed to read file");
 --=20
-2.18.2
-
+2.21.1
 
 
