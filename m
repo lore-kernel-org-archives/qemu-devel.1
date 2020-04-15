@@ -2,57 +2,101 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1752BC2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 11:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0007C38A2C
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 11:35:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCD8F20575
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 11:22:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCD8F20575
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id BE48C208FE
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 11:35:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WnuTRMOZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE48C208FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48197 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOg7J-0006vm-2d
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 07:22:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50255)
+	id 1jOgJq-0000vY-Vu
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 07:35:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51392)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jOg6j-0006Rh-Ev
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 07:21:30 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOgJF-0000SL-Kj
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 07:34:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jOg6i-0005Vl-Cf
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 07:21:29 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:48378)
+ (envelope-from <philmd@redhat.com>) id 1jOgJD-00068E-NV
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 07:34:24 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51799
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jOg6f-0005Tx-TE; Wed, 15 Apr 2020 07:21:26 -0400
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 941A8BF7AF;
- Wed, 15 Apr 2020 11:21:23 +0000 (UTC)
-Date: Wed, 15 Apr 2020 13:21:20 +0200
-From: Klaus Birkelund Jensen <its@irrelevant.dk>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 11/16] nvme: factor out block backend setup
-Message-ID: <20200415112120.xywwownsyzy2o4n2@apples.localdomain>
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOgJD-00067u-85
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 07:34:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586950462;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2BYACKgQbA2aB41XonzcK8WGmovDA0I43ortBqGlWTY=;
+ b=WnuTRMOZmiDuRmac/Uc06sgkodlWTJGoqnPqY1xup3U/S8/XO8qPXKfr36rLqCeDKy77PY
+ v0A8M4BNd1mes9rK6US2aemTVli7M9t2/hj1885Htnrzb9GDXAUQEd+vMMZ11WcUsEOMoS
+ v4O+CjR7ZUsz6pWcdDa4QBRD5Yxqd1k=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-K-qxegN8NTKblJVToQGmag-1; Wed, 15 Apr 2020 07:34:20 -0400
+X-MC-Unique: K-qxegN8NTKblJVToQGmag-1
+Received: by mail-ed1-f72.google.com with SMTP id f11so2674330edc.4
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 04:34:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ku5k91aAs6qhCvO6FVUpSGuQNUhTpIgfzSK5wI7/zW0=;
+ b=VHP95LxE3gelmima3hu1BRMrIXHuQvJAv9BYerYSeyakrWHcUbi+Fb2sf8qS/zCv5A
+ wX0XrbJZB/vzXwrVcGnq23aC+VCgbgIAwjAM6Zfz3HPLnpwoHs9ROlQLV9t3isw+r+OO
+ W5xzQI9WM2bjMUHSWDUty9EbHZZ/yPlVgFZwkQXQFx4VuRLifLHk+E62a+sj+XdHyLxF
+ HNPYhmtMXB9W3FUGLkq4iR2l9+MjJXk6SsS1AnyGvXmpdqmyW/Ju4CEqpabm1p8Nqf7W
+ pIkcSZhe6qi7bgDC3TyACX9Jlgq5BrOp74VmlGP6NCQlc7nBTab6Wtdm6AXGr4ws8kwN
+ DKmQ==
+X-Gm-Message-State: AGi0PuaJozswCJe/gLzmDACDFyMlUXutZuky/fstfJmRC9fua047DX+c
+ QkTFNYIkzPKzE0FA4Hg3xf4OMHsnBWs2spgK/Fs1auXYw9Jw4D3FsmXjwyCoVRQYa6GcN2W/yPk
+ HpPrs3WxHtcraJmA=
+X-Received: by 2002:a05:6402:543:: with SMTP id
+ i3mr7994207edx.255.1586950459395; 
+ Wed, 15 Apr 2020 04:34:19 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKtwKuv2/sAKk+NC5om4z2FWOK9uiBKpBJfuh9hBH2BbiToUKeKDcZkB7NBNraqWxWyNeH8Vg==
+X-Received: by 2002:a05:6402:543:: with SMTP id
+ i3mr7994185edx.255.1586950459153; 
+ Wed, 15 Apr 2020 04:34:19 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id u7sm1753038edy.25.2020.04.15.04.34.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 15 Apr 2020 04:34:18 -0700 (PDT)
+Subject: Re: [PATCH 01/16] nvme: fix pci doorbell size calculation
+To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
 References: <20200415102445.564803-1-its@irrelevant.dk>
- <20200415102445.564803-12-its@irrelevant.dk>
- <1557e920-2869-4e62-f996-30172ce82e0e@redhat.com>
- <20200415110258.qprpbl6dslgs6w2b@apples.localdomain>
+ <20200415102445.564803-2-its@irrelevant.dk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6c2f8cf6-efb0-89e2-8a67-4b752d85c0a1@redhat.com>
+Date: Wed, 15 Apr 2020 13:34:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200415110258.qprpbl6dslgs6w2b@apples.localdomain>
+In-Reply-To: <20200415102445.564803-2-its@irrelevant.dk>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 128.199.63.193
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,58 +109,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
  Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Apr 15 13:02, Klaus Birkelund Jensen wrote:
-> On Apr 15 12:52, Philippe Mathieu-Daud=C3=A9 wrote:
-> > On 4/15/20 12:24 PM, Klaus Jensen wrote:
-> > > From: Klaus Jensen <k.jensen@samsung.com>
-> > >=20
-> > > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> > > ---
-> > >   hw/block/nvme.c | 15 ++++++++++++---
-> > >   1 file changed, 12 insertions(+), 3 deletions(-)
-> > >=20
-> > > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> > > index e67f578fbf79..f0989cbb4335 100644
-> > > --- a/hw/block/nvme.c
-> > > +++ b/hw/block/nvme.c
-> > > @@ -1348,6 +1348,17 @@ static void nvme_init_state(NvmeCtrl *n)
-> > >       n->cq =3D g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
-> > >   }
-> > > +static int nvme_init_blk(NvmeCtrl *n, Error **errp)
-> > > +{
-> > > +    blkconf_blocksizes(&n->conf);
-> > > +    if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(=
-n->conf.blk),
-> > > +                                       false, errp)) {
-> > > +        return -1;
-> > > +    }
-> > > +
-> > > +    return 0;
-> >=20
-> > I'm not sure this is a correct usage of the 'propagating errors' API =
-(see
-> > CODING_STYLE.rst and include/qapi/error.h), I'd expect this function =
-to
-> > return void, and use a local_error & error_propagate() in nvme_realiz=
-e().
-> >=20
-> > However this works, so:
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >=20
+On 4/15/20 12:24 PM, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
 >=20
-> So, I get that and did use the propagate functionality earlier. But I
-> still used the int return. I'm not sure about the style if returning
-> void - should I check if errp is now non-NULL? Point is that I need to
-> return early since the later calls could fail if previous calls did not
-> complete successfully.
+> The size of the BAR is 0x1000 (main registers) + 8 bytes for each
+> queue. Currently, the size of the BAR is calculated like so:
+>=20
+>      n->reg_size =3D pow2ceil(0x1004 + 2 * (n->params.num_queues + 1) * 4=
+);
+>=20
+> Since the 'num_queues' parameter already accounts for the admin queue,
+> this should in any case not need to be incremented by one. Also, the
+> size should be initialized to (0x1000).
+>=20
+>      n->reg_size =3D pow2ceil(0x1000 + 2 * n->params.num_queues * 4);
+>=20
+> This, with the default value of num_queues (64), we will set aside room
+> for 1 admin queue and 63 I/O queues (4 bytes per doorbell, 2 doorbells
+> per queue).
 
-Nevermind, I got it. I've changed it to propagate it correctly.
+It seems you are right, but I'd feel safer with a Ack-by from Keith.
+
+Do you mind adding definitions such:
+
+#define NVME_IO_SIZE (4 * KiB)
+#define DOORBELL_SIZE 4
+#define DOORBELL_COUNT 2
+
+Looking at nvme_set_feature() I see better why you introduce=20
+max_ioqpairs in patch #7:
+
+     case NVME_NUMBER_OF_QUEUES:
+         trace_nvme_setfeat_numq((dw11 & 0xFFFF) + 1,
+                                 ((dw11 >> 16) & 0xFFFF) + 1,
+                                 n->num_queues - 1, n->num_queues - 1);
+         req->cqe.result =3D
+             cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16))=
+;
+         break;
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+>=20
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> ---
+>   hw/block/nvme.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index d28335cbf377..77f9c151a665 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -1345,7 +1345,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
+**errp)
+>       pcie_endpoint_cap_init(pci_dev, 0x80);
+>  =20
+>       n->num_namespaces =3D 1;
+> -    n->reg_size =3D pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
+> +    n->reg_size =3D pow2ceil(0x1000 + 2 * n->num_queues * 4);
+>       n->ns_size =3D bs_size / (uint64_t)n->num_namespaces;
+>  =20
+>       n->namespaces =3D g_new0(NvmeNamespace, n->num_namespaces);
+>=20
+
 
