@@ -2,46 +2,48 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A896EC2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E700C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:09:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 820392076D
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:08:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 820392076D
+	by mail.kernel.org (Postfix) with ESMTPS id 05DC620737
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:09:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05DC620737
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOhmR-0008II-Ki
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 09:08:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33704)
+	id 1jOhnN-0002VS-5K
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 09:09:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33724)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jOhgU-0007DW-JQ
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:02:36 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jOhgV-0007F7-BD
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:02:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jOhgO-0004Bv-IA
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:02:30 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:48514)
+ (envelope-from <its@irrelevant.dk>) id 1jOhgU-0004Mi-95
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:02:31 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:48560)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jOhgL-00044a-1P; Wed, 15 Apr 2020 09:02:21 -0400
+ id 1jOhgN-00045z-0c; Wed, 15 Apr 2020 09:02:23 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 5FB3FBF7AF;
- Wed, 15 Apr 2020 13:02:19 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id CE692BFD25;
+ Wed, 15 Apr 2020 13:02:21 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 00/16] nvme: refactoring and cleanups
-Date: Wed, 15 Apr 2020 15:01:43 +0200
-Message-Id: <20200415130159.611361-1-its@irrelevant.dk>
+Subject: [PATCH v2 05/16] nvme: use constants in identify
+Date: Wed, 15 Apr 2020 15:01:48 +0200
+Message-Id: <20200415130159.611361-6-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.0
+In-Reply-To: <20200415130159.611361-1-its@irrelevant.dk>
+References: <20200415130159.611361-1-its@irrelevant.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -71,58 +73,63 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Changes since v1
-~~~~~~~~~~~~~~~~
-* nvme: fix pci doorbell size calculation
-  - added some defines and a better comment (Philippe)
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/block/nvme.c      | 8 ++++----
+ include/block/nvme.h | 8 ++++++++
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-* nvme: rename trace events to pci_nvme
-  - changed the prefix from nvme_dev to pci_nvme (Philippe)
-
-* nvme: add max_ioqpairs device parameter
-  - added a deprecation comment. I doubt this will go in until 5.1, so
-    changed it to "deprecated from 5.1" (Philippe)
-
-* nvme: factor out property/constraint checks
-* nvme: factor out block backend setup
-  - changed to return void and propagate errors in proper QEMU style
-    (Philippe)
-
-* nvme: add namespace helpers
-  - use the helper immediately (Philippe)
-
-* nvme: factor out pci setup
-  - removed setting of vendor and device id which is already inherited
-    from nvme_class_init() (Philippe)
-
-* nvme: factor out cmb setup
-  - add lost comment (Philippe)
-
-
-Klaus Jensen (16):
-  nvme: fix pci doorbell size calculation
-  nvme: rename trace events to pci_nvme
-  nvme: remove superfluous breaks
-  nvme: move device parameters to separate struct
-  nvme: use constants in identify
-  nvme: refactor nvme_addr_read
-  nvme: add max_ioqpairs device parameter
-  nvme: remove redundant cmbloc/cmbsz members
-  nvme: factor out property/constraint checks
-  nvme: factor out device state setup
-  nvme: factor out block backend setup
-  nvme: add namespace helpers
-  nvme: factor out namespace setup
-  nvme: factor out pci setup
-  nvme: factor out cmb setup
-  nvme: factor out controller identify setup
-
- hw/block/nvme.c       | 433 ++++++++++++++++++++++++------------------
- hw/block/nvme.h       |  36 +++-
- hw/block/trace-events | 172 ++++++++---------
- include/block/nvme.h  |   8 +
- 4 files changed, 372 insertions(+), 277 deletions(-)
-
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index a2b15a0ebd87..563cccae6795 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -682,7 +682,7 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeIde=
+ntify *c)
+=20
+ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
+ {
+-    static const int data_len =3D 4 * KiB;
++    static const int data_len =3D NVME_IDENTIFY_DATA_SIZE;
+     uint32_t min_nsid =3D le32_to_cpu(c->nsid);
+     uint64_t prp1 =3D le64_to_cpu(c->prp1);
+     uint64_t prp2 =3D le64_to_cpu(c->prp2);
+@@ -712,11 +712,11 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd =
+*cmd)
+     NvmeIdentify *c =3D (NvmeIdentify *)cmd;
+=20
+     switch (le32_to_cpu(c->cns)) {
+-    case 0x00:
++    case NVME_ID_CNS_NS:
+         return nvme_identify_ns(n, c);
+-    case 0x01:
++    case NVME_ID_CNS_CTRL:
+         return nvme_identify_ctrl(n, c);
+-    case 0x02:
++    case NVME_ID_CNS_NS_ACTIVE_LIST:
+         return nvme_identify_nslist(n, c);
+     default:
+         trace_pci_nvme_err_invalid_identify_cns(le32_to_cpu(c->cns));
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 8fb941c6537c..c2fd01cf2f1d 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -533,6 +533,14 @@ typedef struct NvmePSD {
+     uint8_t     resv[16];
+ } NvmePSD;
+=20
++#define NVME_IDENTIFY_DATA_SIZE 4096
++
++enum {
++    NVME_ID_CNS_NS             =3D 0x0,
++    NVME_ID_CNS_CTRL           =3D 0x1,
++    NVME_ID_CNS_NS_ACTIVE_LIST =3D 0x2,
++};
++
+ typedef struct NvmeIdCtrl {
+     uint16_t    vid;
+     uint16_t    ssvid;
 --=20
 2.26.0
 
