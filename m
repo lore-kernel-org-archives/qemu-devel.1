@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4C9AC2BA2B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:26:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A948EC2BA2B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:27:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96A38206D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:26:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96A38206D9
+	by mail.kernel.org (Postfix) with ESMTPS id 7641E206D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:27:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7641E206D9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jObVM-0005BJ-Jh
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 02:26:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35916)
+	id 1jObWS-00067J-Fa
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 02:27:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35926)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jOazL-0003Q5-4K
+ (envelope-from <its@irrelevant.dk>) id 1jOazL-0003Qs-E8
  for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:53:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jOazJ-00035p-PA
+ (envelope-from <its@irrelevant.dk>) id 1jOazJ-00034u-23
  for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:53:31 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:47604)
+Received: from charlie.dont.surf ([128.199.63.193]:47602)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jOazH-0002lg-4J; Wed, 15 Apr 2020 01:53:27 -0400
+ id 1jOazG-0002lX-0s; Wed, 15 Apr 2020 01:53:26 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 8A4E6BFE1B;
+ by charlie.dont.surf (Postfix) with ESMTPSA id 29EF2BFE13;
  Wed, 15 Apr 2020 05:52:35 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v7 47/48] nvme: change controller pci id
-Date: Wed, 15 Apr 2020 07:51:39 +0200
-Message-Id: <20200415055140.466900-48-its@irrelevant.dk>
+Subject: [PATCH v7 46/48] pci: allocate pci id for nvme
+Date: Wed, 15 Apr 2020 07:51:38 +0200
+Message-Id: <20200415055140.466900-47-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200415055140.466900-1-its@irrelevant.dk>
 References: <20200415055140.466900-1-its@irrelevant.dk>
@@ -63,7 +63,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
  Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
  Max Reitz <mreitz@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
- Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
  Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -71,101 +72,95 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-There are two reasons for changing this:
+The emulated nvme device (hw/block/nvme.c) is currently using an
+internal Intel device id.
 
-  1. The nvme device currently uses an internal Intel device id.
-
-  2. Since commits "nvme: fix write zeroes offset and count" and "nvme:
-     support multiple namespaces" the controller device no longer has
-     the quirks that the Linux kernel think it has.
-
-     As the quirks are applied based on pci vendor and device id, change
-     them to get rid of the quirks.
-
-To keep backward compatibility, add a new 'x-use-intel-id' parameter to
-the nvme device to force use of the Intel vendor and device id. This is
-off by default but add a compat property to set this for machines 4.2
-and older.
+Prepare to change that by allocating a device id under the 1b36 (Red
+Hat, Inc.) vendor id.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Reviewed-by: Keith Busch <kbusch@kernel.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Acked-by: Keith Busch <kbusch@kernel.org>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- hw/block/nvme.c   | 13 +++++++++----
- hw/block/nvme.h   |  4 +++-
- hw/core/machine.c |  1 +
- 3 files changed, 13 insertions(+), 5 deletions(-)
+ MAINTAINERS            |  1 +
+ docs/specs/nvme.txt    | 25 +++++++++++++++++++++++++
+ docs/specs/pci-ids.txt |  1 +
+ include/hw/pci/pci.h   |  1 +
+ 4 files changed, 28 insertions(+)
+ create mode 100644 docs/specs/nvme.txt
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index e338d0893a70..40a400333828 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -2544,8 +2544,15 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevice *=
-pci_dev)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5f93e8c01d34..b4bbc58b668b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1736,6 +1736,7 @@ L: qemu-block@nongnu.org
+ S: Supported
+ F: hw/block/nvme*
+ F: tests/qtest/nvme-test.c
++F: docs/specs/nvme.txt
 =20
-     pci_conf[PCI_INTERRUPT_PIN] =3D 1;
-     pci_config_set_prog_interface(pci_conf, 0x2);
--    pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_INTEL);
--    pci_config_set_device_id(pci_conf, 0x5845);
+ megasas
+ M: Hannes Reinecke <hare@suse.com>
+diff --git a/docs/specs/nvme.txt b/docs/specs/nvme.txt
+new file mode 100644
+index 000000000000..b51552cb5c3f
+--- /dev/null
++++ b/docs/specs/nvme.txt
+@@ -0,0 +1,25 @@
++NVM Express Controller
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 +
-+    if (n->params.use_intel_id) {
-+        pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_INTEL);
-+        pci_config_set_device_id(pci_conf, 0x5846);
-+    } else {
-+        pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_REDHAT);
-+        pci_config_set_device_id(pci_conf, PCI_DEVICE_ID_REDHAT_NVME);
-+    }
++The nvme device (-device nvme) emulates an NVM Express Controller.
 +
-     pci_config_set_class(pci_conf, PCI_CLASS_STORAGE_EXPRESS);
-     pcie_endpoint_cap_init(pci_dev, 0x80);
++
++Reference Specifications
++------------------------
++
++The device currently implements most mandatory features of NVMe v1.3d, s=
+ee
++
++  https://nvmexpress.org/resources/specifications/
++
++for the specification.
++
++
++Known issues
++------------
++
++* The device does not have any way of storing persistent state, so minor=
+ parts
++  of the implementation is in violation of the specification:
++    - The accounting numbers in the SMART/Health are reset across power =
+cycles
++
++* Interrupt Coalescing is not supported and is disabled by default in vo=
+lation
++  of the specification.
+diff --git a/docs/specs/pci-ids.txt b/docs/specs/pci-ids.txt
+index 4d53e5c7d9d5..abbdbca6be38 100644
+--- a/docs/specs/pci-ids.txt
++++ b/docs/specs/pci-ids.txt
+@@ -63,6 +63,7 @@ PCI devices (other than virtio):
+ 1b36:000b  PCIe Expander Bridge (-device pxb-pcie)
+ 1b36:000d  PCI xhci usb host adapter
+ 1b36:000f  mdpy (mdev sample device), linux/samples/vfio-mdev/mdpy.c
++1b36:0010  PCIe NVMe device (-device nvme)
 =20
-@@ -2727,8 +2734,6 @@ static void nvme_class_init(ObjectClass *oc, void *=
-data)
-     pc->realize =3D nvme_realize;
-     pc->exit =3D nvme_exit;
-     pc->class_id =3D PCI_CLASS_STORAGE_EXPRESS;
--    pc->vendor_id =3D PCI_VENDOR_ID_INTEL;
--    pc->device_id =3D 0x5845;
-     pc->revision =3D 2;
+ All these devices are documented in docs/specs.
 =20
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index f42c17651b7b..615a6ff5d13d 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -13,7 +13,8 @@
-     DEFINE_PROP_UINT32("max_ioqpairs", _state, _props.max_ioqpairs, 64),=
- \
-     DEFINE_PROP_UINT8("aerl", _state, _props.aerl, 3), \
-     DEFINE_PROP_UINT32("aer_max_queued", _state, _props.aer_max_queued, =
-64), \
--    DEFINE_PROP_UINT8("mdts", _state, _props.mdts, 7)
-+    DEFINE_PROP_UINT8("mdts", _state, _props.mdts, 7), \
-+    DEFINE_PROP_BOOL("x-use-intel-id", _state, _props.use_intel_id, fals=
-e)
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index da9057b8db97..92231885bc23 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -104,6 +104,7 @@ extern bool pci_available;
+ #define PCI_DEVICE_ID_REDHAT_XHCI        0x000d
+ #define PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE 0x000e
+ #define PCI_DEVICE_ID_REDHAT_MDPY        0x000f
++#define PCI_DEVICE_ID_REDHAT_NVME        0x0010
+ #define PCI_DEVICE_ID_REDHAT_QXL         0x0100
 =20
- typedef struct NvmeParams {
-     char     *serial;
-@@ -23,6 +24,7 @@ typedef struct NvmeParams {
-     uint8_t  aerl;
-     uint32_t aer_max_queued;
-     uint8_t  mdts;
-+    bool     use_intel_id;
- } NvmeParams;
-=20
- typedef struct NvmeAsyncEvent {
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index c1a444cb7558..de972a7e45dc 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -40,6 +40,7 @@ GlobalProperty hw_compat_4_2[] =3D {
-     { "qxl", "revision", "4" },
-     { "qxl-vga", "revision", "4" },
-     { "fw_cfg", "acpi-mr-restore", "false" },
-+    { "nvme", "x-use-intel-id", "on"},
- };
- const size_t hw_compat_4_2_len =3D G_N_ELEMENTS(hw_compat_4_2);
-=20
+ #define FMT_PCIBUS                      PRIx64
 --=20
 2.26.0
 
