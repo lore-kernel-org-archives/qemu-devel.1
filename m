@@ -2,58 +2,128 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BADE1C3815B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:17:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B689DC2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:18:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9030020775
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:17:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9030020775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 83E4620775
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:18:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fGDwnrhW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83E4620775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOdF5-0002QS-Lm
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 04:17:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54919)
+	id 1jOdFy-0005Q5-KH
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 04:18:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55090)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cfontana@suse.de>) id 1jOdEA-000094-So
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:16:59 -0400
+ (envelope-from <david@redhat.com>) id 1jOdFF-0003OL-Aa
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:18:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cfontana@suse.de>) id 1jOdE9-000254-IE
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:16:58 -0400
-Received: from mx2.suse.de ([195.135.220.15]:43204)
+ (envelope-from <david@redhat.com>) id 1jOdFD-0002gv-M1
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:18:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21097
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cfontana@suse.de>) id 1jOdE9-00023R-CI
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:16:57 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
- by mx2.suse.de (Postfix) with ESMTP id BE471AD57;
- Wed, 15 Apr 2020 08:16:53 +0000 (UTC)
-Subject: Re: [PATCH RESEND v3 0/2] Makefile: libfdt: build only the strict
- necessary
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200411093150.4741-1-cfontana@suse.de>
- <20200414020303.GC48061@umbus.fritz.box>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <47c51117-133c-9b88-4dec-b56d883f5e8b@suse.de>
-Date: Wed, 15 Apr 2020 10:16:52 +0200
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jOdFC-0002fb-KE
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:18:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586938681;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=rfTgrAH6L0B+mSgzyxNYDfa2wjg/tJuOdo8PbPB28ZA=;
+ b=fGDwnrhW36GdBizjj19YK5JQ+DZfRkqlX3t2sAEZ8dVsyh36Tbn9CWXLZoi0LBYCvdmihU
+ 2Y9cUf2fwNofGOujLkVLCAJUKybvyzY2IHiEVNir6S+21aQAyIizeTMy5PhTZhq4gkMhfG
+ klKWXLs+afyYCzAX2PfmScuLc2ObpiQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-266-rVlteduHMseAKlrkh12nUQ-1; Wed, 15 Apr 2020 04:17:58 -0400
+X-MC-Unique: rVlteduHMseAKlrkh12nUQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18B2F18B645A;
+ Wed, 15 Apr 2020 08:17:52 +0000 (UTC)
+Received: from [10.36.114.144] (ovpn-114-144.ams2.redhat.com [10.36.114.144])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D040D10027B0;
+ Wed, 15 Apr 2020 08:17:51 +0000 (UTC)
+Subject: Re: [PATCH v19 QEMU 3/4] virtio-balloon: Provide an interface for
+ free page reporting
+To: Alexander Duyck <alexander.duyck@gmail.com>, pbonzini@redhat.com,
+ mst@redhat.com
+References: <20200410033729.24738.22879.stgit@localhost.localdomain>
+ <20200410034143.24738.78852.stgit@localhost.localdomain>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <4f26ec52-5520-1bfb-a1e5-fe6492f7af60@redhat.com>
+Date: Wed, 15 Apr 2020 10:17:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200414020303.GC48061@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20200410034143.24738.78852.stgit@localhost.localdomain>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic]
-X-Received-From: 195.135.220.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,103 +135,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Philippe Mathieu-Daude <philmd@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Alex Bennee <alex.bennee@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/14/20 4:03 AM, David Gibson wrote:
-> On Sat, Apr 11, 2020 at 11:31:48AM +0200, Claudio Fontana wrote:
->> v2 -> v3:
->>
->> * changed into a 2 patch series; in the second patch we remove the old
->>   compatibility gunks that were meant for removal some time after 4.1.
->>
->> * renamed the libfdt PHONY rule to dtc/all, with the intent to make
->>   existing working trees forward and backward compatible across the change.
->>
->> v1 -> v2:
->>
->> * fix error generated when running UNCHECKED_GOALS without prior configure,
->>   for example during make docker-image-fedora. Without configure, DSOSUF is
->>   empty, and the module pattern rule in rules.mak that uses this variable
->>   can match too much; provide a default in the Makefile to avoid it.
->>
->> * only attempt to build the archive when there is a non-empty list of objects.
->>   This could be done in general for the %.a: pattern in rules.mak, but maybe
->>   there are valid reasons to build an empty .a?
->>
->> * removed some intermediate variables that did not add much value
->>   (LIBFDT_srcdir, LIBFDT_archive)
->>
->> Tested locally with 3 VPATH configurations (no-, VPATH, VPATH in src subdir),
->> and with docker-image-fedora, docker-test-debug@fedora that failed
->> before.
-> 
-> Seems reasonable to me.  It's a bit of a shame that we can't use the
-> dtc makefiles more simply for this.  But I don't quickly know how to
-> fix them upstream to allow that.
+On 10.04.20 05:41, Alexander Duyck wrote:
+> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+>=20
+> Add support for free page reporting. The idea is to function very similar
+> to how the balloon works in that we basically end up madvising the page a=
+s
+> not being used. However we don't really need to bother with any deflate
+> type logic since the page will be faulted back into the guest when it is
+> read or written to.
+>=20
+> This provides a new way of letting the guest proactively report free
+> pages to the hypervisor, so the hypervisor can reuse them. In contrast to
+> inflate/deflate that is triggered via the hypervisor explicitly.
 
+Much better, thanks!
 
-Hi David,
+>=20
+> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> ---
+>  hw/virtio/virtio-balloon.c         |   63 ++++++++++++++++++++++++++++++=
++++++-
+>  include/hw/virtio/virtio-balloon.h |    2 +
+>  2 files changed, 62 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index 1c6d36a29a04..86d8b48a8e3a 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -321,6 +321,57 @@ static void balloon_stats_set_poll_interval(Object *=
+obj, Visitor *v,
+>      balloon_stats_change_timer(s, 0);
+>  }
+> =20
+> +static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *=
+vq)
+> +{
+> +    VirtIOBalloon *dev =3D VIRTIO_BALLOON(vdev);
+> +    VirtQueueElement *elem;
+> +
+> +    while ((elem =3D virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
+> +        unsigned int i;
+> +
+> +        for (i =3D 0; i < elem->in_num; i++) {
+> +            void *addr =3D elem->in_sg[i].iov_base;
+> +            size_t size =3D elem->in_sg[i].iov_len;
+> +            ram_addr_t ram_offset;
+> +            size_t rb_page_size;
+> +            RAMBlock *rb;
+> +
+> +            if (qemu_balloon_is_inhibited() || dev->poison_val) {
+> +                continue;
 
-I tried to look at dtc upstream makefiles, I don't see a perfect solution at the moment.
+actually, you want to do that in the outer loop, no?
 
-I came up with this idea though (not fully tested..) that _could_ work, ie special casing the libfdt target when it is the only goal in MAKECMDGOALS.
+> +            }
+> +
+> +            /*
+> +             * There is no need to check the memory section to see if
+> +             * it is ram/readonly/romd like there is for handle_output
+> +             * below. If the region is not meant to be written to then
+> +             * address_space_map will have allocated a bounce buffer
+> +             * and it will be freed in address_space_unmap and trigger
+> +             * and unassigned_mem_write before failing to copy over the
+> +             * buffer. If more than one bad descriptor is provided it
+> +             * will return NULL after the first bounce buffer and fail
+> +             * to map any resources.
+> +             */
+> +            rb =3D qemu_ram_block_from_host(addr, false, &ram_offset);
+> +            if (!rb) {
+> +                trace_virtio_balloon_bad_addr(elem->in_addr[i]);
+> +                continue;
+> +            }
+> +
+> +            /* For now we will simply ignore unaligned memory regions */
+> +            rb_page_size =3D qemu_ram_pagesize(rb);
+> +            if (!QEMU_IS_ALIGNED(ram_offset | size, rb_page_size)) {
 
-Any thoughts?
+/me thinks you can drop rb_page_size
 
-Ciao,
+I *think* there is still one remaining case to handle: Crossing RAM blocks.
 
-Claudio
+Most probably you should check
 
+/* For now, ignore crossing RAM blocks. */
+if (ram_offset + size >=3D qemu_ram_get_used_length()) {
+=09continue;
+}
 
-diff --git a/Makefile b/Makefile
-index f02aa19..cb256e8 100644
---- a/Makefile
-+++ b/Makefile
-@@ -176,6 +176,7 @@ endif
- 
- 
- ifneq ($(DEPTARGETS),)
-+ifneq ($(MAKECMDGOALS),libfdt)
- -include $(DTC_OBJS:%.o=%.d)
- -include $(CONVERT_OBJS:%.o=%.d)
- -include $(FDTDUMP_OBJS:%.o=%.d)
-@@ -183,6 +184,7 @@ ifneq ($(DEPTARGETS),)
- -include $(FDTPUT_OBJS:%.o=%.d)
- -include $(FDTOVERLAY_OBJS:%.o=%.d)
- endif
-+endif
- 
- 
- 
-@@ -318,7 +320,9 @@ ifeq ($(NO_PYTHON),0)
- TESTS_PYLIBFDT += maybe_pylibfdt
- endif
- 
-+ifneq ($(MAKECMDGOALS),libfdt)
- include tests/Makefile.tests
-+endif
- 
- #
- # Clean rules
+otherwise ram_block_discard_range() will report an error.
 
+--=20
+Thanks,
 
-> 
->>
->> Claudio Fontana (2):
->>   Makefile: libfdt: build only the strict necessary
->>   Makefile: remove old compatibility gunks
->>
->>  Makefile  | 32 ++++++++++++++++----------------
->>  configure |  6 +-----
->>  rules.mak |  2 ++
->>  3 files changed, 19 insertions(+), 21 deletions(-)
->>
-> 
+David / dhildenb
 
 
