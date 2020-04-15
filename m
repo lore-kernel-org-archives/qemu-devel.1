@@ -2,99 +2,56 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79720C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F09D9C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:54:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4496B20737
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:53:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L/M0zzxy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4496B20737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C5D8A20737
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:54:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5D8A20737
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOffH-0000Xn-Ex
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:53:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47061)
+	id 1jOfgL-0001XH-0J
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:54:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47180)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jOfei-0008Ga-2E
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:52:33 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jOffe-00012W-Q6
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:53:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jOfeg-0004o7-OV
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:52:31 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40141
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <its@irrelevant.dk>) id 1jOffd-00067K-MR
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:53:30 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:48308)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOfeg-0004na-LL
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:52:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586947950;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mK08CPN7IHrzcQvykjcxyQ81hnxGB/iCSSS68h1aqXE=;
- b=L/M0zzxyED4Xoco8ILlP9Uh4uSAqw6qzePtiBpgmq3ZIY+Uuf/BBRJ/JPnhAwHc1fKtxFU
- GpVd0QnWOmacA9AW9Du9s9aPjdJyWpHzNTqB0gTAes+3ISDuu2TjbDLPpvbGqxnCTyvWBX
- DMxkBo/H1giH1zXmrYLq6LBn2VaNLgU=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-ioXypyVVPaSez_jse41iIw-1; Wed, 15 Apr 2020 06:52:28 -0400
-X-MC-Unique: ioXypyVVPaSez_jse41iIw-1
-Received: by mail-ed1-f69.google.com with SMTP id i61so2585141edc.2
- for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 03:52:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NT/3XJjKl/vFM+tG5mU1zi30QhQybHMcw8eBken1LTk=;
- b=A1kcGN3cdf/SgpYQsfcbcepa8sFQdV4sRGvCbmAdvUa8OCVYnD1UaLkaAFicP8vO5F
- p6QRXG9suQTO32w7XmJ0CNLWRMOn6leX4L2NVhKkuN4ZPR9eauUjZgYDZz5sYIC0DS0J
- 042i9/vL+2kL1j3gV25BeNWpMoEUnbTKOj1P29288pW94cDgx51TQcvEioGyBimTCovC
- ttrQEUT9p2oUg7hZC5OFEVbzIBPQwlY8sSgyQSuzdetCbfeXwtlG/CPxJKR++iRLKy5q
- FVpeMLkNXNAo39Dib9RlzMm9lw1wKOJsoiUegV0j8YxIDY/mUnkWwMctowUqvRoBUHvF
- Zh8g==
-X-Gm-Message-State: AGi0PuZrLNIYZz2On8XTI/M+oB9qQOxons4ed1exSH4d+sL+hO1jj4jD
- oCpdgmriSwYDbqhAH+HEv5kdhzMgUUsHNWv94wq4W2Po3oiSlAC2vxYM/ACNOZFAhlJuheXTJ4X
- V2U5/Lh9iTVNrMuE=
-X-Received: by 2002:a50:ee10:: with SMTP id g16mr17159236eds.111.1586947947312; 
- Wed, 15 Apr 2020 03:52:27 -0700 (PDT)
-X-Google-Smtp-Source: APiQypL/C7MIJORARa6bEHapV1asqS3mSX+1R5u2Oh3nkiaRgokxVzmT9gUpyaol3GIP79BXtJeBzQ==
-X-Received: by 2002:a50:ee10:: with SMTP id g16mr17159216eds.111.1586947947113; 
- Wed, 15 Apr 2020 03:52:27 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id l19sm2577117ejn.31.2020.04.15.03.52.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 15 Apr 2020 03:52:26 -0700 (PDT)
-Subject: Re: [PATCH 11/16] nvme: factor out block backend setup
-To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
+ (Exim 4.71) (envelope-from <its@irrelevant.dk>)
+ id 1jOffb-00060Z-7y; Wed, 15 Apr 2020 06:53:27 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 514B7BF7AF;
+ Wed, 15 Apr 2020 10:53:25 +0000 (UTC)
+Date: Wed, 15 Apr 2020 12:53:22 +0200
+From: Klaus Birkelund Jensen <its@irrelevant.dk>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH 13/16] nvme: factor out namespace setup
+Message-ID: <20200415105322.iuirj5sphp7i5whu@apples.localdomain>
 References: <20200415102445.564803-1-its@irrelevant.dk>
- <20200415102445.564803-12-its@irrelevant.dk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1557e920-2869-4e62-f996-30172ce82e0e@redhat.com>
-Date: Wed, 15 Apr 2020 12:52:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ <20200415102445.564803-14-its@irrelevant.dk>
+ <1f57886a-8645-eeda-f482-4353b423c80f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200415102445.564803-12-its@irrelevant.dk>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1f57886a-8645-eeda-f482-4353b423c80f@redhat.com>
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 128.199.63.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,67 +64,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>,
+ qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
  Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/15/20 12:24 PM, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
+On Apr 15 12:38, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 4/15/20 12:24 PM, Klaus Jensen wrote:
+> > From: Klaus Jensen <k.jensen@samsung.com>
+> >=20
+> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> > ---
+> >   hw/block/nvme.c | 47 ++++++++++++++++++++++++++--------------------=
+-
+> >   1 file changed, 26 insertions(+), 21 deletions(-)
+> >=20
+> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > index f0989cbb4335..08f7ae0a48b3 100644
+> > --- a/hw/block/nvme.c
+> > +++ b/hw/block/nvme.c
+> > @@ -1359,13 +1359,35 @@ static int nvme_init_blk(NvmeCtrl *n, Error *=
+*errp)
+> >       return 0;
+> >   }
+> > +static int nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error=
+ **errp)
+> > +{
+> > +    int64_t bs_size;
+> > +    NvmeIdNs *id_ns =3D &ns->id_ns;
+> > +
+> > +    bs_size =3D blk_getlength(n->conf.blk);
+> > +    if (bs_size < 0) {
+> > +        error_setg_errno(errp, -bs_size, "could not get backing file=
+ size");
+> > +        return -1;
+> > +    }
+> > +
+> > +    n->ns_size =3D bs_size;
+> > +
+> > +    id_ns->lbaf[0].ds =3D BDRV_SECTOR_BITS;
+> > +    id_ns->nsze =3D cpu_to_le64(nvme_ns_nlbas(n, ns));
+> > +
+> > +    /* no thin provisioning */
+> > +    id_ns->ncap =3D id_ns->nsze;
+> > +    id_ns->nuse =3D id_ns->ncap;
+> > +
+> > +    return 0;
+> > +}
+> > +
+> >   static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+> >   {
+> >       NvmeCtrl *n =3D NVME(pci_dev);
+> >       NvmeIdCtrl *id =3D &n->id_ctrl;
+> >       int i;
+> > -    int64_t bs_size;
+> >       uint8_t *pci_conf;
+> >       if (nvme_check_constraints(n, errp)) {
+> > @@ -1374,12 +1396,6 @@ static void nvme_realize(PCIDevice *pci_dev, E=
+rror **errp)
+> >       nvme_init_state(n);
+> > -    bs_size =3D blk_getlength(n->conf.blk);
+> > -    if (bs_size < 0) {
+> > -        error_setg(errp, "could not get backing file size");
+> > -        return;
+> > -    }
+> > -
+> >       if (nvme_init_blk(n, errp)) {
+> >           return;
+> >       }
+> > @@ -1390,8 +1406,6 @@ static void nvme_realize(PCIDevice *pci_dev, Er=
+ror **errp)
+> >       pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS=
+);
+> >       pcie_endpoint_cap_init(pci_dev, 0x80);
+> > -    n->ns_size =3D bs_size / (uint64_t)n->num_namespaces;
 >=20
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> ---
->   hw/block/nvme.c | 15 ++++++++++++---
->   1 file changed, 12 insertions(+), 3 deletions(-)
+> I'm not sure this line belong to this patch.
 >=20
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index e67f578fbf79..f0989cbb4335 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -1348,6 +1348,17 @@ static void nvme_init_state(NvmeCtrl *n)
->       n->cq =3D g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
->   }
->  =20
-> +static int nvme_init_blk(NvmeCtrl *n, Error **errp)
-> +{
-> +    blkconf_blocksizes(&n->conf);
-> +    if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->con=
-f.blk),
-> +                                       false, errp)) {
-> +        return -1;
-> +    }
-> +
-> +    return 0;
+=20
+It does. It is already there in the middle of the realize function. It
+is moved to nvme_init_namespace as
 
-I'm not sure this is a correct usage of the 'propagating errors' API=20
-(see CODING_STYLE.rst and include/qapi/error.h), I'd expect this=20
-function to return void, and use a local_error & error_propagate() in=20
-nvme_realize().
+  n->ns_size =3D bs_size;
 
-However this works, so:
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-> +}
-> +
->   static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->   {
->       NvmeCtrl *n =3D NVME(pci_dev);
-> @@ -1369,9 +1380,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
-**errp)
->           return;
->       }
->  =20
-> -    blkconf_blocksizes(&n->conf);
-> -    if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->con=
-f.blk),
-> -                                       false, errp)) {
-> +    if (nvme_init_blk(n, errp)) {
->           return;
->       }
->  =20
->=20
-
+since only a single namespace can be configured anyway. I will remove
+the for-loop that initializes multiple namespaces as well.
 
