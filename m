@@ -2,50 +2,49 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9601C2BB55
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:07:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F365C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:07:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFF4A20737
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:07:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFF4A20737
+	by mail.kernel.org (Postfix) with ESMTPS id DB6E520737
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:07:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB6E520737
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOhkx-0004F6-Qm
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 09:07:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33720)
+	id 1jOhlB-0004m5-0R
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 09:07:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jOhgV-0007Ek-69
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:02:32 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jOhgW-0007Io-LQ
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:02:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jOhgU-0004Mb-34
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:02:31 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:48538)
+ (envelope-from <its@irrelevant.dk>) id 1jOhgV-0004NP-IG
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:02:32 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:48590)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jOhgN-00045e-Dh; Wed, 15 Apr 2020 09:02:23 -0400
+ id 1jOhgO-0004AG-JO; Wed, 15 Apr 2020 09:02:24 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 0219ABFA0B;
- Wed, 15 Apr 2020 13:02:20 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 71DD2BFD3D;
+ Wed, 15 Apr 2020 13:02:23 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 03/16] nvme: remove superfluous breaks
-Date: Wed, 15 Apr 2020 15:01:46 +0200
-Message-Id: <20200415130159.611361-4-its@irrelevant.dk>
+Subject: [PATCH v2 09/16] nvme: factor out property/constraint checks
+Date: Wed, 15 Apr 2020 15:01:52 +0200
+Message-Id: <20200415130159.611361-10-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200415130159.611361-1-its@irrelevant.dk>
 References: <20200415130159.611361-1-its@irrelevant.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -73,44 +72,87 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-These break statements was left over when commit 3036a626e9ef ("nvme:
-add Get/Set Feature Timestamp support") was merged.
-
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Acked-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/block/nvme.c | 4 ----
- 1 file changed, 4 deletions(-)
+ hw/block/nvme.c | 43 ++++++++++++++++++++++++++++---------------
+ 1 file changed, 28 insertions(+), 15 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 931ddeb26ba0..a947050209a1 100644
+index 44856e873fd1..5f9ebbd6a1d5 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -791,7 +791,6 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd=
- *cmd, NvmeRequest *req)
-         break;
-     case NVME_TIMESTAMP:
-         return nvme_get_feature_timestamp(n, cmd);
--        break;
-     default:
-         trace_pci_nvme_err_invalid_getfeat(dw10);
-         return NVME_INVALID_FIELD | NVME_DNR;
-@@ -835,11 +834,8 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCm=
-d *cmd, NvmeRequest *req)
-         req->cqe.result =3D
-             cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16=
-));
-         break;
+@@ -1311,24 +1311,19 @@ static const MemoryRegionOps nvme_cmb_ops =3D {
+     },
+ };
+=20
+-static void nvme_realize(PCIDevice *pci_dev, Error **errp)
++static void nvme_check_constraints(NvmeCtrl *n, Error **errp)
+ {
+-    NvmeCtrl *n =3D NVME(pci_dev);
+-    NvmeIdCtrl *id =3D &n->id_ctrl;
++    NvmeParams *params =3D &n->params;
+=20
+-    int i;
+-    int64_t bs_size;
+-    uint8_t *pci_conf;
 -
-     case NVME_TIMESTAMP:
-         return nvme_set_feature_timestamp(n, cmd);
--        break;
--
-     default:
-         trace_pci_nvme_err_invalid_setfeat(dw10);
-         return NVME_INVALID_FIELD | NVME_DNR;
+-    if (n->params.num_queues) {
++    if (params->num_queues) {
+         warn_report("num_queues is deprecated; please use max_ioqpairs "
+                     "instead");
+=20
+-        n->params.max_ioqpairs =3D n->params.num_queues - 1;
++        params->max_ioqpairs =3D params->num_queues - 1;
+     }
+=20
+-    if (n->params.max_ioqpairs < 1 ||
+-        n->params.max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
++    if (params->max_ioqpairs < 1 ||
++        params->max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
+         error_setg(errp, "max_ioqpairs must be between 1 and %d",
+                    PCI_MSIX_FLAGS_QSIZE);
+         return;
+@@ -1339,16 +1334,34 @@ static void nvme_realize(PCIDevice *pci_dev, Erro=
+r **errp)
+         return;
+     }
+=20
++    if (!params->serial) {
++        error_setg(errp, "serial property not set");
++        return;
++    }
++}
++
++static void nvme_realize(PCIDevice *pci_dev, Error **errp)
++{
++    NvmeCtrl *n =3D NVME(pci_dev);
++    NvmeIdCtrl *id =3D &n->id_ctrl;
++    Error *err =3D NULL;
++
++    int i;
++    int64_t bs_size;
++    uint8_t *pci_conf;
++
++    nvme_check_constraints(n, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
+     bs_size =3D blk_getlength(n->conf.blk);
+     if (bs_size < 0) {
+         error_setg(errp, "could not get backing file size");
+         return;
+     }
+=20
+-    if (!n->params.serial) {
+-        error_setg(errp, "serial property not set");
+-        return;
+-    }
+     blkconf_blocksizes(&n->conf);
+     if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->con=
+f.blk),
+                                        false, errp)) {
 --=20
 2.26.0
 
