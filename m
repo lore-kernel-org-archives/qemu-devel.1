@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C50C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7A13C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:06:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1925320737
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:06:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1925320737
+	by mail.kernel.org (Postfix) with ESMTPS id BC4F020737
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:06:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC4F020737
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jObBv-00028K-6I
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 02:06:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35545)
+	id 1jObCA-0002bj-Eq
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 02:06:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35435)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jOaz0-0002qD-Lu
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:53:11 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jOayy-0002px-Ox
+ (envelope-from <its@irrelevant.dk>) id 1jOayy-0002jv-DL
  for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:53:10 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:47568)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <its@irrelevant.dk>) id 1jOayw-0002nN-LJ
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:53:08 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:47560)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jOayv-0002Zs-2A; Wed, 15 Apr 2020 01:53:05 -0400
+ id 1jOayu-0002ZE-AL; Wed, 15 Apr 2020 01:53:04 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 07A86BFD9F;
- Wed, 15 Apr 2020 05:52:28 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 33034BFD68;
+ Wed, 15 Apr 2020 05:52:27 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v7 30/48] nvme: verify validity of prp lists in the cmb
-Date: Wed, 15 Apr 2020 07:51:22 +0200
-Message-Id: <20200415055140.466900-31-its@irrelevant.dk>
+Subject: [PATCH v7 25/48] nvme: replace dma_acct with blk_acct equivalent
+Date: Wed, 15 Apr 2020 07:51:17 +0200
+Message-Id: <20200415055140.466900-26-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200415055140.466900-1-its@irrelevant.dk>
 References: <20200415055140.466900-1-its@irrelevant.dk>
@@ -71,86 +71,47 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Before this patch the device already supported this, but it did not
-check for the validity of it nor announced the support in the LISTS
-field.
-
-If some of the PRPs in a PRP list are in the CMB, then ALL entries must
-be there. This patch makes sure that is verified as well as properly
-announcing support for PRP lists in the CMB.
+The QSG isn't always initialized, so accounting could be wrong. Issue a
+call to blk_acct_start instead with the size taken from the QSG or IOV
+depending on the kind of I/O.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- hw/block/nvme.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ hw/block/nvme.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 1f4ce48b9cbb..3e5e99644a4e 100644
+index b62b053d7c38..c9f7badd5a15 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -218,6 +218,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList =
-*qsg, QEMUIOVector *iov,
-     trans_len =3D MIN(len, trans_len);
-     int num_prps =3D (len >> n->page_bits) + 1;
-     uint16_t status;
-+    bool prp_list_in_cmb =3D false;
+@@ -566,9 +566,10 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *=
+ns, NvmeCmd *cmd,
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
 =20
-     trace_nvme_dev_map_prp(nvme_cid(req), trans_len, len, prp1, prp2,
-                            num_prps);
-@@ -245,11 +246,16 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGLis=
-t *qsg, QEMUIOVector *iov,
-             status =3D NVME_INVALID_FIELD | NVME_DNR;
-             goto unmap;
-         }
-+
-         if (len > n->page_size) {
-             uint64_t prp_list[n->max_prp_ents];
-             uint32_t nents, prp_trans;
-             int i =3D 0;
-=20
-+            if (nvme_addr_is_cmb(n, prp2)) {
-+                prp_list_in_cmb =3D true;
-+            }
-+
-             nents =3D (len + n->page_size - 1) >> n->page_bits;
-             prp_trans =3D MIN(n->max_prp_ents, nents) * sizeof(uint64_t)=
-;
-             nvme_addr_read(n, prp2, (void *)prp_list, prp_trans);
-@@ -263,6 +269,11 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList=
- *qsg, QEMUIOVector *iov,
-                         goto unmap;
-                     }
-=20
-+                    if (prp_list_in_cmb !=3D nvme_addr_is_cmb(n, prp_ent=
-)) {
-+                        status =3D NVME_INVALID_USE_OF_CMB | NVME_DNR;
-+                        goto unmap;
-+                    }
-+
-                     i =3D 0;
-                     nents =3D (len + n->page_size - 1) >> n->page_bits;
-                     prp_trans =3D MIN(n->max_prp_ents, nents) * sizeof(u=
-int64_t);
-@@ -282,6 +293,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList =
-*qsg, QEMUIOVector *iov,
-                 if (status) {
-                     goto unmap;
-                 }
-+
-                 len -=3D trans_len;
-                 i++;
-             }
-@@ -1953,7 +1965,7 @@ static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *p=
-ci_dev)
-=20
-     NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
-     NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
--    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
-+    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 1);
-     NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
-     NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
-     NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2);
+-    dma_acct_start(n->conf.blk, &req->acct, &req->qsg, acct);
+     if (req->qsg.nsg > 0) {
+         req->has_sg =3D true;
++        block_acct_start(blk_get_stats(n->conf.blk), &req->acct, req->qs=
+g.size,
++                         acct);
+         req->aiocb =3D is_write ?
+             dma_blk_write(n->conf.blk, &req->qsg, data_offset, BDRV_SECT=
+OR_SIZE,
+                           nvme_rw_cb, req) :
+@@ -576,6 +577,8 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *n=
+s, NvmeCmd *cmd,
+                          nvme_rw_cb, req);
+     } else {
+         req->has_sg =3D false;
++        block_acct_start(blk_get_stats(n->conf.blk), &req->acct, req->io=
+v.size,
++                         acct);
+         req->aiocb =3D is_write ?
+             blk_aio_pwritev(n->conf.blk, data_offset, &req->iov, 0, nvme=
+_rw_cb,
+                             req) :
 --=20
 2.26.0
 
