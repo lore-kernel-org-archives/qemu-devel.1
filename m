@@ -2,45 +2,45 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D69C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:12:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B16DDC2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:13:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DF1621556
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:12:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DF1621556
+	by mail.kernel.org (Postfix) with ESMTPS id 8890D20737
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:13:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8890D20737
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOhpk-0006s7-Gt
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 09:12:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33878)
+	id 1jOhr0-0000eA-Ob
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 09:13:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jOhgo-0007Vx-KV
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:02:54 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jOhgt-0007YB-TW
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:02:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jOhgn-0004Xw-KN
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:02:50 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:48614)
+ (envelope-from <its@irrelevant.dk>) id 1jOhgs-0004aU-QE
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:02:55 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:48626)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jOhgk-0004CB-Jk; Wed, 15 Apr 2020 09:02:46 -0400
+ id 1jOhgl-0004DI-Py; Wed, 15 Apr 2020 09:02:47 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 4867EBF7AF;
+ by charlie.dont.surf (Postfix) with ESMTPSA id B5E06BF9F3;
  Wed, 15 Apr 2020 13:02:24 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 11/16] nvme: factor out block backend setup
-Date: Wed, 15 Apr 2020 15:01:54 +0200
-Message-Id: <20200415130159.611361-12-its@irrelevant.dk>
+Subject: [PATCH v2 12/16] nvme: add namespace helpers
+Date: Wed, 15 Apr 2020 15:01:55 +0200
+Message-Id: <20200415130159.611361-13-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200415130159.611361-1-its@irrelevant.dk>
 References: <20200415130159.611361-1-its@irrelevant.dk>
@@ -72,45 +72,62 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
+Introduce some small helpers to make the next patches easier on the eye.
+
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 ---
- hw/block/nvme.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ hw/block/nvme.c |  3 +--
+ hw/block/nvme.h | 16 ++++++++++++++++
+ 2 files changed, 17 insertions(+), 2 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 45a352b63d89..80da0825d295 100644
+index 80da0825d295..d5244102252c 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -1351,6 +1351,13 @@ static void nvme_init_state(NvmeCtrl *n)
-     n->cq =3D g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
+@@ -1469,8 +1469,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
+**errp)
+         id_ns->dps =3D 0;
+         id_ns->lbaf[0].ds =3D BDRV_SECTOR_BITS;
+         id_ns->ncap  =3D id_ns->nuse =3D id_ns->nsze =3D
+-            cpu_to_le64(n->ns_size >>
+-                id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas)].ds)=
+;
++            cpu_to_le64(nvme_ns_nlbas(n, ns));
+     }
  }
 =20
-+static void nvme_init_blk(NvmeCtrl *n, Error **errp)
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 7eecfd3a50f6..dd932a9e7ebc 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -67,6 +67,17 @@ typedef struct NvmeNamespace {
+     NvmeIdNs        id_ns;
+ } NvmeNamespace;
+=20
++static inline NvmeLBAF *nvme_ns_lbaf(NvmeNamespace *ns)
 +{
-+    blkconf_blocksizes(&n->conf);
-+    blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk=
-),
-+                                  false, errp);
++    NvmeIdNs *id_ns =3D &ns->id_ns;
++    return &id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(id_ns->flbas)];
 +}
 +
- static void nvme_realize(PCIDevice *pci_dev, Error **errp)
- {
-     NvmeCtrl *n =3D NVME(pci_dev);
-@@ -1375,9 +1382,9 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
-**errp)
-         return;
-     }
++static inline uint8_t nvme_ns_lbads(NvmeNamespace *ns)
++{
++    return nvme_ns_lbaf(ns)->ds;
++}
++
+ #define TYPE_NVME "nvme"
+ #define NVME(obj) \
+         OBJECT_CHECK(NvmeCtrl, (obj), TYPE_NVME)
+@@ -101,4 +112,9 @@ typedef struct NvmeCtrl {
+     NvmeIdCtrl      id_ctrl;
+ } NvmeCtrl;
 =20
--    blkconf_blocksizes(&n->conf);
--    if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->con=
-f.blk),
--                                       false, errp)) {
-+    nvme_init_blk(n, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-         return;
-     }
-=20
++static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
++{
++    return n->ns_size >> nvme_ns_lbads(ns);
++}
++
+ #endif /* HW_NVME_H */
 --=20
 2.26.0
 
