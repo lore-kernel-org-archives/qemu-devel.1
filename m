@@ -2,56 +2,68 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13006C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:03:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB655C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:03:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9E09206F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:03:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9E09206F9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 8E0C4206F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:03:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E0C4206F9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOd0f-0007nT-1X
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 04:03:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52839)
+	id 1jOd1E-0008WH-NR
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 04:03:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52889)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jOczw-00076k-0y
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:02:17 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jOd0L-0007WP-7L
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:02:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jOczu-000304-IT
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:02:15 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:47868)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jOczq-0002yf-Rn; Wed, 15 Apr 2020 04:02:11 -0400
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 1DDE5BF603;
- Wed, 15 Apr 2020 08:02:09 +0000 (UTC)
-Date: Wed, 15 Apr 2020 10:02:05 +0200
-From: Klaus Birkelund Jensen <its@irrelevant.dk>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v7 45/48] nvme: support multiple namespaces
-Message-ID: <20200415080205.v4cxl7a2bub3yqau@apples.localdomain>
-References: <20200415055140.466900-1-its@irrelevant.dk>
- <20200415055140.466900-46-its@irrelevant.dk>
- <dbde592f-1205-a483-c03e-62153ad348d8@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1jOd0J-00036i-Dh
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:02:41 -0400
+Resent-Date: Wed, 15 Apr 2020 04:02:41 -0400
+Resent-Message-Id: <E1jOd0J-00036i-Dh@eggs.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21352)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jOd0E-00035G-LV; Wed, 15 Apr 2020 04:02:34 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1586937735; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=mUjYRGwM+KOfYa4fVmg5ecpjTSjVHWLaHNJdCgVbkiBHi7krHAiZncpxDhvtmACUH/tOYUsQd7MBCX2aOGBvaTjCAXLdStxyjbw37qFeAdXaZ2K0a60cuBJkynem6pxsUPuIsPQWpIElYfQFHn/UpNZ9V8TfizhfTfNh+WO+qV4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1586937735;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=+pyFiL4v2EYPgd+u8oLbdMy5Hs5W3CACe35T4ECday4=; 
+ b=X9v/hlkp7Ab584ZEn+GhL7Ork0okvnBE2wPqDOCbr/SDUKomr4eMD4H9v2K4V3SNOO8lXGR6yuj8xGBcfXONB4J668R02h9iXjVpJXxcaCwyGRyAY+n3LU/oJPnq4wUznz68oy0p+33CXDAfw++1KSBiniybnGAufc+LFBHVs0w=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1586937733392472.15849434237657;
+ Wed, 15 Apr 2020 01:02:13 -0700 (PDT)
+In-Reply-To: <20200415055140.466900-1-its@irrelevant.dk>
+Subject: Re: [PATCH v7 00/48] nvme: support NVMe v1.3d,
+ SGLs and multiple namespaces
+Message-ID: <158693773167.27250.3605083509764023589@39012742ff91>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <dbde592f-1205-a483-c03e-62153ad348d8@redhat.com>
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: its@irrelevant.dk
+Date: Wed, 15 Apr 2020 01:02:13 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 128.199.63.193
+X-Received-From: 136.143.188.53
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,276 +75,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, beata.michalska@linaro.org, qemu-block@nongnu.org,
+ k.jensen@samsung.com, qemu-devel@nongnu.org, mreitz@redhat.com,
+ kbusch@kernel.org, its@irrelevant.dk, javier.gonz@samsung.com,
+ mlevitsk@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Apr 15 09:38, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 4/15/20 7:51 AM, Klaus Jensen wrote:
-> > From: Klaus Jensen <k.jensen@samsung.com>
-> >=20
-> > This adds support for multiple namespaces by introducing a new 'nvme-=
-ns'
-> > device model. The nvme device creates a bus named from the device nam=
-e
-> > ('id'). The nvme-ns devices then connect to this and registers
-> > themselves with the nvme device.
-> >=20
-> > This changes how an nvme device is created. Example with two namespac=
-es:
-> >=20
-> >    -drive file=3Dnvme0n1.img,if=3Dnone,id=3Ddisk1
-> >    -drive file=3Dnvme0n2.img,if=3Dnone,id=3Ddisk2
-> >    -device nvme,serial=3Ddeadbeef,id=3Dnvme0
-> >    -device nvme-ns,drive=3Ddisk1,bus=3Dnvme0,nsid=3D1
-> >    -device nvme-ns,drive=3Ddisk2,bus=3Dnvme0,nsid=3D2
-> >=20
-> > The drive property is kept on the nvme device to keep the change
-> > backward compatible, but the property is now optional. Specifying a
-> > drive for the nvme device will always create the namespace with nsid =
-1.
-> >=20
-> > Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
-> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> > Reviewed-by: Keith Busch <kbusch@kernel.org>
-> > ---
-> >   hw/block/Makefile.objs |   2 +-
-> >   hw/block/nvme-ns.c     | 157 +++++++++++++++++++++++++++
-> >   hw/block/nvme-ns.h     |  60 +++++++++++
-> >   hw/block/nvme.c        | 233 +++++++++++++++++++++++++++-----------=
----
-> >   hw/block/nvme.h        |  47 ++++-----
-> >   hw/block/trace-events  |   8 +-
-> >   6 files changed, 396 insertions(+), 111 deletions(-)
-> >   create mode 100644 hw/block/nvme-ns.c
-> >   create mode 100644 hw/block/nvme-ns.h
-> >=20
-> > diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
-> > index 4b4a2b338dc4..d9141d6a4b9b 100644
-> > --- a/hw/block/Makefile.objs
-> > +++ b/hw/block/Makefile.objs
-> > @@ -7,7 +7,7 @@ common-obj-$(CONFIG_PFLASH_CFI02) +=3D pflash_cfi02.o
-> >   common-obj-$(CONFIG_XEN) +=3D xen-block.o
-> >   common-obj-$(CONFIG_ECC) +=3D ecc.o
-> >   common-obj-$(CONFIG_ONENAND) +=3D onenand.o
-> > -common-obj-$(CONFIG_NVME_PCI) +=3D nvme.o
-> > +common-obj-$(CONFIG_NVME_PCI) +=3D nvme.o nvme-ns.o
-> >   common-obj-$(CONFIG_SWIM) +=3D swim.o
-> >   common-obj-$(CONFIG_SH4) +=3D tc58128.o
-> > diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
-> > new file mode 100644
-> > index 000000000000..bd64d4a94632
-> > --- /dev/null
-> > +++ b/hw/block/nvme-ns.c
-> > @@ -0,0 +1,157 @@
->=20
-> Missing copyright + license.
->=20
-
-Fixed.
-
-> > +
-> > +    switch (n->conf.wce) {
-> > +    case ON_OFF_AUTO_ON:
-> > +        n->features.volatile_wc =3D 1;
-> > +        break;
-> > +    case ON_OFF_AUTO_OFF:
-> > +        n->features.volatile_wc =3D 0;
->=20
-> Missing 'break'?
->=20
-
-Ouch. Fixed.
-
-> > +    case ON_OFF_AUTO_AUTO:
-> > +        n->features.volatile_wc =3D blk_enable_write_cache(ns->blk);
-> > +        break;
-> > +    default:
-> > +        abort();
-> > +    }
-> > +
-> > +    blk_set_enable_write_cache(ns->blk, n->features.volatile_wc);
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +static int nvme_ns_check_constraints(NvmeNamespace *ns, Error **errp=
-)
-> > +{
-> > +    if (!ns->blk) {
-> > +        error_setg(errp, "block backend not configured");
-> > +        return -1;
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +int nvme_ns_setup(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
-> > +{
-> > +    if (nvme_ns_check_constraints(ns, errp)) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    if (nvme_ns_init_blk(n, ns, &n->id_ctrl, errp)) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    nvme_ns_init(ns);
-> > +    if (nvme_register_namespace(n, ns, errp)) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> > +
-> > +static void nvme_ns_realize(DeviceState *dev, Error **errp)
-> > +{
-> > +    NvmeNamespace *ns =3D NVME_NS(dev);
-> > +    BusState *s =3D qdev_get_parent_bus(dev);
-> > +    NvmeCtrl *n =3D NVME(s->parent);
-> > +    Error *local_err =3D NULL;
-> > +
-> > +    if (nvme_ns_setup(n, ns, &local_err)) {
-> > +        error_propagate_prepend(errp, local_err,
-> > +                                "could not setup namespace: ");
-> > +        return;
-> > +    }
-> > +}
-> > +
-> > +static Property nvme_ns_props[] =3D {
-> > +    DEFINE_NVME_NS_PROPERTIES(NvmeNamespace, params),
-> > +    DEFINE_PROP_END_OF_LIST(),
-> > +};
-> > +
-> > +static void nvme_ns_class_init(ObjectClass *oc, void *data)
-> > +{
-> > +    DeviceClass *dc =3D DEVICE_CLASS(oc);
-> > +
-> > +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-> > +
-> > +    dc->bus_type =3D TYPE_NVME_BUS;
-> > +    dc->realize =3D nvme_ns_realize;
-> > +    device_class_set_props(dc, nvme_ns_props);
-> > +    dc->desc =3D "virtual nvme namespace";
->=20
-> "Virtual NVMe namespace"?
->=20
-
-Fixed.
-
-> > +}
-> > +
-> > +static void nvme_ns_instance_init(Object *obj)
-> > +{
-> > +    NvmeNamespace *ns =3D NVME_NS(obj);
-> > +    char *bootindex =3D g_strdup_printf("/namespace@%d,0", ns->param=
-s.nsid);
-> > +
-> > +    device_add_bootindex_property(obj, &ns->bootindex, "bootindex",
-> > +                                  bootindex, DEVICE(obj), &error_abo=
-rt);
-> > +
-> > +    g_free(bootindex);
-> > +}
-> > +
-> > +static const TypeInfo nvme_ns_info =3D {
-> > +    .name =3D TYPE_NVME_NS,
-> > +    .parent =3D TYPE_DEVICE,
-> > +    .class_init =3D nvme_ns_class_init,
-> > +    .instance_size =3D sizeof(NvmeNamespace),
-> > +    .instance_init =3D nvme_ns_instance_init,
-> > +};
-> > +
-> > +static void nvme_ns_register_types(void)
-> > +{
-> > +    type_register_static(&nvme_ns_info);
-> > +}
-> > +
-> > +type_init(nvme_ns_register_types)
-> > diff --git a/hw/block/nvme-ns.h b/hw/block/nvme-ns.h
-> > new file mode 100644
-> > index 000000000000..3c3651d485d0
-> > --- /dev/null
-> > +++ b/hw/block/nvme-ns.h
-> > @@ -0,0 +1,60 @@
->=20
-> Missing copyright + license.
->=20
-
-Fixed.
-
-> > +#ifndef NVME_NS_H
-> > +#define NVME_NS_H
-> > +
-> > +#define TYPE_NVME_NS "nvme-ns"
-> > +#define NVME_NS(obj) \
-> > +    OBJECT_CHECK(NvmeNamespace, (obj), TYPE_NVME_NS)
-> > +
-> > +#define DEFINE_NVME_NS_PROPERTIES(_state, _props) \
-> > +    DEFINE_PROP_DRIVE("drive", _state, blk), \
-> > +    DEFINE_PROP_UINT32("nsid", _state, _props.nsid, 0)
-> > +
-> > +typedef struct NvmeNamespaceParams {
-> > +    uint32_t nsid;
-> > +} NvmeNamespaceParams;
-> > +
-> > +typedef struct NvmeNamespace {
-> > +    DeviceState  parent_obj;
-> > +    BlockBackend *blk;
-> > +    int32_t      bootindex;
-> > +    int64_t      size;
-> > +
-> > +    NvmeIdNs            id_ns;
-> > +    NvmeNamespaceParams params;
-> > +} NvmeNamespace;
-> > +
-> > +static inline uint32_t nvme_nsid(NvmeNamespace *ns)
-> > +{
-> > +    if (ns) {
-> > +        return ns->params.nsid;
-> > +    }
-> > +
-> > +    return -1;
->=20
-> This case doesn't seem possible.
->=20
-> Maybe:
->=20
->       assert(ns);
->       return ns->params.nsid;
->=20
-
-I have some later patches where this might happen in certain traces.
-That's why I'm using a sentinel value. But I will see if I can clean it
-up instead.
-
-> > @@ -2607,26 +2666,28 @@ static int nvme_init_namespace(NvmeCtrl *n, N=
-vmeNamespace *ns, Error **errp)
-> >   static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-> >   {
-> >       NvmeCtrl *n =3D NVME(pci_dev);
-> > -    int i;
-> > +    NvmeNamespace *ns;
-> >       if (nvme_check_constraints(n, errp)) {
-> >           return;
-> >       }
-> > +    qbus_create_inplace(&n->bus, sizeof(NvmeBus), TYPE_NVME_BUS,
-> > +                        &pci_dev->qdev, n->parent_obj.qdev.id);
-> > +
-> >       nvme_init_state(n);
-> > +    nvme_init_pci(n, pci_dev);
-> > +    nvme_init_ctrl(n);
->=20
-> Argh you move these functions again... Why not put them in the correct =
-place
-> when you refactor nvme_realize()?
->=20
-
-"Argh" :) Yeah, I will do an effort to make this better!
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQxNTA1NTE0MC40NjY5
+MDAtMS1pdHNAaXJyZWxldmFudC5kay8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHY3IDAwLzQ4XSBudm1lOiBzdXBwb3J0IE5WTWUg
+djEuM2QsIFNHTHMgYW5kIG11bHRpcGxlIG5hbWVzcGFjZXMKTWVzc2FnZS1pZDogMjAyMDA0MTUw
+NTUxNDAuNDY2OTAwLTEtaXRzQGlycmVsZXZhbnQuZGsKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVs
+bCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
+b3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2Uu
+Lgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
+MWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2pl
+Y3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAwNDEyMjEwOTU0LjMyMzEz
+LTEtZjRidWdAYW1zYXQub3JnIC0+IHBhdGNoZXcvMjAyMDA0MTIyMTA5NTQuMzIzMTMtMS1mNGJ1
+Z0BhbXNhdC5vcmcKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMDQxMjIyMzYxOS4x
+MTI4NC0xLWY0YnVnQGFtc2F0Lm9yZyAtPiBwYXRjaGV3LzIwMjAwNDEyMjIzNjE5LjExMjg0LTEt
+ZjRidWdAYW1zYXQub3JnCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDA0MTUwNTUx
+NDAuNDY2OTAwLTEtaXRzQGlycmVsZXZhbnQuZGsgLT4gcGF0Y2hldy8yMDIwMDQxNTA1NTE0MC40
+NjY5MDAtMS1pdHNAaXJyZWxldmFudC5kawpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CjRhYjIzY2YgbnZtZTogbWFrZSBsYmEgZGF0YSBzaXplIGNvbmZpZ3VyYWJsZQo0YzhhMDU2IG52
+bWU6IGNoYW5nZSBjb250cm9sbGVyIHBjaSBpZAo1MDZmNTQzIHBjaTogYWxsb2NhdGUgcGNpIGlk
+IGZvciBudm1lCjk1NjIzZTcgbnZtZTogc3VwcG9ydCBtdWx0aXBsZSBuYW1lc3BhY2VzCmQyZGEx
+NGIgbnZtZTogcmVmYWN0b3IgaWRlbnRpZnkgYWN0aXZlIG5hbWVzcGFjZSBpZCBsaXN0CmJiYWMw
+NGMgbnZtZTogYWRkIHN1cHBvcnQgZm9yIHNnbCBiaXQgYnVja2V0IGRlc2NyaXB0b3IKZjZjNDBl
+MCBudm1lOiBhZGQgc3VwcG9ydCBmb3Igc2NhdHRlciBnYXRoZXIgbGlzdHMKNTkxY2NkZiBudm1l
+OiBoYXJkZW4gY21iIGFjY2VzcwpjM2NjZjg5IG52bWU6IGhhbmRsZSBkbWEgZXJyb3JzCjc1ZmVi
+Y2QgcGNpOiBwYXNzIGFsb25nIHRoZSByZXR1cm4gdmFsdWUgb2YgZG1hX21lbW9yeV9ydwowNTA0
+OGU4IG52bWU6IHVzZSBwcmVhbGxvY2F0ZWQgcXNnL2lvdiBpbiBudm1lX2RtYV9wcnAKOWE5Mzli
+ZCBudm1lOiBhZGQgbnZtZV9jaGVja19ydyBoZWxwZXIKZDFmZjQ2NiBudm1lOiBhbGxvdyBtdWx0
+aXBsZSBhaW9zIHBlciBjb21tYW5kCjVkYzM4NjQgbnZtZTogcmVtb3ZlIE52bWVDbWQgcGFyYW1l
+dGVyCjBkNmZjMzUgbnZtZTogcmVmYWN0b3IgTnZtZVJlcXVlc3QKYTc3NjU0ZCBudm1lOiBiZSBj
+b25zaXN0ZW50IGFib3V0IHplcm9zIHZzIHplcm9lcwo5ZjdlYzY0IG52bWU6IGFkZCBjaGVjayBm
+b3IgbWR0cwowZjA0ODFjIG52bWU6IHJlZmFjdG9yIHJlcXVlc3QgYm91bmRzIGNoZWNraW5nCmE5
+MjA4ZTQgbnZtZTogdmVyaWZ5IHZhbGlkaXR5IG9mIHBycCBsaXN0cyBpbiB0aGUgY21iCjE5YjZh
+NGIgbnZtZTogYWRkIHJlcXVlc3QgbWFwcGluZyBoZWxwZXIKYmFkMTRkNiBudm1lOiBwYXNzIHJl
+cXVlc3QgYWxvbmcgZm9yIHRyYWNpbmcKM2E5ZmM1MCBudm1lOiByZWZhY3RvciBkbWEgcmVhZC93
+cml0ZQplM2U3ZTU3IG52bWU6IHJlbW92ZSByZWR1bmRhbnQgaGFzX3NnIG1lbWJlcgo5OGU2NDNh
+IG52bWU6IHJlcGxhY2UgZG1hX2FjY3Qgd2l0aCBibGtfYWNjdCBlcXVpdmFsZW50CjhlMmExOTYg
+bnZtZTogYWRkIG1hcHBpbmcgaGVscGVycwo2YzhiZmRmIG52bWU6IG1lbXNldCBwcmVhbGxvY2F0
+ZWQgcmVxdWVzdHMgc3RydWN0dXJlcwoyZGVkNTExIG52bWU6IGJ1bXAgc3VwcG9ydGVkIHZlcnNp
+b24gdG8gdjEuMwpmNGVhMGYyIG52bWU6IHByb3ZpZGUgdGhlIG1hbmRhdG9yeSBzdWJucW4gZmll
+bGQKOGJmNTgwZSBudm1lOiBlbmZvcmNlIHZhbGlkIHF1ZXVlIGNyZWF0aW9uIHNlcXVlbmNlCjQ1
+MmEyZmYgbnZtZTogc3VwcG9ydCBpZGVudGlmeSBuYW1lc3BhY2UgZGVzY3JpcHRvciBsaXN0Cjll
+OGZkM2QgbnZtZTogYWRkIGxvZyBzcGVjaWZpYyBmaWVsZCB0byB0cmFjZSBldmVudHMKYzlhOTEw
+NiBudm1lOiBtYWtlIHN1cmUgbmNxciBhbmQgbnNxciBpcyB2YWxpZAoyYjUzYmZhIG52bWU6IGFk
+ZGl0aW9uYWwgdHJhY2luZwphMjEyMjM3IG52bWU6IGFkZCBtaXNzaW5nIG1hbmRhdG9yeSBmZWF0
+dXJlcwphOWE0M2NmIG52bWU6IGFkZCBzdXBwb3J0IGZvciB0aGUgYXN5bmNocm9ub3VzIGV2ZW50
+IHJlcXVlc3QgY29tbWFuZApmNWRjZjk4IG52bWU6IGFkZCBzdXBwb3J0IGZvciB0aGUgZ2V0IGxv
+ZyBwYWdlIGNvbW1hbmQKY2U2MmM1MiBudm1lOiBhZGQgdGVtcGVyYXR1cmUgdGhyZXNob2xkIGZl
+YXR1cmUKNjU2Yzk4OSBudm1lOiByZWZhY3RvciBkZXZpY2UgcmVhbGl6YXRpb24KNTA5YzM0OSBu
+dm1lOiByZW1vdmUgcmVkdW5kYW50IGNtYmxvYy9jbWJzeiBtZW1iZXJzCjQyZTI5Y2QgbnZtZTog
+YWRkIG1heF9pb3FwYWlycyBkZXZpY2UgcGFyYW1ldGVyCjIwZTZmMjkgbnZtZTogZml4IHBjaSBk
+b29yYmVsbCBzaXplIGNhbGN1bGF0aW9uCmFjZDg0ZTMgbnZtZTogYWRkIHN1cHBvcnQgZm9yIHRo
+ZSBhYm9ydCBjb21tYW5kCmViOTYwMjkgbnZtZTogcmVmYWN0b3IgbnZtZV9hZGRyX3JlYWQKMDc1
+ZGU2MCBudm1lOiB1c2UgY29uc3RhbnRzIGluIGlkZW50aWZ5CjE2ZTRmMGQgbnZtZTogYnVtcCBz
+cGVjIGRhdGEgc3RydWN0dXJlcyB0byB2MS4zCjVjYTVlZWIgbnZtZTogbW92ZSBkZXZpY2UgcGFy
+YW1ldGVycyB0byBzZXBhcmF0ZSBzdHJ1Y3QKYmM2ZmE1YyBudm1lOiByZW1vdmUgc3VwZXJmbHVv
+dXMgYnJlYWtzCmVjYmZlZjUgbnZtZTogcmVuYW1lIHRyYWNlIGV2ZW50cyB0byBudm1lX2RldgoK
+PT09IE9VVFBVVCBCRUdJTiA9PT0KMS80OCBDaGVja2luZyBjb21taXQgZWNiZmVmNTFmMTA1IChu
+dm1lOiByZW5hbWUgdHJhY2UgZXZlbnRzIHRvIG52bWVfZGV2KQoyLzQ4IENoZWNraW5nIGNvbW1p
+dCBiYzZmYTVjYzQ5NTUgKG52bWU6IHJlbW92ZSBzdXBlcmZsdW91cyBicmVha3MpCjMvNDggQ2hl
+Y2tpbmcgY29tbWl0IDVjYTVlZWI1ZDkyYyAobnZtZTogbW92ZSBkZXZpY2UgcGFyYW1ldGVycyB0
+byBzZXBhcmF0ZSBzdHJ1Y3QpCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91
+bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzE4MDogRklMRTogaHcvYmxvY2svbnZtZS5o
+OjY6CisjZGVmaW5lIERFRklORV9OVk1FX1BST1BFUlRJRVMoX3N0YXRlLCBfcHJvcHMpIFwKKyAg
+ICBERUZJTkVfUFJPUF9TVFJJTkcoInNlcmlhbCIsIF9zdGF0ZSwgX3Byb3BzLnNlcmlhbCksIFwK
+KyAgICBERUZJTkVfUFJPUF9VSU5UMzIoImNtYl9zaXplX21iIiwgX3N0YXRlLCBfcHJvcHMuY21i
+X3NpemVfbWIsIDApLCBcCisgICAgREVGSU5FX1BST1BfVUlOVDMyKCJudW1fcXVldWVzIiwgX3N0
+YXRlLCBfcHJvcHMubnVtX3F1ZXVlcywgNjQpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3Ms
+IDE4MSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzQ4IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+Cgo0LzQ4IENoZWNraW5nIGNvbW1pdCAxNmU0ZjBkZDQ4ZWIgKG52bWU6IGJ1bXAgc3BlYyBkYXRh
+IHN0cnVjdHVyZXMgdG8gdjEuMykKNS80OCBDaGVja2luZyBjb21taXQgMDc1ZGU2MGI5YzU4IChu
+dm1lOiB1c2UgY29uc3RhbnRzIGluIGlkZW50aWZ5KQo2LzQ4IENoZWNraW5nIGNvbW1pdCBlYjk2
+MDI5NzdjZjQgKG52bWU6IHJlZmFjdG9yIG52bWVfYWRkcl9yZWFkKQo3LzQ4IENoZWNraW5nIGNv
+bW1pdCBhY2Q4NGUzYmJmMGQgKG52bWU6IGFkZCBzdXBwb3J0IGZvciB0aGUgYWJvcnQgY29tbWFu
+ZCkKOC80OCBDaGVja2luZyBjb21taXQgMjBlNmYyOWZlODFkIChudm1lOiBmaXggcGNpIGRvb3Ji
+ZWxsIHNpemUgY2FsY3VsYXRpb24pCjkvNDggQ2hlY2tpbmcgY29tbWl0IDQyZTI5Y2Q0YmE4OSAo
+bnZtZTogYWRkIG1heF9pb3FwYWlycyBkZXZpY2UgcGFyYW1ldGVyKQoxMC80OCBDaGVja2luZyBj
+b21taXQgNTA5YzM0OWM4NzU1IChudm1lOiByZW1vdmUgcmVkdW5kYW50IGNtYmxvYy9jbWJzeiBt
+ZW1iZXJzKQoxMS80OCBDaGVja2luZyBjb21taXQgNjU2Yzk4OTU4MTAzIChudm1lOiByZWZhY3Rv
+ciBkZXZpY2UgcmVhbGl6YXRpb24pCjEyLzQ4IENoZWNraW5nIGNvbW1pdCBjZTYyYzUyOTViMTgg
+KG52bWU6IGFkZCB0ZW1wZXJhdHVyZSB0aHJlc2hvbGQgZmVhdHVyZSkKMTMvNDggQ2hlY2tpbmcg
+Y29tbWl0IGY1ZGNmOTg4ZWYxYSAobnZtZTogYWRkIHN1cHBvcnQgZm9yIHRoZSBnZXQgbG9nIHBh
+Z2UgY29tbWFuZCkKMTQvNDggQ2hlY2tpbmcgY29tbWl0IGE5YTQzY2YzZDk2NSAobnZtZTogYWRk
+IHN1cHBvcnQgZm9yIHRoZSBhc3luY2hyb25vdXMgZXZlbnQgcmVxdWVzdCBjb21tYW5kKQoxNS80
+OCBDaGVja2luZyBjb21taXQgYTIxMjIzNzEyOTMyIChudm1lOiBhZGQgbWlzc2luZyBtYW5kYXRv
+cnkgZmVhdHVyZXMpCjE2LzQ4IENoZWNraW5nIGNvbW1pdCAyYjUzYmZhNzlhZjYgKG52bWU6IGFk
+ZGl0aW9uYWwgdHJhY2luZykKMTcvNDggQ2hlY2tpbmcgY29tbWl0IGM5YTkxMDYxZGJlYiAobnZt
+ZTogbWFrZSBzdXJlIG5jcXIgYW5kIG5zcXIgaXMgdmFsaWQpCjE4LzQ4IENoZWNraW5nIGNvbW1p
+dCA5ZThmZDNkZGYwYmMgKG52bWU6IGFkZCBsb2cgc3BlY2lmaWMgZmllbGQgdG8gdHJhY2UgZXZl
+bnRzKQoxOS80OCBDaGVja2luZyBjb21taXQgNDUyYTJmZmU2M2VlIChudm1lOiBzdXBwb3J0IGlk
+ZW50aWZ5IG5hbWVzcGFjZSBkZXNjcmlwdG9yIGxpc3QpCjIwLzQ4IENoZWNraW5nIGNvbW1pdCA4
+YmY1ODBlNzA2NTcgKG52bWU6IGVuZm9yY2UgdmFsaWQgcXVldWUgY3JlYXRpb24gc2VxdWVuY2Up
+CjIxLzQ4IENoZWNraW5nIGNvbW1pdCBmNGVhMGYyMTAwMGUgKG52bWU6IHByb3ZpZGUgdGhlIG1h
+bmRhdG9yeSBzdWJucW4gZmllbGQpCjIyLzQ4IENoZWNraW5nIGNvbW1pdCAyZGVkNTExNzQyOGUg
+KG52bWU6IGJ1bXAgc3VwcG9ydGVkIHZlcnNpb24gdG8gdjEuMykKMjMvNDggQ2hlY2tpbmcgY29t
+bWl0IDZjOGJmZGZkZWRhYyAobnZtZTogbWVtc2V0IHByZWFsbG9jYXRlZCByZXF1ZXN0cyBzdHJ1
+Y3R1cmVzKQoyNC80OCBDaGVja2luZyBjb21taXQgOGUyYTE5NmM0ODJhIChudm1lOiBhZGQgbWFw
+cGluZyBoZWxwZXJzKQoyNS80OCBDaGVja2luZyBjb21taXQgOThlNjQzYTZmZjljIChudm1lOiBy
+ZXBsYWNlIGRtYV9hY2N0IHdpdGggYmxrX2FjY3QgZXF1aXZhbGVudCkKMjYvNDggQ2hlY2tpbmcg
+Y29tbWl0IGUzZTdlNTcxMjkzNSAobnZtZTogcmVtb3ZlIHJlZHVuZGFudCBoYXNfc2cgbWVtYmVy
+KQoyNy80OCBDaGVja2luZyBjb21taXQgM2E5ZmM1MGRkM2Q4IChudm1lOiByZWZhY3RvciBkbWEg
+cmVhZC93cml0ZSkKMjgvNDggQ2hlY2tpbmcgY29tbWl0IGJhZDE0ZDZkYjg4YyAobnZtZTogcGFz
+cyByZXF1ZXN0IGFsb25nIGZvciB0cmFjaW5nKQoyOS80OCBDaGVja2luZyBjb21taXQgMTliNmE0
+YmMyNmQ2IChudm1lOiBhZGQgcmVxdWVzdCBtYXBwaW5nIGhlbHBlcikKMzAvNDggQ2hlY2tpbmcg
+Y29tbWl0IGE5MjA4ZTQ1N2ExNSAobnZtZTogdmVyaWZ5IHZhbGlkaXR5IG9mIHBycCBsaXN0cyBp
+biB0aGUgY21iKQozMS80OCBDaGVja2luZyBjb21taXQgMGYwNDgxYzEzYTkwIChudm1lOiByZWZh
+Y3RvciByZXF1ZXN0IGJvdW5kcyBjaGVja2luZykKMzIvNDggQ2hlY2tpbmcgY29tbWl0IDlmN2Vj
+NjQ2ZGZiMyAobnZtZTogYWRkIGNoZWNrIGZvciBtZHRzKQozMy80OCBDaGVja2luZyBjb21taXQg
+YTc3NjU0ZDA2NTFiIChudm1lOiBiZSBjb25zaXN0ZW50IGFib3V0IHplcm9zIHZzIHplcm9lcykK
+MzQvNDggQ2hlY2tpbmcgY29tbWl0IDBkNmZjMzUxOTgwNiAobnZtZTogcmVmYWN0b3IgTnZtZVJl
+cXVlc3QpCjM1LzQ4IENoZWNraW5nIGNvbW1pdCA1ZGMzODY0OTRkNjYgKG52bWU6IHJlbW92ZSBO
+dm1lQ21kIHBhcmFtZXRlcikKMzYvNDggQ2hlY2tpbmcgY29tbWl0IGQxZmY0NjZlNjUxOSAobnZt
+ZTogYWxsb3cgbXVsdGlwbGUgYWlvcyBwZXIgY29tbWFuZCkKMzcvNDggQ2hlY2tpbmcgY29tbWl0
+IDlhOTM5YmRiYmU3YSAobnZtZTogYWRkIG52bWVfY2hlY2tfcncgaGVscGVyKQozOC80OCBDaGVj
+a2luZyBjb21taXQgMDUwNDhlODQ4YjE2IChudm1lOiB1c2UgcHJlYWxsb2NhdGVkIHFzZy9pb3Yg
+aW4gbnZtZV9kbWFfcHJwKQozOS80OCBDaGVja2luZyBjb21taXQgNzVmZWJjZDY4YTQ2IChwY2k6
+IHBhc3MgYWxvbmcgdGhlIHJldHVybiB2YWx1ZSBvZiBkbWFfbWVtb3J5X3J3KQo0MC80OCBDaGVj
+a2luZyBjb21taXQgYzNjY2Y4OTgyNjVkIChudm1lOiBoYW5kbGUgZG1hIGVycm9ycykKNDEvNDgg
+Q2hlY2tpbmcgY29tbWl0IDU5MWNjZGYzYzk0NCAobnZtZTogaGFyZGVuIGNtYiBhY2Nlc3MpCjQy
+LzQ4IENoZWNraW5nIGNvbW1pdCBmNmM0MGUwZDE2NzEgKG52bWU6IGFkZCBzdXBwb3J0IGZvciBz
+Y2F0dGVyIGdhdGhlciBsaXN0cykKNDMvNDggQ2hlY2tpbmcgY29tbWl0IGJiYWMwNGM0YTljMyAo
+bnZtZTogYWRkIHN1cHBvcnQgZm9yIHNnbCBiaXQgYnVja2V0IGRlc2NyaXB0b3IpCjQ0LzQ4IENo
+ZWNraW5nIGNvbW1pdCBkMmRhMTRiNDllOTkgKG52bWU6IHJlZmFjdG9yIGlkZW50aWZ5IGFjdGl2
+ZSBuYW1lc3BhY2UgaWQgbGlzdCkKNDUvNDggQ2hlY2tpbmcgY29tbWl0IDk1NjIzZTdkMTZkMSAo
+bnZtZTogc3VwcG9ydCBtdWx0aXBsZSBuYW1lc3BhY2VzKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQg
+b3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0Mzog
+Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMg
+c2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMyMTg6IEZJTEU6IGh3L2Jsb2NrL252
+bWUtbnMuaDo4OgorI2RlZmluZSBERUZJTkVfTlZNRV9OU19QUk9QRVJUSUVTKF9zdGF0ZSwgX3By
+b3BzKSBcCisgICAgREVGSU5FX1BST1BfRFJJVkUoImRyaXZlIiwgX3N0YXRlLCBibGspLCBcCisg
+ICAgREVGSU5FX1BST1BfVUlOVDMyKCJuc2lkIiwgX3N0YXRlLCBfcHJvcHMubnNpZCwgMCkKCnRv
+dGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgODQxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDQ1LzQ4
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0Ni80OCBDaGVja2luZyBjb21taXQgNTA2ZjU0
+Mzk5YzZhIChwY2k6IGFsbG9jYXRlIHBjaSBpZCBmb3IgbnZtZSkKV0FSTklORzogYWRkZWQsIG1v
+dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
+MzI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0
+NiBsaW5lcyBjaGVja2VkCgpQYXRjaCA0Ni80OCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo0
+Ny80OCBDaGVja2luZyBjb21taXQgNGM4YTA1NmY1ODkzIChudm1lOiBjaGFuZ2UgY29udHJvbGxl
+ciBwY2kgaWQpCjQ4LzQ4IENoZWNraW5nIGNvbW1pdCA0YWIyM2NmNWEzNGYgKG52bWU6IG1ha2Ug
+bGJhIGRhdGEgc2l6ZSBjb25maWd1cmFibGUpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNDE1MDU1MTQwLjQ2NjkwMC0xLWl0c0BpcnJlbGV2
+YW50LmRrL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
