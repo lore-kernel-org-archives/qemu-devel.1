@@ -2,48 +2,49 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3027C2BB55
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:28:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A46E9C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:28:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC32A20787
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:28:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC32A20787
+	by mail.kernel.org (Postfix) with ESMTPS id 7883320787
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:28:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7883320787
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOfHO-0000V6-UR
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:28:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42872)
+	id 1jOfHV-0000j0-Kf
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:28:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43035)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jOfE4-0003Qo-30
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:25:01 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jOfE8-0003Xr-3w
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:25:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jOfE2-0004uo-Uo
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:25:00 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:48086)
+ (envelope-from <its@irrelevant.dk>) id 1jOfE6-0004z2-TO
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:25:04 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:48172)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jOfE0-0004tB-JS; Wed, 15 Apr 2020 06:24:56 -0400
+ id 1jOfE4-0004vI-86; Wed, 15 Apr 2020 06:25:00 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id B89C2BF7AF;
- Wed, 15 Apr 2020 10:24:53 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 272D7BFD3D;
+ Wed, 15 Apr 2020 10:24:59 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH 00/16] nvme: refactoring and cleanups
-Date: Wed, 15 Apr 2020 12:24:29 +0200
-Message-Id: <20200415102445.564803-1-its@irrelevant.dk>
+Subject: [PATCH 09/16] nvme: factor out property/constraint checks
+Date: Wed, 15 Apr 2020 12:24:38 +0200
+Message-Id: <20200415102445.564803-10-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.0
+In-Reply-To: <20200415102445.564803-1-its@irrelevant.dk>
+References: <20200415102445.564803-1-its@irrelevant.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -71,41 +72,91 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Philippe suggested that I split up this already way too huge series
-(more than 50 patches now), so here goes.
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+---
+ hw/block/nvme.c | 52 ++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 32 insertions(+), 20 deletions(-)
 
-The first patch in this series fixes a small bug in the pci doorbell
-size calculation. Please consider cherry-picking this.
-
-The rest are refactorings. The "nvme: add max_ioqpairs device parameter"
-introduces the 'max_ioqpairs' device parameter, the meaning of which
-should be more intuitive than the existing 'num_queues' parameter.
-
-
-Klaus Jensen (16):
-  nvme: fix pci doorbell size calculation
-  nvme: rename trace events to nvme_dev
-  nvme: remove superfluous breaks
-  nvme: move device parameters to separate struct
-  nvme: use constants in identify
-  nvme: refactor nvme_addr_read
-  nvme: add max_ioqpairs device parameter
-  nvme: remove redundant cmbloc/cmbsz members
-  nvme: factor out property/constraint checks
-  nvme: factor out device state setup
-  nvme: factor out block backend setup
-  nvme: add namespace helpers
-  nvme: factor out namespace setup
-  nvme: factor out pci setup
-  nvme: factor out cmb setup
-  nvme: factor out controller identify setup
-
- hw/block/nvme.c       | 436 ++++++++++++++++++++++++------------------
- hw/block/nvme.h       |  36 +++-
- hw/block/trace-events | 172 ++++++++---------
- include/block/nvme.h  |   8 +
- 4 files changed, 373 insertions(+), 279 deletions(-)
-
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index ea613213bd57..635292d6fac4 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -1308,6 +1308,37 @@ static const MemoryRegionOps nvme_cmb_ops =3D {
+     },
+ };
+=20
++static int nvme_check_constraints(NvmeCtrl *n, Error **errp)
++{
++    NvmeParams *params =3D &n->params;
++
++    if (params->num_queues) {
++        warn_report("num_queues is deprecated; please use max_ioqpairs "
++                    "instead");
++
++        params->max_ioqpairs =3D params->num_queues - 1;
++    }
++
++    if (params->max_ioqpairs < 1 ||
++        params->max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
++        error_setg(errp, "max_ioqpairs must be between 1 and %d",
++                   PCI_MSIX_FLAGS_QSIZE);
++        return -1;
++    }
++
++    if (!n->conf.blk) {
++        error_setg(errp, "drive property not set");
++        return -1;
++    }
++
++    if (!params->serial) {
++        error_setg(errp, "serial property not set");
++        return -1;
++    }
++
++    return 0;
++}
++
+ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+ {
+     NvmeCtrl *n =3D NVME(pci_dev);
+@@ -1317,22 +1348,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error=
+ **errp)
+     int64_t bs_size;
+     uint8_t *pci_conf;
+=20
+-    if (n->params.num_queues) {
+-        warn_report("num_queues is deprecated; please use max_ioqpairs "
+-                    "instead");
+-
+-        n->params.max_ioqpairs =3D n->params.num_queues - 1;
+-    }
+-
+-    if (n->params.max_ioqpairs < 1 ||
+-        n->params.max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
+-        error_setg(errp, "max_ioqpairs must be between 1 and %d",
+-                   PCI_MSIX_FLAGS_QSIZE);
+-        return;
+-    }
+-
+-    if (!n->conf.blk) {
+-        error_setg(errp, "drive property not set");
++    if (nvme_check_constraints(n, errp)) {
+         return;
+     }
+=20
+@@ -1342,10 +1358,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error=
+ **errp)
+         return;
+     }
+=20
+-    if (!n->params.serial) {
+-        error_setg(errp, "serial property not set");
+-        return;
+-    }
+     blkconf_blocksizes(&n->conf);
+     if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->con=
+f.blk),
+                                        false, errp)) {
 --=20
 2.26.0
 
