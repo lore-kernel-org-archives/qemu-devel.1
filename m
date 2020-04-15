@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 636F4C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 22:27:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C36DC3815B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 22:27:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DCD4206E9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 22:27:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37B7420784
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 22:27:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="KEbF9j5B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DCD4206E9
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="qqR4T4PG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37B7420784
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOqUp-0005S9-78
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 18:27:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49275)
+	id 1jOqUq-0005Vf-Cj
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 18:27:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49279)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex-krasikov@yandex-team.ru>) id 1jOqTZ-0003qn-3E
+ (envelope-from <alex-krasikov@yandex-team.ru>) id 1jOqTZ-0003qx-62
  for qemu-devel@nongnu.org; Wed, 15 Apr 2020 18:25:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex-krasikov@yandex-team.ru>) id 1jOqTX-0003tl-Or
+ (envelope-from <alex-krasikov@yandex-team.ru>) id 1jOqTX-0003tn-P1
  for qemu-devel@nongnu.org; Wed, 15 Apr 2020 18:25:45 -0400
-Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:56154)
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:37722)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <alex-krasikov@yandex-team.ru>)
- id 1jOqTX-0003s4-CQ
+ id 1jOqTX-0003s1-CJ
  for qemu-devel@nongnu.org; Wed, 15 Apr 2020 18:25:43 -0400
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::119])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 4F7AB2E164A;
- Thu, 16 Apr 2020 01:25:38 +0300 (MSK)
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::162])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id CDFB12E1539;
+ Thu, 16 Apr 2020 01:25:37 +0300 (MSK)
 Received: from myt5-70c90f7d6d7d.qloud-c.yandex.net
  (myt5-70c90f7d6d7d.qloud-c.yandex.net [2a02:6b8:c12:3e2c:0:640:70c9:f7d])
- by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- 8Pd0U4H8GE-PcMmR27f; Thu, 16 Apr 2020 01:25:38 +0300
+ by mxbackcorp1j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ gm1yGdowxP-PbM0ZMvo; Thu, 16 Apr 2020 01:25:37 +0300
 Precedence: bulk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
  s=default; 
- t=1586989538; bh=MfMY9q2td2b1MJFytz7fXEPP8IsDFnaKFqm3ffWfda8=;
+ t=1586989537; bh=QjEPS2tWD3YYMjy0GG+WeZ4SZywFyrdyda249WVakAk=;
  h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=KEbF9j5BwobLA/6k54UZCNzJJ499d7Dnx+KinynLnY9lDTk1/rKtkyISVS9HFzH+A
- hG6cWD9oLHVCduCZIxlFmiyLMIva5OV8Ex5q0hrelcLXrmdSBxB7UWKXvFgqT54OAH
- RzsOK5TQqG9UkD4HXeJtT7HYYCg3oLenwnuz1M2A=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
+ b=qqR4T4PGFhYeaz2DBlaXRVp8nMFt1pjQaUS/H7B8VTirhJ0g8n1cpdLNAp8fIM81J
+ WyI7n/G7F3llvtsWx8mPKi7VXvq6Jr8h67Iy+J45bPvxoEMED1rBxu5hAWSJTYhzOd
+ kaML98Ox9MkVuQ0Cbd9LAx7a+G2S+Cu4yAaRebNE=
+Authentication-Results: mxbackcorp1j.mail.yandex.net;
  dkim=pass header.i=@yandex-team.ru
 Received: from unknown (unknown [2a02:6b8:b080:6410::1:e])
  by myt5-70c90f7d6d7d.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- 0wmBaV4yMk-PcXa2cD0; Thu, 16 Apr 2020 01:25:38 +0300
+ 0wmBaV4yMk-PbXa68Yb; Thu, 16 Apr 2020 01:25:37 +0300
  (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
  (Client certificate not present)
 From: Alexey Krasikov <alex-krasikov@yandex-team.ru>
 To: berrange@redhat.com,
 	qemu-devel@nongnu.org
-Subject: [RFC PATCH v2 5/5] test-crypto-secret: add 'syskey' object tests.
-Date: Thu, 16 Apr 2020 01:25:25 +0300
-Message-Id: <20200415222525.4022-5-alex-krasikov@yandex-team.ru>
+Subject: [RFC PATCH v2 4/5] crypto/linux_keyring: add 'syskey' secret object.
+Date: Thu, 16 Apr 2020 01:25:24 +0300
+Message-Id: <20200415222525.4022-4-alex-krasikov@yandex-team.ru>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200415222525.4022-1-alex-krasikov@yandex-team.ru>
 References: <20200415222525.4022-1-alex-krasikov@yandex-team.ru>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 95.108.205.193
+X-Received-From: 5.45.199.163
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -86,181 +86,226 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* test_secret_seckey_bad_key_access_right() is not working yet.
-  We don't know yet if this due a bag in the Linux kernel or
-  whether it's normal syscall behavior.
-  We've requested information from kernel maintainer.
+* Add the ability for the secret object to obtain secret data from the
+  Linux in-kernel key managment and retention facility, as an extra option
+  to the existing ones: reading from a file or passing directly as a
+  string.
+
+  The secret is identified by the key serial number.  The upper layers
+  need to instantiate the key and make sure the QEMU process has access
+  rights to read it.
 
 Signed-off-by: Alexey Krasikov <alex-krasikov@yandex-team.ru>
 ---
- tests/test-crypto-secret.c | 138 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 138 insertions(+)
+ crypto/Makefile.objs           |   1 +
+ crypto/linux_keyring.c         | 140 +++++++++++++++++++++++++++++++++
+ include/crypto/linux_keyring.h |  38 +++++++++
+ 3 files changed, 179 insertions(+)
+ create mode 100644 crypto/linux_keyring.c
+ create mode 100644 include/crypto/linux_keyring.h
 
-diff --git a/tests/test-crypto-secret.c b/tests/test-crypto-secret.c
-index 13fc6c4c75..6b17fe3a81 100644
---- a/tests/test-crypto-secret.c
-+++ b/tests/test-crypto-secret.c
-@@ -22,8 +22,10 @@
- 
- #include "crypto/init.h"
- #include "crypto/secret.h"
+diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+index 3ae0dfd1a4..7fc354a8d5 100644
+--- a/crypto/Makefile.objs
++++ b/crypto/Makefile.objs
+@@ -19,6 +19,7 @@ crypto-obj-y += tlscredspsk.o
+ crypto-obj-y += tlscredsx509.o
+ crypto-obj-y += tlssession.o
+ crypto-obj-y += secret_interface.o
++crypto-obj-y += linux_keyring.o
+ crypto-obj-y += secret.o
+ crypto-obj-y += pbkdf.o
+ crypto-obj-$(CONFIG_NETTLE) += pbkdf-nettle.o
+diff --git a/crypto/linux_keyring.c b/crypto/linux_keyring.c
+new file mode 100644
+index 0000000000..7950d4c12d
+--- /dev/null
++++ b/crypto/linux_keyring.c
+@@ -0,0 +1,140 @@
++#ifdef __NR_keyctl
++
++#include "qemu/osdep.h"
++#include <asm/unistd.h>
++#include <linux/keyctl.h>
++#include "qapi/error.h"
++#include "qom/object_interfaces.h"
++#include "trace.h"
 +#include "crypto/linux_keyring.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
-+#include <keyutils.h>
- 
- static void test_secret_direct(void)
- {
-@@ -125,6 +127,132 @@ static void test_secret_indirect_emptyfile(void)
- }
- 
- 
-+#define DESCRIPTION "qemu_test_secret"
-+#define PAYLOAD "Test Payload"
 +
 +
-+static void test_secret_seckey_good(void)
++static inline
++long keyctl_read(key_serial_t key, uint8_t *buffer, size_t buflen)
 +{
-+    char key_str[16];
-+    Object *sec;
-+    key_serial_t key = add_key("user", DESCRIPTION, PAYLOAD,
-+                               strlen(PAYLOAD), KEY_SPEC_PROCESS_KEYRING);
-+
-+    g_assert(key >= 0);
-+
-+    snprintf(key_str, sizeof(key_str), "0x%08x", key);
-+    sec = object_new_with_props(
-+        TYPE_QCRYPTO_SECRET_LINUX_KEYRING,
-+        object_get_objects_root(),
-+        "sec0",
-+        &error_abort,
-+        "serial", key_str,
-+        NULL);
-+
-+    assert(0 <= keyctl_unlink(key, KEY_SPEC_PROCESS_KEYRING));
-+    char *pw = qcrypto_secret_lookup_as_utf8("sec0",
-+                                             &error_abort);
-+    g_assert_cmpstr(pw, ==, PAYLOAD);
-+
-+    object_unparent(sec);
-+    g_free(pw);
++    return syscall(__NR_keyctl, KEYCTL_READ, key, buffer, buflen, 0);
 +}
 +
 +
-+static void test_secret_seckey_revoked_key(void)
++static
++long keyctl_read_alloc(key_serial_t key, uint8_t **buffer)
 +{
-+    char key_str[16];
-+    Object *sec;
-+    key_serial_t key = add_key("user", DESCRIPTION, PAYLOAD,
-+                               strlen(PAYLOAD), KEY_SPEC_PROCESS_KEYRING);
-+    g_assert(key >= 0);
-+    g_assert_false(keyctl_revoke(key));
++    uint8_t *loc_buf;
++    long retcode = keyctl_read(key, NULL, 0);
++    if (retcode <= 0) {
++        return retcode;
++    }
++    loc_buf = g_malloc(retcode);
++    retcode = keyctl_read(key, loc_buf, retcode);
 +
-+    snprintf(key_str, sizeof(key_str), "0x%08x", key);
-+    sec = object_new_with_props(
-+        TYPE_QCRYPTO_SECRET_LINUX_KEYRING,
-+        object_get_objects_root(),
-+        "sec0",
-+        NULL,
-+        "serial", key_str,
-+        NULL);
-+
-+    g_assert(errno == EKEYREVOKED);
-+    g_assert(sec == NULL);
-+
-+    keyctl_unlink(key, KEY_SPEC_PROCESS_KEYRING);
++    if (retcode >= 0) {
++        *buffer = loc_buf;
++    } else {
++        g_free(loc_buf);
++    }
++    return retcode;
 +}
 +
 +
-+static void test_secret_seckey_expired_key(void)
++static void
++qcrypto_secret_linux_load_data(Object   *obj,
++                               uint8_t  **output,
++                               size_t   *outputlen,
++                               Error    **errp)
 +{
-+    char key_str[16];
-+    Object *sec;
-+    key_serial_t key = add_key("user", DESCRIPTION, PAYLOAD,
-+                               strlen(PAYLOAD), KEY_SPEC_PROCESS_KEYRING);
-+    g_assert(key >= 0);
-+    g_assert_false(keyctl_set_timeout(key, 1));
-+    sleep(1);
++    QCryptoSecretLinuxKeyring *secret = QCRYPTO_SECRET_LINUX_KEYRING(obj);
++    uint8_t  *buffer = NULL;
++    long     retcode;
 +
-+    snprintf(key_str, sizeof(key_str), "0x%08x", key);
-+    sec = object_new_with_props(
-+        TYPE_QCRYPTO_SECRET_LINUX_KEYRING,
-+        object_get_objects_root(),
-+        "sec0",
-+        NULL,
-+        "serial", key_str,
-+        NULL);
++    *output    = NULL;
++    *outputlen = 0;
 +
-+    g_assert(errno == EKEYEXPIRED);
-+    g_assert(sec == NULL);
-+
-+    keyctl_unlink(key, KEY_SPEC_PROCESS_KEYRING);
++    if (secret->serial) {
++        retcode = keyctl_read_alloc(secret->serial, &buffer);
++        if (retcode < 0) {
++          error_setg_errno(errp, errno,
++                     "Unable to read serial key %08x",
++                     secret->serial);
++          return;
++        } else {
++          *outputlen = retcode;
++          *output    = buffer;
++        }
++    } else {
++      error_setg(errp, "Either 'serial' must be provided");
++    }
 +}
 +
 +
-+static void test_secret_seckey_bad_serial_key(void)
++static void
++qcrypto_secret_prop_set_key(Object     *obj,   Visitor *v,
++                            const char *name,  void    *opaque,
++                            Error      **errp)
 +{
-+    Object *sec;
-+
-+    sec = object_new_with_props(
-+        TYPE_QCRYPTO_SECRET,
-+        object_get_objects_root(),
-+        "sec0",
-+        NULL,
-+        "serial", "1",
-+        NULL);
-+
-+    g_assert(errno == ENOKEY);
-+    g_assert(sec == NULL);
++    QCryptoSecretLinuxKeyring *secret = QCRYPTO_SECRET_LINUX_KEYRING(obj);
++    int32_t value;
++    visit_type_int32(v, name, &value, errp);
++    if (!value) {
++        error_setg(errp, "The 'serial' should be not equal 0");
++    }
++    secret->serial = value;
 +}
 +
 +
-+static void test_secret_seckey_bad_key_access_right(void)
++static void
++qcrypto_secret_prop_get_key(Object     *obj,   Visitor *v,
++                            const char *name,  void    *opaque,
++                            Error      **errp)
 +{
-+    char key_str[16];
-+    Object *sec;
-+    key_serial_t key = add_key("user", DESCRIPTION, PAYLOAD,
-+                               strlen(PAYLOAD), KEY_SPEC_PROCESS_KEYRING);
-+    g_assert(key >= 0);
-+    g_assert_false(keyctl_setperm(key, KEY_POS_ALL & (~KEY_POS_READ)));
-+
-+    snprintf(key_str, sizeof(key_str), "0x%08x", key);
-+
-+    sec = object_new_with_props(
-+        TYPE_QCRYPTO_SECRET_LINUX_KEYRING,
-+        object_get_objects_root(),
-+        "sec0",
-+        NULL,
-+        "serial", key_str,
-+        NULL);
-+
-+    g_assert(errno == EACCES);
-+    g_assert(sec == NULL);
-+
-+    keyctl_unlink(key, KEY_SPEC_PROCESS_KEYRING);
++    QCryptoSecretLinuxKeyring *secret = QCRYPTO_SECRET_LINUX_KEYRING(obj);
++    int32_t value = secret->serial;
++    visit_type_int32(v, name, &value, errp);
 +}
 +
 +
- static void test_secret_noconv_base64_good(void)
- {
-     Object *sec = object_new_with_props(
-@@ -425,6 +553,16 @@ int main(int argc, char **argv)
-                     test_secret_indirect_badfile);
-     g_test_add_func("/crypto/secret/indirect/emptyfile",
-                     test_secret_indirect_emptyfile);
-+    g_test_add_func("/crypto/secret/seckey/good",
-+                    test_secret_seckey_good);
-+    g_test_add_func("/crypto/secret/seckey/revoked_key",
-+                    test_secret_seckey_revoked_key);
-+    g_test_add_func("/crypto/secret/seckey/expired_key",
-+                    test_secret_seckey_expired_key);
-+    g_test_add_func("/crypto/secret/seckey/bad_serial_key",
-+                    test_secret_seckey_bad_serial_key);
-+    g_test_add_func("/crypto/secret/seckey/bad_key_access_right",
-+                    test_secret_seckey_bad_key_access_right);
- 
-     g_test_add_func("/crypto/secret/noconv/base64/good",
-                     test_secret_noconv_base64_good);
++static void
++qcrypto_secret_linux_complete(UserCreatable *uc, Error **errp)
++{
++    object_property_set_bool(OBJECT(uc), true, "loaded", errp);
++}
++
++
++static void
++qcrypto_secret_linux_class_init(ObjectClass *oc, void *data)
++{
++    QCryptoSecretCommonClass *sic = QCRYPTO_SECRET_COMMON_CLASS(oc);
++    sic->load_data = qcrypto_secret_linux_load_data;
++
++    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
++    ucc->complete = qcrypto_secret_linux_complete;
++
++    object_class_property_add(oc, "serial", "key_serial_t",
++                                  qcrypto_secret_prop_get_key,
++                                  qcrypto_secret_prop_set_key,
++                                  NULL, NULL, NULL);
++}
++
++
++static const TypeInfo qcrypto_secret_info = {
++    .parent        = TYPE_QCRYPTO_SECRET_COMMON,
++    .name          = TYPE_QCRYPTO_SECRET_LINUX_KEYRING,
++    .instance_size = sizeof(QCryptoSecretLinuxKeyring),
++    .class_size    = sizeof(QCryptoSecretLinuxKeyringClass),
++    .class_init    = qcrypto_secret_linux_class_init,
++    .interfaces    = (InterfaceInfo[]) {
++        { TYPE_USER_CREATABLE },
++        { }
++    }
++};
++
++
++static void
++qcrypto_secret_register_types(void)
++{
++    type_register_static(&qcrypto_secret_info);
++}
++
++
++type_init(qcrypto_secret_register_types);
++
++#endif /* __NR_keyctl */
+diff --git a/include/crypto/linux_keyring.h b/include/crypto/linux_keyring.h
+new file mode 100644
+index 0000000000..2618b34444
+--- /dev/null
++++ b/include/crypto/linux_keyring.h
+@@ -0,0 +1,38 @@
++#ifndef QCRYPTO_SECRET_LINUX_KEYRING_H
++#define QCRYPTO_SECRET_LINUX_KEYRING_H
++
++#ifdef __NR_keyctl
++
++#include "qapi/qapi-types-crypto.h"
++#include "qom/object.h"
++#include "crypto/secret_interface.h"
++
++#define TYPE_QCRYPTO_SECRET_LINUX_KEYRING "syskey"
++#define QCRYPTO_SECRET_LINUX_KEYRING(obj) \
++    OBJECT_CHECK(QCryptoSecretLinuxKeyring, (obj), \
++                 TYPE_QCRYPTO_SECRET_LINUX_KEYRING)
++#define QCRYPTO_SECRET_LINUX_KEYRING_CLASS(class) \
++    OBJECT_CLASS_CHECK(QCryptoSecretLinuxKeyringClass, \
++                       (class), TYPE_QCRYPTO_SECRET_LINUX_KEYRING)
++#define QCRYPTO_SECRET_LINUX_KEYRING_GET_CLASS(class) \
++    OBJECT_GET_CLASS(QCryptoSecretLinuxKeyringClass, \
++                     (class), TYPE_QCRYPTO_SECRET_LINUX_KEYRING)
++
++typedef struct QCryptoSecretLinux QCryptoSecretLinux;
++typedef struct QCryptoSecretLinuxClass QCryptoSecretLinuxClass;
++
++typedef int32_t key_serial_t;
++
++typedef struct QCryptoSecretLinuxKeyring {
++    QCryptoSecretCommon  parent;
++    key_serial_t         serial;
++} QCryptoSecretLinuxKeyring;
++
++
++typedef struct QCryptoSecretLinuxKeyringClass {
++    QCryptoSecretCommonClass  parent;
++} QCryptoSecretLinuxKeyringClass;
++
++#endif /* __NR_keyctl */
++
++#endif /* QCRYPTO_SECRET_LINUX_KEYRING_H */
 -- 
 2.17.1
 
