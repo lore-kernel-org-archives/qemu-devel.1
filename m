@@ -2,79 +2,99 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B058EC2BA2B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:30:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D410BC2BB85
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:39:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BF1920775
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:30:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90E58206D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:39:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eGk0TOSR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BF1920775
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cMrtJIeA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90E58206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOcUs-0001fo-I1
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 03:30:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47429)
+	id 1jOcdm-0004PI-Md
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 03:39:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48559)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eskultet@redhat.com>) id 1jOcTz-0000Vf-4P
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:29:17 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOcd4-0003tJ-Bp
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:38:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eskultet@redhat.com>) id 1jOcTx-0005Vv-2P
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:29:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58013
+ (envelope-from <philmd@redhat.com>) id 1jOcd0-0002Zb-V2
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:38:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20298
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1jOcTw-0005Vh-TV
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:29:13 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOcd0-0002ZO-Po
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:38:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586935752;
+ s=mimecast20190719; t=1586936314;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wq4PnsZgQ2G24Tjq97vpI5F2ndNze8Wd6Dp4iuNzDEg=;
- b=eGk0TOSRtmAd+WnKpdvBE6TciOUj5xjz1/MsBeYjodkAsA6PY398E7M8ZWtuYhvr9tEC6n
- m+PT7b6HqpxpTNh0uJXVE/rV9BYxqRoD7VRZzSYYn34eTW5lZYPdJ78G0hGvPJiZvAAGVw
- yRy+kC1xTf280mia7BzfbO1u/IwzYjc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-505-G5cDUwQsPCGDTDJeZalDaw-1; Wed, 15 Apr 2020 03:29:10 -0400
-X-MC-Unique: G5cDUwQsPCGDTDJeZalDaw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D786718CA250;
- Wed, 15 Apr 2020 07:29:06 +0000 (UTC)
-Received: from sturgeon (unknown [10.40.192.200])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DF311001281;
- Wed, 15 Apr 2020 07:28:53 +0000 (UTC)
-Date: Wed, 15 Apr 2020 09:28:51 +0200
-From: Erik Skultety <eskultet@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v5 1/4] vfio/mdev: add migration_version attribute for
- mdev (under mdev_type node)
-Message-ID: <20200415072851.GJ269314@sturgeon>
-References: <20200413055201.27053-1-yan.y.zhao@intel.com>
- <20200413055403.27203-1-yan.y.zhao@intel.com>
+ bh=+LSFL4tSe8EaPFFyG9ykzeMJktsxwly8+fJSjPrzcs4=;
+ b=cMrtJIeAoX3EH69agSm1uphOHDh8da35Z+dKLwxR4NyDlfboduoXWOc/SfZ8oHSltx+cjb
+ ErXwsZ4x6eqVn6TD8QMQiZnmf45lpQFbgCRntgAXvaL2Y1TlqpFvumd/s7F4ZKmfhCv+rZ
+ 1nOiNPH5WPLmoFYWVdeffVs+V+mgY2U=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-510-Hk-1WpsRMqK_I9dFHOAzvQ-1; Wed, 15 Apr 2020 03:38:29 -0400
+X-MC-Unique: Hk-1WpsRMqK_I9dFHOAzvQ-1
+Received: by mail-ed1-f70.google.com with SMTP id i61so2208621edc.2
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 00:38:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+LSFL4tSe8EaPFFyG9ykzeMJktsxwly8+fJSjPrzcs4=;
+ b=VpmpgwRCP4+PlXNJcsLQNfTghmVZ7yH5Pw0TDlI6VihjnQBM7SDNJcIWUqNbmlx02d
+ z/8eJkq0nJD0wvZART7Lfd+GODxLR75FUu6VrxLkUFmJAyWAKAKD1rcoKAUIx6DjcQtZ
+ WlF3h1MpDDpPAqqznrRjY/AS6P7dUx09yi9UOvjQjVNxfwUnZ4H9RSvaodT4TjhP4+ab
+ JN7xycXM2EUdrW2OZ/yCAhGtMuiBAogP2zcruTglzf9QoNfL8mBXXCRmibMIJ4xjZQPW
+ BuAhmDEaAtSX5kwEsCx9fS/dyOyZHxVcHs7M7fFVDDto+M6DtfddIA2fpvyiUPVXF6KJ
+ tYuQ==
+X-Gm-Message-State: AGi0PuYFT3sY6Pda2FZmIYJRu8/qC9WQqv0RHZSqAkxDpFvGeIifR1N1
+ kVOMXHngA/HOxsUVkJeTtp7X1CWBhervoPfuUEf9phpidJv39uCAOVwReSuoujJVvWwRIvJ2pFF
+ +frg3OhP/XS4GLjU=
+X-Received: by 2002:aa7:cf16:: with SMTP id a22mr12882412edy.77.1586936306049; 
+ Wed, 15 Apr 2020 00:38:26 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIcjec5AE2un1o/3U1yF17EQ9utUK78/MNxnVrteqYEtmQj/XX3q49U8oPGOk20Ab0iuXJ1lA==
+X-Received: by 2002:aa7:cf16:: with SMTP id a22mr12882387edy.77.1586936305489; 
+ Wed, 15 Apr 2020 00:38:25 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id h9sm2577530ejb.47.2020.04.15.00.38.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 15 Apr 2020 00:38:24 -0700 (PDT)
+Subject: Re: [PATCH v7 45/48] nvme: support multiple namespaces
+To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
+References: <20200415055140.466900-1-its@irrelevant.dk>
+ <20200415055140.466900-46-its@irrelevant.dk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <dbde592f-1205-a483-c03e-62153ad348d8@redhat.com>
+Date: Wed, 15 Apr 2020 09:38:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200413055403.27203-1-yan.y.zhao@intel.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200415055140.466900-46-its@irrelevant.dk>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,383 +106,984 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- libvir-list@redhat.com, Zhengxiao.zx@alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, kwankhede@nvidia.com,
- eauger@redhat.com, yi.l.liu@intel.com, corbet@lwn.net, ziye.yang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, felipe@nutanix.com,
- Ken.Xue@amd.com, kevin.tian@intel.com, xin.zeng@intel.com, dgilbert@redhat.com,
- zhenyuw@linux.intel.com, jonathan.davies@nutanix.com,
- intel-gvt-dev@lists.freedesktop.org, changpeng.liu@intel.com,
- cohuck@redhat.com, linux-kernel@vger.kernel.org, zhi.a.wang@intel.com,
- dinechin@redhat.com, shaopeng.he@intel.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Apr 13, 2020 at 01:54:03AM -0400, Yan Zhao wrote:
-> migration_version attribute is used to check migration compatibility
-> between two mdev devices of the same mdev type.
-> The key is that it's rw and its data is opaque to userspace.
->
-> Userspace reads migration_version of mdev device at source side and
-> writes the value to migration_version attribute of mdev device at targe=
-t
-> side. It judges migration compatibility according to whether the read
-> and write operations succeed or fail.
->
-> Currently, it is able to read/write migration_version attribute under t=
-wo
-> places:
->
-> (1) under mdev_type node
-> userspace is able to know whether two mdev devices are compatible befor=
-e
-> a mdev device is created.
->
-> userspace also needs to check whether the two mdev devices are of the s=
-ame
-> mdev type before checking the migration_version attribute. It also need=
-s
-> to check device creation parameters if aggregation is supported in futu=
-re.
->
-> (2) under mdev device node
-> userspace is able to know whether two mdev devices are compatible after
-> they are all created. But it does not need to check mdev type and devic=
-e
-> creation parameter for aggregation as device vendor driver would have
-> incorporated those information into the migration_version attribute.
->
->              __    userspace
->               /\              \
->              /                 \write
->             / read              \
->    ________/__________       ___\|/_____________
->   | migration_version |     | migration_version |-->check migration
->   ---------------------     ---------------------   compatibility
->     mdev device A               mdev device B
->
-> This patch is for mdev documentation about the first place (under
-> mdev_type node)
->
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Erik Skultety <eskultet@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: "Tian, Kevin" <kevin.tian@intel.com>
-> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
-> Cc: Neo Jia <cjia@nvidia.com>
-> Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Cc: Christophe de Dinechin <dinechin@redhat.com>
->
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
->
+On 4/15/20 7:51 AM, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
+> 
+> This adds support for multiple namespaces by introducing a new 'nvme-ns'
+> device model. The nvme device creates a bus named from the device name
+> ('id'). The nvme-ns devices then connect to this and registers
+> themselves with the nvme device.
+> 
+> This changes how an nvme device is created. Example with two namespaces:
+> 
+>    -drive file=nvme0n1.img,if=none,id=disk1
+>    -drive file=nvme0n2.img,if=none,id=disk2
+>    -device nvme,serial=deadbeef,id=nvme0
+>    -device nvme-ns,drive=disk1,bus=nvme0,nsid=1
+>    -device nvme-ns,drive=disk2,bus=nvme0,nsid=2
+> 
+> The drive property is kept on the nvme device to keep the change
+> backward compatible, but the property is now optional. Specifying a
+> drive for the nvme device will always create the namespace with nsid 1.
+> 
+> Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> Reviewed-by: Keith Busch <kbusch@kernel.org>
 > ---
-> v5:
-> updated commit message a little to indicate this patch is for
-> migration_version attribute under mdev_type node
->
-> v4:
-> fixed a typo. (Cornelia Huck)
->
-> v3:
-> 1. renamed version to migration_version
-> (Christophe de Dinechin, Cornelia Huck, Alex Williamson)
-> 2. let errno to be freely defined by vendor driver
-> (Alex Williamson, Erik Skultety, Cornelia Huck, Dr. David Alan Gilbert)
-> 3. let checking mdev_type be prerequisite of migration compatibility
-> check. (Alex Williamson)
-> 4. reworded example usage section.
-> (most of this section came from Alex Williamson)
-> 5. reworded attribute intention section (Cornelia Huck)
->
-> v2:
-> 1. added detailed intent and usage
-> 2. made definition of version string completely private to vendor drive=
-r
->    (Alex Williamson)
-> 3. abandoned changes to sample mdev drivers (Alex Williamson)
-> 4. mandatory --> optional (Cornelia Huck)
-> 5. added description for errno (Cornelia Huck)
-> ---
->  .../driver-api/vfio-mediated-device.rst       | 113 ++++++++++++++++++
->  1 file changed, 113 insertions(+)
->
-> diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Docume=
-ntation/driver-api/vfio-mediated-device.rst
-> index 25eb7d5b834b..2d1f3c0f3c8f 100644
-> --- a/Documentation/driver-api/vfio-mediated-device.rst
-> +++ b/Documentation/driver-api/vfio-mediated-device.rst
-> @@ -202,6 +202,7 @@ Directories and files under the sysfs for Each Phys=
-ical Device
->    |     |   |--- available_instances
->    |     |   |--- device_api
->    |     |   |--- description
-> +  |     |   |--- migration_version
->    |     |   |--- [devices]
->    |     |--- [<type-id>]
->    |     |   |--- create
-> @@ -209,6 +210,7 @@ Directories and files under the sysfs for Each Phys=
-ical Device
->    |     |   |--- available_instances
->    |     |   |--- device_api
->    |     |   |--- description
-> +  |     |   |--- migration_version
->    |     |   |--- [devices]
->    |     |--- [<type-id>]
->    |          |--- create
-> @@ -216,6 +218,7 @@ Directories and files under the sysfs for Each Phys=
-ical Device
->    |          |--- available_instances
->    |          |--- device_api
->    |          |--- description
-> +  |          |--- migration_version
->    |          |--- [devices]
->
->  * [mdev_supported_types]
-> @@ -246,6 +249,116 @@ Directories and files under the sysfs for Each Ph=
-ysical Device
->    This attribute should show the number of devices of type <type-id> t=
-hat can be
->    created.
+>   hw/block/Makefile.objs |   2 +-
+>   hw/block/nvme-ns.c     | 157 +++++++++++++++++++++++++++
+>   hw/block/nvme-ns.h     |  60 +++++++++++
+>   hw/block/nvme.c        | 233 +++++++++++++++++++++++++++--------------
+>   hw/block/nvme.h        |  47 ++++-----
+>   hw/block/trace-events  |   8 +-
+>   6 files changed, 396 insertions(+), 111 deletions(-)
+>   create mode 100644 hw/block/nvme-ns.c
+>   create mode 100644 hw/block/nvme-ns.h
+> 
+> diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+> index 4b4a2b338dc4..d9141d6a4b9b 100644
+> --- a/hw/block/Makefile.objs
+> +++ b/hw/block/Makefile.objs
+> @@ -7,7 +7,7 @@ common-obj-$(CONFIG_PFLASH_CFI02) += pflash_cfi02.o
+>   common-obj-$(CONFIG_XEN) += xen-block.o
+>   common-obj-$(CONFIG_ECC) += ecc.o
+>   common-obj-$(CONFIG_ONENAND) += onenand.o
+> -common-obj-$(CONFIG_NVME_PCI) += nvme.o
+> +common-obj-$(CONFIG_NVME_PCI) += nvme.o nvme-ns.o
+>   common-obj-$(CONFIG_SWIM) += swim.o
+>   
+>   common-obj-$(CONFIG_SH4) += tc58128.o
+> diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
+> new file mode 100644
+> index 000000000000..bd64d4a94632
+> --- /dev/null
+> +++ b/hw/block/nvme-ns.c
+> @@ -0,0 +1,157 @@
 
-I've got only a few suggestions to improve to wording in the documentatio=
-n
-(feel free to disagree):
+Missing copyright + license.
 
->
-> +* migration_version
+> +#include "qemu/osdep.h"
+> +#include "qemu/units.h"
+> +#include "qemu/cutils.h"
+> +#include "qemu/log.h"
+> +#include "hw/block/block.h"
+> +#include "hw/pci/pci.h"
+> +#include "sysemu/sysemu.h"
+> +#include "sysemu/block-backend.h"
+> +#include "qapi/error.h"
 > +
-> +  This attribute is rw, and is optional.
-
-IMO better wording: "This is an optional, RW attribute."
-
-> +  It is used to check migration compatibility between two mdev devices=
- of the
-> +  same mdev type. Absence of this attribute means the device of type <=
-type-id>
-> +  does not support migration.
-> +  This attribute provides a way to check migration compatibility betwe=
-en two
-> +  mdev devices from userspace even before device creation. The intende=
-d usage is
-
-^This sentence essentially duplicates the information from the first sent=
-ence,
-can we condense it into something like:
-
-"It is used to check the migration compatibility between two mdev devices=
- of the
-same mdev type. Typically, the target device has not been created yet at =
-the
-time of userspace using this attribute to check the migration compatibili=
-ty."
-
-> +  for userspace to read the migration_version attribute from one mdev =
-device and
-> +  then writing that value to the migration_version attribute of the ot=
-her mdev
-> +  device. The second mdev device indicates compatibility via the retur=
-n code of
-> +  the write operation. This makes compatibility between mdev devices c=
-ompletely
-> +  vendor-defined and opaque to userspace. Userspace should do nothing =
-more
-> +  than verify the mdev types match and then use the migration_version =
-attribute
-> +  to confirm source to target compatibility.
-
-I'd rephrase the ^last sentence differently:
-"Therefore, userspace is only expected to verify that the mdev types of t=
-he
-respective devices match and then use the migration_version attribute to
-confirm migration compatibility between the source and target mdev device=
-s."
-
+> +#include "hw/qdev-properties.h"
+> +#include "hw/qdev-core.h"
 > +
-> +  Reading/Writing Attribute Data:
-> +  read(2) will fail if device of type <type-id> does not support migra=
-tion and
-> +          otherwise succeed and return migration_version string of the=
- device of
-
-"returns a migration_version string of the device on success, fails with =
-an
-errno if the device doesn't support migration"
-
-> +          type <type-id>.
+> +#include "nvme.h"
+> +#include "nvme-ns.h"
 > +
-> +          This migration_version string is vendor defined and opaque t=
-o the
-> +          userspace. Vendor is free to include whatever they feel is r=
-elevant.
-> +          e.g. <pciid of parent device>-<software version>.
+> +static int nvme_ns_init(NvmeNamespace *ns)
+> +{
+> +    NvmeIdNs *id_ns = &ns->id_ns;
 > +
-> +          Restrictions on this migration_version string:
-> +            1. It should only contain ascii characters
-> +            2. MAX Length is PATH_MAX (4096)
+> +    id_ns->lbaf[0].ds = BDRV_SECTOR_BITS;
+> +    id_ns->nsze = cpu_to_le64(nvme_ns_nlbas(ns));
 > +
-> +  write(2) expects migration_version string of source mdev device, and=
- will
-> +          succeed if it is determined to be compatible and otherwise f=
-ail with
-> +          vendor specific errno.
-
-"expects a migration_version string of the source mdev device, succeeds i=
-f the
-two mdev devices are migration compatible, otherwise fails with and errno=
-"
-
+> +    /* no thin provisioning */
+> +    id_ns->ncap = id_ns->nsze;
+> +    id_ns->nuse = id_ns->ncap;
 > +
-> +  Errno:
-> +  -An errno on read(2) indicates the device of type <type-id> does not=
- support
-> +  migration;
-> +  -An errno on write(2) indicates the devices are incompatible or the =
-target
-> +  doesn't support migration.
-> +  Vendor driver is free to define specific errno and is suggested to
-> +  print detailed error in syslog for diagnose purpose.
+> +    return 0;
+> +}
 > +
-> +  Userspace should treat ANY of below conditions as two mdev devices n=
-ot
-
-Userspace should treat any of the below conditions as an indication of mi=
-gration
-incompatibility between two mdev devices.
-
-> +  compatible:
-> +  (0) The mdev devices are not of the same type
-> +  (1) any one of the two mdev devices does not have a migration_versio=
-n
-> +  attribute
-
-any of the two mdev devices is missing the migration_version attribute
-
-> +  (2) error when reading from migration_version attribute of one mdev =
-device
-
-when reading the source mdev's migration_version attribute
-
-> +  (3) error when writing migration_version string of one mdev device t=
-o
-> +  migration_version attribute of the other mdev device
-
-when writing the source mdev migration_version string to the target mdev
-device's migration_version attribute
-
+> +static int nvme_ns_init_blk(NvmeCtrl *n, NvmeNamespace *ns, NvmeIdCtrl *id,
+> +                            Error **errp)
+> +{
+> +    uint64_t perm, shared_perm;
 > +
-> +  Userspace should regard two mdev devices compatible when ALL of belo=
-w
-> +  conditions are met:
+> +    Error *local_err = NULL;
+> +    int ret;
+> +
+> +    perm = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE;
+> +    shared_perm = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
+> +        BLK_PERM_GRAPH_MOD;
+> +
+> +    ret = blk_set_perm(ns->blk, perm, shared_perm, &local_err);
+> +    if (ret) {
+> +        error_propagate_prepend(errp, local_err,
+> +                                "could not set block permissions: ");
+> +        return ret;
+> +    }
+> +
+> +    ns->size = blk_getlength(ns->blk);
+> +    if (ns->size < 0) {
+> +        error_setg_errno(errp, -ns->size, "could not get blockdev size");
+> +        return -1;
+> +    }
+> +
+> +    switch (n->conf.wce) {
+> +    case ON_OFF_AUTO_ON:
+> +        n->features.volatile_wc = 1;
+> +        break;
+> +    case ON_OFF_AUTO_OFF:
+> +        n->features.volatile_wc = 0;
 
-Userspace can consider the two mdev devices to be compatible when all of =
-the
-below conditions are met:
+Missing 'break'?
 
-> +  (0) The mdev devices are of the same type
-> +  (1) success when reading from migration_version attribute of one mde=
-v device.
+> +    case ON_OFF_AUTO_AUTO:
+> +        n->features.volatile_wc = blk_enable_write_cache(ns->blk);
+> +        break;
+> +    default:
+> +        abort();
+> +    }
+> +
+> +    blk_set_enable_write_cache(ns->blk, n->features.volatile_wc);
+> +
+> +    return 0;
+> +}
+> +
+> +static int nvme_ns_check_constraints(NvmeNamespace *ns, Error **errp)
+> +{
+> +    if (!ns->blk) {
+> +        error_setg(errp, "block backend not configured");
+> +        return -1;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +int nvme_ns_setup(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+> +{
+> +    if (nvme_ns_check_constraints(ns, errp)) {
+> +        return -1;
+> +    }
+> +
+> +    if (nvme_ns_init_blk(n, ns, &n->id_ctrl, errp)) {
+> +        return -1;
+> +    }
+> +
+> +    nvme_ns_init(ns);
+> +    if (nvme_register_namespace(n, ns, errp)) {
+> +        return -1;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static void nvme_ns_realize(DeviceState *dev, Error **errp)
+> +{
+> +    NvmeNamespace *ns = NVME_NS(dev);
+> +    BusState *s = qdev_get_parent_bus(dev);
+> +    NvmeCtrl *n = NVME(s->parent);
+> +    Error *local_err = NULL;
+> +
+> +    if (nvme_ns_setup(n, ns, &local_err)) {
+> +        error_propagate_prepend(errp, local_err,
+> +                                "could not setup namespace: ");
+> +        return;
+> +    }
+> +}
+> +
+> +static Property nvme_ns_props[] = {
+> +    DEFINE_NVME_NS_PROPERTIES(NvmeNamespace, params),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void nvme_ns_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +
+> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+> +
+> +    dc->bus_type = TYPE_NVME_BUS;
+> +    dc->realize = nvme_ns_realize;
+> +    device_class_set_props(dc, nvme_ns_props);
+> +    dc->desc = "virtual nvme namespace";
 
-reading the migration_version attribute of the source succeeds
+"Virtual NVMe namespace"?
 
-> +  (2) success when writing migration_version string of one mdev device=
- to
-> +  migration_version attribute of the other mdev device.
+> +}
+> +
+> +static void nvme_ns_instance_init(Object *obj)
+> +{
+> +    NvmeNamespace *ns = NVME_NS(obj);
+> +    char *bootindex = g_strdup_printf("/namespace@%d,0", ns->params.nsid);
+> +
+> +    device_add_bootindex_property(obj, &ns->bootindex, "bootindex",
+> +                                  bootindex, DEVICE(obj), &error_abort);
+> +
+> +    g_free(bootindex);
+> +}
+> +
+> +static const TypeInfo nvme_ns_info = {
+> +    .name = TYPE_NVME_NS,
+> +    .parent = TYPE_DEVICE,
+> +    .class_init = nvme_ns_class_init,
+> +    .instance_size = sizeof(NvmeNamespace),
+> +    .instance_init = nvme_ns_instance_init,
+> +};
+> +
+> +static void nvme_ns_register_types(void)
+> +{
+> +    type_register_static(&nvme_ns_info);
+> +}
+> +
+> +type_init(nvme_ns_register_types)
+> diff --git a/hw/block/nvme-ns.h b/hw/block/nvme-ns.h
+> new file mode 100644
+> index 000000000000..3c3651d485d0
+> --- /dev/null
+> +++ b/hw/block/nvme-ns.h
+> @@ -0,0 +1,60 @@
 
-writing the migration_version string to the target mdev's migration_versi=
-on
-attribute succeeds
+Missing copyright + license.
 
+> +#ifndef NVME_NS_H
+> +#define NVME_NS_H
 > +
-> +  Example Usage:
-> +  (1) Compare mdev types:
+> +#define TYPE_NVME_NS "nvme-ns"
+> +#define NVME_NS(obj) \
+> +    OBJECT_CHECK(NvmeNamespace, (obj), TYPE_NVME_NS)
+> +
+> +#define DEFINE_NVME_NS_PROPERTIES(_state, _props) \
+> +    DEFINE_PROP_DRIVE("drive", _state, blk), \
+> +    DEFINE_PROP_UINT32("nsid", _state, _props.nsid, 0)
+> +
+> +typedef struct NvmeNamespaceParams {
+> +    uint32_t nsid;
+> +} NvmeNamespaceParams;
+> +
+> +typedef struct NvmeNamespace {
+> +    DeviceState  parent_obj;
+> +    BlockBackend *blk;
+> +    int32_t      bootindex;
+> +    int64_t      size;
+> +
+> +    NvmeIdNs            id_ns;
+> +    NvmeNamespaceParams params;
+> +} NvmeNamespace;
+> +
+> +static inline uint32_t nvme_nsid(NvmeNamespace *ns)
+> +{
+> +    if (ns) {
+> +        return ns->params.nsid;
+> +    }
+> +
+> +    return -1;
 
-Comparing two mdev types:
+This case doesn't seem possible.
 
-> +
-> +  The mdev type of an instantiated device can be read from the mdev_ty=
-pe link
-> +  within the device instance in sysfs, for example:
-> +
-> +  # basename $(readlink -f /sys/bus/mdev/devices/$MDEV_UUID/mdev_type/=
-)
-> +
-> +  The mdev types available on a given host system can also be found th=
-rough
-> +  /sys/class/mdev_bus, for example:
-> +
-> +  # ls /sys/class/mdev_bus/*/mdev_supported_types/
-> +
-> +  Migration is only possible between devices of the same mdev type.
-> +
-> +  (2) Retrieve the mdev source migration_version:
-> +
-> +  The migration_version information can either be read from the mdev_t=
-ype link
-> +  on an instantiated device:
+Maybe:
 
-s/information/string
+       assert(ns);
+       return ns->params.nsid;
 
+> +}
 > +
-> +  # cat /sys/bus/mdev/devices/$UUID1/mdev_type/migration_version
+> +static inline NvmeLBAF *nvme_ns_lbaf(NvmeNamespace *ns)
+> +{
+> +    NvmeIdNs *id_ns = &ns->id_ns;
+> +    return &id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(id_ns->flbas)];
+> +}
 > +
-> +  Or it can be read from the mdev type definition, for example:
+> +static inline uint8_t nvme_ns_lbads(NvmeNamespace *ns)
+> +{
+> +    return nvme_ns_lbaf(ns)->ds;
+> +}
 > +
-> +  # cat /sys/class/mdev_bus/*/mdev_supported_types/$MDEV_TYPE/migratio=
-n_version
+> +static inline size_t nvme_ns_lbads_bytes(NvmeNamespace *ns)
+> +{
+> +    return 1 << nvme_ns_lbads(ns);
+> +}
 > +
-> +  If reading the source migration_version generates an error, migratio=
-n is not
-> +  possible.
-> +  NB, there might be several parent devices for a given mdev type on a=
- host
-> +  system, each may support or expose different migration_versions.
-> +  Matching the specific mdev type to a parent may become important in =
-such
-> +  configurations.
+> +static inline uint64_t nvme_ns_nlbas(NvmeNamespace *ns)
+> +{
+> +    return ns->size >> nvme_ns_lbads(ns);
+> +}
 > +
-> +  (3) Test source migration_version at target:
+> +typedef struct NvmeCtrl NvmeCtrl;
 > +
-> +  Given a migration_version as outlined above, its compatibility to an
-> +  instantiated device of the same mdev type can be tested as:
-> +  # echo $VERSION > /sys/bus/mdev/devices/$UUID2/mdev_type/migration_v=
-ersion
+> +int nvme_ns_setup(NvmeCtrl *n, NvmeNamespace *ns, Error **errp);
 > +
-> +  If this write fails, the source and target migration versions are no=
-t
-> +  compatible or the target does not support migration.
+> +#endif /* NVME_NS_H */
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 05a6fa334a70..e338d0893a70 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -17,10 +17,11 @@
+>   /**
+>    * Usage: add options:
+>    *      -drive file=<file>,if=none,id=<drive_id>
+> - *      -device nvme,drive=<drive_id>,serial=<serial>,id=<id[optional]>, \
+> + *      -device nvme,serial=<serial>,id=<bus_name>, \
+>    *              cmb_size_mb=<cmb_size_mb[optional]>, \
+>    *              max_ioqpairs=<N[optional]>, \
+>    *              mdts=<mdts[optional]>
+> + *      -device nvme-ns,drive=<drive_id>,bus=bus_name,nsid=1
+>    *
+>    * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
+>    * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
+> @@ -44,6 +45,7 @@
+>   #include "qemu/cutils.h"
+>   #include "trace.h"
+>   #include "nvme.h"
+> +#include "nvme-ns.h"
+>   
+>   #define NVME_SPEC_VER 0x00010300
+>   #define NVME_CMB_BIR 2
+> @@ -89,6 +91,11 @@ static int nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
+>       return pci_dma_read(&n->parent_obj, addr, buf, size);
+>   }
+>   
+> +static uint16_t nvme_nsid_valid(NvmeCtrl *n, uint32_t nsid)
+> +{
+> +    return nsid && nsid <= n->num_namespaces;
+> +}
 > +
-> +  Compatibility can also be tested prior to target device creation usi=
-ng the
+>   static int nvme_check_sqid(NvmeCtrl *n, uint16_t sqid)
+>   {
+>       return sqid < n->params.max_ioqpairs + 1 && n->sq[sqid] != NULL ? 0 : -1;
+> @@ -949,11 +956,12 @@ static uint16_t nvme_check_rw(NvmeCtrl *n, NvmeRequest *req)
+>   
+>   static void nvme_rw_cb(NvmeRequest *req, void *opaque)
+>   {
+> +    NvmeNamespace *ns = req->ns;
+>       NvmeSQueue *sq = req->sq;
+>       NvmeCtrl *n = sq->ctrl;
+>       NvmeCQueue *cq = n->cq[sq->cqid];
+>   
+> -    trace_nvme_dev_rw_cb(nvme_cid(req));
+> +    trace_nvme_dev_rw_cb(nvme_cid(req), nvme_nsid(ns));
+>   
+>       nvme_enqueue_req_completion(cq, req);
+>   }
+> @@ -1036,10 +1044,11 @@ static void nvme_aio_cb(void *opaque, int ret)
+>   
+>   static uint16_t nvme_flush(NvmeCtrl *n, NvmeRequest *req)
+>   {
+> +    NvmeNamespace *ns = req->ns;
+>       NvmeAIO *aio = g_new0(NvmeAIO, 1);
+>   
+>       *aio = (NvmeAIO) {
+> -        .blk = n->conf.blk,
+> +        .blk = ns->blk,
+>           .req = req,
+>       };
+>   
+> @@ -1063,11 +1072,12 @@ static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeRequest *req)
+>       req->slba = le64_to_cpu(rw->slba);
+>       req->nlb  = le16_to_cpu(rw->nlb) + 1;
+>   
+> -    trace_nvme_dev_write_zeroes(nvme_cid(req), req->slba, req->nlb);
+> +    trace_nvme_dev_write_zeroes(nvme_cid(req), nvme_nsid(ns), req->slba,
+> +                                req->nlb);
+>   
+>       status = nvme_check_bounds(n, req->slba, req->nlb, req);
+>       if (status) {
+> -        return status;
+> +        goto invalid;
+>       }
+>   
+>       offset = req->slba << nvme_ns_lbads(ns);
+> @@ -1076,7 +1086,7 @@ static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeRequest *req)
+>       aio = g_new0(NvmeAIO, 1);
+>   
+>       *aio = (NvmeAIO) {
+> -        .blk = n->conf.blk,
+> +        .blk = ns->blk,
+>           .offset = offset,
+>           .len = count,
+>           .req = req,
+> @@ -1086,6 +1096,10 @@ static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeRequest *req)
+>       nvme_submit_aio(aio);
+>   
+>       return NVME_NO_COMPLETE;
+> +
+> +invalid:
+> +    block_acct_invalid(blk_get_stats(ns->blk), BLOCK_ACCT_WRITE);
+> +    return status;
+>   }
+>   
+>   static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *req)
+> @@ -1100,11 +1114,11 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *req)
+>   
+>       req->nlb  = le16_to_cpu(rw->nlb) + 1;
+>       req->slba = le64_to_cpu(rw->slba);
+> -
+>       len = req->nlb << nvme_ns_lbads(ns);
+>   
+> -    trace_nvme_dev_rw(nvme_req_is_write(req) ? "write" : "read", req->nlb,
+> -                      req->nlb << nvme_ns_lbads(req->ns), req->slba);
+> +    trace_nvme_dev_rw(nvme_cid(req), nvme_req_is_write(req) ? "write" : "read",
+> +                      nvme_nsid(ns), req->nlb, req->nlb << nvme_ns_lbads(ns),
+> +                      req->slba);
+>   
+>       status = nvme_check_rw(n, req);
+>       if (status) {
+> @@ -1116,13 +1130,13 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *req)
+>           goto invalid;
+>       }
+>   
+> -    nvme_rw_aio(n->conf.blk, req->slba << nvme_ns_lbads(ns), req);
+> +    nvme_rw_aio(ns->blk, req->slba << nvme_ns_lbads(ns), req);
+>       nvme_req_set_cb(req, nvme_rw_cb, NULL);
+>   
+>       return NVME_NO_COMPLETE;
+>   
+>   invalid:
+> -    block_acct_invalid(blk_get_stats(n->conf.blk), acct);
+> +    block_acct_invalid(blk_get_stats(ns->blk), acct);
+>       return status;
+>   }
+>   
+> @@ -1133,12 +1147,15 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeRequest *req)
+>       trace_nvme_dev_io_cmd(nvme_cid(req), nsid, le16_to_cpu(req->sq->sqid),
+>                             req->cmd.opcode);
+>   
+> -    if (unlikely(nsid == 0 || nsid > n->num_namespaces)) {
+> -        trace_nvme_dev_err_invalid_ns(nsid, n->num_namespaces);
+> +    if (!nvme_nsid_valid(n, nsid)) {
+>           return NVME_INVALID_NSID | NVME_DNR;
+>       }
+>   
+> -    req->ns = &n->namespaces[nsid - 1];
+> +    req->ns = nvme_ns(n, nsid);
+> +    if (unlikely(!req->ns)) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +
+>       switch (req->cmd.opcode) {
+>       case NVME_CMD_FLUSH:
+>           return nvme_flush(n, req);
+> @@ -1283,18 +1300,24 @@ static uint16_t nvme_smart_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
+>       uint64_t units_read = 0, units_written = 0;
+>       uint64_t read_commands = 0, write_commands = 0;
+>       NvmeSmartLog smart;
+> -    BlockAcctStats *s;
+>   
+>       if (nsid && nsid != 0xffffffff) {
+>           return NVME_INVALID_FIELD | NVME_DNR;
+>       }
+>   
+> -    s = blk_get_stats(n->conf.blk);
+> +    for (int i = 1; i <= n->num_namespaces; i++) {
+> +        NvmeNamespace *ns = nvme_ns(n, i);
+> +        if (!ns) {
+> +            continue;
+> +        }
+>   
+> -    units_read = s->nr_bytes[BLOCK_ACCT_READ] >> BDRV_SECTOR_BITS;
+> -    units_written = s->nr_bytes[BLOCK_ACCT_WRITE] >> BDRV_SECTOR_BITS;
+> -    read_commands = s->nr_ops[BLOCK_ACCT_READ];
+> -    write_commands = s->nr_ops[BLOCK_ACCT_WRITE];
+> +        BlockAcctStats *s = blk_get_stats(ns->blk);
+> +
+> +        units_read += s->nr_bytes[BLOCK_ACCT_READ] >> BDRV_SECTOR_BITS;
+> +        units_written += s->nr_bytes[BLOCK_ACCT_WRITE] >> BDRV_SECTOR_BITS;
+> +        read_commands += s->nr_ops[BLOCK_ACCT_READ];
+> +        write_commands += s->nr_ops[BLOCK_ACCT_WRITE];
+> +    }
+>   
+>       if (off > sizeof(smart)) {
+>           return NVME_INVALID_FIELD | NVME_DNR;
+> @@ -1527,18 +1550,23 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeRequest *req)
+>   {
+>       NvmeNamespace *ns;
+>       NvmeIdentify *c = (NvmeIdentify *)&req->cmd;
+> +    NvmeIdNs *id_ns, inactive = { 0 };
+>       uint32_t nsid = le32_to_cpu(c->nsid);
+>   
+>       trace_nvme_dev_identify_ns(nsid);
+>   
+> -    if (unlikely(nsid == 0 || nsid > n->num_namespaces)) {
+> -        trace_nvme_dev_err_invalid_ns(nsid, n->num_namespaces);
+> +    if (!nvme_nsid_valid(n, nsid)) {
+>           return NVME_INVALID_NSID | NVME_DNR;
+>       }
+>   
+> -    ns = &n->namespaces[nsid - 1];
+> +    ns = nvme_ns(n, nsid);
+> +    if (unlikely(!ns)) {
+> +        id_ns = &inactive;
+> +    } else {
+> +        id_ns = &ns->id_ns;
+> +    }
+>   
+> -    return nvme_dma(n, (uint8_t *)&ns->id_ns, sizeof(ns->id_ns),
+> +    return nvme_dma(n, (uint8_t *)id_ns, sizeof(NvmeIdNs),
+>                       DMA_DIRECTION_FROM_DEVICE, req);
+>   }
+>   
+> @@ -1555,7 +1583,7 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeRequest *req)
+>   
+>       list = g_malloc0(data_len);
+>       for (int i = 1; i <= n->num_namespaces; i++) {
+> -        if (i <= min_nsid) {
+> +        if (i <= min_nsid || !nvme_ns(n, i)) {
+>               continue;
+>           }
+>           list[j++] = cpu_to_le32(i);
+> @@ -1573,7 +1601,6 @@ static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeRequest *req)
+>   {
+>       NvmeIdentify *c = (NvmeIdentify *)&req->cmd;
+>       uint32_t nsid = le32_to_cpu(c->nsid);
+> -
+>       uint8_t list[NVME_IDENTIFY_DATA_SIZE];
+>   
+>       struct data {
+> @@ -1587,11 +1614,14 @@ static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeRequest *req)
+>   
+>       trace_nvme_dev_identify_ns_descr_list(nsid);
+>   
+> -    if (unlikely(nsid == 0 || nsid > n->num_namespaces)) {
+> -        trace_nvme_dev_err_invalid_ns(nsid, n->num_namespaces);
+> +    if (!nvme_nsid_valid(n, nsid)) {
+>           return NVME_INVALID_NSID | NVME_DNR;
+>       }
+>   
+> +    if (unlikely(!nvme_ns(n, nsid))) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +
+>       /*
+>        * Because the NGUID and EUI64 fields are 0 in the Identify Namespace data
+>        * structure, a Namespace UUID (nidt = 0x3) must be reported in the
+> @@ -1726,7 +1756,7 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeRequest *req)
+>           result = cpu_to_le32(n->features.err_rec);
+>           break;
+>       case NVME_VOLATILE_WRITE_CACHE:
+> -        result = cpu_to_le32(blk_enable_write_cache(n->conf.blk));
+> +        result = cpu_to_le32(n->features.volatile_wc);
+>           trace_nvme_dev_getfeat_vwcache(result ? "enabled" : "disabled");
+>           break;
+>       case NVME_NUMBER_OF_QUEUES:
+> @@ -1779,6 +1809,8 @@ static uint16_t nvme_set_feature_timestamp(NvmeCtrl *n, NvmeRequest *req)
+>   
+>   static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeRequest *req)
+>   {
+> +    NvmeNamespace *ns;
+> +
+>       NvmeCmd *cmd = &req->cmd;
+>       uint32_t dw10 = le32_to_cpu(cmd->cdw10);
+>       uint32_t dw11 = le32_to_cpu(cmd->cdw11);
+> @@ -1812,12 +1844,23 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeRequest *req)
+>   
+>           break;
+>       case NVME_VOLATILE_WRITE_CACHE:
+> -        if (blk_enable_write_cache(n->conf.blk)) {
+> -            blk_flush(n->conf.blk);
+> +        n->features.volatile_wc = dw11;
+> +
+> +        for (int i = 1; i <= n->num_namespaces; i++) {
+> +            ns = nvme_ns(n, i);
+> +            if (!ns) {
+> +                continue;
+> +            }
+> +
+> +            if (blk_enable_write_cache(ns->blk)) {
+> +                blk_flush(ns->blk);
+> +            }
+> +
+> +            blk_set_enable_write_cache(ns->blk, dw11 & 1);
+>           }
+>   
+> -        blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+>           break;
+> +
+>       case NVME_NUMBER_OF_QUEUES:
+>           if (n->qs_created) {
+>               return NVME_CMD_SEQ_ERROR | NVME_DNR;
+> @@ -1946,9 +1989,17 @@ static void nvme_process_sq(void *opaque)
+>   
+>   static void nvme_clear_ctrl(NvmeCtrl *n)
+>   {
+> +    NvmeNamespace *ns;
+>       int i;
+>   
+> -    blk_drain(n->conf.blk);
+> +    for (i = 1; i <= n->num_namespaces; i++) {
+> +        ns = nvme_ns(n, i);
+> +        if (!ns) {
+> +            continue;
+> +        }
+> +
+> +        blk_drain(ns->blk);
+> +    }
+>   
+>       for (i = 0; i < n->params.max_ioqpairs + 1; i++) {
+>           if (n->sq[i] != NULL) {
+> @@ -1971,7 +2022,15 @@ static void nvme_clear_ctrl(NvmeCtrl *n)
+>       n->outstanding_aers = 0;
+>       n->qs_created = false;
+>   
+> -    blk_flush(n->conf.blk);
+> +    for (i = 1; i <= n->num_namespaces; i++) {
+> +        ns = nvme_ns(n, i);
+> +        if (!ns) {
+> +            continue;
+> +        }
+> +
+> +        blk_flush(ns->blk);
+> +    }
+> +
+>       n->bar.cc = 0;
+>   }
+>   
+> @@ -2406,6 +2465,11 @@ static int nvme_check_constraints(NvmeCtrl *n, Error **errp)
+>           params->max_ioqpairs = params->num_queues - 1;
+>       }
+>   
+> +    if (n->namespace.blk) {
+> +        warn_report("nvme: drive is deprecated; please use an nvme-ns device "
+> +                    "instead");
+> +    }
+> +
+>       if (params->max_ioqpairs < 1 ||
+>           params->max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
+>           error_setg(errp, "nvme: max_ioqpairs must be between 1 and %d",
+> @@ -2413,11 +2477,6 @@ static int nvme_check_constraints(NvmeCtrl *n, Error **errp)
+>           return -1;
+>       }
+>   
+> -    if (!n->conf.blk) {
+> -        error_setg(errp, "nvme: block backend not configured");
+> -        return -1;
+> -    }
+> -
+>       if (!params->serial) {
+>           error_setg(errp, "nvme: serial not configured");
+>           return -1;
+> @@ -2426,22 +2485,10 @@ static int nvme_check_constraints(NvmeCtrl *n, Error **errp)
+>       return 0;
+>   }
+>   
+> -static int nvme_init_blk(NvmeCtrl *n, Error **errp)
+> -{
+> -    blkconf_blocksizes(&n->conf);
+> -    if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
+> -                                       false, errp)) {
+> -        return -1;
+> -    }
+> -
+> -    return 0;
+> -}
+> -
+>   static void nvme_init_state(NvmeCtrl *n)
+>   {
+> -    n->num_namespaces = 1;
+> +    n->num_namespaces = NVME_MAX_NAMESPACES;
+>       n->reg_size = pow2ceil(0x1008 + 2 * (n->params.max_ioqpairs) * 4);
+> -    n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
+>       n->sq = g_new0(NvmeSQueue *, n->params.max_ioqpairs + 1);
+>       n->cq = g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
+>       n->temperature = NVME_TEMPERATURE;
+> @@ -2557,6 +2604,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+>       id->nn = cpu_to_le32(n->num_namespaces);
+>       id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROES | NVME_ONCS_TIMESTAMP);
+>   
+> +    id->vwc = 0x1;
+>       id->sgls = cpu_to_le32(NVME_CTRL_SGLS_SUPPORTED_NO_ALIGNMENT |
+>                              NVME_CTRL_SGLS_BITBUCKET);
+>   
+> @@ -2566,9 +2614,6 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+>       id->psd[0].mp = cpu_to_le16(0x9c4);
+>       id->psd[0].enlat = cpu_to_le32(0x10);
+>       id->psd[0].exlat = cpu_to_le32(0x4);
+> -    if (blk_enable_write_cache(n->conf.blk)) {
+> -        id->vwc = 1;
+> -    }
+>   
+>       n->bar.cap = 0;
+>       NVME_CAP_SET_MQES(n->bar.cap, 0x7ff);
+> @@ -2581,25 +2626,39 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+>       n->bar.intmc = n->bar.intms = 0;
+>   }
+>   
+> -static int nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+> +int nvme_register_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+>   {
+> -    int64_t bs_size;
+> -    NvmeIdNs *id_ns = &ns->id_ns;
+> +    uint32_t nsid = nvme_nsid(ns);
+>   
+> -    bs_size = blk_getlength(n->conf.blk);
+> -    if (bs_size < 0) {
+> -        error_setg_errno(errp, -bs_size, "blk_getlength");
+> +    if (nsid > NVME_MAX_NAMESPACES) {
+> +        error_setg(errp, "invalid namespace id (must be between 0 and %d)",
+> +                   NVME_MAX_NAMESPACES);
+>           return -1;
+>       }
+>   
+> -    id_ns->lbaf[0].ds = BDRV_SECTOR_BITS;
+> -    n->ns_size = bs_size;
+> +    if (!nsid) {
+> +        for (int i = 1; i <= n->num_namespaces; i++) {
+> +            NvmeNamespace *ns = nvme_ns(n, i);
+> +            if (!ns) {
+> +                nsid = i;
+> +                break;
+> +            }
+> +        }
+>   
+> -    id_ns->nsze = cpu_to_le64(nvme_ns_nlbas(n, ns));
+> +        if (!nsid) {
+> +            error_setg(errp, "no free namespace id");
+> +            return -1;
+> +        }
+> +    } else {
+> +        if (n->namespaces[nsid - 1]) {
+> +            error_setg(errp, "namespace id '%d' is already in use", nsid);
+> +            return -1;
+> +        }
+> +    }
+>   
+> -    /* no thin provisioning */
+> -    id_ns->ncap = id_ns->nsze;
+> -    id_ns->nuse = id_ns->ncap;
+> +    trace_nvme_dev_register_namespace(nsid);
+> +
+> +    n->namespaces[nsid - 1] = ns;
+>   
+>       return 0;
+>   }
+> @@ -2607,26 +2666,28 @@ static int nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+>   static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>   {
+>       NvmeCtrl *n = NVME(pci_dev);
+> -    int i;
+> +    NvmeNamespace *ns;
+>   
+>       if (nvme_check_constraints(n, errp)) {
+>           return;
+>       }
+>   
+> +    qbus_create_inplace(&n->bus, sizeof(NvmeBus), TYPE_NVME_BUS,
+> +                        &pci_dev->qdev, n->parent_obj.qdev.id);
+> +
+>       nvme_init_state(n);
+> +    nvme_init_pci(n, pci_dev);
+> +    nvme_init_ctrl(n);
 
-prior to creation of the target device
+Argh you move these functions again... Why not put them in the correct 
+place when you refactor nvme_realize()?
 
-> +  mdev type definition for a parent device with a previously found mat=
-ching mdev
-> +  type, for example:
-
-using the migration_version attribute present inside a specific mdev type
-directory for a given physical parent device.
-
+>   
+> -    if (nvme_init_blk(n, errp)) {
+> -        return;
+> -    }
+> +    /* setup a namespace if the controller drive property was given */
+> +    if (n->namespace.blk) {
+> +        ns = &n->namespace;
+> +        ns->params.nsid = 1;
+>   
+> -    for (i = 0; i < n->num_namespaces; i++) {
+> -        if (nvme_init_namespace(n, &n->namespaces[i], errp)) {
+> +        if (nvme_ns_setup(n, ns, errp)) {
+>               return;
+>           }
+>       }
+> -
+> -    nvme_init_pci(n, pci_dev);
+> -    nvme_init_ctrl(n);
+>   }
+>   
+>   static void nvme_exit(PCIDevice *pci_dev)
+> @@ -2647,7 +2708,8 @@ static void nvme_exit(PCIDevice *pci_dev)
+>   }
+>   
+>   static Property nvme_props[] = {
+> -    DEFINE_BLOCK_PROPERTIES(NvmeCtrl, conf),
+> +    DEFINE_BLOCK_PROPERTIES_BASE(NvmeCtrl, conf), \
+> +    DEFINE_PROP_DRIVE("drive", NvmeCtrl, namespace.blk), \
+>       DEFINE_NVME_PROPERTIES(NvmeCtrl, params),
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+> @@ -2679,26 +2741,35 @@ static void nvme_instance_init(Object *obj)
+>   {
+>       NvmeCtrl *s = NVME(obj);
+>   
+> -    device_add_bootindex_property(obj, &s->conf.bootindex,
+> -                                  "bootindex", "/namespace@1,0",
+> -                                  DEVICE(obj), &error_abort);
+> +    if (s->namespace.blk) {
+> +        device_add_bootindex_property(obj, &s->conf.bootindex,
+> +                                      "bootindex", "/namespace@1,0",
+> +                                      DEVICE(obj), &error_abort);
+> +    }
+>   }
+>   
+>   static const TypeInfo nvme_info = {
+>       .name          = TYPE_NVME,
+>       .parent        = TYPE_PCI_DEVICE,
+>       .instance_size = sizeof(NvmeCtrl),
+> -    .class_init    = nvme_class_init,
+>       .instance_init = nvme_instance_init,
+> +    .class_init    = nvme_class_init,
+>       .interfaces = (InterfaceInfo[]) {
+>           { INTERFACE_PCIE_DEVICE },
+>           { }
+>       },
+>   };
+>   
+> +static const TypeInfo nvme_bus_info = {
+> +    .name = TYPE_NVME_BUS,
+> +    .parent = TYPE_BUS,
+> +    .instance_size = sizeof(NvmeBus),
+> +};
 > +
-> +  # echo $VERSION > \
-> +  /sys/class/mdev_bus/$PARENT/mdev_supported_types/$MDEV_TYPE/migratio=
-n_version
+>   static void nvme_register_types(void)
+>   {
+>       type_register_static(&nvme_info);
+> +    type_register_static(&nvme_bus_info);
+>   }
+>   
+>   type_init(nvme_register_types)
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index ed4a5ce4121d..f42c17651b7b 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -2,6 +2,9 @@
+>   #define HW_NVME_H
+>   
+>   #include "block/nvme.h"
+> +#include "nvme-ns.h"
 > +
-> +  Again, an error writing the migration_version indicates that an inst=
-ance of
-> +  this mdev type would not support a migration from the provided migra=
-tion
-> +  version.
-
-would not support migration from the source.
-
---
-Erik Skultety
+> +#define NVME_MAX_NAMESPACES 256
+>   
+>   #define DEFINE_NVME_PROPERTIES(_state, _props) \
+>       DEFINE_PROP_STRING("serial", _state, _props.serial), \
+> @@ -93,26 +96,6 @@ typedef struct NvmeCQueue {
+>       QTAILQ_HEAD(, NvmeRequest) req_list;
+>   } NvmeCQueue;
+>   
+> -typedef struct NvmeNamespace {
+> -    NvmeIdNs        id_ns;
+> -} NvmeNamespace;
+> -
+> -static inline NvmeLBAF *nvme_ns_lbaf(NvmeNamespace *ns)
+> -{
+> -    NvmeIdNs *id_ns = &ns->id_ns;
+> -    return &id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(id_ns->flbas)];
+> -}
+> -
+> -static inline uint8_t nvme_ns_lbads(NvmeNamespace *ns)
+> -{
+> -    return nvme_ns_lbaf(ns)->ds;
+> -}
+> -
+> -static inline size_t nvme_ns_lbads_bytes(NvmeNamespace *ns)
+> -{
+> -    return 1 << nvme_ns_lbads(ns);
+> -}
+> -
+>   typedef enum NvmeAIOOp {
+>       NVME_AIO_OPC_NONE         = 0x0,
+>       NVME_AIO_OPC_FLUSH        = 0x1,
+> @@ -167,6 +150,13 @@ static inline bool nvme_req_is_write(NvmeRequest *req)
+>       }
+>   }
+>   
+> +#define TYPE_NVME_BUS "nvme-bus"
+> +#define NVME_BUS(obj) OBJECT_CHECK(NvmeBus, (obj), TYPE_NVME_BUS)
+> +
+> +typedef struct NvmeBus {
+> +    BusState parent_bus;
+> +} NvmeBus;
+> +
+>   #define TYPE_NVME "nvme"
+>   #define NVME(obj) \
+>           OBJECT_CHECK(NvmeCtrl, (obj), TYPE_NVME)
+> @@ -176,8 +166,9 @@ typedef struct NvmeCtrl {
+>       MemoryRegion iomem;
+>       MemoryRegion ctrl_mem;
+>       NvmeBar      bar;
+> -    BlockConf    conf;
+>       NvmeParams   params;
+> +    NvmeBus      bus;
+> +    BlockConf    conf;
+>   
+>       bool        qs_created;
+>       uint32_t    page_size;
+> @@ -188,7 +179,6 @@ typedef struct NvmeCtrl {
+>       uint32_t    reg_size;
+>       uint32_t    num_namespaces;
+>       uint32_t    max_q_ents;
+> -    uint64_t    ns_size;
+>       uint8_t     outstanding_aers;
+>       uint8_t     *cmbuf;
+>       uint64_t    irq_status;
+> @@ -202,7 +192,8 @@ typedef struct NvmeCtrl {
+>       QTAILQ_HEAD(, NvmeAsyncEvent) aer_queue;
+>       int         aer_queued;
+>   
+> -    NvmeNamespace   *namespaces;
+> +    NvmeNamespace   namespace;
+> +    NvmeNamespace   *namespaces[NVME_MAX_NAMESPACES];
+>       NvmeSQueue      **sq;
+>       NvmeCQueue      **cq;
+>       NvmeSQueue      admin_sq;
+> @@ -211,9 +202,13 @@ typedef struct NvmeCtrl {
+>       NvmeFeatureVal  features;
+>   } NvmeCtrl;
+>   
+> -static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
+> +static inline NvmeNamespace *nvme_ns(NvmeCtrl *n, uint32_t nsid)
+>   {
+> -    return n->ns_size >> nvme_ns_lbads(ns);
+> +    if (!nsid || nsid > n->num_namespaces) {
+> +        return NULL;
+> +    }
+> +
+> +    return n->namespaces[nsid - 1];
+>   }
+>   
+>   static inline uint16_t nvme_cid(NvmeRequest *req)
+> @@ -225,4 +220,6 @@ static inline uint16_t nvme_cid(NvmeRequest *req)
+>       return 0xffff;
+>   }
+>   
+> +int nvme_register_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp);
+> +
+>   #endif /* HW_NVME_H */
+> diff --git a/hw/block/trace-events b/hw/block/trace-events
+> index accbb04fe396..8fec87260555 100644
+> --- a/hw/block/trace-events
+> +++ b/hw/block/trace-events
+> @@ -29,6 +29,7 @@ hd_geometry_guess(void *blk, uint32_t cyls, uint32_t heads, uint32_t secs, int t
+>   
+>   # nvme.c
+>   # nvme traces for successful events
+> +nvme_dev_register_namespace(uint32_t nsid) "nsid %"PRIu32""
+>   nvme_dev_irq_msix(uint32_t vector) "raising MSI-X IRQ vector %u"
+>   nvme_dev_irq_pin(void) "pulsing IRQ pin"
+>   nvme_dev_irq_masked(void) "IRQ is masked"
+> @@ -39,9 +40,9 @@ nvme_dev_req_add_aio(uint16_t cid, void *aio, const char *blkname, uint64_t offs
+>   nvme_dev_aio_cb(uint16_t cid, void *aio, const char *blkname, uint64_t offset, const char *opc, void *req) "cid %"PRIu16" aio %p blk \"%s\" offset %"PRIu64" opc \"%s\" req %p"
+>   nvme_dev_io_cmd(uint16_t cid, uint32_t nsid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" nsid %"PRIu32" sqid %"PRIu16" opc 0x%"PRIx8""
+>   nvme_dev_admin_cmd(uint16_t cid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" sqid %"PRIu16" opc 0x%"PRIx8""
+> -nvme_dev_rw(const char *verb, uint32_t blk_count, uint64_t byte_count, uint64_t lba) "%s %"PRIu32" blocks (%"PRIu64" bytes) from LBA %"PRIu64""
+> -nvme_dev_rw_cb(uint16_t cid) "cid %"PRIu16""
+> -nvme_dev_write_zeroes(uint16_t cid, uint64_t slba, uint32_t nlb) "cid %"PRIu16" slba %"PRIu64" nlb %"PRIu32""
+> +nvme_dev_rw(uint16_t cid, const char *verb, uint32_t nsid, uint32_t nlb, uint64_t count, uint64_t lba) "cid %"PRIu16" %s nsid %"PRIu32" nlb %"PRIu32" count %"PRIu64" lba 0x%"PRIx64""
+> +nvme_dev_rw_cb(uint16_t cid, uint32_t nsid) "cid %"PRIu16" nsid %"PRIu32""
+> +nvme_dev_write_zeroes(uint16_t cid, uint32_t nsid, uint64_t slba, uint32_t nlb) "cid %"PRIu16" nsid %"PRIu32" slba %"PRIu64" nlb %"PRIu32""
+>   nvme_dev_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t qsize, uint16_t qflags) "create submission queue, addr=0x%"PRIx64", sqid=%"PRIu16", cqid=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16""
+>   nvme_dev_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t size, uint16_t qflags, int ien) "create completion queue, addr=0x%"PRIx64", cqid=%"PRIu16", vector=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16", ien=%d"
+>   nvme_dev_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
+> @@ -98,7 +99,6 @@ nvme_dev_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is null or no
+>   nvme_dev_err_invalid_prp2_align(uint64_t prp2) "PRP2 is not page aligned: 0x%"PRIx64""
+>   nvme_dev_err_invalid_prp2_missing(void) "PRP2 is null and more data to be transferred"
+>   nvme_dev_err_invalid_prp(void) "invalid PRP"
+> -nvme_dev_err_invalid_ns(uint32_t ns, uint32_t limit) "invalid namespace %u not within 1-%u"
+>   nvme_dev_err_invalid_opc(uint8_t opc) "invalid opcode 0x%"PRIx8""
+>   nvme_dev_err_invalid_admin_opc(uint8_t opc) "invalid admin opcode 0x%"PRIx8""
+>   nvme_dev_err_invalid_lba_range(uint64_t start, uint64_t len, uint64_t limit) "Invalid LBA start=%"PRIu64" len=%"PRIu64" limit=%"PRIu64""
+> 
 
 
