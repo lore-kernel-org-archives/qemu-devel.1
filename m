@@ -2,77 +2,88 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11774C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AAEFC2BB55
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:31:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0D5420775
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:31:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A0BE20775
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:31:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hWxaxneb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D5420775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MZISFk0+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A0BE20775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOi8i-000252-Vu
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 09:31:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36496)
+	id 1jOi8k-0002A1-BK
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 09:31:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35879)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <j.abraham1776@gmail.com>) id 1jOX83-0002mZ-V9
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 21:46:16 -0400
+ (envelope-from <lee.jones@linaro.org>) id 1jOeHO-0001P5-EC
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 05:24:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <j.abraham1776@gmail.com>) id 1jOX82-0001RM-Ox
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 21:46:15 -0400
-Received: from mail-ed1-x52d.google.com ([2a00:1450:4864:20::52d]:35761)
+ (envelope-from <lee.jones@linaro.org>) id 1jOeHN-0006Bq-13
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 05:24:22 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54349)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <j.abraham1776@gmail.com>)
- id 1jOX82-0001R0-JG
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 21:46:14 -0400
-Received: by mail-ed1-x52d.google.com with SMTP id c7so2394581edl.2
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 18:46:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to:cc;
- bh=aZ9w9EwowxrFW1JSOXQ19LccGqemigHZasrO9J5U490=;
- b=hWxaxnebT9wZnWCNyJ2ty6eEysZCJ7SDFjcmeEgQCNx92mLsU/l/nDG4I7dXYDhjBU
- ivKlJMv5O15Jp9OmTkvf725trXWH2YCfuw/IArhScAwjmA3O1Beqq/t0gK758ckzRyES
- WHJOrao3IhuiYuRsorEBwHcvhHSRhUGylUsQwRkzhNtekkpk7miAaHf+ZGyW4vJ3nUhU
- lL23/5stMnwKSl345xLZvoGqAOJF+zQlW+IHK5gCYQ0VUMBi/i0vW4KNv4hL8+s8Fy3L
- zCOTC6AS5LO/oKrVN+//9116NAb/FfrZaLRbdHoZ8ocHGJg8NrbDSOAnThZet7DnGSKW
- DdVg==
+ (Exim 4.71) (envelope-from <lee.jones@linaro.org>)
+ id 1jOeHM-0006BE-2I
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 05:24:20 -0400
+Received: by mail-wm1-x341.google.com with SMTP id h2so16527400wmb.4
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 02:24:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to;
+ bh=25hsR70J4xkR7QjWib9TX4C/RIJl6X5HgsLKdDMfcIM=;
+ b=MZISFk0+SGdYrIGleUjYyNyFlKlBZtpvcsFKyJMVxKBrgMGYtPYkcBrS4bRdkEp/7t
+ IW0OdNkkEzJjOHq32c8nyyFfVBOA0CWrvJjsIloNh7+9VO5CUroLlbNB3EdfC+VubzHW
+ RKiPdet4ElIC56WiuMenvtixe2coFc0mPjdD569+2OT9S+0GbYhuHmAMDdAJ2/wquaHH
+ afuwBSmcYlb9MymeQAxl6jMcXisGmnphb0nXiXzgHpPoKvx7ynmkS1jh5aDHDA3xUcag
+ t1mwgvkRTAPwn/Ml63NOIpJfKAurHTPzOMenfettsfMf8meyF+86UE6hMxa9KMhNgPe7
+ /dqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
- bh=aZ9w9EwowxrFW1JSOXQ19LccGqemigHZasrO9J5U490=;
- b=sRmbaQ9rLwqey6wZTJW6E9KkY8IdlL/D7uzHOURwd9ADgoB0rMQVF94i1Lb8y+botC
- GXV2UAgs3U8LE921M+L5HPE+M+kAcGTb4oiEssjTF3Gd7SRsDIJ0OMdkhFEP60pN92Gy
- Ke84Qat2PDcJ/dgPfuAToxUc5hJxObnAegzWulZNK68H4X7iJInNJ3GaG7Ah90I83qdl
- reGVv6GB/FnHB/SICh4ZYWGUba6hDvTv/mksN9yTUBB6CNb38LWK7RmOlCxzpM0yIWsC
- Nbb7JRVOce9D/U+PiARE1uDuxeX8CHwjmyHLJA0n2+mM0UT9mKFHSS0FaW0CRj72f5I2
- rc9A==
-X-Gm-Message-State: AGi0PuZHoakzwSbJhmxMrGf29zB8QJJc97HqJLTGywS1VgEpIAZHnhn1
- StNU3Km98YbFGoJtNYv0qcWs9bmsuYXBqktCgmtPxoDPOIY=
-X-Google-Smtp-Source: APiQypI/cBg5rn0Z1qlQwQw6QEDA8sueWonjReS1HhmnuDHMR/v+4fOPMd7kxof5JpUGk0hzgld6id9hByPXlpdZE5w=
-X-Received: by 2002:a17:906:5601:: with SMTP id
- f1mr2795641ejq.152.1586915172316; 
- Tue, 14 Apr 2020 18:46:12 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=25hsR70J4xkR7QjWib9TX4C/RIJl6X5HgsLKdDMfcIM=;
+ b=bNQRMG5EOtAko2Tp5iHDmdi9rPIKJ59ceh5S0G/hYwdKa81cOtsRp49QssyZqClnpx
+ qairPkU2lqGvd9TdRnj8oEiSs3CWYurZSJ8VLiyriR1sABCB+n/s0HEnB90lgAnJTYNr
+ j+uRFOQQHcWT/n0Hgf2wzQGrGL/9tpj1v6HIRXNLQ2GuPKYo4fdUT2NwEZw4oEJLZEOi
+ 43dVsLgJ9JFkI4Kn23GOQmLMLBNIgVSGFelBAEI/LdNzL6up7gbs+x5SBq9TGFOQOyCJ
+ zTbc2CJeaiqIt+E5whSKFmg0UBuj/gUED2il3H1OFjZMv7ho1OGldVkRD7poy1guy1Nj
+ Dm1w==
+X-Gm-Message-State: AGi0Pua02zQ+xTZPh8S8gXCulz5un4SuWT63YH8/pdYPbuOyM+d1VN2H
+ Hea0L2/IQ4IR/Q47UnlVi5pekA==
+X-Google-Smtp-Source: APiQypI1L9Xj03pMeY/s2kTnKETE0bYjImrIZAgEBCHLd+qOzGsuktY5U9KyEtfeFWAbhU8Q4g0UeA==
+X-Received: by 2002:a7b:c10d:: with SMTP id w13mr4131241wmi.78.1586942657950; 
+ Wed, 15 Apr 2020 02:24:17 -0700 (PDT)
+Received: from dell ([95.149.164.124])
+ by smtp.gmail.com with ESMTPSA id e1sm12258399wrc.12.2020.04.15.02.24.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 15 Apr 2020 02:24:17 -0700 (PDT)
+Date: Wed, 15 Apr 2020 10:25:17 +0100
+From: Lee Jones <lee.jones@linaro.org>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: Re: [PATCH v6 3/8] mfd: sm501: Use GPIO_LOOKUP_IDX() helper macro
+Message-ID: <20200415092517.GF2167633@dell>
+References: <20200324135328.5796-1-geert+renesas@glider.be>
+ <20200324135653.6676-1-geert+renesas@glider.be>
+ <20200324135653.6676-3-geert+renesas@glider.be>
 MIME-Version: 1.0
-From: Joshua Abraham <j.abraham1776@gmail.com>
-Date: Tue, 14 Apr 2020 21:46:00 -0400
-Message-ID: <CAMmOe3R6_Q7929+GOrk+G3_2+uj2BSs4jKP6h9VYD6FXcEOCwA@mail.gmail.com>
-Subject: AF_UNIX Monitor Device
-To: qemu-devel@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200324135653.6676-3-geert+renesas@glider.be>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::52d
+X-Received-From: 2a00:1450:4864:20::341
 X-Mailman-Approved-At: Wed, 15 Apr 2020 09:30:42 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -85,22 +96,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefanha@gmail.com
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Phil Reid <preid@electromag.com.au>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <marc.zyngier@arm.com>, Linus Walleij <linus.walleij@linaro.org>,
+ linux-doc@vger.kernel.org, Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ Rob Herring <robh+dt@kernel.org>, Harish Jenny K N <harish_kandiga@mentor.com>,
+ linux-gpio@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Alexander Graf <graf@amazon.com>, Eugeniu Rosca <erosca@de.adit-jv.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Stefan,
+On Tue, 24 Mar 2020, Geert Uytterhoeven wrote:
 
-This blog post [0] talks about the AF_VSOCK monitoring device
-(vsockmon) Stefan upstreamed into Linux a few years ago. It seems to
-me the same rationale for enabling packet captures for AF_VSOCK
-traffic applies to UNIX domain sockets as well. What do you think? I
-have a proof of concept patch for Linux for a unixmon capture device
-if you think this is a good idea.
+> i801_add_mux() fills in the GPIO lookup table by manually populating an
+> array of gpiod_lookup structures.  Use the existing GPIO_LOOKUP_IDX()
+> helper macro instead, to relax a dependency on the gpiod_lookup
+> structure's member names.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Cc: Lee Jones <lee.jones@linaro.org>
+> ---
+> While this patch is a dependency for "[PATCH v6 4/8] gpiolib: Add
+> support for GPIO lookup by line name", it can be applied independently.
+> But an Acked-by would be nice, too.
+> 
+> Cover letter and full series at
+> https://lore.kernel.org/r/20200324135328.5796-1-geert+renesas@glider.be/
+> 
+> v6:
+>   - New.
+> ---
+>  drivers/mfd/sm501.c | 24 ++++++++----------------
+>  1 file changed, 8 insertions(+), 16 deletions(-)
 
-[0] https://blog.vmsplice.net/2017/07/packet-capture-coming-to-afvsock.html
+Acked-by: Lee Jones <lee.jones@linaro.org>
+
 -- 
-Respectfully,
-Josh Abraham
+Lee Jones [李琼斯]
+Linaro Services Technical Lead
+Linaro.org │ Open source software for ARM SoCs
+Follow Linaro: Facebook | Twitter | Blog
 
