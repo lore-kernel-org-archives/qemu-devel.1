@@ -2,130 +2,81 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FE4FC2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 14:52:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B97C2BB55
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 14:52:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 172552076D
+	by mail.kernel.org (Postfix) with ESMTPS id C41F02076D
 	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 14:52:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="otZzUcRM";
-	dkim=pass (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="LyEdl88y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 172552076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BSgsm16O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C41F02076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOjOZ-0001vu-6k
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 10:52:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50026)
+	id 1jOjOZ-0001yS-W9
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 10:52:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50062)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <steplong@quicinc.com>) id 1jOjNd-0000q4-5m
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 10:51:10 -0400
+ (envelope-from <berrange@redhat.com>) id 1jOjNi-0000v7-H0
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 10:51:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <steplong@quicinc.com>) id 1jOjNa-0002LP-EK
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 10:51:07 -0400
-Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:56732)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <steplong@quicinc.com>)
- id 1jOjNa-0002J6-0q; Wed, 15 Apr 2020 10:51:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1586962266; x=1618498266;
- h=from:to:cc:subject:date:message-id:mime-version;
- bh=y0zKfs7Uy/uAmAMQfv6u0jZHVRB6I7rSYNAzH56d9SQ=;
- b=otZzUcRMD6jd9/nSBG1p31svoArQRD1tngBqgYQozBKeDqmXAhXtQFF7
- uksb2X7bMDB3UAEIst0E8paCc+x4gSdg2Q8h0DhY2AEQikCEcfDrd05P4
- DSWRQSUSxn2A0a3xTFbtOlv7yW59S6TzHxuB87iBtUa+q8CPwu92Ym38o A=;
-Received: from unknown (HELO ironmsg03-sd.qualcomm.com) ([10.53.140.143])
- by alexa-out-sd-01.qualcomm.com with ESMTP; 15 Apr 2020 07:51:02 -0700
-Received: from nasanexm03c.na.qualcomm.com ([10.85.0.106])
- by ironmsg03-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
- 15 Apr 2020 07:51:02 -0700
-Received: from apsanexr02b.ap.qualcomm.com (10.85.0.27) by
- nasanexm03c.na.qualcomm.com (10.85.0.106) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Wed, 15 Apr 2020 07:51:02 -0700
-Received: from nasanexm03b.na.qualcomm.com (10.85.0.98) by
- apsanexr02b.ap.qualcomm.com (10.85.0.27) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Wed, 15 Apr 2020 07:50:59 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (199.106.107.6)
- by nasanexm03b.na.qualcomm.com (10.85.0.98) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2 via Frontend Transport; Wed, 15 Apr 2020 07:50:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CIuxkhS3aCMEFknjnhFp32UjVDfr80AvIceQo7QGRKeayuMQqgRSZwC7HMtrO2Scox4PnkzSfhwoUz9LlfsxxBdC100Yg9thMN+kbl10FdMeScQNExjohTyt+julISulAW25AUB21dJ/wDBUzHqL+Kprd199g2tSyuCdI1ACTJgraNqm9BkKmdubRU+ijjdHeegnXH1Z8lBsJda2qkMD8in63cGjVsiWRdHeURtcTSguO1SdRiifz8dSiEVdffK2rTQXp6c1h1ERDXS3698FXQQ0HAbdHdtEJd0F1NMIGMaaYzv8FMfabChU5z/GTd3f2rEVeKCtFKQCZ1+bHxH2kA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dXCK9ezWbmol15biO5EIlD/PssmFE5WDtL0ZpRj0YCc=;
- b=Wv+ndui1Is3l2MuZO87HYhLzNSI2OpZMQIn2gnBJhCrIrheweukgJU8IkjoIYeLpeYfOMAwks/PAliCbZKmePn7DvNTle8WXpfo2D9QXLq2/ECfV+0Tep/35tjE/qCW67QoseqkMsoFK7/XqYnsqbemVWr4vrSOUWcVrJCHs0Xp5goDbYTN5g53mi3USxULnD5AjYnLDUrzPoMluWdSgNrp3nAPIlFYOn45JhS5wDMuP7Ey9Pdw2cwLs+FhLOYCb3zZzsbBYJz0nAaHaey5cL0DNeEv+vYj3D+FsIJuaAHRiyHZY7TS193e6Os7rRRd6Q4DsWpBWwyeCaVogQsnkPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
- dkim=pass header.d=quicinc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dXCK9ezWbmol15biO5EIlD/PssmFE5WDtL0ZpRj0YCc=;
- b=LyEdl88ybeIe6PjBTvmc/86yySQN6eJGoqXy9aEShLj7ToQIvrZSl77fAOcWtYQxJJLKr/8ZfDv02EBIOESn8tYTO6zBRB08phq1Q9vvYuZXZQQjOvc7H0D0ilsr1whc4SCp7V+iODmChj+A7gAxduOr91dfhlCrMK7Vt8lIzug=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=steplong@quicinc.com; 
-Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
- (2603:10b6:301:7b::24) by MWHPR0201MB3578.namprd02.prod.outlook.com
- (2603:10b6:301:77::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.28; Wed, 15 Apr
- 2020 14:50:58 +0000
-Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
- ([fe80::10ad:5df5:d575:1f37]) by MWHPR0201MB3547.namprd02.prod.outlook.com
- ([fe80::10ad:5df5:d575:1f37%3]) with mapi id 15.20.2900.028; Wed, 15 Apr 2020
- 14:50:58 +0000
-From: Stephen Long <steplong@quicinc.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH RFC v3] target/arm: Implement SVE2 MATCH, NMATCH
-Date: Wed, 15 Apr 2020 10:50:32 -0400
-Message-ID: <20200415145032.2442-1-steplong@quicinc.com>
-Content-Type: text/plain
-X-ClientProxiedBy: CH2PR05CA0038.namprd05.prod.outlook.com
- (2603:10b6:610:38::15) To MWHPR0201MB3547.namprd02.prod.outlook.com
- (2603:10b6:301:7b::24)
+ (envelope-from <berrange@redhat.com>) id 1jOjNh-0002Oq-0x
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 10:51:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60362
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jOjNg-0002OJ-TK
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 10:51:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586962271;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ROlPzgM1HOP3nd4rz937MZhFHSjGbiuIrE8HxycTsXI=;
+ b=BSgsm16OTdIsDSAm8OHy/2iAiygo2mv76dd7AjazkuYRi1Wr8LJcNhaLT5xUoq4zbx1HfM
+ pW+BIMBb54RgqrNOV/JwnakKzG9yqLPzIMiT+eGtCyeO+5cBMk0uDLBFLGvE0WQZhnCG0K
+ nGCUd9BKyDdXVM+6D5Uu7NmkzgLClW8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-328-xmZjFZyyMruuEYd4YHn7cA-1; Wed, 15 Apr 2020 10:51:02 -0400
+X-MC-Unique: xmZjFZyyMruuEYd4YHn7cA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E54A1005510;
+ Wed, 15 Apr 2020 14:51:01 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 42F0A11D2DE;
+ Wed, 15 Apr 2020 14:50:59 +0000 (UTC)
+Date: Wed, 15 Apr 2020 15:50:55 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [for-5.0] docs: Require Sphinx 1.6 or better
+Message-ID: <20200415145055.GA4583@redhat.com>
+References: <20200414124114.5363-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from DESKTOP-L2LA14H.localdomain (108.176.222.2) by
- CH2PR05CA0038.namprd05.prod.outlook.com (2603:10b6:610:38::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2937.5 via Frontend Transport; Wed, 15 Apr 2020 14:50:57 +0000
-X-Originating-IP: [108.176.222.2]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 565b3ddb-b593-4cbe-b96a-08d7e14c6878
-X-MS-TrafficTypeDiagnostic: MWHPR0201MB3578:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <MWHPR0201MB3578DE576420EBCF1D83DBA6C7DB0@MWHPR0201MB3578.namprd02.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:425;
-X-Forefront-PRVS: 0374433C81
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MWHPR0201MB3547.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(366004)(396003)(346002)(376002)(136003)(39860400002)(66476007)(2906002)(8676002)(5660300002)(2616005)(66946007)(81156014)(8936002)(956004)(1076003)(478600001)(6666004)(4326008)(6486002)(107886003)(66556008)(316002)(6506007)(6512007)(26005)(86362001)(6916009)(186003)(52116002)(36756003)(16526019);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5tljFxBWLRwUpMOKukvFQW+/iZIhX29w8N5/BYygmhCyTLBqGTunUjj/QgaCuaP3Eqm4mDqE6pHXhSkF0IESAmulW/1hDv33ez7pUBgjo88F5HGldn5/ZLwyohJorz4mAJj8O5g666YOwchUVUllfP2TyN2+8TawsFX0mW/3fYI2hDQfHDyqmieIyuKsMqMRCG4eiZ+wSBIy0gBCq9mAr8R1shh6l4Q3ROuP79wYqcXdX1QpApqj2u0rLeHqalwzBBq9/dP8ViNVNpX+4fdrOoIZNTlLbklBv85nchGZh8Apa9VHVJwr2tGpLrQ1hFlQ3fDd5y+UGK0tE7sOmpWLLL53zZ/9bEIh7Qixb33r3B8up25bqkgpwVr8Yhx9EhyYoI2eTniabSbixs+1+s2Pz7Q9W06JjUxmLlDZCioCj3NV2XuATR+XC75MHGvexJxd
-X-MS-Exchange-AntiSpam-MessageData: w7h50HTuBEtbGwwML5RgxxqqP4vy5HSsRIG5IELM+1974OdLSICYf5VDzUBhx7Qw5aH9ImDh2Gfp28/ccbGYXQ9+GsVkqeF7v0aOM6HKFvnT7ncaC9Vg1uYtuMw+0KcxfQEMfsXABX82O79LdhqreQ==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 565b3ddb-b593-4cbe-b96a-08d7e14c6878
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2020 14:50:58.4769 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /QnlybB182kROYGcK3AWY3D230MZSCq0jPTUsPlugcPAIDov1/PG+bMmFqmFnY9GzOeaKIznUHqbxqTUcs/KJQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR0201MB3578
-X-OriginatorOrg: quicinc.com
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 199.106.114.38
+In-Reply-To: <20200414124114.5363-1-peter.maydell@linaro.org>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,161 +88,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, richard.henderson@linaro.org, apazos@quicinc.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Stephen Long <steplong@quicinc.com>
----
-Fixed the patch with the suggestions Richard made. I'll be working on
-the HIST insns next instead of the 'SVE2 integer add/subtract narrow
-high part' ones.
+On Tue, Apr 14, 2020 at 01:41:14PM +0100, Peter Maydell wrote:
+> Versions of Sphinx older than 1.6 can't build all of our documentation,
+> because they are too picky about the syntax of the argument to the
+> option:: directive; see Sphinx bugs #646, #3366:
+>=20
+>   https://github.com/sphinx-doc/sphinx/issues/646
+>   https://github.com/sphinx-doc/sphinx/issues/3366
+>=20
+> Trying to build with a 1.4.x Sphinx fails with
+>  docs/system/images.rst:4: SEVERE: Duplicate ID: "cmdoption-qcow2-arg-enc=
+rypt"
+> and a 1.5.x Sphinx fails with
+>  docs/system/invocation.rst:544: WARNING: Malformed option description '[=
+enable=3D]PATTERN', should look like "opt", "-opt
+> args", "--opt args", "/opt args" or "+opt args"
+>=20
+> Update our needs_sphinx setting to indicate that we require at least
+> 1.6.  This will allow configure to fall back to "don't build the
+> docs" rather than causing the build to fail entirely, which is
+> probably what most users building on a host old enough to have such
+> an old Sphinx would want; if they do want the docs then they'll have
+> a useful indication of what they need to do (upgrade Sphinx!) rather
+> than a confusing error message.
+>=20
+> In theory our distro support policy would suggest that we should
+> support building on the Sphinx shipped in those distros, but:
+>  * EPEL7 has Sphinx 1.2.3 (which we've never supported!)
+>  * Debian Stretch has Sphinx 1.4.8
+>=20
+> Trying to get our docs to work with Sphinx 1.4 is not tractable
+> for the 5.0 release and I'm not sure it's worthwhile effort anyway;
+> at least with this change the build as a whole now succeeds.
 
- target/arm/helper-sve.h    | 10 +++++++
- target/arm/sve.decode      |  5 ++++
- target/arm/sve_helper.c    | 59 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 22 ++++++++++++++
- 4 files changed, 96 insertions(+)
+What happens if you try to build QEMU on   RHEL/CentOS-7 / Deb Stretch,
+with the new (unsatisfied) needs_sphinx version ?  Does the build fail,
+or does configure automagically disable the building of docs ?
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 5dd880cf6d..bc4a463bc7 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -2516,6 +2516,16 @@ DEF_HELPER_FLAGS_3(sve2_uqrshrnt_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
- DEF_HELPER_FLAGS_3(sve2_uqrshrnt_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
- DEF_HELPER_FLAGS_3(sve2_uqrshrnt_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_5(sve2_match_ppzz_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve2_match_ppzz_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve2_nmatch_ppzz_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve2_nmatch_ppzz_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_6(sve2_faddp_zpzz_h, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_6(sve2_faddp_zpzz_s, TCG_CALL_NO_RWG,
-diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 374e47fb05..652668df02 100644
---- a/target/arm/sve.decode
-+++ b/target/arm/sve.decode
-@@ -1305,6 +1305,11 @@ UQSHRNT         01000101 .. 1 ..... 00 1101 ..... .....  @rd_rn_tszimm_shr
- UQRSHRNB        01000101 .. 1 ..... 00 1110 ..... .....  @rd_rn_tszimm_shr
- UQRSHRNT        01000101 .. 1 ..... 00 1111 ..... .....  @rd_rn_tszimm_shr
- 
-+### SVE2 Character Match
-+
-+MATCH           01000101 .. 1 ..... 100 ... ..... 0 .... @pd_pg_rn_rm
-+NMATCH          01000101 .. 1 ..... 100 ... ..... 1 .... @pd_pg_rn_rm
-+
- ## SVE2 floating-point pairwise operations
- 
- FADDP           01100100 .. 010 00 0 100 ... ..... ..... @rdn_pg_rm
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index b68f62cd7f..3fbda7ec62 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -6890,3 +6890,62 @@ DO_ST1_ZPZ_D(dd_be, zd, MO_64)
- 
- #undef DO_ST1_ZPZ_S
- #undef DO_ST1_ZPZ_D
-+
-+/* Returns true if m0 or m1 */
-+static inline bool do_match2(uint64_t n, uint64_t m0, uint64_t m1, int esz)
-+{
-+    int bits = 8 << esz;
-+    uint64_t ones = dup_const(esz, 1);
-+    uint64_t signs = ones << (bits - 1);
-+    uint64_t cmp0, cmp1;
-+
-+    cmp1 = dup_const(esz, n);
-+    cmp0 = cmp1 ^ m0;
-+    cmp1 = cmp1 ^ m1;
-+    cmp0 = (cmp0 - ones) & ~cmp0;
-+    cmp1 = (cmp1 - ones) & ~cmp1;
-+    return (cmp0 | cmp1) & signs;
-+}
-+
-+static inline uint32_t do_match(void *vd, void *vn, void *vm, void *vg,
-+                                uint32_t desc, int esz, bool nmatch)
-+{
-+    intptr_t opr_sz = simd_oprsz(desc);
-+    uint32_t flags = PREDTEST_INIT;
-+    intptr_t i, j, k;
-+
-+    for (i = 0; i < opr_sz; i += 16) {
-+        uint64_t m0 = *(uint64_t *)(vm + i);
-+        uint64_t m1 = *(uint64_t *)(vm + i + 8);
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
-+        uint16_t out = 0;
-+
-+        for (j = 0; j < 16; j += 8) {
-+            uint64_t n = *(uint64_t *)(vn + i + j);
-+
-+            for (k = 0; k < 8; k += 1 << esz) {
-+                if (pg & (1 << (j + k))) {
-+                    bool o = do_match2(n >> (k * 8), m0, m1, esz);
-+                    out |= (o ^ nmatch) << (j + k);
-+                }
-+            }
-+        }
-+        *(uint16_t *)(vd + H1_2(i >> 3)) = out;
-+        flags = iter_predtest_fwd(out, pg, flags);
-+    }
-+    return flags;
-+}
-+
-+#define DO_PPZZ_MATCH(NAME, ESZ, INV)                                         \
-+uint32_t HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc)  \
-+{                                                                             \
-+    return do_match(vd, vn, vm, vg, desc, ESZ, INV);                          \
-+}
-+
-+DO_PPZZ_MATCH(sve2_match_ppzz_b, MO_8, false)
-+DO_PPZZ_MATCH(sve2_match_ppzz_h, MO_16, false)
-+
-+DO_PPZZ_MATCH(sve2_nmatch_ppzz_b, MO_8, true)
-+DO_PPZZ_MATCH(sve2_nmatch_ppzz_h, MO_16, true)
-+
-+#undef DO_PPZZ_MATCH
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 07a2040208..c07d39a007 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -7246,6 +7246,28 @@ static bool trans_UQRSHRNT(DisasContext *s, arg_rri_esz *a)
-     return do_sve2_shr_narrow(s, a, ops);
- }
- 
-+static bool do_sve2_ppzz_flags(DisasContext *s, arg_rprr_esz *a,
-+                               gen_helper_gvec_flags_4 *fn)
-+{
-+    if (!dc_isar_feature(aa64_sve2, s)) {
-+        return false;
-+    }
-+    return do_ppzz_flags(s, a, fn);
-+}
-+
-+#define DO_SVE2_PPZZ_MATCH(NAME, name)                                      \
-+static bool trans_##NAME(DisasContext *s, arg_rprr_esz *a)                  \
-+{                                                                           \
-+    static gen_helper_gvec_flags_4 * const fns[4] = {                       \
-+        gen_helper_sve2_##name##_ppzz_b, gen_helper_sve2_##name##_ppzz_h,   \
-+        NULL,                            NULL                               \
-+    };                                                                      \
-+    return do_sve2_ppzz_flags(s, a, fns[a->esz]);                           \
-+}
-+
-+DO_SVE2_PPZZ_MATCH(MATCH, match)
-+DO_SVE2_PPZZ_MATCH(NMATCH, nmatch)
-+
- static bool do_sve2_zpzz_fp(DisasContext *s, arg_rprr_esz *a,
-                             gen_helper_gvec_4_ptr *fn)
- {
--- 
-2.17.1
+> diff --git a/docs/conf.py b/docs/conf.py
+> index 7768611e89c..d6e173ef77b 100644
+> --- a/docs/conf.py
+> +++ b/docs/conf.py
+> @@ -59,8 +59,10 @@ sys.path.insert(0, os.path.join(qemu_docdir, "sphinx")=
+)
+> =20
+>  # If your documentation needs a minimal Sphinx version, state it here.
+>  #
+> -# 1.3 is where the 'alabaster' theme was shipped with Sphinx.
+> -needs_sphinx =3D '1.3'
+> +# Sphinx 1.5 and earlier can't build our docs because they are too
+> +# picky about the syntax of the argument to the option:: directive
+> +# (see Sphinx bugs #646, #3366).
+> +needs_sphinx =3D '1.6'
+> =20
+>  # Add any Sphinx extension module names here, as strings. They can be
+>  # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+> --=20
+> 2.20.1
+>=20
+>=20
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
