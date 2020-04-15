@@ -2,72 +2,60 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CEB3C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 21:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2947EC2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 22:06:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE20C206E9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 21:41:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE20C206E9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id F077D2076D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 22:06:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F077D2076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gentoo.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOpn0-0000CC-UF
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 17:41:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44545)
+	id 1jOqAa-0004gW-4J
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 18:06:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47055)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jOpmS-0008ED-Jp
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 17:41:13 -0400
+ (envelope-from <slyfox@gentoo.org>) id 1jOq9p-0004CX-DI
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 18:05:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jOpmR-0006NH-GS
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 17:41:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42714)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jOpmR-0006Mr-BS
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 17:41:11 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jOpmQ-0005LV-0H
- for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 21:41:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id EEE342E8104
- for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 21:41:09 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Apr 2020 21:34:24 -0000
-From: Babu Moger <1856335@bugs.launchpad.net>
+ (envelope-from <slyfox@gentoo.org>) id 1jOq9n-00085a-S9
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 18:05:20 -0400
+Received: from smtp.gentoo.org ([140.211.166.183]:52682)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <slyfox@gentoo.org>) id 1jOq9n-00085F-Mv
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 18:05:19 -0400
+Received: from sf.home (tunnel547699-pt.tunnel.tserv1.lon2.ipv6.he.net
+ [IPv6:2001:470:1f1c:3e6::2])
+ (using TLSv1 with cipher ECDHE-RSA-AES128-SHA (128/128 bits))
+ (No client certificate requested) (Authenticated sender: slyfox)
+ by smtp.gentoo.org (Postfix) with ESMTPSA id EA05834F04D;
+ Wed, 15 Apr 2020 22:05:16 +0000 (UTC)
+Received: by sf.home (Postfix, from userid 1000)
+ id 4A5805A22061; Wed, 15 Apr 2020 23:05:13 +0100 (BST)
+From: Sergei Trofimovich <slyfox@gentoo.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: babumoger djdatte h-sieger
-X-Launchpad-Bug-Reporter: Damir (djdatte)
-X-Launchpad-Bug-Modifier: Babu Moger (babumoger)
-References: <157625616239.22064.10423897892496347105.malonedeb@gac.canonical.com>
-Message-Id: <158698646423.28259.9098221288590341703.malone@gac.canonical.com>
-Subject: [Bug 1856335] Re: Cache Layout wrong on many Zen Arch CPUs
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e080b7ffc2b13f4f8784c9923c5f8e9da2069500
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Subject: [PATCH] linux-user/syscall.c: add target-to-host mapping for
+ epoll_create1()
+Date: Wed, 15 Apr 2020 23:05:08 +0100
+Message-Id: <20200415220508.5044-1-slyfox@gentoo.org>
+X-Mailer: git-send-email 2.26.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 140.211.166.183
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,82 +64,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856335 <1856335@bugs.launchpad.net>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Sergei Trofimovich <slyfox@gentoo.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-AMD does not use dies. For AMD dies is normally set to 1. You probably
-have to pass dies in some other ways. Did you try the latest qemu v 5.0?
-Please try it.
+Noticed by Barnab=C3=A1s Vir=C3=A1gh as a python-3.7 failue on qemu-alpha=
+.
 
-Qemu expects the user to configure the topology based on their requirement.
- =
+The bug shows up on alpha as it's one of the targets where
+EPOLL_CLOEXEC differs from other targets:
+    sysdeps/unix/sysv/linux/alpha/bits/epoll.h: EPOLL_CLOEXEC  =3D 010000=
+00
+    sysdeps/unix/sysv/linux/bits/epoll.h:        EPOLL_CLOEXEC =3D 020000=
+00
 
-Try replacing <qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1=
-'/> =
+Bug: https://bugs.gentoo.org/717548
+Reported-by: Barnab=C3=A1s Vir=C3=A1gh
+Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
+CC: Riku Voipio <riku.voipio@iki.fi>
+CC: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/syscall.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-with <qemu:arg value=3D'cores=3D6,threads=3D1,dies=3D1,sockets=3D1'/>
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 674f70e70a..05f03919ff 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -12012,7 +12012,7 @@ static abi_long do_syscall1(void *cpu_env, int nu=
+m, abi_long arg1,
+ #endif
+ #if defined(TARGET_NR_epoll_create1) && defined(CONFIG_EPOLL_CREATE1)
+     case TARGET_NR_epoll_create1:
+-        return get_errno(epoll_create1(arg1));
++        return get_errno(epoll_create1(target_to_host_bitmask(arg1, fcnt=
+l_flags_tbl)));
+ #endif
+ #if defined(TARGET_NR_epoll_ctl)
+     case TARGET_NR_epoll_ctl:
+--=20
+2.26.1
 
-You can also use the numa configuration. There are multiple ways you can
-achieve your required configuration.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856335
-
-Title:
-  Cache Layout wrong on many Zen Arch CPUs
-
-Status in QEMU:
-  New
-
-Bug description:
-  AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems
-  to always map Cache ass if it was an 4-Core per CCX CPU, which is
-  incorrect, and costs upwards 30% performance (more realistically 10%)
-  in L3 Cache Layout aware applications.
-
-  Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
-
-  =C2=A0=C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
-  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
-  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'8' threads=3D'1'=
-/>
-
-  In windows, coreinfo reports correctly:
-
-  ****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
-  ----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
-
-  On a 3-CCX CPU (3960X /w 6 cores and no SMT):
-
-  =C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
-  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
-  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'6' threads=3D'1'=
-/>
-
-  in windows, coreinfo reports incorrectly:
-
-  ****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
-  ----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
-
-  Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm.
-
-  With newer Qemu there is a fix (that does behave correctly) in using the =
-dies parameter:
-  =C2=A0<qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
-
-  The problem is that the dies are exposed differently than how AMD does
-  it natively, they are exposed to Windows as sockets, which means, that
-  if you are nto a business user, you can't ever have a machine with
-  more than two CCX (6 cores) as consumer versions of Windows only
-  supports two sockets. (Should this be reported as a separate bug?)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856335/+subscriptions
 
