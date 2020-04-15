@@ -6,77 +6,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E8EEC2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 151AFC2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AEFE20768
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:51:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D57B520768
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:52:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XHzBLwDX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AEFE20768
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RGLB6+Oz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D57B520768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOcpm-0002Ci-2g
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 03:51:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51127)
+	id 1jOcq8-00036Z-UP
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 03:52:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51231)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jOcnd-0006KG-8k
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:34 -0400
+ (envelope-from <armbru@redhat.com>) id 1jOcnf-0006Oo-9p
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jOcnc-0007IY-0b
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41057
+ (envelope-from <armbru@redhat.com>) id 1jOcnd-0007LQ-TX
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32509
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOcnb-0007IL-T4
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:31 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOcnd-0007KP-Oc
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586936971;
+ s=mimecast20190719; t=1586936973;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5B5p1uJJ/d3bIFfMcmE8v5AS5z5KTCerzqC9kY8J+Vk=;
- b=XHzBLwDX0D89zaaHb3i4NSoG1FiEnxGfXrYrCdo9RRvtyk1b14WyuvwHisGZWRWwNezMuT
- Z+27pf9BEyAs+jZJb6O7CT2KKW66apI7m3s0fjyUXelm0QGeC/0ilAvXMAxKJFAJQ1QQCB
- EqXNnd6qHJmexTd+UpAuHe7jrTHvLu0=
+ bh=ZTXu9VOC5cjy/LHpJSbxX3yw8P34uUaNspmSlmDPxBQ=;
+ b=RGLB6+Oz6TiDzDGqR1ayYMTih0aOGI/41U6Lrn2iFIlTbIo7lDOXTMR2uhrKVBl53qke6S
+ 4nrF0TjZBmwd8nM934IRbzgKA/mLn2Dj+7wwpZ81VUYWOjCQbQm2R8MUZD9KmxAVOq3W44
+ Aks2TG+bMJnD5z8v92tH2cSoJ1+VOhU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-1AMbhQZ_O1q1r1mh_ZjIyQ-1; Wed, 15 Apr 2020 03:49:30 -0400
-X-MC-Unique: 1AMbhQZ_O1q1r1mh_ZjIyQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-349-njc0c8RrP3GEx9EmSsVteg-1; Wed, 15 Apr 2020 03:49:31 -0400
+X-MC-Unique: njc0c8RrP3GEx9EmSsVteg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2ECBB18C35A0;
- Wed, 15 Apr 2020 07:49:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B206018C35A7;
+ Wed, 15 Apr 2020 07:49:30 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
  [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AF61D5DA7B;
- Wed, 15 Apr 2020 07:49:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C79119C70;
+ Wed, 15 Apr 2020 07:49:30 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B123711384A9; Wed, 15 Apr 2020 09:49:27 +0200 (CEST)
+ id CB6671132C38; Wed, 15 Apr 2020 09:49:27 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 for-5.1 1/9] tests-qemu-opts: Cover has_help_option(),
- qemu_opt_has_help_opt()
-Date: Wed, 15 Apr 2020 09:49:19 +0200
-Message-Id: <20200415074927.19897-2-armbru@redhat.com>
+Subject: [PATCH v2 for-5.1 9/9] qemu-img: Reject broken -o ""
+Date: Wed, 15 Apr 2020 09:49:27 +0200
+Message-Id: <20200415074927.19897-10-armbru@redhat.com>
 In-Reply-To: <20200415074927.19897-1-armbru@redhat.com>
 References: <20200415074927.19897-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,82 +93,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The two turn out to be inconsistent for "a,b,,help".  Test case
-marked /* BUG */.
+qemu-img create, convert, amend, and measure use accumulate_options()
+to merge multiple -o options.  This is broken for -o "":
+
+    $ qemu-img create -f qcow2 -o backing_file=3Da -o "" -o backing_fmt=3Dr=
+aw,size=3D1M new.qcow2
+    qemu-img: warning: Could not verify backing image. This may become an e=
+rror in future versions.
+    Could not open 'a,backing_fmt=3Draw': No such file or directory
+    Formatting 'new.qcow2', fmt=3Dqcow2 size=3D1048576 backing_file=3Da,,ba=
+cking_fmt=3Draw cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D1=
+6
+    $ qemu-img info new.qcow2
+    image: new.qcow2
+    file format: qcow2
+    virtual size: 1 MiB (1048576 bytes)
+    disk size: 196 KiB
+    cluster_size: 65536
+--> backing file: a,backing_fmt=3Draw
+    Format specific information:
+        compat: 1.1
+        lazy refcounts: false
+        refcount bits: 16
+        corrupt: false
+
+Merging these three -o the obvious way is wrong, because it results in
+an unwanted ',' escape:
+
+    backing_file=3Da,,backing_fmt=3Draw,size=3D1M
+                  ~~
+
+We could silently drop -o "", but Kevin asked me to reject it instead.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-qemu-opts.c | 44 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+ qemu-img.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
-index ef96e84aed..88a3e7bdf4 100644
---- a/tests/test-qemu-opts.c
-+++ b/tests/test-qemu-opts.c
-@@ -728,6 +728,49 @@ static void test_opts_parse_size(void)
-     qemu_opts_reset(&opts_list_02);
- }
-=20
-+static void test_has_help_option(void)
-+{
-+    static const struct {
-+        const char *params;
-+        /* expected value of has_help_option() */
-+        bool expect_has_help_option;
-+        /* expected value of qemu_opt_has_help_opt() with implied=3Dfalse =
-*/
-+        bool expect_opt_has_help_opt;
-+        /* expected value of qemu_opt_has_help_opt() with implied=3Dtrue *=
-/
-+        bool expect_opt_has_help_opt_implied;
-+    } test[] =3D {
-+        { "help", true, true, false },
-+        { "?", true, true, false },
-+        { "helpme", false, false, false },
-+        { "?me", false, false, false },
-+        { "a,help", true, true, true },
-+        { "a,?", true, true, true },
-+        { "a=3D0,help,b", true, true, true },
-+        { "a=3D0,?,b", true, true, true },
-+        { "help,b=3D1", true, true, false },
-+        { "?,b=3D1", true, true, false },
-+        { "a,b,,help", false /* BUG */, true, true },
-+        { "a,b,,?", false /* BUG */, true, true },
-+    };
-+    int i;
-+    QemuOpts *opts;
-+
-+    for (i =3D 0; i < ARRAY_SIZE(test); i++) {
-+        g_assert_cmpint(has_help_option(test[i].params),
-+                        =3D=3D, test[i].expect_has_help_option);
-+        opts =3D qemu_opts_parse(&opts_list_03, test[i].params, false,
-+                               &error_abort);
-+        g_assert_cmpint(qemu_opt_has_help_opt(opts),
-+                        =3D=3D, test[i].expect_opt_has_help_opt);
-+        qemu_opts_del(opts);
-+        opts =3D qemu_opts_parse(&opts_list_03, test[i].params, true,
-+                               &error_abort);
-+        g_assert_cmpint(qemu_opt_has_help_opt(opts),
-+                        =3D=3D, test[i].expect_opt_has_help_opt_implied);
-+        qemu_opts_del(opts);
-+    }
-+}
-+
- static void append_verify_list_01(QemuOptDesc *desc, bool with_overlapping=
-)
+diff --git a/qemu-img.c b/qemu-img.c
+index cc51db7ed4..a2369766f0 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -229,14 +229,16 @@ static bool qemu_img_object_print_help(const char *ty=
+pe, QemuOpts *opts)
+  * To make that work, @optarg must not start with ',' (or else a
+  * separating ',' preceding it gets escaped), and it must not end with
+  * an odd number of ',' (or else a separating ',' following it gets
+- * escaped).
++ * escaped), or be empty (or else a separating ',' preceding it can
++ * escape a separating ',' following it).
++ *=20
+  */
+ static bool is_valid_option_list(const char *optarg)
  {
-     int i =3D 0;
-@@ -990,6 +1033,7 @@ int main(int argc, char *argv[])
-     g_test_add_func("/qemu-opts/opts_parse/bool", test_opts_parse_bool);
-     g_test_add_func("/qemu-opts/opts_parse/number", test_opts_parse_number=
-);
-     g_test_add_func("/qemu-opts/opts_parse/size", test_opts_parse_size);
-+    g_test_add_func("/qemu-opts/has_help_option", test_has_help_option);
-     g_test_add_func("/qemu-opts/append_to_null", test_opts_append_to_null)=
-;
-     g_test_add_func("/qemu-opts/append", test_opts_append);
-     g_test_add_func("/qemu-opts/to_qdict/basic", test_opts_to_qdict_basic)=
-;
+     size_t len =3D strlen(optarg);
+     size_t i;
+=20
+-    if (optarg[0] =3D=3D ',') {
++    if (!optarg[0] || optarg[0] =3D=3D ',') {
+         return false;
+     }
+=20
 --=20
 2.21.1
 
