@@ -2,69 +2,83 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0265C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 09:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB49C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 09:26:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4BFD206E9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 09:13:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4BFD206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6757620768
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 09:26:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MTTBmOyB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6757620768
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOe6W-00082M-1B
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 05:13:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34709)
+	id 1jOeJb-0002MW-Jy
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 05:26:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36007)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jOe5n-0007Ov-Tx
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 05:12:25 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jOeIx-0001wY-Ix
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 05:26:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1jOe5m-0001HI-Aw
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 05:12:23 -0400
-Received: from mga03.intel.com ([134.134.136.65]:25238)
+ (envelope-from <imammedo@redhat.com>) id 1jOeIv-0006sh-Gb
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 05:25:59 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44216
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1jOe5m-0001Gv-2p
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 05:12:22 -0400
-IronPort-SDR: kq0P6aqg+yTZvBzgjxlHUwNcj+j3v1k5Hmz+GpafajeLB/9PpqP/qkMkPFWY90fNyllkysVICg
- ETibBAM3TX+g==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
- by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 15 Apr 2020 02:12:20 -0700
-IronPort-SDR: 6DZfSWbji33ZBRzjz6OV60+zabtDaKUmsqS6CmrO5jvPhgTksdHX4hTo959D8/TW+pnYu1H5Jz
- UD9fHbnsn6Hg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,386,1580803200"; d="scan'208";a="245644372"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by fmsmga008.fm.intel.com with ESMTP; 15 Apr 2020 02:12:14 -0700
-Date: Wed, 15 Apr 2020 05:02:36 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Erik Skultety <eskultet@redhat.com>
-Subject: Re: [PATCH v5 3/4] vfio/mdev: add migration_version attribute for
- mdev (under mdev device node)
-Message-ID: <20200415090236.GK10586@joy-OptiPlex-7040>
-References: <20200413055201.27053-1-yan.y.zhao@intel.com>
- <20200413055504.27311-1-yan.y.zhao@intel.com>
- <20200415074258.GK269314@sturgeon>
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jOeIv-0006sF-9o
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 05:25:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586942756;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XOTwVrLy82/BG89A5g+xV3D6HOhq0pkh39+pOc5+WI0=;
+ b=MTTBmOyBy2ZLe36w9OaoR7KYkYZ2+riWlSKgNDD+1FBH8UCCbQUE0TfbYdu18a9uSXk8Wk
+ A1Riyo+PYoMyU9Ugc4V2PzdraQkcKEIHDinTnTcz64T0xzMDJnlgN7NdFroxplEZbdBDOg
+ KoDF6JvpXJubqmmJpACTP2XQ/nAlWMQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-irtT5uUjMzmlpeGxQVrIQA-1; Wed, 15 Apr 2020 05:25:50 -0400
+X-MC-Unique: irtT5uUjMzmlpeGxQVrIQA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A30A58017FD;
+ Wed, 15 Apr 2020 09:25:49 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 70ADC60BE2;
+ Wed, 15 Apr 2020 09:25:47 +0000 (UTC)
+Date: Wed, 15 Apr 2020 11:25:46 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philipp Eppelt <1871842@bugs.launchpad.net>
+Subject: Re: [Bug 1871842] [NEW] AMD CPUID leaf 0x8000'0008 reported number
+ of cores inconsistent with ACPI.MADT
+Message-ID: <20200415112546.68ca1f15@redhat.com>
+In-Reply-To: <42f0624d-b0fb-5d96-2921-8994c28b9937@kernkonzept.com>
+References: <158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com>
+ <20200409160037.431ec776@redhat.com>
+ <5f7b85c6-09af-1064-f7f8-66ea7abf3ae3@amd.com>
+ <4ac73ad4-db45-f2a8-ddcd-a162a6c0eb73@kernkonzept.com>
+ <42f0624d-b0fb-5d96-2921-8994c28b9937@kernkonzept.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200415074258.GK269314@sturgeon>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 134.134.136.65
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,216 +90,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
- "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "Yang, Ziye" <ziye.yang@intel.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
- "Tian, Kevin" <kevin.tian@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
- "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
- "Liu, Changpeng" <changpeng.liu@intel.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "dinechin@redhat.com" <dinechin@redhat.com>,
- "He, Shaopeng" <shaopeng.he@intel.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Apr 15, 2020 at 03:42:58PM +0800, Erik Skultety wrote:
-> On Mon, Apr 13, 2020 at 01:55:04AM -0400, Yan Zhao wrote:
-> > migration_version attribute is used to check migration compatibility
-> > between two mdev devices of the same mdev type.
-> > The key is that it's rw and its data is opaque to userspace.
-> >
-> > Userspace reads migration_version of mdev device at source side and
-> > writes the value to migration_version attribute of mdev device at target
-> > side. It judges migration compatibility according to whether the read
-> > and write operations succeed or fail.
-> >
-> > Currently, it is able to read/write migration_version attribute under two
-> > places:
-> >
-> > (1) under mdev_type node
-> > userspace is able to know whether two mdev devices are compatible before
-> > a mdev device is created.
-> >
-> > userspace also needs to check whether the two mdev devices are of the same
-> > mdev type before checking the migration_version attribute. It also needs
-> > to check device creation parameters if aggregation is supported in future.
-> >
-> > (2) under mdev device node
-> > userspace is able to know whether two mdev devices are compatible after
-> > they are all created. But it does not need to check mdev type and device
-> > creation parameter for aggregation as device vendor driver would have
-> > incorporated those information into the migration_version attribute.
-> >
-> >              __    userspace
-> >               /\              \
-> >              /                 \write
-> >             / read              \
-> >    ________/__________       ___\|/_____________
-> >   | migration_version |     | migration_version |-->check migration
-> >   ---------------------     ---------------------   compatibility
-> >     mdev device A               mdev device B
-> >
-> > This patch is for mdev documentation about the second place (under
-> > mdev device node)
-> >
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: Erik Skultety <eskultet@redhat.com>
-> > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > Cc: Cornelia Huck <cohuck@redhat.com>
-> > Cc: "Tian, Kevin" <kevin.tian@intel.com>
-> > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
-> > Cc: Neo Jia <cjia@nvidia.com>
-> > Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> > Cc: Daniel P. Berrangé <berrange@redhat.com>
-> > Cc: Christophe de Dinechin <dinechin@redhat.com>
-> >
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > ---
-> >  .../driver-api/vfio-mediated-device.rst       | 70 +++++++++++++++++++
-> >  1 file changed, 70 insertions(+)
-> >
-> > diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
-> > index 2d1f3c0f3c8f..efbadfd51b7e 100644
-> > --- a/Documentation/driver-api/vfio-mediated-device.rst
-> > +++ b/Documentation/driver-api/vfio-mediated-device.rst
-> > @@ -383,6 +383,7 @@ Directories and Files Under the sysfs for Each mdev Device
-> >           |--- remove
-> >           |--- mdev_type {link to its type}
-> >           |--- vendor-specific-attributes [optional]
-> > +         |--- migration_verion [optional]
-> >
-> >  * remove (write only)
-> >
-> > @@ -394,6 +395,75 @@ Example::
-> >
-> >  	# echo 1 > /sys/bus/mdev/devices/$mdev_UUID/remove
-> >
-> > +* migration_version (rw, optional)
-> 
-> Hmm, ^this is not consistent with how patch 1/5 reports this information, but
-> looking at the existing docs we're not doing very well in terms of consistency
-> there either.
-> 
-> I suggest we go with "(read-write)" in both patch 1/5 and here and then start
-> the paragraph with "This is an optional attribute."
->
-ok. got it.
+On Tue, 14 Apr 2020 13:27:34 -0000
+Philipp Eppelt <1871842@bugs.launchpad.net> wrote:
 
-> > +  It is used to check migration compatibility between two mdev devices.
-> > +  Absence of this attribute means the mdev device does not support migration.
-> > +
-> > +  This attribute provides a way to check migration compatibility between two
-> > +  mdev devices from userspace after device created. The intended usage is
+> Hi,
 > 
-> after the target device has been created.
+> I have to clarify some things mentioned in my last post:
 > 
-> side note: maybe add something like "(see the migration_version attribute of
-> the device node if the target device already exists)" in the same section in
-> patch 1/5.
+> I only tested the change with an emulated EPYC-v2 CPU, I cannot test on
+> a physical EPYC CPU at the moment. However, I doubt that the results
+> will be different regarding the 0x8000_0008.ECX result.
+> 
+> The topology information printed is from the EPYC-v2 CPU model. I try to
+> get access to the machine and have a look if -cpu host affects this
+> topology.
+> 
+> So there is still the open question for the -enable-kvm -cpu host -smp 4
+> case. Shouldn't in this case the topology of the host CPU be reported?
+topology was never affected by the choice of -cpu, it's up to users to
+define it using -smp the way they prefer.
+ 
 
-ok. good idea.
+> In all emulated-CPU cases it's on the user to define the topology or to
+> live with the generated one (although I think preferring multi-socket
+> systems is outdated, but it's likely just the case in my 'world').
 > 
-> > +  for userspace to read the migration_version attribute from one mdev device and
-> > +  then writing that value to the migration_version attribute of the other mdev
-> > +  device. The second mdev device indicates compatibility via the return code of
-> > +  the write operation. This makes compatibility between mdev devices completely
-> > +  vendor-defined and opaque to userspace. Userspace should do nothing more
-> > +  than use the migration_version attribute to confirm source to target
-> > +  compatibility.
 > 
-> ...
+> Cheers,
+> Philipp
 > 
-> > +
-> > +  Reading/Writing Attribute Data:
-> > +  read(2) will fail if a mdev device does not support migration and otherwise
-> > +        succeed and return migration_version string of the mdev device.
-> > +
-> > +        This migration_version string is vendor defined and opaque to the
-> > +        userspace. Vendor is free to include whatever they feel is relevant.
-> > +        e.g. <pciid of parent device>-<software version>.
-> > +
-> > +        Restrictions on this migration_version string:
-> > +            1. It should only contain ascii characters
-> > +            2. MAX Length is PATH_MAX (4096)
-> > +
-> > +  write(2) expects migration_version string of source mdev device, and will
-> > +         succeed if it is determined to be compatible and otherwise fail with
-> > +         vendor specific errno.
-> > +
-> > +  Errno:
-> > +  -An errno on read(2) indicates the mdev devicedoes not support migration;
 > 
-> s/devicedoes/device does/
+> On 4/14/20 10:24 AM, Philipp Eppelt wrote:
+> > Hi,
+> > 
+> > thanks for looking into this so quickly.
+> > 
+> > With this patch applied ontop of git commit
+> > f3bac27cc1e303e1860cc55b9b6889ba39dee587 I still have the issue and it
+> > reports the same numbers. I like the new usage of the ApicIdSize field.
+> > 
+> > 
+> > I looked into the mentioned pc_smp_parse() and had it print the topology
+> > for -smp 4:
+> > 
+> > qemu-system-x86_64: warning: cpu topology: sockets (4) , dies (1) ,
+> > cores (1) , threads (1) , maxcpus (4), cpus (4)
+> > 
+> > and with -smp 4,cores=4:
+> > 
+> > qemu-system-x86_64: warning: cpu topology: sockets (1) , dies (1) ,
+> > cores (4) , threads (1) , maxcpus (4), cpus (4)
+> > 
+> > As far as I understand it, these are the numbers the cpuid:8000'0008
+> > code relies on:
+> > `cs->nr_cores`, `cs->nr_threads` with `cs` being of type CPUState.
+> > 
+> > So I think the issue is rooted with the preferring sockets over cores
+> > when the -smp cmdline option is parsed, as stated in hw/i386/pc.c:729.
+> > 
+> > I guess this is the same code for Intel and AMD CPUs alike and this
+> > issue just didn't surface for us on Intel CPUs, as they don't have this
+> > CPUID leaf and we don't look at the topology.
+> > 
+> > This seems to boil down to a more careful use of the -smp option on my end.
+> > 
+> > Thanks again for looking into this.
+> > 
+> > Cheers,
+> > Philipp
+> > 
+> > 
+> > 
+> > On 4/10/20 2:12 AM, Babu Moger wrote:  
+> >> Philipp,
+> >>   Can you please check if this patch works for you.
+> >>
+> >> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> >> index 90ffc5f..e467fee 100644
+> >> --- a/target/i386/cpu.c
+> >> +++ b/target/i386/cpu.c
+> >> @@ -5831,10 +5831,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t
+> >> index, uint32_t count,
+> >>          }
+> >>          *ebx = env->features[FEAT_8000_0008_EBX];
+> >>          *ecx = 0;
+> >> -        *edx = 0;
+> >>          if (cs->nr_cores * cs->nr_threads > 1) {
+> >> -            *ecx |= (cs->nr_cores * cs->nr_threads) - 1;
+> >> +            unsigned long max_apicids, bits_required;
+> >> +
+> >> +            max_apicids = (cs->nr_cores * cs->nr_threads) - 1;
+> >> +            if (max_apicids) {
+> >> +                /* Find out the number of bits to represent all the
+> >> apicids */
+> >> +                bits_required = find_last_bit(&max_apicids,
+> >> BITS_PER_BYTE) + 1;
+> >> +                *ecx |= bits_required << 12 | max_apicids;
+> >> +            }
+> >>          }
+> >> +        *edx = 0;
+> >>          break;
+> >>      case 0x8000000A:
+> >>          if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+> >>
+> >>
+> >> On 4/9/20 9:00 AM, Igor Mammedov wrote:  
+> >>> On Thu, 09 Apr 2020 12:58:11 -0000
+> >>> Philipp Eppelt <1871842@bugs.launchpad.net> wrote:
+> >>>  
+> >>>> Public bug reported:
+> >>>>
+> >>>> Setup:
+> >>>> CPU: AMD EPYC-v2 or host's EPYC cpu
+> >>>> Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
+> >>>> qemu version: self build
+> >>>> git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
+> >>>> config: Configured with: '../configure' '--target-list=x86_64-softmmu,mips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aarch64-softmmu,arm-softmmu' '--prefix=/opt/qemu-master'
+> >>>>
+> >>>> Cmdline: 
+> >>>> qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/bin/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , ... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu EPYC-v2 -m 4G -smp 4 
+> >>>>
+> >>>> Issue:
+> >>>> We are developing an microkernel operating system called L4Re. We recently got an AMD EPYC server for testing and we couldn't execute SMP tests of our system when running Linux + qemu + VM w/ L4Re.
+> >>>> In fact, the kernel did not recognize any APs at all. On AMD CPUs the kernel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[NC] or [ApicIdSize].  [0][1]
+> >>>>
+> >>>> The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18cf757 ECX: 0x703f EDX: 0x1000
+> >>>> The lower four bits of ECX are the [NC] field and all set.
+> >>>>
+> >>>> When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as replacement and addition to the above cmdline) the CPUID leaf shows: EAX: 0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
+> >>>> Note, ECX is zero. Indicating that this is no SMP capabale CPU.
+> >>>>
+> >>>> I'm debugging it using my local machine and the QEMU provided EPYC-v2
+> >>>> CPU model and it is reproducible there as well and reports:  EAX:
+> >>>> 0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
+> >>>>
+> >>>> I checked other AMD based CPU models (phenom, opteron_g3/g5) and they behave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
+> >>>> I believe that behavior here is wrong as ECX[NC] should report the number of cores per processor, as stated in the AMD manual [2] p.584. In my understanding -smp 4 should then lead to ECX[NC] = 0x3.
+> >>>>
+> >>>> The following table shows my findings with the -smp option:
+> >>>> Option | Qemu guest observed ECX value
+> >>>> -smp 4 | 0x0
+> >>>> -smp 4,cores=4  | 0x3
+> >>>> -smp 4,cores=2,thread=2 | 0x3
+> >>>> -smp 4,cores=4,threads=2 | QEMU boot error: topology false.
+> >>>>
+> >>>> Now, I'm asking myself how the terminology of the AMD manual maps to QEMU's -smp option.
+> >>>> Obviously, nr_cores and nr_threads correspond to the cores and threads options on the cmdline and cores * threads <= 4 (in this example), but what corresponds the X in -smp X to?  
+> >>> I'd say X corresponds to number of logical CPUs.
+> >>> Depending on presence of other options these are distributed among them in magical manner
+> >>> (see pc_smp_parse() for starters)
+> >>>  
+> >>>> Querying 0x8000'0008 on the physical processor results in different
+> >>>> reports than quering QEMU's model as does it with -enable-kvm -cpu host.
+> >>>>
+> >>>> Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
+> >>>> CPU leave reports a single core processor.  
+> >>> it matches -smp X as it should be.
+> >>>  
+> >>>>
+> >>>> This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
+> >>>> wrong number.  
+> >>> CCed author of recent epyc patches who might know how AMD should work better than me.
+> >>>  
+> >>>>
+> >>>> Please let me know, if you need more information from my side.
+> >>>>
+> >>>>
+> >>>> [0] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fkernkonzept%2Ffiasco%2Fblob%2F522ccc5f29ab120213cf02d71328e2b879cbbd19%2Fsrc%2Fkern%2Fia32%2Fkernel_thread-ia32.cpp%23L109&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=hcFJzLAVQoIh5IN9CP%2F9cUQNOZoBnpRA6FliJur1wzQ%3D&amp;reserved=0
+> >>>> [1] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fkernkonzept%2Ffiasco%2Fblob%2F522ccc5f29ab120213cf02d71328e2b879cbbd19%2Fsrc%2Fkern%2Fia32%2Fcpu-ia32.cpp%23L1120&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=ANJIbYKbwfq2bDelH%2FRLKnDPIUZc1BwxHspmgxLU7gs%3D&amp;reserved=0
+> >>>> [2] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fqemu%2Fqemu%2Fblob%2Ff2a8261110c32c4dccd84e774d8dd7a0524e00fb%2Ftarget%2Fi386%2Fcpu.c%23L5835&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=oj3mv9e5YOzUsfUjXK44gC8LybyWgMKo8JBIrRR%2BmDA%3D&amp;reserved=0
+> >>>> [3] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.amd.com%2Fsystem%2Ffiles%2FTechDocs%2F24594.pdf&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C57569f7959744399655b08d7dc8e6e24%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637220379083511672&amp;sdata=7Yr3J9ihlqSqXCXKN5JJNTByO3NGI%2BGMz2EqBF2Y4hw%3D&amp;reserved=0
+> >>>>
+> >>>> ** Affects: qemu
+> >>>>      Importance: Undecided
+> >>>>          Status: New
+> >>>>  
+> >>>  
+> >>  
+> >   
 > 
-sorry for such kind of errors.
 
-> > +  -An errno on write(2) indicates the mdev devices are incompatible or the
-> > +   target doesn't support migration.
-> > +  Vendor driver is free to define specific errno and is suggested to
-> > +  print detailed error in syslog for diagnose purpose.
-> > +
-> > +  Userspace should treat ANY of below conditions as two mdev devices not
-> > +  compatible:
-> > +  (1) any one of the two mdev devices does not have a migration_version
-> > +  attribute
-> > +  (2) error when reading from migration_version attribute of one mdev device
-> > +  (3) error when writing migration_version string of one mdev device to
-> > +  migration_version attribute of the other mdev device
-> > +
-> > +  Userspace should regard two mdev devices compatible when ALL of below
-> > +  conditions are met:
-> > +  (1) success when reading from migration_version attribute of one mdev device.
-> > +  (2) success when writing migration_version string of one mdev device to
-> > +  migration_version attribute of the other mdev device.
-> > +
-> > +  Example Usage:
-> > +  (1) Retrieve the mdev source migration_version:
-> > +
-> > +  # cat /sys/bus/mdev/devices/$mdev_UUID1/migration_version
-> > +
-> > +  If reading the source migration_version generates an error, migration is not
-> > +  possible.
-> > +
-> > +  (2) Test source migration_version at target:
-> > +
-> > +  Given a migration_version as outlined above, its compatibility to an
-> > +  instantiated device of the same mdev type can be tested as:
-> > +  # echo $VERSION > /sys/bus/mdev/devices/$mdev_UUID2/migration_version
-> > +
-> > +  If this write fails, the source and target migration versions are not
-> > +  compatible or the target does not support migration.
-> > +
-> > +
-> >  Mediated device Hot plug
-> >  ------------------------
-> 
-> Overall, the same comments as in 1/5 apply text-wise.
-> 
-
-got it. will align it with the first patch.
-
-Thanks
-Yan
-
-> Regards,
-> --
-> Erik Skultety
-> 
 
