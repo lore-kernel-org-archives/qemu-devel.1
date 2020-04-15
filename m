@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25BE3C3815B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BE3C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:26:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE203206F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:25:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE203206F9
+	by mail.kernel.org (Postfix) with ESMTPS id 49427206F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:26:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49427206F9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOcQR-0004r8-2C
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 03:25:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46866)
+	id 1jOcRT-0005v4-HP
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 03:26:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jOcPt-0004N8-EZ
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:25:02 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jOcQt-0005RH-0I
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:26:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jOcPs-0003np-IF
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:25:01 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:47770)
+ (envelope-from <its@irrelevant.dk>) id 1jOcQr-0004G4-VJ
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:26:02 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:47784)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jOcPq-0003mu-KO; Wed, 15 Apr 2020 03:24:58 -0400
+ id 1jOcQp-0004F0-VJ; Wed, 15 Apr 2020 03:26:00 -0400
 Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 00DCCBF603;
- Wed, 15 Apr 2020 07:24:56 +0000 (UTC)
-Date: Wed, 15 Apr 2020 09:24:53 +0200
+ by charlie.dont.surf (Postfix) with ESMTPSA id A7463BF603;
+ Wed, 15 Apr 2020 07:25:58 +0000 (UTC)
+Date: Wed, 15 Apr 2020 09:25:55 +0200
 From: Klaus Birkelund Jensen <its@irrelevant.dk>
 To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v7 12/48] nvme: add temperature threshold feature
-Message-ID: <20200415072453.cs4urfwreedqlmbl@apples.localdomain>
+Subject: Re: [PATCH v7 11/48] nvme: refactor device realization
+Message-ID: <20200415072555.pvrircyuy2t4y3fj@apples.localdomain>
 References: <20200415055140.466900-1-its@irrelevant.dk>
- <20200415055140.466900-13-its@irrelevant.dk>
- <0ab46987-8026-c059-1470-6cac2e6cbcbb@redhat.com>
+ <20200415055140.466900-12-its@irrelevant.dk>
+ <e79da783-872a-4cda-a33e-4ba795fb4a59@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <0ab46987-8026-c059-1470-6cac2e6cbcbb@redhat.com>
+In-Reply-To: <e79da783-872a-4cda-a33e-4ba795fb4a59@redhat.com>
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -72,29 +72,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Apr 15 09:19, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 4/15/20 7:51 AM, Klaus Jensen wrote:
-> > From: Klaus Jensen <k.jensen@samsung.com>
-> >=20
-> > It might seem wierd to implement this feature for an emulated device,
+On Apr 15 09:14, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Klaus,
 >=20
-> 'weird'
-
-Thanks, fixed :)
-
->=20
-> > but it is mandatory to support and the feature is useful for testing
-> > asynchronous event request support, which will be added in a later
-> > patch.
->=20
-> Which patch? I can't find how you set the temperature in this series.
+> This patch is a pain to review... Could you split it? I'd use one trivi=
+al
+> patch for each function extracted from nvme_realize().
 >=20
 
-The temperature cannot be changed, but the thresholds can with the Set
-Features command (and that can then trigger AERs). That is added in
-"nvme: add temperature threshold feature" and "nvme: add support for the
-asynchronous event request command" respectively.
-
-There is a test in SPDK that does this.
-
+Understood, I will split it up!
 
