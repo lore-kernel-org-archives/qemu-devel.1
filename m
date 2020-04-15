@@ -2,86 +2,75 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6C1EC2BB55
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 12:44:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4372FC3815B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 12:47:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75987206A2
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 12:44:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W4IJCZoC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75987206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 14F3D206A2
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 12:47:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14F3D206A2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOhP7-0006wJ-K7
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 08:44:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59253)
+	id 1jOhRy-00007X-7W
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 08:47:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59506)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jOhNT-0005U3-RV
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 08:42:53 -0400
+ (envelope-from <bounces@canonical.com>) id 1jOhQL-0007rJ-U0
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 08:45:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1jOhNS-00043F-L1
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 08:42:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42591
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jOhNS-00042n-Gu
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 08:42:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586954569;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pDg5qi4xsryBk4w02BFiq4x1Ldryzh5UYOH/kWiPtkE=;
- b=W4IJCZoCqzkfvyv1X4fXAmvf0QEBcxIQ0f3B44YeRh2HNfFrvpH5Y90wDboA4G79y/qljv
- RjKYOMfLOhUjXmxms38WNgv3dQxfDV1c59o1h2rfY8m+S8zqBWitjG5wVR1Bq0uzYxGJdE
- 4JioYdKK6Ejlyr1WELriqZKmxKsrm3A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-pTUhGiO2N7iWVEoJH3_vGg-1; Wed, 15 Apr 2020 08:42:42 -0400
-X-MC-Unique: pTUhGiO2N7iWVEoJH3_vGg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3D801005510;
- Wed, 15 Apr 2020 12:42:40 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CA93A19C70;
- Wed, 15 Apr 2020 12:42:39 +0000 (UTC)
-Date: Wed, 15 Apr 2020 13:42:36 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [for-5.0] Deprecate KVM support for AArch32
-Message-ID: <20200415124236.GG1344391@redhat.com>
-References: <20200414120935.12719-1-peter.maydell@linaro.org>
- <20200415123310.GC1344391@redhat.com>
- <CAFEAcA80g-Zohi0t7u51aNs58i8_zPCOcRob6zx6DYdTjYfXWQ@mail.gmail.com>
+ (envelope-from <bounces@canonical.com>) id 1jOhQK-000538-Np
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 08:45:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49208)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jOhQK-00052s-IY
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 08:45:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jOhQJ-0003Np-9E
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 12:45:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 443C52E8105
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 12:45:47 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA80g-Zohi0t7u51aNs58i8_zPCOcRob6zx6DYdTjYfXWQ@mail.gmail.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Date: Wed, 15 Apr 2020 12:35:27 -0000
+From: Barnabas Viragh <1872847@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=gentoo; sourcepackage=None; component=None;
+ status=New; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Tags: alpha linux-user python
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: cyborgyn laurent-vivier
+X-Launchpad-Bug-Reporter: Barnabas Viragh (cyborgyn)
+X-Launchpad-Bug-Modifier: Barnabas Viragh (cyborgyn)
+References: <158690356239.28566.12748384831078553261.malonedeb@gac.canonical.com>
+Message-Id: <158695412791.12198.10081015204976877860.malone@soybean.canonical.com>
+Subject: [Bug 1872847] Re: qemu-alpha linux-user breaks python3.6
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: ad37d083c55591349253369e26b8ba56fec65c77
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,50 +79,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1872847 <1872847@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Apr 15, 2020 at 01:41:05PM +0100, Peter Maydell wrote:
-> On Wed, 15 Apr 2020 at 13:33, Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
-> >
-> > On Tue, Apr 14, 2020 at 01:09:35PM +0100, Peter Maydell wrote:
-> > > The Linux kernel has dropped support for allowing 32-bit Arm systems
-> > > to host KVM guests (kernel commit 541ad0150ca4aa663a2, which just
-> > > landed upstream in the 5.7 merge window).  Mark QEMU's support for
-> > > this configuration as deprecated, so that we can delete that support
-> > > code in 5.2.
-> > >
-> > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > > ---
-> > > I was reading the 5.7 merge window writeup on LWN this weekend
-> > > and saw that the dropping of 32-bit support had gone in; just
-> > > enough time to squeeze our deprecation warning into 5.0 so we
-> > > can drop the code in 5.2 rather than 6.0...
-> > >
-> > >  docs/system/deprecated.rst | 8 ++++++++
-> > >  1 file changed, 8 insertions(+)
-> >
-> > The docs are sufficient to start the deprecation process, but
-> > we might consider also having a warning from configure, or a
-> > message on stderr at runtime to make it more visible to users.
->=20
-> Mmm. I didn't feel entirely comfortable making code changes to
-> print messages at this point in the 5.0 release cycle, though.
+Related Gentoo bug: https://bugs.gentoo.org/717548
 
-Sure, that's understandable.
+** Also affects: gentoo
+   Importance: Undecided
+       Status: New
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1872847
+
+Title:
+  qemu-alpha linux-user breaks python3.6
+
+Status in QEMU:
+  New
+Status in Gentoo Linux:
+  New
+
+Bug description:
+  Running on Gentoo Linux in a chroot environment:
+  # python3 -c 'import selectors; selectors.DefaultSelector()'
+  Traceback (most recent call last):
+    File "<string>", line 1, in <module>
+    File "/usr/lib/python3.7/selectors.py", line 349, in __init__
+      self._selector =3D self._selector_cls()
+  OSError: [Errno 22] Invalid argument
+
+  However, on real hardware, with the same binaries there is no
+  exception.
+
+  This impacts whole python3 based Gentoo ebuild system (package
+  management), and renders linux user mode alpha emulation in chroot
+  environment building useless, more or less.
+
+  The used systems:
+  # qemu-alpha --version
+  qemu-alpha version 4.2.0
+  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+  # uname -a
+  Linux blackbird 5.4.28-gentoo-blackbird-06 #2 SMP Sat Apr 4 13:13:10 CEST=
+ 2020 x86_64 AMD Ryzen 5 3600 6-Core Processor AuthenticAMD GNU/Linux
+  (chroot)# python3 --version
+  Python 3.7.7
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1872847/+subscriptions
 
