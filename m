@@ -7,77 +7,79 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B339DC2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61452C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:38:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E9BB206D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:37:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A6D3208FE
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:38:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t1YI7DSk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E9BB206D9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fFTReTcu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A6D3208FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOfQM-0004Nv-O2
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:37:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44729)
+	id 1jOfRS-0005vM-9B
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:38:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45040)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jOfOH-000268-1d
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:35:33 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jOfQV-0004nx-MP
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:37:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jOfOE-00015O-Rj
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:35:32 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39262)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jOfQU-0001si-Lc
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:37:51 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38585)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jOfOB-000148-HU
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:35:28 -0400
-Received: by mail-wm1-x343.google.com with SMTP id y24so18360186wma.4
- for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 03:35:27 -0700 (PDT)
+ id 1jOfQR-0001qQ-F0
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:37:50 -0400
+Received: by mail-wr1-x443.google.com with SMTP id k11so17891168wrp.5
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 03:37:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=RCPukqXeU90Sta1kCxiNpB66dVcf62a681H7MU0Gmfk=;
- b=t1YI7DSkuL2sA7XoAjLkT91WakZoqVEzk6OHRq1q2SsLaIribeop53bQNC4WE+farD
- hEYny6wsFBfUDPjaYBUCZ72d7KqEWPC6wjrJeAaREL82ImozEDBKvhss1+xxiqlAE1sB
- c4N4hJgafeKqKlm47yXyNftRnvuzOvYy0VSAbykb7h6EsNzViCmn4Nj29bcxgbyWA0dH
- UhmkMRJncsjBQ1/DfZg7JOnBWFxWhFIU2WuYhyIMnmVxypk0Kghc8ddenhNJUq/lmNw1
- mh7fB4Mw9FP8H+sFPyAF4+lW4PJqIDL2CDVRfag5M4vnUSx4OMPCYcSni9omUkotip62
- UjIw==
+ bh=D5sObk6zM7CPpcNkFXpi2dbYOOcLYt59wgs8YQk/lMg=;
+ b=fFTReTcuC4HlpxEdbpOphGhP4AmxXL2fzewVdh9BrRxeQed6b4m5+/rbXik1DqL7KV
+ S3GUtta3GIqJhXf+YD/c39JZ+YrNe26LYqPFlE3NMjWf0f3hyCviFdbhYC1K6K9+LkDi
+ cqq6Px7Ac7xG6sL3RY2WM4WePyRc1dad96pOyVENdcFEAjQHrxFhRmouf+L9xHJYKsK8
+ dg02kJ156903POZnVVzRrkiDbBg8UwgWAKdZ1ZtrWvseK6X0TJ2PmgTBeXQAq/KQ7XNs
+ pxAJOfJf3WDZXI44Do82N0G4Gzq8OAI6wEgdlFFYd5TVcvoFji5f5h2ejqfve652wCEi
+ V92Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=RCPukqXeU90Sta1kCxiNpB66dVcf62a681H7MU0Gmfk=;
- b=KVR2jdNuwarGD0f2LssQMTSqLhtpZ5iuhGqzI5dxMD1hEb05MYjgiZ0zZ5grDV2NRV
- hWlRIhA9DD9v9lLpbcIbl7kpSlrAwzecf/M/7cMYMXT9+fDAHhaCVIftD/8ar9eWMyjD
- 2tu0C+8ZtZhjOtsNVOcmL3rVdlpVMBSULGD3v/ydPqtBvng5eCO+Sh+/iLFOF9/k45kF
- h0V6u/8s/7WxJqcOsO8aKHdyr6pgaeZYOa72P7Z8GhH6CaF1Zx0+WpkuXAwinXhz/dPb
- DBe7dVNCQbwUrgT5v/EiqoveYxbgqpREZqncooIeTvcBjYWwpAj4FmQIvRnMN2sGs587
- +NZA==
-X-Gm-Message-State: AGi0Pub9E9YfwZME4qg6mrg+0rfEhKUSpTUwMA/Jw0A2jdsv7OoKGuN7
- wNz//cX4kOZHJuCIMN6uKxMigjqCKxuglQdsHwY=
-X-Google-Smtp-Source: APiQypKGvKrqB1CpbcMtbgEYojLyAgT7R12eFL1LuqCrxJ4ZZQFScfks8tCcm/UWJRcMRxJ+klMceExOcH93IItgv7U=
-X-Received: by 2002:a7b:c404:: with SMTP id k4mr4293405wmi.37.1586946926130;
- Wed, 15 Apr 2020 03:35:26 -0700 (PDT)
+ bh=D5sObk6zM7CPpcNkFXpi2dbYOOcLYt59wgs8YQk/lMg=;
+ b=tXdnyXsDgnh0EU4nzisgSOChv36gDHXv4AGJPqajx/wk8uCRVqU1Oc60ibmPn0BCHc
+ c4Sl/WNH2lGMB/87i6QpXU/8Y4q4ZjFzvwQ4B82sWKEwwoAofXH0WXvLRhCO0uVXLMA/
+ tschZJMdKrkXkU+IZQHaB5TmEGUG2BfrkJaftqzF7lqya7wcXDlrtMAZDOBGWBvydYRk
+ IiL8nnR5XeqygwvwntE/9vDsq9atSH3oUdY69TpCSzqzsaPYR3d3d2t4gkrXBqeiyU+a
+ yA4Kt7ExXM8YtHR0kl0GRna/jiDxDT1k1WEP/tdKVbHiA9hUohqp+I0KCdS6WEcy2jn9
+ 4eRg==
+X-Gm-Message-State: AGi0PuYebi3vG0o3FRJAIUhWfNpWcA1SrDErJqpH8cdhc9hiHKGgP3aQ
+ WSsrSQSxZsQjpE+e91Wkp8irT0lNMdXeiklBVEo=
+X-Google-Smtp-Source: APiQypJmuxIs84FNE+pNbbmu0uumDWCcEATu4Ezx0ysPW2r1NOMNY/AeeR2UMHelT3GsOAe7yL+Pzl/XqSIwgE40LZs=
+X-Received: by 2002:a05:6000:187:: with SMTP id
+ p7mr27993705wrx.196.1586947066360; 
+ Wed, 15 Apr 2020 03:37:46 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200415032826.16701-1-fengli@smartx.com>
- <20200415032826.16701-4-fengli@smartx.com>
-In-Reply-To: <20200415032826.16701-4-fengli@smartx.com>
+References: <20200415005938.23895-1-alazar@bitdefender.com>
+ <20200415005938.23895-4-alazar@bitdefender.com>
+In-Reply-To: <20200415005938.23895-4-alazar@bitdefender.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 15 Apr 2020 12:35:14 +0200
-Message-ID: <CAJ+F1C+y-UXH=KARXtTK+aFFb58umRDna_jk2XjHsjDeaxkWYQ@mail.gmail.com>
-Subject: Re: [PATCH 3/4] char-socket: avoid double call tcp_chr_free_connection
-To: Li Feng <fengli@smartx.com>
+Date: Wed, 15 Apr 2020 12:37:34 +0200
+Message-ID: <CAJ+F1CLLpzdoNqwgMQh8j4Sd4_HGEmBt=x1wPsHXvgZ7O=8Kzg@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 03/26] char-socket: fix the client mode when
+ created through QMP
+To: =?UTF-8?Q?Adalbert_Laz=C4=83r?= <alazar@bitdefender.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,64 +91,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kyle@smartx.com,
- "open list:All patches CC here" <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Hi
 
-On Wed, Apr 15, 2020 at 5:31 AM Li Feng <fengli@smartx.com> wrote:
+On Wed, Apr 15, 2020 at 3:00 AM Adalbert Laz=C4=83r <alazar@bitdefender.com=
+> wrote:
 >
-> double call tcp_chr_free_connection generates a crash.
+> qmp_chardev_open_socket() ignores the absence of the 'server' argument
+> and always switches to listen/server mode.
 >
-> Signed-off-by: Li Feng <fengli@smartx.com>
-
-Could you describe how you reach the "double call".
-
-Even better would be to write a test for it in tests/test-char.c
-
-thanks
-
+> CC: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Adalbert Laz=C4=83r <alazar@bitdefender.com>
 > ---
->  chardev/char-socket.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  chardev/char-socket.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
 > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 185fe38dda..43aab8f24b 100644
+> index 9b2deb0125..fd0106ab85 100644
 > --- a/chardev/char-socket.c
 > +++ b/chardev/char-socket.c
-> @@ -476,6 +476,11 @@ static void tcp_chr_disconnect_locked(Chardev *chr)
+> @@ -1310,7 +1310,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
 >      SocketChardev *s =3D SOCKET_CHARDEV(chr);
->      bool emit_close =3D s->state =3D=3D TCP_CHARDEV_STATE_CONNECTED;
->
-> +    /* avoid re-enter when socket read/write error and disconnect event.=
- */
-> +    if (s->state =3D=3D TCP_CHARDEV_STATE_DISCONNECTED) {
-> +        return;
-> +    }
-> +
->      tcp_chr_free_connection(chr);
->
->      if (s->listener) {
-> --
-> 2.11.0
->
->
-> --
-> The SmartX email address is only for business purpose. Any sent message
-> that is not related to the business is not authorized or permitted by
-> SmartX.
-> =E6=9C=AC=E9=82=AE=E7=AE=B1=E4=B8=BA=E5=8C=97=E4=BA=AC=E5=BF=97=E5=87=8C=
-=E6=B5=B7=E7=BA=B3=E7=A7=91=E6=8A=80=E6=9C=89=E9=99=90=E5=85=AC=E5=8F=B8=EF=
-=BC=88SmartX=EF=BC=89=E5=B7=A5=E4=BD=9C=E9=82=AE=E7=AE=B1. =E5=A6=82=E6=9C=
-=AC=E9=82=AE=E7=AE=B1=E5=8F=91=E5=87=BA=E7=9A=84=E9=82=AE=E4=BB=B6=E4=B8=8E=
-=E5=B7=A5=E4=BD=9C=E6=97=A0=E5=85=B3,=E8=AF=A5=E9=82=AE=E4=BB=B6=E6=9C=AA=
-=E5=BE=97=E5=88=B0=E6=9C=AC=E5=85=AC=E5=8F=B8=E4=BB=BB=E4=BD=95=E7=9A=84=E6=
-=98=8E=E7=A4=BA=E6=88=96=E9=BB=98=E7=A4=BA=E7=9A=84=E6=8E=88=E6=9D=83.
->
->
+>      ChardevSocket *sock =3D backend->u.socket.data;
+>      bool do_nodelay     =3D sock->has_nodelay ? sock->nodelay : false;
+> -    bool is_listen      =3D sock->has_server  ? sock->server  : true;
+> +    bool is_listen      =3D sock->has_server  ? sock->server  : false;
+
+I don't understand what you mean. It defaults to server mode. We can't
+change that.
+
+>      bool is_telnet      =3D sock->has_telnet  ? sock->telnet  : false;
+>      bool is_tn3270      =3D sock->has_tn3270  ? sock->tn3270  : false;
+>      bool is_waitconnect =3D sock->has_wait    ? sock->wait    : false;
 >
 
 
