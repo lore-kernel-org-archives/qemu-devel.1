@@ -2,121 +2,129 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00F7BC2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 18:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC68C3815B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 18:18:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD77D206D5
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 18:09:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0943D2076D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 18:18:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="ggImo3ur"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD77D206D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MaXb1zAl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0943D2076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOmTI-0000sR-0R
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 14:09:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48885)
+	id 1jOmbt-0003rD-6o
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 14:18:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49858)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Babu.Moger@amd.com>) id 1jOmSV-0000GJ-9j
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 14:08:24 -0400
+ (envelope-from <david@redhat.com>) id 1jOmay-0003Rj-Gt
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 14:17:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Babu.Moger@amd.com>) id 1jOmST-0005UA-Th
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 14:08:23 -0400
-Received: from mail-mw2nam10on2073.outbound.protection.outlook.com
- ([40.107.94.73]:53089 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1jOmST-0005TI-IF
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 14:08:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D0cYO6cQCgVdKPo0hwczCXqOgaCGP24pXAVZa2vvmBBoTv5eQIBaN7feF6MkuclbGBEzH5UWN2Sk74j0miwsjUJKEq168Xhs5GFqzdlAQ4frhh4w6MQgTmlCXWj0AHWaPa2XHKAcm+y2Nr/9bFTzA37qOVBhQ8UI44xYSHskeXg5PNfJkgzA9kEMnwiAGM0tj/4dW2HB9hEZ3JgciaM7YG8cyH21SdslJEhc8AWNbCyfFSiKLTK3sfmm7JC/WLWEBVze81WpUwARGH8phrG2y6Ly/oQpaAWvqGQJaaodTr1ymaX+MHpXWs4Z2anN9fTOBp9blQstJK8AM+oAgFmPIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XrCWbNeTWLcbbxUg7afle4FVYckzysUZEDX2uQ7+MD4=;
- b=eZB3YNZNUgDBZ35zoJ5pYKenK2GIliQMeApo94cjPJIa58qE+zoK6GQtwYSG3XTgFUlUwP+qc48rGZ78dht++AlboyJ2jK7UMaE5568bSon0dMlmuLHfkBoRBtKsCiIJOOuyVt/Nivjhtxtl0BWWO4v29wMs2ZVjlcElA0cPFZNAWtJWDsodZtruArG8rbFt/N6trHxSkBhOugZtjxiIhfUqlNyxs8obVkVnkMITG239FgVpQEwD0SuEODvPp5OO917bD3olT8fofU9V+NGuRnAXgSOIfBWAjbqT8D2EXL2yHA1BNURAX1s9A4WyEJmjUqzMt2YGq3jj/k30D61vIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XrCWbNeTWLcbbxUg7afle4FVYckzysUZEDX2uQ7+MD4=;
- b=ggImo3urPzHtLGjDm64RheVox4e6iA/7PX/4ncHuWZRFsn5W8rR1vM1JweCV8khKpESKCsp2SKyT2fazVvBXLw4kKVLFrSmK4ifwCfBXsNcnc5NlxIOOtULekf6lL1FXpwam8+wKJ9CTjQ/jqynHoNsV/MOr4+9ZPdF6+b4AMqY=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Babu.Moger@amd.com; 
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2351.namprd12.prod.outlook.com (2603:10b6:802:2b::11)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.20; Wed, 15 Apr
- 2020 18:08:18 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::c0f:2938:784f:ed8d]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::c0f:2938:784f:ed8d%7]) with mapi id 15.20.2900.028; Wed, 15 Apr 2020
- 18:08:18 +0000
-From: Babu Moger <babu.moger@amd.com>
-Subject: Re: [Bug 1871842] [NEW] AMD CPUID leaf 0x8000'0008 reported number of
- cores inconsistent with ACPI.MADT
-To: Igor Mammedov <imammedo@redhat.com>,
- Philipp Eppelt <1871842@bugs.launchpad.net>
-References: <158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com>
- <20200409160037.431ec776@redhat.com>
- <c01f506c-5447-d048-15b2-3f113818844f@amd.com>
-Message-ID: <884b4dcd-5ff2-2834-e73f-f88b868dca56@amd.com>
-Date: Wed, 15 Apr 2020 13:08:15 -0500
+ (envelope-from <david@redhat.com>) id 1jOmaw-00015W-SS
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 14:17:08 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55588
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jOmaw-000155-Nz
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 14:17:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586974625;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=hM41k27kUax8oUYBOwLtFTIyVnh6nrdCBGoZTTPr5Q8=;
+ b=MaXb1zAl+C4K1TF8jLzUwGV7RA3W+rL4hXmSXS1nsT0eTsAlmCNCm14fIGVHmcoXIvAaML
+ Ah+Ecgoj7JXYcevoo73ttJ/UVUD2qiQHUPNgXFQOT62vK2MShj54sTwxALGjMtmw28nEuL
+ UiiruSKrkRzhry5T/yIh680XR76X1rY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-85Kmu7RYOEK26hASZijjBw-1; Wed, 15 Apr 2020 14:17:03 -0400
+X-MC-Unique: 85Kmu7RYOEK26hASZijjBw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4BBC8018A1;
+ Wed, 15 Apr 2020 18:17:02 +0000 (UTC)
+Received: from [10.36.114.144] (ovpn-114-144.ams2.redhat.com [10.36.114.144])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D23B3116D7C;
+ Wed, 15 Apr 2020 18:16:58 +0000 (UTC)
+Subject: Re: [PATCH v19 QEMU 1/4] virtio-balloon: Implement support for page
+ poison tracking feature
+To: Alexander Duyck <alexander.duyck@gmail.com>
+References: <20200410033729.24738.22879.stgit@localhost.localdomain>
+ <20200410034129.24738.36022.stgit@localhost.localdomain>
+ <b6f97131-89dc-064a-5b87-2bf68437176d@redhat.com>
+ <CAKgT0UcgbhKASE3RahdVZR35HHcnMVFGvh=q3qewgL7Yxin27w@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <515a7bd8-8840-6534-e76d-6bc2d4edbb72@redhat.com>
+Date: Wed, 15 Apr 2020 20:16:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <c01f506c-5447-d048-15b2-3f113818844f@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR16CA0023.namprd16.prod.outlook.com
- (2603:10b6:3:c0::33) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.87] (165.204.77.1) by
- DM5PR16CA0023.namprd16.prod.outlook.com (2603:10b6:3:c0::33) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2921.25 via Frontend Transport; Wed, 15 Apr 2020 18:08:17 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 6676ae9f-3f39-4f97-67c2-08d7e167f99b
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2351:
-X-Microsoft-Antispam-PRVS: <SN1PR12MB23517BBD0F714992D080437F95DB0@SN1PR12MB2351.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 0374433C81
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10009020)(4636009)(346002)(396003)(39860400002)(366004)(136003)(376002)(86362001)(6486002)(8936002)(110136005)(2616005)(478600001)(53546011)(956004)(316002)(81156014)(16576012)(8676002)(966005)(36756003)(2906002)(186003)(16526019)(31696002)(26005)(66556008)(4326008)(66476007)(52116002)(31686004)(66946007)(44832011)(5660300002);
- DIR:OUT; SFP:1101; 
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3+5qoxfovFvC7/Cu9E7dq1D/g+5yRMhLhlvDkNXzFnEvkhZ6xa2Hj3MhnckUnQAS+VcPMbyNBTB++1HuBD4G8piixEdzn6pMr0n/pvR+aaXsITqE8+ndeuUruahloRAqEjdgjxGvGylT3smON5S1wjMbk0hOrwInTlTKz0iNCCMuJnKy1qL6ko87r+CxbyodQ5bp0Lug0XZi6Ma/FhpvnF1OTk1k+8BkCQr50u2AsYTpmTWmfh2WlJZ/tBnEb1PWvpwy5NUDW9pFJa06dvzlaI2EGbTfkQ6tGf0bDnnzLqHGB2UWpqf9as7hTpZuzysAcLCJiZVNBbpIJwoeqmC8NGwUWS+zh6blrzYDLNiRHY+xAVUs8cS4GZXYhpd7B2wcUkZbMWSTFKbqGSrlDQl8dk/zFhujYYZPGPUK3O4/pRnS3MF8xMcMcJWyTdEAn3Khg/kxiCr1/GAk57+2cd5t3uPg9YUi/taS6B/zATpTecC2MUoW6GuwTnZAOZ4MtaCcUckIX/sYMAxtr2Tfp26wcA==
-X-MS-Exchange-AntiSpam-MessageData: uqjNIsEPFHwNB03ZLbzXVCRHfH665seyNQplQNFXtcMFwnpz7mqqwWNOff5Yhdcg1IByetFzdXjJlJQ9I4Zw3D8YoLB8gq1y3vXRStNChSgRrKNrMyk6FpxujyoOeYytHrp/50UDypssO9gnNJiwgw==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6676ae9f-3f39-4f97-67c2-08d7e167f99b
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2020 18:08:18.4545 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CXj0JEOVFfxZPEaNTzGg/h1O7iebfJYbaJbya7wUGCLBsnHyKWb3nD1eKxNVHVGQ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2351
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+In-Reply-To: <CAKgT0UcgbhKASE3RahdVZR35HHcnMVFGvh=q3qewgL7Yxin27w@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 40.107.94.73
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,85 +136,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ virtio-dev@lists.oasis-open.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks. I saw the update in the thread.
-https://lore.kernel.org/qemu-devel/42f0624d-b0fb-5d96-2921-8994c28b9937@kernkonzept.com/
-Looks like you have found a way to take care of your problem.
-But We need to fix the CPUID leaf 0x8000'0008 anyways.
-Will send the patch to review later this week. Thanks
+>=20
+> The comment above explains the "why". Basically poisoning a page will
+> dirty it. So why hint a page as free when that will drop it back into
+> the guest and result in it being dirtied again. What you end up with
+> is all the pages that were temporarily placed in the balloon are dirty
+> after the hinting report is finished at which point you made things
+> worse instead of helping to improve them.
 
+Let me think this through. What happens on free page hinting is that
 
-On 4/9/20 12:48 PM, Babu Moger wrote:
-> 
-> 
-> On 4/9/20 9:00 AM, Igor Mammedov wrote:
->> On Thu, 09 Apr 2020 12:58:11 -0000
->> Philipp Eppelt <1871842@bugs.launchpad.net> wrote:
+a) we tell the guest that migration starts
+b) it allocates pages (alloc_pages()), sends them to us and adds them to
+   a list
+b) we exclude these pages on migration
+c) we tell the guest that migration is over
+d) the guest frees all allocated pages
+
+The "issue" with VIRTIO_BALLOON_F_PAGE_POISON is, that in d), the guest
+will fill all pages again with a pattern (or zero).
+
+AFAIKs, it's either
+
+1) Not performing free page hinting, migrating pages filled with a
+poison value (or zero).
+2) Performing free page hinting, not migrating pages filled with a
+poison value (or zero), letting only the guest fill them again.
+
+I have the feeling, that 2) is still better for migration, because we
+don't migrate useless pages and let the guest reconstruct the content?
+(having a poison value of zero might be debatable)
+
+Can you tell me what I am missing? :)
+
+>=20
 >>
->>> Public bug reported:
->>>
->>> Setup:
->>> CPU: AMD EPYC-v2 or host's EPYC cpu
->>> Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
->>> qemu version: self build
->>> git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
->>> config: Configured with: '../configure' '--target-list=x86_64-softmmu,mips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aarch64-softmmu,arm-softmmu' '--prefix=/opt/qemu-master'
->>>
->>> Cmdline: 
->>> qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/bin/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , ... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu EPYC-v2 -m 4G -smp 4 
->>>
->>> Issue:
->>> We are developing an microkernel operating system called L4Re. We recently got an AMD EPYC server for testing and we couldn't execute SMP tests of our system when running Linux + qemu + VM w/ L4Re.
->>> In fact, the kernel did not recognize any APs at all. On AMD CPUs the kernel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[NC] or [ApicIdSize].  [0][1]
->>>
->>> The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18cf757 ECX: 0x703f EDX: 0x1000
->>> The lower four bits of ECX are the [NC] field and all set.
->>>
->>> When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as replacement and addition to the above cmdline) the CPUID leaf shows: EAX: 0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
->>> Note, ECX is zero. Indicating that this is no SMP capabale CPU.
->>>
->>> I'm debugging it using my local machine and the QEMU provided EPYC-v2
->>> CPU model and it is reproducible there as well and reports:  EAX:
->>> 0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
->>>
->>> I checked other AMD based CPU models (phenom, opteron_g3/g5) and they behave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
->>> I believe that behavior here is wrong as ECX[NC] should report the number of cores per processor, as stated in the AMD manual [2] p.584. In my understanding -smp 4 should then lead to ECX[NC] = 0x3.
->>>
->>> The following table shows my findings with the -smp option:
->>> Option | Qemu guest observed ECX value
->>> -smp 4 | 0x0
->>> -smp 4,cores=4  | 0x3
->>> -smp 4,cores=2,thread=2 | 0x3
->>> -smp 4,cores=4,threads=2 | QEMU boot error: topology false.
->>>
->>> Now, I'm asking myself how the terminology of the AMD manual maps to QEMU's -smp option.
->>> Obviously, nr_cores and nr_threads correspond to the cores and threads options on the cmdline and cores * threads <= 4 (in this example), but what corresponds the X in -smp X to?
->> I'd say X corresponds to number of logical CPUs.
->> Depending on presence of other options these are distributed among them in magical manner
->> (see pc_smp_parse() for starters)
+>>> +        return;
+>>> +    }
+>>> +
+>>>      if (s->free_page_report_cmd_id =3D=3D UINT_MAX) {
+>>>          s->free_page_report_cmd_id =3D
+>>>                         VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
 >>
->>> Querying 0x8000'0008 on the physical processor results in different
->>> reports than quering QEMU's model as does it with -enable-kvm -cpu host.
->>>
->>> Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
->>> CPU leave reports a single core processor.
->> it matches -smp X as it should be.
+>> We should rename all "free_page_report" stuff we can to
+>> "free_page_hint"/"free_page_hinting" to avoid confusion (e.g., on my
+>> side :) ) before adding free page reporting .
 >>
+>> (looking at the virtio-balloon linux header, it's also confusing but
+>> we're stuck with that - maybe we should add better comments)
+>=20
+> Are we stuck? Couldn't we just convert it to an anonymous union with
+> free_page_hint_cmd_id and then use that where needed?
+
+Saw your patch already :)
+
+>=20
+>>> @@ -618,12 +627,10 @@ static size_t virtio_balloon_config_size(VirtIOBa=
+lloon *s)
+>>>      if (s->qemu_4_0_config_size) {
+>>>          return sizeof(struct virtio_balloon_config);
+>>>      }
+>>> -    if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON)) {
+>>> +    if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON) ||
+>>> +        virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT))=
+ {
+>>>          return sizeof(struct virtio_balloon_config);
+>>>      }
+>>> -    if (virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT))=
+ {
+>>> -        return offsetof(struct virtio_balloon_config, poison_val);
+>>> -    }
+>>
+>> I am not sure this change is completely sane. Why is that necessary at a=
+ll?
+>=20
+> The poison_val is stored at the end of the structure and is required
+> in order to make free page hinting to work. What this change is doing
+
+Required to make it work? In the kernel,
+
+commit 2e991629bcf55a43681aec1ee096eeb03cf81709
+Author: Wei Wang <wei.w.wang@intel.com>
+Date:   Mon Aug 27 09:32:19 2018 +0800
+
+    virtio-balloon: VIRTIO_BALLOON_F_PAGE_POISON
+
+was merged after
+
+commit 86a559787e6f5cf662c081363f64a20cad654195
+Author: Wei Wang <wei.w.wang@intel.com>
+Date:   Mon Aug 27 09:32:17 2018 +0800
+
+    virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT
+
+So I assume it's perfectly fine to not have it.
+
+I'd say it's the responsibility of the guest to *not* use
+VIRTIO_BALLOON_F_FREE_PAGE_HINT in case it is using page poisoning
+without VIRTIO_BALLOON_F_PAGE_POISON. Otherwise it will shoot itself
+into the foot.
+
+> is forcing it so that we report the config size as the full size if
+> either poisoning or hinting are enabled since the poison val is the
+> last member of the config structure.
+>=20
+> If the question is why bother reducing the size if free page hinting
+> is not present then I guess we could simplify this and just report
+> report the size of the config for all cases.
+
+I guess the idea is that if you migrate from one QEMU to another, your
+config size will not suddenly change (fenced by a feature set that will
+not change during migration, observable by a running guest).
+
+My guess would be that we cannot simply change existing configurations
+(defined via feature bits) as you do here - see e.g., qemu-4-0-config-size.
+
+[...]
+
 >>>
->>> This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
->>> wrong number.
->> CCed author of recent epyc patches who might know how AMD should work better than me.
-> 
-> Hmm.. Interesting.. Not sure why this did not come up during my testing.
-> Probably this cpuid information is not widely used.
-> 
-> Yes. I am looking at it right now. I see that EPYC model is reporting
-> wrong. Not sure why -cpu host is reporting wrong. I thought -cpu host gets
-> the information directly from the host. Will investigate.
-> 
-> 
+>>> @@ -706,6 +717,9 @@ static uint64_t virtio_balloon_get_features(VirtIOD=
+evice *vdev, uint64_t f,
+>>>      VirtIOBalloon *dev =3D VIRTIO_BALLOON(vdev);
+>>>      f |=3D dev->host_features;
+>>>      virtio_add_feature(&f, VIRTIO_BALLOON_F_STATS_VQ);
+>>> +    if (virtio_has_feature(f, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
+>>> +        virtio_add_feature(&f, VIRTIO_BALLOON_F_PAGE_POISON);
+>>> +    }
+>>>
+>>>      return f;
+>>>  }
+>>> @@ -854,6 +868,8 @@ static void virtio_balloon_device_reset(VirtIODevic=
+e *vdev)
+>>>          g_free(s->stats_vq_elem);
+>>>          s->stats_vq_elem =3D NULL;
+>>>      }
+>>> +
+>>> +    s->poison_val =3D 0;
+>>>  }
+>>>
+>>>  static void virtio_balloon_set_status(VirtIODevice *vdev, uint8_t stat=
+us)
+>>> @@ -916,6 +932,8 @@ static Property virtio_balloon_properties[] =3D {
+>>>                      VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
+>>>      DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
+>>>                      VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
+>>> +    DEFINE_PROP_BIT("x-page-poison", VirtIOBalloon, host_features,
+>>> +                    VIRTIO_BALLOON_F_PAGE_POISON, false),
+>>
+>> Just curious, why an x- feature?
+>=20
+> It was something I didn't expect the users to enable. It gets enabled
+> when either free page hinting or free page reporting is enabled. So if
+> you look you will see that in virtio_balloon_get_features the page
+> poison feature is added if free page hinting is present. The guest
+> will clear the feature bit if poisoning is not enabled in the guest.
+> That results in the vdev getting the bit cleared.
+
+The weird thing is that setting it to "false" will still enable it
+automatically, depending on other features. Not sure how helpful that is.
+
+I'd prefer to simply always enable it, similar to
+VIRTIO_BALLOON_F_STATS_VQ - but it's late and I am confused how
+migration with compat machines will work. :)
+
+So, I wonder if we need this feature bit here at all.
+
+--=20
+Thanks,
+
+David / dhildenb
+
 
