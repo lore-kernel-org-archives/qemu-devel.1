@@ -7,95 +7,96 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30BE8C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F832C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:10:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF04520768
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:05:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC55E20768
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:10:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CIcPMuyB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF04520768
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KetR7jtO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC55E20768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOc6z-0001gO-22
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 03:05:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43900)
+	id 1jOcCG-0004AA-UW
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 03:10:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44551)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jOc5J-0008JF-JY
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:03:47 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOcBZ-0003Sy-MR
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:10:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jOc5H-0003QL-M2
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:03:45 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33253
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jOcBY-0005MD-9A
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:10:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57221
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOc5H-0003Pw-IW
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:03:43 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOcBY-0005Lm-5v
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:10:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586934222;
+ s=mimecast20190719; t=1586934611;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=umqeUTIUC7tjpv2kxJkFd+h85fpLXwwGK3WPzkLot5M=;
- b=CIcPMuyBs0FapcDo/C9xE0G37hrE5Bibek0E6voW27kWAiit4sPlgGpQjHAB1RYoGiCrpE
- l8O/8sH4mRNQn09Wwvvz8tSXJbDSBYTJMsWSulnJ4oFS3wN3ZQjc81kjGc6CTJTbZ6N7Zn
- 7jTjwLPD/grQatAcpt1vdeyS+tyLwzM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-111-RLOZrsUMMbWVRRq2h1-Jvg-1; Wed, 15 Apr 2020 03:03:40 -0400
-X-MC-Unique: RLOZrsUMMbWVRRq2h1-Jvg-1
-Received: by mail-wr1-f72.google.com with SMTP id r17so10108178wrg.19
- for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 00:03:39 -0700 (PDT)
+ bh=OboI94gbHiAAWu+hheEY2ahcbXXqYx3F8OG0H+cZP/Q=;
+ b=KetR7jtOpVymQgsr0etybFHPGB9EKMxu51dsnMo3Noi/9QsrjixiZ27izrorNMhlfeHtdZ
+ KCnM1f8EGgrxLF8Gxn/1xO5L5D5aK+DB0lFbZbQ1dbne5JDc1x8ojWXMnNhmIbwK58E34e
+ 46KgW+qk6xn9Y7qP/68OynYKYgD8sVY=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-icWjldBWN3CA89WuPHvFXQ-1; Wed, 15 Apr 2020 03:10:07 -0400
+X-MC-Unique: icWjldBWN3CA89WuPHvFXQ-1
+Received: by mail-ed1-f72.google.com with SMTP id z25so2147057edx.8
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 00:10:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=67Jt2F68UY1Uql47K+hEgAPxcnn5LHCbfOX7OShW8/Q=;
- b=Vy2Vl8nxODVzMWRdyi6OjwmWpAZDFwxadfjb7omP2SSwTWlp/g6/uuymMi7M1jRahy
- FXhmcDjsV6H/H7pgKegPK7IEY3ixcIj/GV4pF4Tke6cA45GVKnSp+NK2jLCJlSi6BT2S
- 7POdBBm873GNfIV8JFJKhhtvX3Gj9MPETAb/5cZQRa/liIzpz0qtGHzmnoNpAh28CGt+
- zVig/B6NQc80nofx3tqmlT42YFJ5WTRTdFDSkuCxKIldapq8QKX9MB7CDHIpdsKoZdD0
- XAyB5mnVFYv2RmppvQsmtMnH9ogZ2uLe15eSu6rkjpomG+v3QqqUNsWfCQU99ovLeBPr
- uWkA==
-X-Gm-Message-State: AGi0PuYRsWdIQxQF+c2974ZpmJLx+8TEnSOWiso8yvYi9WtsYDLX75Jt
- gLnfVS7v0k5hs1Ya0B64L/GDxKnYdQvZBHVdjcwfdwc1VQIBx/CKn9S7vqOhOxDLk9tS7DeNGry
- Ns1+76hQ+By33UXg=
-X-Received: by 2002:a1c:6503:: with SMTP id z3mr3791412wmb.92.1586934219008;
- Wed, 15 Apr 2020 00:03:39 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLt7vb050T4a+40XwBVRtsJF5Mgx2odC7GhLZYSYVOLs8isLAvXse0Kopil/fyiqJY+6XaSeA==
-X-Received: by 2002:a1c:6503:: with SMTP id z3mr3791391wmb.92.1586934218833;
- Wed, 15 Apr 2020 00:03:38 -0700 (PDT)
+ bh=E4+Dlwx5bVuz4h19y7/KHIoXIYxk5jK2fSrNSNTb1HY=;
+ b=cj3Tcvswiig/Fa7tmVfxhzWDNwP/RqV+SngqY/UKRF7Cjnh18KL6ejb8IRX+VPevgd
+ 4xpOQX9MBpWBHt4iynxqqt+laqmqrIh/85l0psbz8U4Kxm9F37G//wRDWpo9a/eBF4lR
+ NqN1KZr1I+sXJ5rBZ3EgStAizLtTDtG5gfvbuHX3FpFsjWBDMcqeZ/Kk+/M9/SbRZUyE
+ O/L4I2ncOCXGkRcQml2PkbyU+6EWglK2BzgVsRn7J1pi8TPfcQvqQ5m4mxViCmj2qTce
+ Yfl8qniHmIrlZW7iPZiM5NCmfZyw6Aa+POVE9leJdSrbceU6yLMisS5ZzyDhPb8hQDMk
+ vSjg==
+X-Gm-Message-State: AGi0PuZlaldNlAh/4g1yuwIPz2U9y1S67XnMg4QrxS84wnyLeAXEYd5y
+ VxvZpAuZCvCgyi036p/IXL/ux4roQEK+Wmx5hz6fHDicvj8FaabcSHb95bZ2RT+A+uZvUWrHNNG
+ ujigemTxFNP7EZNo=
+X-Received: by 2002:a17:906:1c56:: with SMTP id
+ l22mr3750708ejg.304.1586934606349; 
+ Wed, 15 Apr 2020 00:10:06 -0700 (PDT)
+X-Google-Smtp-Source: APiQypK46oltSKnjPDv5y1hkubqlr91L0cPpmM/fiAsXIJMwdo+yLdm13M4L7fJJo5YR4zB9aaHIYg==
+X-Received: by 2002:a17:906:1c56:: with SMTP id
+ l22mr3750683ejg.304.1586934606128; 
+ Wed, 15 Apr 2020 00:10:06 -0700 (PDT)
 Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id v16sm21571493wml.30.2020.04.15.00.03.37
+ by smtp.gmail.com with ESMTPSA id u2sm2033369edj.21.2020.04.15.00.10.04
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 15 Apr 2020 00:03:38 -0700 (PDT)
-Subject: Re: [PATCH v7 06/48] nvme: refactor nvme_addr_read
+ Wed, 15 Apr 2020 00:10:05 -0700 (PDT)
+Subject: Re: [PATCH v7 10/48] nvme: remove redundant cmbloc/cmbsz members
 To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
 References: <20200415055140.466900-1-its@irrelevant.dk>
- <20200415055140.466900-7-its@irrelevant.dk>
+ <20200415055140.466900-11-its@irrelevant.dk>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <08ae8e87-1bfc-85a2-edac-f704fed4fb3b@redhat.com>
-Date: Wed, 15 Apr 2020 09:03:36 +0200
+Message-ID: <62ec4481-a31d-d2cf-efb4-9107ae23bb76@redhat.com>
+Date: Wed, 15 Apr 2020 09:10:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200415055140.466900-7-its@irrelevant.dk>
+In-Reply-To: <20200415055140.466900-11-its@irrelevant.dk>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,56 +117,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/15/20 7:50 AM, Klaus Jensen wrote:
+On 4/15/20 7:51 AM, Klaus Jensen wrote:
 > From: Klaus Jensen <k.jensen@samsung.com>
 >=20
-> Pull the controller memory buffer check to its own function. The check
-> will be used on its own in later patches.
->=20
 > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> Acked-by: Keith Busch <kbusch@kernel.org>
 > ---
->   hw/block/nvme.c | 16 ++++++++++++----
->   1 file changed, 12 insertions(+), 4 deletions(-)
+>   hw/block/nvme.c | 7 ++-----
+>   hw/block/nvme.h | 2 --
+>   2 files changed, 2 insertions(+), 7 deletions(-)
 >=20
 > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 622103c42d0a..02d3dde90842 100644
+> index f45909dad480..123539a5d0ae 100644
 > --- a/hw/block/nvme.c
 > +++ b/hw/block/nvme.c
-> @@ -52,14 +52,22 @@
+> @@ -63,7 +63,7 @@ static inline bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr=
+ addr)
 >  =20
->   static void nvme_process_sq(void *opaque);
->  =20
-> +static inline bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr)
-
-'inline' not really necessary here.
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-> +{
-> +    hwaddr low =3D n->ctrl_mem.addr;
-> +    hwaddr hi  =3D n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size);
-> +
-> +    return addr >=3D low && addr < hi;
-> +}
-> +
 >   static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int siz=
 e)
 >   {
-> -    if (n->cmbsz && addr >=3D n->ctrl_mem.addr &&
-> -                addr < (n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size=
-))) {
-> +    if (n->cmbsz && nvme_addr_is_cmb(n, addr)) {
+> -    if (n->cmbsz && nvme_addr_is_cmb(n, addr)) {
+> +    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr)) {
 >           memcpy(buf, (void *)&n->cmbuf[addr - n->ctrl_mem.addr], size);
-> -    } else {
-> -        pci_dma_read(&n->parent_obj, addr, buf, size);
-> +        return;
+>           return;
 >       }
-> +
-> +    pci_dma_read(&n->parent_obj, addr, buf, size);
->   }
+> @@ -157,7 +157,7 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOV=
+ector *iov, uint64_t prp1,
+>       if (unlikely(!prp1)) {
+>           trace_nvme_dev_err_invalid_prp();
+>           return NVME_INVALID_FIELD | NVME_DNR;
+> -    } else if (n->cmbsz && prp1 >=3D n->ctrl_mem.addr &&
+> +    } else if (n->bar.cmbsz && prp1 >=3D n->ctrl_mem.addr &&
+>                  prp1 < n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size)=
+) {
+>           qsg->nsg =3D 0;
+>           qemu_iovec_init(iov, num_prps);
+> @@ -1443,9 +1443,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
+**errp)
+>           NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
+>           NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
 >  =20
->   static int nvme_check_sqid(NvmeCtrl *n, uint16_t sqid)
+> -        n->cmbloc =3D n->bar.cmbloc;
+> -        n->cmbsz =3D n->bar.cmbsz;
+> -
+>           n->cmbuf =3D g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
+>           memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n=
+,
+>                                 "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmb=
+sz));
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index 98f5b9479244..ad1786953be9 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -88,8 +88,6 @@ typedef struct NvmeCtrl {
+>       uint32_t    num_namespaces;
+>       uint32_t    max_q_ents;
+>       uint64_t    ns_size;
+> -    uint32_t    cmbsz;
+> -    uint32_t    cmbloc;
+>       uint8_t     *cmbuf;
+>       uint64_t    irq_status;
+>       uint64_t    host_timestamp;                 /* Timestamp sent by th=
+e host */
 >=20
+
+"hw/block/nvme.h" should not pull in "block/nvme.h", both should include=20
+a common "hw/block/nvme_spec.h" (or better named). Not related to this=20
+patch although.
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
