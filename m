@@ -2,67 +2,92 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CA93C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 14:30:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FCFC2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 14:46:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E5492076D
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 14:30:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E5492076D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4132A2076D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 14:46:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NKJ0wxK+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4132A2076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOj3j-0003NF-9b
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 10:30:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46497)
+	id 1jOjIy-000312-9z
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 10:46:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48878)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jOj2y-0002Oz-P5
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 10:29:50 -0400
+ (envelope-from <armbru@redhat.com>) id 1jOjHw-0002Mq-Kw
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 10:45:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jOj2x-0006lj-Cw
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 10:29:48 -0400
-Resent-Date: Wed, 15 Apr 2020 10:29:48 -0400
-Resent-Message-Id: <E1jOj2x-0006lj-Cw@eggs.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21388)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jOj2s-0006gq-Pu; Wed, 15 Apr 2020 10:29:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1586960963; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=hqf3lkzTHNdAbD6nQlxTJRM8ewp6EvnefUS1zSeDnVktLZaK5R+ZwqJPxjkfEa0OdjYbkReOiyo4rasXB0yvL4bsCi68o3EcnMjqIBX+1Fj4HgJWxYA/VKOpGpMDi7k1gG7WdLvsQQHEzr3Edcyb7QqhqDq3fO2tUEKosaDCX+E=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1586960963;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=TIHLJppVsG8MBeqQOcoyCf+QiNluKG9msgASLHFgaEE=; 
- b=AdqaM8uDbBWrkSTNunu1rVjX0HqN0fDBYfvTkSJAllFdoOBQK+/ut+4AWeK60uYqvCSXe7qoQ0AbHLeDvQmA4C2PFJN3fXRM7gte0R4R4H1h2Vj8CZTfXCevZGNGkTGdeZBxoJUW59ZNd5fod5eFNe1vYzRsr0iyPfR0+NDAVv0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1586960961793958.0738871584068;
- Wed, 15 Apr 2020 07:29:21 -0700 (PDT)
-In-Reply-To: <20200415130159.611361-1-its@irrelevant.dk>
-Subject: Re: [PATCH v2 00/16] nvme: refactoring and cleanups
-Message-ID: <158696095983.10493.2643884634295715253@39012742ff91>
+ (envelope-from <armbru@redhat.com>) id 1jOjHu-0007W0-7K
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 10:45:15 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40654
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOjHu-0007VP-16
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 10:45:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586961913;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aIKZYJYAVAiALj9/FMppXV+nKFf0TQeFy5yaIyhJzYI=;
+ b=NKJ0wxK+zwyzKhnaSEImAcCKN8OYz/3RgaXH4M1BbNd6r4YANfeeHyJlgk3V6xMmjVnJlW
+ ZsGoA6EcHTSe1IDFRyS71j2/YYDLOaV26MTWYFfeFhmDwQJHzwuFm7+Bx9qLxwKxWGFAVC
+ KiTs56vGZg0sNs7jNvvOwPHsd2wYwCM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-31-lju12_ibNN2Rossj_-AB4w-1; Wed, 15 Apr 2020 10:45:10 -0400
+X-MC-Unique: lju12_ibNN2Rossj_-AB4w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7B87802563;
+ Wed, 15 Apr 2020 14:45:09 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
+ [10.36.113.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 581C81265A0;
+ Wed, 15 Apr 2020 14:45:02 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id AEB6311385C8; Wed, 15 Apr 2020 16:45:00 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH for-5.1 1/8] tests-qemu-opts: Cover has_help_option(),
+ qemu_opt_has_help_opt()
+References: <20200409153041.17576-1-armbru@redhat.com>
+ <20200409153041.17576-2-armbru@redhat.com>
+ <8ea167d6-2784-1ab9-cf55-52eb7553cb4d@redhat.com>
+ <878siyxwir.fsf@dusky.pond.sub.org>
+ <20200414131339.GE7747@linux.fritz.box>
+ <87v9m2p4to.fsf@dusky.pond.sub.org>
+ <20200414142954.GH7747@linux.fritz.box>
+ <874ktlomey.fsf@dusky.pond.sub.org>
+ <20200415100024.GA6916@linux.fritz.box>
+Date: Wed, 15 Apr 2020 16:45:00 +0200
+In-Reply-To: <20200415100024.GA6916@linux.fritz.box> (Kevin Wolf's message of
+ "Wed, 15 Apr 2020 12:00:24 +0200")
+Message-ID: <87pnc8g64z.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: its@irrelevant.dk
-Date: Wed, 15 Apr 2020 07:29:21 -0700 (PDT)
-X-ZohoMailClient: External
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.53
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,73 +99,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, beata.michalska@linaro.org, qemu-block@nongnu.org,
- k.jensen@samsung.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- kbusch@kernel.org, its@irrelevant.dk, javier.gonz@samsung.com,
- mlevitsk@redhat.com, philmd@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQxNTEzMDE1OS42MTEz
-NjEtMS1pdHNAaXJyZWxldmFudC5kay8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYyIDAwLzE2XSBudm1lOiByZWZhY3RvcmluZyBh
-bmQgY2xlYW51cHMKTWVzc2FnZS1pZDogMjAyMDA0MTUxMzAxNTkuNjExMzYxLTEtaXRzQGlycmVs
-ZXZhbnQuZGsKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
-IFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Njcmlw
-dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmEwZTgwOGQgbnZtZTogZmFjdG9yIG91dCBjb250
-cm9sbGVyIGlkZW50aWZ5IHNldHVwCmVhMmQyOTUgbnZtZTogZmFjdG9yIG91dCBjbWIgc2V0dXAK
-YzNjMWU1MSBudm1lOiBmYWN0b3Igb3V0IHBjaSBzZXR1cApiNGI2YzU1IG52bWU6IGZhY3RvciBv
-dXQgbmFtZXNwYWNlIHNldHVwCjc5MjI5YWUgbnZtZTogYWRkIG5hbWVzcGFjZSBoZWxwZXJzCmM3
-ZDBmMmIgbnZtZTogZmFjdG9yIG91dCBibG9jayBiYWNrZW5kIHNldHVwCjA4MDIyMTggbnZtZTog
-ZmFjdG9yIG91dCBkZXZpY2Ugc3RhdGUgc2V0dXAKYjQwN2ZmYSBudm1lOiBmYWN0b3Igb3V0IHBy
-b3BlcnR5L2NvbnN0cmFpbnQgY2hlY2tzCmE3YjRhYzAgbnZtZTogcmVtb3ZlIHJlZHVuZGFudCBj
-bWJsb2MvY21ic3ogbWVtYmVycwpiZjhkNGNjIG52bWU6IGFkZCBtYXhfaW9xcGFpcnMgZGV2aWNl
-IHBhcmFtZXRlcgplZWYxNjA3IG52bWU6IHJlZmFjdG9yIG52bWVfYWRkcl9yZWFkCmMwNjNiNzcg
-bnZtZTogdXNlIGNvbnN0YW50cyBpbiBpZGVudGlmeQo5YzFhZDc1IG52bWU6IG1vdmUgZGV2aWNl
-IHBhcmFtZXRlcnMgdG8gc2VwYXJhdGUgc3RydWN0CjcyMTI0Y2YgbnZtZTogcmVtb3ZlIHN1cGVy
-Zmx1b3VzIGJyZWFrcwo4Y2JhZjllIG52bWU6IHJlbmFtZSB0cmFjZSBldmVudHMgdG8gcGNpX252
-bWUKODI2YjBjYSBudm1lOiBmaXggcGNpIGRvb3JiZWxsIHNpemUgY2FsY3VsYXRpb24KCj09PSBP
-VVRQVVQgQkVHSU4gPT09CjEvMTYgQ2hlY2tpbmcgY29tbWl0IDgyNmIwY2FmMWJlZCAobnZtZTog
-Zml4IHBjaSBkb29yYmVsbCBzaXplIGNhbGN1bGF0aW9uKQoyLzE2IENoZWNraW5nIGNvbW1pdCA4
-Y2JhZjllOThlMDAgKG52bWU6IHJlbmFtZSB0cmFjZSBldmVudHMgdG8gcGNpX252bWUpCjMvMTYg
-Q2hlY2tpbmcgY29tbWl0IDcyMTI0Y2ZjOGUzNSAobnZtZTogcmVtb3ZlIHN1cGVyZmx1b3VzIGJy
-ZWFrcykKNC8xNiBDaGVja2luZyBjb21taXQgOWMxYWQ3NTgxN2U3IChudm1lOiBtb3ZlIGRldmlj
-ZSBwYXJhbWV0ZXJzIHRvIHNlcGFyYXRlIHN0cnVjdCkKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBs
-ZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMTgyOiBGSUxFOiBo
-dy9ibG9jay9udm1lLmg6NjoKKyNkZWZpbmUgREVGSU5FX05WTUVfUFJPUEVSVElFUyhfc3RhdGUs
-IF9wcm9wcykgXAorICAgIERFRklORV9QUk9QX1NUUklORygic2VyaWFsIiwgX3N0YXRlLCBfcHJv
-cHMuc2VyaWFsKSwgXAorICAgIERFRklORV9QUk9QX1VJTlQzMigiY21iX3NpemVfbWIiLCBfc3Rh
-dGUsIF9wcm9wcy5jbWJfc2l6ZV9tYiwgMCksIFwKKyAgICBERUZJTkVfUFJPUF9VSU5UMzIoIm51
-bV9xdWV1ZXMiLCBfc3RhdGUsIF9wcm9wcy5udW1fcXVldWVzLCA2NCkKCnRvdGFsOiAxIGVycm9y
-cywgMCB3YXJuaW5ncywgMTgyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvMTYgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCjUvMTYgQ2hlY2tpbmcgY29tbWl0IGMwNjNiNzdlMjE4ZSAobnZtZTog
-dXNlIGNvbnN0YW50cyBpbiBpZGVudGlmeSkKNi8xNiBDaGVja2luZyBjb21taXQgZWVmMTYwNzQ2
-MzhlIChudm1lOiByZWZhY3RvciBudm1lX2FkZHJfcmVhZCkKNy8xNiBDaGVja2luZyBjb21taXQg
-YmY4ZDRjYzY3NDU4IChudm1lOiBhZGQgbWF4X2lvcXBhaXJzIGRldmljZSBwYXJhbWV0ZXIpCjgv
-MTYgQ2hlY2tpbmcgY29tbWl0IGE3YjRhYzBhOWNiZSAobnZtZTogcmVtb3ZlIHJlZHVuZGFudCBj
-bWJsb2MvY21ic3ogbWVtYmVycykKOS8xNiBDaGVja2luZyBjb21taXQgYjQwN2ZmYWU4OWY4IChu
-dm1lOiBmYWN0b3Igb3V0IHByb3BlcnR5L2NvbnN0cmFpbnQgY2hlY2tzKQoxMC8xNiBDaGVja2lu
-ZyBjb21taXQgMDgwMjIxOGNhMThiIChudm1lOiBmYWN0b3Igb3V0IGRldmljZSBzdGF0ZSBzZXR1
-cCkKMTEvMTYgQ2hlY2tpbmcgY29tbWl0IGM3ZDBmMmIxN2MwOCAobnZtZTogZmFjdG9yIG91dCBi
-bG9jayBiYWNrZW5kIHNldHVwKQoxMi8xNiBDaGVja2luZyBjb21taXQgNzkyMjlhZWY1OTg4IChu
-dm1lOiBhZGQgbmFtZXNwYWNlIGhlbHBlcnMpCjEzLzE2IENoZWNraW5nIGNvbW1pdCBiNGI2YzU1
-Y2Q1YWYgKG52bWU6IGZhY3RvciBvdXQgbmFtZXNwYWNlIHNldHVwKQoxNC8xNiBDaGVja2luZyBj
-b21taXQgYzNjMWU1MTIxZGI2IChudm1lOiBmYWN0b3Igb3V0IHBjaSBzZXR1cCkKMTUvMTYgQ2hl
-Y2tpbmcgY29tbWl0IGVhMmQyOTUwN2MxZSAobnZtZTogZmFjdG9yIG91dCBjbWIgc2V0dXApCjE2
-LzE2IENoZWNraW5nIGNvbW1pdCBhMGU4MDhkMmZjYTUgKG52bWU6IGZhY3RvciBvdXQgY29udHJv
-bGxlciBpZGVudGlmeSBzZXR1cCkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
-dGNoZXcub3JnL2xvZ3MvMjAyMDA0MTUxMzAxNTkuNjExMzYxLTEtaXRzQGlycmVsZXZhbnQuZGsv
-dGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Kevin Wolf <kwolf@redhat.com> writes:
+
+> Am 14.04.2020 um 22:13 hat Markus Armbruster geschrieben:
+>> Kevin Wolf <kwolf@redhat.com> writes:
+>>=20
+>> > Am 14.04.2020 um 15:36 hat Markus Armbruster geschrieben:
+>> >> Kevin Wolf <kwolf@redhat.com> writes:
+>> >> > Am 14.04.2020 um 11:10 hat Markus Armbruster geschrieben:
+>> >> >> Eric Blake <eblake@redhat.com> writes:
+>> >> >> > On 4/9/20 10:30 AM, Markus Armbruster wrote:
+>> >> >> >> +        { "helpme", false, false, false },
+>> >> >> >> +        { "a,help", true, true, true },
+>> >> >> >> +        { "a=3D0,help,b", true, true, true },
+>> >> >> >> +        { "help,b=3D1", true, true, false },
+>> >> >> >> +        { "a,b,,help", false /* BUG */, true, true },
+>> >> >> >
+>> >> >> > So which way are you calling the bug?  Without looking at the co=
+de but
+>> >> >> > going off my intuition, I parse this as option 'a' and option
+>> >> >> > 'b,help'. The latter is not a normal option name because it cont=
+ains a
+>> >> >> > ',', but is a valid option value.
+>> >> >> >
+>> >> >> > I agree that we have a bug, but I'm not yet sure in which direct=
+ion
+>> >> >> > the bug lies (should has_help_option be fixed to report true, in=
+ which
+>> >> >> > case the substring ",help" has precedence over ',,' escaping; or
+>> >> >> > should qemu_opt_has_help_opt be fixed to report false, due to tr=
+eating
+>> >> >> > 'b,help' after ',,' escape removal as an invalid option name).  =
+So the
+>> >> >> > placement of the /* BUG */ comment matters - where you placed it=
+, I'm
+>> >> >> > presuming that later in the series you change has_help_option to
+>> >> >> > return true, even though that goes against my intuitive parse.
+>> >> >>=20
+>> >> >> In addition to the canonical QemuOpts parser opts_do_parse(), we h=
+ave
+>> >> >> several more, and of course they all differ from the canonical one=
+ for
+>> >> >> corner cases.
+>> >> >>=20
+>> >> >> I treat the canonical one as correct, and fix the others by elimin=
+ating
+>> >> >> the extra parsers.
+>> >> >>=20
+>> >> >> The others are:
+>> >> >>=20
+>> >> >> * has_help_option()
+>> >> >>=20
+>> >> >>   Fixed in PATCH 5 by reusing the guts of opts_do_parse().
+>> >> >>=20
+>> >> >> * is_valid_option_list()
+>> >> >>=20
+>> >> >>   Fixed in PATCH 8 by not parsing.
+>> >> >>=20
+>> >> >> * "id" extraction in opts_parse()
+>> >> >>=20
+>> >> >>   Lazy hack.  Fixed in PATCH 3 by reusing the guts of opts_do_pars=
+e().
+>> >> >>=20
+>> >> >> Back to your question: the value of has_help_option() differs from=
+ the
+>> >> >> value of qemu_opt_has_help_opt().  The latter uses the canonical p=
+arser,
+>> >> >> the former is one of the other parsers.  I therefore judge the lat=
+ter
+>> >> >> right and the former wrong.
+>> >> >
+>> >> > Shouldn't we also consider what users would reasonably expect?
+>> >>=20
+>> >> Of course we should consider reasonable user expectations.
+>> >>=20
+>> >> Grumpy aside: when I do, I commonly run into objections that users
+>> >> reasonably expect things not to change.
+>> >
+>> > Fair point. It's not always easy to tell whether something should be
+>> > considered a bug in the external interface (and consequently be fixed)
+>> > or just an idiosyncrasy that people may have get used to (and therefor=
+e
+>> > requires deprecation before improving it).
+>> >
+>> > In this specific case, I'm not aware of empty option names actually
+>> > doing anything useful anywhere, so I think it might be clearer in this
+>> > case that it's indeed a bug.
+>>=20
+>> You're right in that backward compatibility is not a convincing argument
+>> for stuff that has no known productive uses, and is bonkers to boot.
+>>=20
+>> >> > Getting it parsed as an empty option name (I assume with a default =
+value
+>> >> > of "on"?) certainly looks like something that would surprise most u=
+sers
+>> >> > and, as you can see, even some QEMU developers.
+>> >>=20
+>> >> My preferred way to address QemuOpts parsing madness is replacing it
+>> >> wholesale by keyval.c, but that's some time off, I'm afraid.
+>> >>=20
+>> >> This series merely aims for more method to the same old madness.
+>> >
+>> > I understand. Though I think replacing with keyval will be potentially
+>> > less problematic if QemuOpts already behaved more similar.
+>> >
+>> > If I were writing the code, I think I would use existing bugs and
+>> > inconsistencies as an excuse to make QemuOpts behave more like what
+>> > keyval can easily handle by declaring whatever is closest to keyval as
+>> > the correct interpretation.
+>>=20
+>> Fair enough.
+>>=20
+>> However,
+>>=20
+>> (1) is_valid_option_list()'s and opts_do_parse()'s parse of "a,b,,help"
+>>     are equidistant from keyval_parse()'s:
+>>=20
+>>     opts_do_parse() splits it into four parts:
+>>=20
+>>         "a"     (desugared to a=3Don)
+>>         "b"     (desugared to b=3Don)
+>>         ""      (desugared to =3Don)
+>>         "help"  (desugared to help=3Don)
+>>=20
+>>     has_help_option() splits it into two:
+>>=20
+>>         "a"
+>>         "b,help"
+>>=20
+>>     keyval_parse() fails:
+>>=20
+>>         Expected '=3D' after parameter 'a'
+>>=20
+>>     If I it implemented boolean sugar, then it would fail at the third
+>>     comma, just like ",help" fails now:
+>>=20
+>>         Invalid parameter ''
+>>=20
+>>     Fails because ",help" does not start with a valid name.
+>>=20
+>>     Thus, the answer to the question which of the two functions covered
+>>     by the test are wrong would be "both".
+>
+> opts_do_parse() can return an error. So maybe what we should do is
+> rejecting empty option names there?
+>
+>> (2) This series tries hard not to write QemuOpts parsing code.  It
+>>     throws away QemuOpts parsing code.
+>
+> Arguably, an additional error is writing QemuOpts parsing code, but
+> maybe little enough that it's tolerable?
+
+The patch would be simple enough, but I dread writing the commit
+message.
+
+I permitted myself to get sidetracked into this series, I'm desperate to
+get it out of the way and return to the work I actually want to do.
+
 
