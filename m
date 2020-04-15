@@ -2,101 +2,56 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD622C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8853CC2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:58:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9786120737
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:57:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QFzzY7v+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9786120737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A80620737
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:58:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A80620737
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=the-dreams.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOfjU-0004FJ-PF
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:57:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47530)
+	id 1jOfkG-0005da-JY
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:58:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47669)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jOfid-000355-Pe
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:56:37 -0400
+ (envelope-from <wsa@the-dreams.de>) id 1jOfjW-0004Yz-RH
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jOfic-00021a-Ku
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:56:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39203
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOfic-000210-Hu
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:56:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586948194;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aWLqunhliYycN+b/k7XTOIb3oxzGjKxAaoIPQlN+1Zo=;
- b=QFzzY7v+/utzTQWG1QTeIXfLei6Zq7vorTccvOIVD6pVTa3ByaKSbo5q0QbUZNM3YBIKWg
- 2s5F+IhVXYxOBF6qVfSj/v3Flk8papJSyVJ0jCGc0FUQI3Ql9gOk7a6zo82lvEPFxZiy1m
- rh8k7Vsj0s9C4MC6SzcenLBQxKRS7Zc=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-XxkKHm6FPtiFz5JQjMl8TA-1; Wed, 15 Apr 2020 06:56:31 -0400
-X-MC-Unique: XxkKHm6FPtiFz5JQjMl8TA-1
-Received: by mail-ed1-f71.google.com with SMTP id l25so2613683edt.1
- for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 03:56:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=R/RAtG79RvZSv4hzNcH30eK0xKw1T49UmiKRn/hsZwA=;
- b=PhDuiTXMvAq+C0xzxJzMNsNqaeBWXU+4yrcJBE3iga8SmKZnLdafZASXR5HB3e7TP0
- pYGf5Mdv5GKGXWQwTso6q0iO4yZmJqq52SioMeV97JT2kxHJeR2rePlW7wbFta8wTBqL
- wUmXvsKUJXsnqbmZwNMisal3IquTakTCWLvvVDxc2/TkrQ7ByzLiKr8pB63qCucoj7QO
- ZyZ3YWQrJjpRpA0kfR2E1MJdpkv/YZSkj7oCQllNjSj/MfAehmX0ZS/E6/RBkMdUCclg
- eCVRlmbTE74fG9U8o9NjhBJV2xMYLuFNwpQtnsj35FagfJn6A4EWGwMJ/EmJhLlFEwDs
- giCA==
-X-Gm-Message-State: AGi0PuZqKQjtBedwgFDH412e2dW1vDxZHMUHii1LSQ5UyBa46/b9+Jjl
- VzH3kObIlsmzLyLBFPAiR0Z5pG7DHiCt+bDeq+xOQ/sOtELWZJUw7B6Apsj9xQg4SJ9tgE8xk5t
- xtoQ4FU6jRDDZgOw=
-X-Received: by 2002:a17:906:2418:: with SMTP id
- z24mr4387782eja.42.1586948190301; 
- Wed, 15 Apr 2020 03:56:30 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIwGdlynmyXYaWh4ZWjJv6dR61T48ZWbrU/ixs9ENrGjew+59fz1z4B+lydifV4N0cMw3ah4Q==
-X-Received: by 2002:a17:906:2418:: with SMTP id
- z24mr4387765eja.42.1586948190014; 
- Wed, 15 Apr 2020 03:56:30 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id k24sm2535197ejv.15.2020.04.15.03.56.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 15 Apr 2020 03:56:29 -0700 (PDT)
-Subject: Re: [PATCH 09/16] nvme: factor out property/constraint checks
-To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
-References: <20200415102445.564803-1-its@irrelevant.dk>
- <20200415102445.564803-10-its@irrelevant.dk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9f6d453c-b74e-15fd-54c0-87eaf52520fe@redhat.com>
-Date: Wed, 15 Apr 2020 12:56:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <wsa@the-dreams.de>) id 1jOfjV-0003V8-K6
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:57:30 -0400
+Received: from sauhun.de ([88.99.104.3]:45304 helo=pokefinder.org)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <wsa@the-dreams.de>) id 1jOfjV-0003Rk-D5
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:57:29 -0400
+Received: from localhost (p54B33507.dip0.t-ipconnect.de [84.179.53.7])
+ by pokefinder.org (Postfix) with ESMTPSA id 073202C1FF1;
+ Wed, 15 Apr 2020 12:57:27 +0200 (CEST)
+Date: Wed, 15 Apr 2020 12:57:26 +0200
+From: Wolfram Sang <wsa@the-dreams.de>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: Re: [PATCH v6 2/8] i2c: i801: Use GPIO_LOOKUP() helper macro
+Message-ID: <20200415105726.GL1141@ninjato>
+References: <20200324135328.5796-1-geert+renesas@glider.be>
+ <20200324135653.6676-1-geert+renesas@glider.be>
+ <20200324135653.6676-2-geert+renesas@glider.be>
 MIME-Version: 1.0
-In-Reply-To: <20200415102445.564803-10-its@irrelevant.dk>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature"; boundary="5VuzLDXibKSJvVYD"
+Content-Disposition: inline
+In-Reply-To: <20200324135653.6676-2-geert+renesas@glider.be>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 88.99.104.3
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,110 +63,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Phil Reid <preid@electromag.com.au>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <marc.zyngier@arm.com>, Linus Walleij <linus.walleij@linaro.org>,
+ linux-doc@vger.kernel.org, Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ Jean Delvare <jdelvare@suse.com>, Rob Herring <robh+dt@kernel.org>,
+ Harish Jenny K N <harish_kandiga@mentor.com>, linux-i2c@vger.kernel.org,
+ linux-gpio@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Alexander Graf <graf@amazon.com>, Eugeniu Rosca <erosca@de.adit-jv.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/15/20 12:24 PM, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
+
+--5VuzLDXibKSJvVYD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Mar 24, 2020 at 02:56:47PM +0100, Geert Uytterhoeven wrote:
+> i801_add_mux() fills in the GPIO lookup table by manually populating an
+> array of gpiod_lookup structures.  Use the existing GPIO_LOOKUP() helper
+> macro instead, to relax a dependency on the gpiod_lookup structure's
+> member names.
 >=20
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> ---
->   hw/block/nvme.c | 52 ++++++++++++++++++++++++++++++-------------------
->   1 file changed, 32 insertions(+), 20 deletions(-)
->=20
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index ea613213bd57..635292d6fac4 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -1308,6 +1308,37 @@ static const MemoryRegionOps nvme_cmb_ops =3D {
->       },
->   };
->  =20
-> +static int nvme_check_constraints(NvmeCtrl *n, Error **errp)
-> +{
-> +    NvmeParams *params =3D &n->params;
-> +
-> +    if (params->num_queues) {
-> +        warn_report("num_queues is deprecated; please use max_ioqpairs "
-> +                    "instead");
-> +
-> +        params->max_ioqpairs =3D params->num_queues - 1;
-> +    }
-> +
-> +    if (params->max_ioqpairs < 1 ||
-> +        params->max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
-> +        error_setg(errp, "max_ioqpairs must be between 1 and %d",
-> +                   PCI_MSIX_FLAGS_QSIZE);
-> +        return -1;
-> +    }
-> +
-> +    if (!n->conf.blk) {
-> +        error_setg(errp, "drive property not set");
-> +        return -1;
-> +    }
-> +
-> +    if (!params->serial) {
-> +        error_setg(errp, "serial property not set");
-> +        return -1;
-> +    }
-> +
-> +    return 0;
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Cc: Jean Delvare <jdelvare@suse.com>
+> Cc: linux-i2c@vger.kernel.org
 
-Similar comment than nvme_init_blk(), I'd expect this
-function to return void, and use a local_error & error_propagate() in
-nvme_realize().
+Applied to for-next, thanks!
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-> +}
-> +
->   static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->   {
->       NvmeCtrl *n =3D NVME(pci_dev);
-> @@ -1317,22 +1348,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error=
- **errp)
->       int64_t bs_size;
->       uint8_t *pci_conf;
->  =20
-> -    if (n->params.num_queues) {
-> -        warn_report("num_queues is deprecated; please use max_ioqpairs "
-> -                    "instead");
-> -
-> -        n->params.max_ioqpairs =3D n->params.num_queues - 1;
-> -    }
-> -
-> -    if (n->params.max_ioqpairs < 1 ||
-> -        n->params.max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
-> -        error_setg(errp, "max_ioqpairs must be between 1 and %d",
-> -                   PCI_MSIX_FLAGS_QSIZE);
-> -        return;
-> -    }
-> -
-> -    if (!n->conf.blk) {
-> -        error_setg(errp, "drive property not set");
-> +    if (nvme_check_constraints(n, errp)) {
->           return;
->       }
->  =20
-> @@ -1342,10 +1358,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error=
- **errp)
->           return;
->       }
->  =20
-> -    if (!n->params.serial) {
-> -        error_setg(errp, "serial property not set");
-> -        return;
-> -    }
->       blkconf_blocksizes(&n->conf);
->       if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->co=
-nf.blk),
->                                          false, errp)) {
->=20
+--5VuzLDXibKSJvVYD
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAl6W6JYACgkQFA3kzBSg
+KbZydg/8DULg8EIKkSzuh9yI6MGrXGUqwwvyIQHaC4oNjuLWC+cZPSPccmfkU9uQ
+o6AiQrnaN8DZR3q8QmuGEM1u8lWVsa41SjYPxIoqdYanYHCHb0SkajUh0nSCKpxF
+l5o/rcx0eoQq0cfS3D+Zx5tSrFXvruFSDCvcRRTkpkrjSN+k3Xu9Ax3WN3tj4+6q
+n2h254Z2JkFSDU5lLY/anLWJ8T9rw+o7TtuswdLV+whub9bZJqY9CMAMqAzJJyaG
+wK7HKn5WHLLEYGLDboN93jsTUFSn+HFQHNaDX0VKxGe+SvuWBQuMNC3gXQ0d4m7D
+tZtcW/6d4fVQ7GN5J+qgumLfjrWRpGgBSj5OSQtQhhlg1odDZEKediQXODLQe0Fl
+Zhcc1eh+IG4gBmfQ6DS00DMbeOBxTbQhKIfMvM8kLkQii6aLRuGr3GXD56Ssuo3v
+0U0h/L27isgQ/+EW1Bpncb03xpwkkF/x95sEFf2OsJDKmZwFKkI2vdlMYT78OLZc
+w5R954iVPIi1MgZoxULGz8DJ7TYLBYjLJQsgH4rADEJ9qh057/uo2pdGJsaBp4tH
+WDcpnmNMGjE96EhcdwgUWQ+jxhJJoaFofTDV8wdXIVApVW7h1mABRMk6Lnjfp+c9
+O+TDbzFWsbskBkXKpgp8wuDujmh8FLz2CRkeVDkuvan7iy6oUh0=
+=f8zu
+-----END PGP SIGNATURE-----
+
+--5VuzLDXibKSJvVYD--
 
