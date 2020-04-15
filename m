@@ -2,59 +2,82 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2DFAC2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 17:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A2F3C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 17:37:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 973AA2076D
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 17:36:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 973AA2076D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 6354F2076D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 17:37:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="irG3hHj7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6354F2076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOlxu-0003oD-M7
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 13:36:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44787)
+	id 1jOlyp-00057P-HV
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 13:37:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45400)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jOlv0-0000hv-IB
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:33:47 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jOly9-0004Vb-0v
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:37:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jOluy-0004LW-1M
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:33:45 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:38921)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jOluv-0004Db-Pd; Wed, 15 Apr 2020 13:33:43 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 67B8574637F;
- Wed, 15 Apr 2020 19:33:31 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 3FF6574637E; Wed, 15 Apr 2020 19:33:31 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 3E97D745953;
- Wed, 15 Apr 2020 19:33:31 +0200 (CEST)
-Date: Wed, 15 Apr 2020 19:33:31 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH-for-5.0 v2] hw/display/sm501: Avoid heap overflow in
- sm501_2d_operation()
-In-Reply-To: <CAFEAcA8kF1dhR0k2kgEr-KxBspxcqLXxVqWcMadDns3-SYKrAQ@mail.gmail.com>
-Message-ID: <alpine.BSF.2.22.395.2004151923090.92157@zero.eik.bme.hu>
-References: <20200413220100.18628-1-f4bug@amsat.org>
- <CAFEAcA8kF1dhR0k2kgEr-KxBspxcqLXxVqWcMadDns3-SYKrAQ@mail.gmail.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <peter.maydell@linaro.org>) id 1jOly7-0006IS-Ez
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:37:00 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42970)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jOly7-0006I7-0r
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:36:59 -0400
+Received: by mail-ot1-x341.google.com with SMTP id m18so689688otq.9
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 10:36:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=2EyO364a0kXLGseAJ7olz+cpd3YRYZTwLcTWouU9izo=;
+ b=irG3hHj7zgSXScFTqO2U6v/wa774J+FuvA4sPRwu/d7yIq6diL0PftDCmPJwFMdGgm
+ mkqaw5q/rhII3G6+B99kASR+caF2hcpAGT3WqRsxQtZ9zy61MJtas2nbOLx51kidd2Ur
+ KwxCe2UjeCXSiUGGHhN2O1oADU4EQM33N6+lkrqFKJboYDsq60BgZyJ+sIL5xSnchLRI
+ XZ8kPhOHsFudPETGk/us+no7doIi7kVqtoVwgypuqYhwxJngpW2v8taNakSwZrY0NBSH
+ eszNcLu6a+RnVSJaIOuXXGkFi38XTeCexZPFje6BypuhMj31Ibl7B1cUhef32bDOgehI
+ hiSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=2EyO364a0kXLGseAJ7olz+cpd3YRYZTwLcTWouU9izo=;
+ b=IbWm0C+tYLPg8t3EBl2DLGDmWSt1tko6JclZbfdsg+RIcoDNd8FtzsCNWclBKQ1GmT
+ K1VbQiieAX47qFk8xXQNcFh7iIINq3w6lRJfYefMvasAAfr4S8Lu3c6Sg6UU2O5cUQta
+ /ggbd8fIv1E0Zo5YNQMOmTQ3elHXooK5exd8UbugHlGi8A5DD+IwjAAKS5+5GurysnAH
+ OBFbA28A0nW6dQWpHQGgGigFXc+htlZB4DvZcKGImAMjoRcZtL1Oa0ww1M8XA9MRX3sk
+ +nH5KAq3PpeEiWCHtpKi71mH4g01040vTZlCDEtYTIi44DmuHQBdGuLMAnogcCHLD5kK
+ OU1w==
+X-Gm-Message-State: AGi0PuZQca9123N8RjHo34tP6fYvIimD44Rdb+8YWRB3rxO3/5hmHffu
+ Zx8GAvFScmh6S3MBiSDrQIjaoJ6UVQQ3+iYOPh+Ixw==
+X-Google-Smtp-Source: APiQypIpFn4aFJYmG8KnZOGKesTQGhE7PQ34qFACumNxw2T/6ShZPZqIQZAhLKCE658nbQk3Q0aq00mpAR8GSEDrUAY=
+X-Received: by 2002:a05:6830:1e4e:: with SMTP id
+ e14mr5142184otj.91.1586972218073; 
+ Wed, 15 Apr 2020 10:36:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-716024976-1586972011=:92157"
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+References: <20200415152202.14463-1-mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20200415152202.14463-1-mdroth@linux.vnet.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 15 Apr 2020 18:36:46 +0100
+Message-ID: <CAFEAcA91TuwPw0kT1avyfBHF2-fk1joBeDdiJFcaGUpKY6iCDg@mail.gmail.com>
+Subject: Re: [PULL for-5.0 0/4] qemu-ga patch queue for hard-freeze
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,91 +89,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
- Zhang Zi Ming <1015138407@qq.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---3866299591-716024976-1586972011=:92157
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, 15 Apr 2020, Peter Maydell wrote:
-> On Mon, 13 Apr 2020 at 23:01, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
-org> wrote:
->>
->> Zhang Zi Ming reported a heap overflow in the Drawing Engine of
->> the SM501 companion chip model, in particular in the COPY_AREA()
->> macro in sm501_2d_operation().
->>
->> Add a simple check to avoid the heap overflow.
+On Wed, 15 Apr 2020 at 16:22, Michael Roth <mdroth@linux.vnet.ibm.com> wrot=
+e:
 >
->> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
->> index de0ab9d977..902acb3875 100644
->> --- a/hw/display/sm501.c
->> +++ b/hw/display/sm501.c
->> @@ -726,6 +726,12 @@ static void sm501_2d_operation(SM501State *s)
->>      int crt =3D (s->dc_crt_control & SM501_DC_CRT_CONTROL_SEL) ? 1 : =
-0;
->>      int fb_len =3D get_width(s, crt) * get_height(s, crt) * get_bpp(s=
-, crt);
->>
->> +    if (rtl && (src_x < operation_width || src_y < operation_height))=
- {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "sm501: Illegal RTL address (%=
-i, %i)\n",
->> +                      src_x, src_y);
->> +        return;
->> +    }
+> The following changes since commit 73995d15557a3cf2328cc6b7982264897c65cf=
+65:
 >
-> This does fix an issue, but I have a feeling that there are
-> other possible guest register value combinations that might
-> cause us to index off one end or the other of the local_mem.
+>   Merge remote-tracking branch 'remotes/stsquad/tags/pull-more-fixes-1504=
+20-1' into staging (2020-04-15 12:02:59 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/mdroth/qemu.git tags/qga-pull-2020-04-15-tag
+>
+> for you to fetch changes up to 1329651fb4d4c5068ad12fd86aff7e52f9e18c34:
+>
+>   qga: Restrict guest-file-read count to 48 MB to avoid crashes (2020-04-=
+15 09:18:48 -0500)
+>
+> ----------------------------------------------------------------
+> qemu-ga patch queue for hard-freeze
+>
+> * enforce 48MB limit for guest-file-read to avoid memory allocation
+>   failures
+>
+> ----------------------------------------------------------------
+> Philippe Mathieu-Daud=C3=A9 (4):
+>       Revert "prevent crash when executing guest-file-read with large cou=
+nt"
+>       qga: Extract guest_file_handle_find() to commands-common.h
+>       qga: Extract qmp_guest_file_read() to common commands.c
+>       qga: Restrict guest-file-read count to 48 MB to avoid crashes
+>
 
-That's what I've meant by it should be reimplemented eventually to fix al=
-l=20
-possible problems but could not do that before 5.0. Since this is existin=
-g=20
-bug ever since this device is first committed not patching it now is=20
-probably not a big deal if this is not considered a security problem. (An=
-d=20
-if it is then all the abort() calls are probably a problem too although=20
-less serious.)
 
-> The SM501 datasheet is entirely unhelpful on this question, but
-> my suggestion is that we should convert the code so that instead
-> of operating directly on pointers into the middle of the local_mem
-> buffer all the accesses to local_mem go via functions which mask
-> off the high bits of the index. That effectively means that the
-> behaviour if we index off the end of the graphics memory is
-> that we just wrap round to the start of it. It should be fairly
-> easy to be confident that the code isn't accessing off the end
-> of the array and it might even be what the hardware actually does
-> (since it would correspond to 'use low bits of the address to
-> index the ram, ignore high bits')...
+Applied, thanks.
 
-Does that make it even slower than it is already? I think it should rathe=
-r=20
-be changed to do what I've done in ati_2d.c and call optimised functions=20
-to do the blit operation instead of implementing it directly. Then we'll=20
-need checking parameters to avoid overflows. I may try to do that=20
-eventually but don't know when will I have time for that so if there's=20
-anyone who submits a patch fixing it some way before that that's OK too.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-I also know about these missing ops that could be fixed:
-
-sm501: rop3 mode with rop 99 is not supported.
-sm501: rop3 mode with rop ee is not supported.
-
-Regards,
-BALATON Zoltan
---3866299591-716024976-1586972011=:92157--
+-- PMM
 
