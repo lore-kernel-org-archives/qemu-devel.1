@@ -2,90 +2,92 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE2B1C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 03:29:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5072DC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 03:29:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86E87206F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 03:29:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 16D51206F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 03:29:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20150623.gappssmtp.com header.i=@smartx-com.20150623.gappssmtp.com header.b="ROOMXU12"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86E87206F9
+	dkim=pass (2048-bit key) header.d=smartx-com.20150623.gappssmtp.com header.i=@smartx-com.20150623.gappssmtp.com header.b="uOC7xMkg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16D51206F9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOYjf-0005Cf-Oa
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 23:29:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47502)
+	id 1jOYjp-0005YN-2a
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 23:29:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47571)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fengli@smartx.com>) id 1jOYic-0003qj-B3
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 23:28:07 -0400
+ (envelope-from <fengli@smartx.com>) id 1jOYim-0003zD-11
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 23:28:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fengli@smartx.com>) id 1jOYib-0003SD-3O
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 23:28:06 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46288)
+ (envelope-from <fengli@smartx.com>) id 1jOYik-0003Wd-S6
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 23:28:15 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41644)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <fengli@smartx.com>) id 1jOYia-0003Rf-Mx
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 23:28:04 -0400
-Received: by mail-pf1-x443.google.com with SMTP id m21so900679pff.13
- for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 20:28:03 -0700 (PDT)
+ (Exim 4.71) (envelope-from <fengli@smartx.com>) id 1jOYik-0003WG-NM
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 23:28:14 -0400
+Received: by mail-pl1-x642.google.com with SMTP id d24so744447pll.8
+ for <qemu-devel@nongnu.org>; Tue, 14 Apr 2020 20:28:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=smartx-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:from:to:cc:subject:date:message-id
- :content-transfer-encoding;
- bh=qdVfe2QUukV3BpLl1BRexPLCXtYN6LN/z+zHrtHIb5U=;
- b=ROOMXU12WqwarlXx/o/Aiz7FZdkHe92o09mtE6rhIZfkZK1E9kr6LZDQP1yoE0gNuN
- EP4UVNKCVyJED+6PliEej8Byiu+LtgK9lngEuwyTIRjaLXZLAsxwl0ilh2WZ7zl+JQ0v
- u+5NOo9KYVCpaMinxx5xgKSX7VasKdMifAuyWWOvmiIYVyh44S7YGS529LdROSyQmpzN
- kP67192KKjXYQFt6Zu3pvpclsadDHapQ+ASvGe5NeVkNMuRrtEs+/7ZZm5eJ1FBTam0E
- ePjcAtn4+MrNNYGOgazr3ST6mNrC7zXDAm+H5S2IjBT+Jn6xTxT4ET7A0UIRYea/vLJl
- Xn6g==
+ h=mime-version:from:to:cc:subject:date:message-id:in-reply-to
+ :references:content-transfer-encoding;
+ bh=b6O9MOPsS5sqJwwRSOtIH4vxPCnN0SubzzVkQkgHtWE=;
+ b=uOC7xMkgTRK3uL5lWMJprvE4cZXzrsuX/xuqArrJ0W6B75tletpxKX46xDiAsQmfDJ
+ vNLHTzkwcQJ2NauINYSoTSVgTd0/CvqVh2leLzqVKxzexzU/SrUtOZYBO2czXDofrlX/
+ LV3pDstcCJQSArYL3xrSnuQZd9jFcTcvujVNiVj8Dop9YtQxi3cidovoZ9BbQUQZ64je
+ Lk7fT+2ee97TxRgzUr2kODul1O3pEP/l69UlE43sVAC6ReHSl+9VSyoHV1jI+EBIF9bj
+ UpCVHbCjrpdZOE8enBfW1IqQsKxkDo5U0/W0ysm5HU5n/SPJvRe7RbfkPKsZgWeVkw/h
+ Yz7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
- :content-transfer-encoding;
- bh=qdVfe2QUukV3BpLl1BRexPLCXtYN6LN/z+zHrtHIb5U=;
- b=hmalRtZjvEQbxiNjoqYebMJ5qncT2yKtkOzt9bKQtOKfx3vJEGcQyzUd8qVCfUl90m
- CWGFDtusdlrhvnbfWEVDLh3sXrPtai8Wwk9ZQ05jM8dUA2higtu/pl8QPf73dUDJdBAA
- 3f2WJzMvt1IKgiG+gTsBsZqvjetzq1x0iefmoCDsLjDKbkbGB5Q211vGmarVhAmYH/fm
- AKj4Rs4RrqdoA2Wt8LGkc3iu8b5ZIfKeU5icg0kDYLX2eT1IP5a3OnJuZIu8Rs/ppMw4
- Y7qaSqvumfxicg0VZFz8AEPrC48V3/4XyWi0LpU5JBdXpj/h6hV/3B4Ard4R2MdV2Qoa
- 3PoQ==
+ :in-reply-to:references:content-transfer-encoding;
+ bh=b6O9MOPsS5sqJwwRSOtIH4vxPCnN0SubzzVkQkgHtWE=;
+ b=BVqaSHPU4kjTVKyc/enl4zixLsSZcYj4ht24UYtS5e23O1hYu1xx6W0IgB9PO6RZtw
+ uGxRnMTtEL5RS7sBgsP+N5090d/7y3B6FBVZqXaJILDfgvfglOQR+OLnG6euT7B0xIxJ
+ ou2xSqXcXWip91avx6acgMg0H5O3RT2xO2UwZFs0FpXxQ4QfXKLlEd35YumwAb5CYgYN
+ e0z37PCjKXnyaIlwI8C+7gqwKJMQzttmNO0NVb1ZUoYyA2VMTk1HuF7jkV3mRuGvThDW
+ jT0z0ghGnk7iQLbsamzYLVPNDFfEkXBfGeUjEVeSuXFy5FDdryFSv409iHyGH3nwrTmf
+ iQug==
 MIME-Version: 1.0
-X-Gm-Message-State: AGi0PuYGavoMpAVwXhLd3ipUnu8qVkXbXaTBLtwv9qF3jc/lzy93A4jo
- y7cK2Lr13EeQztkxKNd3/pxOiVz7VeqYsqogZEQM4T+J9abFowJB/HvV8jXayEnbLmp2BK64fQ0
- JP4lJnx0l
-X-Google-Smtp-Source: APiQypJVbN9kez0cF++JkBTrjF/nWha0ybWyUqjQigyxByWx3hnYf7pX4pU7dEk0TN9/zv/S4Kle2A==
-X-Received: by 2002:a65:6250:: with SMTP id q16mr25829502pgv.9.1586921282745; 
- Tue, 14 Apr 2020 20:28:02 -0700 (PDT)
+X-Gm-Message-State: AGi0PuZMfp33RBshug4WZBLi9bW+ShplbhLfeSNqS/b1einYnLclmlEg
+ y/BywBtkumrxcUTgo971RMsY/nuXx6tSrHso/eqNvqj33ohmryc32nRs7YNZbXTNPipw49Tv6Jn
+ 9WBPG4AP7
+X-Google-Smtp-Source: APiQypLPo/eiQ8JgedI0yKEnD504kyhFcjFFqgZwQuQJG1GlQZ49O9vbKix5//mHOeunCdmvYeglcQ==
+X-Received: by 2002:a17:902:8d89:: with SMTP id
+ v9mr3026092plo.83.1586921293772; 
+ Tue, 14 Apr 2020 20:28:13 -0700 (PDT)
 Received: from 31_216.localdomain ([47.240.167.159])
- by smtp.gmail.com with ESMTPSA id d21sm5915061pjs.3.2020.04.14.20.27.59
+ by smtp.gmail.com with ESMTPSA id d21sm5915061pjs.3.2020.04.14.20.28.11
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 14 Apr 2020 20:28:02 -0700 (PDT)
+ Tue, 14 Apr 2020 20:28:13 -0700 (PDT)
 From: Li Feng <fengli@smartx.com>
-To: kyle@smartx.com, Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
+To: kyle@smartx.com, Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>,
  qemu-block@nongnu.org (open list:Block layer core),
- qemu-devel@nongnu.org (open list:All patches CC here),
- Raphael Norwitz <raphael.norwitz@nutanix.com>
-Subject: [PATCH 0/4] fix crashes when inject errors to vhost-user-blk chardev
-Date: Wed, 15 Apr 2020 11:28:22 +0800
-Message-Id: <20200415032826.16701-1-fengli@smartx.com>
+ qemu-devel@nongnu.org (open list:All patches CC here)
+Subject: [PATCH 4/4] vhost-user-blk: fix crash in realize process
+Date: Wed, 15 Apr 2020 11:28:26 +0800
+Message-Id: <20200415032826.16701-5-fengli@smartx.com>
 X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20200415032826.16701-1-fengli@smartx.com>
+References: <20200415032826.16701-1-fengli@smartx.com>
 Content-Type: text/plain; charset="GB2312"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,43 +104,109 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following patches fix various crashes happened when injecting errors to
-chardev unix domain socket.
-
-The crashes are encountered when the socket is from connected to disconnect=
-ed at
-vhost-user-blk realize routine.
-
-These crashes could be reproduced like this:
-1. gdb break at vhost_user_write;
-2. add a vhost-user-blk device through qmp;
-3. when stop at vhost_user_write, kill the vhost-user-blk target;
+The crash could be reproduced like this:
+1. break vhost_user_write;
+2. kill the vhost-user-blk target;
 3. let qemu continue running;
 4. start vhost-user-blk;
 5. see crash!
 
-The 'CLOSE' event path is core trouble maker.
+This fix makes changes:
+1. set s->connected to true after vhost_dev_init;
+2. call vhost_dev_get_config when s->connected is true, otherwise the
+    hdev->host_ops will be nullptr.
 
-qemu_chr_fe_set_handlers
-   -> vhost_user_blk_event(OPEN)
-       -> vhost_user_blk_connect
-            -> vhost_dev_init
-                -> vhost_user_blk_event(CLOSE)
-                -> vhost_dev_cleanup
-
-
-Li Feng (4):
-  vhost-user-blk: delay vhost_user_blk_disconnect
-  vhost-user-blk: fix invalid memory access
-  char-socket: avoid double call tcp_chr_free_connection
-  vhost-user-blk: fix crash in realize process
-
- chardev/char-socket.c     |  5 ++++
- hw/block/vhost-user-blk.c | 75 ++++++++++++++++++++++++++++++++-----------=
+Signed-off-by: Li Feng <fengli@smartx.com>
+---
+ hw/block/vhost-user-blk.c | 47 +++++++++++++++++++++++++------------------=
 ----
- hw/virtio/vhost.c         |  2 +-
- 3 files changed, 58 insertions(+), 24 deletions(-)
+ 1 file changed, 25 insertions(+), 22 deletions(-)
 
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index 19e79b96e4..35386b7cb7 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -303,8 +303,6 @@ static int vhost_user_blk_connect(DeviceState *dev)
+     if (s->connected) {
+         return 0;
+     }
+-    s->connected =3D true;
+-
+     s->dev.nvqs =3D s->num_queues;
+     s->dev.vqs =3D s->vhost_vqs;
+     s->dev.vq_index =3D 0;
+@@ -318,6 +316,11 @@ static int vhost_user_blk_connect(DeviceState *dev)
+                      strerror(-ret));
+         return ret;
+     }
++    /*
++     * set true util vhost_dev_init return ok, because CLOSE event may hap=
+pen
++     * in vhost_dev_init routine.
++     */
++    s->connected =3D true;
+=20
+     /* restore vhost state */
+     if (virtio_device_started(vdev, vdev->status)) {
+@@ -401,6 +404,7 @@ static void vhost_user_blk_device_realize(DeviceState *=
+dev, Error **errp)
+     VHostUserBlk *s =3D VHOST_USER_BLK(vdev);
+     Error *err =3D NULL;
+     int i, ret;
++    bool reconnect;
+=20
+     if (!s->chardev.chr) {
+         error_setg(errp, "vhost-user-blk: chardev is mandatory");
+@@ -433,27 +437,26 @@ static void vhost_user_blk_device_realize(DeviceState=
+ *dev, Error **errp)
+     s->inflight =3D g_new0(struct vhost_inflight, 1);
+     s->vhost_vqs =3D g_new0(struct vhost_virtqueue, s->num_queues);
+     s->connected =3D false;
++    reconnect =3D false;
+=20
+-    qemu_chr_fe_set_handlers(&s->chardev,  NULL, NULL, vhost_user_blk_even=
+t,
+-                             NULL, (void *)dev, NULL, true);
+-
+-reconnect:
+-    if (qemu_chr_fe_wait_connected(&s->chardev, &err) < 0) {
+-        error_report_err(err);
+-        goto virtio_err;
+-    }
+-
+-    /* check whether vhost_user_blk_connect() failed or not */
+-    if (!s->connected) {
+-        goto reconnect;
+-    }
+-
+-    ret =3D vhost_dev_get_config(&s->dev, (uint8_t *)&s->blkcfg,
+-                               sizeof(struct virtio_blk_config));
+-    if (ret < 0) {
+-        error_report("vhost-user-blk: get block config failed");
+-        goto reconnect;
+-    }
++    do {
++        if (qemu_chr_fe_wait_connected(&s->chardev, &err) < 0) {
++            error_report_err(err);
++            goto virtio_err;
++        }
++        qemu_chr_fe_set_handlers(&s->chardev,  NULL, NULL, vhost_user_blk_=
+event,
++                                 NULL, (void *)dev, NULL, true);
++        if (s->connected) {
++            ret =3D vhost_dev_get_config(&s->dev, (uint8_t *)&s->blkcfg,
++                                       sizeof(struct virtio_blk_config));
++            if (ret < 0) {
++                error_report("vhost-user-blk: get block config failed");
++                reconnect =3D true;
++            } else {
++                reconnect =3D false;
++            }
++        }
++    } while (!s->connected || reconnect);
+=20
+     if (s->blkcfg.num_queues !=3D s->num_queues) {
+         s->blkcfg.num_queues =3D s->num_queues;
 --=20
 2.11.0
 
