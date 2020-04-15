@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27B8CC3815B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:32:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C7E5C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:32:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4DC020768
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:32:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA1D420768
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:32:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MCAFQnkZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4DC020768
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gV3BpKP4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA1D420768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOdSm-0004TA-VU
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 04:32:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57276)
+	id 1jOdSr-0004fD-Sy
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 04:32:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jOdRf-0002jJ-A5
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:30:56 -0400
+ (envelope-from <armbru@redhat.com>) id 1jOdRh-0002mw-Vu
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jOdRe-0004KQ-5B
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:30:55 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54305
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1jOdRg-0004NP-SW
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:30:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55819
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOdRd-0004IZ-Vd
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:30:54 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOdRg-0004N1-Ov
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:30:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586939453;
+ s=mimecast20190719; t=1586939456;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qvE+iD5Jt+PVv9yVEIP15pNGb4faDFqJ651/njshmzM=;
- b=MCAFQnkZOH+MKdvZz+NbH9ByRVtUTbMCQoceplHBLlZp9v6/NQI+qNQgEBPQzL2/lgQK5M
- JlqtTlFz4QDfUKeQzwXBp2XKOYKYXYXzWQN9HSlzBNCwAsl1x8DoaBzdoCoH/0Qc3+z+eV
- BpIDAncEs5THUBwu9Ou32EROXuF0rEA=
+ bh=+RhYhE4o65MxagfGEHae2s2haeSOzIgE6d1jL7M1ikM=;
+ b=gV3BpKP4bu1lj9N9EVTkqo1i12PudAJyK2fl03bBZ46giz5qeL6l7y7gpXrwTI2/y6J6lI
+ jV4pND6ndhLOOeRc2xSQlHsB4nLBt4TSODtNyu1LP+gT5zZKF7uWQ9MqRWvgQtSfYpSxbH
+ Tgj7KbgLHDbww05O/Tvcg8hiWIMQV1w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83-wEVozBb1ObOPB2qFld9mCQ-1; Wed, 15 Apr 2020 04:30:51 -0400
-X-MC-Unique: wEVozBb1ObOPB2qFld9mCQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-74-q4b62mXwMlOhbGPD5n51Qg-1; Wed, 15 Apr 2020 04:30:52 -0400
+X-MC-Unique: q4b62mXwMlOhbGPD5n51Qg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CA2119067E4;
- Wed, 15 Apr 2020 08:30:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA6A5107ACC7;
+ Wed, 15 Apr 2020 08:30:51 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
  [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2566260BE0;
- Wed, 15 Apr 2020 08:30:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 98CDC10372C2;
+ Wed, 15 Apr 2020 08:30:51 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9EF3311358AF; Wed, 15 Apr 2020 10:30:48 +0200 (CEST)
+ id A8CD911358B2; Wed, 15 Apr 2020 10:30:48 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.1 2/5] qobject: Factor out helper json_pretty_newline()
-Date: Wed, 15 Apr 2020 10:30:45 +0200
-Message-Id: <20200415083048.14339-3-armbru@redhat.com>
+Subject: [PATCH for-5.1 5/5] qemu-option: Clean up after the previous commit
+Date: Wed, 15 Apr 2020 10:30:48 +0200
+Message-Id: <20200415083048.14339-6-armbru@redhat.com>
 In-Reply-To: <20200415083048.14339-1-armbru@redhat.com>
 References: <20200415083048.14339-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,99 +95,112 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qobject/qjson.c | 40 ++++++++++++++++------------------------
- 1 file changed, 16 insertions(+), 24 deletions(-)
+ util/qemu-option.c | 43 +++++++++++++++----------------------------
+ 1 file changed, 15 insertions(+), 28 deletions(-)
 
-diff --git a/qobject/qjson.c b/qobject/qjson.c
-index db36101f3b..f3c62711b9 100644
---- a/qobject/qjson.c
-+++ b/qobject/qjson.c
-@@ -159,21 +159,28 @@ typedef struct ToJsonIterState
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index 3fabfd157d..123c52bf07 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -967,18 +967,16 @@ void qemu_opts_set_defaults(QemuOptsList *list, const=
+ char *params,
+     assert(opts);
+ }
 =20
- static void to_json(const QObject *obj, QString *str, int pretty, int inde=
-nt);
+-typedef struct OptsFromQDictState {
+-    QemuOpts *opts;
+-    Error **errp;
+-} OptsFromQDictState;
+-
+-static void qemu_opts_from_qdict_1(const char *key, QObject *obj, void *op=
+aque)
++static void qemu_opts_from_qdict_entry(QemuOpts *opts,
++                                       const QDictEntry *entry,
++                                       Error **errp)
+ {
+-    OptsFromQDictState *state =3D opaque;
++    const char *key =3D qdict_entry_key(entry);
++    QObject *obj =3D qdict_entry_value(entry);
+     char buf[32], *tmp =3D NULL;
+     const char *value;
 =20
-+static void json_pretty_newline(QString *str, bool pretty, int indent)
-+{
-+    int i;
-+
-+    if (pretty) {
-+        qstring_append(str, "\n");
-+        for (i =3D 0 ; i < indent ; i++) {
-+            qstring_append(str, "    ");
+-    if (!strcmp(key, "id") || *state->errp) {
++    if (!strcmp(key, "id")) {
+         return;
+     }
+=20
+@@ -999,7 +997,7 @@ static void qemu_opts_from_qdict_1(const char *key, QOb=
+ject *obj, void *opaque)
+         return;
+     }
+=20
+-    qemu_opt_set(state->opts, key, value, state->errp);
++    qemu_opt_set(opts, key, value, errp);
+     g_free(tmp);
+ }
+=20
+@@ -1012,7 +1010,6 @@ static void qemu_opts_from_qdict_1(const char *key, Q=
+Object *obj, void *opaque)
+ QemuOpts *qemu_opts_from_qdict(QemuOptsList *list, const QDict *qdict,
+                                Error **errp)
+ {
+-    OptsFromQDictState state;
+     Error *local_err =3D NULL;
+     QemuOpts *opts;
+     const QDictEntry *entry;
+@@ -1026,20 +1023,15 @@ QemuOpts *qemu_opts_from_qdict(QemuOptsList *list, =
+const QDict *qdict,
+=20
+     assert(opts !=3D NULL);
+=20
+-    state.errp =3D &local_err;
+-    state.opts =3D opts;
+-
+     for (entry =3D qdict_first(qdict);
+          entry;
+          entry =3D qdict_next(qdict, entry)) {
+-        qemu_opts_from_qdict_1(qdict_entry_key(entry),
+-                               qdict_entry_value(entry),
+-                               &state);
+-    }
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        qemu_opts_del(opts);
+-        return NULL;
++        qemu_opts_from_qdict_entry(opts, entry, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            qemu_opts_del(opts);
++            return NULL;
 +        }
-+    }
-+}
-+
- static void to_json_dict_iter(const char *key, QObject *obj, void *opaque)
- {
-     ToJsonIterState *s =3D opaque;
-     QString *qkey;
--    int j;
-=20
-     if (s->count) {
-         qstring_append(s->str, s->pretty ? "," : ", ");
      }
 =20
--    if (s->pretty) {
--        qstring_append(s->str, "\n");
--        for (j =3D 0 ; j < s->indent ; j++)
--            qstring_append(s->str, "    ");
--    }
-+    json_pretty_newline(s->str, s->pretty, s->indent);
+     return opts;
+@@ -1058,21 +1050,16 @@ void qemu_opts_absorb_qdict(QemuOpts *opts, QDict *=
+qdict, Error **errp)
 =20
-     qkey =3D qstring_from_str(key);
-     to_json(QOBJECT(qkey), s->str, s->pretty, s->indent);
-@@ -187,17 +194,12 @@ static void to_json_dict_iter(const char *key, QObjec=
-t *obj, void *opaque)
- static void to_json_list_iter(QObject *obj, void *opaque)
- {
-     ToJsonIterState *s =3D opaque;
--    int j;
+     while (entry !=3D NULL) {
+         Error *local_err =3D NULL;
+-        OptsFromQDictState state =3D {
+-            .errp =3D &local_err,
+-            .opts =3D opts,
+-        };
 =20
-     if (s->count) {
-         qstring_append(s->str, s->pretty ? "," : ", ");
-     }
+         next =3D qdict_next(qdict, entry);
 =20
--    if (s->pretty) {
--        qstring_append(s->str, "\n");
--        for (j =3D 0 ; j < s->indent ; j++)
--            qstring_append(s->str, "    ");
--    }
-+    json_pretty_newline(s->str, s->pretty, s->indent);
+         if (find_desc_by_name(opts->list->desc, entry->key)) {
+-            qemu_opts_from_qdict_1(entry->key, entry->value, &state);
++            qemu_opts_from_qdict_entry(opts, entry, &local_err);
+             if (local_err) {
+                 error_propagate(errp, local_err);
+                 return;
+-            } else {
+-                qdict_del(qdict, entry->key);
+             }
++            qdict_del(qdict, entry->key);
+         }
 =20
-     to_json(obj, s->str, s->pretty, s->indent);
-     s->count++;
-@@ -282,12 +284,7 @@ static void to_json(const QObject *obj, QString *str, =
-int pretty, int indent)
-         s.pretty =3D pretty;
-         qstring_append(str, "{");
-         qdict_iter(val, to_json_dict_iter, &s);
--        if (pretty) {
--            int j;
--            qstring_append(str, "\n");
--            for (j =3D 0 ; j < indent ; j++)
--                qstring_append(str, "    ");
--        }
-+        json_pretty_newline(str, pretty, indent);
-         qstring_append(str, "}");
-         break;
-     }
-@@ -301,12 +298,7 @@ static void to_json(const QObject *obj, QString *str, =
-int pretty, int indent)
-         s.pretty =3D pretty;
-         qstring_append(str, "[");
-         qlist_iter(val, (void *)to_json_list_iter, &s);
--        if (pretty) {
--            int j;
--            qstring_append(str, "\n");
--            for (j =3D 0 ; j < indent ; j++)
--                qstring_append(str, "    ");
--        }
-+        json_pretty_newline(str, pretty, indent);
-         qstring_append(str, "]");
-         break;
-     }
+         entry =3D next;
 --=20
 2.21.1
 
