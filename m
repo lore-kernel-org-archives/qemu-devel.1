@@ -2,48 +2,50 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02B73C38A29
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 01:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F468C352BE
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 01:13:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF3DE2076C
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 01:13:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF3DE2076C
+	by mail.kernel.org (Postfix) with ESMTPS id 76C7720732
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 01:13:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76C7720732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bitdefender.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOWcK-0001Ht-Uu
-	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 21:13:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58376)
+	id 1jOWcP-0001Si-Id
+	for qemu-devel@archiver.kernel.org; Tue, 14 Apr 2020 21:13:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58559)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alazar@bitdefender.com>) id 1jOWOz-0000wA-AS
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 20:59:43 -0400
+ (envelope-from <alazar@bitdefender.com>) id 1jOWPC-0001RE-BP
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 20:59:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alazar@bitdefender.com>) id 1jOWOw-00050c-1v
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 20:59:41 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:48992)
+ (envelope-from <alazar@bitdefender.com>) id 1jOWP9-0005Cp-5D
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 20:59:54 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:49106)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <alazar@bitdefender.com>)
- id 1jOWOv-0004y0-L0
- for qemu-devel@nongnu.org; Tue, 14 Apr 2020 20:59:38 -0400
+ id 1jOWP8-00052Q-Ih
+ for qemu-devel@nongnu.org; Tue, 14 Apr 2020 20:59:51 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
  by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id
- ED486306E47C; Wed, 15 Apr 2020 03:59:33 +0300 (EEST)
+ 165A53074838; Wed, 15 Apr 2020 03:59:36 +0300 (EEST)
 Received: from localhost.localdomain (unknown [91.199.104.27])
- by smtp.bitdefender.com (Postfix) with ESMTPSA id 8CB213034443;
- Wed, 15 Apr 2020 03:59:33 +0300 (EEST)
+ by smtp.bitdefender.com (Postfix) with ESMTPSA id EE47F305B7A4;
+ Wed, 15 Apr 2020 03:59:35 +0300 (EEST)
 From: =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v1 00/26] VM introspection
-Date: Wed, 15 Apr 2020 03:59:12 +0300
-Message-Id: <20200415005938.23895-1-alazar@bitdefender.com>
+Subject: [RFC PATCH v1 20/26] kvm: vmi: intercept live migration
+Date: Wed, 15 Apr 2020 03:59:32 +0300
+Message-Id: <20200415005938.23895-21-alazar@bitdefender.com>
+In-Reply-To: <20200415005938.23895-1-alazar@bitdefender.com>
+References: <20200415005938.23895-1-alazar@bitdefender.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -61,201 +63,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tamas K Lengyel <tamas@tklengyel.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- Jan Kiszka <jan.kiszka@siemens.com>,
- =?UTF-8?q?Samuel=20Laur=C3=A9n?= <samuel.lauren@iki.fi>,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>,
- Juan Quintela <quintela@redhat.com>, Patrick Colp <patrick.colp@oracle.com>,
- Mathieu Tarral <mathieu.tarral@protonmail.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+Cc: =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>,
  Marian Rotariu <marian.c.rotariu@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The KVM introspection subsystem provides a facility for applications
-running on the host or in a separate VM, to control the execution of
-other VMs (pause, resume, shutdown), query the state of the vCPUs (GPRs,
-MSRs etc.), alter the page access bits in the shadow page tables (only
-for the hardware backed ones, eg. Intel's EPT) and receive notifications
-when events of interest have taken place (shadow page table level faults,
-key MSR writes, hypercalls etc.).
+From: Marian Rotariu <marian.c.rotariu@gmail.com>
 
-This is the userspace part of the KVM introspection API already posted
-on the KVM list[1]. Thanks to Samuel Laur=C3=A9n and Mathieu Tarral, this
-new VMI API has been integrated into the KVM-VMI[2] project. The pull
-request into the libVMI[3] library is under review.
+It is possible that the introspection tool has made some changes inside
+the introspected VM which can make the guest crash if the introspection
+connection is suddenly closed.
 
-As suggested by Stefan Hajnoczi and Paolo Bonzini, the connection with th=
-e
-introspection tool is initiated by the QEMU process of the introspected V=
-M
-using a socket. After the handshake, QEMU will hand over the file
-descriptor to KVM. From this point, the introspection tool will use
-the socket to send introspection commands (read/write guest memory, set
-page access, etc.) directly to KVM and to receive introspection events
-(breakpoint, page fault, etc.). However, for some user actions such
-as pause, suspend, live migration, etc., we rely on QEMU to notify KVM,
-that will notify the introspection tool, to remove the changes made to
-the guest, so that the guest can run when the introspection channel
-is disconnected.
+When the live migration starts, for now, the introspection tool is
+signaled to remove its hooks from the introspected VM.
 
-The patches were tested with QEMU 2.12 (through libvirt 1.3.1) and
-summarly tested with 5.0.0-rc2, except for the last two patches (25
-and 26) which were not tested at all, but still included for the initial
-feedback.
-
-Patches 01-06 add some extensions to the current code, which may or
-may not be needed for the next patches, but we're looking forward for you=
-r
-comments about these. Except for patch 6, all are chardev/socket related.
-
-Patch 07 adds the KVM ioctls for VM introspection:
-  - KVM_INTROSPECTION_HOOK used to hand over the file descriptor
-  - KVM_INTROSPETION_PREUNHOOK used on pause/suspend/live migration
-  - KVM_INTROSPECTION_UNHOOK used to clean-up the introspection structure=
-s
-    from KVM
-  - KVM_INTROSPECTION_COMMAND and KVM_INTROSPECTION_EVENT used to mark th=
-e
-    the introspection commands/events that are allowed.
-
-Patch 08 and 09 introduce the newly added introspection object. Patch 08
-contains the usage documenation of this object with all the parameters
-that will be added by the next patches. We've tested the creation of
-this object through QMP/libvirt and we rely on this to start the VM
-introspection for any running VM.
-
-Patches 10-12 add the handshake, the authentication of the introspection
-tool and the hand over to KVM.
-
-Patches 13-15 add some safe guards (block the destruction of the
-introspection object if the introspection socket is connected and
-allow only one instance of the introspection object) and force the
-socket reconnection on guest reset. Blocking the destruction of the
-introspection object might not be enough, because we also want to block
-the destruction of the introspection socket. Or it might be too much,
-because this can be done through QMP, and whoever has access to it
-may crash the guest in multiple ways.
-
-Patches 16-17 add the first intercepted commands (pause/resume) and
-introduce one of the method we use to delay intercepted commands
-until the introspection tool has a chance to react.
-
-Patch 18 adds the information we save with the VM snapshot,
-the VM start time.
-
-Patches 19-20 add the interception of force-reset and live migration
-commands.
-
-Patch 21 adds an workaround to block the snapshots with memory done by
-libvirt until the introspection tool has a chance to react. It hasn't
-been tested with 5.0.0-rc2. For 2.12 the patch is slightly bigger.
-
-Patch 22 adds a second method of delaying the intercepted commands,
-by running the main loop.
-
-Patches 23-24 add the interception of the shutdown command, which doesn't
-seems to be done right because the shutdown signal might not be delivered
-to the guest, not to mention that is desirable to catch all sources that
-my trigger the shudown.
-
-Patch 25, which is not tested, extends the handshake structures to send
-the e820 table (for the x86* architectures).
-
-Patch 26, adds the properties to control what introspection commands
-and what introspection events are allowed for this guest.
-
-[1]: https://lore.kernel.org/kvm/20200330101308.21702-1-alazar@bitdefende=
-r.com/
-[2]: https://github.com/KVM-VMI/kvm-vmi
-[3]: https://github.com/libvmi/libvmi
-
-Adalbert Laz=C4=83r (20):
-  chardev: tcp: allow to change the reconnect timer
-  char-socket: allow vsock parameters (cid, port)
-  char-socket: fix the client mode when created through QMP
-  char-socket: add 'reconnecting' property
-  char-socket: add 'fd' property
-  E820: extend the table access interface
-  linux-headers: update with VM introspection interface
-  kvm: introduce the VM introspection object
-  kvm: vmi: add the handshake with the introspection tool
-  kvm: vmi: add 'handshake_timeout' property
-  kvm: vmi: add 'key' property
-  kvm: vmi: block the object destruction if the chardev is connected
-  kvm: vmi: allow only one instance of the introspection object
-  kvm: vmi: add 'unhook_timeout' property
-  kvm: vmi: store/restore 'vm_start_time' on migrate/snapshot
-  kvm: vmi: postpone the OK response from qmp_stop()
-  kvm: vmi: add 'async_unhook' property
-  kvm: vmi: add 'unhook_on_shutdown' property
-  kvm: vmi: extend handshake to include the e820 table
-  kvm: vmi: add 'command' and 'event' properties
-
-Marian Rotariu (6):
-  kvm: add VM introspection usage documentation
-  kvm: vmi: reconnect the socket on reset
-  kvm: vmi: intercept pause/resume
-  kvm: vmi: intercept force-reset
-  kvm: vmi: intercept live migration
-  kvm: vmi: intercept shutdown
-
- accel/kvm/Makefile.objs        |    1 +
- accel/kvm/vmi.c                | 1091 ++++++++++++++++++++++++++++++++
- accel/stubs/Makefile.objs      |    1 +
- accel/stubs/vmi-stubs.c        |   14 +
- chardev/char-fe.c              |   11 +
- chardev/char-socket.c          |   72 ++-
- chardev/char.c                 |    3 +
- hw/i386/e820_memory_layout.c   |   12 +
- hw/i386/e820_memory_layout.h   |    2 +
- include/chardev/char-fe.h      |    7 +
- include/chardev/char.h         |    1 +
- include/monitor/monitor.h      |    1 +
- include/sysemu/vmi-handshake.h |   66 ++
- include/sysemu/vmi-intercept.h |   25 +
- linux-headers/linux/kvm.h      |   20 +
- migration/migration.c          |   18 +-
- migration/migration.h          |    2 +
- monitor/Makefile.objs          |    2 +-
- monitor/qmp-cmds.c             |   18 +
- monitor/qmp.c                  |   11 +
- monitor/stubs.c                |    9 +
- qemu-options.hx                |   76 +++
- 22 files changed, 1455 insertions(+), 8 deletions(-)
- create mode 100644 accel/kvm/vmi.c
- create mode 100644 accel/stubs/vmi-stubs.c
- create mode 100644 include/sysemu/vmi-handshake.h
- create mode 100644 include/sysemu/vmi-intercept.h
- create mode 100644 monitor/stubs.c
-
-
-base-commit: 14e5526b51910efd62cd31cd95b49baca975c83f
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Tamas K Lengyel <tamas@tklengyel.com>
-CC: Mathieu Tarral <mathieu.tarral@protonmail.com>
-CC: Samuel Laur=C3=A9n <samuel.lauren@iki.fi>
-CC: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-CC: Patrick Colp <patrick.colp@oracle.com>
-CC: Jan Kiszka <jan.kiszka@siemens.com>
-CC: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
-CC: Richard Henderson <rth@twiddle.net>
-CC: Eduardo Habkost <ehabkost@redhat.com>
-CC: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-CC: Markus Armbruster <armbru@redhat.com>
 CC: Juan Quintela <quintela@redhat.com>
 CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-CC: Marian Rotariu <marian.c.rotariu@gmail.com>
-CC: Mihai Don=C8=9Bu <mdontu@bitdefender.com>
+Signed-off-by: Marian Rotariu <marian.c.rotariu@gmail.com>
+Signed-off-by: Adalbert Laz=C4=83r <alazar@bitdefender.com>
+---
+ accel/kvm/vmi.c                | 31 +++++++++++++++++++++++++++----
+ include/sysemu/vmi-intercept.h |  1 +
+ migration/migration.c          | 18 +++++++++++++++---
+ migration/migration.h          |  2 ++
+ 4 files changed, 45 insertions(+), 7 deletions(-)
+
+diff --git a/accel/kvm/vmi.c b/accel/kvm/vmi.c
+index 90906478b4..ea7191e48d 100644
+--- a/accel/kvm/vmi.c
++++ b/accel/kvm/vmi.c
+@@ -21,6 +21,8 @@
+ #include "chardev/char.h"
+ #include "chardev/char-fe.h"
+ #include "migration/vmstate.h"
++#include "migration/migration.h"
++#include "migration/misc.h"
+=20
+ #include "sysemu/vmi-intercept.h"
+ #include "sysemu/vmi-handshake.h"
+@@ -58,6 +60,7 @@ typedef struct VMIntrospection {
+     int64_t vm_start_time;
+=20
+     Notifier machine_ready;
++    Notifier migration_state_change;
+     bool created_from_command_line;
+=20
+     bool kvmi_hooked;
+@@ -74,9 +77,11 @@ static const char *action_string[] =3D {
+     "suspend",
+     "resume",
+     "force-reset",
++    "migrate",
+ };
+=20
+ static bool suspend_pending;
++static bool migrate_pending;
+=20
+ #define TYPE_VM_INTROSPECTION "introspection"
+=20
+@@ -88,6 +93,15 @@ static bool suspend_pending;
+ static Error *vm_introspection_init(VMIntrospection *i);
+ static void vm_introspection_reset(void *opaque);
+=20
++static void migration_state_notifier(Notifier *notifier, void *data)
++{
++    MigrationState *s =3D data;
++
++    if (migration_has_failed(s)) {
++        migrate_pending =3D false;
++    }
++}
++
+ static void machine_ready(Notifier *notifier, void *data)
+ {
+     VMIntrospection *i =3D container_of(notifier, VMIntrospection, machi=
+ne_ready);
+@@ -144,6 +158,9 @@ static void complete(UserCreatable *uc, Error **errp)
+=20
+     ic->uniq =3D i;
+=20
++    i->migration_state_change.notify =3D migration_state_notifier;
++    add_migration_state_change_notifier(&i->migration_state_change);
++
+     qemu_register_reset(vm_introspection_reset, i);
+ }
+=20
+@@ -478,6 +495,9 @@ static void continue_with_the_intercepted_action(VMIn=
+trospection *i)
+     case VMI_INTERCEPT_SUSPEND:
+         vm_stop(RUN_STATE_PAUSED);
+         break;
++    case VMI_INTERCEPT_MIGRATE:
++        start_live_migration_thread(migrate_get_current());
++        break;
+     default:
+         error_report("VMI: %s: unexpected action %d",
+                      __func__, i->intercepted_action);
+@@ -571,9 +591,9 @@ static void chr_event_open(VMIntrospection *i)
+ {
+     Error *local_err =3D NULL;
+=20
+-    if (suspend_pending) {
+-        info_report("VMI: %s: too soon (suspend=3D%d)",
+-                    __func__, suspend_pending);
++    if (suspend_pending || migrate_pending) {
++        info_report("VMI: %s: too soon (suspend=3D%d, migrate=3D%d)",
++                    __func__, suspend_pending, migrate_pending);
+         maybe_disable_socket_reconnect(i);
+         qemu_chr_fe_disconnect(&i->sock);
+         return;
+@@ -608,7 +628,7 @@ static void chr_event_close(VMIntrospection *i)
+     cancel_unhook_timer(i);
+     cancel_handshake_timer(i);
+=20
+-    if (suspend_pending) {
++    if (suspend_pending || migrate_pending) {
+         maybe_disable_socket_reconnect(i);
+=20
+         if (i->intercepted_action !=3D VMI_INTERCEPT_NONE) {
+@@ -680,6 +700,9 @@ static bool record_intercept_action(VMI_intercept_com=
+mand action)
+         break;
+     case VMI_INTERCEPT_FORCE_RESET:
+         break;
++    case VMI_INTERCEPT_MIGRATE:
++        migrate_pending =3D true;
++        break;
+     default:
+         return false;
+     }
+diff --git a/include/sysemu/vmi-intercept.h b/include/sysemu/vmi-intercep=
+t.h
+index ef591b49e7..b4a9a3faa7 100644
+--- a/include/sysemu/vmi-intercept.h
++++ b/include/sysemu/vmi-intercept.h
+@@ -15,6 +15,7 @@ typedef enum {
+     VMI_INTERCEPT_SUSPEND,
+     VMI_INTERCEPT_RESUME,
+     VMI_INTERCEPT_FORCE_RESET,
++    VMI_INTERCEPT_MIGRATE,
+ } VMI_intercept_command;
+=20
+ bool vm_introspection_intercept(VMI_intercept_command ic, Error **errp);
+diff --git a/migration/migration.c b/migration/migration.c
+index 187ac0410c..222037d739 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -55,6 +55,8 @@
+ #include "qemu/queue.h"
+ #include "multifd.h"
+=20
++#include "sysemu/vmi-intercept.h"
++
+ #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed thrott=
+ling */
+=20
+ /* Amount of time to allocate to each "chunk" of bandwidth-throttled
+@@ -3471,6 +3473,13 @@ static void *migration_thread(void *opaque)
+     return NULL;
+ }
+=20
++void start_live_migration_thread(MigrationState *s)
++{
++    qemu_thread_create(&s->thread, "live_migration", migration_thread, s=
+,
++                    QEMU_THREAD_JOINABLE);
++    s->migration_thread_running =3D true;
++}
++
+ void migrate_fd_connect(MigrationState *s, Error *error_in)
+ {
+     Error *local_err =3D NULL;
+@@ -3534,9 +3543,12 @@ void migrate_fd_connect(MigrationState *s, Error *=
+error_in)
+         migrate_fd_cleanup(s);
+         return;
+     }
+-    qemu_thread_create(&s->thread, "live_migration", migration_thread, s=
+,
+-                       QEMU_THREAD_JOINABLE);
+-    s->migration_thread_running =3D true;
++
++    if (vm_introspection_intercept(VMI_INTERCEPT_MIGRATE, &error_in)) {
++        return;
++    }
++
++    start_live_migration_thread(s);
+ }
+=20
+ void migration_global_dump(Monitor *mon)
+diff --git a/migration/migration.h b/migration/migration.h
+index 507284e563..eb5668e1f2 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -263,6 +263,8 @@ struct MigrationState
+     uint8_t clear_bitmap_shift;
+ };
+=20
++void start_live_migration_thread(MigrationState *s);
++
+ void migrate_set_state(int *state, int old_state, int new_state);
+=20
+ void migration_fd_process_incoming(QEMUFile *f, Error **errp);
 
