@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FDFC3815B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:40:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1E93C3815B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:41:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD5AD20775
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:40:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD5AD20775
+	by mail.kernel.org (Postfix) with ESMTPS id CB45E20784
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:41:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB45E20784
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOfSb-0007lV-1a
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:40:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43308)
+	id 1jOfTe-0000qR-1f
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:41:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43304)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jOfEb-0004AW-Uw
+ (envelope-from <its@irrelevant.dk>) id 1jOfEb-0004AQ-UU
  for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:25:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jOfEZ-0005Ee-VU
+ (envelope-from <its@irrelevant.dk>) id 1jOfEa-0005Eq-0X
  for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:25:33 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:48232)
+Received: from charlie.dont.surf ([128.199.63.193]:48210)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jOfEQ-0004xz-P4; Wed, 15 Apr 2020 06:25:22 -0400
+ id 1jOfEP-0004ws-SE; Wed, 15 Apr 2020 06:25:22 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 7F6FBBFD4F;
- Wed, 15 Apr 2020 10:25:01 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id B0F68BF9F3;
+ Wed, 15 Apr 2020 10:25:00 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH 15/16] nvme: factor out cmb setup
-Date: Wed, 15 Apr 2020 12:24:44 +0200
-Message-Id: <20200415102445.564803-16-its@irrelevant.dk>
+Subject: [PATCH 13/16] nvme: factor out namespace setup
+Date: Wed, 15 Apr 2020 12:24:42 +0200
+Message-Id: <20200415102445.564803-14-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200415102445.564803-1-its@irrelevant.dk>
 References: <20200415102445.564803-1-its@irrelevant.dk>
@@ -74,97 +74,101 @@ From: Klaus Jensen <k.jensen@samsung.com>
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 ---
- hw/block/nvme.c | 50 +++++++++++++++++++++++++++----------------------
- 1 file changed, 28 insertions(+), 22 deletions(-)
+ hw/block/nvme.c | 47 ++++++++++++++++++++++++++---------------------
+ 1 file changed, 26 insertions(+), 21 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 16d01af53a07..7387cf409f96 100644
+index f0989cbb4335..08f7ae0a48b3 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -44,6 +44,8 @@
- #include "trace.h"
- #include "nvme.h"
-=20
-+#define NVME_CMB_BIR 2
-+
- #define NVME_GUEST_ERR(trace, fmt, ...) \
-     do { \
-         (trace_##trace)(__VA_ARGS__); \
-@@ -1382,6 +1384,28 @@ static int nvme_init_namespace(NvmeCtrl *n, NvmeNa=
-mespace *ns, Error **errp)
+@@ -1359,13 +1359,35 @@ static int nvme_init_blk(NvmeCtrl *n, Error **err=
+p)
      return 0;
  }
 =20
-+static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
++static int nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **e=
+rrp)
 +{
-+    NVME_CMBLOC_SET_BIR(n->bar.cmbloc, NVME_CMB_BIR);
-+    NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
++    int64_t bs_size;
++    NvmeIdNs *id_ns =3D &ns->id_ns;
 +
-+    NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
-+    NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
-+    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
-+    NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
-+    NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
-+    NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2);
-+    NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
++    bs_size =3D blk_getlength(n->conf.blk);
++    if (bs_size < 0) {
++        error_setg_errno(errp, -bs_size, "could not get backing file siz=
+e");
++        return -1;
++    }
 +
-+    n->cmbuf =3D g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
-+    memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
-+                          "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
-+    pci_register_bar(pci_dev, NVME_CMBLOC_BIR(n->bar.cmbloc),
-+                     PCI_BASE_ADDRESS_SPACE_MEMORY |
-+                     PCI_BASE_ADDRESS_MEM_TYPE_64 |
-+                     PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
++    n->ns_size =3D bs_size;
++
++    id_ns->lbaf[0].ds =3D BDRV_SECTOR_BITS;
++    id_ns->nsze =3D cpu_to_le64(nvme_ns_nlbas(n, ns));
++
++    /* no thin provisioning */
++    id_ns->ncap =3D id_ns->nsze;
++    id_ns->nuse =3D id_ns->ncap;
++
++    return 0;
 +}
 +
- static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
- {
-     uint8_t *pci_conf =3D pci_dev->config;
-@@ -1398,6 +1422,10 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevice *=
-pci_dev)
-     pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
-                      PCI_BASE_ADDRESS_MEM_TYPE_64, &n->iomem);
-     msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL=
-);
-+
-+    if (n->params.cmb_size_mb) {
-+        nvme_init_cmb(n, pci_dev);
-+    }
- }
-=20
  static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-@@ -1454,28 +1482,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error=
- **errp)
-     n->bar.vs =3D 0x00010200;
-     n->bar.intmc =3D n->bar.intms =3D 0;
+ {
+     NvmeCtrl *n =3D NVME(pci_dev);
+     NvmeIdCtrl *id =3D &n->id_ctrl;
 =20
--    if (n->params.cmb_size_mb) {
--
--        NVME_CMBLOC_SET_BIR(n->bar.cmbloc, 2);
--        NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
--
--        NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
--        NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
--        NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
--        NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
--        NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
--        NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
--        NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
--
--        n->cmbuf =3D g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
--        memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
--                              "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbs=
-z));
--        pci_register_bar(pci_dev, NVME_CMBLOC_BIR(n->bar.cmbloc),
--            PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64=
- |
--            PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
--
+     int i;
+-    int64_t bs_size;
+     uint8_t *pci_conf;
+=20
+     if (nvme_check_constraints(n, errp)) {
+@@ -1374,12 +1396,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error=
+ **errp)
+=20
+     nvme_init_state(n);
+=20
+-    bs_size =3D blk_getlength(n->conf.blk);
+-    if (bs_size < 0) {
+-        error_setg(errp, "could not get backing file size");
+-        return;
 -    }
 -
+     if (nvme_init_blk(n, errp)) {
+         return;
+     }
+@@ -1390,8 +1406,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
+**errp)
+     pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
+     pcie_endpoint_cap_init(pci_dev, 0x80);
+=20
+-    n->ns_size =3D bs_size / (uint64_t)n->num_namespaces;
+-
+     memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
+                           "nvme", n->reg_size);
+     pci_register_bar(pci_dev, 0,
+@@ -1455,18 +1469,9 @@ static void nvme_realize(PCIDevice *pci_dev, Error=
+ **errp)
+     }
+=20
      for (i =3D 0; i < n->num_namespaces; i++) {
-         if (nvme_init_namespace(n, &n->namespaces[i], errp)) {
-             return;
+-        NvmeNamespace *ns =3D &n->namespaces[i];
+-        NvmeIdNs *id_ns =3D &ns->id_ns;
+-        id_ns->nsfeat =3D 0;
+-        id_ns->nlbaf =3D 0;
+-        id_ns->flbas =3D 0;
+-        id_ns->mc =3D 0;
+-        id_ns->dpc =3D 0;
+-        id_ns->dps =3D 0;
+-        id_ns->lbaf[0].ds =3D BDRV_SECTOR_BITS;
+-        id_ns->ncap  =3D id_ns->nuse =3D id_ns->nsze =3D
+-            cpu_to_le64(n->ns_size >>
+-                id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas)].ds)=
+;
++        if (nvme_init_namespace(n, &n->namespaces[i], errp)) {
++            return;
++        }
+     }
+ }
+=20
 --=20
 2.26.0
 
