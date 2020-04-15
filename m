@@ -2,75 +2,59 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82EFEC2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 17:34:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2DFAC2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 17:36:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 500BA2076D
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 17:34:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y2l2hgpx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 500BA2076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 973AA2076D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 17:36:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 973AA2076D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53141 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOlw4-0001pi-B7
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 13:34:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44764)
+	id 1jOlxu-0003oD-M7
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 13:36:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44787)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jOlus-0000gd-LX
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:33:41 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1jOlv0-0000hv-IB
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:33:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jOlur-0004HI-0V
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:33:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48803
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <balaton@eik.bme.hu>) id 1jOluy-0004LW-1M
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:33:45 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:38921)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jOluq-0004G8-PQ
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:33:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586972015;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Az/gQbOKfUzruycPEWSy5QuYUfbuKgZBYvnLcR55WV8=;
- b=Y2l2hgpxsAUKiOJiOUd2Zu/nTa1ymbmc8ZkRpvZqikEVkmXIScBbIGQcvkgNdzupZz65Ws
- JYlP30kDZNNFb53x6/ts4z+XLSRMuPIHttvE/1+4mpi8sH6/2gdfidcpsoNpiOMYPVELMS
- ggXurqiCmAr7Yi/qHHJ9/I0Yl38xJWA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-101-KHugAyvnMuuViLQUwUIZRg-1; Wed, 15 Apr 2020 13:33:31 -0400
-X-MC-Unique: KHugAyvnMuuViLQUwUIZRg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA1E0107ACC4;
- Wed, 15 Apr 2020 17:33:30 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-119-33.rdu2.redhat.com [10.10.119.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2B3EB19488;
- Wed, 15 Apr 2020 17:33:29 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH RFC] configure: prefer sphinx-build to sphinx-build-3
-Date: Wed, 15 Apr 2020 13:33:29 -0400
-Message-Id: <20200415173329.4920-1-jsnow@redhat.com>
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1jOluv-0004Db-Pd; Wed, 15 Apr 2020 13:33:43 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 67B8574637F;
+ Wed, 15 Apr 2020 19:33:31 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 3FF6574637E; Wed, 15 Apr 2020 19:33:31 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 3E97D745953;
+ Wed, 15 Apr 2020 19:33:31 +0200 (CEST)
+Date: Wed, 15 Apr 2020 19:33:31 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH-for-5.0 v2] hw/display/sm501: Avoid heap overflow in
+ sm501_2d_operation()
+In-Reply-To: <CAFEAcA8kF1dhR0k2kgEr-KxBspxcqLXxVqWcMadDns3-SYKrAQ@mail.gmail.com>
+Message-ID: <alpine.BSF.2.22.395.2004151923090.92157@zero.eik.bme.hu>
+References: <20200413220100.18628-1-f4bug@amsat.org>
+ <CAFEAcA8kF1dhR0k2kgEr-KxBspxcqLXxVqWcMadDns3-SYKrAQ@mail.gmail.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: multipart/mixed;
+ boundary="3866299591-716024976-1586972011=:92157"
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,107 +66,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, peter.maydell@linaro.org, philmd@redhat.com,
- ehabkost@redhat.com
+Cc: "Michael S . Tsirkin" <mst@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ Zhang Zi Ming <1015138407@qq.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-sphinx-build is the name of the script entry point from the sphinx
-package itself. sphinx-build-3 is a pacakging convention by Linux
-distributions. Prefer, where possible, the canonical package name.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-In the event that this resolves to a python2 version, test the
-suitability of the binary early in the configuration process, and
-continue looking for sphinx-build-3 if necessary.
+--3866299591-716024976-1586972011=:92157
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-This prioritizes a virtual environment version of sphinx above any
-distribution versions, if attempting to build of a virtual python
-environment.
+On Wed, 15 Apr 2020, Peter Maydell wrote:
+> On Mon, 13 Apr 2020 at 23:01, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
+org> wrote:
+>>
+>> Zhang Zi Ming reported a heap overflow in the Drawing Engine of
+>> the SM501 companion chip model, in particular in the COPY_AREA()
+>> macro in sm501_2d_operation().
+>>
+>> Add a simple check to avoid the heap overflow.
+>
+>> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+>> index de0ab9d977..902acb3875 100644
+>> --- a/hw/display/sm501.c
+>> +++ b/hw/display/sm501.c
+>> @@ -726,6 +726,12 @@ static void sm501_2d_operation(SM501State *s)
+>>      int crt =3D (s->dc_crt_control & SM501_DC_CRT_CONTROL_SEL) ? 1 : =
+0;
+>>      int fb_len =3D get_width(s, crt) * get_height(s, crt) * get_bpp(s=
+, crt);
+>>
+>> +    if (rtl && (src_x < operation_width || src_y < operation_height))=
+ {
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "sm501: Illegal RTL address (%=
+i, %i)\n",
+>> +                      src_x, src_y);
+>> +        return;
+>> +    }
+>
+> This does fix an issue, but I have a feeling that there are
+> other possible guest register value combinations that might
+> cause us to index off one end or the other of the local_mem.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- configure | 50 ++++++++++++++++++++++++++++++++------------------
- 1 file changed, 32 insertions(+), 18 deletions(-)
+That's what I've meant by it should be reimplemented eventually to fix al=
+l=20
+possible problems but could not do that before 5.0. Since this is existin=
+g=20
+bug ever since this device is first committed not patching it now is=20
+probably not a big deal if this is not considered a security problem. (An=
+d=20
+if it is then all the abort() calls are probably a problem too although=20
+less serious.)
 
-diff --git a/configure b/configure
-index 233c671aaa..82143e8a41 100755
---- a/configure
-+++ b/configure
-@@ -928,13 +928,34 @@ do
-     fi
- done
-=20
-+# Check we have a new enough version of sphinx-build
-+test_sphinx_build() {
-+    sphinx=3D$1
-+    # This is a bit awkward but works: create a trivial document and
-+    # try to run it with our configuration file (which enforces a
-+    # version requirement). This will fail if either
-+    # sphinx-build doesn't exist at all or if it is too old.
-+    mkdir -p "$TMPDIR1/sphinx"
-+    touch "$TMPDIR1/sphinx/index.rst"
-+    "$sphinx" -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMPDIR1/s=
-phinx/out" >/dev/null 2>&1
-+}
-+
-+# We require the python3 version of sphinx, but sphinx-build-3 is a
-+# distro package. prefer 'sphinx-build' to find the venv version, if
-+# any, but ensure it is a suitable version.
- sphinx_build=3D
--for binary in sphinx-build-3 sphinx-build
-+sphinx_ok=3D
-+for binary in sphinx-build sphinx-build-3
- do
-     if has "$binary"
-     then
--        sphinx_build=3D$(command -v "$binary")
--        break
-+        sphinx_candidate=3D$(command -v "$binary")
-+        if test_sphinx_build "$sphinx_candidate"
-+        then
-+            sphinx_build=3D$sphinx_candidate
-+            sphinx_ok=3Dyes
-+            break
-+        fi
-     fi
- done
-=20
-@@ -4928,24 +4949,17 @@ if check_include sys/kcov.h ; then
-     kcov=3Dyes
- fi
-=20
--# Check we have a new enough version of sphinx-build
--has_sphinx_build() {
--    # This is a bit awkward but works: create a trivial document and
--    # try to run it with our configuration file (which enforces a
--    # version requirement). This will fail if either
--    # sphinx-build doesn't exist at all or if it is too old.
--    mkdir -p "$TMPDIR1/sphinx"
--    touch "$TMPDIR1/sphinx/index.rst"
--    "$sphinx_build" -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMP=
-DIR1/sphinx/out" >/dev/null 2>&1
--}
--
- # Check if tools are available to build documentation.
- if test "$docs" !=3D "no" ; then
--  if has_sphinx_build; then
--    sphinx_ok=3Dyes
--  else
--    sphinx_ok=3Dno
-+
-+  if [ "$sphinx_ok" !=3D "yes" ]; then
-+    if test_sphinx_build "$sphinx_build"; then
-+      sphinx_ok=3Dyes
-+    else
-+      sphinx_ok=3Dno
-+    fi
-   fi
-+
-   if has makeinfo && has pod2man && test "$sphinx_ok" =3D "yes"; then
-     docs=3Dyes
-   else
---=20
-2.21.1
+> The SM501 datasheet is entirely unhelpful on this question, but
+> my suggestion is that we should convert the code so that instead
+> of operating directly on pointers into the middle of the local_mem
+> buffer all the accesses to local_mem go via functions which mask
+> off the high bits of the index. That effectively means that the
+> behaviour if we index off the end of the graphics memory is
+> that we just wrap round to the start of it. It should be fairly
+> easy to be confident that the code isn't accessing off the end
+> of the array and it might even be what the hardware actually does
+> (since it would correspond to 'use low bits of the address to
+> index the ram, ignore high bits')...
 
+Does that make it even slower than it is already? I think it should rathe=
+r=20
+be changed to do what I've done in ati_2d.c and call optimised functions=20
+to do the blit operation instead of implementing it directly. Then we'll=20
+need checking parameters to avoid overflows. I may try to do that=20
+eventually but don't know when will I have time for that so if there's=20
+anyone who submits a patch fixing it some way before that that's OK too.
+
+I also know about these missing ops that could be fixed:
+
+sm501: rop3 mode with rop 99 is not supported.
+sm501: rop3 mode with rop ee is not supported.
+
+Regards,
+BALATON Zoltan
+--3866299591-716024976-1586972011=:92157--
 
