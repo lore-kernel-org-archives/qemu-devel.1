@@ -2,82 +2,56 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A430C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13006C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:03:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12795206F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:59:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MgnNG0qc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12795206F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D9E09206F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:03:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9E09206F9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOcxP-00063m-8F
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 03:59:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51243)
+	id 1jOd0f-0007nT-1X
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 04:03:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52839)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jOcnf-0006Pe-Kx
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:36 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jOczw-00076k-0y
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:02:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jOcnd-0007LJ-Sj
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:35 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53989
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <its@irrelevant.dk>) id 1jOczu-000304-IT
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:02:15 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:47868)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOcnd-0007KS-NB
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586936973;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=w4/aCNwhpA9m3Y65zS8cEH4smCxfFNnQD2MenRfIuZ0=;
- b=MgnNG0qcjGcaWBgFJ+wodoLTpRvQ/htL5OtELYmzYyPJA+fZM/gzMOtFIXkNDiw+/K27aB
- 4kI/MCmPWeU7gswnZ/MfJsAV2LHmRM/Z97LUHb6OjzxDtMoG2AHg1BERNmvAn6StYmjRAL
- FIq4WiNCa2BAfkqKnZaGPWpvcPMrMk0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-bo95N2rdM3KrbxLdV2EKCQ-1; Wed, 15 Apr 2020 03:49:31 -0400
-X-MC-Unique: bo95N2rdM3KrbxLdV2EKCQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B89AE8018AB;
- Wed, 15 Apr 2020 07:49:30 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
- [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A56B9F9B6;
- Wed, 15 Apr 2020 07:49:30 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C838511358BB; Wed, 15 Apr 2020 09:49:27 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 for-5.1 8/9] qemu-img: Move is_valid_option_list() to
- qemu-img.c and rewrite
-Date: Wed, 15 Apr 2020 09:49:26 +0200
-Message-Id: <20200415074927.19897-9-armbru@redhat.com>
-In-Reply-To: <20200415074927.19897-1-armbru@redhat.com>
-References: <20200415074927.19897-1-armbru@redhat.com>
+ (Exim 4.71) (envelope-from <its@irrelevant.dk>)
+ id 1jOczq-0002yf-Rn; Wed, 15 Apr 2020 04:02:11 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 1DDE5BF603;
+ Wed, 15 Apr 2020 08:02:09 +0000 (UTC)
+Date: Wed, 15 Apr 2020 10:02:05 +0200
+From: Klaus Birkelund Jensen <its@irrelevant.dk>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v7 45/48] nvme: support multiple namespaces
+Message-ID: <20200415080205.v4cxl7a2bub3yqau@apples.localdomain>
+References: <20200415055140.466900-1-its@irrelevant.dk>
+ <20200415055140.466900-46-its@irrelevant.dk>
+ <dbde592f-1205-a483-c03e-62153ad348d8@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <dbde592f-1205-a483-c03e-62153ad348d8@redhat.com>
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 128.199.63.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,119 +63,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
+ qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-is_valid_option_list()'s purpose is ensuring qemu-img.c's can safely
-join multiple parameter strings separated by ',' like this:
-
-        g_strdup_printf("%s,%s", params1, params2);
-
-How it does that is anything but obvious.  A close reading of the code
-reveals that it fails exactly when its argument starts with ',' or
-ends with an odd number of ','.  Makes sense, actually, because when
-the argument starts with ',', a separating ',' preceding it would get
-escaped, and when it ends with an odd number of ',', a separating ','
-following it would get escaped.
-
-Move it to qemu-img.c and rewrite it the obvious way.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+On Apr 15 09:38, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 4/15/20 7:51 AM, Klaus Jensen wrote:
+> > From: Klaus Jensen <k.jensen@samsung.com>
+> >=20
+> > This adds support for multiple namespaces by introducing a new 'nvme-=
+ns'
+> > device model. The nvme device creates a bus named from the device nam=
+e
+> > ('id'). The nvme-ns devices then connect to this and registers
+> > themselves with the nvme device.
+> >=20
+> > This changes how an nvme device is created. Example with two namespac=
+es:
+> >=20
+> >    -drive file=3Dnvme0n1.img,if=3Dnone,id=3Ddisk1
+> >    -drive file=3Dnvme0n2.img,if=3Dnone,id=3Ddisk2
+> >    -device nvme,serial=3Ddeadbeef,id=3Dnvme0
+> >    -device nvme-ns,drive=3Ddisk1,bus=3Dnvme0,nsid=3D1
+> >    -device nvme-ns,drive=3Ddisk2,bus=3Dnvme0,nsid=3D2
+> >=20
+> > The drive property is kept on the nvme device to keep the change
+> > backward compatible, but the property is now optional. Specifying a
+> > drive for the nvme device will always create the namespace with nsid =
+1.
+> >=20
+> > Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
+> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> > Reviewed-by: Keith Busch <kbusch@kernel.org>
+> > ---
+> >   hw/block/Makefile.objs |   2 +-
+> >   hw/block/nvme-ns.c     | 157 +++++++++++++++++++++++++++
+> >   hw/block/nvme-ns.h     |  60 +++++++++++
+> >   hw/block/nvme.c        | 233 +++++++++++++++++++++++++++-----------=
 ---
- include/qemu/option.h |  1 -
- qemu-img.c            | 26 ++++++++++++++++++++++++++
- util/qemu-option.c    | 22 ----------------------
- 3 files changed, 26 insertions(+), 23 deletions(-)
+> >   hw/block/nvme.h        |  47 ++++-----
+> >   hw/block/trace-events  |   8 +-
+> >   6 files changed, 396 insertions(+), 111 deletions(-)
+> >   create mode 100644 hw/block/nvme-ns.c
+> >   create mode 100644 hw/block/nvme-ns.h
+> >=20
+> > diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+> > index 4b4a2b338dc4..d9141d6a4b9b 100644
+> > --- a/hw/block/Makefile.objs
+> > +++ b/hw/block/Makefile.objs
+> > @@ -7,7 +7,7 @@ common-obj-$(CONFIG_PFLASH_CFI02) +=3D pflash_cfi02.o
+> >   common-obj-$(CONFIG_XEN) +=3D xen-block.o
+> >   common-obj-$(CONFIG_ECC) +=3D ecc.o
+> >   common-obj-$(CONFIG_ONENAND) +=3D onenand.o
+> > -common-obj-$(CONFIG_NVME_PCI) +=3D nvme.o
+> > +common-obj-$(CONFIG_NVME_PCI) +=3D nvme.o nvme-ns.o
+> >   common-obj-$(CONFIG_SWIM) +=3D swim.o
+> >   common-obj-$(CONFIG_SH4) +=3D tc58128.o
+> > diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
+> > new file mode 100644
+> > index 000000000000..bd64d4a94632
+> > --- /dev/null
+> > +++ b/hw/block/nvme-ns.c
+> > @@ -0,0 +1,157 @@
+>=20
+> Missing copyright + license.
+>=20
 
-diff --git a/include/qemu/option.h b/include/qemu/option.h
-index 844587cab3..eb4097889d 100644
---- a/include/qemu/option.h
-+++ b/include/qemu/option.h
-@@ -33,7 +33,6 @@ const char *get_opt_value(const char *p, char **value);
- void parse_option_size(const char *name, const char *value,
-                        uint64_t *ret, Error **errp);
- bool has_help_option(const char *param);
--bool is_valid_option_list(const char *param);
-=20
- enum QemuOptType {
-     QEMU_OPT_STRING =3D 0,  /* no parsing (use string as-is)              =
-          */
-diff --git a/qemu-img.c b/qemu-img.c
-index d36b21b758..cc51db7ed4 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -223,6 +223,32 @@ static bool qemu_img_object_print_help(const char *typ=
-e, QemuOpts *opts)
-     return true;
- }
-=20
-+/*
-+ * Is @optarg safe for accumulate_options()?
-+ * It is when multiple of them can be joined together separated by ','.
-+ * To make that work, @optarg must not start with ',' (or else a
-+ * separating ',' preceding it gets escaped), and it must not end with
-+ * an odd number of ',' (or else a separating ',' following it gets
-+ * escaped).
-+ */
-+static bool is_valid_option_list(const char *optarg)
-+{
-+    size_t len =3D strlen(optarg);
-+    size_t i;
-+
-+    if (optarg[0] =3D=3D ',') {
-+        return false;
-+    }
-+
-+    for (i =3D len; i > 0 && optarg[i - 1] =3D=3D ','; i--) {
-+    }
-+    if ((len - i) % 2) {
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
- static int accumulate_options(char **options, char *optarg)
- {
-     char *new_options;
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 2d0d24ee27..9542988183 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -165,28 +165,6 @@ void parse_option_size(const char *name, const char *v=
-alue,
-     *ret =3D size;
- }
-=20
--bool is_valid_option_list(const char *p)
--{
--    char *value =3D NULL;
--    bool result =3D false;
--
--    while (*p) {
--        p =3D get_opt_value(p, &value);
--        if ((*p && !*++p) ||
--            (!*value || *value =3D=3D ',')) {
--            goto out;
--        }
--
--        g_free(value);
--        value =3D NULL;
--    }
--
--    result =3D true;
--out:
--    g_free(value);
--    return result;
--}
--
- static const char *opt_type_to_string(enum QemuOptType type)
- {
-     switch (type) {
---=20
-2.21.1
+Fixed.
+
+> > +
+> > +    switch (n->conf.wce) {
+> > +    case ON_OFF_AUTO_ON:
+> > +        n->features.volatile_wc =3D 1;
+> > +        break;
+> > +    case ON_OFF_AUTO_OFF:
+> > +        n->features.volatile_wc =3D 0;
+>=20
+> Missing 'break'?
+>=20
+
+Ouch. Fixed.
+
+> > +    case ON_OFF_AUTO_AUTO:
+> > +        n->features.volatile_wc =3D blk_enable_write_cache(ns->blk);
+> > +        break;
+> > +    default:
+> > +        abort();
+> > +    }
+> > +
+> > +    blk_set_enable_write_cache(ns->blk, n->features.volatile_wc);
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +static int nvme_ns_check_constraints(NvmeNamespace *ns, Error **errp=
+)
+> > +{
+> > +    if (!ns->blk) {
+> > +        error_setg(errp, "block backend not configured");
+> > +        return -1;
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +int nvme_ns_setup(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+> > +{
+> > +    if (nvme_ns_check_constraints(ns, errp)) {
+> > +        return -1;
+> > +    }
+> > +
+> > +    if (nvme_ns_init_blk(n, ns, &n->id_ctrl, errp)) {
+> > +        return -1;
+> > +    }
+> > +
+> > +    nvme_ns_init(ns);
+> > +    if (nvme_register_namespace(n, ns, errp)) {
+> > +        return -1;
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +static void nvme_ns_realize(DeviceState *dev, Error **errp)
+> > +{
+> > +    NvmeNamespace *ns =3D NVME_NS(dev);
+> > +    BusState *s =3D qdev_get_parent_bus(dev);
+> > +    NvmeCtrl *n =3D NVME(s->parent);
+> > +    Error *local_err =3D NULL;
+> > +
+> > +    if (nvme_ns_setup(n, ns, &local_err)) {
+> > +        error_propagate_prepend(errp, local_err,
+> > +                                "could not setup namespace: ");
+> > +        return;
+> > +    }
+> > +}
+> > +
+> > +static Property nvme_ns_props[] =3D {
+> > +    DEFINE_NVME_NS_PROPERTIES(NvmeNamespace, params),
+> > +    DEFINE_PROP_END_OF_LIST(),
+> > +};
+> > +
+> > +static void nvme_ns_class_init(ObjectClass *oc, void *data)
+> > +{
+> > +    DeviceClass *dc =3D DEVICE_CLASS(oc);
+> > +
+> > +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+> > +
+> > +    dc->bus_type =3D TYPE_NVME_BUS;
+> > +    dc->realize =3D nvme_ns_realize;
+> > +    device_class_set_props(dc, nvme_ns_props);
+> > +    dc->desc =3D "virtual nvme namespace";
+>=20
+> "Virtual NVMe namespace"?
+>=20
+
+Fixed.
+
+> > +}
+> > +
+> > +static void nvme_ns_instance_init(Object *obj)
+> > +{
+> > +    NvmeNamespace *ns =3D NVME_NS(obj);
+> > +    char *bootindex =3D g_strdup_printf("/namespace@%d,0", ns->param=
+s.nsid);
+> > +
+> > +    device_add_bootindex_property(obj, &ns->bootindex, "bootindex",
+> > +                                  bootindex, DEVICE(obj), &error_abo=
+rt);
+> > +
+> > +    g_free(bootindex);
+> > +}
+> > +
+> > +static const TypeInfo nvme_ns_info =3D {
+> > +    .name =3D TYPE_NVME_NS,
+> > +    .parent =3D TYPE_DEVICE,
+> > +    .class_init =3D nvme_ns_class_init,
+> > +    .instance_size =3D sizeof(NvmeNamespace),
+> > +    .instance_init =3D nvme_ns_instance_init,
+> > +};
+> > +
+> > +static void nvme_ns_register_types(void)
+> > +{
+> > +    type_register_static(&nvme_ns_info);
+> > +}
+> > +
+> > +type_init(nvme_ns_register_types)
+> > diff --git a/hw/block/nvme-ns.h b/hw/block/nvme-ns.h
+> > new file mode 100644
+> > index 000000000000..3c3651d485d0
+> > --- /dev/null
+> > +++ b/hw/block/nvme-ns.h
+> > @@ -0,0 +1,60 @@
+>=20
+> Missing copyright + license.
+>=20
+
+Fixed.
+
+> > +#ifndef NVME_NS_H
+> > +#define NVME_NS_H
+> > +
+> > +#define TYPE_NVME_NS "nvme-ns"
+> > +#define NVME_NS(obj) \
+> > +    OBJECT_CHECK(NvmeNamespace, (obj), TYPE_NVME_NS)
+> > +
+> > +#define DEFINE_NVME_NS_PROPERTIES(_state, _props) \
+> > +    DEFINE_PROP_DRIVE("drive", _state, blk), \
+> > +    DEFINE_PROP_UINT32("nsid", _state, _props.nsid, 0)
+> > +
+> > +typedef struct NvmeNamespaceParams {
+> > +    uint32_t nsid;
+> > +} NvmeNamespaceParams;
+> > +
+> > +typedef struct NvmeNamespace {
+> > +    DeviceState  parent_obj;
+> > +    BlockBackend *blk;
+> > +    int32_t      bootindex;
+> > +    int64_t      size;
+> > +
+> > +    NvmeIdNs            id_ns;
+> > +    NvmeNamespaceParams params;
+> > +} NvmeNamespace;
+> > +
+> > +static inline uint32_t nvme_nsid(NvmeNamespace *ns)
+> > +{
+> > +    if (ns) {
+> > +        return ns->params.nsid;
+> > +    }
+> > +
+> > +    return -1;
+>=20
+> This case doesn't seem possible.
+>=20
+> Maybe:
+>=20
+>       assert(ns);
+>       return ns->params.nsid;
+>=20
+
+I have some later patches where this might happen in certain traces.
+That's why I'm using a sentinel value. But I will see if I can clean it
+up instead.
+
+> > @@ -2607,26 +2666,28 @@ static int nvme_init_namespace(NvmeCtrl *n, N=
+vmeNamespace *ns, Error **errp)
+> >   static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+> >   {
+> >       NvmeCtrl *n =3D NVME(pci_dev);
+> > -    int i;
+> > +    NvmeNamespace *ns;
+> >       if (nvme_check_constraints(n, errp)) {
+> >           return;
+> >       }
+> > +    qbus_create_inplace(&n->bus, sizeof(NvmeBus), TYPE_NVME_BUS,
+> > +                        &pci_dev->qdev, n->parent_obj.qdev.id);
+> > +
+> >       nvme_init_state(n);
+> > +    nvme_init_pci(n, pci_dev);
+> > +    nvme_init_ctrl(n);
+>=20
+> Argh you move these functions again... Why not put them in the correct =
+place
+> when you refactor nvme_realize()?
+>=20
+
+"Argh" :) Yeah, I will do an effort to make this better!
 
 
