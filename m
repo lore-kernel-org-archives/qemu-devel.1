@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 020F8C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:00:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66245C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:01:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA36F206E9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:00:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA36F206E9
+	by mail.kernel.org (Postfix) with ESMTPS id 334C2206E9
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:01:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 334C2206E9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOb65-0007y4-UX
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 02:00:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35172)
+	id 1jOb7C-00012M-7V
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 02:01:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35162)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jOaye-0001js-Si
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:52:50 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jOaye-0001jF-Ii
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:52:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jOayd-0002c9-BX
+ (envelope-from <its@irrelevant.dk>) id 1jOayd-0002cE-F4
  for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:52:48 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:47270)
+Received: from charlie.dont.surf ([128.199.63.193]:47298)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jOayZ-0002QU-VT; Wed, 15 Apr 2020 01:52:44 -0400
+ id 1jOayb-0002RE-2c; Wed, 15 Apr 2020 01:52:45 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id D875DBF967;
- Wed, 15 Apr 2020 05:52:22 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id F3694BFD52;
+ Wed, 15 Apr 2020 05:52:23 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v7 15/48] nvme: add missing mandatory features
-Date: Wed, 15 Apr 2020 07:51:07 +0200
-Message-Id: <20200415055140.466900-16-its@irrelevant.dk>
+Subject: [PATCH v7 18/48] nvme: add log specific field to trace events
+Date: Wed, 15 Apr 2020 07:51:10 +0200
+Message-Id: <20200415055140.466900-19-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200415055140.466900-1-its@irrelevant.dk>
 References: <20200415055140.466900-1-its@irrelevant.dk>
@@ -71,211 +71,60 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Add support for returning a resonable response to Get/Set Features of
-mandatory features.
+The LSP field is not used directly now, but include it in the trace.
 
-Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Acked-by: Keith Busch <kbusch@kernel.org>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- hw/block/nvme.c       | 60 ++++++++++++++++++++++++++++++++++++++++++-
- hw/block/trace-events |  2 ++
- include/block/nvme.h  |  6 ++++-
- 3 files changed, 66 insertions(+), 2 deletions(-)
+ hw/block/nvme.c       | 3 ++-
+ hw/block/trace-events | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index b45840ddf8b3..e448a1c85cb9 100644
+index c1e3ae81666a..d4622278450e 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -1025,7 +1025,15 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, Nvme=
-Cmd *cmd, NvmeRequest *req)
-     uint32_t dw11 =3D le32_to_cpu(cmd->cdw11);
-     uint32_t result;
-=20
-+    trace_nvme_dev_getfeat(nvme_cid(req), dw10);
-+
-     switch (dw10) {
-+    case NVME_ARBITRATION:
-+        result =3D cpu_to_le32(n->features.arbitration);
-+        break;
-+    case NVME_POWER_MANAGEMENT:
-+        result =3D cpu_to_le32(n->features.power_mgmt);
-+        break;
-     case NVME_TEMPERATURE_THRESHOLD:
-         result =3D 0;
-=20
-@@ -1046,9 +1054,12 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, Nvme=
-Cmd *cmd, NvmeRequest *req)
-             break;
-         }
-=20
-+        break;
-+    case NVME_ERROR_RECOVERY:
-+        result =3D cpu_to_le32(n->features.err_rec);
-         break;
-     case NVME_VOLATILE_WRITE_CACHE:
--        result =3D blk_enable_write_cache(n->conf.blk);
-+        result =3D cpu_to_le32(blk_enable_write_cache(n->conf.blk));
-         trace_nvme_dev_getfeat_vwcache(result ? "enabled" : "disabled");
-         break;
-     case NVME_NUMBER_OF_QUEUES:
-@@ -1058,6 +1069,19 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, Nvme=
-Cmd *cmd, NvmeRequest *req)
-         break;
-     case NVME_TIMESTAMP:
-         return nvme_get_feature_timestamp(n, cmd);
-+    case NVME_INTERRUPT_COALESCING:
-+        result =3D cpu_to_le32(n->features.int_coalescing);
-+        break;
-+    case NVME_INTERRUPT_VECTOR_CONF:
-+        if ((dw11 & 0xffff) >=3D n->params.max_ioqpairs + 1) {
-+            return NVME_INVALID_FIELD | NVME_DNR;
-+        }
-+
-+        result =3D cpu_to_le32(n->features.int_vector_config[dw11 & 0xff=
-ff]);
-+        break;
-+    case NVME_WRITE_ATOMICITY:
-+        result =3D cpu_to_le32(n->features.write_atomicity);
-+        break;
-     case NVME_ASYNCHRONOUS_EVENT_CONF:
-         result =3D cpu_to_le32(n->features.async_config);
-         break;
-@@ -1093,6 +1117,8 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeC=
-md *cmd, NvmeRequest *req)
-     uint32_t dw10 =3D le32_to_cpu(cmd->cdw10);
-     uint32_t dw11 =3D le32_to_cpu(cmd->cdw11);
-=20
-+    trace_nvme_dev_setfeat(nvme_cid(req), dw10, dw11);
-+
-     switch (dw10) {
-     case NVME_TEMPERATURE_THRESHOLD:
-         if (NVME_TEMP_TMPSEL(dw11) !=3D NVME_TEMP_TMPSEL_COMPOSITE) {
-@@ -1120,6 +1146,10 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, Nvme=
-Cmd *cmd, NvmeRequest *req)
-=20
-         break;
-     case NVME_VOLATILE_WRITE_CACHE:
-+        if (blk_enable_write_cache(n->conf.blk)) {
-+            blk_flush(n->conf.blk);
-+        }
-+
-         blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
-         break;
-     case NVME_NUMBER_OF_QUEUES:
-@@ -1135,6 +1165,13 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, Nvme=
-Cmd *cmd, NvmeRequest *req)
-     case NVME_ASYNCHRONOUS_EVENT_CONF:
-         n->features.async_config =3D dw11;
-         break;
-+    case NVME_ARBITRATION:
-+    case NVME_POWER_MANAGEMENT:
-+    case NVME_ERROR_RECOVERY:
-+    case NVME_INTERRUPT_COALESCING:
-+    case NVME_INTERRUPT_VECTOR_CONF:
-+    case NVME_WRITE_ATOMICITY:
-+        return NVME_FEAT_NOT_CHANGABLE | NVME_DNR;
-     default:
-         trace_nvme_dev_err_invalid_setfeat(dw10);
+@@ -767,6 +767,7 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cm=
+d, NvmeRequest *req)
+     uint32_t dw12 =3D le32_to_cpu(cmd->cdw12);
+     uint32_t dw13 =3D le32_to_cpu(cmd->cdw13);
+     uint8_t  lid =3D dw10 & 0xff;
++    uint8_t  lsp =3D (dw10 >> 8) & 0xf;
+     uint8_t  rae =3D (dw10 >> 15) & 0x1;
+     uint32_t numdl, numdu;
+     uint64_t off, lpol, lpou;
+@@ -784,7 +785,7 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cm=
+d, NvmeRequest *req)
          return NVME_INVALID_FIELD | NVME_DNR;
-@@ -1715,6 +1752,25 @@ static void nvme_init_state(NvmeCtrl *n)
-     n->temperature =3D NVME_TEMPERATURE;
-     n->features.temp_thresh_hi =3D NVME_TEMPERATURE_WARNING;
-     n->starttime_ms =3D qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-+
-+    /*
-+     * There is no limit on the number of commands that the controller m=
-ay
-+     * launch at one time from a particular Submission Queue.
-+     */
-+    n->features.arbitration =3D NVME_ARB_AB_NOLIMIT;
-+
-+    n->features.int_vector_config =3D g_malloc0_n(n->params.max_ioqpairs=
- + 1,
-+        sizeof(*n->features.int_vector_config));
-+
-+    for (int i =3D 0; i < n->params.max_ioqpairs + 1; i++) {
-+        n->features.int_vector_config[i] =3D i;
-+
-+        /* interrupt coalescing is not supported for the admin queue */
-+        if (i =3D=3D 0) {
-+            n->features.int_vector_config[i] |=3D NVME_INTVC_NOCOALESCIN=
-G;
-+        }
-+    }
-+
-     n->aer_reqs =3D g_new0(NvmeRequest *, n->params.aerl + 1);
- }
+     }
 =20
-@@ -1803,6 +1859,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
-     id->cqes =3D (0x4 << 4) | 0x4;
-     id->nn =3D cpu_to_le32(n->num_namespaces);
-     id->oncs =3D cpu_to_le16(NVME_ONCS_WRITE_ZEROS | NVME_ONCS_TIMESTAMP=
-);
-+
-     id->psd[0].mp =3D cpu_to_le16(0x9c4);
-     id->psd[0].enlat =3D cpu_to_le32(0x10);
-     id->psd[0].exlat =3D cpu_to_le32(0x4);
-@@ -1878,6 +1935,7 @@ static void nvme_exit(PCIDevice *pci_dev)
-     g_free(n->cq);
-     g_free(n->sq);
-     g_free(n->aer_reqs);
-+    g_free(n->features.int_vector_config);
+-    trace_nvme_dev_get_log(nvme_cid(req), lid, rae, len, off);
++    trace_nvme_dev_get_log(nvme_cid(req), lid, lsp, rae, len, off);
 =20
-     if (n->params.cmb_size_mb) {
-         g_free(n->cmbuf);
+     switch (lid) {
+     case NVME_LOG_ERROR_INFO:
 diff --git a/hw/block/trace-events b/hw/block/trace-events
-index a0a6de7dd5aa..b6fde13419bf 100644
+index 659091fc2fed..fb5b26f6f5f6 100644
 --- a/hw/block/trace-events
 +++ b/hw/block/trace-events
-@@ -41,6 +41,8 @@ nvme_dev_del_cq(uint16_t cqid) "deleted completion queu=
-e, cqid=3D%"PRIu16""
- nvme_dev_identify_ctrl(void) "identify controller"
- nvme_dev_identify_ns(uint16_t ns) "identify namespace, nsid=3D%"PRIu16""
- nvme_dev_identify_nslist(uint16_t ns) "identify namespace list, nsid=3D%=
-"PRIu16""
-+nvme_dev_getfeat(uint16_t cid, uint32_t fid) "cid %"PRIu16" fid 0x%"PRIx=
-32""
-+nvme_dev_setfeat(uint16_t cid, uint32_t fid, uint32_t val) "cid %"PRIu16=
-" fid 0x%"PRIx32" val 0x%"PRIx32""
- nvme_dev_getfeat_vwcache(const char* result) "get feature volatile write=
- cache, result=3D%s"
- nvme_dev_getfeat_numq(int result) "get feature number of queues, result=3D=
-%d"
+@@ -52,7 +52,7 @@ nvme_dev_getfeat_numq(int result) "get feature number o=
+f queues, result=3D%d"
  nvme_dev_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "reque=
 sted cq_count=3D%d sq_count=3D%d, responding with cq_count=3D%d sq_count=3D=
 %d"
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 0df5534cb8bf..88e5385a9d3f 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -490,7 +490,8 @@ enum NvmeStatusCodes {
-     NVME_FW_REQ_RESET           =3D 0x010b,
-     NVME_INVALID_QUEUE_DEL      =3D 0x010c,
-     NVME_FID_NOT_SAVEABLE       =3D 0x010d,
--    NVME_FID_NOT_NSID_SPEC      =3D 0x010f,
-+    NVME_FEAT_NOT_CHANGABLE     =3D 0x010e,
-+    NVME_FEAT_NOT_NS_SPEC       =3D 0x010f,
-     NVME_FW_REQ_SUSYSTEM_RESET  =3D 0x0110,
-     NVME_CONFLICTING_ATTRS      =3D 0x0180,
-     NVME_INVALID_PROT_INFO      =3D 0x0181,
-@@ -706,6 +707,7 @@ typedef struct NvmeFeatureVal {
- } NvmeFeatureVal;
-=20
- #define NVME_ARB_AB(arb)    (arb & 0x7)
-+#define NVME_ARB_AB_NOLIMIT 0x7
- #define NVME_ARB_LPW(arb)   ((arb >> 8) & 0xff)
- #define NVME_ARB_MPW(arb)   ((arb >> 16) & 0xff)
- #define NVME_ARB_HPW(arb)   ((arb >> 24) & 0xff)
-@@ -713,6 +715,8 @@ typedef struct NvmeFeatureVal {
- #define NVME_INTC_THR(intc)     (intc & 0xff)
- #define NVME_INTC_TIME(intc)    ((intc >> 8) & 0xff)
-=20
-+#define NVME_INTVC_NOCOALESCING (0x1 << 16)
-+
- #define NVME_TEMP_THSEL(temp)  ((temp >> 20) & 0x3)
- #define NVME_TEMP_THSEL_OVER   0x0
- #define NVME_TEMP_THSEL_UNDER  0x1
+ nvme_dev_setfeat_timestamp(uint64_t ts) "set feature timestamp =3D 0x%"P=
+RIx64""
+ nvme_dev_getfeat_timestamp(uint64_t ts) "get feature timestamp =3D 0x%"P=
+RIx64""
+-nvme_dev_get_log(uint16_t cid, uint8_t lid, uint8_t rae, uint32_t len, u=
+int64_t off) "cid %"PRIu16" lid 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" o=
+ff %"PRIu64""
++nvme_dev_get_log(uint16_t cid, uint8_t lid, uint8_t lsp, uint8_t rae, ui=
+nt32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" lsp 0x%"PRIx8" ra=
+e 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
+ nvme_dev_process_aers(int queued) "queued %d"
+ nvme_dev_aer(uint16_t cid) "cid %"PRIu16""
+ nvme_dev_aer_aerl_exceeded(void) "aerl exceeded"
 --=20
 2.26.0
 
