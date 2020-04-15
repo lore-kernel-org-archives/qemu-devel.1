@@ -2,68 +2,102 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB655C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:03:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6A77C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:09:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E0C4206F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:03:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E0C4206F9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9E2E12051A
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 08:09:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AiIDpOEg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E2E12051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOd1E-0008WH-NR
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 04:03:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52889)
+	id 1jOd6l-0003vW-Rm
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 04:09:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53838)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jOd0L-0007WP-7L
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:02:43 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOd60-0002xk-3L
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:08:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jOd0J-00036i-Dh
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:02:41 -0400
-Resent-Date: Wed, 15 Apr 2020 04:02:41 -0400
-Resent-Message-Id: <E1jOd0J-00036i-Dh@eggs.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21352)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jOd0E-00035G-LV; Wed, 15 Apr 2020 04:02:34 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1586937735; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=mUjYRGwM+KOfYa4fVmg5ecpjTSjVHWLaHNJdCgVbkiBHi7krHAiZncpxDhvtmACUH/tOYUsQd7MBCX2aOGBvaTjCAXLdStxyjbw37qFeAdXaZ2K0a60cuBJkynem6pxsUPuIsPQWpIElYfQFHn/UpNZ9V8TfizhfTfNh+WO+qV4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1586937735;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=+pyFiL4v2EYPgd+u8oLbdMy5Hs5W3CACe35T4ECday4=; 
- b=X9v/hlkp7Ab584ZEn+GhL7Ork0okvnBE2wPqDOCbr/SDUKomr4eMD4H9v2K4V3SNOO8lXGR6yuj8xGBcfXONB4J668R02h9iXjVpJXxcaCwyGRyAY+n3LU/oJPnq4wUznz68oy0p+33CXDAfw++1KSBiniybnGAufc+LFBHVs0w=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1586937733392472.15849434237657;
- Wed, 15 Apr 2020 01:02:13 -0700 (PDT)
-In-Reply-To: <20200415055140.466900-1-its@irrelevant.dk>
-Subject: Re: [PATCH v7 00/48] nvme: support NVMe v1.3d,
- SGLs and multiple namespaces
-Message-ID: <158693773167.27250.3605083509764023589@39012742ff91>
+ (envelope-from <philmd@redhat.com>) id 1jOd5y-00064i-O6
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:08:31 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58283
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOd5y-00062D-KC
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 04:08:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586938110;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NLb3J6KknSIpIQG6qoJuymVTS6ocZqFv05q/r/z4pqs=;
+ b=AiIDpOEgkfYd8h5iAPCeZMb92zXLhqtb7pGBM85ZzalV8L65ZTCXzbMm1bBOMYoDRzUbk7
+ LV6opRHQzTwVi64WTwuNJj6s7TIhTKjF6xhZpdPcOHLP1/nSo0vdyHJYzQ50i7qrOuEGxL
+ FeVhNhROT+niSBQSd6fnOU9xUPnhwqI=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-442-A8sqlciZMVmP3Uw0g7-AdA-1; Wed, 15 Apr 2020 04:08:27 -0400
+X-MC-Unique: A8sqlciZMVmP3Uw0g7-AdA-1
+Received: by mail-ed1-f70.google.com with SMTP id eb6so2230431edb.12
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 01:08:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=XHyEm8c4E+spvWhsm8X7aogjDRLmTu11yDvuSGUlUz8=;
+ b=Ojj6K+qj+EYJl1DLftkIRs/7aDzYgq0HUm+yFfYUrZtIbzKUceoORhMn5a2LX3nJMT
+ +7aRGtG8aka5LDEJWaxourP7QihPaLTOC8c9l8pIDhGWHK4yH5Hu3Oiua94oIjcleiGP
+ M57YYtjCd84VwLrgGzKlUTfhR/hM0pmJY2M45pu6Ur6vdr3CzWUjIq4SrGPRgOClm+OZ
+ w+Y2fiwwkebS+ahGPzQv2hc3Z7qX2Rb7muTsVDwLSkQcjwvSKFC26dFITZqOnxdorwkH
+ lTy++1XR3L9CkcZ+5d4rhvapywo1SLL3wsmULwQYcul/dhvOD+AtE2LvEv6cjdTygZQe
+ h26w==
+X-Gm-Message-State: AGi0PuaMtLA10tC9bvn1mvQ04n3UtwTVDsAj73f+uD4UNVPEQPaI+cw1
+ woc68SpygBNsU2cOw4ugDP5ezYKyaooDK9zu3K9HZU/3+3pxtuSz0mY1TCux/VcnEnBBln/h2sE
+ Wte8BSyN72ZI5jZI=
+X-Received: by 2002:a17:906:32d8:: with SMTP id
+ k24mr4011970ejk.2.1586938106437; 
+ Wed, 15 Apr 2020 01:08:26 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJbqr2FgpgRsN/uMcXjD3GMcR06aKxoFKlAZOzYy37mzCOi2Ny6ZUPLhGnoKo5U8Iac/SzqVg==
+X-Received: by 2002:a17:906:32d8:: with SMTP id
+ k24mr4011920ejk.2.1586938106057; 
+ Wed, 15 Apr 2020 01:08:26 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id u2sm2044974edj.21.2020.04.15.01.08.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 15 Apr 2020 01:08:25 -0700 (PDT)
+Subject: Re: [PATCH-for-5.0 10/12] hw/block/pflash: Check return value of
+ blk_pwrite()
+To: qemu-devel@nongnu.org
+References: <20200414133052.13712-1-philmd@redhat.com>
+ <20200414133052.13712-11-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e32b3082-6e6d-8dd0-f74c-3add72a3173d@redhat.com>
+Date: Wed, 15 Apr 2020 10:08:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: its@irrelevant.dk
-Date: Wed, 15 Apr 2020 01:02:13 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20200414133052.13712-11-philmd@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.53
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,165 +109,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, beata.michalska@linaro.org, qemu-block@nongnu.org,
- k.jensen@samsung.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- kbusch@kernel.org, its@irrelevant.dk, javier.gonz@samsung.com,
- mlevitsk@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Mansour Ahmadi <mansourweb@gmail.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Fabien Chouteau <chouteau@adacore.com>, Max Filippov <jcmvbkbc@gmail.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Stafford Horne <shorne@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQxNTA1NTE0MC40NjY5
-MDAtMS1pdHNAaXJyZWxldmFudC5kay8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHY3IDAwLzQ4XSBudm1lOiBzdXBwb3J0IE5WTWUg
-djEuM2QsIFNHTHMgYW5kIG11bHRpcGxlIG5hbWVzcGFjZXMKTWVzc2FnZS1pZDogMjAyMDA0MTUw
-NTUxNDAuNDY2OTAwLTEtaXRzQGlycmVsZXZhbnQuZGsKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVs
-bCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
-b3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2Uu
-Lgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
-MWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2pl
-Y3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAwNDEyMjEwOTU0LjMyMzEz
-LTEtZjRidWdAYW1zYXQub3JnIC0+IHBhdGNoZXcvMjAyMDA0MTIyMTA5NTQuMzIzMTMtMS1mNGJ1
-Z0BhbXNhdC5vcmcKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMDQxMjIyMzYxOS4x
-MTI4NC0xLWY0YnVnQGFtc2F0Lm9yZyAtPiBwYXRjaGV3LzIwMjAwNDEyMjIzNjE5LjExMjg0LTEt
-ZjRidWdAYW1zYXQub3JnCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDA0MTUwNTUx
-NDAuNDY2OTAwLTEtaXRzQGlycmVsZXZhbnQuZGsgLT4gcGF0Y2hldy8yMDIwMDQxNTA1NTE0MC40
-NjY5MDAtMS1pdHNAaXJyZWxldmFudC5kawpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
-CjRhYjIzY2YgbnZtZTogbWFrZSBsYmEgZGF0YSBzaXplIGNvbmZpZ3VyYWJsZQo0YzhhMDU2IG52
-bWU6IGNoYW5nZSBjb250cm9sbGVyIHBjaSBpZAo1MDZmNTQzIHBjaTogYWxsb2NhdGUgcGNpIGlk
-IGZvciBudm1lCjk1NjIzZTcgbnZtZTogc3VwcG9ydCBtdWx0aXBsZSBuYW1lc3BhY2VzCmQyZGEx
-NGIgbnZtZTogcmVmYWN0b3IgaWRlbnRpZnkgYWN0aXZlIG5hbWVzcGFjZSBpZCBsaXN0CmJiYWMw
-NGMgbnZtZTogYWRkIHN1cHBvcnQgZm9yIHNnbCBiaXQgYnVja2V0IGRlc2NyaXB0b3IKZjZjNDBl
-MCBudm1lOiBhZGQgc3VwcG9ydCBmb3Igc2NhdHRlciBnYXRoZXIgbGlzdHMKNTkxY2NkZiBudm1l
-OiBoYXJkZW4gY21iIGFjY2VzcwpjM2NjZjg5IG52bWU6IGhhbmRsZSBkbWEgZXJyb3JzCjc1ZmVi
-Y2QgcGNpOiBwYXNzIGFsb25nIHRoZSByZXR1cm4gdmFsdWUgb2YgZG1hX21lbW9yeV9ydwowNTA0
-OGU4IG52bWU6IHVzZSBwcmVhbGxvY2F0ZWQgcXNnL2lvdiBpbiBudm1lX2RtYV9wcnAKOWE5Mzli
-ZCBudm1lOiBhZGQgbnZtZV9jaGVja19ydyBoZWxwZXIKZDFmZjQ2NiBudm1lOiBhbGxvdyBtdWx0
-aXBsZSBhaW9zIHBlciBjb21tYW5kCjVkYzM4NjQgbnZtZTogcmVtb3ZlIE52bWVDbWQgcGFyYW1l
-dGVyCjBkNmZjMzUgbnZtZTogcmVmYWN0b3IgTnZtZVJlcXVlc3QKYTc3NjU0ZCBudm1lOiBiZSBj
-b25zaXN0ZW50IGFib3V0IHplcm9zIHZzIHplcm9lcwo5ZjdlYzY0IG52bWU6IGFkZCBjaGVjayBm
-b3IgbWR0cwowZjA0ODFjIG52bWU6IHJlZmFjdG9yIHJlcXVlc3QgYm91bmRzIGNoZWNraW5nCmE5
-MjA4ZTQgbnZtZTogdmVyaWZ5IHZhbGlkaXR5IG9mIHBycCBsaXN0cyBpbiB0aGUgY21iCjE5YjZh
-NGIgbnZtZTogYWRkIHJlcXVlc3QgbWFwcGluZyBoZWxwZXIKYmFkMTRkNiBudm1lOiBwYXNzIHJl
-cXVlc3QgYWxvbmcgZm9yIHRyYWNpbmcKM2E5ZmM1MCBudm1lOiByZWZhY3RvciBkbWEgcmVhZC93
-cml0ZQplM2U3ZTU3IG52bWU6IHJlbW92ZSByZWR1bmRhbnQgaGFzX3NnIG1lbWJlcgo5OGU2NDNh
-IG52bWU6IHJlcGxhY2UgZG1hX2FjY3Qgd2l0aCBibGtfYWNjdCBlcXVpdmFsZW50CjhlMmExOTYg
-bnZtZTogYWRkIG1hcHBpbmcgaGVscGVycwo2YzhiZmRmIG52bWU6IG1lbXNldCBwcmVhbGxvY2F0
-ZWQgcmVxdWVzdHMgc3RydWN0dXJlcwoyZGVkNTExIG52bWU6IGJ1bXAgc3VwcG9ydGVkIHZlcnNp
-b24gdG8gdjEuMwpmNGVhMGYyIG52bWU6IHByb3ZpZGUgdGhlIG1hbmRhdG9yeSBzdWJucW4gZmll
-bGQKOGJmNTgwZSBudm1lOiBlbmZvcmNlIHZhbGlkIHF1ZXVlIGNyZWF0aW9uIHNlcXVlbmNlCjQ1
-MmEyZmYgbnZtZTogc3VwcG9ydCBpZGVudGlmeSBuYW1lc3BhY2UgZGVzY3JpcHRvciBsaXN0Cjll
-OGZkM2QgbnZtZTogYWRkIGxvZyBzcGVjaWZpYyBmaWVsZCB0byB0cmFjZSBldmVudHMKYzlhOTEw
-NiBudm1lOiBtYWtlIHN1cmUgbmNxciBhbmQgbnNxciBpcyB2YWxpZAoyYjUzYmZhIG52bWU6IGFk
-ZGl0aW9uYWwgdHJhY2luZwphMjEyMjM3IG52bWU6IGFkZCBtaXNzaW5nIG1hbmRhdG9yeSBmZWF0
-dXJlcwphOWE0M2NmIG52bWU6IGFkZCBzdXBwb3J0IGZvciB0aGUgYXN5bmNocm9ub3VzIGV2ZW50
-IHJlcXVlc3QgY29tbWFuZApmNWRjZjk4IG52bWU6IGFkZCBzdXBwb3J0IGZvciB0aGUgZ2V0IGxv
-ZyBwYWdlIGNvbW1hbmQKY2U2MmM1MiBudm1lOiBhZGQgdGVtcGVyYXR1cmUgdGhyZXNob2xkIGZl
-YXR1cmUKNjU2Yzk4OSBudm1lOiByZWZhY3RvciBkZXZpY2UgcmVhbGl6YXRpb24KNTA5YzM0OSBu
-dm1lOiByZW1vdmUgcmVkdW5kYW50IGNtYmxvYy9jbWJzeiBtZW1iZXJzCjQyZTI5Y2QgbnZtZTog
-YWRkIG1heF9pb3FwYWlycyBkZXZpY2UgcGFyYW1ldGVyCjIwZTZmMjkgbnZtZTogZml4IHBjaSBk
-b29yYmVsbCBzaXplIGNhbGN1bGF0aW9uCmFjZDg0ZTMgbnZtZTogYWRkIHN1cHBvcnQgZm9yIHRo
-ZSBhYm9ydCBjb21tYW5kCmViOTYwMjkgbnZtZTogcmVmYWN0b3IgbnZtZV9hZGRyX3JlYWQKMDc1
-ZGU2MCBudm1lOiB1c2UgY29uc3RhbnRzIGluIGlkZW50aWZ5CjE2ZTRmMGQgbnZtZTogYnVtcCBz
-cGVjIGRhdGEgc3RydWN0dXJlcyB0byB2MS4zCjVjYTVlZWIgbnZtZTogbW92ZSBkZXZpY2UgcGFy
-YW1ldGVycyB0byBzZXBhcmF0ZSBzdHJ1Y3QKYmM2ZmE1YyBudm1lOiByZW1vdmUgc3VwZXJmbHVv
-dXMgYnJlYWtzCmVjYmZlZjUgbnZtZTogcmVuYW1lIHRyYWNlIGV2ZW50cyB0byBudm1lX2RldgoK
-PT09IE9VVFBVVCBCRUdJTiA9PT0KMS80OCBDaGVja2luZyBjb21taXQgZWNiZmVmNTFmMTA1IChu
-dm1lOiByZW5hbWUgdHJhY2UgZXZlbnRzIHRvIG52bWVfZGV2KQoyLzQ4IENoZWNraW5nIGNvbW1p
-dCBiYzZmYTVjYzQ5NTUgKG52bWU6IHJlbW92ZSBzdXBlcmZsdW91cyBicmVha3MpCjMvNDggQ2hl
-Y2tpbmcgY29tbWl0IDVjYTVlZWI1ZDkyYyAobnZtZTogbW92ZSBkZXZpY2UgcGFyYW1ldGVycyB0
-byBzZXBhcmF0ZSBzdHJ1Y3QpCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91
-bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzE4MDogRklMRTogaHcvYmxvY2svbnZtZS5o
-OjY6CisjZGVmaW5lIERFRklORV9OVk1FX1BST1BFUlRJRVMoX3N0YXRlLCBfcHJvcHMpIFwKKyAg
-ICBERUZJTkVfUFJPUF9TVFJJTkcoInNlcmlhbCIsIF9zdGF0ZSwgX3Byb3BzLnNlcmlhbCksIFwK
-KyAgICBERUZJTkVfUFJPUF9VSU5UMzIoImNtYl9zaXplX21iIiwgX3N0YXRlLCBfcHJvcHMuY21i
-X3NpemVfbWIsIDApLCBcCisgICAgREVGSU5FX1BST1BfVUlOVDMyKCJudW1fcXVldWVzIiwgX3N0
-YXRlLCBfcHJvcHMubnVtX3F1ZXVlcywgNjQpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3Ms
-IDE4MSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzQ4IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-Cgo0LzQ4IENoZWNraW5nIGNvbW1pdCAxNmU0ZjBkZDQ4ZWIgKG52bWU6IGJ1bXAgc3BlYyBkYXRh
-IHN0cnVjdHVyZXMgdG8gdjEuMykKNS80OCBDaGVja2luZyBjb21taXQgMDc1ZGU2MGI5YzU4IChu
-dm1lOiB1c2UgY29uc3RhbnRzIGluIGlkZW50aWZ5KQo2LzQ4IENoZWNraW5nIGNvbW1pdCBlYjk2
-MDI5NzdjZjQgKG52bWU6IHJlZmFjdG9yIG52bWVfYWRkcl9yZWFkKQo3LzQ4IENoZWNraW5nIGNv
-bW1pdCBhY2Q4NGUzYmJmMGQgKG52bWU6IGFkZCBzdXBwb3J0IGZvciB0aGUgYWJvcnQgY29tbWFu
-ZCkKOC80OCBDaGVja2luZyBjb21taXQgMjBlNmYyOWZlODFkIChudm1lOiBmaXggcGNpIGRvb3Ji
-ZWxsIHNpemUgY2FsY3VsYXRpb24pCjkvNDggQ2hlY2tpbmcgY29tbWl0IDQyZTI5Y2Q0YmE4OSAo
-bnZtZTogYWRkIG1heF9pb3FwYWlycyBkZXZpY2UgcGFyYW1ldGVyKQoxMC80OCBDaGVja2luZyBj
-b21taXQgNTA5YzM0OWM4NzU1IChudm1lOiByZW1vdmUgcmVkdW5kYW50IGNtYmxvYy9jbWJzeiBt
-ZW1iZXJzKQoxMS80OCBDaGVja2luZyBjb21taXQgNjU2Yzk4OTU4MTAzIChudm1lOiByZWZhY3Rv
-ciBkZXZpY2UgcmVhbGl6YXRpb24pCjEyLzQ4IENoZWNraW5nIGNvbW1pdCBjZTYyYzUyOTViMTgg
-KG52bWU6IGFkZCB0ZW1wZXJhdHVyZSB0aHJlc2hvbGQgZmVhdHVyZSkKMTMvNDggQ2hlY2tpbmcg
-Y29tbWl0IGY1ZGNmOTg4ZWYxYSAobnZtZTogYWRkIHN1cHBvcnQgZm9yIHRoZSBnZXQgbG9nIHBh
-Z2UgY29tbWFuZCkKMTQvNDggQ2hlY2tpbmcgY29tbWl0IGE5YTQzY2YzZDk2NSAobnZtZTogYWRk
-IHN1cHBvcnQgZm9yIHRoZSBhc3luY2hyb25vdXMgZXZlbnQgcmVxdWVzdCBjb21tYW5kKQoxNS80
-OCBDaGVja2luZyBjb21taXQgYTIxMjIzNzEyOTMyIChudm1lOiBhZGQgbWlzc2luZyBtYW5kYXRv
-cnkgZmVhdHVyZXMpCjE2LzQ4IENoZWNraW5nIGNvbW1pdCAyYjUzYmZhNzlhZjYgKG52bWU6IGFk
-ZGl0aW9uYWwgdHJhY2luZykKMTcvNDggQ2hlY2tpbmcgY29tbWl0IGM5YTkxMDYxZGJlYiAobnZt
-ZTogbWFrZSBzdXJlIG5jcXIgYW5kIG5zcXIgaXMgdmFsaWQpCjE4LzQ4IENoZWNraW5nIGNvbW1p
-dCA5ZThmZDNkZGYwYmMgKG52bWU6IGFkZCBsb2cgc3BlY2lmaWMgZmllbGQgdG8gdHJhY2UgZXZl
-bnRzKQoxOS80OCBDaGVja2luZyBjb21taXQgNDUyYTJmZmU2M2VlIChudm1lOiBzdXBwb3J0IGlk
-ZW50aWZ5IG5hbWVzcGFjZSBkZXNjcmlwdG9yIGxpc3QpCjIwLzQ4IENoZWNraW5nIGNvbW1pdCA4
-YmY1ODBlNzA2NTcgKG52bWU6IGVuZm9yY2UgdmFsaWQgcXVldWUgY3JlYXRpb24gc2VxdWVuY2Up
-CjIxLzQ4IENoZWNraW5nIGNvbW1pdCBmNGVhMGYyMTAwMGUgKG52bWU6IHByb3ZpZGUgdGhlIG1h
-bmRhdG9yeSBzdWJucW4gZmllbGQpCjIyLzQ4IENoZWNraW5nIGNvbW1pdCAyZGVkNTExNzQyOGUg
-KG52bWU6IGJ1bXAgc3VwcG9ydGVkIHZlcnNpb24gdG8gdjEuMykKMjMvNDggQ2hlY2tpbmcgY29t
-bWl0IDZjOGJmZGZkZWRhYyAobnZtZTogbWVtc2V0IHByZWFsbG9jYXRlZCByZXF1ZXN0cyBzdHJ1
-Y3R1cmVzKQoyNC80OCBDaGVja2luZyBjb21taXQgOGUyYTE5NmM0ODJhIChudm1lOiBhZGQgbWFw
-cGluZyBoZWxwZXJzKQoyNS80OCBDaGVja2luZyBjb21taXQgOThlNjQzYTZmZjljIChudm1lOiBy
-ZXBsYWNlIGRtYV9hY2N0IHdpdGggYmxrX2FjY3QgZXF1aXZhbGVudCkKMjYvNDggQ2hlY2tpbmcg
-Y29tbWl0IGUzZTdlNTcxMjkzNSAobnZtZTogcmVtb3ZlIHJlZHVuZGFudCBoYXNfc2cgbWVtYmVy
-KQoyNy80OCBDaGVja2luZyBjb21taXQgM2E5ZmM1MGRkM2Q4IChudm1lOiByZWZhY3RvciBkbWEg
-cmVhZC93cml0ZSkKMjgvNDggQ2hlY2tpbmcgY29tbWl0IGJhZDE0ZDZkYjg4YyAobnZtZTogcGFz
-cyByZXF1ZXN0IGFsb25nIGZvciB0cmFjaW5nKQoyOS80OCBDaGVja2luZyBjb21taXQgMTliNmE0
-YmMyNmQ2IChudm1lOiBhZGQgcmVxdWVzdCBtYXBwaW5nIGhlbHBlcikKMzAvNDggQ2hlY2tpbmcg
-Y29tbWl0IGE5MjA4ZTQ1N2ExNSAobnZtZTogdmVyaWZ5IHZhbGlkaXR5IG9mIHBycCBsaXN0cyBp
-biB0aGUgY21iKQozMS80OCBDaGVja2luZyBjb21taXQgMGYwNDgxYzEzYTkwIChudm1lOiByZWZh
-Y3RvciByZXF1ZXN0IGJvdW5kcyBjaGVja2luZykKMzIvNDggQ2hlY2tpbmcgY29tbWl0IDlmN2Vj
-NjQ2ZGZiMyAobnZtZTogYWRkIGNoZWNrIGZvciBtZHRzKQozMy80OCBDaGVja2luZyBjb21taXQg
-YTc3NjU0ZDA2NTFiIChudm1lOiBiZSBjb25zaXN0ZW50IGFib3V0IHplcm9zIHZzIHplcm9lcykK
-MzQvNDggQ2hlY2tpbmcgY29tbWl0IDBkNmZjMzUxOTgwNiAobnZtZTogcmVmYWN0b3IgTnZtZVJl
-cXVlc3QpCjM1LzQ4IENoZWNraW5nIGNvbW1pdCA1ZGMzODY0OTRkNjYgKG52bWU6IHJlbW92ZSBO
-dm1lQ21kIHBhcmFtZXRlcikKMzYvNDggQ2hlY2tpbmcgY29tbWl0IGQxZmY0NjZlNjUxOSAobnZt
-ZTogYWxsb3cgbXVsdGlwbGUgYWlvcyBwZXIgY29tbWFuZCkKMzcvNDggQ2hlY2tpbmcgY29tbWl0
-IDlhOTM5YmRiYmU3YSAobnZtZTogYWRkIG52bWVfY2hlY2tfcncgaGVscGVyKQozOC80OCBDaGVj
-a2luZyBjb21taXQgMDUwNDhlODQ4YjE2IChudm1lOiB1c2UgcHJlYWxsb2NhdGVkIHFzZy9pb3Yg
-aW4gbnZtZV9kbWFfcHJwKQozOS80OCBDaGVja2luZyBjb21taXQgNzVmZWJjZDY4YTQ2IChwY2k6
-IHBhc3MgYWxvbmcgdGhlIHJldHVybiB2YWx1ZSBvZiBkbWFfbWVtb3J5X3J3KQo0MC80OCBDaGVj
-a2luZyBjb21taXQgYzNjY2Y4OTgyNjVkIChudm1lOiBoYW5kbGUgZG1hIGVycm9ycykKNDEvNDgg
-Q2hlY2tpbmcgY29tbWl0IDU5MWNjZGYzYzk0NCAobnZtZTogaGFyZGVuIGNtYiBhY2Nlc3MpCjQy
-LzQ4IENoZWNraW5nIGNvbW1pdCBmNmM0MGUwZDE2NzEgKG52bWU6IGFkZCBzdXBwb3J0IGZvciBz
-Y2F0dGVyIGdhdGhlciBsaXN0cykKNDMvNDggQ2hlY2tpbmcgY29tbWl0IGJiYWMwNGM0YTljMyAo
-bnZtZTogYWRkIHN1cHBvcnQgZm9yIHNnbCBiaXQgYnVja2V0IGRlc2NyaXB0b3IpCjQ0LzQ4IENo
-ZWNraW5nIGNvbW1pdCBkMmRhMTRiNDllOTkgKG52bWU6IHJlZmFjdG9yIGlkZW50aWZ5IGFjdGl2
-ZSBuYW1lc3BhY2UgaWQgbGlzdCkKNDUvNDggQ2hlY2tpbmcgY29tbWl0IDk1NjIzZTdkMTZkMSAo
-bnZtZTogc3VwcG9ydCBtdWx0aXBsZSBuYW1lc3BhY2VzKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQg
-b3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0Mzog
-Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMg
-c2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMyMTg6IEZJTEU6IGh3L2Jsb2NrL252
-bWUtbnMuaDo4OgorI2RlZmluZSBERUZJTkVfTlZNRV9OU19QUk9QRVJUSUVTKF9zdGF0ZSwgX3By
-b3BzKSBcCisgICAgREVGSU5FX1BST1BfRFJJVkUoImRyaXZlIiwgX3N0YXRlLCBibGspLCBcCisg
-ICAgREVGSU5FX1BST1BfVUlOVDMyKCJuc2lkIiwgX3N0YXRlLCBfcHJvcHMubnNpZCwgMCkKCnRv
-dGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgODQxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDQ1LzQ4
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0Ni80OCBDaGVja2luZyBjb21taXQgNTA2ZjU0
-Mzk5YzZhIChwY2k6IGFsbG9jYXRlIHBjaSBpZCBmb3IgbnZtZSkKV0FSTklORzogYWRkZWQsIG1v
-dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
-MzI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0
-NiBsaW5lcyBjaGVja2VkCgpQYXRjaCA0Ni80OCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo0
-Ny80OCBDaGVja2luZyBjb21taXQgNGM4YTA1NmY1ODkzIChudm1lOiBjaGFuZ2UgY29udHJvbGxl
-ciBwY2kgaWQpCjQ4LzQ4IENoZWNraW5nIGNvbW1pdCA0YWIyM2NmNWEzNGYgKG52bWU6IG1ha2Ug
-bGJhIGRhdGEgc2l6ZSBjb25maWd1cmFibGUpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
-dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNDE1MDU1MTQwLjQ2NjkwMC0xLWl0c0BpcnJlbGV2
-YW50LmRrL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 4/14/20 3:30 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> From: Mansour Ahmadi <mansourweb@gmail.com>
+>=20
+> When updating the PFLASH file contents, we should check for a
+> possible failure of blk_pwrite(). Similar to commit 3a688294e.
+>=20
+
+There is actually a Coverity report for this issue, CID 1357678=20
+(Unchecked return value) from 2016-07-15 06:28:48:
+
+CID 1357678 (#2 of 2): Unchecked return value (CHECKED_RETURN).=20
+check_return: Calling blk_pwrite without checking return value (as is=20
+done elsewhere 52 out of 59 times).
+
+So it seems fair to add:
+
+Reported-by: Coverity (CID 1357678 CHECKED_RETURN)
+
+> Signed-off-by: Mansour Ahmadi <mansourweb@gmail.com>
+> Message-Id: <20200408003552.58095-1-mansourweb@gmail.com>
+> [PMD: Add missing "qemu/error-report.h" include and TODO comment]
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>   hw/block/pflash_cfi01.c | 8 +++++++-
+>   hw/block/pflash_cfi02.c | 8 +++++++-
+>   2 files changed, 14 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+> index 24f3bce7ef..be1954c5d8 100644
+> --- a/hw/block/pflash_cfi01.c
+> +++ b/hw/block/pflash_cfi01.c
+> @@ -42,6 +42,7 @@
+>   #include "hw/qdev-properties.h"
+>   #include "sysemu/block-backend.h"
+>   #include "qapi/error.h"
+> +#include "qemu/error-report.h"
+>   #include "qemu/timer.h"
+>   #include "qemu/bitops.h"
+>   #include "qemu/error-report.h"
+> @@ -399,13 +400,18 @@ static void pflash_update(PFlashCFI01 *pfl, int off=
+set,
+>                             int size)
+>   {
+>       int offset_end;
+> +    int ret;
+>       if (pfl->blk) {
+>           offset_end =3D offset + size;
+>           /* widen to sector boundaries */
+>           offset =3D QEMU_ALIGN_DOWN(offset, BDRV_SECTOR_SIZE);
+>           offset_end =3D QEMU_ALIGN_UP(offset_end, BDRV_SECTOR_SIZE);
+> -        blk_pwrite(pfl->blk, offset, pfl->storage + offset,
+> +        ret =3D blk_pwrite(pfl->blk, offset, pfl->storage + offset,
+>                      offset_end - offset, 0);
+> +        if (ret < 0) {
+> +            /* TODO set error bit in status */
+> +            error_report("Could not update PFLASH: %s", strerror(-ret));
+> +        }
+>       }
+>   }
+>  =20
+> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+> index 12f18d401a..c6b6f2d082 100644
+> --- a/hw/block/pflash_cfi02.c
+> +++ b/hw/block/pflash_cfi02.c
+> @@ -37,6 +37,7 @@
+>   #include "hw/block/flash.h"
+>   #include "hw/qdev-properties.h"
+>   #include "qapi/error.h"
+> +#include "qemu/error-report.h"
+>   #include "qemu/bitmap.h"
+>   #include "qemu/timer.h"
+>   #include "sysemu/block-backend.h"
+> @@ -393,13 +394,18 @@ static uint64_t pflash_read(void *opaque, hwaddr of=
+fset, unsigned int width)
+>   static void pflash_update(PFlashCFI02 *pfl, int offset, int size)
+>   {
+>       int offset_end;
+> +    int ret;
+>       if (pfl->blk) {
+>           offset_end =3D offset + size;
+>           /* widen to sector boundaries */
+>           offset =3D QEMU_ALIGN_DOWN(offset, BDRV_SECTOR_SIZE);
+>           offset_end =3D QEMU_ALIGN_UP(offset_end, BDRV_SECTOR_SIZE);
+> -        blk_pwrite(pfl->blk, offset, pfl->storage + offset,
+> +        ret =3D blk_pwrite(pfl->blk, offset, pfl->storage + offset,
+>                      offset_end - offset, 0);
+> +        if (ret < 0) {
+> +            /* TODO set error bit in status */
+> +            error_report("Could not update PFLASH: %s", strerror(-ret));
+> +        }
+>       }
+>   }
+>  =20
+>=20
+
 
