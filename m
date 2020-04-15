@@ -2,64 +2,81 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76C30C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:50:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CADA2C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:50:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CBFA20768
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:50:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CBFA20768
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9881F20768
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:50:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GCY5+D2g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9881F20768
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOcoK-00076s-CP
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 03:50:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51003)
+	id 1jOcp0-0000WQ-Ma
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 03:50:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51140)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1jOcn6-00053d-O6
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:01 -0400
+ (envelope-from <armbru@redhat.com>) id 1jOcnd-0006Ko-Dt
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1jOcn5-0007C2-Pu
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:00 -0400
-Received: from 12.mo6.mail-out.ovh.net ([178.32.125.228]:52686)
+ (envelope-from <armbru@redhat.com>) id 1jOcnc-0007Iy-7k
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:33 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26808
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jOcn5-0007BB-Gs
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:48:59 -0400
-Received: from player794.ha.ovh.net (unknown [10.108.35.215])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 1AFAE20B308
- for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 09:48:57 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player794.ha.ovh.net (Postfix) with ESMTPSA id C91BCE662EB5;
- Wed, 15 Apr 2020 07:48:00 +0000 (UTC)
-Subject: Re: [PATCH-for-5.1 1/3] target: Remove unnecessary CPU() cast
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200412210954.32313-1-f4bug@amsat.org>
- <20200412210954.32313-2-f4bug@amsat.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <1a7f2324-4264-e23f-b218-beeb50051cce@kaod.org>
-Date: Wed, 15 Apr 2020 09:48:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jOcnc-0007IQ-3P
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:49:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586936971;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KvuqjXhJLnLeqwthQBgW9+Jz4hAncjgDWrmt3VVcZBA=;
+ b=GCY5+D2gZRGDvXv1EyhCuOC3s/SCGLoftOmck6ae+KTLIY9EIUl2OuQp8kHx8gtGlFGem/
+ urYuV2mwnhNEE0ygf39k38wijGclTUkASH6OKEBMx3uTK6lvYMw19jDr4S8q8ASV0bEm/9
+ E7Xv5faHXn1g86qbCKeOACklRuna8e0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-206-Jl3IJNT2OsqnAgGPhlXnKQ-1; Wed, 15 Apr 2020 03:49:30 -0400
+X-MC-Unique: Jl3IJNT2OsqnAgGPhlXnKQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C86A107ACCC;
+ Wed, 15 Apr 2020 07:49:29 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-20.ams2.redhat.com
+ [10.36.113.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 03C7460BE2;
+ Wed, 15 Apr 2020 07:49:29 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id B7BC511358B0; Wed, 15 Apr 2020 09:49:27 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 for-5.1 3/9] qemu-option: Fix sloppy recognition of
+ "id=..." after ", , "
+Date: Wed, 15 Apr 2020 09:49:21 +0200
+Message-Id: <20200415074927.19897-4-armbru@redhat.com>
+In-Reply-To: <20200415074927.19897-1-armbru@redhat.com>
+References: <20200415074927.19897-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200412210954.32313-2-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 13576101080511187955
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrfedvgdduvddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpeegnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejleegrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.32.125.228
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,69 +88,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Hildenbrand <david@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Stefano Stabellini <sstabellini@kernel.org>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>, Markus Armbruster <armbru@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Joel Stanley <joel@jms.id.au>, Anthony Perard <anthony.perard@citrix.com>,
- xen-devel@lists.xenproject.org, David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Andrew Jeffery <andrew@aj.id.au>, Cornelia Huck <cohuck@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/12/20 11:09 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> The CPU() macro is defined as:
->=20
->   #define CPU(obj) ((CPUState *)(obj))
->=20
-> Remove an unnecessary CPU() cast.
->=20
-> Patch created mechanically using spatch with this script:
->=20
->   @@
->   typedef CPUState;
->   CPUState *s;
->   @@
->   -   CPU(s)
->   +   s
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/test-qemu-opts.c |  4 ++--
+ util/qemu-option.c     | 27 +++++++++++++++++++--------
+ 2 files changed, 21 insertions(+), 10 deletions(-)
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-> ---
->  target/ppc/mmu_helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-> index 86c667b094..8972714775 100644
-> --- a/target/ppc/mmu_helper.c
-> +++ b/target/ppc/mmu_helper.c
-> @@ -1820,7 +1820,7 @@ static inline void do_invalidate_BAT(CPUPPCState =
-*env, target_ulong BATu,
->      if (((end - base) >> TARGET_PAGE_BITS) > 1024) {
->          /* Flushing 1024 4K pages is slower than a complete flush */
->          LOG_BATS("Flush all BATs\n");
-> -        tlb_flush(CPU(cs));
-> +        tlb_flush(cs);
->          LOG_BATS("Flush done\n");
->          return;
->      }
->=20
+diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
+index 88a3e7bdf4..8ff97268d8 100644
+--- a/tests/test-qemu-opts.c
++++ b/tests/test-qemu-opts.c
+@@ -500,10 +500,10 @@ static void test_opts_parse(void)
+     g_assert(!opts);
+     /* TODO Cover .merge_lists =3D true */
+=20
+-    /* Buggy ID recognition */
++    /* Buggy ID recognition (fixed) */
+     opts =3D qemu_opts_parse(&opts_list_03, "x=3D,,id=3Dbar", false, &erro=
+r_abort);
+     g_assert_cmpuint(opts_count(opts), =3D=3D, 1);
+-    g_assert_cmpstr(qemu_opts_id(opts), =3D=3D, "bar"); /* BUG */
++    g_assert(!qemu_opts_id(opts));
+     g_assert_cmpstr(qemu_opt_get(opts, "x"), =3D=3D, ",id=3Dbar");
+=20
+     /* Anti-social ID */
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index f08f4bc458..d2956082bd 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -872,6 +872,24 @@ static void opts_do_parse(QemuOpts *opts, const char *=
+params,
+     }
+ }
+=20
++static char *opts_parse_id(const char *params)
++{
++    const char *p;
++    char *name, *value;
++
++    for (p =3D params; *p;) {
++        p =3D get_opt_name_value(p, NULL, &name, &value);
++        if (!strcmp(name, "id")) {
++            g_free(name);
++            return value;
++        }
++        g_free(name);
++        g_free(value);
++    }
++
++    return NULL;
++}
++
+ /**
+  * Store options parsed from @params into @opts.
+  * If @firstname is non-null, the first key=3Dvalue in @params may omit
+@@ -889,20 +907,13 @@ static QemuOpts *opts_parse(QemuOptsList *list, const=
+ char *params,
+                             bool *invalidp, Error **errp)
+ {
+     const char *firstname;
+-    char *id =3D NULL;
+-    const char *p;
++    char *id =3D opts_parse_id(params);
+     QemuOpts *opts;
+     Error *local_err =3D NULL;
+=20
+     assert(!permit_abbrev || list->implied_opt_name);
+     firstname =3D permit_abbrev ? list->implied_opt_name : NULL;
+=20
+-    if (strncmp(params, "id=3D", 3) =3D=3D 0) {
+-        get_opt_value(params + 3, &id);
+-    } else if ((p =3D strstr(params, ",id=3D")) !=3D NULL) {
+-        get_opt_value(p + 4, &id);
+-    }
+-
+     /*
+      * This code doesn't work for defaults && !list->merge_lists: when
+      * params has no id=3D, and list has an element with !opts->id, it
+--=20
+2.21.1
 
 
