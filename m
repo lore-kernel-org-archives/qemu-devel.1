@@ -7,89 +7,87 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F57C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:18:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0877EC2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:19:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 012EF20575
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:18:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C88222074F
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:19:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bAWrvwVy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 012EF20575
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Df4IipIe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C88222074F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOhvk-0008FX-3F
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 09:18:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36240)
+	id 1jOhwy-0001iX-0s
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 09:19:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35785)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jOhuc-0006cD-JK
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:17:07 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOhro-0002Pm-RL
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:14:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jOhub-0001Vh-CV
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:17:06 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47209
+ (envelope-from <philmd@redhat.com>) id 1jOhrn-0000Or-O2
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:14:12 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42411
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOhub-0001VX-9W
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:17:05 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOhrn-0000Ne-Kd
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:14:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586956625;
+ s=mimecast20190719; t=1586956451;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ezGOSjRBDdZNTydU70FNJ11qo6iDj5/jX3I/nUlIsHA=;
- b=bAWrvwVy6PkvvrXSs1KJuTt2PI+bEYZLnInzzg2niKebMajzXnAwVsZZygeBYV9Wy5647K
- 8ALMy+AaiVME2aXd34ioEX0qH6T/DhW9WOB1vv5iRXJWC/2Soo3WPulXHFX/hGCe8/EWGn
- yEX4yu+0ahW1C8CJe2aywbGRO8+WADc=
+ bh=MHz7mtn7qtvPjghEX66KIWD8OsT82bjFj4HktfHCaWs=;
+ b=Df4IipIeDpZRLhw4rtD83cYmDBKztnGVa/V5cDK2kqRcZdFGvRSbRSzHJGJ2/wVgBFN+Ax
+ gbC4MfstjgCtU5fJQoFy7BlNYxb6E6apAhTq7t1URgR9r8w2cSglkgzL/te7ZKJCe4Zcyw
+ mSTvhI/HcrZ85Y77eFavCobBMfvqUDQ=
 Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
  [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-B-yUtzI_MBmLhL6n2yDPdg-1; Wed, 15 Apr 2020 09:17:03 -0400
-X-MC-Unique: B-yUtzI_MBmLhL6n2yDPdg-1
-Received: by mail-ed1-f71.google.com with SMTP id y6so2876444edo.18
- for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 06:17:03 -0700 (PDT)
+ us-mta-314-fvfqS4zDM0Wls2CKEKJ5uw-1; Wed, 15 Apr 2020 09:14:08 -0400
+X-MC-Unique: fvfqS4zDM0Wls2CKEKJ5uw-1
+Received: by mail-ed1-f71.google.com with SMTP id b12so2900350edy.7
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 06:14:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=nzoBjtHh/HGZpYAXZt6YkHxCX6Ujn/3Ekx7EQ1jOE7M=;
- b=PnpjedR/cRS9kDgB7rGtoXQaSqIpMhRaBj1phjs36Q9y7hShbMNonWqr38oSEdbZMq
- Dgi2mFRccPvkWG4j6GlpHx0eRObKbq5XaSOxoFxSF5zZxFqKqE1flfTxNdQHXdG6Ae5B
- qx5ZH3WyfpgrqqcocVtFF7PXTxIMm0NkSPr5APfu71c3m6SWlhgcEjoYOlrOqMh2+Vza
- zu/XP23k3VbhQfD4VeKdOsi37ljNactKF4TPa+i8MtsbuNwuj7WU8aRoyZVSfKBJGVwy
- ciSn6aM0OZ0eexIJ5nEz9mtf4NGvOUA58ZBkHX2I0InU4R0+sVp8qzWAxuhtTjbM16mv
- 3e0w==
-X-Gm-Message-State: AGi0PuZu08MuseIdb5eCip5G+oanCXkvYZctdczM3i8/3dmwNDkJwxY+
- B8F06Q6IyCSFisGJ1BCpO871H7166FOfJ/a/Uwb9gSrhBqy8iXxE8IlMG5gIpOVUeCQdgixId0f
- 38nb770rAcgdOib4=
-X-Received: by 2002:a17:906:855a:: with SMTP id
- h26mr5208764ejy.56.1586956620997; 
- Wed, 15 Apr 2020 06:17:00 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ2b2Qt8Ehr63xvRdWBzJyS9s5KRdylNP0V4jpQFVd7lUFUnHKgAVGf98IGNlAnRSZUyD7sng==
-X-Received: by 2002:a17:906:855a:: with SMTP id
- h26mr5208741ejy.56.1586956620750; 
- Wed, 15 Apr 2020 06:17:00 -0700 (PDT)
+ bh=hPKQB0LNb4alCRIiJsPfsa4YJFJL/OEF1XGY+WE6ihU=;
+ b=tKhHwfL83xdk0A3DzcVhtDQBdFnify3aq7qegmryVAgbHZ6zm7crcEL5y380f4l1en
+ Cn0g6XC61BNC7nJTzFpGNtssG9Op4MIDjKjyu/SBL7qfEmrOeS6dVFXzmkInul1TLNbh
+ CWDMhZkEQP3DfHfgtaruHKwVmm5PPCCnw2u1EvVLdSGHxhIv2N03CY0qjuFBbbu/MRE5
+ MSY2gG3k9w541Eph5JrW5Dkmqe0yL0lJb+bds/JhefVMiOwMcPZTPaDAZ8TdXL0u96Xn
+ SrDRy3nFAt5jv423GfaEzg3mTau00nOfufxUvssbpGNczxc3KPPn/gh8QM5kJD7pANE0
+ wzjQ==
+X-Gm-Message-State: AGi0PuYKju2L4I7eMLxu7c4qdGUZ09Hm6BwsRUCGITCRUJjjXGrEDLXw
+ utLiWYcNg3Dj2gipf1uSjZFc/lV5ewm6CdyIOOtT7xV8kt+tqP9JUQpu5zbTxGSq/CXO/7KI4ag
+ aE08GTaYtFFngUvg=
+X-Received: by 2002:a50:ee86:: with SMTP id f6mr10337197edr.123.1586956447413; 
+ Wed, 15 Apr 2020 06:14:07 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKXkDh4SNgbn+qEz9Pbr44gXaPNts5JYiRfpQI4Sb59SDUBkuo8Cpa7vfHqb46Yi5wAtCtc7Q==
+X-Received: by 2002:a50:ee86:: with SMTP id f6mr10337183edr.123.1586956447244; 
+ Wed, 15 Apr 2020 06:14:07 -0700 (PDT)
 Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id p22sm2621290ejd.24.2020.04.15.06.16.59
+ by smtp.gmail.com with ESMTPSA id by9sm2625320ejb.16.2020.04.15.06.14.05
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 15 Apr 2020 06:17:00 -0700 (PDT)
-Subject: Re: [PATCH v2 13/16] nvme: factor out namespace setup
+ Wed, 15 Apr 2020 06:14:06 -0700 (PDT)
+Subject: Re: [PATCH v2 14/16] nvme: factor out pci setup
 To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
 References: <20200415130159.611361-1-its@irrelevant.dk>
- <20200415130159.611361-14-its@irrelevant.dk>
+ <20200415130159.611361-15-its@irrelevant.dk>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b05fdbb7-2f74-be05-e108-36b14abce0be@redhat.com>
-Date: Wed, 15 Apr 2020 15:16:58 +0200
+Message-ID: <056035e2-2dc8-7394-f03e-fa381d8c77fd@redhat.com>
+Date: Wed, 15 Apr 2020 15:14:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200415130159.611361-14-its@irrelevant.dk>
+In-Reply-To: <20200415130159.611361-15-its@irrelevant.dk>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -122,105 +120,66 @@ On 4/15/20 3:01 PM, Klaus Jensen wrote:
 >=20
 > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 > ---
->   hw/block/nvme.c | 46 ++++++++++++++++++++++++++--------------------
->   1 file changed, 26 insertions(+), 20 deletions(-)
+>   hw/block/nvme.c | 30 ++++++++++++++++++------------
+>   1 file changed, 18 insertions(+), 12 deletions(-)
 >=20
 > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index d5244102252c..2b007115c302 100644
+> index 2b007115c302..906ae595025a 100644
 > --- a/hw/block/nvme.c
 > +++ b/hw/block/nvme.c
-> @@ -1358,6 +1358,27 @@ static void nvme_init_blk(NvmeCtrl *n, Error **err=
-p)
->                                     false, errp);
+> @@ -1379,6 +1379,22 @@ static void nvme_init_namespace(NvmeCtrl *n, NvmeN=
+amespace *ns, Error **errp)
+>       id_ns->nuse =3D id_ns->ncap;
 >   }
 >  =20
-> +static void nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **=
-errp)
+> +static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
 > +{
-> +    int64_t bs_size;
-> +    NvmeIdNs *id_ns =3D &ns->id_ns;
+> +    uint8_t *pci_conf =3D pci_dev->config;
 > +
-> +    bs_size =3D blk_getlength(n->conf.blk);
-> +    if (bs_size < 0) {
-> +        error_setg_errno(errp, -bs_size, "could not get backing file siz=
-e");
-> +        return;
-> +    }
+> +    pci_conf[PCI_INTERRUPT_PIN] =3D 1;
+> +    pci_config_set_prog_interface(pci_conf, 0x2);
+> +    pci_config_set_class(pci_conf, PCI_CLASS_STORAGE_EXPRESS);
+> +    pcie_endpoint_cap_init(pci_dev, 0x80);
 > +
-> +    n->ns_size =3D bs_size;
-> +
-> +    id_ns->lbaf[0].ds =3D BDRV_SECTOR_BITS;
-> +    id_ns->nsze =3D cpu_to_le64(nvme_ns_nlbas(n, ns));
-> +
-> +    /* no thin provisioning */
-> +    id_ns->ncap =3D id_ns->nsze;
-> +    id_ns->nuse =3D id_ns->ncap;
+> +    memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n, "nvme=
+",
+> +                          n->reg_size);
+> +    pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+> +                     PCI_BASE_ADDRESS_MEM_TYPE_64, &n->iomem);
+> +    msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL=
+);
 > +}
 > +
 >   static void nvme_realize(PCIDevice *pci_dev, Error **errp)
 >   {
 >       NvmeCtrl *n =3D NVME(pci_dev);
-> @@ -1365,7 +1386,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
-**errp)
->       Error *err =3D NULL;
->  =20
->       int i;
-> -    int64_t bs_size;
->       uint8_t *pci_conf;
->  =20
->       nvme_check_constraints(n, &err);
-> @@ -1376,12 +1396,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error=
+> @@ -1402,19 +1418,9 @@ static void nvme_realize(PCIDevice *pci_dev, Error=
  **errp)
+>           return;
+>       }
 >  =20
->       nvme_init_state(n);
->  =20
-> -    bs_size =3D blk_getlength(n->conf.blk);
-> -    if (bs_size < 0) {
-> -        error_setg(errp, "could not get backing file size");
-> -        return;
-> -    }
+> +    nvme_init_pci(n, pci_dev);
+> +
+>       pci_conf =3D pci_dev->config;
+> -    pci_conf[PCI_INTERRUPT_PIN] =3D 1;
+> -    pci_config_set_prog_interface(pci_dev->config, 0x2);
+> -    pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
+> -    pcie_endpoint_cap_init(pci_dev, 0x80);
 > -
->       nvme_init_blk(n, &err);
->       if (err) {
->           error_propagate(errp, err);
-> @@ -1394,8 +1408,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
-**errp)
->       pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
->       pcie_endpoint_cap_init(pci_dev, 0x80);
->  =20
-> -    n->ns_size =3D bs_size / (uint64_t)n->num_namespaces;
-
-Valid because currently 'n->num_namespaces' =3D 1, OK.
+> -    memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
+> -                          "nvme", n->reg_size);
+> -    pci_register_bar(pci_dev, 0,
+> -        PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
+> -        &n->iomem);
+> -    msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL=
+);
+> -
+>       id->vid =3D cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
+>       id->ssvid =3D cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VEN=
+DOR_ID));
+>       strpadcpy((char *)id->mn, sizeof(id->mn), "QEMU NVMe Ctrl", ' ');
+>=20
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
->       memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
->                             "nvme", n->reg_size);
->       pci_register_bar(pci_dev, 0,
-> @@ -1459,17 +1471,11 @@ static void nvme_realize(PCIDevice *pci_dev, Erro=
-r **errp)
->       }
->  =20
->       for (i =3D 0; i < n->num_namespaces; i++) {
-> -        NvmeNamespace *ns =3D &n->namespaces[i];
-> -        NvmeIdNs *id_ns =3D &ns->id_ns;
-> -        id_ns->nsfeat =3D 0;
-> -        id_ns->nlbaf =3D 0;
-> -        id_ns->flbas =3D 0;
-> -        id_ns->mc =3D 0;
-> -        id_ns->dpc =3D 0;
-> -        id_ns->dps =3D 0;
-> -        id_ns->lbaf[0].ds =3D BDRV_SECTOR_BITS;
-> -        id_ns->ncap  =3D id_ns->nuse =3D id_ns->nsze =3D
-> -            cpu_to_le64(nvme_ns_nlbas(n, ns));
-> +        nvme_init_namespace(n, &n->namespaces[i], &err);
-> +        if (err) {
-> +            error_propagate(errp, err);
-> +            return;
-> +        }
->       }
->   }
->  =20
->=20
 
 
