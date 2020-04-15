@@ -7,71 +7,68 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA837C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 20:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 124A8C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 20:17:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2E1D2076D
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 20:15:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC3882076D
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 20:17:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="JYwFp000"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2E1D2076D
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="yh/zpLzd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC3882076D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOoRQ-0003rI-RA
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 16:15:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34614)
+	id 1jOoT4-0005yr-17
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 16:17:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34615)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex-krasikov@yandex-team.ru>) id 1jOoPw-0002ms-FK
+ (envelope-from <alex-krasikov@yandex-team.ru>) id 1jOoPw-0002mt-Ff
  for qemu-devel@nongnu.org; Wed, 15 Apr 2020 16:13:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex-krasikov@yandex-team.ru>) id 1jOoPt-00029K-HP
+ (envelope-from <alex-krasikov@yandex-team.ru>) id 1jOoPt-00029F-H8
  for qemu-devel@nongnu.org; Wed, 15 Apr 2020 16:13:50 -0400
-Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:38612)
+Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:40176)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <alex-krasikov@yandex-team.ru>)
- id 1jOoPt-00027c-0F
+ id 1jOoPt-00027S-09
  for qemu-devel@nongnu.org; Wed, 15 Apr 2020 16:13:49 -0400
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
- [IPv6:2a02:6b8:0:1402::301])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 210672E153F;
- Wed, 15 Apr 2020 23:13:45 +0300 (MSK)
+Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::119])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id B3D642E1566;
+ Wed, 15 Apr 2020 23:13:44 +0300 (MSK)
 Received: from myt4-18a966dbd9be.qloud-c.yandex.net
  (myt4-18a966dbd9be.qloud-c.yandex.net [2a02:6b8:c00:12ad:0:640:18a9:66db])
- by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- m1uKeaoX5j-DioaJmgY; Wed, 15 Apr 2020 23:13:45 +0300
+ by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ RmHf9PHlSa-DiMO4SB8; Wed, 15 Apr 2020 23:13:44 +0300
 Precedence: bulk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
  s=default; 
- t=1586981625; bh=xFEgqaRt4OqmMhZ3aKg8fvqzTuQRplZHQsffheL7kZQ=;
- h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=JYwFp0001syQx1jRw5QoE4uOG/w9moLinviGElDW07rH/fB99Q1nab+ARQk3HqJ1u
- NM0Z/g4Pu67yJr3hksJCTqmDhuU8gqzOFFftsF1yLHPwNgmn+va9FNwHb/UM+Szb6b
- hM/T05nrzhxE1evVp5MO7VV8rEv91aRU+FzWFNa8=
-Authentication-Results: mxbackcorp1g.mail.yandex.net;
+ t=1586981624; bh=sbjVUcvaK53FMsSghhGVEcWs7eQXtomn7upWO7roQmA=;
+ h=Message-Id:Date:Subject:To:From:Cc;
+ b=yh/zpLzdQXIPbz5588YNePjlOfmaTyP0Th6GLGeNMHWcvJ7Y4lWh/hy+35FaQ0MFo
+ vIzotEn0SUXupgVIS/FTUghpJ2JzfkSuHf0lTtawKnVEQ4Cz9sLffdXUJe/N/rqftj
+ oMeu+vL5cvnd77AVD7jF0SEtCOQQgb5NBlEko4ik=
+Authentication-Results: mxbackcorp2j.mail.yandex.net;
  dkim=pass header.i=@yandex-team.ru
 Received: from unknown (unknown [2a02:6b8:b080:6410::1:e])
  by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- trkOwaUcU7-DiW4FT0Z; Wed, 15 Apr 2020 23:13:44 +0300
+ trkOwaUcU7-DiW4Tw11; Wed, 15 Apr 2020 23:13:44 +0300
  (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
  (Client certificate not present)
 From: Alexey Krasikov <alex-krasikov@yandex-team.ru>
 To: berrange@redhat.com,
 	qemu-devel@nongnu.org
-Subject: [PATCH 2/2] crypto/secret: fix return logic of
- crypto_secret_prop_get_loaded()
-Date: Wed, 15 Apr 2020 23:13:36 +0300
-Message-Id: <20200415201336.24195-2-alex-krasikov@yandex-team.ru>
+Subject: [PATCH 1/2] crypto/secret: fix inconsequential errors.
+Date: Wed, 15 Apr 2020 23:13:35 +0300
+Message-Id: <20200415201336.24195-1-alex-krasikov@yandex-team.ru>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200415201336.24195-1-alex-krasikov@yandex-team.ru>
-References: <20200415201336.24195-1-alex-krasikov@yandex-team.ru>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a02:6b8:0:1619::183
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 77.88.29.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -87,9 +84,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Get function returned value of properties 'data' insteed of returning
-  value of raw data internal field. This error did not affect anyone,
-  because no one called the get function.
+* change condition from QCRYPTO_SECRET_FORMAT_RAW
+  to QCRYPTO_SECRET_FORMAT_BASE64 in if-operator, because
+  this is potencial error if you add another format value.
 
 Signed-off-by: Alexey Krasikov <alex-krasikov@yandex-team.ru>
 ---
@@ -97,18 +94,18 @@ Signed-off-by: Alexey Krasikov <alex-krasikov@yandex-team.ru>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/crypto/secret.c b/crypto/secret.c
-index 546b965afe..79b9b4ce0c 100644
+index 1cf0ad0ce8..546b965afe 100644
 --- a/crypto/secret.c
 +++ b/crypto/secret.c
-@@ -231,7 +231,7 @@ qcrypto_secret_prop_get_loaded(Object *obj,
-                                Error **errp G_GNUC_UNUSED)
- {
-     QCryptoSecret *secret = QCRYPTO_SECRET(obj);
--    return secret->data != NULL;
-+    return secret->rawdata != NULL;
- }
- 
- 
+@@ -204,7 +204,7 @@ qcrypto_secret_prop_set_loaded(Object *obj,
+             input = output;
+             inputlen = outputlen;
+         } else {
+-            if (secret->format != QCRYPTO_SECRET_FORMAT_RAW) {
++            if (secret->format == QCRYPTO_SECRET_FORMAT_BASE64) {
+                 qcrypto_secret_decode(input, inputlen,
+                                       &output, &outputlen, &local_err);
+                 g_free(input);
 -- 
 2.17.1
 
