@@ -2,102 +2,53 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5299C3815B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 05:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99AE0C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 05:53:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AAEC20767
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 05:13:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="ZwohSkyO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AAEC20767
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 62838206F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 05:53:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62838206F9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOaMG-0001df-Lf
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 01:13:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57510)
+	id 1jOazF-0002UY-Dl
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 01:53:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34763)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty@apple.com>) id 1jOaLP-0000yR-Ot
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:12:17 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jOay5-0000WL-4Q
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:52:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty@apple.com>) id 1jOaLO-0000F5-8O
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:12:15 -0400
-Received: from ma1-aaemail-dr-lapp02.apple.com ([17.171.2.68]:59712)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dirty@apple.com>) id 1jOaLO-0000Er-3o
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:12:14 -0400
-Received: from pps.filterd (ma1-aaemail-dr-lapp02.apple.com [127.0.0.1])
- by ma1-aaemail-dr-lapp02.apple.com (8.16.0.27/8.16.0.27) with SMTP id
- 03F57NU9012343; Tue, 14 Apr 2020 22:12:13 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
- h=sender : from : to :
- cc : subject : date : message-id : mime-version :
- content-transfer-encoding; s=20180706;
- bh=i43vv9WPVrcUyphs5fPLX0bhZYezzF0RV08AOgVpbAg=;
- b=ZwohSkyOk28FBfPtH5M1qGc7glaavvR1skKdyD0+foO+1Aq9AG8uk1VnRtFoQJeamrsD
- wKOPuldDoWkBvgHy9O3slFbpObszvrQe6ckMJ7rTzopRXHY/ELO/QN/D0hi0uWGfH4SZ
- vWFyBKI+uUmb4FUtMZ0pDFzFDyzlkG69ae1Cmw7wpA/6XCbEA1P2SaBF2gxa3StAXzfW
- PENvKumtJzIQ/X5cBvGNRHA5fXH2i47pdM1HmlZVX5ZNx9RI53NHBpjnJj1syEvp7jn0
- buByiDAI82mRJ/2k2ufdh9bA2nfsu+LnGtlHgUC1qqqHlAY6365Da8gMLh1jpNSDLPek Eg== 
-Received: from rn-mailsvcp-mta-lapp04.rno.apple.com
- (rn-mailsvcp-mta-lapp04.rno.apple.com [10.225.203.152])
- by ma1-aaemail-dr-lapp02.apple.com with ESMTP id 30dn6e5q2d-5
- (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
- Tue, 14 Apr 2020 22:12:13 -0700
-Received: from rn-mailsvcp-mmp-lapp03.rno.apple.com
- (rn-mailsvcp-mmp-lapp03.rno.apple.com [17.179.253.16])
- by rn-mailsvcp-mta-lapp04.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020)) with ESMTPS id <0Q8T00709D4C9Q70@rn-mailsvcp-mta-lapp04.rno.apple.com>; 
- Tue, 14 Apr 2020 22:12:12 -0700 (PDT)
-Received: from process_milters-daemon.rn-mailsvcp-mmp-lapp03.rno.apple.com by
- rn-mailsvcp-mmp-lapp03.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020)) id <0Q8T00I00CTSDR00@rn-mailsvcp-mmp-lapp03.rno.apple.com>; Tue,
- 14 Apr 2020 22:12:12 -0700 (PDT)
-X-Va-A: 
-X-Va-T-CD: d0f689b0b1d4f2921c086db3eba98d8e
-X-Va-E-CD: e14fcdfc33eea5cc0e983f03059066f4
-X-Va-R-CD: d9b5446d85b3bde180ecd3ccc3b5b568
-X-Va-CD: 0
-X-Va-ID: 5a26dce1-dd8d-44c3-96c9-ae6a92729360
-X-V-A: 
-X-V-T-CD: d0f689b0b1d4f2921c086db3eba98d8e
-X-V-E-CD: e14fcdfc33eea5cc0e983f03059066f4
-X-V-R-CD: d9b5446d85b3bde180ecd3ccc3b5b568
-X-V-CD: 0
-X-V-ID: f0a5421d-2f27-4962-828f-a642cd0df344
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-15_01:2020-04-14,
- 2020-04-15 signatures=0
-Received: from pontoon.com (unknown [17.234.86.21])
- by rn-mailsvcp-mmp-lapp03.rno.apple.com
- (Oracle Communications Messaging Server 8.1.0.5.20200312 64bit (built Mar 12
- 2020))
- with ESMTPSA id <0Q8T00ACYD4CTB00@rn-mailsvcp-mmp-lapp03.rno.apple.com>; Tue,
- 14 Apr 2020 22:12:12 -0700 (PDT)
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, r.bolshakov@yadro.com
-Subject: [PATCH v2] hvf: use standard CR0 and CR4 register definitions
-Date: Tue, 14 Apr 2020 22:12:12 -0700
-Message-id: <a31c1c7f7a7b4f537be9d307ccddc6e17761f1b0.1586927010.git.dirty@apple.com>
-X-Mailer: git-send-email 2.24.0
-MIME-version: 1.0
-Content-transfer-encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-15_01:2020-04-14,
- 2020-04-15 signatures=0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 17.171.2.68
+ (envelope-from <its@irrelevant.dk>) id 1jOay3-0002K9-Lw
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:52:13 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:47120)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <its@irrelevant.dk>)
+ id 1jOay0-0002IU-A3; Wed, 15 Apr 2020 01:52:08 -0400
+Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 465F5BF467;
+ Wed, 15 Apr 2020 05:52:05 +0000 (UTC)
+From: Klaus Jensen <its@irrelevant.dk>
+To: qemu-block@nongnu.org
+Subject: [PATCH v7 00/48] nvme: support NVMe v1.3d,
+ SGLs and multiple namespaces
+Date: Wed, 15 Apr 2020 07:50:52 +0200
+Message-Id: <20200415055140.466900-1-its@irrelevant.dk>
+X-Mailer: git-send-email 2.26.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 128.199.63.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,203 +60,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
+ Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: Cameron Esfahani <dirty@apple.com>
-From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-Signed-off-by: Cameron Esfahani <dirty@apple.com>
----
+From: Klaus Jensen <k.jensen@samsung.com>
 
-v2:
-+ Fix duplicate line Roman Bolshakov <r.bolshakov@yadro.com> found in review.
----
- target/i386/cpu.h          |  2 ++
- target/i386/hvf/hvf.c      |  2 +-
- target/i386/hvf/vmx.h      | 15 ++++++++-------
- target/i386/hvf/x86.c      |  6 +++---
- target/i386/hvf/x86.h      | 34 ----------------------------------
- target/i386/hvf/x86_mmu.c  |  2 +-
- target/i386/hvf/x86_task.c |  3 ++-
- 7 files changed, 17 insertions(+), 47 deletions(-)
+Hi,
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 60d797d594..1286ec6e7a 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -225,6 +225,8 @@ typedef enum X86Seg {
- #define CR0_NE_MASK  (1U << 5)
- #define CR0_WP_MASK  (1U << 16)
- #define CR0_AM_MASK  (1U << 18)
-+#define CR0_NW_MASK  (1U << 29)
-+#define CR0_CD_MASK  (1U << 30)
- #define CR0_PG_MASK  (1U << 31)
- 
- #define CR4_VME_MASK  (1U << 0)
-diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index d72543dc31..48f3ef050c 100644
---- a/target/i386/hvf/hvf.c
-+++ b/target/i386/hvf/hvf.c
-@@ -455,7 +455,7 @@ void hvf_reset_vcpu(CPUState *cpu) {
-         wvmcs(cpu->hvf_fd, VMCS_GUEST_PDPTE0 + i * 2, pdpte[i]);
-     }
- 
--    macvm_set_cr0(cpu->hvf_fd, 0x60000010);
-+    macvm_set_cr0(cpu->hvf_fd, CR0_CD_MASK | CR0_NW_MASK | CR0_ET_MASK);
- 
-     wvmcs(cpu->hvf_fd, VMCS_CR4_MASK, CR4_VMXE_MASK);
-     wvmcs(cpu->hvf_fd, VMCS_CR4_SHADOW, 0x0);
-diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
-index 03d2c79b9c..8ec2e6414e 100644
---- a/target/i386/hvf/vmx.h
-+++ b/target/i386/hvf/vmx.h
-@@ -121,9 +121,10 @@ static inline void macvm_set_cr0(hv_vcpuid_t vcpu, uint64_t cr0)
-     uint64_t pdpte[4] = {0, 0, 0, 0};
-     uint64_t efer = rvmcs(vcpu, VMCS_GUEST_IA32_EFER);
-     uint64_t old_cr0 = rvmcs(vcpu, VMCS_GUEST_CR0);
--    uint64_t mask = CR0_PG | CR0_CD | CR0_NW | CR0_NE | CR0_ET;
-+    uint64_t mask = CR0_PG_MASK | CR0_CD_MASK | CR0_NW_MASK |
-+                    CR0_NE_MASK | CR0_ET_MASK;
- 
--    if ((cr0 & CR0_PG) && (rvmcs(vcpu, VMCS_GUEST_CR4) & CR4_PAE) &&
-+    if ((cr0 & CR0_PG_MASK) && (rvmcs(vcpu, VMCS_GUEST_CR4) & CR4_PAE_MASK) &&
-         !(efer & MSR_EFER_LME)) {
-         address_space_read(&address_space_memory,
-                            rvmcs(vcpu, VMCS_GUEST_CR3) & ~0x1f,
-@@ -138,17 +139,17 @@ static inline void macvm_set_cr0(hv_vcpuid_t vcpu, uint64_t cr0)
-     wvmcs(vcpu, VMCS_CR0_SHADOW, cr0);
- 
-     if (efer & MSR_EFER_LME) {
--        if (!(old_cr0 & CR0_PG) && (cr0 & CR0_PG)) {
-+        if (!(old_cr0 & CR0_PG_MASK) && (cr0 & CR0_PG_MASK)) {
-             enter_long_mode(vcpu, cr0, efer);
-         }
--        if (/*(old_cr0 & CR0_PG) &&*/ !(cr0 & CR0_PG)) {
-+        if (!(cr0 & CR0_PG_MASK)) {
-             exit_long_mode(vcpu, cr0, efer);
-         }
-     }
- 
-     /* Filter new CR0 after we are finished examining it above. */
--    cr0 = (cr0 & ~(mask & ~CR0_PG));
--    wvmcs(vcpu, VMCS_GUEST_CR0, cr0 | CR0_NE | CR0_ET);
-+    cr0 = (cr0 & ~(mask & ~CR0_PG_MASK));
-+    wvmcs(vcpu, VMCS_GUEST_CR0, cr0 | CR0_NE_MASK | CR0_ET_MASK);
- 
-     hv_vcpu_invalidate_tlb(vcpu);
-     hv_vcpu_flush(vcpu);
-@@ -156,7 +157,7 @@ static inline void macvm_set_cr0(hv_vcpuid_t vcpu, uint64_t cr0)
- 
- static inline void macvm_set_cr4(hv_vcpuid_t vcpu, uint64_t cr4)
- {
--    uint64_t guest_cr4 = cr4 | CR4_VMXE;
-+    uint64_t guest_cr4 = cr4 | CR4_VMXE_MASK;
- 
-     wvmcs(vcpu, VMCS_GUEST_CR4, guest_cr4);
-     wvmcs(vcpu, VMCS_CR4_SHADOW, cr4);
-diff --git a/target/i386/hvf/x86.c b/target/i386/hvf/x86.c
-index 3afcedc7fc..668c02de6e 100644
---- a/target/i386/hvf/x86.c
-+++ b/target/i386/hvf/x86.c
-@@ -119,7 +119,7 @@ bool x86_read_call_gate(struct CPUState *cpu, struct x86_call_gate *idt_desc,
- bool x86_is_protected(struct CPUState *cpu)
- {
-     uint64_t cr0 = rvmcs(cpu->hvf_fd, VMCS_GUEST_CR0);
--    return cr0 & CR0_PE;
-+    return cr0 & CR0_PE_MASK;
- }
- 
- bool x86_is_real(struct CPUState *cpu)
-@@ -150,13 +150,13 @@ bool x86_is_long64_mode(struct CPUState *cpu)
- bool x86_is_paging_mode(struct CPUState *cpu)
- {
-     uint64_t cr0 = rvmcs(cpu->hvf_fd, VMCS_GUEST_CR0);
--    return cr0 & CR0_PG;
-+    return cr0 & CR0_PG_MASK;
- }
- 
- bool x86_is_pae_enabled(struct CPUState *cpu)
- {
-     uint64_t cr4 = rvmcs(cpu->hvf_fd, VMCS_GUEST_CR4);
--    return cr4 & CR4_PAE;
-+    return cr4 & CR4_PAE_MASK;
- }
- 
- target_ulong linear_addr(struct CPUState *cpu, target_ulong addr, X86Seg seg)
-diff --git a/target/i386/hvf/x86.h b/target/i386/hvf/x86.h
-index c95d5b2116..bc0170b2a8 100644
---- a/target/i386/hvf/x86.h
-+++ b/target/i386/hvf/x86.h
-@@ -100,40 +100,6 @@ typedef struct x86_reg_flags {
-     };
- } __attribute__ ((__packed__)) x86_reg_flags;
- 
--typedef enum x86_reg_cr0 {
--    CR0_PE =            (1L << 0),
--    CR0_MP =            (1L << 1),
--    CR0_EM =            (1L << 2),
--    CR0_TS =            (1L << 3),
--    CR0_ET =            (1L << 4),
--    CR0_NE =            (1L << 5),
--    CR0_WP =            (1L << 16),
--    CR0_AM =            (1L << 18),
--    CR0_NW =            (1L << 29),
--    CR0_CD =            (1L << 30),
--    CR0_PG =            (1L << 31),
--} x86_reg_cr0;
--
--typedef enum x86_reg_cr4 {
--    CR4_VME =            (1L << 0),
--    CR4_PVI =            (1L << 1),
--    CR4_TSD =            (1L << 2),
--    CR4_DE  =            (1L << 3),
--    CR4_PSE =            (1L << 4),
--    CR4_PAE =            (1L << 5),
--    CR4_MSE =            (1L << 6),
--    CR4_PGE =            (1L << 7),
--    CR4_PCE =            (1L << 8),
--    CR4_OSFXSR =         (1L << 9),
--    CR4_OSXMMEXCPT =     (1L << 10),
--    CR4_VMXE =           (1L << 13),
--    CR4_SMXE =           (1L << 14),
--    CR4_FSGSBASE =       (1L << 16),
--    CR4_PCIDE =          (1L << 17),
--    CR4_OSXSAVE =        (1L << 18),
--    CR4_SMEP =           (1L << 20),
--} x86_reg_cr4;
--
- /* 16 bit Task State Segment */
- typedef struct x86_tss_segment16 {
-     uint16_t link;
-diff --git a/target/i386/hvf/x86_mmu.c b/target/i386/hvf/x86_mmu.c
-index 65d4603dbf..8f38eccffc 100644
---- a/target/i386/hvf/x86_mmu.c
-+++ b/target/i386/hvf/x86_mmu.c
-@@ -130,7 +130,7 @@ static bool test_pt_entry(struct CPUState *cpu, struct gpt_translation *pt,
- 
-     uint32_t cr0 = rvmcs(cpu->hvf_fd, VMCS_GUEST_CR0);
-     /* check protection */
--    if (cr0 & CR0_WP) {
-+    if (cr0 & CR0_WP_MASK) {
-         if (pt->write_access && !pte_write_access(pte)) {
-             return false;
-         }
-diff --git a/target/i386/hvf/x86_task.c b/target/i386/hvf/x86_task.c
-index 1daac6cc2b..5e41d09b89 100644
---- a/target/i386/hvf/x86_task.c
-+++ b/target/i386/hvf/x86_task.c
-@@ -174,7 +174,8 @@ void vmx_handle_task_switch(CPUState *cpu, x68_segment_selector tss_sel, int rea
-         //ret = task_switch_16(cpu, tss_sel, old_tss_sel, old_tss_base, &next_tss_desc);
-         VM_PANIC("task_switch_16");
- 
--    macvm_set_cr0(cpu->hvf_fd, rvmcs(cpu->hvf_fd, VMCS_GUEST_CR0) | CR0_TS);
-+    macvm_set_cr0(cpu->hvf_fd,
-+                  rvmcs(cpu->hvf_fd, VMCS_GUEST_CR0) | CR0_TS_MASK);
-     x86_segment_descriptor_to_vmx(cpu, tss_sel, &next_tss_desc, &vmx_seg);
-     vmx_write_segment_descriptor(cpu, &vmx_seg, R_TR);
- 
--- 
-2.24.0
+v7 is mostly just changes proposed by Maxim. Also, Gollu's patch for the
+bit bucket sgl descriptor has been added (patch #43), but it is of a
+pretty manageable size.
+
+
+
+Changes since v6
+~~~~~~~~~~~~~~~~
+
+* 01/48 ("nvme: rename trace events to nvme_dev")
+  - indentation nitpicks (Maxim)
+
+* 04/48 ("nvme: bump spec data structures to v1.3")
+  - added defines for temperature threshold and sensor selection (Maxim)
+  - added defines for the EUI64 and NGUID NIDT types (Maxim)
+
+* 09/48 ("nvme: add max_ioqpairs device parameter")
+  - hoisted a bugfix out (Maxim)
+
+* 11/48 ("nvme: refactor device realization")
+  - pulled the removal of the duplicated cmbsz/cmbloc struct members to
+    separate patch (Maxim)
+  - fixed an incomplete error message (Maxim)
+
+* 12/48 ("nvme: add temperature threshold feature")
+  - use the defines added in 04/48 (Maxim)
+  - remove the addition of the unused 'temperature' NvmeCtrl member
+
+* 13/48 ("nvme: add support for the get log page command")
+  - use the already defined NvmeErrorLog type (Maxim)
+  - add the 'temperature' NvmeCtrl member here instead (Maxim)
+
+* 15/48 ("nvme: add missing mandatory features")
+  - fix off-by-one when validating dw11 for the interrupt vector config
+    feature (Maxim)
+  - some nitpicks (Maxim)
+
+* 16/48 ("nvme: additional tracing")
+  - moved some traces (that was added in later patches) to here
+
+* 19/48 ("nvme: support identify namespace descriptor list")
+  - refactored for the nth time; I think I'm finally kind of happy with
+    it
+
+* 20/48 ("nvme: enforce valid queue creation sequence")
+  - added a comment (Maxim)
+
+* 24/48 ("nvme: add mapping helpers")
+  - fixed an off-by-one error that would cause valid read/writes to the
+    CMB to be rejected (Maxim)
+  - add a check on len so we don't add 0 sized elements to the iovec
+    (Maxim)
+
+* 26/48 ("nvme: remove redundant has_sg member")
+  - pulled the s/dma_acct/block_acct change to a separate patch (Maxim)
+
+* 36/48 ("nvme: allow multiple aios per command")
+  - renamed nvme_req_register_aio to nvme_req_add_aio and added some
+    comments (Maxim)
+  - killed the prinfo patch
+  - pulled a bunch of refactoring stuff into other patches to make this
+    one easier to read (Maxim)
+
+* 42/48 ("nvme: add support for scatter gather lists")
+  - pulled the nvme_addr_read hardening into its own patch (Maxim)
+  - refactored the logic around allowed sgl descriptor types (Maxim)
+  - additional comments (Maxim)
+
+* 45/48 ("nvme: support multiple namespaces")
+  - fix an inconsistent return value
+  - fix an edge error case where all namespaces are allocated (Maxim)
+
+
+
+git-backport-diff against rebased v6
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
+
+001/48:[0006] [FC] 'nvme: rename trace events to nvme_dev'
+002/48:[----] [--] 'nvme: remove superfluous breaks'
+003/48:[----] [--] 'nvme: move device parameters to separate struct'
+004/48:[0017] [FC] 'nvme: bump spec data structures to v1.3'
+005/48:[down]      'nvme: use constants in identify'
+006/48:[----] [--] 'nvme: refactor nvme_addr_read'
+007/48:[----] [--] 'nvme: add support for the abort command'
+008/48:[down]      'nvme: fix pci doorbell size calculation'
+009/48:[0002] [FC] 'nvme: add max_ioqpairs device parameter'
+010/48:[down]      'nvme: remove redundant cmbloc/cmbsz members'
+011/48:[0022] [FC] 'nvme: refactor device realization'
+012/48:[0013] [FC] 'nvme: add temperature threshold feature'
+013/48:[0007] [FC] 'nvme: add support for the get log page command'
+014/48:[----] [-C] 'nvme: add support for the asynchronous event request =
+command'
+015/48:[0002] [FC] 'nvme: add missing mandatory features'
+016/48:[0014] [FC] 'nvme: additional tracing'
+017/48:[----] [--] 'nvme: make sure ncqr and nsqr is valid'
+018/48:[----] [--] 'nvme: add log specific field to trace events'
+019/48:[0029] [FC] 'nvme: support identify namespace descriptor list'
+020/48:[0005] [FC] 'nvme: enforce valid queue creation sequence'
+021/48:[----] [--] 'nvme: provide the mandatory subnqn field'
+022/48:[----] [--] 'nvme: bump supported version to v1.3'
+023/48:[----] [--] 'nvme: memset preallocated requests structures'
+024/48:[0010] [FC] 'nvme: add mapping helpers'
+025/48:[down]      'nvme: replace dma_acct with blk_acct equivalent'
+026/48:[0007] [FC] 'nvme: remove redundant has_sg member'
+027/48:[0011] [FC] 'nvme: refactor dma read/write'
+028/48:[0004] [FC] 'nvme: pass request along for tracing'
+029/48:[----] [--] 'nvme: add request mapping helper'
+030/48:[----] [--] 'nvme: verify validity of prp lists in the cmb'
+031/48:[----] [-C] 'nvme: refactor request bounds checking'
+032/48:[----] [--] 'nvme: add check for mdts'
+033/48:[down]      'nvme: be consistent about zeros vs zeroes'
+034/48:[down]      'nvme: refactor NvmeRequest'
+035/48:[down]      'nvme: remove NvmeCmd parameter'
+036/48:[0218] [FC] 'nvme: allow multiple aios per command'
+037/48:[down]      'nvme: add nvme_check_rw helper'
+038/48:[----] [--] 'nvme: use preallocated qsg/iov in nvme_dma_prp'
+039/48:[----] [--] 'pci: pass along the return value of dma_memory_rw'
+040/48:[----] [-C] 'nvme: handle dma errors'
+041/48:[down]      'nvme: harden cmb access'
+042/48:[0102] [FC] 'nvme: add support for scatter gather lists'
+043/48:[down]      'nvme: add support for sgl bit bucket descriptor'
+044/48:[----] [-C] 'nvme: refactor identify active namespace id list'
+045/48:[0036] [FC] 'nvme: support multiple namespaces'
+046/48:[----] [--] 'pci: allocate pci id for nvme'
+047/48:[----] [--] 'nvme: change controller pci id'
+048/48:[----] [-C] 'nvme: make lba data size configurable'
+
+
+
+Gollu Appalanaidu (1):
+  nvme: add support for sgl bit bucket descriptor
+
+Klaus Jensen (47):
+  nvme: rename trace events to nvme_dev
+  nvme: remove superfluous breaks
+  nvme: move device parameters to separate struct
+  nvme: bump spec data structures to v1.3
+  nvme: use constants in identify
+  nvme: refactor nvme_addr_read
+  nvme: add support for the abort command
+  nvme: fix pci doorbell size calculation
+  nvme: add max_ioqpairs device parameter
+  nvme: remove redundant cmbloc/cmbsz members
+  nvme: refactor device realization
+  nvme: add temperature threshold feature
+  nvme: add support for the get log page command
+  nvme: add support for the asynchronous event request command
+  nvme: add missing mandatory features
+  nvme: additional tracing
+  nvme: make sure ncqr and nsqr is valid
+  nvme: add log specific field to trace events
+  nvme: support identify namespace descriptor list
+  nvme: enforce valid queue creation sequence
+  nvme: provide the mandatory subnqn field
+  nvme: bump supported version to v1.3
+  nvme: memset preallocated requests structures
+  nvme: add mapping helpers
+  nvme: replace dma_acct with blk_acct equivalent
+  nvme: remove redundant has_sg member
+  nvme: refactor dma read/write
+  nvme: pass request along for tracing
+  nvme: add request mapping helper
+  nvme: verify validity of prp lists in the cmb
+  nvme: refactor request bounds checking
+  nvme: add check for mdts
+  nvme: be consistent about zeros vs zeroes
+  nvme: refactor NvmeRequest
+  nvme: remove NvmeCmd parameter
+  nvme: allow multiple aios per command
+  nvme: add nvme_check_rw helper
+  nvme: use preallocated qsg/iov in nvme_dma_prp
+  pci: pass along the return value of dma_memory_rw
+  nvme: handle dma errors
+  nvme: harden cmb access
+  nvme: add support for scatter gather lists
+  nvme: refactor identify active namespace id list
+  nvme: support multiple namespaces
+  pci: allocate pci id for nvme
+  nvme: change controller pci id
+  nvme: make lba data size configurable
+
+ MAINTAINERS            |    1 +
+ block/nvme.c           |   22 +-
+ docs/specs/nvme.txt    |   25 +
+ docs/specs/pci-ids.txt |    1 +
+ hw/block/Makefile.objs |    2 +-
+ hw/block/nvme-ns.c     |  162 +++
+ hw/block/nvme-ns.h     |   62 ++
+ hw/block/nvme.c        | 2139 ++++++++++++++++++++++++++++++++--------
+ hw/block/nvme.h        |  177 +++-
+ hw/block/trace-events  |  206 ++--
+ hw/core/machine.c      |    1 +
+ include/block/nvme.h   |  190 +++-
+ include/hw/pci/pci.h   |    4 +-
+ 13 files changed, 2413 insertions(+), 579 deletions(-)
+ create mode 100644 docs/specs/nvme.txt
+ create mode 100644 hw/block/nvme-ns.c
+ create mode 100644 hw/block/nvme-ns.h
+
+--=20
+2.26.0
 
 
