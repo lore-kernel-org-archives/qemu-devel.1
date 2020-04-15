@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D547C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:15:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E6C0C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:16:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47CD9206D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:15:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47CD9206D9
+	by mail.kernel.org (Postfix) with ESMTPS id 43105206D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 06:16:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43105206D9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jObKP-0000na-FS
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 02:15:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35939)
+	id 1jObLk-0003HT-Bn
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 02:16:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35627)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jOazL-0003Si-VD
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:53:33 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jOaz2-0002uO-6H
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:53:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jOazK-00036g-QZ
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:53:31 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:47606)
+ (envelope-from <its@irrelevant.dk>) id 1jOaz0-0002s0-LX
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 01:53:12 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:47578)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jOazH-0002lj-43; Wed, 15 Apr 2020 01:53:27 -0400
+ id 1jOayw-0002aj-4p; Wed, 15 Apr 2020 01:53:06 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id E39BABFE23;
- Wed, 15 Apr 2020 05:52:35 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 23845BFDAD;
+ Wed, 15 Apr 2020 05:52:30 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v7 48/48] nvme: make lba data size configurable
-Date: Wed, 15 Apr 2020 07:51:40 +0200
-Message-Id: <20200415055140.466900-49-its@irrelevant.dk>
+Subject: [PATCH v7 33/48] nvme: be consistent about zeros vs zeroes
+Date: Wed, 15 Apr 2020 07:51:25 +0200
+Message-Id: <20200415055140.466900-34-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200415055140.466900-1-its@irrelevant.dk>
 References: <20200415055140.466900-1-its@irrelevant.dk>
@@ -71,72 +71,108 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Acked-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- hw/block/nvme-ns.c | 7 ++++++-
- hw/block/nvme-ns.h | 4 +++-
- hw/block/nvme.c    | 1 +
- 3 files changed, 10 insertions(+), 2 deletions(-)
+The spec in general uses 'zeroes' and not 'zeros'.
 
-diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
-index bd64d4a94632..d34b6b2439f1 100644
---- a/hw/block/nvme-ns.c
-+++ b/hw/block/nvme-ns.c
-@@ -18,7 +18,7 @@ static int nvme_ns_init(NvmeNamespace *ns)
- {
-     NvmeIdNs *id_ns =3D &ns->id_ns;
+Now, according to the Oxford dictionary, 'zeroes' is the action of
+zeroing something, i.e. "he zeroes the range" and 'zeros' is the plural
+of zero. Thus, Write Zeroes should actually be called Write Zeros, but
+alas, let us align with the spec.
+
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+---
+ block/nvme.c         | 4 ++--
+ hw/block/nvme.c      | 8 ++++----
+ include/block/nvme.h | 4 ++--
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/block/nvme.c b/block/nvme.c
+index 7302cc19ade4..304e975e0270 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -465,7 +465,7 @@ static void nvme_identify(BlockDriverState *bs, int n=
+amespace, Error **errp)
+                           s->page_size / sizeof(uint64_t) * s->page_size=
+);
 =20
--    id_ns->lbaf[0].ds =3D BDRV_SECTOR_BITS;
-+    id_ns->lbaf[0].ds =3D ns->params.lbads;
-     id_ns->nsze =3D cpu_to_le64(nvme_ns_nlbas(ns));
+     oncs =3D le16_to_cpu(idctrl->oncs);
+-    s->supports_write_zeroes =3D !!(oncs & NVME_ONCS_WRITE_ZEROS);
++    s->supports_write_zeroes =3D !!(oncs & NVME_ONCS_WRITE_ZEROES);
+     s->supports_discard =3D !!(oncs & NVME_ONCS_DSM);
 =20
-     /* no thin provisioning */
-@@ -78,6 +78,11 @@ static int nvme_ns_check_constraints(NvmeNamespace *ns=
-, Error **errp)
-         return -1;
+     memset(resp, 0, 4096);
+@@ -1119,7 +1119,7 @@ static coroutine_fn int nvme_co_pwrite_zeroes(Block=
+DriverState *bs,
      }
 =20
-+    if (ns->params.lbads < 9 || ns->params.lbads > 12) {
-+        error_setg(errp, "unsupported lbads (supported: 9-12)");
-+        return 1;
-+    }
-+
-     return 0;
- }
-=20
-diff --git a/hw/block/nvme-ns.h b/hw/block/nvme-ns.h
-index 3c3651d485d0..43b78f8b8d9c 100644
---- a/hw/block/nvme-ns.h
-+++ b/hw/block/nvme-ns.h
-@@ -7,10 +7,12 @@
-=20
- #define DEFINE_NVME_NS_PROPERTIES(_state, _props) \
-     DEFINE_PROP_DRIVE("drive", _state, blk), \
--    DEFINE_PROP_UINT32("nsid", _state, _props.nsid, 0)
-+    DEFINE_PROP_UINT32("nsid", _state, _props.nsid, 0), \
-+    DEFINE_PROP_UINT8("lbads", _state, _props.lbads, BDRV_SECTOR_BITS)
-=20
- typedef struct NvmeNamespaceParams {
-     uint32_t nsid;
-+    uint8_t  lbads;
- } NvmeNamespaceParams;
-=20
- typedef struct NvmeNamespace {
+     NvmeCmd cmd =3D {
+-        .opcode =3D NVME_CMD_WRITE_ZEROS,
++        .opcode =3D NVME_CMD_WRITE_ZEROES,
+         .nsid =3D cpu_to_le32(s->nsid),
+         .cdw10 =3D cpu_to_le32((offset >> s->blkshift) & 0xFFFFFFFF),
+         .cdw11 =3D cpu_to_le32(((offset >> s->blkshift) >> 32) & 0xFFFFF=
+FFF),
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 40a400333828..dd2759a4ce2e 100644
+index d8edd071b261..94d42046149e 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -2690,6 +2690,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
-**errp)
-     if (n->namespace.blk) {
-         ns =3D &n->namespace;
-         ns->params.nsid =3D 1;
-+        ns->params.lbads =3D BDRV_SECTOR_BITS;
+@@ -564,7 +564,7 @@ static uint16_t nvme_flush(NvmeCtrl *n, NvmeNamespace=
+ *ns, NvmeCmd *cmd,
+     return NVME_NO_COMPLETE;
+ }
 =20
-         if (nvme_ns_setup(n, ns, errp)) {
-             return;
+-static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd=
+ *cmd,
++static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeNamespace *ns, NvmeCm=
+d *cmd,
+     NvmeRequest *req)
+ {
+     NvmeRwCmd *rw =3D (NvmeRwCmd *)cmd;
+@@ -662,8 +662,8 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd *cmd=
+, NvmeRequest *req)
+     switch (cmd->opcode) {
+     case NVME_CMD_FLUSH:
+         return nvme_flush(n, ns, cmd, req);
+-    case NVME_CMD_WRITE_ZEROS:
+-        return nvme_write_zeros(n, ns, cmd, req);
++    case NVME_CMD_WRITE_ZEROES:
++        return nvme_write_zeroes(n, ns, cmd, req);
+     case NVME_CMD_WRITE:
+     case NVME_CMD_READ:
+         return nvme_rw(n, ns, cmd, req);
+@@ -2086,7 +2086,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+     id->sqes =3D (0x6 << 4) | 0x6;
+     id->cqes =3D (0x4 << 4) | 0x4;
+     id->nn =3D cpu_to_le32(n->num_namespaces);
+-    id->oncs =3D cpu_to_le16(NVME_ONCS_WRITE_ZEROS | NVME_ONCS_TIMESTAMP=
+);
++    id->oncs =3D cpu_to_le16(NVME_ONCS_WRITE_ZEROES | NVME_ONCS_TIMESTAM=
+P);
+=20
+     pstrcpy((char *) id->subnqn, sizeof(id->subnqn), "nqn.2019-08.org.qe=
+mu:");
+     pstrcat((char *) id->subnqn, sizeof(id->subnqn), n->params.serial);
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 88e5385a9d3f..c4c669e32fc4 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -287,7 +287,7 @@ enum NvmeIoCommands {
+     NVME_CMD_READ               =3D 0x02,
+     NVME_CMD_WRITE_UNCOR        =3D 0x04,
+     NVME_CMD_COMPARE            =3D 0x05,
+-    NVME_CMD_WRITE_ZEROS        =3D 0x08,
++    NVME_CMD_WRITE_ZEROES       =3D 0x08,
+     NVME_CMD_DSM                =3D 0x09,
+ };
+=20
+@@ -665,7 +665,7 @@ enum NvmeIdCtrlOncs {
+     NVME_ONCS_COMPARE       =3D 1 << 0,
+     NVME_ONCS_WRITE_UNCORR  =3D 1 << 1,
+     NVME_ONCS_DSM           =3D 1 << 2,
+-    NVME_ONCS_WRITE_ZEROS   =3D 1 << 3,
++    NVME_ONCS_WRITE_ZEROES  =3D 1 << 3,
+     NVME_ONCS_FEATURES      =3D 1 << 4,
+     NVME_ONCS_RESRVATIONS   =3D 1 << 5,
+     NVME_ONCS_TIMESTAMP     =3D 1 << 6,
 --=20
 2.26.0
 
