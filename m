@@ -2,68 +2,101 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13641C38A2C
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73715C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:20:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCED8206F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:18:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCED8206F9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 38D9D206F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 07:20:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XKvaDcUu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38D9D206F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOcJP-000083-VN
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 03:18:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45510)
+	id 1jOcLA-0001hv-8l
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 03:20:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45782)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jOcIi-0007yh-Mh
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:17:38 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOcKY-0001Ci-GV
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:19:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jOcIg-0007mv-Ur
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:17:36 -0400
-Resent-Date: Wed, 15 Apr 2020 03:17:36 -0400
-Resent-Message-Id: <E1jOcIg-0007mv-Ur@eggs.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21309)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jOcIc-0007l9-MJ; Wed, 15 Apr 2020 03:17:30 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1586935032; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=KH+uCi0qaDc/erUZHmCpKvDpMZVZmrEVLyhzKv6OA9LCAJ7IcytWPhpqdbOwOGmwR1eDFgwy4yZWQhYi5O6deLf/ifsW7GB5aSnaSz4cpu8prPxjCg3ACYJRERlcmg4/0wOeN+TVrMwGdvw52V/5tlg7TcBurgLKP/bWa+pIvqw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1586935032;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=0AzrSaj1ppF5UpDpRXpaEDW9pgdGC/vjyAZHdeasyBU=; 
- b=k/W+NSJcCDfxgLO7asb+ykQEtZHf1A3SijWdmjJk1zhse3TFlhBOjLF8E7nW5izkd9uRGZ+1wVgjq6eykABwVG7Y2KfEiTjwlkFpE7RF5zvmX6g7PDJ0e2Nq6/+If5dmOeXKuMFBiYWvsEiAIyw3IXlLado7sdG223smYIEG45M=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1586935031231332.5646970805003;
- Wed, 15 Apr 2020 00:17:11 -0700 (PDT)
-In-Reply-To: <20200415055140.466900-1-its@irrelevant.dk>
-Subject: Re: [PATCH v7 00/48] nvme: support NVMe v1.3d,
- SGLs and multiple namespaces
-Message-ID: <158693502941.27250.12163743959303503032@39012742ff91>
+ (envelope-from <philmd@redhat.com>) id 1jOcKX-0008Pz-9H
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:19:30 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49876
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOcKX-0008PI-61
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 03:19:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586935167;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1Vf3NY3+IFnyD8lQacXF6q5X98HTLg+E5TvQ3oZfoWo=;
+ b=XKvaDcUu8TQAlyu4QFdOk++HnWW0NenUeFTfB1ODZLnHFcvjxYFQLgxWaXH/+r/ylOvAoh
+ Wx46GlPf5PxH6A8feF+E+aaXrVcenDfB6AxOzV8MUbQhyab/9oxDPWUOtEy9f6EZdJVoDd
+ G0mY5jf9mrsUN+kg47KO2rACKoP16aA=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-144-HKfPRn0oOCSxcgHtgYn1zQ-1; Wed, 15 Apr 2020 03:19:25 -0400
+X-MC-Unique: HKfPRn0oOCSxcgHtgYn1zQ-1
+Received: by mail-ed1-f71.google.com with SMTP id l25so2195288edt.1
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 00:19:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1Vf3NY3+IFnyD8lQacXF6q5X98HTLg+E5TvQ3oZfoWo=;
+ b=da/p1k84EJ31ccOiBLEMk/6bXjfIypNEEqoBNFjEc9m4AxTdz52g4DokU4IM1HeVgZ
+ h0uBDkYFeQ30I9CGT/1hlJsdwAHjMic6+uZKVJbHqpuOya5M2uWoeas9B5zLkrNUp3RN
+ Reu6mR4q0W+pDdI0XJsmkvKRDz5WSWeI/B72bD4xRjm3bBnN2l8nBUkoqJo+yOKiPPik
+ gvBhXmXcejCyIZJCyaN1XXdkha8ejXY58TAhxqOcqv2AoVeZ5jikEzm35g0KHCMYQ7CI
+ Zd2tamIWboM/o5aVGKmjas5ByP/7C7ZFegAMOKwZDmSfAtLufZ7BwuOqLwble397OZ/9
+ KYWQ==
+X-Gm-Message-State: AGi0Pua1/8FLFq8aHIlT9UkXQzb8IdM2QvyKYocODyOg4d65yD/eSI/d
+ VMVEntn2TNYsnhVU8eRGUQ7sIx4ywOCg24EES54/RDxAh38WcnvbyDEgYmGTtRn2nmjAze6wNK1
+ CUAhWJqU+bogvgzA=
+X-Received: by 2002:a17:906:2584:: with SMTP id
+ m4mr3739206ejb.200.1586935164632; 
+ Wed, 15 Apr 2020 00:19:24 -0700 (PDT)
+X-Google-Smtp-Source: APiQypL00t7KM+vQ43tEjZeBXiXZv8ox/gmqbrV3Amjrz0nIRnEMR0np17SkkPgiH4wRy/3RE/cQjQ==
+X-Received: by 2002:a17:906:2584:: with SMTP id
+ m4mr3739184ejb.200.1586935164389; 
+ Wed, 15 Apr 2020 00:19:24 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id l91sm2002296ede.64.2020.04.15.00.19.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 15 Apr 2020 00:19:23 -0700 (PDT)
+Subject: Re: [PATCH v7 12/48] nvme: add temperature threshold feature
+To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
+References: <20200415055140.466900-1-its@irrelevant.dk>
+ <20200415055140.466900-13-its@irrelevant.dk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <0ab46987-8026-c059-1470-6cac2e6cbcbb@redhat.com>
+Date: Wed, 15 Apr 2020 09:19:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: its@irrelevant.dk
-Date: Wed, 15 Apr 2020 00:17:11 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20200415055140.466900-13-its@irrelevant.dk>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.53
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,160 +108,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, beata.michalska@linaro.org, qemu-block@nongnu.org,
- k.jensen@samsung.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- kbusch@kernel.org, its@irrelevant.dk, javier.gonz@samsung.com,
- mlevitsk@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQxNTA1NTE0MC40NjY5
-MDAtMS1pdHNAaXJyZWxldmFudC5kay8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHY3IDAwLzQ4XSBudm1lOiBzdXBwb3J0IE5WTWUg
-djEuM2QsIFNHTHMgYW5kIG11bHRpcGxlIG5hbWVzcGFjZXMKTWVzc2FnZS1pZDogMjAyMDA0MTUw
-NTUxNDAuNDY2OTAwLTEtaXRzQGlycmVsZXZhbnQuZGsKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVs
-bCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
-b3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2Uu
-Lgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hl
-dy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMDQxNTA1NTE0
-MC40NjY5MDAtMS1pdHNAaXJyZWxldmFudC5kayAtPiBwYXRjaGV3LzIwMjAwNDE1MDU1MTQwLjQ2
-NjkwMC0xLWl0c0BpcnJlbGV2YW50LmRrClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-MDc1YTAwOCBudm1lOiBtYWtlIGxiYSBkYXRhIHNpemUgY29uZmlndXJhYmxlCjQ3ZjA1ODkgbnZt
-ZTogY2hhbmdlIGNvbnRyb2xsZXIgcGNpIGlkCmQ1NTI2YzYgcGNpOiBhbGxvY2F0ZSBwY2kgaWQg
-Zm9yIG52bWUKYzk0NWVjYyBudm1lOiBzdXBwb3J0IG11bHRpcGxlIG5hbWVzcGFjZXMKODhmZjRh
-ZiBudm1lOiByZWZhY3RvciBpZGVudGlmeSBhY3RpdmUgbmFtZXNwYWNlIGlkIGxpc3QKMDVlYjcz
-MCBudm1lOiBhZGQgc3VwcG9ydCBmb3Igc2dsIGJpdCBidWNrZXQgZGVzY3JpcHRvcgpjY2QzNDk1
-IG52bWU6IGFkZCBzdXBwb3J0IGZvciBzY2F0dGVyIGdhdGhlciBsaXN0cwo1MjU0MTNkIG52bWU6
-IGhhcmRlbiBjbWIgYWNjZXNzCmM4OTMyNDggbnZtZTogaGFuZGxlIGRtYSBlcnJvcnMKYTFkY2I4
-MSBwY2k6IHBhc3MgYWxvbmcgdGhlIHJldHVybiB2YWx1ZSBvZiBkbWFfbWVtb3J5X3J3CjY4ZTUw
-NWQgbnZtZTogdXNlIHByZWFsbG9jYXRlZCBxc2cvaW92IGluIG52bWVfZG1hX3BycAo1Nzc4Yjdj
-IG52bWU6IGFkZCBudm1lX2NoZWNrX3J3IGhlbHBlcgpiZGRiNjI3IG52bWU6IGFsbG93IG11bHRp
-cGxlIGFpb3MgcGVyIGNvbW1hbmQKNDUwMTYyYSBudm1lOiByZW1vdmUgTnZtZUNtZCBwYXJhbWV0
-ZXIKNWI4MDYwYyBudm1lOiByZWZhY3RvciBOdm1lUmVxdWVzdAphNGM1MGU0IG52bWU6IGJlIGNv
-bnNpc3RlbnQgYWJvdXQgemVyb3MgdnMgemVyb2VzCmQ2MGUzYzIgbnZtZTogYWRkIGNoZWNrIGZv
-ciBtZHRzCjQ2NWUyOGQgbnZtZTogcmVmYWN0b3IgcmVxdWVzdCBib3VuZHMgY2hlY2tpbmcKMzRi
-NzI4ZiBudm1lOiB2ZXJpZnkgdmFsaWRpdHkgb2YgcHJwIGxpc3RzIGluIHRoZSBjbWIKYzk0NGJj
-NyBudm1lOiBhZGQgcmVxdWVzdCBtYXBwaW5nIGhlbHBlcgoyOWNmNWFiIG52bWU6IHBhc3MgcmVx
-dWVzdCBhbG9uZyBmb3IgdHJhY2luZwpkZmViMzI2IG52bWU6IHJlZmFjdG9yIGRtYSByZWFkL3dy
-aXRlCmJlNjNjOGQgbnZtZTogcmVtb3ZlIHJlZHVuZGFudCBoYXNfc2cgbWVtYmVyCjMxYzBmNzQg
-bnZtZTogcmVwbGFjZSBkbWFfYWNjdCB3aXRoIGJsa19hY2N0IGVxdWl2YWxlbnQKYzIzNzQ2MiBu
-dm1lOiBhZGQgbWFwcGluZyBoZWxwZXJzCjVlZGFjMWIgbnZtZTogbWVtc2V0IHByZWFsbG9jYXRl
-ZCByZXF1ZXN0cyBzdHJ1Y3R1cmVzCmE3MTViOGUgbnZtZTogYnVtcCBzdXBwb3J0ZWQgdmVyc2lv
-biB0byB2MS4zCjFjNTdkOTggbnZtZTogcHJvdmlkZSB0aGUgbWFuZGF0b3J5IHN1Ym5xbiBmaWVs
-ZAo2N2E1ZGQ1IG52bWU6IGVuZm9yY2UgdmFsaWQgcXVldWUgY3JlYXRpb24gc2VxdWVuY2UKMmU5
-NzA5NSBudm1lOiBzdXBwb3J0IGlkZW50aWZ5IG5hbWVzcGFjZSBkZXNjcmlwdG9yIGxpc3QKMDU3
-YTQ4OSBudm1lOiBhZGQgbG9nIHNwZWNpZmljIGZpZWxkIHRvIHRyYWNlIGV2ZW50cwo2NWY5NWUz
-IG52bWU6IG1ha2Ugc3VyZSBuY3FyIGFuZCBuc3FyIGlzIHZhbGlkCjMzMTEwNTkgbnZtZTogYWRk
-aXRpb25hbCB0cmFjaW5nCjNiMzU5MTYgbnZtZTogYWRkIG1pc3NpbmcgbWFuZGF0b3J5IGZlYXR1
-cmVzCjlhZmUxOGUgbnZtZTogYWRkIHN1cHBvcnQgZm9yIHRoZSBhc3luY2hyb25vdXMgZXZlbnQg
-cmVxdWVzdCBjb21tYW5kCjY0MjUwOWIgbnZtZTogYWRkIHN1cHBvcnQgZm9yIHRoZSBnZXQgbG9n
-IHBhZ2UgY29tbWFuZApkOTdiMzNkIG52bWU6IGFkZCB0ZW1wZXJhdHVyZSB0aHJlc2hvbGQgZmVh
-dHVyZQpjNmNhOWZjIG52bWU6IHJlZmFjdG9yIGRldmljZSByZWFsaXphdGlvbgoyNzg2NzEzIG52
-bWU6IHJlbW92ZSByZWR1bmRhbnQgY21ibG9jL2NtYnN6IG1lbWJlcnMKZDlkZTlkNiBudm1lOiBh
-ZGQgbWF4X2lvcXBhaXJzIGRldmljZSBwYXJhbWV0ZXIKNTQwNzg4NyBudm1lOiBmaXggcGNpIGRv
-b3JiZWxsIHNpemUgY2FsY3VsYXRpb24KZmM0YmRjYyBudm1lOiBhZGQgc3VwcG9ydCBmb3IgdGhl
-IGFib3J0IGNvbW1hbmQKYTgwZTk4MSBudm1lOiByZWZhY3RvciBudm1lX2FkZHJfcmVhZAoxNDFk
-ZGU5IG52bWU6IHVzZSBjb25zdGFudHMgaW4gaWRlbnRpZnkKMGQyOTNkOCBudm1lOiBidW1wIHNw
-ZWMgZGF0YSBzdHJ1Y3R1cmVzIHRvIHYxLjMKZDEwMmE5OSBudm1lOiBtb3ZlIGRldmljZSBwYXJh
-bWV0ZXJzIHRvIHNlcGFyYXRlIHN0cnVjdAoyMWE3ZDg4IG52bWU6IHJlbW92ZSBzdXBlcmZsdW91
-cyBicmVha3MKZTNlMDZjZSBudm1lOiByZW5hbWUgdHJhY2UgZXZlbnRzIHRvIG52bWVfZGV2Cgo9
-PT0gT1VUUFVUIEJFR0lOID09PQoxLzQ4IENoZWNraW5nIGNvbW1pdCBlM2UwNmNlMmExYzYgKG52
-bWU6IHJlbmFtZSB0cmFjZSBldmVudHMgdG8gbnZtZV9kZXYpCjIvNDggQ2hlY2tpbmcgY29tbWl0
-IDIxYTdkODg1Y2YwNyAobnZtZTogcmVtb3ZlIHN1cGVyZmx1b3VzIGJyZWFrcykKMy80OCBDaGVj
-a2luZyBjb21taXQgZDEwMmE5OWI5MDJjIChudm1lOiBtb3ZlIGRldmljZSBwYXJhbWV0ZXJzIHRv
-IHNlcGFyYXRlIHN0cnVjdCkKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3Vs
-ZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMTgwOiBGSUxFOiBody9ibG9jay9udm1lLmg6
-NjoKKyNkZWZpbmUgREVGSU5FX05WTUVfUFJPUEVSVElFUyhfc3RhdGUsIF9wcm9wcykgXAorICAg
-IERFRklORV9QUk9QX1NUUklORygic2VyaWFsIiwgX3N0YXRlLCBfcHJvcHMuc2VyaWFsKSwgXAor
-ICAgIERFRklORV9QUk9QX1VJTlQzMigiY21iX3NpemVfbWIiLCBfc3RhdGUsIF9wcm9wcy5jbWJf
-c2l6ZV9tYiwgMCksIFwKKyAgICBERUZJTkVfUFJPUF9VSU5UMzIoIm51bV9xdWV1ZXMiLCBfc3Rh
-dGUsIF9wcm9wcy5udW1fcXVldWVzLCA2NCkKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywg
-MTgxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvNDggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-CjQvNDggQ2hlY2tpbmcgY29tbWl0IDBkMjkzZDg1YWFkNSAobnZtZTogYnVtcCBzcGVjIGRhdGEg
-c3RydWN0dXJlcyB0byB2MS4zKQo1LzQ4IENoZWNraW5nIGNvbW1pdCAxNDFkZGU5NTQ3MGIgKG52
-bWU6IHVzZSBjb25zdGFudHMgaW4gaWRlbnRpZnkpCjYvNDggQ2hlY2tpbmcgY29tbWl0IGE4MGU5
-ODFiNDRmNSAobnZtZTogcmVmYWN0b3IgbnZtZV9hZGRyX3JlYWQpCjcvNDggQ2hlY2tpbmcgY29t
-bWl0IGZjNGJkY2M4ZDk5YiAobnZtZTogYWRkIHN1cHBvcnQgZm9yIHRoZSBhYm9ydCBjb21tYW5k
-KQo4LzQ4IENoZWNraW5nIGNvbW1pdCA1NDA3ODg3Y2NkNDAgKG52bWU6IGZpeCBwY2kgZG9vcmJl
-bGwgc2l6ZSBjYWxjdWxhdGlvbikKOS80OCBDaGVja2luZyBjb21taXQgZDlkZTlkNmJlYTliIChu
-dm1lOiBhZGQgbWF4X2lvcXBhaXJzIGRldmljZSBwYXJhbWV0ZXIpCjEwLzQ4IENoZWNraW5nIGNv
-bW1pdCAyNzg2NzEzNjc2MGEgKG52bWU6IHJlbW92ZSByZWR1bmRhbnQgY21ibG9jL2NtYnN6IG1l
-bWJlcnMpCjExLzQ4IENoZWNraW5nIGNvbW1pdCBjNmNhOWZjNzcxYzggKG52bWU6IHJlZmFjdG9y
-IGRldmljZSByZWFsaXphdGlvbikKMTIvNDggQ2hlY2tpbmcgY29tbWl0IGQ5N2IzM2Q3MTRmZCAo
-bnZtZTogYWRkIHRlbXBlcmF0dXJlIHRocmVzaG9sZCBmZWF0dXJlKQoxMy80OCBDaGVja2luZyBj
-b21taXQgNjQyNTA5Yjg4ZmEyIChudm1lOiBhZGQgc3VwcG9ydCBmb3IgdGhlIGdldCBsb2cgcGFn
-ZSBjb21tYW5kKQoxNC80OCBDaGVja2luZyBjb21taXQgOWFmZTE4ZTZjOTJlIChudm1lOiBhZGQg
-c3VwcG9ydCBmb3IgdGhlIGFzeW5jaHJvbm91cyBldmVudCByZXF1ZXN0IGNvbW1hbmQpCjE1LzQ4
-IENoZWNraW5nIGNvbW1pdCAzYjM1OTE2OGM0MDIgKG52bWU6IGFkZCBtaXNzaW5nIG1hbmRhdG9y
-eSBmZWF0dXJlcykKMTYvNDggQ2hlY2tpbmcgY29tbWl0IDMzMTEwNTlhMmQxMCAobnZtZTogYWRk
-aXRpb25hbCB0cmFjaW5nKQoxNy80OCBDaGVja2luZyBjb21taXQgNjVmOTVlMzJlYWMyIChudm1l
-OiBtYWtlIHN1cmUgbmNxciBhbmQgbnNxciBpcyB2YWxpZCkKMTgvNDggQ2hlY2tpbmcgY29tbWl0
-IDA1N2E0ODllODJmNSAobnZtZTogYWRkIGxvZyBzcGVjaWZpYyBmaWVsZCB0byB0cmFjZSBldmVu
-dHMpCjE5LzQ4IENoZWNraW5nIGNvbW1pdCAyZTk3MDk1MjM3OWIgKG52bWU6IHN1cHBvcnQgaWRl
-bnRpZnkgbmFtZXNwYWNlIGRlc2NyaXB0b3IgbGlzdCkKMjAvNDggQ2hlY2tpbmcgY29tbWl0IDY3
-YTVkZDUxMGEzYyAobnZtZTogZW5mb3JjZSB2YWxpZCBxdWV1ZSBjcmVhdGlvbiBzZXF1ZW5jZSkK
-MjEvNDggQ2hlY2tpbmcgY29tbWl0IDFjNTdkOThmOWNkMyAobnZtZTogcHJvdmlkZSB0aGUgbWFu
-ZGF0b3J5IHN1Ym5xbiBmaWVsZCkKMjIvNDggQ2hlY2tpbmcgY29tbWl0IGE3MTViOGViY2ExYiAo
-bnZtZTogYnVtcCBzdXBwb3J0ZWQgdmVyc2lvbiB0byB2MS4zKQoyMy80OCBDaGVja2luZyBjb21t
-aXQgNWVkYWMxYmJkMjA4IChudm1lOiBtZW1zZXQgcHJlYWxsb2NhdGVkIHJlcXVlc3RzIHN0cnVj
-dHVyZXMpCjI0LzQ4IENoZWNraW5nIGNvbW1pdCBjMjM3NDYyYWRhNGMgKG52bWU6IGFkZCBtYXBw
-aW5nIGhlbHBlcnMpCjI1LzQ4IENoZWNraW5nIGNvbW1pdCAzMWMwZjc0MWEyZDkgKG52bWU6IHJl
-cGxhY2UgZG1hX2FjY3Qgd2l0aCBibGtfYWNjdCBlcXVpdmFsZW50KQoyNi80OCBDaGVja2luZyBj
-b21taXQgYmU2M2M4ZGU3MWI5IChudm1lOiByZW1vdmUgcmVkdW5kYW50IGhhc19zZyBtZW1iZXIp
-CjI3LzQ4IENoZWNraW5nIGNvbW1pdCBkZmViMzI2M2RmNzcgKG52bWU6IHJlZmFjdG9yIGRtYSBy
-ZWFkL3dyaXRlKQoyOC80OCBDaGVja2luZyBjb21taXQgMjljZjVhYjE5YjhlIChudm1lOiBwYXNz
-IHJlcXVlc3QgYWxvbmcgZm9yIHRyYWNpbmcpCjI5LzQ4IENoZWNraW5nIGNvbW1pdCBjOTQ0YmM3
-MDk1NzkgKG52bWU6IGFkZCByZXF1ZXN0IG1hcHBpbmcgaGVscGVyKQozMC80OCBDaGVja2luZyBj
-b21taXQgMzRiNzI4ZmQzNWQ2IChudm1lOiB2ZXJpZnkgdmFsaWRpdHkgb2YgcHJwIGxpc3RzIGlu
-IHRoZSBjbWIpCjMxLzQ4IENoZWNraW5nIGNvbW1pdCA0NjVlMjhkZDMyYTIgKG52bWU6IHJlZmFj
-dG9yIHJlcXVlc3QgYm91bmRzIGNoZWNraW5nKQozMi80OCBDaGVja2luZyBjb21taXQgZDYwZTNj
-MjM0NjM0IChudm1lOiBhZGQgY2hlY2sgZm9yIG1kdHMpCjMzLzQ4IENoZWNraW5nIGNvbW1pdCBh
-NGM1MGU0NzVmMWQgKG52bWU6IGJlIGNvbnNpc3RlbnQgYWJvdXQgemVyb3MgdnMgemVyb2VzKQoz
-NC80OCBDaGVja2luZyBjb21taXQgNWI4MDYwY2MxOWE3IChudm1lOiByZWZhY3RvciBOdm1lUmVx
-dWVzdCkKMzUvNDggQ2hlY2tpbmcgY29tbWl0IDQ1MDE2MmE5YWY5ZSAobnZtZTogcmVtb3ZlIE52
-bWVDbWQgcGFyYW1ldGVyKQozNi80OCBDaGVja2luZyBjb21taXQgYmRkYjYyNzVkZGVjIChudm1l
-OiBhbGxvdyBtdWx0aXBsZSBhaW9zIHBlciBjb21tYW5kKQozNy80OCBDaGVja2luZyBjb21taXQg
-NTc3OGI3YzkyZjlhIChudm1lOiBhZGQgbnZtZV9jaGVja19ydyBoZWxwZXIpCjM4LzQ4IENoZWNr
-aW5nIGNvbW1pdCA2OGU1MDVkNjcxMGMgKG52bWU6IHVzZSBwcmVhbGxvY2F0ZWQgcXNnL2lvdiBp
-biBudm1lX2RtYV9wcnApCjM5LzQ4IENoZWNraW5nIGNvbW1pdCBhMWRjYjgxYjFmYzQgKHBjaTog
-cGFzcyBhbG9uZyB0aGUgcmV0dXJuIHZhbHVlIG9mIGRtYV9tZW1vcnlfcncpCjQwLzQ4IENoZWNr
-aW5nIGNvbW1pdCBjODkzMjQ4MmFiNTQgKG52bWU6IGhhbmRsZSBkbWEgZXJyb3JzKQo0MS80OCBD
-aGVja2luZyBjb21taXQgNTI1NDEzZDFlMGFmIChudm1lOiBoYXJkZW4gY21iIGFjY2VzcykKNDIv
-NDggQ2hlY2tpbmcgY29tbWl0IGNjZDM0OTU5MTg1NiAobnZtZTogYWRkIHN1cHBvcnQgZm9yIHNj
-YXR0ZXIgZ2F0aGVyIGxpc3RzKQo0My80OCBDaGVja2luZyBjb21taXQgMDVlYjczMDA2YzVjIChu
-dm1lOiBhZGQgc3VwcG9ydCBmb3Igc2dsIGJpdCBidWNrZXQgZGVzY3JpcHRvcikKNDQvNDggQ2hl
-Y2tpbmcgY29tbWl0IDg4ZmY0YWY2NTU1MSAobnZtZTogcmVmYWN0b3IgaWRlbnRpZnkgYWN0aXZl
-IG5hbWVzcGFjZSBpZCBsaXN0KQo0NS80OCBDaGVja2luZyBjb21taXQgYzk0NWVjYzcxOWJkIChu
-dm1lOiBzdXBwb3J0IG11bHRpcGxlIG5hbWVzcGFjZXMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBv
-ciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQzOiAK
-bmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBz
-aG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzIxODogRklMRTogaHcvYmxvY2svbnZt
-ZS1ucy5oOjg6CisjZGVmaW5lIERFRklORV9OVk1FX05TX1BST1BFUlRJRVMoX3N0YXRlLCBfcHJv
-cHMpIFwKKyAgICBERUZJTkVfUFJPUF9EUklWRSgiZHJpdmUiLCBfc3RhdGUsIGJsayksIFwKKyAg
-ICBERUZJTkVfUFJPUF9VSU5UMzIoIm5zaWQiLCBfc3RhdGUsIF9wcm9wcy5uc2lkLCAwKQoKdG90
-YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCA4NDEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNDUvNDgg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQ2LzQ4IENoZWNraW5nIGNvbW1pdCBkNTUyNmM2
-ZjM0OTkgKHBjaTogYWxsb2NhdGUgcGNpIGlkIGZvciBudm1lKQpXQVJOSU5HOiBhZGRlZCwgbW92
-ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMz
-MjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ2
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQ2LzQ4IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjQ3
-LzQ4IENoZWNraW5nIGNvbW1pdCA0N2YwNTg5ZTM2NDcgKG52bWU6IGNoYW5nZSBjb250cm9sbGVy
-IHBjaSBpZCkKNDgvNDggQ2hlY2tpbmcgY29tbWl0IDA3NWEwMDhlYThlNCAobnZtZTogbWFrZSBs
-YmEgZGF0YSBzaXplIGNvbmZpZ3VyYWJsZSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
-bmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
-cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA0MTUwNTUxNDAuNDY2OTAwLTEtaXRzQGlycmVsZXZh
-bnQuZGsvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 4/15/20 7:51 AM, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
+> 
+> It might seem wierd to implement this feature for an emulated device,
+
+'weird'
+
+> but it is mandatory to support and the feature is useful for testing
+> asynchronous event request support, which will be added in a later
+> patch.
+
+Which patch? I can't find how you set the temperature in this series.
+
+> 
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> Acked-by: Keith Busch <kbusch@kernel.org>
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>   hw/block/nvme.c      | 48 ++++++++++++++++++++++++++++++++++++++++++++
+>   hw/block/nvme.h      |  1 +
+>   include/block/nvme.h |  8 +++++++-
+>   3 files changed, 56 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index d1c42ee4765c..e777cc9075c1 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -45,6 +45,9 @@
+>   #include "nvme.h"
+>   
+>   #define NVME_CMB_BIR 2
+> +#define NVME_TEMPERATURE 0x143
+> +#define NVME_TEMPERATURE_WARNING 0x157
+> +#define NVME_TEMPERATURE_CRITICAL 0x175
+>   
+>   #define NVME_GUEST_ERR(trace, fmt, ...) \
+>       do { \
+> @@ -798,9 +801,31 @@ static uint16_t nvme_get_feature_timestamp(NvmeCtrl *n, NvmeCmd *cmd)
+>   static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>   {
+>       uint32_t dw10 = le32_to_cpu(cmd->cdw10);
+> +    uint32_t dw11 = le32_to_cpu(cmd->cdw11);
+>       uint32_t result;
+>   
+>       switch (dw10) {
+> +    case NVME_TEMPERATURE_THRESHOLD:
+> +        result = 0;
+> +
+> +        /*
+> +         * The controller only implements the Composite Temperature sensor, so
+> +         * return 0 for all other sensors.
+> +         */
+> +        if (NVME_TEMP_TMPSEL(dw11) != NVME_TEMP_TMPSEL_COMPOSITE) {
+> +            break;
+> +        }
+> +
+> +        switch (NVME_TEMP_THSEL(dw11)) {
+> +        case NVME_TEMP_THSEL_OVER:
+> +            result = cpu_to_le16(n->features.temp_thresh_hi);
+> +            break;
+> +        case NVME_TEMP_THSEL_UNDER:
+> +            result = cpu_to_le16(n->features.temp_thresh_low);
+> +            break;
+> +        }
+> +
+> +        break;
+>       case NVME_VOLATILE_WRITE_CACHE:
+>           result = blk_enable_write_cache(n->conf.blk);
+>           trace_nvme_dev_getfeat_vwcache(result ? "enabled" : "disabled");
+> @@ -845,6 +870,23 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>       uint32_t dw11 = le32_to_cpu(cmd->cdw11);
+>   
+>       switch (dw10) {
+> +    case NVME_TEMPERATURE_THRESHOLD:
+> +        if (NVME_TEMP_TMPSEL(dw11) != NVME_TEMP_TMPSEL_COMPOSITE) {
+> +            break;
+> +        }
+> +
+> +        switch (NVME_TEMP_THSEL(dw11)) {
+> +        case NVME_TEMP_THSEL_OVER:
+> +            n->features.temp_thresh_hi = NVME_TEMP_TMPTH(dw11);
+> +            break;
+> +        case NVME_TEMP_THSEL_UNDER:
+> +            n->features.temp_thresh_low = NVME_TEMP_TMPTH(dw11);
+> +            break;
+> +        default:
+> +            return NVME_INVALID_FIELD | NVME_DNR;
+> +        }
+> +
+> +        break;
+>       case NVME_VOLATILE_WRITE_CACHE:
+>           blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+>           break;
+> @@ -1373,6 +1415,7 @@ static void nvme_init_state(NvmeCtrl *n)
+>       n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
+>       n->sq = g_new0(NvmeSQueue *, n->params.max_ioqpairs + 1);
+>       n->cq = g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
+> +    n->features.temp_thresh_hi = NVME_TEMPERATURE_WARNING;
+>   }
+>   
+>   static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
+> @@ -1450,6 +1493,11 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+>       id->acl = 3;
+>       id->frmw = 7 << 1;
+>       id->lpa = 1 << 0;
+> +
+> +    /* recommended default value (~70 C) */
+> +    id->wctemp = cpu_to_le16(NVME_TEMPERATURE_WARNING);
+> +    id->cctemp = cpu_to_le16(NVME_TEMPERATURE_CRITICAL);
+> +
+>       id->sqes = (0x6 << 4) | 0x6;
+>       id->cqes = (0x4 << 4) | 0x4;
+>       id->nn = cpu_to_le32(n->num_namespaces);
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index b7c465560eea..807c4ad19dcc 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -115,6 +115,7 @@ typedef struct NvmeCtrl {
+>       NvmeSQueue      admin_sq;
+>       NvmeCQueue      admin_cq;
+>       NvmeIdCtrl      id_ctrl;
+> +    NvmeFeatureVal  features;
+>   } NvmeCtrl;
+>   
+>   static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
+> diff --git a/include/block/nvme.h b/include/block/nvme.h
+> index b30744068d46..a0519814ecec 100644
+> --- a/include/block/nvme.h
+> +++ b/include/block/nvme.h
+> @@ -688,7 +688,13 @@ enum NvmeIdCtrlOncs {
+>   typedef struct NvmeFeatureVal {
+>       uint32_t    arbitration;
+>       uint32_t    power_mgmt;
+> -    uint32_t    temp_thresh;
+> +    union {
+> +        struct {
+> +            uint16_t temp_thresh_hi;
+> +            uint16_t temp_thresh_low;
+> +        };
+> +        uint32_t temp_thresh;
+> +    };
+>       uint32_t    err_rec;
+>       uint32_t    volatile_wc;
+>       uint32_t    num_queues;
+> 
+
 
