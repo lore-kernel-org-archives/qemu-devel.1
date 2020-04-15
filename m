@@ -7,87 +7,87 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F5FC2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:14:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EEE6C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:15:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B78792074F
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:14:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DB7920575
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 13:15:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hkxQbBEY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B78792074F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PkvKqCbf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DB7920575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOhrj-0001qD-Ox
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 09:14:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34889)
+	id 1jOhsl-0003WO-91
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 09:15:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34688)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jOhmq-0001gN-HE
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:09:05 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOhmB-00082A-VL
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:08:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jOhmp-0006da-GU
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:09:04 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33398
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jOhmA-0006OW-Ps
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:08:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42887
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOhmp-0006dK-Cr
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:09:03 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOhmA-0006O3-Lf
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 09:08:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586956142;
+ s=mimecast20190719; t=1586956102;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QiDBNnQG1uzK2Vm9GELAOknE819NdQfSTdybdbZmQ3U=;
- b=hkxQbBEY4OZgtbnGTM9jMXhrAVZ4Et53bf9PbpdTQ0GyCutAu99EKGl8qTVV3878GdFngJ
- KQgwwPCM4/3/RHQ2DizZzFBsyeuUACsndzH315y8C5cT7f8zRORChJJBe9kQtW5Q1wnwtv
- EVJ+msrTopkW3Jb8IdEpreGkjefAvGs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-8RX4rtX3OX6fwMFSLI5cMg-1; Wed, 15 Apr 2020 09:09:01 -0400
-X-MC-Unique: 8RX4rtX3OX6fwMFSLI5cMg-1
-Received: by mail-wr1-f72.google.com with SMTP id v14so10556438wrq.13
- for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 06:09:01 -0700 (PDT)
+ bh=ZJJaxyCw3+mZ+OMiRwgzw7jtSLA86QJfVvFFxP8Car8=;
+ b=PkvKqCbfACL7QO5zyB1TGwYBLULz5HyzQODOqSyTmnVuJND0oQNvwsiuDpTAO4ymUtiH4a
+ eTCNZ4WVHOV8+4ZtJlPOD8amLgQ3SUewvBevc2SvF/47JW82x4Z7nJOHWg6/Uox13CQNRX
+ 3gxpftCvcztkmhSDdA0tiAiSZ5eWJNk=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-379-zwxSZQOHOLyOzCd25d7OiQ-1; Wed, 15 Apr 2020 09:08:19 -0400
+X-MC-Unique: zwxSZQOHOLyOzCd25d7OiQ-1
+Received: by mail-ed1-f71.google.com with SMTP id b9so2877319edj.10
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 06:08:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=DJcgCPWagtcPKFcXYDUtCdAw0ueYLMcAFCJqfQ5kJn0=;
- b=lvbg73QYiaM9d4ykaCKE6U/IFkl1yVcWHmCmq6oKknCz/wcRQP8Ev25DahY36+iYGF
- tRFXpx7h9fm6V/iIbkWdkoEITX561Lui/C7xdGPUV5oVE5LqvpFvD9/UJaf+4nFqSrwM
- 4VvjHI7PnD8ifPtWdheZawNynbRpo5IJUKaSXfXZ+IMGF8wcSAhmXvFKsaX3f9FXG1em
- OsXL8zG0xvTkB8O7d9sOIf9y6WyCukokvcL7WpDV5e78Ir4GpK6fqJX8eoxjB2paa8Gb
- nu/wCihoUzdKvQAYQ9n5eBES/LZkHnGHoBZprYm3+Fsthtusq+kcXyhFnYL3BEKN8Zdr
- Lbew==
-X-Gm-Message-State: AGi0PuZD4ZJYYV4I/u/LzJlNhORXZ3ASFGSigmWW7W33ChZWZGF9TGcQ
- mq92j/MViC32uzoEk/BCoVJmz8ZrVtgtThXZ9keRXrYRTWB1FNgjWZhM5Te6u7cjJmRbXM6/BeQ
- oAsghIRjQL393DTs=
-X-Received: by 2002:a1c:9aca:: with SMTP id c193mr5013523wme.38.1586956140345; 
- Wed, 15 Apr 2020 06:09:00 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJBGohX3CjtvOj9c4vcr7D2Pv4Bn/u5Fb1C36PhlmxXy1r0eiEB5WRKwh5vENfhFaYFvi4Agw==
-X-Received: by 2002:a1c:9aca:: with SMTP id c193mr5013509wme.38.1586956140147; 
- Wed, 15 Apr 2020 06:09:00 -0700 (PDT)
+ bh=fHd2pg6fXgQjEObz/mE4+e7bLXcjxDYU3+AlQy7iSS0=;
+ b=FbT/6sAJ4xbZoQ0l8giaIPk8l/M/p0T7rzWA811FF3Slt8zi9G6swhUSYSi7Rd3hVZ
+ c2nNJDQnEjFSMriyR+/Do4V1vYGc685CxXfLbKaqk/pXJcsT9rFwGAxgVuHE4/U76oN8
+ NpJQ2dxPcdV3u3JYW/kHmGlZKvq9HcOuTpuQzS5KktHOAjg28Z/E3kIRPD+te5vwfCN7
+ OlOBO6gvdEYfaFiESGKuBNVeHKV0fwEw9N6puAsVh1aNgvasbI39w20e/apgsJ+2T3Od
+ vsesjeVbvHrL2xHRNG2QHfquh6t7mJqIUQQ24emo8g2eBjbe3Zgk1pducyNDKwvqwqGR
+ sRLQ==
+X-Gm-Message-State: AGi0PuaCtM1aa7xOatUiaDwin0dbl8w/vF2cStGEsrT2rfCK2vRqbMRG
+ ZFuFIIbFMD00HIK58DS3r9V+rRVKeaS1Bqmrv4sufBwHcNnl1y6rHysb5XDcz/ZGQNHtNc1YEvM
+ XwSRnz8D2cgVL64k=
+X-Received: by 2002:a50:f306:: with SMTP id p6mr23148789edm.363.1586956098344; 
+ Wed, 15 Apr 2020 06:08:18 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLgY9S4uggYaSWkrdZuuGDGgSIuCZ3/kI7Q/cuf9ft8mIyJ7t/YqDy+7UA7L8K6pceJosAGhg==
+X-Received: by 2002:a50:f306:: with SMTP id p6mr23148749edm.363.1586956098026; 
+ Wed, 15 Apr 2020 06:08:18 -0700 (PDT)
 Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id z10sm21258313wrg.69.2020.04.15.06.08.58
+ by smtp.gmail.com with ESMTPSA id a21sm2133673edr.22.2020.04.15.06.08.16
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 15 Apr 2020 06:08:59 -0700 (PDT)
-Subject: Re: [PATCH v2 11/16] nvme: factor out block backend setup
+ Wed, 15 Apr 2020 06:08:17 -0700 (PDT)
+Subject: Re: [PATCH v2 09/16] nvme: factor out property/constraint checks
 To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
 References: <20200415130159.611361-1-its@irrelevant.dk>
- <20200415130159.611361-12-its@irrelevant.dk>
+ <20200415130159.611361-10-its@irrelevant.dk>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b8eff0ea-485f-1f07-a0d0-3bba1ca2e526@redhat.com>
-Date: Wed, 15 Apr 2020 15:08:58 +0200
+Message-ID: <41d67c89-6392-265e-6169-691c51d95340@redhat.com>
+Date: Wed, 15 Apr 2020 15:08:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200415130159.611361-12-its@irrelevant.dk>
+In-Reply-To: <20200415130159.611361-10-its@irrelevant.dk>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -95,7 +95,7 @@ Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,46 +121,94 @@ On 4/15/20 3:01 PM, Klaus Jensen wrote:
 >=20
 > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 > ---
->   hw/block/nvme.c | 13 ++++++++++---
->   1 file changed, 10 insertions(+), 3 deletions(-)
+>   hw/block/nvme.c | 43 ++++++++++++++++++++++++++++---------------
+>   1 file changed, 28 insertions(+), 15 deletions(-)
 >=20
 > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 45a352b63d89..80da0825d295 100644
+> index 44856e873fd1..5f9ebbd6a1d5 100644
 > --- a/hw/block/nvme.c
 > +++ b/hw/block/nvme.c
-> @@ -1351,6 +1351,13 @@ static void nvme_init_state(NvmeCtrl *n)
->       n->cq =3D g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
->   }
+> @@ -1311,24 +1311,19 @@ static const MemoryRegionOps nvme_cmb_ops =3D {
+>       },
+>   };
 >  =20
-> +static void nvme_init_blk(NvmeCtrl *n, Error **errp)
+> -static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+> +static void nvme_check_constraints(NvmeCtrl *n, Error **errp)
+>   {
+> -    NvmeCtrl *n =3D NVME(pci_dev);
+> -    NvmeIdCtrl *id =3D &n->id_ctrl;
+> +    NvmeParams *params =3D &n->params;
+>  =20
+> -    int i;
+> -    int64_t bs_size;
+> -    uint8_t *pci_conf;
+> -
+> -    if (n->params.num_queues) {
+> +    if (params->num_queues) {
+>           warn_report("num_queues is deprecated; please use max_ioqpairs =
+"
+>                       "instead");
+>  =20
+> -        n->params.max_ioqpairs =3D n->params.num_queues - 1;
+> +        params->max_ioqpairs =3D params->num_queues - 1;
+>       }
+>  =20
+> -    if (n->params.max_ioqpairs < 1 ||
+> -        n->params.max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
+> +    if (params->max_ioqpairs < 1 ||
+> +        params->max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
+>           error_setg(errp, "max_ioqpairs must be between 1 and %d",
+>                      PCI_MSIX_FLAGS_QSIZE);
+>           return;
+> @@ -1339,16 +1334,34 @@ static void nvme_realize(PCIDevice *pci_dev, Erro=
+r **errp)
+>           return;
+>       }
+>  =20
+> +    if (!params->serial) {
+> +        error_setg(errp, "serial property not set");
+> +        return;
+> +    }
+> +}
+> +
+> +static void nvme_realize(PCIDevice *pci_dev, Error **errp)
 > +{
-> +    blkconf_blocksizes(&n->conf);
-> +    blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk=
-),
-> +                                  false, errp);
+> +    NvmeCtrl *n =3D NVME(pci_dev);
+> +    NvmeIdCtrl *id =3D &n->id_ctrl;
+> +    Error *err =3D NULL;
+
+Nitpick if you ever have to respin, name this 'local_err'.
+
+> +
+> +    int i;
+> +    int64_t bs_size;
+> +    uint8_t *pci_conf;
+> +
+> +    nvme_check_constraints(n, &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+
+Thanks :)
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-> +}
+> +        return;
+> +    }
 > +
->   static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->   {
->       NvmeCtrl *n =3D NVME(pci_dev);
-> @@ -1375,9 +1382,9 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
-**errp)
+>       bs_size =3D blk_getlength(n->conf.blk);
+>       if (bs_size < 0) {
+>           error_setg(errp, "could not get backing file size");
 >           return;
 >       }
 >  =20
-> -    blkconf_blocksizes(&n->conf);
-> -    if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->con=
-f.blk),
-> -                                       false, errp)) {
-> +    nvme_init_blk(n, &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
->           return;
->       }
->  =20
+> -    if (!n->params.serial) {
+> -        error_setg(errp, "serial property not set");
+> -        return;
+> -    }
+>       blkconf_blocksizes(&n->conf);
+>       if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->co=
+nf.blk),
+>                                          false, errp)) {
 >=20
 
 
