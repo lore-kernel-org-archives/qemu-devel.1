@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2270DC3815B
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:44:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A64AC2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:45:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3E5C206F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:44:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09A2E20737
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:45:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kVn17K3R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3E5C206F9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SXCrfySX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09A2E20737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOfXF-0007IR-1A
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:44:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45605)
+	id 1jOfXY-0007aC-5s
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:45:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45637)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jOfUw-0002Pw-CT
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:42:27 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jOfV2-0002iF-J9
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:42:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jOfUr-00038m-Mb
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:42:26 -0400
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:53113)
+ (envelope-from <alex.bennee@linaro.org>) id 1jOfUs-00039D-FF
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:42:32 -0400
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:37420)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jOfUr-00038K-Gm
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:42:21 -0400
-Received: by mail-wm1-x32a.google.com with SMTP id o81so11243878wmo.2
- for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 03:42:21 -0700 (PDT)
+ id 1jOfUs-00038j-9G
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:42:22 -0400
+Received: by mail-wr1-x436.google.com with SMTP id k1so11308961wrx.4
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 03:42:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=lUvP8ILsx2IDdEAZ5yyYY9/3My9j0MLorL0tokHSiKc=;
- b=kVn17K3RRpWAUiMVy8jLloOQ73Uzb/t3cz8e3frYLgH5nHxI5YVgqZnJ1FhIh+h5LS
- OYOgUdoj/egm1rChyWkXP9tunqhrEpma9q4NPthI+C20c9DMuOfbyTpXw5SiDY4qmBI/
- nzuPgQMjEOQ65MpT/8E2Pe3Z79axe423n3nLM0YXt2sjX4d50EZblNkCC+BGHI0Uil9a
- 75k84yJfySKba0BZSvL4DXc5YIBHC4hwn/k61+qU2+gcX9B9SMiBp+x4aQdifhOWk8Fm
- tjyJLtkNtop8mHXLXKWqhFjGOA53CVg7gcrk9PHhGTwEhBK6t2YZect2qFupHkJky3A7
- Z+sg==
+ bh=MK/jC81/8sRpluD3scWqqrQbZZzk/m9KkgnOCQx5tL4=;
+ b=SXCrfySXY+B05afPhpSqlY7shjKkEMXLp6BVdiDm1qiz/nt5g0vnhmNmNGoe/4NsZi
+ cIoO0FYCiLy09566psoY/M3riT1F9pDUQG/ptxtZnZ1PuZkwWFUvB0KYo1SN37XDQk/F
+ vG1qCLb4utntovGhhph9ficu96n1FZgrWio7FEtbKr0Fh13wvuHetrRwlo2NkyzN/GpQ
+ 6tsJxK7ozCxFf1TBKnMxha7rb5GOflJ2qgbkpgGA47vrcyDnStKTFAJI+x6w6wkErN5w
+ sJaQyN5ZlRU2MJ/BxCG8oLYM6agS7OKOxyM320sAN7RLynre+wxQbRXR1RFL9BkbulY6
+ YcWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=lUvP8ILsx2IDdEAZ5yyYY9/3My9j0MLorL0tokHSiKc=;
- b=kjabjz9PhEbc/HwMN4b2QPCIlaT1U4F8zPSDGrbOlkJJjkQoU1JIeNuP3++2H8uySx
- aXC2QDSf8ix0yPXQV7rjj5wVECgj6JhEVQwhn6U7PDCuRRwh7CQtA840EWBYvyKjwwdp
- 9Qdqz+joedppXdVTlVTrwFIRF9e2AdVx6ctXaeBbJEWbKvVRrePJrMsIDmQVyeO0iot1
- mSQrjKcDhRsTGHXQ/j7ECRISi6cWBON+TXPDi68PXdv5akQjm7oCtenOHP/3ACws/zaE
- JjW67+fzFbWnyNNDsy/JrLXWasNPNM8KgDgyrI+2GCr3St2G4UzXtTjcM+lnubFolgJ9
- IjnA==
-X-Gm-Message-State: AGi0PuZjA//74iwTRABHDHhYHBanKsuv+EGdemsjzJoZ/zlH6VAqzmKJ
- 6WqOZrNMAqxab+LIFSZBHQfjPg==
-X-Google-Smtp-Source: APiQypJKxHMP/I1VgGmLVXJtPq1oEs6y6kdDSQFICuMplf8DVubgmUPMThU9fW3/UHQ7oCWu619eIg==
-X-Received: by 2002:a1c:4409:: with SMTP id r9mr4712601wma.165.1586947340337; 
- Wed, 15 Apr 2020 03:42:20 -0700 (PDT)
+ bh=MK/jC81/8sRpluD3scWqqrQbZZzk/m9KkgnOCQx5tL4=;
+ b=dQ1qcfTMy2q9iBzoP9q6lb23uBxdugwxKB53wuN5EA+dh4Y4IS4MjkDQ9cdv/Rixtf
+ 6/sEqedePq81iuJPa1Whwcl0JlBXhykRwIh1dJ2FSsXlxZElsNrldfakzk5zESi1Q2mm
+ xTAhclUu8FLbvFCqhLs+CBogQdebhiHfZz/pUopi/D9aMTK1TKK2YHbON5N86dw53NeW
+ LqJFh+WugN1A9N06pn8sPmX0TzFq1lop85EF27GMKT+gajykkNlFFwCg7otLOr5CvmM5
+ TCng5UscudEw30nLLY6W9blGLUYV0u/DvDl9LbvpK72TJItb5aCzvdbUUk4r2HbliGJa
+ SxCg==
+X-Gm-Message-State: AGi0PuYYW+7V2/Leosljoh80hYQUN0uvIIUJa23XVUom5MyYKL3HPLUJ
+ EcJHNnKMh0HRBlHIZW3FHePnOg==
+X-Google-Smtp-Source: APiQypIJ7XPn20g5D0NuYknmXtkpL+A8IRmhO38Hdas9EIyyJmkFx/2OKG4SQF6S9rYaAZJxgz2zAg==
+X-Received: by 2002:adf:e3ca:: with SMTP id k10mr11722322wrm.53.1586947341200; 
+ Wed, 15 Apr 2020 03:42:21 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id w17sm14375640wru.20.2020.04.15.03.42.14
+ by smtp.gmail.com with ESMTPSA id z18sm16637303wrw.41.2020.04.15.03.42.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Wed, 15 Apr 2020 03:42:17 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6C2B91FF91;
+ by zen.linaroharston (Postfix) with ESMTP id 825CC1FF92;
  Wed, 15 Apr 2020 11:42:12 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 5/8] target/m68k/helper: Fix m68k_fpu_gdb_get_reg() use of
- GByteArray
-Date: Wed, 15 Apr 2020 11:42:08 +0100
-Message-Id: <20200415104211.9388-6-alex.bennee@linaro.org>
+Subject: [PULL 6/8] gdbstub: i386: Fix gdb_get_reg16() parameter to unbreak gdb
+Date: Wed, 15 Apr 2020 11:42:09 +0100
+Message-Id: <20200415104211.9388-7-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200415104211.9388-1-alex.bennee@linaro.org>
 References: <20200415104211.9388-1-alex.bennee@linaro.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32a
+X-Received-From: 2a00:1450:4864:20::436
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,44 +96,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Peter Xu <peterx@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Peter Xu <peterx@redhat.com>
 
-Since a010bdbe719 the gdbstub API takes a GByteArray*. Unfortunately
-we forgot to update the gdb_get_reg*() calls. Do it now.
+We should only pass in gdb_get_reg16() with the GByteArray* object
+itself, no need to shift.  Without this patch, gdb remote attach will
+crash QEMU:
+
+  (gdb) target remote :1234
+  Remote debugging using :1234
+  Remote communication error.  Target disconnected.: Connection reset by peer.
+  $ qemu-system-x86_64 -m 1G -smp 4 ... -s
+  ERROR:qemu/gdbstub.c:1843:handle_read_all_regs: assertion failed: (len == gdbserver_state.mem_buf->len)
+  Bail out! ERROR:qemu/gdbstub.c:1843:handle_read_all_regs: assertion failed: (len == gdbserver_state.mem_buf->len)
 
 Fixes: a010bdbe719 ("extend GByteArray to read register helpers")
-Reported-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Stefano Garzarella <sgarzare@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200409172509.4078-1-philmd@redhat.com>
-Message-Id: <20200414200631.12799-11-alex.bennee@linaro.org>
+Message-Id: <20200409164954.36902-3-peterx@redhat.com>
+Message-Id: <20200414200631.12799-12-alex.bennee@linaro.org>
 
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index 014657c6372..cad40838956 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -109,8 +109,8 @@ static int m68k_fpu_gdb_get_reg(CPUM68KState *env, GByteArray *mem_buf, int n)
- {
-     if (n < 8) {
-         int len = gdb_get_reg16(mem_buf, env->fregs[n].l.upper);
--        len += gdb_get_reg16(mem_buf + len, 0);
--        len += gdb_get_reg64(mem_buf + len, env->fregs[n].l.lower);
-+        len += gdb_get_reg16(mem_buf, 0);
-+        len += gdb_get_reg64(mem_buf, env->fregs[n].l.lower);
+diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c
+index f3d23b614ee..b98a99500ae 100644
+--- a/target/i386/gdbstub.c
++++ b/target/i386/gdbstub.c
+@@ -106,7 +106,7 @@ int x86_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+     } else if (n >= IDX_FP_REGS && n < IDX_FP_REGS + 8) {
+         floatx80 *fp = (floatx80 *) &env->fpregs[n - IDX_FP_REGS];
+         int len = gdb_get_reg64(mem_buf, cpu_to_le64(fp->low));
+-        len += gdb_get_reg16(mem_buf + len, cpu_to_le16(fp->high));
++        len += gdb_get_reg16(mem_buf, cpu_to_le16(fp->high));
          return len;
-     }
-     switch (n) {
+     } else if (n >= IDX_XMM_REGS && n < IDX_XMM_REGS + CPU_NB_REGS) {
+         n -= IDX_XMM_REGS;
 -- 
 2.20.1
 
