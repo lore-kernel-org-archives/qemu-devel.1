@@ -2,100 +2,83 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC70C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 884DFC2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:48:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EE9220737
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:48:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5005120737
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:48:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hky2ryfw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EE9220737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uuLYskoe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5005120737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOfau-0005vS-SX
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:48:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45791)
+	id 1jOfb3-00064u-Ht
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:48:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46416)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jOfW6-0004l7-N5
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:43:48 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jOfZZ-0004K9-QV
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:47:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jOfW5-0003ej-Gn
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:43:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51065
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOfW5-0003eZ-DJ
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:43:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586947417;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ofi8je2wP1nCW9e7McQzsNRAwCMXxB7OTGUAKTQ0Cr0=;
- b=Hky2ryfwnLoCA9XgASRnmAugtP7aI+Aid2S+pKKuqb30gid2nPezC6Ao1TRcB/ueQC6XT/
- 9Tr+hreNslaENNMNbgjr+uzA5xEvER+BMomDnZqRXd/C2RmEO+3gxReI2Icu0M6++66Yuh
- bgmIsKLswLNunh6s9Ts6wYtIBFwzilo=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395--rzA_fStNLu_Ecye_pIcgQ-1; Wed, 15 Apr 2020 06:43:35 -0400
-X-MC-Unique: -rzA_fStNLu_Ecye_pIcgQ-1
-Received: by mail-ed1-f72.google.com with SMTP id f11so2575196edc.4
- for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 03:43:35 -0700 (PDT)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jOfZY-00070Z-NI
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:47:13 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39454)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1jOfZY-0006xi-Gr
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:47:12 -0400
+Received: by mail-wm1-x344.google.com with SMTP id y24so18400371wma.4
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 03:47:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=eaH8cnBY+1M0lWYZxTpwdfzQ/feooZwfZWoSUSO/MQg=;
+ b=uuLYskoeRrd/xxXh8dn9deOFfxrz1mXX1hq2G8jr8RkGHwA/XGYbNU9QHyHZYvL4uj
+ 0JkLxwlb/LMPuESEgSE1cSLin7PVjE57RzEdQ16F3uHzQHzx7dD5R/sJ0Aibt8GLqUF+
+ 8TWCYk7yvB73S4jgK8R2h84+ysnDgCm7tsIU1udvYS0FWM6mwRdVzPrUYCVmbEmdFvyj
+ OBakrF93IwI0otvLTkL3rUPRhwex5fno8yvD+Xtyse16sKQPlfZPJVnsoRLpkPTuTEUn
+ /QR7mYHmp+a8f4r2qx6gj14OIgQ1dSVuWMGDkLN/RpluWu7xBoDfLNVGocwoYYQn7yh6
+ guRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ofi8je2wP1nCW9e7McQzsNRAwCMXxB7OTGUAKTQ0Cr0=;
- b=UfXEez1yotZ/qSoLUOkbYQPeWE1uwCRjomm0rv8vtS0FV9SJA5rDJ22t76PkAkTnuz
- zqRr8jtnPRz/uAdVgZLT66GlhvBnizsEu7yOP4ZN8YP1XMbZm8RwveewMmBdhZk7eSvK
- 4I5AwoicVkhXIfjjiN1KiJ9lcBZkcuJQQ1On3UA/UY9vFzS4r3GoUa++WsVXbiewKWoV
- dDBpAFg4NFm25pXBNTd5BTlqMnfnhHhaMQWw6eVupFRx3+uoJnXndwH4ty/Mv7/Kngrt
- fxhGG3I8K5jXwpS5Wku+SYEMtMJNZLVznf59KqPj0si3btKfxz+iD87MoPUldk9v1Q4w
- uAiw==
-X-Gm-Message-State: AGi0PuaZK+1DbJbaZKVSrUfCeNX0Ae29LSRuupsbw2d8amXnYyZRTEIP
- h8Cb6a3gyrxNYglEffI2N7uyTrYrzQqrGXN6c1dNSH5QRSDpnbXHuX6gn1w4q7qa5ZgjlZhUQou
- LrZpsHBhcUJd7iw4=
-X-Received: by 2002:a50:dac9:: with SMTP id s9mr22102784edj.313.1586947414298; 
- Wed, 15 Apr 2020 03:43:34 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJWrM3veihm/2OnGLiNiD4resWu+jHDWM8hkbRsmHq4eRLPvmqjf8fdVzbGA31Z8gpLP61QFQ==
-X-Received: by 2002:a50:dac9:: with SMTP id s9mr22102764edj.313.1586947414050; 
- Wed, 15 Apr 2020 03:43:34 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d19sm1150883edx.49.2020.04.15.03.43.32
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 15 Apr 2020 03:43:33 -0700 (PDT)
-Subject: Re: [PATCH 14/16] nvme: factor out pci setup
-To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
-References: <20200415102445.564803-1-its@irrelevant.dk>
- <20200415102445.564803-15-its@irrelevant.dk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <bcb8fd8b-9eae-9b38-5360-d9c9b3447529@redhat.com>
-Date: Wed, 15 Apr 2020 12:43:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=eaH8cnBY+1M0lWYZxTpwdfzQ/feooZwfZWoSUSO/MQg=;
+ b=D0j+zJAuamGoSkKQB4q25vuEUuRFnCzHE8aXoge4WFP9wu10XInolNsdpKIlENfk1H
+ n087k+bwQC9MJG44U1dHTJBc1GtqEP717oIo/9MYI+a9y1nixGV7YVLzK+brWCwAbJEy
+ EU2j5MO+GDgqfF0w+9K+4tDGLtLLI91aJ9rbDc+wtWdiHjYohERxMedyNkYZuPBVpxrf
+ TvaQV5zxGn00kEg4c3ptKOeMoCWUHzzRZ7vyt4bsril6I8arGn03GvMBnTNT0u4FHWNl
+ mbwn04/DS/oKGU63TP9tZwagfxEzapVyWa2zqtAXeQeFda02YSCtGeY/NhBOcTIFX4+K
+ Gcgw==
+X-Gm-Message-State: AGi0PubJUDH5L9/1NlnXIROyOXunIYTNNubNfTeNEHMAL1zNkJaDTCg1
+ z+KIH+3gj/Dx7e5jkBwiDCjCwTkGHgVK5X+8By458Z5+
+X-Google-Smtp-Source: APiQypJqMne8VMtYR4ud5M7+hY5dvvC18aUKHQjcImbugMgHreM/SqG2p4uiKYNpVNg+6jM+hx1KoiZiWWFhjbNdd5E=
+X-Received: by 2002:a1c:e284:: with SMTP id z126mr4817729wmg.32.1586947630424; 
+ Wed, 15 Apr 2020 03:47:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200415102445.564803-15-its@irrelevant.dk>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200415005938.23895-1-alazar@bitdefender.com>
+ <20200415005938.23895-5-alazar@bitdefender.com>
+In-Reply-To: <20200415005938.23895-5-alazar@bitdefender.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 15 Apr 2020 12:46:57 +0200
+Message-ID: <CAJ+F1C+JsPGWy=KJXcDyfsHOmmtUPP7vNvwJu_pFeeO6Mg-XyQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 04/26] char-socket: add 'reconnecting' property
+To: =?UTF-8?Q?Adalbert_Laz=C4=83r?= <alazar@bitdefender.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,82 +90,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/15/20 12:24 PM, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
-> 
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Hi
+
+On Wed, Apr 15, 2020 at 3:03 AM Adalbert Laz=C4=83r <alazar@bitdefender.com=
+> wrote:
+>
+> This is used by the VM introspection object to check if the connection
+> will be reestablished in case it disconnects from some reason.
+>
+> The closing of the socket is used by any of the three parties involved,
+> KVM, the introspection tool and QEMU (eg. on force-reset), to signal
+> the other parties that the session is over. As such, it is very important
+> that the socket will reconnect.
+>
+> CC: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Adalbert Laz=C4=83r <alazar@bitdefender.com>
 > ---
->   hw/block/nvme.c | 32 ++++++++++++++++++++------------
->   1 file changed, 20 insertions(+), 12 deletions(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 08f7ae0a48b3..16d01af53a07 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -1382,6 +1382,24 @@ static int nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
->       return 0;
->   }
->   
-> +static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
+>  chardev/char-socket.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> index fd0106ab85..22ab242748 100644
+> --- a/chardev/char-socket.c
+> +++ b/chardev/char-socket.c
+> @@ -1492,6 +1492,13 @@ char_socket_get_connected(Object *obj, Error **err=
+p)
+>      return s->state =3D=3D TCP_CHARDEV_STATE_CONNECTED;
+>  }
+>
+> +static bool char_socket_get_reconnecting(Object *obj, Error **errp)
 > +{
-> +    uint8_t *pci_conf = pci_dev->config;
+> +    SocketChardev *s =3D SOCKET_CHARDEV(obj);
 > +
-> +    pci_conf[PCI_INTERRUPT_PIN] = 1;
-> +    pci_config_set_prog_interface(pci_conf, 0x2);
-
-<--
-
-> +    pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_INTEL);
-> +    pci_config_set_device_id(pci_conf, 0x5845);
-
--->
-
-This is new. Already inherited by nvme_class_init().
-
-> +    pci_config_set_class(pci_conf, PCI_CLASS_STORAGE_EXPRESS);
-> +    pcie_endpoint_cap_init(pci_dev, 0x80);
-> +
-> +    memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n, "nvme",
-> +                          n->reg_size);
-> +    pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
-> +                     PCI_BASE_ADDRESS_MEM_TYPE_64, &n->iomem);
-> +    msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL);
+> +    return s->reconnect_time > 0;
 > +}
 > +
->   static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->   {
->       NvmeCtrl *n = NVME(pci_dev);
-> @@ -1400,19 +1418,9 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->           return;
->       }
->   
-> +    nvme_init_pci(n, pci_dev);
+>  static int tcp_chr_reconnect_time(Chardev *chr, int secs)
+>  {
+>      SocketChardev *s =3D SOCKET_CHARDEV(chr);
+> @@ -1528,6 +1535,10 @@ static void char_socket_class_init(ObjectClass *oc=
+, void *data)
+>
+>      object_class_property_add_bool(oc, "connected", char_socket_get_conn=
+ected,
+>                                     NULL, &error_abort);
 > +
->       pci_conf = pci_dev->config;
-> -    pci_conf[PCI_INTERRUPT_PIN] = 1;
-> -    pci_config_set_prog_interface(pci_dev->config, 0x2);
-> -    pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
-> -    pcie_endpoint_cap_init(pci_dev, 0x80);
-> -
-> -    memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
-> -                          "nvme", n->reg_size);
-> -    pci_register_bar(pci_dev, 0,
-> -        PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
-> -        &n->iomem);
-> -    msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL);
-> -
->       id->vid = cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
->       id->ssvid = cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VENDOR_ID));
->       strpadcpy((char *)id->mn, sizeof(id->mn), "QEMU NVMe Ctrl", ' ');
-> 
+> +    object_class_property_add_bool(oc, "reconnecting",
+> +                                   char_socket_get_reconnecting,
+> +                                   NULL, &error_abort);
 
+That may be misleading, as the socket connection may be established
+and this will return true if reconnect_time > 0. Why not have a
+"reconnect-time" property instead?
+
+>  }
+>
+>  static const TypeInfo char_socket_type_info =3D {
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
