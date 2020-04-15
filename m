@@ -2,89 +2,99 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19976C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:46:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B7D7C2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:46:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D88A020737
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:46:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A30C20737
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 10:46:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z8oriZLa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D88A020737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zf4apH/c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A30C20737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOfYp-0002YJ-1C
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:46:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45490)
+	id 1jOfYs-0002d4-A7
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 06:46:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46173)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jOfUr-0002Db-DU
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:42:23 -0400
+ (envelope-from <philmd@redhat.com>) id 1jOfXh-0008WQ-3x
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:45:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jOfUq-00038D-9f
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:42:21 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39953)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jOfUq-00037t-2u
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:42:20 -0400
-Received: by mail-wm1-x343.google.com with SMTP id a81so18368554wmf.5
- for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 03:42:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=xbro/RkD78CkyyXw+NBefFNc/SpIU1l0Ej5jYONi0ms=;
- b=Z8oriZLafPy1iDQxG3Fe9GeQv78TtU963w4AhWk6iHSTB9iK7i334CwDJSsL1HAIZ8
- R5SsYqQ/Yzgs18TP1rGfzSybzphIRIAdttoj5M0IfYn5oHPa57+nGy8HIb0pRx1AmPkM
- 9+QuJOOgtJ8u8oERT4F/ss6WcSm/Y2RLafTr8S0XqePZc0WWk5wjK/7a9jXb3ylRPtC4
- hUfWtWoxizcsdQDfZRBI1pjN/tU7uRgdY72hly0j76/Cu2glTi8EQRPnwP59PLIVOnLp
- K9SJB0aA7gUTcMQd7X/Nc6zzQJMWx26kuOSb730B6w+R1MR9gBG/vNVa7nkSFPYVsTgB
- QJmA==
+ (envelope-from <philmd@redhat.com>) id 1jOfXf-0004kU-Tu
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:45:17 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52766
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jOfXf-0004jt-Qk
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 06:45:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1586947515;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=PMeokp4kxfMXp1B/fCISiKl2sfNro4rIMuyxgeys9CE=;
+ b=Zf4apH/cqPxiLaxPYtWMffUKU0NXVfbJ/ps+Hx/0UMgfdOG43gl7Snxl2WrzYvRCBroRAB
+ 0jVJK5FI4iqs1pVyRWVFA4Toscf4TdyKD03BriGFMNZyT2RYr+EY9iZjtJ1O7tbxzSeunW
+ Cg0aJguU+pcwEqpNWMQZ7XrBB7RcZu0=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-414-oG6levw3OnSqv7k7BV37YA-1; Wed, 15 Apr 2020 06:45:13 -0400
+X-MC-Unique: oG6levw3OnSqv7k7BV37YA-1
+Received: by mail-ed1-f70.google.com with SMTP id j10so2523177edy.21
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 03:45:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=xbro/RkD78CkyyXw+NBefFNc/SpIU1l0Ej5jYONi0ms=;
- b=A9ICF1nPbhAvSyXZa3zlrgXd27qFu+oOTyCQ4c4hDjQ09Np9z1fkASiNOL34MhRYJU
- sxfgfmpzfyO/VB6WtuvVC/D/gnzLA5ETBa3o5z6tSouaa1+Qk9I7z2Z6FluC7qBqM+WH
- JtkN15Gi4zsRVPbVLrP0nhl4Se+e5evrNA6cFp0I/7EfpyiykvjSPLQsCOYToRIs8Glo
- vdNgK4GPw8NffPqKwf/sOTGCn72HJL0/xh6QGOHMt7t5pJ+BkL/mVpl+3TEMSy2mbIMj
- JWlvJWwsbI/Koyjet1mOnwUXFmjH2RuF5VffWUth6KZTnIsVoN48jDKToh+S7VZ27UXe
- Zh9A==
-X-Gm-Message-State: AGi0PuaTKddSmC3qxyr7T6tOeQdyd+xCamGoH7iuxiyuACzB3BKHlPWx
- I4JAHQTug2UCtRhK3rHTbpoAfw==
-X-Google-Smtp-Source: APiQypICNbw5c2xGu4wILI6O2VWgnWV1pnQQ5vHgstO9uTNEL4QbB+Im7Ng25Bxj1P5cZog1CB3kFQ==
-X-Received: by 2002:a7b:c755:: with SMTP id w21mr4465467wmk.120.1586947339104; 
- Wed, 15 Apr 2020 03:42:19 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id r27sm3810254wra.83.2020.04.15.03.42.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 15 Apr 2020 03:42:17 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5689F1FF90;
- Wed, 15 Apr 2020 11:42:12 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 4/8] linux-user: fix /proc/self/stat handling
-Date: Wed, 15 Apr 2020 11:42:07 +0100
-Message-Id: <20200415104211.9388-5-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200415104211.9388-1-alex.bennee@linaro.org>
-References: <20200415104211.9388-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Qdqev5DF4/rM/Qv0hJYVHmvlZDSOAmHGxT6dLPtHGDY=;
+ b=QXDAOXGKnjwOTeh8R0LyW+f1VzADMkaoYlVYIbeSx3Cyl1PqTiVp5e5RRH8gPQqZet
+ 4Y87NngSH1061Zw6mECS7J71JPRhH6DxdK03nIdNwCmXY8mnMnWuO2Gx5saKRSDVbV/Y
+ PL3v69E4AipIY6rg+aP71UMNEJ81QMvzYEmS2N7DWgiZazBXZc7MHYLRTAiYQBQ3ft/Y
+ +FuVnfGLXYMaaUYIVDCpaMFnPTZg2oatCsr8qSZ/s6NelcCGHudnUBIQL9dMO9IXG7Qp
+ TrxygPEyvFtDQzEgsdkBPJn4eE8TwSACUtJzc6aGhf5NTLUOFXSJlOWQVJpTxdt8eqYx
+ eV/A==
+X-Gm-Message-State: AGi0PuaPLwYqELmqbKHHN2WQ8HccPB9U4racINGmvlq21QIVHE64YeVl
+ bsFxTq3S/YAWEZX87LEcrI0OokycSkBc37q2BO7pwnYtInOLqL0GFF9m++y2VZAxGZ2FlrCE0Rn
+ XZ0BSGDI6yXN/w6k=
+X-Received: by 2002:aa7:cf16:: with SMTP id a22mr13428632edy.77.1586947511945; 
+ Wed, 15 Apr 2020 03:45:11 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIZJJ9a6tvBwgbNzht3h3swldo48a6ET0uDDq9i+ft+hw3/STrzUdqqV+9Yb6ZSK/GtRk5PZA==
+X-Received: by 2002:aa7:cf16:: with SMTP id a22mr13428619edy.77.1586947511767; 
+ Wed, 15 Apr 2020 03:45:11 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id l19sm2575412ejn.31.2020.04.15.03.45.10
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 15 Apr 2020 03:45:11 -0700 (PDT)
+Subject: Re: [PATCH 15/16] nvme: factor out cmb setup
+To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
+References: <20200415102445.564803-1-its@irrelevant.dk>
+ <20200415102445.564803-16-its@irrelevant.dk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <82e0183c-f2e5-7fba-0de1-79b093b7aff6@redhat.com>
+Date: Wed, 15 Apr 2020 12:45:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+In-Reply-To: <20200415102445.564803-16-its@irrelevant.dk>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,97 +106,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, Brice Goglin <Brice.Goglin@inria.fr>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the original bug report long files names in Guix caused
-/proc/self/stat be truncated without the trailing ") " as specified in
-proc manpage which says:
-    (2) comm  %s
-           The  filename of the executable, in parentheses.  This
-           is visible whether or not the  executable  is  swapped
-           out.
+On 4/15/20 12:24 PM, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
+>=20
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> ---
+>   hw/block/nvme.c | 50 +++++++++++++++++++++++++++----------------------
+>   1 file changed, 28 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 16d01af53a07..7387cf409f96 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -44,6 +44,8 @@
+>   #include "trace.h"
+>   #include "nvme.h"
+>  =20
+> +#define NVME_CMB_BIR 2
+> +
+>   #define NVME_GUEST_ERR(trace, fmt, ...) \
+>       do { \
+>           (trace_##trace)(__VA_ARGS__); \
+> @@ -1382,6 +1384,28 @@ static int nvme_init_namespace(NvmeCtrl *n, NvmeNa=
+mespace *ns, Error **errp)
+>       return 0;
+>   }
+>  =20
+> +static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
+> +{
+> +    NVME_CMBLOC_SET_BIR(n->bar.cmbloc, NVME_CMB_BIR);
+> +    NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
+> +
+> +    NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
+> +    NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
+> +    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
+> +    NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
+> +    NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
+> +    NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2);
 
-In the kernel this is currently done by do_task_stat calling
-proc_task_name() which uses a structure limited by TASK_COMM_LEN (16).
+We lost the /* MBs */ comment, otherwise:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Additionally it should only be reporting the executable name rather
-than the full path. Fix both these failings while cleaning up the code
-to use GString to build up the reported values. As the whole function
-is cleaned up also adjust the white space to the current coding style.
-
-Message-ID: <fb4c55fa-d539-67ee-c6c9-de8fb63c8488@inria.fr>
-Reported-by: Brice Goglin <Brice.Goglin@inria.fr>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200414200631.12799-10-alex.bennee@linaro.org>
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 6495ddc4cda..674f70e70a5 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -7295,34 +7295,29 @@ static int open_self_stat(void *cpu_env, int fd)
- {
-     CPUState *cpu = env_cpu((CPUArchState *)cpu_env);
-     TaskState *ts = cpu->opaque;
--    abi_ulong start_stack = ts->info->start_stack;
-+    g_autoptr(GString) buf = g_string_new(NULL);
-     int i;
- 
-     for (i = 0; i < 44; i++) {
--      char buf[128];
--      int len;
--      uint64_t val = 0;
--
--      if (i == 0) {
--        /* pid */
--        val = getpid();
--        snprintf(buf, sizeof(buf), "%"PRId64 " ", val);
--      } else if (i == 1) {
--        /* app name */
--        snprintf(buf, sizeof(buf), "(%s) ", ts->bprm->argv[0]);
--      } else if (i == 27) {
--        /* stack bottom */
--        val = start_stack;
--        snprintf(buf, sizeof(buf), "%"PRId64 " ", val);
--      } else {
--        /* for the rest, there is MasterCard */
--        snprintf(buf, sizeof(buf), "0%c", i == 43 ? '\n' : ' ');
--      }
-+        if (i == 0) {
-+            /* pid */
-+            g_string_printf(buf, FMT_pid " ", getpid());
-+        } else if (i == 1) {
-+            /* app name */
-+            gchar *bin = g_strrstr(ts->bprm->argv[0], "/");
-+            bin = bin ? bin + 1 : ts->bprm->argv[0];
-+            g_string_printf(buf, "(%.15s) ", bin);
-+        } else if (i == 27) {
-+            /* stack bottom */
-+            g_string_printf(buf, TARGET_ABI_FMT_ld " ", ts->info->start_stack);
-+        } else {
-+            /* for the rest, there is MasterCard */
-+            g_string_printf(buf, "0%c", i == 43 ? '\n' : ' ');
-+        }
- 
--      len = strlen(buf);
--      if (write(fd, buf, len) != len) {
--          return -1;
--      }
-+        if (write(fd, buf->str, buf->len) != buf->len) {
-+            return -1;
-+        }
-     }
- 
-     return 0;
--- 
-2.20.1
+> +    NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
+> +
+> +    n->cmbuf =3D g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
+> +    memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
+> +                          "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
+> +    pci_register_bar(pci_dev, NVME_CMBLOC_BIR(n->bar.cmbloc),
+> +                     PCI_BASE_ADDRESS_SPACE_MEMORY |
+> +                     PCI_BASE_ADDRESS_MEM_TYPE_64 |
+> +                     PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
+> +}
+> +
+>   static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
+>   {
+>       uint8_t *pci_conf =3D pci_dev->config;
+> @@ -1398,6 +1422,10 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevice *=
+pci_dev)
+>       pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+>                        PCI_BASE_ADDRESS_MEM_TYPE_64, &n->iomem);
+>       msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NUL=
+L);
+> +
+> +    if (n->params.cmb_size_mb) {
+> +        nvme_init_cmb(n, pci_dev);
+> +    }
+>   }
+>  =20
+>   static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+> @@ -1454,28 +1482,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error=
+ **errp)
+>       n->bar.vs =3D 0x00010200;
+>       n->bar.intmc =3D n->bar.intms =3D 0;
+>  =20
+> -    if (n->params.cmb_size_mb) {
+> -
+> -        NVME_CMBLOC_SET_BIR(n->bar.cmbloc, 2);
+> -        NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
+> -
+> -        NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
+> -        NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
+> -        NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
+> -        NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
+> -        NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
+> -        NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
+> -        NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
+> -
+> -        n->cmbuf =3D g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
+> -        memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
+> -                              "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbs=
+z));
+> -        pci_register_bar(pci_dev, NVME_CMBLOC_BIR(n->bar.cmbloc),
+> -            PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64=
+ |
+> -            PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
+> -
+> -    }
+> -
+>       for (i =3D 0; i < n->num_namespaces; i++) {
+>           if (nvme_init_namespace(n, &n->namespaces[i], errp)) {
+>               return;
+>=20
 
 
