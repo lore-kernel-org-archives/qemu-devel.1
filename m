@@ -2,61 +2,79 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77C3CC2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 17:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E60C2BB85
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 17:56:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EFA920787
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 17:54:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EFA920787
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bitdefender.com
+	by mail.kernel.org (Postfix) with ESMTPS id 72179208E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 17:56:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ihmmb6nu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72179208E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOmEZ-00033E-FB
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 13:53:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47376)
+	id 1jOmHB-0004oe-J6
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 13:56:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47717)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alazar@bitdefender.com>) id 1jOmDx-0002eB-LR
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:53:22 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jOmGT-0004Oa-6Q
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:55:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alazar@bitdefender.com>) id 1jOmDt-00086d-Th
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:53:19 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:40574)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alazar@bitdefender.com>)
- id 1jOmDs-00080D-8R
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:53:16 -0400
-Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
- by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id
- BE8F4306E47C; Wed, 15 Apr 2020 20:53:13 +0300 (EEST)
-Received: from localhost (unknown [91.199.104.27])
- by smtp.bitdefender.com (Postfix) with ESMTPSA id A707E303EF00;
- Wed, 15 Apr 2020 20:53:13 +0300 (EEST)
-From: Adalbert =?iso-8859-2?b?TGF643I=?= <alazar@bitdefender.com>
-Subject: Re: [RFC PATCH v1 03/26] char-socket: fix the client mode when
- created through QMP
-To: Markus Armbruster <armbru@redhat.com>
-In-Reply-To: <87tv1kg7p9.fsf@dusky.pond.sub.org>
-References: <20200415005938.23895-1-alazar@bitdefender.com>
- <20200415005938.23895-4-alazar@bitdefender.com>
- <CAJ+F1CLLpzdoNqwgMQh8j4Sd4_HGEmBt=x1wPsHXvgZ7O=8Kzg@mail.gmail.com>
- <15869512460.BE82bEee.22517@host> <87tv1kg7p9.fsf@dusky.pond.sub.org>
-Date: Wed, 15 Apr 2020 20:53:40 +0300
-Message-ID: <15869732200.9DFE1C.30594@host>
-User-agent: void
-Content-Type: text/plain; charset=UTF-8
+ (envelope-from <peter.maydell@linaro.org>) id 1jOmGR-000133-Na
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:55:56 -0400
+Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:34176
+ helo=mail-oo1-xc41.google.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jOmGR-00012t-I2
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 13:55:55 -0400
+Received: by mail-oo1-xc41.google.com with SMTP id q204so66896ooq.1
+ for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 10:55:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4ZBsCiO5v7mZrs1S97d2XZy2Dto81Hfb2sdUVyI6aSE=;
+ b=Ihmmb6nul/Jf+RuwktSNzyktNHRw2Pe3hlqijiomvZpMRq5HF2P+RQLBp1M5b02lOB
+ HkbBu5PjrDCgolwBsjWJgmbD4rMsyD8ZoJ8u+eHO4kcHKizMjS4rB77XrIgG9DUG3dHE
+ RmI6Ub3iI20iOlxtze6cFiGWUWJCnAobJtstCdI1yS9QDR1ZOkOFG0Vspm5gxvxg5l8J
+ llYrLyp7S8QB6/gJmyvFIibEIY5srfX/cY7LraSa5sVC48pgEcqQXdz1A/ipHZgRTxQL
+ SZMPJaLvTGk6VcldPgaivteL8hvFWDzgthtycDVfPat98PRD9FLNGGPCnWA/vHmb/a75
+ 8lLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4ZBsCiO5v7mZrs1S97d2XZy2Dto81Hfb2sdUVyI6aSE=;
+ b=RGqnh5msTWp0PPck/RbYAVXcnEyjFarcCw2PugZdNzjI6Sf6YTY6q7QHRSlOVSQynE
+ d+Y9r9sILTMacz4AXvf80v7EjY3vpdIhdBNr7epsotP2e2Jt/V2NlZu4wzinbzmL6xO6
+ VZ0HBtbTA3hIxnEuJbcXpBN2ZnrN3+d8sRIN1MS0o4ZM90vRfSkQppxHoK1cNvKtbtHU
+ 8s6Bq8ZPmK3HvRR/AKHPqc2+25v1xk9I/hsDWGryO4TIO9KNUedklBjX/Zv2fEFPc5CO
+ jrpQmgXe5Zxe0NirdBdk7jOPAMuF5odfDi1srrleQe/HF1Lzwrdnt9sC46OiPRN+Fr+e
+ EY5w==
+X-Gm-Message-State: AGi0PuZ5Nlljy3ZZWrwAhsAul7MRnyXi1wj8YZ6YRFP1HuuhoPM83iWx
+ FbEEUwrCg3BEFzQ1cWVNB7+HeQWPpFeyWdUW/JjVQkl6JfE=
+X-Google-Smtp-Source: APiQypIas+45g0h9D8aWtKZw104bpxvAqW9yYBD38cGjXMGKM0sxM0+TjqUTejwYPAP596WSyccXCTcXcw708kBeQm4=
+X-Received: by 2002:a4a:890b:: with SMTP id f11mr23516231ooi.85.1586973354374; 
+ Wed, 15 Apr 2020 10:55:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.199.104.161
+References: <20200415173329.4920-1-jsnow@redhat.com>
+In-Reply-To: <20200415173329.4920-1-jsnow@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 15 Apr 2020 18:55:43 +0100
+Message-ID: <CAFEAcA-ipjVsGuzTWhEq59SvSSSiO+ufcqdcx9JYDOZMLLfPfA@mail.gmail.com>
+Subject: Re: [PATCH RFC] configure: prefer sphinx-build to sphinx-build-3
+To: John Snow <jsnow@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::c41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,88 +86,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?iso-8859-1?q?Paolo=0A?= Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
- QEMU <qemu-devel@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 15 Apr 2020 16:11:14 +0200, Markus Armbruster <armbru@redhat.com>=
- wrote:
-> Adalbert Laz=C3=A3r <alazar@bitdefender.com> writes:
->=20
-> > On Wed, 15 Apr 2020 12:37:34 +0200, Marc-Andr=C3=A9 Lureau <marcandre=
-.lureau@gmail.com> wrote:
-> >> Hi
-> >>=20
-> >> On Wed, Apr 15, 2020 at 3:00 AM Adalbert Laz=C4=83r <alazar@bitdefen=
-der.com> wrote:
-> >> >
-> >> > qmp_chardev_open_socket() ignores the absence of the 'server' argu=
-ment
-> >> > and always switches to listen/server mode.
-> >> >
-> >> > CC: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
-> >> > CC: Paolo Bonzini <pbonzini@redhat.com>
-> >> > Signed-off-by: Adalbert Laz=C4=83r <alazar@bitdefender.com>
-> >> > ---
-> >> >  chardev/char-socket.c | 2 +-
-> >> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >> >
-> >> > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> >> > index 9b2deb0125..fd0106ab85 100644
-> >> > --- a/chardev/char-socket.c
-> >> > +++ b/chardev/char-socket.c
-> >> > @@ -1310,7 +1310,7 @@ static void qmp_chardev_open_socket(Chardev =
-*chr,
-> >> >      SocketChardev *s =3D SOCKET_CHARDEV(chr);
-> >> >      ChardevSocket *sock =3D backend->u.socket.data;
-> >> >      bool do_nodelay     =3D sock->has_nodelay ? sock->nodelay : f=
-alse;
-> >> > -    bool is_listen      =3D sock->has_server  ? sock->server  : t=
-rue;
-> >> > +    bool is_listen      =3D sock->has_server  ? sock->server  : f=
-alse;
-> >>=20
-> >> I don't understand what you mean. It defaults to server mode. We can=
-'t
-> >> change that.
-> >
-> > First of all, thanks for your comments.
-> >
-> > I understand that a chardev socket is either in client mode or in ser=
-ver
-> > mode.  If the 'server' parameter is not used, the socket is put in cl=
-ient
-> > mode. At least this is the behavior when the socket is created by par=
-sing
-> > the command line. But, when created through QMP, without the 'server'=
- parameter,
-> > the socket is put in server mode.
-> >
-> > Until this moment, I did not think that we can use "server=3Dno" thro=
-ugh QMP :))
->=20
-> Start here:
->=20
->     $ socat "READLINE,history=3D$HOME/.qmp_history,prompt=3DQMP>" UNIX-=
-CONNECT:$HOME/work/images/test-qmp=20
->     {"QMP": {"version": {"qemu": {"micro": 92, "minor": 2, "major": 4},=
- "package": "v5.0.0-rc2-30-g25b0509e28"}, "capabilities": ["oob"]}}
->     QMP>{"execute": "qmp_capabilities"}
->     {"return": {}}
->     QMP>{"execute":"chardev-add", "arguments": {"id":"foo", "backend": =
-{"type": "socket", "data": {"addr": {"type": "inet", "data": {"host": "0.=
-0.0.0", "port": "2445"}}, "server": false}}}}
->     {"error": {"class": "GenericError", "desc": "Failed to connect sock=
-et: Connection refused"}}
->=20
+On Wed, 15 Apr 2020 at 18:33, John Snow <jsnow@redhat.com> wrote:
+>
+> sphinx-build is the name of the script entry point from the sphinx
+> package itself. sphinx-build-3 is a pacakging convention by Linux
+> distributions. Prefer, where possible, the canonical package name.
 
-Thank you, Markus.
+This was Markus's code originally; cc'ing him.
 
-I wanted to say that while I was writing the reply, I had an aha! moment =
-and I was
-amused that I have not thought to use server=3Dno/false and I used the wr=
-ong verb tense.
+(Incidentally I think when we say "Linux distributions" we
+really mean "Red Hat"; Debian/Ubuntu don't use the "sphinx-build-3" name.)
+
+thanks
+-- PMM
+(rest of email untrimmed for context)
+
+> In the event that this resolves to a python2 version, test the
+> suitability of the binary early in the configuration process, and
+> continue looking for sphinx-build-3 if necessary.
+>
+> This prioritizes a virtual environment version of sphinx above any
+> distribution versions, if attempting to build of a virtual python
+> environment.
+>
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  configure | 50 ++++++++++++++++++++++++++++++++------------------
+>  1 file changed, 32 insertions(+), 18 deletions(-)
+>
+> diff --git a/configure b/configure
+> index 233c671aaa..82143e8a41 100755
+> --- a/configure
+> +++ b/configure
+> @@ -928,13 +928,34 @@ do
+>      fi
+>  done
+>
+> +# Check we have a new enough version of sphinx-build
+> +test_sphinx_build() {
+> +    sphinx=$1
+> +    # This is a bit awkward but works: create a trivial document and
+> +    # try to run it with our configuration file (which enforces a
+> +    # version requirement). This will fail if either
+> +    # sphinx-build doesn't exist at all or if it is too old.
+> +    mkdir -p "$TMPDIR1/sphinx"
+> +    touch "$TMPDIR1/sphinx/index.rst"
+> +    "$sphinx" -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMPDIR1/sphinx/out" >/dev/null 2>&1
+> +}
+> +
+> +# We require the python3 version of sphinx, but sphinx-build-3 is a
+> +# distro package. prefer 'sphinx-build' to find the venv version, if
+> +# any, but ensure it is a suitable version.
+>  sphinx_build=
+> -for binary in sphinx-build-3 sphinx-build
+> +sphinx_ok=
+> +for binary in sphinx-build sphinx-build-3
+>  do
+>      if has "$binary"
+>      then
+> -        sphinx_build=$(command -v "$binary")
+> -        break
+> +        sphinx_candidate=$(command -v "$binary")
+> +        if test_sphinx_build "$sphinx_candidate"
+> +        then
+> +            sphinx_build=$sphinx_candidate
+> +            sphinx_ok=yes
+> +            break
+> +        fi
+>      fi
+>  done
+>
+> @@ -4928,24 +4949,17 @@ if check_include sys/kcov.h ; then
+>      kcov=yes
+>  fi
+>
+> -# Check we have a new enough version of sphinx-build
+> -has_sphinx_build() {
+> -    # This is a bit awkward but works: create a trivial document and
+> -    # try to run it with our configuration file (which enforces a
+> -    # version requirement). This will fail if either
+> -    # sphinx-build doesn't exist at all or if it is too old.
+> -    mkdir -p "$TMPDIR1/sphinx"
+> -    touch "$TMPDIR1/sphinx/index.rst"
+> -    "$sphinx_build" -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMPDIR1/sphinx/out" >/dev/null 2>&1
+> -}
+> -
+>  # Check if tools are available to build documentation.
+>  if test "$docs" != "no" ; then
+> -  if has_sphinx_build; then
+> -    sphinx_ok=yes
+> -  else
+> -    sphinx_ok=no
+> +
+> +  if [ "$sphinx_ok" != "yes" ]; then
+> +    if test_sphinx_build "$sphinx_build"; then
+> +      sphinx_ok=yes
+> +    else
+> +      sphinx_ok=no
+> +    fi
+>    fi
+> +
+>    if has makeinfo && has pod2man && test "$sphinx_ok" = "yes"; then
+>      docs=yes
+>    else
+> --
 
