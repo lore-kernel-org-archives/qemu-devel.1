@@ -2,84 +2,83 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E36D5C2BB55
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 12:43:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6C1EC2BB55
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 12:44:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A80CA20737
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 12:43:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75987206A2
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 12:44:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SjzHRZmR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A80CA20737
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W4IJCZoC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75987206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOhOA-0005pm-RV
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 08:43:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59154)
+	id 1jOhP7-0006wJ-K7
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 08:44:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59253)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jOhMi-0004m2-A0
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 08:42:05 -0400
+ (envelope-from <berrange@redhat.com>) id 1jOhNT-0005U3-RV
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 08:42:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jOhMg-0003rf-5a
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 08:42:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31512
+ (envelope-from <berrange@redhat.com>) id 1jOhNS-00043F-L1
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 08:42:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42591
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jOhMf-0003qO-DF
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 08:42:01 -0400
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jOhNS-00042n-Gu
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 08:42:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1586954517;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1586954569;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Uwdaa4+rNlAcxdAlHQIsXb7V9TVkJokxuI4BkrBO1MM=;
- b=SjzHRZmRHEGz76ymjvOJ3+acrE+CjmLvpen0d6UU4fhqZ1+NHB2t8Y1ieOzOPAYKwEQTGI
- wekW9xZZu0yMqQr3i4Mu+a9bKHvYThy5AMY1aTrPyGOl9+0K4HL4EKiPeUjmL9evrL6X2F
- HfA7+/rADLf8bgy19xS9I0nUlJUoP4U=
+ bh=pDg5qi4xsryBk4w02BFiq4x1Ldryzh5UYOH/kWiPtkE=;
+ b=W4IJCZoCqzkfvyv1X4fXAmvf0QEBcxIQ0f3B44YeRh2HNfFrvpH5Y90wDboA4G79y/qljv
+ RjKYOMfLOhUjXmxms38WNgv3dQxfDV1c59o1h2rfY8m+S8zqBWitjG5wVR1Bq0uzYxGJdE
+ 4JioYdKK6Ejlyr1WELriqZKmxKsrm3A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-101-hxVd3qcqMOO9tr6JD_B0GA-1; Wed, 15 Apr 2020 08:41:55 -0400
-X-MC-Unique: hxVd3qcqMOO9tr6JD_B0GA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-276-pTUhGiO2N7iWVEoJH3_vGg-1; Wed, 15 Apr 2020 08:42:42 -0400
+X-MC-Unique: pTUhGiO2N7iWVEoJH3_vGg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B04E9DBA5;
- Wed, 15 Apr 2020 12:41:54 +0000 (UTC)
-Received: from [10.3.115.59] (ovpn-115-59.phx2.redhat.com [10.3.115.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C1D55C1C5;
- Wed, 15 Apr 2020 12:41:54 +0000 (UTC)
-Subject: Re: [PATCH v2 for-5.1 4/9] qemu-option: Fix has_help_option()'s
- sloppy parsing
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200415074927.19897-1-armbru@redhat.com>
- <20200415074927.19897-5-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <cc5537c6-fdb6-7cd3-16a6-d91265964a4e@redhat.com>
-Date: Wed, 15 Apr 2020 07:41:53 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3D801005510;
+ Wed, 15 Apr 2020 12:42:40 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CA93A19C70;
+ Wed, 15 Apr 2020 12:42:39 +0000 (UTC)
+Date: Wed, 15 Apr 2020 13:42:36 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [for-5.0] Deprecate KVM support for AArch32
+Message-ID: <20200415124236.GG1344391@redhat.com>
+References: <20200414120935.12719-1-peter.maydell@linaro.org>
+ <20200415123310.GC1344391@redhat.com>
+ <CAFEAcA80g-Zohi0t7u51aNs58i8_zPCOcRob6zx6DYdTjYfXWQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200415074927.19897-5-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <CAFEAcA80g-Zohi0t7u51aNs58i8_zPCOcRob6zx6DYdTjYfXWQ@mail.gmail.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,28 +90,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/15/20 2:49 AM, Markus Armbruster wrote:
-> has_help_option() uses its own parser.  It's inconsistent with
-> qemu_opts_parse(), as demonstrated by test-qemu-opts case
-> /qemu-opts/has_help_option.  Fix by reusing the common parser.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   tests/test-qemu-opts.c |  4 ++--
->   util/qemu-option.c     | 39 +++++++++++++++++++--------------------
->   2 files changed, 21 insertions(+), 22 deletions(-)
-> 
+On Wed, Apr 15, 2020 at 01:41:05PM +0100, Peter Maydell wrote:
+> On Wed, 15 Apr 2020 at 13:33, Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+> >
+> > On Tue, Apr 14, 2020 at 01:09:35PM +0100, Peter Maydell wrote:
+> > > The Linux kernel has dropped support for allowing 32-bit Arm systems
+> > > to host KVM guests (kernel commit 541ad0150ca4aa663a2, which just
+> > > landed upstream in the 5.7 merge window).  Mark QEMU's support for
+> > > this configuration as deprecated, so that we can delete that support
+> > > code in 5.2.
+> > >
+> > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > > ---
+> > > I was reading the 5.7 merge window writeup on LWN this weekend
+> > > and saw that the dropping of 32-bit support had gone in; just
+> > > enough time to squeeze our deprecation warning into 5.0 so we
+> > > can drop the code in 5.2 rather than 6.0...
+> > >
+> > >  docs/system/deprecated.rst | 8 ++++++++
+> > >  1 file changed, 8 insertions(+)
+> >
+> > The docs are sufficient to start the deprecation process, but
+> > we might consider also having a warning from configure, or a
+> > message on stderr at runtime to make it more visible to users.
+>=20
+> Mmm. I didn't feel entirely comfortable making code changes to
+> print messages at this point in the 5.0 release cycle, though.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Sure, that's understandable.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
