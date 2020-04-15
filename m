@@ -2,87 +2,91 @@ Return-Path: <SRS0=EwQe=57=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 792A2C2BA19
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 15:23:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A1CC2BA19
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 15:24:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 434C32076A
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 15:23:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D34C220732
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Apr 2020 15:24:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mFZWO388"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 434C32076A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rIjIQsTc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D34C220732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOjt8-0004Iv-CE
-	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 11:23:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55014)
+	id 1jOjtt-000633-1D
+	for qemu-devel@archiver.kernel.org; Wed, 15 Apr 2020 11:24:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55065)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <flukshun@gmail.com>) id 1jOjs3-0002se-EI
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 11:22:36 -0400
+ (envelope-from <flukshun@gmail.com>) id 1jOjsk-0004BX-49
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 11:23:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <flukshun@gmail.com>) id 1jOjs2-00028z-7P
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 11:22:35 -0400
-Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:43710)
+ (envelope-from <flukshun@gmail.com>) id 1jOjsi-0002MS-Iu
+ for qemu-devel@nongnu.org; Wed, 15 Apr 2020 11:23:18 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39528)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1jOjs2-00028p-2M
- for qemu-devel@nongnu.org; Wed, 15 Apr 2020 11:22:34 -0400
-Received: by mail-ot1-x32d.google.com with SMTP id g14so227464otg.10
- for <qemu-devel@nongnu.org>; Wed, 15 Apr 2020 08:22:34 -0700 (PDT)
+ (Exim 4.71) (envelope-from <flukshun@gmail.com>)
+ id 1jOjsi-0002ML-EE; Wed, 15 Apr 2020 11:23:16 -0400
+Received: by mail-ot1-x341.google.com with SMTP id m13so259835otf.6;
+ Wed, 15 Apr 2020 08:23:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=KceTHV7pQV4klqcfJPr/8hOIvfOLjh6kumuldohc+h0=;
- b=mFZWO388M5tPoR70k5KxMVY6wdzTuIrvBaX6IPOc0MMD+J5lL+K/LptxMBsUFKmvKO
- xnLfAb2SacxLgYOfehGj+VUXdqzodyMnIuoJHLFMRyWXOTqsWbZcFtA1duCuzWOqYJNq
- 9wWJ+gTaOIQIuXW+oz3lcBDiaradvvBZnvOSY5MF0J8+AVjNP3A6mUZZbuMD9NQTsMos
- 9VMnAv2uC7C7MD0sEBw5gtvTlkYuRkHupLG+0UseHJNovx31n0kwKR+dhHm0usq2Z8tk
- FWP843MdCkP2DsaPc33PRF4YB4jnheXkGCa7GntkADMb+7fpcnh2hJe6r4YSAeVg9+NT
- +wyw==
+ h=sender:mime-version:content-transfer-encoding:to:from:in-reply-to
+ :cc:references:message-id:user-agent:subject:date;
+ bh=z9c3BC7dWsrCkABIzRvwVOeIfYSxdUw3GfSyrHsO+KQ=;
+ b=rIjIQsTc7P1HX0CZwxJ/v17EIE8XXXB+AeQVLhjgvWt1ZRqvZQtaIMhQ5AyzbuSMzX
+ u2toZG449q3H/y735OjuDXNX3DO56H58qlJzuJtjDurGz+LDyyYEigjd+DKjTSREbqum
+ 5bTCcJK1D0BNLwrpAIkH4TONDE/HcTBh+l+LLaA9gTvJLn6I9/ph5Ym2Y/WB1h2dvXds
+ apYShiuQPeDZHDGCXPDZQx4hekMcE0kR2S89cSeqkOZEosbC+OkRMj7w/6Sjr3Qm+O/K
+ zF9yowJbFrKmls/ECeWZGupdCOSTjMZdx8OeMPrBjenxuIPKHFjI0CzyePBHCw7s9P0G
+ lXuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=KceTHV7pQV4klqcfJPr/8hOIvfOLjh6kumuldohc+h0=;
- b=oSjUB85LyhWEWQ8+ANXrAUZTiaL6OZnextj42g5HTBm7UasbnIwzCnSZKOeR0bXJTD
- yz2mi+mks0UplCI7TaFMe0VXHKt1mTr6m58Sc28+pRtKdX+a8d/QoBo3v9karlE2nNlp
- QwOIvGWJHzX1cpKfHO4Hx+YZicN31a1yXZ6ogWQPKuEi0N7/0FSwVOHqRl1dDiLmLyY5
- vgLpfZ4nVkkjWdSgbi44OXvQSRjBH/ed5rI4qQ8/JXTLlkLUtQvj84lPYiPEI04KBIxD
- HBYhy4htoYJdGlceTbpRb6FXqC3fPMbRiCvevalSAGzjcls4W+lfJhr95l6hQT+5faAl
- a8nw==
-X-Gm-Message-State: AGi0PubGLOUeMypIoIedvLjKF1g26g13XF0sbNQpyFpIqTmXp8BSDca4
- 7sWvHBoGbw3ZDmNxiCzkaoUe0n6fdAA=
-X-Google-Smtp-Source: APiQypK/NDLJUi/U09XM6MWR63nqpQvi7s/SsuzdGMMXf8pAq9bQMyzi6yryoQytTSB85lU03H6DLg==
-X-Received: by 2002:a9d:1a6:: with SMTP id e35mr5915796ote.240.1586964152993; 
- Wed, 15 Apr 2020 08:22:32 -0700 (PDT)
+ h=x-gm-message-state:sender:mime-version:content-transfer-encoding:to
+ :from:in-reply-to:cc:references:message-id:user-agent:subject:date;
+ bh=z9c3BC7dWsrCkABIzRvwVOeIfYSxdUw3GfSyrHsO+KQ=;
+ b=B4McLDGQRl1IG7CrFs5wCifwELD4lmJ5rbV+ECj/b+Paq5TxDx34aqIBaVT56qlNdm
+ +MsGifWvejwnnHvvMGnwzwaTLbrP9cD4mLl/NKaPPmwuux1RBg5k5/OOdtknVR/Sje1n
+ yw6FEsQrVrxGL8w4XuzMpZx8ocu3i0xYPVf0fD6e+/AlGBsiJGHEumzP2o1kIk5U2Ipm
+ o1K+dy/uLfLjLzOA7+DHpZi9mZZtj89D2FStIhuSzH8CiXPpFxLiGmAwKWZHuImAjWrN
+ oOOCWVeNHu07xKEU0mjIfj9g99Bpmf2w0WBDYVB4SrPPTlrKvF0oatItLv7ymo4JkvGr
+ k8LA==
+X-Gm-Message-State: AGi0Puboej8pgbyIOOBBb4WWngPFQ+PPmuJohTVTGYnITlnZ4y/UTNYL
+ yYof4o2u+Lk6Fq5ySuFjuhk=
+X-Google-Smtp-Source: APiQypIq5Fkh/HrZw2YYRVx7DyOYv87X/6/DtlqHJoTvH2I7Y551/cHhk9b/CmCnt6vzxYoqJAw0Og==
+X-Received: by 2002:a05:6830:22dc:: with SMTP id
+ q28mr1843590otc.221.1586964194865; 
+ Wed, 15 Apr 2020 08:23:14 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id c13sm1902320otf.35.2020.04.15.08.22.31
+ by smtp.gmail.com with ESMTPSA id h18sm342794otm.10.2020.04.15.08.23.13
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Wed, 15 Apr 2020 08:22:32 -0700 (PDT)
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL for-5.0 3/4] qga: Extract qmp_guest_file_read() to common
- commands.c
-Date: Wed, 15 Apr 2020 10:22:01 -0500
-Message-Id: <20200415152202.14463-4-mdroth@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200415152202.14463-1-mdroth@linux.vnet.ibm.com>
-References: <20200415152202.14463-1-mdroth@linux.vnet.ibm.com>
+ Wed, 15 Apr 2020 08:23:13 -0700 (PDT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+To: =?utf-8?q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <3cd57dd9-0552-8064-c9d8-43913ed73e2e@redhat.com>
+References: <20200414133052.13712-1-philmd@redhat.com>
+ <20200414133052.13712-5-philmd@redhat.com>
+ <20200415123405.GD1344391@redhat.com>
+ <3cd57dd9-0552-8064-c9d8-43913ed73e2e@redhat.com>
+Message-ID: <158696418716.14409.1221138720205363596@sif>
+User-Agent: alot/0.7
+Subject: Re: [PATCH-for-5.0 04/12] qga: Restrict guest-file-read count to 48
+ MB to avoid crashes
+Date: Wed, 15 Apr 2020 10:23:07 -0500
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::32d
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,165 +98,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>, qemu-devel@nongnu.org,
+ Fabien Chouteau <chouteau@adacore.com>, Max Filippov <jcmvbkbc@gmail.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ =?utf-8?q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ Stafford Horne <shorne@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Quoting Philippe Mathieu-Daud=C3=A9 (2020-04-15 08:02:18)
+> On 4/15/20 2:34 PM, Daniel P. Berrang=C3=A9 wrote:
+> > On Tue, Apr 14, 2020 at 03:30:44PM +0200, Philippe Mathieu-Daud=C3=A9 w=
+rote:
+> >> On [*] Daniel Berrang=C3=A9 commented:
+> >>
+> >>    The QEMU guest agent protocol is not sensible way to access huge
+> >>    files inside the guest. It requires the inefficient process of
+> >>    reading the entire data into memory than duplicating it again in
+> >>    base64 format, and then copying it again in the JSON serializer /
+> >>    monitor code.
+> >>
+> >>    For arbitrary general purpose file access, especially for large
+> >>    files, use a real file transfer program or use a network block
+> >>    device, not the QEMU guest agent.
+> >>
+> >> To avoid bug reports as BZ#1594054 (CVE-2018-12617), follow his
+> >> suggestion to put a low, hard limit on "count" in the guest agent
+> >> QAPI schema, and don't allow count to be larger than 48 MB.
+> >>
+> >> [*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg693176.html
+> >>
+> >> Fixes: CVE-2018-12617
+> >> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1594054
+> >> Reported-by: Fakhri Zulkifli <mohdfakhrizulkifli@gmail.com>
+> >> Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> >> ---
+> >>   qga/qapi-schema.json | 6 ++++--
+> >>   qga/commands.c       | 9 ++++++++-
+> >>   2 files changed, 12 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+> >> index f6fcb59f34..7758d9daf8 100644
+> >> --- a/qga/qapi-schema.json
+> >> +++ b/qga/qapi-schema.json
+> >> @@ -266,11 +266,13 @@
+> >>   ##
+> >>   # @guest-file-read:
+> >>   #
+> >> -# Read from an open file in the guest. Data will be base64-encoded
+> >> +# Read from an open file in the guest. Data will be base64-encoded.
+> >> +# As this command is just for limited, ad-hoc debugging, such as log
+> >> +# file access, the number of bytes to read is limited to 10 MB.
+> > =
 
-Extract the common code shared by both POSIX/Win32 implementations.
+> > s/10/48/
+> > =
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- qga/commands-common.h |  3 +++
- qga/commands-posix.c  | 22 +++-------------------
- qga/commands-win32.c  | 20 +++-----------------
- qga/commands.c        | 26 ++++++++++++++++++++++++++
- 4 files changed, 35 insertions(+), 36 deletions(-)
+> >>   #
+> >>   # @handle: filehandle returned by guest-file-open
+> >>   #
+> >> -# @count: maximum number of bytes to read (default is 4KB)
+> >> +# @count: maximum number of bytes to read (default is 4KB, maximum is=
+ 10MB)
+> > =
 
-diff --git a/qga/commands-common.h b/qga/commands-common.h
-index af90e5481e..90785ed4bb 100644
---- a/qga/commands-common.h
-+++ b/qga/commands-common.h
-@@ -15,4 +15,7 @@ typedef struct GuestFileHandle GuestFileHandle;
- 
- GuestFileHandle *guest_file_handle_find(int64_t id, Error **errp);
- 
-+GuestFileRead *guest_file_read_unsafe(GuestFileHandle *gfh,
-+                                      int64_t count, Error **errp);
-+
- #endif
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index c59c32185c..a52af0315f 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -461,29 +461,14 @@ void qmp_guest_file_close(int64_t handle, Error **errp)
-     g_free(gfh);
- }
- 
--struct GuestFileRead *qmp_guest_file_read(int64_t handle, bool has_count,
--                                          int64_t count, Error **errp)
-+GuestFileRead *guest_file_read_unsafe(GuestFileHandle *gfh,
-+                                      int64_t count, Error **errp)
- {
--    GuestFileHandle *gfh = guest_file_handle_find(handle, errp);
-     GuestFileRead *read_data = NULL;
-     guchar *buf;
--    FILE *fh;
-+    FILE *fh = gfh->fh;
-     size_t read_count;
- 
--    if (!gfh) {
--        return NULL;
--    }
--
--    if (!has_count) {
--        count = QGA_READ_COUNT_DEFAULT;
--    } else if (count < 0 || count >= UINT32_MAX) {
--        error_setg(errp, "value '%" PRId64 "' is invalid for argument count",
--                   count);
--        return NULL;
--    }
--
--    fh = gfh->fh;
--
-     /* explicitly flush when switching from writing to reading */
-     if (gfh->state == RW_STATE_WRITING) {
-         int ret = fflush(fh);
-@@ -498,7 +483,6 @@ struct GuestFileRead *qmp_guest_file_read(int64_t handle, bool has_count,
-     read_count = fread(buf, 1, count, fh);
-     if (ferror(fh)) {
-         error_setg_errno(errp, errno, "failed to read file");
--        slog("guest-file-read failed, handle: %" PRId64, handle);
-     } else {
-         buf[read_count] = 0;
-         read_data = g_new0(GuestFileRead, 1);
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index cfaf6b84b8..9717a8d52d 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -322,33 +322,19 @@ void qmp_guest_shutdown(bool has_mode, const char *mode, Error **errp)
-     }
- }
- 
--GuestFileRead *qmp_guest_file_read(int64_t handle, bool has_count,
--                                   int64_t count, Error **errp)
-+GuestFileRead *guest_file_read_unsafe(GuestFileHandle *gfh,
-+                                      int64_t count, Error **errp)
- {
-     GuestFileRead *read_data = NULL;
-     guchar *buf;
--    HANDLE fh;
-+    HANDLE fh = gfh->fh;
-     bool is_ok;
-     DWORD read_count;
--    GuestFileHandle *gfh = guest_file_handle_find(handle, errp);
--
--    if (!gfh) {
--        return NULL;
--    }
--    if (!has_count) {
--        count = QGA_READ_COUNT_DEFAULT;
--    } else if (count < 0 || count >= UINT32_MAX) {
--        error_setg(errp, "value '%" PRId64
--                   "' is invalid for argument count", count);
--        return NULL;
--    }
- 
--    fh = gfh->fh;
-     buf = g_malloc0(count + 1);
-     is_ok = ReadFile(fh, buf, count, &read_count, NULL);
-     if (!is_ok) {
-         error_setg_win32(errp, GetLastError(), "failed to read file");
--        slog("guest-file-read failed, handle %" PRId64, handle);
-     } else {
-         buf[read_count] = 0;
-         read_data = g_new0(GuestFileRead, 1);
-diff --git a/qga/commands.c b/qga/commands.c
-index 4471a9f08d..5611117372 100644
---- a/qga/commands.c
-+++ b/qga/commands.c
-@@ -18,6 +18,7 @@
- #include "qemu/base64.h"
- #include "qemu/cutils.h"
- #include "qemu/atomic.h"
-+#include "commands-common.h"
- 
- /* Maximum captured guest-exec out_data/err_data - 16MB */
- #define GUEST_EXEC_MAX_OUTPUT (16*1024*1024)
-@@ -547,3 +548,28 @@ error:
-     g_free(info);
-     return NULL;
- }
-+
-+GuestFileRead *qmp_guest_file_read(int64_t handle, bool has_count,
-+                                   int64_t count, Error **errp)
-+{
-+    GuestFileHandle *gfh = guest_file_handle_find(handle, errp);
-+    GuestFileRead *read_data;
-+
-+    if (!gfh) {
-+        return NULL;
-+    }
-+    if (!has_count) {
-+        count = QGA_READ_COUNT_DEFAULT;
-+    } else if (count < 0 || count >= UINT32_MAX) {
-+        error_setg(errp, "value '%" PRId64 "' is invalid for argument count",
-+                   count);
-+        return NULL;
-+    }
-+
-+    read_data = guest_file_read_unsafe(gfh, count, errp);
-+    if (!read_data) {
-+        slog("guest-file-write failed, handle: %" PRId64, handle);
-+    }
-+
-+    return read_data;
-+}
--- 
-2.17.1
+> > s/10/48/
+> =
 
+> Oops I totally missed those, thanks!
+
+I've rolled in the doc fix-ups and sent a pull request for patches 1-4
+
+> =
+
+> > =
+
+> >>   #
+> >>   # Returns: @GuestFileRead on success.
+> >>   #
+> >> diff --git a/qga/commands.c b/qga/commands.c
+> >> index 5611117372..efc8b90281 100644
+> >> --- a/qga/commands.c
+> >> +++ b/qga/commands.c
+> >> @@ -11,6 +11,7 @@
+> >>    */
+> >>   =
+
+> >>   #include "qemu/osdep.h"
+> >> +#include "qemu/units.h"
+> >>   #include "guest-agent-core.h"
+> >>   #include "qga-qapi-commands.h"
+> >>   #include "qapi/error.h"
+> >> @@ -24,6 +25,12 @@
+> >>   #define GUEST_EXEC_MAX_OUTPUT (16*1024*1024)
+> >>   /* Allocation and I/O buffer for reading guest-exec out_data/err_dat=
+a - 4KB */
+> >>   #define GUEST_EXEC_IO_SIZE (4*1024)
+> >> +/*
+> >> + * Maximum file size to read - 48MB
+> >> + *
+> >> + * (48MB + Base64 3:4 overhead =3D JSON parser 64 MB limit)
+> >> + */
+> >> +#define GUEST_FILE_READ_COUNT_MAX (48 * MiB)
+> >>   =
+
+> >>   /* Note: in some situations, like with the fsfreeze, logging may be
+> >>    * temporarilly disabled. if it is necessary that a command be able
+> >> @@ -560,7 +567,7 @@ GuestFileRead *qmp_guest_file_read(int64_t handle,=
+ bool has_count,
+> >>       }
+> >>       if (!has_count) {
+> >>           count =3D QGA_READ_COUNT_DEFAULT;
+> >> -    } else if (count < 0 || count >=3D UINT32_MAX) {
+> >> +    } else if (count < 0 || count > GUEST_FILE_READ_COUNT_MAX) {
+> >>           error_setg(errp, "value '%" PRId64 "' is invalid for argumen=
+t count",
+> >>                      count);
+> >>           return NULL;
+> > =
+
+> > With the docs typos fixed:
+> > =
+
+> >    Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > =
+
+> > =
+
+> > Regards,
+> > Daniel
+> > =
+
+>=20
 
