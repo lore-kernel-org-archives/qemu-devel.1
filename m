@@ -4,37 +4,37 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A33B4C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 07:24:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D487C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 07:41:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43D03206D5
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 07:24:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43D03206D5
+	by mail.kernel.org (Postfix) with ESMTPS id 12C972064A
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 07:41:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12C972064A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jOysY-0006GI-Ch
-	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 03:24:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37927)
+	id 1jOz96-0001q2-3e
+	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 03:41:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39373)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jOyrl-0005r6-UQ
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 03:23:18 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jOz8T-0001KD-JO
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 03:40:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jOyrk-0007Xv-TX
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 03:23:17 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:36753)
+ (envelope-from <laurent@vivier.eu>) id 1jOz8S-00072q-Ck
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 03:40:33 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:34235)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jOyrk-0007XZ-LL
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 03:23:16 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jOz8S-000724-4X
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 03:40:32 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
  (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M7KG2-1jJVDH3ihQ-007npZ; Thu, 16 Apr 2020 09:23:04 +0200
+ 1N0FE1-1j58Qe1bYF-00xIsb; Thu, 16 Apr 2020 09:39:55 +0200
 Subject: Re: [PATCH] linux-user/syscall.c: add target-to-host mapping for
  epoll_create1()
 To: Sergei Trofimovich <slyfox@gentoo.org>, qemu-devel@nongnu.org
@@ -82,8 +82,8 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <db152931-fbbb-6100-0778-3433dcac49f4@vivier.eu>
-Date: Thu, 16 Apr 2020 09:23:00 +0200
+Message-ID: <fe098fc1-4e89-0679-4aae-76e716b9e789@vivier.eu>
+Date: Thu, 16 Apr 2020 09:39:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
@@ -91,25 +91,25 @@ In-Reply-To: <20200415220508.5044-1-slyfox@gentoo.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:T1GneZfrNtrYz4Sxh2crxNjO1WzA3iIGq9Y7DjkoNV6Dr1D0KB+
- 2j92rzqc6U1tyhKh8+WnXTYACcZHV5PIBX93qEodvyfu1cSBgB76mXbdWWAwHvqFa+Ko3Zy
- z7iQmGaUT7ivqNgQRVLwMUbfMPoCfcm+dFPkZgY4bMy9B2eik6XMxdkUKhca7XIo84C+j4G
- 6vHCTMKOVVSTMHFGrAHvQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zCQTceuJ9Ww=:07USXe4HlaLZNVlSlYF+AO
- cKc5p97PJMfVODmaFdXce88eyU+sSzh41jFLSZht2OhN2d1cY1DGhdLBksonnGr88Mxs8GAxJ
- Nbd3zvxoWeNcwlI3ENbpZJP5P0IqsmkORMk4RazUb26hDAMNQ874Rvvy7VgYH3piUI3IIl11e
- 3jrPOosmhNuvxF//cL5ROG4a+4wF9WgIV3KKcIGbEmzt2bHm4aseKDH4odG3o89itOnw9Xxb3
- GReoOfhMnN4kRyFnmK8B7+xmuyhuOlzNd30oEslLpDK/FCpu//Cq+oo0rRi+gwcz3GDIUIAyo
- QqiFSO9smsigdfLI2VdLoxzo6FTrjR+8liSmAKMO52comxVNZBvD7leSQNrmDOZI3T4fn3ozS
- LeGxmcPOxQ8EHO38k17o/NI5bP0t3032KFvG2DswQDiJfj7c7hiGffGEXWcdbPnTDZ2lxQkC0
- /JcEQ6d2Xvig28+TzY9uAkKBlI9WwY8//i9SDIcbW4JKmZv0ehnHgKIM1GXOldVnKM3roLio8
- BDC41LWJk5XsqnY8nmUjdwJfPV7Kg/+q25u8qdbEqh5JtPjblWsKeoMMRknpGmXnohMaiaPfT
- WfKi5pXzSCMU/P0HGZ4x/6LcMMd+MU5SSAe5CTZKnUbUFVItka8vH3zyfKTCqkFVm5aajfrIE
- rJa8wawLeZ1eMUgfVgwJvWABrAI2Iff4GIuBroH6DyhcAoGg5np9yLc9nsgFXV37BFQWVXJSB
- JL/2CcUmPnVL9uYLNcgdbJB80KXJaMHR5iesMAe0e9iSWh9VcFajqADHp9GJ+lQmiO/WS4xFy
- wLhpdS2KtbQ+NuCMEcVlyBb8kPoIOvIwsFGrKIH9Rz7VLNUeQ746JOMUgdTr/JMpR0cyvO6
+X-Provags-ID: V03:K1:k26MwutozzYxnI/tFCpPxabnnjzm328Vh0V/5VunXLvj5QJDURM
+ 1h0YwFU5P2HHEsfdD0wtbwhjsgp3LqRQFQoQtTN8U0GPKb7ubGLMPPKcFVu/GXO/0dGEQT5
+ TFSNm7wtAetBGLWplExXpytv5wxVGFimD7ySCFFop5oXOh+7ykx4igSzmcpsmQTuuTIxfv5
+ 5sHtNYym8z1IykpRnEUtw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Nds2S9INWzc=:8w1u2DTpRxV4wXuabhY37B
+ h+5MG+S8f6y5z1wTgtnj9Xjn7DiWaMS1IW1Sj2TZFOFrf0kjVF+ByCCXsv44/g2+EH+FiyMvL
+ mJSSTgJ4aktNTb/9bw60vSgZptN/ulhAoyKlXkC4KU1/VgrHYcmDQs8agR0P4YR0NTwTAtJM7
+ n7/Xfgeejf+irk76pbeCPAmgqXcJ3T6gfpuYDmfUMxj8jtys7p97QaR+DN31NXugUnP1iIFiq
+ byokKxewFk7pCa+Ri069RTsMWmIgfnq5+NiYk+5iGiQggWcq+e7NBYEwvNmJHA7o0d9STIwKS
+ KSIdUCALAiL8Gt9x/JDv07e5MdbMkPZ3s+W/e1sCbYrOYyhnIzKr9u/PQQYNNrek8qZ9kjtgW
+ lNl0eWTWZ4X3NZnC2mgwgXfu4wSjgSKDWft3TVAQgHlutVzzid71luK6GyxwRqogstMlbzUzh
+ qowSiUG6SeiuMcZMcXSrVrbm+vHaF0UC9Jyr6hwzCWEKY5MSS3D5sw3zHPrzQM+2VHtZKvkAt
+ ewLB6XTkt5i8SWevOKNoM2MMEYzgMwW2nb/24uTKQI+MXwpUHWvblhnyjxZJRVO2QRFjt+7Zr
+ WGnCykOv/0el86pDMohl2YhTbQl5kABtrm7Kddm3tQXq2tVscvkdNJFP6C3I4FIqpTcTEu6Qf
+ 7Z151csQqv3PVmJ4GJPLmLzOJ+wRs26Qwk44DuYBp12hQOzguLP+W8Msiu+v8FCCLvyurjukS
+ IYoNwqloi57X5rJMzieRbBpCLYCRZTdK5U5yf0Xs3eaxnW5ICCrxfx5wThPd/w7BPeAgWkEam
+ ZFtzwUKCId86F7xaEXrTlurs0IpgdOHdivFqugWWMoyjiJzanvkNCPR8qOx5xb5Cbd/GNPY
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -158,5 +158,8 @@ Le 16/04/2020 à 00:05, Sergei Trofimovich a écrit :
 >      case TARGET_NR_epoll_ctl:
 > 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Applied to my linux-user-for-5.0 branch.
+
+Thanks,
+Laurent
 
