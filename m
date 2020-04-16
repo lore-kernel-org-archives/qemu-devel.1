@@ -2,100 +2,115 @@ Return-Path: <SRS0=3HrQ=6A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3093C2BB85
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 11:10:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4496DC352BE
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 11:19:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91077206E9
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 11:10:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OZ0qHXZ4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91077206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1DE942063A
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 11:19:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DE942063A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jP2Pq-0003Si-N0
-	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 07:10:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42647)
+	id 1jP2Ye-0006Zq-7m
+	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 07:19:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43835)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jP2PG-0002rp-8k
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 07:10:07 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jP2Xs-00069Q-P2
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 07:19:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jP2PE-0006D6-UK
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 07:10:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43175
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jP2PE-0006CR-QR
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 07:10:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587035403;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wIPDI7c8wyLmq4vVtx2jYxwBWb4ssXaSn4gTWG+NqQQ=;
- b=OZ0qHXZ4taR3nM+SI3YabdnoAc93fJwZrknQpNTD5hGjRBOxIf6vHaTGWT/+T84tfFLKJO
- FrOh2Uhg02s2XFQD5FNreDNC2Tmz9dSGcyA1+o3CklA8KSLYx7DF+D4dwXtpc7c+JWeMzn
- pWM7X1OzsgXZq9VeClmTz+c59uUYRkg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-pxvLLwAmPOWkKTwmQxwVhQ-1; Thu, 16 Apr 2020 07:09:58 -0400
-X-MC-Unique: pxvLLwAmPOWkKTwmQxwVhQ-1
-Received: by mail-wr1-f70.google.com with SMTP id j12so1508988wrr.18
- for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 04:09:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=wIPDI7c8wyLmq4vVtx2jYxwBWb4ssXaSn4gTWG+NqQQ=;
- b=P0rzTVxk4NQV9Ixt/KAqT4UtoPSh+0ea8TNjoIKCAzzpvKy+2QBuaRfsXbKcuPSyD8
- FkxnGRMaG26DbTSuPslnUL24oAHOSpdeb8I6LH646WKelbl/sFGsTCDeS7egtfzI767X
- QlnfiUsT+G21w0J6FjC2NfajkPM152GcrCCWOt/X8XwPFZMhpo+LyTsToIjt6kOiipNK
- bPWYLTawqd6mZHtTFNwCYfWVY78q4xTpTQqvQ2E7JlW4WCWzzpuYL40RJPGjYnc2IdyH
- zy8W+Y3k354v3V501xE6kvbSa6CPCNePaHZfmrtPf9dUQ+BoJjhLer14HgGAXDpEAIa7
- RULA==
-X-Gm-Message-State: AGi0PuYfHlw48H2e2SVXsNYW2hnemqZjVCBCDi2RdFMCjbG7ZjePTD7N
- wyi4ML++DmcjCYVyx8i0ySkw8mHIxPaKRsPP2/lzDnAf26zhhO/BqBDJ4aPoAMC+OGh59B6Rhb8
- Y7HZrvUSqpRCOhFU=
-X-Received: by 2002:a05:600c:2c47:: with SMTP id
- r7mr4289261wmg.50.1587035397232; 
- Thu, 16 Apr 2020 04:09:57 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJw27MLRabik1y+BUupZskvZEkYXwa3MT4/1RXztSHCRPn2re2fP69WKHhUMihdSIyGH7SiXw==
-X-Received: by 2002:a05:600c:2c47:: with SMTP id
- r7mr4289234wmg.50.1587035397039; 
- Thu, 16 Apr 2020 04:09:57 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id p3sm9144941wrx.82.2020.04.16.04.09.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 16 Apr 2020 04:09:56 -0700 (PDT)
-Subject: Re: [PATCH] Cadence: gem: fix wraparound in 64bit descriptors
-To: qemu-devel@nongnu.org, rfried.dev@gmail.com
-References: <158702996540.15335.16514068999380777664@39012742ff91>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <71dd512d-485c-d395-df90-f6208f91c655@redhat.com>
-Date: Thu, 16 Apr 2020 13:09:55 +0200
+ (envelope-from <laurent@vivier.eu>) id 1jP2Xq-0001ZY-4G
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 07:19:00 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:37705)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jP2Xp-0001Yk-SR
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 07:18:58 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M8yoa-1jMGaI3fIk-0063xh; Thu, 16 Apr 2020 13:18:53 +0200
+Subject: Re: m68k: gdbstub crashing setting float register on cfv4e cpu
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <3be54f78-cf6d-af3b-6e1f-e91d146c6a3a@amsat.org>
+ <87sgh680qb.fsf@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <7922d9aa-f849-7774-7f6e-71ce3dacde43@vivier.eu>
+Date: Thu, 16 Apr 2020 13:18:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <158702996540.15335.16514068999380777664@39012742ff91>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <87sgh680qb.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:ljKSSWSShddrsw3NPOe3R/2MooOL4c8pUJUtKYyh3i4yyzqxGln
+ /Q76mKLO7hKUzxY/Q7fRnpEiZXCXVWDgYv+FksTpmDBJwFxCIl0j4/FVfruGljS1gJ77JGt
+ BOT/H0kKkpqwoYQNnRBtOKJXW3LyJqPIO2HSD/YL06G3AwDbd1natRTfW5W6gGPHvregIbY
+ CXcFq0hFv/aJ2xqrsYslw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:39oiFbmnIOE=:oYHhlDzYniXaviasFbEqyN
+ SPbH3o6dRyxZrirWnL43JW7asPCZzu0PwlU3fdEt+2DinAhQ3D7k4b4AruGJ9IDUTHupf0wum
+ 7kTachonUIjT0aVZ7+Rx0fB0IBD0eCp3XNpTqcjtx1ABASY6AMIxCVSBT6yq7rQSj6QQEGV/D
+ D1omp9caChPUgASmRTUKZbSJhhdIMhO1AJ/D6wOsoIgeb+Gwl8oS/3ZBBpoWYFZ8vNoS+YI5L
+ 7R3p4igeBi00hPJfC0zvu/F88aAuJwGY+BTSw2Yddc/uS0O/QzcJrbXWjlr3hppMToeO+h1i7
+ IIJ3Z7xsiZEF319agGCWwbOWxANUG4ueAWRVf23nVbVqB7I3WOgYXTEcrCcGlo8vOaZodlr7Y
+ o8I05kIEGmwM2XKJlUXS+aR/l6Z/VWH3/Uh3HUM1TFpn49Yz+xM2Wp+KV1V5aLs0QcffzBkUZ
+ L6rQ3T6DqdDMu0vqI+3uxfSLk2ABS78cft0xOOI895zqx0Cdv/dXnJcNObeC8Zer2R+RUR5yU
+ dDb/z8ylTdCK1nfUJe6eYGMqRmEKrT36JFQk7itH9szZCSAoBiOFLOBXGN0ka090Vc+uqecqK
+ l3DIYzXbqnw6ULprIxT4TEz+7na2Ahj90RnOEMGYdGEa+53jruG98UGxlTOgNgN0Y4NLV5wJ0
+ X7oEbiqjJGPrCwsHNEiCOv9CZPLPLSUog8EpRWaEQZ34+96nMrQL7FEHj5RrMKw69eQJu4Mde
+ NQiN/Qn7SPk653o82j9+B1LsOn0/rcjvqm9BJGaZCwgkJNci6K3hS3nfFbHXztaJUP3F9u2FZ
+ VdH9McrxKMFF+RjxwPQ0yK/xLEtsYb2J1GZBNZxu8BU3TtN+Bo3akhLc0xaarjfPmNKCpd0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,21 +122,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Juan Quintela <quintela@redhat.com>,
- jasowang@redhat.com, alistair@alistair23.me,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org
+Cc: Thomas Huth <huth@tuxfamily.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/16/20 11:39 AM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20200416090247.353414-1-rfried.dev@gmail.com/
+Le 14/04/2020 à 18:56, Alex Bennée a écrit :
 > 
-[...]
-> ERROR:/tmp/qemu-test/src/tests/qtest/migration-test.c:1229:test_migrate_auto_converge: 'got_stop' should be FALSE
-> ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/qtest/migration-test.c:1229:test_migrate_auto_converge: 'got_stop' should be FALSE
-> make: *** [/tmp/qemu-test/src/tests/Makefile.include:636: check-qtest-x86_64] Error 1
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+> 
+>> gdbstub/m68k seems broken with floats, previous to refactor commit
+>> a010bdbe719 ("extend GByteArray to read register helpers").
+>>
+>> HEAD at 6fb1603aa2:
+>>
+>> $ qemu-system-m68k -s -S -cpu cfv4e
+>>
+>> ---[GUEST]---
+>>
+>> (gdb) set architecture m68k:cfv4e
+>> The target architecture is assumed to be m68k:cfv4e
+>> (gdb) target remote 172.17.0.1:1234
+>> Remote debugging using 172.17.0.1:1234
+>> (gdb) info float
+>> fp0            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
+>> fp1            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
+>> fp2            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
+>> fp3            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
+>> fp4            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
+>> fp5            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
+>> fp6            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
+>> fp7            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
+>> fpcontrol      0x0                 0
+>> fpstatus       0x0                 0
+>> fpiaddr        0x0                 0x0
+>> (gdb) set $fp0=1
+>> Remote communication error.  Target disconnected.: Connection reset by
+>> peer.
+> 
+> With my sha1 debugging test case I get different results depending on
+> the cpu type:
+> 
+>   /home/alex/lsrc/qemu.git/tests/guest-debug/run-test.py --gdb /home/alex/src/tools/binutils-gdb.git/builds/all/install/bin/gdb --qemu /home/alex/lsrc/qemu.git/builds/user.static/m68k-linux-user/qemu-m68k --qargs "" --bin tests/tcg/m68k-linux-user/sha1 --test /home/alex/lsrc/qemu.git/tests/tcg/multiarch/gdbstub/sha1.py
+>   GNU gdb (GDB) 10.0.50.20200414-git
+>   Copyright (C) 2020 Free Software Foundation, Inc.
+>   License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+>   This is free software: you are free to change and redistribute it.
+>   There is NO WARRANTY, to the extent permitted by law.
+>   Type "show copying" and "show warranty" for details.
+>   This GDB was configured as "x86_64-pc-linux-gnu".
+>   Type "show configuration" for configuration details.
+>   For bug reporting instructions, please see:
+>   <http://www.gnu.org/software/gdb/bugs/>.
+>   Find the GDB manual and other documentation resources online at:
+>       <http://www.gnu.org/software/gdb/documentation/>.
+> 
+>   For help, type "help".
+>   Type "apropos word" to search for commands related to "word"...
+>   Executed .gdbinit
+>   Reading symbols from tests/tcg/m68k-linux-user/sha1...
+>   Remote debugging using localhost:1234
+>   warning: Register "fp0" has an unsupported size (96 bits)
+>   warning: Register "fp1" has an unsupported size (96 bits)
+>   warning: Register "fp2" has an unsupported size (96 bits)
+>   warning: Register "fp3" has an unsupported size (96 bits)
+>   warning: Register "fp4" has an unsupported size (96 bits)
+>   warning: Register "fp5" has an unsupported size (96 bits)
+>   warning: Register "fp6" has an unsupported size (96 bits)
+>   warning: Register "fp7" has an unsupported size (96 bits)
+>   Remote 'g' packet reply is too long (expected 148 bytes, got 180 bytes): 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000408009f000000000800003407fff0000ffffffffffffffff7fff0000ffffffffffffffff7fff0000ffffffffffffffff7fff0000ffffffffffffffff7fff0000ffffffffffffffff7fff0000ffffffffffffffff7fff0000ffffffffffffffff7fff0000ffffffffffffffff000000000000000000000000
 
-Doesn't seem related to the patch content...
+This is a bug in GDB that doesn't support 96bit float registers of 680x0
+but only 64bit registers of coldfire.
 
+There was a rework of GDB in the past that has broken that and no one
+noticed. I bisected and found the commit but it was really too complex
+and difficult to fix.
+
+To be able to debug remotely m68k I use gdb from etch-m68k in a chroot
+(or from real hardware).
+
+Thanks,
+Laurent
 
