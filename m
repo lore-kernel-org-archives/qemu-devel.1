@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.5 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49455C2BB55
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 19:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB152C2BB55
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 19:41:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D5FA2054F
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 19:38:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D5FA2054F
+	by mail.kernel.org (Postfix) with ESMTPS id 9EF3321BE5
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 19:41:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EF3321BE5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=email.cz
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPALH-0000MC-B5
-	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 15:38:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53022)
+	id 1jPAON-0002gs-QQ
+	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 15:41:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53702)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jPAIY-0005wl-5y
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 15:35:43 -0400
+ (envelope-from <bounces@canonical.com>) id 1jPANZ-0001YT-4v
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 15:40:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jPAIW-00064r-L9
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 15:35:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41498)
+ (envelope-from <bounces@canonical.com>) id 1jPANY-0008Ks-0y
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 15:40:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42730)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jPAIV-00063H-Gb
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 15:35:40 -0400
+ id 1jPANX-0008KW-Rz
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 15:40:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jPAIT-0005Xz-C3
- for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 19:35:37 +0000
+ id 1jPANW-0006Ft-Lv
+ for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 19:40:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 50B822E806D
- for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 19:35:37 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 8A0752E806D
+ for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 19:40:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 16 Apr 2020 19:28:26 -0000
+Date: Thu, 16 Apr 2020 19:35:18 -0000
 From: ruthan <ruthan@email.cz>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,16 +54,17 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: ruthan
 X-Launchpad-Bug-Reporter: ruthan (ruthan)
 X-Launchpad-Bug-Modifier: ruthan (ruthan)
-Message-Id: <158706530687.6368.4226982042682182002.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1873335] [NEW] Dos Keypad is not working for numbers - numlock
- is not working
+Message-Id: <158706571876.12002.5666042854910451278.malonedeb@soybean.canonical.com>
+Subject: [Bug 1873339] [NEW] Qemu DOS Quake - 640x480 and above resolutions -
+ Unable to load VESA palette in dos prompt and game crashing are not
+ working 
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1e916786ac5e91ef76e7ef07c1ccf89570cc66c3
+X-Launchpad-Hash: 9328006d1086959e6fc022ed5b6964e012b0e9b5
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -76,61 +77,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1873335 <1873335@bugs.launchpad.net>
+Reply-To: Bug 1873339 <1873339@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Public bug reported:
 
-Hello,
-i tried to use Qemu 4.2 for Dos, but there is problem what in Dos is not po=
-ssible turn on Numlock for input numbers, so games need it.. Numlock only w=
-orking as arrow keys.
-=C2=A0=C2=A0I tested bough Windows and Linux builds.
-
-With same setting, when i use Windows 98 or later os, numlock is working
+I have problem make Quake Demo working with 640x480+, with 320x200 working =
 fine.
+I tried 3 virtual videocards settings: -vga cirrus 640x480 is not available=
+, probably emulated GPU has not enough VRAM or some Vesa2 utility is needed=
+. For -vga std and -vga vmware // 640x480 is available in game menu, but wh=
+en i tried to set it, im getting: Unable to load VESA palette in dos prompt=
+ and game crashing.
+With vmware svgaII other Q2DOS 640x480 and 1024x768 its working fine, so it=
+ not working only with some games.
+
+  Qemu 4.2, its same on Linux and Windows.
 
 ** Affects: qemu
      Importance: Undecided
          Status: New
 
-** Description changed:
-
-  Hello,
-  i tried to use Qemu 4.2 for Dos, but there is problem what in Dos is not =
-possible turn on Numlock for input numbers, so games need it.. Numlock only=
- working as arrow keys.
--   I tested bough Windows and Linux builds.
-+ =C2=A0=C2=A0I tested bough Windows and Linux builds.
-+ =
-
-+ With same setting, when i use Windows 98 or later os, numlock is working
-+ fine.
-
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1873335
+https://bugs.launchpad.net/bugs/1873339
 
 Title:
-  Dos Keypad is not working for numbers - numlock is not working
+  Qemu DOS Quake - 640x480 and above resolutions - Unable to load VESA
+  palette in dos prompt and game crashing are not working
 
 Status in QEMU:
   New
 
 Bug description:
-  Hello,
-  i tried to use Qemu 4.2 for Dos, but there is problem what in Dos is not =
-possible turn on Numlock for input numbers, so games need it.. Numlock only=
- working as arrow keys.
-  =C2=A0=C2=A0I tested bough Windows and Linux builds.
+  I have problem make Quake Demo working with 640x480+, with 320x200 workin=
+g fine.
+  I tried 3 virtual videocards settings: -vga cirrus 640x480 is not availab=
+le, probably emulated GPU has not enough VRAM or some Vesa2 utility is need=
+ed. For -vga std and -vga vmware // 640x480 is available in game menu, but =
+when i tried to set it, im getting: Unable to load VESA palette in dos prom=
+pt and game crashing.
+  With vmware svgaII other Q2DOS 640x480 and 1024x768 its working fine, so =
+it not working only with some games.
 
-  With same setting, when i use Windows 98 or later os, numlock is
-  working fine.
+    Qemu 4.2, its same on Linux and Windows.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1873335/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1873339/+subscriptions
 
