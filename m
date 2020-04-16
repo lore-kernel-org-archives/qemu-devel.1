@@ -2,79 +2,80 @@ Return-Path: <SRS0=3HrQ=6A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C427EC2BB85
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 16:52:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB60C2BB55
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 17:10:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 916842223E
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 16:52:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59D082078E
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 17:10:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZEWZ38OM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 916842223E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pBrubWH/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59D082078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jP7kc-0001aI-Po
-	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 12:52:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32955)
+	id 1jP825-0000r4-F2
+	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 13:10:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35426)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jP7hm-0006r1-Pn
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 12:49:35 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jP81G-0000D3-Qj
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 13:09:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1jP7hl-0000Pr-R4
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 12:49:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30846
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jP7hl-0000Pa-NE
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 12:49:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587055773;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OfPb5Xn/B/myf3QvtDqfsuKstRVK4hF/CQiBtI98nAY=;
- b=ZEWZ38OMEwm9w1EFgdOXtsAr4NbTtdjLZ6O9SrxsTQwATjEXfV5RfKYUy4JDLVBvfcrw26
- /IRHulMzxz4fV7s4198t8qIOGHSEq0y1Eo0AtlMmNYVseBqDPfoYA8wNia3FO1gfidA06k
- XgrQJlorRnZLIAKYjAVaTgSIuhINfMI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-1r7NIdbSNDixjmlBnkk9qw-1; Thu, 16 Apr 2020 12:49:30 -0400
-X-MC-Unique: 1r7NIdbSNDixjmlBnkk9qw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2E58802683
- for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 16:49:29 +0000 (UTC)
-Received: from localhost (ovpn-114-223.ams2.redhat.com [10.36.114.223])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EE0639A265;
- Thu, 16 Apr 2020 16:49:23 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] virtiofsd: drop all capabilities in the wait parent
- process
-Date: Thu, 16 Apr 2020 17:49:07 +0100
-Message-Id: <20200416164907.244868-3-stefanha@redhat.com>
-In-Reply-To: <20200416164907.244868-1-stefanha@redhat.com>
-References: <20200416164907.244868-1-stefanha@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jP81F-00060J-7a
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 13:09:42 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:44463)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jP81F-0005yH-0T
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 13:09:41 -0400
+Received: by mail-oi1-x241.google.com with SMTP id o25so17138933oic.11
+ for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 10:09:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=AKgydUrU/Fn6ekzsFFMFlZAQx+wS1FvQ4F+WPYEsmCQ=;
+ b=pBrubWH/FpA51fTOOuhPtGpTBglxmdF66+LaYPT+MwDKNvoOnysuEeL5yTAO2v6lTy
+ Stj/4QwKspwgPQqjm6VwqWNgXNhB/CFEyM27kmSlCqHIOAnY02iOeO4U3y+sBHV9ulbU
+ /bFHQg8Z5AmVQb801cnaDzQyn4NbMEMBm5Fk3RMhiIzxSIKfbUXn25SbCA0AL2CKwlQu
+ zlUzuB0yye81/OcQlVmn2ks/NP+uLibg4YhOxULKBXNvo2ldZuQNVOxYzhTV+re4rvqN
+ tRi3K4R/BOBl+iyIRYTO5w+gfSfgus2PxYxUtiYTU481XYTnIH/gRHrXuSJ8BR37Zul8
+ tnQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=AKgydUrU/Fn6ekzsFFMFlZAQx+wS1FvQ4F+WPYEsmCQ=;
+ b=AGo2lencYLzjWPYhhs0dXGN/3wtpIEU9xq/5YoOKOaRGIKCqH57sEkf6jAsuac+2fV
+ NZVCbjQ17JGqx13FU3ZZuLHLWrzJdab6wkqpVVCvPPSqxMPMHnb2ywyl1Yi8JAxjn3yP
+ ER+l/XYXlPYRE+mrEZVUg+DMTSSKJItGS3YTcHleTnywQfDFJvVyrbJ6iIOfZY15NhC+
+ GZEjxkGDuEbwhpbOroFkxZCwLr6N8OgGDJMTmbeQQ7Lh4TFjYdDKcCX9eVhNqAcKlewC
+ j/gvEu8YxXO/l4186o8ggba/yHOxRQDgBS8EXeok76ST27grMGe5ZNK+LH26TqgFHgRy
+ EbWA==
+X-Gm-Message-State: AGi0PubOUk+5A30LqZlpGuldcWw+a06LLZPYnyWNxtVtnTgzMH9/Bwd/
+ AykUaMqmIaQfLmYh6gFOe22sf3q+WeK/epxtXF42Kw==
+X-Google-Smtp-Source: APiQypKYye+QGhCYqv3OCe+Td0OPQbemKS3X4z6ZnDLtOrJfF6bmjaDQaYsvPhGqC3XUcbIXxNXFsOyhCg22a7mBOgM=
+X-Received: by 2002:aca:dc56:: with SMTP id t83mr3435815oig.48.1587056980016; 
+ Thu, 16 Apr 2020 10:09:40 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <51b427f06838622da783d38ba56e3630d6d85c60.1586925392.git.dirty@apple.com>
+In-Reply-To: <51b427f06838622da783d38ba56e3630d6d85c60.1586925392.git.dirty@apple.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Apr 2020 18:09:27 +0100
+Message-ID: <CAFEAcA-YmjVq_CRyKySOHrfXU7z=1Myi7zPFAW-HGUkoB4t1=g@mail.gmail.com>
+Subject: Re: [PATCH v2] nrf51: Fix last GPIO CNF address
+To: Cameron Esfahani <dirty@apple.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,33 +87,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Vivek Goyal <vgoyal@redhat.com>
+Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QWxsIHRoaXMgcHJvY2VzcyBkb2VzIGlzIHdhaXQgZm9yIGl0cyBjaGlsZC4gIE5vIGNhcGFiaWxp
-dGllcyBhcmUKbmVlZGVkLgoKU2lnbmVkLW9mZi1ieTogU3RlZmFuIEhham5vY3ppIDxzdGVmYW5o
-YUByZWRoYXQuY29tPgotLS0KIHRvb2xzL3ZpcnRpb2ZzZC9wYXNzdGhyb3VnaF9sbC5jIHwgMTMg
-KysrKysrKysrKysrKwogMSBmaWxlIGNoYW5nZWQsIDEzIGluc2VydGlvbnMoKykKCmRpZmYgLS1n
-aXQgYS90b29scy92aXJ0aW9mc2QvcGFzc3Rocm91Z2hfbGwuYyBiL3Rvb2xzL3ZpcnRpb2ZzZC9w
-YXNzdGhyb3VnaF9sbC5jCmluZGV4IGFmOTdiYTFjNDEuLjBjM2YzM2IwNzQgMTAwNjQ0Ci0tLSBh
-L3Rvb2xzL3ZpcnRpb2ZzZC9wYXNzdGhyb3VnaF9sbC5jCisrKyBiL3Rvb2xzL3ZpcnRpb2ZzZC9w
-YXNzdGhyb3VnaF9sbC5jCkBAIC0yNTMwLDYgKzI1MzAsMTcgQEAgc3RhdGljIHZvaWQgcHJpbnRf
-Y2FwYWJpbGl0aWVzKHZvaWQpCiAgICAgcHJpbnRmKCJ9XG4iKTsKIH0KIAorLyoKKyAqIERyb3Ag
-YWxsIExpbnV4IGNhcGFiaWxpdGllcyBiZWNhdXNlIHRoZSB3YWl0IHBhcmVudCBwcm9jZXNzIG9u
-bHkgbmVlZHMgdG8KKyAqIHNpdCBpbiB3YWl0cGlkKDIpIGFuZCB0ZXJtaW5hdGUuCisgKi8KK3N0
-YXRpYyB2b2lkIHNldHVwX3dhaXRfcGFyZW50X2NhcGFiaWxpdGllcyh2b2lkKQoreworICAgIGNh
-cG5nX3NldHBpZChzeXNjYWxsKFNZU19nZXR0aWQpKTsKKyAgICBjYXBuZ19jbGVhcihDQVBOR19T
-RUxFQ1RfQk9USCk7CisgICAgY2FwbmdfYXBwbHkoQ0FQTkdfU0VMRUNUX0JPVEgpOworfQorCiAv
-KgogICogTW92ZSB0byBhIG5ldyBtb3VudCwgbmV0LCBhbmQgcGlkIG5hbWVzcGFjZXMgdG8gaXNv
-bGF0ZSB0aGlzIHByb2Nlc3MuCiAgKi8KQEAgLTI1NjEsNiArMjU3Miw4IEBAIHN0YXRpYyB2b2lk
-IHNldHVwX25hbWVzcGFjZXMoc3RydWN0IGxvX2RhdGEgKmxvLCBzdHJ1Y3QgZnVzZV9zZXNzaW9u
-ICpzZSkKICAgICAgICAgcGlkX3Qgd2FpdGVkOwogICAgICAgICBpbnQgd3N0YXR1czsKIAorICAg
-ICAgICBzZXR1cF93YWl0X3BhcmVudF9jYXBhYmlsaXRpZXMoKTsKKwogICAgICAgICAvKiBUaGUg
-cGFyZW50IHdhaXRzIGZvciB0aGUgY2hpbGQgKi8KICAgICAgICAgZG8gewogICAgICAgICAgICAg
-d2FpdGVkID0gd2FpdHBpZChjaGlsZCwgJndzdGF0dXMsIDApOwotLSAKMi4yNS4xCgo=
+On Wed, 15 Apr 2020 at 05:37, Cameron Esfahani <dirty@apple.com> wrote:
+>
+> NRF51_GPIO_REG_CNF_END doesn't actually refer to the start of the last
+> valid CNF register: it's referring to the last byte of the last valid
+> CNF register.
+>
+> This hasn't been a problem up to now, as current implementation in
+> memory.c turns an unaligned 4-byte read from 0x77f to a single byte read
+> and the qtest only looks at the least-significant byte of the register.
+>
+> But when running with patches which fix unaligned accesses in memory.c,
+> the qtest breaks.
+>
+> Considering NRF51 doesn't support unaligned accesses, the simplest fix
+> is to actually set NRF51_GPIO_REG_CNF_END to the start of the last valid
+> CNF register: 0x77c.
+>
+> Now, qtests work with or without the unaligned access patches.
+>
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Tested-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Reviewed-by: Joel Stanley <joel@jms.id.au>
+> Signed-off-by: Cameron Esfahani <dirty@apple.com>
 
+
+
+Applied to target-arm.next for 5.1, thanks.
+
+-- PMM
 
