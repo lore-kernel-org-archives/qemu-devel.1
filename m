@@ -6,76 +6,77 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9BCBC352BE
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 12:20:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42ACDC2BB55
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 12:24:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B828A20936
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 12:20:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B81820786
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 12:24:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kmBsc544"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B828A20936
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KKlbo9ne"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B81820786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jP3VD-0007It-VD
-	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 08:20:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53054)
+	id 1jP3ZN-0000bk-Vr
+	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 08:24:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53395)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jP3UW-0006kv-Tv
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 08:19:38 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jP3YW-0008Nt-6G
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 08:23:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jP3UV-0003rB-Ss
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 08:19:36 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39590)
+ (envelope-from <peter.maydell@linaro.org>) id 1jP3YV-0005BL-AM
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 08:23:44 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40036)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jP3UV-0003qn-JO
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 08:19:35 -0400
-Received: by mail-ot1-x343.google.com with SMTP id m13so2853979otf.6
- for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 05:19:35 -0700 (PDT)
+ id 1jP3YU-0005Ax-VC
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 08:23:43 -0400
+Received: by mail-ot1-x344.google.com with SMTP id i27so2865127ota.7
+ for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 05:23:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=5ZcsL05B1ot02DO4kYp6bZ4rMjBwIUOtktRMVs6NzEc=;
- b=kmBsc54465o72JnO26cLR08cEMimj71OeMpon2Ib/mDnwsb1E/8oWAr3A7ODnvMY8A
- ahtnSR+ZZegbcXzA/v5czG1JnAxnSUWwVO9bUs8VGKBsso3LBByzltklSpH129i6sTfL
- WrlV1PWJpdbTlU1BBtjSCk7tQIGxoXLwlMemrVZE5VPsrw2FrLqnDtn7tSqOFy9VNHIL
- 1p+NAhdNuBtvxakDSBn/hdgWhdIZN1NhIY8hgpKqb7Nc38a2WPLjW3JYvHHcsTHudFcj
- DPrBy/vmtTTiePj66Jo16IMNnaSzNnWNY1cLZ/6TTgk1PWQKfZ5O5NsIRI9B0Ishmfzj
- Q3PQ==
+ :cc; bh=yLfuVwRrMu/a6rdozyYUe0pegeZw2lWd9zI9S2tbKfg=;
+ b=KKlbo9nelFtrOgPHst8n/QYWspeynB/5W8NE3+XBdgl0bdC7Wo4AwNnQBgfUE7LPja
+ xACHE6IG6u5qiUtGFYHdIHnPVBgmv5JgAc2ldec+dFQrLlUXPczaBWyxfs2PRYZObJ4n
+ dmaWqECMaZHB+365mc1UJ12Zx2l6t5rtewg8BcQjj3RzzahcqsdgdxRl3dZJPQLUNVfB
+ 95+Rd1vHPFExO35TEHq4c0A6mAey9YO8F7o/LXUNnJMG4oKdCjXn9z/xOWi4SIZSBf0+
+ 0jghseNPKG1Uv3QIq7dZcARoN/4tF8X85b+nAxaUx9u4MHbb2BGOmEsZo8O6SZf9tIdT
+ n54w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=5ZcsL05B1ot02DO4kYp6bZ4rMjBwIUOtktRMVs6NzEc=;
- b=W74AH92cfdajMPdKfIjMd8/+Xbn64qil4batV1H731glk/bhzdvaOZkoT7hS3EXBKW
- dU2IyRk0PrQUwC7XrC0f+tMdZOnymGG8zwKziMJQbf0EkMjOCKbDtH+Wbnn6zZR4UEn9
- uF5uz1KVZ5SpnbAnAFeSpza0QkO9a2csHR/SrjO9q/tovQ94sGRunBrutMJl7iMmoqk+
- ctiu77D3m9w1/B20I2PoWwteiYzt4fqLgoU1tmaybSzMn+7+kiRMS/4HwFnjt/jDp3QU
- jZITaCqrfanlwEquRloRd5LF3+31q5ZAW7XL89roH9fGh3oFzDTdqbZzrwZCJ1SutvEr
- 74uQ==
-X-Gm-Message-State: AGi0PuZfYRtnYM81IFhoahamYpCNaSqswm8FNUV8AgA6e41NsLTclOZw
- lpQ5r9DKmXWWAV4nJOxMTcL2tlDOTXfCtKr238YbOQ==
-X-Google-Smtp-Source: APiQypIpI5+hnX9zx84fybrYOco0fqGnqaAC/nef/6TI2KQeeJZAcgtJ/g0CWURah4nkinHkXwb7LHEqI+DwA9rW2+E=
-X-Received: by 2002:a05:6830:1e4e:: with SMTP id
- e14mr7925564otj.91.1587039574221; 
- Thu, 16 Apr 2020 05:19:34 -0700 (PDT)
+ bh=yLfuVwRrMu/a6rdozyYUe0pegeZw2lWd9zI9S2tbKfg=;
+ b=oHM2g/52BBl8p72L9rNDGFziZGVGd08gvZpdR2dPtasuxAzfsluXyHe5g/H2JfEpZt
+ /Rkwd4bSKzUVNrY2zLB2dWJJO0ifd+Vx23saZVIGD+cWpl0IomRE3pjgQqD1mpAcQDUJ
+ 6lQB6S8wSfWBVKol2I4YiKt1KipwAouXRLhWnsCsh8UTNaWwU5hRcf4Fo1H11iIC2d1Q
+ mN+cqAl/IG7Ec1YQrnSTG+0wxeHvOa6waSQOL/9B8i89xm3zxPrCVwnugdjXtHcBd04j
+ RMlUjSu3CrFwsz0RBW/aelxveGK7D6tifeWVgmbXNYkkbg4YoLgDn5wCqsG1ngzAVYp4
+ P5kg==
+X-Gm-Message-State: AGi0PubVMdo1AL2AxBbKxYXDuetWL+cRxVUcdS/zAisfo6xpOmNd+PWB
+ C9tKSvmDd/mHjWAYDAwv6G0W6ANYvSMPRk2XpuNY3w==
+X-Google-Smtp-Source: APiQypKfwv2GE9zv6KlezWIEPYpaIcv722YncDXntyoVzXItfn2iekgixXWgZufEAAVUb3nCxWG2KBdKhBCdmxFmeHg=
+X-Received: by 2002:a05:6830:1f39:: with SMTP id
+ e25mr26839885oth.135.1587039821971; 
+ Thu, 16 Apr 2020 05:23:41 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200311064420.30606-1-richard.henderson@linaro.org>
- <20200311064420.30606-5-richard.henderson@linaro.org>
-In-Reply-To: <20200311064420.30606-5-richard.henderson@linaro.org>
+ <20200311064420.30606-6-richard.henderson@linaro.org>
+In-Reply-To: <20200311064420.30606-6-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Apr 2020 13:19:23 +0100
-Message-ID: <CAFEAcA9D9cpx5vxtuaeVonFJ0NNKjMOB6viPuE0+ppGiqZSMFw@mail.gmail.com>
-Subject: Re: [PATCH 04/16] target/arm: Use cpu_*_data_ra for sve_ldst_tlb_fn
+Date: Thu, 16 Apr 2020 13:23:30 +0100
+Message-ID: <CAFEAcA8sBjb=05cDzYRvc9oBzJFGrTVokBbx6gqUNzPvskXoyA@mail.gmail.com>
+Subject: Re: [PATCH 05/16] target/arm: Drop manual handling of
+ set/clear_helper_retaddr
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,43 +96,12 @@ Sender: "Qemu-devel"
 On Wed, 11 Mar 2020 at 06:44, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> Use the "normal" memory access functions, rather than the
-> softmmu internal helper functions directly.
->
-> Since fb901c905dc3, cpu_mem_index is now a simple extract
-> from env->hflags and not a large computation.  Which means
-> that it's now more work to pass around this value than it
-> is to recompute it.
->
-> This only adjusts the primitives, and does not clean up
-> all of the uses within sve_helper.c.
+> Since we converted back to cpu_*_data_ra, we do not need to
+> do this ourselves.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/sve_helper.c | 241 ++++++++++++++++++----------------------
->  1 file changed, 107 insertions(+), 134 deletions(-)
 
-> +#ifdef TARGET_WORDS_BIGENDIAN
-> +# define be_bswap16(x)  ((uint16_t)(x))
-> +# define be_bswap32(x)  ((uint32_t)(x))
-> +# define be_bswap64(x)  ((uint64_t)(x))
-> +# define le_bswap16(x)  bswap16(x)
-> +# define le_bswap32(x)  bswap32(x)
-> +# define le_bswap64(x)  bswap64(x)
-> +#else
-> +# define be_bswap16(x)  bswap16(x)
-> +# define be_bswap32(x)  bswap32(x)
-> +# define be_bswap64(x)  bswap64(x)
-> +# define le_bswap16(x)  ((uint16_t)(x))
-> +# define le_bswap32(x)  ((uint32_t)(x))
-> +# define le_bswap64(x)  ((uint64_t)(x))
-> +#endif
-
-Am I confused, or are these just reimplementing
-cpu_to_be16()/cpu_to_le16()/le16_to_cpu()/be16_to_cpu() etc from bswap.h ?
-
-(It seems a pity to have to lose the memory subsystem handling
-endianness for us.)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
