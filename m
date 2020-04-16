@@ -4,66 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB733C2BB55
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 14:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57436C352BE
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 14:53:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7570C206A2
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 14:53:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2493F206A2
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 14:53:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GsNvtgZT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7570C206A2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GaJ8YPM5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2493F206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jP5tZ-0000M3-Kq
-	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 10:53:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45632)
+	id 1jP5tj-0000UD-4X
+	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 10:53:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45605)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jP5ra-0005vT-47
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 10:51:35 -0400
+ (envelope-from <eblake@redhat.com>) id 1jP5rX-0005oU-20
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 10:51:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jP5rY-0004Hi-E2
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 10:51:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52514
+ (envelope-from <eblake@redhat.com>) id 1jP5rV-00049Q-AX
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 10:51:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57319
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jP5rY-0004GC-A9
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 10:51:32 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jP5rT-00048O-Pu
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 10:51:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587048691;
+ s=mimecast20190719; t=1587048686;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4lALPtScT6gir/jpjzcOMmlzfGURjh+wMxkTlrOLeOQ=;
- b=GsNvtgZTlZa44/G4YPjJ9SmaUqbq/dDvyeebPfoP0xecgju2Mt11lN0l8wptfVtYosr2OQ
- cSyMVzwH7jpWMYrXQwwVnxnYyyb9GvHZGbqm0y0+V+NNB3IsjOiTBDj+ktivgKxhKNF5wU
- gcoNccGUi2hCUxRnAgCqgeXxygBfTB4=
+ bh=lnjtElUniCSRnUXKRVHpqrvTsLwfWRH/d76JxEHIAAQ=;
+ b=GaJ8YPM59dcL1zSdkBgZ1to813bke5lSGJBdwvig+jIf7xMg/bwRusFLu331qgNomNpf6a
+ zXyY/N1cfm2knP9ntmQmL/gUAo7cFQX8/xPLjmjAjXlXTb0eqXJUhmpobr0K4DBD5Wjl4N
+ 1UbHPcjn8ztjwhPv20OQP3tEoJotvoI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-260-CVTB3m1KOT6cLStpUSpbNw-1; Thu, 16 Apr 2020 10:51:20 -0400
-X-MC-Unique: CVTB3m1KOT6cLStpUSpbNw-1
+ us-mta-146-StmlYZjlMUCkAOtkdHarmg-1; Thu, 16 Apr 2020 10:51:21 -0400
+X-MC-Unique: StmlYZjlMUCkAOtkdHarmg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76ADF100DFC5;
- Thu, 16 Apr 2020 14:51:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 356E18017F6;
+ Thu, 16 Apr 2020 14:51:20 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-115-59.phx2.redhat.com [10.3.115.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E50EF1001DD8;
- Thu, 16 Apr 2020 14:51:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A46791001DD8;
+ Thu, 16 Apr 2020 14:51:19 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/3] qemu-img: Add convert --bitmaps option
-Date: Thu, 16 Apr 2020 09:51:14 -0500
-Message-Id: <20200416145115.699033-3-eblake@redhat.com>
+Subject: [PATCH 3/3] iotests: Add test 291 to for qemu-img convert --bitmaps
+Date: Thu, 16 Apr 2020 09:51:15 -0500
+Message-Id: <20200416145115.699033-4-eblake@redhat.com>
 In-Reply-To: <20200416145115.699033-1-eblake@redhat.com>
 References: <20200416145115.699033-1-eblake@redhat.com>
 MIME-Version: 1.0
@@ -91,256 +90,244 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make it easier to copy all the persistent bitmaps of a source image
-along with the contents, by adding a boolean flag for use with
-qemu-img convert.
-
-See also https://bugzilla.redhat.com/show_bug.cgi?id=3D1779893
+Add a new test covering the feature added in the previous patch.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- docs/tools/qemu-img.rst |  6 ++-
- qemu-img.c              | 81 +++++++++++++++++++++++++++++++++++++++--
- qemu-img-cmds.hx        |  4 +-
- 3 files changed, 85 insertions(+), 6 deletions(-)
+ tests/qemu-iotests/291     | 143 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/291.out |  56 +++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 200 insertions(+)
+ create mode 100755 tests/qemu-iotests/291
+ create mode 100644 tests/qemu-iotests/291.out
 
-diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
-index 0080f83a76c9..8c4d85e0b835 100644
---- a/docs/tools/qemu-img.rst
-+++ b/docs/tools/qemu-img.rst
-@@ -186,6 +186,10 @@ Parameters to convert subcommand:
-
- .. program:: qemu-img-convert
-
-+.. option:: --bitmaps
+diff --git a/tests/qemu-iotests/291 b/tests/qemu-iotests/291
+new file mode 100755
+index 000000000000..dfdcc8e352c8
+--- /dev/null
++++ b/tests/qemu-iotests/291
+@@ -0,0 +1,143 @@
++#!/usr/bin/env bash
++#
++# Test qemu-img convert --bitmaps
++#
++# Copyright (C) 2018-2020 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+  Additionally copy all bitmaps
++seq=3D"$(basename $0)"
++echo "QA output created by $seq"
 +
- .. option:: -n
-
-   Skip the creation of the target volume
-@@ -373,7 +377,7 @@ Command description:
-   4
-     Error on reading data
-
--.. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-op=
-ts] [--target-is-zero] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [-t CACHE] [-=
-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l SNAPSHOT_PA=
-RAM] [-S SPARSE_SIZE] [-m NUM_COROUTINES] [-W] FILENAME [FILENAME2 [...]] O=
-UTPUT_FILENAME
-+.. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-op=
-ts] [--target-is-zero] [--bitmaps] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [=
--t CACHE] [-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l=
- SNAPSHOT_PARAM] [-S SPARSE_SIZE] [-m NUM_COROUTINES] [-W] FILENAME [FILENA=
-ME2 [...]] OUTPUT_FILENAME
-
-   Convert the disk image *FILENAME* or a snapshot *SNAPSHOT_PARAM*
-   to disk image *OUTPUT_FILENAME* using format *OUTPUT_FMT*. It can
-diff --git a/qemu-img.c b/qemu-img.c
-index 821cbf610e5f..6541357179c2 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -28,6 +28,7 @@
- #include "qemu-common.h"
- #include "qemu-version.h"
- #include "qapi/error.h"
-+#include "qapi/qapi-commands-block-core.h"
- #include "qapi/qapi-visit-block-core.h"
- #include "qapi/qobject-output-visitor.h"
- #include "qapi/qmp/qjson.h"
-@@ -71,6 +72,7 @@ enum {
-     OPTION_SHRINK =3D 266,
-     OPTION_SALVAGE =3D 267,
-     OPTION_TARGET_IS_ZERO =3D 268,
-+    OPTION_BITMAPS =3D 269,
- };
-
- typedef enum OutputFormat {
-@@ -176,6 +178,7 @@ static void QEMU_NORETURN help(void)
-            "       hiding corruption that has already occurred.\n"
-            "\n"
-            "Parameters to convert subcommand:\n"
-+           "  '--bitmaps' copies all persistent bitmaps to destination\n"
-            "  '-m' specifies how many coroutines work in parallel during t=
-he convert\n"
-            "       process (defaults to 8)\n"
-            "  '-W' allow to write to the target out of order rather than s=
-equential\n"
-@@ -2054,6 +2057,47 @@ static int convert_do_copy(ImgConvertState *s)
-     return s->ret;
- }
-
-+static int convert_copy_bitmaps(BlockDriverState *src, BlockDriverState *d=
-st)
++status=3D1 # failure is the default!
++
++_cleanup()
 +{
-+    BdrvDirtyBitmap *bm;
-+    Error *err =3D NULL;
-+    BlockDirtyBitmapMergeSource *merge;
-+    BlockDirtyBitmapMergeSourceList *list;
++    _cleanup_test_img
++    nbd_server_stop
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
 +
-+    FOR_EACH_DIRTY_BITMAP(src, bm) {
-+        const char *name;
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.nbd
 +
-+        if (!bdrv_dirty_bitmap_get_persistence(bm)) {
-+            continue;
-+        }
-+        name =3D bdrv_dirty_bitmap_name(bm);
-+        qmp_block_dirty_bitmap_add(dst->node_name, name,
-+                                   true, bdrv_dirty_bitmap_granularity(bm)=
-,
-+                                   true, true,
-+                                   true, !bdrv_dirty_bitmap_enabled(bm),
-+                                   &err);
-+        if (err) {
-+            error_reportf_err(err, "Failed to create bitmap %s: ", name);
-+            return -1;
-+        }
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++_require_command QEMU_NBD
 +
-+        merge =3D g_new0(BlockDirtyBitmapMergeSource, 1);
-+        merge->type =3D QTYPE_QDICT;
-+        merge->u.external.node =3D g_strdup(src->node_name);
-+        merge->u.external.name =3D g_strdup(name);
-+        list =3D g_new0(BlockDirtyBitmapMergeSourceList, 1);
-+        list->value =3D merge;
-+        qmp_block_dirty_bitmap_merge(dst->node_name, name, list, &err);
-+        qapi_free_BlockDirtyBitmapMergeSourceList(list);
-+        if (err) {
-+            error_reportf_err(err, "Failed to populate bitmap %s: ", name)=
-;
-+            return -1;
-+        }
-+    }
-+
-+    return 0;
++do_run_qemu()
++{
++    echo Testing: "$@"
++    $QEMU -nographic -qmp stdio -serial none "$@"
++    echo
 +}
 +
- #define MAX_BUF_SECTORS 32768
-
- static int img_convert(int argc, char **argv)
-@@ -2075,6 +2119,8 @@ static int img_convert(int argc, char **argv)
-     int64_t ret =3D -EINVAL;
-     bool force_share =3D false;
-     bool explict_min_sparse =3D false;
-+    bool bitmaps =3D false;
-+    size_t nbitmaps =3D 0;
-
-     ImgConvertState s =3D (ImgConvertState) {
-         /* Need at least 4k of zeros for sparse detection */
-@@ -2094,6 +2140,7 @@ static int img_convert(int argc, char **argv)
-             {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_OPTS=
-},
-             {"salvage", no_argument, 0, OPTION_SALVAGE},
-             {"target-is-zero", no_argument, 0, OPTION_TARGET_IS_ZERO},
-+            {"bitmaps", no_argument, 0, OPTION_BITMAPS},
-             {0, 0, 0, 0}
-         };
-         c =3D getopt_long(argc, argv, ":hf:O:B:Cco:l:S:pt:T:qnm:WU",
-@@ -2225,6 +2272,9 @@ static int img_convert(int argc, char **argv)
-              */
-             s.has_zero_init =3D true;
-             break;
-+        case OPTION_BITMAPS:
-+            bitmaps =3D true;
-+            break;
-         }
-     }
-
-@@ -2286,7 +2336,6 @@ static int img_convert(int argc, char **argv)
-         goto fail_getopt;
-     }
-
--
-     /* ret is still -EINVAL until here */
-     ret =3D bdrv_parse_cache_mode(src_cache, &src_flags, &src_writethrough=
-);
-     if (ret < 0) {
-@@ -2446,6 +2495,28 @@ static int img_convert(int argc, char **argv)
-         }
-     }
-
-+    /* Determine how many bitmaps need copying */
-+    if (bitmaps) {
-+        BdrvDirtyBitmap *bm;
++run_qemu()
++{
++    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qmp \
++                          | _filter_qemu | _filter_imgfmt \
++                          | _filter_actual_image_size | _filter_qemu_io
++}
 +
-+        if (s.src_num > 1) {
-+            error_report("Copying bitmaps only possible with single source=
-");
-+            ret =3D -1;
-+            goto out;
-+        }
-+        FOR_EACH_DIRTY_BITMAP(blk_bs(s.src[0]), bm) {
-+            if (bdrv_dirty_bitmap_get_persistence(bm)) {
-+                nbitmaps++;
-+            }
-+        }
-+        if (nbitmaps > 0 && drv && !drv->bdrv_co_can_store_new_dirty_bitma=
-p) {
-+            error_report("Format driver '%s' does not support bitmaps",
-+                         out_fmt);
-+            ret =3D -1;
-+            goto out;
-+        }
++# Create initial image and populate two bitmaps: one active, one inactive
++_make_test_img 10M
++run_qemu <<EOF
++{ "execute": "qmp_capabilities" }
++{ "execute": "blockdev-add",
++  "arguments": {
++    "driver": "$IMGFMT",
++    "node-name": "n",
++    "file": {
++      "driver": "file",
++      "filename": "$TEST_IMG"
 +    }
-+
-     /*
-      * The later open call will need any decryption secrets, and
-      * bdrv_create() will purge "opts", so extract them now before
-@@ -2454,9 +2525,7 @@ static int img_convert(int argc, char **argv)
-     if (!skip_create) {
-         open_opts =3D qdict_new();
-         qemu_opt_foreach(opts, img_add_key_secrets, open_opts, &error_abor=
-t);
--    }
-
--    if (!skip_create) {
-         /* Create the new image */
-         ret =3D bdrv_create(drv, out_filename, opts, &local_err);
-         if (ret < 0) {
-@@ -2553,6 +2622,12 @@ static int img_convert(int argc, char **argv)
-     }
-
-     ret =3D convert_do_copy(&s);
-+
-+    /* Now copy the bitmaps */
-+    if (nbitmaps > 0 && ret =3D=3D 0) {
-+        ret =3D convert_copy_bitmaps(blk_bs(s.src[0]), out_bs);
++  }
++}
++{ "execute": "human-monitor-command",
++    "arguments": {
++        "command-line": 'qemu-io n "write 0 1M"'
 +    }
++}
++{ "execute": "block-dirty-bitmap-add",
++  "arguments": {
++    "node": "n",
++    "name": "b1",
++    "persistent": true,
++    "granularity": 65536
++  }
++}
++{ "execute": "human-monitor-command",
++    "arguments": {
++        "command-line": 'qemu-io n "write 1M 1M"'
++    }
++}
++{ "execute": "transaction",
++  "arguments": {
++    "actions": [
++      { "type": "block-dirty-bitmap-disable",
++        "data": {
++          "node": "n",
++          "name": "b1"
++        } },
++      { "type": "block-dirty-bitmap-add",
++        "data": {
++          "node": "n",
++          "name": "b2",
++          "persistent": true
++       } }
++    ]
++  }
++}
++{ "execute": "human-monitor-command",
++    "arguments": {
++        "command-line": 'qemu-io n "write 2M 1M"'
++    }
++}
++{ "execute": "quit" }
++EOF
 +
- out:
-     if (!ret) {
-         qemu_progress_print(100, 0);
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index c9c54de1df40..37cb36335218 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -39,9 +39,9 @@ SRST
- ERST
-
- DEF("convert", img_convert,
--    "convert [--object objectdef] [--image-opts] [--target-image-opts] [--=
-target-is-zero] [-U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_c=
-ache] [-O output_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-=
-S sparse_size] [-m num_coroutines] [-W] [--salvage] filename [filename2 [..=
-.]] output_filename")
-+    "convert [--object objectdef] [--image-opts] [--target-image-opts] [--=
-target-is-zero] [--bitmaps] [-U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cach=
-e] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-l snapsh=
-ot_param] [-S sparse_size] [-m num_coroutines] [-W] [--salvage] filename [f=
-ilename2 [...]] output_filename")
- SRST
--.. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-op=
-ts] [--target-is-zero] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [-t CACHE] [-=
-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l SNAPSHOT_PA=
-RAM] [-S SPARSE_SIZE] [-m NUM_COROUTINES] [-W] [--salvage] FILENAME [FILENA=
-ME2 [...]] OUTPUT_FILENAME
-+.. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-op=
-ts] [--target-is-zero] [--bitmaps] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [=
--t CACHE] [-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l=
- SNAPSHOT_PARAM] [-S SPARSE_SIZE] [-m NUM_COROUTINES] [-W] [--salvage] FILE=
-NAME [FILENAME2 [...]] OUTPUT_FILENAME
- ERST
-
- DEF("create", img_create,
++echo
++echo "=3D=3D=3D Bitmap preservation not possible to non-qcow2 =3D=3D=3D"
++echo
++
++mv "$TEST_IMG" "$TEST_IMG.orig"
++$QEMU_IMG convert --bitmaps -O raw "$TEST_IMG.orig" "$TEST_IMG"
++
++echo
++echo "=3D=3D=3D convert with bitmap preservation =3D=3D=3D"
++echo
++
++$QEMU_IMG convert --bitmaps -O qcow2 "$TEST_IMG.orig" "$TEST_IMG"
++$QEMU_IMG info "$TEST_IMG" | _filter_img_info --format-specific
++
++echo
++echo "=3D=3D=3D check bitmap contents =3D=3D=3D"
++echo
++
++IMG=3D"driver=3Dnbd,server.type=3Dunix,server.path=3D$nbd_unix_socket"
++nbd_server_start_unix_socket -r -f qcow2 -B b1 "$TEST_IMG"
++$QEMU_IMG map --output=3Djson --image-opts \
++    "$IMG,x-dirty-bitmap=3Dqemu:dirty-bitmap:b1" | _filter_qemu_img_map
++nbd_server_start_unix_socket -r -f qcow2 -B b2 "$TEST_IMG"
++$QEMU_IMG map --output=3Djson --image-opts \
++    "$IMG,x-dirty-bitmap=3Dqemu:dirty-bitmap:b2" | _filter_qemu_img_map
++
++# success, all done
++echo '*** done'
++rm -f $seq.full
++status=3D0
+diff --git a/tests/qemu-iotests/291.out b/tests/qemu-iotests/291.out
+new file mode 100644
+index 000000000000..3e826f93ca82
+--- /dev/null
++++ b/tests/qemu-iotests/291.out
+@@ -0,0 +1,56 @@
++QA output created by 291
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D10485760
++Testing:
++QMP_VERSION
++{"return": {}}
++{"return": {}}
++wrote 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{"return": ""}
++{"return": {}}
++wrote 1048576/1048576 bytes at offset 1048576
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{"return": ""}
++{"return": {}}
++wrote 1048576/1048576 bytes at offset 2097152
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{"return": ""}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "SHUTDOWN", "data": {"guest": false, "reason": "host-qmp-quit"}}
++
++
++=3D=3D=3D Bitmap preservation not possible to non-qcow2 =3D=3D=3D
++
++qemu-img: Format driver 'raw' does not support bitmaps
++
++=3D=3D=3D convert with bitmap preservation =3D=3D=3D
++
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 10 MiB (10485760 bytes)
++disk size: 3.39 MiB
++Format specific information:
++    compat: 1.1
++    lazy refcounts: false
++    bitmaps:
++        [0]:
++            flags:
++                [0]: auto
++            name: b2
++            granularity: 65536
++        [1]:
++            flags:
++            name: b1
++            granularity: 65536
++    refcount bits: 16
++    corrupt: false
++
++=3D=3D=3D check bitmap contents =3D=3D=3D
++
++[{ "start": 0, "length": 1048576, "depth": 0, "zero": false, "data": true,=
+ "offset": OFFSET},
++{ "start": 1048576, "length": 1048576, "depth": 0, "zero": false, "data": =
+false},
++{ "start": 2097152, "length": 8388608, "depth": 0, "zero": false, "data": =
+true, "offset": OFFSET}]
++[{ "start": 0, "length": 2097152, "depth": 0, "zero": false, "data": true,=
+ "offset": OFFSET},
++{ "start": 2097152, "length": 1048576, "depth": 0, "zero": false, "data": =
+false},
++{ "start": 3145728, "length": 7340032, "depth": 0, "zero": false, "data": =
+true, "offset": OFFSET}]
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 435dccd5af90..8e9b9513a091 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -297,3 +297,4 @@
+ 288 quick
+ 289 rw quick
+ 290 rw auto quick
++291 rw quick
 --=20
 2.26.0
 
