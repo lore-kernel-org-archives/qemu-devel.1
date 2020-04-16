@@ -2,75 +2,69 @@ Return-Path: <SRS0=3HrQ=6A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F18FC352BE
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 21:24:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DE62C2BB55
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 21:34:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 381CB2223F
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 21:24:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z028o0yL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 381CB2223F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C3CF206D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 21:34:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C3CF206D5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPC04-0004n4-Bt
-	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 17:24:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38619)
+	id 1jPC9G-0000na-4m
+	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 17:34:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39682)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jPBzK-0004IG-JO
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 17:24:00 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jPC8O-0008T1-Mc
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 17:33:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jPBzI-0007AL-OC
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 17:23:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26630
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jPBzI-00079k-HV
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 17:23:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587072235;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=OWPN0bnj5ROZ+/50hGVj8oHcrNJm1uaNdNQ7h/YOESE=;
- b=Z028o0yLsP/jGFft4F7tE2n3qiddMiLuaPVTsSH1AuWLtCxQLyGibtSa4sWen/DdJo4enI
- 0Zp1B1VoNLIfuG3M37K2MmmFngCx6OBFrz0qb8b3UZ9RV+e2QkVDFM7ACC402XQL4RY6re
- QsK0SydpsNPy2l7SwVihIg8eKOLD3fw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-v8sTUDRxMQCB7azoBRA1jQ-1; Thu, 16 Apr 2020 17:23:54 -0400
-X-MC-Unique: v8sTUDRxMQCB7azoBRA1jQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BF8B800D53;
- Thu, 16 Apr 2020 21:23:53 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-115-59.phx2.redhat.com [10.3.115.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 654B219756;
- Thu, 16 Apr 2020 21:23:52 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] qcow2: Expose bitmaps' size during measure
-Date: Thu, 16 Apr 2020 16:23:49 -0500
-Message-Id: <20200416212349.731404-1-eblake@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1jPC8N-0004XD-34
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 17:33:20 -0400
+Resent-Date: Thu, 16 Apr 2020 17:33:20 -0400
+Resent-Message-Id: <E1jPC8N-0004XD-34@eggs.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21319)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jPC8M-0004WU-Ra
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 17:33:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1587072788; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=TCASvUki+pq+qUCPygNeTJtfFIcHVncuUY3vsw4K5sMijgTqsisiKPGjhnRdPOXQ6GUYSQOrEzolsXJ8WLt7IgonU+ekR2oM7VQ6SjF1ZfCqWKFE7Oy/3Sg9dtJEMCSaHn4opW4z5X0QGJQdQi0vPtLGlbuRrTPwNMdQlR/N6Hg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1587072788;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=4oPLJosxG7lHkd47nb4tQebVWnffZbcKvXz9Y7zfC0w=; 
+ b=YyhTJA41yMiWewXIBiZHHH346kx99uwW95KDCGpZUGZoMoOx2WY8lcgEeSIdLRkrt9M4oMhb2yvjHtDHDfv2zmYemyY9UDac3sJR95TI+JQD7JQvdekdc5ReduEJI0ad/J2vLP/RK83dwegiaJC9hPD13/hMvLhnU2SHU27ocOU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1587072787347972.7866598241501;
+ Thu, 16 Apr 2020 14:33:07 -0700 (PDT)
+In-Reply-To: <20200416203624.32366-1-mlevitsk@redhat.com>
+Subject: Re: [PATCH 0/4] RFC/WIP: Fix scsi devices plug/unplug races w.r.t
+ virtio-scsi iothread
+Message-ID: <158707278589.15335.6263551213569071566@39012742ff91>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mlevitsk@redhat.com
+Date: Thu, 16 Apr 2020 14:33:07 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 136.143.188.53
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,160 +76,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- nsoffer@redhat.com, jsnow@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, berrange@redhat.com, ehabkost@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, mlevitsk@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's useful to know how much space can be occupied by qcow2 persistent
-bitmaps, even though such metadata is unrelated to the guest-visible
-data.  Report this value as an additional field.
-
-Reported-by: Nir Soffer <nsoffer@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
-
-This is independent from my 'qemu-img convert --bitmaps' series, but
-highly related.  As an example, if I create a 100M image, then 2
-persistent bitmaps, all with default cluster/granularity sizing, I now
-see:
-
-$ ./qemu-img measure -f qcow2 -O qcow2 build/img.top
-required size: 52756480
-fully allocated size: 105185280
-bitmaps size: 327680
-
-which argues that I should allocate 52756480 + 327680 bytes prior to
-attempting qemu-img convert --bitmaps to a pre-sized destination.
-
-If we like the idea, I probably need to submit a 2/1 patch adding
-iotest coverage of the new measurement.
-
- qapi/block-core.json | 15 ++++++++++-----
- block/qcow2.c        | 25 +++++++++++++++++++++++++
- qemu-img.c           |  3 +++
- 3 files changed, 38 insertions(+), 5 deletions(-)
-
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 943df1926a91..b47c6d69ba27 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -633,18 +633,23 @@
- # efficiently so file size may be smaller than virtual disk size.
- #
- # The values are upper bounds that are guaranteed to fit the new image fil=
-e.
--# Subsequent modification, such as internal snapshot or bitmap creation, m=
-ay
--# require additional space and is not covered here.
-+# Subsequent modification, such as internal snapshot or further bitmap
-+# creation, may require additional space and is not covered here.
- #
--# @required: Size required for a new image file, in bytes.
-+# @required: Size required for a new image file, in bytes, when copying ju=
-st
-+#            guest-visible contents.
- #
- # @fully-allocated: Image file size, in bytes, once data has been written
--#                   to all sectors.
-+#                   to all sectors, when copying just guest-visible conten=
-ts.
-+#
-+# @bitmaps: Additional size required for bitmap metadata not directly used
-+#           for guest contents, when that metadata can be copied in additi=
-on
-+#           to guest contents. (since 5.1)
- #
- # Since: 2.10
- ##
- { 'struct': 'BlockMeasureInfo',
--  'data': {'required': 'int', 'fully-allocated': 'int'} }
-+  'data': {'required': 'int', 'fully-allocated': 'int', '*bitmaps': 'int'}=
- }
-
- ##
- # @query-block:
-diff --git a/block/qcow2.c b/block/qcow2.c
-index b524b0c53f84..eba6c2511e60 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4657,6 +4657,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts=
-, BlockDriverState *in_bs,
-     PreallocMode prealloc;
-     bool has_backing_file;
-     bool has_luks;
-+    uint64_t bitmaps_size =3D 0; /* size occupied by bitmaps in in_bs */
-
-     /* Parse image creation options */
-     cluster_size =3D qcow2_opt_get_cluster_size_del(opts, &local_err);
-@@ -4732,6 +4733,8 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts=
-, BlockDriverState *in_bs,
-
-     /* Account for input image */
-     if (in_bs) {
-+        BdrvDirtyBitmap *bm;
-+        size_t bitmap_overhead =3D 0;
-         int64_t ssize =3D bdrv_getlength(in_bs);
-         if (ssize < 0) {
-             error_setg_errno(&local_err, -ssize,
-@@ -4739,6 +4742,26 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opt=
-s, BlockDriverState *in_bs,
-             goto err;
-         }
-
-+        FOR_EACH_DIRTY_BITMAP(in_bs, bm) {
-+            if (bdrv_dirty_bitmap_get_persistence(bm)) {
-+                uint64_t bmsize =3D bdrv_dirty_bitmap_size(bm);
-+                uint32_t granularity =3D bdrv_dirty_bitmap_granularity(bm)=
-;
-+                const char *name =3D bdrv_dirty_bitmap_name(bm);
-+                uint64_t bmclusters =3D DIV_ROUND_UP(bmsize / granularity
-+                                                   / CHAR_BIT, cluster_siz=
-e);
-+
-+                /* Assume the entire bitmap is allocated */
-+                bitmaps_size +=3D bmclusters * cluster_size;
-+                /* Also reserve space for the bitmap table entries */
-+                bitmaps_size +=3D ROUND_UP(bmclusters * sizeof(uint64_t),
-+                                         cluster_size);
-+                /* Guess at contribution to bitmap directory size */
-+                bitmap_overhead +=3D ROUND_UP(strlen(name) + 24,
-+                                            sizeof(uint64_t));
-+            }
-+        }
-+        bitmaps_size +=3D ROUND_UP(bitmap_overhead, cluster_size);
-+
-         virtual_size =3D ROUND_UP(ssize, cluster_size);
-
-         if (has_backing_file) {
-@@ -4795,6 +4818,8 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts=
-, BlockDriverState *in_bs,
-      * still counted.
-      */
-     info->required =3D info->fully_allocated - virtual_size + required;
-+    info->has_bitmaps =3D !!bitmaps_size;
-+    info->bitmaps =3D bitmaps_size;
-     return info;
-
- err:
-diff --git a/qemu-img.c b/qemu-img.c
-index 6541357179c2..d900bde89911 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -5084,6 +5084,9 @@ static int img_measure(int argc, char **argv)
-     if (output_format =3D=3D OFORMAT_HUMAN) {
-         printf("required size: %" PRIu64 "\n", info->required);
-         printf("fully allocated size: %" PRIu64 "\n", info->fully_allocate=
-d);
-+        if (info->has_bitmaps) {
-+            printf("bitmaps size: %" PRIu64 "\n", info->bitmaps);
-+        }
-     } else {
-         dump_json_block_measure_info(info);
-     }
---=20
-2.26.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQxNjIwMzYyNC4zMjM2
+Ni0xLW1sZXZpdHNrQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCAwLzRdIFJGQy9XSVA6IEZpeCBzY3NpIGRldmlj
+ZXMgcGx1Zy91bnBsdWcgcmFjZXMgdy5yLnQgdmlydGlvLXNjc2kgaW90aHJlYWQKTWVzc2FnZS1p
+ZDogMjAyMDA0MTYyMDM2MjQuMzIzNjYtMS1tbGV2aXRza0ByZWRoYXQuY29tClR5cGU6IHNlcmll
+cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJh
+c2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
+bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
+YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
+cGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMDQx
+NjIxMjM0OS43MzE0MDQtMS1lYmxha2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAwNDE2MjEy
+MzQ5LjczMTQwNC0xLWVibGFrZUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
+dGVzdCcKNWU0NzE1NSB2aXJ0aW8tc2NzaTogZG9uJ3QgdG91Y2ggc2NzaSBkZXZpY2VzIHRoYXQg
+YXJlIG5vdCB5ZXQgcmVhbGl6ZWQKN2E0ZTIwYiBkZXZpY2UtY29yZTogdXNlIGF0b21pY19zZXQg
+b24gLnJlYWxpemVkIHByb3BlcnR5CmM4YzZkNzIgZGV2aWNlLWNvcmU6IHVzZSBSQ1UgZm9yIGxp
+c3Qgb2YgY2hpbGRzIG9mIGEgYnVzCjdiM2NhNjMgc2NzaS9zY3NpX2J1czogc3dpdGNoIHNlYXJj
+aCBkaXJlY3Rpb24gaW4gc2NzaV9kZXZpY2VfZmluZAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS80
+IENoZWNraW5nIGNvbW1pdCA3YjNjYTYzNmJlMmYgKHNjc2kvc2NzaV9idXM6IHN3aXRjaCBzZWFy
+Y2ggZGlyZWN0aW9uIGluIHNjc2lfZGV2aWNlX2ZpbmQpCjIvNCBDaGVja2luZyBjb21taXQgYzhj
+NmQ3MjMwNjAyIChkZXZpY2UtY29yZTogdXNlIFJDVSBmb3IgbGlzdCBvZiBjaGlsZHMgb2YgYSBi
+dXMpCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gYnJhY2UgJ3snCiMzNDog
+RklMRTogaHcvY29yZS9idXMuYzo1MjoKKyAgICBXSVRIX1JDVV9SRUFEX0xPQ0tfR1VBUkQoKXsK
+CkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gYnJhY2UgJ3snCiM4ODogRklM
+RTogaHcvY29yZS9idXMuYzoyMDA6CisgICAgICAgIFdJVEhfUkNVX1JFQURfTE9DS19HVUFSRCgp
+ewoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNTUgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+Mi80IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzQgQ2hlY2tpbmcgY29tbWl0IDdhNGUy
+MGJmOWQyNSAoZGV2aWNlLWNvcmU6IHVzZSBhdG9taWNfc2V0IG9uIC5yZWFsaXplZCBwcm9wZXJ0
+eSkKNC80IENoZWNraW5nIGNvbW1pdCA1ZTQ3MTU1Nzk0YmYgKHZpcnRpby1zY3NpOiBkb24ndCB0
+b3VjaCBzY3NpIGRldmljZXMgdGhhdCBhcmUgbm90IHlldCByZWFsaXplZCkKV0FSTklORzogQmxv
+Y2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzMzOiBGSUxF
+OiBody9zY3NpL3ZpcnRpby1zY3NpLmM6NDk6CisgICAgLyogVGhpcyBmdW5jdGlvbiBtaWdodCBy
+dW4gb24gdGhlIElPIHRocmVhZCBhbmQgd2UgbWlnaHQgcmFjZSBhZ2FpbnN0Cgp0b3RhbDogMCBl
+cnJvcnMsIDEgd2FybmluZ3MsIDMwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvNCBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
+d2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
+dy5vcmcvbG9ncy8yMDIwMDQxNjIwMzYyNC4zMjM2Ni0xLW1sZXZpdHNrQHJlZGhhdC5jb20vdGVz
+dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
