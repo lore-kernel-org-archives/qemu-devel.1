@@ -2,85 +2,89 @@ Return-Path: <SRS0=3HrQ=6A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94872C2BB55
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 20:01:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D53D1C2BB55
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 20:01:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DEC521744
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 20:01:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DCF621744
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 20:01:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s+o2CtzG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DEC521744
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="goWnYVxh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DCF621744
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPAhX-0005b5-8P
-	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 16:01:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56112)
+	id 1jPAhn-000611-LO
+	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 16:01:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56128)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alexander.duyck@gmail.com>) id 1jPAgU-0004Yp-N9
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 16:00:27 -0400
+ (envelope-from <alexander.duyck@gmail.com>) id 1jPAgb-0004dV-A3
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 16:00:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alexander.duyck@gmail.com>) id 1jPAgT-0000Ja-Hq
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 16:00:26 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42997)
+ (envelope-from <alexander.duyck@gmail.com>) id 1jPAga-0000Lo-Bh
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 16:00:33 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43604)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alexander.duyck@gmail.com>)
- id 1jPAgT-0000J7-BA
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 16:00:25 -0400
-Received: by mail-pf1-x444.google.com with SMTP id r20so2147749pfh.9
- for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 13:00:25 -0700 (PDT)
+ id 1jPAga-0000LV-5A
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 16:00:32 -0400
+Received: by mail-pl1-x641.google.com with SMTP id z6so14972plk.10
+ for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 13:00:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:from:to:cc:date:message-id:user-agent:mime-version
- :content-transfer-encoding;
- bh=0QoMSSkoO1WtiMmWyqMxCuih2EheX/gZF6FbL8pMGKQ=;
- b=s+o2CtzGme5TyZlLDsHTGJBBWcmOHvuOBsnb8ois9dU81FrnsB4Uxnav9f42O+KuBw
- cpv/K1Iyb5aDiDw1dXc8VckQnQ5mHkKP/RjSiloDhBsuCJWmfK81V/d+SmmPL8KeorEh
- 3FoOe7FdWh20s1p+OcpEUNsG53eJTwcU0mB/Hj3hUdoiEqreh+PdKsg1rr/8M3oUxIrG
- TLn2Po6Fgkl3zJziG6Zr/VepusjsROUhoaquLqlOvF5ybpXGB1AN02cB1m1gMbuqV9sb
- +l5nRClZMCH7uu+AYLzU87kZwKB4Ss4KZSY3e0W41Nd31/qEAuWsk59rw/tgPNr/dULX
- HZKg==
+ h=subject:from:to:cc:date:message-id:in-reply-to:references
+ :user-agent:mime-version:content-transfer-encoding;
+ bh=XWQH+WqkRfp4wJIRuWJ29KttjuuuSpzbvrw8QWn/fPk=;
+ b=goWnYVxhjX5vHde8S++Gnuxwje6qW154GE0dmSzDliq6YxGxVQ9RpyFHJkPXpG4abj
+ NJ2kWUkxLCdoNOLdCqZfneVhJkzww7lOKlL/o5o1Sqak4/X+CkbY1TUKi5X+9b6IxZYb
+ jq2CHT3sRjya2WIBXyD1+P9YSgoyMqVurMGWuzDNg9SgViieAV7b+D9K2drevedDLLGl
+ hXO+FHN+v0dF+q9TtETUMAWj09M2ZOspWYCN7YpA4/aoG5KmaAOYjNBeAJTqE8gEUrV3
+ 9N+/xw/6mWDiT6JlxBeXyFmClh8RCmAF55zidTM8uo7RJVq2+ivC4j0vaaFpPTZPocJ7
+ JAow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:date:message-id:user-agent
- :mime-version:content-transfer-encoding;
- bh=0QoMSSkoO1WtiMmWyqMxCuih2EheX/gZF6FbL8pMGKQ=;
- b=hx4t102T3sGenVkgjXq0E8jH5ZglZnwglfNryIFLfMQO6Iy5Vd288goSpzdqQp72NY
- UOOoPkqEIQBq4xJw8pFLRce5rDoyRBVqIJAWGXOaQVxvLXAQXODDZbgLRZwbYtVLzOIU
- zmkbX13qUkfrVWKhbybqEEW9228FpPLR8LFBBHeksgSuvjSkKn0yppm1L+sStX9AbHvC
- BL52Z9pmkD6MEg+P4K0JYXWhx0Wd+EkpimwfD7a63OJY9BQrltZZHFEko6KMODBZkQdI
- MZlOnKiJBLJwcnvNPI5Z2cEiPPT1zP11M3rdiNMCNa5uVMIDxnUMnts621PLDOlXS7/7
- 92ow==
-X-Gm-Message-State: AGi0Pua2Wqi6maJaBNxcMRt0BdnmqdwA77kbVdgVEZP9ljEaJicF68S0
- tZ6QDBsIqqEla7iqhpPaokM=
-X-Google-Smtp-Source: APiQypIGM8nWqVcYlJI2KzmAaKJHJEwlHW2GgCuvd/+KCSSV0Cd9Lvafs1hilOM7efP3pHYjOTpRKQ==
-X-Received: by 2002:aa7:9502:: with SMTP id b2mr5585181pfp.277.1587067223959; 
- Thu, 16 Apr 2020 13:00:23 -0700 (PDT)
+ h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
+ :references:user-agent:mime-version:content-transfer-encoding;
+ bh=XWQH+WqkRfp4wJIRuWJ29KttjuuuSpzbvrw8QWn/fPk=;
+ b=JcE0iJgpZblt/Mvu+uyqGsl4wbpRPGO0HwkgZQp2Oc7KdSM6l2RbQzhPuaRBKWYodH
+ wZ2rrqsD8bYWeqsCYahNts6ON4jiftkYL3CbZ0+2pEUdjVoUUE54G2LVpnCyTsoMdeRO
+ evW6wDvilM4Rl6brvJ873vFeSRjkLd/79s+QFD+bt+4LwLv6o8I4O1bb+nRYfmoHQTAL
+ mGrA+IbBwKb+wKNwUawEtbvSiKXMAgU9YyP+2Ts1wT90MnItl+3e3swYOmCmf10ihE3q
+ jiUWmBinZcMMQGGN5zIsME1M4YkrV2d2a6KJxk3AgYaLUnmVuX2E5YAs7gl0SVGwVS0V
+ oz5A==
+X-Gm-Message-State: AGi0PuYkB+9bInejWi7pvPlHovr+0qKYVcBS6v1ImWXfUwsbRfB13rqn
+ OZl45tr4qRHNEyi4tLsi7U8=
+X-Google-Smtp-Source: APiQypIMQmN6sXFtDrPrUQmCQBmH/xUeksrL0cfeLaWTFOv9duU4Oc6XQnkGvpuX/LhPozMEAm9nqQ==
+X-Received: by 2002:a17:902:8d86:: with SMTP id
+ v6mr11689175plo.57.1587067230717; 
+ Thu, 16 Apr 2020 13:00:30 -0700 (PDT)
 Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
- by smtp.gmail.com with ESMTPSA id z7sm12708203pfz.216.2020.04.16.13.00.22
+ by smtp.gmail.com with ESMTPSA id v202sm1210185pgb.46.2020.04.16.13.00.29
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 16 Apr 2020 13:00:22 -0700 (PDT)
-Subject: [PATCH v20 QEMU 0/5] virtio-balloon: add support for free page
- reporting
+ Thu, 16 Apr 2020 13:00:29 -0700 (PDT)
+Subject: [PATCH v20 QEMU 1/5] linux-headers: Update to allow renaming of
+ free_page_report_cmd_id
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: david@redhat.com, mst@redhat.com
-Date: Thu, 16 Apr 2020 13:00:21 -0700
-Message-ID: <20200416195641.13144.16955.stgit@localhost.localdomain>
+Date: Thu, 16 Apr 2020 13:00:29 -0700
+Message-ID: <20200416200029.13144.8957.stgit@localhost.localdomain>
+In-Reply-To: <20200416195641.13144.16955.stgit@localhost.localdomain>
+References: <20200416195641.13144.16955.stgit@localhost.localdomain>
 User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,54 +101,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series provides an asynchronous means of reporting free guest pages
-to QEMU through virtio-balloon so that the memory associated with those
-pages can be dropped and reused by other processes and/or guests on the
-host. Using this it is possible to avoid unnecessary I/O to disk and
-greatly improve performance in the case of memory overcommit on the host.
+From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-I originally submitted this patch series back on February 11th 2020[1],
-but at that time I was focused primarily on the kernel portion of this
-patch set. However as of April 7th those patches are now included in
-Linus's kernel tree[2] and so I am submitting the QEMU pieces for
-inclusion.
+Sync to the latest upstream changes for free page hinting. To be
+replaced by a full linux header sync.
 
-[1]: https://lore.kernel.org/lkml/20200211224416.29318.44077.stgit@localhost.localdomain/
-[2]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b0c504f154718904ae49349147e3b7e6ae91ffdc
-
-Changes from v17:
-Fixed typo in patch 1 title
-Addressed white-space issues reported via checkpatch
-Added braces {} for two if statements to match expected coding style
-
-Changes from v18:
-Updated patches 2 and 3 based on input from dhildenb
-Added comment to patch 2 describing what keeps us from reporting a bad page
-Added patch to address issue with ROM devices being directly writable
-
-Changes from v19:
-Added std-headers change to match changes pushed for linux kernel headers
-Added patch to remove "report" from page hinting code paths
-Updated comment to better explain why we disable hints w/ page poisoning
-Removed code that was modifying config size for poison vs hinting
-Dropped x-page-poison property
-Added code to bounds check the reported region vs the RAM block
-Dropped patch for ROM devices as that was already pulled in by Paolo
-
+Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 ---
+ include/standard-headers/linux/virtio_balloon.h |   11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-Alexander Duyck (5):
-      linux-headers: Update to allow renaming of free_page_report_cmd_id
-      virtio-balloon: Replace free page hinting references to 'report' with 'hint'
-      virtio-balloon: Implement support for page poison tracking feature
-      linux-headers: update to contain virito-balloon free page reporting
-      virtio-balloon: Provide an interface for free page reporting
+diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/standard-headers/linux/virtio_balloon.h
+index 9375ca2a70de..af0a6b59dab2 100644
+--- a/include/standard-headers/linux/virtio_balloon.h
++++ b/include/standard-headers/linux/virtio_balloon.h
+@@ -47,8 +47,15 @@ struct virtio_balloon_config {
+ 	uint32_t num_pages;
+ 	/* Number of pages we've actually got in balloon. */
+ 	uint32_t actual;
+-	/* Free page report command id, readonly by guest */
+-	uint32_t free_page_report_cmd_id;
++	/*
++	 * Free page hint command id, readonly by guest.
++	 * Was previously name free_page_report_cmd_id so we
++	 * need to carry that name for legacy support.
++	 */
++	union {
++		uint32_t free_page_hint_cmd_id;
++		uint32_t free_page_report_cmd_id;	/* deprecated */
++	};
+ 	/* Stores PAGE_POISON if page poisoning is in use */
+ 	uint32_t poison_val;
+ };
 
-
- hw/virtio/virtio-balloon.c                      |  161 ++++++++++++++++++-----
- include/hw/virtio/virtio-balloon.h              |   23 ++-
- include/standard-headers/linux/virtio_balloon.h |   12 +-
- 3 files changed, 146 insertions(+), 50 deletions(-)
-
---
 
