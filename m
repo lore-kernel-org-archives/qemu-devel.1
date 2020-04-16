@@ -2,132 +2,86 @@ Return-Path: <SRS0=3HrQ=6A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF732C2BB55
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 18:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA0FC2BB55
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 18:48:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7362F206E9
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 18:35:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 39B7E2087E
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 18:48:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="biD69R3b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7362F206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="EphPKEmq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39B7E2087E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jP9Mc-0007bO-Ks
-	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 14:35:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44953)
+	id 1jP9Yj-0004bI-89
+	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 14:48:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46422)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jP9Kx-00064f-IY
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 14:34:08 -0400
+ (envelope-from <osandov@osandov.com>) id 1jP9Xi-0003u9-WD
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 14:47:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jP9Kw-0002Oo-1W
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 14:34:07 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46080
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jP9Kv-0002N5-PO
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 14:34:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587062044;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=xrminbf/gJNBcKDABHXSfAwB6o6FXd54vCEyh7DHoLI=;
- b=biD69R3bXJWRnSMFWVhJqY/vuXg32Ve6ttw1C0f1CBLMF6WOLNZnIrsdXhDbsxxEqQ0bGx
- /bo0R/cuUTgosQCIhCbajvmmhugaMzNzTw0+5EG/1f9zfg5ksU6hKfX+6HDwT35OvnZzWa
- Xn5DLe7rM3nOX3Spn2DsvXvyZlemDaQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-7qmdXixEMn2V8WsvaxovZw-1; Thu, 16 Apr 2020 14:34:03 -0400
-X-MC-Unique: 7qmdXixEMn2V8WsvaxovZw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9F558017F5;
- Thu, 16 Apr 2020 18:34:01 +0000 (UTC)
-Received: from [10.36.114.9] (ovpn-114-9.ams2.redhat.com [10.36.114.9])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 809A960BE0;
- Thu, 16 Apr 2020 18:33:57 +0000 (UTC)
-Subject: Re: [PATCH v19 QEMU 1/4] virtio-balloon: Implement support for page
- poison tracking feature
-To: Alexander Duyck <alexander.duyck@gmail.com>
-References: <CAKgT0UcaBfyKdTPErOxxLJgShOaJNfo9Maqps0ufABMbAo0iuQ@mail.gmail.com>
- <EDD25A47-8A8D-4F9B-9875-B983A1BA72C2@redhat.com>
- <CAKgT0Uf9a8K50XAS9K39KxBGdNRd5+G7nmkg2PsCHOYHAZ7Xew@mail.gmail.com>
- <f685fa75-6898-4fbe-c2a1-ba35424cb4a2@redhat.com>
- <20200416102229-mutt-send-email-mst@kernel.org>
- <5df12fd8-da98-dd3c-04ef-740189bc48ea@redhat.com>
- <CAKgT0UeVi=xnNxaVE5vB44rDwR4-m305wE671VdaK6R2TM6KGw@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <f6545f81-dab0-2979-ca20-45333ec16e4e@redhat.com>
-Date: Thu, 16 Apr 2020 20:33:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <osandov@osandov.com>) id 1jP9Xh-0002BU-Hx
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 14:47:18 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44584)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <osandov@osandov.com>) id 1jP9Xf-00029t-8V
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 14:47:16 -0400
+Received: by mail-pg1-x544.google.com with SMTP id 2so2034855pgp.11
+ for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 11:47:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=osandov-com.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=HUEWLw1uSNp6AdHrBcWiKo2O097La11hzrAKh3eSUAQ=;
+ b=EphPKEmqsYEdeU9gEfJTnwRPkxGbuidllQk8BI+JrIe4gr5wnIhPgdsl3dSBWKrcBA
+ k4zpo2efxMciKP3+4bGt4Y6SkT3nDMXjPz0+ftGmovt3NzdJdxuCscBGa7Z8068y/p/y
+ ugwFKnO3q7tYfKPcd6N6JRg88SUEaedfO0DqnC69jWN39yHfEkhYwB22E3EZcDKxs0/S
+ hTohJISWq57Ir5MDWbn7lQlIP2O82Ze6NaareWj7AcyJ1P/WKiAp+9GhzzrhDFLz/xou
+ SCpFB92JGMINe7ZlT9r4GrkSwM1GVe/Pdf28trcBx4LsJySzSMhwU6XuG7fXLIHC2v+8
+ hqAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=HUEWLw1uSNp6AdHrBcWiKo2O097La11hzrAKh3eSUAQ=;
+ b=Gj4mprWf7xzxPrH3jHvgdg9CPyRP7d2lEHvesP9/LhAXYb19LxHbc6iVQluXXOf/Oi
+ d34/JRK8M3jcl6U4vp8tjvJ6nhve9mZqi6WXw2/8gvH2IQXBvEB8rysr9KQFdVuQGtQf
+ hbS0a5L0Z3i/OZ8dej7BEI+PRGCh2iEC9FbUXKeke2tvBMoQSvWB/7HoYuXtTKn9vTKn
+ Kuz35un6NaCRqwn8JkR1pbmjStRkj6UbNX00Y5vK6TzmBx8P0WhNOEw+AqTr61E8pntP
+ NyRXlp6vomlSMe81FcXY8CY5fH0xFcQZ0A8atrFLp6o8lDy/jeLtYeNWEr8+cnHXsU2d
+ DsVA==
+X-Gm-Message-State: AGi0PuY27yXU418EaA4YzqW7mxhrhdriuMv4FUeLpHPR7o2htSwvbYla
+ hUbLY08wxtGuFXqXWX4PsqYmP4A+hSk=
+X-Google-Smtp-Source: APiQypK/JJIEhXqpB4feFloVLDhyEAOXV0A18rxvpjte3JqZ77C1U4F6D3slUUrJT7OVt9uF+8aT9Q==
+X-Received: by 2002:a62:6dc1:: with SMTP id i184mr33871419pfc.25.1587062833042; 
+ Thu, 16 Apr 2020 11:47:13 -0700 (PDT)
+Received: from vader ([2601:602:8b80:8e0::7584])
+ by smtp.gmail.com with ESMTPSA id c80sm3447258pfb.82.2020.04.16.11.47.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 16 Apr 2020 11:47:12 -0700 (PDT)
+Date: Thu, 16 Apr 2020 11:47:11 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH] 9pfs: local: ignore O_NOATIME if we don't have permissions
+Message-ID: <20200416184711.GB696015@vader>
+References: <1e65cffe9778857735e7ae6066d6f0df0b0e2db3.1586997767.git.osandov@fb.com>
+ <2496702.lrWaslOkEp@silver>
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0UeVi=xnNxaVE5vB44rDwR4-m305wE671VdaK6R2TM6KGw@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2496702.lrWaslOkEp@silver>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -139,78 +93,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, "Wang, Wei W" <wei.w.wang@intel.com>,
- David Hildenbrand <dhildenb@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> The other thing to keep in mind is that the poison value only really
-> comes into play with hinting/reporting. In the case of the standard
-> balloon the pages are considered allocated from the guest's
+On Thu, Apr 16, 2020 at 04:58:31PM +0200, Christian Schoenebeck wrote:
+> On Donnerstag, 16. April 2020 02:44:33 CEST Omar Sandoval wrote:
+> > From: Omar Sandoval <osandov@fb.com>
+> > 
+> > QEMU's local 9pfs server passes through O_NOATIME from the client. If
+> > the QEMU process doesn't have permissions to use O_NOATIME (namely, it
+> > does not own the file nor have the CAP_FOWNER capability), the open will
+> > fail. This causes issues when from the client's point of view, it
+> > believes it has permissions to use O_NOATIME (e.g., a process running as
+> > root in the virtual machine). Additionally, overlayfs on Linux opens
+> > files on the lower layer using O_NOATIME, so in this case a 9pfs mount
+> > can't be used as a lower layer for overlayfs (cf.
+> > https://github.com/osandov/drgn/blob/dabfe1971951701da13863dbe6d8a1d172ad965
+> > 0/vmtest/onoatimehack.c and https://github.com/NixOS/nixpkgs/issues/54509).
+> > 
+> > Luckily, O_NOATIME is effectively a hint, and is often ignored by, e.g.,
+> > network filesystems. open(2) notes that O_NOATIME "may not be effective
+> > on all filesystems. One example is NFS, where the server maintains the
+> > access time." This means that we can honor it when possible but fall
+> > back to ignoring it.
+> 
+> I am not sure whether NFS would simply silently ignore O_NOATIME i.e. without 
+> returning EPERM. I don't read it that way.
 
-Currently just as free page hinting IMHO. They are temporarily
-considered allocated.
+As far as I can tell, the NFS protocol has nothing equivalent to
+O_NOATIME and thus can't honor it. Feel free to test it:
 
-> perspective until the balloon is deflated. Then any poison/init will
-> occur over again anyway so I don't think the standard balloon should
-> really care.
+  # mount -t nfs -o vers=4,rw 10.0.2.2:/ /mnt
+  # echo foo > /mnt/foo
+  # touch -d "1 hour ago" /mnt/foo
+  # stat /mnt/foo | grep 'Access: [0-9]'
+  Access: 2020-04-16 10:43:36.838952593 -0700
+  # # Drop caches so we have to go to the NFS server.
+  # echo 3 > /proc/sys/vm/drop_caches
+  # strace -e openat dd if=/mnt/foo of=/dev/null iflag=noatime |& grep /mnt/foo
+  openat(AT_FDCWD, "/mnt/foo", O_RDONLY|O_NOATIME) = 3
+  # stat /mnt/foo | grep 'Access: [0-9]'
+  Access: 2020-04-16 11:43:36.906462928 -0700
 
-I think we should make this consistent. And as we discuss below, this
-allows for a nice optimization in the guest even for ordinary
-inflation/deflation (no need to zero out/poison again when giving the
-pages back to the buddy).
+> Fact is on Linux the expected 
+> behaviour is returning EPERM if O_NOATIME cannot be satisfied, consistent 
+> since its introduction 22 years ago:
+> http://lkml.iu.edu/hypermail/linux/kernel/9811.2/0118.html
 
->=20
-> For hinting it somewhat depends. Currently the implementation is
-> inflating a balloon so having poisoning or init_on_free means it is
-> written to immediately after it is freed so it defeats the purpose of
-> the hinting. However that is a Linux implementation issue, not
+The exact phrasing in the man-page is: "EPERM  The O_NOATIME flag was
+specified, but the effective user ID of the caller did not match the
+owner of the file and the caller was not privileged." IMO, it's about
+whether the (guest) process has permission from the (guest) kernel's
+point of view, not whether the filesystem could satisfy it.
 
-Yeah, and as we discuss below, we can optimize that later in Linux. It's
-sub-optimal, I agree.
+> > Signed-off-by: Omar Sandoval <osandov@fb.com>
+> > ---
+> >  hw/9pfs/9p-util.h | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+> > index 79ed6b233e..50842d540f 100644
+> > --- a/hw/9pfs/9p-util.h
+> > +++ b/hw/9pfs/9p-util.h
+> > @@ -37,9 +37,14 @@ static inline int openat_file(int dirfd, const char
+> > *name, int flags, {
+> >      int fd, serrno, ret;
+> > 
+> > +again:
+> >      fd = openat(dirfd, name, flags | O_NOFOLLOW | O_NOCTTY | O_NONBLOCK,
+> >                  mode);
+> >      if (fd == -1) {
+> > +        if (errno == EPERM && (flags & O_NOATIME)) {
+> > +            flags &= ~O_NOATIME;
+> > +            goto again;
+> > +        }
+> >          return -1;
+> >      }
+> 
+> It would certainly fix the problem in your use case. But it would also unmask 
+> O_NOATIME for all other ones (i.e. regular users on guest).
 
-> necessarily an issue with the QEMU implementation. As such may be I
-> should fix that in the Linux driver since that has been ignored in
-> QEMU up until now anyway. The more interesting bit is what should the
-> behavior be from the hypervisor when a page is marked as being hinted.
-> I think right now the behavior is to just not migrate the page. I
-> wonder though if we shouldn't instead just consider the page a zero
-> page, and then maybe modify the zero page behavior for the case where
-> we know page poisoning is enabled.
+The guest kernel will still check whether processes on the guest have
+permission to use O_NOATIME. This only changes the behavior when the
+guest kernel believes that the process has permission even though the
+host QEMU process doesn't.
 
-I consider that maybe future work. Let's keep it simple for now (iow,
-try to get page poisoning handling right first). The optimize the guest
-handling on balloon deflation / end of free page hinting.
+> I mean I understand your point, but I also have to take other use cases into 
+> account which might expect to receive EPERM if O_NOATIME cannot be granted.
 
-[...]
+If you'd still like to preserve this behavior, would it be acceptable to
+make this a QEMU option? Maybe something like "-virtfs
+honor_noatime=no": the default would be "yes", which is the current
+behavior, and "no" would always mask out NOATIME.
 
->> I can totally understand if Alex would want to stop working on
->> VIRTIO_BALLOON_F_PAGE_POISON at this point and only fix the guest to not
->> enable free page reporting in case we don't have
->> VIRTIO_BALLOON_F_PAGE_POISON (unless that's already done), lol. :)
->=20
-> I already have a patch for that.
->=20
-> The bigger issue is how to deal with the PAGE_POISON being enabled
-> with FREE_PAGE_HINTING. The legacy code at this point is just broken
-> and is plowing through with FREE_PAGE_HINTING while it is enabled.
-> That is safe for now because it is using a balloon, the side effect is
-> that it is going to defer migration. If it switches to a page
-> reporting type setup at some point in the future we would need to make
-> sure something is written to the other end to identify the poison/zero
-> pages.
+> May I ask how come that file/dir in question does not share the same uid in 
+> your specific use case? Are the file(s) created outside of QEMU, i.e. directly 
+> by some app on host?
 
-
-I think we don't have to worry about that for now. Might be sub-optimal,
-but then, I don't think actual page poisoning isn't all that frequently
-used in production setups.
-
-
---=20
-Thanks,
-
-David / dhildenb
-
+My use case is running tests on different versions of the Linux kernel
+while reusing the host's userspace environment. I export the host's root
+filesystem read-only to the guest via 9pfs, and the guest sets up
+overlayfs on top of it (to allow certain modifications) and chroots into
+that. Without a workaround like the LD_PRELOAD one I mentioned in the
+commit message, any (read) accesses to files owned by root on the host
+(like /bin/sh) will fail.
 
