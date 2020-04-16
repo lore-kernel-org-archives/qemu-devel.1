@@ -2,80 +2,80 @@ Return-Path: <SRS0=3HrQ=6A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A65E8C2BB55
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 14:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FEF4C2BB55
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 14:26:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EBCF2076D
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 14:24:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFA012076D
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 14:26:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EVLFfVvH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EBCF2076D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nx6WPkmj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFA012076D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jP5R6-0007dE-3o
-	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 10:24:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40638)
+	id 1jP5TL-000140-1l
+	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 10:26:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41036)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jP5QW-000701-Le
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 10:23:37 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jP5Sg-0000Sb-46
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 10:25:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jP5QV-0008Fy-NC
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 10:23:36 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37113)
+ (envelope-from <peter.maydell@linaro.org>) id 1jP5Sf-0000hx-7p
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 10:25:50 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44316)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jP5QV-0008FU-Br
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 10:23:35 -0400
-Received: by mail-oi1-x242.google.com with SMTP id r25so6832263oij.4
- for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 07:23:35 -0700 (PDT)
+ id 1jP5Sf-0000hc-05
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 10:25:49 -0400
+Received: by mail-oi1-x244.google.com with SMTP id o25so16665919oic.11
+ for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 07:25:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/jAf2FbxydNNbQDtHpCp6CvdVyhHMkK3D7xMPYfuX1Y=;
- b=EVLFfVvHGe63c9ijfvkZJjppOrZqwddwk9l/799utYbGTI6D3dcRDydmFRsCBARUO1
- XlbEYdTJpr0Ayb6KPXz9gmQcTJ91L6NY0EH3YRJr5OYeSrWzNJHMXf3xOfMqxyGVFecR
- hG8oQxpNI43zUt//Ky6MBOMEuJQwpgq2C6xrgtZTJ06El2psq3R7LfmF7aNOyJrGGaTi
- RZHnEe6vYzUjp87ubscjaP24Ex1826ENH3G60DXhPlwVw3kvNkwL55uaCZOnktiJj1ql
- tgV4U4VLcWjvS157MItIr8sVPu+DplA8EkG4ee+Q81hhIbxD9BfOcs5TWarAHxaSDN6s
- /5Mw==
+ :cc; bh=LbEv7BSJhfmeZsEBRpflbOl0RzbW3gd+CcYyFhMsz/0=;
+ b=Nx6WPkmjbumIORxCD4Btw2twZpes4NHd52xYIkpjF0L3zQ7bO0V7D/yhfNnK2m8jRm
+ oTIUGvTgQzXhS+FUD2+aBB8dffeiWpERFVph754KJfk00DCagH6cu43JCzKyOAv8d5De
+ lCeOjtlI9wQTNpJPNtJo4kMyfCgq8vv6PM8adnCItjKI9JxGX50JmesKiQUIc9nB0xA8
+ 1Nsn/fj4E3Q/vou/7fSWq0fblqSwnSHvgU5fzi0gD+QQY9ak7pKMciGK5NCCkD4YXVKs
+ NT4I2P0mgMYzBa5u7Zr9z5uj8hyQoikt4Ao/7plLE/S9oiDfF609TMUaOkzDb/Z3lYla
+ +5JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=/jAf2FbxydNNbQDtHpCp6CvdVyhHMkK3D7xMPYfuX1Y=;
- b=A8ez3heUa2YtjTZN0/0lfxJnuQ9oQ/GggbpRVbTGpEvbmm/qrHBpFSbE7Jkx+Nyl9g
- IJoAMDk7DNFvQsxymS05UjlyKh+Zmfptpoi1K1BGn0CiNXM0uafa1U6lqKGf4xPiQeaq
- svg8iD3ZoMQsPRNnI1Css78zT8Hh3gvlZiB5vV7g5ZE3g3Cao37dqreCSqMYjvjpAVq1
- LJFOH8DU5RUkOdQ7kEDDvUhl/LKF4v3z2hFkjansbqyZOmZDvUsauJyssqKn9LipGpk9
- V/3waCntir3YDPcb7WrvRfs7XuIM6OBTJ9Imiw1W97yLMDqnIPM+tSHjjJU1cGIB6/UR
- 9fXQ==
-X-Gm-Message-State: AGi0PuYv+dU+ARh6+BE/4urjYeZmn+eFxW9H/kZtaTybhTgHLQFulr3e
- hYMklknxy9CDFt6+KOt/p7tsA3N4hu7KPgppcFAbxA==
-X-Google-Smtp-Source: APiQypIk4addRE2SJUqChD8vkHhnhBg2BVRCEfDw36hlmOqvrh14tmPzR15BwdaFLVEjYuuHXIq0gkS2A+6FDlqasRg=
-X-Received: by 2002:aca:170e:: with SMTP id j14mr3040616oii.163.1587047014474; 
- Thu, 16 Apr 2020 07:23:34 -0700 (PDT)
+ bh=LbEv7BSJhfmeZsEBRpflbOl0RzbW3gd+CcYyFhMsz/0=;
+ b=ZZzw/Gt+4+g7Jjb4Y2sno3hXXJPeJoTqZU3FcFF3VEjRn4mdjlAbTOzPIQYsa/O15N
+ lBgV0cht76FPRfNi16SWsmBBfT/F1oPL85mCJ2mr7O0eHDxzGsQifNnMT6OlfIXzWAr2
+ 1Vw9hMmWo9IB5tWTJqNE33pRx8nj+kLVuEywqazvAV6MX9BRtWyAdxubViobndgy1XZ6
+ xpLOuLJ4F8RajLjxPWlnjUygBiuRjV3n8Dy1pnrhKthlZlCT0qs7X9YcCrlFHxFTQCBr
+ K4jWP95T2C058StSLR3RLBIS8LoVAEc5RIdnrppkezGiZi+CBhwdkJUmfWUOSByLjdBV
+ 9MkA==
+X-Gm-Message-State: AGi0PuaXc5VjicXvbN0nmiA1ew6cPMBXSn1PNUO5bdTa/JgdjjEsw215
+ dCGpoai5DQT9PDWNdQMvLlBFFl7L3RauePRBDliJ9w==
+X-Google-Smtp-Source: APiQypKC1zFOFFyvke4XXJx1stbYXx6SauXJxERN/BfcM2TVZqHnt6pVW+4crxAS73CuWxvJbS7mKadQklXOaYu3kCE=
+X-Received: by 2002:aca:170e:: with SMTP id j14mr3047364oii.163.1587047148413; 
+ Thu, 16 Apr 2020 07:25:48 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200311064420.30606-1-richard.henderson@linaro.org>
- <20200311064420.30606-14-richard.henderson@linaro.org>
-In-Reply-To: <20200311064420.30606-14-richard.henderson@linaro.org>
+ <20200311064420.30606-15-richard.henderson@linaro.org>
+In-Reply-To: <20200311064420.30606-15-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Apr 2020 15:23:23 +0100
-Message-ID: <CAFEAcA9_F3yTHC+Rt6A8NPYjEDESRY6cEAqjYEA1LVV-MDE-JA@mail.gmail.com>
-Subject: Re: [PATCH 13/16] target/arm: Reuse sve_probe_page for gather
- first-fault loads
+Date: Thu, 16 Apr 2020 15:25:36 +0100
+Message-ID: <CAFEAcA9+GQbZ2COG=JnirsTUEj_CMmOnhxEwGZG9ZxYr6=s0dQ@mail.gmail.com>
+Subject: Re: [PATCH 14/16] target/arm: Reuse sve_probe_page for scatter stores
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,10 +95,11 @@ Sender: "Qemu-devel"
 On Wed, 11 Mar 2020 at 06:44, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> This avoids the need for a separate set of helpers to implement
-> no-fault semantics, and will enable MTE in the future.
->
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/sve_helper.c | 182 ++++++++++++++++++++++++----------------
+>  1 file changed, 111 insertions(+), 71 deletions(-)
+>
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
