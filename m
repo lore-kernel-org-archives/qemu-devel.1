@@ -2,103 +2,79 @@ Return-Path: <SRS0=3HrQ=6A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5966FC2BB55
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 16:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81139C2BB55
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 16:43:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22391206F9
-	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 16:32:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4986D21D7E
+	for <qemu-devel@archiver.kernel.org>; Thu, 16 Apr 2020 16:43:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="biIMZhEv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22391206F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IvxpVh3P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4986D21D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jP7RY-00050v-7n
-	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 12:32:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58390)
+	id 1jP7bt-00048d-Fg
+	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 12:43:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60242)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jP7Ph-0003s4-Ol
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 12:30:55 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jP7b9-0003M2-Vv
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 12:42:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jP7Pf-0004Q8-61
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 12:30:52 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49353
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jP7Pd-0004Oz-IH
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 12:30:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587054648;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mtFf1T/H68GgQAJdcnp6BaBE6PWUnUnDoWKFMTuQTX0=;
- b=biIMZhEvMvAB+P/qdBLRcVtuA72JcvBBdqxqjxR0vRIWfHvIRdTRnqALBVwXfVlRiGEtj9
- 5nG7jur42TvUvrDQZ0LQR7MxI+0T1cExIXID8b9phj/2tEgr/kl01RSyhvfynPAVCgIE17
- 6elu2IX2wKTj+u1iV4RI+oDgnpUAUMU=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-1kXs39MYMLOePCXb8g46YQ-1; Thu, 16 Apr 2020 12:30:44 -0400
-X-MC-Unique: 1kXs39MYMLOePCXb8g46YQ-1
-Received: by mail-ed1-f70.google.com with SMTP id c2so5408331edx.16
- for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 09:30:44 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1jP7b8-0003sq-To
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 12:42:43 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35391)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jP7b8-0003sB-LC
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 12:42:42 -0400
+Received: by mail-oi1-x242.google.com with SMTP id b7so14518561oic.2
+ for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 09:42:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=5BdeQP5buwuaCPoSnZDcP6t1GFG6iOsZDMGobvDcraM=;
+ b=IvxpVh3PssQTt53pZ6eR2pKhdO72MPeJTr328mcvrTn09JhX56KTI8yvpr+Lq9n6ok
+ p0Ik9L1B2XiHJzm2cUDDPf9u8Pg/1ym4sW2THVs1KLDF49SMZyNd5l3hz7Z5azslFfBx
+ 3Cgjpes7+MUFKvVTzdzx0Q9sx+ZX968P+AnVw+076i8BBT52ofaFKpIomYD3GGBwuGm5
+ dOT19YyHsZJPCrI9LLkSJlcHnDkB2R5t/ETIzo2oKp1ucmXme4XxTxFH4KH8LXfBu4Md
+ mPbPWvDeKy94Gv0RNlybzddWTUkwtZey53pMasEcU3QXddj+nKK5/5PEor2sk4piUxIL
+ JBKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mtFf1T/H68GgQAJdcnp6BaBE6PWUnUnDoWKFMTuQTX0=;
- b=C2tqGb6UG50sgWqsurUj452vjjeZQ9m6hYAh/LPSc1N5KuiXCjmbXP2EaselaE3LAr
- PrUvaN61EKd9XBFIiAM10sTo7hudlt7BPgaIuEgG0W6Q5Pyz6F6W9Mc4LKtvxMW7w5oh
- WcLj27PlEWIagVutv4JU4mQ1+od2VxpEuQXuzzVy/WwhDvKLbAJsAcfBVphno2Yg+muQ
- ykmTs2TI+669Gzy9owt3B36kAGiJmn+01gso0iqRxll7cJF9MZn2R9fzQvLoSVE+kX3v
- QpojLEK2dYD4AABQfcGISpzxI64Zwx6Wl4qSPkUxZPezgw9Coubyprp9qkuF/9Ky6Yjh
- GuWA==
-X-Gm-Message-State: AGi0PuYf+oXMOw0MAhVsd8UAf3USD+dXKdxH+Z/tMeqv+zBJ2jkb2kaM
- wPB1+DVfnI0zyEwNqcvta+NoIq8zLQJImsvWJlThbHhooSRaDYzfN1qcncXKmhhNGE6N/ltwHwy
- 0WPeEiwemUDwretI=
-X-Received: by 2002:a17:906:30c5:: with SMTP id
- b5mr10882831ejb.102.1587054643264; 
- Thu, 16 Apr 2020 09:30:43 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI783bhpx6CO8bEAy894aKDX079CAHV3iKkGFo/+ysOM7FosLEr0/cHVBFLGYZ7FPXMFjN1Ig==
-X-Received: by 2002:a17:906:30c5:: with SMTP id
- b5mr10882817ejb.102.1587054643054; 
- Thu, 16 Apr 2020 09:30:43 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id c19sm3101678ejd.48.2020.04.16.09.30.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 16 Apr 2020 09:30:42 -0700 (PDT)
-Subject: Re: [PATCH v2 4/6] dwc-hsotg USB host controller emulation
-To: Peter Maydell <peter.maydell@linaro.org>,
- Paul Zimmerman <pauldzim@gmail.com>
-References: <20200329001705.15966-1-pauldzim@gmail.com>
- <20200329001705.15966-5-pauldzim@gmail.com>
- <CAFEAcA9bL=uZ3-F4bYbHW+V9REnS1OnSusGKB2UoHS0bjSbvzA@mail.gmail.com>
- <CAFEAcA-nysMVx1-xukuhaUCWaH544+2_J8AtUMru2hsyv-hPEQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7830b8bd-efea-4987-3727-165385e6dd25@redhat.com>
-Date: Thu, 16 Apr 2020 18:30:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=5BdeQP5buwuaCPoSnZDcP6t1GFG6iOsZDMGobvDcraM=;
+ b=UVT3mnxQueyJmtLj5c3jjETCqJv0DP9IT94mt1IMH3PzqlHFm7B4YZVi0jXTmJR32U
+ jPIjXNb/LEJYpkj8YMwdtcywablU0nm+mSnC+qZLl9Egnzw38ULnvZB4364glh7YfbS9
+ LaJADcNKOKUXGSXCc4Jki0jbsQKSq6SO9/XoET/pTwzXpU7eQSyCfiX4EQxzoydCM2vo
+ Z7y4aUcSoChyYx6yO+o6mPog3jn2xtCV+Fbb6RAJah3xl5PvhELqtjZtZMeVvCJsxH7b
+ jYiYonRRwfnIw7wo7oq79sQWaUnd0O7+J9sq88GTuU1qrVxEFhTrfjhaA6MoYBvXohNI
+ 2NGg==
+X-Gm-Message-State: AGi0Pua5VcN7ijb4MhAsBR7uBlE3aVNUDYR0ET8rL8Fq51DPi6D/ikn7
+ Vkq2AteSsG87YVQSpCaF6WGK7RTzT/grNzGeVdMkEw==
+X-Google-Smtp-Source: APiQypKk+6d7jpFoToCUp5oRDATwgYTd7fluSJPaGpmp9A/bx1UN8c+qKzdAsWVTre4LafAy846mVpImbJ4DzK9PN2s=
+X-Received: by 2002:aca:dc56:: with SMTP id t83mr3349854oig.48.1587055361541; 
+ Thu, 16 Apr 2020 09:42:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-nysMVx1-xukuhaUCWaH544+2_J8AtUMru2hsyv-hPEQ@mail.gmail.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <20200404122718.25111-1-edgar.iglesias@gmail.com>
+In-Reply-To: <20200404122718.25111-1-edgar.iglesias@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Apr 2020 17:42:29 +0100
+Message-ID: <CAFEAcA8JFo=-zUYE6gp3Dg2wux-cHGhHZ5hG6BhrhJvwtRyRUw@mail.gmail.com>
+Subject: Re: [PATCH v1 0/2] dma/xlnx-zdma: Fix descriptor loading wrt host
+ endianness
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,36 +86,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: figlesia@xilinx.com, Edgar Iglesias <edgar.iglesias@xilinx.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/16/20 5:47 PM, Peter Maydell wrote:
-> On Thu, 16 Apr 2020 at 16:45, Peter Maydell <peter.maydell@linaro.org> wrote:
->>
->> On Sun, 29 Mar 2020 at 00:18, Paul Zimmerman <pauldzim@gmail.com> wrote:
-> 
->>> +    s->as = &address_space_memory;
->>
->> Ideally this should be a device property. (hw/dma/pl080.c
->> has an example of how to declare a TYPE_MEMORY_REGION
->> property and then create an AddressSpace from it in
->> the realize method. hw/arm/versatilepb.c and hw/arm/mps2-tz.c
->> show the other end, using object_property_set_link() to pass
->> the appropriate MemoryRegion to the device before realizing it.)
-> 
-> On closer inspection you're already doing that with the dma_as/
-> dma_mr. What's this AddressSpace for if it's different?
+On Sat, 4 Apr 2020 at 13:26, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+>
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>
+> Hi,
+>
+> This fixes the endinannes related bugs with descriptor loading
+> that Peter pointed out.
+>
+> Cheers,
+> Edgar
+>
+> Edgar E. Iglesias (2):
+>   dma/xlnx-zdma: Fix descriptor loading (MEM) wrt endianness
+>   dma/xlnx-zdma: Fix descriptor loading (REG) wrt endianness
 
-s->as is not used, probably a leftover (s->dma_as is used).
 
-> 
-> thanks
-> -- PMM
-> 
 
+Applied to target-arm.next for 5.1, thanks.
+
+-- PMM
 
