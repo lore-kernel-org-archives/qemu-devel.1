@@ -2,47 +2,60 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLACK,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3084BC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 04:12:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54348C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 05:06:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 042CF21D93
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 04:12:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 042CF21D93
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 20509221E9
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 05:06:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="BAovK896"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20509221E9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPIMd-0007zE-VE
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 00:12:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49264)
+	id 1jPJDJ-0001tH-B0
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 01:06:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1jPILv-0007TP-3y
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 00:11:44 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jPJBy-0000gi-VY
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 01:05:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1jPILt-0004td-34
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 00:11:42 -0400
-Received: from [107.174.27.60] (port=49116 helo=ozlabs.ru)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>)
- id 1jPILs-0004tG-S2; Fri, 17 Apr 2020 00:11:41 -0400
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
- by ozlabs.ru (Postfix) with ESMTP id 35256AE80008;
- Fri, 17 Apr 2020 00:09:12 -0400 (EDT)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: qemu-devel@nongnu.org
-Subject: [PATCH qemu] spapr: Add PVR setting capability
-Date: Fri, 17 Apr 2020 14:11:05 +1000
-Message-Id: <20200417041105.63563-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 107.174.27.60
+ (envelope-from <dgibson@ozlabs.org>) id 1jPJBx-0007SD-JU
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 01:05:30 -0400
+Received: from ozlabs.org ([203.11.71.1]:34671)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1jPJBv-0007RE-Ln; Fri, 17 Apr 2020 01:05:29 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 493PDM0jHnz9sSk; Fri, 17 Apr 2020 15:05:22 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1587099923;
+ bh=2OnDImsdpiCMfNcjIUi9npBTgcF2FbYCrCsFvsZlETs=;
+ h=From:To:Cc:Subject:Date:From;
+ b=BAovK896jvn+zc5VGunltTaoScvQooLsPzfpJxtklBC1TqgZjOrg5/FcaStLD7PAt
+ KQvyGB+jf3lDKrALlYVvFNJIHTS+2c8VAVumIFRQ+qK8R1951qWbGMs5jnqO3qT+oA
+ LsCM8TmeR5wedGmPukpXbBfHzFYiu+t4TNEoBfF8=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Subject: [PULL 0/3] ppc-for-5.0 queue 20200417
+Date: Fri, 17 Apr 2020 15:05:11 +1000
+Message-Id: <20200417050514.235060-1-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.25.2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -54,152 +67,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
+ qemu-ppc@nongnu.org, groug@kaod.org, clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-At the moment the VCPU init sequence includes setting PVR which in case of
-KVM-HV only checks if it matches the hardware PVR mask as PVR cannot be
-virtualized by the hardware. In order to cope with various CPU revisions
-only top 16bit of PVR are checked which works for minor revision updates.
+The following changes since commit 20038cd7a8412feeb49c01f6ede89e36c89954=
+72:
 
-However in every CPU generation starting POWER7 (at least) there were CPUs
-supporting the (almost) same POWER ISA level but having different top
-16bits of PVR - POWER7+, POWER8E, POWER8NVL; this time we got POWER9+
-with a new PVR family. We would normally add the PVR mask for the new one
-too, the problem with it is that although the physical machines exist,
-P9+ is not going to be released as a product, and this situation is likely
-to repeat in the future.
+  Update version for v5.0.0-rc3 release (2020-04-15 20:51:54 +0100)
 
-Instead of adding every new CPU family in QEMU, this adds a new sPAPR
-machine capability to force PVR setting/checking. It is "on" by default
-to preserve the existing behavior. When "off", it is the user's
-responsibility to specify the correct CPU.
+are available in the Git repository at:
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- include/hw/ppc/spapr.h |  5 ++++-
- hw/ppc/spapr.c         |  1 +
- hw/ppc/spapr_caps.c    | 18 ++++++++++++++++++
- target/ppc/kvm.c       | 16 ++++++++++++++--
- 4 files changed, 37 insertions(+), 3 deletions(-)
+  git://github.com/dgibson/qemu.git tags/ppc-for-5.0-20200417
 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index e579eaf28c05..5ccac4d56871 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -81,8 +81,10 @@ typedef enum {
- #define SPAPR_CAP_CCF_ASSIST            0x09
- /* Implements PAPR FWNMI option */
- #define SPAPR_CAP_FWNMI                 0x0A
-+/* Implements PAPR PVR option */
-+#define SPAPR_CAP_PVR                   0x0B
- /* Num Caps */
--#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI + 1)
-+#define SPAPR_CAP_NUM                   (SPAPR_CAP_PVR + 1)
- 
- /*
-  * Capability Values
-@@ -912,6 +914,7 @@ extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
- extern const VMStateDescription vmstate_spapr_cap_large_decr;
- extern const VMStateDescription vmstate_spapr_cap_ccf_assist;
- extern const VMStateDescription vmstate_spapr_cap_fwnmi;
-+extern const VMStateDescription vmstate_spapr_cap_pvr;
- 
- static inline uint8_t spapr_get_cap(SpaprMachineState *spapr, int cap)
- {
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 841b5ec59b12..ecc74c182b9f 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4535,6 +4535,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
-     smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_ON;
-     smc->default_caps.caps[SPAPR_CAP_FWNMI] = SPAPR_CAP_ON;
-+    smc->default_caps.caps[SPAPR_CAP_PVR] = SPAPR_CAP_ON;
-     spapr_caps_add_properties(smc, &error_abort);
-     smc->irq = &spapr_irq_dual;
-     smc->dr_phb_enabled = true;
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index eb54f9422722..398b72b77f9f 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -525,6 +525,14 @@ static void cap_fwnmi_apply(SpaprMachineState *spapr, uint8_t val,
-     }
- }
- 
-+static void cap_pvr_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
-+{
-+    if (val) {
-+        return;
-+    }
-+    warn_report("If you're uing kvm-hv.ko, only \"-cpu host\" is supported");
-+}
-+
- SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-     [SPAPR_CAP_HTM] = {
-         .name = "htm",
-@@ -633,6 +641,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-         .type = "bool",
-         .apply = cap_fwnmi_apply,
-     },
-+    [SPAPR_CAP_PVR] = {
-+        .name = "pvr",
-+        .description = "Enforce PVR in KVM",
-+        .index = SPAPR_CAP_PVR,
-+        .get = spapr_cap_get_bool,
-+        .set = spapr_cap_set_bool,
-+        .type = "bool",
-+        .apply = cap_pvr_apply,
-+    },
- };
- 
- static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
-@@ -773,6 +790,7 @@ SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
- SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
- SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
- SPAPR_CAP_MIG_STATE(fwnmi, SPAPR_CAP_FWNMI);
-+SPAPR_CAP_MIG_STATE(pvr, SPAPR_CAP_PVR);
- 
- void spapr_caps_init(SpaprMachineState *spapr)
- {
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 03d0667e8f94..a4adc29b6522 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -466,15 +466,27 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-     CPUPPCState *cenv = &cpu->env;
-     int ret;
-+    SpaprMachineState *spapr;
- 
-     /* Synchronize sregs with kvm */
-     ret = kvm_arch_sync_sregs(cpu);
-     if (ret) {
-         if (ret == -EINVAL) {
-             error_report("Register sync failed... If you're using kvm-hv.ko,"
--                         " only \"-cpu host\" is possible");
-+                         " only \"-cpu host\" is supported");
-+        }
-+        /*
-+         * The user chose not to set PVR which makes sense if we are running
-+         * on a CPU with known ISA level but unknown PVR.
-+         */
-+        spapr = (SpaprMachineState *)
-+            object_dynamic_cast(OBJECT(qdev_get_machine()), TYPE_SPAPR_MACHINE);
-+
-+        if (spapr && spapr->eff.caps[SPAPR_CAP_PVR] == SPAPR_CAP_OFF) {
-+            ret = 0;
-+        } else {
-+            return ret;
-         }
--        return ret;
-     }
- 
-     switch (cenv->mmu_model) {
--- 
-2.17.1
+for you to fetch changes up to 5ed195065cc6895f61b9d59bfa0a0536ed5ed51e:
 
+  target/ppc: Fix mtmsr(d) L=3D1 variant that loses interrupts (2020-04-1=
+7 10:39:03 +1000)
+
+----------------------------------------------------------------
+ppc patch queue for 2020-04-17
+
+Here are a few late bugfixes for qemu-5.0 in the ppc target code.
+Unless some really nasty last minute bug shows up, I expect this to be
+the last ppc pull request for qemu-5.0.
+
+----------------------------------------------------------------
+Ganesh Goudar (1):
+      target/ppc: Fix wrong interpretation of the disposition flag.
+
+Nicholas Piggin (1):
+      target/ppc: Fix mtmsr(d) L=3D1 variant that loses interrupts
+
+Richard Henderson (1):
+      linux-user/ppc: Fix padding in mcontext_t for ppc64
+
+ linux-user/ppc/signal.c | 69 +++++++++++++++++++++----------------------=
+------
+ target/ppc/kvm.c        |  4 +--
+ target/ppc/translate.c  | 46 +++++++++++++++++++--------------
+ 3 files changed, 58 insertions(+), 61 deletions(-)
 
