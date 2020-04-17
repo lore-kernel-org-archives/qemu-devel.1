@@ -2,130 +2,75 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38182C3815B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 18:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EAAAC38A2B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 18:35:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E8672220A
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 18:34:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D8B8722202
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 18:35:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="qc82EyI8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E8672220A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RrBOuJLk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8B8722202
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPVp8-0005Qw-74
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 14:34:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36620)
+	id 1jPVpT-0005x8-08
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 14:35:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39198)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fnuv@xilinx.com>) id 1jPVkz-0001Nb-4T
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:30:30 -0400
+ (envelope-from <leoluan@gmail.com>) id 1jPVo0-0004SA-8U
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:33:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fnuv@xilinx.com>) id 1jPVkx-0002LC-OW
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:30:29 -0400
-Received: from mail-bn8nam11on2071.outbound.protection.outlook.com
- ([40.107.236.71]:14706 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <fnuv@xilinx.com>)
- id 1jPVkx-0002JK-Hh; Fri, 17 Apr 2020 14:30:27 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kUlBLG2bQsVlHecWRZRmtlAxRi986eUgIxP+LRJ/qqLlapeyliKQ2zsydHTVj5U823waQu23HdYQFCc5OYv8nLraGYo+qF4fy2ahgEI9NXqusAxvyCE2SRA3XbR5PtP/qJAf8H+3ahJpLl8+p7AyBGBNKBD10yShAZDlFt73vAPvIggRLt7tB6zVZYG2vs1zJN569oiKU5dx6cCpKGz4zE4Qoisn6DPGQcE7OAOoVcJW3VsscFCBFqtZu687W7paBWIVqrWlRPw2peOrEep3VEJApgLXlf+tVWrTNzYjqeE5fajqxvtM6dVLmI1XK4QBztZy7h44pr6r0iIpTYbIQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fG7IgnCg9nxH5mrMyGedUHEr1BMqvwjOwlyz+Txeo7M=;
- b=BR/iB5EGFuaFwprr4oZyQVQPIjwXfZXCP7rCUASNH5ZKDYqLKPG7wlNe5xS1mAFMBCR4ipgGMRc7Nv3dRSZLdpBANx+rLUKkus9Mmb4PtOm/y1cGHH/0H3oKYTjgymwcCLCw+vnVofddVbNWRsxGLnKIcjssHTp1Wqwinmsirn0FZswAllxTHKb1HdR35FX5WYm3e7RSxJ2HTN7zRXs6y3yT4BGjvjpgOkovH8xewfWHdG3/wxYC1PGNo1PgX/HSuGNOrNZ6EVqXV+mzezzM4I+jLBTkvKx2NZVn/PByeB/q2bQhMNP6cUeMqIm5c7jxER2H/UyMfJlZwC7pkPfRfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=nongnu.org smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fG7IgnCg9nxH5mrMyGedUHEr1BMqvwjOwlyz+Txeo7M=;
- b=qc82EyI8LDnwih984EuBCAlYIDk0lXqNkLTL3dSDJIR9HR7ZpUBp51CbLdkcYNnLCn+Ew3Z09pFEbMS9zBtK5S0CH+IYjZXcjRR+o44lEUXx+7HmA+zmjiav8pnQHDqmA0acmCZ/XRdvWmhfsLqRErPzV5lgU2GiBlho72TBkP4=
-Received: from SN4PR0701CA0034.namprd07.prod.outlook.com
- (2603:10b6:803:2d::15) by BYAPR02MB4774.namprd02.prod.outlook.com
- (2603:10b6:a03:4d::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.28; Fri, 17 Apr
- 2020 18:30:25 +0000
-Received: from SN1NAM02FT046.eop-nam02.prod.protection.outlook.com
- (2603:10b6:803:2d:cafe::88) by SN4PR0701CA0034.outlook.office365.com
- (2603:10b6:803:2d::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.26 via Frontend
- Transport; Fri, 17 Apr 2020 18:30:25 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- SN1NAM02FT046.mail.protection.outlook.com (10.152.72.191) with Microsoft SMTP
- Server id 15.20.2921.25 via Frontend Transport; Fri, 17 Apr 2020 18:30:24
- +0000
-Received: from [149.199.38.66] (port=36434 helo=xsj-pvapsmtp01)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <fnu.vikram@xilinx.com>)
- id 1jPVk6-0007KG-HV; Fri, 17 Apr 2020 11:29:34 -0700
-Received: from [127.0.0.1] (helo=localhost)
- by xsj-pvapsmtp01 with smtp (Exim 4.63)
- (envelope-from <fnu.vikram@xilinx.com>)
- id 1jPVku-0006MZ-A1; Fri, 17 Apr 2020 11:30:24 -0700
-Received: from [172.19.2.115] (helo=xsjfnuv50.xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <fnu.vikram@xilinx.com>)
- id 1jPVks-00055H-Qy; Fri, 17 Apr 2020 11:30:22 -0700
-From: Vikram Garhwal <fnu.vikram@xilinx.com>
-To: qemu-devel@nongnu.org
-Subject: [[PATCH v2 3/4] hw/net/can: Connect Xlnx ZynqMP CAN controller to
- ZCU102 machine
-Date: Fri, 17 Apr 2020 11:29:28 -0700
-Message-Id: <1587148169-173268-4-git-send-email-fnu.vikram@xilinx.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1587148169-173268-1-git-send-email-fnu.vikram@xilinx.com>
-References: <1587148169-173268-1-git-send-email-fnu.vikram@xilinx.com>
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFTY:;
- SFS:(10009020)(4636009)(396003)(39860400002)(136003)(376002)(346002)(46966005)(2906002)(82740400003)(70586007)(7696005)(2616005)(26005)(70206006)(47076004)(36756003)(478600001)(356005)(8936002)(81156014)(5660300002)(186003)(54906003)(426003)(6916009)(4326008)(316002)(81166007)(336012)(9786002)(8676002);
- DIR:OUT; SFP:1101; 
+ (envelope-from <leoluan@gmail.com>) id 1jPVnx-0005wf-Sg
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:33:36 -0400
+Received: from mail-io1-xd34.google.com ([2607:f8b0:4864:20::d34]:41008)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <leoluan@gmail.com>) id 1jPVnx-0005u3-Mi
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:33:33 -0400
+Received: by mail-io1-xd34.google.com with SMTP id b12so3358482ion.8
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 11:33:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=gqWyM1NUsDEgwukS7pgzVFpqxPCykt/KGKvJC0x5ZK8=;
+ b=RrBOuJLkGXO8lVWwCENZcFx0vTwAlyr77uV9zpkJPi8IFJtYV1eMpft0M1trdyJpmk
+ xOy0GdembnvEbxhbsXDrnAiXP6diSxbHVcuIeh3U92jaLYUn/+L//HLT50RapVkF977X
+ Q4wS5R190Xy4pXer3zB4N7tTYw2OKWMlClkgzC0M5a782hfm8efuBOH4ifXOam8hAcyt
+ nf0Il5Rv5uuM2Q0/kbbsMG8R9lZJTA6t2pywacHivcWI9g4grt2iys+dmCzuE2PQu4B6
+ NfmJVoYB2nhpbLYEf31mi62OFCVdX4WanTI+M2ffjFoDNPjow2RtfJpcYVNq+HmJOzlF
+ ONAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=gqWyM1NUsDEgwukS7pgzVFpqxPCykt/KGKvJC0x5ZK8=;
+ b=Vz+hGhzP3LIUd3fTyUi0tskEvjsd8P5Lx4srGcjM3vV76LvdhtjyrJ9tvCRLq4AdU8
+ zv6ih2hRk7skbDnlLRnGjn1eiheaGgo3CGZjE45WCfvp7ANfMBuU/QFb+s5uJVjNNYsD
+ 4MEaSA6bATD9OJe+7q/AvRDPAnELDaTUCdL26ItJFem6cyI/aAuuBrnFiR+jxVqDdrOO
+ UFbVpAEVHnuBFx51XrAvoST01xUD8B7Hc4KAKk3rQ1j1wnAgzodAePNWB+Oqo+daP9aN
+ JvL0a9/gSfXqPxMPg8I0CI7Ha8lPphID3tFi4WJnJJkQL5RWLHRM6/FSRzbI6LwKMLAN
+ XP0w==
+X-Gm-Message-State: AGi0PuYCX7C5GwHVJYpS4mqXtLYZ/lKOXytQvJg/WB+Ml+HHXrgj3FQt
+ R5MMzWxSstRV3Lughr7nTZ6jFk0Hite2g5RPAvbZ2Obn
+X-Google-Smtp-Source: APiQypJjt5qHudyFk/2jUVYv9+lOXSDetKAk+0+OQE26LR+fQ59kX/qfFEDNwCmge5+8xdBx7d/FX4csRxOFNDLKF7E=
+X-Received: by 2002:a02:1482:: with SMTP id 124mr4610111jag.4.1587148411454;
+ Fri, 17 Apr 2020 11:33:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: faba8f8e-f8b9-4202-7481-08d7e2fd650d
-X-MS-TrafficTypeDiagnostic: BYAPR02MB4774:
-X-Microsoft-Antispam-PRVS: <BYAPR02MB47748CE39F6DA2872A9AFD7BBCD90@BYAPR02MB4774.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:94;
-X-Forefront-PRVS: 0376ECF4DD
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Qw+Wm+RpMQlM66+XFftPRmLWlFztnNmsLbxRtzagUF1TtaI+dEj2IDw3KU7m505a8qV+jOi4uZX6Cdb3uaNJzWtJMZP4PDU90ZXmzbSKs6FPkehKfkNyvQJeTfmYrmSg8lGQYX/hmQdY8IKOh5hV0hiPVRO2BRE+FCi64rnki+tlpxAdGXKmW1usKaGpXszZ8Khw2HjNzKYU/tMbn9uItRjLWxv1cGKzNbzUNICWh1Xu/xQv/iYX3M3zKg2oGfhtak3q1/4Xw40+vL1qoLsWQ71b62RDnHB7imhRcL2J+MBwkxp9TB9CGBuPemg7j22A7rRiNmhMeMRE7e3QHAh69LHA7K9pqhx5i9mYxuWemq2kqn2LjiZlvbTpWlE/+5sqGMYhu4mzsr3zzbKaKc5jO950mmPcXLuev04ci6zsFYLrNBSdS5jWyDYg/68lrt21P8UqwdXuEU/vL/Gl9dK8FgayXW/LFG3bPaK6Z2Yb555JE5w+DEdkrOL3weO1Ds+ePXrLBRYocCxfMmRaHZaLGQ==
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2020 18:30:24.6108 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: faba8f8e-f8b9-4202-7481-08d7e2fd650d
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB4774
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.236.71
+From: Leo Luan <leoluan@gmail.com>
+Date: Fri, 17 Apr 2020 11:33:20 -0700
+Message-ID: <CAD_3s9Jnd9BzkZAe6SEKz7unuxJHY502pNdUgxrC3MOQAFj9Hw@mail.gmail.com>
+Subject: Avoid copying unallocated clusters during full backup
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="00000000000045486605a380c9eb"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d34
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,103 +82,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Vikram Garhwal <fnu.vikram@xilinx.com>, jasowang@redhat.com,
- Alistair Francis <alistair@alistair23.me>, francisco.iglesias@xilinx.com,
- "open list:Xilinx ZynqMP" <qemu-arm@nongnu.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Connect CAN0 and CAN1 to ZCU102 board.
+--00000000000045486605a380c9eb
+Content-Type: text/plain; charset="UTF-8"
 
-Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
----
- hw/arm/xlnx-zynqmp.c         | 26 ++++++++++++++++++++++++++
- include/hw/arm/xlnx-zynqmp.h |  3 +++
- 2 files changed, 29 insertions(+)
+When doing a full backup from a single layer qcow2 disk file to a new qcow2
+file, the backup_run function does not unset unallocated parts in the copy
+bit map.  The subsequent backup_loop call goes through these unallocated
+clusters unnecessarily.  In the case when the target and source reside in
+different file systems, an EXDEV error would cause zeroes to be actually
+copied into the target and that causes a target file size explosion to the
+full virtual disk size.
 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index b84d153..e5f0d9f 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -81,6 +81,14 @@ static const int uart_intr[XLNX_ZYNQMP_NUM_UARTS] = {
-     21, 22,
- };
- 
-+static const uint64_t can_addr[XLNX_ZYNQMP_NUM_CAN] = {
-+    0xFF060000, 0xFF070000,
-+};
-+
-+static const int can_intr[XLNX_ZYNQMP_NUM_CAN] = {
-+    23, 24,
-+};
-+
- static const uint64_t sdhci_addr[XLNX_ZYNQMP_NUM_SDHCI] = {
-     0xFF160000, 0xFF170000,
- };
-@@ -254,6 +262,11 @@ static void xlnx_zynqmp_init(Object *obj)
-                               TYPE_CADENCE_UART);
-     }
- 
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
-+        sysbus_init_child_obj(obj, "can[*]", &s->can[i], sizeof(s->can[i]),
-+                              TYPE_XLNX_ZYNQMP_CAN);
-+    }
-+
-     sysbus_init_child_obj(obj, "sata", &s->sata, sizeof(s->sata),
-                           TYPE_SYSBUS_AHCI);
- 
-@@ -508,6 +521,19 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-                            gic_spi[uart_intr[i]]);
-     }
- 
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
-+        object_property_set_int(OBJECT(&s->can[i]), i, "ctrl-idx",
-+                                &error_abort);
-+        object_property_set_bool(OBJECT(&s->can[i]), true, "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->can[i]), 0, can_addr[i]);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->can[i]), 0,
-+                           gic_spi[can_intr[i]]);
-+    }
-+
-     object_property_set_int(OBJECT(&s->sata), SATA_NUM_PORTS, "num-ports",
-                             &error_abort);
-     object_property_set_bool(OBJECT(&s->sata), true, "realized", &err);
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index 53076fa..2be0ff9 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -22,6 +22,7 @@
- #include "hw/intc/arm_gic.h"
- #include "hw/net/cadence_gem.h"
- #include "hw/char/cadence_uart.h"
-+#include "hw/net/xlnx-zynqmp-can.h"
- #include "hw/ide/ahci.h"
- #include "hw/sd/sdhci.h"
- #include "hw/ssi/xilinx_spips.h"
-@@ -41,6 +42,7 @@
- #define XLNX_ZYNQMP_NUM_RPU_CPUS 2
- #define XLNX_ZYNQMP_NUM_GEMS 4
- #define XLNX_ZYNQMP_NUM_UARTS 2
-+#define XLNX_ZYNQMP_NUM_CAN 2
- #define XLNX_ZYNQMP_NUM_SDHCI 2
- #define XLNX_ZYNQMP_NUM_SPIS 2
- #define XLNX_ZYNQMP_NUM_GDMA_CH 8
-@@ -92,6 +94,7 @@ typedef struct XlnxZynqMPState {
- 
-     CadenceGEMState gem[XLNX_ZYNQMP_NUM_GEMS];
-     CadenceUARTState uart[XLNX_ZYNQMP_NUM_UARTS];
-+    XlnxZynqMPCANState    can[XLNX_ZYNQMP_NUM_CAN];
-     SysbusAHCIState sata;
-     SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
-     XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
--- 
-2.7.4
+This patch aims to unset the unallocated parts in the copy bitmap when it
+is safe to do so, thereby avoid dealing with unallocated clusters in the
+backup loop to prevent significant performance or storage efficiency
+impacts when running full backup jobs.
 
+Any insights or corrections?
+
+diff --git a/block/backup.c b/block/backup.c
+index cf62b1a38c..609d551b1e 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -139,6 +139,29 @@ static void backup_clean(Job *job)
+     bdrv_backup_top_drop(s->backup_top);
+ }
+
++static bool backup_ok_to_skip_unallocated(BackupBlockJob *s)
++{
++    /* Checks whether this backup job can avoid copying or dealing with
++       unallocated clusters in the backup loop and their associated
++       performance and storage effciency impacts. Check for the condition
++       when it's safe to skip copying unallocated clusters that allows the
++       corresponding bits in the copy bitmap to be unset.  The assumption
++       here is that it is ok to do so when we are doing a full backup,
++       the target file is a qcow2, and the source is single layer.
++       Do we need to add additional checks (so that it does not break
++       something) or add addtional conditions to optimize additional use
++       cases?
++     */
++
++    if (s->sync_mode == MIRROR_SYNC_MODE_FULL &&
++       s->bcs->target->bs->drv != NULL &&
++       strncmp(s->bcs->target->bs->drv->format_name, "qcow2", 5) == 0 &&
++       s->bcs->source->bs->backing_file[0] == '\0')
++       return true;
++    else
++        return false;
++}
++
+ void backup_do_checkpoint(BlockJob *job, Error **errp)
+ {
+     BackupBlockJob *backup_job = container_of(job, BackupBlockJob, common);
+@@ -248,7 +271,7 @@ static int coroutine_fn backup_run(Job *job, Error
+**errp)
+
+     backup_init_copy_bitmap(s);
+
+-    if (s->sync_mode == MIRROR_SYNC_MODE_TOP) {
++    if (s->sync_mode == MIRROR_SYNC_MODE_TOP ||
+backup_ok_to_skip_unallocated(s)) {
+         int64_t offset = 0;
+         int64_t count;
+
+--00000000000045486605a380c9eb
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>When doing a full backup from a single layer qcow2 di=
+sk file to a new qcow2 file, the backup_run function does not unset unalloc=
+ated parts in the copy bit map.=C2=A0 The subsequent backup_loop call goes =
+through these unallocated clusters unnecessarily.=C2=A0 In the case when th=
+e target and source reside in different file systems, an EXDEV error would =
+cause zeroes to be actually copied into the target and that causes a target=
+ file size explosion to the full virtual disk size.</div><div><br></div><di=
+v>This patch aims to unset the unallocated parts in the copy bitmap when it=
+ is safe to do so, thereby avoid dealing with unallocated clusters in the b=
+ackup loop to prevent significant performance or storage efficiency impacts=
+ when running full backup jobs.</div><div><br></div><div>Any insights or co=
+rrections?</div><div><br></div>diff --git a/block/backup.c b/block/backup.c=
+<br>index cf62b1a38c..609d551b1e 100644<br>--- a/block/backup.c<br>+++ b/bl=
+ock/backup.c<br>@@ -139,6 +139,29 @@ static void backup_clean(Job *job)<br>=
+=C2=A0 =C2=A0 =C2=A0bdrv_backup_top_drop(s-&gt;backup_top);<br>=C2=A0}<br>=
+=C2=A0<br>+static bool backup_ok_to_skip_unallocated(BackupBlockJob *s)<br>=
++{<br>+ =C2=A0 =C2=A0/* Checks whether this backup job can avoid copying or=
+ dealing with<br>+ =C2=A0 =C2=A0 =C2=A0 unallocated clusters in the backup =
+loop and their associated <br>+ =C2=A0 =C2=A0 =C2=A0 performance and storag=
+e effciency impacts. Check for the condition<br>+ =C2=A0 =C2=A0 =C2=A0 when=
+ it&#39;s safe to skip copying unallocated clusters that allows the<br>+ =
+=C2=A0 =C2=A0 =C2=A0 corresponding bits in the copy bitmap to be unset.=C2=
+=A0 The assumption<br>+ =C2=A0 =C2=A0 =C2=A0 here is that it is ok to do so=
+ when we are doing a full backup,<br>+ =C2=A0 =C2=A0 =C2=A0 the target file=
+ is a qcow2, and the source is single layer.<br>+ =C2=A0 =C2=A0 =C2=A0 Do w=
+e need to add additional checks (so that it does not break<br>+ =C2=A0 =C2=
+=A0 =C2=A0 something) or add addtional conditions to optimize additional us=
+e<br>+ =C2=A0 =C2=A0 =C2=A0 cases?<br>+ =C2=A0 =C2=A0 */<br>+<br>+ =C2=A0 =
+=C2=A0if (s-&gt;sync_mode =3D=3D MIRROR_SYNC_MODE_FULL &amp;&amp;<br>+ =C2=
+=A0 =C2=A0 =C2=A0 s-&gt;bcs-&gt;target-&gt;bs-&gt;drv !=3D NULL &amp;&amp;<=
+br>+ =C2=A0 =C2=A0 =C2=A0 strncmp(s-&gt;bcs-&gt;target-&gt;bs-&gt;drv-&gt;f=
+ormat_name, &quot;qcow2&quot;, 5) =3D=3D 0 &amp;&amp;<br>+ =C2=A0 =C2=A0 =
+=C2=A0 s-&gt;bcs-&gt;source-&gt;bs-&gt;backing_file[0] =3D=3D &#39;\0&#39;)=
+<br>+ =C2=A0 =C2=A0 =C2=A0 return true;<br>+ =C2=A0 =C2=A0else<br>+ =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0return false;<br>+}<br>+<br>=C2=A0void backup_do_checkp=
+oint(BlockJob *job, Error **errp)<br>=C2=A0{<br>=C2=A0 =C2=A0 =C2=A0BackupB=
+lockJob *backup_job =3D container_of(job, BackupBlockJob, common);<br>@@ -2=
+48,7 +271,7 @@ static int coroutine_fn backup_run(Job *job, Error **errp)<b=
+r>=C2=A0<br>=C2=A0 =C2=A0 =C2=A0backup_init_copy_bitmap(s);<br>=C2=A0<br>- =
+=C2=A0 =C2=A0if (s-&gt;sync_mode =3D=3D MIRROR_SYNC_MODE_TOP) {<br>+ =C2=A0=
+ =C2=A0if (s-&gt;sync_mode =3D=3D MIRROR_SYNC_MODE_TOP || backup_ok_to_skip=
+_unallocated(s)) {<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int64_t offset =3D =
+0;<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int64_t count;<br>=C2=A0<br></div>
+
+--00000000000045486605a380c9eb--
 
