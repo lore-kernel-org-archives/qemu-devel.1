@@ -2,84 +2,97 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10861C2D0EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 20:25:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA377C2D0EF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 20:38:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD8C620724
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 20:25:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yr1LD2hF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD8C620724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7A91F20656
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 20:38:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A91F20656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPXYg-0000V5-W7
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 16:25:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32935)
+	id 1jPXl2-0004wK-Lf
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 16:38:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42707)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jPXXu-00080J-6Q
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 16:25:07 -0400
+ (envelope-from <jrossi@linux.ibm.com>) id 1jPVqp-0007gZ-SL
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:36:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jPXXr-000686-V8
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 16:25:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41747
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jPXXr-00065u-P7
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 16:25:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587155100;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IlGVH0jDcgY8G+8A/9c7Gq29RK8hHh1VoHllYeH3Q1o=;
- b=Yr1LD2hF0oouBAXaetPCDKiJ7Ni7/UEg+Wt4sg2+McARssYl6OX9p3Ez7dDEhkg2TkItrU
- G4u+oz2YsBS5MlOegaHrEKSBVkwx0JodV1DSDkZUcSEyNihRShniI29yx9fzUIOl9uKGJU
- oSeD6UvGi/ojxAtywuzWVahQv6ncxyc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-O2wvpwLnPrey_XOQKuSuWg-1; Fri, 17 Apr 2020 16:24:54 -0400
-X-MC-Unique: O2wvpwLnPrey_XOQKuSuWg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 424A413F6;
- Fri, 17 Apr 2020 20:24:53 +0000 (UTC)
-Received: from [10.3.115.59] (ovpn-115-59.phx2.redhat.com [10.3.115.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9157060BE0;
- Fri, 17 Apr 2020 20:24:52 +0000 (UTC)
-Subject: Re: Avoid copying unallocated clusters during full backup
-To: John Snow <jsnow@redhat.com>, Leo Luan <leoluan@gmail.com>,
- qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>
-References: <CAD_3s9Jnd9BzkZAe6SEKz7unuxJHY502pNdUgxrC3MOQAFj9Hw@mail.gmail.com>
- <ba8ff0c2-2e56-c8d7-a13a-4af48372f172@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <7c722a98-29ab-ba65-2f19-088628ce8f00@redhat.com>
-Date: Fri, 17 Apr 2020 15:24:51 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <jrossi@linux.ibm.com>) id 1jPVqo-0001fg-MB
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:36:31 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63044)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jrossi@linux.ibm.com>)
+ id 1jPVqo-0001em-G7; Fri, 17 Apr 2020 14:36:30 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 03HIXDUQ070590; Fri, 17 Apr 2020 14:36:30 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 30fgc0adbj-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 17 Apr 2020 14:36:29 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03HIXOFA071143;
+ Fri, 17 Apr 2020 14:36:29 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 30fgc0adb7-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 17 Apr 2020 14:36:29 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03HITjYw003256;
+ Fri, 17 Apr 2020 18:36:27 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com
+ (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+ by ppma01dal.us.ibm.com with ESMTP id 30b5h7sc5t-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 17 Apr 2020 18:36:27 +0000
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 03HIaQKW52560230
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 17 Apr 2020 18:36:26 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6285EC605A;
+ Fri, 17 Apr 2020 18:36:26 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A4AA9C6057;
+ Fri, 17 Apr 2020 18:36:25 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.85.151.210])
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Fri, 17 Apr 2020 18:36:25 +0000 (GMT)
+From: Jared Rossi <jrossi@linux.ibm.com>
+To: Eric Farman <farman@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH 1/1] vfio-ccw: Enable transparent CCW IPL from DASD
+Date: Fri, 17 Apr 2020 14:38:38 -0400
+Message-Id: <20200417183838.11796-2-jrossi@linux.ibm.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200417183838.11796-1-jrossi@linux.ibm.com>
+References: <20200417183838.11796-1-jrossi@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <ba8ff0c2-2e56-c8d7-a13a-4af48372f172@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-17_08:2020-04-17,
+ 2020-04-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 clxscore=1015
+ lowpriorityscore=0 priorityscore=1501 phishscore=0 impostorscore=0
+ mlxlogscore=999 bulkscore=0 suspectscore=0 adultscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004170142
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+X-Mailman-Approved-At: Fri, 17 Apr 2020 16:37:31 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,67 +104,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/17/20 3:11 PM, John Snow wrote:
+Remove the explicit prefetch check when using vfio-ccw devices.
+This check is not needed as all Linux channel programs are intended
+to use prefetch and will be executed in the same way regardless.
 
->> +
->> + =C2=A0 =C2=A0if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_FULL &&
->> + =C2=A0 =C2=A0 =C2=A0 s->bcs->target->bs->drv !=3D NULL &&
->> + =C2=A0 =C2=A0 =C2=A0 strncmp(s->bcs->target->bs->drv->format_name, "qc=
-ow2", 5) =3D=3D 0 &&
->> + =C2=A0 =C2=A0 =C2=A0 s->bcs->source->bs->backing_file[0] =3D=3D '\0')
->=20
-> This isn't going to suffice upstream; the backup job can't be performing
-> format introspection to determine behavior on the fly.
+Signed-off-by: Jared Rossi <jrossi@linux.ibm.com>
+---
+ hw/vfio/ccw.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
-Agreed.  The idea is right (we NEED to make backup operations smarter=20
-based on knowledge about both source and destination block status), but=20
-the implementation is not (a check for strcncmp("qcow2") is not ideal).
-
->=20
-> I think what you're really after is something like
-> bdrv_unallocated_blocks_are_zero().
-
-The fact that qemu-img already has a lot of optimizations makes me=20
-wonder what we can salvage from there into reusable code that both=20
-qemu-img and block backup can share, so that we're not reimplementing=20
-block status handling in multiple places.
-
-> So the basic premise is that if you are copying a qcow2 file and the
-> unallocated portions as defined by the qcow2 metadata are zero, it's
-> safe to skip those, so you can treat it like SYNC_MODE_TOP.
->=20
-> I think you *also* have to know if the *source* needs those regions
-> explicitly zeroed, and it's not always safe to just skip them at the
-> manifest level.
->=20
-> I thought there was code that handled this to some extent already, but I
-> don't know. I think Vladimir has worked on it recently and can probably
-> let you know where I am mistaken :)
-
-Yes, I'm hoping Vladimir (or his other buddies at Virtuozzo) can chime=20
-in.  Meanwhile, I've working on v2 of some patches that will improve=20
-qemu's ability to tell if a destination qcow2 file already reads as all=20
-zeroes, and we already have bdrv_block_status() for telling which=20
-portions of a source image already read as all zeroes (whether or not it=20
-is due to not being allocated, the goal here is that we should NOT have=20
-to copy anything that reads as zero on the source over to the=20
-destination if the destination already starts life as reading all zero).
-
-And if nothing else, qemu 5.0 just added 'qemu-img convert=20
---target-is-zero' as a last-ditch means of telling qemu to assume the=20
-destination reads as all zeroes, even if it cannot quickly prove it; we=20
-probably want to add a similar knob into the QMP commands for initiating=20
-block backup, for the same reasons.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index 50cc2ec75c..e649377b68 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -74,16 +74,9 @@ static IOInstEnding vfio_ccw_handle_request(SubchDev *sch)
+     struct ccw_io_region *region = vcdev->io_region;
+     int ret;
+ 
+-    if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH)) {
+-        if (!(vcdev->force_orb_pfch)) {
+-            warn_once_pfch(vcdev, sch, "requires PFCH flag set");
+-            sch_gen_unit_exception(sch);
+-            css_inject_io_interrupt(sch);
+-            return IOINST_CC_EXPECTED;
+-        } else {
+-            sch->orb.ctrl0 |= ORB_CTRL0_MASK_PFCH;
+-            warn_once_pfch(vcdev, sch, "PFCH flag forced");
+-        }
++    if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH) && vcdev->force_orb_pfch) {
++        sch->orb.ctrl0 |= ORB_CTRL0_MASK_PFCH;
++        warn_once_pfch(vcdev, sch, "PFCH flag forced");
+     }
+ 
+     QEMU_BUILD_BUG_ON(sizeof(region->orb_area) != sizeof(ORB));
+-- 
+2.21.1
 
 
