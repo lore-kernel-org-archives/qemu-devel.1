@@ -2,86 +2,84 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EABFC2D0EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 18:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE436C2D0EF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 18:49:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17BDC20780
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 18:37:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7CF9420936
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 18:49:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="cJKLlzqo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17BDC20780
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="FmAcCsfs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CF9420936
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPVru-0008JB-8O
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 14:37:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42209)
+	id 1jPW3p-0005GS-Ko
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 14:49:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57059)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <osandov@osandov.com>) id 1jPVqT-0007T2-J5
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:36:11 -0400
+ (envelope-from <osandov@osandov.com>) id 1jPW2y-0003yi-0G
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:49:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <osandov@osandov.com>) id 1jPVqR-000151-42
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:36:09 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:45752)
+ (envelope-from <osandov@osandov.com>) id 1jPW2w-0001SR-MM
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:49:03 -0400
+Received: from mail-pl1-x632.google.com ([2607:f8b0:4864:20::632]:39360)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <osandov@osandov.com>) id 1jPVqQ-00012d-Ob
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:36:07 -0400
-Received: by mail-pf1-x442.google.com with SMTP id w65so1437249pfc.12
- for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 11:36:06 -0700 (PDT)
+ (Exim 4.71) (envelope-from <osandov@osandov.com>) id 1jPW2w-0001Qo-Fm
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:49:02 -0400
+Received: by mail-pl1-x632.google.com with SMTP id k18so1284276pll.6
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 11:49:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=osandov-com.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=Hzvj7OOYXOhPIvsUeCGihYX8zmn28YGY+um7T06891I=;
- b=cJKLlzqoZvjBuZD4xd6rQkvcPOk4WPVU+Wrlkp2xet4/vp5Hu/OGYfwO/vbPT6wieB
- rnUrV/1iOohIhFYKHdE6vALCkT4UjhSmZObmbYoEZ/Chsup+ohKHaEIV974tSC7BfBJD
- swSKrYpCq5B9Ffu3obdQCYPphyiomcYjhHimZuh9EZW5WPmkIlF+vthMHADbTksppaKX
- T/6rhyTqfCs/BkgMJrS2GM8LohC8NKvhZqGtlLVu+RK95PpMGASR4MkNky0ej4yJxVEw
- xCLRBzyRLTA5biJE9JclZtonUZQsSEIVnfgmZkyf/KseBc+u2XWlRGdqwYTXVWO9duYx
- cALQ==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=DlNMpF2CMpqeTP2iekn92c+9jpUi7a1OMI+kSZWpYVM=;
+ b=FmAcCsfssTVy/6B6h9bQmP0/X7fKXkMGL5s0b6QNRYEgIKnM2mnXviQLPjPzMzxZkv
+ RRGgQgut/zZuad59e1HhxrlV+8CEEqc4lD4G0r9taOUCjY+Ho5vFlLYXbVL8N/YMoLmf
+ ZCD1iCGNywiL54lNG7yB2f9Nh/2k69uhKPTe2bQTjW25VNMnHCVE/X1TuJAqstZAaf8m
+ fNl0b18fVppfOsYDC+B1tDr+iFgJCpE/6x5YAO2a3MqNGJEiCoM7AXL2jucFxVojXya/
+ MQ3dHhwnOi5tB01ZpOzRpY7gJU1AfSPPm1ccDYxyUMnjtsMRfzmoJBdATxtYrGvYe9bb
+ rOSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Hzvj7OOYXOhPIvsUeCGihYX8zmn28YGY+um7T06891I=;
- b=TDLd1DsyhXnTSF0XGGIFN1PPoLjuV/wVefbpJ0Y7sIx+ggsWMyyHj/msaYlaayYs27
- Hw9gEYFShOYQSNSmNkb71OqHSYI3nUZW52sP5RGMpuaIJWCm5bbeyiHS4xOzIbn4fbD5
- W3AfmUOTdMuX+24IQvy+lGi44uubA8ro/mAaAsYQuEEKLILTTQ1QcwWoUuQrOmg5GSGH
- 6sOqblo+4rjMsf7U/byNU6OeNTDbciys/uxddnNp+nAymFZHP4Bd1scd3r9fKEGWJSnl
- T7k23B/ILU0K31yjtGh1rliqGrNU7Y1T8hzbgFO/kgrwA44IAPruPzeNocl4ZHrApAGN
- 2R9w==
-X-Gm-Message-State: AGi0PuYZnJcBy+jQ46iH9mNO73nrRy80xA7bvZmQD3LJHqoNY5nur0C9
- b/tHon4bXNrosQrB/f2hvyygdFTE1Hk=
-X-Google-Smtp-Source: APiQypK+wdAUuWnlNh+Ay2bjSvRtEuNozJOb7Qq8kv9CznNZUIk7Ak0EHWbKjAR+apQv8yp/KEAPKg==
-X-Received: by 2002:a63:1506:: with SMTP id v6mr4513712pgl.365.1587148565193; 
- Fri, 17 Apr 2020 11:36:05 -0700 (PDT)
-Received: from vader ([2620:10d:c090:400::5:82d8])
- by smtp.gmail.com with ESMTPSA id a18sm6236745pjh.25.2020.04.17.11.36.03
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=DlNMpF2CMpqeTP2iekn92c+9jpUi7a1OMI+kSZWpYVM=;
+ b=mgckI/bpJ3CElQwLrHF0wZkcvgf/feLL4FczFnCPqF514+WKiXixZRStWIdSdtJdDi
+ okuK3TsNbFnEAE7LWX28fgzmMj01/hdaKQR4j9DJmts/IAUXNvWas6vThidKSy+hbHZP
+ ULU5MpFtRUTjNspkcywgKkfJLL323epvY36rFtU7j/2xAbLBz11aDgCkhLGZb9vO2vX7
+ LQP7GAWuueNZRgEpgHowzgPQkaAKAhnfKFiRqhPI8szNZIPf7/TobJv+Fc/h2Hr/yHS6
+ 3vgcSXymOfPtYR6//yC4TtQoynVJhuWpiNXX3Q2BJ4PBhmMWLSimBSzL38te1Anc2Ckx
+ pamw==
+X-Gm-Message-State: AGi0PuZPk2bcb8HIE0OyaiTreJk82jvIaLelD0O+f0MXvf9Rd3VGvPub
+ yaY3X55UuXnwvfVBwIm6+mflqXVfjJ8=
+X-Google-Smtp-Source: APiQypIv8WETmEXuCrNbbIhSYBFdIlhv5m8cMUJppkzqxZh5T1rR3mCm/iVn1tOlXXwuJW46BsQFrA==
+X-Received: by 2002:a17:902:8b82:: with SMTP id
+ ay2mr4961733plb.285.1587149340917; 
+ Fri, 17 Apr 2020 11:49:00 -0700 (PDT)
+Received: from vader.tfbnw.net ([2620:10d:c090:400::5:82d8])
+ by smtp.gmail.com with ESMTPSA id ml24sm5908747pjb.48.2020.04.17.11.48.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Apr 2020 11:36:04 -0700 (PDT)
-Date: Fri, 17 Apr 2020 11:36:01 -0700
+ Fri, 17 Apr 2020 11:48:57 -0700 (PDT)
 From: Omar Sandoval <osandov@osandov.com>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH] 9pfs: local: ignore O_NOATIME if we don't have permissions
-Message-ID: <20200417183601.GA719237@vader>
-References: <1e65cffe9778857735e7ae6066d6f0df0b0e2db3.1586997767.git.osandov@fb.com>
- <2496702.lrWaslOkEp@silver> <20200416184711.GB696015@vader>
- <1939315.5ePf2Jtb4B@silver>
+To: Greg Kurz <groug@kaod.org>, Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: [PATCH v2] 9pfs: local: ignore O_NOATIME if we don't have permissions
+Date: Fri, 17 Apr 2020 11:48:24 -0700
+Message-Id: <e9bee604e8df528584693a4ec474ded6295ce8ad.1587149256.git.osandov@fb.com>
+X-Mailer: git-send-email 2.26.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1939315.5ePf2Jtb4B@silver>
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
+X-Received-From: 2607:f8b0:4864:20::632
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,77 +91,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Apr 17, 2020 at 12:45:36PM +0200, Christian Schoenebeck wrote:
-> On Donnerstag, 16. April 2020 20:47:11 CEST Omar Sandoval wrote:
-> > > > Luckily, O_NOATIME is effectively a hint, and is often ignored by, e.g.,
-> > > > network filesystems. open(2) notes that O_NOATIME "may not be effective
-> > > > on all filesystems. One example is NFS, where the server maintains the
-> > > > access time." This means that we can honor it when possible but fall
-> > > > back to ignoring it.
-> > > 
-> > > I am not sure whether NFS would simply silently ignore O_NOATIME i.e.
-> > > without returning EPERM. I don't read it that way.
-> > 
-> > As far as I can tell, the NFS protocol has nothing equivalent to
-> > O_NOATIME and thus can't honor it. Feel free to test it:
-> 
-> I did not doubt that NFS does not support O_NOATIME, what I said was that I 
-> thought using O_NOATIME on NFS would return EPERM, but ...
-> 
-> >   # mount -t nfs -o vers=4,rw 10.0.2.2:/ /mnt
-> >   # echo foo > /mnt/foo
-> >   # touch -d "1 hour ago" /mnt/foo
-> >   # stat /mnt/foo | grep 'Access: [0-9]'
-> >   Access: 2020-04-16 10:43:36.838952593 -0700
-> >   # # Drop caches so we have to go to the NFS server.
-> >   # echo 3 > /proc/sys/vm/drop_caches
-> >   # strace -e openat dd if=/mnt/foo of=/dev/null iflag=noatime |& grep
-> > /mnt/foo openat(AT_FDCWD, "/mnt/foo", O_RDONLY|O_NOATIME) = 3
-> >   # stat /mnt/foo | grep 'Access: [0-9]'
-> >   Access: 2020-04-16 11:43:36.906462928 -0700
-> 
-> ... I tried this as well, and you are right, O_NOATIME is indeed simply 
-> *silently* dropped/ignored by NFS (i.e. without raising any error).
-> 
-> > > It would certainly fix the problem in your use case. But it would also
-> > > unmask O_NOATIME for all other ones (i.e. regular users on guest).
-> > 
-> > The guest kernel will still check whether processes on the guest have
-> > permission to use O_NOATIME. This only changes the behavior when the
-> > guest kernel believes that the process has permission even though the
-> > host QEMU process doesn't.
-> 
-> Good point!
-> 
-> > > I mean I understand your point, but I also have to take other use cases
-> > > into account which might expect to receive EPERM if O_NOATIME cannot be
-> > > granted.
-> > If you'd still like to preserve this behavior, would it be acceptable to
-> > make this a QEMU option? Maybe something like "-virtfs
-> > honor_noatime=no": the default would be "yes", which is the current
-> > behavior, and "no" would always mask out NOATIME.
-> 
-> That was my initial tendency yesterday, but your arguments now convinced me 
-> that the implied re-run, in the way your provided patch already does, is in 
-> this particular case the better choice.
-> 
-> Making that a configurable option would render this issue unnecessarily 
-> complicated and probably even contra productive for other users which might 
-> stumble over the same issue.
-> 
-> Just do me a favour: you already thoroughly explained the issue in the commit 
-> log, that's good, but please also add a short comment in code why the rerun is 
-> required, because it is not obvious by just reading the code. Finding that 
-> info from git log becomes tedious as soon as code is refactored there.
-> 
-> Aside of the missing comment in code:
-> 
-> Acked-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+From: Omar Sandoval <osandov@fb.com>
 
-Thank you! I'll add the comment and resend.
+QEMU's local 9pfs server passes through O_NOATIME from the client. If
+the QEMU process doesn't have permissions to use O_NOATIME (namely, it
+does not own the file nor have the CAP_FOWNER capability), the open will
+fail. This causes issues when from the client's point of view, it
+believes it has permissions to use O_NOATIME (e.g., a process running as
+root in the virtual machine). Additionally, overlayfs on Linux opens
+files on the lower layer using O_NOATIME, so in this case a 9pfs mount
+can't be used as a lower layer for overlayfs (cf.
+https://github.com/osandov/drgn/blob/dabfe1971951701da13863dbe6d8a1d172ad9650/vmtest/onoatimehack.c
+and https://github.com/NixOS/nixpkgs/issues/54509).
+
+Luckily, O_NOATIME is effectively a hint, and is often ignored by, e.g.,
+network filesystems. open(2) notes that O_NOATIME "may not be effective
+on all filesystems. One example is NFS, where the server maintains the
+access time." This means that we can honor it when possible but fall
+back to ignoring it.
+
+Acked-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+---
+Changes from v1:
+
+* Add comment
+* Add Christian's acked-by
+
+ hw/9pfs/9p-util.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+index 79ed6b233e..546f46dc7d 100644
+--- a/hw/9pfs/9p-util.h
++++ b/hw/9pfs/9p-util.h
+@@ -37,9 +37,22 @@ static inline int openat_file(int dirfd, const char *name, int flags,
+ {
+     int fd, serrno, ret;
+ 
++again:
+     fd = openat(dirfd, name, flags | O_NOFOLLOW | O_NOCTTY | O_NONBLOCK,
+                 mode);
+     if (fd == -1) {
++        if (errno == EPERM && (flags & O_NOATIME)) {
++            /*
++             * The client passed O_NOATIME but we lack permissions to honor it.
++             * Rather than failing the open, fall back without O_NOATIME. This
++             * doesn't break the semantics on the client side, as the Linux
++             * open(2) man page notes that O_NOATIME "may not be effective on
++             * all filesystems". In particular, NFS and other network
++             * filesystems ignore it entirely.
++             */
++            flags &= ~O_NOATIME;
++            goto again;
++        }
+         return -1;
+     }
+ 
+-- 
+2.26.1
+
 
