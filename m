@@ -2,83 +2,74 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5195BC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 22:04:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A1DC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 22:05:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4D9B20B1F
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 22:04:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fjJq5BN/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4D9B20B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4169E20B1F
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 22:05:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4169E20B1F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPZ6H-0007YA-4T
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 18:04:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58045)
+	id 1jPZ6u-000834-Ep
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 18:05:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54171)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jPZ5A-0006ct-9h
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 18:03:33 -0400
+ (envelope-from <bounces@canonical.com>) id 1jPZ2y-00058j-46
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 18:01:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jPZ58-00044U-M5
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 18:03:32 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:33052)
+ (envelope-from <bounces@canonical.com>) id 1jPZ2n-00088T-8p
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 18:01:14 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48976)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jPZ58-00042K-Ef; Fri, 17 Apr 2020 18:03:30 -0400
-Received: by mail-io1-xd41.google.com with SMTP id o127so4087403iof.0;
- Fri, 17 Apr 2020 15:03:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=a4/x6xRsw9K/HUBExZFp0MUgzjYOQRYa2n5oNgj9u4Y=;
- b=fjJq5BN/yPTqp1tyCuM1CpyIiIEHd8CY5oiTIiTn+jTWvWK+swJMhAtDKTHx7PnBvw
- K0IfnVQ/VrKg3OsCnaBRgcLX+WFGKjgHEw9a7l9AsUYaKi52Mjk6b//uLBk3dVXlfQMm
- CvSbp7bsLbEuzdq1SoJIVIuj83xmYhJnnTlnX10phlFwlydVEztN0HRXkoZjevGIbpbW
- i9EutqZEZhm4on8GPP0cm5yOK8cOwM6Z3S6t3an6IjVDUQC+uHr/xfcXUzcs9jnWCh4G
- VZn2W49hmap/ZK8d0wR095b+aykiZ3zU4hl1bRuyPKyZ6uq10uyQK0ywDOCLVsj357nP
- aFiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=a4/x6xRsw9K/HUBExZFp0MUgzjYOQRYa2n5oNgj9u4Y=;
- b=jtuZOKDjEYS0x0nklWZyF4myu/5qb6j6VoqVGp4pgiR5fEXSf+vm2DSghnmWhPLdi1
- 8L2HLECR8cUvfEJN/N17LlN5ozgbBm+LUuCHug9aE/aeW+O4Q12AB9ABoXZ9q0O9nQEk
- K9lUcW8DvkEk7/0scnoInUUqZzPEGCeEFfvwpaSvobqIgozAj+RkSjK10Zs/j2nuv6RS
- R4S/H7gqXmssAyDQAjCGYM4u1nf/jo5aDhN3mE+wGc0Uv5xvmdMSXGNjp3SgDpnljvwt
- GOwuhaRB2/cXJDJliqZZ7BVd2WSNmODb6YRlDfSFwBr7l2cLci4bgS7QZgAjIfe4R3EP
- mu8g==
-X-Gm-Message-State: AGi0PuYeHtY0MLGFoDz3bjIj8NpGgzDf5O5u5rGCeI5dJMFEA8tdyaHb
- I0wDnMnmm+57r5lp7FNJnaYTU5pTIU7yGzksNqM=
-X-Google-Smtp-Source: APiQypJzZRiNCiDKibRhfqUID24vrZC2ximHh2ZTtQCHffleVG5Sk3dzjEmqR/ObYtk5JegJptuW+jFJ17/xxsbqo+I=
-X-Received: by 2002:a5e:880b:: with SMTP id l11mr5356854ioj.42.1587161009437; 
- Fri, 17 Apr 2020 15:03:29 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jPZ2m-000837-KI
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 18:01:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jPZ2j-0003JS-Vt
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 22:01:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id EE0322E8041
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 22:01:01 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
- <20200330153633.15298-29-zhiwei_liu@c-sky.com>
-In-Reply-To: <20200330153633.15298-29-zhiwei_liu@c-sky.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 17 Apr 2020 14:55:06 -0700
-Message-ID: <CAKmqyKM0qvcPNtkaNDph6RqUVuzSBteMt7LjcBHMBE0wcocgJQ@mail.gmail.com>
-Subject: Re: [PATCH v7 28/61] target/riscv: vector single-width scaling shift
- instructions
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d41
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Apr 2020 21:55:13 -0000
+From: Babu Moger <1871842@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: babumoger e-philipp ehabkost imammedo
+X-Launchpad-Bug-Reporter: Philipp Eppelt (e-philipp)
+X-Launchpad-Bug-Modifier: Babu Moger (babumoger)
+References: <158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com>
+Message-Id: <20200417215345.64800.73351.stgit@localhost.localdomain>
+Subject: [Bug 1871842] [v2 PATCH] target/i386: Fix the CPUID leaf
+ CPUID_Fn80000008
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 60d73f9732cbb17e35f893eda0d589fa31fd19be
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,215 +78,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
- wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
+Reply-To: Bug 1871842 <1871842@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200417215513.l3CGlfkHza0ej3r24DZVZ-cyHoAWeVzaoiMWh2tXUdw@z>
 
-On Mon, Mar 30, 2020 at 9:33 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
->
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+CPUID leaf CPUID_Fn80000008_ECX provides information about the
+number of threads supported by the processor. It was found that
+the field ApicIdSize(bits 15-12) was not set correctly.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+ApicIdSize is defined as the number of bits required to represent
+all the ApicId values within a package.
 
-Alistair
+Valid Values: Value Description
+3h-0h		Reserved.
+4h		up to 16 threads.
+5h		up to 32 threads.
+6h		up to 64 threads.
+7h		up to 128 threads.
+Fh-8h		Reserved.
 
-> ---
->  target/riscv/helper.h                   |  17 ++++
->  target/riscv/insn32.decode              |   6 ++
->  target/riscv/insn_trans/trans_rvv.inc.c |   8 ++
->  target/riscv/vector_helper.c            | 117 ++++++++++++++++++++++++
->  4 files changed, 148 insertions(+)
->
-> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-> index eb383787a2..f36f840714 100644
-> --- a/target/riscv/helper.h
-> +++ b/target/riscv/helper.h
-> @@ -767,3 +767,20 @@ DEF_HELPER_6(vwsmaccsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
->  DEF_HELPER_6(vwsmaccus_vx_b, void, ptr, ptr, tl, ptr, env, i32)
->  DEF_HELPER_6(vwsmaccus_vx_h, void, ptr, ptr, tl, ptr, env, i32)
->  DEF_HELPER_6(vwsmaccus_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-> +
-> +DEF_HELPER_6(vssrl_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vssrl_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vssrl_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vssrl_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vssra_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vssra_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vssra_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vssra_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vssrl_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vssrl_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vssrl_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vssrl_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vssra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vssra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vssra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vssra_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-> index 2e0e66bdfa..2ecac3d96d 100644
-> --- a/target/riscv/insn32.decode
-> +++ b/target/riscv/insn32.decode
-> @@ -431,6 +431,12 @@ vwsmacc_vx      111101 . ..... ..... 100 ..... 1010111 @r_vm
->  vwsmaccsu_vv    111110 . ..... ..... 000 ..... 1010111 @r_vm
->  vwsmaccsu_vx    111110 . ..... ..... 100 ..... 1010111 @r_vm
->  vwsmaccus_vx    111111 . ..... ..... 100 ..... 1010111 @r_vm
-> +vssrl_vv        101010 . ..... ..... 000 ..... 1010111 @r_vm
-> +vssrl_vx        101010 . ..... ..... 100 ..... 1010111 @r_vm
-> +vssrl_vi        101010 . ..... ..... 011 ..... 1010111 @r_vm
-> +vssra_vv        101011 . ..... ..... 000 ..... 1010111 @r_vm
-> +vssra_vx        101011 . ..... ..... 100 ..... 1010111 @r_vm
-> +vssra_vi        101011 . ..... ..... 011 ..... 1010111 @r_vm
->
->  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
->  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-> index c67faba23c..d5aaf18a07 100644
-> --- a/target/riscv/insn_trans/trans_rvv.inc.c
-> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-> @@ -1791,3 +1791,11 @@ GEN_OPIVX_WIDEN_TRANS(vwsmaccu_vx)
->  GEN_OPIVX_WIDEN_TRANS(vwsmacc_vx)
->  GEN_OPIVX_WIDEN_TRANS(vwsmaccsu_vx)
->  GEN_OPIVX_WIDEN_TRANS(vwsmaccus_vx)
-> +
-> +/* Vector Single-Width Scaling Shift Instructions */
-> +GEN_OPIVV_TRANS(vssrl_vv, opivv_check)
-> +GEN_OPIVV_TRANS(vssra_vv, opivv_check)
-> +GEN_OPIVX_TRANS(vssrl_vx,  opivx_check)
-> +GEN_OPIVX_TRANS(vssra_vx,  opivx_check)
-> +GEN_OPIVI_TRANS(vssrl_vi, 1, vssrl_vx, opivx_check)
-> +GEN_OPIVI_TRANS(vssra_vi, 0, vssra_vx, opivx_check)
-> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-> index b9c1cf5237..00ee42ea83 100644
-> --- a/target/riscv/vector_helper.c
-> +++ b/target/riscv/vector_helper.c
-> @@ -2908,3 +2908,120 @@ RVVCALL(OPIVX3_RM, vwsmaccus_vx_w, WOP_SUS_W, H8, H4, vwsmaccus32)
->  GEN_VEXT_VX_RM(vwsmaccus_vx_b, 1, 2, clearh)
->  GEN_VEXT_VX_RM(vwsmaccus_vx_h, 2, 4, clearl)
->  GEN_VEXT_VX_RM(vwsmaccus_vx_w, 4, 8, clearq)
-> +
-> +/* Vector Single-Width Scaling Shift Instructions */
-> +static inline uint8_t
-> +vssrl8(CPURISCVState *env, int vxrm, uint8_t a, uint8_t b)
-> +{
-> +    uint8_t round, shift = b & 0x7;
-> +    uint8_t res;
-> +
-> +    round = get_round(vxrm, a, shift);
-> +    res   = (a >> shift)  + round;
-> +    return res;
-> +}
-> +static inline uint16_t
-> +vssrl16(CPURISCVState *env, int vxrm, uint16_t a, uint16_t b)
-> +{
-> +    uint8_t round, shift = b & 0xf;
-> +    uint16_t res;
-> +
-> +    round = get_round(vxrm, a, shift);
-> +    res   = (a >> shift)  + round;
-> +    return res;
-> +}
-> +static inline uint32_t
-> +vssrl32(CPURISCVState *env, int vxrm, uint32_t a, uint32_t b)
-> +{
-> +    uint8_t round, shift = b & 0x1f;
-> +    uint32_t res;
-> +
-> +    round = get_round(vxrm, a, shift);
-> +    res   = (a >> shift)  + round;
-> +    return res;
-> +}
-> +static inline uint64_t
-> +vssrl64(CPURISCVState *env, int vxrm, uint64_t a, uint64_t b)
-> +{
-> +    uint8_t round, shift = b & 0x3f;
-> +    uint64_t res;
-> +
-> +    round = get_round(vxrm, a, shift);
-> +    res   = (a >> shift)  + round;
-> +    return res;
-> +}
-> +RVVCALL(OPIVV2_RM, vssrl_vv_b, OP_UUU_B, H1, H1, H1, vssrl8)
-> +RVVCALL(OPIVV2_RM, vssrl_vv_h, OP_UUU_H, H2, H2, H2, vssrl16)
-> +RVVCALL(OPIVV2_RM, vssrl_vv_w, OP_UUU_W, H4, H4, H4, vssrl32)
-> +RVVCALL(OPIVV2_RM, vssrl_vv_d, OP_UUU_D, H8, H8, H8, vssrl64)
-> +GEN_VEXT_VV_RM(vssrl_vv_b, 1, 1, clearb)
-> +GEN_VEXT_VV_RM(vssrl_vv_h, 2, 2, clearh)
-> +GEN_VEXT_VV_RM(vssrl_vv_w, 4, 4, clearl)
-> +GEN_VEXT_VV_RM(vssrl_vv_d, 8, 8, clearq)
-> +
-> +RVVCALL(OPIVX2_RM, vssrl_vx_b, OP_UUU_B, H1, H1, vssrl8)
-> +RVVCALL(OPIVX2_RM, vssrl_vx_h, OP_UUU_H, H2, H2, vssrl16)
-> +RVVCALL(OPIVX2_RM, vssrl_vx_w, OP_UUU_W, H4, H4, vssrl32)
-> +RVVCALL(OPIVX2_RM, vssrl_vx_d, OP_UUU_D, H8, H8, vssrl64)
-> +GEN_VEXT_VX_RM(vssrl_vx_b, 1, 1, clearb)
-> +GEN_VEXT_VX_RM(vssrl_vx_h, 2, 2, clearh)
-> +GEN_VEXT_VX_RM(vssrl_vx_w, 4, 4, clearl)
-> +GEN_VEXT_VX_RM(vssrl_vx_d, 8, 8, clearq)
-> +
-> +static inline int8_t
-> +vssra8(CPURISCVState *env, int vxrm, int8_t a, int8_t b)
-> +{
-> +    uint8_t round, shift = b & 0x7;
-> +    int8_t res;
-> +
-> +    round = get_round(vxrm, a, shift);
-> +    res   = (a >> shift)  + round;
-> +    return res;
-> +}
-> +static inline int16_t
-> +vssra16(CPURISCVState *env, int vxrm, int16_t a, int16_t b)
-> +{
-> +    uint8_t round, shift = b & 0xf;
-> +    int16_t res;
-> +
-> +    round = get_round(vxrm, a, shift);
-> +    res   = (a >> shift)  + round;
-> +    return res;
-> +}
-> +static inline int32_t
-> +vssra32(CPURISCVState *env, int vxrm, int32_t a, int32_t b)
-> +{
-> +    uint8_t round, shift = b & 0x1f;
-> +    int32_t res;
-> +
-> +    round = get_round(vxrm, a, shift);
-> +    res   = (a >> shift)  + round;
-> +    return res;
-> +}
-> +static inline int64_t
-> +vssra64(CPURISCVState *env, int vxrm, int64_t a, int64_t b)
-> +{
-> +    uint8_t round, shift = b & 0x3f;
-> +    int64_t res;
-> +
-> +    round = get_round(vxrm, a, shift);
-> +    res   = (a >> shift)  + round;
-> +    return res;
-> +}
-> +RVVCALL(OPIVV2_RM, vssra_vv_b, OP_SSS_B, H1, H1, H1, vssra8)
-> +RVVCALL(OPIVV2_RM, vssra_vv_h, OP_SSS_H, H2, H2, H2, vssra16)
-> +RVVCALL(OPIVV2_RM, vssra_vv_w, OP_SSS_W, H4, H4, H4, vssra32)
-> +RVVCALL(OPIVV2_RM, vssra_vv_d, OP_SSS_D, H8, H8, H8, vssra64)
-> +GEN_VEXT_VV_RM(vssra_vv_b, 1, 1, clearb)
-> +GEN_VEXT_VV_RM(vssra_vv_h, 2, 2, clearh)
-> +GEN_VEXT_VV_RM(vssra_vv_w, 4, 4, clearl)
-> +GEN_VEXT_VV_RM(vssra_vv_d, 8, 8, clearq)
-> +
-> +RVVCALL(OPIVX2_RM, vssra_vx_b, OP_SSS_B, H1, H1, vssra8)
-> +RVVCALL(OPIVX2_RM, vssra_vx_h, OP_SSS_H, H2, H2, vssra16)
-> +RVVCALL(OPIVX2_RM, vssra_vx_w, OP_SSS_W, H4, H4, vssra32)
-> +RVVCALL(OPIVX2_RM, vssra_vx_d, OP_SSS_D, H8, H8, vssra64)
-> +GEN_VEXT_VX_RM(vssra_vx_b, 1, 1, clearb)
-> +GEN_VEXT_VX_RM(vssra_vx_h, 2, 2, clearh)
-> +GEN_VEXT_VX_RM(vssra_vx_w, 4, 4, clearl)
-> +GEN_VEXT_VX_RM(vssra_vx_d, 8, 8, clearq)
-> --
-> 2.23.0
->
+Fix the bit appropriately.
+
+This came up during following thread.
+https://lore.kernel.org/qemu-devel/158643709116.17430.15995069125716778943.=
+malonedeb@wampee.canonical.com/#t
+
+Refer the Processor Programming Reference (PPR) for AMD Family 17h
+Model 01h, Revision B1 Processors. The documentation is available
+from the bugzilla Link below.
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D206537
+
+Reported-by: Philipp Eppelt <1871842@bugs.launchpad.net>
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+---
+v2: =
+
+  Used env->pkg_offset for bits 15:12 which is already available.
+
+ target/i386/cpu.c |   15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 90ffc5f..5e5a605 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5830,11 +5830,20 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index=
+, uint32_t count,
+             *eax =3D cpu->phys_bits;
+         }
+         *ebx =3D env->features[FEAT_8000_0008_EBX];
+-        *ecx =3D 0;
+-        *edx =3D 0;
+         if (cs->nr_cores * cs->nr_threads > 1) {
+-            *ecx |=3D (cs->nr_cores * cs->nr_threads) - 1;
++            /*
++             * Bits 15:12 is "The number of bits in the initial
++             * Core::X86::Apic::ApicId[ApicId] value that indicate
++             * thread ID within a package". This is already stored at
++             * CPUX86State::pkg_offset.
++             * Bits 7:0 is "The number of threads in the package is NC+1"
++             */
++            *ecx =3D (env->pkg_offset << 12) |
++                   ((cs->nr_cores * cs->nr_threads) - 1);
++        } else {
++            *ecx =3D 0;
+         }
++        *edx =3D 0;
+         break;
+     case 0x8000000A:
+         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1871842
+
+Title:
+  AMD CPUID leaf 0x8000'0008 reported number of cores  inconsistent with
+  ACPI.MADT
+
+Status in QEMU:
+  New
+
+Bug description:
+  Setup:
+  CPU: AMD EPYC-v2 or host's EPYC cpu
+  Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
+  qemu version: self build
+  git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
+  config: Configured with: '../configure' '--target-list=3Dx86_64-softmmu,m=
+ips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aar=
+ch64-softmmu,arm-softmmu' '--prefix=3D/opt/qemu-master'
+
+  Cmdline: =
+
+  qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/b=
+in/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , =
+... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu =
+EPYC-v2 -m 4G -smp 4 =
+
+
+  Issue:
+  We are developing an microkernel operating system called L4Re. We recentl=
+y got an AMD EPYC server for testing and we couldn't execute SMP tests of o=
+ur system when running Linux + qemu + VM w/ L4Re.
+  In fact, the kernel did not recognize any APs at all. On AMD CPUs the ker=
+nel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[N=
+C] or [ApicIdSize].  [0][1]
+
+  The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18=
+cf757 ECX: 0x703f EDX: 0x1000
+  The lower four bits of ECX are the [NC] field and all set.
+
+  When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as=
+ replacement and addition to the above cmdline) the CPUID leaf shows: EAX: =
+0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
+  Note, ECX is zero. Indicating that this is no SMP capabale CPU.
+
+  I'm debugging it using my local machine and the QEMU provided EPYC-v2
+  CPU model and it is reproducible there as well and reports:  EAX:
+  0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
+
+  I checked other AMD based CPU models (phenom, opteron_g3/g5) and they beh=
+ave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
+  I believe that behavior here is wrong as ECX[NC] should report the number=
+ of cores per processor, as stated in the AMD manual [2] p.584. In my under=
+standing -smp 4 should then lead to ECX[NC] =3D 0x3.
+
+  The following table shows my findings with the -smp option:
+  Option | Qemu guest observed ECX value
+  -smp 4 | 0x0
+  -smp 4,cores=3D4  | 0x3
+  -smp 4,cores=3D2,thread=3D2 | 0x3
+  -smp 4,cores=3D4,threads=3D2 | QEMU boot error: topology false.
+
+  Now, I'm asking myself how the terminology of the AMD manual maps to QEMU=
+'s -smp option.
+  Obviously, nr_cores and nr_threads correspond to the cores and threads op=
+tions on the cmdline and cores * threads <=3D 4 (in this example), but what=
+ corresponds the X in -smp X to?
+
+  Querying 0x8000'0008 on the physical processor results in different
+  reports than quering QEMU's model as does it with -enable-kvm -cpu
+  host.
+
+  Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
+  CPU leave reports a single core processor.
+
+  This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
+  wrong number.
+
+  =
+
+  Please let me know, if you need more information from my side.
+
+  =
+
+  [0] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
+28e2b879cbbd19/src/kern/ia32/kernel_thread-ia32.cpp#L109
+  [1] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
+28e2b879cbbd19/src/kern/ia32/cpu-ia32.cpp#L1120
+  [2] https://github.com/qemu/qemu/blob/f2a8261110c32c4dccd84e774d8dd7a0524=
+e00fb/target/i386/cpu.c#L5835
+  [3] https://www.amd.com/system/files/TechDocs/24594.pdf
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1871842/+subscriptions
 
