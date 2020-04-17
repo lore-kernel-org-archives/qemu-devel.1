@@ -2,81 +2,77 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FECC352BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 08:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0DC9C2BB55
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 08:46:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 757882137B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 08:31:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7059C221EB
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 08:46:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="foIApmw1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 757882137B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PjAPnDri"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7059C221EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPMPA-000067-LX
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 04:31:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49858)
+	id 1jPMdi-0005Q5-J6
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 04:46:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52596)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jPMOJ-0007m2-4x
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 04:30:28 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jPMcl-0004l2-2m
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 04:45:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jPMOI-0008OE-2m
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 04:30:27 -0400
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:38364)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jPMOH-0008Ne-Un
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 04:30:26 -0400
-Received: by mail-oi1-x22c.google.com with SMTP id r66so1440576oie.5
- for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 01:30:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=sfhJTgSwj+/KbMdjRpAGh+olc5UKTAi60OPHokqgWVQ=;
- b=foIApmw1V7DqVZ4Qk1skZqsKR0M6m6p2k/tNCH/wMC0lczsUHeBIf/nr+3NrsLXi5A
- myhuSdu6V2xM47zylkiQbUP/1L+r6oCDjWfPACUOQ06tr9gTD4iqzXLdwyOqQfUMtSyg
- 2VTm99yLSLLEUQ1razA7aEravwKUDBa2OxnaTrUA5U2G/kzfsOiOzCCwd/z7QU/Q3w+1
- ZbLDXL+kfxoGjiAS3h1ncRJXDAZq4yTbJFvdCe85CtSpQAKUnWQ6ScD86yKv3vtr8Uwp
- jtpta5gssN2R4kxbRZwUJu4YuElCMe4UF+hg+ncs6fU+Iht4ITVQFocnU2ygxUJccS+6
- QSKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=sfhJTgSwj+/KbMdjRpAGh+olc5UKTAi60OPHokqgWVQ=;
- b=dyTk4aM/ZX0eP62zoSr9Vydd8b87HZx2zKVJmjM5zHMRGxNmYMj9RPyan3IRNRCtsS
- o4v/uDvQEZ6W9FuBjunY6NCV+s7ExBSabbaDAYTbolChJz9tMRkyH66JqhpTaFRHBLPO
- l+Cv65XMYVXzKX1lkTtnxxlHgZZsBU+fswwjO0loE1AZ/uyQS8YoJMcv/bQSnHD1MwM5
- ex6kYlGtA+xeFoUxLpan03u0TzjUOQcQkhiLBTorcfq4C4iGGJeynR7449Wb0WGhVFl0
- 28sB63oB8/KdSy5Ch5b0YZXx0DQBs95mUWTjmbfzAzc+k/Ec41mOQlTg5uankF7FRwE6
- 6hyA==
-X-Gm-Message-State: AGi0PualqViM9rPfA8dZ04MlDBjAhH79uEYgnU0sFwXCkdjFRUGm+vIF
- +7SsCg1c6fy8RwFcPJmrjL9EMzvhtxcfQ7ki/SgIMQ==
-X-Google-Smtp-Source: APiQypLphAfVfboOMuOELUT71F1B9y482I9iyYPyqvc7/po/eKt2dhLn4tfzJx4LbcmpKH1RBqPgCcgmSAz28dO2FAQ=
-X-Received: by 2002:aca:3a8a:: with SMTP id h132mr1312833oia.146.1587112225046; 
- Fri, 17 Apr 2020 01:30:25 -0700 (PDT)
+ (envelope-from <cohuck@redhat.com>) id 1jPMci-00026E-Dx
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 04:45:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58324
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jPMcg-00023j-SZ
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 04:45:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587113117;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jlSmzPpbvnqZnwcalXuvPkUwVQHZbnaF9jJhRsTm+Sg=;
+ b=PjAPnDriDXYPGDQFODsluu5q4hTThrXNH8urjg772ko8IrbdmzN98l0yI2v386uxiHIeuY
+ GM2eyFJDgfveaOkJKUAQGY2i0EgoI3U28kuQtqsUV3BhUL8a0n+HsQTi1jTtchy8hQ704r
+ XHL4m1SBg58HUUk2zc70WoIFlZjLg00=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-290-UJZeq6-DPWex82UXcQVOOA-1; Fri, 17 Apr 2020 04:45:13 -0400
+X-MC-Unique: UJZeq6-DPWex82UXcQVOOA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 615DC85EE6B;
+ Fri, 17 Apr 2020 08:45:10 +0000 (UTC)
+Received: from gondolin (ovpn-112-200.ams2.redhat.com [10.36.112.200])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 303765C296;
+ Fri, 17 Apr 2020 08:44:53 +0000 (UTC)
+Date: Fri, 17 Apr 2020 10:44:50 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200417104450.2d2f2fa9.cohuck@redhat.com>
+In-Reply-To: <20200413055201.27053-1-yan.y.zhao@intel.com>
+References: <20200413055201.27053-1-yan.y.zhao@intel.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20200414133052.13712-1-philmd@redhat.com>
- <20200417024020-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200417024020-mutt-send-email-mst@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Apr 2020 09:30:13 +0100
-Message-ID: <CAFEAcA-9XTQ25gQm18+s1AExFoSR5bQFR9ryEEaEaOGPiCosEA@mail.gmail.com>
-Subject: Re: [PATCH-for-5.0 00/12] various bugfixes
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22c
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,37 +84,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Fabien Chouteau <chouteau@adacore.com>, Max Filippov <jcmvbkbc@gmail.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- qemu-ppc <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Stafford Horne <shorne@gmail.com>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: cjia@nvidia.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ libvir-list@redhat.com, Zhengxiao.zx@alibaba-inc.com,
+ shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, yi.l.liu@intel.com, eskultet@redhat.com,
+ ziye.yang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ felipe@nutanix.com, Ken.Xue@amd.com, kevin.tian@intel.com, xin.zeng@intel.com,
+ dgilbert@redhat.com, zhenyuw@linux.intel.com, dinechin@redhat.com,
+ alex.williamson@redhat.com, intel-gvt-dev@lists.freedesktop.org,
+ changpeng.liu@intel.com, berrange@redhat.com, corbet@lwn.net,
+ linux-kernel@vger.kernel.org, zhi.a.wang@intel.com,
+ jonathan.davies@nutanix.com, shaopeng.he@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 Apr 2020 at 07:40, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Tue, Apr 14, 2020 at 03:30:40PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> > Collection of bugfixes for 5.0.
-> >
-> > Only vhost-user-gpu/grlib_ahb_apb_pnp patches are reviewed.
-> >
-> > As 5.0-rc3 is tomorrow, I thought it could help to gather
-> > them and resend altogether.
->
->
-> So who's applying all this stuff? Peter?
+On Mon, 13 Apr 2020 01:52:01 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-I talked to Philippe about this on irc; I cherry picked the
-one bug that we thought was critical for 5.0 (the vhost-user-gpu
-free/g_free mismatch bugfix) and the rest will be for 5.1.
+> This patchset introduces a migration_version attribute under sysfs of VFIO
+> Mediated devices.
+> 
+> This migration_version attribute is used to check migration compatibility
+> between two mdev devices.
+> 
+> Currently, it has two locations:
+> (1) under mdev_type node,
+>     which can be used even before device creation, but only for mdev
+>     devices of the same mdev type.
+> (2) under mdev device node,
+>     which can only be used after the mdev devices are created, but the src
+>     and target mdev devices are not necessarily be of the same mdev type
+> (The second location is newly added in v5, in order to keep consistent
+> with the migration_version node for migratable pass-though devices)
 
-thanks
--- PMM
+What is the relationship between those two attributes?
+
+Is existence (and compatibility) of (1) a pre-req for possible
+existence (and compatibility) of (2)?
+
+Does userspace need to check (1) or can it completely rely on (2), if
+it so chooses?
+
+If devices with a different mdev type are indeed compatible, it seems
+userspace can only find out after the devices have actually been
+created, as (1) does not apply?
+
+One of my worries is that the existence of an attribute with the same
+name in two similar locations might lead to confusion. But maybe it
+isn't a problem.
+
+> 
+> Patch 1 defines migration_version attribute for the first location in
+> Documentation/vfio-mediated-device.txt
+> 
+> Patch 2 uses GVT as an example for patch 1 to show how to expose
+> migration_version attribute and check migration compatibility in vendor
+> driver.
+> 
+> Patch 3 defines migration_version attribute for the second location in
+> Documentation/vfio-mediated-device.txt
+> 
+> Patch 4 uses GVT as an example for patch 3 to show how to expose
+> migration_version attribute and check migration compatibility in vendor
+> driver.
+> 
+> (The previous "Reviewed-by" and "Acked-by" for patch 1 and patch 2 are
+> kept in v5, as there are only small changes to commit messages of the two
+> patches.)
+> 
+> v5:
+> added patch 2 and 4 for mdev device part of migration_version attribute.
+> 
+> v4:
+> 1. fixed indentation/spell errors, reworded several error messages
+> 2. added a missing memory free for error handling in patch 2
+> 
+> v3:
+> 1. renamed version to migration_version
+> 2. let errno to be freely defined by vendor driver
+> 3. let checking mdev_type be prerequisite of migration compatibility check
+> 4. reworded most part of patch 1
+> 5. print detailed error log in patch 2 and generate migration_version
+> string at init time
+> 
+> v2:
+> 1. renamed patched 1
+> 2. made definition of device version string completely private to vendor
+> driver
+> 3. reverted changes to sample mdev drivers
+> 4. described intent and usage of version attribute more clearly.
+> 
+> 
+> Yan Zhao (4):
+>   vfio/mdev: add migration_version attribute for mdev (under mdev_type
+>     node)
+>   drm/i915/gvt: export migration_version to mdev sysfs (under mdev_type
+>     node)
+>   vfio/mdev: add migration_version attribute for mdev (under mdev device
+>     node)
+>   drm/i915/gvt: export migration_version to mdev sysfs (under mdev
+>     device node)
+> 
+>  .../driver-api/vfio-mediated-device.rst       | 183 ++++++++++++++++++
+>  drivers/gpu/drm/i915/gvt/Makefile             |   2 +-
+>  drivers/gpu/drm/i915/gvt/gvt.c                |  39 ++++
+>  drivers/gpu/drm/i915/gvt/gvt.h                |   7 +
+>  drivers/gpu/drm/i915/gvt/kvmgt.c              |  55 ++++++
+>  drivers/gpu/drm/i915/gvt/migration_version.c  | 170 ++++++++++++++++
+>  drivers/gpu/drm/i915/gvt/vgpu.c               |  13 +-
+>  7 files changed, 466 insertions(+), 3 deletions(-)
+>  create mode 100644 drivers/gpu/drm/i915/gvt/migration_version.c
+> 
+
 
