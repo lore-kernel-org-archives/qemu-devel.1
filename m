@@ -2,64 +2,117 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3EF1C352BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 09:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E05FDC352BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 09:22:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FDC32137B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 09:19:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB4EA221EA
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 09:22:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Yu8TXgEH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FDC32137B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o5kI/aOy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB4EA221EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPNA1-0006W2-Hc
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 05:19:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57406)
+	id 1jPNCU-0001T2-R1
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 05:22:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57739)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jPN9D-00065A-3T
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 05:18:56 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jPNB6-00080d-3q
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 05:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jPN9C-0002TC-1u
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 05:18:55 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:38953 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jPN9B-0002OK-NN; Fri, 17 Apr 2020 05:18:54 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 493Vrp51qjz9sSM; Fri, 17 Apr 2020 19:18:50 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1587115130;
- bh=lItEv67cnf3x7aZX3FiD3AIyQkS2bJHdACixw7VtxrI=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Yu8TXgEHrSGf0++7RL2NyErVxG07MvdSESJ8dvoUnrVfIc2CVA2dHdvva2udi8+dG
- BZayr1Azn5O7bfrtDzh6VhQ9jbDMR0qeRXp5RxCNx3DvU6/+T8eQPeWzXTShhpS7ys
- rC0Srwv8lWW9lXMkVLMeYkzdCIgfSDgTO2TTzvUo=
-Date: Fri, 17 Apr 2020 19:18:12 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 0/3] ppc-for-5.0 queue 20200417
-Message-ID: <20200417091812.GE2102@umbus.fritz.box>
-References: <20200417050514.235060-1-david@gibson.dropbear.id.au>
- <CAFEAcA8qLznGS2YCFxz7QYrhbociZsqzEcxQPdp1rUy4OnnnFQ@mail.gmail.com>
- <20200417091431.GC2102@umbus.fritz.box>
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jPNB4-0006Zf-Vx
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 05:20:52 -0400
+Received: from mail-ej1-x633.google.com ([2a00:1450:4864:20::633]:43030)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jPNB0-0006NM-6J; Fri, 17 Apr 2020 05:20:46 -0400
+Received: by mail-ej1-x633.google.com with SMTP id gr25so1057775ejb.10;
+ Fri, 17 Apr 2020 02:20:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:references:cc:from:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=kG6hv1YDexRUfq1qfGt9ldyQuL+gsxnz/gSByTCB6EQ=;
+ b=o5kI/aOy3Dpnu4pJBxC39W3w1EBJ2fco9qShtevM9faaf/OzN8+gfWJMIFc3XD/n6J
+ Ks2DZKb2J6eKlctJyfqxXlFaD3FM/QrKPffxcfpE4byhPUk06vgINRDTtlcm7twdj1Zv
+ pdXISdlT/51Ooh3P2WbuAktkes5RxKL81CYdz5QUO86RtBxODGGwq6KqxUE6JiZg5Sl7
+ 7qDSNOCPkXoKd8FgBv1cmcqAEEcQASOfGQ8bQJkn3F+yX3zzQDk17YSzTm9G3/y1vguV
+ 2Z3TROY9btes+FP3pvQsldwg4Hot2vyOtBrX2P0e9P+Ux3svIhdQGqRThOzPrH0hUQ1/
+ 6VKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:references:cc:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=kG6hv1YDexRUfq1qfGt9ldyQuL+gsxnz/gSByTCB6EQ=;
+ b=bMohy4ALwNTCnZGy3IfIzn5USOQvj0pYk7jkqwN3caIjsndj7sSPd636V5Y6ELGy6K
+ NVAENGadtvrWgZ+GP6KuYYlI99R9OZBxZO1v9D9FE7Kp5mjf8sG8N8khxqonmMwDr6so
+ M3718i1HiD0UEXDIPEDa2lu2LWETXC8xoqhB7MSBC6sgC5iWcFLWLXNP6vRaBoeb2FqK
+ FiOo3PCDceqwZhsPNEfuqP5y6AtiAZLji/lN9rEM8E8Ub0tohINVaLixtttdB9f6mQtf
+ AxS4wIY0oO3NCYwrdLhKbFZHPKHCRCmcaHTGRaAUKTioouXlI3R/FQ5ekJ6nrMJw0BKB
+ ZHsQ==
+X-Gm-Message-State: AGi0PuaU5ywpw56v5OZp4d6AlIRcKbVU0/VlzlPf1MYRGUqcFN9NRjMH
+ Jsa+633RKFoDQz6cdHvnLLy0KShat5A=
+X-Google-Smtp-Source: APiQypJwjrW/Oe0AMoPaswV8zsc+YyxgsaeemjHJEpICAF99iVHRv04DO8+kl0utGoZzgpCruwCckw==
+X-Received: by 2002:a17:906:2bd1:: with SMTP id
+ n17mr2059406ejg.176.1587115244653; 
+ Fri, 17 Apr 2020 02:20:44 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id b5sm2878054edk.72.2020.04.17.02.20.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 17 Apr 2020 02:20:43 -0700 (PDT)
+Subject: Re: 5.0.0-rc3 : Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
+To: Dennis Clarke <dclarke@blastwave.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>
+References: <707f641b-1cf6-15a0-0602-5950e7b98886@blastwave.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <023af69c-d21b-55a7-cdb4-f61ff3cd50f9@amsat.org>
+Date: Fri, 17 Apr 2020 11:20:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="brEuL7wsLY8+TuWz"
-Content-Disposition: inline
-In-Reply-To: <20200417091431.GC2102@umbus.fritz.box>
+In-Reply-To: <707f641b-1cf6-15a0-0602-5950e7b98886@blastwave.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 2a00:1450:4864:20::633
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,83 +124,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
- Greg Kurz <groug@kaod.org>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-discuss <qemu-discuss@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Dennis,
 
---brEuL7wsLY8+TuWz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 4/17/20 2:42 AM, Dennis Clarke via wrote:>
+> Very strange messages from qemu 5.0.0-rc3 wherein I try to run :
+>
+> $ /usr/local/bin/qemu-system-ppc64 --version
+> QEMU emulator version 4.2.93
+> Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
+> $
+> $
+> $ /usr/local/bin/qemu-system-ppc64 \
+>  > -machine pseries-4.1 -cpu power9 -smp 4 -m 12G -accel tcg \
+>  > -drive file=/home/ppc64/ppc64le.qcow2 \
+>  > -device virtio-net-pci,netdev=usernet \
+>  > -netdev user,id=usernet,hostfwd=tcp::10000-:22 \
+>  > -serial stdio -display none -vga none
+> qemu-system-ppc64: warning: TCG doesn't support requested feature,
+> cap-cfpc=workaround
+> qemu-system-ppc64: warning: TCG doesn't support requested feature,
+> cap-sbbc=workaround
+> qemu-system-ppc64: warning: TCG doesn't support requested feature,
+> cap-ibs=workaround[...]> Quiescing Open Firmware ...
+> Booting Linux via __start() @ 0x0000000002000000 ...
+> Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
+[...]
 
-On Fri, Apr 17, 2020 at 07:14:31PM +1000, David Gibson wrote:
-> On Fri, Apr 17, 2020 at 09:28:46AM +0100, Peter Maydell wrote:
-> > On Fri, 17 Apr 2020 at 06:05, David Gibson <david@gibson.dropbear.id.au=
-> wrote:
-> > >
-> > > The following changes since commit 20038cd7a8412feeb49c01f6ede89e36c8=
-995472:
-> > >
-> > >   Update version for v5.0.0-rc3 release (2020-04-15 20:51:54 +0100)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   git://github.com/dgibson/qemu.git tags/ppc-for-5.0-20200417
-> > >
-> > > for you to fetch changes up to 5ed195065cc6895f61b9d59bfa0a0536ed5ed5=
-1e:
-> > >
-> > >   target/ppc: Fix mtmsr(d) L=3D1 variant that loses interrupts (2020-=
-04-17 10:39:03 +1000)
-> > >
-> > > ----------------------------------------------------------------
-> > > ppc patch queue for 2020-04-17
-> > >
-> > > Here are a few late bugfixes for qemu-5.0 in the ppc target code.
-> > > Unless some really nasty last minute bug shows up, I expect this to be
-> > > the last ppc pull request for qemu-5.0.
-> > >
-> >=20
-> > We're past rc3 now, so I don't really want to do an rc4 unless we
-> > absolutely critically need to. How important are these bug fixes?
->=20
-> Eh, probably not important enough.  They're not regressions AFAICT -
-> two fairly longstanding bugs, and one bug in a new feature.  It can
-> wait until 5.1.
->=20
-> But, I guess throw them in if something else does force an rc4.
+Thanks for this report. I purposed a patch to fix this, but don't expect
+it to be fixed in the next 5.0 release because this is not a critical
+security bug.
 
-Oof.  Such as, perhaps the TCG temp leak in slbia.  That one *is* a
-regression :(.
+>  From this point onwards I see an endless stream of :
+>
+> Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
+> Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
+> Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
+> Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
+> Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
+> Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
+[...]
+>
+> No idea what that is .. but it doesn't look friendly.
+>
+> Also I did compile qemu with --enable-debug --disable-strip and the
+> performance is truely horrific.  I can only assume that those options
+> are the cause. Any thoughts from anyone would be wonderful.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---brEuL7wsLY8+TuWz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6ZdFQACgkQbDjKyiDZ
-s5KXcg/+PrDhyjMVTITIThpES0zU9jPHq0UqNswZRd95WM5vk8Kv6F2iYShCWEYR
-6z5N2K5uVwElTHrJ5kN5eFMLi5d8LmVTHQSSuQv2BrQG9EuR2iC1ZNHTLgm9iyRh
-kbvidLQo3hTw26T42fEbkfNKZHiN5bL4X2ipqk8VeAjSLX4l6NBvZfwFPiF+AJBa
-zIwl+RPVk8njWoc07R0wEXJ/p1Y7entz/M+1XMehDPTq6lDeIauAvRttGhfhZkCc
-qouiCNG0F+PM0caSkCTgyt4piw9y3JB50kSQhltedwLN8C9+tsHGbTXoCKV4kBJK
-SfHTv2/R+g79nAPKmGugq7GebzPv5QXOyaT7fdZ4ee0CvIYy+umikB8iMDvVNyID
-4BHwFy0LAg8dihyZ7sv0vtxcQCGYJvL4RtTvi6Bia/P1DbDZV3mUreX/u+XMmLEA
-PpiAgX/itDH1cLNcMTQXHZxcYJ8N2yrWXhUbq3pn3QazFVKDjprnmKpxWOkVarwY
-rjh397e6q1vsgwTrRo0WREmSP9v3/2K0ayV6iyIvkZSQ0VhUouZTZ0tGxtuIqzk2
-x2W6raPodAFB+f4K2N17mmYXLoya4vzEx7XgkK1mFXDB6aNKHgRsPIIP0HbnFaeE
-0c32ZjaPCi5ynO862wbtIAGTx+67Dm/QcCnNgnZ8gob4BlV+lhw=
-=6UnZ
------END PGP SIGNATURE-----
-
---brEuL7wsLY8+TuWz--
+--enable-debug enables --enable-debug-tcg which is not designed for
+performance. You might want to try '--enable-debug --disable-debug-tcg'.
 
