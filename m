@@ -7,57 +7,56 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45ECAC2D0EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 05:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9C58C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 05:08:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1234721D94
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 05:08:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 73A6021D94
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 05:08:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="g4+htptk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1234721D94
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hpcAaddH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73A6021D94
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPJES-0003mw-8P
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 01:08:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53909)
+	id 1jPJER-0003mT-L4
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 01:08:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53905)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jPJBz-0000gk-40
+ (envelope-from <dgibson@ozlabs.org>) id 1jPJBz-0000gj-5r
  for qemu-devel@nongnu.org; Fri, 17 Apr 2020 01:05:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jPJBx-0007S7-IZ
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 01:05:31 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:54563 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1jPJBx-0007Rz-ED
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 01:05:30 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:44107 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jPJBv-0007RD-Mr; Fri, 17 Apr 2020 01:05:29 -0400
+ id 1jPJBv-0007RS-K7; Fri, 17 Apr 2020 01:05:29 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 493PDM5S39z9sSv; Fri, 17 Apr 2020 15:05:23 +1000 (AEST)
+ id 493PDM3Y3bz9sQx; Fri, 17 Apr 2020 15:05:23 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1587099923;
- bh=sukPRN7kqfCsG8KffgiHN7+nZU28w250zeniJlzFCFw=;
+ bh=4XGPYHVoUfRb7ZLjjBorBfA3SzHrRVUtdj2ETvavjJM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=g4+htptkfIzbWFMJvzAnJr70psXB3ZFPVnay7lpAPjggVuqIuzJd4RW93kVTD4yGn
- t9WAXPgFgA5Ib3pzIp1KqolMO/ezlGzGDj2wJuO6FJOg44BBBwJK2zLqgXiqWDQW00
- 0qKn+kxY3ZqU7qCXBQjpFoqCxuvDpKWR1n9xzvCg=
+ b=hpcAaddHXuUExNc2G8gy3USfLUDFX3F96DNbQ8KQPYItzN71YZb6IC+wF9pZo6sRz
+ Qe44e62iO14oKoNeF4hPzv0VLsj6Mmg2B7dW3rxzZRQrRfr3c+nJDd9/YECqkqL54W
+ lZCS1B1Hx+tIpkTkZIaSNo9dKVivb2EAe8ND3aPY=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 3/3] target/ppc: Fix mtmsr(d) L=1 variant that loses interrupts
-Date: Fri, 17 Apr 2020 15:05:14 +1000
-Message-Id: <20200417050514.235060-4-david@gibson.dropbear.id.au>
+Subject: [PULL 1/3] linux-user/ppc: Fix padding in mcontext_t for ppc64
+Date: Fri, 17 Apr 2020 15:05:12 +1000
+Message-Id: <20200417050514.235060-2-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.25.2
 In-Reply-To: <20200417050514.235060-1-david@gibson.dropbear.id.au>
 References: <20200417050514.235060-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,168 +68,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
- qemu-stable@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
- Nathan Chancellor <natechancellor@gmail.com>,
- Anton Blanchard <anton@ozlabs.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>, groug@kaod.org, qemu-ppc@nongnu.org,
+ clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Nicholas Piggin <npiggin@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-If mtmsr L=3D1 sets MSR[EE] while there is a maskable exception pending,
-it does not cause an interrupt. This causes the test case to hang:
+The padding that was added in 95cda4c44ee was added to a union,
+and so it had no effect.  This fixes misalignment errors detected
+by clang sanitizers for ppc64 and ppc64le.
 
-https://lists.gnu.org/archive/html/qemu-ppc/2019-10/msg00826.html
+In addition, only ppc64 allocates space for VSX registers, so do
+not save them for ppc32.  The kernel only has references to
+CONFIG_SPE in signal_32.c, so do not attempt to save them for ppc64.
 
-More recently, Linux reduced the occurance of operations (e.g., rfi)
-which stop translation and allow pending interrupts to be processed.
-This started causing hangs in Linux boot in long-running kernel tests,
-running with '-d int' shows the decrementer stops firing despite DEC
-wrapping and MSR[EE]=3D1.
-
-https://lists.ozlabs.org/pipermail/linuxppc-dev/2020-April/208301.html
-
-The cause is the broken mtmsr L=3D1 behaviour, which is contrary to the
-architecture. From Power ISA v3.0B, p.977, Move To Machine State Register=
-,
-Programming Note states:
-
-    If MSR[EE]=3D0 and an External, Decrementer, or Performance Monitor
-    exception is pending, executing an mtmsrd instruction that sets
-    MSR[EE] to 1 will cause the interrupt to occur before the next
-    instruction is executed, if no higher priority exception exists
-
-Fix this by handling L=3D1 exactly the same way as L=3D0, modulo the MSR
-bits altered.
-
-The confusion arises from L=3D0 being "context synchronizing" whereas L=3D=
-1
-is "execution synchronizing", which is a weaker semantic. However this
-is not a relaxation of the requirement that these exceptions cause
-interrupts when MSR[EE]=3D1 (e.g., when mtmsr executes to completion as
-TCG is doing here), rather it specifies how a pipelined processor can
-have multiple instructions in flight where one may influence how another
-behaves.
-
-Cc: qemu-stable@nongnu.org
-Reported-by: Anton Blanchard <anton@ozlabs.org>
-Reported-by: Nathan Chancellor <natechancellor@gmail.com>
-Tested-by: Nathan Chancellor <natechancellor@gmail.com>
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-Message-Id: <20200414111131.465560-1-npiggin@gmail.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Tested-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Fixes: 95cda4c44ee
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200407032105.26711-1-richard.henderson@linaro.org>
+Acked-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c | 46 +++++++++++++++++++++++++-----------------
- 1 file changed, 27 insertions(+), 19 deletions(-)
+ linux-user/ppc/signal.c | 69 +++++++++++++++++------------------------
+ 1 file changed, 29 insertions(+), 40 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index b207fb5386..9959259dba 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -4361,30 +4361,34 @@ static void gen_mtmsrd(DisasContext *ctx)
-     CHK_SV;
-=20
- #if !defined(CONFIG_USER_ONLY)
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-     if (ctx->opcode & 0x00010000) {
--        /* Special form that does not need any synchronisation */
-+        /* L=3D1 form only updates EE and RI */
-         TCGv t0 =3D tcg_temp_new();
-+        TCGv t1 =3D tcg_temp_new();
-         tcg_gen_andi_tl(t0, cpu_gpr[rS(ctx->opcode)],
-                         (1 << MSR_RI) | (1 << MSR_EE));
--        tcg_gen_andi_tl(cpu_msr, cpu_msr,
-+        tcg_gen_andi_tl(t1, cpu_msr,
-                         ~(target_ulong)((1 << MSR_RI) | (1 << MSR_EE)));
--        tcg_gen_or_tl(cpu_msr, cpu_msr, t0);
-+        tcg_gen_or_tl(t1, t1, t0);
+diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
+index ecd99736b7..20a02c197c 100644
+--- a/linux-user/ppc/signal.c
++++ b/linux-user/ppc/signal.c
+@@ -35,12 +35,26 @@ struct target_mcontext {
+     target_ulong mc_gregs[48];
+     /* Includes fpscr.  */
+     uint64_t mc_fregs[33];
 +
-+        gen_helper_store_msr(cpu_env, t1);
-         tcg_temp_free(t0);
-+        tcg_temp_free(t1);
-+
-     } else {
-         /*
-          * XXX: we need to update nip before the store if we enter
-          *      power saving mode, we will exit the loop directly from
-          *      ppc_store_msr
-          */
--        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
--            gen_io_start();
--        }
-         gen_update_nip(ctx, ctx->base.pc_next);
-         gen_helper_store_msr(cpu_env, cpu_gpr[rS(ctx->opcode)]);
--        /* Must stop the translation as machine state (may have) changed=
- */
--        /* Note that mtmsr is not always defined as context-synchronizin=
-g */
--        gen_stop_exception(ctx);
-     }
-+    /* Must stop the translation as machine state (may have) changed */
-+    gen_stop_exception(ctx);
- #endif /* !defined(CONFIG_USER_ONLY) */
- }
- #endif /* defined(TARGET_PPC64) */
-@@ -4394,15 +4398,23 @@ static void gen_mtmsr(DisasContext *ctx)
-     CHK_SV;
-=20
- #if !defined(CONFIG_USER_ONLY)
--   if (ctx->opcode & 0x00010000) {
--        /* Special form that does not need any synchronisation */
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-+    if (ctx->opcode & 0x00010000) {
-+        /* L=3D1 form only updates EE and RI */
-         TCGv t0 =3D tcg_temp_new();
-+        TCGv t1 =3D tcg_temp_new();
-         tcg_gen_andi_tl(t0, cpu_gpr[rS(ctx->opcode)],
-                         (1 << MSR_RI) | (1 << MSR_EE));
--        tcg_gen_andi_tl(cpu_msr, cpu_msr,
-+        tcg_gen_andi_tl(t1, cpu_msr,
-                         ~(target_ulong)((1 << MSR_RI) | (1 << MSR_EE)));
--        tcg_gen_or_tl(cpu_msr, cpu_msr, t0);
-+        tcg_gen_or_tl(t1, t1, t0);
-+
-+        gen_helper_store_msr(cpu_env, t1);
-         tcg_temp_free(t0);
-+        tcg_temp_free(t1);
-+
-     } else {
-         TCGv msr =3D tcg_temp_new();
-=20
-@@ -4411,9 +4423,6 @@ static void gen_mtmsr(DisasContext *ctx)
-          *      power saving mode, we will exit the loop directly from
-          *      ppc_store_msr
-          */
--        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
--            gen_io_start();
--        }
-         gen_update_nip(ctx, ctx->base.pc_next);
  #if defined(TARGET_PPC64)
-         tcg_gen_deposit_tl(msr, cpu_msr, cpu_gpr[rS(ctx->opcode)], 0, 32=
-);
-@@ -4422,10 +4431,9 @@ static void gen_mtmsr(DisasContext *ctx)
- #endif
-         gen_helper_store_msr(cpu_env, msr);
-         tcg_temp_free(msr);
--        /* Must stop the translation as machine state (may have) changed=
- */
--        /* Note that mtmsr is not always defined as context-synchronizin=
-g */
--        gen_stop_exception(ctx);
+     /* Pointer to the vector regs */
+     target_ulong v_regs;
++    /*
++     * On ppc64, this mcontext structure is naturally *unaligned*,
++     * or rather it is aligned on a 8 bytes boundary but not on
++     * a 16 byte boundary.  This pad fixes it up.  This is why we
++     * cannot use ppc_avr_t, which would force alignment.  This is
++     * also why the vector regs are referenced in the ABI by the
++     * v_regs pointer above so any amount of padding can be added here.
++     */
++    target_ulong pad;
++    /* VSCR and VRSAVE are saved separately.  Also reserve space for VSX=
+. */
++    struct {
++        uint64_t altivec[34 + 16][2];
++    } mc_vregs;
+ #else
+     target_ulong mc_pad[2];
+-#endif
++
+     /* We need to handle Altivec and SPE at the same time, which no
+        kernel needs to do.  Fortunately, the kernel defines this bit to
+        be Altivec-register-large all the time, rather than trying to
+@@ -48,32 +62,14 @@ struct target_mcontext {
+     union {
+         /* SPE vector registers.  One extra for SPEFSCR.  */
+         uint32_t spe[33];
+-        /* Altivec vector registers.  The packing of VSCR and VRSAVE
+-           varies depending on whether we're PPC64 or not: PPC64 splits
+-           them apart; PPC32 stuffs them together.
+-           We also need to account for the VSX registers on PPC64
+-        */
+-#if defined(TARGET_PPC64)
+-#define QEMU_NVRREG (34 + 16)
+-        /* On ppc64, this mcontext structure is naturally *unaligned*,
+-         * or rather it is aligned on a 8 bytes boundary but not on
+-         * a 16 bytes one. This pad fixes it up. This is also why the
+-         * vector regs are referenced by the v_regs pointer above so
+-         * any amount of padding can be added here
+-         */
+-        target_ulong pad;
+-#else
+-        /* On ppc32, we are already aligned to 16 bytes */
+-#define QEMU_NVRREG 33
+-#endif
+-        /* We cannot use ppc_avr_t here as we do *not* want the implied
+-         * 16-bytes alignment that would result from it. This would have
+-         * the effect of making the whole struct target_mcontext aligned
+-         * which breaks the layout of struct target_ucontext on ppc64.
++        /*
++         * Altivec vector registers.  One extra for VRSAVE.
++         * On ppc32, we are already aligned to 16 bytes.  We could
++         * use ppc_avr_t, but choose to share the same type as ppc64.
+          */
+-        uint64_t altivec[QEMU_NVRREG][2];
+-#undef QEMU_NVRREG
++        uint64_t altivec[33][2];
+     } mc_vregs;
++#endif
+ };
+=20
+ /* See arch/powerpc/include/asm/sigcontext.h.  */
+@@ -278,6 +274,7 @@ static void save_user_regs(CPUPPCState *env, struct t=
+arget_mcontext *frame)
+         __put_user((uint32_t)env->spr[SPR_VRSAVE], vrsave);
      }
-+    /* Must stop the translation as machine state (may have) changed */
-+    gen_stop_exception(ctx);
- #endif
+=20
++#if defined(TARGET_PPC64)
+     /* Save VSX second halves */
+     if (env->insns_flags2 & PPC2_VSX) {
+         uint64_t *vsregs =3D (uint64_t *)&frame->mc_vregs.altivec[34];
+@@ -286,6 +283,7 @@ static void save_user_regs(CPUPPCState *env, struct t=
+arget_mcontext *frame)
+             __put_user(*vsrl, &vsregs[i]);
+         }
+     }
++#endif
+=20
+     /* Save floating point registers.  */
+     if (env->insns_flags & PPC_FLOAT) {
+@@ -296,22 +294,18 @@ static void save_user_regs(CPUPPCState *env, struct=
+ target_mcontext *frame)
+         __put_user((uint64_t) env->fpscr, &frame->mc_fregs[32]);
+     }
+=20
++#if !defined(TARGET_PPC64)
+     /* Save SPE registers.  The kernel only saves the high half.  */
+     if (env->insns_flags & PPC_SPE) {
+-#if defined(TARGET_PPC64)
+-        for (i =3D 0; i < ARRAY_SIZE(env->gpr); i++) {
+-            __put_user(env->gpr[i] >> 32, &frame->mc_vregs.spe[i]);
+-        }
+-#else
+         for (i =3D 0; i < ARRAY_SIZE(env->gprh); i++) {
+             __put_user(env->gprh[i], &frame->mc_vregs.spe[i]);
+         }
+-#endif
+         /* Set MSR_SPE in the saved MSR value to indicate that
+            frame->mc_vregs contains valid data.  */
+         msr |=3D MSR_SPE;
+         __put_user(env->spe_fscr, &frame->mc_vregs.spe[32]);
+     }
++#endif
+=20
+     /* Store MSR.  */
+     __put_user(msr, &frame->mc_gregs[TARGET_PT_MSR]);
+@@ -392,6 +386,7 @@ static void restore_user_regs(CPUPPCState *env,
+         __get_user(env->spr[SPR_VRSAVE], vrsave);
+     }
+=20
++#if defined(TARGET_PPC64)
+     /* Restore VSX second halves */
+     if (env->insns_flags2 & PPC2_VSX) {
+         uint64_t *vsregs =3D (uint64_t *)&frame->mc_vregs.altivec[34];
+@@ -400,6 +395,7 @@ static void restore_user_regs(CPUPPCState *env,
+             __get_user(*vsrl, &vsregs[i]);
+         }
+     }
++#endif
+=20
+     /* Restore floating point registers.  */
+     if (env->insns_flags & PPC_FLOAT) {
+@@ -412,22 +408,15 @@ static void restore_user_regs(CPUPPCState *env,
+         env->fpscr =3D (uint32_t) fpscr;
+     }
+=20
++#if !defined(TARGET_PPC64)
+     /* Save SPE registers.  The kernel only saves the high half.  */
+     if (env->insns_flags & PPC_SPE) {
+-#if defined(TARGET_PPC64)
+-        for (i =3D 0; i < ARRAY_SIZE(env->gpr); i++) {
+-            uint32_t hi;
+-
+-            __get_user(hi, &frame->mc_vregs.spe[i]);
+-            env->gpr[i] =3D ((uint64_t)hi << 32) | ((uint32_t) env->gpr[=
+i]);
+-        }
+-#else
+         for (i =3D 0; i < ARRAY_SIZE(env->gprh); i++) {
+             __get_user(env->gprh[i], &frame->mc_vregs.spe[i]);
+         }
+-#endif
+         __get_user(env->spe_fscr, &frame->mc_vregs.spe[32]);
+     }
++#endif
  }
 =20
+ #if !defined(TARGET_PPC64)
 --=20
 2.25.2
 
