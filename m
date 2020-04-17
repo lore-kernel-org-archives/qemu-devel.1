@@ -2,83 +2,81 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35BC4C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 21:25:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A4CAC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 21:40:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F189420857
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 21:25:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 373E12137B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 21:40:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e6T4FFQk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F189420857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m1LLGdMS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 373E12137B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPYUX-000474-5l
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 17:25:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56473)
+	id 1jPYiZ-0000L7-CU
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 17:40:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51210)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jPYTZ-0002jG-I3
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:24:43 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jPYhn-0008FR-4j
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:39:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jPYTT-0005bj-UP
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:24:37 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26621
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jPYTS-0005Xq-4p
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:24:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587158672;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=O2PRcZrDcmt/14gR+cuBquy5C19t4TI3JDQN5oBAsEo=;
- b=e6T4FFQkl6d6O4jq1RUANRlEB0wQXiP31oiGbCX/oaSGF88wMyWB6nn3egtR5eVdYtLMKF
- 5z7J2BclCxTSfmFldCw5+1tGduS7Z/rMk37to9JI1lH6+nFaN7M5hBOVbsWQAJu8qm9eBX
- TIEvRI6OdJljP3ryy4DHPYNR6iyagk8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-446-C1gwYVncNmeu7HICH68cwg-1; Fri, 17 Apr 2020 17:24:24 -0400
-X-MC-Unique: C1gwYVncNmeu7HICH68cwg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08D98108442F;
- Fri, 17 Apr 2020 21:24:23 +0000 (UTC)
-Received: from [10.3.115.59] (ovpn-115-59.phx2.redhat.com [10.3.115.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E97CA09AF;
- Fri, 17 Apr 2020 21:24:21 +0000 (UTC)
-Subject: Re: [PATCH v18 4/4] iotests: 287: add qcow2 compression type test
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20200402063645.23685-1-dplotnikov@virtuozzo.com>
- <20200402063645.23685-5-dplotnikov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <cbb2e89c-a46d-a3f2-a19b-97c6a1deaf6f@redhat.com>
-Date: Fri, 17 Apr 2020 16:24:20 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <alistair23@gmail.com>) id 1jPYhl-0001gI-Vp
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:39:23 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:40429)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1jPYhl-0001e7-P1
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:39:21 -0400
+Received: by mail-il1-x141.google.com with SMTP id f2so3623359ilq.7
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 14:39:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ciLcWXal68MTEKmCfzhFtQVPdRcC04oPpmsAtsP3yYY=;
+ b=m1LLGdMSE3fEvOK0n6nDFRMFXim1/d+Cz+i//7ommzSQYyO1fMHWyQGeq3agF9T+HY
+ xd5X+GMp/eIa1GmAjrKtos0Ks1UygGMs2lhEHg1NyHfg2SW5zz0UabDW4TV7CWIKf7wl
+ Kg56sbfe97WaCaWt3/4RKebZprAYDC2U1FaFje5oA4KKskFB3bH8YLM8bNiKF2Z4eKld
+ Oe9NCWOY1he6MuB/uD+55ATzAo9n7CMO8re+tLf3+q2VYdvWi0xC73VVEf8+S+ELjPEW
+ VNcxyFXvsHCxinhGOnhzW7wIKrncDCD6fKcNhRGRBNRVrBMsMOvpKFxy9lR/nOSmLFU/
+ rrqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ciLcWXal68MTEKmCfzhFtQVPdRcC04oPpmsAtsP3yYY=;
+ b=OEo39XUbCVyQkKD+QRsHdzLclY4epStzrogveRR6I6/mZrMZaQOg9xcHIv/+zNEBW6
+ gM8KWFrbkPsYm7T48f/8S3gHSyXQUm6mcqkB7LSgcGyj6weYfTA9ypjBFh2qLawTS2AO
+ 8RXgpIsLeJ+w/OhfXV2ESeDE9Cx377XOu+sf6dnTfXE0x/6R3+QOjAGU+XAfbydfmzPa
+ 9VXZfL4fLPv/Q0ZjkeC6vGfodGhMeZSahfacbmyRfuipAeROOOmUzAklpWcDUA3mkhVN
+ v9qiUBZeL2Y3EjPX5k5Toe9yA8MIsiSYhF25A09dyXNVWLw/SBvsoYWvKuO0GyG4/7YZ
+ mR/A==
+X-Gm-Message-State: AGi0PuZh3hPhR4b67NIpxNtUrphra9Kzu9qDBUgS3vCxT8H3mUR9LWMO
+ rUIA3bM+uS0ygFFBvdX/scObxLaOdlyvhgLZr0c=
+X-Google-Smtp-Source: APiQypJaUn8TqubPWSobT0rM5TftdAGh/9JPe8AaxEFwXxNfwda36Viojc6Al75/RPHbmYrQE8kxXT/woP68PuPbqGA=
+X-Received: by 2002:a92:d182:: with SMTP id z2mr5422106ilz.177.1587159560653; 
+ Fri, 17 Apr 2020 14:39:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200402063645.23685-5-dplotnikov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <20200417191022.5247-1-edgar.iglesias@gmail.com>
+ <20200417191022.5247-2-edgar.iglesias@gmail.com>
+In-Reply-To: <20200417191022.5247-2-edgar.iglesias@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 17 Apr 2020 14:30:57 -0700
+Message-ID: <CAKmqyKM2hsMJ94yHPCjUBcMYn1eR924T8_jZq2HzpK0SrmHATg@mail.gmail.com>
+Subject: Re: [PATCH v1 1/6] target/microblaze: Add the opcode-0x0-illegal CPU
+ property
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::141
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,185 +88,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/2/20 1:36 AM, Denis Plotnikov wrote:
-> The test checks fulfilling qcow2 requiriements for the compression
+On Fri, Apr 17, 2020 at 12:12 PM Edgar E. Iglesias
+<edgar.iglesias@gmail.com> wrote:
+>
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>
+> Add the opcode-0x0-illegal CPU property to control if the core
+> should trap opcode zero as illegal.
+>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-requirements
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-> type feature and zstd compression type operability.
-> 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Alistair
+
 > ---
->   tests/qemu-iotests/287     | 167 +++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/287.out |  70 ++++++++++++++++
->   tests/qemu-iotests/group   |   1 +
->   3 files changed, 238 insertions(+)
->   create mode 100755 tests/qemu-iotests/287
->   create mode 100644 tests/qemu-iotests/287.out
-> 
-
-> +# Check if we can run this test.
-> +if IMGOPTS='compression_type=zstd' _make_test_img 64M |
-> +    grep "Invalid parameter 'zstd'"; then
-> +    _notrun "ZSTD is disabled"
-> +fi
-
-Side effect - this created an image (which gets cleaned up when 
-skipping, so no problem there)...
-
-> +
-> +# Test: when compression is zlib the incompatible bit is unset
-> +echo
-> +echo "=== Testing compression type incompatible bit setting for zlib ==="
-> +echo
-> +
-> +IMGOPTS='compression_type=zlib' _make_test_img 64M
-
-...and this recreates the same image.  You could drop this line as 
-redundant.
-
-> +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
-> +
-> +# Test: when compression differs from zlib the incompatible bit is set
-> +echo
-> +echo "=== Testing compression type incompatible bit setting for zstd ==="
-> +echo
-
-The duplication of '# Test xyz' and 'echo "=== Test xyz"' is awkward; 
-you can safely delete the redundant # lines.
-
-> +
-> +IMGOPTS='compression_type=zstd' _make_test_img 64M
-> +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
-> +
-> +# Test: an image can't be opened if compression type is zlib and
-> +#       incompatible feature compression type is set
-> +echo
-> +echo "=== Testing zlib with incompatible bit set ==="
-> +echo
-> +
-> +IMGOPTS='compression_type=zlib' _make_test_img 64M
-> +$PYTHON qcow2.py "$TEST_IMG" set-feature-bit incompatible 3
-> +# to make sure the bit was actually set
-> +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
-> +$QEMU_IMG info "$TEST_IMG" 2>1 1>/dev/null
-
-This creates a file named '1' populated with stderr from qemu-img.  I 
-don't think that was your intent; you probably meant 2>&1 (if you wanted 
-stderr to be logged with the rest of this script's output).
-
-> +if (($?==0)); then
-> +    echo "Error: The image opened successfully. The image must not be opened"
-> +fi
-
-Although this is valid bash, the use of (()) is documented as being 
-something you should avoid in modern scripts (it can be confused for a 
-nested subshell).  So, rewriting these last few lines:
-
-if $QEMU_IMG info "$TEST_IMG" 2>&1 >/dev/null ; then
-     echo "Error ..."
-fi
-
-> +
-> +# Test: an image can't be opened if compression type is NOT zlib and
-> +#       incompatible feature compression type is UNSET
-> +echo
-> +echo "=== Testing zstd with incompatible bit unset ==="
-> +echo
-> +
-> +IMGOPTS='compression_type=zstd' _make_test_img 64M
-> +$PYTHON qcow2.py "$TEST_IMG" set-header incompatible_features 0
-> +# to make sure the bit was actually unset
-> +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
-> +$QEMU_IMG info "$TEST_IMG" 2>1 1>/dev/null
-
-Another bad redirect,
-
-> +if (($?==0)); then
-
-and another awkward (()).
-
-> +    echo "Error: The image opened successfully. The image must not be opened"
-> +fi
-> +# Test: check compression type values
-> +echo
-> +echo "=== Testing compression type values ==="
-> +echo
-> +# zlib=0
-> +IMGOPTS='compression_type=zlib' _make_test_img 64M
-> +od -j104 -N1 -An -vtu1 "$TEST_IMG"
-
-We recently added peek_file_be in common.rc that would be a lot nicer 
-than writing your own od command line.  Use it as:
-
-peek_file_be "$TEST_IMG" 104 1
-
-> +
-> +# zstd=1
-> +IMGOPTS='compression_type=zstd' _make_test_img 64M
-> +od -j104 -N1 -An -vtu1 "$TEST_IMG"
-
-and again
-
-> +echo "=== Testing incompressible cluster processing with zstd ==="
-> +echo
-> +
-> +dd if=/dev/urandom of="$RAND_FILE" bs=1M count=1
-> +
-> +_make_test_img 64M
-> +
-> +# fill the image with likely incompressible and compressible clusters
-> +
-> +# TODO: if RAND_FILE variable contain a whitespace, the following will fail.
-> +# We need to support some kind of quotes to make possible file paths with
-> +# white spaces for -s option
-
-In the meantime, you can make this test robust, by adding up front 
-(copying from test 197 for example):
-
-# Sanity check: our use of $RAND_FILE fails if $TEST_DIR contains spaces
-# or other problems
-case "$TEST_DIR" in
-     *[^-_a-zA-Z0-9/]*)
-         _notrun "Suspicious TEST_DIR='$TEST_DIR', cowardly refusing to 
-run" ;;
-esac
-
-> +$QEMU_IO -c "write -c -s $RAND_FILE 0 1M " "$TEST_IMG" | _filter_qemu_io
-> +$QEMU_IO -c "write -c -P 0xFA 1M 1M " "$TEST_IMG" | _filter_qemu_io
-> +$QEMU_IMG convert -O $IMGFMT -c -o compression_type=zstd \
-> +                  "$TEST_IMG" "$COMPR_IMG"
-> +$QEMU_IMG compare "$TEST_IMG" "$COMPR_IMG"
-
-You test that data read in as compressed in zlib and written back out as 
-zstd compares as equal, which is not quite as strong as whether what is 
-read back out matches the original $RAND_FILE, but this is still a 
-pretty good round-trip test (it did not prove whether zlib is 
-corruption-free, but does show that zstd is coruption-free, and the 
-point of this test is what zstd does).
-
-If you want to avoid the issues with 'write -c -s $RAND_FILE' being 
-risky, you could instead do:
-
-$QEMU_IO -c "write -P 0xFA 1M 1M" "$RAND_FILE"
-$QEMU_IMG convert -f raw -O $IMGFMT -c "$RAND_FILE" "$TEST_IMG"
-
-for creating the zlib file.
-
-Overall, I'm liking how this looks.  There are still a few shell bugs to 
-clean up, and I'm not sure which maintainer will be incorporating this, 
-but I'm hoping v19 goes into 5.1 rather early in the cycle.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+>  target/microblaze/cpu.c       | 6 +++++-
+>  target/microblaze/cpu.h       | 1 +
+>  target/microblaze/translate.c | 2 +-
+>  3 files changed, 7 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+> index a2c2f271df..1044120702 100644
+> --- a/target/microblaze/cpu.c
+> +++ b/target/microblaze/cpu.c
+> @@ -206,7 +206,9 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
+>                          (cpu->cfg.dopb_bus_exception ?
+>                                                   PVR2_DOPB_BUS_EXC_MASK : 0) |
+>                          (cpu->cfg.iopb_bus_exception ?
+> -                                                 PVR2_IOPB_BUS_EXC_MASK : 0);
+> +                                                 PVR2_IOPB_BUS_EXC_MASK : 0) |
+> +                        (cpu->cfg.opcode_0_illegal ?
+> +                                                 PVR2_OPCODE_0x0_ILL_MASK : 0);
+>
+>      env->pvr.regs[5] |= cpu->cfg.dcache_writeback ?
+>                                          PVR5_DCACHE_WRITEBACK_MASK : 0;
+> @@ -274,6 +276,8 @@ static Property mb_properties[] = {
+>      /* Enables bus exceptions on failed instruction fetches.  */
+>      DEFINE_PROP_BOOL("iopb-bus-exception", MicroBlazeCPU,
+>                       cfg.iopb_bus_exception, false),
+> +    DEFINE_PROP_BOOL("opcode-0x0-illegal", MicroBlazeCPU,
+> +                     cfg.opcode_0_illegal, false),
+>      DEFINE_PROP_STRING("version", MicroBlazeCPU, cfg.version),
+>      DEFINE_PROP_UINT8("pvr", MicroBlazeCPU, cfg.pvr, C_PVR_FULL),
+>      DEFINE_PROP_END_OF_LIST(),
+> diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+> index 1a700a880c..d51587b342 100644
+> --- a/target/microblaze/cpu.h
+> +++ b/target/microblaze/cpu.h
+> @@ -303,6 +303,7 @@ struct MicroBlazeCPU {
+>          bool endi;
+>          bool dopb_bus_exception;
+>          bool iopb_bus_exception;
+> +        bool opcode_0_illegal;
+>          char *version;
+>          uint8_t pvr;
+>      } cfg;
+> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+> index 37a844db99..222632b670 100644
+> --- a/target/microblaze/translate.c
+> +++ b/target/microblaze/translate.c
+> @@ -1573,7 +1573,7 @@ static inline void decode(DisasContext *dc, uint32_t ir)
+>      LOG_DIS("%8.8x\t", dc->ir);
+>
+>      if (ir == 0) {
+> -        trap_illegal(dc, dc->cpu->env.pvr.regs[2] & PVR2_OPCODE_0x0_ILL_MASK);
+> +        trap_illegal(dc, dc->cpu->cfg.opcode_0_illegal);
+>          /* Don't decode nop/zero instructions any further.  */
+>          return;
+>      }
+> --
+> 2.20.1
+>
+>
 
