@@ -2,89 +2,75 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB55C2D0EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:18:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20875C38A29
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:21:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C630A2076D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:18:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iU5LuAPE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C630A2076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id F252B2078E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:21:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F252B2078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPWVi-0002aN-1U
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 15:18:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54389)
+	id 1jPWYa-00051e-37
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 15:21:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38121)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jPWNo-0002kd-88
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:10:37 -0400
+ (envelope-from <bounces@canonical.com>) id 1jPWXc-0004BH-Jh
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:20:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jPWNm-0005Sd-Jp
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:10:36 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:42596)
+ (envelope-from <bounces@canonical.com>) id 1jPWXa-0003FC-TK
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:20:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48560)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jPWNm-0005OB-98
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:10:34 -0400
-Received: by mail-lf1-x141.google.com with SMTP id j14so2674037lfg.9
- for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 12:10:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=b0T2/yc1VAw0adGUFTBuH3ADGJB4Oe5EFs26KUSMiuM=;
- b=iU5LuAPEAiAcKmCa5oMGgOhjsHU3rwQm7FNmnqvT8wimQz1CfftyGGtszKRvmsZk8t
- gmLiHKUMNYYi1izmtNmKqE4V7IE6NYp7M5jI9OIWxxZgcBNPW8+Ab6CbY1Wn0hF7mlwe
- 4KxOUMQOBR+vEPFnkfoxxT9+mBVJ6kuB/t3px9m4l/KtkRzunhl8VFNvieEx1Bk05CWz
- XkIldc5BJUCn/x88x1IGKYBT9YxuIQ1kSpFa5xT2KgnAKg7rJpP7j/9AaTJobMZqLczJ
- Edkpuc1XqDeUJX0sYx29CbHg2x2VivUW9LMsxrUa5pPnjaWVgN7U2As691cFg0kFNZSJ
- B3yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=b0T2/yc1VAw0adGUFTBuH3ADGJB4Oe5EFs26KUSMiuM=;
- b=SLHl2BY/c/sDn7od4DujAb22SWpHk7twoeXNs2rTSd/ptCPqSaoKAO11X/uOQOWAe6
- BmIwM5zbb5g1/NULb1X6qAlZpnNfJvsjUjwZQQJFn5+FP9QilHfGQVNpLe1xi4iqxEF5
- dzqM698VzMLw0YG/rbNPeqWDd3knLCB3/t2VGj86EWb5gWJaG6DNKTrORPdtdyCF2Lq5
- zQDnrGg0tzhPpwwphU0fc8/xVwvAjJypTB60vUVGpDLXWNnxJRRlq4Fpv4fy/X9wdUWG
- 4a2fo8J/bVMAS7AC0BL/KL8p2ZOKPTaGeySgYaiTmnm82RZo8PhYOKmvlXLpvqmWLIAy
- vDjg==
-X-Gm-Message-State: AGi0PuYqqiBT80CjGxNiHDMQI36eu4MVnfQ9VwlvdgP58uCedaI9krmq
- QeM30hjmRu5mgop6xbLvB4x1YGLjKrpvhA==
-X-Google-Smtp-Source: APiQypJZFjRkH7WKP1XTv60yjUL5kUhmpFEbJ+6izpKRd2JgIISgjkSxYnskUuebf8ZBkQwDnNXi0A==
-X-Received: by 2002:a19:224e:: with SMTP id i75mr3019832lfi.22.1587150631056; 
- Fri, 17 Apr 2020 12:10:31 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id t3sm10315665ljo.51.2020.04.17.12.10.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Apr 2020 12:10:29 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 5/6] target/microblaze: Add the pvr-user1 property
-Date: Fri, 17 Apr 2020 21:10:21 +0200
-Message-Id: <20200417191022.5247-6-edgar.iglesias@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200417191022.5247-1-edgar.iglesias@gmail.com>
-References: <20200417191022.5247-1-edgar.iglesias@gmail.com>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jPWXa-0003CF-NN
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:20:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jPWXZ-0002ML-2z
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 19:20:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 144242E8109
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 19:20:41 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::141
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Apr 2020 19:15:13 -0000
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: babumoger e-philipp ehabkost imammedo
+X-Launchpad-Bug-Reporter: Philipp Eppelt (e-philipp)
+X-Launchpad-Bug-Modifier: Eduardo Habkost (ehabkost)
+References: <158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com>
+ <20200417151432.46867.72601.stgit@localhost.localdomain>
+Message-Id: <20200417191513.GD4952@habkost.net>
+Subject: [Bug 1871842] Re: [PATCH] target/i386: Fix the CPUID leaf
+ CPUID_Fn80000008
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 0753b4de3360b31d3275b883eecbc156c512e48f
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,61 +79,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- frasse.iglesias@gmail.com, alistair@alistair23.me,
- richard.henderson@linaro.org, frederic.konrad@adacore.com, philmd@redhat.com,
- luc.michel@greensocs.com
+Reply-To: Bug 1871842 <1871842@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200417191513.1nmNbPTuMYPPS5_hQdt5epD_rn66tkH28CPZLsK32rM@z>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Good catch, thanks for the patch.  Comments below:
 
-Add the pvr-user1 property to control the user-defined
-PVR0 User1 field.
+On Fri, Apr 17, 2020 at 10:14:32AM -0500, Babu Moger wrote:
+> CPUID leaf CPUID_Fn80000008_ECX provides information about the
+> number of threads supported by the processor. It was found that
+> the field ApicIdSize(bits 15-12) was not set correctly.
+> =
 
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- target/microblaze/cpu.c | 4 +++-
- target/microblaze/cpu.h | 1 +
- 2 files changed, 4 insertions(+), 1 deletion(-)
+> ApicIdSize is defined as the number of bits required to represent
+> all the ApicId values within a package.
+> =
 
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index a850c7b23c..0759b23a83 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -193,7 +193,8 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-                         (cpu->cfg.use_mmu ? PVR0_USE_MMU_MASK : 0) |
-                         (cpu->cfg.endi ? PVR0_ENDI_MASK : 0) |
-                         (version_code << PVR0_VERSION_SHIFT) |
--                        (cpu->cfg.pvr == C_PVR_FULL ? PVR0_PVR_FULL_MASK : 0);
-+                        (cpu->cfg.pvr == C_PVR_FULL ? PVR0_PVR_FULL_MASK : 0) |
-+                        cpu->cfg.pvr_user1;
- 
-     env->pvr.regs[2] |= (cpu->cfg.use_fpu ? PVR2_USE_FPU_MASK : 0) |
-                         (cpu->cfg.use_fpu > 1 ? PVR2_USE_FPU2_MASK : 0) |
-@@ -290,6 +291,7 @@ static Property mb_properties[] = {
-                      cfg.opcode_0_illegal, false),
-     DEFINE_PROP_STRING("version", MicroBlazeCPU, cfg.version),
-     DEFINE_PROP_UINT8("pvr", MicroBlazeCPU, cfg.pvr, C_PVR_FULL),
-+    DEFINE_PROP_UINT8("pvr-user1", MicroBlazeCPU, cfg.pvr_user1, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index ef9081db40..7bb5a3d6c6 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -307,6 +307,7 @@ struct MicroBlazeCPU {
-         bool opcode_0_illegal;
-         bool div_zero_exception;
-         bool unaligned_exceptions;
-+        uint8_t pvr_user1;
-         char *version;
-         uint8_t pvr;
-     } cfg;
--- 
-2.20.1
+> Valid Values: Value Description
+> 3h-0h		Reserved.
+> 4h		up to 16 threads.
+> 5h		up to 32 threads.
+> 6h		up to 64 threads.
+> 7h		up to 128 threads.
+> Fh-8h		Reserved.
+> =
 
+> Fix the bit appropriately.
+> =
+
+> This came up during following thread.
+> https://lore.kernel.org/qemu-devel/158643709116.17430.1599506912571677894=
+3.malonedeb@wampee.canonical.com/#t
+> =
+
+> Refer the Processor Programming Reference (PPR) for AMD Family 17h
+> Model 01h, Revision B1 Processors. The documentation is available
+> from the bugzilla Link below.
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D206537
+> =
+
+> Reported-by: Philipp Eppelt <1871842@bugs.launchpad.net>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  target/i386/cpu.c |   12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+> =
+
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 90ffc5f..68210f6 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -5830,11 +5830,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t ind=
+ex, uint32_t count,
+>              *eax =3D cpu->phys_bits;
+>          }
+>          *ebx =3D env->features[FEAT_8000_0008_EBX];
+> -        *ecx =3D 0;
+> -        *edx =3D 0;
+>          if (cs->nr_cores * cs->nr_threads > 1) {
+> -            *ecx |=3D (cs->nr_cores * cs->nr_threads) - 1;
+
+I'm not sure we want a compatibility flag to keep ABI on older
+machine types, here.  Strictly speaking, CPUID must never change
+on older machine types, but sometimes trying hard to emulate bugs
+of old QEMU versions is a pointless exercise.
+
+
+> +            unsigned int max_apicids, bits_required;
+> +
+> +            max_apicids =3D (cs->nr_cores * cs->nr_threads) - 1;
+> +            /* Find out the number of bits to represent all the apicids =
+*/
+> +            bits_required =3D 32 - clz32(max_apicids);
+
+This won't work if nr_cores > 1 and nr_threads is not a power of
+2, will it?
+
+For reference, the field is documented[1] as:
+
+"The number of bits in the initial Core::X86::Apic::ApicId[ApicId]
+value that indicate thread ID within a package"
+
+This sounds like the value already stored at
+CPUX86State::pkg_offset.
+
+
+> +            *ecx =3D bits_required << 12 | max_apicids;
+
+Bits 7:0 are documented as "The number of threads in the package
+is NC+1", with no reference to APIC IDs at all.
+
+Using ((nr_cores * nr_threads) - 1) for bits 7:0 sounds correct,
+but the variable name seems misleading.
+
+
+> +        } else {
+> +            *ecx =3D 0;
+>          }
+> +        *edx =3D 0;
+>          break;
+>      case 0x8000000A:
+>          if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+> =
+
+> =
+
+
+References:
+
+[1] Processor Programming Reference (PPR) for
+    AMD Family 17h Model 18h, Revision B1 Processors
+    55570-B1 Rev 3.14 - Sep 26, 2019
+    https://bugzilla.kernel.org/attachment.cgi?id=3D287395&action=3Dedit
+
+
+-- =
+
+Eduardo
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1871842
+
+Title:
+  AMD CPUID leaf 0x8000'0008 reported number of cores  inconsistent with
+  ACPI.MADT
+
+Status in QEMU:
+  New
+
+Bug description:
+  Setup:
+  CPU: AMD EPYC-v2 or host's EPYC cpu
+  Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
+  qemu version: self build
+  git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
+  config: Configured with: '../configure' '--target-list=3Dx86_64-softmmu,m=
+ips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aar=
+ch64-softmmu,arm-softmmu' '--prefix=3D/opt/qemu-master'
+
+  Cmdline: =
+
+  qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/b=
+in/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , =
+... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu =
+EPYC-v2 -m 4G -smp 4 =
+
+
+  Issue:
+  We are developing an microkernel operating system called L4Re. We recentl=
+y got an AMD EPYC server for testing and we couldn't execute SMP tests of o=
+ur system when running Linux + qemu + VM w/ L4Re.
+  In fact, the kernel did not recognize any APs at all. On AMD CPUs the ker=
+nel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[N=
+C] or [ApicIdSize].  [0][1]
+
+  The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18=
+cf757 ECX: 0x703f EDX: 0x1000
+  The lower four bits of ECX are the [NC] field and all set.
+
+  When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as=
+ replacement and addition to the above cmdline) the CPUID leaf shows: EAX: =
+0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
+  Note, ECX is zero. Indicating that this is no SMP capabale CPU.
+
+  I'm debugging it using my local machine and the QEMU provided EPYC-v2
+  CPU model and it is reproducible there as well and reports:  EAX:
+  0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
+
+  I checked other AMD based CPU models (phenom, opteron_g3/g5) and they beh=
+ave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
+  I believe that behavior here is wrong as ECX[NC] should report the number=
+ of cores per processor, as stated in the AMD manual [2] p.584. In my under=
+standing -smp 4 should then lead to ECX[NC] =3D 0x3.
+
+  The following table shows my findings with the -smp option:
+  Option | Qemu guest observed ECX value
+  -smp 4 | 0x0
+  -smp 4,cores=3D4  | 0x3
+  -smp 4,cores=3D2,thread=3D2 | 0x3
+  -smp 4,cores=3D4,threads=3D2 | QEMU boot error: topology false.
+
+  Now, I'm asking myself how the terminology of the AMD manual maps to QEMU=
+'s -smp option.
+  Obviously, nr_cores and nr_threads correspond to the cores and threads op=
+tions on the cmdline and cores * threads <=3D 4 (in this example), but what=
+ corresponds the X in -smp X to?
+
+  Querying 0x8000'0008 on the physical processor results in different
+  reports than quering QEMU's model as does it with -enable-kvm -cpu
+  host.
+
+  Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
+  CPU leave reports a single core processor.
+
+  This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
+  wrong number.
+
+  =
+
+  Please let me know, if you need more information from my side.
+
+  =
+
+  [0] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
+28e2b879cbbd19/src/kern/ia32/kernel_thread-ia32.cpp#L109
+  [1] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
+28e2b879cbbd19/src/kern/ia32/cpu-ia32.cpp#L1120
+  [2] https://github.com/qemu/qemu/blob/f2a8261110c32c4dccd84e774d8dd7a0524=
+e00fb/target/i386/cpu.c#L5835
+  [3] https://www.amd.com/system/files/TechDocs/24594.pdf
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1871842/+subscriptions
 
