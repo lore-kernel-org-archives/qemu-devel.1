@@ -6,81 +6,74 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CEF4C38A2B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 13:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60040C2D0EF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 13:58:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF568214AF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 13:56:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A9542087E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 13:58:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="InB76e91"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF568214AF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I50gEb87"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A9542087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPRTM-0008Kx-00
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 09:56:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39795)
+	id 1jPRW2-0001zn-Cy
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 09:58:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40134)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jPRSZ-0007jA-6y
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 09:55:12 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jPRVF-0001BC-U4
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 09:57:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jPRSX-0002Wb-W3
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 09:55:10 -0400
-Received: from mail-oo1-xc41.google.com ([2607:f8b0:4864:20::c41]:41644)
+ (envelope-from <peter.maydell@linaro.org>) id 1jPRVE-0004Dk-OT
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 09:57:57 -0400
+Received: from mail-ua1-x941.google.com ([2607:f8b0:4864:20::941]:39095)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jPRSX-0002WH-Pu
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 09:55:09 -0400
-Received: by mail-oo1-xc41.google.com with SMTP id t3so464121oou.8
- for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 06:55:09 -0700 (PDT)
+ id 1jPRVE-0004Bx-DJ
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 09:57:56 -0400
+Received: by mail-ua1-x941.google.com with SMTP id i22so668613uak.6
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 06:57:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=1qGKkVLPIOtw/YCvUqno/ATBMMnNSopURWMtrEnMW9Q=;
- b=InB76e91InNRl4vyHbco2mX3gA95gKqUTLdjn05M2oFYDqF0CAuDPCwlzLNBuuZPfI
- 4MKNCkdc40czeE3rueAak70LjGNoLyRag7RpIRPyQwmMXeWyKPR2d6sJRS+POCliPBsW
- Rm0Otziqg0VNrXQr2qN4xCpCOTtIpXXscyHyMey40TvFMEg04ZRYX+dfMwvUxUhFAbo5
- uRlZZekevrWmmnaOTvmg7fD7EaXijbyDsqmo+14ew/gwczaCinlSK7bS22iQH7QSDR1/
- xFf7EuUz1RwtwotdZwc6FI6wA1IN10u4ASDroMW+WzT10O5bFQiJ3komlt10ZbLzNOMf
- 84pw==
+ :cc; bh=IkDKHSoXtkgxj/FtUPqqyiyfXjHOtFUFK0Fi91nt2NQ=;
+ b=I50gEb87GSWahboVJ5Cj/zt+uMKqfHnFO3lGj1aoVELzOp5KJTnzw2iQ28z74Q71dd
+ CyNmYdInYJ8kQDh+pG3SDJNqFh9SFOkNoZYcA8igIZrsvcqw+bk3z37gz+vRWrp4lquK
+ EwYip5m8//tMFo1d/G6X14JEtFatxtKwkY8c91qYBgRCXSiWJpryWnA0YPYBLh+voEJA
+ pLdkMp/Ms+YQ/Mtep62ovz6NAKdYDfbKUB5GrNA4bvdDkdQxQBUJmQzOJ0UD8t50ijx1
+ rC5/GhsQ6Q23rQnXrGs16Ro01DJO1j3mXWIhLkw/aG8eG9HAZmBAAMDrR5sz8h0Np7mK
+ 2vnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=1qGKkVLPIOtw/YCvUqno/ATBMMnNSopURWMtrEnMW9Q=;
- b=EUr21b3argAQXMNMnTPqqb+IE+jiyKPsJF2vh12Rw52mO2DeBeU03eIRUc/FmYtKU6
- i/WBspV7dmO5iSaFYmQhm4v0z85ddU4Ms1vRCnSEKj7gikjB0XNYltEkQEjbC1Hfn0EV
- Yy063XPgMDrNJRwNHjiU7UJI+N1+hdIq1RaAFQwfscPByHRL4YDtCIRHAlvc0guLRa3i
- d5zCSbOhMSiZwM2h9WHQIKzTJgLvKaGoIr4/32p6dY9MNDXjcHckSb+TuOH3v5yEyXQJ
- zFAkPe+mmXov34ozcuYtvgkEZ6a4kBEWcmFGCfFjdK5GLgrexamYieGdznqRuqskI7JU
- vWUw==
-X-Gm-Message-State: AGi0PuZmsjrgWEifM0Mb/04u0jReTaVmkLZgdA9zjlhu6mAK5aYUeFHj
- 2gLYZ2icky1CcV2LpSuFPwbPywj0UH5CR6p38Gx4Iw==
-X-Google-Smtp-Source: APiQypIDTfiyQpnk189V+b3jR/JVtVNY8V+qgHsx26aO/iXmbTcjjwPHPe0X0jHHcFoDSvwMFPKVRIFx8YqySqhqrdU=
-X-Received: by 2002:a4a:890b:: with SMTP id f11mr2576302ooi.85.1587131708881; 
- Fri, 17 Apr 2020 06:55:08 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=IkDKHSoXtkgxj/FtUPqqyiyfXjHOtFUFK0Fi91nt2NQ=;
+ b=TJFsRZneOaJuAZT5WAMtE7EIsiV29ql64MOt/wfcpo0Wt9zW6ME9HiY0cvuRpQ3dzB
+ xROKN6+ePBlwfCJqDVYHDo1lMXBlUDfgeeL67pQF4N3Qla3ROJ0wkGEcd1dnUIl67wvX
+ l1NIuZsmhDhiSTshNZA+kvfBhZHxi4+aSi+C7bUL4x3elrtFb1aD7THGdPwBg1yjRXKB
+ gK6JeCQNViviYQhG7ofCqXjZPJY1ZuUVL0fMYFNLIDG/2up+ncAZzeAR5pGA1lXrAyql
+ NLrNKjSkYYqzjFm5NYdpVq8H8PdIfjUDPfIsdW5tfdOIxAdKGuwFiWntyuZ1GMipcaYB
+ bU0w==
+X-Gm-Message-State: AGi0PuZcYkxhHG3H8nQnt+Al9g8IQZHVjP4ZhTQyI9LbNCXbfGE5aUU2
+ YE6/wACoEI13IBEb4XI7ARfthpD8/XMnWGtfJ/JhwoTHNsA=
+X-Google-Smtp-Source: APiQypIFFsrU6jCmb2SzZ4GxzmAtcHKhq5TI0HHx1YaHIQgKXVMLnIiKIRRscNiPF9vaUKLBeWghXMx1thUZ6JJelQs=
+X-Received: by 2002:a9d:2c08:: with SMTP id f8mr2674288otb.135.1587131874884; 
+ Fri, 17 Apr 2020 06:57:54 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200316160634.3386-1-philmd@redhat.com>
- <20200316160634.3386-4-philmd@redhat.com>
- <f570579b-da9c-e89a-3430-08e82d9052c1@linaro.org>
- <CAFEAcA8K-njh=TyjS_4deD4wTjhqnc=t6SQB1DbKgWWS5rixSQ@mail.gmail.com>
- <5d9606c9-f812-f629-e03f-d72ddbce05ee@redhat.com>
-In-Reply-To: <5d9606c9-f812-f629-e03f-d72ddbce05ee@redhat.com>
+References: <1587048891-30493-1-git-send-email-sundeep.lkml@gmail.com>
+In-Reply-To: <1587048891-30493-1-git-send-email-sundeep.lkml@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Apr 2020 14:54:57 +0100
-Message-ID: <CAFEAcA-4+Jcfxc5dax8exV+kBJKYEnWZ2d-V1A6sm6uJafZdPg@mail.gmail.com>
-Subject: Re: [PATCH v3 03/19] target/arm: Restrict DC-CVAP instruction to TCG
- accel
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Fri, 17 Apr 2020 14:57:42 +0100
+Message-ID: <CAFEAcA8AOSEK4w+AvyLgOc6gX83_XN7FVvU7kkxpuTuSO3cz9g@mail.gmail.com>
+Subject: Re: [Qemu devel PATCH v6 0/3] Add SmartFusion2 EMAC block
+To: sundeep subbaraya <sundeep.lkml@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::c41
+X-Received-From: 2607:f8b0:4864:20::941
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,65 +85,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- kvm-devel <kvm@vger.kernel.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Subbaraya Sundeep <sbhatta@marvell.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 Apr 2020 at 14:49, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
+On Thu, 16 Apr 2020 at 15:55, <sundeep.lkml@gmail.com> wrote:
 >
-> On 3/16/20 9:11 PM, Peter Maydell wrote:
-> > On Mon, 16 Mar 2020 at 19:36, Richard Henderson
-> > <richard.henderson@linaro.org> wrote:
-> >> I'm not 100% sure how the system regs function under kvm.
-> >>
-> >> If they are not used at all, then we should avoid them all en masse an=
- not
-> >> piecemeal like this.
-> >>
-> >> If they are used for something, then we should keep them registered an=
-d change
-> >> the writefn like so:
-> >>
-> >> #ifdef CONFIG_TCG
-> >>      /* existing stuff */
-> >> #else
-> >>      /* Handled by hardware accelerator. */
-> >>      g_assert_not_reached();
-> >> #endif
+> From: Subbaraya Sundeep <sbhatta@marvell.com>
 >
-> I ended with that patch because dccvap_writefn() calls probe_read()
-> which is an inlined call to probe_access(), which itself is only defined
-> when using TCG. So with KVM either linking fails or I get:
+> This patch set emulates Ethernet MAC block
+> present in Microsemi SmartFusion2 SoC.
 >
-> target/arm/helper.c: In function =E2=80=98dccvap_writefn=E2=80=99:
-> target/arm/helper.c:6898:13: error: implicit declaration of function
-> =E2=80=98probe_read=E2=80=99;
->       haddr =3D probe_read(env, vaddr, dline_size, mem_idx, GETPC());
->               ^~~~~~~~~~
+> v6:
+>  Fixed destination address matching logic
+>  Added missing break in emac_write
+> v5:
+>  As per Philippe comments:
+>         Returned size in receive function
+>         Added link property to pass DMA memory
+>     Used FIELD() APIs
+>     Added mac_addr in emac state
+>     Used FIELD_EX32 and FIELD_DP32 APIs
+>     Simplified if else logics in emac_write/read
+> v4:
+>   Added loop back as per Jason's comment
+> v3:
+>   Added SmartFusion2 ethernet test to tests/acceptance
+> v2:
+>   No changes. Fixed Signed-off mail id in patch 2/2
 
-IN this particular case, DC CVAP is really a system insn rather
-than a 'register'; our register struct for it is marked up as
-ARM_CP_NO_RAW, which means we'll effectively ignore it when
-running KVM (it will not be migrated, have its state synced
-against the kernel, or be visible in gdb). If dccvap_writefn()
-ever gets called somehow that's a bug, so having it end up
-with an assert is the right thing.
+Applied to target-arm.next for 5.1, thanks.
 
-> I'll use your suggestion which works for me:
-
-Your suggested patch isn't quite the same as RTH's suggestion,
-because it puts the assert inside a stub probe_read()
-implementation rather than having the ifdef at the level
-of the writefn body. I have no opinion on whether one or
-the other of these is preferable.
-
-thanks
 -- PMM
 
