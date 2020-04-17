@@ -2,99 +2,73 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8C35C2D0EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 20:38:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ED81C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 20:42:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D3C120656
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 20:38:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D3C120656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id D2C8F20656
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 20:42:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2C8F20656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPXlB-0005G7-Ou
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 16:38:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42640)
+	id 1jPXoM-0007mA-0l
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 16:42:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52834)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jrossi@linux.ibm.com>) id 1jPVqo-0007eH-D3
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:36:31 -0400
+ (envelope-from <bounces@canonical.com>) id 1jPXnJ-0006ce-06
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 16:41:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jrossi@linux.ibm.com>) id 1jPVqn-0001cx-Aa
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 14:36:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8154
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jrossi@linux.ibm.com>)
- id 1jPVqn-0001b5-5H; Fri, 17 Apr 2020 14:36:29 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 03HIYa0s018074; Fri, 17 Apr 2020 14:36:28 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30fgpfj4m8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 17 Apr 2020 14:36:27 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03HIYmvM019285;
- Fri, 17 Apr 2020 14:36:27 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30fgpfj4kt-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 17 Apr 2020 14:36:27 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03HIUans004544;
- Fri, 17 Apr 2020 18:36:26 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma01dal.us.ibm.com with ESMTP id 30b5h7sc5p-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 17 Apr 2020 18:36:26 +0000
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 03HIaP1U66257290
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 17 Apr 2020 18:36:25 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 75C3EC6059;
- Fri, 17 Apr 2020 18:36:25 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C836CC6057;
- Fri, 17 Apr 2020 18:36:24 +0000 (GMT)
-Received: from localhost.localdomain.com (unknown [9.85.151.210])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Fri, 17 Apr 2020 18:36:24 +0000 (GMT)
-From: Jared Rossi <jrossi@linux.ibm.com>
-To: Eric Farman <farman@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH 0/1] vfio-ccw: Enable transparent CCW IPL from DASD
-Date: Fri, 17 Apr 2020 14:38:37 -0400
-Message-Id: <20200417183838.11796-1-jrossi@linux.ibm.com>
-X-Mailer: git-send-email 2.21.1
+ (envelope-from <bounces@canonical.com>) id 1jPXnG-0002pH-Pk
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 16:41:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34402)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jPXnG-0002ma-Kn
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 16:40:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jPXnE-00036s-W8
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 20:40:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D0DFE2E8108
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 20:40:56 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-17_08:2020-04-17,
- 2020-04-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 suspectscore=0
- lowpriorityscore=0 mlxlogscore=789 clxscore=1011 mlxscore=0 spamscore=0
- phishscore=0 priorityscore=1501 adultscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004170141
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-X-Mailman-Approved-At: Fri, 17 Apr 2020 16:37:30 -0400
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Apr 2020 20:27:08 -0000
+From: John Snow <1873338@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jnsnow ruthan
+X-Launchpad-Bug-Reporter: ruthan (ruthan)
+X-Launchpad-Bug-Modifier: John Snow (jnsnow)
+References: <158706562034.6027.11807874678540403888.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158715522835.6474.9301621161181932874.malone@chaenomeles.canonical.com>
+Subject: [Bug 1873338] Re: Dos on the fly CD image replacement is not Working
+ with DOS
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 9ad48e6725c67e5bf3a8a6fa6941a0e6d20b0503
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -103,22 +77,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Reply-To: Bug 1873338 <1873338@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Remove the explicit prefetch check when using vfio-ccw devices.
-This check is not needed as all Linux channel programs are intended
-to use prefetch and will be executed in the same way regardless.
+Does this work with other guests, like Windows 95/98 as far as you can
+tell? Is it only a problem in DOS? What exact version of DOS are you
+seeing the problem with?
 
-Jared Rossi (1):
-  vfio-ccw: Enable transparent CCW IPL from DASD
+-- =
 
- hw/vfio/ccw.c | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1873338
 
--- 
-2.21.1
+Title:
+  Dos on the fly CD image replacement is not Working with DOS
 
+Status in QEMU:
+  New
+
+Bug description:
+  Im not able to exchange CD image on the fly (needed for some games). I
+  messed with command like - in console(ATL+CRTL+2) eject ide1-cd0 and
+  change ide-cd0 D:/Games/!Emulators/Dos-QEMU/ISOs/TestChangeISO.iso ,
+  but system so never able to find new CD data.. simply drive so empty..
+  but when i reboot virtual machine, new change image is now working.
+
+    Qemu 4.2.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1873338/+subscriptions
 
