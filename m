@@ -2,81 +2,115 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8E37C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 21:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 380D7C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 21:57:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A47E620B1F
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 21:56:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F100120B1F
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 21:57:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eYiQ9GHr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A47E620B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="r8oYjzMl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F100120B1F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPYy3-0001Ke-Td
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 17:56:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45155)
+	id 1jPYzJ-0002JO-5R
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 17:57:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45396)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jPYx7-0000g4-6W
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:55:14 -0400
+ (envelope-from <Babu.Moger@amd.com>) id 1jPYxD-0000m6-Gn
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:55:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jPYx5-0005Zq-TA
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:55:13 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:46321)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jPYx5-0005Xz-Ov; Fri, 17 Apr 2020 17:55:11 -0400
-Received: by mail-io1-xd42.google.com with SMTP id i3so3984336ioo.13;
- Fri, 17 Apr 2020 14:55:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mrDaV4mGqUQph+k8yeoTK7cMhAGVxKGCLsk+WnYVjtw=;
- b=eYiQ9GHrGohNhONd0sX8mtkTpc/t2hbGNfnjKUYnjncR8aMLzV57+ZDNroWzPivmNs
- dHt1GILsMxL7BjdN46Da7pBor42KS57ilvw9WXUhyWG3XNj7YE26vvRhl0OtJUx7tnV+
- 6Pey8eamHf0QKlZLuFCPIjvLw8oG3Nkzt287Nl+clTZA8146i8PgBrJCjbDCkfL/8nmZ
- kFPyfFwqpCz9Yk67Hwu9wJh6eLYh0A32k2V5DAmd8tTdLs+q922D3qBHkzm5iZ7bjmVM
- CW5tKfIYVkshhgR5sAflqNah4nTedf4Px3xDb89Y0sdkAmVZDMGQTCO0eHMSo8xjhSR8
- 7bQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mrDaV4mGqUQph+k8yeoTK7cMhAGVxKGCLsk+WnYVjtw=;
- b=bolPAKpTo3Z1GEnecvHRKGTvxuLpuwFU+x6dxmZHqZPh5kFNGXRHUNHaupFhkJHpaD
- lxiozYXvH2y26z998hIFAPzYsTsxcBuRUIPrL9wuBq7pG/1FT8qz6P7HKsAAlm3uYSwd
- SpUG/8kDxtnWWpEsXti4YguTcOeYDYbDOqPECSvLGPn+IYHS5n+abhAT2wyIxR8GXaqZ
- c2Ynm9KMqZag7I8pmym3GdXkXzxnPrka29RNycB8pDtGE6ZVfJWCK43M/A2n43TblhqQ
- ltX5UwL5OHdZER6KjdRrZO/Pvz0xUQrZwmDI4NNP3rLkjMIH6AwUX8bV52JXhbAWD8dT
- yDNg==
-X-Gm-Message-State: AGi0PuZj0Om/pzTniGk42u8CT1jj6gCp9hWAp2jjeke/Di8ylRNf2k50
- /neJesR1XmFF7IVHMzVLKEeL8qBB5hNB3nmpv3o=
-X-Google-Smtp-Source: APiQypJSdbI7ZjejPcPgxwFxNxUijhKdNAPktDdqYddptosi3bNEtcnkDB9jzDtljed7RxWIVwAZsNNSyDQgkHhCJeM=
-X-Received: by 2002:a02:6414:: with SMTP id t20mr5570014jac.8.1587160510977;
- Fri, 17 Apr 2020 14:55:10 -0700 (PDT)
+ (envelope-from <Babu.Moger@amd.com>) id 1jPYxB-0005o1-2w
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:55:19 -0400
+Received: from mail-dm6nam12on2046.outbound.protection.outlook.com
+ ([40.107.243.46]:10113 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1jPYxA-0005kK-Mi
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:55:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KrM/C06WDa7ZIlBkHzNfRf3prIBo/7uF1GiflNvWn95QaOL+aojunlIj1Ufzqa2UZWSFHthtWiZ/39dtbigMs3EoC+R4VYaP17YxwA9+ocQCmc2jxxBEfXI1Rcoo47T5G2Qp1Pbc6VRjlNfu4fZN66DJhQZ2bF30xe/If60OBle14VaKVW6vrW+SgNC+6wDtLaWk1wQz9aFdOI7IbiFLNnyjL3oFgsKTap70BFcNjafjdsVE9zCusQy8pCbItWMT5QLfRAZGr8nd3mZ5hrNhCplN8rYan361T6fqb8zXXV0B2hxvROtL2tDgckP5a+9Z22p0ucEGPjCNGKcTVqFIxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+/iialRbx/+naLyBe5T/+oAZMmnhe2N/TSs8voT36go=;
+ b=mqHF5iTRB7tGIHHRMxMvh0EJffzfsyJ7dq97jYBDKKcUd1Lltv0VjWvWFST7nkQW8pDAgwCTdt1naqWtpxNteMkD+PNyf8ykfjcv3VlJqKwoNYVOeI+NDcGICKVj+6ka5w7d9Ni9X3Cs2CAFdOywACMVEZEIkoYrUwV0TUgr/GjZsPl8FS1rtIu+emakdulCgDUYlS/NdrdMfiL0n3N/Ey7BR78VrKJfnjMl+9QdA2fOOPcZfj7djw8qNmYO1rvQnGtvCfiIel1OSiVkGBECvp/TaNIWxYwp3G2IWWiKPAWr8vTrTx/AKHMYvqyb2gEGl1fqRSOlCyrM7U7LHKUbVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+/iialRbx/+naLyBe5T/+oAZMmnhe2N/TSs8voT36go=;
+ b=r8oYjzMlQh/VmPCk+b0vqg3E3vnm0dItHt8OKNG+6iI5OCqgUP+bnI6hPRxUGzIlP9OxG0F8M6Y9hrENrG1RdyFIiAQMj2MpQ3/dEtHuQVbd9ZvDaUEYnnGlFCucKKfnnLdMDBlByUe4PqnAQGuci04uuV3fLbg0SNHsx4LxnnM=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.26; Fri, 17 Apr
+ 2020 21:55:14 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::c0f:2938:784f:ed8d]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::c0f:2938:784f:ed8d%7]) with mapi id 15.20.2900.028; Fri, 17 Apr 2020
+ 21:55:14 +0000
+Subject: [v2 PATCH] target/i386: Fix the CPUID leaf CPUID_Fn80000008
+From: Babu Moger <babu.moger@amd.com>
+To: pbonzini@redhat.com, ehabkost@redhat.com, rth@twiddle.net
+Date: Fri, 17 Apr 2020 16:55:13 -0500
+Message-ID: <20200417215345.64800.73351.stgit@localhost.localdomain>
+User-Agent: StGit/0.17.1-dirty
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0701CA0027.namprd07.prod.outlook.com
+ (2603:10b6:803:2d::13) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
 MIME-Version: 1.0
-References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
- <20200330153633.15298-34-zhiwei_liu@c-sky.com>
-In-Reply-To: <20200330153633.15298-34-zhiwei_liu@c-sky.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 17 Apr 2020 14:46:47 -0700
-Message-ID: <CAKmqyKNzYSNJ4VdabAE5q65Y+=B7czohK4ey3C0qoeCa88zMYg@mail.gmail.com>
-Subject: Re: [PATCH v7 33/61] target/riscv: vector widening floating-point
- multiply
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d42
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (165.204.78.2) by
+ SN4PR0701CA0027.namprd07.prod.outlook.com (2603:10b6:803:2d::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.29 via Frontend
+ Transport; Fri, 17 Apr 2020 21:55:13 +0000
+X-Originating-IP: [165.204.78.2]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 360843cf-9aab-459e-98b2-08d7e31a0218
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2560:|SN1PR12MB2560:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN1PR12MB25604A0EADA98E1FCB8466A395D90@SN1PR12MB2560.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Forefront-PRVS: 0376ECF4DD
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10009020)(4636009)(136003)(39860400002)(366004)(396003)(346002)(376002)(66946007)(103116003)(8676002)(26005)(478600001)(2906002)(5660300002)(81156014)(66556008)(8936002)(186003)(86362001)(16526019)(6506007)(316002)(66476007)(7696005)(55016002)(956004)(9686003)(1076003)(52116002)(4326008)(44832011)(966005);
+ DIR:OUT; SFP:1101; 
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: KGvimh+0Qx5DyRtQxSrzUe6iWCxgD22vyrruNY12m4+5Pu1/2idIvkOs8r0695WuoaxURC6l/0JLAcV4kc6kKzsS/Yet5b5Miq81D5ExbDD4bkkg6ENNsL8bNf9qRWgFBZoNwtTJiwt8gbseE3oHHqqfa6uaoC6H49iIm4e8kVyxxFT4jXAN9HlaCRrXF+5zvqqk0rWErntVZnsBFTo5XoScwsKaWO/3GzSIxGvCTxZ32KSqWuAde2TJ2PeJBy08qmL5ifpG/jajxo1RkFdcrxylcdSMj5bnc3Ecq7VVMtVysBXDlqnRwyMsw7EWGut8SVNvy42zEoyxV5a+Be8IqxlzDcPvn1Ei5W/Qt8Zgv5BcAgjl58ZoeodtZ+G/8+Lg6h7jtaMkdxWwzxfchHirDkzUp/EIjuV5NiowUNIv5xujq38WNkTRpJyggyMf92I9067MAX/P1MMRrGDct19AbXLhEdXtXdednAiQ6KnPbclzNHIik5/+UV8BaZbA3Rc+ajiZXsxf+XZfWDd0E4AB4w==
+X-MS-Exchange-AntiSpam-MessageData: dMz6VDk+IwLweCaSPuAORYsyTOdmroBWioB1z91XjUH5U0GpwltcIkiyvxj4NQJLVHfqhHI7HLnlaMj8kFOllEaZ5gMAFjZwCoCz1a+0LWIM5JY9PMW+A1zi+IXpZ0KwjQ9+mHbVO3wnG1ZolGMggw==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 360843cf-9aab-459e-98b2-08d7e31a0218
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2020 21:55:14.2744 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dpB109bZNCkOWFuXE+v2ovHGPCYcbhvDGDq7LOgOpXXCOSaz4vrxYJRAaeN4BlNp
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2560
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.243.46
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,100 +122,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
- wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
+Cc: imammedo@redhat.com, qemu-devel@nongnu.org, 1871842@bugs.launchpad.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 30, 2020 at 9:43 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
->
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+CPUID leaf CPUID_Fn80000008_ECX provides information about the
+number of threads supported by the processor. It was found that
+the field ApicIdSize(bits 15-12) was not set correctly.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+ApicIdSize is defined as the number of bits required to represent
+all the ApicId values within a package.
 
-Alistair
+Valid Values: Value Description
+3h-0h		Reserved.
+4h		up to 16 threads.
+5h		up to 32 threads.
+6h		up to 64 threads.
+7h		up to 128 threads.
+Fh-8h		Reserved.
 
-> ---
->  target/riscv/helper.h                   |  5 +++++
->  target/riscv/insn32.decode              |  2 ++
->  target/riscv/insn_trans/trans_rvv.inc.c |  4 ++++
->  target/riscv/vector_helper.c            | 22 ++++++++++++++++++++++
->  4 files changed, 33 insertions(+)
->
-> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-> index fa1558179a..5b3340a4af 100644
-> --- a/target/riscv/helper.h
-> +++ b/target/riscv/helper.h
-> @@ -846,3 +846,8 @@ DEF_HELPER_6(vfdiv_vf_d, void, ptr, ptr, i64, ptr, env, i32)
->  DEF_HELPER_6(vfrdiv_vf_h, void, ptr, ptr, i64, ptr, env, i32)
->  DEF_HELPER_6(vfrdiv_vf_w, void, ptr, ptr, i64, ptr, env, i32)
->  DEF_HELPER_6(vfrdiv_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-> +
-> +DEF_HELPER_6(vfwmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vfwmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vfwmul_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vfwmul_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-> index 16fd938261..1d963f0b8a 100644
-> --- a/target/riscv/insn32.decode
-> +++ b/target/riscv/insn32.decode
-> @@ -461,6 +461,8 @@ vfmul_vf        100100 . ..... ..... 101 ..... 1010111 @r_vm
->  vfdiv_vv        100000 . ..... ..... 001 ..... 1010111 @r_vm
->  vfdiv_vf        100000 . ..... ..... 101 ..... 1010111 @r_vm
->  vfrdiv_vf       100001 . ..... ..... 101 ..... 1010111 @r_vm
-> +vfwmul_vv       111000 . ..... ..... 001 ..... 1010111 @r_vm
-> +vfwmul_vf       111000 . ..... ..... 101 ..... 1010111 @r_vm
->
->  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
->  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-> index 77c5222c4d..5395063b1b 100644
-> --- a/target/riscv/insn_trans/trans_rvv.inc.c
-> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-> @@ -2075,3 +2075,7 @@ GEN_OPFVV_TRANS(vfdiv_vv, opfvv_check)
->  GEN_OPFVF_TRANS(vfmul_vf,  opfvf_check)
->  GEN_OPFVF_TRANS(vfdiv_vf,  opfvf_check)
->  GEN_OPFVF_TRANS(vfrdiv_vf,  opfvf_check)
-> +
-> +/* Vector Widening Floating-Point Multiply */
-> +GEN_OPFVV_WIDEN_TRANS(vfwmul_vv, opfvv_widen_check)
-> +GEN_OPFVF_WIDEN_TRANS(vfwmul_vf)
-> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-> index a9fdf47c2a..bbe3719e69 100644
-> --- a/target/riscv/vector_helper.c
-> +++ b/target/riscv/vector_helper.c
-> @@ -3409,3 +3409,25 @@ RVVCALL(OPFVF2, vfrdiv_vf_d, OP_UUU_D, H8, H8, float64_rdiv)
->  GEN_VEXT_VF(vfrdiv_vf_h, 2, 2, clearh)
->  GEN_VEXT_VF(vfrdiv_vf_w, 4, 4, clearl)
->  GEN_VEXT_VF(vfrdiv_vf_d, 8, 8, clearq)
-> +
-> +/* Vector Widening Floating-Point Multiply */
-> +static uint32_t vfwmul16(uint16_t a, uint16_t b, float_status *s)
-> +{
-> +    return float32_mul(float16_to_float32(a, true, s),
-> +            float16_to_float32(b, true, s), s);
-> +}
-> +
-> +static uint64_t vfwmul32(uint32_t a, uint32_t b, float_status *s)
-> +{
-> +    return float64_mul(float32_to_float64(a, s),
-> +            float32_to_float64(b, s), s);
-> +
-> +}
-> +RVVCALL(OPFVV2, vfwmul_vv_h, WOP_UUU_H, H4, H2, H2, vfwmul16)
-> +RVVCALL(OPFVV2, vfwmul_vv_w, WOP_UUU_W, H8, H4, H4, vfwmul32)
-> +GEN_VEXT_VV_ENV(vfwmul_vv_h, 2, 4, clearl)
-> +GEN_VEXT_VV_ENV(vfwmul_vv_w, 4, 8, clearq)
-> +RVVCALL(OPFVF2, vfwmul_vf_h, WOP_UUU_H, H4, H2, vfwmul16)
-> +RVVCALL(OPFVF2, vfwmul_vf_w, WOP_UUU_W, H8, H4, vfwmul32)
-> +GEN_VEXT_VF(vfwmul_vf_h, 2, 4, clearl)
-> +GEN_VEXT_VF(vfwmul_vf_w, 4, 8, clearq)
-> --
-> 2.23.0
->
+Fix the bit appropriately.
+
+This came up during following thread.
+https://lore.kernel.org/qemu-devel/158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com/#t
+
+Refer the Processor Programming Reference (PPR) for AMD Family 17h
+Model 01h, Revision B1 Processors. The documentation is available
+from the bugzilla Link below.
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=206537
+
+Reported-by: Philipp Eppelt <1871842@bugs.launchpad.net>
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+---
+v2: 
+  Used env->pkg_offset for bits 15:12 which is already available.
+
+ target/i386/cpu.c |   15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 90ffc5f..5e5a605 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5830,11 +5830,20 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             *eax = cpu->phys_bits;
+         }
+         *ebx = env->features[FEAT_8000_0008_EBX];
+-        *ecx = 0;
+-        *edx = 0;
+         if (cs->nr_cores * cs->nr_threads > 1) {
+-            *ecx |= (cs->nr_cores * cs->nr_threads) - 1;
++            /*
++             * Bits 15:12 is "The number of bits in the initial
++             * Core::X86::Apic::ApicId[ApicId] value that indicate
++             * thread ID within a package". This is already stored at
++             * CPUX86State::pkg_offset.
++             * Bits 7:0 is "The number of threads in the package is NC+1"
++             */
++            *ecx = (env->pkg_offset << 12) |
++                   ((cs->nr_cores * cs->nr_threads) - 1);
++        } else {
++            *ecx = 0;
+         }
++        *edx = 0;
+         break;
+     case 0x8000000A:
+         if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
+
 
