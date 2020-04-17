@@ -2,61 +2,97 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9C58C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 05:08:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A76C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 06:40:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73A6021D94
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 05:08:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD9EF20771
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 06:40:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hpcAaddH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73A6021D94
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VKGJpOFG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD9EF20771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPJER-0003mT-L4
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 01:08:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53905)
+	id 1jPKg8-0006uu-LI
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 02:40:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33503)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jPJBz-0000gj-5r
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 01:05:32 -0400
+ (envelope-from <mst@redhat.com>) id 1jPKfK-0006Dt-Vy
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 02:39:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jPJBx-0007Rz-ED
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 01:05:30 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:44107 helo=ozlabs.org)
+ (envelope-from <mst@redhat.com>) id 1jPKfJ-00078d-Hh
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 02:39:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60443
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jPJBv-0007RS-K7; Fri, 17 Apr 2020 01:05:29 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 493PDM3Y3bz9sQx; Fri, 17 Apr 2020 15:05:23 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1587099923;
- bh=4XGPYHVoUfRb7ZLjjBorBfA3SzHrRVUtdj2ETvavjJM=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=hpcAaddHXuUExNc2G8gy3USfLUDFX3F96DNbQ8KQPYItzN71YZb6IC+wF9pZo6sRz
- Qe44e62iO14oKoNeF4hPzv0VLsj6Mmg2B7dW3rxzZRQrRfr3c+nJDd9/YECqkqL54W
- lZCS1B1Hx+tIpkTkZIaSNo9dKVivb2EAe8ND3aPY=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Subject: [PULL 1/3] linux-user/ppc: Fix padding in mcontext_t for ppc64
-Date: Fri, 17 Apr 2020 15:05:12 +1000
-Message-Id: <20200417050514.235060-2-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.25.2
-In-Reply-To: <20200417050514.235060-1-david@gibson.dropbear.id.au>
-References: <20200417050514.235060-1-david@gibson.dropbear.id.au>
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jPKfJ-00077v-EN
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 02:39:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587105592;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MUBVQPBPFdM7O8Ue/0lkR4HtTtJFO9rT0lI5kG1dp6A=;
+ b=VKGJpOFGvnINIjspD3OjhoYmXR/V6zAPR1oRxQ8KSHfZfzRNEIoAbLDyYsygXPzGvfGggs
+ K1mdUJ8d/6QtYycUdIqH8ReXhqOSDYDcVxYBD6JrchPJVl33fNbAg80asdEUYPcHXDiP6s
+ S7edGn9+zGNAig86A8PRXo8/5XPz5uA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-Kd6Azl-KOvOkq5YWVt2FcQ-1; Fri, 17 Apr 2020 02:39:51 -0400
+X-MC-Unique: Kd6Azl-KOvOkq5YWVt2FcQ-1
+Received: by mail-wr1-f72.google.com with SMTP id o12so516958wra.14
+ for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 23:39:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=s8pQoSM8B9SNpU47Rf2Vn7xWVBYdXT3UvqvSWwIi4Bk=;
+ b=jK8XAYC2ueAPQT7KYYCKsGVMhieY/8usTvg4XYD7nu3Og3aydgn5ny4Hs8iLn27lg4
+ Uqukd7R8sEvMb/Nh7wNc/YaoVcqsrXxPBwdpKebgrMARbHHGv0/Q4rv2gjVBVrzMJEj9
+ 61YeFzRE3uWcGAEaWwiVHYPNsXG5cqLl1We6Leaty4AbhomD2dHKPV/UQJnkY0hmusQQ
+ hEe+/bhHHuPam/oou6O4KoHKxiK+pLQXaofq0p7m+YOPwAZXtscMHwHI+J7Aw6/pQ1qo
+ 9r9+9e4L8Yc9BVaKfpK9KjrUfNx396gUEHtcAY5aW3tW7VAnW8NC6Hs0wBN9BqAMFDc0
+ qZUA==
+X-Gm-Message-State: AGi0PuZkHmZ9VDNPwYAa+vKJ2TGv6c4+O0b9qORFSxJZBtAc3wuvJMwd
+ CvyS1i7oJwrmVVkRDuNChgC9bR11ii0QJ7YvEbNpotbFxWM+jko7q3X6mDW55h5srwy2z1TyYrh
+ yIVkCWpeDgg4wE38=
+X-Received: by 2002:a5d:4388:: with SMTP id i8mr2093445wrq.186.1587105589750; 
+ Thu, 16 Apr 2020 23:39:49 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJBBPo6Nz+Hv9o45x6UcjLvxmf14qBPtDK/Bn1gEPYCTqU8DeFD9ONRf/O3RoPUFFrT4TD47w==
+X-Received: by 2002:a5d:4388:: with SMTP id i8mr2093409wrq.186.1587105589461; 
+ Thu, 16 Apr 2020 23:39:49 -0700 (PDT)
+Received: from redhat.com (bzq-79-183-51-3.red.bezeqint.net. [79.183.51.3])
+ by smtp.gmail.com with ESMTPSA id m14sm28673674wrs.76.2020.04.16.23.39.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 16 Apr 2020 23:39:48 -0700 (PDT)
+Date: Fri, 17 Apr 2020 02:39:45 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.0 05/12] vhost-user-gpu: Release memory returned by
+ vu_queue_pop() with free()
+Message-ID: <20200417023937-mutt-send-email-mst@kernel.org>
+References: <20200414133052.13712-1-philmd@redhat.com>
+ <20200414133052.13712-6-philmd@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <20200414133052.13712-6-philmd@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,191 +104,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, groug@kaod.org, qemu-ppc@nongnu.org,
- clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ qemu-stable@nongnu.org, qemu-devel@nongnu.org,
+ Fabien Chouteau <chouteau@adacore.com>, Max Filippov <jcmvbkbc@gmail.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Stafford Horne <shorne@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+On Tue, Apr 14, 2020 at 03:30:45PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> vu_queue_pop() returns memory that must be freed with free().
+>=20
+> Cc: qemu-stable@nongnu.org
+> Reported-by: Coverity (CID 1421887 ALLOC_FREE_MISMATCH)
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-The padding that was added in 95cda4c44ee was added to a union,
-and so it had no effect.  This fixes misalignment errors detected
-by clang sanitizers for ppc64 and ppc64le.
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-In addition, only ppc64 allocates space for VSX registers, so do
-not save them for ppc32.  The kernel only has references to
-CONFIG_SPE in signal_32.c, so do not attempt to save them for ppc64.
-
-Fixes: 95cda4c44ee
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200407032105.26711-1-richard.henderson@linaro.org>
-Acked-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- linux-user/ppc/signal.c | 69 +++++++++++++++++------------------------
- 1 file changed, 29 insertions(+), 40 deletions(-)
-
-diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
-index ecd99736b7..20a02c197c 100644
---- a/linux-user/ppc/signal.c
-+++ b/linux-user/ppc/signal.c
-@@ -35,12 +35,26 @@ struct target_mcontext {
-     target_ulong mc_gregs[48];
-     /* Includes fpscr.  */
-     uint64_t mc_fregs[33];
-+
- #if defined(TARGET_PPC64)
-     /* Pointer to the vector regs */
-     target_ulong v_regs;
-+    /*
-+     * On ppc64, this mcontext structure is naturally *unaligned*,
-+     * or rather it is aligned on a 8 bytes boundary but not on
-+     * a 16 byte boundary.  This pad fixes it up.  This is why we
-+     * cannot use ppc_avr_t, which would force alignment.  This is
-+     * also why the vector regs are referenced in the ABI by the
-+     * v_regs pointer above so any amount of padding can be added here.
-+     */
-+    target_ulong pad;
-+    /* VSCR and VRSAVE are saved separately.  Also reserve space for VSX=
-. */
-+    struct {
-+        uint64_t altivec[34 + 16][2];
-+    } mc_vregs;
- #else
-     target_ulong mc_pad[2];
--#endif
-+
-     /* We need to handle Altivec and SPE at the same time, which no
-        kernel needs to do.  Fortunately, the kernel defines this bit to
-        be Altivec-register-large all the time, rather than trying to
-@@ -48,32 +62,14 @@ struct target_mcontext {
-     union {
-         /* SPE vector registers.  One extra for SPEFSCR.  */
-         uint32_t spe[33];
--        /* Altivec vector registers.  The packing of VSCR and VRSAVE
--           varies depending on whether we're PPC64 or not: PPC64 splits
--           them apart; PPC32 stuffs them together.
--           We also need to account for the VSX registers on PPC64
--        */
--#if defined(TARGET_PPC64)
--#define QEMU_NVRREG (34 + 16)
--        /* On ppc64, this mcontext structure is naturally *unaligned*,
--         * or rather it is aligned on a 8 bytes boundary but not on
--         * a 16 bytes one. This pad fixes it up. This is also why the
--         * vector regs are referenced by the v_regs pointer above so
--         * any amount of padding can be added here
--         */
--        target_ulong pad;
--#else
--        /* On ppc32, we are already aligned to 16 bytes */
--#define QEMU_NVRREG 33
--#endif
--        /* We cannot use ppc_avr_t here as we do *not* want the implied
--         * 16-bytes alignment that would result from it. This would have
--         * the effect of making the whole struct target_mcontext aligned
--         * which breaks the layout of struct target_ucontext on ppc64.
-+        /*
-+         * Altivec vector registers.  One extra for VRSAVE.
-+         * On ppc32, we are already aligned to 16 bytes.  We could
-+         * use ppc_avr_t, but choose to share the same type as ppc64.
-          */
--        uint64_t altivec[QEMU_NVRREG][2];
--#undef QEMU_NVRREG
-+        uint64_t altivec[33][2];
-     } mc_vregs;
-+#endif
- };
-=20
- /* See arch/powerpc/include/asm/sigcontext.h.  */
-@@ -278,6 +274,7 @@ static void save_user_regs(CPUPPCState *env, struct t=
-arget_mcontext *frame)
-         __put_user((uint32_t)env->spr[SPR_VRSAVE], vrsave);
-     }
-=20
-+#if defined(TARGET_PPC64)
-     /* Save VSX second halves */
-     if (env->insns_flags2 & PPC2_VSX) {
-         uint64_t *vsregs =3D (uint64_t *)&frame->mc_vregs.altivec[34];
-@@ -286,6 +283,7 @@ static void save_user_regs(CPUPPCState *env, struct t=
-arget_mcontext *frame)
-             __put_user(*vsrl, &vsregs[i]);
-         }
-     }
-+#endif
-=20
-     /* Save floating point registers.  */
-     if (env->insns_flags & PPC_FLOAT) {
-@@ -296,22 +294,18 @@ static void save_user_regs(CPUPPCState *env, struct=
- target_mcontext *frame)
-         __put_user((uint64_t) env->fpscr, &frame->mc_fregs[32]);
-     }
-=20
-+#if !defined(TARGET_PPC64)
-     /* Save SPE registers.  The kernel only saves the high half.  */
-     if (env->insns_flags & PPC_SPE) {
--#if defined(TARGET_PPC64)
--        for (i =3D 0; i < ARRAY_SIZE(env->gpr); i++) {
--            __put_user(env->gpr[i] >> 32, &frame->mc_vregs.spe[i]);
--        }
--#else
-         for (i =3D 0; i < ARRAY_SIZE(env->gprh); i++) {
-             __put_user(env->gprh[i], &frame->mc_vregs.spe[i]);
-         }
--#endif
-         /* Set MSR_SPE in the saved MSR value to indicate that
-            frame->mc_vregs contains valid data.  */
-         msr |=3D MSR_SPE;
-         __put_user(env->spe_fscr, &frame->mc_vregs.spe[32]);
-     }
-+#endif
-=20
-     /* Store MSR.  */
-     __put_user(msr, &frame->mc_gregs[TARGET_PT_MSR]);
-@@ -392,6 +386,7 @@ static void restore_user_regs(CPUPPCState *env,
-         __get_user(env->spr[SPR_VRSAVE], vrsave);
-     }
-=20
-+#if defined(TARGET_PPC64)
-     /* Restore VSX second halves */
-     if (env->insns_flags2 & PPC2_VSX) {
-         uint64_t *vsregs =3D (uint64_t *)&frame->mc_vregs.altivec[34];
-@@ -400,6 +395,7 @@ static void restore_user_regs(CPUPPCState *env,
-             __get_user(*vsrl, &vsregs[i]);
-         }
-     }
-+#endif
-=20
-     /* Restore floating point registers.  */
-     if (env->insns_flags & PPC_FLOAT) {
-@@ -412,22 +408,15 @@ static void restore_user_regs(CPUPPCState *env,
-         env->fpscr =3D (uint32_t) fpscr;
-     }
-=20
-+#if !defined(TARGET_PPC64)
-     /* Save SPE registers.  The kernel only saves the high half.  */
-     if (env->insns_flags & PPC_SPE) {
--#if defined(TARGET_PPC64)
--        for (i =3D 0; i < ARRAY_SIZE(env->gpr); i++) {
--            uint32_t hi;
--
--            __get_user(hi, &frame->mc_vregs.spe[i]);
--            env->gpr[i] =3D ((uint64_t)hi << 32) | ((uint32_t) env->gpr[=
-i]);
--        }
--#else
-         for (i =3D 0; i < ARRAY_SIZE(env->gprh); i++) {
-             __get_user(env->gprh[i], &frame->mc_vregs.spe[i]);
-         }
--#endif
-         __get_user(env->spe_fscr, &frame->mc_vregs.spe[32]);
-     }
-+#endif
- }
-=20
- #if !defined(TARGET_PPC64)
---=20
-2.25.2
+> ---
+>  contrib/vhost-user-gpu/vhost-user-gpu.c | 4 ++--
+>  contrib/vhost-user-gpu/virgl.c          | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/contrib/vhost-user-gpu/vhost-user-gpu.c b/contrib/vhost-user=
+-gpu/vhost-user-gpu.c
+> index b45d2019b4..a019d0a9ac 100644
+> --- a/contrib/vhost-user-gpu/vhost-user-gpu.c
+> +++ b/contrib/vhost-user-gpu/vhost-user-gpu.c
+> @@ -848,7 +848,7 @@ vg_handle_ctrl(VuDev *dev, int qidx)
+>              QTAILQ_INSERT_TAIL(&vg->fenceq, cmd, next);
+>              vg->inflight++;
+>          } else {
+> -            g_free(cmd);
+> +            free(cmd);
+>          }
+>      }
+>  }
+> @@ -939,7 +939,7 @@ vg_handle_cursor(VuDev *dev, int qidx)
+>          }
+>          vu_queue_push(dev, vq, elem, 0);
+>          vu_queue_notify(dev, vq);
+> -        g_free(elem);
+> +        free(elem);
+>      }
+>  }
+> =20
+> diff --git a/contrib/vhost-user-gpu/virgl.c b/contrib/vhost-user-gpu/virg=
+l.c
+> index 43413e29df..b0bc22c3c1 100644
+> --- a/contrib/vhost-user-gpu/virgl.c
+> +++ b/contrib/vhost-user-gpu/virgl.c
+> @@ -519,7 +519,7 @@ virgl_write_fence(void *opaque, uint32_t fence)
+>          g_debug("FENCE %" PRIu64, cmd->cmd_hdr.fence_id);
+>          vg_ctrl_response_nodata(g, cmd, VIRTIO_GPU_RESP_OK_NODATA);
+>          QTAILQ_REMOVE(&g->fenceq, cmd, next);
+> -        g_free(cmd);
+> +        free(cmd);
+>          g->inflight--;
+>      }
+>  }
+> --=20
+> 2.21.1
 
 
