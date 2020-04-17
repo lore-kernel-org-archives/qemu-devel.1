@@ -2,76 +2,71 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BA4C2D0EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:51:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A5E1C2D0EF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:56:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A37B20715
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:51:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A37B20715
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6162A20776
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:56:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6162A20776
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPX1K-0002B1-Bq
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 15:51:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45615)
+	id 1jPX6e-0003y5-Gv
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 15:56:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52793)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jPX0Z-0001lN-0a
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:50:40 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jPX5m-0003XF-Dv
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:56:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jPX0W-0005bf-S5
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:50:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52814)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jPX0W-0005Yj-KX
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:50:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jPX0U-0005VN-QU
- for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 19:50:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A25D52E804A
- for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 19:50:34 +0000 (UTC)
+ (envelope-from <no-reply@patchew.org>) id 1jPX5k-0005Z6-8b
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:56:01 -0400
+Resent-Date: Fri, 17 Apr 2020 15:56:01 -0400
+Resent-Message-Id: <E1jPX5k-0005Z6-8b@eggs.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21322)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jPX5i-0005SM-37
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:55:58 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1587153347; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=jwYOCK2I79yzns6et5VESkOPHTwNo+/l0w7uTXBSfJJZDdCjhHuxAJQJyIVfknUhRJ5LD54HCbsM1979+V2kTVNRrrWf9jYdcsyFYjCnIY/1WhDEgtZMSc3o1Ud/1Oe0P54CxNJG6kpCjtYP/3fwo90s0/+GlstaI5rC18SEves=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1587153347;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=674UmRMmK8e2q72Ov4fKTYLn5h/K+eulw8B0Z8zaWnk=; 
+ b=GwOIwYAt5KBLmHE2ZMdVVfkBmWaVVxUyV25P/eV425bXHfj015h/RC5VDOn+CFqNSLSjuaiiBNr+jRnwGPVwzYZqus6DhFiDNQ9fSSWdOJSHa+GvMhmfA5gd1uGqVPOirlhokRLBranawydFZZw/gMBQeP8RMs7MV1y2R22j3ic=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1587153344297249.03684046992691;
+ Fri, 17 Apr 2020 12:55:44 -0700 (PDT)
+In-Reply-To: <1587148169-173268-1-git-send-email-fnu.vikram@xilinx.com>
+Subject: Re: [[PATCH v2 0/4] Introduce Xlnx ZynqMP CAN controller for QEMU
+Message-ID: <158715334271.22793.15278954676283700830@39012742ff91>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Apr 2020 19:44:05 -0000
-From: Babu Moger <1871842@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: babumoger e-philipp ehabkost imammedo
-X-Launchpad-Bug-Reporter: Philipp Eppelt (e-philipp)
-X-Launchpad-Bug-Modifier: Babu Moger (babumoger)
-References: <158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com>
- <20200417151432.46867.72601.stgit@localhost.localdomain>
- <20200417191513.GD4952@habkost.net>
-Message-Id: <114b32f5-6557-4d94-a212-f44137ccf003@amd.com>
-Subject: [Bug 1871842] Re: [PATCH] target/i386: Fix the CPUID leaf
- CPUID_Fn80000008
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 26a7cab97f5b3f9962959c3f561e79b718ec5671
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: fnu.vikram@xilinx.com
+Date: Fri, 17 Apr 2020 12:55:44 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 136.143.188.53
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,250 +75,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1871842 <1871842@bugs.launchpad.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: francisco.iglesias@xilinx.com, jasowang@redhat.com, fnu.vikram@xilinx.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200417194405.ITPRV97_AFK6M0r8t9Qh8yJxAsQVhsEgc8UBTXde4Xs@z>
 
-On 4/17/20 2:15 PM, Eduardo Habkost wrote:
-> Good catch, thanks for the patch.  Comments below:
-> =
-
-> On Fri, Apr 17, 2020 at 10:14:32AM -0500, Babu Moger wrote:
->> CPUID leaf CPUID_Fn80000008_ECX provides information about the
->> number of threads supported by the processor. It was found that
->> the field ApicIdSize(bits 15-12) was not set correctly.
->>
->> ApicIdSize is defined as the number of bits required to represent
->> all the ApicId values within a package.
->>
->> Valid Values: Value Description
->> 3h-0h		Reserved.
->> 4h		up to 16 threads.
->> 5h		up to 32 threads.
->> 6h		up to 64 threads.
->> 7h		up to 128 threads.
->> Fh-8h		Reserved.
->>
->> Fix the bit appropriately.
->>
->> This came up during following thread.
->> https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Flore=
-.kernel.org%2Fqemu-devel%2F158643709116.17430.15995069125716778943.malonede=
-b%40wampee.canonical.com%2F%23t&amp;data=3D02%7C01%7Cbabu.moger%40amd.com%7=
-C1b8d59370cdb403dd54308d7e303adb7%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C=
-0%7C637227477274521298&amp;sdata=3DNZHLwOkQrbjkGeqYSI0wgRNUd3QHRCf7lBtdqoR5=
-XfI%3D&amp;reserved=3D0
->>
->> Refer the Processor Programming Reference (PPR) for AMD Family 17h
->> Model 01h, Revision B1 Processors. The documentation is available
->> from the bugzilla Link below.
->> Link: https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%=
-2Fbugzilla.kernel.org%2Fshow_bug.cgi%3Fid%3D206537&amp;data=3D02%7C01%7Cbab=
-u.moger%40amd.com%7C1b8d59370cdb403dd54308d7e303adb7%7C3dd8961fe4884e608e11=
-a82d994e183d%7C0%7C0%7C637227477274521298&amp;sdata=3DoNLqu0J49eTrJ8pQ6GKg6=
-4ZUDfV3egZN2VVkU0DwMaU%3D&amp;reserved=3D0
->>
->> Reported-by: Philipp Eppelt <1871842@bugs.launchpad.net>
->> Signed-off-by: Babu Moger <babu.moger@amd.com>
->> ---
->>  target/i386/cpu.c |   12 +++++++++---
->>  1 file changed, 9 insertions(+), 3 deletions(-)
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index 90ffc5f..68210f6 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -5830,11 +5830,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t in=
-dex, uint32_t count,
->>              *eax =3D cpu->phys_bits;
->>          }
->>          *ebx =3D env->features[FEAT_8000_0008_EBX];
->> -        *ecx =3D 0;
->> -        *edx =3D 0;
->>          if (cs->nr_cores * cs->nr_threads > 1) {
->> -            *ecx |=3D (cs->nr_cores * cs->nr_threads) - 1;
-> =
-
-> I'm not sure we want a compatibility flag to keep ABI on older
-> machine types, here.  Strictly speaking, CPUID must never change
-> on older machine types, but sometimes trying hard to emulate bugs
-> of old QEMU versions is a pointless exercise.
-
-Not sure about this. But it seemed like nobody cared about this field befor=
-e.
-> =
-
-> =
-
->> +            unsigned int max_apicids, bits_required;
->> +
->> +            max_apicids =3D (cs->nr_cores * cs->nr_threads) - 1;
->> +            /* Find out the number of bits to represent all the apicids=
- */
->> +            bits_required =3D 32 - clz32(max_apicids);
-> =
-
-> This won't work if nr_cores > 1 and nr_threads is not a power of
-> 2, will it?
-
-It seem to work. Tested with threads=3D5,cores=3D3.
-
-> =
-
-> For reference, the field is documented[1] as:
-> =
-
-> "The number of bits in the initial Core::X86::Apic::ApicId[ApicId]
-> value that indicate thread ID within a package"
-> =
-
-> This sounds like the value already stored at
-> CPUX86State::pkg_offset.
-
-Yes, it is already in pkg_offset. We can use it.
-
-> =
-
-> =
-
->> +            *ecx =3D bits_required << 12 | max_apicids;
-> =
-
-> Bits 7:0 are documented as "The number of threads in the package
-> is NC+1", with no reference to APIC IDs at all.
-> =
-
-> Using ((nr_cores * nr_threads) - 1) for bits 7:0 sounds correct,
-> but the variable name seems misleading.
-
-I can change the variable name to num_threads.
-> =
-
-> =
-
->> +        } else {
->> +            *ecx =3D 0;
->>          }
->> +        *edx =3D 0;
->>          break;
->>      case 0x8000000A:
->>          if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
->>
->>
-> =
-
-> References:
-> =
-
-> [1] Processor Programming Reference (PPR) for
->     AMD Family 17h Model 18h, Revision B1 Processors
->     55570-B1 Rev 3.14 - Sep 26, 2019
->     https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fb=
-ugzilla.kernel.org%2Fattachment.cgi%3Fid%3D287395%26action%3Dedit&amp;data=
-=3D02%7C01%7Cbabu.moger%40amd.com%7C1b8d59370cdb403dd54308d7e303adb7%7C3dd8=
-961fe4884e608e11a82d994e183d%7C0%7C0%7C637227477274521298&amp;sdata=3DUsM3h=
-4vp3dTgigqOvt7GrGiIUHvH8Kn1g%2BO%2FfGMav%2Bc%3D&amp;reserved=3D0
-> =
-
->
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1871842
-
-Title:
-  AMD CPUID leaf 0x8000'0008 reported number of cores  inconsistent with
-  ACPI.MADT
-
-Status in QEMU:
-  New
-
-Bug description:
-  Setup:
-  CPU: AMD EPYC-v2 or host's EPYC cpu
-  Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
-  qemu version: self build
-  git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
-  config: Configured with: '../configure' '--target-list=3Dx86_64-softmmu,m=
-ips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aar=
-ch64-softmmu,arm-softmmu' '--prefix=3D/opt/qemu-master'
-
-  Cmdline: =
-
-  qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/b=
-in/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , =
-... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu =
-EPYC-v2 -m 4G -smp 4 =
-
-
-  Issue:
-  We are developing an microkernel operating system called L4Re. We recentl=
-y got an AMD EPYC server for testing and we couldn't execute SMP tests of o=
-ur system when running Linux + qemu + VM w/ L4Re.
-  In fact, the kernel did not recognize any APs at all. On AMD CPUs the ker=
-nel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[N=
-C] or [ApicIdSize].  [0][1]
-
-  The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18=
-cf757 ECX: 0x703f EDX: 0x1000
-  The lower four bits of ECX are the [NC] field and all set.
-
-  When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as=
- replacement and addition to the above cmdline) the CPUID leaf shows: EAX: =
-0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
-  Note, ECX is zero. Indicating that this is no SMP capabale CPU.
-
-  I'm debugging it using my local machine and the QEMU provided EPYC-v2
-  CPU model and it is reproducible there as well and reports:  EAX:
-  0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
-
-  I checked other AMD based CPU models (phenom, opteron_g3/g5) and they beh=
-ave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
-  I believe that behavior here is wrong as ECX[NC] should report the number=
- of cores per processor, as stated in the AMD manual [2] p.584. In my under=
-standing -smp 4 should then lead to ECX[NC] =3D 0x3.
-
-  The following table shows my findings with the -smp option:
-  Option | Qemu guest observed ECX value
-  -smp 4 | 0x0
-  -smp 4,cores=3D4  | 0x3
-  -smp 4,cores=3D2,thread=3D2 | 0x3
-  -smp 4,cores=3D4,threads=3D2 | QEMU boot error: topology false.
-
-  Now, I'm asking myself how the terminology of the AMD manual maps to QEMU=
-'s -smp option.
-  Obviously, nr_cores and nr_threads correspond to the cores and threads op=
-tions on the cmdline and cores * threads <=3D 4 (in this example), but what=
- corresponds the X in -smp X to?
-
-  Querying 0x8000'0008 on the physical processor results in different
-  reports than quering QEMU's model as does it with -enable-kvm -cpu
-  host.
-
-  Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
-  CPU leave reports a single core processor.
-
-  This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
-  wrong number.
-
-  =
-
-  Please let me know, if you need more information from my side.
-
-  =
-
-  [0] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
-28e2b879cbbd19/src/kern/ia32/kernel_thread-ia32.cpp#L109
-  [1] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
-28e2b879cbbd19/src/kern/ia32/cpu-ia32.cpp#L1120
-  [2] https://github.com/qemu/qemu/blob/f2a8261110c32c4dccd84e774d8dd7a0524=
-e00fb/target/i386/cpu.c#L5835
-  [3] https://www.amd.com/system/files/TechDocs/24594.pdf
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1871842/+subscriptions
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTg3MTQ4MTY5LTE3MzI2OC0x
+LWdpdC1zZW5kLWVtYWlsLWZudS52aWtyYW1AeGlsaW54LmNvbS8KCgoKSGksCgpUaGlzIHNlcmll
+cyBmYWlsZWQgdGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
+IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
+IERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
+Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdl
+LWNlbnRvczcgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9z
+NyBTSE9XX0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIEND
+ICAgICAgdGVzdHMvcXRlc3QvY2Ryb20tdGVzdC5vCiAgQ0MgICAgICB0ZXN0X2FfZjMyX3pfaTMy
+X3J4Lm8KICBDQyAgICAgIHRlc3RzL3F0ZXN0L2RldmljZS1pbnRyb3NwZWN0LXRlc3QubwovdG1w
+L3FlbXUtdGVzdC9zcmMvdGVzdHMvcXRlc3QveGxueC1jYW4tdGVzdC5jOjI3OjI0OiBmYXRhbCBl
+cnJvcjogcWVtdS9vc2RlcC5oOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CiAjaW5jbHVkZSAi
+cWVtdS9vc2RlcC5oIgogICAgICAgICAgICAgICAgICAgICAgICBeCmNvbXBpbGF0aW9uIHRlcm1p
+bmF0ZWQuCi0tLQogIENDICAgICAgdGVzdF9hX2YzMl96X2YxNi5vCiAgQ0MgICAgICB0ZXN0cy9x
+dGVzdC9xbXAtY21kLXRlc3QubwogIENDICAgICAgdGVzdHMvcXRlc3QvcW9tLXRlc3QubwptYWtl
+OiAqKiogW3Rlc3RzL3F0ZXN0L3hsbngtY2FuLXRlc3RdIEVycm9yIDEKbWFrZTogKioqIFdhaXRp
+bmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KICBDQyAgICAgIHRlc3RfYV9mMzJfel9mNjQubwog
+IENDICAgICAgdGVzdF9hX2YzMl96X2V4dEY4MC5vCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vz
+c0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1h
+bmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUu
+aW5zdGFuY2UudXVpZD1hNTM5NGMxNDgxYmM0NWE4YTVjNDk4MzA0MzI5OTM1ZScsICctdScsICcx
+MDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1l
+JywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAn
+Vj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICct
+ZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8u
+Y2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIv
+dG1wL3BhdGNoZXctdGVzdGVyLXRtcC02Zm10cTM2cC9zcmMvZG9ja2VyLXNyYy4yMDIwLTA0LTE3
+LTE1LjUyLjUwLjE0MjY3Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAnL3Zh
+ci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0
+YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1hNTM5
+NGMxNDgxYmM0NWE4YTVjNDk4MzA0MzI5OTM1ZQptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVy
+cm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVy
+LXRtcC02Zm10cTM2cC9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRv
+czddIEVycm9yIDIKCnJlYWwgICAgMm01My4xNDVzCnVzZXIgICAgMG04LjU1M3MKCgpUaGUgZnVs
+bCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1ODcxNDgxNjkt
+MTczMjY4LTEtZ2l0LXNlbmQtZW1haWwtZm51LnZpa3JhbUB4aWxpbnguY29tL3Rlc3RpbmcuZG9j
+a2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
+bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
