@@ -2,56 +2,58 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B0DC352BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 11:41:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93C9BC352BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 12:02:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B8CD207FC
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 11:41:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B8CD207FC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 65B292078E
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 12:02:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65B292078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPPN9-0004Vp-JD
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 07:41:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47960)
+	id 1jPPhF-0002iI-HR
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 08:02:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51401)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jPPMW-0003mS-Q0
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 07:40:49 -0400
+ (envelope-from <dovgaluk@ispras.ru>) id 1jPPgf-0002JO-1S
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 08:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jPPMV-0005Av-19
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 07:40:48 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:22905)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1jPPMS-00058l-2w
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 07:40:44 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 121BA747DFD;
- Fri, 17 Apr 2020 13:40:42 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id E2EA0747DFB; Fri, 17 Apr 2020 13:40:41 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id E1A3674637F;
- Fri, 17 Apr 2020 13:40:41 +0200 (CEST)
-Date: Fri, 17 Apr 2020 13:40:41 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Randy Yates <yates@digitalsignallabs.com>
-Subject: Re: QEMU Development Questions
-In-Reply-To: <87mu7ac2ah.fsf@digitalsignallabs.com>
-Message-ID: <alpine.BSF.2.22.395.2004171316240.20859@zero.eik.bme.hu>
-References: <87mu7ac2ah.fsf@digitalsignallabs.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <dovgaluk@ispras.ru>) id 1jPPgd-0003IP-OE
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 08:01:36 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:42018)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <dovgaluk@ispras.ru>) id 1jPPgd-0003Fl-GI
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 08:01:35 -0400
+Received: from [192.168.0.183] (unknown [62.118.151.149])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 760F9CD464;
+ Fri, 17 Apr 2020 15:01:31 +0300 (MSK)
+Subject: Re: [PATCH] hw/arm/virt: Add DT property /secure-chosen/kaslr-seed
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Jerome Forissier <jerome@forissier.org>
+References: <20200410153916.17718-1-jerome@forissier.org>
+ <CAFEAcA-JpeYgDwKRarWwggrU5XX7eWsdVy1ngLn538rC6J75vg@mail.gmail.com>
+From: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Message-ID: <37b74bfc-bf61-450a-21d1-43fbdeaa400a@ispras.ru>
+Date: Fri, 17 Apr 2020 15:01:31 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+In-Reply-To: <CAFEAcA-JpeYgDwKRarWwggrU5XX7eWsdVy1ngLn538rC6J75vg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 83.149.199.45
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,76 +65,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Jens Wiklander <jens.wiklander@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 16 Apr 2020, Randy Yates wrote:
->    1.  Apparently the CPU has properties. What are the specific properties and their
->        defaults?  How do you change a property's default value?
 
-Maybe look for DEFINE_PROP_ to find out, For example:
-
-qemu/target/arm/cpu.c:2757:
-static Property arm_cpu_properties[] = {
-     DEFINE_PROP_BOOL("start-powered-off", ARMCPU, start_powered_off, false),
-     DEFINE_PROP_UINT32("psci-conduit", ARMCPU, psci_conduit, 0),
-     DEFINE_PROP_UINT32("midr", ARMCPU, midr, 0),
-     DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
-                         mp_affinity, ARM64_AFFINITY_INVALID),
-     DEFINE_PROP_INT32("node-id", ARMCPU, node_id, CPU_UNSET_NUMA_NODE_ID),
-     DEFINE_PROP_INT32("core-count", ARMCPU, core_count, -1),
-     DEFINE_PROP_END_OF_LIST()
-};
-
-then qemu/hw/arm/bcm2836.c:138:
-         /* start powered off if not enabled */
-         object_property_set_bool(OBJECT(&s->cpu[n].core), n >= s->enabled_cpus,
-                                  "start-powered-off", &err);
-
-
-There's probably also a way to query and set these from monitor, info 
-qtree command lists properties of instantiated devices I think. There's 
-also some device_add option to get info on other devices but I don't know 
-how that works. Maybe help device_add in monitor tells you.
-
->    2.  Ditto previous question for other machine components.
-
-Same as above, but look for property definition in device model under 
-qemu/hw.
-
->    5.  There may be custom hardware involved, e.g., GPIOs, I2Cs, etc.  How would
->        these be defined in the machine?
-
-You need to find the appropriate device model or write it if does not 
-exist then set it up in the board code to appear at the right addresses 
-(or attach to right bus e.g. for i2c devices). The info mtree monitor 
-command is useful to see what's mapped where and you can compare it to 
-memory map of real hardware. For writing device models look at exising 
-similar examples. Also enabling #define DEBUG_UNASSIGNED in qemu/memory.c 
-is useful to get logs about guest attempting to access missing devices 
-(although logged address can be relative to a memory region so may not be 
-actual memory address in some cases). There's also a placeholder 
-unimplemented device model that you can map over known unimplemented 
-areas before you actually implement them, see for example 
-hw/arm/xlnx-versal.c for how it's used.
-
->    6.  Documentation for routing the monitor to another place (e.g., a telnet termi-
->        nal) could be better.  pm215 gave me the following complex set of command-
->        line options:
+On 17.04.2020 13:18, Peter Maydell wrote:
+> On Fri, 10 Apr 2020 at 18:02, Jerome Forissier <jerome@forissier.org> wrote:
+>> This commit generates a random seed to be used by the secure OS for
+>> ASLR when the machine is secure. The seed is a 64-bit random value
+>> exported via the DT in /secure-chosen/kaslr-seed. This interface is
+>> used by OP-TEE [1].
+>>
+>> [1] https://github.com/OP-TEE/optee_os/commit/ef262691fe0e
+> The kernel devicetree documentation documents this as a generic
+> property of /chosen -- should we be providing a /chosen/kaslr-seed
+> too ?
 >
+>> Signed-off-by: Jerome Forissier <jerome@forissier.org>
+>> ---
+>> +static void create_secure_kaslr_seed(VirtMachineState *vms)
+>> +{
+>> +    Error *err = NULL;
+>> +    uint64_t seed;
+>> +
+>> +    if (qcrypto_random_bytes(&seed, sizeof(seed), &err)) {
+>> +        error_free(err);
+>> +        return;
+>> +    }
+> Since this is exposed to the guest I'm wondering if we should
+> use qemu_guest_getrandom() (which lets you make the randomness
+> deterministic for the benefit of record-and-replay). But I'm
+> not sure if that function is usable before the guest has even
+> started running. Pavel, could you answer that?
+
+Yes, usage of deterministic functions is possible before machine is running,
+
+because replay_configure is executed before machine initialization.
+
+
 >
->        -chardev  socket,id=monitor,host=127.0.0.1,port=4444,server,nowait,telnet  -mon  chardev=monitor,mode=readline
-
-This works, for telnet I'm afraid that's the simplest way. There's 
--monitor stdio or -serial stdio that can be useful.
-
->    7.  Ditto above comment for the -d option.
-
-I think there's -D logfile to specify log file, these are somewhat 
-documented in --help.
-
-Regards,
-BALATON Zoltan
+>> +    qemu_fdt_setprop_u64(vms->fdt, "/secure-chosen", "kaslr-seed", seed);
+>> +}
+>> +
+>>   static void machvirt_init(MachineState *machine)
+>>   {
+>>       VirtMachineState *vms = VIRT_MACHINE(machine);
+>> @@ -1837,6 +1850,7 @@ static void machvirt_init(MachineState *machine)
+>>       if (vms->secure) {
+>>           create_secure_ram(vms, secure_sysmem);
+>>           create_uart(vms, VIRT_SECURE_UART, secure_sysmem, serial_hd(1));
+>> +        create_secure_kaslr_seed(vms);
+> This is implicitly relying on create_uart() having created
+> the "/secure-chosen" node. I think it would be better now
+> that we have multiple things we might want to put there if we
+> just pulled the "create /secure-chosen" code out to the
+> create_fdt() function so we do it at the same place we
+> create "/chosen". (You can do that as a simple patch of its own
+> that comes before this one in the patchseries.)
+>
+>>       }
+>>
+>>       vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
+> thanks
+> -- PMM
 
