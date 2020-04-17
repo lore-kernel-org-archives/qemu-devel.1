@@ -2,67 +2,68 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD87C2D0EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3029C2D0EF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:49:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8C0820715
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:46:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9FAA220715
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:49:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tagonb9b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8C0820715
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gg8DF6h2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FAA220715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPWwj-00063x-TO
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 15:46:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38724)
+	id 1jPWze-0000qz-Rp
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 15:49:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39740)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jPWve-0004zi-FJ
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:45:35 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jPWwI-0005lG-Gm
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:46:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jPWvd-0005uh-Aa
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:45:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41259
+ (envelope-from <jsnow@redhat.com>) id 1jPWwG-00074O-JH
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:46:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43057
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jPWvd-0005st-5r
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:45:33 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jPWwG-00073L-Fn
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:46:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587152732;
+ s=mimecast20190719; t=1587152771;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=7SGmO4CMWTruMjIwOTsUxxI3ib9EdM5DOMAXSKcbj5A=;
- b=Tagonb9bIC9zYJEgCLhmdYjStuMpPpJds5DB6VexS3hCGYg1ntawEB6ZwetCtnJuTqlhY1
- S8DAax9LoML2B7iRU0TAjd1feiojdU+YIYrY06o0eQnINfgXCSMI1fBM2OBjDeUsmsafqU
- NqcN2whQZfrnWGDEID/GpQt3f7mZzb0=
+ bh=PLcbl+bmeMrJ87QQsOvOjSaI65Nvn1hnJ1HGq+00ox4=;
+ b=gg8DF6h2qyZBo7xP/avXv6iT9P5vPMLPk9Ru5x8OQEGWegrCoMCCo69pfZ4t5mk7X/SY4c
+ wY3EmFvTjK1x6jnVzNQbciSdcvqoGag2SgpvCGZ4nqnJCvdP7ozJRBWI6skaDFVQ6/JPvr
+ 02gYvNQN2G29xTSFJTNH/ArH68Y0jH0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-HBjqHuMQPKyk9jQwPny2NA-1; Fri, 17 Apr 2020 15:45:30 -0400
-X-MC-Unique: HBjqHuMQPKyk9jQwPny2NA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-510-pcV3h1kAOY-R5aFO7L_9Nw-1; Fri, 17 Apr 2020 15:46:10 -0400
+X-MC-Unique: pcV3h1kAOY-R5aFO7L_9Nw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D06D192D785;
- Fri, 17 Apr 2020 19:45:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1CAB107ACC9;
+ Fri, 17 Apr 2020 19:46:05 +0000 (UTC)
 Received: from [10.10.119.33] (ovpn-119-33.rdu2.redhat.com [10.10.119.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5F9AA5C28E;
- Fri, 17 Apr 2020 19:45:09 +0000 (UTC)
-Subject: Re: [PATCH-for-5.1 2/3] various: Remove unnecessary OBJECT() cast
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6CF1F8D57F;
+ Fri, 17 Apr 2020 19:45:53 +0000 (UTC)
+Subject: Re: [PATCH-for-5.1 3/3] hw: Remove unnecessary DEVICE() cast
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20200412210954.32313-1-f4bug@amsat.org>
- <20200412210954.32313-3-f4bug@amsat.org>
+ <20200412210954.32313-4-f4bug@amsat.org>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -138,21 +139,20 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <f3b9362e-b55e-c9e1-81b0-fa770f96bd13@redhat.com>
-Date: Fri, 17 Apr 2020 15:45:08 -0400
+Message-ID: <a4eda645-9e09-b384-0b17-c38a4025ef3c@redhat.com>
+Date: Fri, 17 Apr 2020 15:45:52 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200412210954.32313-3-f4bug@amsat.org>
+In-Reply-To: <20200412210954.32313-4-f4bug@amsat.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -193,9 +193,20 @@ Sender: "Qemu-devel"
 
 
 On 4/12/20 5:09 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> -    memory_region_init_io(&a->mmio, OBJECT(obj), &allwinner_ahci_mem_ops=
-, a,
-> +    memory_region_init_io(&a->mmio, obj, &allwinner_ahci_mem_ops, a,
+> diff --git a/hw/ide/piix.c b/hw/ide/piix.c
+> index 3b2de4c312..b402a93636 100644
+> --- a/hw/ide/piix.c
+> +++ b/hw/ide/piix.c
+> @@ -193,7 +193,7 @@ int pci_piix3_xen_ide_unplug(DeviceState *dev, bool a=
+ux)
+>              blk_unref(blk);
+>          }
+>      }
+> -    qdev_reset_all(DEVICE(dev));
+> +    qdev_reset_all(dev);
+>      return 0;
+>  }
+> =20
 
 Acked-by: John Snow <jsnow@redhat.com>
 
