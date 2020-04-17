@@ -2,91 +2,81 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B2CBC38A2C
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 11:07:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F3FDC38A29
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 11:10:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A88F21D95
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 11:07:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFC2B21D95
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 11:10:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="niEPODbR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A88F21D95
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XCqdspfA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFC2B21D95
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPOqD-0005xf-Ei
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 07:07:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43068)
+	id 1jPOtP-0007oN-W8
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 07:10:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43467)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thatlemon@gmail.com>) id 1jPOpU-0005HD-7Q
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 07:06:41 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jPOsZ-0007Du-OH
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 07:09:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thatlemon@gmail.com>) id 1jPOpR-00009S-LC
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 07:06:39 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51097)
+ (envelope-from <peter.maydell@linaro.org>) id 1jPOsY-0002zr-Fe
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 07:09:51 -0400
+Received: from mail-oo1-xc42.google.com ([2607:f8b0:4864:20::c42]:33908)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <thatlemon@gmail.com>) id 1jPOpQ-00006r-8f
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 07:06:36 -0400
-Received: by mail-wm1-x343.google.com with SMTP id x25so2522351wmc.0
- for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 04:06:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:from:to:references:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=t049tPTWuQGmt7oQLivwMJYJhpKdXyVYu2P8qMMUd+o=;
- b=niEPODbRS1hDPYMyRjfm/yCvNNmn18re0lRIZKFb4DUOMACiAIjezcJBNOWXQIZiUq
- 6H+wRFBGUB3NQ3s5ly0QAk95sAkFSsyZlrqaAFHCrRdJ7eKtw+z4mhCPrEqddkVruiLL
- fcJjTEuSPX5AJOApjm0yCjfrdKu9yfJ/wLhDeN/Xz4AkKTYtYXx8Xd30rmjyrhrUyEPL
- klpxfasrzvoK1beb98NYBwUlEOV8vKkV6+FQKT37qJiM+t1JALgwXRVS8l2Rc8oBXoVH
- wtL9IVqAcUm17zfvpy7Gb71pv6wSujiXEm+7ugGFxmeJDPywp6b6NprKI1HbpcqCmwNG
- lXjA==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jPOsY-0002zR-6m
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 07:09:50 -0400
+Received: by mail-oo1-xc42.google.com with SMTP id q204so376363ooq.1
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 04:09:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=L+a6vh1vUZ/GYvIsQQJcWYuzro5d5IT5YKmZYXp+FtQ=;
+ b=XCqdspfAJJJBHPIqDiPxZzbqhdRwD+rB0tkhAk28fZQHxCZVFvBPaqMFFsbcLEJMiB
+ YYOdnZy03qKoWuShVn7AFN7teT96Lewsi3X8XengNmj7ZfpLMEhH9OGK9wtv96UMr+6N
+ GbiyB4p6mR/3yIgHsupbVS/PyxuVeznzrxJHayE8RaH7zskEeOFPNVKvPFA3A0ifnMgd
+ g9cjzhX8+kx/BnfvnbJ/DXAF4TaS61q7ai8fpaPWPEAJ/09OK7e8P/UcrJ0R4o1drUSt
+ ucEwP2s3gpTWuIfiZqgmyvYw2nvaGQN5GMNxDALbncGAYU7PrzqY6Qd28qpF1VTMDQBl
+ IYvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=t049tPTWuQGmt7oQLivwMJYJhpKdXyVYu2P8qMMUd+o=;
- b=d943juF5E+Lnj4AbhNH4ZI+LWBFtPmcIHCbkJMGrvGvv7JyTkN7BJt2b8U6viFAOu8
- TLyVjIX1+dHeBQxMaO+vZuWwBZxYX2+suvV30dsOyxxl0WKCpATKJjkcr+ipA+d4hQ66
- atcTu5osPhh5+RJD0vmsQuJBFUiJiM+JQa9oP7wojwf1vG15/H3lsxi221j0GHCKlAVP
- 60s9P1YCOGcLr5HxrELVlTa6TAEfJVrXFagNuMaVhqc0dqKtC9mS/m+F80beCRYiSx+K
- jQ9an5AcW5SOdJeGbzcITZdBd08Dl2PctfBAjnmWw6/BQJ3L+P3l5uqhoSD2onfIEgIz
- /OMg==
-X-Gm-Message-State: AGi0PuabnXLt0eL4kSDDnHzvRdRrmQ5KM2LsWQLH2DafRz71Aob03Jgj
- Pp0h9xcfkm7lmhoEUBiv23Y=
-X-Google-Smtp-Source: APiQypIUFWa+hPY4vaDv2vFRT4mCULN3ZrYp4PdAlB4Yb+13jM9tyZE/S5qhC+WIO46hNirn4nz9NQ==
-X-Received: by 2002:a1c:9cc6:: with SMTP id f189mr2731347wme.75.1587121593900; 
- Fri, 17 Apr 2020 04:06:33 -0700 (PDT)
-Received: from [192.168.1.199] (93-43-179-29.ip93.fastwebnet.it.
- [93.43.179.29])
- by smtp.gmail.com with ESMTPSA id 5sm7444483wmg.34.2020.04.17.04.06.32
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 17 Apr 2020 04:06:33 -0700 (PDT)
-Subject: Re: [PATCH] linux-user/sparc64: Translate flushw opcode
-From: LemonBoy <thatlemon@gmail.com>
-To: qemu-devel@nongnu.org, laurent@vivier.eu, mark.cave-ayland@ilande.co.uk,
- atar4qemu@gmail.com
-References: <894ec93e-05dd-2110-a0c2-e0afa2fa6fd5@gmail.com>
-Message-ID: <37bfb13b-7562-1c61-6563-197b4618f680@gmail.com>
-Date: Fri, 17 Apr 2020 13:06:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=L+a6vh1vUZ/GYvIsQQJcWYuzro5d5IT5YKmZYXp+FtQ=;
+ b=MPEfdawAvJ/CWgdZvcJePPXMjZ919ICEUPuFdgLISG/1vfGg40sW0NUpAcS7AZvU7r
+ EUahPrklL6HEyxW+R3Kem13+AMyr4AXKZs+VPDCDre9ik4ZO2qeWSTlfyuo8YdrS7bLN
+ beQiJAhyesy0JizlQMTMip+1y1HG0g4Wq87l/Nvj681DXxPC1LeOTVKtzrbFJIN8jgp+
+ gZmGgmSaf0GgEBWrn2yCv3ImLyjvNOCcn8W4M7AwtZ0/35ce+izyEZWHdhWdyMQGJv+N
+ ztpb8zvBYPvAmy2Khn9hksL+azI0vSfvq8uPas6g4gnI/Hsb+UKlDfV2tqRdY/QASsRH
+ sKfw==
+X-Gm-Message-State: AGi0PuYnWQIUs0qWaLPk/KrkpshfSNkm63iXsNSvhfGwuACHtPthz9dc
+ H9D+gAOrjTEXPUfXhTvG0fzpGFcd6ImR3GQrjGU/BQ==
+X-Google-Smtp-Source: APiQypI4VAXkXEn8MfLlMSE9RZMeskOWdKDt3PhXdlboy/MePoSTgGy3h5dZGJagFVlkZszYIrnmdCB/w1cZuofEqmU=
+X-Received: by 2002:a4a:890b:: with SMTP id f11mr2021652ooi.85.1587121789362; 
+ Fri, 17 Apr 2020 04:09:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <894ec93e-05dd-2110-a0c2-e0afa2fa6fd5@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200413091552.62748-1-zhukeqian1@huawei.com>
+ <20200413091552.62748-3-zhukeqian1@huawei.com>
+In-Reply-To: <20200413091552.62748-3-zhukeqian1@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Apr 2020 12:09:38 +0100
+Message-ID: <CAFEAcA9iUAtVvuv_8AOm0TkYzDD54QHZEL_DKRv_b_YpaVTJ_g@mail.gmail.com>
+Subject: Re: [PATCH 2/3] intc/gicv3_kvm: use kvm_gicc_access to get
+ ICC_CTLR_EL1
+To: Keqian Zhu <zhukeqian1@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::c42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,73 +88,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: wanghaibin.wang@huawei.com, Igor Mammedov <imammedo@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping, I forgot to CC the SPARC mantainers in the previous mail.
-
-On 10/04/20 23:14, LemonBoy wrote:
-> From 11d0cfe58d12e0f191b435ade88622cfceb2098a Mon Sep 17 00:00:00 2001
-> From: LemonBoy <thatlemon@gmail.com>
-> Date: Fri, 10 Apr 2020 22:55:26 +0200
-> Subject: [PATCH] linux-user/sparc64: Translate flushw opcode
-> 
-> The ifdef logic should unconditionally compile in the `xop == 0x2b` case
-> when targeting sparc64.
-> 
-> Fix the handling of window spill traps by keeping cansave into account
-> when calculating the new CWP.
-> 
-> Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
+On Mon, 13 Apr 2020 at 10:18, Keqian Zhu <zhukeqian1@huawei.com> wrote:
+>
+> Replace kvm_device_access with kvm_gicc_access to simplify
+> code.
+>
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 > ---
->  bsd-user/main.c             | 4 +++-
->  linux-user/sparc/cpu_loop.c | 4 +++-
->  target/sparc/translate.c    | 2 ++
->  3 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/bsd-user/main.c b/bsd-user/main.c
-> index 770c2b267a..d6b1c997e3 100644
-> --- a/bsd-user/main.c
-> +++ b/bsd-user/main.c
-> @@ -413,7 +413,9 @@ static void save_window(CPUSPARCState *env)
->      save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
->      env->wim = new_wim;
->  #else
-> -    save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
-> +    /* cansave is zero if the spill trap handler is triggered by `save` and */
-> +    /* nonzero if triggered by a `flushw` */
-> +    save_window_offset(env, cpu_cwp_dec(env, env->cwp - env->cansave - 2));
->      env->cansave++;
->      env->canrestore--;
->  #endif
-> diff --git a/linux-user/sparc/cpu_loop.c b/linux-user/sparc/cpu_loop.c
-> index 7645cc04ca..20a7401126 100644
-> --- a/linux-user/sparc/cpu_loop.c
-> +++ b/linux-user/sparc/cpu_loop.c
-> @@ -69,7 +69,9 @@ static void save_window(CPUSPARCState *env)
->      save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
->      env->wim = new_wim;
->  #else
-> -    save_window_offset(env, cpu_cwp_dec(env, env->cwp - 2));
-> +    /* cansave is zero if the spill trap handler is triggered by `save` and */
-> +    /* nonzero if triggered by a `flushw` */
-> +    save_window_offset(env, cpu_cwp_dec(env, env->cwp - env->cansave - 2));
->      env->cansave++;
->      env->canrestore--;
->  #endif
-> diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-> index 9416a551cf..1a4efd4ed6 100644
-> --- a/target/sparc/translate.c
-> +++ b/target/sparc/translate.c
-> @@ -3663,6 +3663,8 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
->  #endif
->                  gen_store_gpr(dc, rd, cpu_tmp0);
->                  break;
-> +#endif
-> +#if defined(TARGET_SPARC64) || !defined(CONFIG_USER_ONLY)
->              } else if (xop == 0x2b) { /* rdtbr / V9 flushw */
->  #ifdef TARGET_SPARC64
->                  gen_helper_flushw(cpu_env);
-> 
+>  hw/intc/arm_gicv3_kvm.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+> index ca43bf87ca..85f6420498 100644
+> --- a/hw/intc/arm_gicv3_kvm.c
+> +++ b/hw/intc/arm_gicv3_kvm.c
+> @@ -678,9 +678,8 @@ static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+>      }
+>
+>      /* Initialize to actual HW supported configuration */
+> -    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+> -                      KVM_VGIC_ATTR(ICC_CTLR_EL1, c->gicr_typer),
+> -                      &c->icc_ctlr_el1[GICV3_NS], false, &error_abort);
+> +    kvm_gicc_access(s, ICC_CTLR_EL1, c->cpu->cpu_index,
+> +                    &c->icc_ctlr_el1[GICV3_NS], false);
+
+This works at the moment, but I'd rather we avoided looking into
+cpu->cpu_index inside the GIC code. The cpu_index is the overall
+index of the CPU of all CPUs in the system, which is not in
+theory the same as "index of this CPU for this GIC". The two
+currently match up because arm_gicv3_common_realize() populates
+its s->cpu[i].cpu by calling qemu_get_cpu(i), but in future
+we might change that code (eg so that the board code has to
+explicitly wire up the CPUs to the GIC object by passing
+pointers to the CPUs to the GIC via link properties). So I'd
+rather not have the internals of the GIC code bake in the
+assumption that 'global CPU index is the same as the index
+of the CPU for this GIC object'.
+
+(All the other places that call kvm_gicc_access() are doing it
+as part of a loop from 0 to n->num_cpus, so they don't have this
+issue.)
+
+thanks
+-- PMM
 
