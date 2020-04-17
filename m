@@ -2,75 +2,160 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20875C38A29
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:21:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 217C1C38A29
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:43:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F252B2078E
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:21:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F252B2078E
+	by mail.kernel.org (Postfix) with ESMTPS id D0F562076A
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:43:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JHZYBDcC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0F562076A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPWYa-00051e-37
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 15:21:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38121)
+	id 1jPWtw-0002tm-TD
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 15:43:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35123)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jPWXc-0004BH-Jh
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:20:46 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jPWt9-0002P8-J5
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:43:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jPWXa-0003FC-TK
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:20:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48560)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jPWXa-0003CF-NN
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:20:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jPWXZ-0002ML-2z
- for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 19:20:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 144242E8109
- for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 19:20:41 +0000 (UTC)
+ (envelope-from <jsnow@redhat.com>) id 1jPWt7-0001se-TA
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:42:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22137
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jPWt7-0001rm-Oz
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:42:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587152577;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=BV78+5epUs37yXC/+mGqC65hBUCFLaxqM1VISkn78DU=;
+ b=JHZYBDcCTpKwk+vDRgn3jbhaxSdXslG3u0xxRvRECnTo7KAV22bEyItdTRYdkkBXojkAvL
+ BszVTCJ3F/rW6HiTlV/YPozrXtWz8ECVkvZvFqYvdMpQS7dg5UfaKNI5D8GciPlxA7VMD1
+ jcw2hZ6ykXLV72gKtnqccLGzt7PBi9E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-qD8BjsviNuKBqSkjbdDHow-1; Fri, 17 Apr 2020 15:42:55 -0400
+X-MC-Unique: qD8BjsviNuKBqSkjbdDHow-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6B8E149C2;
+ Fri, 17 Apr 2020 19:42:53 +0000 (UTC)
+Received: from [10.10.119.33] (ovpn-119-33.rdu2.redhat.com [10.10.119.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 735451000325;
+ Fri, 17 Apr 2020 19:42:51 +0000 (UTC)
+Subject: Re: [PATCH-for-5.1 1/3] hw/ide/ahci: Use qdev gpio rather than
+ qemu_allocate_irqs()
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200412212943.4117-1-f4bug@amsat.org>
+ <20200412212943.4117-2-f4bug@amsat.org>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <4d1a57d6-a59a-95f2-d8d8-e0a62393a567@redhat.com>
+Date: Fri, 17 Apr 2020 15:42:49 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200412212943.4117-2-f4bug@amsat.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Apr 2020 19:15:13 -0000
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: babumoger e-philipp ehabkost imammedo
-X-Launchpad-Bug-Reporter: Philipp Eppelt (e-philipp)
-X-Launchpad-Bug-Modifier: Eduardo Habkost (ehabkost)
-References: <158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com>
- <20200417151432.46867.72601.stgit@localhost.localdomain>
-Message-Id: <20200417191513.GD4952@habkost.net>
-Subject: [Bug 1871842] Re: [PATCH] target/i386: Fix the CPUID leaf
- CPUID_Fn80000008
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0753b4de3360b31d3275b883eecbc156c512e48f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,221 +164,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1871842 <1871842@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Stafford Horne <shorne@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200417191513.1nmNbPTuMYPPS5_hQdt5epD_rn66tkH28CPZLsK32rM@z>
-
-Good catch, thanks for the patch.  Comments below:
-
-On Fri, Apr 17, 2020 at 10:14:32AM -0500, Babu Moger wrote:
-> CPUID leaf CPUID_Fn80000008_ECX provides information about the
-> number of threads supported by the processor. It was found that
-> the field ApicIdSize(bits 15-12) was not set correctly.
-> =
-
-> ApicIdSize is defined as the number of bits required to represent
-> all the ApicId values within a package.
-> =
-
-> Valid Values: Value Description
-> 3h-0h		Reserved.
-> 4h		up to 16 threads.
-> 5h		up to 32 threads.
-> 6h		up to 64 threads.
-> 7h		up to 128 threads.
-> Fh-8h		Reserved.
-> =
-
-> Fix the bit appropriately.
-> =
-
-> This came up during following thread.
-> https://lore.kernel.org/qemu-devel/158643709116.17430.1599506912571677894=
-3.malonedeb@wampee.canonical.com/#t
-> =
-
-> Refer the Processor Programming Reference (PPR) for AMD Family 17h
-> Model 01h, Revision B1 Processors. The documentation is available
-> from the bugzilla Link below.
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D206537
-> =
-
-> Reported-by: Philipp Eppelt <1871842@bugs.launchpad.net>
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> ---
->  target/i386/cpu.c |   12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
-> =
-
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 90ffc5f..68210f6 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -5830,11 +5830,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t ind=
-ex, uint32_t count,
->              *eax =3D cpu->phys_bits;
->          }
->          *ebx =3D env->features[FEAT_8000_0008_EBX];
-> -        *ecx =3D 0;
-> -        *edx =3D 0;
->          if (cs->nr_cores * cs->nr_threads > 1) {
-> -            *ecx |=3D (cs->nr_cores * cs->nr_threads) - 1;
-
-I'm not sure we want a compatibility flag to keep ABI on older
-machine types, here.  Strictly speaking, CPUID must never change
-on older machine types, but sometimes trying hard to emulate bugs
-of old QEMU versions is a pointless exercise.
 
 
-> +            unsigned int max_apicids, bits_required;
-> +
-> +            max_apicids =3D (cs->nr_cores * cs->nr_threads) - 1;
-> +            /* Find out the number of bits to represent all the apicids =
-*/
-> +            bits_required =3D 32 - clz32(max_apicids);
 
-This won't work if nr_cores > 1 and nr_threads is not a power of
-2, will it?
+On 4/12/20 5:29 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Switch to using the qdev gpio API which is preferred over
+> qemu_allocate_irqs(). One step to eventually deprecate and
+> remove qemu_allocate_irqs() one day.
+>=20
+> Patch created mechanically using spatch with this script
+> inspired from commit d6ef883d9d7:
+>=20
+>   @@
+>   typedef qemu_irq;
+>   identifier irqs, handler;
+>   expression opaque, count, i;
+>   @@
+>   -   qemu_irq *irqs;
+>       ...
+>   -   irqs =3D qemu_allocate_irqs(handler, opaque, count);
+>   +   qdev_init_gpio_in(DEVICE(opaque), handler, count);
+>       <+...
+>   -   irqs[i]
+>   +   qdev_get_gpio_in(DEVICE(opaque), i)
+>       ...+>
+>   ?-  g_free(irqs);
+>=20
+> Inspired-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-For reference, the field is documented[1] as:
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-"The number of bits in the initial Core::X86::Apic::ApicId[ApicId]
-value that indicate thread ID within a package"
+Acked-by: John Snow <jsnow@redhat.com>
 
-This sounds like the value already stored at
-CPUX86State::pkg_offset.
-
-
-> +            *ecx =3D bits_required << 12 | max_apicids;
-
-Bits 7:0 are documented as "The number of threads in the package
-is NC+1", with no reference to APIC IDs at all.
-
-Using ((nr_cores * nr_threads) - 1) for bits 7:0 sounds correct,
-but the variable name seems misleading.
-
-
-> +        } else {
-> +            *ecx =3D 0;
->          }
-> +        *edx =3D 0;
->          break;
->      case 0x8000000A:
->          if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
-> =
-
-> =
-
-
-References:
-
-[1] Processor Programming Reference (PPR) for
-    AMD Family 17h Model 18h, Revision B1 Processors
-    55570-B1 Rev 3.14 - Sep 26, 2019
-    https://bugzilla.kernel.org/attachment.cgi?id=3D287395&action=3Dedit
-
-
--- =
-
-Eduardo
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1871842
-
-Title:
-  AMD CPUID leaf 0x8000'0008 reported number of cores  inconsistent with
-  ACPI.MADT
-
-Status in QEMU:
-  New
-
-Bug description:
-  Setup:
-  CPU: AMD EPYC-v2 or host's EPYC cpu
-  Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
-  qemu version: self build
-  git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
-  config: Configured with: '../configure' '--target-list=3Dx86_64-softmmu,m=
-ips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aar=
-ch64-softmmu,arm-softmmu' '--prefix=3D/opt/qemu-master'
-
-  Cmdline: =
-
-  qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/b=
-in/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , =
-... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu =
-EPYC-v2 -m 4G -smp 4 =
-
-
-  Issue:
-  We are developing an microkernel operating system called L4Re. We recentl=
-y got an AMD EPYC server for testing and we couldn't execute SMP tests of o=
-ur system when running Linux + qemu + VM w/ L4Re.
-  In fact, the kernel did not recognize any APs at all. On AMD CPUs the ker=
-nel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[N=
-C] or [ApicIdSize].  [0][1]
-
-  The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18=
-cf757 ECX: 0x703f EDX: 0x1000
-  The lower four bits of ECX are the [NC] field and all set.
-
-  When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as=
- replacement and addition to the above cmdline) the CPUID leaf shows: EAX: =
-0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
-  Note, ECX is zero. Indicating that this is no SMP capabale CPU.
-
-  I'm debugging it using my local machine and the QEMU provided EPYC-v2
-  CPU model and it is reproducible there as well and reports:  EAX:
-  0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
-
-  I checked other AMD based CPU models (phenom, opteron_g3/g5) and they beh=
-ave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
-  I believe that behavior here is wrong as ECX[NC] should report the number=
- of cores per processor, as stated in the AMD manual [2] p.584. In my under=
-standing -smp 4 should then lead to ECX[NC] =3D 0x3.
-
-  The following table shows my findings with the -smp option:
-  Option | Qemu guest observed ECX value
-  -smp 4 | 0x0
-  -smp 4,cores=3D4  | 0x3
-  -smp 4,cores=3D2,thread=3D2 | 0x3
-  -smp 4,cores=3D4,threads=3D2 | QEMU boot error: topology false.
-
-  Now, I'm asking myself how the terminology of the AMD manual maps to QEMU=
-'s -smp option.
-  Obviously, nr_cores and nr_threads correspond to the cores and threads op=
-tions on the cmdline and cores * threads <=3D 4 (in this example), but what=
- corresponds the X in -smp X to?
-
-  Querying 0x8000'0008 on the physical processor results in different
-  reports than quering QEMU's model as does it with -enable-kvm -cpu
-  host.
-
-  Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
-  CPU leave reports a single core processor.
-
-  This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
-  wrong number.
-
-  =
-
-  Please let me know, if you need more information from my side.
-
-  =
-
-  [0] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
-28e2b879cbbd19/src/kern/ia32/kernel_thread-ia32.cpp#L109
-  [1] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
-28e2b879cbbd19/src/kern/ia32/cpu-ia32.cpp#L1120
-  [2] https://github.com/qemu/qemu/blob/f2a8261110c32c4dccd84e774d8dd7a0524=
-e00fb/target/i386/cpu.c#L5835
-  [3] https://www.amd.com/system/files/TechDocs/24594.pdf
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1871842/+subscriptions
 
