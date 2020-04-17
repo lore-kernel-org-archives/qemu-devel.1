@@ -8,73 +8,73 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D13D6C2D0EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51DF7C2D0EF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:13:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E3C520780
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:11:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1446220780
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:13:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dqXPKC35"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E3C520780
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SI5oIYz0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1446220780
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPWOw-0003gw-Pc
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 15:11:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54320)
+	id 1jPWQY-0005RH-8b
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 15:13:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54219)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jPWNk-0002iQ-5T
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:10:33 -0400
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jPWNh-0002fJ-6L
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:10:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jPWNi-0005NO-Va
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:10:32 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:44655)
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jPWNf-0005H6-3a
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:10:29 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:33073)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jPWNi-0005Lw-Nj
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:10:30 -0400
-Received: by mail-lj1-x244.google.com with SMTP id z26so3134735ljz.11
- for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 12:10:30 -0700 (PDT)
+ id 1jPWNe-0005Ep-Rz
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:10:27 -0400
+Received: by mail-lj1-x242.google.com with SMTP id q22so3200501ljg.0
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 12:10:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=j6qAH/yc9ASWu022edKXnrycRFAgkzUAnHYobHnSqsw=;
- b=dqXPKC359jSI4EApqsfrPY1xSRvW+3EEL7xTo4WcjXKn1pTYLRjAHgjr97aTEjm6vs
- L/llYbh367vpzBMihjUY4B1bgXhbq+1cFlbAhhktlr8sNtDKiWvTO71REjPhCOqMkRl6
- UEJ62x+GTZYpg+mOiYIX9LDdiBOrmuq8qhk/JmcpnCedR0kFKXR6Tsk0rsj5wNhZ/u5B
- DiCD64KG+RCpNjWIpa7CUWRLAaQron8jeQsrnhb8XUl7A99t1NjU8cC/InxCoCSiSmbi
- UBsp0yemeyU+yqdW3pQkmODNepqSWMy9hz2qfPUTLetS4L5BIb6Dw0T6q63MoRatDTQM
- EUEA==
+ bh=j4+pLj7eQpP+1IFfO1O1TwFE+yPC5V1FdSQ5yPNNIxA=;
+ b=SI5oIYz0rxAo0t32NBu+qd3LM6xE/sY4dTJJZBK2aCB01JY8UPCfxYQVWpesPHRxZ9
+ GW8/z9uAzFtO0UjzwH+J3R8h2s3hoa1SJiAI4FlIQJuweRr7phWBdpI5+V1AidRpK4qw
+ IdnR8NkhEkf2hCVDvFPkw5rIUz656xJPiWuH7q9nzTtlTuMgMk+LyK0dCzryI2TEylVd
+ rz41QCfCFzwI2n08ZFva9nPn21oGHx8ZhJAvtTZKfYU8Oh7RFpVmUmfnB/Tl5IqAZVca
+ BNIn/qI/1xCv30Mel9myKTzHwe6L0YqVoQVvh5QvX250d3bN2uN6oLeccpMT3SeixDsN
+ CDbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=j6qAH/yc9ASWu022edKXnrycRFAgkzUAnHYobHnSqsw=;
- b=JK7k1TR8RbE/yGsAlxKs7xGd87VHa4Z2l+hU5MxQKYEeB+sBcmKuU7hbnV8Lkd1NGN
- VxY7qTaBJSRZBIAF91UuxQjjmC1rlR88w067a5Is8ALgfWsvJEOVthC4+cIWvbbXtO4y
- swgHDknhw8tGwGQoY/W77dmntrPSEM7wTQO9ZYXNp4iR4A97cS0YSaj/A44qwxhcw+zd
- pWrRA0DTT3w6K65BqjyLh5IO92Rut0ZCRQ0BWdaoPgwx7Ftf8KBf99+ar3+71YYIYplE
- 0Ctfxf7+8MYaargbYPY8QwL1ZgkpR7hE6U/+P71mJsJ44QxWBN+JSLLFMEL51zG75rlL
- Wtmg==
-X-Gm-Message-State: AGi0PubQ44KPKEO+OnDcMkclp8M0igcqiogHs9k9MxhN9lP80Ocrbjmp
- sPXhF72pGU9LN6DpXALcXh34PM/+NTO+Qw==
-X-Google-Smtp-Source: APiQypLSg9SB9K5Paqtq2nr1NTgZRvRIPbzXnRnJb33wPJ3q/Z8+xg/GLMOzaDK98dYaHLkJNBYUhg==
-X-Received: by 2002:a2e:9752:: with SMTP id f18mr3084673ljj.181.1587150629170; 
- Fri, 17 Apr 2020 12:10:29 -0700 (PDT)
+ bh=j4+pLj7eQpP+1IFfO1O1TwFE+yPC5V1FdSQ5yPNNIxA=;
+ b=bY/PXhqg9viWZWE+5E8Uv2BON5yhvnEb+vGdSlnkOx1h+jzavxY+dExbKRuIDRg6O+
+ 3qzhZW0pQiE11iicbQ8HiJWsb7OEmYR1Sl15IGZVYEl/k4Ewd7FYXd98NWKKv4xr4Duk
+ u04qSTce36MxHTM/C1rEDI9z8VGUuH4y5YCCLNUGe3HOzm6HYS96fqA/B7Hn0LsVeii/
+ Q/tianxsgni0QEy5QP1+dsATv9MqzWf+x1GebKQXNttUKglGm3xI81vqoeLO9u82jjri
+ vXk1gheqef3pyF78x7S6/u1lsPD8DYQ6JEhzlbM+PiwRNOu0eSxVhIbh0Jy7+hO06WfK
+ +R7w==
+X-Gm-Message-State: AGi0PubcoghPuy8YSdx8sxkHZMqj6KpfukschNlID2SSF97NpN+G74Ko
+ VwlRTKj4eMAK1yh833mjyezn04LsAq8fzw==
+X-Google-Smtp-Source: APiQypLNkc8db9WZydwpU+px78fjKec64UnfXLIp2fZanWQKzTNifgWfjNMZ66QSLvpKPxGob4353Q==
+X-Received: by 2002:a2e:988f:: with SMTP id b15mr3116550ljj.232.1587150625127; 
+ Fri, 17 Apr 2020 12:10:25 -0700 (PDT)
 Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id 6sm18697919lfy.97.2020.04.17.12.10.28
+ by smtp.gmail.com with ESMTPSA id j22sm19235399lfg.96.2020.04.17.12.10.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Apr 2020 12:10:28 -0700 (PDT)
+ Fri, 17 Apr 2020 12:10:24 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 4/6] target/microblaze: Add the unaligned-exceptions
+Subject: [PATCH v1 1/6] target/microblaze: Add the opcode-0x0-illegal CPU
  property
-Date: Fri, 17 Apr 2020 21:10:20 +0200
-Message-Id: <20200417191022.5247-5-edgar.iglesias@gmail.com>
+Date: Fri, 17 Apr 2020 21:10:17 +0200
+Message-Id: <20200417191022.5247-2-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200417191022.5247-1-edgar.iglesias@gmail.com>
 References: <20200417191022.5247-1-edgar.iglesias@gmail.com>
@@ -82,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::244
+X-Received-From: 2a00:1450:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,72 +105,65 @@ Sender: "Qemu-devel"
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Add the unaligned-exceptions property to control if the core
-traps unaligned memory accesses.
+Add the opcode-0x0-illegal CPU property to control if the core
+should trap opcode zero as illegal.
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/cpu.c       | 4 ++++
+ target/microblaze/cpu.c       | 6 +++++-
  target/microblaze/cpu.h       | 1 +
- target/microblaze/translate.c | 4 ++--
+ target/microblaze/translate.c | 2 +-
  3 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 7a40e2fbad..a850c7b23c 100644
+index a2c2f271df..1044120702 100644
 --- a/target/microblaze/cpu.c
 +++ b/target/microblaze/cpu.c
-@@ -209,6 +209,8 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-                                                  PVR2_IOPB_BUS_EXC_MASK : 0) |
-                         (cpu->cfg.illegal_opcode_exception ?
-                                                 PVR2_ILL_OPCODE_EXC_MASK : 0) |
-+                        (cpu->cfg.unaligned_exceptions ?
-+                                                PVR2_UNALIGNED_EXC_MASK : 0) |
-                         (cpu->cfg.opcode_0_illegal ?
-                                                  PVR2_OPCODE_0x0_ILL_MASK : 0);
+@@ -206,7 +206,9 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
+                         (cpu->cfg.dopb_bus_exception ?
+                                                  PVR2_DOPB_BUS_EXC_MASK : 0) |
+                         (cpu->cfg.iopb_bus_exception ?
+-                                                 PVR2_IOPB_BUS_EXC_MASK : 0);
++                                                 PVR2_IOPB_BUS_EXC_MASK : 0) |
++                        (cpu->cfg.opcode_0_illegal ?
++                                                 PVR2_OPCODE_0x0_ILL_MASK : 0);
  
-@@ -282,6 +284,8 @@ static Property mb_properties[] = {
-                      cfg.illegal_opcode_exception, false),
-     DEFINE_PROP_BOOL("div-zero-exception", MicroBlazeCPU,
-                      cfg.div_zero_exception, false),
-+    DEFINE_PROP_BOOL("unaligned-exceptions", MicroBlazeCPU,
-+                     cfg.unaligned_exceptions, false),
-     DEFINE_PROP_BOOL("opcode-0x0-illegal", MicroBlazeCPU,
-                      cfg.opcode_0_illegal, false),
+     env->pvr.regs[5] |= cpu->cfg.dcache_writeback ?
+                                         PVR5_DCACHE_WRITEBACK_MASK : 0;
+@@ -274,6 +276,8 @@ static Property mb_properties[] = {
+     /* Enables bus exceptions on failed instruction fetches.  */
+     DEFINE_PROP_BOOL("iopb-bus-exception", MicroBlazeCPU,
+                      cfg.iopb_bus_exception, false),
++    DEFINE_PROP_BOOL("opcode-0x0-illegal", MicroBlazeCPU,
++                     cfg.opcode_0_illegal, false),
      DEFINE_PROP_STRING("version", MicroBlazeCPU, cfg.version),
+     DEFINE_PROP_UINT8("pvr", MicroBlazeCPU, cfg.pvr, C_PVR_FULL),
+     DEFINE_PROP_END_OF_LIST(),
 diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index 3c07f9b3f7..ef9081db40 100644
+index 1a700a880c..d51587b342 100644
 --- a/target/microblaze/cpu.h
 +++ b/target/microblaze/cpu.h
-@@ -306,6 +306,7 @@ struct MicroBlazeCPU {
-         bool illegal_opcode_exception;
-         bool opcode_0_illegal;
-         bool div_zero_exception;
-+        bool unaligned_exceptions;
+@@ -303,6 +303,7 @@ struct MicroBlazeCPU {
+         bool endi;
+         bool dopb_bus_exception;
+         bool iopb_bus_exception;
++        bool opcode_0_illegal;
          char *version;
          uint8_t pvr;
      } cfg;
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index b4a78551ef..20b7427811 100644
+index 37a844db99..222632b670 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -995,7 +995,7 @@ static void dec_load(DisasContext *dc)
-     v = tcg_temp_new_i32();
-     tcg_gen_qemu_ld_i32(v, addr, mem_index, mop);
+@@ -1573,7 +1573,7 @@ static inline void decode(DisasContext *dc, uint32_t ir)
+     LOG_DIS("%8.8x\t", dc->ir);
  
--    if ((dc->cpu->env.pvr.regs[2] & PVR2_UNALIGNED_EXC_MASK) && size > 1) {
-+    if (dc->cpu->cfg.unaligned_exceptions && size > 1) {
-         TCGv_i32 t0 = tcg_const_i32(0);
-         TCGv_i32 treg = tcg_const_i32(dc->rd);
-         TCGv_i32 tsize = tcg_const_i32(size - 1);
-@@ -1110,7 +1110,7 @@ static void dec_store(DisasContext *dc)
-     tcg_gen_qemu_st_i32(cpu_R[dc->rd], addr, mem_index, mop);
- 
-     /* Verify alignment if needed.  */
--    if ((dc->cpu->env.pvr.regs[2] & PVR2_UNALIGNED_EXC_MASK) && size > 1) {
-+    if (dc->cpu->cfg.unaligned_exceptions && size > 1) {
-         TCGv_i32 t1 = tcg_const_i32(1);
-         TCGv_i32 treg = tcg_const_i32(dc->rd);
-         TCGv_i32 tsize = tcg_const_i32(size - 1);
+     if (ir == 0) {
+-        trap_illegal(dc, dc->cpu->env.pvr.regs[2] & PVR2_OPCODE_0x0_ILL_MASK);
++        trap_illegal(dc, dc->cpu->cfg.opcode_0_illegal);
+         /* Don't decode nop/zero instructions any further.  */
+         return;
+     }
 -- 
 2.20.1
 
