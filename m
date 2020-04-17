@@ -2,94 +2,86 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A528AC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 06:43:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F157C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 08:05:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B58D20771
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 06:43:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49D7220644
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 08:05:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G0RGKHVB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B58D20771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HpZknUQu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49D7220644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPKiN-0000mn-KH
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 02:43:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33695)
+	id 1jPM0A-00072E-ES
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 04:05:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54799)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jPKgF-00076N-KP
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 02:40:52 -0400
+ (envelope-from <ni.xun.intel@gmail.com>) id 1jPJKk-0005fx-7E
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 01:14:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jPKgE-0007ok-Hd
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 02:40:51 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27371
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jPKgC-0007mA-NT
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 02:40:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587105647;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fEMxjAYNaA24PRwCIBTPQwHjswgDw/0sJlHDOVvm1G0=;
- b=G0RGKHVBGCWhukryt+9GpYPQKZ65rP6bz76xHaELuibvrxwuO1anf5QRb4sXZRNhJhb1Iv
- 1T7KY8xsKwIUXeoL9epfUcryf59XElChn5UKUculiYqoN5wJAd2moeiwtugD2AfEvPmWT6
- k1lyN1Ci570AtmdLddJQMwBAioZBb4A=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-210-2eY-1d94P_-ssnl8yY77gg-1; Fri, 17 Apr 2020 02:40:44 -0400
-X-MC-Unique: 2eY-1d94P_-ssnl8yY77gg-1
-Received: by mail-wr1-f70.google.com with SMTP id h95so519494wrh.11
- for <qemu-devel@nongnu.org>; Thu, 16 Apr 2020 23:40:43 -0700 (PDT)
+ (envelope-from <ni.xun.intel@gmail.com>) id 1jPJKj-0002Vc-6P
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 01:14:34 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:38243)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <ni.xun.intel@gmail.com>)
+ id 1jPJKg-0002Ub-Qf; Fri, 17 Apr 2020 01:14:30 -0400
+Received: by mail-pf1-x441.google.com with SMTP id y25so524321pfn.5;
+ Thu, 16 Apr 2020 22:14:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=4FGrssPyP2GvHmjw7awTY/F55dKYyfXpXPoaU8AZM5o=;
+ b=HpZknUQu+qOV8VzyAhv26eF5Hm5NZxSpSUOIuCeZUOwA3Ob2KzImoDfoQaQtYWbweD
+ oId5YBUoC4BbMXjomPMOwBZljXK8ByzrerujS1xq6Jwp8DZAT4gykVFq313il8v5kNu6
+ dSGpmTsjZq+3ofSoCKtokOfYFcNBxrTGyyftlnSX/hd0HbchC6ccOXbjHXUx8Hl+gdY7
+ JHLfKpksnHaN1M/PiscSNLrbssaxWlL2EacRWabyEwjhCRcKe34HtTsN9+AnaYQJdQMe
+ mPpKCUhlVRC62bG8/08b9gK4PNyt/7PMHn/upwbOm8uJveFof5xV/G8ZnygflQ3oA/Zp
+ Lgkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=2mHImV1cMqRM3Vy0b2SFiCR52s4bh8qmJiZQmqCJy9w=;
- b=QTMrDBd+i/QgrkLdzQFCgXe24ZiDiFKXCXsSwdR81Xeiw1MIm9eulMd1KzKhSewrJI
- VsI8XJuPBndXO7Oltifn3E8IW3e97IYwL8rnUCYoX+oY8MYr3FP7Z4XFuJ1wMxD6i+t2
- HhxTTLPPEDLgl3s4jOmmjDstXfRvDY8po+idhEVBtKGMVpqF4imO9NnGlSLj1wm99t3Y
- 86FwZQ80J/27WB/0fN78gY0Pew21Jxx3vA1FzbzSpzxbKpOehK4C9/AofDi/F+x+ciLf
- X/WO+lCrD3sd6w+nZFzmXbXtPgCO3b6IgKxciUDbEZablNVL0jAsHNGoSYKYZjcaOgkx
- tm5A==
-X-Gm-Message-State: AGi0Pubp3DJgY7ETXPFwjrFbItyODgZ1UjMyIumOhqzp1zEWMp75uAdu
- DgyKnDvC+3M0dJ9vIkDSpEMiSM8Dord/SMjH6N/mH/cB8x5kKnv/5ZZghZSNlJdgelqw/kPwiu4
- nDKndmXGsP/UZaw4=
-X-Received: by 2002:a1c:9e43:: with SMTP id h64mr1749155wme.0.1587105642864;
- Thu, 16 Apr 2020 23:40:42 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKzlAP17UU5r0iAIWNFd7owlN6f/orkvhQ1YHL+Xld4z3riVhqvA9+PyWSCH4So4BHxOoywrA==
-X-Received: by 2002:a1c:9e43:: with SMTP id h64mr1749122wme.0.1587105642603;
- Thu, 16 Apr 2020 23:40:42 -0700 (PDT)
-Received: from redhat.com (bzq-79-183-51-3.red.bezeqint.net. [79.183.51.3])
- by smtp.gmail.com with ESMTPSA id v21sm6436460wmj.8.2020.04.16.23.40.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 16 Apr 2020 23:40:42 -0700 (PDT)
-Date: Fri, 17 Apr 2020 02:40:39 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH-for-5.0 00/12] various bugfixes
-Message-ID: <20200417024020-mutt-send-email-mst@kernel.org>
-References: <20200414133052.13712-1-philmd@redhat.com>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=4FGrssPyP2GvHmjw7awTY/F55dKYyfXpXPoaU8AZM5o=;
+ b=Y4Tz1bMoC0qiX8boKGJ26/5jVt4qXNB7K6/Xy0Lh0hBVVW5dH1f6GqJmQI+g+haU66
+ ZtcQyFDoeBFqKahKkmykKTdYr7R8ZxbObP+e4wOWZtn6PJhURemw2erbIugAmU194fQ/
+ IOzUjYq6HrLvylF5UZxGqr4qu/FgMJTB1cIsVh3Mo/aIPkLy1h/wf9rPqzE6irYzasID
+ L/qWYuRZf7Bwz34/eSxDUq0dZZl0ghHXQ0EHMVaOwUeOe937BeYvwK9wkTkkB1nY4/gi
+ 2fWQIccZNRhB4uqjonmJ+jWxeZ9zauF3y4RG2OpIi7j2IPrp0p4esrzv00i3Pe9vU8jl
+ XmIw==
+X-Gm-Message-State: AGi0PubwxgYDFkxxApAlt5IJRYDjUet/pBbUEwTKqOjxND9Gm/a3Twox
+ cZ5mkDMaYh+dRZzvzWQdE8w=
+X-Google-Smtp-Source: APiQypLJ4fcDAc9SZ1fR6eViE3QCLgps6/l3HyeWQZUPzfFhisJmXvvpFWq1AwV5JGJxcvCC9FrgVQ==
+X-Received: by 2002:aa7:9a92:: with SMTP id w18mr1446065pfi.95.1587100469260; 
+ Thu, 16 Apr 2020 22:14:29 -0700 (PDT)
+Received: from RICHARDNI-MB0.tencent.com ([203.205.141.36])
+ by smtp.gmail.com with ESMTPSA id d7sm18241638pfa.106.2020.04.16.22.14.26
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 16 Apr 2020 22:14:28 -0700 (PDT)
+From: ni.xun.intel@gmail.com
+X-Google-Original-From: richardni@tencent.com
+To: raphael.norwitz@nutanix.com, mst@redhat.com, kwolf@redhat.com,
+ mreitz@redhat.com, qemu-block@nongnu.org
+Subject: [PATCH] resend slave fd to vhost when reconnect to vhost
+Date: Fri, 17 Apr 2020 13:14:00 +0800
+Message-Id: <20200417051400.30398-1-richardni@tencent.com>
+X-Mailer: git-send-email 2.24.1 (Apple Git-126)
 MIME-Version: 1.0
-In-Reply-To: <20200414133052.13712-1-philmd@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::441
+X-Mailman-Approved-At: Fri, 17 Apr 2020 04:03:58 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,71 +93,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Fabien Chouteau <chouteau@adacore.com>,
- Max Filippov <jcmvbkbc@gmail.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Stafford Horne <shorne@gmail.com>, Max Reitz <mreitz@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Yan Miao <leomyan@tencent.com>, lucascye <lucascye@tencent.com>,
+ Lu Zhigang <tonnylu@tencent.com>, qemu-devel@nongnu.org,
+ Ni Xun <richardni@tencent.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Apr 14, 2020 at 03:30:40PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Collection of bugfixes for 5.0.
->=20
-> Only vhost-user-gpu/grlib_ahb_apb_pnp patches are reviewed.
->=20
-> As 5.0-rc3 is tomorrow, I thought it could help to gather
-> them and resend altogether.
+From: Ni Xun <richardni@tencent.com>
 
+when reconnecting to vhost server, it doesn't send slave fd to vhost
+as the slave fd is only sent in vhost_user_init. also resend the slave fd
+in vhost reconnect.
 
-So who's applying all this stuff? Peter?
+Signed-off-by: Ni Xun <richardni@tencent.com>
+Signed-off-by: Lu Zhigang <tonnylu@tencent.com>
+Signed-off-by: Yan Miao <leomyan@tencent.com>
+Signed-off-by: lucascye <lucascye@tencent.com>
+---
+ hw/block/vhost-user-blk.c | 6 ++++++
+ hw/virtio/vhost-user.c    | 2 +-
+ include/hw/virtio/vhost.h | 1 +
+ 3 files changed, 8 insertions(+), 1 deletion(-)
 
-> Regards,
->=20
-> Phil.
->=20
-> Mansour Ahmadi (1):
->   hw/block/pflash: Check return value of blk_pwrite()
->=20
-> Philippe Mathieu-Daud=E9 (11):
->   Revert "prevent crash when executing guest-file-read with large count"
->   qga: Extract guest_file_handle_find() to commands-common.h
->   qga: Extract qmp_guest_file_read() to common commands.c
->   qga: Restrict guest-file-read count to 48 MB to avoid crashes
->   vhost-user-gpu: Release memory returned by vu_queue_pop() with free()
->   hw/openrisc/pic_cpu: Use qdev gpio rather than qemu_allocate_irqs()
->   hw/misc/grlib_ahb_apb_pnp: Avoid crash when writing to AHB PnP
->     registers
->   hw/misc/grlib_ahb_apb_pnp: Fix AHB PnP 8-bit accesses
->   hw/display/sm501: Avoid heap overflow in sm501_2d_operation()
->   gdbstub: Do not use memset() on GByteArray
->   gdbstub: Introduce gdb_get_freg32() to get float32 registers
->=20
->  qga/qapi-schema.json                    |  6 +++--
->  include/exec/gdbstub.h                  | 22 ++++++++++++++++
->  qga/commands-common.h                   | 21 +++++++++++++++
->  contrib/vhost-user-gpu/vhost-user-gpu.c |  4 +--
->  contrib/vhost-user-gpu/virgl.c          |  2 +-
->  hw/block/pflash_cfi01.c                 |  8 +++++-
->  hw/block/pflash_cfi02.c                 |  8 +++++-
->  hw/display/sm501.c                      |  6 +++++
->  hw/misc/grlib_ahb_apb_pnp.c             | 11 ++++++++
->  hw/openrisc/pic_cpu.c                   |  5 ++--
->  qga/commands-posix.c                    | 29 +++++---------------
->  qga/commands-win32.c                    | 35 ++++++-------------------
->  qga/commands.c                          | 33 +++++++++++++++++++++++
->  target/arm/gdbstub.c                    |  3 +--
->  target/sh4/gdbstub.c                    |  6 ++---
->  target/xtensa/gdbstub.c                 |  6 ++---
->  16 files changed, 136 insertions(+), 69 deletions(-)
->  create mode 100644 qga/commands-common.h
->=20
-> --=20
-> 2.21.1
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index 17df5338e7..59650a570b 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -138,6 +138,12 @@ static int vhost_user_blk_start(VirtIODevice *vdev)
+             error_report("Error get inflight: %d", -ret);
+             goto err_guest_notifiers;
+         }
++    } else {
++        ret = vhost_setup_slave_channel(&s->dev);
++        if (ret < 0) {
++            error_report("Error setting vhost slave channel: %d", -ret);
++            return ret;
++        }
+     }
+ 
+     ret = vhost_dev_set_inflight(&s->dev, s->inflight);
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 08e7e63790..0da4a12787 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -1115,7 +1115,7 @@ err:
+     return;
+ }
+ 
+-static int vhost_setup_slave_channel(struct vhost_dev *dev)
++int vhost_setup_slave_channel(struct vhost_dev *dev)
+ {
+     VhostUserMsg msg = {
+         .hdr.request = VHOST_USER_SET_SLAVE_REQ_FD,
+diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+index 085450c6f8..cad60ad521 100644
+--- a/include/hw/virtio/vhost.h
++++ b/include/hw/virtio/vhost.h
+@@ -100,6 +100,7 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev);
+ void vhost_dev_stop(struct vhost_dev *hdev, VirtIODevice *vdev);
+ int vhost_dev_enable_notifiers(struct vhost_dev *hdev, VirtIODevice *vdev);
+ void vhost_dev_disable_notifiers(struct vhost_dev *hdev, VirtIODevice *vdev);
++int vhost_setup_slave_channel(struct vhost_dev *hdev);
+ 
+ /* Test and clear masked event pending status.
+  * Should be called after unmask to avoid losing events.
+-- 
+2.24.1 (Apple Git-126)
 
 
