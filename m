@@ -5,77 +5,78 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BCBFC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 22:42:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC543C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 22:44:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E46C420732
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 22:42:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E64E20732
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 22:44:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LCajHX21"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E46C420732
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iI9vE3Hp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E64E20732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPZge-0000qX-39
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 18:42:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50768)
+	id 1jPZiJ-00028C-Nn
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 18:43:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53929)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jPZfJ-00007v-P6
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 18:40:55 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jPZhI-0001M4-Ox
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 18:42:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jPZfG-0001js-6M
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 18:40:53 -0400
-Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:36750)
+ (envelope-from <alistair23@gmail.com>) id 1jPZhH-00063D-6W
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 18:42:56 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:44229)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jPZfG-0001iS-1C; Fri, 17 Apr 2020 18:40:50 -0400
-Received: by mail-il1-x141.google.com with SMTP id t8so3787734ilj.3;
- Fri, 17 Apr 2020 15:40:49 -0700 (PDT)
+ id 1jPZhH-00060z-1V; Fri, 17 Apr 2020 18:42:55 -0400
+Received: by mail-io1-xd44.google.com with SMTP id h6so4098092iok.11;
+ Fri, 17 Apr 2020 15:42:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=h42oSFXPhsLmadCN/knTOlx3oag1JQc2lFqM/eLYHuQ=;
- b=LCajHX21c6sdRefuOBqGbjU/CzuXw9auV8ikZL328K68e6DlPp39ntufgzVNgocM6y
- xLqw2A5dLNDXlbtqTRmwvlvqVfijIR8yis+txbJPd6pfuh+iNaQYDca2zyQ1boIPIGgz
- DmyTDG4SHDXIByrZI3wtFA9V2TC/Skf6F0SYWcRbg4XIyCTrX9MV6Nwu6AQF9E0GLl2o
- bsXFaPsZBeKdva4p/ISJQOP+hPwoO29udclZp6ScmCqAyGczOlLlkmFEupgWft8w+Bja
- Kkv+dT/mm9xaGx+F9BHxzRTHaUaj4SbFoZLyUEIKZx9eKP0YHV0uWzrCj7nVdJQuNX7c
- XgDg==
+ :cc; bh=Sy/88jthBUW9INdoLUgFavxhraz0ghOJNjOgNrh94Vw=;
+ b=iI9vE3HpJKeDUJ988SlWt0u2595k6I2mb706viVZU6vqf2vDOFdqAz20oxLk0nHufj
+ gN3EWtNzBnzcuCEaWHieNhvLFMcYhCKL8llK/y9fmYvm7LJH+9QX14mJX3vXUTThEnME
+ CvGV7wDK5wPTK4d7CUQGaKHtQqrME/E9QvQg8odNHf8fImmJE3PJ2fmiWGJqBwwuWfh8
+ /ldlJ9OFwYT8rHXCUJyiT6EmHUxsR7QUoDq0D/OZy9xMjmbu0Er0/6CIdSVr0JvN1abQ
+ 0dWqkXiDbkPiQNh3ctdbWmUZ6lyrQD9IeHSksoM9HT1gEyy0LFZlrC7/BVPubSYB7Mks
+ S45g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=h42oSFXPhsLmadCN/knTOlx3oag1JQc2lFqM/eLYHuQ=;
- b=MZXuW7LQQ8iyTAqaVW+YNAp7i03Jo/3/eOUW5vV/75rW/0ymnZ9159yq4SpjosD636
- OZ7yvxLbaOOOGYg/NPZOJdXSju3apLqAZcI0EwSIvjQJ8Rsmqpkk1+F03UwrRidotvDD
- DG+w4BEMS5JOkTkS/oJVGYSRYMcDfSGz9QxOFjgvblh58xdPrQ5sRyHmlMTg0kxv1G2v
- H8oLouYZKPH9yhTweGe69JAMEosStIwnTXITbheSlJeN8A/O11q47VQX3LVW3EcX3p53
- TrvnGCLUXqcTRMCJ0ssYUh1vbPRvSpTkZnVKwRcLJwvQ1CCGAIc5aa6X/nCSdSu6zM7Y
- zsvQ==
-X-Gm-Message-State: AGi0Pubbg7EtxhUSr1DTvbfWA2WBFu0XqPzRRkF0ddL/Q8XREgkzUu95
- ieVwQWBkx6TLHw4rGGVW95g3vX8AWRTN0TocVkc=
-X-Google-Smtp-Source: APiQypLVY/TRGdvH7WIcclk9yTEon1s6WoQvCmkqKe9JrrZjIOgkkj/e1ZCNp8OQWwVicHAroZfUdDLKvRe6rNTCBEQ=
-X-Received: by 2002:a92:9a5c:: with SMTP id t89mr5536999ili.267.1587163249150; 
- Fri, 17 Apr 2020 15:40:49 -0700 (PDT)
+ bh=Sy/88jthBUW9INdoLUgFavxhraz0ghOJNjOgNrh94Vw=;
+ b=oWCSjctZ9tVLVZRj+yuC7sYKK9ZQdl4o7Zb+sMhoQ8QT7i6ATN1bP0Nmx6L5HvJiPs
+ UAp1F1hK3M+1+aut0J65W3HTYjzABql9HKjo8CMKNMkxRVsJGV5r/+CfUBTZmWMmEane
+ 9YCNJtsyfDtz3k3w8wBgHfCL+nhnLozRfneU4r6qjNK8Lhc//SxmtCKrgVfIzDUFAyQQ
+ wd3fzqJYEHaAB0Pj/9Z3o46VryS4azwdRpcJ7Sf4WsgyI5wbrfZGhleCtQYx2R2HrU93
+ DIMxORootsG13QBG9WUZf905oUxf1laaRhGUSpYOZRA/vDE8oOTdq6u+60g8s0mW9xaL
+ UZYg==
+X-Gm-Message-State: AGi0Pua0U91RC/SuloT6ZvvHpxgFEwuMjA8aUGKtuTKrVsUMlxaYeIL3
+ URe97lo9nWd9vZ1NsayIZz04HsVDC4luwwVXbQU=
+X-Google-Smtp-Source: APiQypKmvyR+hOnLuLLZj9C1Mc8pC8nwwn19bomBcxzO8HBzXlQRng95uSbx68Smfafx6TnsuxP77hEk08opvmt7AE8=
+X-Received: by 2002:a5e:880b:: with SMTP id l11mr5513871ioj.42.1587163374220; 
+ Fri, 17 Apr 2020 15:42:54 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
- <20200330153633.15298-40-zhiwei_liu@c-sky.com>
-In-Reply-To: <20200330153633.15298-40-zhiwei_liu@c-sky.com>
+References: <20200411041427.14828-1-jiangyifei@huawei.com>
+ <20200411041427.14828-3-jiangyifei@huawei.com>
+In-Reply-To: <20200411041427.14828-3-jiangyifei@huawei.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 17 Apr 2020 15:32:25 -0700
-Message-ID: <CAKmqyKOjxPKkht+FhNN_Ede_Q_zmmLv5yc0KSbvcrdLk-MtShg@mail.gmail.com>
-Subject: Re: [PATCH v7 39/61] target/riscv: vector floating-point compare
- instructions
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Date: Fri, 17 Apr 2020 15:34:30 -0700
+Message-ID: <CAKmqyKOJCDHNma9Wx3Vygwe7w+jwEo6U7Z_=TSnET_Nm3Lps3A@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 2/9] target/riscv: Add target/riscv/kvm.c to place
+ the public kvm interface
+To: Yifei Jiang <jiangyifei@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::141
+X-Received-From: 2607:f8b0:4864:20::d44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,324 +88,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
+Cc: kvm-riscv@lists.infradead.org, Anup Patel <anup.patel@wdc.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>, zhang.zhanghailiang@huawei.com,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ victor.zhangxiaofeng@huawei.com,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
- wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
+ Alistair Francis <Alistair.Francis@wdc.com>, yinyipeng1@huawei.com,
+ Palmer Dabbelt <palmer@dabbelt.com>, "dengkai \(A\)" <dengkai1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 30, 2020 at 9:55 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+On Fri, Apr 10, 2020 at 9:16 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
 >
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> Add target/riscv/kvm.c to place kvm_arch_* function needed by kvm/kvm-all.c.
+> Meanwhile, add kvm support in configure file.
+>
+> Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+> Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
->  target/riscv/helper.h                   |  37 +++++
->  target/riscv/insn32.decode              |  12 ++
->  target/riscv/insn_trans/trans_rvv.inc.c |  35 +++++
->  target/riscv/vector_helper.c            | 174 ++++++++++++++++++++++++
->  4 files changed, 258 insertions(+)
+>  configure                  |   1 +
+>  target/riscv/Makefile.objs |   1 +
+>  target/riscv/kvm.c         | 128 +++++++++++++++++++++++++++++++++++++
+>  3 files changed, 130 insertions(+)
+>  create mode 100644 target/riscv/kvm.c
 >
-> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-> index d6e7ce57be..bedd4d0114 100644
-> --- a/target/riscv/helper.h
-> +++ b/target/riscv/helper.h
-> @@ -953,3 +953,40 @@ DEF_HELPER_6(vfsgnjn_vf_d, void, ptr, ptr, i64, ptr, env, i32)
->  DEF_HELPER_6(vfsgnjx_vf_h, void, ptr, ptr, i64, ptr, env, i32)
->  DEF_HELPER_6(vfsgnjx_vf_w, void, ptr, ptr, i64, ptr, env, i32)
->  DEF_HELPER_6(vfsgnjx_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-> +
-> +DEF_HELPER_6(vmfeq_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmfeq_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmfeq_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmfne_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmfne_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmfne_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmflt_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmflt_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmflt_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmfle_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmfle_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmfle_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmfeq_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfeq_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfeq_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfne_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfne_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfne_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmflt_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmflt_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmflt_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfle_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfle_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfle_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfgt_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfgt_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfgt_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfge_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfge_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmfge_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmford_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmford_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmford_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vmford_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmford_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vmford_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-> index ce2f497ed2..b0f1c54d53 100644
-> --- a/target/riscv/insn32.decode
-> +++ b/target/riscv/insn32.decode
-> @@ -500,6 +500,18 @@ vfsgnjn_vv      001001 . ..... ..... 001 ..... 1010111 @r_vm
->  vfsgnjn_vf      001001 . ..... ..... 101 ..... 1010111 @r_vm
->  vfsgnjx_vv      001010 . ..... ..... 001 ..... 1010111 @r_vm
->  vfsgnjx_vf      001010 . ..... ..... 101 ..... 1010111 @r_vm
-> +vmfeq_vv        011000 . ..... ..... 001 ..... 1010111 @r_vm
-> +vmfeq_vf        011000 . ..... ..... 101 ..... 1010111 @r_vm
-> +vmfne_vv        011100 . ..... ..... 001 ..... 1010111 @r_vm
-> +vmfne_vf        011100 . ..... ..... 101 ..... 1010111 @r_vm
-> +vmflt_vv        011011 . ..... ..... 001 ..... 1010111 @r_vm
-> +vmflt_vf        011011 . ..... ..... 101 ..... 1010111 @r_vm
-> +vmfle_vv        011001 . ..... ..... 001 ..... 1010111 @r_vm
-> +vmfle_vf        011001 . ..... ..... 101 ..... 1010111 @r_vm
-> +vmfgt_vf        011101 . ..... ..... 101 ..... 1010111 @r_vm
-> +vmfge_vf        011111 . ..... ..... 101 ..... 1010111 @r_vm
-> +vmford_vv       011010 . ..... ..... 001 ..... 1010111 @r_vm
-> +vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
+> diff --git a/configure b/configure
+> index 233c671aaa..7114a1c64d 100755
+> --- a/configure
+> +++ b/configure
+> @@ -200,6 +200,7 @@ supported_kvm_target() {
+>          x86_64:i386 | x86_64:x86_64 | x86_64:x32 | \
+>          mips:mips | mipsel:mips | \
+>          ppc:ppc | ppc64:ppc | ppc:ppc64 | ppc64:ppc64 | ppc64:ppc64le | \
+> +        riscv32:riscv32 | riscv64:riscv64 | \
+>          s390x:s390x)
+>              return 0
+>          ;;
+> diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
+> index ff651f69f6..7ea8f4c3da 100644
+> --- a/target/riscv/Makefile.objs
+> +++ b/target/riscv/Makefile.objs
+> @@ -1,5 +1,6 @@
+>  obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o gdbstub.o
+>  obj-$(CONFIG_SOFTMMU) += pmp.o
+> +obj-$(CONFIG_KVM) += kvm.o
 >
->  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
->  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-> index 4963004dd4..9d13bb4c79 100644
-> --- a/target/riscv/insn_trans/trans_rvv.inc.c
-> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-> @@ -2163,3 +2163,38 @@ GEN_OPFVV_TRANS(vfsgnjx_vv, opfvv_check)
->  GEN_OPFVF_TRANS(vfsgnj_vf, opfvf_check)
->  GEN_OPFVF_TRANS(vfsgnjn_vf, opfvf_check)
->  GEN_OPFVF_TRANS(vfsgnjx_vf, opfvf_check)
+>  ifeq ($(CONFIG_SOFTMMU),y)
+>  obj-y += monitor.o
+> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
+> new file mode 100644
+> index 0000000000..8c386d9acf
+> --- /dev/null
+> +++ b/target/riscv/kvm.c
+> @@ -0,0 +1,128 @@
+> +/*
+> + * RISC-V implementation of KVM hooks
+> + *
+> + * Copyright (c) 2020 Huawei Technologies Co., Ltd
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
 > +
-> +/* Vector Floating-Point Compare Instructions */
-> +static bool opfvv_cmp_check(DisasContext *s, arg_rmrr *a)
+> +#include "qemu/osdep.h"
+> +#include <sys/ioctl.h>
+> +
+> +#include <linux/kvm.h>
+> +
+> +#include "qemu-common.h"
+> +#include "qemu/timer.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/main-loop.h"
+> +#include "sysemu/sysemu.h"
+> +#include "sysemu/kvm.h"
+> +#include "sysemu/kvm_int.h"
+> +#include "cpu.h"
+> +#include "trace.h"
+> +#include "hw/pci/pci.h"
+> +#include "exec/memattrs.h"
+> +#include "exec/address-spaces.h"
+> +#include "hw/boards.h"
+> +#include "hw/irq.h"
+> +#include "qemu/log.h"
+> +#include "hw/loader.h"
+> +
+> +const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+> +    KVM_CAP_LAST_INFO
+> +};
+> +
+> +int kvm_arch_get_registers(CPUState *cs)
 > +{
-> +    return (vext_check_isa_ill(s) &&
-> +            vext_check_reg(s, a->rs2, false) &&
-> +            vext_check_reg(s, a->rs1, false) &&
-> +            (s->sew != 0) &&
-> +            ((vext_check_overlap_group(a->rd, 1, a->rs1, 1 << s->lmul) &&
-> +              vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul)) ||
-> +             (s->lmul == 0)));
+> +    return 0;
 > +}
 > +
-> +GEN_OPFVV_TRANS(vmfeq_vv, opfvv_cmp_check)
-> +GEN_OPFVV_TRANS(vmfne_vv, opfvv_cmp_check)
-> +GEN_OPFVV_TRANS(vmflt_vv, opfvv_cmp_check)
-> +GEN_OPFVV_TRANS(vmfle_vv, opfvv_cmp_check)
-> +GEN_OPFVV_TRANS(vmford_vv, opfvv_cmp_check)
-> +
-> +static bool opfvf_cmp_check(DisasContext *s, arg_rmrr *a)
+> +int kvm_arch_put_registers(CPUState *cs, int level)
 > +{
-> +    return (vext_check_isa_ill(s) &&
-> +            vext_check_reg(s, a->rs2, false) &&
-> +            (s->sew != 0) &&
-> +            (vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul) ||
-> +             (s->lmul == 0)));
+> +    return 0;
 > +}
 > +
-> +GEN_OPFVF_TRANS(vmfeq_vf, opfvf_cmp_check)
-> +GEN_OPFVF_TRANS(vmfne_vf, opfvf_cmp_check)
-> +GEN_OPFVF_TRANS(vmflt_vf, opfvf_cmp_check)
-> +GEN_OPFVF_TRANS(vmfle_vf, opfvf_cmp_check)
-> +GEN_OPFVF_TRANS(vmfgt_vf, opfvf_cmp_check)
-> +GEN_OPFVF_TRANS(vmfge_vf, opfvf_cmp_check)
-> +GEN_OPFVF_TRANS(vmford_vf, opfvf_cmp_check)
-> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-> index 3f01fdd83c..92227228b7 100644
-> --- a/target/riscv/vector_helper.c
-> +++ b/target/riscv/vector_helper.c
-> @@ -3928,3 +3928,177 @@ RVVCALL(OPFVF2, vfsgnjx_vf_d, OP_UUU_D, H8, H8, fsgnjx64)
->  GEN_VEXT_VF(vfsgnjx_vf_h, 2, 2, clearh)
->  GEN_VEXT_VF(vfsgnjx_vf_w, 4, 4, clearl)
->  GEN_VEXT_VF(vfsgnjx_vf_d, 8, 8, clearq)
-> +
-> +/* Vector Floating-Point Compare Instructions */
-> +#define GEN_VEXT_CMP_VV_ENV(NAME, ETYPE, H, DO_OP)            \
-> +void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,   \
-> +                  CPURISCVState *env, uint32_t desc)          \
-> +{                                                             \
-> +    uint32_t mlen = vext_mlen(desc);                          \
-> +    uint32_t vm = vext_vm(desc);                              \
-> +    uint32_t vl = env->vl;                                    \
-> +    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);        \
-> +    uint32_t i;                                               \
-> +                                                              \
-> +    for (i = 0; i < vl; i++) {                                \
-> +        ETYPE s1 = *((ETYPE *)vs1 + H(i));                    \
-> +        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
-> +        if (!vm && !vext_elem_mask(v0, mlen, i)) {            \
-> +            continue;                                         \
-> +        }                                                     \
-> +        vext_set_elem_mask(vd, mlen, i, DO_OP(s2, s1,         \
-> +                           &env->fp_status));                 \
-> +    }                                                         \
-> +    for (; i < vlmax; i++) {                                  \
-> +        vext_set_elem_mask(vd, mlen, i, 0);                   \
-> +    }                                                         \
-> +}
-> +
-> +static uint8_t float16_eq_quiet(uint16_t a, uint16_t b, float_status *s)
+> +int kvm_arch_release_virq_post(int virq)
 > +{
-> +    int compare = float16_compare_quiet(a, b, s);
-> +    return compare == float_relation_equal;
+> +    return 0;
 > +}
 > +
-> +GEN_VEXT_CMP_VV_ENV(vmfeq_vv_h, uint16_t, H2, float16_eq_quiet)
-> +GEN_VEXT_CMP_VV_ENV(vmfeq_vv_w, uint32_t, H4, float32_eq_quiet)
-> +GEN_VEXT_CMP_VV_ENV(vmfeq_vv_d, uint64_t, H8, float64_eq_quiet)
-> +
-> +#define GEN_VEXT_CMP_VF(NAME, ETYPE, H, DO_OP)                      \
-> +void HELPER(NAME)(void *vd, void *v0, uint64_t s1, void *vs2,       \
-> +                  CPURISCVState *env, uint32_t desc)                \
-> +{                                                                   \
-> +    uint32_t mlen = vext_mlen(desc);                                \
-> +    uint32_t vm = vext_vm(desc);                                    \
-> +    uint32_t vl = env->vl;                                          \
-> +    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);              \
-> +    uint32_t i;                                                     \
-> +                                                                    \
-> +    for (i = 0; i < vl; i++) {                                      \
-> +        ETYPE s2 = *((ETYPE *)vs2 + H(i));                          \
-> +        if (!vm && !vext_elem_mask(v0, mlen, i)) {                  \
-> +            continue;                                               \
-> +        }                                                           \
-> +        vext_set_elem_mask(vd, mlen, i, DO_OP(s2, (ETYPE)s1,        \
-> +                           &env->fp_status));                       \
-> +    }                                                               \
-> +    for (; i < vlmax; i++) {                                        \
-> +        vext_set_elem_mask(vd, mlen, i, 0);                         \
-> +    }                                                               \
-> +}
-> +
-> +GEN_VEXT_CMP_VF(vmfeq_vf_h, uint16_t, H2, float16_eq_quiet)
-> +GEN_VEXT_CMP_VF(vmfeq_vf_w, uint32_t, H4, float32_eq_quiet)
-> +GEN_VEXT_CMP_VF(vmfeq_vf_d, uint64_t, H8, float64_eq_quiet)
-> +
-> +static uint8_t vmfne16(uint16_t a, uint16_t b, float_status *s)
+> +int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+> +                             uint64_t address, uint32_t data, PCIDevice *dev)
 > +{
-> +    int compare = float16_compare_quiet(a, b, s);
-> +    return compare != float_relation_equal;
+> +    return 0;
 > +}
 > +
-> +static uint8_t vmfne32(uint32_t a, uint32_t b, float_status *s)
+> +int kvm_arch_destroy_vcpu(CPUState *cs)
 > +{
-> +    int compare = float32_compare_quiet(a, b, s);
-> +    return compare != float_relation_equal;
+> +    return 0;
 > +}
 > +
-> +static uint8_t vmfne64(uint64_t a, uint64_t b, float_status *s)
+> +unsigned long kvm_arch_vcpu_id(CPUState *cpu)
 > +{
-> +    int compare = float64_compare_quiet(a, b, s);
-> +    return compare != float_relation_equal;
+> +    return cpu->cpu_index;
 > +}
 > +
-> +GEN_VEXT_CMP_VV_ENV(vmfne_vv_h, uint16_t, H2, vmfne16)
-> +GEN_VEXT_CMP_VV_ENV(vmfne_vv_w, uint32_t, H4, vmfne32)
-> +GEN_VEXT_CMP_VV_ENV(vmfne_vv_d, uint64_t, H8, vmfne64)
-> +GEN_VEXT_CMP_VF(vmfne_vf_h, uint16_t, H2, vmfne16)
-> +GEN_VEXT_CMP_VF(vmfne_vf_w, uint32_t, H4, vmfne32)
-> +GEN_VEXT_CMP_VF(vmfne_vf_d, uint64_t, H8, vmfne64)
-> +
-> +static uint8_t float16_lt(uint16_t a, uint16_t b, float_status *s)
+> +void kvm_arch_init_irq_routing(KVMState *s)
 > +{
-> +    int compare = float16_compare(a, b, s);
-> +    return compare == float_relation_less;
 > +}
 > +
-> +GEN_VEXT_CMP_VV_ENV(vmflt_vv_h, uint16_t, H2, float16_lt)
-> +GEN_VEXT_CMP_VV_ENV(vmflt_vv_w, uint32_t, H4, float32_lt)
-> +GEN_VEXT_CMP_VV_ENV(vmflt_vv_d, uint64_t, H8, float64_lt)
-> +GEN_VEXT_CMP_VF(vmflt_vf_h, uint16_t, H2, float16_lt)
-> +GEN_VEXT_CMP_VF(vmflt_vf_w, uint32_t, H4, float32_lt)
-> +GEN_VEXT_CMP_VF(vmflt_vf_d, uint64_t, H8, float64_lt)
-> +
-> +static uint8_t float16_le(uint16_t a, uint16_t b, float_status *s)
+> +int kvm_arch_init_vcpu(CPUState *cs)
 > +{
-> +    int compare = float16_compare(a, b, s);
-> +    return compare == float_relation_less ||
-> +           compare == float_relation_equal;
+> +    return 0;
 > +}
 > +
-> +GEN_VEXT_CMP_VV_ENV(vmfle_vv_h, uint16_t, H2, float16_le)
-> +GEN_VEXT_CMP_VV_ENV(vmfle_vv_w, uint32_t, H4, float32_le)
-> +GEN_VEXT_CMP_VV_ENV(vmfle_vv_d, uint64_t, H8, float64_le)
-> +GEN_VEXT_CMP_VF(vmfle_vf_h, uint16_t, H2, float16_le)
-> +GEN_VEXT_CMP_VF(vmfle_vf_w, uint32_t, H4, float32_le)
-> +GEN_VEXT_CMP_VF(vmfle_vf_d, uint64_t, H8, float64_le)
-> +
-> +static uint8_t vmfgt16(uint16_t a, uint16_t b, float_status *s)
+> +int kvm_arch_msi_data_to_gsi(uint32_t data)
 > +{
-> +    int compare = float16_compare(a, b, s);
-> +    return compare == float_relation_greater;
+> +    abort();
 > +}
 > +
-> +static uint8_t vmfgt32(uint32_t a, uint32_t b, float_status *s)
+> +int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route,
+> +                                int vector, PCIDevice *dev)
 > +{
-> +    int compare = float32_compare(a, b, s);
-> +    return compare == float_relation_greater;
+> +    return 0;
 > +}
 > +
-> +static uint8_t vmfgt64(uint64_t a, uint64_t b, float_status *s)
+> +int kvm_arch_init(MachineState *ms, KVMState *s)
 > +{
-> +    int compare = float64_compare(a, b, s);
-> +    return compare == float_relation_greater;
+> +    return 0;
 > +}
 > +
-> +GEN_VEXT_CMP_VF(vmfgt_vf_h, uint16_t, H2, vmfgt16)
-> +GEN_VEXT_CMP_VF(vmfgt_vf_w, uint32_t, H4, vmfgt32)
-> +GEN_VEXT_CMP_VF(vmfgt_vf_d, uint64_t, H8, vmfgt64)
-> +
-> +static uint8_t vmfge16(uint16_t a, uint16_t b, float_status *s)
+> +int kvm_arch_irqchip_create(KVMState *s)
 > +{
-> +    int compare = float16_compare(a, b, s);
-> +    return compare == float_relation_greater ||
-> +           compare == float_relation_equal;
+> +    return 0;
 > +}
 > +
-> +static uint8_t vmfge32(uint32_t a, uint32_t b, float_status *s)
+> +int kvm_arch_process_async_events(CPUState *cs)
 > +{
-> +    int compare = float32_compare(a, b, s);
-> +    return compare == float_relation_greater ||
-> +           compare == float_relation_equal;
+> +    return 0;
 > +}
 > +
-> +static uint8_t vmfge64(uint64_t a, uint64_t b, float_status *s)
+> +void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
 > +{
-> +    int compare = float64_compare(a, b, s);
-> +    return compare == float_relation_greater ||
-> +           compare == float_relation_equal;
 > +}
 > +
-> +GEN_VEXT_CMP_VF(vmfge_vf_h, uint16_t, H2, vmfge16)
-> +GEN_VEXT_CMP_VF(vmfge_vf_w, uint32_t, H4, vmfge32)
-> +GEN_VEXT_CMP_VF(vmfge_vf_d, uint64_t, H8, vmfge64)
-> +
-> +static uint8_t float16_unordered_quiet(uint16_t a, uint16_t b, float_status *s)
+> +MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
 > +{
-> +    int compare = float16_compare_quiet(a, b, s);
-> +    return compare == float_relation_unordered;
+> +    return MEMTXATTRS_UNSPECIFIED;
 > +}
 > +
-> +GEN_VEXT_CMP_VV_ENV(vmford_vv_h, uint16_t, H2, !float16_unordered_quiet)
-> +GEN_VEXT_CMP_VV_ENV(vmford_vv_w, uint32_t, H4, !float32_unordered_quiet)
-> +GEN_VEXT_CMP_VV_ENV(vmford_vv_d, uint64_t, H8, !float64_unordered_quiet)
-> +GEN_VEXT_CMP_VF(vmford_vf_h, uint16_t, H2, !float16_unordered_quiet)
-> +GEN_VEXT_CMP_VF(vmford_vf_w, uint32_t, H4, !float32_unordered_quiet)
-> +GEN_VEXT_CMP_VF(vmford_vf_d, uint64_t, H8, !float64_unordered_quiet)
+> +bool kvm_arch_stop_on_emulation_error(CPUState *cs)
+> +{
+> +    return true;
+> +}
+> +
+> +int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+> +{
+> +    return 0;
+> +}
 > --
-> 2.23.0
+> 2.19.1
+>
+>
 >
 
