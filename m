@@ -2,73 +2,92 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ED81C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 20:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 342A1C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 21:25:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2C8F20656
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 20:42:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2C8F20656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id EE78520936
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 21:25:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mSZhtTcj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE78520936
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPXoM-0007mA-0l
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 16:42:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52834)
+	id 1jPYUO-0003Vj-9N
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 17:25:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56302)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jPXnJ-0006ce-06
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 16:41:02 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jPYTJ-0002aB-0U
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:24:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jPXnG-0002pH-Pk
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 16:41:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34402)
+ (envelope-from <richard.henderson@linaro.org>) id 1jPYTH-0005NC-QN
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:24:24 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:40930)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jPXnG-0002ma-Kn
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 16:40:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jPXnE-00036s-W8
- for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 20:40:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D0DFE2E8108
- for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 20:40:56 +0000 (UTC)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jPYTG-0005IU-7j
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 17:24:23 -0400
+Received: by mail-pg1-x544.google.com with SMTP id n16so1698933pgb.7
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 14:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=o/HOXdmdZb0BmsCOpVAfwt8rIREjuInC2IMtHu75w7k=;
+ b=mSZhtTcj02mbFxyrl/J74g3J7Dtn6D+HJQD04hw2I3+11Ai7qW3IQKk9feE/aCbRQN
+ SZaqS/eEIG7bvQYKTiGak0rx2PvVulasmaF9Ff42GsF6xeB1p6xPrWRpW+kEJDBIWdxv
+ lU4sKH8jIhPDmq5ktm7pH5UyWEfy9IRVtP5qi7EtS/6AJO78wPqsi3n47WdblxfCq4x6
+ VMOyGf5OZXEuFaebHiQlpf2s2qRpR+2+08SIb/v9c0caMxtX29/7NMiIJbJCjCbbxGkw
+ T5IZR9WQvdZQzpHSqENOp5B5XXP2kXSG+RlpK/lesdnHWEsggLB6P6ErS/XD8VfnBNUk
+ gs4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=o/HOXdmdZb0BmsCOpVAfwt8rIREjuInC2IMtHu75w7k=;
+ b=jhVmABEm9FDZsG6MT3+BY1cLMcrK4qNzWReIGRcVLgwqOr4AEqulVKpQLnE+a687mj
+ //GQN/GDOVzlWX4TFIgxtNoKzNQhkYngi8a06Ms2/hLmv70GYPMLlPJalrvqmqeg0a3S
+ v/yuGqarPB4rU0jInRMh7etYk7UucPkGAoxidqQJp0UfAXLlS8S8lTeUOHuRYANDAMwX
+ 3l8i+4p/f7wrffWJr8DtD8c+t6+KZepTXaC+ZCPobEEycn6b+GVN4rEIJcPSKVJk9VVO
+ lo2lS77K2GDGYXngm8jM2tBwNjnzjQXJ8slg7kZZ3sje1VSkvu5elrzrycPygSmlUDVc
+ 5+Qw==
+X-Gm-Message-State: AGi0PuZx9kVXvhNkwfDK8ycaFLrSfciWKrR7AabQHYXg5KrlPssel2kJ
+ YLhMhj+BpUgTTH440tyyf7TFVw==
+X-Google-Smtp-Source: APiQypJ2oDQD+04oow5iRTgjYZPRpX7dFVmzIfZwCkbhTlfkfD+uVDAq0Gd+tCPI4Atdqwemt5GRUg==
+X-Received: by 2002:aa7:96c1:: with SMTP id h1mr5295521pfq.212.1587158660802; 
+ Fri, 17 Apr 2020 14:24:20 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id j4sm16371665pfa.214.2020.04.17.14.24.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 17 Apr 2020 14:24:20 -0700 (PDT)
+Subject: Re: [PATCH 2/4] target/arm: Implement SVE2 RADDHNB, RADDHNT
+To: Stephen Long <steplong@quicinc.com>, qemu-devel@nongnu.org
+References: <20200417162231.10374-1-steplong@quicinc.com>
+ <20200417162231.10374-3-steplong@quicinc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7593864c-828f-5c03-c3d5-8ba8eab8cd6a@linaro.org>
+Date: Fri, 17 Apr 2020 14:24:17 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Apr 2020 20:27:08 -0000
-From: John Snow <1873338@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jnsnow ruthan
-X-Launchpad-Bug-Reporter: ruthan (ruthan)
-X-Launchpad-Bug-Modifier: John Snow (jnsnow)
-References: <158706562034.6027.11807874678540403888.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158715522835.6474.9301621161181932874.malone@chaenomeles.canonical.com>
-Subject: [Bug 1873338] Re: Dos on the fly CD image replacement is not Working
- with DOS
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 9ad48e6725c67e5bf3a8a6fa6941a0e6d20b0503
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+In-Reply-To: <20200417162231.10374-3-steplong@quicinc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,36 +96,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1873338 <1873338@bugs.launchpad.net>
+Cc: qemu-arm@nongnu.org, apazos@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Does this work with other guests, like Windows 95/98 as far as you can
-tell? Is it only a problem in DOS? What exact version of DOS are you
-seeing the problem with?
+On 4/17/20 9:22 AM, Stephen Long wrote:
+> +#define DO_RADDHN(N, M, SH) ((N + M + (1 << (SH - 1))) >> SH)
 
--- =
+This formula will overflow.  See DO_RSHR -- with some added parenthesis, we
+could actually reuse that macro.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1873338
 
-Title:
-  Dos on the fly CD image replacement is not Working with DOS
-
-Status in QEMU:
-  New
-
-Bug description:
-  Im not able to exchange CD image on the fly (needed for some games). I
-  messed with command like - in console(ATL+CRTL+2) eject ide1-cd0 and
-  change ide-cd0 D:/Games/!Emulators/Dos-QEMU/ISOs/TestChangeISO.iso ,
-  but system so never able to find new CD data.. simply drive so empty..
-  but when i reboot virtual machine, new change image is now working.
-
-    Qemu 4.2.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1873338/+subscriptions
+r~
 
