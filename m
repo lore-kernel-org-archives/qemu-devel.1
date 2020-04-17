@@ -2,82 +2,61 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 367D3C2BA2B
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 00:18:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BC95C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 01:02:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBC1520857
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 00:18:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12C9E20776
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 01:02:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LIXA2EYE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBC1520857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="K+nttMMp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12C9E20776
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPEif-0004g6-5V
-	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 20:18:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55509)
+	id 1jPFOL-00011e-87
+	for qemu-devel@archiver.kernel.org; Thu, 16 Apr 2020 21:02:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60142)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jPEhl-0004Bh-GL
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 20:18:02 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jPFNH-0000M0-EZ
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 21:00:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jPEhj-0002d9-Sb
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 20:18:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45873
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1jPFNF-0002C4-9m
+ for qemu-devel@nongnu.org; Thu, 16 Apr 2020 21:00:54 -0400
+Received: from ozlabs.org ([203.11.71.1]:45071)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jPEhj-0002cu-Or
- for qemu-devel@nongnu.org; Thu, 16 Apr 2020 20:17:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587082679;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TVDKQS89YFlUExExsitQ+FvXCY50LFBoF0g6JKI2j8A=;
- b=LIXA2EYE3WV4tch3TU1SZGanxpOi0/wyWg1KJlClxvdKLRqcNuEV7V6YJ/tFsVCPWugVDK
- 6EZczjtgZCJPO2rUg64+X059owFfeav7BzDy1vX6uLTSZ/sRI1SiOd+zUP2zbhSQ254z76
- fiTjWoNBUF+kq39gOFFDORHWsOaqiN8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-IOi0h4kVN_C723DlqsuPhA-1; Thu, 16 Apr 2020 20:17:54 -0400
-X-MC-Unique: IOi0h4kVN_C723DlqsuPhA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 581F7107ACC9;
- Fri, 17 Apr 2020 00:17:53 +0000 (UTC)
-Received: from [10.3.115.59] (ovpn-115-59.phx2.redhat.com [10.3.115.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 763595C219;
- Fri, 17 Apr 2020 00:17:52 +0000 (UTC)
-Subject: Re: [PATCH] qcow2: Expose bitmaps' size during measure
-To: qemu-devel@nongnu.org
-References: <158707735381.15335.6543965736162160984@39012742ff91>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <a995b3cc-e17a-58ef-f778-9edeb21b4623@redhat.com>
-Date: Thu, 16 Apr 2020 19:17:51 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1jPFNE-00023q-5d; Thu, 16 Apr 2020 21:00:53 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 493Hp21kWhz9sSG; Fri, 17 Apr 2020 11:00:42 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1587085242;
+ bh=yoah8bflFH5+cIjZW68ZwOiWwUY28dTHfS4xBrV55Lg=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=K+nttMMp/QFurxERBnQtMKnndcRtzCwL2DLHLx1Hn3NSPTBUUag1ymTvHTKORXgt6
+ 9kX/XlyDnwx0RIjZfU8cN4t4jP3ceEBt7giarpHxcE10EsoOBekvi9awjOZhageKdt
+ t4aMiN4AL4r/Gpqk4rSJK0jBdFTZiER6BKaDOzeo=
+Date: Fri, 17 Apr 2020 10:40:12 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH] target/ppc: Fix mtmsr(d) L=1 variant that loses interrupts
+Message-ID: <20200417004012.GA2102@umbus.fritz.box>
+References: <20200414111131.465560-1-npiggin@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <158707735381.15335.6543965736162160984@39012742ff91>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="/9DWx/yDrRhgMJTb"
+Content-Disposition: inline
+In-Reply-To: <20200414111131.465560-1-npiggin@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,58 +68,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
- mreitz@redhat.com, nsoffer@redhat.com, jsnow@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@fr.ibm.com>, qemu-ppc@nongnu.org,
+ Nathan Chancellor <natechancellor@gmail.com>,
+ Anton Blanchard <anton@ozlabs.org>, linuxppc-dev@lists.ozlabs.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/16/20 5:49 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20200416212349.731404-1-eblake@redhat.com/
-> 
-> 
-> 
-> Hi,
-> 
-> This series failed the docker-quick@centos7 build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> make docker-image-centos7 V=1 NETWORK=1
-> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
-> === TEST SCRIPT END ===
-> 
-> Not run: 259
-> Failures: 190
-> Failed 1 of 117 iotests
 
-Hmm - the email truncated the useful part of the failure.  Anyways, 
-reading from...
+--/9DWx/yDrRhgMJTb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> The full log is available at
-> http://patchew.org/logs/20200416212349.731404-1-eblake@redhat.com/testing.docker-quick@centos7/?type=message.
+On Tue, Apr 14, 2020 at 09:11:31PM +1000, Nicholas Piggin wrote:
+65;5803;1c> If mtmsr L=3D1 sets MSR[EE] while there is a maskable exception=
+ pending,
+> it does not cause an interrupt. This causes the test case to hang:
+>=20
+> https://lists.gnu.org/archive/html/qemu-ppc/2019-10/msg00826.html
+>=20
+> More recently, Linux reduced the occurance of operations (e.g., rfi)
+> which stop translation and allow pending interrupts to be processed.
+> This started causing hangs in Linux boot in long-running kernel tests,
+> running with '-d int' shows the decrementer stops firing despite DEC
+> wrapping and MSR[EE]=3D1.
+>=20
+> https://lists.ozlabs.org/pipermail/linuxppc-dev/2020-April/208301.html
+>=20
+> The cause is the broken mtmsr L=3D1 behaviour, which is contrary to the
+> architecture. From Power ISA v3.0B, p.977, Move To Machine State Register,
+> Programming Note states:
+>=20
+>     If MSR[EE]=3D0 and an External, Decrementer, or Performance Monitor
+>     exception is pending, executing an mtmsrd instruction that sets
+>     MSR[EE] to 1 will cause the interrupt to occur before the next
+>     instruction is executed, if no higher priority exception exists
+>=20
+> Fix this by handling L=3D1 exactly the same way as L=3D0, modulo the MSR
+> bits altered.
+>=20
+> The confusion arises from L=3D0 being "context synchronizing" whereas L=
+=3D1
+> is "execution synchronizing", which is a weaker semantic. However this
+> is not a relaxation of the requirement that these exceptions cause
+> interrupts when MSR[EE]=3D1 (e.g., when mtmsr executes to completion as
+> TCG is doing here), rather it specifies how a pipelined processor can
+> have multiple instructions in flight where one may influence how another
+> behaves.
+>=20
+> Cc: qemu-stable@nongnu.org
+> Reported-by: Anton Blanchard <anton@ozlabs.org>
+> Reported-by: Nathan Chancellor <natechancellor@gmail.com>
+> Tested-by: Nathan Chancellor <natechancellor@gmail.com>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+> Thanks very much to Nathan for reporting and testing it, I added his
+> Tested-by tag despite a more polished patch, as the the basics are=20
+> still the same (and still fixes his test case here).
+>=20
+> This bug possibly goes back to early v2.04 / mtmsrd L=3D1 support around
+> 2007, and the code has been changed several times since then so may
+> require some backporting.
+>=20
+> 32-bit / mtmsr untested at the moment, I don't have an environment
+> handy.
+>=20
+>  target/ppc/translate.c | 46 +++++++++++++++++++++++++-----------------
+>  1 file changed, 27 insertions(+), 19 deletions(-)
 
-I see:
+Applied to ppc-for-5.0.
 
---- /tmp/qemu-test/src/tests/qemu-iotests/190.out	2020-04-16 
-21:15:51.000000000 +0000
-+++ /tmp/qemu-test/build/tests/qemu-iotests/190.out.bad	2020-04-16 
-22:45:47.504493172 +0000
-@@ -4,6 +4,7 @@
-  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2199023255552
-  required size: 2199023255552
-  fully allocated size: 2199023255552
-+bitmaps size: 4846791580151137091
-  required size: 335806464
+>=20
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index b207fb5386..9959259dba 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -4361,30 +4361,34 @@ static void gen_mtmsrd(DisasContext *ctx)
+>      CHK_SV;
+> =20
+>  #if !defined(CONFIG_USER_ONLY)
+> +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
+> +        gen_io_start();
+> +    }
+>      if (ctx->opcode & 0x00010000) {
+> -        /* Special form that does not need any synchronisation */
+> +        /* L=3D1 form only updates EE and RI */
+>          TCGv t0 =3D tcg_temp_new();
+> +        TCGv t1 =3D tcg_temp_new();
+>          tcg_gen_andi_tl(t0, cpu_gpr[rS(ctx->opcode)],
+>                          (1 << MSR_RI) | (1 << MSR_EE));
+> -        tcg_gen_andi_tl(cpu_msr, cpu_msr,
+> +        tcg_gen_andi_tl(t1, cpu_msr,
+>                          ~(target_ulong)((1 << MSR_RI) | (1 << MSR_EE)));
+> -        tcg_gen_or_tl(cpu_msr, cpu_msr, t0);
+> +        tcg_gen_or_tl(t1, t1, t0);
+> +
+> +        gen_helper_store_msr(cpu_env, t1);
+>          tcg_temp_free(t0);
+> +        tcg_temp_free(t1);
+> +
+>      } else {
+>          /*
+>           * XXX: we need to update nip before the store if we enter
+>           *      power saving mode, we will exit the loop directly from
+>           *      ppc_store_msr
+>           */
+> -        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
+> -            gen_io_start();
+> -        }
+>          gen_update_nip(ctx, ctx->base.pc_next);
+>          gen_helper_store_msr(cpu_env, cpu_gpr[rS(ctx->opcode)]);
+> -        /* Must stop the translation as machine state (may have) changed=
+ */
+> -        /* Note that mtmsr is not always defined as context-synchronizin=
+g */
+> -        gen_stop_exception(ctx);
+>      }
+> +    /* Must stop the translation as machine state (may have) changed */
+> +    gen_stop_exception(ctx);
+>  #endif /* !defined(CONFIG_USER_ONLY) */
+>  }
+>  #endif /* defined(TARGET_PPC64) */
+> @@ -4394,15 +4398,23 @@ static void gen_mtmsr(DisasContext *ctx)
+>      CHK_SV;
+> =20
+>  #if !defined(CONFIG_USER_ONLY)
+> -   if (ctx->opcode & 0x00010000) {
+> -        /* Special form that does not need any synchronisation */
+> +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
+> +        gen_io_start();
+> +    }
+> +    if (ctx->opcode & 0x00010000) {
+> +        /* L=3D1 form only updates EE and RI */
+>          TCGv t0 =3D tcg_temp_new();
+> +        TCGv t1 =3D tcg_temp_new();
+>          tcg_gen_andi_tl(t0, cpu_gpr[rS(ctx->opcode)],
+>                          (1 << MSR_RI) | (1 << MSR_EE));
+> -        tcg_gen_andi_tl(cpu_msr, cpu_msr,
+> +        tcg_gen_andi_tl(t1, cpu_msr,
+>                          ~(target_ulong)((1 << MSR_RI) | (1 << MSR_EE)));
+> -        tcg_gen_or_tl(cpu_msr, cpu_msr, t0);
+> +        tcg_gen_or_tl(t1, t1, t0);
+> +
+> +        gen_helper_store_msr(cpu_env, t1);
+>          tcg_temp_free(t0);
+> +        tcg_temp_free(t1);
+> +
+>      } else {
+>          TCGv msr =3D tcg_temp_new();
+> =20
+> @@ -4411,9 +4423,6 @@ static void gen_mtmsr(DisasContext *ctx)
+>           *      power saving mode, we will exit the loop directly from
+>           *      ppc_store_msr
+>           */
+> -        if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
+> -            gen_io_start();
+> -        }
+>          gen_update_nip(ctx, ctx->base.pc_next);
+>  #if defined(TARGET_PPC64)
+>          tcg_gen_deposit_tl(msr, cpu_msr, cpu_gpr[rS(ctx->opcode)], 0, 32=
+);
+> @@ -4422,10 +4431,9 @@ static void gen_mtmsr(DisasContext *ctx)
+>  #endif
+>          gen_helper_store_msr(cpu_env, msr);
+>          tcg_temp_free(msr);
+> -        /* Must stop the translation as machine state (may have) changed=
+ */
+> -        /* Note that mtmsr is not always defined as context-synchronizin=
+g */
+> -        gen_stop_exception(ctx);
+>      }
+> +    /* Must stop the translation as machine state (may have) changed */
+> +    gen_stop_exception(ctx);
+>  #endif
+>  }
+> =20
 
-which looks suspiciously like an uninitialized variable leaking through 
-when there are no bitmaps to be measured.  I'll fix it in v2.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+--/9DWx/yDrRhgMJTb
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6Y+uoACgkQbDjKyiDZ
+s5IfvQ/7B95w2bN1JzPlxMZJbbl/6U1RSYX643qSwxmHp3qmmWV4okUgaNzsVscC
+mBl17DQbHuvl8YJduL5G6qNwfnkcEq+OIfX3k60QyQ+bf7ETK5UlmUq3c4Ao/E7e
+H9O44iv5RSBZ41TQoYUVC+1IU11Mx0GXMsKiGkHOCCB3aK9no22rY4Um9LoEhHLB
+Kue9WvNLlOcUm78BJ/00K70UffTgnbyR6q/CzUY81Lq1vuohZ1SdJWb6z8DeJLLe
+XQ9Thne+6Z48MN/tPc0gLg6MF/NSaXzC4jeuI6Ht6WHe2P1USIgB+CrRpUmU/eK2
+cpeHUZjg1oZgvno8v9uoKyQloTdaNczVJ4HmdMjt0+FmEhUFyZqx6o5aW4V93BV7
+tPUc0TxNORcc31ol2gjBVWzQRTHbF5dq3rCBJzVellzUg6hA+H/AXudVRR1Z/Szk
+CzbvVhLCpbJXmx5e/g0MZJnvejOjOTM1WLi0VwibH/ZIGVBbFP0wwG5GfAkP7D9+
+/8YX1vb+5E8a10ThMP01hyQFJjjFbhkLilT6IMwJAzf5rv3josFj+QI5wKmt9b6n
+zI2f0xkb15zX4aMAwTj05ReDQ7qA3ICwcu4As2N32PqO9j+jJ08sAzpkH6e2zXDE
+Jb0Ew1oM/n0XkPQHIRIE4pjGhpgafPyOaK5PLokVaSpm1D/2hfU=
+=Qw8M
+-----END PGP SIGNATURE-----
+
+--/9DWx/yDrRhgMJTb--
 
