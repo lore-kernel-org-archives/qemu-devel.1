@@ -2,78 +2,86 @@ Return-Path: <SRS0=Zx28=6B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A3FC2D0EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:16:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63F01C2D0EF
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:16:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 514082076D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:16:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FD182076D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 19:16:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QSV16RgR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 514082076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gztDRzsG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FD182076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPWTh-0000mk-Hb
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 15:16:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60170)
+	id 1jPWTm-0000wy-Ci
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 15:16:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54302)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1jPWSV-0008FM-8Q
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:15:28 -0400
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jPWNi-0002go-OK
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:10:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1jPWST-000476-5m
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:15:26 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44845
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1jPWST-00045K-0O
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:15:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587150924;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MEhB/OyykWO2OkIVhBuDuZl5ra8QacGxxwL4NJe9+J0=;
- b=QSV16RgRGA6+BhVph66JzR3ymkyQsqT1XIxYAdTLVoKasMYhgcsvdy8b70C2c58CQWEnNR
- QJ+HTdAUqnfPFlniXKEoQHDKQnYKktaLQSnz/yKla2REKBbgNDsGQH01l88dIbSLUzeVWh
- /44A8dkpsO8qqM4yAUTtxME9oARBhtw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-jn7c0a8IO1OQDCilsMgepw-1; Fri, 17 Apr 2020 15:15:16 -0400
-X-MC-Unique: jn7c0a8IO1OQDCilsMgepw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF046107ACC9;
- Fri, 17 Apr 2020 19:15:14 +0000 (UTC)
-Received: from localhost (ovpn-114-67.phx2.redhat.com [10.3.114.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 799DC9E0D4;
- Fri, 17 Apr 2020 19:15:14 +0000 (UTC)
-Date: Fri, 17 Apr 2020 15:15:13 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH] target/i386: Fix the CPUID leaf CPUID_Fn80000008
-Message-ID: <20200417191513.GD4952@habkost.net>
-References: <20200417151432.46867.72601.stgit@localhost.localdomain>
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jPWNh-0005LX-Jk
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:10:30 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:33074)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jPWNh-0005JA-Bj
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 15:10:29 -0400
+Received: by mail-lj1-x243.google.com with SMTP id q22so3200624ljg.0
+ for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 12:10:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=eFVwLS4HPN4oqr0mH+SQHWdJFcIbsw3m7YyR83VCRKI=;
+ b=gztDRzsG1tIftHUgWi8hworbKaq+Iy/B54cbxUDsHevQabD7CIcYxx08o6qZqvd86o
+ mhsA0URcjhKJZG3xmf5mYoqXZ58wl+/h/If6I0UCxzYV9KTq/XQZkZH82JVjhz+m8LPy
+ k+3AbPlq5mBeaeiPuvxTAXzrlbRMZlMOi20x+u1cJOaB6mVQ/HW3+prHU5vAjcVyqYrO
+ tYcAJrq7RIi197leQPCmWBTdM2M0+obMHHpHF/cAS1Ir5E3kWWzB1EUyjtIxzVRRrWBG
+ XI4h6P7HRlIDbPL4kn11QPL+OMvMZ/Tg8DTCintZm9Ixsn3MpvQY8CqItfBeY4RfKfo3
+ 3m8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=eFVwLS4HPN4oqr0mH+SQHWdJFcIbsw3m7YyR83VCRKI=;
+ b=jKRpSEnkFGYWXv66Vr6GvAvQFXlaI4Jqt13AP9HGy3QVt/EMQS9CgJ3YRjBfoFRnbp
+ nILeXRi8aDbx64dBMcIwMdV3C5b0i2yL4LY9yQ6PkY7DtKaT63yOLa3W1MoNOBVvkuV9
+ cM/ngS1b6llk3aZ2LjU6+aLV+RqRF2infIzhe23ikLmhDDZqAwOpZFWxURXHgrRz2Dgt
+ gMXSKmmJ613Ahjx4wrJyoFe+mbrGxYYNv6owde77W3i9FjfPFBw/XAJXN4NHu78DdA07
+ ci40G1Wa6dcwE1EwiZgJMARUr/EolqPv+5tCK9jrEbAIezLJQ+vXEXKR1V/8ERjmbVU+
+ 41hA==
+X-Gm-Message-State: AGi0Pub3g3Nl67A7k2ZSoka2WHjMLOB44U1D1y3BqarhJwug4u3hPDqJ
+ W5P20MGqh1oOOL1jIHU+INbD0hdVX8wVDg==
+X-Google-Smtp-Source: APiQypKr9oxIrWwX1ClKwiSKo+IkX4EmRA9vvdsZGGHwGVClgQrJKAr+fmlauHglC/+v336hPvIypw==
+X-Received: by 2002:a2e:998c:: with SMTP id w12mr3068945lji.57.1587150627577; 
+ Fri, 17 Apr 2020 12:10:27 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id q19sm1656943ljj.84.2020.04.17.12.10.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 17 Apr 2020 12:10:27 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 3/6] target/microblaze: Add the div-zero-exception property
+Date: Fri, 17 Apr 2020 21:10:19 +0200
+Message-Id: <20200417191022.5247-4-edgar.iglesias@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200417191022.5247-1-edgar.iglesias@gmail.com>
+References: <20200417191022.5247-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200417151432.46867.72601.stgit@localhost.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,114 +93,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, imammedo@redhat.com, 1871842@bugs.launchpad.net,
- qemu-devel@nongnu.org, rth@twiddle.net
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
+ frasse.iglesias@gmail.com, alistair@alistair23.me,
+ richard.henderson@linaro.org, frederic.konrad@adacore.com, philmd@redhat.com,
+ luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Good catch, thanks for the patch.  Comments below:
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-On Fri, Apr 17, 2020 at 10:14:32AM -0500, Babu Moger wrote:
-> CPUID leaf CPUID_Fn80000008_ECX provides information about the
-> number of threads supported by the processor. It was found that
-> the field ApicIdSize(bits 15-12) was not set correctly.
->=20
-> ApicIdSize is defined as the number of bits required to represent
-> all the ApicId values within a package.
->=20
-> Valid Values: Value Description
-> 3h-0h=09=09Reserved.
-> 4h=09=09up to 16 threads.
-> 5h=09=09up to 32 threads.
-> 6h=09=09up to 64 threads.
-> 7h=09=09up to 128 threads.
-> Fh-8h=09=09Reserved.
->=20
-> Fix the bit appropriately.
->=20
-> This came up during following thread.
-> https://lore.kernel.org/qemu-devel/158643709116.17430.1599506912571677894=
-3.malonedeb@wampee.canonical.com/#t
->=20
-> Refer the Processor Programming Reference (PPR) for AMD Family 17h
-> Model 01h, Revision B1 Processors. The documentation is available
-> from the bugzilla Link below.
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D206537
->=20
-> Reported-by: Philipp Eppelt <1871842@bugs.launchpad.net>
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> ---
->  target/i386/cpu.c |   12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
->=20
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 90ffc5f..68210f6 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -5830,11 +5830,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t ind=
-ex, uint32_t count,
->              *eax =3D cpu->phys_bits;
->          }
->          *ebx =3D env->features[FEAT_8000_0008_EBX];
-> -        *ecx =3D 0;
-> -        *edx =3D 0;
->          if (cs->nr_cores * cs->nr_threads > 1) {
-> -            *ecx |=3D (cs->nr_cores * cs->nr_threads) - 1;
+Add the div-zero-exception property to control if the core
+traps divizions by zero.
 
-I'm not sure we want a compatibility flag to keep ABI on older
-machine types, here.  Strictly speaking, CPUID must never change
-on older machine types, but sometimes trying hard to emulate bugs
-of old QEMU versions is a pointless exercise.
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ target/microblaze/cpu.c       | 2 ++
+ target/microblaze/cpu.h       | 1 +
+ target/microblaze/op_helper.c | 5 +++--
+ 3 files changed, 6 insertions(+), 2 deletions(-)
 
-
-> +            unsigned int max_apicids, bits_required;
-> +
-> +            max_apicids =3D (cs->nr_cores * cs->nr_threads) - 1;
-> +            /* Find out the number of bits to represent all the apicids =
-*/
-> +            bits_required =3D 32 - clz32(max_apicids);
-
-This won't work if nr_cores > 1 and nr_threads is not a power of
-2, will it?
-
-For reference, the field is documented[1] as:
-
-"The number of bits in the initial Core::X86::Apic::ApicId[ApicId]
-value that indicate thread ID within a package"
-
-This sounds like the value already stored at
-CPUX86State::pkg_offset.
-
-
-> +            *ecx =3D bits_required << 12 | max_apicids;
-
-Bits 7:0 are documented as "The number of threads in the package
-is NC+1", with no reference to APIC IDs at all.
-
-Using ((nr_cores * nr_threads) - 1) for bits 7:0 sounds correct,
-but the variable name seems misleading.
-
-
-> +        } else {
-> +            *ecx =3D 0;
->          }
-> +        *edx =3D 0;
->          break;
->      case 0x8000000A:
->          if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
->=20
->=20
-
-References:
-
-[1] Processor Programming Reference (PPR) for
-    AMD Family 17h Model 18h, Revision B1 Processors
-    55570-B1 Rev 3.14 - Sep 26, 2019
-    https://bugzilla.kernel.org/attachment.cgi?id=3D287395&action=3Dedit
-
-
---=20
-Eduardo
+diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+index 36c20d9724..7a40e2fbad 100644
+--- a/target/microblaze/cpu.c
++++ b/target/microblaze/cpu.c
+@@ -280,6 +280,8 @@ static Property mb_properties[] = {
+                      cfg.iopb_bus_exception, false),
+     DEFINE_PROP_BOOL("ill-opcode-exception", MicroBlazeCPU,
+                      cfg.illegal_opcode_exception, false),
++    DEFINE_PROP_BOOL("div-zero-exception", MicroBlazeCPU,
++                     cfg.div_zero_exception, false),
+     DEFINE_PROP_BOOL("opcode-0x0-illegal", MicroBlazeCPU,
+                      cfg.opcode_0_illegal, false),
+     DEFINE_PROP_STRING("version", MicroBlazeCPU, cfg.version),
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index 71d7317a58..3c07f9b3f7 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -305,6 +305,7 @@ struct MicroBlazeCPU {
+         bool iopb_bus_exception;
+         bool illegal_opcode_exception;
+         bool opcode_0_illegal;
++        bool div_zero_exception;
+         char *version;
+         uint8_t pvr;
+     } cfg;
+diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
+index 18677ddfca..f3b17a95b3 100644
+--- a/target/microblaze/op_helper.c
++++ b/target/microblaze/op_helper.c
+@@ -132,11 +132,12 @@ uint32_t helper_carry(uint32_t a, uint32_t b, uint32_t cf)
+ 
+ static inline int div_prepare(CPUMBState *env, uint32_t a, uint32_t b)
+ {
++    MicroBlazeCPU *cpu = env_archcpu(env);
++
+     if (b == 0) {
+         env->sregs[SR_MSR] |= MSR_DZ;
+ 
+-        if ((env->sregs[SR_MSR] & MSR_EE)
+-            && !(env->pvr.regs[2] & PVR2_DIV_ZERO_EXC_MASK)) {
++        if ((env->sregs[SR_MSR] & MSR_EE) && cpu->cfg.div_zero_exception) {
+             env->sregs[SR_ESR] = ESR_EC_DIVZERO;
+             helper_raise_exception(env, EXCP_HW_EXCP);
+         }
+-- 
+2.20.1
 
 
