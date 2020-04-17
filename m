@@ -8,75 +8,75 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A5CC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 22:11:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B0FC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 22:13:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBDCC20B1F
-	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 22:11:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 21F3320B1F
+	for <qemu-devel@archiver.kernel.org>; Fri, 17 Apr 2020 22:13:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YZc/YQdl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBDCC20B1F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ioll/K8r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21F3320B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPZCV-0002GQ-3M
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 18:11:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39169)
+	id 1jPZER-0003Yl-8k
+	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 18:13:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40885)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jPZB0-0001gw-Fn
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 18:09:36 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jPZCO-0002Ns-L3
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 18:11:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jPZAy-0007QB-IO
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 18:09:34 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:40967)
+ (envelope-from <alistair23@gmail.com>) id 1jPZCM-0001Ni-4k
+ for qemu-devel@nongnu.org; Fri, 17 Apr 2020 18:11:00 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:46465)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jPZAy-0007ON-BQ; Fri, 17 Apr 2020 18:09:32 -0400
-Received: by mail-il1-x142.google.com with SMTP id f82so3685517ilh.8;
- Fri, 17 Apr 2020 15:09:32 -0700 (PDT)
+ id 1jPZCL-0001LM-VU; Fri, 17 Apr 2020 18:10:58 -0400
+Received: by mail-io1-xd42.google.com with SMTP id i3so4028732ioo.13;
+ Fri, 17 Apr 2020 15:10:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0FXDPGiNdHkEkTErB/nqN8AxbDbQ1pWY+qKu1bM5us0=;
- b=YZc/YQdlfunMGXdqeZN51adNLQjlIyUZPdO9Hr7Oag/s1cvrSRjOG3sc3LwxiAsMVR
- E1eFrZ1Rz/v3PB8eBEUyylrYcymsvXmgkusuTpPX3UfeQBXcuN9n2kqm6+nGHqiWl4V/
- DUBELErxojVzAiIJiOMS4iID3KCyaQYmoG7wfn42givVnIpNudxD8ZAWgJAIv//xTzVt
- hm9t9SjBVSWugN6T7Ul7772ZpWmNtn81agu0g6y2Vwe2/y0YNnfCh2NH902jLMBXacjm
- esO7isydu7zw/UlNFm/3BzGljsw3d8MwDkzbA3PGHs5/Sc3ox/NhW3SlgnNDyQKEj3W+
- MqyQ==
+ :cc; bh=piU0swIERRP9Yf/WLECtmHgt9WHa4so5z8YIpNNhwuY=;
+ b=Ioll/K8rhvDQmYHtYe3AWjV6P662a1N1iQgxG5HwK2LLsntcPg+jsSx1r7QKLRtiBT
+ XHnf6m4adjNQB+aoiCFqZS2ePZxogPrXqKKjsXFDAfgmovKhj1If8EPH2/34GeWhSx57
+ DGLQQ1ZnSdOnlz6wW/UH17fwT1FEx3H2FP06C4UnnkwM/WCSXSwx3maqfrs342XVnkVD
+ Ybb1PD5cdcGF3kYSh00TkRhy6jGfoiBhlE21lRj32VM8SxzZHvPPobdkMav/E5HbArNS
+ bccsVjRNkXSfw8rbr521WdKVxUGEO1+asKPAyVg0+0QEshuyCMucuSMaB+TLcQqRN1Co
+ kozA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=0FXDPGiNdHkEkTErB/nqN8AxbDbQ1pWY+qKu1bM5us0=;
- b=gBiTuLiqsyLpfZzwgVRMsiOljTuBy7KY3U7oQw9tM1k+7NrRCJtbGumrDGxN2T/fw5
- RrdbwlLAu7M8sgZt1JNmZhawcXi3wsJk3EnrjQQ0Fz9W6tijVHkjiuop1uNVWt4RIaFt
- XJWUV1dTBsjxlDf4xRZYTmbGGP0ShecKuP9Rc0883wCKW2mWaUq0VeQdILI2O4bBnNzT
- UjB1wPLCVvtOJsGorR39n9dqdz/xBCRG7mKooLpFCMxQUykxfDFyBOdMjln1FcHCtFrn
- ffH0lZmw6o8Dr7CspdLRl83JwpItsvZcOP9sBUpcyMyxdUKZespLQsMHgTUq9OikQ8vY
- 0LZw==
-X-Gm-Message-State: AGi0PuZ3F/ag9XJ+Y+5pEf1Pa5tRVY8IFAL+q+0asBT6TNayxoC+Ov5q
- lrxFZFE3+fYPthY+ON26OW7589dB4IJpMG0yaOk=
-X-Google-Smtp-Source: APiQypLz32bxVs3KzHVwoqKzVLyh3G8ucJDejbQ6OE/2uqmRT40a/qWcdJfyLXPvDB7kjFc95O5o5H28oktdyaOqRb0=
-X-Received: by 2002:a92:79cc:: with SMTP id u195mr5385035ilc.131.1587161371659; 
- Fri, 17 Apr 2020 15:09:31 -0700 (PDT)
+ bh=piU0swIERRP9Yf/WLECtmHgt9WHa4so5z8YIpNNhwuY=;
+ b=S/tG0i9eITK9puu44vO0bGp4NVpgpdBugJmoXKJTiNIkacqFJAdTdaK+StbGhUIpsC
+ uVqRi2Iz4UuLfOs0/PdFvWxkBuEt+9jy/RR18MNmwtEDQ3KO+s+pzXtYK9l5TP1CSjph
+ H6fxqJa+KMUlhwWPcQtP0TUKrvUtjK5QlND0/I3bkI+98ixUlda/c7iS1zX6inOr15lu
+ ogrDuNs10uteOlvGJ1uJyHWMAjLIQNVcCgxfww1D1+lQ1aWy3/Pgq7UYJAXVdJfjbanA
+ NwSdKn5pA5Qlo56MTKd8puxDPV7wDDKXtrOx+L7doZZsvPc/pPaL45chS5vem6pLY64l
+ RWvg==
+X-Gm-Message-State: AGi0PuY3zMKEZGbQQ2hMTW98HIF4dW9/05OXYN3uK5F1QOzXAZDWKQCV
+ oGUkNE5F8wZn+xZsIT4YIJhtMoA86xEpIN3fDCY=
+X-Google-Smtp-Source: APiQypK86XLZT+IzVOzYlIvDw3TZ5EmDo3/oxyv3mpD+TX+SrGxI2IOXlA8TLnhBVRs7UGVgFfThO9TbZjj+4d+9/t8=
+X-Received: by 2002:a5e:880b:: with SMTP id l11mr5390212ioj.42.1587161457025; 
+ Fri, 17 Apr 2020 15:10:57 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200330153633.15298-1-zhiwei_liu@c-sky.com>
- <20200330153633.15298-32-zhiwei_liu@c-sky.com>
-In-Reply-To: <20200330153633.15298-32-zhiwei_liu@c-sky.com>
+ <20200330153633.15298-35-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200330153633.15298-35-zhiwei_liu@c-sky.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 17 Apr 2020 15:01:08 -0700
-Message-ID: <CAKmqyKMQHrtXkZHGHQ7fLvarXevDv_XX9AGaJ9vnUCuvjnV+6g@mail.gmail.com>
-Subject: Re: [PATCH v7 31/61] target/riscv: vector widening floating-point
- add/subtract instructions
+Date: Fri, 17 Apr 2020 15:02:33 -0700
+Message-ID: <CAKmqyKNgwGd16ff7hXjyiPokP2S49SpiJZXiWo2aoagCqXNn1A@mail.gmail.com>
+Subject: Re: [PATCH v7 34/61] target/riscv: vector single-width floating-point
+ fused multiply-add instructions
 To: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::142
+X-Received-From: 2607:f8b0:4864:20::d42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,7 +97,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 30, 2020 at 9:39 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+On Mon, Mar 30, 2020 at 9:45 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
 >
 > Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
@@ -107,300 +107,381 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  target/riscv/helper.h                   |  17 +++
->  target/riscv/insn32.decode              |   8 ++
->  target/riscv/insn_trans/trans_rvv.inc.c | 145 ++++++++++++++++++++++++
->  target/riscv/vector_helper.c            |  83 ++++++++++++++
->  4 files changed, 253 insertions(+)
+>  target/riscv/helper.h                   |  49 +++++
+>  target/riscv/insn32.decode              |  16 ++
+>  target/riscv/insn_trans/trans_rvv.inc.c |  18 ++
+>  target/riscv/vector_helper.c            | 251 ++++++++++++++++++++++++
+>  4 files changed, 334 insertions(+)
 >
 > diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-> index 3031a941c2..73fc7a5a00 100644
+> index 5b3340a4af..5cd1694412 100644
 > --- a/target/riscv/helper.h
 > +++ b/target/riscv/helper.h
-> @@ -813,3 +813,20 @@ DEF_HELPER_6(vfsub_vf_d, void, ptr, ptr, i64, ptr, env, i32)
->  DEF_HELPER_6(vfrsub_vf_h, void, ptr, ptr, i64, ptr, env, i32)
->  DEF_HELPER_6(vfrsub_vf_w, void, ptr, ptr, i64, ptr, env, i32)
->  DEF_HELPER_6(vfrsub_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+> @@ -851,3 +851,52 @@ DEF_HELPER_6(vfwmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+>  DEF_HELPER_6(vfwmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+>  DEF_HELPER_6(vfwmul_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+>  DEF_HELPER_6(vfwmul_vf_w, void, ptr, ptr, i64, ptr, env, i32)
 > +
-> +DEF_HELPER_6(vfwadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vfwadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vfwsub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vfwsub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vfwadd_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vfwadd_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vfwsub_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vfwsub_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vfwadd_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vfwadd_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vfwsub_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vfwsub_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vfwadd_wf_h, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vfwadd_wf_w, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vfwsub_wf_h, void, ptr, ptr, i64, ptr, env, i32)
-> +DEF_HELPER_6(vfwsub_wf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmacc_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfnmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfnmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfnmacc_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmsac_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmsac_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmsac_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfnmsac_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfnmsac_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfnmsac_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmadd_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfnmadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfnmadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfnmadd_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmsub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmsub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmsub_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfnmsub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfnmsub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfnmsub_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
+> +DEF_HELPER_6(vfmacc_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmacc_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmacc_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfnmacc_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfnmacc_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfnmacc_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmsac_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmsac_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmsac_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfnmsac_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfnmsac_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfnmsac_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmadd_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmadd_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmadd_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfnmadd_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfnmadd_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfnmadd_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmsub_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmsub_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfmsub_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfnmsub_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfnmsub_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+> +DEF_HELPER_6(vfnmsub_vf_d, void, ptr, ptr, i64, ptr, env, i32)
 > diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-> index c8e3f10162..68e9448842 100644
+> index 1d963f0b8a..c42bcd141c 100644
 > --- a/target/riscv/insn32.decode
 > +++ b/target/riscv/insn32.decode
-> @@ -448,6 +448,14 @@ vfadd_vf        000000 . ..... ..... 101 ..... 1010111 @r_vm
->  vfsub_vv        000010 . ..... ..... 001 ..... 1010111 @r_vm
->  vfsub_vf        000010 . ..... ..... 101 ..... 1010111 @r_vm
->  vfrsub_vf       100111 . ..... ..... 101 ..... 1010111 @r_vm
-> +vfwadd_vv       110000 . ..... ..... 001 ..... 1010111 @r_vm
-> +vfwadd_vf       110000 . ..... ..... 101 ..... 1010111 @r_vm
-> +vfwadd_wv       110100 . ..... ..... 001 ..... 1010111 @r_vm
-> +vfwadd_wf       110100 . ..... ..... 101 ..... 1010111 @r_vm
-> +vfwsub_vv       110010 . ..... ..... 001 ..... 1010111 @r_vm
-> +vfwsub_vf       110010 . ..... ..... 101 ..... 1010111 @r_vm
-> +vfwsub_wv       110110 . ..... ..... 001 ..... 1010111 @r_vm
-> +vfwsub_wf       110110 . ..... ..... 101 ..... 1010111 @r_vm
+> @@ -463,6 +463,22 @@ vfdiv_vf        100000 . ..... ..... 101 ..... 1010111 @r_vm
+>  vfrdiv_vf       100001 . ..... ..... 101 ..... 1010111 @r_vm
+>  vfwmul_vv       111000 . ..... ..... 001 ..... 1010111 @r_vm
+>  vfwmul_vf       111000 . ..... ..... 101 ..... 1010111 @r_vm
+> +vfmacc_vv       101100 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfnmacc_vv      101101 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfnmacc_vf      101101 . ..... ..... 101 ..... 1010111 @r_vm
+> +vfmacc_vf       101100 . ..... ..... 101 ..... 1010111 @r_vm
+> +vfmsac_vv       101110 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfmsac_vf       101110 . ..... ..... 101 ..... 1010111 @r_vm
+> +vfnmsac_vv      101111 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfnmsac_vf      101111 . ..... ..... 101 ..... 1010111 @r_vm
+> +vfmadd_vv       101000 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfmadd_vf       101000 . ..... ..... 101 ..... 1010111 @r_vm
+> +vfnmadd_vv      101001 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfnmadd_vf      101001 . ..... ..... 101 ..... 1010111 @r_vm
+> +vfmsub_vv       101010 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfmsub_vf       101010 . ..... ..... 101 ..... 1010111 @r_vm
+> +vfnmsub_vv      101011 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfnmsub_vf      101011 . ..... ..... 101 ..... 1010111 @r_vm
 >
 >  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
 >  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 > diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-> index 9a8fb18adc..a539849fab 100644
+> index 5395063b1b..b2af9c314c 100644
 > --- a/target/riscv/insn_trans/trans_rvv.inc.c
 > +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-> @@ -1923,3 +1923,148 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)            \
->  GEN_OPFVF_TRANS(vfadd_vf,  opfvf_check)
->  GEN_OPFVF_TRANS(vfsub_vf,  opfvf_check)
->  GEN_OPFVF_TRANS(vfrsub_vf,  opfvf_check)
+> @@ -2079,3 +2079,21 @@ GEN_OPFVF_TRANS(vfrdiv_vf,  opfvf_check)
+>  /* Vector Widening Floating-Point Multiply */
+>  GEN_OPFVV_WIDEN_TRANS(vfwmul_vv, opfvv_widen_check)
+>  GEN_OPFVF_WIDEN_TRANS(vfwmul_vf)
 > +
-> +/* Vector Widening Floating-Point Add/Subtract Instructions */
-> +static bool opfvv_widen_check(DisasContext *s, arg_rmrr *a)
-> +{
-> +    return (vext_check_isa_ill(s) &&
-> +            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
-> +            vext_check_reg(s, a->rd, true) &&
-> +            vext_check_reg(s, a->rs2, false) &&
-> +            vext_check_reg(s, a->rs1, false) &&
-> +            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs2,
-> +                                     1 << s->lmul) &&
-> +            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs1,
-> +                                     1 << s->lmul) &&
-> +            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
-> +}
-> +
-> +/* OPFVV with WIDEN */
-> +#define GEN_OPFVV_WIDEN_TRANS(NAME, CHECK)                       \
-> +static bool trans_##NAME(DisasContext *s, arg_rmrr *a)           \
-> +{                                                                \
-> +    if (CHECK(s, a)) {                                           \
-> +        uint32_t data = 0;                                       \
-> +        static gen_helper_gvec_4_ptr * const fns[2] = {          \
-> +            gen_helper_##NAME##_h, gen_helper_##NAME##_w,        \
-> +        };                                                       \
-> +        TCGLabel *over = gen_new_label();                        \
-> +        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);        \
-> +                                                                 \
-> +        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);           \
-> +        data = FIELD_DP32(data, VDATA, VM, a->vm);               \
-> +        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);           \
-> +        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),   \
-> +                           vreg_ofs(s, a->rs1),                  \
-> +                           vreg_ofs(s, a->rs2), cpu_env, 0,      \
-> +                           s->vlen / 8, data, fns[s->sew - 1]);  \
-> +        gen_set_label(over);                                     \
-> +        return true;                                             \
-> +    }                                                            \
-> +    return false;                                                \
-> +}
-> +
-> +GEN_OPFVV_WIDEN_TRANS(vfwadd_vv, opfvv_widen_check)
-> +GEN_OPFVV_WIDEN_TRANS(vfwsub_vv, opfvv_widen_check)
-> +
-> +static bool opfvf_widen_check(DisasContext *s, arg_rmrr *a)
-> +{
-> +    return (vext_check_isa_ill(s) &&
-> +            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
-> +            vext_check_reg(s, a->rd, true) &&
-> +            vext_check_reg(s, a->rs2, false) &&
-> +            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs2,
-> +                                     1 << s->lmul) &&
-> +            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
-> +}
-> +
-> +/* OPFVF with WIDEN */
-> +#define GEN_OPFVF_WIDEN_TRANS(NAME)                              \
-> +static bool trans_##NAME(DisasContext *s, arg_rmrr *a)           \
-> +{                                                                \
-> +    if (opfvf_widen_check(s, a)) {                               \
-> +        uint32_t data = 0;                                       \
-> +        static gen_helper_opfvf *const fns[2] = {                \
-> +            gen_helper_##NAME##_h, gen_helper_##NAME##_w,        \
-> +        };                                                       \
-> +        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);           \
-> +        data = FIELD_DP32(data, VDATA, VM, a->vm);               \
-> +        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);           \
-> +        return opfvf_trans(a->rd, a->rs1, a->rs2, data,          \
-> +                           fns[s->sew - 1], s);                  \
-> +    }                                                            \
-> +    return false;                                                \
-> +}
-> +
-> +GEN_OPFVF_WIDEN_TRANS(vfwadd_vf)
-> +GEN_OPFVF_WIDEN_TRANS(vfwsub_vf)
-> +
-> +static bool opfwv_widen_check(DisasContext *s, arg_rmrr *a)
-> +{
-> +    return (vext_check_isa_ill(s) &&
-> +            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
-> +            vext_check_reg(s, a->rd, true) &&
-> +            vext_check_reg(s, a->rs2, true) &&
-> +            vext_check_reg(s, a->rs1, false) &&
-> +            vext_check_overlap_group(a->rd, 2 << s->lmul, a->rs1,
-> +                                     1 << s->lmul) &&
-> +            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
-> +}
-> +
-> +/* WIDEN OPFVV with WIDEN */
-> +#define GEN_OPFWV_WIDEN_TRANS(NAME)                                \
-> +static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
-> +{                                                                  \
-> +    if (opfwv_widen_check(s, a)) {                                 \
-> +        uint32_t data = 0;                                         \
-> +        static gen_helper_gvec_4_ptr * const fns[2] = {            \
-> +            gen_helper_##NAME##_h, gen_helper_##NAME##_w,          \
-> +        };                                                         \
-> +        TCGLabel *over = gen_new_label();                          \
-> +        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
-> +                                                                   \
-> +        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
-> +        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
-> +        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
-> +        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
-> +                           vreg_ofs(s, a->rs1),                    \
-> +                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
-> +                           s->vlen / 8, data, fns[s->sew - 1]);    \
-> +        gen_set_label(over);                                       \
-> +        return true;                                               \
-> +    }                                                              \
-> +    return false;                                                  \
-> +}
-> +
-> +GEN_OPFWV_WIDEN_TRANS(vfwadd_wv)
-> +GEN_OPFWV_WIDEN_TRANS(vfwsub_wv)
-> +
-> +static bool opfwf_widen_check(DisasContext *s, arg_rmrr *a)
-> +{
-> +    return (vext_check_isa_ill(s) &&
-> +            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
-> +            vext_check_reg(s, a->rd, true) &&
-> +            vext_check_reg(s, a->rs2, true) &&
-> +            (s->lmul < 0x3) && (s->sew < 0x3) && (s->sew != 0));
-> +}
-> +
-> +/* WIDEN OPFVF with WIDEN */
-> +#define GEN_OPFWF_WIDEN_TRANS(NAME)                              \
-> +static bool trans_##NAME(DisasContext *s, arg_rmrr *a)           \
-> +{                                                                \
-> +    if (opfwf_widen_check(s, a)) {                               \
-> +        uint32_t data = 0;                                       \
-> +        static gen_helper_opfvf *const fns[2] = {                \
-> +            gen_helper_##NAME##_h, gen_helper_##NAME##_w,        \
-> +        };                                                       \
-> +        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);           \
-> +        data = FIELD_DP32(data, VDATA, VM, a->vm);               \
-> +        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);           \
-> +        return opfvf_trans(a->rd, a->rs1, a->rs2, data,          \
-> +                           fns[s->sew - 1], s);                  \
-> +    }                                                            \
-> +    return false;                                                \
-> +}
-> +
-> +GEN_OPFWF_WIDEN_TRANS(vfwadd_wf)
-> +GEN_OPFWF_WIDEN_TRANS(vfwsub_wf)
+> +/* Vector Single-Width Floating-Point Fused Multiply-Add Instructions */
+> +GEN_OPFVV_TRANS(vfmacc_vv, opfvv_check)
+> +GEN_OPFVV_TRANS(vfnmacc_vv, opfvv_check)
+> +GEN_OPFVV_TRANS(vfmsac_vv, opfvv_check)
+> +GEN_OPFVV_TRANS(vfnmsac_vv, opfvv_check)
+> +GEN_OPFVV_TRANS(vfmadd_vv, opfvv_check)
+> +GEN_OPFVV_TRANS(vfnmadd_vv, opfvv_check)
+> +GEN_OPFVV_TRANS(vfmsub_vv, opfvv_check)
+> +GEN_OPFVV_TRANS(vfnmsub_vv, opfvv_check)
+> +GEN_OPFVF_TRANS(vfmacc_vf, opfvf_check)
+> +GEN_OPFVF_TRANS(vfnmacc_vf, opfvf_check)
+> +GEN_OPFVF_TRANS(vfmsac_vf, opfvf_check)
+> +GEN_OPFVF_TRANS(vfnmsac_vf, opfvf_check)
+> +GEN_OPFVF_TRANS(vfmadd_vf, opfvf_check)
+> +GEN_OPFVF_TRANS(vfnmadd_vf, opfvf_check)
+> +GEN_OPFVF_TRANS(vfmsub_vf, opfvf_check)
+> +GEN_OPFVF_TRANS(vfnmsub_vf, opfvf_check)
 > diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-> index af343e9bf9..08e59b0e29 100644
+> index bbe3719e69..016f49507e 100644
 > --- a/target/riscv/vector_helper.c
 > +++ b/target/riscv/vector_helper.c
-> @@ -3277,3 +3277,86 @@ RVVCALL(OPFVF2, vfrsub_vf_d, OP_UUU_D, H8, H8, float64_rsub)
->  GEN_VEXT_VF(vfrsub_vf_h, 2, 2, clearh)
->  GEN_VEXT_VF(vfrsub_vf_w, 4, 4, clearl)
->  GEN_VEXT_VF(vfrsub_vf_d, 8, 8, clearq)
+> @@ -3431,3 +3431,254 @@ RVVCALL(OPFVF2, vfwmul_vf_h, WOP_UUU_H, H4, H2, vfwmul16)
+>  RVVCALL(OPFVF2, vfwmul_vf_w, WOP_UUU_W, H8, H4, vfwmul32)
+>  GEN_VEXT_VF(vfwmul_vf_h, 2, 4, clearl)
+>  GEN_VEXT_VF(vfwmul_vf_w, 4, 8, clearq)
 > +
-> +/* Vector Widening Floating-Point Add/Subtract Instructions */
-> +static uint32_t vfwadd16(uint16_t a, uint16_t b, float_status *s)
-> +{
-> +    return float32_add(float16_to_float32(a, true, s),
-> +            float16_to_float32(b, true, s), s);
+> +/* Vector Single-Width Floating-Point Fused Multiply-Add Instructions */
+> +#define OPFVV3(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)       \
+> +static void do_##NAME(void *vd, void *vs1, void *vs2, int i,       \
+> +        CPURISCVState *env)                                        \
+> +{                                                                  \
+> +    TX1 s1 = *((T1 *)vs1 + HS1(i));                                \
+> +    TX2 s2 = *((T2 *)vs2 + HS2(i));                                \
+> +    TD d = *((TD *)vd + HD(i));                                    \
+> +    *((TD *)vd + HD(i)) = OP(s2, s1, d, &env->fp_status);          \
 > +}
 > +
-> +static uint64_t vfwadd32(uint32_t a, uint32_t b, float_status *s)
+> +static uint16_t fmacc16(uint16_t a, uint16_t b, uint16_t d, float_status *s)
 > +{
-> +    return float64_add(float32_to_float64(a, s),
-> +            float32_to_float64(b, s), s);
-> +
+> +    return float16_muladd(a, b, d, 0, s);
 > +}
 > +
-> +RVVCALL(OPFVV2, vfwadd_vv_h, WOP_UUU_H, H4, H2, H2, vfwadd16)
-> +RVVCALL(OPFVV2, vfwadd_vv_w, WOP_UUU_W, H8, H4, H4, vfwadd32)
-> +GEN_VEXT_VV_ENV(vfwadd_vv_h, 2, 4, clearl)
-> +GEN_VEXT_VV_ENV(vfwadd_vv_w, 4, 8, clearq)
-> +RVVCALL(OPFVF2, vfwadd_vf_h, WOP_UUU_H, H4, H2, vfwadd16)
-> +RVVCALL(OPFVF2, vfwadd_vf_w, WOP_UUU_W, H8, H4, vfwadd32)
-> +GEN_VEXT_VF(vfwadd_vf_h, 2, 4, clearl)
-> +GEN_VEXT_VF(vfwadd_vf_w, 4, 8, clearq)
-> +
-> +static uint32_t vfwsub16(uint16_t a, uint16_t b, float_status *s)
+> +static uint32_t fmacc32(uint32_t a, uint32_t b, uint32_t d, float_status *s)
 > +{
-> +    return float32_sub(float16_to_float32(a, true, s),
-> +            float16_to_float32(b, true, s), s);
+> +    return float32_muladd(a, b, d, 0, s);
 > +}
 > +
-> +static uint64_t vfwsub32(uint32_t a, uint32_t b, float_status *s)
+> +static uint64_t fmacc64(uint64_t a, uint64_t b, uint64_t d, float_status *s)
 > +{
-> +    return float64_sub(float32_to_float64(a, s),
-> +            float32_to_float64(b, s), s);
-> +
+> +    return float64_muladd(a, b, d, 0, s);
 > +}
 > +
-> +RVVCALL(OPFVV2, vfwsub_vv_h, WOP_UUU_H, H4, H2, H2, vfwsub16)
-> +RVVCALL(OPFVV2, vfwsub_vv_w, WOP_UUU_W, H8, H4, H4, vfwsub32)
-> +GEN_VEXT_VV_ENV(vfwsub_vv_h, 2, 4, clearl)
-> +GEN_VEXT_VV_ENV(vfwsub_vv_w, 4, 8, clearq)
-> +RVVCALL(OPFVF2, vfwsub_vf_h, WOP_UUU_H, H4, H2, vfwsub16)
-> +RVVCALL(OPFVF2, vfwsub_vf_w, WOP_UUU_W, H8, H4, vfwsub32)
-> +GEN_VEXT_VF(vfwsub_vf_h, 2, 4, clearl)
-> +GEN_VEXT_VF(vfwsub_vf_w, 4, 8, clearq)
+> +RVVCALL(OPFVV3, vfmacc_vv_h, OP_UUU_H, H2, H2, H2, fmacc16)
+> +RVVCALL(OPFVV3, vfmacc_vv_w, OP_UUU_W, H4, H4, H4, fmacc32)
+> +RVVCALL(OPFVV3, vfmacc_vv_d, OP_UUU_D, H8, H8, H8, fmacc64)
+> +GEN_VEXT_VV_ENV(vfmacc_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV_ENV(vfmacc_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV_ENV(vfmacc_vv_d, 8, 8, clearq)
 > +
-> +static uint32_t vfwaddw16(uint32_t a, uint16_t b, float_status *s)
-> +{
-> +    return float32_add(a, float16_to_float32(b, true, s), s);
+> +#define OPFVF3(NAME, TD, T1, T2, TX1, TX2, HD, HS2, OP)           \
+> +static void do_##NAME(void *vd, uint64_t s1, void *vs2, int i,    \
+> +        CPURISCVState *env)                                       \
+> +{                                                                 \
+> +    TX2 s2 = *((T2 *)vs2 + HS2(i));                               \
+> +    TD d = *((TD *)vd + HD(i));                                   \
+> +    *((TD *)vd + HD(i)) = OP(s2, (TX1)(T1)s1, d, &env->fp_status);\
 > +}
 > +
-> +static uint64_t vfwaddw32(uint64_t a, uint32_t b, float_status *s)
+> +RVVCALL(OPFVF3, vfmacc_vf_h, OP_UUU_H, H2, H2, fmacc16)
+> +RVVCALL(OPFVF3, vfmacc_vf_w, OP_UUU_W, H4, H4, fmacc32)
+> +RVVCALL(OPFVF3, vfmacc_vf_d, OP_UUU_D, H8, H8, fmacc64)
+> +GEN_VEXT_VF(vfmacc_vf_h, 2, 2, clearh)
+> +GEN_VEXT_VF(vfmacc_vf_w, 4, 4, clearl)
+> +GEN_VEXT_VF(vfmacc_vf_d, 8, 8, clearq)
+> +
+> +static uint16_t fnmacc16(uint16_t a, uint16_t b, uint16_t d, float_status *s)
 > +{
-> +    return float64_add(a, float32_to_float64(b, s), s);
+> +    return float16_muladd(a, b, d,
+> +            float_muladd_negate_c | float_muladd_negate_product, s);
 > +}
 > +
-> +RVVCALL(OPFVV2, vfwadd_wv_h, WOP_WUUU_H, H4, H2, H2, vfwaddw16)
-> +RVVCALL(OPFVV2, vfwadd_wv_w, WOP_WUUU_W, H8, H4, H4, vfwaddw32)
-> +GEN_VEXT_VV_ENV(vfwadd_wv_h, 2, 4, clearl)
-> +GEN_VEXT_VV_ENV(vfwadd_wv_w, 4, 8, clearq)
-> +RVVCALL(OPFVF2, vfwadd_wf_h, WOP_WUUU_H, H4, H2, vfwaddw16)
-> +RVVCALL(OPFVF2, vfwadd_wf_w, WOP_WUUU_W, H8, H4, vfwaddw32)
-> +GEN_VEXT_VF(vfwadd_wf_h, 2, 4, clearl)
-> +GEN_VEXT_VF(vfwadd_wf_w, 4, 8, clearq)
-> +
-> +static uint32_t vfwsubw16(uint32_t a, uint16_t b, float_status *s)
+> +static uint32_t fnmacc32(uint32_t a, uint32_t b, uint32_t d, float_status *s)
 > +{
-> +    return float32_sub(a, float16_to_float32(b, true, s), s);
+> +    return float32_muladd(a, b, d,
+> +            float_muladd_negate_c | float_muladd_negate_product, s);
 > +}
 > +
-> +static uint64_t vfwsubw32(uint64_t a, uint32_t b, float_status *s)
+> +static uint64_t fnmacc64(uint64_t a, uint64_t b, uint64_t d, float_status *s)
 > +{
-> +    return float64_sub(a, float32_to_float64(b, s), s);
+> +    return float64_muladd(a, b, d,
+> +            float_muladd_negate_c | float_muladd_negate_product, s);
 > +}
 > +
-> +RVVCALL(OPFVV2, vfwsub_wv_h, WOP_WUUU_H, H4, H2, H2, vfwsubw16)
-> +RVVCALL(OPFVV2, vfwsub_wv_w, WOP_WUUU_W, H8, H4, H4, vfwsubw32)
-> +GEN_VEXT_VV_ENV(vfwsub_wv_h, 2, 4, clearl)
-> +GEN_VEXT_VV_ENV(vfwsub_wv_w, 4, 8, clearq)
-> +RVVCALL(OPFVF2, vfwsub_wf_h, WOP_WUUU_H, H4, H2, vfwsubw16)
-> +RVVCALL(OPFVF2, vfwsub_wf_w, WOP_WUUU_W, H8, H4, vfwsubw32)
-> +GEN_VEXT_VF(vfwsub_wf_h, 2, 4, clearl)
-> +GEN_VEXT_VF(vfwsub_wf_w, 4, 8, clearq)
+> +RVVCALL(OPFVV3, vfnmacc_vv_h, OP_UUU_H, H2, H2, H2, fnmacc16)
+> +RVVCALL(OPFVV3, vfnmacc_vv_w, OP_UUU_W, H4, H4, H4, fnmacc32)
+> +RVVCALL(OPFVV3, vfnmacc_vv_d, OP_UUU_D, H8, H8, H8, fnmacc64)
+> +GEN_VEXT_VV_ENV(vfnmacc_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV_ENV(vfnmacc_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV_ENV(vfnmacc_vv_d, 8, 8, clearq)
+> +RVVCALL(OPFVF3, vfnmacc_vf_h, OP_UUU_H, H2, H2, fnmacc16)
+> +RVVCALL(OPFVF3, vfnmacc_vf_w, OP_UUU_W, H4, H4, fnmacc32)
+> +RVVCALL(OPFVF3, vfnmacc_vf_d, OP_UUU_D, H8, H8, fnmacc64)
+> +GEN_VEXT_VF(vfnmacc_vf_h, 2, 2, clearh)
+> +GEN_VEXT_VF(vfnmacc_vf_w, 4, 4, clearl)
+> +GEN_VEXT_VF(vfnmacc_vf_d, 8, 8, clearq)
+> +
+> +static uint16_t fmsac16(uint16_t a, uint16_t b, uint16_t d, float_status *s)
+> +{
+> +    return float16_muladd(a, b, d, float_muladd_negate_c, s);
+> +}
+> +
+> +static uint32_t fmsac32(uint32_t a, uint32_t b, uint32_t d, float_status *s)
+> +{
+> +    return float32_muladd(a, b, d, float_muladd_negate_c, s);
+> +}
+> +
+> +static uint64_t fmsac64(uint64_t a, uint64_t b, uint64_t d, float_status *s)
+> +{
+> +    return float64_muladd(a, b, d, float_muladd_negate_c, s);
+> +}
+> +
+> +RVVCALL(OPFVV3, vfmsac_vv_h, OP_UUU_H, H2, H2, H2, fmsac16)
+> +RVVCALL(OPFVV3, vfmsac_vv_w, OP_UUU_W, H4, H4, H4, fmsac32)
+> +RVVCALL(OPFVV3, vfmsac_vv_d, OP_UUU_D, H8, H8, H8, fmsac64)
+> +GEN_VEXT_VV_ENV(vfmsac_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV_ENV(vfmsac_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV_ENV(vfmsac_vv_d, 8, 8, clearq)
+> +RVVCALL(OPFVF3, vfmsac_vf_h, OP_UUU_H, H2, H2, fmsac16)
+> +RVVCALL(OPFVF3, vfmsac_vf_w, OP_UUU_W, H4, H4, fmsac32)
+> +RVVCALL(OPFVF3, vfmsac_vf_d, OP_UUU_D, H8, H8, fmsac64)
+> +GEN_VEXT_VF(vfmsac_vf_h, 2, 2, clearh)
+> +GEN_VEXT_VF(vfmsac_vf_w, 4, 4, clearl)
+> +GEN_VEXT_VF(vfmsac_vf_d, 8, 8, clearq)
+> +
+> +static uint16_t fnmsac16(uint16_t a, uint16_t b, uint16_t d, float_status *s)
+> +{
+> +    return float16_muladd(a, b, d, float_muladd_negate_product, s);
+> +}
+> +
+> +static uint32_t fnmsac32(uint32_t a, uint32_t b, uint32_t d, float_status *s)
+> +{
+> +    return float32_muladd(a, b, d, float_muladd_negate_product, s);
+> +}
+> +
+> +static uint64_t fnmsac64(uint64_t a, uint64_t b, uint64_t d, float_status *s)
+> +{
+> +    return float64_muladd(a, b, d, float_muladd_negate_product, s);
+> +}
+> +
+> +RVVCALL(OPFVV3, vfnmsac_vv_h, OP_UUU_H, H2, H2, H2, fnmsac16)
+> +RVVCALL(OPFVV3, vfnmsac_vv_w, OP_UUU_W, H4, H4, H4, fnmsac32)
+> +RVVCALL(OPFVV3, vfnmsac_vv_d, OP_UUU_D, H8, H8, H8, fnmsac64)
+> +GEN_VEXT_VV_ENV(vfnmsac_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV_ENV(vfnmsac_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV_ENV(vfnmsac_vv_d, 8, 8, clearq)
+> +RVVCALL(OPFVF3, vfnmsac_vf_h, OP_UUU_H, H2, H2, fnmsac16)
+> +RVVCALL(OPFVF3, vfnmsac_vf_w, OP_UUU_W, H4, H4, fnmsac32)
+> +RVVCALL(OPFVF3, vfnmsac_vf_d, OP_UUU_D, H8, H8, fnmsac64)
+> +GEN_VEXT_VF(vfnmsac_vf_h, 2, 2, clearh)
+> +GEN_VEXT_VF(vfnmsac_vf_w, 4, 4, clearl)
+> +GEN_VEXT_VF(vfnmsac_vf_d, 8, 8, clearq)
+> +
+> +static uint16_t fmadd16(uint16_t a, uint16_t b, uint16_t d, float_status *s)
+> +{
+> +    return float16_muladd(d, b, a, 0, s);
+> +}
+> +
+> +static uint32_t fmadd32(uint32_t a, uint32_t b, uint32_t d, float_status *s)
+> +{
+> +    return float32_muladd(d, b, a, 0, s);
+> +}
+> +
+> +static uint64_t fmadd64(uint64_t a, uint64_t b, uint64_t d, float_status *s)
+> +{
+> +    return float64_muladd(d, b, a, 0, s);
+> +}
+> +
+> +RVVCALL(OPFVV3, vfmadd_vv_h, OP_UUU_H, H2, H2, H2, fmadd16)
+> +RVVCALL(OPFVV3, vfmadd_vv_w, OP_UUU_W, H4, H4, H4, fmadd32)
+> +RVVCALL(OPFVV3, vfmadd_vv_d, OP_UUU_D, H8, H8, H8, fmadd64)
+> +GEN_VEXT_VV_ENV(vfmadd_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV_ENV(vfmadd_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV_ENV(vfmadd_vv_d, 8, 8, clearq)
+> +RVVCALL(OPFVF3, vfmadd_vf_h, OP_UUU_H, H2, H2, fmadd16)
+> +RVVCALL(OPFVF3, vfmadd_vf_w, OP_UUU_W, H4, H4, fmadd32)
+> +RVVCALL(OPFVF3, vfmadd_vf_d, OP_UUU_D, H8, H8, fmadd64)
+> +GEN_VEXT_VF(vfmadd_vf_h, 2, 2, clearh)
+> +GEN_VEXT_VF(vfmadd_vf_w, 4, 4, clearl)
+> +GEN_VEXT_VF(vfmadd_vf_d, 8, 8, clearq)
+> +
+> +static uint16_t fnmadd16(uint16_t a, uint16_t b, uint16_t d, float_status *s)
+> +{
+> +    return float16_muladd(d, b, a,
+> +            float_muladd_negate_c | float_muladd_negate_product, s);
+> +}
+> +
+> +static uint32_t fnmadd32(uint32_t a, uint32_t b, uint32_t d, float_status *s)
+> +{
+> +    return float32_muladd(d, b, a,
+> +            float_muladd_negate_c | float_muladd_negate_product, s);
+> +}
+> +
+> +static uint64_t fnmadd64(uint64_t a, uint64_t b, uint64_t d, float_status *s)
+> +{
+> +    return float64_muladd(d, b, a,
+> +            float_muladd_negate_c | float_muladd_negate_product, s);
+> +}
+> +
+> +RVVCALL(OPFVV3, vfnmadd_vv_h, OP_UUU_H, H2, H2, H2, fnmadd16)
+> +RVVCALL(OPFVV3, vfnmadd_vv_w, OP_UUU_W, H4, H4, H4, fnmadd32)
+> +RVVCALL(OPFVV3, vfnmadd_vv_d, OP_UUU_D, H8, H8, H8, fnmadd64)
+> +GEN_VEXT_VV_ENV(vfnmadd_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV_ENV(vfnmadd_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV_ENV(vfnmadd_vv_d, 8, 8, clearq)
+> +RVVCALL(OPFVF3, vfnmadd_vf_h, OP_UUU_H, H2, H2, fnmadd16)
+> +RVVCALL(OPFVF3, vfnmadd_vf_w, OP_UUU_W, H4, H4, fnmadd32)
+> +RVVCALL(OPFVF3, vfnmadd_vf_d, OP_UUU_D, H8, H8, fnmadd64)
+> +GEN_VEXT_VF(vfnmadd_vf_h, 2, 2, clearh)
+> +GEN_VEXT_VF(vfnmadd_vf_w, 4, 4, clearl)
+> +GEN_VEXT_VF(vfnmadd_vf_d, 8, 8, clearq)
+> +
+> +static uint16_t fmsub16(uint16_t a, uint16_t b, uint16_t d, float_status *s)
+> +{
+> +    return float16_muladd(d, b, a, float_muladd_negate_c, s);
+> +}
+> +
+> +static uint32_t fmsub32(uint32_t a, uint32_t b, uint32_t d, float_status *s)
+> +{
+> +    return float32_muladd(d, b, a, float_muladd_negate_c, s);
+> +}
+> +
+> +static uint64_t fmsub64(uint64_t a, uint64_t b, uint64_t d, float_status *s)
+> +{
+> +    return float64_muladd(d, b, a, float_muladd_negate_c, s);
+> +}
+> +
+> +RVVCALL(OPFVV3, vfmsub_vv_h, OP_UUU_H, H2, H2, H2, fmsub16)
+> +RVVCALL(OPFVV3, vfmsub_vv_w, OP_UUU_W, H4, H4, H4, fmsub32)
+> +RVVCALL(OPFVV3, vfmsub_vv_d, OP_UUU_D, H8, H8, H8, fmsub64)
+> +GEN_VEXT_VV_ENV(vfmsub_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV_ENV(vfmsub_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV_ENV(vfmsub_vv_d, 8, 8, clearq)
+> +RVVCALL(OPFVF3, vfmsub_vf_h, OP_UUU_H, H2, H2, fmsub16)
+> +RVVCALL(OPFVF3, vfmsub_vf_w, OP_UUU_W, H4, H4, fmsub32)
+> +RVVCALL(OPFVF3, vfmsub_vf_d, OP_UUU_D, H8, H8, fmsub64)
+> +GEN_VEXT_VF(vfmsub_vf_h, 2, 2, clearh)
+> +GEN_VEXT_VF(vfmsub_vf_w, 4, 4, clearl)
+> +GEN_VEXT_VF(vfmsub_vf_d, 8, 8, clearq)
+> +
+> +static uint16_t fnmsub16(uint16_t a, uint16_t b, uint16_t d, float_status *s)
+> +{
+> +    return float16_muladd(d, b, a, float_muladd_negate_product, s);
+> +}
+> +
+> +static uint32_t fnmsub32(uint32_t a, uint32_t b, uint32_t d, float_status *s)
+> +{
+> +    return float32_muladd(d, b, a, float_muladd_negate_product, s);
+> +}
+> +
+> +static uint64_t fnmsub64(uint64_t a, uint64_t b, uint64_t d, float_status *s)
+> +{
+> +    return float64_muladd(d, b, a, float_muladd_negate_product, s);
+> +}
+> +
+> +RVVCALL(OPFVV3, vfnmsub_vv_h, OP_UUU_H, H2, H2, H2, fnmsub16)
+> +RVVCALL(OPFVV3, vfnmsub_vv_w, OP_UUU_W, H4, H4, H4, fnmsub32)
+> +RVVCALL(OPFVV3, vfnmsub_vv_d, OP_UUU_D, H8, H8, H8, fnmsub64)
+> +GEN_VEXT_VV_ENV(vfnmsub_vv_h, 2, 2, clearh)
+> +GEN_VEXT_VV_ENV(vfnmsub_vv_w, 4, 4, clearl)
+> +GEN_VEXT_VV_ENV(vfnmsub_vv_d, 8, 8, clearq)
+> +RVVCALL(OPFVF3, vfnmsub_vf_h, OP_UUU_H, H2, H2, fnmsub16)
+> +RVVCALL(OPFVF3, vfnmsub_vf_w, OP_UUU_W, H4, H4, fnmsub32)
+> +RVVCALL(OPFVF3, vfnmsub_vf_d, OP_UUU_D, H8, H8, fnmsub64)
+> +GEN_VEXT_VF(vfnmsub_vf_h, 2, 2, clearh)
+> +GEN_VEXT_VF(vfnmsub_vf_w, 4, 4, clearl)
+> +GEN_VEXT_VF(vfnmsub_vf_d, 8, 8, clearq)
 > --
 > 2.23.0
 >
