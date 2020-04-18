@@ -2,71 +2,70 @@ Return-Path: <SRS0=r7Ry=6C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B71C2BA19
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 08:56:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6536DC352BE
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 09:06:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C08921D7E
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 08:56:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C08921D7E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 2AECE214D8
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 09:06:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AECE214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPjH6-0001Ex-Ep
-	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 04:56:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51001)
+	id 1jPjR1-0004cX-Bv
+	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 05:06:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55841)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jPjGO-0000o2-Cv
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 04:55:49 -0400
+ (envelope-from <bounces@canonical.com>) id 1jPjQ9-00040d-Ll
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 05:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jPjGN-0000g9-1t
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 04:55:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:32962)
+ (envelope-from <bounces@canonical.com>) id 1jPjQ8-000860-Bk
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 05:05:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34838)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jPjGM-0000eD-TB
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 04:55:47 -0400
+ id 1jPjQ8-000816-62
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 05:05:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jPjGL-0003NZ-Jh
- for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 08:55:45 +0000
+ id 1jPjQ5-0004Rn-Qh
+ for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 09:05:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8B22D2E80E7
- for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 08:55:45 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id C615E2E8108
+ for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 09:05:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 18 Apr 2020 08:41:13 -0000
-From: Barnabas Viragh <1872847@bugs.launchpad.net>
+Date: Sat, 18 Apr 2020 08:58:22 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=gentoo; sourcepackage=None; component=None;
- status=Fix Released; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Tags: alpha linux-user python
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: docs
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: cyborgyn laurent-vivier trofi
-X-Launchpad-Bug-Reporter: Barnabas Viragh (cyborgyn)
-X-Launchpad-Bug-Modifier: Barnabas Viragh (cyborgyn)
-References: <158690356239.28566.12748384831078553261.malonedeb@gac.canonical.com>
-Message-Id: <158719927418.11953.17985298690764322885.launchpad@soybean.canonical.com>
-Subject: [Bug 1872847] Re: qemu-alpha linux-user breaks python3.6
+X-Launchpad-Bug-Commenters: kekepower pmaydell
+X-Launchpad-Bug-Reporter: =?utf-8?q?Stig-=C3=98rjan_Smelror_=28kekepower=29?=
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <158654057369.6269.6354060003943218170.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158720030211.28516.14316652555102198837.malone@gac.canonical.com>
+Subject: [Bug 1872113] Re: qemu docs fails to build with Sphinx 3.0.x
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f85cdb9ec9fb2dfbba7148240aab5da304f3cc94
+X-Launchpad-Hash: b4696177e890dcf094eeb426c9fcde89a46c44d1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,54 +78,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1872847 <1872847@bugs.launchpad.net>
+Reply-To: Bug 1872113 <1872113@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: gentoo
-       Status: Fix Committed =3D> Fix Released
+The upstream fix for this is now in 5.0-rc3 and will be in the final 5.0
+release.
+
+** Changed in: qemu
+       Status: In Progress =3D> Fix Committed
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1872847
+https://bugs.launchpad.net/bugs/1872113
 
 Title:
-  qemu-alpha linux-user breaks python3.6
+  qemu docs fails to build with Sphinx 3.0.x
 
 Status in QEMU:
-  New
-Status in Gentoo Linux:
-  Fix Released
+  Fix Committed
 
 Bug description:
-  Running on Gentoo Linux in a chroot environment:
-  # python3 -c 'import selectors; selectors.DefaultSelector()'
-  Traceback (most recent call last):
-    File "<string>", line 1, in <module>
-    File "/usr/lib/python3.7/selectors.py", line 349, in __init__
-      self._selector =3D self._selector_cls()
-  OSError: [Errno 22] Invalid argument
+  We've just updated Sphinx to version 3.0.1 and qemu fails to build the
+  docs with this version.
 
-  However, on real hardware, with the same binaries there is no
-  exception.
+  Here's the relevant section in the build log.
 
-  This impacts whole python3 based Gentoo ebuild system (package
-  management), and renders linux user mode alpha emulation in chroot
-  environment building useless, more or less.
+  CONFDIR=3D"/etc/qemu" /usr/bin/sphinx-build-3  -W -b html -D version=3D4.=
+2.92 -D release=3D"4.2.92 (qemu-5.0.0-0.rc2.0.1.mga8)" -d .doctrees/devel-h=
+tml /home/iurt/rpmbuild/BUILD/qemu-5.0.0-rc2/docs/devel docs/devel
+  Running Sphinx v3.0.1
+  making output directory... done
+  building [mo]: targets for 0 po files that are out of date
+  building [html]: targets for 14 source files that are out of date
+  updating environment: [new config] 14 added, 0 changed, 0 removed
+  reading sources... [  7%] bitops
+  reading sources... [ 14%] decodetree
+  reading sources... [ 21%] index
+  reading sources... [ 28%] kconfig
+  reading sources... [ 35%] loads-stores
+  reading sources... [ 42%] memory
+  reading sources... [ 50%] migration
+  reading sources... [ 57%] reset
+  reading sources... [ 64%] s390-dasd-ipl
+  reading sources... [ 71%] secure-coding-practices
+  reading sources... [ 78%] stable-process
+  reading sources... [ 85%] tcg
+  reading sources... [ 92%] tcg-plugins
+  reading sources... [100%] testing
 
-  The used systems:
-  # qemu-alpha --version
-  qemu-alpha version 4.2.0
-  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-  # uname -a
-  Linux blackbird 5.4.28-gentoo-blackbird-06 #2 SMP Sat Apr 4 13:13:10 CEST=
- 2020 x86_64 AMD Ryzen 5 3600 6-Core Processor AuthenticAMD GNU/Linux
-  (chroot)# python3 --version
-  Python 3.7.7
+  Warning, treated as error:
+  /home/iurt/rpmbuild/BUILD/qemu-5.0.0-rc2/docs/../include/exec/memory.h:3:=
+Type must be either just a name or a typedef-like declaration.
+  If just a name:
+  =C2=A0=C2=A0Error in declarator or parameters
+  =C2=A0=C2=A0Invalid C declaration: Expected identifier in nested name, go=
+t keyword: struct [error at 6]
+  =C2=A0=C2=A0=C2=A0=C2=A0struct MemoryListener
+  =C2=A0=C2=A0=C2=A0=C2=A0------^
+  If typedef-like declaration:
+  =C2=A0=C2=A0Error in declarator or parameters
+  =C2=A0=C2=A0Invalid C declaration: Expected identifier in nested name. [e=
+rror at 21]
+  =C2=A0=C2=A0=C2=A0=C2=A0struct MemoryListener
+  =C2=A0=C2=A0=C2=A0=C2=A0---------------------^
+
+  make: *** [Makefile:1095: docs/devel/index.html] Error 2
+  make: *** Waiting for unfinished jobs....
+
+  I found this commit for memory.h that includes the section that faults.
+  https://github.com/qemu/qemu/commit/5d248213180749e674fbccbacc6ee9c38499a=
+bb3#diff-d892cbf314945b44699534cc1de4ebbd
+
+  You can see the whole build log here.
+  https://pkgsubmit.mageia.org/uploads/failure/cauldron/core/release/202004=
+10161120.tv.duvel.699/log/qemu-5.0.0-0.rc2.0.1.mga8/build.0.20200410161338.=
+log
+
+  System: Mageia Cauldron
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1872847/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1872113/+subscriptions
 
