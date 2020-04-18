@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 482ACC38A29
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 16:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF55C38A29
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 16:21:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13DC22054F
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 16:20:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD3952054F
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 16:21:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kpu9n7i1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13DC22054F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w6CYIEJA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD3952054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPqDC-0005t3-4l
-	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 12:20:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48114)
+	id 1jPqDG-00065i-1H
+	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 12:21:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48150)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jPqBg-00046r-JC
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 12:19:25 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jPqBk-0004AA-78
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 12:19:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jPqBe-0004uO-FZ
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 12:19:24 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:51723)
+ (envelope-from <richard.henderson@linaro.org>) id 1jPqBi-00056k-18
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 12:19:28 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:51724)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jPqBe-0004sR-9Q
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 12:19:22 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id kb16so2558703pjb.1
- for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 09:19:22 -0700 (PDT)
+ id 1jPqBh-000531-RY
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 12:19:25 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id kb16so2558754pjb.1
+ for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 09:19:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=/fduq7+z5S6wjChMKi9oJb/vmTzyRgenbcyuQtF0AWE=;
- b=kpu9n7i1gDNQH7fWevb1vvS82BmFoT8ajpqan0W86tzv3rJfWeqtEylutyfS8tydi1
- 5TWeEs0fpHppawRhv2WPcDexQmT9VIOojjNVVne23o5dQBVyV6pjile3uZEkjmG7FeFW
- olDsYIpt1h3UCv1PLjlM+exc0Oesr7LuPiD6ejcyXZzCtKnuUYCpsiD57oU1E9LsLq7M
- 5pLTyUAsa6oAgdAJ/m/h16AxlzDZqagP0LxWvA/x72nS2PvVcrZYL9GRHqGKc675O5gC
- csAC4Oz7dvBVVG5m1gTgY0H3ZPu+G4ZF4wplZgFTZ879TC+R6s3I+QuqhHu4FLt5P5Vw
- mIIQ==
+ bh=UBTvpXnQhX/NB3BncFrtFDo86VAuYzf/XHrJqnCZIJI=;
+ b=w6CYIEJABMQudswv/V+rdbAPAP/PHYPiCyCQjrhkl6CEBQdoVOoaQofTqX+StZj7oU
+ g1Lsjgabnsf3F+VzfCnOpkAsHXkl2S5tiJyce3lDSPkFDpc6TRN2nsHLkCH50chx6kNT
+ E+wM3OV9I8V/YJ8kaMF/uUi9W31FEuMaMqrqCazLEZP6aMPfZOf0ykYZDCnicLV5iFNl
+ EslWZdJ4qQfTjesOHgUlotkkc6JhKoTds6n9+eKioLc2vJ8SAy+zxL8rYKm9bnqGvCLw
+ JPeMMpndldCiPEg6+eEQwHVs3gJnc9jM+FJXJX4/Wn6cIxOBZVat+03NfUg9kiZvqip3
+ Yr3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=/fduq7+z5S6wjChMKi9oJb/vmTzyRgenbcyuQtF0AWE=;
- b=UEsuqhfB70FRSiCKIUuAXlrCGDEqBrvKHsQV4oE2c9MPscvTL3VEj2UpAOnNkM7PqT
- xJiKbRVP+N43Pc15DK3PEJaSN1AVbaH8Z//qcYAL5ZiOhQi4jZx9xPY3W2e+JQvCuL89
- idf+qg7rqtIjtiwWvLokWYBYxaz4wacIW+GMfx1t1YyTtG6JOwT+ZGxvTKqhSM8De4Cv
- PYTFWiGgxTbqYHSYjbyi4dh3Ctmyv6asMlD2BZ1JmChq3eQZ0ZvFxj3S4nbvnzDCMz/a
- o6+/4bCSgyyKH2GO5tOmKLtJ9ZiIJoNS0Wdxa0Zg+wgcaPJOadXhdDojp8/OCzyxxNPO
- EviQ==
-X-Gm-Message-State: AGi0PubwPe+68MZqWhAH8jqJ17Nd/czbB8GFnqj16Cz392CjxXYX0FIk
- zoOYZsYEs4crU6+3X7F9qDNGmYL5Mw8=
-X-Google-Smtp-Source: APiQypITvEIym9Jxw021lDzSjm7haZ3gmV6Wy2dnO9zSg+MgFWYxrlh+6+sacaSq/jf2VhstpNoZCQ==
-X-Received: by 2002:a17:90a:2023:: with SMTP id
- n32mr11250411pjc.150.1587226760981; 
- Sat, 18 Apr 2020 09:19:20 -0700 (PDT)
+ bh=UBTvpXnQhX/NB3BncFrtFDo86VAuYzf/XHrJqnCZIJI=;
+ b=KzHstsbN4spJmJNZs2ylJy7+wE125ehTryFpDC1qx9kAWajQino9VFLJE5aYyQI0/1
+ 2YfOCZ9C/FY9tCoqcF0j52ijvLsfFXStmn9t0wQiQmsLvXVdLd5nAUlKrvTmOL42GXKF
+ uRv24jS4CAqe1/oOk8F5W2f478oS1ouP7ITdyj+Ta3CYAtKS8YcxjtS+yGMb3Feml4D/
+ hsL80MRI7SrnfgeL1XFr3ZuA+GEfNp4H9A425BHDynWYgw0bmyqqJfM7wkrtp7tuhkhL
+ DtZMFbQY8mzOSKcHEKcy/QpHqUwg0z1B5t5lagKRBkdNUQvNfGVpMWctPpTHyakulh2C
+ TXkA==
+X-Gm-Message-State: AGi0PuZV+qLkaY9lq+em/NFu7Q4SZDnubMqLH2pjTWicgO3mzbH3SOgG
+ jTsu6O+PGrFnBofyYx985F/gYUw2bek=
+X-Google-Smtp-Source: APiQypLPWHIMEJkZYGUOjaSSOo92gIESVXmChfYc2XmuL+kJJBNAOGXa6r6m8YCUByte7gHtLGqAwg==
+X-Received: by 2002:a17:90a:a113:: with SMTP id
+ s19mr11535140pjp.161.1587226764399; 
+ Sat, 18 Apr 2020 09:19:24 -0700 (PDT)
 Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
  [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id i187sm22398382pfc.112.2020.04.18.09.19.19
+ by smtp.gmail.com with ESMTPSA id i187sm22398382pfc.112.2020.04.18.09.19.23
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 18 Apr 2020 09:19:20 -0700 (PDT)
+ Sat, 18 Apr 2020 09:19:23 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 03/16] tcg: Use tcg_constant_i32 with icount expander
-Date: Sat, 18 Apr 2020 09:19:01 -0700
-Message-Id: <20200418161914.4387-4-richard.henderson@linaro.org>
+Subject: [PATCH 06/16] tcg: Use tcg_constant_{i32,i64} with tcg plugins
+Date: Sat, 18 Apr 2020 09:19:04 -0700
+Message-Id: <20200418161914.4387-7-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200418161914.4387-1-richard.henderson@linaro.org>
 References: <20200418161914.4387-1-richard.henderson@linaro.org>
@@ -83,7 +83,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,65 +99,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We must do this before we adjust how tcg_out_movi_i32,
-lest the under-the-hood poking that we do be broken.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/gen-icount.h | 25 +++++++++++++------------
- 1 file changed, 13 insertions(+), 12 deletions(-)
+ accel/tcg/plugin-gen.c | 49 +++++++++++++++++++-----------------------
+ 1 file changed, 22 insertions(+), 27 deletions(-)
 
-diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-index 822c43cfd3..404732518a 100644
---- a/include/exec/gen-icount.h
-+++ b/include/exec/gen-icount.h
-@@ -34,7 +34,7 @@ static inline void gen_io_end(void)
+diff --git a/accel/tcg/plugin-gen.c b/accel/tcg/plugin-gen.c
+index 51580d51a0..e5dc9d0ca9 100644
+--- a/accel/tcg/plugin-gen.c
++++ b/accel/tcg/plugin-gen.c
+@@ -284,8 +284,8 @@ static TCGOp *copy_extu_i32_i64(TCGOp **begin_op, TCGOp *op)
+     if (TCG_TARGET_REG_BITS == 32) {
+         /* mov_i32 */
+         op = copy_op(begin_op, op, INDEX_op_mov_i32);
+-        /* movi_i32 */
+-        op = copy_op(begin_op, op, INDEX_op_movi_i32);
++        /* mov_i32 w/ $0 */
++        op = copy_op(begin_op, op, INDEX_op_mov_i32);
+     } else {
+         /* extu_i32_i64 */
+         op = copy_op(begin_op, op, INDEX_op_extu_i32_i64);
+@@ -306,39 +306,34 @@ static TCGOp *copy_mov_i64(TCGOp **begin_op, TCGOp *op)
+     return op;
+ }
  
- static inline void gen_tb_start(TranslationBlock *tb)
- {
--    TCGv_i32 count, imm;
-+    TCGv_i32 count;
- 
-     tcg_ctx->exitreq_label = gen_new_label();
-     if (tb_cflags(tb) & CF_USE_ICOUNT) {
-@@ -48,15 +48,13 @@ static inline void gen_tb_start(TranslationBlock *tb)
-                    offsetof(ArchCPU, env));
- 
-     if (tb_cflags(tb) & CF_USE_ICOUNT) {
--        imm = tcg_temp_new_i32();
--        /* We emit a movi with a dummy immediate argument. Keep the insn index
--         * of the movi so that we later (when we know the actual insn count)
--         * can update the immediate argument with the actual insn count.  */
--        tcg_gen_movi_i32(imm, 0xdeadbeef);
-+        /*
-+         * We emit a sub with a dummy immediate argument. Keep the insn index
-+         * of the sub so that we later (when we know the actual insn count)
-+         * can update the argument with the actual insn count.
-+         */
-+        tcg_gen_sub_i32(count, count, tcg_constant_i32(0));
-         icount_start_insn = tcg_last_op();
+-static TCGOp *copy_movi_i64(TCGOp **begin_op, TCGOp *op, uint64_t v)
+-{
+-    if (TCG_TARGET_REG_BITS == 32) {
+-        /* 2x movi_i32 */
+-        op = copy_op(begin_op, op, INDEX_op_movi_i32);
+-        op->args[1] = v;
 -
--        tcg_gen_sub_i32(count, count, imm);
--        tcg_temp_free_i32(imm);
-     }
- 
-     tcg_gen_brcondi_i32(TCG_COND_LT, count, 0, tcg_ctx->exitreq_label);
-@@ -74,9 +72,12 @@ static inline void gen_tb_start(TranslationBlock *tb)
- static inline void gen_tb_end(TranslationBlock *tb, int num_insns)
+-        op = copy_op(begin_op, op, INDEX_op_movi_i32);
+-        op->args[1] = v >> 32;
+-    } else {
+-        /* movi_i64 */
+-        op = copy_op(begin_op, op, INDEX_op_movi_i64);
+-        op->args[1] = v;
+-    }
+-    return op;
+-}
+-
+ static TCGOp *copy_const_ptr(TCGOp **begin_op, TCGOp *op, void *ptr)
  {
-     if (tb_cflags(tb) & CF_USE_ICOUNT) {
--        /* Update the num_insn immediate parameter now that we know
--         * the actual insn count.  */
--        tcg_set_insn_param(icount_start_insn, 1, num_insns);
-+        /*
-+         * Update the num_insn immediate parameter now that we know
-+         * the actual insn count.
-+         */
-+        tcg_set_insn_param(icount_start_insn, 2,
-+                           tcgv_i32_arg(tcg_constant_i32(num_insns)));
+     if (UINTPTR_MAX == UINT32_MAX) {
+-        /* movi_i32 */
+-        op = copy_op(begin_op, op, INDEX_op_movi_i32);
+-        op->args[1] = (uintptr_t)ptr;
++        /* mov_i32 */
++        op = copy_op(begin_op, op, INDEX_op_mov_i32);
++        op->args[1] = tcgv_i32_arg(tcg_constant_i32((uintptr_t)ptr));
+     } else {
+-        /* movi_i64 */
+-        op = copy_movi_i64(begin_op, op, (uint64_t)(uintptr_t)ptr);
++        /* mov_i64 */
++        op = copy_op(begin_op, op, INDEX_op_mov_i64);
++        op->args[1] = tcgv_i64_arg(tcg_constant_i64((uintptr_t)ptr));
      }
+     return op;
+ }
  
-     gen_set_label(tcg_ctx->exitreq_label);
+ static TCGOp *copy_const_i64(TCGOp **begin_op, TCGOp *op, uint64_t v)
+ {
+-    return copy_movi_i64(begin_op, op, v);
++    if (TCG_TARGET_REG_BITS == 32) {
++        /* 2x mov_i32 */
++        op = copy_op(begin_op, op, INDEX_op_mov_i32);
++        op->args[1] = tcgv_i32_arg(tcg_constant_i32(v));
++        op = copy_op(begin_op, op, INDEX_op_mov_i32);
++        op->args[1] = tcgv_i32_arg(tcg_constant_i32(v >> 32));
++    } else {
++        /* mov_i64 */
++        op = copy_op(begin_op, op, INDEX_op_mov_i64);
++        op->args[1] = tcgv_i64_arg(tcg_constant_i64(v));
++    }
++    return op;
+ }
+ 
+ static TCGOp *copy_extu_tl_i64(TCGOp **begin_op, TCGOp *op)
+@@ -486,8 +481,8 @@ static TCGOp *append_mem_cb(const struct qemu_plugin_dyn_cb *cb,
+ 
+     tcg_debug_assert(type == PLUGIN_GEN_CB_MEM);
+ 
+-    /* const_i32 == movi_i32 ("info", so it remains as is) */
+-    op = copy_op(&begin_op, op, INDEX_op_movi_i32);
++    /* const_i32 == mov_i32 ("info", so it remains as is) */
++    op = copy_op(&begin_op, op, INDEX_op_mov_i32);
+ 
+     /* const_ptr */
+     op = copy_const_ptr(&begin_op, op, cb->userp);
 -- 
 2.20.1
 
