@@ -2,115 +2,56 @@ Return-Path: <SRS0=r7Ry=6C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D008C2BA19
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 04:32:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCC4DC2BA19
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 06:30:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD56821D91
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 04:32:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="3imz1owd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD56821D91
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7F22F214AF
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 06:30:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F22F214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPf9X-0005CN-Tt
-	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 00:32:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34540)
+	id 1jPh0A-0002wj-Jz
+	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 02:30:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39148)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Wei.Huang2@amd.com>) id 1jPf6M-00040m-Bq
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 00:29:13 -0400
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1jPgwO-00026r-R2
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 02:27:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Wei.Huang2@amd.com>) id 1jPf6G-0000UD-89
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 00:29:05 -0400
-Received: from mail-bn7nam10on2059.outbound.protection.outlook.com
- ([40.107.92.59]:42593 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Wei.Huang2@amd.com>) id 1jPf6E-00009Q-77
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 00:29:03 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K9Ut/hoxoH+5qjrZgjVw195NS9N1XF7FuO/dA0ih+hnIEMjZme5mDhPKLuL6abO9Hh6Mab6CWFqFvR4nJGIK/y7iGzhkuJ0yU2waGN2KpuCRhDw7YC0S1vne+px02ND3VHYI7kNR5Z9Kl2Pr1h7eSYT8KV4W/lpmgDTzYFFwWvOPjpdb6DfFMNKwO/S2Fb1G+8HkiUEQfv41ngjB1zKwyKXLRMD+sA9TQIPvEsyxSM9EktJUptSbcsopo0IztPVLiOkCGPPrz9je67+AxzS7OVmn6VGreQL6Hx5MdbGzdbWof4t5sEnL8ymgYepOZV3n9BpGyvc4BAOVnmqG2DpdWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=swmB899Ns/MkOErvY7A2/mnvA2TL56CmKzKyNWK6Qk8=;
- b=iF9h6BoJlHm/M1RYoucWzbADoFE1xdIBD+076OOg4l4l1CZtEUExf5OVJbY2JDoN6m3Xlj40ARaa43JVO6185QhpbtrLGZ0bPKK1L0owW2Uei8TvY9j12c3jnLqjzwuORXJkCu06Sb1Td8yVSArBNRzOmpynXE9LTM1QrZ4eycwYEhuXEXUvLXhKs74ZEQ22n2ZjkdK5ZVdDGtgaqWuusQddv296AhkKgX98u3eg6VgDTW/HP/f4a/bD3IEMKHn56xb0Q2jjYsCqlRae67e0H6W95Hf61d0d8ULUEfYwK6zrZujOYELxxbyDFz2mfA9+4nkmQlWMF3NYnVRJvWWsaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=swmB899Ns/MkOErvY7A2/mnvA2TL56CmKzKyNWK6Qk8=;
- b=3imz1owdjbmmRJAbSXfoAksy+FPv+0QV+KWTrn8Pb1KmmRlMiBzeXIakGFWEgylSlr8tbLBZYVfU5H/uzYoKJHSwYxPKtivtdlEfR6VZYpB0jjZAkuDHToEdgw9gMo2yc/lbCnV5+wGJuAw9gKOC82Dgd4p7I4QkXdLSADv45ts=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Wei.Huang2@amd.com; 
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM5PR12MB2486.namprd12.prod.outlook.com (2603:10b6:4:b2::32) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2900.24; Sat, 18 Apr 2020 04:28:52 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::5d16:1d8f:9e02:9938]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::5d16:1d8f:9e02:9938%9]) with mapi id 15.20.2921.027; Sat, 18 Apr 2020
- 04:28:52 +0000
-From: Wei Huang <wei.huang2@amd.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/i386/amd_iommu: Fix the reserved bits definition of IOMMU
- commands
-Date: Fri, 17 Apr 2020 23:28:45 -0500
-Message-Id: <20200418042845.596457-1-wei.huang2@amd.com>
-X-Mailer: git-send-email 2.24.1
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-ClientProxiedBy: DM5PR07CA0066.namprd07.prod.outlook.com
- (2603:10b6:4:ad::31) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1jPgwM-0006TS-Fx
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 02:26:59 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3673 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1jPgwE-0004N2-Tu; Sat, 18 Apr 2020 02:26:51 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id A998E56E407A6C3971DD;
+ Sat, 18 Apr 2020 14:26:32 +0800 (CST)
+Received: from huawei.com (10.133.205.93) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Sat, 18 Apr 2020
+ 14:26:23 +0800
+From: Chen Qun <kuhn.chenqun@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
+Subject: [PATCH] block/iscsi:fix heap-buffer-overflow in iscsi_aio_ioctl_cb
+Date: Sat, 18 Apr 2020 14:26:02 +0800
+Message-ID: <20200418062602.10776-1-kuhn.chenqun@huawei.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from weiserver.amd.com (165.204.77.1) by
- DM5PR07CA0066.namprd07.prod.outlook.com (2603:10b6:4:ad::31) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2921.25 via Frontend Transport; Sat, 18 Apr 2020 04:28:51 +0000
-X-Mailer: git-send-email 2.24.1
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: d4a6eba1-80b7-4cf4-44ca-08d7e350ff67
-X-MS-TrafficTypeDiagnostic: DM5PR12MB2486:
-X-Microsoft-Antispam-PRVS: <DM5PR12MB2486676DEF58D817ADECDF81CFD60@DM5PR12MB2486.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:287;
-X-Forefront-PRVS: 0377802854
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM5PR12MB1355.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10009020)(4636009)(396003)(376002)(346002)(136003)(39860400002)(366004)(956004)(66556008)(4326008)(86362001)(7696005)(478600001)(52116002)(2906002)(66476007)(1076003)(8936002)(54906003)(26005)(36756003)(16526019)(81156014)(2616005)(316002)(6666004)(8676002)(6486002)(5660300002)(6916009)(66946007)(186003);
- DIR:OUT; SFP:1101; 
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: urS+p5Kyqw84rhzRJ0cCLFYXrGEUwFpqqlRCNATa0hqVlH4SiECom+OmG0dFWdyyYRaiU5+EULwuM8ZmZPBTobOm5AfOLd9xNBprXwDmzG9e2VbjH5ocXRIzTQlSlSwNk14YJb9Dyt1N6w/ruTz8trp7uKVI3yvegulJx1O666DN8Ndqc05Lz9nUgB+qpdBNRZvvEZ4XJ2COu908/vDgyNjzTXgz+shM3zHEFpUPm0h0QLhaA0jOj938dsBYMgWoP9Bs+e2B+QeOGPcn0WDdIDLqYTT4k3EhPHBFdue/tC2e2qAvL/yTMvhFXeJnDom20ChvaPLI2Cj8lLrkFfSLra+KoebKiuOhL1OZLIU1/vOJi0Bq+57i8NWQ503PX0TnJ3K46u3gn5yQIYlF8batCeo6a+duHj/U2/lwyoIqD6wublEzw3uUNkmXUTnmsB9S
-X-MS-Exchange-AntiSpam-MessageData: JBuV7zugx8i2saw6zfAgelYUB28rIL8lG9TvYX1QpsCzlvTQP0jvIjxz714EqEmQRw7EYsBpvg20D7JoP0lcM6khCa4r/NSdASY3sCfOI1jKNq0iv3oq13SNkHe+lIO3jMkPdHdO9u18qAaohcZ+Lw==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d4a6eba1-80b7-4cf4-44ca-08d7e350ff67
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2020 04:28:52.2089 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Rr/OnOsC+GIeBa54PfUlLuKsHMRS4ndRiOTcvYLR60dLJhyx1iYZGCMwRiRdSogj
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2486
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+Content-Type: text/plain
+X-Originating-IP: [10.133.205.93]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 40.107.92.59
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,95 +63,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, zhang.zhanghailiang@huawei.com,
+ qemu-block@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>,
+ Peter Lieven <pl@kamp.de>, Prasad J Pandit <ppandit@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>,
+ Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Many reserved bits of amd_iommu commands are defined incorrectly in QEMU.
-Because of it, QEMU incorrectly injects lots of illegal commands into guest
-VM's IOMMU event log.
+There is an overflow, the source 'datain.data[2]' is 100 bytes,
+ but the 'ss' is 252 bytes.This may cause a security issue because
+ we can access a lot of unrelated memory data.
 
-Signed-off-by: Wei Huang <wei.huang2@amd.com>
+The len for sbp copy data should take the minimum of mx_sb_len and
+ sb_len_wr, not the maximum.
+
+If we use iscsi device for VM backend storage, ASAN show stack:
+
+READ of size 252 at 0xfffd149dcfc4 thread T0
+    #0 0xaaad433d0d34 in __asan_memcpy (aarch64-softmmu/qemu-system-aarch=
+64+0x2cb0d34)
+    #1 0xaaad45f9d6d0 in iscsi_aio_ioctl_cb /qemu/block/iscsi.c:996:9
+    #2 0xfffd1af0e2dc  (/usr/lib64/iscsi/libiscsi.so.8+0xe2dc)
+    #3 0xfffd1af0d174  (/usr/lib64/iscsi/libiscsi.so.8+0xd174)
+    #4 0xfffd1af19fac  (/usr/lib64/iscsi/libiscsi.so.8+0x19fac)
+    #5 0xaaad45f9acc8 in iscsi_process_read /qemu/block/iscsi.c:403:5
+    #6 0xaaad4623733c in aio_dispatch_handler /qemu/util/aio-posix.c:467:=
+9
+    #7 0xaaad4622f350 in aio_dispatch_handlers /qemu/util/aio-posix.c:510=
+:20
+    #8 0xaaad4622f350 in aio_dispatch /qemu/util/aio-posix.c:520
+    #9 0xaaad46215944 in aio_ctx_dispatch /qemu/util/async.c:298:5
+    #10 0xfffd1bed12f4 in g_main_context_dispatch (/lib64/libglib-2.0.so.=
+0+0x512f4)
+    #11 0xaaad46227de0 in glib_pollfds_poll /qemu/util/main-loop.c:219:9
+    #12 0xaaad46227de0 in os_host_main_loop_wait /qemu/util/main-loop.c:2=
+42
+    #13 0xaaad46227de0 in main_loop_wait /qemu/util/main-loop.c:518
+    #14 0xaaad43d9d60c in qemu_main_loop /qemu/softmmu/vl.c:1662:9
+    #15 0xaaad4607a5b0 in main /qemu/softmmu/main.c:49:5
+    #16 0xfffd1a460b9c in __libc_start_main (/lib64/libc.so.6+0x20b9c)
+    #17 0xaaad43320740 in _start (aarch64-softmmu/qemu-system-aarch64+0x2=
+c00740)
+
+0xfffd149dcfc4 is located 0 bytes to the right of 100-byte region [0xfffd=
+149dcf60,0xfffd149dcfc4)
+allocated by thread T0 here:
+    #0 0xaaad433d1e70 in __interceptor_malloc (aarch64-softmmu/qemu-syste=
+m-aarch64+0x2cb1e70)
+    #1 0xfffd1af0e254  (/usr/lib64/iscsi/libiscsi.so.8+0xe254)
+    #2 0xfffd1af0d174  (/usr/lib64/iscsi/libiscsi.so.8+0xd174)
+    #3 0xfffd1af19fac  (/usr/lib64/iscsi/libiscsi.so.8+0x19fac)
+    #4 0xaaad45f9acc8 in iscsi_process_read /qemu/block/iscsi.c:403:5
+    #5 0xaaad4623733c in aio_dispatch_handler /qemu/util/aio-posix.c:467:=
+9
+    #6 0xaaad4622f350 in aio_dispatch_handlers /qemu/util/aio-posix.c:510=
+:20
+    #7 0xaaad4622f350 in aio_dispatch /qemu/util/aio-posix.c:520
+    #8 0xaaad46215944 in aio_ctx_dispatch /qemu/util/async.c:298:5
+    #9 0xfffd1bed12f4 in g_main_context_dispatch (/lib64/libglib-2.0.so.0=
++0x512f4)
+    #10 0xaaad46227de0 in glib_pollfds_poll /qemu/util/main-loop.c:219:9
+    #11 0xaaad46227de0 in os_host_main_loop_wait /qemu/util/main-loop.c:2=
+42
+    #12 0xaaad46227de0 in main_loop_wait /qemu/util/main-loop.c:518
+    #13 0xaaad43d9d60c in qemu_main_loop /qemu/softmmu/vl.c:1662:9
+    #14 0xaaad4607a5b0 in main /qemu/softmmu/main.c:49:5
+    #15 0xfffd1a460b9c in __libc_start_main (/lib64/libc.so.6+0x20b9c)
+    #16 0xaaad43320740 in _start (aarch64-softmmu/qemu-system-aarch64+0x2=
+c00740)
+
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/i386/amd_iommu.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+v1->v2:
+Use MIN() macro for mx_sb_len and sb_len_wr.
+(Base comments from Michael S. Tsirkin, Stefan Hajnoczi, Kevin Wolf)
 
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index fd75cae02437..4346060e6223 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -370,7 +370,7 @@ static void amdvi_completion_wait(AMDVIState *s, uint64_t *cmd)
-     hwaddr addr = cpu_to_le64(extract64(cmd[0], 3, 49)) << 3;
-     uint64_t data = cpu_to_le64(cmd[1]);
- 
--    if (extract64(cmd[0], 51, 8)) {
-+    if (extract64(cmd[0], 52, 8)) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-                                    s->cmdbuf + s->cmdbuf_head);
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Prasad J Pandit <ppandit@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Lieven <pl@kamp.de>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: qemu-block@nongnu.org
+---
+ block/iscsi.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 4e216bd8aa..0b4b7210df 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -991,8 +991,7 @@ iscsi_aio_ioctl_cb(struct iscsi_context *iscsi, int s=
+tatus,
+         acb->ioh->driver_status |=3D SG_ERR_DRIVER_SENSE;
+=20
+         acb->ioh->sb_len_wr =3D acb->task->datain.size - 2;
+-        ss =3D (acb->ioh->mx_sb_len >=3D acb->ioh->sb_len_wr) ?
+-             acb->ioh->mx_sb_len : acb->ioh->sb_len_wr;
++        ss =3D MIN(acb->ioh->mx_sb_len, acb->ioh->sb_len_wr);
+         memcpy(acb->ioh->sbp, &acb->task->datain.data[2], ss);
      }
-@@ -395,7 +395,7 @@ static void amdvi_inval_devtab_entry(AMDVIState *s, uint64_t *cmd)
-     uint16_t devid = cpu_to_le16((uint16_t)extract64(cmd[0], 0, 16));
- 
-     /* This command should invalidate internal caches of which there isn't */
--    if (extract64(cmd[0], 15, 16) || cmd[1]) {
-+    if (extract64(cmd[0], 16, 44) || cmd[1]) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-                                    s->cmdbuf + s->cmdbuf_head);
-     }
-@@ -405,9 +405,9 @@ static void amdvi_inval_devtab_entry(AMDVIState *s, uint64_t *cmd)
- 
- static void amdvi_complete_ppr(AMDVIState *s, uint64_t *cmd)
- {
--    if (extract64(cmd[0], 15, 16) ||  extract64(cmd[0], 19, 8) ||
-+    if (extract64(cmd[0], 16, 16) ||  extract64(cmd[0], 52, 8) ||
-         extract64(cmd[1], 0, 2) || extract64(cmd[1], 3, 29)
--        || extract64(cmd[1], 47, 16)) {
-+        || extract64(cmd[1], 48, 16)) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-                                    s->cmdbuf + s->cmdbuf_head);
-     }
-@@ -438,8 +438,8 @@ static void amdvi_inval_pages(AMDVIState *s, uint64_t *cmd)
- {
-     uint16_t domid = cpu_to_le16((uint16_t)extract64(cmd[0], 32, 16));
- 
--    if (extract64(cmd[0], 20, 12) || extract64(cmd[0], 16, 12) ||
--        extract64(cmd[0], 3, 10)) {
-+    if (extract64(cmd[0], 20, 12) || extract64(cmd[0], 48, 12) ||
-+        extract64(cmd[1], 3, 9)) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-                                    s->cmdbuf + s->cmdbuf_head);
-     }
-@@ -451,7 +451,7 @@ static void amdvi_inval_pages(AMDVIState *s, uint64_t *cmd)
- 
- static void amdvi_prefetch_pages(AMDVIState *s, uint64_t *cmd)
- {
--    if (extract64(cmd[0], 16, 8) || extract64(cmd[0], 20, 8) ||
-+    if (extract64(cmd[0], 16, 8) || extract64(cmd[0], 52, 8) ||
-         extract64(cmd[1], 1, 1) || extract64(cmd[1], 3, 1) ||
-         extract64(cmd[1], 5, 7)) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-@@ -463,7 +463,7 @@ static void amdvi_prefetch_pages(AMDVIState *s, uint64_t *cmd)
- 
- static void amdvi_inval_inttable(AMDVIState *s, uint64_t *cmd)
- {
--    if (extract64(cmd[0], 16, 16) || cmd[1]) {
-+    if (extract64(cmd[0], 16, 44) || cmd[1]) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-                                    s->cmdbuf + s->cmdbuf_head);
-         return;
-@@ -479,7 +479,8 @@ static void iommu_inval_iotlb(AMDVIState *s, uint64_t *cmd)
- {
- 
-     uint16_t devid = extract64(cmd[0], 0, 16);
--    if (extract64(cmd[1], 1, 1) || extract64(cmd[1], 3, 9)) {
-+    if (extract64(cmd[1], 1, 1) || extract64(cmd[1], 3, 1) ||
-+        extract64(cmd[1], 6, 6)) {
-         amdvi_log_illegalcom_error(s, extract64(cmd[0], 60, 4),
-                                    s->cmdbuf + s->cmdbuf_head);
-         return;
--- 
-2.24.1
+=20
+--=20
+2.23.0
+
 
 
