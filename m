@@ -2,88 +2,91 @@ Return-Path: <SRS0=r7Ry=6C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61914C2D0EF
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 10:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB34C2D0EF
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 12:03:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21E6721D82
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 10:47:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 678D621D79
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 12:03:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EWjnuXPQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21E6721D82
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hPnt89yz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 678D621D79
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPl0D-00080D-Bv
-	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 06:47:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47541)
+	id 1jPmCT-000776-GG
+	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 08:03:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35759)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <npiggin@gmail.com>) id 1jPkzZ-0007al-S7
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 06:46:35 -0400
+ (envelope-from <marcel.apfelbaum@gmail.com>) id 1jPmBX-0006gW-LR
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 08:03:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1jPkzY-0001Vl-KO
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 06:46:33 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:41630)
+ (envelope-from <marcel.apfelbaum@gmail.com>) id 1jPmBV-0008AH-Pv
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 08:02:59 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53372)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1jPkzY-0001VB-Ez; Sat, 18 Apr 2020 06:46:32 -0400
-Received: by mail-pg1-x543.google.com with SMTP id h69so2430930pgc.8;
- Sat, 18 Apr 2020 03:46:32 -0700 (PDT)
+ (Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+ id 1jPmBU-00085a-7y
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 08:02:57 -0400
+Received: by mail-wm1-x344.google.com with SMTP id t63so4479368wmt.3
+ for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 05:02:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:subject:to:cc:references:in-reply-to:mime-version
- :message-id:content-transfer-encoding;
- bh=7mqV1p0Nt77G49UyNiZx6Bi2R2qRxhbDDLmCM7ehfmg=;
- b=EWjnuXPQRrrEY3AFU+qkwmkhYEvEBx359eLEgyf+o//zu++/dqBDWRhM+EwSjNiFDs
- N2LIjgLQM6P2lD0jVkBlptlpUTJ3RKIGrmyvoRpIyofQcZvfMehwPZjWo3VBPZzthtIT
- 9no55ITp1Qln21A0NLuC2A5mxpTmNblY+5DOcl9VId5dTMMro0tylbdL7biyG0n4ge+W
- S5GVoEJariK3Zze/11dNW4v3nQ4SZRcpltfeWBg2quGovXSxq3Hjw26uiZy9PU5gM23l
- w8nbTmmm2Cc8nmJQ+Rqo1yxZAF0tcRsXkFMIqvlkslbNK7CcqSIh5d5bN6tbOfnJrP8u
- 6mLA==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-transfer-encoding:content-language;
+ bh=SlOlS1gFviishPqZ4RS/em4z6I7xVRtjcRu9EuFjdSY=;
+ b=hPnt89yzWeJ3VDdi6LdiJukRqi8ZwRCWBH7yrivCIZMzQiuH9WD/ztSiZhzg+iRRpW
+ xOmiVwNKLaBzYFp39WjjtBZCNf6sDbghsV5VJEeqzkuXLkecSOUwXVM12WY3fUCs8mvS
+ eLA/Si/HO5VcinFuNNa6xZ41zl9gneRDEYAykC1CkKUTgSqZIqBddjNPgqWgvcQV6SXZ
+ RPOxStT3FTD1DSYITEx4X4daJW4ea6JBGkqT9VzHMIfS71MI2VDaponmqFMk4qK73e+c
+ qkeXlg2EYyAlg9RU17LwTMO4+kwTyzVLSYpipgh5uprLnlImDztiIgwBeS6sIOPM9pTr
+ 4aWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
- :mime-version:message-id:content-transfer-encoding;
- bh=7mqV1p0Nt77G49UyNiZx6Bi2R2qRxhbDDLmCM7ehfmg=;
- b=TcnxGuSpUBgQ0+P9w9E8bYe3FFANWee4EdAyeqCORvj1UxL15+eS49ysqLizAH8hMa
- EC9/q+xNoy3oYGD0ikZ19w2yjltdhNY23eDQ4ct+qzSaDJQSSVHyUeZUjRlLqcAwf+/U
- lAGFphxr7jDkJ7+lAXcN1Tu8GVeKQONUI6uolx0gnFoAf8dI11qsoR9opxhl1rHAQx8C
- EzvwW8g3FzHgYiSiricSRYh9Bh+8uQUlVcDXlUW5763qgA7H9l6c51UtbkkU4Rk5jECI
- yoO2kCIZEMHpRFNV9cCeP/m2UWmSVCYqOh1mDJg4/zFrP+SrYVi3NKIEF2JtsTVYVusJ
- vwNA==
-X-Gm-Message-State: AGi0PubtAlZX+4+2o3y0npdO9M4PncBeMr9qRszJSjRfyiE7XldJdBUb
- kfaGEEJCZS2ts7gFbWmy0kQ=
-X-Google-Smtp-Source: APiQypKEyxihvy+H25jh4pbiCteUNASY49nUGz8RUqP5dzzblDtZ5fBAFXVAvVTLBebp0wHzjhD24w==
-X-Received: by 2002:a62:144c:: with SMTP id 73mr7835121pfu.37.1587206790870;
- Sat, 18 Apr 2020 03:46:30 -0700 (PDT)
-Received: from localhost (220-244-86-41.tpgi.com.au. [220.244.86.41])
- by smtp.gmail.com with ESMTPSA id n8sm9922278pfq.213.2020.04.18.03.46.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 18 Apr 2020 03:46:30 -0700 (PDT)
-Date: Sat, 18 Apr 2020 20:45:44 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH-for-5.0?] target/ppc: Fix TCG temporary leaks in
- gen_slbia()
-To: Philippe =?iso-8859-1?q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200417090749.14310-1-f4bug@amsat.org>
- <1587120086.g7mzwaexlz.astroid@bobo.none>
- <a7ff1611-6273-f42e-d67d-bec10e6b4b0e@amsat.org>
-In-Reply-To: <a7ff1611-6273-f42e-d67d-bec10e6b4b0e@amsat.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-transfer-encoding
+ :content-language;
+ bh=SlOlS1gFviishPqZ4RS/em4z6I7xVRtjcRu9EuFjdSY=;
+ b=YOFc03WCkwO1W6MM/D3dfSZAQHMYOMTKt9Lmq7TS4V5JCuQuaaq0LRUJnwMqjmx4FN
+ wWdgfqDJWNjFosb/oLOscDOyQf9igrYsZBCz2XQky8o6pl5rN9VRP5oeb2dB0LW+NmR3
+ 6S3kqRnEfgggTX0TYFmtkW+Ls2Qkk1PoShkUEeSkcDoNw7V9N3YPkDC3LakIOw93piq6
+ xKVZ+M8V5nIa7oeXY47Ny+UwAdaOQBAbc7jOOKhtoD/CDoqcmOad+VgaJM/NK2bq+mSw
+ IDFxZnTK3g3gPayaWOtZenErk5B/0MTH3JWUA/1xPXfKoSB5KXW9Z6FoGagjfD8O+hgc
+ bAVg==
+X-Gm-Message-State: AGi0Pubpp26EaYTuAaDMKNklbPTVFA7t/+PN6v6HRHQyd5ARZJ0nNqZO
+ On6h9JSQrXw4g7AvYKZKoUs=
+X-Google-Smtp-Source: APiQypIVBWUYkad2Z6BhkgtFu3E8CdtTVzPNYsEnOCZ863iibVdSJUmi6Ae5WerTvBt6wh3okrTGOg==
+X-Received: by 2002:a1c:dfc2:: with SMTP id w185mr7628641wmg.1.1587211374399; 
+ Sat, 18 Apr 2020 05:02:54 -0700 (PDT)
+Received: from [192.168.86.37] ([37.142.144.12])
+ by smtp.gmail.com with ESMTPSA id o129sm5868641wme.16.2020.04.18.05.02.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 18 Apr 2020 05:02:53 -0700 (PDT)
+Subject: Re: [PATCH v2] lockable: Replace locks with lock guard macros
+To: Simran Singhal <singhalsimran0@gmail.com>, qemu-devel@nongnu.org,
+ rkagan@virtuozzo.com
+References: <20200402065035.GA15477@simran-Inspiron-5558>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <f0eec74a-387d-79ce-b23f-d7f16747f9ad@gmail.com>
+Date: Sat, 18 Apr 2020 15:03:29 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Message-Id: <1587206719.dnd7j2vc3t.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200402065035.GA15477@simran-Inspiron-5558>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,46 +98,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- Dennis Clarke <dclarke@blastwave.org>,
- =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Julia Suvorova <jusual@mail.ru>,
+ Yuval Shaia <yuval.shaia.ml@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Excerpts from Philippe Mathieu-Daud=C3=A9's message of April 17, 2020 9:00 =
-pm:
-> On 4/17/20 12:51 PM, Nicholas Piggin wrote:
->> Excerpts from Philippe Mathieu-Daud=C3=A9's message of April 17, 2020 7:=
-07 pm:
->>> This fixes:
->>>
->>>   $ qemu-system-ppc64 \
->>>   -machine pseries-4.1 -cpu power9 \
->>>   -smp 4 -m 12G -accel tcg ...
->>>   ...
->>>   Quiescing Open Firmware ...
->>>   Booting Linux via __start() @ 0x0000000002000000 ...
->>>   Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
->>>   Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
->>>   Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
->>>
->>> [*] https://www.mail-archive.com/qemu-discuss@nongnu.org/msg05400.html
->>>
->>> Fixes: 0418bf78fe8 ("Fix ISA v3.0 (POWER9) slbia implementation")
->>> Reported-by: Dennis Clarke <dclarke@blastwave.org>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>=20
->> Thank you, brown bag required. Looks like I should be testing
->> this stuff with --enable-debug, sorry I didn't realise it.
->=20
-> Is that an implicit:
->=20
-> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+Hi Simran,
 
-Yes sure :) If not already merged,=20
+On 4/2/20 9:50 AM, Simran Singhal wrote:
+> Replace manual lock()/unlock() calls with lock guard macros
+> (QEMU_LOCK_GUARD/WITH_QEMU_LOCK_GUARD).
+>
+> Signed-off-by: Simran Singhal <singhalsimran0@gmail.com>
+> ---
+> Changes in v2:
+>          -Drop changes in file hw/rdma/rdma_utils.c
+>
+>   hw/hyperv/hyperv.c     | 15 ++++++-------
+>   hw/rdma/rdma_backend.c | 50 +++++++++++++++++++++---------------------
+>   hw/rdma/rdma_rm.c      |  3 +--
+>   3 files changed, 33 insertions(+), 35 deletions(-)
+>
+> diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
+> index 8ca3706f5b..4ddafe1de1 100644
+> --- a/hw/hyperv/hyperv.c
+> +++ b/hw/hyperv/hyperv.c
+> @@ -15,6 +15,7 @@
+>   #include "sysemu/kvm.h"
+>   #include "qemu/bitops.h"
+>   #include "qemu/error-report.h"
+> +#include "qemu/lockable.h"
+>   #include "qemu/queue.h"
+>   #include "qemu/rcu.h"
+>   #include "qemu/rcu_queue.h"
+> @@ -491,7 +492,7 @@ int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandler handler, void *data)
+>       int ret;
+>       MsgHandler *mh;
+>   
+> -    qemu_mutex_lock(&handlers_mutex);
+> +    QEMU_LOCK_GUARD(&handlers_mutex);
 
-Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+It does not passes compilation:
+     export ARCH=x86_64
+     make docker-image-fedora V=1 NETWORK=1
+     make docker-test-debug@fedora TARGET_LIST=x86_64-softmmu NETWORK=1
+
+Error:
+
+  CC      x86_64-softmmu/hw/net/virtio-net.o
+/tmp/qemu-test/src/hw/hyperv/hyperv.c:495:5: error: unused variable 
+'qemu_lockable_auto__COUNTER__' [-Werror,-Wunused-variable]
+     QEMU_LOCK_GUARD(&handlers_mutex);
+     ^
+/tmp/qemu-test/src/include/qemu/lockable.h:173:29: note: expanded from 
+macro 'QEMU_LOCK_GUARD'
+     g_autoptr(QemuLockable) qemu_lockable_auto##__COUNTER__ = \
+                             ^
+<scratch space>:24:1: note: expanded from here
+qemu_lockable_auto__COUNTER__
+^
+/tmp/qemu-test/src/hw/hyperv/hyperv.c:568:5: error: unused variable 
+'qemu_lockable_auto__COUNTER__' [-Werror,-Wunused-variable]
+     QEMU_LOCK_GUARD(&handlers_mutex);
+     ^
+/tmp/qemu-test/src/include/qemu/lockable.h:173:29: note: expanded from 
+macro 'QEMU_LOCK_GUARD'
+     g_autoptr(QemuLockable) qemu_lockable_auto##__COUNTER__ = \
+                             ^
+<scratch space>:39:1: note: expanded from here
+qemu_lockable_auto__COUNTER__
+^
+2 errors generated.
+
+I suggest splitting it into an pvrdma path and hyperv patch anyway.
+It will be nice to get an ack from the hyperv maintainer, adding Roman.
+
+Thanks,
+Marcel
+
+
+>       QLIST_FOREACH(mh, &msg_handlers, link) {
+>           if (mh->conn_id == conn_id) {
+>               if (handler) {
+> @@ -501,7 +502,7 @@ int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandler handler, void *data)
+>                   g_free_rcu(mh, rcu);
+>                   ret = 0;
+>               }
+> -            goto unlock;
+> +            return ret;
+>           }
+>       }
+>   
+> @@ -515,8 +516,7 @@ int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandler handler, void *data)
+>       } else {
+>           ret = -ENOENT;
+>       }
+> -unlock:
+> -    qemu_mutex_unlock(&handlers_mutex);
+> +
+>       return ret;
+>   }
+>   
+> @@ -565,7 +565,7 @@ static int set_event_flag_handler(uint32_t conn_id, EventNotifier *notifier)
+>       int ret;
+>       EventFlagHandler *handler;
+>   
+> -    qemu_mutex_lock(&handlers_mutex);
+> +    QEMU_LOCK_GUARD(&handlers_mutex);
+>       QLIST_FOREACH(handler, &event_flag_handlers, link) {
+>           if (handler->conn_id == conn_id) {
+>               if (notifier) {
+> @@ -575,7 +575,7 @@ static int set_event_flag_handler(uint32_t conn_id, EventNotifier *notifier)
+>                   g_free_rcu(handler, rcu);
+>                   ret = 0;
+>               }
+> -            goto unlock;
+> +            return ret;
+>           }
+>       }
+>   
+> @@ -588,8 +588,7 @@ static int set_event_flag_handler(uint32_t conn_id, EventNotifier *notifier)
+>       } else {
+>           ret = -ENOENT;
+>       }
+> -unlock:
+> -    qemu_mutex_unlock(&handlers_mutex);
+> +
+>       return ret;
+>   }
+>   
+> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
+> index 3dd39fe1a7..db7e5c8be5 100644
+> --- a/hw/rdma/rdma_backend.c
+> +++ b/hw/rdma/rdma_backend.c
+> @@ -95,36 +95,36 @@ static int rdma_poll_cq(RdmaDeviceResources *rdma_dev_res, struct ibv_cq *ibcq)
+>       struct ibv_wc wc[2];
+>       RdmaProtectedGSList *cqe_ctx_list;
+>   
+> -    qemu_mutex_lock(&rdma_dev_res->lock);
+> -    do {
+> -        ne = ibv_poll_cq(ibcq, ARRAY_SIZE(wc), wc);
+> +    WITH_QEMU_LOCK_GUARD(&rdma_dev_res->lock) {
+> +        do {
+> +            ne = ibv_poll_cq(ibcq, ARRAY_SIZE(wc), wc);
+>   
+> -        trace_rdma_poll_cq(ne, ibcq);
+> +            trace_rdma_poll_cq(ne, ibcq);
+>   
+> -        for (i = 0; i < ne; i++) {
+> -            bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, wc[i].wr_id);
+> -            if (unlikely(!bctx)) {
+> -                rdma_error_report("No matching ctx for req %"PRId64,
+> -                                  wc[i].wr_id);
+> -                continue;
+> -            }
+> +            for (i = 0; i < ne; i++) {
+> +                bctx = rdma_rm_get_cqe_ctx(rdma_dev_res, wc[i].wr_id);
+> +                if (unlikely(!bctx)) {
+> +                    rdma_error_report("No matching ctx for req %"PRId64,
+> +                                      wc[i].wr_id);
+> +                    continue;
+> +                }
+>   
+> -            comp_handler(bctx->up_ctx, &wc[i]);
+> +                comp_handler(bctx->up_ctx, &wc[i]);
+>   
+> -            if (bctx->backend_qp) {
+> -                cqe_ctx_list = &bctx->backend_qp->cqe_ctx_list;
+> -            } else {
+> -                cqe_ctx_list = &bctx->backend_srq->cqe_ctx_list;
+> -            }
+> +                if (bctx->backend_qp) {
+> +                    cqe_ctx_list = &bctx->backend_qp->cqe_ctx_list;
+> +                } else {
+> +                    cqe_ctx_list = &bctx->backend_srq->cqe_ctx_list;
+> +                }
+>   
+> -            rdma_protected_gslist_remove_int32(cqe_ctx_list, wc[i].wr_id);
+> -            rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
+> -            g_free(bctx);
+> -        }
+> -        total_ne += ne;
+> -    } while (ne > 0);
+> -    atomic_sub(&rdma_dev_res->stats.missing_cqe, total_ne);
+> -    qemu_mutex_unlock(&rdma_dev_res->lock);
+> +                rdma_protected_gslist_remove_int32(cqe_ctx_list, wc[i].wr_id);
+> +                rdma_rm_dealloc_cqe_ctx(rdma_dev_res, wc[i].wr_id);
+> +                g_free(bctx);
+> +            }
+> +            total_ne += ne;
+> +        } while (ne > 0);
+> +        atomic_sub(&rdma_dev_res->stats.missing_cqe, total_ne);
+> +    }
+>   
+>       if (ne < 0) {
+>           rdma_error_report("ibv_poll_cq fail, rc=%d, errno=%d", ne, errno);
+> diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
+> index 7e9ea283c9..60957f88db 100644
+> --- a/hw/rdma/rdma_rm.c
+> +++ b/hw/rdma/rdma_rm.c
+> @@ -147,14 +147,13 @@ static inline void rdma_res_tbl_dealloc(RdmaRmResTbl *tbl, uint32_t handle)
+>   {
+>       trace_rdma_res_tbl_dealloc(tbl->name, handle);
+>   
+> -    qemu_mutex_lock(&tbl->lock);
+> +    QEMU_LOCK_GUARD(&tbl->lock);
+>   
+>       if (handle < tbl->tbl_sz) {
+>           clear_bit(handle, tbl->bitmap);
+>           tbl->used--;
+>       }
+>   
+> -    qemu_mutex_unlock(&tbl->lock);
+>   }
+>   
+>   int rdma_rm_alloc_pd(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
 
 
