@@ -2,94 +2,73 @@ Return-Path: <SRS0=r7Ry=6C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9086DC2BA19
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 03:49:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5A9CC2BA19
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 04:29:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CD7521D91
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 03:49:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q3B+2PQ8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CD7521D91
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6F13C221EA
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 04:29:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F13C221EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPeTV-0004xh-Ue
-	for qemu-devel@archiver.kernel.org; Fri, 17 Apr 2020 23:49:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34717)
+	id 1jPf6M-0003mE-By
+	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 00:29:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58862)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jPeM9-0002qE-M4
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 23:41:27 -0400
+ (envelope-from <bounces@canonical.com>) id 1jPf3P-0003HF-2X
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 00:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jPeM0-0000Oz-Gq
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 23:41:18 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:38403)
+ (envelope-from <bounces@canonical.com>) id 1jPf3L-0005EK-V3
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 00:26:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41860)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jPeLy-0000Dh-6T
- for qemu-devel@nongnu.org; Fri, 17 Apr 2020 23:41:14 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id t40so1874919pjb.3
- for <qemu-devel@nongnu.org>; Fri, 17 Apr 2020 20:41:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=kyXs52D+W8xKx80sHVX3U7UyTi/vLCOHtkNQK+UXwVs=;
- b=q3B+2PQ8O4FNhku0/3V7OzCkEKHLlEYLQizS6tHtToz8GYgfCV/pR9ey5iscjJqs1V
- YJmBg5aUQPfRIgmxC4l+7Ni3pC8hEJvyE5YDx1ssis0PpVzrkrKpu3jv2BVo7v8F6KdA
- i+yHp1NiuauEJDlil60atk6qgL5ZkpjHgbGNMyHQkRq3Pg0hHVVG/6upDOmvD6KXbAJn
- cWPlNaoNspkXdafPiyjc/hkbLBTIYrC7hxu6D9fY6ly68rMv+S16xVFlpVG4ISi+bSdh
- LerFjBoyj6cB7AXCheq3zc69pRPHQ8Ul0GjpQuDjUJC7O+XvsHZGj6kVXVHLYn9CXdEV
- 0jvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=kyXs52D+W8xKx80sHVX3U7UyTi/vLCOHtkNQK+UXwVs=;
- b=eq3gvazv5n516twz+U5g2q5WwqhkXF+npqDsOvlLJIs00fq1myoRORJsGJfS1g8FGi
- LSgnleIFRODC7LAN7o/pNHUgzNePegARGiBNRWGMkcYaPtA0EyEThNlAk8wCRJc6T84Q
- OjAAVxAZQfnsRdaMJDJisP79oqej6ReQhThAX2YswkdEkb3QqA6H0H9BnCUyJxP96yAv
- m/kMahCDyvpIbSTL6dM4/62ayuNRSJK5Unc1XcWgl19mVzo8KtwLEd+XvXXSXX+y4BvY
- w14YAGX0BeKjLZiI0Ztz0kMqq6+U5jZtG13Mx126zRNywuUw9yu/2kio9boicLx4licj
- cQFg==
-X-Gm-Message-State: AGi0PuZO+vs69QL6hWrdKDZzet/HiIcjj59rgSid/MJ5nl0t98d4XZEJ
- l4o4G5SSCNikTNl6RI2EOMS/rA==
-X-Google-Smtp-Source: APiQypJSw6NtoVd2sPZijlUM8mC9mIGktPyZZXfZXg4ubSp9+xfk8M5e3zVTWv1bMCApNluFzb7O0Q==
-X-Received: by 2002:a17:90a:f689:: with SMTP id
- cl9mr8422457pjb.43.1587181270468; 
- Fri, 17 Apr 2020 20:41:10 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id k24sm20548440pfk.164.2020.04.17.20.41.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 17 Apr 2020 20:41:09 -0700 (PDT)
-Subject: Re: [PATCH 08/16] target/arm: Use SVEContLdSt in sve_ld1_r
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200311064420.30606-1-richard.henderson@linaro.org>
- <20200311064420.30606-9-richard.henderson@linaro.org>
- <CAFEAcA-v9O6+iZu9_grS6iW=QhmJeLGVfnJ8BOe59KzaPMczzg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ba2b5050-4d21-dfad-ae81-667438dbd89b@linaro.org>
-Date: Fri, 17 Apr 2020 20:41:07 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jPf3K-00058j-1u
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 00:26:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jPf3E-0005K6-RN
+ for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 04:25:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CA9042E8108
+ for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 04:25:56 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-v9O6+iZu9_grS6iW=QhmJeLGVfnJ8BOe59KzaPMczzg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 18 Apr 2020 04:17:19 -0000
+From: Launchpad Bug Tracker <1859920@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: janitor js1943 th-huth
+X-Launchpad-Bug-Reporter: JS (js1943)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+References: <157915647770.15306.7117337280333115892.malonedeb@wampee.canonical.com>
+Message-Id: <158718343938.6294.12059125525830367484.malone@loganberry.canonical.com>
+Subject: [Bug 1859920] Re: daemoniz not working on MacOS
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: aebb0a062d306da62cf01f9f232c9ea72aaa05ab
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -98,76 +77,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1859920 <1859920@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/16/20 6:26 AM, Peter Maydell wrote:
-> On Wed, 11 Mar 2020 at 06:44, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> First use of the new helper functions, so we can remove the
->> unused markup.  No longer need a scratch for user-only, as
->> we completely probe the page set before reading; system mode
->> still requires a scratch for MMIO.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> 
->> +    /* The entire operation is in RAM, on valid pages. */
->> +
->> +    memset(vd, 0, reg_max);
->> +    mem_off = info.mem_off_first[0];
->> +    reg_off = info.reg_off_first[0];
->> +    reg_last = info.reg_off_last[0];
->> +    host = info.page[0].host;
->> +
->> +    while (reg_off <= reg_last) {
->> +        uint64_t pg = vg[reg_off >> 6];
->> +        do {
->> +            if ((pg >> (reg_off & 63)) & 1) {
->> +                host_fn(vd, reg_off, host + mem_off);
->> +            }
->> +            reg_off += 1 << esz;
->> +            mem_off += 1 << msz;
->> +        } while (reg_off <= reg_last && (reg_off & 63));
->> +    }
->> +
->> +    /*
->> +     * Use the slow path to manage the cross-page misalignment.
->> +     * But we know this is RAM and cannot trap.
->> +     */
->> +    mem_off = info.mem_off_split;
->> +    if (unlikely(mem_off >= 0)) {
->> +        tlb_fn(env, vd, info.reg_off_split, addr + mem_off, retaddr);
->> +    }
->> +
->> +    mem_off = info.mem_off_first[1];
->> +    if (unlikely(mem_off >= 0)) {
->> +        reg_off = info.reg_off_first[1];
->> +        reg_last = info.reg_off_last[1];
->> +        host = info.page[1].host;
->> +
->> +        do {
->> +            uint64_t pg = vg[reg_off >> 6];
->> +            do {
->> +                if ((pg >> (reg_off & 63)) & 1) {
->> +                    host_fn(vd, reg_off, host + mem_off);
->> +                }
->> +                reg_off += 1 << esz;
->> +                mem_off += 1 << msz;
->> +            } while (reg_off & 63);
->> +        } while (reg_off <= reg_last);
-> 
-> Does this loop for the second page need to be phrased
-> differently than the loop for the first page was? I was
-> expecting the two chunks of code to be identical, and they
-> almost are, but not quite...
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Yes, they do need to be different.  In particular, the first page may only have
-the one element that crosses the page boundary, so we may have reg_first >
-reg_last.  The second page is never has that problem.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
+-- =
 
-r~
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859920
+
+Title:
+  daemoniz not working on MacOS
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  OS: MacOS Catalina 10.15.2
+  Qemu install via brew: brew install qemu
+
+  qemu-system-x86_64 -version
+  QEMU emulator version 4.2.50 (v4.2.0-13-g084a398bf8-dirty)
+  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+
+  ---
+
+  Start Ubuntu Desktop 18.04 client as follow:
+
+  IMG_CD=3D$HOME/Downloads/iso/ubuntu-18.04.3-desktop-amd64.iso
+  IMG_FILE=3D$HOME/code/vm/qemu/u64d01.qcow2
+  MAC_ADDR=3Dxx:xx:xx:xx:xx:xx
+
+  qemu-system-x86_64 \
+  -no-user-config -nodefaults \
+  -show-cursor \
+  -name u64d01 \
+  -M q35,accel=3Dhvf,usb=3Doff,vmport=3Doff \
+  -cpu host -smp 4 -m 2048 \
+  -overcommit mem-lock=3Doff \
+  -overcommit cpu-pm=3Doff \
+  -rtc base=3Dutc,clock=3Dhost \
+  \
+  -device virtio-tablet-pci \
+  -device virtio-vga \
+  \
+  -device virtio-blk-pci,drive=3Dssd1 \
+  -drive id=3Dssd1,file=3D$IMG_FILE,if=3Dnone,format=3Dqcow2 \
+  \
+  -device virtio-net-pci,netdev=3Dnic1,mac=3D$MAC_ADDR \
+  -netdev user,id=3Dnic1,ipv4=3Don,ipv6=3Don,hostname=3Du64d01,hostfwd=3Dtc=
+p::2222-:22 \
+  \
+  -device ich9-intel-hda,id=3Dsnd,msi=3Don \
+  -device hda-output,id=3Dsnd-codec0,bus=3Dsnd.0,cad=3D0,audiodev=3Dsnd0 \
+  -audiodev coreaudio,id=3Dsnd0,out.buffer-count=3D10000 \
+  \
+  -daemonize
+
+  Give following error:
+
+  objc[3432]: +[NSNumber initialize] may have been in progress in another t=
+hread when fork() was called.
+  objc[3432]: +[NSNumber initialize] may have been in progress in another t=
+hread when fork() was called. We cannot safely call it or ignore it in the =
+fork() child process. Crashing instead. Set a breakpoint on objc_initialize=
+AfterForkError to debug.
+
+  =
+
+  I checked "ps -ef|grep qemu" before and after the command, there was no q=
+emu process running.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1859920/+subscriptions
 
