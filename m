@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 062D4C38A29
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 16:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F40B2C38A29
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 16:23:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C139D2054F
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 16:23:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C01B12054F
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 16:23:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T23yHe/G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C139D2054F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QwtnPhgr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C01B12054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPqFf-0001CF-QD
-	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 12:23:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48179)
+	id 1jPqFv-0001JR-88
+	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 12:23:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48200)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jPqBm-0004Ce-HJ
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 12:19:31 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jPqBo-0004Iz-IH
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 12:19:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jPqBl-0005FQ-8n
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 12:19:30 -0400
-Received: from mail-pj1-x102a.google.com ([2607:f8b0:4864:20::102a]:36456)
+ (envelope-from <richard.henderson@linaro.org>) id 1jPqBn-0005Lc-Bo
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 12:19:32 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:41536)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jPqBl-0005CF-2H
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 12:19:29 -0400
-Received: by mail-pj1-x102a.google.com with SMTP id nu11so2474860pjb.1
- for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 09:19:28 -0700 (PDT)
+ id 1jPqBn-0005Ii-5y
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 12:19:31 -0400
+Received: by mail-pg1-x544.google.com with SMTP id h69so2754936pgc.8
+ for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 09:19:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=DuJkDhPEOnaROoc/1JyNu5wUbGL/01Lw8KOKVY4KSao=;
- b=T23yHe/Gr6i1dtamJBmXgruKsQmfGotnEi8hYEzqD+kVWQelxkqEPZfIpluhDa2hIU
- eMsbrN3skiuBbDBjZ9Txw5A+hFx1DpmMyhlIJef3+tme2f2c5R6r3heWeIrI96WT3yEH
- jIVdPbQgtGoVgzheW33yd88sJAUiaORJ2gH+qQvoPVEFd/5gceTEygWnxFENVbWDpxwn
- KMeHl5bqG4P1M4VtBO1qXYbY8kdO7SWWx905iu2X5P7/8Kc/nxFKlJbv1tzjq8qdi9AJ
- oeRdPNwtmHq7XCd3af7txIgKb7h51AUy3aj4YbJ2OeUaqCkM/t/uf9z+LOqXyI02QPHX
- Itdg==
+ bh=Zdjt8WpN4waxB25J3ykCncF8gpDtxEJVdnhsqarrM50=;
+ b=QwtnPhgrhOXmMsn5hHVTSYL6WN5GsmWrg4zkIQUdfrJde0kF067gpRLj+SPPQK/nHi
+ GG6t/U3QvIZSm6oeClE2vY6y2fedj5uftEENO1YEZ3Bj9wmFdEqNywAPYnGBM3UEgaES
+ d5dpiQZ+F6u7ALkGJVUbj855Zu/SY8GQJti970BSif7jBq/2nGcZuDKjxvT8es67F4Oz
+ HGrwl2Q89BwwirzurxT9l+VrO/IzAGNF7gpc72K15FbJ2F73EfsBOr/Ra14/HQwbGZRc
+ lssz1cppqTTpk1xp42HjDPT54cOJ79UtctyWzh3QD2NKlu9q7DPMlUWQlXKiv7g9TLYN
+ 6tpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=DuJkDhPEOnaROoc/1JyNu5wUbGL/01Lw8KOKVY4KSao=;
- b=redk1x+Am4zvRYBCXFdcyGvtDYFoq1gbD2OF05DNCfS+0JZJTSdfFkoKFOvUjm60Wl
- CewMAOW7fXLQrD8XroElKNYExmAQEhjOVYLTKUGGfLviCtVb5afF0WG/U7zeBPZlDTou
- 37HqZsR5VcCMyMMPmWszGN+nx2s9uSt4I/GXnbd1vFcGX4++w9QsgBtn0+rZYL21Ff+d
- cyDWYZqxw4+P1O3tjPAGLsmgcs260AqhAKYYYolTQO4Yp+Kk8FdYpUr5jligdUp3f+iy
- T0PIVQyqTVXBqN7pUfyFGzG5m47YFvxQIgbSgrtgdAIp52aTodxqR3PLnj3/iNQQIu/l
- /8/g==
-X-Gm-Message-State: AGi0PuaWpvPidtfT/9uCZwS7YMRgU8B3efnR6l5/XrWAZxbfEsKzh3Zt
- 9PoJ7ztcK6Rbp1rfQVs+Eh5x6jEoxwI=
-X-Google-Smtp-Source: APiQypLuKyMJkNoKQtdrPcj16j0GK8ziTaGQ4hq/X1PdMIkRE4TusKWiDazIBnQsGFbp4E36OjdSfg==
-X-Received: by 2002:a17:90a:1743:: with SMTP id
- 3mr11389559pjm.106.1587226767247; 
- Sat, 18 Apr 2020 09:19:27 -0700 (PDT)
+ bh=Zdjt8WpN4waxB25J3ykCncF8gpDtxEJVdnhsqarrM50=;
+ b=QHe+bvN72krQrTQs/vZM3+ACHoByX3SLk9/Wsl7Gl5Fj3oY7EbSVvcHNYANIEugUrc
+ sh/qz/D7ZDoQntbCb2/h/+3La0ON6WEpKlXN8MQjx7GlMPeyIRhSaVRJ6wb0IzOOrpUF
+ QHcVe2GfhmGh9f+TQNb6IAuHAq++LQDDvBSaBR0ORWu1DeMW4AKX8Tv3xO9zJPGvpN9D
+ 28OaHUDkwJhuNp/4fsoniiglx8oeCljWNDPMDjUdnjpTiuPMH5NgWK61un0+Mm75CDtu
+ 9i4XK3vmQfG0uNeX81ond+W4mAEytlc4Rt6++Q8gFChqkAjsU/EKKeoEczNO7NisSTKs
+ YsWg==
+X-Gm-Message-State: AGi0PubarhSHkkELsO+hRSewIYg4VPLMjiU3rR2WbwbIZ85QCK0UQ7x0
+ wRvAnl7lchFM6G6doeKkhgTF5unAQxk=
+X-Google-Smtp-Source: APiQypKDg0AkuSVsHB1urbNkgRijU4ptJbLKxeAME0OPyBz0WT56X7vaYYGlCMf+soRVGp/ENJrbrA==
+X-Received: by 2002:aa7:93c2:: with SMTP id y2mr8580079pff.50.1587226769846;
+ Sat, 18 Apr 2020 09:19:29 -0700 (PDT)
 Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
  [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id i187sm22398382pfc.112.2020.04.18.09.19.26
+ by smtp.gmail.com with ESMTPSA id i187sm22398382pfc.112.2020.04.18.09.19.28
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 18 Apr 2020 09:19:26 -0700 (PDT)
+ Sat, 18 Apr 2020 09:19:29 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 08/16] tcg/optimize: Adjust TempOptInfo allocation
-Date: Sat, 18 Apr 2020 09:19:06 -0700
-Message-Id: <20200418161914.4387-9-richard.henderson@linaro.org>
+Subject: [PATCH 10/16] tcg/tci: Add special tci_movi_{i32,i64} opcodes
+Date: Sat, 18 Apr 2020 09:19:08 -0700
+Message-Id: <20200418161914.4387-11-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200418161914.4387-1-richard.henderson@linaro.org>
 References: <20200418161914.4387-1-richard.henderson@linaro.org>
@@ -83,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::102a
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,130 +98,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do not allocate a large block for indexing.  Instead, allocate
-for each temporary as they are seen.
-
-In general, this will use less memory, if we consider that most
-TBs do not touch every target register.  This also allows us to
-allocate TempOptInfo for new temps created during optimization.
+The normal movi opcodes are going away.  We need something
+for TCI to use internally.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/optimize.c | 60 ++++++++++++++++++++++++++++----------------------
- 1 file changed, 34 insertions(+), 26 deletions(-)
+ include/tcg/tcg-opc.h    | 8 ++++++++
+ tcg/tci.c                | 4 ++--
+ tcg/tci/tcg-target.inc.c | 4 ++--
+ 3 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/tcg/optimize.c b/tcg/optimize.c
-index b86bf3d707..d36d7e1d7f 100644
---- a/tcg/optimize.c
-+++ b/tcg/optimize.c
-@@ -89,35 +89,41 @@ static void reset_temp(TCGArg arg)
- }
+diff --git a/include/tcg/tcg-opc.h b/include/tcg/tcg-opc.h
+index 9288a04946..7dee9b38f7 100644
+--- a/include/tcg/tcg-opc.h
++++ b/include/tcg/tcg-opc.h
+@@ -268,6 +268,14 @@ DEF(last_generic, 0, 0, 0, TCG_OPF_NOT_PRESENT)
+ #include "tcg-target.opc.h"
+ #endif
  
- /* Initialize and activate a temporary.  */
--static void init_ts_info(TempOptInfo *infos,
--                         TCGTempSet *temps_used, TCGTemp *ts)
-+static void init_ts_info(TCGTempSet *temps_used, TCGTemp *ts)
- {
-     size_t idx = temp_idx(ts);
--    if (!test_bit(idx, temps_used->l)) {
--        TempOptInfo *ti = &infos[idx];
-+    TempOptInfo *ti;
- 
-+    if (test_bit(idx, temps_used->l)) {
-+        return;
-+    }
-+    set_bit(idx, temps_used->l);
++#ifdef TCG_TARGET_INTERPRETER
++/* These opcodes are only for use between the tci generator and interpreter. */
++DEF(tci_movi_i32, 1, 0, 1, TCG_OPF_NOT_PRESENT)
++#if TCG_TARGET_REG_BITS == 64
++DEF(tci_movi_i64, 1, 0, 1, TCG_OPF_64BIT | TCG_OPF_NOT_PRESENT)
++#endif
++#endif
 +
-+    ti = ts->state_ptr;
-+    if (ti == NULL) {
-+        ti = tcg_malloc(sizeof(TempOptInfo));
-         ts->state_ptr = ti;
--        ti->next_copy = ts;
--        ti->prev_copy = ts;
--        if (ts->kind == TEMP_CONST) {
--            ti->is_const = true;
--            ti->val = ti->mask = ts->val;
--            if (TCG_TARGET_REG_BITS > 32 && ts->type == TCG_TYPE_I32) {
--                /* High bits of a 32-bit quantity are garbage.  */
--                ti->mask |= ~0xffffffffull;
--            }
--        } else {
--            ti->is_const = false;
--            ti->mask = -1;
-+    }
-+
-+    ti->next_copy = ts;
-+    ti->prev_copy = ts;
-+    if (ts->kind == TEMP_CONST) {
-+        ti->is_const = true;
-+        ti->val = ts->val;
-+        ti->mask = ts->val;
-+        if (TCG_TARGET_REG_BITS > 32 && ts->type == TCG_TYPE_I32) {
-+            /* High bits of a 32-bit quantity are garbage.  */
-+            ti->mask |= ~0xffffffffull;
-         }
--        set_bit(idx, temps_used->l);
-+    } else {
-+        ti->is_const = false;
-+        ti->mask = -1;
-     }
- }
- 
--static void init_arg_info(TempOptInfo *infos,
--                          TCGTempSet *temps_used, TCGArg arg)
-+static void init_arg_info(TCGTempSet *temps_used, TCGArg arg)
- {
--    init_ts_info(infos, temps_used, arg_temp(arg));
-+    init_ts_info(temps_used, arg_temp(arg));
- }
- 
- static TCGTemp *find_better_copy(TCGContext *s, TCGTemp *ts)
-@@ -603,9 +609,8 @@ static bool swap_commutative2(TCGArg *p1, TCGArg *p2)
- /* Propagate constants and copies, fold constant expressions. */
- void tcg_optimize(TCGContext *s)
- {
--    int nb_temps, nb_globals;
-+    int nb_temps, nb_globals, i;
-     TCGOp *op, *op_next, *prev_mb = NULL;
--    TempOptInfo *infos;
-     TCGTempSet temps_used;
- 
-     /* Array VALS has an element for each temp.
-@@ -615,12 +620,15 @@ void tcg_optimize(TCGContext *s)
- 
-     nb_temps = s->nb_temps;
-     nb_globals = s->nb_globals;
-+
-     bitmap_zero(temps_used.l, nb_temps);
--    infos = tcg_malloc(sizeof(TempOptInfo) * nb_temps);
-+    for (i = 0; i < nb_temps; ++i) {
-+        s->temps[i].state_ptr = NULL;
-+    }
- 
-     QTAILQ_FOREACH_SAFE(op, &s->ops, link, op_next) {
-         tcg_target_ulong mask, partmask, affected;
--        int nb_oargs, nb_iargs, i;
-+        int nb_oargs, nb_iargs;
-         TCGArg tmp;
-         TCGOpcode opc = op->opc;
-         const TCGOpDef *def = &tcg_op_defs[opc];
-@@ -633,14 +641,14 @@ void tcg_optimize(TCGContext *s)
-             for (i = 0; i < nb_oargs + nb_iargs; i++) {
-                 TCGTemp *ts = arg_temp(op->args[i]);
-                 if (ts) {
--                    init_ts_info(infos, &temps_used, ts);
-+                    init_ts_info(&temps_used, ts);
-                 }
-             }
-         } else {
-             nb_oargs = def->nb_oargs;
-             nb_iargs = def->nb_iargs;
-             for (i = 0; i < nb_oargs + nb_iargs; i++) {
--                init_arg_info(infos, &temps_used, op->args[i]);
-+                init_arg_info(&temps_used, op->args[i]);
-             }
-         }
- 
+ #undef TLADDR_ARGS
+ #undef DATA64_ARGS
+ #undef IMPL
+diff --git a/tcg/tci.c b/tcg/tci.c
+index 46fe9ce63f..a6c1aaf5af 100644
+--- a/tcg/tci.c
++++ b/tcg/tci.c
+@@ -576,7 +576,7 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
+             t1 = tci_read_r32(regs, &tb_ptr);
+             tci_write_reg32(regs, t0, t1);
+             break;
+-        case INDEX_op_movi_i32:
++        case INDEX_op_tci_movi_i32:
+             t0 = *tb_ptr++;
+             t1 = tci_read_i32(&tb_ptr);
+             tci_write_reg32(regs, t0, t1);
+@@ -847,7 +847,7 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
+             t1 = tci_read_r64(regs, &tb_ptr);
+             tci_write_reg64(regs, t0, t1);
+             break;
+-        case INDEX_op_movi_i64:
++        case INDEX_op_tci_movi_i64:
+             t0 = *tb_ptr++;
+             t1 = tci_read_i64(&tb_ptr);
+             tci_write_reg64(regs, t0, t1);
+diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c
+index 992d50cb1e..1f1639df0d 100644
+--- a/tcg/tci/tcg-target.inc.c
++++ b/tcg/tci/tcg-target.inc.c
+@@ -530,13 +530,13 @@ static void tcg_out_movi(TCGContext *s, TCGType type,
+     uint8_t *old_code_ptr = s->code_ptr;
+     uint32_t arg32 = arg;
+     if (type == TCG_TYPE_I32 || arg == arg32) {
+-        tcg_out_op_t(s, INDEX_op_movi_i32);
++        tcg_out_op_t(s, INDEX_op_tci_movi_i32);
+         tcg_out_r(s, t0);
+         tcg_out32(s, arg32);
+     } else {
+         tcg_debug_assert(type == TCG_TYPE_I64);
+ #if TCG_TARGET_REG_BITS == 64
+-        tcg_out_op_t(s, INDEX_op_movi_i64);
++        tcg_out_op_t(s, INDEX_op_tci_movi_i64);
+         tcg_out_r(s, t0);
+         tcg_out64(s, arg);
+ #else
 -- 
 2.20.1
 
