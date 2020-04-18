@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A6CC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 15:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3FD5C54F70
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 15:58:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40A6B221E9
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 15:58:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF148221F7
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 15:58:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QXLS/Bgm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40A6B221E9
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LHcXxhgY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF148221F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPpr6-0008GJ-Ee
-	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 11:58:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44227)
+	id 1jPpr8-0008MX-QC
+	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 11:58:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44243)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jPppy-0006wY-JR
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 11:56:59 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jPppz-0006wk-IZ
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 11:57:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jPppx-0002iM-9h
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 11:56:58 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36444)
+ (envelope-from <richard.henderson@linaro.org>) id 1jPppy-0002kN-AZ
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 11:56:59 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41575)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jPppx-0002ha-4F
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 11:56:57 -0400
-Received: by mail-pg1-x542.google.com with SMTP id o185so2200194pgo.3
- for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 08:56:57 -0700 (PDT)
+ id 1jPppy-0002iy-57
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 11:56:58 -0400
+Received: by mail-pl1-x642.google.com with SMTP id d24so2191432pll.8
+ for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 08:56:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=5wIqJJlAXSxMp0Ef0rZrs4CyiYgBlKFC7q0dmEQ2am4=;
- b=QXLS/Bgmn5Sly7dRplMVrYtHFnTlszesYi/raOKNsl3+LKH7NueONtFOO1nCowo4i8
- wMD/oir0F2VxcmdPZMe6XB4mGTKmXVmgQw2TPYVdWFvmqKiMWKlCO3ExDCJWTUBZ3neM
- h/9CgcKXavaFk80tvky3FI7I/BUgk9BJiXXk0//+chVTvki3kHP+liMTyYNtM5c3dIH8
- YuTJAgHrp3DuzIFRuFFH+x+DqRjel1w6M0W0d5t2Gzykiw7eNod34kSLw8qNtMm0ZRce
- Ge7tO/HJEf2MAvkpt4mi2XL9Gsmjt1WxRqtHe1ZVbUOJ2bdbDdpL/23s1czj0TyRKcsr
- fH1Q==
+ bh=7uX8ThqikoEq018tD9k93q1ZZz6mGC+ypRxdEu5/0Vw=;
+ b=LHcXxhgYH8NUJ32OqE1+8L5xl0iipBPoiI1xa0YRy0pH1jm6NAkOc7oaVccIVeOy3g
+ T/F7+wIYib6zNYSm5gebCftgMbwR0CO+WqT5y6Ihe94VFe4KW7T2TSxyvvvRpSBMBJvi
+ 1Bi031xX1jFptSs2i/zmLZzqEWe1pftpO1AgrHDdtbIg4A8b2go7f8JA/utmrKFpKOV0
+ BPSL4kLzLxG2JYuwLxpt5Wdoxa6Fp6/38c898k58rVcE1QOy55+v5l9WFVFUnEm5fuD8
+ cBfwjdV9xId0Zq2olmCJwVyb/Cq8CcJEiPr9Uecr+3UApJQMR2L0WrWhEIrYs75MdjNH
+ zxsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=5wIqJJlAXSxMp0Ef0rZrs4CyiYgBlKFC7q0dmEQ2am4=;
- b=sCR6UJNW3qmMCa5Upt8BfjZJWXgGOXqGxXDvPJGDf5s31FSj0AckMquG+7Z0zbsutD
- oHNz/M86a8AXvwiZawir94YsTlfiV+f4wOGMuQ4fSS1hhE0ctqyxicxILjJjja30FENb
- B9pD/VT3CLtAKiYMUGdeSGz2bzlEzIZORiYtX5i/Qy4ziWAq9nVsw8RF5xlzyws52dsW
- y3eajFkujfQlL3ED9QaKokKgheDElY0qzltpkp4Wpur/HbtMLFHq2fAk1UBm27PhJN0u
- 2HTdwOBsMqbkL7MhcVAzDH2wcbYYA/vzYE7fdWwRne8aWCayWylpbvnAqVpJCgTQWkcu
- DSuw==
-X-Gm-Message-State: AGi0PuYY0AiNHlZgBt0Ay5zBNMEDtTK4P6yjGFlupN9/ZvmA6LB5RVx1
- rI3d+fRCPKU7514x8WhHAIOIiABW8fM=
-X-Google-Smtp-Source: APiQypKFj+8RW/B1CfE67L7JkddqVNNSkLQ83S8XRPC3soXdf3k/KKk5wo+il1gd6Tbi4gC+yHe6VQ==
-X-Received: by 2002:a63:cd08:: with SMTP id i8mr8301816pgg.55.1587225415562;
- Sat, 18 Apr 2020 08:56:55 -0700 (PDT)
+ bh=7uX8ThqikoEq018tD9k93q1ZZz6mGC+ypRxdEu5/0Vw=;
+ b=qXf92rVBILiMmldNmEy/gzISoFbfXF+5tX32cRjmqqtbndVCubfx5gQrC5s0oPMap3
+ gqYv1Z4upDLBtV7+6TVj0H9jCKZQ5W+23UkhqWf7ye4LMY7ET9MEvGI3o9IsfZ5ois3p
+ is38ouSA/EKqiuMPNnwcagYczn5yE90o3SHYitllo6osRPUhNsAamqJp5H20cyx1v2gd
+ F//Z9A1YoYtWmpOmquWjFwsO7aIf1PgXunvK8Jks11cvo/LclluKHaf9/MRBPGi+AHLp
+ nU0RLmrJWXKuAIT59bOrV7Fxr0SxqOdX9ecAw0iSaScJ7AfiMpwn0yyEq/f2MpqYCvBG
+ D86g==
+X-Gm-Message-State: AGi0PuYan1BHP1+AvPupjqVsNk2aCuH69pKPSrsIB65zPklzlUs+9CdN
+ OlYueQu+O0saGC4UOjnBRAIOwsLnmdw=
+X-Google-Smtp-Source: APiQypInsW1j8bdviOTcpHgkM9TbZW04QcFv9JYn8hnkpQGzfK5Qecb4gC5kqT6eMOzlPVUatZRLpQ==
+X-Received: by 2002:a17:90a:fb4e:: with SMTP id
+ iq14mr11022943pjb.146.1587225416810; 
+ Sat, 18 Apr 2020 08:56:56 -0700 (PDT)
 Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
  [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id m189sm13928532pfm.60.2020.04.18.08.56.54
+ by smtp.gmail.com with ESMTPSA id m189sm13928532pfm.60.2020.04.18.08.56.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 18 Apr 2020 08:56:54 -0700 (PDT)
+ Sat, 18 Apr 2020 08:56:56 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/3] tcg: Improve vector tail clearing
-Date: Sat, 18 Apr 2020 08:56:49 -0700
-Message-Id: <20200418155651.3901-2-richard.henderson@linaro.org>
+Subject: [PATCH 2/3] target/arm: Use tcg_gen_gvec_mov for clear_vec_high
+Date: Sat, 18 Apr 2020 08:56:50 -0700
+Message-Id: <20200418155651.3901-3-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200418155651.3901-1-richard.henderson@linaro.org>
 References: <20200418155651.3901-1-richard.henderson@linaro.org>
@@ -81,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,123 +99,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Better handling of non-power-of-2 tails as seen with Arm 8-byte
-vector operations.
+The 8-byte store for the end a !is_q operation can be
+merged with the other stores.  Use a no-op vector move
+to trigger the expand_clr portion of tcg_gen_gvec_mov.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg-op-gvec.c | 82 ++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 63 insertions(+), 19 deletions(-)
+ target/arm/translate-a64.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index 5a6cc19812..43cac1a0bf 100644
---- a/tcg/tcg-op-gvec.c
-+++ b/tcg/tcg-op-gvec.c
-@@ -326,11 +326,34 @@ void tcg_gen_gvec_5_ptr(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-    in units of LNSZ.  This limits the expansion of inline code.  */
- static inline bool check_size_impl(uint32_t oprsz, uint32_t lnsz)
- {
--    if (oprsz % lnsz == 0) {
--        uint32_t lnct = oprsz / lnsz;
--        return lnct >= 1 && lnct <= MAX_UNROLL;
-+    uint32_t q, r;
-+
-+    if (oprsz < lnsz) {
-+        return false;
-     }
--    return false;
-+
-+    q = oprsz / lnsz;
-+    r = oprsz % lnsz;
-+    tcg_debug_assert((r & 7) == 0);
-+
-+    if (lnsz < 16) {
-+        /* For sizes below 16, accept no remainder. */
-+        if (r != 0) {
-+            return false;
-+        }
-+    } else {
-+        /*
-+         * Recall that ARM SVE allows vector sizes that are not a
-+         * power of 2, but always a multiple of 16.  The intent is
-+         * that e.g. size == 80 would be expanded with 2x32 + 1x16.
-+         * In addition, expand_clr needs to handle a multiple of 8.
-+         * Thus we can handle the tail with one more operation per
-+         * diminishing power of 2.
-+         */
-+        q += ctpop32(r);
-+    }
-+
-+    return q <= MAX_UNROLL;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 095638e09a..d57aa54d6a 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -513,14 +513,8 @@ static void clear_vec_high(DisasContext *s, bool is_q, int rd)
+     unsigned ofs = fp_reg_offset(s, rd, MO_64);
+     unsigned vsz = vec_full_reg_size(s);
+ 
+-    if (!is_q) {
+-        TCGv_i64 tcg_zero = tcg_const_i64(0);
+-        tcg_gen_st_i64(tcg_zero, cpu_env, ofs + 8);
+-        tcg_temp_free_i64(tcg_zero);
+-    }
+-    if (vsz > 16) {
+-        tcg_gen_gvec_dup_imm(MO_64, ofs + 16, vsz - 16, vsz - 16, 0);
+-    }
++    /* Nop move, with side effect of clearing the tail. */
++    tcg_gen_gvec_mov(MO_64, ofs, ofs, is_q ? 16 : 8, vsz);
  }
  
- static void expand_clr(uint32_t dofs, uint32_t maxsz);
-@@ -402,22 +425,31 @@ static void gen_dup_i64(unsigned vece, TCGv_i64 out, TCGv_i64 in)
- static TCGType choose_vector_type(const TCGOpcode *list, unsigned vece,
-                                   uint32_t size, bool prefer_i64)
- {
--    if (TCG_TARGET_HAS_v256 && check_size_impl(size, 32)) {
--        /*
--         * Recall that ARM SVE allows vector sizes that are not a
--         * power of 2, but always a multiple of 16.  The intent is
--         * that e.g. size == 80 would be expanded with 2x32 + 1x16.
--         * It is hard to imagine a case in which v256 is supported
--         * but v128 is not, but check anyway.
--         */
--        if (tcg_can_emit_vecop_list(list, TCG_TYPE_V256, vece)
--            && (size % 32 == 0
--                || tcg_can_emit_vecop_list(list, TCG_TYPE_V128, vece))) {
--            return TCG_TYPE_V256;
--        }
-+    /*
-+     * Recall that ARM SVE allows vector sizes that are not a
-+     * power of 2, but always a multiple of 16.  The intent is
-+     * that e.g. size == 80 would be expanded with 2x32 + 1x16.
-+     * It is hard to imagine a case in which v256 is supported
-+     * but v128 is not, but check anyway.
-+     * In addition, expand_clr needs to handle a multiple of 8.
-+     */
-+    if (TCG_TARGET_HAS_v256 &&
-+        check_size_impl(size, 32) &&
-+        tcg_can_emit_vecop_list(list, TCG_TYPE_V256, vece) &&
-+        (!(size & 16) ||
-+         (TCG_TARGET_HAS_v128 &&
-+          tcg_can_emit_vecop_list(list, TCG_TYPE_V128, vece))) &&
-+        (!(size & 8) ||
-+         (TCG_TARGET_HAS_v64 &&
-+          tcg_can_emit_vecop_list(list, TCG_TYPE_V64, vece)))) {
-+        return TCG_TYPE_V256;
-     }
--    if (TCG_TARGET_HAS_v128 && check_size_impl(size, 16)
--        && tcg_can_emit_vecop_list(list, TCG_TYPE_V128, vece)) {
-+    if (TCG_TARGET_HAS_v128 &&
-+        check_size_impl(size, 16) &&
-+        tcg_can_emit_vecop_list(list, TCG_TYPE_V128, vece) &&
-+        (!(size & 8) ||
-+         (TCG_TARGET_HAS_v64 &&
-+          tcg_can_emit_vecop_list(list, TCG_TYPE_V64, vece)))) {
-         return TCG_TYPE_V128;
-     }
-     if (TCG_TARGET_HAS_v64 && !prefer_i64 && check_size_impl(size, 8)
-@@ -432,6 +464,18 @@ static void do_dup_store(TCGType type, uint32_t dofs, uint32_t oprsz,
- {
-     uint32_t i = 0;
- 
-+    tcg_debug_assert(oprsz >= 8);
-+
-+    /*
-+     * This may be expand_clr for the tail of an operation, e.g.
-+     * oprsz == 8 && maxsz == 64.  The first 8 bytes of this store
-+     * are misaligned wrt the maximum vector size, so do that first.
-+     */
-+    if (dofs & 8) {
-+        tcg_gen_stl_vec(t_vec, cpu_env, dofs + i, TCG_TYPE_V64);
-+        i += 8;
-+    }
-+
-     switch (type) {
-     case TCG_TYPE_V256:
-         /*
+ void write_fp_dreg(DisasContext *s, int reg, TCGv_i64 v)
 -- 
 2.20.1
 
