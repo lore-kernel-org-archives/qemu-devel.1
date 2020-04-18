@@ -2,87 +2,84 @@ Return-Path: <SRS0=r7Ry=6C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20464C38A29
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 15:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DB49C38A29
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 15:58:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D25292076A
-	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 15:10:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC510221E9
+	for <qemu-devel@archiver.kernel.org>; Sat, 18 Apr 2020 15:58:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zeLf60bF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D25292076A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d8TBnRTG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC510221E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPp77-0006d8-2c
-	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 11:10:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36895)
+	id 1jPpqz-00085i-35
+	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 11:58:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44196)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jPp19-0007Bs-Jq
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 11:04:28 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jPppx-0006wI-CZ
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 11:56:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jPp18-0003gM-HD
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 11:04:27 -0400
-Received: from mail-pj1-x1036.google.com ([2607:f8b0:4864:20::1036]:50705)
+ (envelope-from <richard.henderson@linaro.org>) id 1jPppw-0002gS-2I
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 11:56:57 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:54865)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jPp18-0003am-BX
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 11:04:26 -0400
-Received: by mail-pj1-x1036.google.com with SMTP id t9so341391pjw.0
- for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 08:04:25 -0700 (PDT)
+ id 1jPppv-0002fR-OU
+ for qemu-devel@nongnu.org; Sat, 18 Apr 2020 11:56:56 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id np9so2522068pjb.4
+ for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 08:56:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Zg6kmbV/F10qD8ScMZSnJyiRBl2OgcABfr1ZRnLbG9o=;
- b=zeLf60bF53jO7zHQIwcT/TTO5d7OXtDPeOyANNcBBPeM/DwRitPOG05u1VdhuSub7S
- c1FFC3yzt8Ktm4n+u/ayzV21vj3eq/EVQASsBOoYzEBDXQOKiP+i+eehFMyb16MG4dss
- oPd2NOHdz0bMTP8FPqpUJbbeJV27q6C5WLARZW1u1TJX8sl/T30EHyvlV4Vmj7bcWFZa
- IpNvpqTR9G4l+KlZA+0qhJOtuq1k7gjNTib40vG8EH2dOFR6KLgpuXBUWTGWwgAQxxLz
- EfWggHDBOpNlNdz1w4f1OCRB/q+9skcdi7c2arYGQD7d9zHUyWE+vBrE+tfTT3FF7FLe
- 5hig==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Lj6lSrPVM5tWkCU7F3bE232plkF3rYU2Va87V8fTIjA=;
+ b=d8TBnRTGilmRgq2dtoYGdAw2K7bwQEG6YP0gFA9lHi3isKEPd0KP0Mk4I+S1C5mv3Z
+ ZmH3M+P/N+Vu271Kl+x2uOemiT1mxR66lt7iP06f6oomzpI0UiAtHbHW1ZSzAsy3LWs2
+ vHMhViUUHyZrV9qqsgNIUcsUzuVjvXsJUAuBfVK8EwJQt2rybFRsqT8ZicuHOjPwmQz5
+ PHbrain04i2i1WnK+EmheuOalGyqSMYlsVRaGCh9lSvT/CVcyQJxfEbEP0rt/BsD/0Mj
+ jGuE2vMBRR0xKYWIedGqDjnEDXgW58/h74YDpgzrvyg8LzIYB4E2ZNBDOweR7iWhZeRb
+ d4/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Zg6kmbV/F10qD8ScMZSnJyiRBl2OgcABfr1ZRnLbG9o=;
- b=PsoOWHT3UPin6XR+SmSOk5ib46v2Dzt9nGIZvTuU1h6zqyHZdgc/+FNh9eIGHcsrM+
- tn5N61iEDEXgpq1vNibT6vSSKQLuHeUiTQ7p9JHro5gzhPxUTRKVfHGyKVUM+BJHZlKP
- HGR/tq1W6ZNKjcfGu3Piw2IAZKkLWKcdBeujdZPiRzt0bd3T7CFxdpbtYGOr+hcpNFdP
- dOfFLXZci46HRzdM2GbVORJa7PprUq+XL83avhvlhTvA7TiQotTnEQdRyDhuoGklPQSt
- TkxvYf0RaOhNzX2AgL32ad4itMoIGzY12LeMs0PD3UNNoYcAdQOWqnnCIHNwHtzFtK7o
- zXiw==
-X-Gm-Message-State: AGi0PuaB0H1q6CNG+QGUQoi/9JvZqEmHIhlheNcOO+wDsaLMd8tVI4u9
- dESFpqcaycCQHFLTJwvsJyrcl9wtuz0=
-X-Google-Smtp-Source: APiQypLzn+ToV7yeEmxlo+4D6XaHWfuH5DWEycsjzJERrv+n2iZ6dBkoXA+1zevHtmbLV/GOY+8xhg==
-X-Received: by 2002:a17:90a:c401:: with SMTP id
- i1mr10561169pjt.131.1587222264775; 
- Sat, 18 Apr 2020 08:04:24 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Lj6lSrPVM5tWkCU7F3bE232plkF3rYU2Va87V8fTIjA=;
+ b=WYb0jiuyEEGIp1DhMAj1dseVCJlLeBVt3oVWmgCdZmwPB+kgRJa4w2WpV/1qQ4S+Y2
+ 5IQN1rxeZxYbsZbQ405XczXHjGJfK3iYi0/KP5tvQh06htL1oomS7EYqiqdPnku3KgaF
+ eM0jmkmHaz4jJx6XzehM/Caz3POOK403dqbnFgk28XlIXXjpO4uQKe9iDogQETfm8ugj
+ IFD9snVNvTEbqWulTC+8tk4LPyX7LWAWyDt4ATlB4VjDUEfvo3nOfuQc3cE/qpmpIDpD
+ /iXMz8ao6ZuLZhCKOvAx5JvHlm6bePz5Qk6hT/+TzIBlYcPOSUcddQVhtBmNWpAxCLAp
+ rsZQ==
+X-Gm-Message-State: AGi0PuZVgJgYu0/DlYUd/sx1QLL070Qm6HO5O3FIY54/rB9klRTyhaNO
+ cXPQfG0YPS+cbksDY0Ey3MqB9Ij9FVw=
+X-Google-Smtp-Source: APiQypLa6AlFdlQcjZk1UlTqk13RvLcrRboorDsSWl0xdKmSHfnftgLDW/TVpajAdLIyk2cr5HxUSA==
+X-Received: by 2002:a17:90a:9b17:: with SMTP id
+ f23mr10972815pjp.118.1587225414334; 
+ Sat, 18 Apr 2020 08:56:54 -0700 (PDT)
 Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
  [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id t103sm8668601pjb.46.2020.04.18.08.04.23
+ by smtp.gmail.com with ESMTPSA id m189sm13928532pfm.60.2020.04.18.08.56.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 18 Apr 2020 08:04:24 -0700 (PDT)
+ Sat, 18 Apr 2020 08:56:53 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 7/7] tcg: Add tcg_gen_gvec_dup_tl
-Date: Sat, 18 Apr 2020 08:04:11 -0700
-Message-Id: <20200418150411.1831-8-richard.henderson@linaro.org>
+Subject: [PATCH 0/3] tcg: Improve vector tail clearing
+Date: Sat, 18 Apr 2020 08:56:48 -0700
+Message-Id: <20200418155651.3901-1-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200418150411.1831-1-richard.henderson@linaro.org>
-References: <20200418150411.1831-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1036
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,37 +91,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, david@redhat.com, zhiwei_liu@c-sky.com,
- david@gibson.dropbear.id.au
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For use when a target needs to pass a configure-specific
-target_ulong value to duplicate.
+Something I noticed while looking at AdvSIMD dumps, while
+testing changes common with SVE2.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/tcg/tcg-op-gvec.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+If we're going to load a zero into a vector register for
+clearing the high bits of the SVE register, we might as
+well use that zero to store the 8 bytes at the top of the
+AdvSIMD register as well.
 
-diff --git a/include/tcg/tcg-op-gvec.h b/include/tcg/tcg-op-gvec.h
-index fa8a0c8d03..d89f91f40e 100644
---- a/include/tcg/tcg-op-gvec.h
-+++ b/include/tcg/tcg-op-gvec.h
-@@ -320,6 +320,12 @@ void tcg_gen_gvec_dup_i32(unsigned vece, uint32_t dofs, uint32_t s,
- void tcg_gen_gvec_dup_i64(unsigned vece, uint32_t dofs, uint32_t s,
-                           uint32_t m, TCGv_i64);
- 
-+#if TARGET_LONG_BITS == 64
-+# define tcg_gen_gvec_dup_tl  tcg_gen_gvec_dup_i64
-+#else
-+# define tcg_gen_gvec_dup_tl  tcg_gen_gvec_dup_i32
-+#endif
-+
- void tcg_gen_gvec_shli(unsigned vece, uint32_t dofs, uint32_t aofs,
-                        int64_t shift, uint32_t oprsz, uint32_t maxsz);
- void tcg_gen_gvec_shri(unsigned vece, uint32_t dofs, uint32_t aofs,
+Output assembly goes from e.g.
+
+  00:   48 c7 85 08 10 00 00 00   movq   $0x0,0x1008(%rbp)
+        00 00 00
+  0b:   c5 f9 ef c0               vpxor  %xmm0,%xmm0,%xmm0
+  0f:   c5 fe 7f 85 10 10 00 00   vmovdqu %ymm0,0x1010(%rbp)
+  17:   c5 fa 7f 85 30 10 00 00   vmovdqu %xmm0,0x1030(%rbp)
+
+to
+
+  00:   c5 f9 ef c0               vpxor  %xmm0,%xmm0,%xmm0
+  04:   c5 f9 d6 85 08 10 00 00   vmovq  %xmm0,0x1008(%rbp)
+  0c:   c5 fe 7f 85 10 10 00 00   vmovdqu %ymm0,0x1010(%rbp)
+  14:   c5 fa 7f 85 30 10 00 00   vmovdqu %xmm0,0x1030(%rbp)
+
+Saves a few bytes now, and more when we can do better with
+loading constants into registers, where we can share the
+vpxor between instructions.
+
+The target/arm patches are not aided by the tcg patch, but
+are not dependent on it.
+
+
+r~
+
+
+Richard Henderson (3):
+  tcg: Improve vector tail clearing
+  target/arm: Use tcg_gen_gvec_mov for clear_vec_high
+  target/arm: Use clear_vec_high more effectively
+
+ target/arm/translate-a64.c | 69 ++++++++++++++++++--------------
+ tcg/tcg-op-gvec.c          | 82 +++++++++++++++++++++++++++++---------
+ 2 files changed, 101 insertions(+), 50 deletions(-)
+
 -- 
 2.20.1
 
