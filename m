@@ -2,90 +2,91 @@ Return-Path: <SRS0=RqUc=6D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B32AC38A30
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Apr 2020 18:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CCD9C38A30
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Apr 2020 18:49:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F3B5206B6
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Apr 2020 18:29:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E5B6206D9
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Apr 2020 18:49:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qZIJlAPn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F3B5206B6
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v4XFt+P1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E5B6206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQEgy-0002F0-7X
-	for qemu-devel@archiver.kernel.org; Sun, 19 Apr 2020 14:29:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37066 helo=eggs1p.gnu.org)
+	id 1jQEzz-0006Qk-9G
+	for qemu-devel@archiver.kernel.org; Sun, 19 Apr 2020 14:48:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40606 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jQEfu-0001Gi-Io
- for qemu-devel@nongnu.org; Sun, 19 Apr 2020 14:28:14 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jQEzH-0005x5-6A
+ for qemu-devel@nongnu.org; Sun, 19 Apr 2020 14:48:15 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jQEft-0006aG-7K
- for qemu-devel@nongnu.org; Sun, 19 Apr 2020 14:28:14 -0400
-Received: from mail-pf1-x435.google.com ([2607:f8b0:4864:20::435]:46935)
+ (envelope-from <richard.henderson@linaro.org>) id 1jQEzG-0005nq-GA
+ for qemu-devel@nongnu.org; Sun, 19 Apr 2020 14:48:14 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:45249)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jQEfs-0006Xy-Pn
- for qemu-devel@nongnu.org; Sun, 19 Apr 2020 14:28:12 -0400
-Received: by mail-pf1-x435.google.com with SMTP id 145so1564242pfw.13
- for <qemu-devel@nongnu.org>; Sun, 19 Apr 2020 11:28:11 -0700 (PDT)
+ id 1jQEzF-0005bD-Vc
+ for qemu-devel@nongnu.org; Sun, 19 Apr 2020 14:48:14 -0400
+Received: by mail-pg1-x544.google.com with SMTP id w11so3910777pga.12
+ for <qemu-devel@nongnu.org>; Sun, 19 Apr 2020 11:48:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ZX6QVxCj7wdv+7Ms3OrdD/hu6nmG0qusF62bCz9dF6Y=;
- b=qZIJlAPn1TpSBlpyiCKvSebM0LBlH8FAIEs9eWUjbThPUfCJwfKeTOrCES7yJpC+yF
- e5IODNE+o6s10UlFZdgCUxiOhcpDZ3EA6N3cVjgcCgOuhdztGMfYXwOhLr4Q9dy3wCLX
- FU8Kw9DZRwNC3TjiZyZvx6Bpo5TqsT5MsDDHN3g8S+y2l5mIRzVkHbWeyjPPO0g3TQ7c
- +b82fLmSltD6VQGOUtjGtrOyGHjuaYllc7X3KgkqF+0THY6o4dEKdMifgZ6BQkFh0eJM
- tQdU3pd1w4qTqoql1k0sLLsYr5FSn5B/1DX5TsEPllYJxdxdBdor27WRGnDsyFFWmabE
- AVGw==
+ bh=OyeBkGtIkoGRqPrAYvVf7h8+XBsXT41Qh6d2p1IQw7c=;
+ b=v4XFt+P1Qi0nmdnnsQJROQpOUoX1c8pP6yqHyutBzuCr0rJB14egCmr9173I8ICtQH
+ ekFBBCTTG9aj3wnY14xef8HjvHw3tBWx1w584cJm8kHkl0JVAFIG8s0MWuwZjyTtTRqe
+ 8XUxt3LNT5AQ6c6fMmx2oUB54wRpDl+34m2wNUcrK7mJWXRyOGF6/lsMkAKGXMMBfwog
+ c8xuhZEu/8NKXew2/kKucyc0b5RiMacpznFtWbRvAmjfJdc2ck+bIupeyu9gqGKkpDNt
+ JCIvwF//aOLKx9drkJHPesIcsULCF3sAOpviC5Zq0dgAtQbKkj5XizYqDwPMK5B/BHtV
+ F12g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ZX6QVxCj7wdv+7Ms3OrdD/hu6nmG0qusF62bCz9dF6Y=;
- b=jKvBgNkcHD2lvOCpB47U3oZYKvG62XMULGz8z2e0HayFriUpH6FA77zNV6DLsoro+K
- b3fbZ/MdHHIrsrp+z63yizM3YTQfKASVjHS1jYXWMYJOKClBmZB3/aFALr3nZ9tX2AvG
- BkgU/w0j9oYA4Q+7Fa2FBmTfBVxsU4B7n4mIa7vYtEukGEnc1reIIXL9lOh983xZzy/r
- YqUp1KiM4G9nkBC2LYSqTnjXYVxixZ78XfaG1GZF1FycssLd0720Hxe66E1BgIBdtFmc
- N0/iVWXPRyapzQd2Zsdzs6daNH8Smv0EQ50g7TclML2spytl0gkbxUMntyjDSeKN8Mg/
- YJBg==
-X-Gm-Message-State: AGi0PuY7+6w+D8eu/NYGg76XbTldtqYW56NA07oY8St9sAcyRRNNG0J0
- V9FAyCcsh9hQ/RiP151lVmb4AA==
-X-Google-Smtp-Source: APiQypLbAfXUlG/lA71gm1APRwZISKvBT73eXdvUNdnQDG0o6i0lOuSWL2aK1/N7O6pXQyAJSrwXWA==
-X-Received: by 2002:a62:fc02:: with SMTP id e2mr13209761pfh.195.1587320890832; 
- Sun, 19 Apr 2020 11:28:10 -0700 (PDT)
+ bh=OyeBkGtIkoGRqPrAYvVf7h8+XBsXT41Qh6d2p1IQw7c=;
+ b=nPbTxGdEU2HPuYzp0yLoIUknyCJQw3RWoHKp+1e9G15e5gfATnHcYG5RbtdM+cEFak
+ bOB4cT3mBHAYsbRUlZF7WehSLlo7AHq6siRV1RNwudcYbqE5D1KyImK5qPsw8KOYKcka
+ ivSjCfx0Q7JrmLSpwiKV5qq0z4/baQjif4sGoSPu8LQZkAirRnOUosQaxPmeczyQ98dq
+ GetScTF9RH+aygq4hFekBiZsg+8H16eBd9AeoiEJuLHIjIPeBFDhRekmT058O1kmvSB5
+ rL1nTgR+q33Tou+UCZlw+8OmZjaWDcXoXEhb+jFBVnZHFtRyjK5opW8R6azCf+MsrjpJ
+ s50A==
+X-Gm-Message-State: AGi0PuYebJz3pJ1kY+0KW5p5VEfWrzimt6QKrlf/7bUaZaRmccHup5BB
+ JRVR3cujZJ7KBtvCF8XevR/r9w==
+X-Google-Smtp-Source: APiQypK7SdODBJUaaMmqK4fpPWe3r5Qqkl3Rp971uqYlSpjYbiJAtJcEswH6SeFOY+hHVFusIJsYpg==
+X-Received: by 2002:a63:6bc4:: with SMTP id g187mr6233581pgc.75.1587322091844; 
+ Sun, 19 Apr 2020 11:48:11 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id t188sm4591416pgc.3.2020.04.19.11.28.09
+ by smtp.gmail.com with ESMTPSA id w75sm17531018pfc.156.2020.04.19.11.48.10
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 19 Apr 2020 11:28:10 -0700 (PDT)
-Subject: Re: [PATCH 0/4] target/arm: Implement last SVE2 narrowing section
+ Sun, 19 Apr 2020 11:48:10 -0700 (PDT)
+Subject: Re: [PATCH RFC v5] target/arm: Implement SVE2 HISTCNT, HISTSEG
 To: Stephen Long <steplong@quicinc.com>, qemu-devel@nongnu.org
-References: <20200417162231.10374-1-steplong@quicinc.com>
+References: <20200416173109.8856-1-steplong@quicinc.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <695f5339-9a21-ea78-f842-52169027e86f@linaro.org>
-Date: Sun, 19 Apr 2020 11:28:08 -0700
+Message-ID: <258026b9-a001-bdef-68ad-14da75e152e0@linaro.org>
+Date: Sun, 19 Apr 2020 11:48:09 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200417162231.10374-1-steplong@quicinc.com>
+In-Reply-To: <20200416173109.8856-1-steplong@quicinc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::435;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x435.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs1p.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::435
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,17 +103,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/17/20 9:22 AM, Stephen Long wrote:
-> Submitting patches for the section 'SVE2 integer add/subtract narrow
-> high part' for early review.
+On 4/16/20 10:31 AM, Stephen Long wrote:
+> Signed-off-by: Stephen Long <steplong@quicinc.com>
+> ---
+> Made the fixes Richard noted.
 > 
-> Stephen Long (4):
->   target/arm: Implement SVE2 ADDHNB, ADDHNT
->   target/arm: Implement SVE2 RADDHNB, RADDHNT
->   target/arm: Implement SVE2 SUBHNB, SUBHNT
->   target/arm: Implement SVE2 RSUBHNB, RSUBHNT
+>  target/arm/helper-sve.h    |   7 +++
+>  target/arm/sve.decode      |   6 +++
+>  target/arm/sve_helper.c    | 104 +++++++++++++++++++++++++++++++++++++
+>  target/arm/translate-sve.c |  29 +++++++++++
+>  4 files changed, 146 insertions(+)
 
-Thanks.  Applied to my SVE2 branch.
+Applied to my SVE2 branch.  Thanks!
 
 
 r~
