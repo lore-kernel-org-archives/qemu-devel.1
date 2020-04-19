@@ -2,83 +2,138 @@ Return-Path: <SRS0=RqUc=6D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 021C0C2BA19
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Apr 2020 02:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5902C2BA2B
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Apr 2020 04:01:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2D8F21D7E
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Apr 2020 02:47:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B27521973
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Apr 2020 04:01:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mail.ru header.i=@mail.ru header.b="XKwewYTf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2D8F21D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=mail.ru
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="U9pYptn9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B27521973
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jPzzu-0002bR-RX
-	for qemu-devel@archiver.kernel.org; Sat, 18 Apr 2020 22:47:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53004)
+	id 1jQ19P-0006UH-JT
+	for qemu-devel@archiver.kernel.org; Sun, 19 Apr 2020 00:01:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58422)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jusual@mail.ru>) id 1jPzzJ-0002CE-0v
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 22:47:17 -0400
+ (envelope-from <ani.sinha@nutanix.com>) id 1jQ18W-0005zz-KO
+ for qemu-devel@nongnu.org; Sun, 19 Apr 2020 00:00:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <jusual@mail.ru>) id 1jPzzI-0005wS-AX
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 22:47:16 -0400
-Received: from smtp57.i.mail.ru ([217.69.128.37]:49388)
+ (envelope-from <ani.sinha@nutanix.com>) id 1jQ18S-00024l-3C
+ for qemu-devel@nongnu.org; Sun, 19 Apr 2020 00:00:51 -0400
+Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:18584)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jusual@mail.ru>) id 1jPzzH-0005tL-At
- for qemu-devel@nongnu.org; Sat, 18 Apr 2020 22:47:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru;
- s=mail2; 
- h=Content-Type:Cc:To:Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version;
- bh=d9HMw6jHdz/EQE3BU+oMEsWKdsIFCXGsPtnejs7u49Y=; 
- b=XKwewYTfMGs4uA/pceG1dr7mnBhSUy1C8fiN2fz2HXLI1F7h6+WAcC0N7NdQLlnMrKD0CN333fzVi86Dq2n9w5qmDosLIGFUAgiWP+jsUch7WOvMZaPxCGNtQ0k2rqLuGj6jqf6QEdqn07OH7lGIIXucblAZX246T+iTErsYAic=;
-Received: by smtp57.i.mail.ru with esmtpa (envelope-from <jusual@mail.ru>)
- id 1jPzzC-0004Co-Fe
- for qemu-devel@nongnu.org; Sun, 19 Apr 2020 05:47:10 +0300
-Received: by mail-lj1-f177.google.com with SMTP id q22so6236460ljg.0
- for <qemu-devel@nongnu.org>; Sat, 18 Apr 2020 19:47:10 -0700 (PDT)
-X-Gm-Message-State: AGi0PualeJyyOUdKTmmTF6wIbIKUJSo2OaiK0deewwSeNxUCEvWCwMjA
- OYBORfkGnWz87ISR1xkbHqbDMlJ/FqO3vaCpYLBhuA==
-X-Google-Smtp-Source: APiQypK5UohU6SPgL1wkp3maL9ZM2MzM/H6skLfXDxUcGpPJqFIAK1iJ+iKVjYkTYRTaHDgWQH5mzF2yCkz6RL37aaQ=
-X-Received: by 2002:a05:651c:515:: with SMTP id
- o21mr6291850ljp.91.1587264430014; 
- Sat, 18 Apr 2020 19:47:10 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200402065035.GA15477@simran-Inspiron-5558>
- <f0eec74a-387d-79ce-b23f-d7f16747f9ad@gmail.com>
-In-Reply-To: <f0eec74a-387d-79ce-b23f-d7f16747f9ad@gmail.com>
-From: Julia Suvorova <jusual@mail.ru>
-Date: Sun, 19 Apr 2020 04:46:59 +0200
-X-Gmail-Original-Message-ID: <CAMDeoFVipYBYCE_GTjytpXT_PvKt6xjTdtPyv=HyLYf4FkCDUQ@mail.gmail.com>
-Message-ID: <CAMDeoFVipYBYCE_GTjytpXT_PvKt6xjTdtPyv=HyLYf4FkCDUQ@mail.gmail.com>
-Subject: Re: [PATCH v2] lockable: Replace locks with lock guard macros
+ (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
+ id 1jQ18R-00021W-Cz
+ for qemu-devel@nongnu.org; Sun, 19 Apr 2020 00:00:47 -0400
+Received: from pps.filterd (m0127841.ppops.net [127.0.0.1])
+ by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 03J40CF2014765; Sat, 18 Apr 2020 21:00:43 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=rghC2poQvs4dWrqS4/e614iorXOHjGoVEwTyAq7MGtw=;
+ b=U9pYptn9HYpwOYTfePfTOpSHJB5F/EzUvbykyJTA1eqUILktQKrRK0af47BQh/U8gW57
+ d64h2jGmNpzu0h4sl6Ka1EaDfUB3ZQBXWAtvf3I9EVAEVhGksoIrWfjGSGBtNqY9HLj2
+ gdPm58Fb64LJJO+26GAsmKxUzXJkVOHiHTV7qlplhNhUiS30axrnQjpzTLmUgESQ/75z
+ n+27Wqql8V0rMX5Oq6OdlC8nIWCLo3eyT1W6Eu7ZMa3VddB41PiGgvfGo3VPos3Zr1th
+ ugPEL55kq1Lyn/wFv0Dh4XdUwn6GlAMkyzVknBPWurEY7rwLawkgN7poXZsUPLTfP0LB 5Q== 
+Received: from nam02-sn1-obe.outbound.protection.outlook.com
+ (mail-sn1nam02lp2059.outbound.protection.outlook.com [104.47.36.59])
+ by mx0b-002c1b01.pphosted.com with ESMTP id 30fy39s30h-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Sat, 18 Apr 2020 21:00:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=e2vRATPkfZcEZStflrjO9tk9GFn/bwFbCDlG4dLlMjKsV3Nd/8cLkVSt0I5e1orS1offezFIGHAS4xaUYxGYNfWVR5JBNiH3MeOSA8bf4prM12tWd1CtjTnt2gjn4UKjuCk+YzqqEExzuwp9r5JQHMAEtVoAK+oZz8wK0Lu5Kbyr15TZWU3+2kFRUtFHJa/s14g1FUiPJnhHhN8g8K3ei8u/2YTjkUboWNm8tLk5/X+1ciR0uzM7Ud6pZfPAsy88srsWWciRmPTouzYvYcVF7lUyRGYxuXB8wc6FZ/ifGO4YWB9E5tIxDNMEeoZdQLRRjl0H3eDT/xMXrcg8QtxVYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rghC2poQvs4dWrqS4/e614iorXOHjGoVEwTyAq7MGtw=;
+ b=mY27X9FPOQB7ZfG/XOqK+M9rUdG5Tv0i22nfmmwY60+bVHqcOtmLodoMcHyNSiY+io7ZhZNRA+i8zN6HE2e5iz1Kvw9ojIL+djmFdd1jYwEYsu11CEWQtVLisk7/HEmfPtUXoBfP5H8fNw6WO51h5CP6ul1QA++5r+M2F9seGa7L0vNcMl4Ffujj6bBRdch0NICyZyBTQQYdj3lOr4MjqDC1hHUbjYSuAVpLdGbpq3yeyj6Py0Fc/ynIVsIaQ5Iq6DQuAM6ofj3Z2pmIUPbELw68JJC1AnO7XR87xDp0AWJc2CzuSgnqGhswUzOr4zI8GqTkXtGtY66MEPjWhPQKmQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MN2PR02MB5742.namprd02.prod.outlook.com (2603:10b6:208:10d::27)
+ by MN2PR02MB7006.namprd02.prod.outlook.com (2603:10b6:208:203::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.29; Sun, 19 Apr
+ 2020 04:00:41 +0000
+Received: from MN2PR02MB5742.namprd02.prod.outlook.com
+ ([fe80::200c:b06c:d8c6:42a]) by MN2PR02MB5742.namprd02.prod.outlook.com
+ ([fe80::200c:b06c:d8c6:42a%7]) with mapi id 15.20.2921.027; Sun, 19 Apr 2020
+ 04:00:41 +0000
+From: Ani Sinha <ani.sinha@nutanix.com>
 To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Simran Singhal <singhalsimran0@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, 
- rkagan@virtuozzo.com, Yuval Shaia <yuval.shaia.ml@gmail.com>, 
- Stefan Hajnoczi <stefanha@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Authentication-Results: smtp57.i.mail.ru; auth=pass smtp.auth=jusual@mail.ru
- smtp.mailfrom=jusual@mail.ru
-X-7564579A: 78E4E2B564C1792B
-X-77F55803: 0A44E481635329DB0E1AA8A03B392317D32E5E48865217369133EF8E375211088EB211710A2F872DF688BCB05C26794DDACC537B7083D38DB5B1C2081BA68ADBBC90E9F57D15F35F44991F226FA649A4
-X-7FA49CB5: FF5795518A3D127A4AD6D5ED66289B5278DA827A17800CE7F65C230EDDCD559EEA1F7E6F0F101C67BD4B6F7A4D31EC0BCC500DACC3FED6E28638F802B75D45FF8AA50765F7900637560334CFC131571A8638F802B75D45FF5571747095F342E8C7A0BC55FA0FE5FC5652AC20C12CBE68FCF726063EA1334428C18608FBBA3BF1389733CBF5DBD5E913377AFFFEAFD269176DF2183F8FC7C06030C3405640F6718941B15DA834481FCF19DD082D7633A0E7DDDDC251EA7DABA471835C12D1D977725E5C173C3A84C390D92131081DE748117882F4460429728AD0CFFFB425014E40A5AABA2AD371193AA81AA40904B5D9A18204E546F3947CA2475C18617057EEBA3038C0950A5D36C8A9BA7A39EFB7668729DE7A884B61D1BA3038C0950A5D36D5E8D9A59859A8B634143DAF28A1E3E73AA81AA40904B5D99449624AB7ADAF3726B9191E2D567F0E725E5C173C3A84C3A1C30C8AFC676C8B35872C767BF85DA2F004C906525384306FED454B719173D6462275124DF8B9C9DF33B08B2BB81206574AF45C6390F7469DAA53EE0834AAEE
-X-D57D3AED: Y8kq8+OzVozcFQziTi/Zi1xwo7H2ZNxGP5qz8aO2mjTJzjHGC4ogvVuzB3zfVUBtENeZ6b5av1fnCBE34JUDkWdM6QxE+Ga5d8voMtmXfSrDH5DzFnuN67JdENjvzQK2
-X-Mailru-Sender: 4C235FE2E5D2D89006A073D5FD45C5B4F54DDE0A1ABD91FF6A15BCA84B42FB17976AF1CB91E6FA81342D7E53901C55FD6F53C80213D1719C4487B406A59785443329DBF425CF03A167EA787935ED9F1B
-X-Mras: Ok
-Received-SPF: pass client-ip=217.69.128.37; envelope-from=jusual@mail.ru;
- helo=smtp57.i.mail.ru
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 217.69.128.37
+Subject: Re: [PATCH] Add a new PIIX option to control PCI hot unplugging of
+ devices on non-root buses
+Thread-Topic: [PATCH] Add a new PIIX option to control PCI hot unplugging of
+ devices on non-root buses
+Thread-Index: AQHWFMrLeCs/JzKNrUaCDY3Nn1YJmqh9b9kAgAACaICAAAksAIAAB0KAgABZuwCAAFwZAIAAnSIAgAD+6oA=
+Date: Sun, 19 Apr 2020 04:00:41 +0000
+Message-ID: <A02464B1-9204-4116-B18A-BE9DA130EC77@nutanix.com>
+References: <1587136411-200885-1-git-send-email-ani.sinha@nutanix.com>
+ <20200417112620-mutt-send-email-mst@kernel.org>
+ <2A13ACCD-BD24-41FB-B6EA-2804F7C1FF1D@nutanix.com>
+ <20200417120732-mutt-send-email-mst@kernel.org>
+ <56B4E13C-DCAA-4E40-A821-6C043844A253@nutanix.com>
+ <0e15c8e7-7b32-985e-c182-2868273a1bd7@redhat.com>
+ <AFEDBC1F-8536-4354-9C5E-9829C258B6E3@nutanix.com>
+ <67ca69f6-8d6b-8be0-72f2-b30a67edf200@gmail.com>
+In-Reply-To: <67ca69f6-8d6b-8be0-72f2-b30a67edf200@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [115.96.105.18]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 20999ef2-15c6-483a-b477-08d7e4163a59
+x-ms-traffictypediagnostic: MN2PR02MB7006:
+x-microsoft-antispam-prvs: <MN2PR02MB7006089C97A82428F7448411F1D70@MN2PR02MB7006.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 0378F1E47A
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MN2PR02MB5742.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(39850400004)(346002)(396003)(376002)(136003)(366004)(6512007)(86362001)(36756003)(6486002)(91956017)(6916009)(4326008)(316002)(478600001)(186003)(54906003)(7416002)(966005)(8936002)(8676002)(81156014)(71200400001)(53546011)(6506007)(66476007)(66556008)(64756008)(26005)(76116006)(66946007)(33656002)(44832011)(5660300002)(66446008)(2616005)(2906002);
+ DIR:OUT; SFP:1102; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: vNLsf8kwVGyw7WuI/W2Y3nacvj5Y35D3/ZTYkZfy7c//z+f/145OxFDaXwkztTHt1vGAljgoyJjgJsblIcqyJaBmZ33/MLEmCvHGyGePV1qW70PlAzywYu++ae3bZyAE0wNQn6R7CvfEggT8tcZ24zqmNXFuH6p9qYmfCZ1vlUXN/pAFW8EUd3BMTfIz+gTdEzeSVGkZ+mO0Sa2o3qcrwggn/+zC1mz70A1sJLogl2/SGYp1UEjgB8oCPoTfQ4oxhwZzzeLHVZb35oLY7/GbRl9tmxManoFE0v3aysNABYcc4pNkJMDSnShgfmv4kibdeQane7vVi8kSFwycak6CtnRr/cgPd/ToAt9CKKZsTf7yDKYSR+djRnebHui7vaxfD/vUipYd2Wbcka1peFIFEAgXn3IlEkkKac9l9cVTjOdKrEKNUPCfQg/ycNp0R+/zJ4tiQkSCMp/x8lcYtd8RYLz+6z8mxAqUjuqBpF00OGNKV3Sa2KUldvoX7RwBqAfRRZNyOli6+yBkXpEKcRrqRg==
+x-ms-exchange-antispam-messagedata: ycV+pKs79CoYLSKIx47hFyRNx15WN+JElC4QlDHJod1eeQnNAMChXeSytepfzhltg75vYed6JFgpV8PLKGIsAX6m91CvO6RglzOFxLN0PdKMvpWM0r+2pKT6xIlKnor+CFMl3krJpXMIjyZM80vLHQ==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9EAC81F1240DE9479AE280C945F2BAAD@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 20999ef2-15c6-483a-b477-08d7e4163a59
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Apr 2020 04:00:41.2607 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: opC4aD6pJazbmH9MSmYHGUpI8TMe7d1ZjsjIck9pWdOlvfkGPs7D2xCckZ3/v933xQDgiuEpzBJ09yMJGDyjbg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB7006
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-18_10:2020-04-17,
+ 2020-04-18 signatures=0
+X-Proofpoint-Spam-Reason: safe
+Received-SPF: pass client-ip=148.163.155.12;
+ envelope-from=ani.sinha@nutanix.com; helo=mx0b-002c1b01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: Linux 3.x [generic]
+X-Received-From: 148.163.155.12
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,57 +145,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Ani Sinha <ani@anirban.org>,
+ Laine Stump <laine@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Apr 18, 2020 at 2:03 PM Marcel Apfelbaum
-<marcel.apfelbaum@gmail.com> wrote:
->
-> Hi Simran,
->
-> On 4/2/20 9:50 AM, Simran Singhal wrote:
-> > Replace manual lock()/unlock() calls with lock guard macros
-> > (QEMU_LOCK_GUARD/WITH_QEMU_LOCK_GUARD).
-> >
-> > Signed-off-by: Simran Singhal <singhalsimran0@gmail.com>
-> > ---
-> > Changes in v2:
-> >          -Drop changes in file hw/rdma/rdma_utils.c
-> >
-> >   hw/hyperv/hyperv.c     | 15 ++++++-------
-> >   hw/rdma/rdma_backend.c | 50 +++++++++++++++++++++---------------------
-> >   hw/rdma/rdma_rm.c      |  3 +--
-> >   3 files changed, 33 insertions(+), 35 deletions(-)
-> >
-> > diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
-> > index 8ca3706f5b..4ddafe1de1 100644
-> > --- a/hw/hyperv/hyperv.c
-> > +++ b/hw/hyperv/hyperv.c
-> > @@ -15,6 +15,7 @@
-> >   #include "sysemu/kvm.h"
-> >   #include "qemu/bitops.h"
-> >   #include "qemu/error-report.h"
-> > +#include "qemu/lockable.h"
-> >   #include "qemu/queue.h"
-> >   #include "qemu/rcu.h"
-> >   #include "qemu/rcu_queue.h"
-> > @@ -491,7 +492,7 @@ int hyperv_set_msg_handler(uint32_t conn_id, HvMsgHandler handler, void *data)
-> >       int ret;
-> >       MsgHandler *mh;
-> >
-> > -    qemu_mutex_lock(&handlers_mutex);
-> > +    QEMU_LOCK_GUARD(&handlers_mutex);
->
-> It does not passes compilation:
->      export ARCH=x86_64
->      make docker-image-fedora V=1 NETWORK=1
->      make docker-test-debug@fedora TARGET_LIST=x86_64-softmmu NETWORK=1
-
-This is a problem with the macros themselves, not with this patch.
-This is fixed (concat '##' problem and warnings) in
-  [PATCH v5 0/2] Replaced locks with lock guard macros
-and the patch should be based on it.
-
-Best regards, Julia Suvorova.
+DQoNCj4gT24gQXByIDE4LCAyMDIwLCBhdCA2OjE4IFBNLCBNYXJjZWwgQXBmZWxiYXVtIDxtYXJj
+ZWwuYXBmZWxiYXVtQGdtYWlsLmNvbT4gd3JvdGU6DQo+IA0KPiBIaSBBbmksDQo+IA0KPiBPbiA0
+LzE4LzIwIDY6MjUgQU0sIEFuaSBTaW5oYSB3cm90ZToNCj4+ICtKdWxpYSB3aG8gaW1wbGVtZW50
+ZWQgaHR0cHM6Ly91cmxkZWZlbnNlLnByb29mcG9pbnQuY29tL3YyL3VybD91PWh0dHBzLTNBX19w
+YXRjaHdvcmsua2VybmVsLm9yZ19wYXRjaF8xMTM4ODg4MV8mZD1Ed0lDYVEmYz1zODgzR3BVQ09D
+aEtPSGlvY1l0R2NnJnI9SUlVeEl5UndHNFJHeTU3eTJudk1OWWNEa3FXLU5Ib3paMlIzOFZZY2c1
+VSZtPWNwakhvUWV5bHRaZlJXYTdhNWFVdXhNXzUteDZfWVpaQ0diNFVpeGh2aUUmcz1iRWM4RnNU
+aHFJYTlXMXB6eWgzVnVPQ0lDd1RXd1ppa0VDRDE5TU9tdHRnJmU9IA0KPj4gDQo+Pj4gT24gQXBy
+IDE4LCAyMDIwLCBhdCAzOjI2IEFNLCBMYWluZSBTdHVtcCA8bGFpbmVAcmVkaGF0LmNvbT4gd3Jv
+dGU6DQo+Pj4gDQo+Pj4gT24gNC8xNy8yMCAxMjozNSBQTSwgQW5pIFNpbmhhIHdyb3RlOg0KPj4+
+PiArTGFpbmUNCj4+Pj4+IE9uIEFwciAxNywgMjAyMCwgYXQgOTozOSBQTSwgTWljaGFlbCBTLiBU
+c2lya2luIDxtc3RAcmVkaGF0LmNvbT4gd3JvdGU6DQo+Pj4+PiANCj4+Pj4+IFByb2JsZW0gaXMs
+IEkgdGhpbmsgdGhpcyBpcyBub3Qgc29tZXRoaW5nIHdlIGNhbiBzdXBwb3J0IHdpdGggcGNpZSBv
+ciBzaHBjLg0KPj4+Pj4gSSdtIHJlbHVjdGFudCB0byBhZGQgZmVhdHVyZXMgdGhhdCBvbmx5IEFD
+UEkgY2FuIHN1cHBvcnQsDQo+Pj4+PiB3ZSBhcmUgdHJ5aW5nIHRvIHBoYXNlIHRoYXQgb3V0Lg0K
+Pj4+PiBIbW0uIEkgc2VlLiBXZSB1c2UgY29udmVudGlvbmFsIFBDSSBhbmQgaGVuY2Ugd2FzIGxv
+b2tpbmcgZm9yIHByb3ZpZGluZyB0aGlzIGZlYXR1cmUgZm9yIGNvbnZlbnRpb25hbCBQQ0kgb25s
+eS4gTGFpbmUgbWlnaHQgYmUgYWJsZSB0byB0aHJvdyBzb21lIGxpZ2h0cyBhcyB0byBmZWFzaWJp
+bGl0eSBvZiB0aGUgaW4gUENJRSB3b3JsZC4NCj4+PiBTb3JyeSwgbXkga25vd2xlZGdlIGRvZXNu
+J3QgZ28gdGhhdCBsb3cuIElmIHRoZXJlJ3MgYSBxZW11IG9wdGlvbiBJIGNhbiBleHBvc2UgaXQg
+aW4gbGlidmlydCwgYnV0IGFtIGJ5IG5vIG1lYW5zIGFuIGV4cGVydCBvZiBxZW11IGludGVybmFs
+cyBvciB0aGUgcGNpL3BjaWUgc3BlY3MgOi0pDQo+Pj4gDQo+Pj4gKEJUVywgSSB0aGluayBpbiB0
+aGUgcGFzdCBwZW9wbGUgaGF2ZSBwcmV2ZW50ZWQgZW5hYmxpbmcgaG90LXVucGx1ZyBieSB1bnBy
+aXZpbGVnZWQgdXNlcnMgaW4gV2luZG93cyB3aXRoIHNvbWUgc29ydCBvZiBhICJzeXN0ZW0gcG9s
+aWN5IiBpbiBXaW5kb3dzLiAod2hhdGV2ZXIgdGhhdCBpcyAtIEkgZG9uJ3QgdXNlIFdpbmRvd3Ms
+IGFuZCBoYXZlIGp1c3QgaGVhcmQgdGhpcyBmcm9tIG90aGVycyB3aGVuIGRpc2N1c3NpbmcgdGhl
+IHByb2JsZW0pLg0KPj4+IA0KPiANCj4gQSBQQ0llIFJvb3QgUG9ydCBvciBhIFBDSSBzbG90IGNh
+biBvciBjYW5ub3Qgc3VwcG9ydCBob3QtcGx1Z2dpbmcuIEFueXRoaW5nIGluIHRoZSBtaWRkbGUg
+Y2FuJ3QgYmUgZG9uZSBhdCBQQ0llL1BDSSBsZXZlbCAoYXMgZmFyIGFzIEkga25vdykuDQo+IEkg
+dGhpbmsgdGhlIGFuc3dlciBjYW4gYmUgYXQgdGhlIG1vZGVsbGluZyBsZXZlbC4gVXNlIG5vbiBo
+b3QtcGx1Z2dhYmxlIHNsb3RzIChvciBQQ0llIFJvb3QgUG9ydHMgd2l0aG91dCBob3QtcGx1ZyBz
+dXBwb3J0KSBmb3IgdGhlIGRldmljZXMNCj4geW91IGRvbid0IHdhbnQgaG90LXVucGx1Z2dlZCwg
+bGVhdmUgYW4gZW1wdHkgUENJIEJyaWRnZSAob3Igc29tZSBQQ0llIFJvb3QgUG9ydHMgd2l0aCBo
+b3QtcGx1ZyBzdXBwb3J0KSB0byBiZSBhYmxlIHRvIGhvdC1wbHVnIGRldmljZXMuDQoNClllcywg
+dGhpcyBpcyBleGFjdGx5IHRoZSBtb2RlbGluZyBJIHdhcyBnb2luZyB3aXRoIHRvIHByZXZlbnQg
+dXNlcnMgZnJvbSB3aXRoaW4gV2luZG93cyBndWVzdHMgdG8gaG90LXVucGx1ZyBhIGRldmljZS4g
+VGhlbiBJIHJlYWxpemVkIHRoYXQgaWYgd2UgcGx1ZyBpbiBhIGRldmljZSBpbnRvIGEgc2xvdCB3
+aGVyZSBob3QgcGx1Z2dpbmcgaXMgZGlzYWJsZWQgd2l0aCBhbiBpbnRlbnRpb24gdG8gZGlzYWJs
+ZSBob3QgdW5wbHVnZ2luZywgd2UgY2Fu4oCZdCBldmVuIGhvdCBwbHVnIGEgZGV2aWNlIGludG8g
+dGhhdCBzbG90LiBXaGVuIHdlIHBsdWcgaW4gYSBkZXZpY2UgaW50byBhIHNsb3Qgd2hlcmUgaG90
+IHBsdWdnaW5nIGlzIGVuYWJsZWQsIGJvdGggcGx1Z2dpbmcgaW4gYW5kIHVucGx1Z2dpbmcgaXMg
+cG9zc2libGUuIEluIG90aGVyIHdvcmRzLCB0aGUgYmVoYXZpb3IgaXMgc3ltbWV0cmljIGluIHRl
+cm1zIG9mIGJvdGggcGx1Z2dpbmcgYW5kIHVucGx1Z2dpbmcuIEhlbmNlIGZvciBjb252ZW50aW9u
+YWwgUENJIEkgY29va2VkIHVwIHRoaXMgcGF0Y2ggd2hlcmUgSSBkaXNhYmxlIOKAnF9FSjDigJ0g
+QUNQSSBmdW5jdGlvbnMgZnJvbSBwY2ktcGNpIGJyaWRnZSB0byBvcmRlciB0byBlbmFibGUgaG90
+IHBsdWdnaW5nIGJ1dCBwcmV2ZW50IGhvdCB1bnBsdWdnaW5nIGludG8gdGhlIHNsb3RzIG9mIHRo
+YXQgYnJpZGdlLiBJIHRlc3RlZCB0aGlzIG9uIFdpbmRvd3MgZ3Vlc3RzIGFuZCBpdCBzZWVtcyB0
+byB3b3JrLiBTbyBteSBuZXh0IHF1ZXN0aW9uIGlzLCBmb3IgUENJRSwgaXMgdGhlcmUgc29tZXRo
+aW5nIGVxdWl2YWxlbnQgdGhhdCBjYW4gYmUgZG9uZT8gTXkga25vd2xlZGdlIGlzIGxpbWl0ZWQg
+aW4gdGhhdCBzcGFjZS4NCg0KdGhhbmtzDQphbmkNCg0K
 
