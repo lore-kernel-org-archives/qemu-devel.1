@@ -2,65 +2,88 @@ Return-Path: <SRS0=RqUc=6D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FED5C38A30
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Apr 2020 16:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A35C38A30
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Apr 2020 16:28:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBEFC206A2
-	for <qemu-devel@archiver.kernel.org>; Sun, 19 Apr 2020 16:27:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13D5C206D9
+	for <qemu-devel@archiver.kernel.org>; Sun, 19 Apr 2020 16:28:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="Tir/AJZe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBEFC206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g65OAbpp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13D5C206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQCmx-0006XQ-1z
-	for qemu-devel@archiver.kernel.org; Sun, 19 Apr 2020 12:27:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42128 helo=eggs1p.gnu.org)
+	id 1jQCoM-0008Kl-9C
+	for qemu-devel@archiver.kernel.org; Sun, 19 Apr 2020 12:28:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42292 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fdb0e29a86d1df6005021a08078d7e69ed0de1a2@lizzy.crudebyte.com>)
- id 1jQCmK-0005mA-1w
- for qemu-devel@nongnu.org; Sun, 19 Apr 2020 12:26:44 -0400
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jQCn9-0006vQ-GH
+ for qemu-devel@nongnu.org; Sun, 19 Apr 2020 12:27:35 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <fdb0e29a86d1df6005021a08078d7e69ed0de1a2@lizzy.crudebyte.com>)
- id 1jQCmJ-00063z-Ax
- for qemu-devel@nongnu.org; Sun, 19 Apr 2020 12:26:43 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:41361)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <fdb0e29a86d1df6005021a08078d7e69ed0de1a2@lizzy.crudebyte.com>)
- id 1jQCmI-0004j9-RE
- for qemu-devel@nongnu.org; Sun, 19 Apr 2020 12:26:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
- Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=Exi2eVU0aC9WtbkX7/D0N5Fl28ExllAxepKnldAijZ4=; b=Tir/A
- JZeE15PgLCj9TJ9cnqGNbRPqWNEfyzo5o0uidD98GZ9XjSiEP5eUOfX44gG+4byZVQOD2C+pG0Lg8
- d+gN4MyPKhH9C9/CNn2J9rnfRFtKGWUTX3U7OWCRclXP3Lyc7/2F44pcHO2VCBCiHQJNTW9pFNMPq
- SagxeWPFJrsJY7AzLktP5/i5oiWelfmJyMYJjfYp6tbHdZrCOQYNuHDW/ySKnsHwGs6u3Z6LDguuo
- srGNPmqn3Hl5fQGNi/pgGCw8im2Nt8P2gATRLN+J6wtrOJLYOMS5fIajCuk4ZDzX4HdA9/DKseevj
- W+MrY5syL4L3Soq9i/iuiTn77fxvw==;
-Message-Id: <fdb0e29a86d1df6005021a08078d7e69ed0de1a2.1587309014.git.qemu_oss@crudebyte.com>
-In-Reply-To: <cover.1587309014.git.qemu_oss@crudebyte.com>
-References: <cover.1587309014.git.qemu_oss@crudebyte.com>
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Sun, 19 Apr 2020 17:02:27 +0200
-Subject: [PATCH v6 3/5] 9pfs: add new function v9fs_co_readdir_many()
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jQCn9-0006mw-5V
+ for qemu-devel@nongnu.org; Sun, 19 Apr 2020 12:27:35 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:44652)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jQCn8-0006jH-PA; Sun, 19 Apr 2020 12:27:34 -0400
+Received: by mail-lf1-x141.google.com with SMTP id 131so5833339lfh.11;
+ Sun, 19 Apr 2020 09:27:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=amT1mUeA8CgJ+fNQXmKD+MyQ372jkNh8S+OnBAOdBHA=;
+ b=g65OAbpp5q6AX75HMC7olMHDiTTdW+R5IYHA2hOfUnv1Cma7UxINjtEVgmkgPAJkQj
+ Qqf0bQ55xIw5Np/oSdeo4orsPOq94VoKWxEiW3g1lctklnthIpFeq6hCOykeEbTAdNzX
+ BB8aGVZqDg3+bHpEhpuXSw5HGV2QPiTYw2BssmMbejFhf1jwtMJ5X3ALlWgEs8fKNm6a
+ NpUAjkGQ3lctxxpodlL8Q5oOirGZmZeqsKn5kp4SjCZSCyABlSYR4+Egc1RJSFXpbmO1
+ dRYSG2UkuQKwRwwXteIclv+ygDmvqPTOWEO33eHg9KjAK+yeKKz/rHMsWuUV51YdUqcJ
+ I91g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=amT1mUeA8CgJ+fNQXmKD+MyQ372jkNh8S+OnBAOdBHA=;
+ b=VPuImf0qqVkbBKQJBE3HNVPc4302yU9ln/aqEFKdWOkl+WFg/XvD0lZHrPQ/C+w5b+
+ tM2DgW9nQCnzzAPUOcajbUnTS5zd9Vhyn4WjPmx0kDsh2uMoUolRojUVz8OVhL+Gzd8k
+ LypGUJuMzUo6x8UNBogaJ52w8v0SaOutb80LG9V8DpmMnmGqCsVP3T/5D4IY8TfaC9XI
+ Um0fS7/nlaZNhThfj08kPR2bUl0XPKm9nGN+rAuiIpB1CB7Qj1UdupFuxwkTI69w1V1J
+ Fk3qnXpr/gVvCDgAYr0hYh5/llW1AhFgtXSslOMzu57Tiwn187+pD7amZxXKMMJ7Q8ZM
+ swSQ==
+X-Gm-Message-State: AGi0PuZgqd4vVZG2h83N3+Iv6qk6olRpId/9jxFCzj9cEaz58X3gGvVD
+ Ixq37IaZAtSl/kxB4DqxERYdPJKz2mY=
+X-Google-Smtp-Source: APiQypJN9NvhxTRvnVyxXEQVkZ024cG5jxyTzGznspLDCa/YYKRfORIGMigm1gOQHF+fMKVjlsTXOg==
+X-Received: by 2002:a19:4a03:: with SMTP id x3mr7836383lfa.159.1587313652464; 
+ Sun, 19 Apr 2020 09:27:32 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id v7sm4670854lfq.55.2020.04.19.09.27.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 19 Apr 2020 09:27:31 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
-Received-SPF: none client-ip=91.194.90.13;
- envelope-from=fdb0e29a86d1df6005021a08078d7e69ed0de1a2@lizzy.crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs1p.gnu.org: Linux 3.11 and newer
-X-Received-From: 91.194.90.13
+Subject: [PATCH v1 3/3] hw/arm: xlnx-zcu102: Disable unsupported FDT firmware
+ nodes
+Date: Sun, 19 Apr 2020 18:27:27 +0200
+Message-Id: <20200419162727.19148-4-edgar.iglesias@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200419162727.19148-1-edgar.iglesias@gmail.com>
+References: <20200419162727.19148-1-edgar.iglesias@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x141.google.com
+X-detected-operating-system: by eggs1p.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::141
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,281 +95,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
+ frasse.iglesias@gmail.com, alistair@alistair23.me,
+ richard.henderson@linaro.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
+ philmd@redhat.com, luc.michel@greensocs.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The newly added function v9fs_co_readdir_many() retrieves multiple
-directory entries with a single fs driver request. It is intended to
-replace uses of v9fs_co_readdir(), the latter only retrives a single
-directory entry per fs driver request instead.
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-The reason for this planned replacement is that for every fs driver
-request the coroutine is dispatched from main I/O thread to a
-background I/O thread and eventually dispatched back to main I/O
-thread. Hopping between threads adds latency. So if a 9pfs Treaddir
-request reads a large amount of directory entries, this currently
-sums up to huge latencies of several hundred ms or even more. So
-using v9fs_co_readdir_many() instead of v9fs_co_readdir() will
-provide significant performance improvements.
+Disable unsupported FDT firmware nodes if a user passes us
+a DTB with nodes enabled that the machine cannot support
+due to lack of EL3 or EL2 support.
 
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/9pfs/9p.h    |  22 ++++++
- hw/9pfs/codir.c | 181 +++++++++++++++++++++++++++++++++++++++++++++---
- hw/9pfs/coth.h  |   3 +
- 3 files changed, 195 insertions(+), 11 deletions(-)
+ hw/arm/xlnx-zcu102.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-index 9553700dbb..116977939b 100644
---- a/hw/9pfs/9p.h
-+++ b/hw/9pfs/9p.h
-@@ -215,6 +215,28 @@ static inline void v9fs_readdir_init(V9fsDir *dir)
-     qemu_mutex_init(&dir->readdir_mutex);
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index 4eb117c755..3332630380 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -23,6 +23,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/log.h"
+ #include "sysemu/qtest.h"
++#include "sysemu/device_tree.h"
+ 
+ typedef struct XlnxZCU102 {
+     MachineState parent_obj;
+@@ -68,6 +69,35 @@ static void zcu102_set_virt(Object *obj, bool value, Error **errp)
+     s->virt = value;
  }
  
-+/**
-+ * Type for 9p fs drivers' (a.k.a. 9p backends) result of readdir requests,
-+ * which is a chained list of directory entries.
-+ */
-+typedef struct V9fsDirEnt {
-+    /* mandatory (must not be NULL) information for all readdir requests */
-+    struct dirent *dent;
-+    /*
-+     * optional (may be NULL): A full stat of each directory entry is just
-+     * done if explicitly told to fs driver.
-+     */
-+    struct stat *st;
-+    /*
-+     * instead of an array, directory entries are always returned as
-+     * chained list, that's because the amount of entries retrieved by fs
-+     * drivers is dependent on the individual entries' name (since response
-+     * messages are size limited), so the final amount cannot be estimated
-+     * before hand
-+     */
-+    struct V9fsDirEnt *next;
-+} V9fsDirEnt;
-+
- /*
-  * Filled by fs driver on open and other
-  * calls.
-diff --git a/hw/9pfs/codir.c b/hw/9pfs/codir.c
-index 73f9a751e1..45c65a8f5b 100644
---- a/hw/9pfs/codir.c
-+++ b/hw/9pfs/codir.c
-@@ -18,28 +18,187 @@
- #include "qemu/main-loop.h"
- #include "coth.h"
- 
-+/*
-+ * This is solely executed on a background IO thread.
-+ */
-+static int do_readdir(V9fsPDU *pdu, V9fsFidState *fidp, struct dirent **dent)
++static void zcu102_modify_dtb(const struct arm_boot_info *binfo, void *fdt)
 +{
-+    int err = 0;
-+    V9fsState *s = pdu->s;
-+    struct dirent *entry;
++    XlnxZCU102 *s = container_of(binfo, XlnxZCU102, binfo);
++    bool method_is_hvc;
++    char **node_path;
++    const char *r;
++    int prop_len;
++    int i;
 +
-+    errno = 0;
-+    entry = s->ops->readdir(&s->ctx, &fidp->fs);
-+    if (!entry && errno) {
-+        *dent = NULL;
-+        err = -errno;
-+    } else {
-+        *dent = entry;
-+    }
-+    return err;
-+}
++    /* If EL3 is enabled, we keep all firmware nodes active.  */
++    if (!s->secure) {
++        node_path = qemu_fdt_node_path(fdt, NULL,
++                                       (char *)"xlnx,zynqmp-firmware",
++                                       &error_fatal);
 +
-+/*
-+ * TODO: This will be removed for performance reasons.
-+ * Use v9fs_co_readdir_many() instead.
-+ */
- int coroutine_fn v9fs_co_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
-                                  struct dirent **dent)
- {
-     int err;
--    V9fsState *s = pdu->s;
- 
-     if (v9fs_request_cancelled(pdu)) {
-         return -EINTR;
-     }
--    v9fs_co_run_in_worker(
--        {
--            struct dirent *entry;
-+    v9fs_co_run_in_worker({
-+        err = do_readdir(pdu, fidp, dent);
-+    });
-+    return err;
-+}
++        for (i = 0; node_path && node_path[i]; i++) {
++            r = qemu_fdt_getprop(fdt, node_path[i], "method", &prop_len, NULL);
++            method_is_hvc = r && !strcmp("hvc", r);
 +
-+/*
-+ * This is solely executed on a background IO thread.
-+ *
-+ * See v9fs_co_readdir_many() (as its only user) below for details.
-+ */
-+static int do_readdir_many(V9fsPDU *pdu, V9fsFidState *fidp,
-+                             struct V9fsDirEnt **entries,
-+                             int32_t maxsize, bool dostat)
-+{
-+    V9fsState *s = pdu->s;
-+    V9fsString name;
-+    int len, err = 0;
-+    int32_t size = 0;
-+    off_t saved_dir_pos;
-+    struct dirent *dent;
-+    struct V9fsDirEnt *e = NULL;
-+    V9fsPath path;
-+    struct stat stbuf;
- 
--            errno = 0;
--            entry = s->ops->readdir(&s->ctx, &fidp->fs);
--            if (!entry && errno) {
-+    *entries = NULL;
-+    v9fs_path_init(&path);
-+
-+    /*
-+     * TODO: Here should be a warn_report_once() if lock failed.
-+     *
-+     * With a good 9p client we should not get into concurrency here,
-+     * because a good client would not use the same fid for concurrent
-+     * requests. We do the lock here for safety reasons though. However
-+     * the client would then suffer performance issues, so better log that
-+     * issue here.
-+     */
-+    v9fs_readdir_lock(&fidp->fs.dir);
-+
-+    /* save the directory position */
-+    saved_dir_pos = s->ops->telldir(&s->ctx, &fidp->fs);
-+    if (saved_dir_pos < 0) {
-+        err = saved_dir_pos;
-+        goto out;
-+    }
-+
-+    while (true) {
-+        /* get directory entry from fs driver */
-+        err = do_readdir(pdu, fidp, &dent);
-+        if (err || !dent) {
-+            break;
-+        }
-+
-+        /*
-+         * stop this loop as soon as it would exceed the allowed maximum
-+         * response message size for the directory entries collected so far,
-+         * because anything beyond that size would need to be discarded by
-+         * 9p controller (main thread / top half) anyway
-+         */
-+        v9fs_string_init(&name);
-+        v9fs_string_sprintf(&name, "%s", dent->d_name);
-+        len = v9fs_readdir_response_size(&name);
-+        v9fs_string_free(&name);
-+        if (size + len > maxsize) {
-+            /* this is not an error case actually */
-+            break;
-+        }
-+
-+        /* append next node to result chain */
-+        if (!e) {
-+            *entries = e = g_malloc0(sizeof(V9fsDirEnt));
-+        } else {
-+            e = e->next = g_malloc0(sizeof(V9fsDirEnt));
-+        }
-+        e->dent = g_malloc0(sizeof(struct dirent));
-+        memcpy(e->dent, dent, sizeof(struct dirent));
-+
-+        /* perform a full stat() for directory entry if requested by caller */
-+        if (dostat) {
-+            err = s->ops->name_to_path(
-+                &s->ctx, &fidp->path, dent->d_name, &path
-+            );
-+            if (err < 0) {
-                 err = -errno;
--            } else {
--                *dent = entry;
--                err = 0;
-+                break;
-             }
--        });
-+
-+            err = s->ops->lstat(&s->ctx, &path, &stbuf);
-+            if (err < 0) {
-+                err = -errno;
-+                break;
++            /* Allow HVC based firmware if EL2 is enabled.  */
++            if (method_is_hvc && s->virt) {
++                continue;
 +            }
-+
-+            e->st = g_malloc0(sizeof(struct stat));
-+            memcpy(e->st, &stbuf, sizeof(struct stat));
++            qemu_fdt_setprop_string(fdt, node_path[i], "status", "disabled");
 +        }
-+
-+        size += len;
-+        saved_dir_pos = dent->d_off;
++        g_strfreev(node_path);
 +    }
-+
-+    /* restore (last) saved position */
-+    s->ops->seekdir(&s->ctx, &fidp->fs, saved_dir_pos);
-+
-+out:
-+    v9fs_readdir_unlock(&fidp->fs.dir);
-+    v9fs_path_free(&path);
-+    if (err < 0) {
-+        return err;
-+    }
-+    return size;
 +}
 +
-+/**
-+ * @brief Reads multiple directory entries in one rush.
-+ *
-+ * Retrieves the requested (max. amount of) directory entries from the fs
-+ * driver. This function must only be called by the main IO thread (top half).
-+ * Internally this function call will be dispatched to a background IO thread
-+ * (bottom half) where it is eventually executed by the fs driver.
-+ *
-+ * Acquiring multiple directory entries in one rush from the fs driver,
-+ * instead of retrieving each directory entry individually, is very beneficial
-+ * from performance point of view. Because for every fs driver request latency
-+ * is added, which in practice could lead to overall latencies of several
-+ * hundred ms for reading all entries (of just a single directory) if every
-+ * directory entry was individually requested from driver.
-+ *
-+ * @param pdu - the causing 9p (T_readdir) client request
-+ * @param fidp - already opened directory where readdir shall be performed on
-+ * @param entries - output for directory entries (must not be NULL)
-+ * @param maxsize - maximum result message body size (in bytes)
-+ * @param dostat - whether a stat() should be performed and returned for
-+ *                 each directory entry
-+ * @returns resulting response message body size (in bytes) on success,
-+ *          negative error code otherwise
-+ */
-+int coroutine_fn v9fs_co_readdir_many(V9fsPDU *pdu, V9fsFidState *fidp,
-+                                      struct V9fsDirEnt **entries,
-+                                      int32_t maxsize, bool dostat)
-+{
-+    int err = 0;
-+
-+    if (v9fs_request_cancelled(pdu)) {
-+        return -EINTR;
-+    }
-+    v9fs_co_run_in_worker({
-+        err = do_readdir_many(pdu, fidp, entries, maxsize, dostat);
-+    });
-     return err;
+ static void xlnx_zcu102_init(MachineState *machine)
+ {
+     XlnxZCU102 *s = ZCU102_MACHINE(machine);
+@@ -169,6 +199,7 @@ static void xlnx_zcu102_init(MachineState *machine)
+ 
+     s->binfo.ram_size = ram_size;
+     s->binfo.loader_start = 0;
++    s->binfo.modify_dtb = zcu102_modify_dtb;
+     arm_load_kernel(s->soc.boot_cpu_ptr, machine, &s->binfo);
  }
  
-diff --git a/hw/9pfs/coth.h b/hw/9pfs/coth.h
-index c2cdc7a9ea..a6851822d5 100644
---- a/hw/9pfs/coth.h
-+++ b/hw/9pfs/coth.h
-@@ -49,6 +49,9 @@
- void co_run_in_worker_bh(void *);
- int coroutine_fn v9fs_co_readlink(V9fsPDU *, V9fsPath *, V9fsString *);
- int coroutine_fn v9fs_co_readdir(V9fsPDU *, V9fsFidState *, struct dirent **);
-+int coroutine_fn v9fs_co_readdir_many(V9fsPDU *, V9fsFidState *,
-+                                      struct V9fsDirEnt **,
-+                                      int32_t, bool);
- off_t coroutine_fn v9fs_co_telldir(V9fsPDU *, V9fsFidState *);
- void coroutine_fn v9fs_co_seekdir(V9fsPDU *, V9fsFidState *, off_t);
- void coroutine_fn v9fs_co_rewinddir(V9fsPDU *, V9fsFidState *);
 -- 
 2.20.1
 
