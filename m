@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9456C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 18:42:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC1FBC3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 18:42:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C22392074F
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 18:42:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C22392074F
+	by mail.kernel.org (Postfix) with ESMTPS id A26FC2074F
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 18:42:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A26FC2074F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQbNH-0007px-TJ
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 14:42:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44882 helo=eggs1p.gnu.org)
+	id 1jQbNe-0008Gd-Sj
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 14:42:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44900 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1jQbI7-00018I-0q
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:37:15 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1jQbI9-0001Dj-09
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:37:13 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1jQbI4-0004A0-TD
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:37:10 -0400
-Received: from relay.sw.ru ([185.231.240.75]:39792)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1jQbI3-00046L-JD
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:37:12 -0400
+Received: from relay.sw.ru ([185.231.240.75]:39798)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jQbHr-0003NG-Tl; Mon, 20 Apr 2020 14:36:55 -0400
+ id 1jQbHr-0003NH-Vk; Mon, 20 Apr 2020 14:36:56 -0400
 Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jQbHj-0001xO-LB; Mon, 20 Apr 2020 21:36:47 +0300
+ id 1jQbHj-0001xO-3b; Mon, 20 Apr 2020 21:36:47 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 5/7] qapi: add filter-node-name to block-stream
-Date: Mon, 20 Apr 2020 21:36:44 +0300
-Message-Id: <1587407806-109784-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH 2/7] stream: exclude a link to filter from freezing
+Date: Mon, 20 Apr 2020 21:36:41 +0300
+Message-Id: <1587407806-109784-3-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1587407806-109784-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1587407806-109784-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -68,138 +68,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Provide the possibility to pass the 'filter-node-name' parameter to the
-block-stream job as it is done for the commit block job.
+A node above the base can be the filter of the concurrent job. In that
+case, the filter cannot be removed being a part of the frozen chain.
+Exclude the link to filter node from freezing and provide the safety
+check for a concurrent job.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/stream.c            | 5 +++--
- blockdev.c                | 8 +++++++-
- include/block/block_int.h | 7 ++++++-
- monitor/hmp-cmds.c        | 4 ++--
- qapi/block-core.json      | 6 ++++++
- 5 files changed, 24 insertions(+), 6 deletions(-)
+ block/stream.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/block/stream.c b/block/stream.c
-index d8b4bbe..fab7923 100644
+index bd4a351..d8b4bbe 100644
 --- a/block/stream.c
 +++ b/block/stream.c
-@@ -229,7 +229,9 @@ static const BlockJobDriver stream_job_driver = {
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
-                   int creation_flags, int64_t speed,
--                  BlockdevOnError on_error, Error **errp)
-+                  BlockdevOnError on_error,
-+                  const char *filter_node_name,
-+                  Error **errp)
- {
-     StreamBlockJob *s;
-     BlockDriverState *iter;
-@@ -265,7 +267,6 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     } else {
-         bdrv_unfreeze_chain(bottom_cow_node, above_base);
+@@ -244,7 +244,7 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+          above_base = bdrv_filtered_bs(above_base))
+     {}
+ 
+-    if (bdrv_freeze_chain(bs, above_base, errp) < 0) {
++    if (bdrv_freeze_chain(bs, bottom_cow_node, errp) < 0) {
+         return;
      }
--
+ 
+@@ -257,6 +257,15 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+         }
+     }
+ 
++    /*
++     * Check for an overlapping block-commit job that is not allowed.
++     */
++    if (bdrv_freeze_chain(bottom_cow_node, above_base, errp) < 0) {
++        goto fail;
++    } else {
++        bdrv_unfreeze_chain(bottom_cow_node, above_base);
++    }
++
      /* Prevent concurrent jobs trying to modify the graph structure here, we
       * already have our own plans. Also don't allow resize as the image size is
       * queried only at the job start and then cached. */
-diff --git a/blockdev.c b/blockdev.c
-index 72d28ce..f275a64 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3242,6 +3242,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-                       bool has_backing_file, const char *backing_file,
-                       bool has_speed, int64_t speed,
-                       bool has_on_error, BlockdevOnError on_error,
-+                      bool has_filter_node_name, const char *filter_node_name,
-                       bool has_auto_finalize, bool auto_finalize,
-                       bool has_auto_dismiss, bool auto_dismiss,
-                       Error **errp)
-@@ -3257,6 +3258,10 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-         on_error = BLOCKDEV_ON_ERROR_REPORT;
+@@ -276,7 +285,8 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+      * bdrv_reopen_set_read_only() due to parallel block jobs running.
+      */
+     base = bdrv_filtered_bs(above_base);
+-    for (iter = bdrv_filtered_bs(bs); iter && iter != base;
++    for (iter = bdrv_filtered_bs(bs);
++         iter && iter != base && iter->drv && !iter->drv->is_filter;
+          iter = bdrv_filtered_bs(iter))
+     {
+         block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
+@@ -298,5 +308,5 @@ fail:
+     if (bs_read_only) {
+         bdrv_reopen_set_read_only(bs, true, NULL);
      }
- 
-+    if (!has_filter_node_name) {
-+        filter_node_name = NULL;
-+    }
-+
-     bs = bdrv_lookup_bs(device, device, errp);
-     if (!bs) {
-         return;
-@@ -3324,7 +3329,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-     }
- 
-     stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
--                 job_flags, has_speed ? speed : 0, on_error, &local_err);
-+                 job_flags, has_speed ? speed : 0, on_error,
-+                 filter_node_name, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto out;
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 993bafc..5ac4891 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1052,6 +1052,9 @@ int is_windows_drive(const char *filename);
-  *                  See @BlockJobCreateFlags
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-  * @on_error: The action to take upon error.
-+ * @filter_node_name: The node name that should be assigned to the filter
-+ * driver that the commit job inserts into the graph above @bs. NULL means
-+ * that a node name should be autogenerated.
-  * @errp: Error object.
-  *
-  * Start a streaming operation on @bs.  Clusters that are unallocated
-@@ -1064,7 +1067,9 @@ int is_windows_drive(const char *filename);
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
-                   int creation_flags, int64_t speed,
--                  BlockdevOnError on_error, Error **errp);
-+                  BlockdevOnError on_error,
-+                  const char *filter_node_name,
-+                  Error **errp);
- 
- /**
-  * commit_start:
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 5ca3ebe..0432ac9 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -2044,8 +2044,8 @@ void hmp_block_stream(Monitor *mon, const QDict *qdict)
- 
-     qmp_block_stream(true, device, device, base != NULL, base, false, NULL,
-                      false, NULL, qdict_haskey(qdict, "speed"), speed, true,
--                     BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
--                     &error);
-+                     BLOCKDEV_ON_ERROR_REPORT, false, NULL, false, false,
-+                     false, false, &error);
- 
-     hmp_handle_error(mon, &error);
+-    bdrv_unfreeze_chain(bs, above_base);
++    bdrv_unfreeze_chain(bs, bottom_cow_node);
  }
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 3c54717..169f8ea 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2552,6 +2552,11 @@
- #            'stop' and 'enospc' can only be used if the block device
- #            supports io-status (see BlockInfo).  Since 1.3.
- #
-+# @filter-node-name: the node name that should be assigned to the
-+#                    filter driver that the stream job inserts into the graph
-+#                    above @device. If this option is not given, a node name is
-+#                    autogenerated. (Since: 5.0)
-+#
- # @auto-finalize: When false, this job will wait in a PENDING state after it has
- #                 finished its work, waiting for @block-job-finalize before
- #                 making any block graph changes.
-@@ -2581,6 +2586,7 @@
-   'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
-             '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
-             '*on-error': 'BlockdevOnError',
-+            '*filter-node-name': 'str',
-             '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
- 
- ##
 -- 
 1.8.3.1
 
