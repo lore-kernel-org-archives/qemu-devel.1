@@ -8,68 +8,68 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B54EFC3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2DE3C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:16:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CAFE2078E
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:16:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80D1E2078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:16:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nJGO3FWc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CAFE2078E
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MmCjtK46"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80D1E2078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQSXI-0002Iz-Mr
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 05:16:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36512 helo=eggs1p.gnu.org)
+	id 1jQSXx-0003C2-MP
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 05:16:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36936 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <igotti@gmail.com>) id 1jQSVr-00012k-Aa
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:14:47 -0400
+ (envelope-from <igotti@gmail.com>) id 1jQSWy-00026c-Rt
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:15:57 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <igotti@gmail.com>) id 1jQSVm-0001io-Fz
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:14:47 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:39848)
+ (envelope-from <igotti@gmail.com>) id 1jQSWx-000335-71
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:15:56 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:34217)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <igotti@gmail.com>) id 1jQSVm-0001gp-3X
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:14:42 -0400
-Received: by mail-lj1-x242.google.com with SMTP id u6so9087552ljl.6
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 02:14:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <igotti@gmail.com>) id 1jQSWw-00030f-OM
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:15:54 -0400
+Received: by mail-lj1-x242.google.com with SMTP id m8so9103460lji.1
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 02:15:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:from:date:message-id:subject:to:cc;
- bh=M23dGuolte4OKFci/2F1ujcn3PNLR40b6HiOobswFkI=;
- b=nJGO3FWcs56mEJbqpJKlVdgbSpNHSXG+GpL+FaFgo7Ic/eKKp9Ex2yV/CWU+EdZAlA
- OVLYIvOR3VDIU5udRTCr5edtnYkjWNVsb+9v9kiYiQGGKFtedaQCrELBMEMZgxZmU0kZ
- f5s//4xy97bB0AZo+XNMs7julDtLauCXbU5D7ITHTfSJlh1CJc/VsZUlnyIYSZbLxFcN
- Z/fPOVjv/EmX8Y5/TNXpV1h18Blzj7fmJREY8erE0woUbUPvpvKSRCD49HBs6Ljq5rrw
- /iWzOR6P0S6OyJd9b6JoFCbrZ0j/9p0iID8yCWwrNinIildyYn73rGrkbIJkD1hVjTd9
- vBKw==
+ bh=XJcCygqyV5dgqVsYnUNUCzeV/UXXZpTi0n/ViOolZUI=;
+ b=MmCjtK46F7BLZDfO/EEbGO74n95Ajw9xLYBp8DATO3P9JY83Dqt/Y3UGOPb353PZXK
+ UKcimTLUYR01BIBNKy3hDZ84v6kyQzMm7sN+ASqf12IqK2DBdrIYad6+WwySr+h7B72n
+ t7Rvzes2yty0M5a1twta8zc6az3fxQUL6OHCqy1ugV8AREzqjt3eFobDHvKBgLVMqueA
+ XIuRj5dSpyibOopeGZ5M6et6y8y/ogJ4F3WOKyaluMYMfMGdmyCN/NoeFL/8+mV78Iu7
+ IMv/9BOLlY1ePpsqg1XG4VuRu+mBQaD69pSU0YeePaKA+Hyd9d53GGsprBhzhWS6ig+e
+ ly8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
- bh=M23dGuolte4OKFci/2F1ujcn3PNLR40b6HiOobswFkI=;
- b=RvOHYz0l0sbvrZpbfaQhkN6frr1BAd3jdnidvbzX3kojTey8j6R7ViVp2Ci9znUwGe
- ani0vha/SvgiiZPwQHmOjREcVgZjlSRc1CuPpH3JZ1MVtR+hffMDXXkuXdWj+pSZcmld
- SAEG45g3iFwYZDOw7nexp2Q0GU2H7rMcF3zVirNdurrfcxmCBunR4VrpvjqrYWlMKzOX
- 1nlbcnzMldpF1dHU0PQ6Zq/JKpPA/8FJpXz2dwRPv2DnSNUUoBadokc0naWwu1QgvPef
- a70PS3caoA3Ny1YO4ZGk5bmvpEathtkFvORk4z2ntR5VtjMZfqsvwZz3JGSfrnivyahI
- u3Uw==
-X-Gm-Message-State: AGi0PuZe1E3iVr7zDY2Ec8vlG1Y7uiOqr5YMb2/1u3Kaq96UuXFneF1M
- 10DCS7u+Eu0Lm0zVIQyAvhIflUhcbJOy41zpIZs=
-X-Google-Smtp-Source: APiQypJ1KYC2/WswZRGsCjbHL3DWjDO5PNhWUn8VlN65Am+QZ+ese26qK/vU3EqSbC2uZAryAiEu3AZVNCkDoUxGANM=
-X-Received: by 2002:a2e:80cc:: with SMTP id r12mr1120618ljg.269.1587374080331; 
- Mon, 20 Apr 2020 02:14:40 -0700 (PDT)
+ bh=XJcCygqyV5dgqVsYnUNUCzeV/UXXZpTi0n/ViOolZUI=;
+ b=L91+81pJc3eWK+/8QAb10gSA0LMCa8jqG/uY30gQV8xD01SvxktRcH4O5NGF3ma5Z/
+ CYFL8t5xGqRU3GYTykf+QG9Q5uzKwdOI7IWNRZPW/uZXKq2fYPxjo8pFuwe8JDyctpWs
+ kYvvdGHSpuN38ccnaFGJxOK7hpt1mlgA18qpm0Y5H/PK8FqnlD1eOsqfnS0o6KBZ0bjt
+ im7DbWkeNLU7dU1k7rEjWptlCZEo+eVbRR9tuEP1Eju/uHOSpYY6vmlha8mhCXEuhNRq
+ HiMSPmJLpLH0CIS5E87nP7w9JhV9ENljQapwc+XqAYwXGs7wsDCRbGtcUe6mImniKCNq
+ 8Xzw==
+X-Gm-Message-State: AGi0PuYMRKfKsdQh+4YjDJOggXPxsFAE41FXYyRrWCEyfTfFxB6Sac6O
+ YoQBmS6MIgXwOY+JsSR7IbvlKUWz61ntZbHoqHB8ztWXWuCpPA==
+X-Google-Smtp-Source: APiQypJ2/QRf0sV/cBIFNl8TGocPO32EIQRUgm0TIauUuB18K5Ta7wcsW2iA4P2IuFVog1vIE3C8OOjsJP7lvmYrHIM=
+X-Received: by 2002:a2e:800f:: with SMTP id j15mr7304916ljg.27.1587374150484; 
+ Mon, 20 Apr 2020 02:15:50 -0700 (PDT)
 MIME-Version: 1.0
 From: Nikolay Igotti <igotti@gmail.com>
-Date: Mon, 20 Apr 2020 12:14:29 +0300
-Message-ID: <CAEme+7E6inE1xKzpPCGvAB=ynSqOOE-_hre=QNLy2NQxrwmPhg@mail.gmail.com>
-Subject: [PATCH 2/3] linux-user: strace: better format mmap logs,
- support mremap
+Date: Mon, 20 Apr 2020 12:15:39 +0300
+Message-ID: <CAEme+7FPF+inSJSXQPmuv8Up3Eam0N7fT03zqM-RvcvKsxjfVQ@mail.gmail.com>
+Subject: [PATCH 3/3] plugins: avoid failing plugin when CPU is inited several
+ times
 To: laurent@vivier.eu, riku.voipio@iki.fi
-Content-Type: multipart/alternative; boundary="0000000000002f141b05a3b55438"
+Content-Type: multipart/alternative; boundary="0000000000005d851f05a3b558b9"
 Received-SPF: pass client-ip=2a00:1450:4864:20::242;
  envelope-from=igotti@gmail.com; helo=mail-lj1-x242.google.com
 X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
@@ -92,166 +92,226 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000002f141b05a3b55438
+--0000000000005d851f05a3b558b9
 Content-Type: text/plain; charset="UTF-8"
 
-On 64-bit platforms strace entries were not properly formatted, also some
-addresses were printed as integers.
-Also mremap syscall support is added.
+In linux-user multithreaded scenarious CPU could be inited many times with
+the same id,
+
+so avoid assertions on already present hashtable entry.
+
 
 Signed-off-by: Nikolay Igotti <igotti@gmail.com>
+
 ---
- linux-user/strace.c    | 31 +++++++++++++++++++++++++++----
- linux-user/strace.list |  2 +-
- 2 files changed, 28 insertions(+), 5 deletions(-)
 
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 0d9095c674..3e65ffe356 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -969,6 +969,14 @@ UNUSED static struct flags mmap_flags[] = {
-     FLAG_END,
- };
+ plugins/core.c | 5 +----
 
-+#ifdef TARGET_NR_mremap
-+UNUSED static struct flags mremap_flags[] = {
-+    FLAG_GENERIC(MREMAP_MAYMOVE),
-+    FLAG_GENERIC(MREMAP_FIXED),
-+    FLAG_END,
-+};
-+#endif
-+
- UNUSED static struct flags clone_flags[] = {
-     FLAG_GENERIC(CLONE_VM),
-     FLAG_GENERIC(CLONE_FS),
-@@ -2654,11 +2662,11 @@ print_mmap(const struct syscallname *name,
- {
-     print_syscall_prologue(name);
-     print_pointer(arg0, 0);
--    print_raw_param("%d", arg1, 0);
-+    print_raw_param("%lld", (long long)arg1, 0);
-     print_flags(mmap_prot_flags, arg2, 0);
-     print_flags(mmap_flags, arg3, 0);
-     print_raw_param("%d", arg4, 0);
--    print_raw_param("%#x", arg5, 1);
-+    print_raw_param("%#llx", (long long)arg5, 1);
-     print_syscall_epilogue(name);
- }
- #define print_mmap2     print_mmap
-@@ -2672,12 +2680,27 @@ print_mprotect(const struct syscallname *name,
- {
-     print_syscall_prologue(name);
-     print_pointer(arg0, 0);
--    print_raw_param("%d", arg1, 0);
-+    print_raw_param("%lld", (long long)arg1, 0);
-     print_flags(mmap_prot_flags, arg2, 1);
-     print_syscall_epilogue(name);
- }
- #endif
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-+#ifdef TARGET_NR_mremap
-+static void
-+print_mremap(const struct syscallname *name,
-+    abi_long arg0, abi_long arg1, abi_long arg2,
-+    abi_long arg3, abi_long arg4, abi_long arg5)
-+{
-+    print_syscall_prologue(name);
-+    print_pointer(arg0, 0);
-+    print_raw_param("%lld", (long long)arg1, 0);
-+    print_raw_param("%lld", (long long)arg2, 0);
-+    print_flags(mremap_flags, arg3, 1);
-+    print_syscall_epilogue(name);
-+}
-+#endif
-+
- #ifdef TARGET_NR_munmap
- static void
- print_munmap(const struct syscallname *name,
-@@ -2686,7 +2709,7 @@ print_munmap(const struct syscallname *name,
+
+diff --git a/plugins/core.c b/plugins/core.c
+
+index 51bfc94787..889cc6441a 100644
+
+--- a/plugins/core.c
+
++++ b/plugins/core.c
+
+@@ -196,13 +196,10 @@ plugin_register_cb_udata(qemu_plugin_id_t id, enum
+qemu_plugin_event ev,
+
+
+
+ void qemu_plugin_vcpu_init_hook(CPUState *cpu)
+
  {
-     print_syscall_prologue(name);
-     print_pointer(arg0, 0);
--    print_raw_param("%d", arg1, 1);
-+    print_raw_param("%lld", (long long)arg1, 1);
-     print_syscall_epilogue(name);
- }
- #endif
-diff --git a/linux-user/strace.list b/linux-user/strace.list
-index d49a1e92a8..b3bd1c6229 100644
---- a/linux-user/strace.list
-+++ b/linux-user/strace.list
-@@ -612,7 +612,7 @@
- { TARGET_NR_mq_unlink, "mq_unlink" , NULL, print_mq_unlink, NULL },
- #endif
- #ifdef TARGET_NR_mremap
--{ TARGET_NR_mremap, "mremap" , NULL, NULL, NULL },
-+{ TARGET_NR_mremap, "mremap" , NULL, print_mremap, print_syscall_ret_addr
-},
- #endif
- #ifdef TARGET_NR_msgctl
- { TARGET_NR_msgctl, "msgctl" , NULL, NULL, NULL },
+
+-    bool success;
+
+-
+
+     qemu_rec_mutex_lock(&plugin.lock);
+
+     plugin_cpu_update__locked(&cpu->cpu_index, NULL, NULL);
+
+-    success = g_hash_table_insert(plugin.cpu_ht, &cpu->cpu_index,
+
++    g_hash_table_insert(plugin.cpu_ht, &cpu->cpu_index,
+
+                                   &cpu->cpu_index);
+
+-    g_assert(success);
+
+     qemu_rec_mutex_unlock(&plugin.lock);
+
+
+
+     plugin_vcpu_cb__simple(cpu, QEMU_PLUGIN_EV_VCPU_INIT);
+
 -- 
+
 2.24.2 (Apple Git-127)
 
---0000000000002f141b05a3b55438
+--0000000000005d851f05a3b558b9
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr">On 64-bit platforms strace entries were not properly forma=
-tted, also some addresses were printed as integers.<br>Also mremap syscall =
-support is added.<br><br>Signed-off-by: Nikolay Igotti &lt;<a href=3D"mailt=
-o:igotti@gmail.com">igotti@gmail.com</a>&gt;<br>---<br>=C2=A0linux-user/str=
-ace.c =C2=A0 =C2=A0| 31 +++++++++++++++++++++++++++----<br>=C2=A0linux-user=
-/strace.list | =C2=A02 +-<br>=C2=A02 files changed, 28 insertions(+), 5 del=
-etions(-)<br><br>diff --git a/linux-user/strace.c b/linux-user/strace.c<br>=
-index 0d9095c674..3e65ffe356 100644<br>--- a/linux-user/strace.c<br>+++ b/l=
-inux-user/strace.c<br>@@ -969,6 +969,14 @@ UNUSED static struct flags mmap_=
-flags[] =3D {<br>=C2=A0 =C2=A0 =C2=A0FLAG_END,<br>=C2=A0};<br>=C2=A0<br>+#i=
-fdef TARGET_NR_mremap<br>+UNUSED static struct flags mremap_flags[] =3D {<b=
-r>+ =C2=A0 =C2=A0FLAG_GENERIC(MREMAP_MAYMOVE),<br>+ =C2=A0 =C2=A0FLAG_GENER=
-IC(MREMAP_FIXED),<br>+ =C2=A0 =C2=A0FLAG_END,<br>+};<br>+#endif<br>+<br>=C2=
-=A0UNUSED static struct flags clone_flags[] =3D {<br>=C2=A0 =C2=A0 =C2=A0FL=
-AG_GENERIC(CLONE_VM),<br>=C2=A0 =C2=A0 =C2=A0FLAG_GENERIC(CLONE_FS),<br>@@ =
--2654,11 +2662,11 @@ print_mmap(const struct syscallname *name,<br>=C2=A0{<=
-br>=C2=A0 =C2=A0 =C2=A0print_syscall_prologue(name);<br>=C2=A0 =C2=A0 =C2=
-=A0print_pointer(arg0, 0);<br>- =C2=A0 =C2=A0print_raw_param(&quot;%d&quot;=
-, arg1, 0);<br>+ =C2=A0 =C2=A0print_raw_param(&quot;%lld&quot;, (long long)=
-arg1, 0);<br>=C2=A0 =C2=A0 =C2=A0print_flags(mmap_prot_flags, arg2, 0);<br>=
-=C2=A0 =C2=A0 =C2=A0print_flags(mmap_flags, arg3, 0);<br>=C2=A0 =C2=A0 =C2=
-=A0print_raw_param(&quot;%d&quot;, arg4, 0);<br>- =C2=A0 =C2=A0print_raw_pa=
-ram(&quot;%#x&quot;, arg5, 1);<br>+ =C2=A0 =C2=A0print_raw_param(&quot;%#ll=
-x&quot;, (long long)arg5, 1);<br>=C2=A0 =C2=A0 =C2=A0print_syscall_epilogue=
-(name);<br>=C2=A0}<br>=C2=A0#define print_mmap2 =C2=A0 =C2=A0 print_mmap<br=
->@@ -2672,12 +2680,27 @@ print_mprotect(const struct syscallname *name,<br>=
-=C2=A0{<br>=C2=A0 =C2=A0 =C2=A0print_syscall_prologue(name);<br>=C2=A0 =C2=
-=A0 =C2=A0print_pointer(arg0, 0);<br>- =C2=A0 =C2=A0print_raw_param(&quot;%=
-d&quot;, arg1, 0);<br>+ =C2=A0 =C2=A0print_raw_param(&quot;%lld&quot;, (lon=
-g long)arg1, 0);<br>=C2=A0 =C2=A0 =C2=A0print_flags(mmap_prot_flags, arg2, =
-1);<br>=C2=A0 =C2=A0 =C2=A0print_syscall_epilogue(name);<br>=C2=A0}<br>=C2=
-=A0#endif<br>=C2=A0<br>+#ifdef TARGET_NR_mremap<br>+static void<br>+print_m=
-remap(const struct syscallname *name,<br>+ =C2=A0 =C2=A0abi_long arg0, abi_=
-long arg1, abi_long arg2,<br>+ =C2=A0 =C2=A0abi_long arg3, abi_long arg4, a=
-bi_long arg5)<br>+{<br>+ =C2=A0 =C2=A0print_syscall_prologue(name);<br>+ =
-=C2=A0 =C2=A0print_pointer(arg0, 0);<br>+ =C2=A0 =C2=A0print_raw_param(&quo=
-t;%lld&quot;, (long long)arg1, 0);<br>+ =C2=A0 =C2=A0print_raw_param(&quot;=
-%lld&quot;, (long long)arg2, 0);<br>+ =C2=A0 =C2=A0print_flags(mremap_flags=
-, arg3, 1);<br>+ =C2=A0 =C2=A0print_syscall_epilogue(name);<br>+}<br>+#endi=
-f<br>+<br>=C2=A0#ifdef TARGET_NR_munmap<br>=C2=A0static void<br>=C2=A0print=
-_munmap(const struct syscallname *name,<br>@@ -2686,7 +2709,7 @@ print_munm=
-ap(const struct syscallname *name,<br>=C2=A0{<br>=C2=A0 =C2=A0 =C2=A0print_=
-syscall_prologue(name);<br>=C2=A0 =C2=A0 =C2=A0print_pointer(arg0, 0);<br>-=
- =C2=A0 =C2=A0print_raw_param(&quot;%d&quot;, arg1, 1);<br>+ =C2=A0 =C2=A0p=
-rint_raw_param(&quot;%lld&quot;, (long long)arg1, 1);<br>=C2=A0 =C2=A0 =C2=
-=A0print_syscall_epilogue(name);<br>=C2=A0}<br>=C2=A0#endif<br>diff --git a=
-/linux-user/strace.list b/linux-user/strace.list<br>index d49a1e92a8..b3bd1=
-c6229 100644<br>--- a/linux-user/strace.list<br>+++ b/linux-user/strace.lis=
-t<br>@@ -612,7 +612,7 @@<br>=C2=A0{ TARGET_NR_mq_unlink, &quot;mq_unlink&qu=
-ot; , NULL, print_mq_unlink, NULL },<br>=C2=A0#endif<br>=C2=A0#ifdef TARGET=
-_NR_mremap<br>-{ TARGET_NR_mremap, &quot;mremap&quot; , NULL, NULL, NULL },=
-<br>+{ TARGET_NR_mremap, &quot;mremap&quot; , NULL, print_mremap, print_sys=
-call_ret_addr },<br>=C2=A0#endif<br>=C2=A0#ifdef TARGET_NR_msgctl<br>=C2=A0=
-{ TARGET_NR_msgctl, &quot;msgctl&quot; , NULL, NULL, NULL },<br>-- <br>2.24=
-.2 (Apple Git-127)<br><br></div>
+<div dir=3D"ltr">
 
---0000000000002f141b05a3b55438--
+
+
+
+
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">In linux-user multithreaded sce=
+narious CPU could be inited many times with the same id,</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">so avoid assertions on already =
+present hashtable entry.</span></p>
+<p class=3D"gmail-p2" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0);min-height:13px"><span class=3D"gma=
+il-s1" style=3D"font-variant-ligatures:no-common-ligatures"></span><br></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">Signed-off-by: Nikolay Igotti &=
+lt;<a href=3D"mailto:igotti@gmail.com">igotti@gmail.com</a>&gt;</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">---</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures"><span class=3D"gmail-Apple-conv=
+erted-space">=C2=A0</span>plugins/core.c | 5 +----</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures"><span class=3D"gmail-Apple-conv=
+erted-space">=C2=A0</span>1 file changed, 1 insertion(+), 4 deletions(-)</s=
+pan></p>
+<p class=3D"gmail-p2" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0);min-height:13px"><span class=3D"gma=
+il-s1" style=3D"font-variant-ligatures:no-common-ligatures"></span><br></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">diff --git a/plugins/core.c b/p=
+lugins/core.c</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">index 51bfc94787..889cc6441a 10=
+0644</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">--- a/plugins/core.c</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">+++ b/plugins/core.c</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">@@ -196,13 +196,10 @@ plugin_re=
+gister_cb_udata(qemu_plugin_id_t id, enum qemu_plugin_event ev,</span></p>
+<p class=3D"gmail-p2" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0);min-height:13px"><span class=3D"gma=
+il-s1" style=3D"font-variant-ligatures:no-common-ligatures"><span class=3D"=
+gmail-Apple-converted-space">=C2=A0</span></span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures"><span class=3D"gmail-Apple-conv=
+erted-space">=C2=A0</span>void qemu_plugin_vcpu_init_hook(CPUState *cpu)</s=
+pan></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures"><span class=3D"gmail-Apple-conv=
+erted-space">=C2=A0</span>{</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">-<span class=3D"gmail-Apple-con=
+verted-space">=C2=A0 =C2=A0 </span>bool success;</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">-</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures"><span class=3D"gmail-Apple-conv=
+erted-space">=C2=A0=C2=A0 =C2=A0 </span>qemu_rec_mutex_lock(&amp;plugin.loc=
+k);</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures"><span class=3D"gmail-Apple-conv=
+erted-space">=C2=A0=C2=A0 =C2=A0 </span>plugin_cpu_update__locked(&amp;cpu-=
+&gt;cpu_index, NULL, NULL);</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">-<span class=3D"gmail-Apple-con=
+verted-space">=C2=A0 =C2=A0 </span>success =3D g_hash_table_insert(plugin.c=
+pu_ht, &amp;cpu-&gt;cpu_index,</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">+<span class=3D"gmail-Apple-con=
+verted-space">=C2=A0 =C2=A0 </span>g_hash_table_insert(plugin.cpu_ht, &amp;=
+cpu-&gt;cpu_index,</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures"><span class=3D"gmail-Apple-conv=
+erted-space">=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 </span>&amp;=
+cpu-&gt;cpu_index);</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">-<span class=3D"gmail-Apple-con=
+verted-space">=C2=A0 =C2=A0 </span>g_assert(success);</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures"><span class=3D"gmail-Apple-conv=
+erted-space">=C2=A0=C2=A0 =C2=A0 </span>qemu_rec_mutex_unlock(&amp;plugin.l=
+ock);</span></p>
+<p class=3D"gmail-p2" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0);min-height:13px"><span class=3D"gma=
+il-s1" style=3D"font-variant-ligatures:no-common-ligatures"><span class=3D"=
+gmail-Apple-converted-space">=C2=A0</span></span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures"><span class=3D"gmail-Apple-conv=
+erted-space">=C2=A0=C2=A0 =C2=A0 </span>plugin_vcpu_cb__simple(cpu, QEMU_PL=
+UGIN_EV_VCPU_INIT);</span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">--<span class=3D"gmail-Apple-co=
+nverted-space">=C2=A0</span></span></p>
+<p class=3D"gmail-p1" style=3D"margin:0px;font-variant-numeric:normal;font-=
+variant-east-asian:normal;font-stretch:normal;font-size:11px;line-height:no=
+rmal;font-family:Menlo;color:rgb(0,0,0)"><span class=3D"gmail-s1" style=3D"=
+font-variant-ligatures:no-common-ligatures">2.24.2 (Apple Git-127)</span></=
+p></div>
+
+--0000000000005d851f05a3b558b9--
 
