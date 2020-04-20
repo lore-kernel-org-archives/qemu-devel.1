@@ -2,89 +2,81 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E1CC38A30
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 17:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C98C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 17:58:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26104205C9
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 17:58:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A698A205C9
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 17:58:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sbx3Uu14"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26104205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K8GKDiAh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A698A205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQagj-0007QM-6V
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 13:58:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36578 helo=eggs1p.gnu.org)
+	id 1jQagz-0007sW-Kt
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 13:58:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36658 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jQabR-0006n2-2H
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 13:53:05 -0400
+ (envelope-from <eblake@redhat.com>) id 1jQabf-0007Nh-Jp
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 13:53:20 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jQabO-00045a-4R
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 13:53:04 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:36172)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jQabN-00043N-Nm
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 13:53:01 -0400
-Received: by mail-lj1-x242.google.com with SMTP id u15so11023106ljd.3
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 10:53:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=/DrXlXCXCjcKxXaL3UynOI4aoP3LB9wkYq+IB5RRGYY=;
- b=sbx3Uu148od2PhVUlI0IFX9GYw3j0gFxWulYVrKsBZT5ZfuB3gy0FAQqLL/uSrxahx
- itYj7icQWe0XB8NqDOPySKW+9L/ljHuHHy+ketJOewy+t80v9wsOz0LhLrjiDEQT0Edp
- E7vd/kSsyGSl8jgE5vRAydkfoChxWp4V+SEwrUvnADdYemz36AysBxlT/l8hEf3195cj
- wUbsBqdbRQyrmphrdrMhMT7UL4Uh+d12yPGeotM8m48nA+bFP5egXRm3sDdonqe839TI
- RdiW7b2ezv4mfDKClxga3h8W5oV8vYjkKRQug8CKSxzmsdA4wAsHBm2ekqrxqX3jIwDd
- 9EEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=/DrXlXCXCjcKxXaL3UynOI4aoP3LB9wkYq+IB5RRGYY=;
- b=UBbVoCOR2W/qCChPE8UI/YYBP81T//XL28z6Xqs2S/QpvyeoHeRPZZsFoZrAG4N6uW
- jQmW15hnPC9Ba5A3vcStttm6AKYSwoJSUCU22mzvQpV7J0FYxHH3n23yJuvXCv0zjiAi
- FjKn9p6Spn1xo5duPcRtQQfxd5UsvYbhW1nxZNcKRM8hHo4GxLo55pf7ZUHRRP3SGRH6
- Tnqsy5RIF3rIpthKF73yQZRbhTRiyFKtMuRM15O59YINwOYZxZOPZhd02hr7G+5MpZ0N
- 2vm1Sa5sxGoOaema7m+uHQFCIc6hxP4xHTcu48g7G0zFWxDkF8Lw4l4BTooUlIsoI/1L
- L3FQ==
-X-Gm-Message-State: AGi0Puaf/qdfFa9DqxwEDeymOiUdfwQVQP2ik+0lr/1X0JncFVuLPPny
- ZzGmsuxXX48deAsTmwrRS2J1kb4d6HY=
-X-Google-Smtp-Source: APiQypKq25z8WYE/aRkch683i5iyuTbIfI0TVx0ph7gblDlRnCgn3y7XwVWXOQBimhp3i069YWPgMw==
-X-Received: by 2002:a2e:9886:: with SMTP id b6mr11205677ljj.237.1587405179944; 
- Mon, 20 Apr 2020 10:52:59 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id s7sm79548lfb.40.2020.04.20.10.52.59
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Apr 2020 10:52:59 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+ (envelope-from <eblake@redhat.com>) id 1jQabe-0004tG-4u
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 13:53:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44841
+ helo=us-smtp-1.mimecast.com)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jQabd-0004oJ-KH
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 13:53:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587405196;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3P+njxzp3Lmcfu/1uJRc/Eo2AmUeLCf+wLUBObG0sX0=;
+ b=K8GKDiAhI6klzhUNU6OgJk9tQ7NF8AK2WAn6OGwAC7egk/p1HTcuNd/O4IKOkPntr6w7g5
+ zTXVRS6aljqs8LgCfZ0kVKMLtzpAFc/97B0qxSzzmlyoen46YcpLs1FNvTnBkfjmtAnEuC
+ tXgybS2BdnYcFqfUJ9Bzk3SYd7bgpGE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-417-fGWRDdDzPG2fthAgax_6Kw-1; Mon, 20 Apr 2020 13:53:14 -0400
+X-MC-Unique: fGWRDdDzPG2fthAgax_6Kw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8905C800D5C;
+ Mon, 20 Apr 2020 17:53:13 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 16803A103F;
+ Mon, 20 Apr 2020 17:53:11 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 6/6] target/microblaze: Add the pvr-user2 property
-Date: Mon, 20 Apr 2020 19:52:50 +0200
-Message-Id: <20200420175250.25777-7-edgar.iglesias@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200420175250.25777-1-edgar.iglesias@gmail.com>
-References: <20200420175250.25777-1-edgar.iglesias@gmail.com>
+Subject: [PATCH 1/2] hax: Fix setting of FD_CLOEXEC
+Date: Mon, 20 Apr 2020 12:53:07 -0500
+Message-Id: <20200420175309.75894-2-eblake@redhat.com>
+In-Reply-To: <20200420175309.75894-1-eblake@redhat.com>
+References: <20200420175309.75894-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x242.google.com
-X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::242
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
+ 03:29:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,61 +88,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- frasse.iglesias@gmail.com, alistair@alistair23.me,
- richard.henderson@linaro.org, frederic.konrad@adacore.com, philmd@redhat.com,
- luc.michel@greensocs.com
+Cc: peter.maydell@linaro.org, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-trivial@nongnu.org, "open list:X86 HAXM CPUs" <haxm-team@intel.com>,
+ Colin Xu <colin.xu@intel.com>, Wenchao Wang <wenchao.wang@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Blindly setting FD_CLOEXEC without a read-modify-write will
+inadvertently clear any other intentionally-set bits, such as a
+proposed new bit for designating a fd that must behave in 32-bit mode.
+Use our wrapper function instead of an incorrect hand-rolled version.
 
-Add the pvr-user2 property to control the user-defined
-PVR1 User2 register.
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- target/microblaze/cpu.c | 2 ++
- target/microblaze/cpu.h | 1 +
- 2 files changed, 3 insertions(+)
+ target/i386/hax-posix.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 53027846c4..22d08dc8cb 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -196,6 +196,7 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-                         (cpu->cfg.pvr == C_PVR_FULL ? PVR0_PVR_FULL_MASK : 0) |
-                         cpu->cfg.pvr_user1;
- 
-+    env->pvr.regs[1] = cpu->cfg.pvr_user2;
-     env->pvr.regs[2] |= (cpu->cfg.use_fpu ? PVR2_USE_FPU_MASK : 0) |
-                         (cpu->cfg.use_fpu > 1 ? PVR2_USE_FPU2_MASK : 0) |
-                         (cpu->cfg.use_hw_mul ? PVR2_USE_HW_MUL_MASK : 0) |
-@@ -294,6 +295,7 @@ static Property mb_properties[] = {
-     DEFINE_PROP_STRING("version", MicroBlazeCPU, cfg.version),
-     DEFINE_PROP_UINT8("pvr", MicroBlazeCPU, cfg.pvr, C_PVR_FULL),
-     DEFINE_PROP_UINT8("pvr-user1", MicroBlazeCPU, cfg.pvr_user1, 0),
-+    DEFINE_PROP_UINT32("pvr-user2", MicroBlazeCPU, cfg.pvr_user2, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index 7bb5a3d6c6..a31134b65c 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -308,6 +308,7 @@ struct MicroBlazeCPU {
-         bool div_zero_exception;
-         bool unaligned_exceptions;
-         uint8_t pvr_user1;
-+        uint32_t pvr_user2;
-         char *version;
-         uint8_t pvr;
-     } cfg;
--- 
-2.20.1
+diff --git a/target/i386/hax-posix.c b/target/i386/hax-posix.c
+index 3bad89f13337..5f9d1b803dec 100644
+--- a/target/i386/hax-posix.c
++++ b/target/i386/hax-posix.c
+@@ -23,7 +23,7 @@ hax_fd hax_mod_open(void)
+         fprintf(stderr, "Failed to open the hax module\n");
+     }
+
+-    fcntl(fd, F_SETFD, FD_CLOEXEC);
++    qemu_set_cloexec(fd);
+
+     return fd;
+ }
+@@ -147,7 +147,7 @@ hax_fd hax_host_open_vm(struct hax_state *hax, int vm_i=
+d)
+     fd =3D open(vm_name, O_RDWR);
+     g_free(vm_name);
+
+-    fcntl(fd, F_SETFD, FD_CLOEXEC);
++    qemu_set_cloexec(fd);
+
+     return fd;
+ }
+@@ -200,7 +200,7 @@ hax_fd hax_host_open_vcpu(int vmid, int vcpuid)
+     if (fd < 0) {
+         fprintf(stderr, "Failed to open the vcpu devfs\n");
+     }
+-    fcntl(fd, F_SETFD, FD_CLOEXEC);
++    qemu_set_cloexec(fd);
+     return fd;
+ }
+
+--=20
+2.26.1
 
 
