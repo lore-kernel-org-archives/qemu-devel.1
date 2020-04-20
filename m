@@ -2,81 +2,82 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D07F2C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 06:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1E27C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 06:58:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DD302080C
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 06:49:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 689F721473
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 06:58:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LZbTr2ip"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DD302080C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uFR4tvqq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 689F721473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQQEq-0001TQ-Ks
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 02:49:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39628 helo=eggs1p.gnu.org)
+	id 1jQQNu-0003Su-It
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 02:58:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40936 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQQDs-0000pR-9t
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 02:48:04 -0400
+ id 1jQQMf-0002x1-U3
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 02:57:23 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQQDr-0004Cx-UE
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 02:48:04 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:39497)
+ id 1jQQMc-0004G3-Lq
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 02:57:09 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:41079)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQQDq-00046a-8v; Mon, 20 Apr 2020 02:48:02 -0400
-Received: by mail-ed1-x543.google.com with SMTP id k22so2144741eds.6;
- Sun, 19 Apr 2020 23:48:01 -0700 (PDT)
+ id 1jQQMc-0004ET-Ay
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 02:57:06 -0400
+Received: by mail-ed1-x541.google.com with SMTP id d16so6225519edv.8
+ for <qemu-devel@nongnu.org>; Sun, 19 Apr 2020 23:57:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+ h=sender:subject:to:references:from:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Y+elNH9UOqsLoxVoBcJ1OsX/EFngxxl6oFsmcqeECEs=;
- b=LZbTr2ip8DIvBjvk72+37eOITUkmmatZOQ+Eo4qS36ZfYu6fDsayrsL2umHpMu4TuR
- P6OtxhF9pvWlgK2a8mPobEa1CYRrg5imlWKE/tObSDU6TyGZuvtMzVK9w3L+N49WKH1H
- nvEpCiZM9I0pKB1oXRfgbwbvbHdllY3GoJaEiudwswythgsk1PRnrAgppH0HzR7wMm4I
- TER6ZJ+eCkd0GVqpq25BrTNXH/Egz5N6XL6gTPI2h12E1Jrmdq+wjuk3GR3soiy1XNtd
- TjWmjgzu/EMW6U4i0ksm6Kq0Yrme1Z9lep0A5icVh5YFJlM5RMchsZag69elIPyo0KP6
- qQFQ==
+ bh=+RaLOTHSKcIpMNYxzGzfOuJa9J2naYEdK3d/cXnjVLk=;
+ b=uFR4tvqqulZ4+dB2xDMMdeF/gq7NZ3PzjY8Sf2x3gq15/+sKEbrG7TYCmZ8eAsZqEm
+ zJEGk9EJmzp8nx/g6FMePtfR4JMX78oBvn6rAhd/Ey8xA6Kx/XSTolBdOCYSPt1AQWkl
+ cBHEtaQGOpxRjPU1IuvXcX0rIlJiFM4JSRx5a1vTRbdpQ6qBT3hFCBvJ616Cl8cUPErQ
+ IudT0yNUi9MUseA7T8VKozesEauPdXhtKQFsHdb4agaYEDZUcJCsePjONNmhYC1XOn7U
+ ywoSRgOoeCB7YhLMb4PpHFWZiURgMgxcNJzkNbe+8XYatgxjUYcqUUqV0KztylFKQo5d
+ Xz6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ h=x-gm-message-state:sender:subject:to:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=Y+elNH9UOqsLoxVoBcJ1OsX/EFngxxl6oFsmcqeECEs=;
- b=KjM5CfaxiP+6u7ap2jswOCXoFTS49etZx4kTRykaQz4QhjMUm+eKKOUDos8rCsz0ya
- n0600rrCRRqSW2CZpJLPSDTkalcIDNLNV/hJP46U91FZ4qUQXDUQmGH26qtIMEl4m2mW
- eQxt+U/moNrkOA8+QUaSoi1gNhUEhxHr7f8u8bkfj5QWIIsH+hELkoeBZjxH49GQ/2Eg
- Hyz9wXcKBv5BOlck8TJsgq/U0mYeSaM60mBR7/vqsxVcT4Y2qP4EodFMUyBknIrf7J2l
- 9Op2EyasQp0u2a2WFxlR0iGAdezor8RSWWqmtpR25AJQ5/EGv2EoSyPVviYkK3Lt3HKi
- U15Q==
-X-Gm-Message-State: AGi0PuY/2VKbSk5k1PkA3Rh1txmWpnvrqk4S1aDJo0EA9F79AxqWwJHD
- 4akhLw2h9pi6pgbMEEs1Ung=
-X-Google-Smtp-Source: APiQypLHkzIZ6RSALA3FeJx2HSx1aoEEN/C/kgwzEFGHFtn7Ziq33lOarS5l8587xQuHwNOCqhyYwQ==
-X-Received: by 2002:a50:8a03:: with SMTP id i3mr12894910edi.121.1587365279762; 
- Sun, 19 Apr 2020 23:47:59 -0700 (PDT)
+ bh=+RaLOTHSKcIpMNYxzGzfOuJa9J2naYEdK3d/cXnjVLk=;
+ b=PCga7R6Lo5T9EwzcHclu7JKECzPuhBuGX3wBsxNHHGJcagbteytneY3N8arCVf1+JU
+ 7cIaajEToA5uMq/5Hj1uIvyd/mk/UvPyhbli9Jyhqk98D4/e9NuK/F8qUAaqcINqIGd7
+ 5tBQSlVTXW2mpzmsFvAAmObKRWVBfY1AVp8PP12G/IeFWp7/oZ4FyP+pO/DKE0aBIH51
+ xvhyACn/8SPCA0L+jSPbXRDg5f3AlxnDrGXg9s5Xlg1chUFPhowAo7LbUMNV1VsZzUpz
+ twhDqwiWHqCGJN/y1gCKtDWM3uEhafYotd8KZc/Rb0jOmGUCt7mhod3YWJIXHzNnrgG9
+ 9QDw==
+X-Gm-Message-State: AGi0PubMPpFKsfCQQ+EZK4DCPPOI5JcgNiJ/yDj1Dm4O920AK75Y0ns/
+ PLmXQWQXyXwIHyGdFqMdyQNYDPt0k2Q=
+X-Google-Smtp-Source: APiQypInb2zn9ym+zzJ9f6oqe5OhOpeyzSbbrmc2aON9NxyVjJC0Y1v01rJkfyUGnYN1q1jiYSk/Zg==
+X-Received: by 2002:a05:6402:8c1:: with SMTP id
+ d1mr7295123edz.236.1587365824087; 
+ Sun, 19 Apr 2020 23:57:04 -0700 (PDT)
 Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id f13sm23922ejd.2.2020.04.19.23.47.57
+ by smtp.gmail.com with ESMTPSA id i16sm31958ejy.64.2020.04.19.23.57.03
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 19 Apr 2020 23:47:58 -0700 (PDT)
-Subject: Re: [PATCH v1 2/3] hw/arm: xlnx-zcu102: Move arm_boot_info into
- XlnxZCU102
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
-References: <20200419162727.19148-1-edgar.iglesias@gmail.com>
- <20200419162727.19148-3-edgar.iglesias@gmail.com>
+ Sun, 19 Apr 2020 23:57:03 -0700 (PDT)
+Subject: Re: [PATCH 01/16] tcg: Add temp_readonly
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200418161914.4387-1-richard.henderson@linaro.org>
+ <20200418161914.4387-2-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Autocrypt: addr=f4bug@amsat.org; keydata=
  mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
@@ -101,21 +102,21 @@ Autocrypt: addr=f4bug@amsat.org; keydata=
  K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
  n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
  CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <0f4e47cd-d362-c79e-0522-7e6077c6640d@amsat.org>
-Date: Mon, 20 Apr 2020 08:47:56 +0200
+Message-ID: <43df1b6b-db63-223d-4526-3b33692cefa3@amsat.org>
+Date: Mon, 20 Apr 2020 08:57:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200419162727.19148-3-edgar.iglesias@gmail.com>
+In-Reply-To: <20200418161914.4387-2-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x543.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x541.google.com
 X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::543
+X-Received-From: 2a00:1450:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,59 +128,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- frasse.iglesias@gmail.com, alistair@alistair23.me,
- richard.henderson@linaro.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
- philmd@redhat.com, luc.michel@greensocs.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/19/20 6:27 PM, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+On 4/18/20 6:18 PM, Richard Henderson wrote:
+> In most, but not all, places that we check for TEMP_FIXED,
+> we are really testing that we do not modify the temporary.
 > 
-> Move arm_boot_info into XlnxZCU102.
-> 
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
->  hw/arm/xlnx-zcu102.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-> index bd645ad818..4eb117c755 100644
-> --- a/hw/arm/xlnx-zcu102.c
-> +++ b/hw/arm/xlnx-zcu102.c
-> @@ -31,13 +31,14 @@ typedef struct XlnxZCU102 {
->  
->      bool secure;
->      bool virt;
-> +
-> +    struct arm_boot_info binfo;
->  } XlnxZCU102;
->  
->  #define TYPE_ZCU102_MACHINE   MACHINE_TYPE_NAME("xlnx-zcu102")
->  #define ZCU102_MACHINE(obj) \
->      OBJECT_CHECK(XlnxZCU102, (obj), TYPE_ZCU102_MACHINE)
->  
-> -static struct arm_boot_info xlnx_zcu102_binfo;
->  
->  static bool zcu102_get_secure(Object *obj, Error **errp)
->  {
-> @@ -166,9 +167,9 @@ static void xlnx_zcu102_init(MachineState *machine)
->  
->      /* TODO create and connect IDE devices for ide_drive_get() */
->  
-> -    xlnx_zcu102_binfo.ram_size = ram_size;
-> -    xlnx_zcu102_binfo.loader_start = 0;
-> -    arm_load_kernel(s->soc.boot_cpu_ptr, machine, &xlnx_zcu102_binfo);
-> +    s->binfo.ram_size = ram_size;
-> +    s->binfo.loader_start = 0;
-> +    arm_load_kernel(s->soc.boot_cpu_ptr, machine, &s->binfo);
->  }
->  
->  static void xlnx_zcu102_machine_instance_init(Object *obj)
-> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  include/tcg/tcg.h |  5 +++++
+>  tcg/tcg.c         | 21 ++++++++++-----------
+>  2 files changed, 15 insertions(+), 11 deletions(-)
+> 
+> diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
+> index 3534dce77f..27e1b509a6 100644
+> --- a/include/tcg/tcg.h
+> +++ b/include/tcg/tcg.h
+> @@ -678,6 +678,11 @@ struct TCGContext {
+>      target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
+>  };
+>  
+> +static inline bool temp_readonly(TCGTemp *ts)
+> +{
+> +    return ts->kind == TEMP_FIXED;
+> +}
+> +
+>  extern TCGContext tcg_init_ctx;
+>  extern __thread TCGContext *tcg_ctx;
+>  extern TCGv_env cpu_env;
+> diff --git a/tcg/tcg.c b/tcg/tcg.c
+> index eaf81397a3..92b3767097 100644
+> --- a/tcg/tcg.c
+> +++ b/tcg/tcg.c
+> @@ -3132,7 +3132,7 @@ static void temp_load(TCGContext *, TCGTemp *, TCGRegSet, TCGRegSet, TCGRegSet);
+>     mark it free; otherwise mark it dead.  */
+>  static void temp_free_or_dead(TCGContext *s, TCGTemp *ts, int free_or_dead)
+>  {
+> -    if (ts->kind == TEMP_FIXED) {
+> +    if (temp_readonly(ts)) {
+>          return;
+>      }
+>      if (ts->val_type == TEMP_VAL_REG) {
+> @@ -3156,7 +3156,7 @@ static inline void temp_dead(TCGContext *s, TCGTemp *ts)
+>  static void temp_sync(TCGContext *s, TCGTemp *ts, TCGRegSet allocated_regs,
+>                        TCGRegSet preferred_regs, int free_or_dead)
+>  {
+> -    if (ts->kind == TEMP_FIXED) {
+> +    if (temp_readonly(ts)) {
+>          return;
+>      }
+>      if (!ts->mem_coherent) {
+> @@ -3314,8 +3314,7 @@ static void temp_save(TCGContext *s, TCGTemp *ts, TCGRegSet allocated_regs)
+>  {
+>      /* The liveness analysis already ensures that globals are back
+>         in memory. Keep an tcg_debug_assert for safety. */
+> -    tcg_debug_assert(ts->val_type == TEMP_VAL_MEM
+> -                     || ts->kind == TEMP_FIXED);
+> +    tcg_debug_assert(ts->val_type == TEMP_VAL_MEM || temp_readonly(ts));
+>  }
+>  
+>  /* save globals to their canonical location and assume they can be
+> @@ -3373,7 +3372,7 @@ static void tcg_reg_alloc_do_movi(TCGContext *s, TCGTemp *ots,
+>                                    TCGRegSet preferred_regs)
+>  {
+>      /* ENV should not be modified.  */
+> -    tcg_debug_assert(ots->kind != TEMP_FIXED);
+> +    tcg_debug_assert(!temp_readonly(ots));
+>  
+>      /* The movi is not explicitly generated here.  */
+>      if (ots->val_type == TEMP_VAL_REG) {
+> @@ -3413,7 +3412,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
+>      ts = arg_temp(op->args[1]);
+>  
+>      /* ENV should not be modified.  */
+> -    tcg_debug_assert(ots->kind != TEMP_FIXED);
+> +    tcg_debug_assert(!temp_readonly(ots));
+>  
+>      /* Note that otype != itype for no-op truncation.  */
+>      otype = ots->type;
+> @@ -3474,7 +3473,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
+>                   * Store the source register into the destination slot
+>                   * and leave the destination temp as TEMP_VAL_MEM.
+>                   */
+> -                assert(ots->kind != TEMP_FIXED);
+> +                assert(!temp_readonly(ots));
+>                  if (!ts->mem_allocated) {
+>                      temp_allocate_frame(s, ots);
+>                  }
+> @@ -3511,7 +3510,7 @@ static void tcg_reg_alloc_dup(TCGContext *s, const TCGOp *op)
+>      its = arg_temp(op->args[1]);
+>  
+>      /* ENV should not be modified.  */
+> -    tcg_debug_assert(ots->kind != TEMP_FIXED);
+> +    tcg_debug_assert(!temp_readonly(ots));
+>  
+>      itype = its->type;
+>      vece = TCGOP_VECE(op);
+> @@ -3742,7 +3741,7 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
+>              ts = arg_temp(arg);
+>  
+>              /* ENV should not be modified.  */
+> -            tcg_debug_assert(ts->kind != TEMP_FIXED);
+> +            tcg_debug_assert(!temp_readonly(ts));
+>  
+>              if ((arg_ct->ct & TCG_CT_ALIAS)
+>                  && !const_args[arg_ct->alias_index]) {
+> @@ -3784,7 +3783,7 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
+>          ts = arg_temp(op->args[i]);
+>  
+>          /* ENV should not be modified.  */
+> -        tcg_debug_assert(ts->kind != TEMP_FIXED);
+> +        tcg_debug_assert(!temp_readonly(ts));
+>  
+>          if (NEED_SYNC_ARG(i)) {
+>              temp_sync(s, ts, o_allocated_regs, 0, IS_DEAD_ARG(i));
+> @@ -3916,7 +3915,7 @@ static void tcg_reg_alloc_call(TCGContext *s, TCGOp *op)
+>          ts = arg_temp(arg);
+>  
+>          /* ENV should not be modified.  */
+> -        tcg_debug_assert(ts->kind != TEMP_FIXED);
+> +        tcg_debug_assert(!temp_readonly(ts));
+>  
+>          reg = tcg_target_call_oarg_regs[i];
+>          tcg_debug_assert(s->reg_to_temp[reg] == NULL);
+> 
 
