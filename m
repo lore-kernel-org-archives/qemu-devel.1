@@ -2,109 +2,82 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19EF0C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 11:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97086C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 12:17:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D844921744
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 11:41:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5EC72206B9
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 12:17:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c7M32eSe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D844921744
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qk0TXZbU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EC72206B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQUo8-0000sL-2J
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 07:41:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40416 helo=eggs1p.gnu.org)
+	id 1jQVMm-00013a-JE
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 08:17:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45804 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jQUmz-0000O8-2s
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:40:37 -0400
+ (envelope-from <maxim.uvarov@linaro.org>) id 1jQVMC-0000WP-9T
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 08:17:00 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jQUmx-0006ag-Dv
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:40:36 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20742
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jQUmw-0006Zy-Ul
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:40:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587382833;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=my80FUwzhPpk1SB485cUkF4jJz0wJGp44Y2BAg+Fb0Y=;
- b=c7M32eSewjQ0baqjPIRK/5/RMRgwKn+k4Oc6d3hKDIMoMoQXfSJmaCYLk9DE/TPa3F88qH
- jWyKYCDc9nev7KpkQ6Sm9s2RQaa/IHDqdSoiEYBZfpsRbKC/trnGh7pQJKz3wE7189JMck
- f83P4yJl/ANbZpDbrf4hRkT7XjoMO1s=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-S7EeUq69O4u3Jmyh32mcIA-1; Mon, 20 Apr 2020 07:40:27 -0400
-X-MC-Unique: S7EeUq69O4u3Jmyh32mcIA-1
-Received: by mail-ej1-f72.google.com with SMTP id j19so6206740ejs.1
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 04:40:27 -0700 (PDT)
+ (envelope-from <maxim.uvarov@linaro.org>) id 1jQVMB-00076T-D0
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 08:16:59 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:44646)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <maxim.uvarov@linaro.org>)
+ id 1jQVMA-00075C-Pj
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 08:16:59 -0400
+Received: by mail-lf1-x143.google.com with SMTP id 131so7695626lfh.11
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 05:16:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=90U7g6QRjcavx5MlRUxgpf0KQqMNtMFsmbd8Sg10FCw=;
+ b=Qk0TXZbUZRpUsUFf/9N+LWjfMBXED4QR/z1lTbIL5oD1JSogTMJBrxnhNLG99I6xtO
+ l27t1JnH/0NZMAlUPx3WHqW1M9P29vfVx8NIiqZfM3Im7zCvbtN7+gatC8jyE/6LFVqd
+ aV5UMXzlHRRfSQX1xraVVeyqvhyfTjglPMQjD3MUl+qZwz+tdtG8IFuYM/D4SvdnhqDS
+ TRnvGcM8Wy/FFRlZKbFhyb/6cSWPiCyAYYzAhdrcZA7GAfbrCc9+oqdmt5D7+MeeS2Cp
+ ihm4UFv+bCNFWHNDKD3DMb1gfL1PvKpKEcGac/KMNk/6izJttF/izwzJNZMJhsMkoxp7
+ +0AA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=aLq4XdLuPWsM50dfm026BAXhMI3kRXcvG8TE9CYhfhA=;
- b=MHkLS14LcFPchkGRY1K7CK2FBRNGRq3NWEHByfycxgdVriLSAywRvVad7G8vVxHLi+
- lkmHYFIn7iII8DEv+1QKo4GsHvaB1SQ5WBDCZiXnGQSWRl5RHhxsMwCxczv+C+CX51zc
- LQWUzBjWa9o4fqTNpEqzhcagEICdJ03LigpVK6xAizCUQD2yAP/+dm0XgDWyrw2yLAj0
- UhVwXZWMZIRqq6JDyZj0uRGCG3R9po/m8z2naFqU8kK5WzXY0aCA/7oN2+F0jp1gOyK0
- 9IknnpxZqKCRbobET7XvpXtdytIt8eZgQh4cq3csvuUhxP2J2vep+Zeg5aX0IV5JKhbt
- 4yhQ==
-X-Gm-Message-State: AGi0PuaZuGpAkX3li7DZMsKm2dWk8ZXbzEW7qaTJSjZLffZst1wDXkWV
- kF/AeX3trA0/NwXg16gfskDseh/no2AmOEq5Jlmy1DNc4+r7hvB14aALMdkuSGd19lWKPnSVnBh
- KAzQ36MrlDqY8/PA=
-X-Received: by 2002:a17:906:e01:: with SMTP id
- l1mr15234591eji.76.1587382826128; 
- Mon, 20 Apr 2020 04:40:26 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJkyufnWVoa8DcHhnDjXAwiUPRuq/BMzjbvXN5kj5zufzCBo/xKbYYMOmJ+iwqb9pLXlX7Ouw==
-X-Received: by 2002:a17:906:e01:: with SMTP id
- l1mr15234566eji.76.1587382825884; 
- Mon, 20 Apr 2020 04:40:25 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id b5sm53897edk.72.2020.04.20.04.40.24
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 20 Apr 2020 04:40:25 -0700 (PDT)
-Subject: Re: [PATCH] Add a new PIIX option to control PCI hot unplugging of
- devices on non-root buses
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
-References: <1587136411-200885-1-git-send-email-ani.sinha@nutanix.com>
- <20200417112620-mutt-send-email-mst@kernel.org>
- <2A13ACCD-BD24-41FB-B6EA-2804F7C1FF1D@nutanix.com>
- <20200417120732-mutt-send-email-mst@kernel.org>
- <20200420092459.GF346737@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <5182c28e-0a84-8141-89ca-954dacfc0ca7@redhat.com>
-Date: Mon, 20 Apr 2020 13:40:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200420092459.GF346737@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 01:47:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=90U7g6QRjcavx5MlRUxgpf0KQqMNtMFsmbd8Sg10FCw=;
+ b=NVbwI9rkLc/2vYPJLFGO/j1jfqj27xTF5nrjiiaJMCGf4q1Yv5kGkAuPDQHrwXn7/W
+ 41kfhHMukGzvuQ9Zbn/tN/eBYR9HQE21EprxoP3WMT1A6NuJSD6PQCgaF9meNPDRffBx
+ mOSQnmEU/hQwBJyEGtd8ZuHye6X5CyNgQuxQi6IKc/909yWMyDebF8lsKNNnC+zPxFWp
+ Uap+cBBt3hR1yRRuTkTPI0Stov56KZpm9tJFqKk0uQTDaYFU2M5HutjfcaDb2cwK8ujn
+ gy3kQorWPr5+MYJ6aseKoV6thrkP53eha2yd2bzSYc89h0nwqqUblofiT2kUZoJjLn2s
+ 87+A==
+X-Gm-Message-State: AGi0PuZdo2MqzG6d4A4kWxhVgCQfb2Uh0yCXCpcaBfddtFm9+Pk87Zz5
+ 4yIjw1XQNSwIfbuRLg5ENbKVOhQKiic=
+X-Google-Smtp-Source: APiQypInREpOoN8pmLAPTky/rKtZQNZXFjkUtnYg/JGVFliPq01I89wGgJnxoAyEQP107zCQSO6aIw==
+X-Received: by 2002:a19:f206:: with SMTP id q6mr10732045lfh.85.1587385016408; 
+ Mon, 20 Apr 2020 05:16:56 -0700 (PDT)
+Received: from localhost.localdomain ([176.59.41.106])
+ by smtp.gmail.com with ESMTPSA id w15sm909249ljd.35.2020.04.20.05.16.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Apr 2020 05:16:55 -0700 (PDT)
+From: Maxim Uvarov <maxim.uvarov@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] add optee dts entry for secure machine
+Date: Mon, 20 Apr 2020 15:16:52 +0300
+Message-Id: <20200420121652.16615-1-maxim.uvarov@linaro.org>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=2a00:1450:4864:20::143;
+ envelope-from=maxim.uvarov@linaro.org; helo=mail-lf1-x143.google.com
+X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,62 +89,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ani Sinha <ani.sinha@nutanix.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Maxim Uvarov <maxim.uvarov@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/20/20 11:24 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Fri, Apr 17, 2020 at 12:09:00PM -0400, Michael S. Tsirkin wrote:
->> On Fri, Apr 17, 2020 at 03:36:14PM +0000, Ani Sinha wrote:
->>>
->>>
->>>> On Apr 17, 2020, at 8:57 PM, Michael S. Tsirkin <mst@redhat.com> wrote=
-:
->>>>
->>>> Is there a real reason to do this? Can't we just limit the
->>>> hotplug control to pcie ports? At some point I'd like us to
->>>> start leaving piix alone..
->>>
->>> Yes we really need this feature as want to be able to hot plug devices =
-into the guest but prevent customers from hot unplugging them from say Wind=
-ows system tray.
->>>
->>> ani
->>
->> Problem is, I think this is not something we can support with pcie or sh=
-pc.
->> I'm reluctant to add features that only ACPI can support,
->> we are trying to phase that out.
->=20
->  From the upstream POV, there's been no decision / agreement to phase
-> out PIIX, this is purely a RHEL downstream decision & plan. If other
-> distros / users have a different POV, and find the feature useful, we
-> should accept the patch if it meets the normal QEMU patch requirements.
+Add optee compatible string for dtb to force linux
+to boot optee module.
 
-Remotely related, this thread suggest to rename the current Frankenstein=20
-PIIX as 'virt_southbridge' /s
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg691232.html
+Signed-off-by: Maxim Uvarov <maxim.uvarov@linaro.org>
+---
+ hw/arm/virt.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-Seriously, apparently thinking to modify PIIX scares various people.
-Is there a virt equivalent that could work?
-On one hand people want to use Windows guest unmodified (or with=20
-digitally signed drivers, which seems impossible to do with virtio=20
-package [*]). OTOH we are not sure how the PIIX model works because it=20
-is not based on specs, and does not match its datasheet, and do not want=20
-to modify it.
-
-[*] If you click on 'How to Release-Sign File System Drivers' on
-https://www.linux-kvm.org/page/WindowsGuestDrivers/Download_Drivers
-it opens https://www.microsoft.com/whdc/driver/tips/IFS_Signing.mspx
-and displays "Your request has been blocked."...
-
->=20
-> Regards,
-> Daniel
->=20
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 656b008..7d712f3 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1335,6 +1335,22 @@ static void create_platform_bus(VirtMachineState *vms)
+                                 sysbus_mmio_get_region(s, 0));
+ }
+ 
++static void create_secure_tee(VirtMachineState *vms)
++{
++    char *firmware;
++    char *optee;
++
++    firmware = g_strdup_printf("/firmware");
++    qemu_fdt_add_subnode(vms->fdt, firmware);
++
++    optee = g_strdup_printf("/firmware/optee");
++    qemu_fdt_add_subnode(vms->fdt, optee);
++    qemu_fdt_setprop_string(vms->fdt, optee, "compatible", "linaro,optee-tz");
++
++    g_free(optee);
++    g_free(firmware);
++}
++
+ static void create_secure_ram(VirtMachineState *vms,
+                               MemoryRegion *secure_sysmem)
+ {
+@@ -1720,6 +1736,7 @@ static void machvirt_init(MachineState *machine)
+     if (vms->secure) {
+         create_secure_ram(vms, secure_sysmem);
+         create_uart(vms, VIRT_SECURE_UART, secure_sysmem, serial_hd(1));
++        create_secure_tee(vms);
+     }
+ 
+     vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
+-- 
+2.17.1
 
 
