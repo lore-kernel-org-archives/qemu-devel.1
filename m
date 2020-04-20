@@ -2,87 +2,64 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25A05C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:35:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B9AC3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:41:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E057720A8B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:35:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZM4zVNkV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E057720A8B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2AEF620A8B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:41:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AEF620A8B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQSq2-0004GM-3R
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 05:35:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43862 helo=eggs1p.gnu.org)
+	id 1jQSvG-0006lk-CQ
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 05:41:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45740 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jQSok-0003PT-TB
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:34:20 -0400
+ (envelope-from <groug@kaod.org>) id 1jQSud-0006HP-CV
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:40:23 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jQSoj-0003im-6K
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:34:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59298
- helo=us-smtp-1.mimecast.com)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jQSoh-0003gt-8D
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:34:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587375254;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+wRbyZJtD89Qzdg9t92Gka/kVVGfRwXn/VB2ORSHPVk=;
- b=ZM4zVNkV334u66R351KMoORd+SKNE+OvKjzTU2J2p3NaeYAjfcafzcCIn68Fmlz//rymxc
- OfGfwg+p0sQ+Htyl+HPSQadjooput1TCpwqzYWUgWu00hlwFcsup17R1WXglK2ZgNu46hw
- /lCLgzGKN5r3qn8Tyn0CjGgOlDgeWlQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-102-ybLRZ8gUP1mVbkSTZvs_Sw-1; Mon, 20 Apr 2020 05:34:12 -0400
-X-MC-Unique: ybLRZ8gUP1mVbkSTZvs_Sw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B67668018A1
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 09:34:11 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.47])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C9B9111A1F3;
- Mon, 20 Apr 2020 09:34:10 +0000 (UTC)
-Date: Mon, 20 Apr 2020 10:34:07 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH 10/11] io: Fix qio_channel_socket_close() error handling
-Message-ID: <20200420093407.GJ346737@redhat.com>
-References: <20200420083236.19309-1-armbru@redhat.com>
- <20200420083236.19309-11-armbru@redhat.com>
+ (envelope-from <groug@kaod.org>) id 1jQSuc-0001Fb-N8
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:40:23 -0400
+Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:34343)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jQSuc-00013W-62
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:40:22 -0400
+Received: from player772.ha.ovh.net (unknown [10.108.54.36])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id 0033F1D06E1
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 11:40:06 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player772.ha.ovh.net (Postfix) with ESMTPSA id 708EF119DA7BE;
+ Mon, 20 Apr 2020 09:40:02 +0000 (UTC)
+Date: Mon, 20 Apr 2020 11:39:59 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH] MAINTAINERS: Upgrade myself as 9pfs co-maintainer
+Message-ID: <20200420113959.2c98e63d@bahia.lan>
+In-Reply-To: <E1jEYz4-0004pt-Cs@lizzy.crudebyte.com>
+References: <E1jEYz4-0004pt-Cs@lizzy.crudebyte.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200420083236.19309-11-armbru@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 7923239123003283776
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrgeefgddujecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucffohhmrghinhepqhgvmhhurdhorhhgnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjedvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=188.165.53.149; envelope-from=groug@kaod.org;
+ helo=2.mo2.mail-out.ovh.net
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 04:32:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ 05:40:11
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Received-From: 188.165.53.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,44 +71,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Apr 20, 2020 at 10:32:35AM +0200, Markus Armbruster wrote:
-> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
-> pointer to a variable containing NULL.  Passing an argument of the
-> latter kind twice without clearing it in between is wrong: if the
-> first call sets an error, it no longer points to NULL for the second
-> call.
->=20
-> qio_channel_socket_close() passes @errp first to
-> socket_listen_cleanup(), and then, if closesocket() fails, to
-> error_setg_errno().  If socket_listen_cleanup() failed, this will trip
-> the assertion in error_setv().
->=20
-> Fix by ignoring a second error.
->=20
-> Fixes: 73564c407caedf992a1c688b5fea776a8b56ba2a
-> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On Wed, 18 Mar 2020 14:33:44 +0100
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+
+> As suggested by Greg, let's upgrade myself as co-maintainer of 9pfs.
+> 
+> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 > ---
->  io/channel-socket.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Applied to 9p-next.
 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Hi Peter,
+
+Christian has been contributing to and reviewing 9pfs patches for some
+time now. I'm glad he's now volunteering for maintainership. The next
+step is to be able to send PRs that have a chance to be accepted by you.
+Christian told me he would need to start with a brand new GPG key. Because
+of the confinement, it is very unlikely he has a chance to get this key
+signed by anybody *in person* as described in [1]... if I try to make sure
+Christian's key fingerprint is valid in a "best effort" way, e.g. multiple
+messages using different media or channels, would it be acceptable for you
+that I'm the only signer for his key ?
+
+Cheers,
+
+--
+Greg
+
+[1] https://wiki.qemu.org/Contribute/SubmitAPullRequest
+
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 7364af0d8b..8d9cd04ab5 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1630,7 +1630,7 @@ F: include/hw/virtio/
+>  
+>  virtio-9p
+>  M: Greg Kurz <groug@kaod.org>
+> -R: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> +M: Christian Schoenebeck <qemu_oss@crudebyte.com>
+>  S: Odd Fixes
+>  F: hw/9pfs/
+>  X: hw/9pfs/xen-9p*
 
 
