@@ -2,84 +2,93 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40029C38A30
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 18:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00203C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 18:07:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10409206D6
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 18:06:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF5E3206D6
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 18:07:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+qyckNH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10409206D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iuf7sjcI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF5E3206D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQaoG-0004Wa-7y
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 14:06:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39056 helo=eggs1p.gnu.org)
+	id 1jQapW-0005ZG-Tu
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 14:07:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39178 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jQane-00043s-5u
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:05:42 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jQaoW-0004uE-Kf
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:06:37 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jQana-0000bs-1o
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:05:41 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:46582)
+ (envelope-from <richard.henderson@linaro.org>) id 1jQaoV-00017s-QP
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:06:36 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:39996)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jQanZ-0000au-KR
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:05:37 -0400
-Received: by mail-io1-xd43.google.com with SMTP id i3so12019460ioo.13
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 11:05:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=oocbVISTNdw51WmZebw7l80BwX58MKMF5pst+yHUbqg=;
- b=g+qyckNHxhtuvFofTA2hhJpbuB+XvNTA18z9p5U/asG/UGBbFiR9CboSkuaaeVyZI3
- 3+/0QRwLIwT2ZnMQ5lgQ/rp/4JjssNHloHBlncGEZh18QF9t25+qo7I5/PgFbwMi7D9O
- Ymj8KBzKs/Nzhd1ujRXBAIFF9BYCBZIai08b7fvCx48mOXS/yEtvhREisxUIOjevUVQC
- wt4Rj6FLX7F9LPLorGZzMDShNeD0P8Ihb3OA4TRpDC7BKkhFLnHh5YXMX0/HnDdfWfsf
- GFThXa4T6ACXslb7+1rZzyM5W25cmBe+CQhqWeTYpMjxHIyhNri1nUkjNiPTfnOtWp/s
- acBg==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jQaoV-000173-7I
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:06:35 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id a22so186286pjk.5
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 11:06:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Y/q97tNUy33Qie7GTOfiL8/EmYLdh4AV+2gMB2fSR+s=;
+ b=iuf7sjcImbuaETe3zR0m1Lff/bS8FHaRrwbTRyAULEJZ0Pbruonn+eMCiViT/ht2vI
+ wP2d++zo9L/8PwzHEQ5LBAEIYrDr97WlSlQVMotMaRKKWJwygL6owF7IXSbIIT35T1Vs
+ 3ElkRyfetN1lkomujAnhm01rVaTKIAbuvxcoIKsS+cl1RYD5H+44dBOYR8hbqSB9B2+t
+ vi09pA+N4UY9URsnC/gkHYISRwYQWXsa3RPGOVLghFNMI1C12hKWB1f+u8gzAHmiwPH8
+ nG9FP6JmG74BYSnndEbVERGn8rfAAsebg1gF3NsdVW6Aw6JXk+yKxaANnMFpH+4xUPRY
+ 2Dsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=oocbVISTNdw51WmZebw7l80BwX58MKMF5pst+yHUbqg=;
- b=qokMMt4y8N9mTfwz4CN02YoxDLV4sMNnEqejupBoDhpovfazpnwrcFxr4eyeoDc5y4
- K13yCoYmfOoC8Sf3EJxNNvw/TJYe3FaX+ntYDT0CUDbSfShjpAE8skEsn0GfzW+k4YxG
- zqMnZcS8A7sQ/WLUa3eyOWmQiIGwKC0D+5RbIh0cj9QlD3UdIUkRMeA8u0mWfvJmcP/4
- 76hZ7sadNzbl1QeOMNqSunMIAH4Zq2l9MlK7K/k2J/sI60RnENTVWHj7+n1PwavZljyK
- H35N4nmrqlnXdgtqO8yj0xNln6K7f5vxL4XlGFiXbgCBMNEbtZz1kVyjYcxeQYuuZyia
- Ix/g==
-X-Gm-Message-State: AGi0PubPl8TkGK1MBiCugs2vPryZGOZr3kaNJFCOttBWzbbhNfS8F5Bs
- /QXYI9YO6X4v0ZfE34JJVH9JWWifvlM/bUGZhtg=
-X-Google-Smtp-Source: APiQypIUi4NU8dNBLENI2KA8VoScUIlYCQ+S11gohgu+jCQQjcImKouvvKrQ74tnCFoovLztXpSI9CfviDAJODjQJuU=
-X-Received: by 2002:a5d:984b:: with SMTP id p11mr16886128ios.175.1587405936271; 
- Mon, 20 Apr 2020 11:05:36 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Y/q97tNUy33Qie7GTOfiL8/EmYLdh4AV+2gMB2fSR+s=;
+ b=c4ZYDJnEH5cxCawBQSTvvbwt2iRYw/MFvjdQID/V3LV8A3wuoMCr2FX/R/V6GcEfcb
+ AyOMlNRHKfsLpd88Z8NgD7qi6xzp8C1DavJAjBuVgjZen7cpJqONbUJgWyMlGhUy+Mx6
+ ShjUjoFKKAKlPkSEh+m+nSBFn9IiKbvKOlxpoj15wNw2AFUP+bM1of8r6FPMxjOpt0E9
+ OKHikvZAkUjKqUp1GgFXOdEk1GOOmZN7rJgHbhtiHabPC70JM2WtgFgsAwh97oSMj6Su
+ 4ESf4QOe5Q9TtqH+I2OQi2gVvKGBHDZZZCQXmpg45OKEwy9TT2eh2vPBVTElZ/exurYG
+ fepw==
+X-Gm-Message-State: AGi0PuaOOnAG9rtafxht0cUDbmQCT6L1rkbW0fp6wZhE7aPusqKxpi4/
+ jc1bU2vCn1uCoRaHLQX96XMjcYxurfI=
+X-Google-Smtp-Source: APiQypJQD2g58zejpfpGVNssYbSp6lfoGeZqAwTd6PX5g5hLdk51KBJ8KepOPHe/5tWOpch4l2MPnQ==
+X-Received: by 2002:a17:902:9f93:: with SMTP id
+ g19mr17375339plq.208.1587405993293; 
+ Mon, 20 Apr 2020 11:06:33 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id l15sm1760208pgk.59.2020.04.20.11.06.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 20 Apr 2020 11:06:32 -0700 (PDT)
+Subject: Re: [PATCH 00/16] tcg: Better handling of constants
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200418161914.4387-1-richard.henderson@linaro.org>
+ <87a736dv3q.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2f020e80-2450-913f-7d40-4b45b93b9b71@linaro.org>
+Date: Mon, 20 Apr 2020 11:06:30 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <20200420175250.25777-1-edgar.iglesias@gmail.com>
- <20200420175250.25777-4-edgar.iglesias@gmail.com>
-In-Reply-To: <20200420175250.25777-4-edgar.iglesias@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 20 Apr 2020 10:57:09 -0700
-Message-ID: <CAKmqyKOqy+=HZtrhw1EHqNGsiXXi39d6C6c3Hm-Q0456kDgJQA@mail.gmail.com>
-Subject: Re: [PATCH v2 3/6] target/microblaze: Add the div-zero-exception
- property
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd43.google.com
+In-Reply-To: <87a736dv3q.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
 X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::d43
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,96 +100,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>,
- Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Apr 20, 2020 at 10:54 AM Edgar E. Iglesias
-<edgar.iglesias@gmail.com> wrote:
->
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Add the div-zero-exception property to control if the core
-> traps divizions by zero.
->
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+On 4/20/20 8:39 AM, Alex Bennée wrote:
+> The series failed to apply at the first patch. Should it be based on any
+> other patches?
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+While I had split it out of the middle of a branch, I had not realized there
+are dependencies.
 
-Alistair
+Best guess is the "tcg: Clean up tcg_gen_gvec_dupi interface​" series is what
+you need.
 
-> ---
->  target/microblaze/cpu.c       | 4 ++++
->  target/microblaze/cpu.h       | 1 +
->  target/microblaze/op_helper.c | 5 +++--
->  3 files changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-> index 36c20d9724..53e80f4e5d 100644
-> --- a/target/microblaze/cpu.c
-> +++ b/target/microblaze/cpu.c
-> @@ -207,6 +207,8 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
->                                                   PVR2_DOPB_BUS_EXC_MASK : 0) |
->                          (cpu->cfg.iopb_bus_exception ?
->                                                   PVR2_IOPB_BUS_EXC_MASK : 0) |
-> +                        (cpu->cfg.div_zero_exception ?
-> +                                                 PVR2_DIV_ZERO_EXC_MASK : 0) |
->                          (cpu->cfg.illegal_opcode_exception ?
->                                                  PVR2_ILL_OPCODE_EXC_MASK : 0) |
->                          (cpu->cfg.opcode_0_illegal ?
-> @@ -280,6 +282,8 @@ static Property mb_properties[] = {
->                       cfg.iopb_bus_exception, false),
->      DEFINE_PROP_BOOL("ill-opcode-exception", MicroBlazeCPU,
->                       cfg.illegal_opcode_exception, false),
-> +    DEFINE_PROP_BOOL("div-zero-exception", MicroBlazeCPU,
-> +                     cfg.div_zero_exception, false),
->      DEFINE_PROP_BOOL("opcode-0x0-illegal", MicroBlazeCPU,
->                       cfg.opcode_0_illegal, false),
->      DEFINE_PROP_STRING("version", MicroBlazeCPU, cfg.version),
-> diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-> index 71d7317a58..3c07f9b3f7 100644
-> --- a/target/microblaze/cpu.h
-> +++ b/target/microblaze/cpu.h
-> @@ -305,6 +305,7 @@ struct MicroBlazeCPU {
->          bool iopb_bus_exception;
->          bool illegal_opcode_exception;
->          bool opcode_0_illegal;
-> +        bool div_zero_exception;
->          char *version;
->          uint8_t pvr;
->      } cfg;
-> diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
-> index 18677ddfca..f3b17a95b3 100644
-> --- a/target/microblaze/op_helper.c
-> +++ b/target/microblaze/op_helper.c
-> @@ -132,11 +132,12 @@ uint32_t helper_carry(uint32_t a, uint32_t b, uint32_t cf)
->
->  static inline int div_prepare(CPUMBState *env, uint32_t a, uint32_t b)
->  {
-> +    MicroBlazeCPU *cpu = env_archcpu(env);
-> +
->      if (b == 0) {
->          env->sregs[SR_MSR] |= MSR_DZ;
->
-> -        if ((env->sregs[SR_MSR] & MSR_EE)
-> -            && !(env->pvr.regs[2] & PVR2_DIV_ZERO_EXC_MASK)) {
-> +        if ((env->sregs[SR_MSR] & MSR_EE) && cpu->cfg.div_zero_exception) {
->              env->sregs[SR_ESR] = ESR_EC_DIVZERO;
->              helper_raise_exception(env, EXCP_HW_EXCP);
->          }
-> --
-> 2.20.1
->
->
+
+r~
 
