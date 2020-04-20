@@ -2,118 +2,85 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64AD0C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA56C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:05:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36DE920CC7
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:52:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36DE920CC7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 0023520857
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:05:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VPiVDN4q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0023520857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQT6L-0005fH-EA
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 05:52:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48402 helo=eggs1p.gnu.org)
+	id 1jQTJG-0004Li-0g
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 06:05:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50626 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jQT5h-0005D6-PA
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:51:50 -0400
+ (envelope-from <berrange@redhat.com>) id 1jQTI3-00033i-UY
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:04:40 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jQT5h-0004ZF-7F
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:51:49 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:51119)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jQT5g-0004Sh-Iv
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:51:48 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MNOZO-1jbwV22baU-00Orzk; Mon, 20 Apr 2020 11:51:42 +0200
-Subject: Re: [PATCH 3/3] plugins: avoid failing plugin when CPU is inited
- several times
-To: Nikolay Igotti <igotti@gmail.com>, riku.voipio@iki.fi
-References: <CAEme+7FPF+inSJSXQPmuv8Up3Eam0N7fT03zqM-RvcvKsxjfVQ@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <f4feb648-7dc5-ac54-bc0b-db650dd176f1@vivier.eu>
-Date: Mon, 20 Apr 2020 11:51:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <berrange@redhat.com>) id 1jQTI2-0006Bb-Bi
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:04:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37581
+ helo=us-smtp-1.mimecast.com)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jQTI1-00068g-VI
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:04:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587377072;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Rd8ck0rG+VWuzFUfCUtC6WQUhQmJdODGU2whSWDpkIs=;
+ b=VPiVDN4q8AlvP45hwCWaEp0Ko0JbnVz0VgNJ0XcZSZitGV5LpM43V9h0Lunem9udEUaf4X
+ rmY4B9YtYpoaRVPILtVa/65Q/ejgKRcIwNshNlZaEjol0wwjKeQ03VONZA01F8wFUvq6Zy
+ haPFWFJCkQ4bsLu0HtMcFoMmovDz4+k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-203-Mc9FX2lBPEibQ-G84ty2Dw-1; Mon, 20 Apr 2020 06:04:08 -0400
+X-MC-Unique: Mc9FX2lBPEibQ-G84ty2Dw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 550DB18C8C02;
+ Mon, 20 Apr 2020 10:04:06 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B053A188D;
+ Mon, 20 Apr 2020 10:03:53 +0000 (UTC)
+Date: Mon, 20 Apr 2020 11:03:50 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Chen Qun <kuhn.chenqun@huawei.com>
+Subject: Re: [PATCH] block/iscsi:fix heap-buffer-overflow in iscsi_aio_ioctl_cb
+Message-ID: <20200420100350.GL346737@redhat.com>
+References: <20200418062602.10776-1-kuhn.chenqun@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAEme+7FPF+inSJSXQPmuv8Up3Eam0N7fT03zqM-RvcvKsxjfVQ@mail.gmail.com>
+In-Reply-To: <20200418062602.10776-1-kuhn.chenqun@huawei.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:bQEOPWtyMeF0SITcgAa0cjT8IuQzcGfgkhje/l6yAhlrgDrTaOw
- /Ur8viV3x49RhiUfIIUAht/g+KCm4wvJcEGETYXz8HruX/YgFt4Qn2qlK+fb94zNq5KZFXs
- 0AiErRPLQZy3DuJhiJ80oogL5/m6egvbLtzM4ypOXodWkhkNHV2647JzypNpkAXRqOr18Yi
- 26tOw5kHMu25mTT6ucdPQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:46EUutRews4=:rwAIy5bzkpZ8q3rBSKmIYD
- yL4KOoM8rumdmzD0corA8WadP6NNZo5aAWndGwTVW8JEY81WV0se93fsum0mESelg2cwRqkbe
- /x5rhLNwY7CUYiPSnr8/HAdLs7EvsYDPoGPJrvI9QqPcBrDvqkF4LR0Pqx2i9YQ6QlbdhfMAy
- u38nuGwXv0EH7Z9AcS979CUjIi1QleCd2szHRglcvD318qXk0Xc4ZINbNvSidjzUUwtIBklnY
- 27UoJDSm/ekvVQEePcqDgsvy28SkbjwQ0aCqg9Yyr7gJELBWww7SJfAUlQ2YUiIa80qE8RyGH
- VFaPIWq/9rSQLnO/SEVo6KR5fTwblXRV9PsC6KHZQvBaDCZS1JaueFDiP1URoSMUgOhrIdNof
- R0+mUALGBZbr1cvcRv/SlqaX0p+6IEkU7atmJQDavInr8GV1Goo3SbeQ4rsnrc/c5r29QIjX5
- l36uCW1OMogO4YFbTekPTQeVYH1MLzmRfL37eAPTwqdmLhia5xyc24l8gpP9QYdb1B5uORAhY
- cGblhtk04RggYJlmpyXm1USc6WpiVIczhcUSEsYkQStiQryHQGs0VnibGWVxRTIrCsVnGeKcN
- fVRQ2eQNvgceGlK013qeFbktimmRsfnuB/TXu2Z4N0EYrZat+4gZI0qGF6e8QvXcHkq8/jFDm
- QWxzx6TtoRR7CiQLfsvZw3U1OU8hfSg+watwYbi3/IgmL2UNTLMCbgpmwCBFMCQW2XX06HXZX
- /Vde02c4T/1d/4GgFH0PNOZAbHXJYsJ4AtOJ+mjJ4NL0TL69RzW/BC5dKagFNq49ZGEo64idu
- yqbcj4yZiLMCarM2e0Xo6qYAS1JHenPGGLe9jubWKDdahwqWwwWyWhjlG+cU1EMUCKuvZTv
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 05:22:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 212.227.126.131
+ 03:29:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,79 +92,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Emilio G. Cota" <cota@braap.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, zhang.zhanghailiang@huawei.com,
+ qemu-block@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>,
+ qemu-trivial@nongnu.org, Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org,
+ Prasad J Pandit <ppandit@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Euler Robot <euler.robot@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Nikolay,
-
-the patch seems corrupted by your mailer.
-
-CC: Alex and Emilio as this code is theirs.
-
-Thanks,
-Laurent
-
-Le 20/04/2020 à 11:15, Nikolay Igotti a écrit :
-> In linux-user multithreaded scenarious CPU could be inited many times
-> with the same id,
-> 
-> so avoid assertions on already present hashtable entry.
-> 
-> 
-> Signed-off-by: Nikolay Igotti <igotti@gmail.com <mailto:igotti@gmail.com>>
-> 
+On Sat, Apr 18, 2020 at 02:26:02PM +0800, Chen Qun wrote:
+> There is an overflow, the source 'datain.data[2]' is 100 bytes,
+>  but the 'ss' is 252 bytes.This may cause a security issue because
+>  we can access a lot of unrelated memory data.
+>=20
+> The len for sbp copy data should take the minimum of mx_sb_len and
+>  sb_len_wr, not the maximum.
+>=20
+> If we use iscsi device for VM backend storage, ASAN show stack:
+>=20
+> READ of size 252 at 0xfffd149dcfc4 thread T0
+>     #0 0xaaad433d0d34 in __asan_memcpy (aarch64-softmmu/qemu-system-aarch=
+64+0x2cb0d34)
+>     #1 0xaaad45f9d6d0 in iscsi_aio_ioctl_cb /qemu/block/iscsi.c:996:9
+>     #2 0xfffd1af0e2dc  (/usr/lib64/iscsi/libiscsi.so.8+0xe2dc)
+>     #3 0xfffd1af0d174  (/usr/lib64/iscsi/libiscsi.so.8+0xd174)
+>     #4 0xfffd1af19fac  (/usr/lib64/iscsi/libiscsi.so.8+0x19fac)
+>     #5 0xaaad45f9acc8 in iscsi_process_read /qemu/block/iscsi.c:403:5
+>     #6 0xaaad4623733c in aio_dispatch_handler /qemu/util/aio-posix.c:467:=
+9
+>     #7 0xaaad4622f350 in aio_dispatch_handlers /qemu/util/aio-posix.c:510=
+:20
+>     #8 0xaaad4622f350 in aio_dispatch /qemu/util/aio-posix.c:520
+>     #9 0xaaad46215944 in aio_ctx_dispatch /qemu/util/async.c:298:5
+>     #10 0xfffd1bed12f4 in g_main_context_dispatch (/lib64/libglib-2.0.so.=
+0+0x512f4)
+>     #11 0xaaad46227de0 in glib_pollfds_poll /qemu/util/main-loop.c:219:9
+>     #12 0xaaad46227de0 in os_host_main_loop_wait /qemu/util/main-loop.c:2=
+42
+>     #13 0xaaad46227de0 in main_loop_wait /qemu/util/main-loop.c:518
+>     #14 0xaaad43d9d60c in qemu_main_loop /qemu/softmmu/vl.c:1662:9
+>     #15 0xaaad4607a5b0 in main /qemu/softmmu/main.c:49:5
+>     #16 0xfffd1a460b9c in __libc_start_main (/lib64/libc.so.6+0x20b9c)
+>     #17 0xaaad43320740 in _start (aarch64-softmmu/qemu-system-aarch64+0x2=
+c00740)
+>=20
+> 0xfffd149dcfc4 is located 0 bytes to the right of 100-byte region [0xfffd=
+149dcf60,0xfffd149dcfc4)
+> allocated by thread T0 here:
+>     #0 0xaaad433d1e70 in __interceptor_malloc (aarch64-softmmu/qemu-syste=
+m-aarch64+0x2cb1e70)
+>     #1 0xfffd1af0e254  (/usr/lib64/iscsi/libiscsi.so.8+0xe254)
+>     #2 0xfffd1af0d174  (/usr/lib64/iscsi/libiscsi.so.8+0xd174)
+>     #3 0xfffd1af19fac  (/usr/lib64/iscsi/libiscsi.so.8+0x19fac)
+>     #4 0xaaad45f9acc8 in iscsi_process_read /qemu/block/iscsi.c:403:5
+>     #5 0xaaad4623733c in aio_dispatch_handler /qemu/util/aio-posix.c:467:=
+9
+>     #6 0xaaad4622f350 in aio_dispatch_handlers /qemu/util/aio-posix.c:510=
+:20
+>     #7 0xaaad4622f350 in aio_dispatch /qemu/util/aio-posix.c:520
+>     #8 0xaaad46215944 in aio_ctx_dispatch /qemu/util/async.c:298:5
+>     #9 0xfffd1bed12f4 in g_main_context_dispatch (/lib64/libglib-2.0.so.0=
++0x512f4)
+>     #10 0xaaad46227de0 in glib_pollfds_poll /qemu/util/main-loop.c:219:9
+>     #11 0xaaad46227de0 in os_host_main_loop_wait /qemu/util/main-loop.c:2=
+42
+>     #12 0xaaad46227de0 in main_loop_wait /qemu/util/main-loop.c:518
+>     #13 0xaaad43d9d60c in qemu_main_loop /qemu/softmmu/vl.c:1662:9
+>     #14 0xaaad4607a5b0 in main /qemu/softmmu/main.c:49:5
+>     #15 0xfffd1a460b9c in __libc_start_main (/lib64/libc.so.6+0x20b9c)
+>     #16 0xaaad43320740 in _start (aarch64-softmmu/qemu-system-aarch64+0x2=
+c00740)
+>=20
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
-> 
->  plugins/core.c | 5 +----
-> 
->  1 file changed, 1 insertion(+), 4 deletions(-)
-> 
-> 
-> diff --git a/plugins/core.c b/plugins/core.c
-> 
-> index 51bfc94787..889cc6441a 100644
-> 
-> --- a/plugins/core.c
-> 
-> +++ b/plugins/core.c
-> 
-> @@ -196,13 +196,10 @@ plugin_register_cb_udata(qemu_plugin_id_t id, enum
-> qemu_plugin_event ev,
-> 
->  
-> 
->  void qemu_plugin_vcpu_init_hook(CPUState *cpu)
-> 
->  {
-> 
-> -    bool success;
-> 
-> -
-> 
->      qemu_rec_mutex_lock(&plugin.lock);
-> 
->      plugin_cpu_update__locked(&cpu->cpu_index, NULL, NULL);
-> 
-> -    success = g_hash_table_insert(plugin.cpu_ht, &cpu->cpu_index,
-> 
-> +    g_hash_table_insert(plugin.cpu_ht, &cpu->cpu_index,
-> 
->                                    &cpu->cpu_index);
-> 
-> -    g_assert(success);
-> 
->      qemu_rec_mutex_unlock(&plugin.lock);
-> 
->  
-> 
->      plugin_vcpu_cb__simple(cpu, QEMU_PLUGIN_EV_VCPU_INIT);
-> 
-> -- 
-> 
-> 2.24.2 (Apple Git-127)
-> 
+> v1->v2:
+> Use MIN() macro for mx_sb_len and sb_len_wr.
+> (Base comments from Michael S. Tsirkin, Stefan Hajnoczi, Kevin Wolf)
+>=20
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Prasad J Pandit <ppandit@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Peter Lieven <pl@kamp.de>
+> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+> Cc: qemu-block@nongnu.org
+> ---
+>  block/iscsi.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+I think it is resonable to include this in 5.0 too.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
