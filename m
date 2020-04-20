@@ -2,83 +2,84 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0229AC3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E01EC3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:19:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFD66205C9
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:12:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA5EB20A8B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:19:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lmzqLzXs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFD66205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y6gyFRkj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA5EB20A8B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQTPN-0001Wg-Vz
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 06:12:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52102 helo=eggs1p.gnu.org)
+	id 1jQTWu-0003bz-8w
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 06:19:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53542 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jQTOm-00017q-Ru
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:11:33 -0400
+ (envelope-from <igotti@gmail.com>) id 1jQTW2-0003D5-E5
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:19:02 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jQTOm-0002Z2-3a
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:11:32 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33156)
+ (envelope-from <igotti@gmail.com>) id 1jQTW1-0000V7-Ao
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:19:02 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:34066)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jQTOl-0002YD-OS
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:11:31 -0400
-Received: by mail-ot1-x342.google.com with SMTP id j26so7586593ots.0
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 03:11:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.90_1) (envelope-from <igotti@gmail.com>) id 1jQTW0-0000T8-Tg
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:19:01 -0400
+Received: by mail-lf1-x141.google.com with SMTP id x23so7459311lfq.1
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 03:19:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=dUV7qcLtj1M9SSM+xC2v0N+o6DtwyCd+1yJf1qa3WEY=;
- b=lmzqLzXsEdIbVS4A7P3o88aDU8zMvDGfCPrlRAo5sC6N2rH/pVdBrMVBkd4gU/B1cz
- bwyPekfxmy1m3juR2UqDarpdUNT+NCsnuBMUqCrs9Nw9UF2SofIUOMi7IyKSAdGXwj+7
- UzkRSAYCvQiQ0eMlbC6lyk3NZCB2M2u4/mQ/GcU9tTO3W5VhyTV2t/UCqwcbvQiGKwBc
- T2U+ql6yLoEY9mOxHrF5sr8seOTAbyxicEXvuYmZvrtK6JkVMF00nDfUDuHMVQbE7j/I
- F9FmGOuZE27tC1rTyEM8O2ycRISI4b5s+JXPCnZPwX7gDc4Me5S5sLCU9NLEQVvaC9e9
- yqEw==
+ :cc; bh=OyeIQoOv+CBKXLeZgJ1HGwbxMgFE5TUlgdeLbHR6Kjc=;
+ b=Y6gyFRkj5TJAkgr9Pn/SgfS+pf4cHI4VUezDk/DfOZ7HuhwRikEo607h+fSFw3wvfa
+ 32s+UvNul3bbxQH9wscPpbmWWQ6CQA1Tvd8f+URfn+7y2Kat4VGJz72hMLQ9RV5cdBuZ
+ VinSpmuH3oRSx5HLD1gsBlQAIP87qNPyDhgH5KRdt+nCeyHXoDfxEuImXIo8RKWsRex+
+ LGrfh1MBaqJfNE5/TgmtV20r3gf9Yqu+FrgQ8ODdsB5jjNeKQx21h22hXnOv7quJCkxA
+ wG/IY5F7JlZpzs07cUBHe/+m7L9leFU3sIFAAdoyGY1w6HZh0msfTMH2M4jXm4AY7ChG
+ JA/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=dUV7qcLtj1M9SSM+xC2v0N+o6DtwyCd+1yJf1qa3WEY=;
- b=CXKAO9y7szolTsdHQ0ObLUrYThoGMNZ2NysUw0egXfRAc8Je26OpItCnPdne2Pk6Is
- VAAAB6jr7EhxGuDlNztugT0q8r5P7iPpxT+S1gTnNmch9jji5D9tMpRVUePUeuu5KLVf
- pBzvg5GnrVX6fzJizKpZTpp5YmoYor9sjTr/L8pivTkB983vFqngoZWPIuu2LAivQaM8
- W6nhkgUyXrwDjmpjQHB+OtQ2E9LlTmbGYRhVZcCYQ+KkKmy2PKF+LqbhTC+FPvQeilpR
- frvckDzsb7Dn84tg2k0ieTmU3YNh1ZgPhCoDjF5n0Hc1nzC9/A8mpq4fkoRBbNt7VnJJ
- d6zQ==
-X-Gm-Message-State: AGi0PuZwnXpIkgK6l0VAdgO7iP7h5cYTYQNqaZdhhQmUVA+9N4ZE3Nm/
- gZxkzyCAH63tD3Y0nIW0xDybtMAqgFkiV6oltjBx2A==
-X-Google-Smtp-Source: APiQypLX7nuWktFAL7hsuC4XzF3v+aeb4VxJDAV404kQ3hGKxGQ+70Y/9ArpTxmjmPzVp+m0CTUIZydcaGaYqN6TTxY=
-X-Received: by 2002:a05:6830:22dc:: with SMTP id
- q28mr8505497otc.221.1587377489852; 
- Mon, 20 Apr 2020 03:11:29 -0700 (PDT)
+ bh=OyeIQoOv+CBKXLeZgJ1HGwbxMgFE5TUlgdeLbHR6Kjc=;
+ b=mds3FfUz0ORjxfR1gOHPQof6hmuCvU1G66Z7+wD175XVe8Po25F/GlnGaF+GC/iL0a
+ iFvyJlG/NlGHlK9Cr3wMMX/KGs4KX3gzrqz6UfR1hSBiLqcsmoSdFFkp2ivX9P0kfA+M
+ Rc/dHMstvzd+w/Y8y1n9ULCdw3W2iQpq30YvFUmemV3GLceDYk0kP2vqQxNMw7nOYqrm
+ c5G2urQzshYv5s1rXmumulf/8hu6ZQRdTY3Ze/Q5bPPk13qPDwqK+RJ7Jv3vknICZCRw
+ lTmL8xbh9tmEnUyVUZbF9uaf2ambA80uJxxlWFGN+yKFH5FaHIEzd2GAUDXtMwncH19c
+ Imlw==
+X-Gm-Message-State: AGi0PuY47GbFyI6uPI/XBU/g2naJlyQpgIve0ClOD6FJujc2wdJD5SC+
+ 0E0/PmZR06nW5W24Cslon1F9mHMkfW4B8gLCCns=
+X-Google-Smtp-Source: APiQypLbAomzIphBLNuYM3KgiU8Apw6Entsz850iR3gJ4FvIS+7l0Wh/qc4GoMpGc7DD4wnPUzlvgugXoXTZanOraes=
+X-Received: by 2002:a05:6512:1082:: with SMTP id
+ j2mr10204688lfg.53.1587377938530; 
+ Mon, 20 Apr 2020 03:18:58 -0700 (PDT)
 MIME-Version: 1.0
 References: <CAEme+7FPF+inSJSXQPmuv8Up3Eam0N7fT03zqM-RvcvKsxjfVQ@mail.gmail.com>
-In-Reply-To: <CAEme+7FPF+inSJSXQPmuv8Up3Eam0N7fT03zqM-RvcvKsxjfVQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Apr 2020 11:11:18 +0100
-Message-ID: <CAFEAcA9Yk53oK5YstN7DpCCq344+tbyjvDA6RaWcJCrL9QSjMw@mail.gmail.com>
+ <CAFEAcA9Yk53oK5YstN7DpCCq344+tbyjvDA6RaWcJCrL9QSjMw@mail.gmail.com>
+In-Reply-To: <CAFEAcA9Yk53oK5YstN7DpCCq344+tbyjvDA6RaWcJCrL9QSjMw@mail.gmail.com>
+From: Nikolay Igotti <igotti@gmail.com>
+Date: Mon, 20 Apr 2020 13:18:47 +0300
+Message-ID: <CAEme+7Gt+TX99-pun80doARC5gE6=zDsuJLd1PVxt_SvRPf6Yw@mail.gmail.com>
 Subject: Re: [PATCH 3/3] plugins: avoid failing plugin when CPU is inited
  several times
-To: Nikolay Igotti <igotti@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000002683c905a3b63a08"
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=igotti@gmail.com; helo=mail-lf1-x141.google.com
 X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2a00:1450:4864:20::141
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,19 +97,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 20 Apr 2020 at 10:16, Nikolay Igotti <igotti@gmail.com> wrote:
->
-> In linux-user multithreaded scenarious CPU could be inited many times with the same id,
->
-> so avoid assertions on already present hashtable entry.
->
->
-> Signed-off-by: Nikolay Igotti <igotti@gmail.com>
+--0000000000002683c905a3b63a08
+Content-Type: text/plain; charset="UTF-8"
 
-Wouldn't it be better to make sure we remove the entry from
-the hashtable when the old thread that was using that CPU
-ID exits, or is that not feasible ?
+Maybe, I've tried least intrusive change as not entirely familiar with
+plugin login in QEMU.
 
-thanks
--- PMM
+On Mon, Apr 20, 2020 at 1:11 PM Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+> On Mon, 20 Apr 2020 at 10:16, Nikolay Igotti <igotti@gmail.com> wrote:
+> >
+> > In linux-user multithreaded scenarious CPU could be inited many times
+> with the same id,
+> >
+> > so avoid assertions on already present hashtable entry.
+> >
+> >
+> > Signed-off-by: Nikolay Igotti <igotti@gmail.com>
+>
+> Wouldn't it be better to make sure we remove the entry from
+> the hashtable when the old thread that was using that CPU
+> ID exits, or is that not feasible ?
+>
+> thanks
+> -- PMM
+>
+
+--0000000000002683c905a3b63a08
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Maybe, I&#39;ve tried least intrusive change as not entire=
+ly familiar with plugin login in QEMU.</div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Mon, Apr 20, 2020 at 1:11 PM Peter=
+ Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@lina=
+ro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">On Mon, 20 Apr 2020 at 10:16, Nikolay Igotti &lt;<a href=3D"mailto:ig=
+otti@gmail.com" target=3D"_blank">igotti@gmail.com</a>&gt; wrote:<br>
+&gt;<br>
+&gt; In linux-user multithreaded scenarious CPU could be inited many times =
+with the same id,<br>
+&gt;<br>
+&gt; so avoid assertions on already present hashtable entry.<br>
+&gt;<br>
+&gt;<br>
+&gt; Signed-off-by: Nikolay Igotti &lt;<a href=3D"mailto:igotti@gmail.com" =
+target=3D"_blank">igotti@gmail.com</a>&gt;<br>
+<br>
+Wouldn&#39;t it be better to make sure we remove the entry from<br>
+the hashtable when the old thread that was using that CPU<br>
+ID exits, or is that not feasible ?<br>
+<br>
+thanks<br>
+-- PMM<br>
+</blockquote></div>
+
+--0000000000002683c905a3b63a08--
 
