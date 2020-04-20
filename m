@@ -2,137 +2,92 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1F21C38A30
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:34:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49094C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:35:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EC112082E
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:34:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F0242078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:35:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="UxT4P3VZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EC112082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y9QWbiDR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F0242078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQTlK-0001Gt-ND
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 06:34:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56508 helo=eggs1p.gnu.org)
+	id 1jQTm5-0002EQ-7u
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 06:35:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56610 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ani.sinha@nutanix.com>) id 1jQTkT-0000qf-HG
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:33:58 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jQTl5-0001EM-E5
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:34:48 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <ani.sinha@nutanix.com>) id 1jQTkS-0008MN-8d
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:33:56 -0400
-Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:18946)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
- id 1jQTkR-0008Du-Fu
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:33:55 -0400
-Received: from pps.filterd (m0127842.ppops.net [127.0.0.1])
- by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 03KAXJUr006641; Mon, 20 Apr 2020 03:33:52 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version;
- s=proofpoint20171006; bh=GcgH1rggOCMHmeWRZmbvffzfS/8NHJ0+1zMHqzgxAkU=;
- b=UxT4P3VZsFmsZjdLWcsvD86kvFQsolBODjUS1zEgWgcSLl9F3HNGFDYfPuYoualU1+3A
- hA/D0ioCfp7dxRIvaPeIVv2ylzriE0Ct96SBwwNe4BCgHQ7Gsk9sSe2ZbeZu8jZMXULV
- /45DbvO3DLleqFs1pIXQwZKIhPAPxwhMhXDWnySL8+GACtC3JHJ7CAwvZj0g/0Y7pjvQ
- l8QBIFW2wagiMrPcR+LhUjZTWz9zhKRMJEhcvRw8mzI6JS5f4/N3x77Es0IB4vvAHTZ/
- zeKdaYGXH9BRikPegWMIw7xLRzlHc78EJcO1a7hBRGMPQoAghC3yvvqAoB8Uwr8QgLqs 1w== 
-Received: from nam12-mw2-obe.outbound.protection.outlook.com
- (mail-mw2nam12lp2040.outbound.protection.outlook.com [104.47.66.40])
- by mx0b-002c1b01.pphosted.com with ESMTP id 30g0vg341y-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 20 Apr 2020 03:33:52 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cRzsNN/gAd+wFO2vTaO0oYunr4FYBHwhQA9mTFbxAjph8x1aaUmXX6UmKteCRPGU3g9PvehsUC+27RftC7zvB6pWWnAbvhUf55CaAj9YOJRfDh47MoExCdlQd8etvbvWHbcPwYaY0G/aUi9YLj15MGlkDUBKX43bR+3+TsIQePRza0uXRU17ZtXu7LmqrxX//LaOSERssCb4liLr0N2UBLb6BCwVTY3vF47tJLfBVljBu5u8zqDKGBtwxyUex3VP6I05uyKu4H5YbYG+z50YQxcnOEQZYEE4yTdFaWlTLu5Ymp/9ZT+w1wgiqRJxVXH+n+kJGjQUfeyWd2HN6fNe5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GcgH1rggOCMHmeWRZmbvffzfS/8NHJ0+1zMHqzgxAkU=;
- b=gNDOGZpFsiRyHQnWWerlZ5DpQJvWqiq26HeQp5/rbia82NMc5xGcxVkk+jrlIbJMIlQJh9PQl8m6CK6I4VTZ+XAL+X4klADHGJW1BGcqenAYXwkXOb3edjZtAhosUXtJYIreKjXPBYV+Pe8evNu44Qty2mTyt8QqtWZyZsTjNn5XEiFvVDh5rbRnGy3kskAE//YspoCf2P+cW6hzLVnqT6mKc8d3jwCimpkOHe3rsBgCcUpZ+lIkWPgfYbRgQ7hr/zKKYPvRpb+/+c0APc6DH/FgH7dRBYVCOH1Eotnfb0qxvrctwJyocnxdax37rrS1x0Fk+iz4ahZGpkwMHx9N5w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MN2PR02MB5742.namprd02.prod.outlook.com (2603:10b6:208:10d::27)
- by MN2PR02MB5904.namprd02.prod.outlook.com (2603:10b6:208:113::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.29; Mon, 20 Apr
- 2020 10:33:49 +0000
-Received: from MN2PR02MB5742.namprd02.prod.outlook.com
- ([fe80::200c:b06c:d8c6:42a]) by MN2PR02MB5742.namprd02.prod.outlook.com
- ([fe80::200c:b06c:d8c6:42a%7]) with mapi id 15.20.2921.027; Mon, 20 Apr 2020
- 10:33:49 +0000
-From: Ani Sinha <ani.sinha@nutanix.com>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
-Subject: Re: [PATCH] Add a new PIIX option to control PCI hot unplugging of
- devices on non-root buses
-Thread-Topic: [PATCH] Add a new PIIX option to control PCI hot unplugging of
- devices on non-root buses
-Thread-Index: AQHWFMrLeCs/JzKNrUaCDY3Nn1YJmqh9b9kAgAACaICAAAksAIAERh2AgAATKQA=
-Date: Mon, 20 Apr 2020 10:33:49 +0000
-Message-ID: <E2078F88-AF75-4D85-B677-C090FA0FD88B@nutanix.com>
-References: <1587136411-200885-1-git-send-email-ani.sinha@nutanix.com>
- <20200417112620-mutt-send-email-mst@kernel.org>
- <2A13ACCD-BD24-41FB-B6EA-2804F7C1FF1D@nutanix.com>
- <20200417120732-mutt-send-email-mst@kernel.org>
- <20200420092459.GF346737@redhat.com>
-In-Reply-To: <20200420092459.GF346737@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [115.110.205.84]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2006b651-6938-4ae8-1102-08d7e5165039
-x-ms-traffictypediagnostic: MN2PR02MB5904:
-x-microsoft-antispam-prvs: <MN2PR02MB590417061F9A0ECC69AC09F5F1D40@MN2PR02MB5904.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:5516;
-x-forefront-prvs: 03793408BA
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MN2PR02MB5742.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(39860400002)(346002)(376002)(136003)(366004)(396003)(71200400001)(2906002)(81156014)(8676002)(8936002)(44832011)(33656002)(66946007)(26005)(76116006)(6506007)(53546011)(66476007)(66556008)(64756008)(5660300002)(66446008)(2616005)(4326008)(4744005)(91956017)(6916009)(36756003)(6512007)(6486002)(86362001)(54906003)(478600001)(186003)(316002);
- DIR:OUT; SFP:1102; 
-received-spf: None (protection.outlook.com: nutanix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: i+7B12EBQ2xGz207ZNNTpJiUHPqfZ6L8Gjjc9zzcaMjkhfTqj9LJuY0peI0IA1SKuQkFqi2eAkDZqOQXLrea90lK2UEZiELwA2jNx700CAVq9CD+uQhMvsQrKvcZkr4jup8dAYQI5Tfi3W+Z29KHjn3XdEPWnKf685UNulj+KOz2L+Brpk5mNEM5EE2ivR1uCyX2MnS6ANCGdERfI1f2ejo5hg/nJCzuQT6eYO6RsJjyehFIPP4zHK/6UmU6vXWAXXNSYz2t1FQ3776BWqZer2+KTUq4fEK69wccdgJ0DQRY+VPfZh1XmDCHCUBaLHQov0+OgPt7CKchXbVfxQUonzgEmQTs9K9AHs6/aikykjNqEtvBZA9Mh1A4/20HM8XkycauIdj/nN/U1DJ1xl8zjNZ47E8yF1X+f4g/tI/ey/hOTofzgQtI9h+bfkLcU2VP
-x-ms-exchange-antispam-messagedata: qUIk23MRj522hgx2/kwbaL7IJXf0obGnH7MKxFvybmi0e3N7aL6BJ6MagFnKwNb4+nfLOvnpBzVHboXR6PF/OFPGl49CKoKpQHa5FTMM509k9xHmgC/u505Bf+zpz+jLVll6x/Y43B8bZKq6lO7aQw==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E4CE4CC1489D404E891BE558305CCF88@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <alex.bennee@linaro.org>) id 1jQTkv-0000Ns-Du
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:34:35 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45155)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jQTku-0000M3-TD
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:34:25 -0400
+Received: by mail-wr1-x443.google.com with SMTP id t14so11420082wrw.12
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 03:34:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=qODjT8LGS2xf0CckhwOI1H0DuXfWEICr2g7ZD0uov14=;
+ b=Y9QWbiDREPNoq+ChAXR3O7FguxO3TCokhyCGezNdkIIWqVR7IKMfkMvwQcAGcDpMuT
+ W+pKgAVkAVR3sfBH+g9KNXfod41SPqU1lS4WptkuXvgiFjD+Nt1dxmRYnBvLrPR7fUnL
+ VjfBH7d+HyWARuX4csNLLdjL26HsBvyefQZInkaPGCHdc6Kwj9goTs6oai8dYtPZXEAs
+ mMzU1mntX3jLjdPqKsmzKShSRPKdMaLJgVtXiDuY4ULcp/b7hgbsnLwX+mB0HqefJO+j
+ K01Hds0q051lDs0I57gAcbZ0vpW++pY33sFGBumGBO/UWfqUtTjZs+yAqFYCvR0RZAGk
+ IMwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=qODjT8LGS2xf0CckhwOI1H0DuXfWEICr2g7ZD0uov14=;
+ b=GZUtAiKWoHyj58LNZQ0t4vV63ScGaUS1dEUuZv6fuSZL++1aWfqU9tUHRFCdiZYt/Z
+ jLbNQs2Mel7AnlbWmElbkGKnSFm7t8nlqp2YJefPoDXCv+cFYiPSPzVVXM0RFMifOoDp
+ q4v9yESSvnBrrnroufN9TYHiOtAUm1McQB8pGvx1EbD6bGa1aL8iRBsdqBZ3K4BbhpDs
+ nyKsJ9kYVwX05k2KGh4kB3w2OP5fw6iy6UaFbZ5W0yDUcbrRt9sSiaN69d4naNcL9tzj
+ W+3RdHmVgzwqHo/XaCBZy5xdxAUWgraoKrAsp26PLnpiFRY8CKDbd/pBimu4eO1yq3W5
+ iCSg==
+X-Gm-Message-State: AGi0PuYQ25fhw35sG10+2KfuSoGBAjeR6ilNJOjf0BS1A47as7Vdixpm
+ KvgxZeN+qCtTcyMyQEYKb2dNlQ==
+X-Google-Smtp-Source: APiQypKgemvGROc+mSkW6U3K9CinQuaKobipnJtidYA5NDFJEkctdH8BxwaNt3likgEcjVTKwDezbQ==
+X-Received: by 2002:adf:afc6:: with SMTP id y6mr17368290wrd.74.1587378862875; 
+ Mon, 20 Apr 2020 03:34:22 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f7sm644383wrt.10.2020.04.20.03.34.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Apr 2020 03:34:21 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 8F37D1FF7E;
+ Mon, 20 Apr 2020 11:34:20 +0100 (BST)
+References: <20200418150411.1831-1-richard.henderson@linaro.org>
+ <20200418150411.1831-4-richard.henderson@linaro.org>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 3/7] target/ppc: Use tcg_gen_gvec_dup_imm
+In-reply-to: <20200418150411.1831-4-richard.henderson@linaro.org>
+Date: Mon, 20 Apr 2020 11:34:20 +0100
+Message-ID: <87368yfntf.fsf@linaro.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2006b651-6938-4ae8-1102-08d7e5165039
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Apr 2020 10:33:49.3323 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rAcwFfOQUjsJ3LWh1t2Uud4i26QHrjoQu1hzL+jhiFWGkJoJkUb7Br1zYqTQjKJJQtlEmVe5pNFcRhUX7VOjPQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB5904
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-20_03:2020-04-20,
- 2020-04-20 signatures=0
-X-Proofpoint-Spam-Reason: safe
-Received-SPF: pass client-ip=148.163.155.12;
- envelope-from=ani.sinha@nutanix.com; helo=mx0b-002c1b01.pphosted.com
-X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 06:33:52
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Received-From: 148.163.155.12
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -144,25 +99,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org,
+ david@gibson.dropbear.id.au, zhiwei_liu@c-sky.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gT24gQXByIDIwLCAyMDIwLCBhdCAyOjU0IFBNLCBEYW5pZWwgUC4gQmVycmFuZ8OpIDxi
-ZXJyYW5nZUByZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+IEZyb20gdGhlIHVwc3RyZWFtIFBPViwg
-dGhlcmUncyBiZWVuIG5vIGRlY2lzaW9uIC8gYWdyZWVtZW50IHRvIHBoYXNlDQo+IG91dCBQSUlY
-LCB0aGlzIGlzIHB1cmVseSBhIFJIRUwgZG93bnN0cmVhbSBkZWNpc2lvbiAmIHBsYW4uIElmIG90
-aGVyDQo+IGRpc3Ryb3MgLyB1c2VycyBoYXZlIGEgZGlmZmVyZW50IFBPViwgYW5kIGZpbmQgdGhl
-IGZlYXR1cmUgdXNlZnVsLCB3ZQ0KPiBzaG91bGQgYWNjZXB0IHRoZSBwYXRjaCBpZiBpdCBtZWV0
-cyB0aGUgbm9ybWFsIFFFTVUgcGF0Y2ggcmVxdWlyZW1lbnRzLg0KDQpFeGNlbGxlbnQuIEkgd2ls
-bCB3b3JrIHdpdGggYW55b25lIHdobyB3b3VsZCB3YW50IHRvIHJldmlldyB0aGlzIHBhdGNoLiBB
-bHNvIEkganVzdCByZWFsaXplZCB0aGlzIHBhdGNoIGlzIGJhc2VkIG9mZiBRZW11IDIuMTIuIFNv
-IEkgd2lsbCBzZW5kIGFub3RoZXIgcGF0Y2ggYWZ0ZXIgcmViYXNpbmcgaXQgd2l0aCB0aGUgbGF0
-ZXN0IG1hc3Rlci4gTWVhbndoaWxlLCBsZXQgdGhlIGZlZWRiYWNrcyBrZWVwIGZsb3dpbmcg4oCm
-DQoNCmFuaQ0KDQoNCg==
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> We can now unify the implementation of the 3 VSPLTI instructions.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/ppc/translate/vmx-impl.inc.c | 32 ++++++++++++++++-------------
+>  target/ppc/translate/vsx-impl.inc.c |  2 +-
+>  2 files changed, 19 insertions(+), 15 deletions(-)
+>
+> diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
+mx-impl.inc.c
+> index 81d5a7a341..403ed3a01c 100644
+> --- a/target/ppc/translate/vmx-impl.inc.c
+> +++ b/target/ppc/translate/vmx-impl.inc.c
+> @@ -1035,21 +1035,25 @@ GEN_VXRFORM_DUAL(vcmpbfp, PPC_ALTIVEC, PPC_NONE, \
+>  GEN_VXRFORM_DUAL(vcmpgtfp, PPC_ALTIVEC, PPC_NONE, \
+>                   vcmpgtud, PPC_NONE, PPC2_ALTIVEC_207)
+>=20=20
+> -#define GEN_VXFORM_DUPI(name, tcg_op, opc2, opc3)                       \
+> -static void glue(gen_, name)(DisasContext *ctx)                         \
+> -    {                                                                   \
+> -        int simm;                                                       \
+> -        if (unlikely(!ctx->altivec_enabled)) {                          \
+> -            gen_exception(ctx, POWERPC_EXCP_VPU);                       \
+> -            return;                                                     \
+> -        }                                                               \
+> -        simm =3D SIMM5(ctx->opcode);                                    =
+  \
+> -        tcg_op(avr_full_offset(rD(ctx->opcode)), 16, 16, simm);         \
+> +static void gen_vsplti(DisasContext *ctx, int vece)
+> +{
+> +    int simm;
+> +
+> +    if (unlikely(!ctx->altivec_enabled)) {
+> +        gen_exception(ctx, POWERPC_EXCP_VPU);
+> +        return;
+>      }
+>=20=20
+> -GEN_VXFORM_DUPI(vspltisb, tcg_gen_gvec_dup8i, 6, 12);
+> -GEN_VXFORM_DUPI(vspltish, tcg_gen_gvec_dup16i, 6, 13);
+> -GEN_VXFORM_DUPI(vspltisw, tcg_gen_gvec_dup32i, 6, 14);
+> +    simm =3D SIMM5(ctx->opcode);
+> +    tcg_gen_gvec_dup_imm(vece, avr_full_offset(rD(ctx->opcode)), 16, 16,=
+ simm);
+> +}
+> +
+> +#define GEN_VXFORM_VSPLTI(name, vece, opc2, opc3) \
+> +static void glue(gen_, name)(DisasContext *ctx) { gen_vsplti(ctx, vece);=
+ }
+> +
+> +GEN_VXFORM_VSPLTI(vspltisb, MO_8, 6, 12);
+> +GEN_VXFORM_VSPLTI(vspltish, MO_16, 6, 13);
+> +GEN_VXFORM_VSPLTI(vspltisw, MO_32, 6, 14);
+
+There are unused parameters opc2/opc3 parameters here. Given that is it
+really worth the glue obfuscation:
+
+  static void gen_vspltisb(DisasContext *ctx)
+  {
+      gen_vsplti(ctx, MO_8);
+  }
+
+  static void gen_vspltish(DisasContext *ctx)
+  {
+      gen_vsplti(ctx, MO_8);
+  }
+
+  static void gen_vspltisw(DisasContext *ctx)
+  {
+      gen_vsplti(ctx, MO_8);
+  }
+
+Of course I tried grepping for their use and couldn't find them until I
+realised the call to them was hidden inside another glue operation.
+
+With the removed extra unused macro params:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+
+>=20=20
+>  #define GEN_VXFORM_NOA(name, opc2, opc3)                                \
+>  static void glue(gen_, name)(DisasContext *ctx)                         \
+> @@ -1559,7 +1563,7 @@ GEN_VXFORM_DUAL(vsldoi, PPC_ALTIVEC, PPC_NONE,
+>  #undef GEN_VXRFORM_DUAL
+>  #undef GEN_VXRFORM1
+>  #undef GEN_VXRFORM
+> -#undef GEN_VXFORM_DUPI
+> +#undef GEN_VXFORM_VSPLTI
+>  #undef GEN_VXFORM_NOA
+>  #undef GEN_VXFORM_UIMM
+>  #undef GEN_VAFORM_PAIRED
+> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+> index 8287e272f5..b518de46db 100644
+> --- a/target/ppc/translate/vsx-impl.inc.c
+> +++ b/target/ppc/translate/vsx-impl.inc.c
+> @@ -1579,7 +1579,7 @@ static void gen_xxspltib(DisasContext *ctx)
+>              return;
+>          }
+>      }
+> -    tcg_gen_gvec_dup8i(vsr_full_offset(rt), 16, 16, uim8);
+> +    tcg_gen_gvec_dup_imm(MO_8, vsr_full_offset(rt), 16, 16, uim8);
+>  }
+>=20=20
+>  static void gen_xxsldwi(DisasContext *ctx)
+
+
+--=20
+Alex Benn=C3=A9e
 
