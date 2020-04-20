@@ -2,54 +2,64 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA42C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:20:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C153C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:21:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDBCB21473
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:20:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDBCB21473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 43E0A20CC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:21:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43E0A20CC7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQSbi-0007uO-2b
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 05:20:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37832 helo=eggs1p.gnu.org)
+	id 1jQScD-0000J8-FB
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 05:21:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38244 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jQSZI-0004qj-KA
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:18:21 -0400
+ (envelope-from <pannengyuan@huawei.com>) id 1jQSaO-0006bb-C7
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:19:29 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jQSZF-0004iv-N6
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:18:19 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48524)
+ (envelope-from <pannengyuan@huawei.com>) id 1jQSaI-00064n-Jm
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:19:28 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:45050 helo=huawei.com)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jQSZE-0004hU-Ii; Mon, 20 Apr 2020 05:18:17 -0400
-Received: from dptest2.qa.sw.ru ([10.94.4.71])
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jQSZ3-0006Q3-21; Mon, 20 Apr 2020 12:18:05 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v19 2/4] qcow2: rework the cluster compression routine
-Date: Mon, 20 Apr 2020 12:17:55 +0300
-Message-Id: <20200420091757.14102-3-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20200420091757.14102-1-dplotnikov@virtuozzo.com>
-References: <20200420091757.14102-1-dplotnikov@virtuozzo.com>
-Received-SPF: pass client-ip=185.231.240.75;
- envelope-from=dplotnikov@virtuozzo.com; helo=relay.sw.ru
+ (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
+ id 1jQSaH-0005vU-LT
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:19:22 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id AF04EDB3A2F3C8D8A9E3
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 17:19:15 +0800 (CST)
+Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server (TLS) id 14.3.487.0; Mon, 20 Apr
+ 2020 17:18:45 +0800
+Subject: Re: [PATCH] op_helper: fix some compile warnings
+To: Yoshinori Sato <ysato@users.sourceforge.jp>
+References: <20200420054959.8082-1-pannengyuan@huawei.com>
+ <87o8rmv8vb.wl-ysato@users.sourceforge.jp>
+From: Pan Nengyuan <pannengyuan@huawei.com>
+Message-ID: <b55a0120-55bb-eb9b-208c-13a01fb8af06@huawei.com>
+Date: Mon, 20 Apr 2020 17:18:39 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <87o8rmv8vb.wl-ysato@users.sourceforge.jp>
+Content-Type: text/plain; charset="iso-8859-7"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.184.39.213]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.32;
+ envelope-from=pannengyuan@huawei.com; helo=huawei.com
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 05:18:12
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Received-From: 185.231.240.75
+ 03:55:47
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,146 +71,266 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
+ euler.robot@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The patch enables processing the image compression type defined
-for the image and chooses an appropriate method for image clusters
-(de)compression.
 
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
----
- block/qcow2-threads.c | 71 ++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 60 insertions(+), 11 deletions(-)
 
-diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-index a68126f291..7dbaf53489 100644
---- a/block/qcow2-threads.c
-+++ b/block/qcow2-threads.c
-@@ -74,7 +74,9 @@ typedef struct Qcow2CompressData {
- } Qcow2CompressData;
- 
- /*
-- * qcow2_compress()
-+ * qcow2_zlib_compress()
-+ *
-+ * Compress @src_size bytes of data using zlib compression method
-  *
-  * @dest - destination buffer, @dest_size bytes
-  * @src - source buffer, @src_size bytes
-@@ -83,8 +85,8 @@ typedef struct Qcow2CompressData {
-  *          -ENOMEM destination buffer is not enough to store compressed data
-  *          -EIO    on any other error
-  */
--static ssize_t qcow2_compress(void *dest, size_t dest_size,
--                              const void *src, size_t src_size)
-+static ssize_t qcow2_zlib_compress(void *dest, size_t dest_size,
-+                                   const void *src, size_t src_size)
- {
-     ssize_t ret;
-     z_stream strm;
-@@ -119,10 +121,10 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
- }
- 
- /*
-- * qcow2_decompress()
-+ * qcow2_zlib_decompress()
-  *
-  * Decompress some data (not more than @src_size bytes) to produce exactly
-- * @dest_size bytes.
-+ * @dest_size bytes using zlib compression method
-  *
-  * @dest - destination buffer, @dest_size bytes
-  * @src - source buffer, @src_size bytes
-@@ -130,8 +132,8 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
-  * Returns: 0 on success
-  *          -EIO on fail
-  */
--static ssize_t qcow2_decompress(void *dest, size_t dest_size,
--                                const void *src, size_t src_size)
-+static ssize_t qcow2_zlib_decompress(void *dest, size_t dest_size,
-+                                     const void *src, size_t src_size)
- {
-     int ret;
-     z_stream strm;
-@@ -191,20 +193,67 @@ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
-     return arg.ret;
- }
- 
-+/*
-+ * qcow2_co_compress()
-+ *
-+ * Compress @src_size bytes of data using the compression
-+ * method defined by the image compression type
-+ *
-+ * @dest - destination buffer, @dest_size bytes
-+ * @src - source buffer, @src_size bytes
-+ *
-+ * Returns: compressed size on success
-+ *          a negative error code on failure
-+ */
- ssize_t coroutine_fn
- qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
-                   const void *src, size_t src_size)
- {
--    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
--                                qcow2_compress);
-+    BDRVQcow2State *s = bs->opaque;
-+    Qcow2CompressFunc fn;
-+
-+    switch (s->compression_type) {
-+    case QCOW2_COMPRESSION_TYPE_ZLIB:
-+        fn = qcow2_zlib_compress;
-+        break;
-+
-+    default:
-+        abort();
-+    }
-+
-+    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size, fn);
- }
- 
-+/*
-+ * qcow2_co_decompress()
-+ *
-+ * Decompress some data (not more than @src_size bytes) to produce exactly
-+ * @dest_size bytes using the compression method defined by the image
-+ * compression type
-+ *
-+ * @dest - destination buffer, @dest_size bytes
-+ * @src - source buffer, @src_size bytes
-+ *
-+ * Returns: 0 on success
-+ *          a negative error code on failure
-+ */
- ssize_t coroutine_fn
- qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
-                     const void *src, size_t src_size)
- {
--    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
--                                qcow2_decompress);
-+    BDRVQcow2State *s = bs->opaque;
-+    Qcow2CompressFunc fn;
-+
-+    switch (s->compression_type) {
-+    case QCOW2_COMPRESSION_TYPE_ZLIB:
-+        fn = qcow2_zlib_decompress;
-+        break;
-+
-+    default:
-+        abort();
-+    }
-+
-+    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size, fn);
- }
- 
- 
--- 
-2.17.0
+On 4/20/2020 4:50 PM, Yoshinori Sato wrote:
+> On Mon, 20 Apr 2020 14:49:59 +0900,
+> Pan Nengyuan wrote:
+>>
+>> We got the following compile-time warnings(gcc7.3):
+>> /mnt/sdb//qemu/target/rx/op_helper.c: In function ¡helper_scmpu¢:
+>> /mnt/sdb/qemu/target/rx/op_helper.c:213:24: error: ¡tmp1¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>>      env->psw_c = (tmp0 >= tmp1);
+>>                   ~~~~~~^~~~~~~~
+>> /mnt/sdb/qemu/target/rx/op_helper.c:213:24: error: ¡tmp0¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>> /mnt/sdb/qemu/target/rx/op_helper.c: In function ¡helper_suntil¢:
+>> /mnt/sdb/qemu/target/rx/op_helper.c:299:23: error: ¡tmp¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>>      env->psw_c = (tmp <= env->regs[2]);
+>>                   ~~~~~^~~~~~~~~~~~~~~~
+>> /mnt/sdb/qemu/target/rx/op_helper.c: In function ¡helper_swhile¢:
+>> /mnt/sdb/qemu/target/rx/op_helper.c:318:23: error: ¡tmp¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>>      env->psw_c = (tmp <= env->regs[2]);
+>>
+>> Actually, it looks like a false-positive because it will enter the body of while loop and init it for the first time.
+>> Let's change 'while' to 'do .. while' to avoid it.
+> 
+> OK.
+> 
+>> Reported-by: Euler Robot <euler.robot@huawei.com>
+>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+>> ---
+>>  target/rx/op_helper.c | 12 ++++++------
+>>  1 file changed, 6 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
+>> index f89d294f2b..b612ab1da8 100644
+>> --- a/target/rx/op_helper.c
+>> +++ b/target/rx/op_helper.c
+>> @@ -201,14 +201,14 @@ void helper_scmpu(CPURXState *env)
+>>      if (env->regs[3] == 0) {
+>>          return;
+>>      }
+>> -    while (env->regs[3] != 0) {
+>> +    do {
+>>          tmp0 = cpu_ldub_data_ra(env, env->regs[1]++, GETPC());
+>>          tmp1 = cpu_ldub_data_ra(env, env->regs[2]++, GETPC());
+>>          env->regs[3]--;
+>>          if (tmp0 != tmp1 || tmp0 == '\0') {
+>>              break;
+>>          }
+>> -    }
+>> +    } while (env->regs[3] != 0);
+>>      env->psw_z = tmp0 - tmp1;
+>>      env->psw_c = (tmp0 >= tmp1);
+>>  }
+>> @@ -287,14 +287,14 @@ void helper_suntil(CPURXState *env, uint32_t sz)
+>>      if (env->regs[3] == 0) {
+>>          return ;
+>>      }
+>> -    while (env->regs[3] != 0) {
+>> +    do {
+>>          tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
+>>          env->regs[1] += 1 << sz;
+>>          env->regs[3]--;
+>>          if (tmp == env->regs[2]) {
+>>              break;
+>>          }
+>> -    }
+>> +    } while (env->regs[3] != 0);
+>>      env->psw_z = tmp - env->regs[2];
+>>      env->psw_c = (tmp <= env->regs[2]);
+>>  }
+>> @@ -306,14 +306,14 @@ void helper_swhile(CPURXState *env, uint32_t sz)
+>>      if (env->regs[3] == 0) {
+>>          return ;
+>>      }
+>> -    while (env->regs[3] != 0) {
+>> +    do {
+>>          tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
+>>          env->regs[1] += 1 << sz;
+>>          env->regs[3]--;
+>>          if (tmp != env->regs[2]) {
+>>              break;
+>>          }
+>> -    }
+>> +    } while (env->regs[3] != 0);
+>>      env->psw_z = env->regs[3];
+>>      env->psw_c = (tmp <= env->regs[2]);
+>>  }
+>> -- 
+>> 2.18.2
+>>
+>>
+> 
+> It looks different result in env->regs[3] is zero.
 
+If env->regs[3] is zero, it will return at the begin of these functions:
+
+  if (env->regs[3] == 0) {
+      return;
+  }
+
+Thus, the while loop will not be reached.
+In this case, I think 'while' and 'do .. while' will get the same result and it will disappear the warnings.
+
+> In such a case, nothing changes.
+> 
+> I think that the warning of the uninitialized variable
+> will disappear by fixing as follows.
+> 
+
+Yes, it also can fix these warnings.
+
+Thanks.
+
+>>From 5de0c54a970e01e96b41870252d0ea54ec61c540 Mon Sep 17 00:00:00 2001
+> From: Yoshinori Sato <ysato@users.sourceforge.jp>
+> Date: Mon, 20 Apr 2020 17:41:04 +0900
+> Subject: [PATCH] target/rx/op_helper: Fix uninitialized warning.
+> 
+> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> ---
+>  target/rx/op_helper.c | 101 ++++++++++++++++++++----------------------
+>  1 file changed, 49 insertions(+), 52 deletions(-)
+> 
+> diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
+> index f89d294f2b..f84f6c706c 100644
+> --- a/target/rx/op_helper.c
+> +++ b/target/rx/op_helper.c
+> @@ -284,38 +284,36 @@ void helper_suntil(CPURXState *env, uint32_t sz)
+>  {
+>      uint32_t tmp;
+>      tcg_debug_assert(sz < 3);
+> -    if (env->regs[3] == 0) {
+> -        return ;
+> -    }
+> -    while (env->regs[3] != 0) {
+> -        tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
+> -        env->regs[1] += 1 << sz;
+> -        env->regs[3]--;
+> -        if (tmp == env->regs[2]) {
+> -            break;
+> +    if (env->regs[3] > 0) {
+> +        while (env->regs[3] != 0) {
+> +            tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
+> +            env->regs[1] += 1 << sz;
+> +            env->regs[3]--;
+> +            if (tmp == env->regs[2]) {
+> +                break;
+> +            }
+>          }
+> +        env->psw_z = tmp - env->regs[2];
+> +        env->psw_c = (tmp <= env->regs[2]);
+>      }
+> -    env->psw_z = tmp - env->regs[2];
+> -    env->psw_c = (tmp <= env->regs[2]);
+>  }
+>  
+>  void helper_swhile(CPURXState *env, uint32_t sz)
+>  {
+>      uint32_t tmp;
+>      tcg_debug_assert(sz < 3);
+> -    if (env->regs[3] == 0) {
+> -        return ;
+> -    }
+> -    while (env->regs[3] != 0) {
+> -        tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
+> -        env->regs[1] += 1 << sz;
+> -        env->regs[3]--;
+> -        if (tmp != env->regs[2]) {
+> -            break;
+> +    if (env->regs[3] > 0) {
+> +        while (env->regs[3] != 0) {
+> +            tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
+> +            env->regs[1] += 1 << sz;
+> +            env->regs[3]--;
+> +            if (tmp != env->regs[2]) {
+> +                break;
+> +            }
+>          }
+> +        env->psw_z = env->regs[3];
+> +        env->psw_c = (tmp <= env->regs[2]);
+>      }
+> -    env->psw_z = env->regs[3];
+> -    env->psw_c = (tmp <= env->regs[2]);
+>  }
+>  
+>  /* accumlator operations */
+> @@ -325,40 +323,39 @@ void helper_rmpa(CPURXState *env, uint32_t sz)
+>      int32_t result_h;
+>      int64_t tmp0, tmp1;
+>  
+> -    if (env->regs[3] == 0) {
+> -        return;
+> -    }
+> -    result_l = env->regs[5];
+> -    result_l <<= 32;
+> -    result_l |= env->regs[4];
+> -    result_h = env->regs[6];
+> -    env->psw_o = 0;
+> +    if (env->regs[3] > 0) {
+> +        result_l = env->regs[5];
+> +        result_l <<= 32;
+> +        result_l |= env->regs[4];
+> +        result_h = env->regs[6];
+> +        env->psw_o = 0;
+>  
+> -    while (env->regs[3] != 0) {
+> -        tmp0 = cpu_ldfn[sz](env, env->regs[1], GETPC());
+> -        tmp1 = cpu_ldfn[sz](env, env->regs[2], GETPC());
+> -        tmp0 *= tmp1;
+> -        prev = result_l;
+> -        result_l += tmp0;
+> -        /* carry / bollow */
+> -        if (tmp0 < 0) {
+> -            if (prev > result_l) {
+> -                result_h--;
+> -            }
+> -        } else {
+> -            if (prev < result_l) {
+> -                result_h++;
+> +        while (env->regs[3] != 0) {
+> +            tmp0 = cpu_ldfn[sz](env, env->regs[1], GETPC());
+> +            tmp1 = cpu_ldfn[sz](env, env->regs[2], GETPC());
+> +            tmp0 *= tmp1;
+> +            prev = result_l;
+> +            result_l += tmp0;
+> +            /* carry / bollow */
+> +            if (tmp0 < 0) {
+> +                if (prev > result_l) {
+> +                    result_h--;
+> +                }
+> +            } else {
+> +                if (prev < result_l) {
+> +                    result_h++;
+> +                }
+>              }
+> -        }
+>  
+> -        env->regs[1] += 1 << sz;
+> -        env->regs[2] += 1 << sz;
+> +            env->regs[1] += 1 << sz;
+> +            env->regs[2] += 1 << sz;
+> +        }
+> +        env->psw_s = result_h;
+> +        env->psw_o = (result_h != 0 && result_h != -1) << 31;
+> +        env->regs[6] = result_h;
+> +        env->regs[5] = result_l >> 32;
+> +        env->regs[4] = result_l & 0xffffffff;
+>      }
+> -    env->psw_s = result_h;
+> -    env->psw_o = (result_h != 0 && result_h != -1) << 31;
+> -    env->regs[6] = result_h;
+> -    env->regs[5] = result_l >> 32;
+> -    env->regs[4] = result_l & 0xffffffff;
+>  }
+>  
+>  void helper_racw(CPURXState *env, uint32_t imm)
+> 
 
