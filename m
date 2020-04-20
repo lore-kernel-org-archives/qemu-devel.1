@@ -2,66 +2,133 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC98C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 11:05:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B96A9C54FCF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 11:06:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B320520724
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 11:05:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B320520724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8601B20724
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 11:06:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="Rc6WNOj8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8601B20724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQUFI-0002bt-QZ
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 07:05:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33664 helo=eggs1p.gnu.org)
+	id 1jQUGP-0003VN-PJ
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 07:06:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33950 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1jQUEU-0001vo-Uw
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:04:59 -0400
+ (envelope-from <thanos.makatos@nutanix.com>) id 1jQUFJ-0002l8-BC
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:05:53 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1jQUET-00013F-IZ
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:04:58 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:47780 helo=huawei.com)
+ (envelope-from <thanos.makatos@nutanix.com>) id 1jQUF4-0001vb-Fo
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:05:48 -0400
+Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:1452)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
- id 1jQUES-0000tG-7y
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:04:57 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 8B9AE9FF1C31B10C1515
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 19:04:47 +0800 (CST)
-Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
- (10.3.19.210) with Microsoft SMTP Server (TLS) id 14.3.487.0; Mon, 20 Apr
- 2020 19:04:40 +0800
-Subject: Re: [PATCH] op_helper: fix some compile warnings
-To: Yoshinori Sato <ysato@users.sourceforge.jp>
-References: <20200420054959.8082-1-pannengyuan@huawei.com>
- <87o8rmv8vb.wl-ysato@users.sourceforge.jp>
- <b55a0120-55bb-eb9b-208c-13a01fb8af06@huawei.com>
- <87mu76v65h.wl-ysato@users.sourceforge.jp>
-From: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <b2e34f27-7dcf-7aaf-6b74-00c5d354723f@huawei.com>
-Date: Mon, 20 Apr 2020 19:04:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.90_1) (envelope-from <thanos.makatos@nutanix.com>)
+ id 1jQUF4-0001tB-24
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:05:34 -0400
+Received: from pps.filterd (m0127842.ppops.net [127.0.0.1])
+ by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 03KB3WXb011104; Mon, 20 Apr 2020 04:05:27 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=proofpoint20171006;
+ bh=Pc4F1nUFzUr932218U9gb2WZsGCRl/1hTpEfOKYXCmE=;
+ b=Rc6WNOj8Hx3dLEyDtcl9aIDWUHILPyoQoyVfCVZ/7TVEba3yfv/KO1t7UvH6XrXUS6AN
+ IMFaBG2x7307PIdoQRnF5F0X9fQyfRHkgZ5YWN6pMkJm7Ch4S3MIsotjNHNBXOq5c6kQ
+ vZ6OAE3TLtThlVE+qr7vwL6pdE9+0C6x+qbgr85+reKRvl3aJZ0mgUBKdpeav4P49r2E
+ HdtHS5JfbLixGku6xRYbY1GV80nZkaSbNxtGFfa9bgLur7uJJ6QZiPT4JQh1y31FWkIE
+ 6rnGF0pp3L6U0PXkqefnC5QW7IfGLnvHJGZRhvbZXiwwRSbPigIoLyga4rxx38+6h/ML Ew== 
+Received: from nam11-dm6-obe.outbound.protection.outlook.com
+ (mail-dm6nam11lp2171.outbound.protection.outlook.com [104.47.57.171])
+ by mx0b-002c1b01.pphosted.com with ESMTP id 30g0vg35wf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 20 Apr 2020 04:05:27 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LRFy3t+elDh7p1fSvw5suPxGUFnrjHFsaNaOmwOSuSpNLs/jmpOIJhatWz6pnYi5mvp0ACWfdR/Ybqm4Vd9t/QlLeDLamGPpm42OaP6tXzd0OGvNjP7hFPJQhDdn38EfopY30RWGYP1xbcQiARC4gR/M0Cyy3VkI2TSllJneaXEfMBkO1FaGamsTYx1xnu36T8cYsCU7jIiUlu+psYHroq+LtwaoLN3waqW5UTsDoKevFODLFqyq5oevgyj2jqiXqhSLdRDdzU1vbuVG1SlBmiZJp6wIIyND2obD8UYs2FnfQ0HyGU1ltZ0UH3rBxGtVVd/obGTSX7GefyBfSIc6VA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Pc4F1nUFzUr932218U9gb2WZsGCRl/1hTpEfOKYXCmE=;
+ b=EpJrhh/e2ql81+NnqgbEhS9e96FrHRuOps7p1kVfb0F8niXD1vtqgKoe4OlRAHrRNovfKnlWZV/QjMEM+cUvKmu1kt0GqargLg+grgb+rWsJ5d02brgA6bA89rkLZV0m/3x5XUdfx0U5US7sAfu3eD0mNQsLnDmjHUpCByIxEA6gyvTxUNXExeXnOCqJpF7t5jqje3zUG6xw9KESkCD19YiY/kbLnQ+ZF3CzD8HtQ6CTvihAiM0m9N3E6MOyUTZsCobLm76KDG/r2E6iAUb7SJfS6gRvSgYj6cDLPFwYsxmkUL0metI4xCFyE3G/Ih9wVXI0Zwv2uViV6oqMHxbCcQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MW2PR02MB3723.namprd02.prod.outlook.com (2603:10b6:907:2::32)
+ by MW2PR02MB3739.namprd02.prod.outlook.com (2603:10b6:907:9::33) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.29; Mon, 20 Apr
+ 2020 11:05:25 +0000
+Received: from MW2PR02MB3723.namprd02.prod.outlook.com
+ ([fe80::b90a:dbb6:2412:266e]) by MW2PR02MB3723.namprd02.prod.outlook.com
+ ([fe80::b90a:dbb6:2412:266e%5]) with mapi id 15.20.2921.027; Mon, 20 Apr 2020
+ 11:05:25 +0000
+From: Thanos Makatos <thanos.makatos@nutanix.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: RE: RFC: use VFIO over a UNIX domain socket to implement device
+ offloading
+Thread-Topic: RFC: use VFIO over a UNIX domain socket to implement device
+ offloading
+Thread-Index: AdYDU20BI9Of/G6jR7ONy5zZTB1T9QEsuagAA77zu+A=
+Date: Mon, 20 Apr 2020 11:05:25 +0000
+Message-ID: <MW2PR02MB372349E25A0842DE045B95F58BD40@MW2PR02MB3723.namprd02.prod.outlook.com>
+References: <MN2PR02MB62052E54C752229C115EAD898BCF0@MN2PR02MB6205.namprd02.prod.outlook.com>
+ <20200401091712.GA221892@stefanha-x1.localdomain>
+In-Reply-To: <20200401091712.GA221892@stefanha-x1.localdomain>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [92.29.225.29]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 38da976d-9793-428a-44f7-08d7e51aba60
+x-ms-traffictypediagnostic: MW2PR02MB3739:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MW2PR02MB37398AC7766F02D5B92DD3B18BD40@MW2PR02MB3739.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 03793408BA
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MW2PR02MB3723.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(376002)(39860400002)(346002)(396003)(136003)(366004)(86362001)(186003)(316002)(6506007)(2906002)(54906003)(52536014)(478600001)(8936002)(81156014)(26005)(6916009)(44832011)(966005)(8676002)(33656002)(71200400001)(5660300002)(66446008)(64756008)(66556008)(66476007)(66946007)(7416002)(4326008)(76116006)(7696005)(55016002)(9686003);
+ DIR:OUT; SFP:1102; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: BaKCsWLV67OAHbdUEiFwPuMBKuk3ulQvJYHx7zJ7lZgkuHgzzHprJED7h/cXvSqMnWTgllBO7JumazKFzl7QRVjuReEo6ZGE97pGgPnqUZH5OXK7zs5C6o8c04GCFHdIRP1ATijZ8ebBgKV/WJK5mpaPec8B05gbdK72+M10E5W7wrf6zRO5rThaMvS6jmr1y/oLyry+A5/guGLj8zgUh1TFMQ2c2O2iwDi8T/WQZ83XOQLhHj/kjlTG1Eg8C3U0LdTlkIRbeg5hXm4na8CZFqBZTsfyK3sOTWQybejSDEp61MTm4vvEOfMQDfUSKdlluk2/2hUbCbndWebLe6kw4foGmF2UKfWbVJCxl11/9xfNyQWUvP4MqcjBCiVrL6zLKGzdR9nyKJQTXSzUcVuJPR/cDr12Xqz8UQlDUtygckksaxl8GnloqsQcd7lSxCe8eJ9r9D6QZJc8HAWZNql9ITa8VvLhSJmSQ9Q8Bp174yI7nfEqFt3Gx3LaJjp+4fksYSVoz6mGbPoJO57dta85Cg==
+x-ms-exchange-antispam-messagedata: 3t5oeRVabuRC4EezVQaPfL6dkNe9cwzLqwoz6Z28uhjP70gFFb/37VP0oTAFE9BfrleqrIIs5eI83/9KTPZ7h/u6dRZA/RVgCyuWAmHPXFeQAFY8QJzLpsrAKThSFHvQxMTl8UFjXzMNNvxsmPhdZQ==
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <87mu76v65h.wl-ysato@users.sourceforge.jp>
-Content-Type: text/plain; charset="iso-8859-7"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.184.39.213]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32;
- envelope-from=pannengyuan@huawei.com; helo=huawei.com
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 38da976d-9793-428a-44f7-08d7e51aba60
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Apr 2020 11:05:25.2737 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vQ8z74YuCS52I9fXWn8eUmjt1IfOe8RsVqEBZ8P4g2ztUruohUYs9QomXYrRqkjP5GHWq+UU1pyb769+nbi1y+MFLBpjQ+de7rnVaF05FAo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR02MB3739
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-20_03:2020-04-20,
+ 2020-04-20 signatures=0
+X-Proofpoint-Spam-Reason: safe
+Received-SPF: pass client-ip=148.163.155.12;
+ envelope-from=thanos.makatos@nutanix.com; helo=mx0b-002c1b01.pphosted.com
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 03:55:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 45.249.212.32
+ 06:33:52
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Received-From: 148.163.155.12
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,306 +140,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
- euler.robot@huawei.com
+Cc: "Walker, Benjamin" <benjamin.walker@intel.com>,
+ Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+ "john.g.johnson@oracle.com" <john.g.johnson@oracle.com>,
+ Jag Raman <jag.raman@oracle.com>, "Harris, 
+ James R" <james.r.harris@intel.com>, Swapnil Ingle <swapnil.ingle@nutanix.com>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Kanth Ghatraju <Kanth.Ghatraju@oracle.com>,
+ Felipe Franciosi <felipe@nutanix.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>, "Zhang,
+ Tina" <tina.zhang@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+> In order to interoperate we'll need to maintain a protocol
+> specification.  Mayb You and JJ could put that together and CC the vfio,
+> rust-vmm, and QEMU communities for discussion?
+>=20
+> It should cover the UNIX domain socket connection semantics (does a
+> listen socket only accept 1 connection at a time?  What happens when the
+> client disconnects?  What happens when the server disconnects?), how
+> VFIO structs are exchanged, any vfio-over-socket specific protocol
+> messages, etc.  Basically everything needed to write an implementation
+> (although it's not necessary to copy the VFIO struct definitions from
+> the kernel headers into the spec or even document their semantics if
+> they are identical to kernel VFIO).
+>=20
+> The next step beyond the LD_PRELOAD library is a native vfio-over-socket
+> client implementation in QEMU.  There is a prototype here:
+> https://github.com/elmarco/qemu/blob/wip/vfio-user/hw/vfio/libvfio-
+> user.c
+>=20
+> If there are any volunteers for working on that then this would be a
+> good time to discuss it.
 
+Hi,
 
-On 4/20/2020 5:49 PM, Yoshinori Sato wrote:
-> On Mon, 20 Apr 2020 18:18:39 +0900,
-> Pan Nengyuan wrote:
->>
->>
->>
->> On 4/20/2020 4:50 PM, Yoshinori Sato wrote:
->>> On Mon, 20 Apr 2020 14:49:59 +0900,
->>> Pan Nengyuan wrote:
->>>>
->>>> We got the following compile-time warnings(gcc7.3):
->>>> /mnt/sdb//qemu/target/rx/op_helper.c: In function ¡helper_scmpu¢:
->>>> /mnt/sdb/qemu/target/rx/op_helper.c:213:24: error: ¡tmp1¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->>>>      env->psw_c = (tmp0 >= tmp1);
->>>>                   ~~~~~~^~~~~~~~
->>>> /mnt/sdb/qemu/target/rx/op_helper.c:213:24: error: ¡tmp0¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->>>> /mnt/sdb/qemu/target/rx/op_helper.c: In function ¡helper_suntil¢:
->>>> /mnt/sdb/qemu/target/rx/op_helper.c:299:23: error: ¡tmp¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->>>>      env->psw_c = (tmp <= env->regs[2]);
->>>>                   ~~~~~^~~~~~~~~~~~~~~~
->>>> /mnt/sdb/qemu/target/rx/op_helper.c: In function ¡helper_swhile¢:
->>>> /mnt/sdb/qemu/target/rx/op_helper.c:318:23: error: ¡tmp¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->>>>      env->psw_c = (tmp <= env->regs[2]);
->>>>
->>>> Actually, it looks like a false-positive because it will enter the body of while loop and init it for the first time.
->>>> Let's change 'while' to 'do .. while' to avoid it.
->>>
->>> OK.
->>>
->>>> Reported-by: Euler Robot <euler.robot@huawei.com>
->>>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->>>> ---
->>>>  target/rx/op_helper.c | 12 ++++++------
->>>>  1 file changed, 6 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
->>>> index f89d294f2b..b612ab1da8 100644
->>>> --- a/target/rx/op_helper.c
->>>> +++ b/target/rx/op_helper.c
->>>> @@ -201,14 +201,14 @@ void helper_scmpu(CPURXState *env)
->>>>      if (env->regs[3] == 0) {
->>>>          return;
->>>>      }
->>>> -    while (env->regs[3] != 0) {
->>>> +    do {
->>>>          tmp0 = cpu_ldub_data_ra(env, env->regs[1]++, GETPC());
->>>>          tmp1 = cpu_ldub_data_ra(env, env->regs[2]++, GETPC());
->>>>          env->regs[3]--;
->>>>          if (tmp0 != tmp1 || tmp0 == '\0') {
->>>>              break;
->>>>          }
->>>> -    }
->>>> +    } while (env->regs[3] != 0);
->>>>      env->psw_z = tmp0 - tmp1;
->>>>      env->psw_c = (tmp0 >= tmp1);
->>>>  }
->>>> @@ -287,14 +287,14 @@ void helper_suntil(CPURXState *env, uint32_t sz)
->>>>      if (env->regs[3] == 0) {
->>>>          return ;
->>>>      }
->>>> -    while (env->regs[3] != 0) {
->>>> +    do {
->>>>          tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
->>>>          env->regs[1] += 1 << sz;
->>>>          env->regs[3]--;
->>>>          if (tmp == env->regs[2]) {
->>>>              break;
->>>>          }
->>>> -    }
->>>> +    } while (env->regs[3] != 0);
->>>>      env->psw_z = tmp - env->regs[2];
->>>>      env->psw_c = (tmp <= env->regs[2]);
->>>>  }
->>>> @@ -306,14 +306,14 @@ void helper_swhile(CPURXState *env, uint32_t sz)
->>>>      if (env->regs[3] == 0) {
->>>>          return ;
->>>>      }
->>>> -    while (env->regs[3] != 0) {
->>>> +    do {
->>>>          tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
->>>>          env->regs[1] += 1 << sz;
->>>>          env->regs[3]--;
->>>>          if (tmp != env->regs[2]) {
->>>>              break;
->>>>          }
->>>> -    }
->>>> +    } while (env->regs[3] != 0);
->>>>      env->psw_z = env->regs[3];
->>>>      env->psw_c = (tmp <= env->regs[2]);
->>>>  }
->>>> -- 
->>>> 2.18.2
->>>>
->>>>
->>>
->>> It looks different result in env->regs[3] is zero.
->>
->> If env->regs[3] is zero, it will return at the begin of these functions:
->>
->>   if (env->regs[3] == 0) {
->>       return;
->>   }
->>
->> Thus, the while loop will not be reached.
->> In this case, I think 'while' and 'do .. while' will get the same result and it will disappear the warnings.
-> 
-> Oh. Sorry. I misunderstood.
-> 
-> Since the pseudo code described in the manual uses while,
-> I think it's easier for everyone to understand by following
-> the description.
-> 
->>> In such a case, nothing changes.
->>>
->>> I think that the warning of the uninitialized variable
->>> will disappear by fixing as follows.
->>>
->>
->> Yes, it also can fix these warnings.
+I've just shared with you the Google doc we've working on with John where w=
+e've
+been drafting the protocol specification, we think it's time for some first
+comments. Please feel free to comment/edit and suggest more people to be on=
+ the
+reviewers list.
 
-Oh, I'm sorry for my mistake, it can't disappear the warnings:
+You can also find the Google doc here:
 
-/mnt/sdb/qemu/target/rx/op_helper.c: In function ¡helper_scmpu¢:
-/mnt/sdb/qemu/target/rx/op_helper.c:211:28: error: ¡tmp1¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-         env->psw_c = (tmp0 >= tmp1);
-                      ~~~~~~^~~~~~~~
-/mnt/sdb/qemu/target/rx/op_helper.c:211:28: error: ¡tmp0¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  CC      ppc64abi32-linux-user/target/ppc/translate.o
-  CC      ppc64le-linux-user/target/ppc/translate.o
-  CC      ppc64-linux-user/target/ppc/translate.o
-  CC      ppc-linux-user/target/ppc/translate.o
-/mnt/sdb/qemu/target/rx/op_helper.c: In function ¡helper_suntil¢:
-/mnt/sdb/qemu/target/rx/op_helper.c:296:27: error: ¡tmp¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-         env->psw_c = (tmp <= env->regs[2]);
-                      ~~~~~^~~~~~~~~~~~~~~~
-/mnt/sdb/qemu/target/rx/op_helper.c: In function ¡helper_swhile¢:
-/mnt/sdb/qemu/target/rx/op_helper.c:314:27: error: ¡tmp¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-         env->psw_c = (tmp <= env->regs[2]);
-                      ~~~~~^~~~~~~~~~~~~~~~
+https://docs.google.com/document/d/1FspkL0hVEnZqHbdoqGLUpyC38rSk_7HhY471TsV=
+wyK8/edit?usp=3Dsharing
 
-If we want to use 'while' as the pseudo code described in the manual, can we init the tmp variable at the beginning? like that:
+If a Google doc doesn't work for you we're open to suggestions.
 
-     uint32_t tmp = 0;
-
-> 
-> OK. Thanks.
-> 
->> Thanks.
->>
->>> >From 5de0c54a970e01e96b41870252d0ea54ec61c540 Mon Sep 17 00:00:00 2001
->>> From: Yoshinori Sato <ysato@users.sourceforge.jp>
->>> Date: Mon, 20 Apr 2020 17:41:04 +0900
->>> Subject: [PATCH] target/rx/op_helper: Fix uninitialized warning.
->>>
->>> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
->>> ---
->>>  target/rx/op_helper.c | 101 ++++++++++++++++++++----------------------
->>>  1 file changed, 49 insertions(+), 52 deletions(-)
->>>
->>> diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
->>> index f89d294f2b..f84f6c706c 100644
->>> --- a/target/rx/op_helper.c
->>> +++ b/target/rx/op_helper.c
->>> @@ -284,38 +284,36 @@ void helper_suntil(CPURXState *env, uint32_t sz)
->>>  {
->>>      uint32_t tmp;
->>>      tcg_debug_assert(sz < 3);
->>> -    if (env->regs[3] == 0) {
->>> -        return ;
->>> -    }
->>> -    while (env->regs[3] != 0) {
->>> -        tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
->>> -        env->regs[1] += 1 << sz;
->>> -        env->regs[3]--;
->>> -        if (tmp == env->regs[2]) {
->>> -            break;
->>> +    if (env->regs[3] > 0) {
->>> +        while (env->regs[3] != 0) {
->>> +            tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
->>> +            env->regs[1] += 1 << sz;
->>> +            env->regs[3]--;
->>> +            if (tmp == env->regs[2]) {
->>> +                break;
->>> +            }
->>>          }
->>> +        env->psw_z = tmp - env->regs[2];
->>> +        env->psw_c = (tmp <= env->regs[2]);
->>>      }
->>> -    env->psw_z = tmp - env->regs[2];
->>> -    env->psw_c = (tmp <= env->regs[2]);
->>>  }
->>>  
->>>  void helper_swhile(CPURXState *env, uint32_t sz)
->>>  {
->>>      uint32_t tmp;
->>>      tcg_debug_assert(sz < 3);
->>> -    if (env->regs[3] == 0) {
->>> -        return ;
->>> -    }
->>> -    while (env->regs[3] != 0) {
->>> -        tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
->>> -        env->regs[1] += 1 << sz;
->>> -        env->regs[3]--;
->>> -        if (tmp != env->regs[2]) {
->>> -            break;
->>> +    if (env->regs[3] > 0) {
->>> +        while (env->regs[3] != 0) {
->>> +            tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
->>> +            env->regs[1] += 1 << sz;
->>> +            env->regs[3]--;
->>> +            if (tmp != env->regs[2]) {
->>> +                break;
->>> +            }
->>>          }
->>> +        env->psw_z = env->regs[3];
->>> +        env->psw_c = (tmp <= env->regs[2]);
->>>      }
->>> -    env->psw_z = env->regs[3];
->>> -    env->psw_c = (tmp <= env->regs[2]);
->>>  }
->>>  
->>>  /* accumlator operations */
->>> @@ -325,40 +323,39 @@ void helper_rmpa(CPURXState *env, uint32_t sz)
->>>      int32_t result_h;
->>>      int64_t tmp0, tmp1;
->>>  
->>> -    if (env->regs[3] == 0) {
->>> -        return;
->>> -    }
->>> -    result_l = env->regs[5];
->>> -    result_l <<= 32;
->>> -    result_l |= env->regs[4];
->>> -    result_h = env->regs[6];
->>> -    env->psw_o = 0;
->>> +    if (env->regs[3] > 0) {
->>> +        result_l = env->regs[5];
->>> +        result_l <<= 32;
->>> +        result_l |= env->regs[4];
->>> +        result_h = env->regs[6];
->>> +        env->psw_o = 0;
->>>  
->>> -    while (env->regs[3] != 0) {
->>> -        tmp0 = cpu_ldfn[sz](env, env->regs[1], GETPC());
->>> -        tmp1 = cpu_ldfn[sz](env, env->regs[2], GETPC());
->>> -        tmp0 *= tmp1;
->>> -        prev = result_l;
->>> -        result_l += tmp0;
->>> -        /* carry / bollow */
->>> -        if (tmp0 < 0) {
->>> -            if (prev > result_l) {
->>> -                result_h--;
->>> -            }
->>> -        } else {
->>> -            if (prev < result_l) {
->>> -                result_h++;
->>> +        while (env->regs[3] != 0) {
->>> +            tmp0 = cpu_ldfn[sz](env, env->regs[1], GETPC());
->>> +            tmp1 = cpu_ldfn[sz](env, env->regs[2], GETPC());
->>> +            tmp0 *= tmp1;
->>> +            prev = result_l;
->>> +            result_l += tmp0;
->>> +            /* carry / bollow */
->>> +            if (tmp0 < 0) {
->>> +                if (prev > result_l) {
->>> +                    result_h--;
->>> +                }
->>> +            } else {
->>> +                if (prev < result_l) {
->>> +                    result_h++;
->>> +                }
->>>              }
->>> -        }
->>>  
->>> -        env->regs[1] += 1 << sz;
->>> -        env->regs[2] += 1 << sz;
->>> +            env->regs[1] += 1 << sz;
->>> +            env->regs[2] += 1 << sz;
->>> +        }
->>> +        env->psw_s = result_h;
->>> +        env->psw_o = (result_h != 0 && result_h != -1) << 31;
->>> +        env->regs[6] = result_h;
->>> +        env->regs[5] = result_l >> 32;
->>> +        env->regs[4] = result_l & 0xffffffff;
->>>      }
->>> -    env->psw_s = result_h;
->>> -    env->psw_o = (result_h != 0 && result_h != -1) << 31;
->>> -    env->regs[6] = result_h;
->>> -    env->regs[5] = result_l >> 32;
->>> -    env->regs[4] = result_l & 0xffffffff;
->>>  }
->>>  
->>>  void helper_racw(CPURXState *env, uint32_t imm)
->>>
-> 
+Thanks
 
