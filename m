@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D852C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B2E6C54FCB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:37:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44D4120857
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:37:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 497C320857
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:37:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d58TaOMA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44D4120857
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IfpkXb8G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 497C320857
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQWbq-0001b7-FH
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 09:37:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60796 helo=eggs1p.gnu.org)
+	id 1jQWbr-0001fe-EC
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 09:37:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60918 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jQWXX-0004JA-Dj
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:52 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jQWXl-0004N8-FL
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:33:06 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jQWXS-0004Vd-PI
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23086
+ (envelope-from <kwolf@redhat.com>) id 1jQWXd-0004iI-1H
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:33:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52509
  helo=us-smtp-1.mimecast.com)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jQWXS-0004TW-Cy
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:42 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jQWXc-0004dw-Fv
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587389561;
+ s=mimecast20190719; t=1587389570;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QJj864E9p0xkklZiEnuehfB6TMtfUvFKgNYmz5HtNv0=;
- b=d58TaOMA5XRXMOT6mLYWt2F05Tmnk1k1Cl1OLkTEtEY10eiJHH0pwXtFObBooKrfx9WeCz
- JKTnrCp++MGRK60Y3n4tR4G0pcvj/BGag41PTQP0ojghWQ2ShGbqiQIj2Oapa+GibuDd84
- Ae/cc1XEZUQoc/q2xLcfJ52Lik0+kF0=
+ bh=2XnrMwGu/xHrxu+4elEdDQvksopg+zhKpBMUt0ExzpQ=;
+ b=IfpkXb8GGxFxILKvrDsCYM3qVtNem1FU2deZe7jY0KTr5ozHRhvbM5FwRB2EeYkWfMpq2u
+ KjUi3ShMMPj+FoNjtzp7Q3fHz1YMIUAy8mzwViQEDPr6O9uMHhOvwCz6y1b3dDwKd9gA86
+ 4cIgv1mKZAXeWhmidYGSqge2CN5o8Bw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-i2JZosT3O6ya7R36UTIM-w-1; Mon, 20 Apr 2020 09:32:39 -0400
-X-MC-Unique: i2JZosT3O6ya7R36UTIM-w-1
+ us-mta-14-9U83nwtZMpGQUB-bF50CLA-1; Mon, 20 Apr 2020 09:32:48 -0400
+X-MC-Unique: 9U83nwtZMpGQUB-bF50CLA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAA5F8018CB;
- Mon, 20 Apr 2020 13:32:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C376DDBA9;
+ Mon, 20 Apr 2020 13:32:47 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-38.ams2.redhat.com [10.36.114.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3D91711E7F8;
- Mon, 20 Apr 2020 13:32:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4B1ED118DF5;
+ Mon, 20 Apr 2020 13:32:46 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v4 3/9] block-backend: Add flags to blk_truncate()
-Date: Mon, 20 Apr 2020 15:32:08 +0200
-Message-Id: <20200420133214.28921-4-kwolf@redhat.com>
+Subject: [PATCH v4 8/9] iotests: Filter testfiles out in img_info_log()
+Date: Mon, 20 Apr 2020 15:32:13 +0200
+Message-Id: <20200420133214.28921-9-kwolf@redhat.com>
 In-Reply-To: <20200420133214.28921-1-kwolf@redhat.com>
 References: <20200420133214.28921-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -71,12 +71,12 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 03:29:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+ 04:32:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,311 +94,145 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that node level interface bdrv_truncate() supports passing request
-flags to the block driver, expose this on the BlockBackend level, too.
+This changes the output of some files where instead of filter_img_info()
+now filter_testfiles() takes precedence, so update the reference output.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/sysemu/block-backend.h | 2 +-
- block.c                        | 3 ++-
- block/block-backend.c          | 4 ++--
- block/commit.c                 | 4 ++--
- block/crypto.c                 | 2 +-
- block/mirror.c                 | 2 +-
- block/qcow2.c                  | 4 ++--
- block/qed.c                    | 2 +-
- block/vdi.c                    | 2 +-
- block/vhdx.c                   | 4 ++--
- block/vmdk.c                   | 6 +++---
- block/vpc.c                    | 2 +-
- blockdev.c                     | 2 +-
- qemu-img.c                     | 2 +-
- qemu-io-cmds.c                 | 2 +-
- 15 files changed, 22 insertions(+), 21 deletions(-)
+ tests/qemu-iotests/iotests.py |  5 ++++-
+ tests/qemu-iotests/206.out    | 12 ++++++------
+ tests/qemu-iotests/242.out    | 12 ++++++------
+ 3 files changed, 16 insertions(+), 13 deletions(-)
 
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.=
-h
-index 9bbdbd63d7..34de7faa81 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -237,7 +237,7 @@ int coroutine_fn blk_co_pwrite_zeroes(BlockBackend *blk=
-, int64_t offset,
- int blk_pwrite_compressed(BlockBackend *blk, int64_t offset, const void *b=
-uf,
-                           int bytes);
- int blk_truncate(BlockBackend *blk, int64_t offset, bool exact,
--                 PreallocMode prealloc, Error **errp);
-+                 PreallocMode prealloc, BdrvRequestFlags flags, Error **er=
-rp);
- int blk_pdiscard(BlockBackend *blk, int64_t offset, int bytes);
- int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
-                      int64_t pos, int size);
-diff --git a/block.c b/block.c
-index 2e3905c99e..03cc5813a2 100644
---- a/block.c
-+++ b/block.c
-@@ -548,7 +548,8 @@ static int64_t create_file_fallback_truncate(BlockBacke=
-nd *blk,
-     int64_t size;
-     int ret;
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 7bc4934cd2..3eaf29411b 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -152,7 +152,10 @@ def img_info_log(filename, filter_path=3DNone, imgopts=
+=3DFalse, extra_args=3D[]):
+     output =3D qemu_img_pipe(*args)
+     if not filter_path:
+         filter_path =3D filename
+-    log(filter_img_info(output, filter_path))
++
++    output =3D filter_testfiles(output)
++    output =3D filter_img_info(output, filter_path)
++    log(output)
 =20
--    ret =3D blk_truncate(blk, minimum_size, false, PREALLOC_MODE_OFF, &loc=
-al_err);
-+    ret =3D blk_truncate(blk, minimum_size, false, PREALLOC_MODE_OFF, 0,
-+                       &local_err);
-     if (ret < 0 && ret !=3D -ENOTSUP) {
-         error_propagate(errp, local_err);
-         return ret;
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 8be20060d3..17ed6d8c5b 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -2137,14 +2137,14 @@ int blk_pwrite_compressed(BlockBackend *blk, int64_=
-t offset, const void *buf,
- }
+ def qemu_io(*args):
+     '''Run qemu-io and return the stdout data'''
+diff --git a/tests/qemu-iotests/206.out b/tests/qemu-iotests/206.out
+index 61e7241e0b..adde82f9b8 100644
+--- a/tests/qemu-iotests/206.out
++++ b/tests/qemu-iotests/206.out
+@@ -12,7 +12,7 @@
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
 =20
- int blk_truncate(BlockBackend *blk, int64_t offset, bool exact,
--                 PreallocMode prealloc, Error **errp)
-+                 PreallocMode prealloc, BdrvRequestFlags flags, Error **er=
-rp)
- {
-     if (!blk_is_available(blk)) {
-         error_setg(errp, "No medium inserted");
-         return -ENOMEDIUM;
-     }
+-image: TEST_IMG
++image: TEST_DIR/PID-t.IMGFMT
+ file format: IMGFMT
+ virtual size: 128 MiB (134217728 bytes)
+ cluster_size: 65536
+@@ -34,7 +34,7 @@ Format specific information:
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
 =20
--    return bdrv_truncate(blk->root, offset, exact, prealloc, 0, errp);
-+    return bdrv_truncate(blk->root, offset, exact, prealloc, flags, errp);
- }
+-image: TEST_IMG
++image: TEST_DIR/PID-t.IMGFMT
+ file format: IMGFMT
+ virtual size: 64 MiB (67108864 bytes)
+ cluster_size: 65536
+@@ -56,7 +56,7 @@ Format specific information:
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
 =20
- int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
-diff --git a/block/commit.c b/block/commit.c
-index 8e672799af..87f6096d90 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -133,7 +133,7 @@ static int coroutine_fn commit_run(Job *job, Error **er=
-rp)
-     }
+-image: TEST_IMG
++image: TEST_DIR/PID-t.IMGFMT
+ file format: IMGFMT
+ virtual size: 32 MiB (33554432 bytes)
+ cluster_size: 2097152
+@@ -78,11 +78,11 @@ Format specific information:
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
 =20
-     if (base_len < len) {
--        ret =3D blk_truncate(s->base, len, false, PREALLOC_MODE_OFF, NULL)=
-;
-+        ret =3D blk_truncate(s->base, len, false, PREALLOC_MODE_OFF, 0, NU=
-LL);
-         if (ret) {
-             goto out;
-         }
-@@ -458,7 +458,7 @@ int bdrv_commit(BlockDriverState *bs)
-      * grow the backing file image if possible.  If not possible,
-      * we must return an error */
-     if (length > backing_length) {
--        ret =3D blk_truncate(backing, length, false, PREALLOC_MODE_OFF,
-+        ret =3D blk_truncate(backing, length, false, PREALLOC_MODE_OFF, 0,
-                            &local_err);
-         if (ret < 0) {
-             error_report_err(local_err);
-diff --git a/block/crypto.c b/block/crypto.c
-index ab33545c92..e02f343590 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -115,7 +115,7 @@ static ssize_t block_crypto_init_func(QCryptoBlock *blo=
-ck,
-      * which will be used by the crypto header
-      */
-     return blk_truncate(data->blk, data->size + headerlen, false,
--                        data->prealloc, errp);
-+                        data->prealloc, 0, errp);
- }
+-image: TEST_IMG
++image: TEST_DIR/PID-t.IMGFMT
+ file format: IMGFMT
+ virtual size: 32 MiB (33554432 bytes)
+ cluster_size: 512
+-backing file: TEST_IMG.base
++backing file: TEST_DIR/PID-t.IMGFMT.base
+ backing file format: IMGFMT
+ Format specific information:
+     compat: 0.10
+@@ -95,7 +95,7 @@ Format specific information:
+ {"execute": "job-dismiss", "arguments": {"id": "job0"}}
+ {"return": {}}
 =20
+-image: TEST_IMG
++image: TEST_DIR/PID-t.IMGFMT
+ file format: IMGFMT
+ virtual size: 32 MiB (33554432 bytes)
+ encrypted: yes
+diff --git a/tests/qemu-iotests/242.out b/tests/qemu-iotests/242.out
+index 7ac8404d11..0cc3a78bb2 100644
+--- a/tests/qemu-iotests/242.out
++++ b/tests/qemu-iotests/242.out
+@@ -6,7 +6,7 @@ wrote 262144/262144 bytes at offset 0
 =20
-diff --git a/block/mirror.c b/block/mirror.c
-index c26fd9260d..aca95c9bc9 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -900,7 +900,7 @@ static int coroutine_fn mirror_run(Job *job, Error **er=
-rp)
+ qemu-img info dump:
 =20
-         if (s->bdev_length > base_length) {
-             ret =3D blk_truncate(s->target, s->bdev_length, false,
--                               PREALLOC_MODE_OFF, NULL);
-+                               PREALLOC_MODE_OFF, 0, NULL);
-             if (ret < 0) {
-                 goto immediate_exit;
-             }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index c2f060b670..6c6d6101ce 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3511,7 +3511,7 @@ qcow2_co_create(BlockdevCreateOptions *create_options=
-, Error **errp)
+-image: TEST_IMG
++image: TEST_DIR/PID-disk
+ file format: IMGFMT
+ virtual size: 1 MiB (1048576 bytes)
+ cluster_size: 65536
+@@ -26,7 +26,7 @@ wrote 262144/262144 bytes at offset 262144
 =20
-     /* Okay, now that we have a valid image, let's give it the right size =
-*/
-     ret =3D blk_truncate(blk, qcow2_opts->size, false, qcow2_opts->preallo=
-cation,
--                       errp);
-+                       0, errp);
-     if (ret < 0) {
-         error_prepend(errp, "Could not resize image: ");
-         goto out;
-@@ -5372,7 +5372,7 @@ static int qcow2_amend_options(BlockDriverState *bs, =
-QemuOpts *opts,
-          * Amending image options should ensure that the image has
-          * exactly the given new values, so pass exact=3Dtrue here.
-          */
--        ret =3D blk_truncate(blk, new_size, true, PREALLOC_MODE_OFF, errp)=
-;
-+        ret =3D blk_truncate(blk, new_size, true, PREALLOC_MODE_OFF, 0, er=
-rp);
-         blk_unref(blk);
-         if (ret < 0) {
-             return ret;
-diff --git a/block/qed.c b/block/qed.c
-index fb6100bd20..b0fdb8f565 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -677,7 +677,7 @@ static int coroutine_fn bdrv_qed_co_create(BlockdevCrea=
-teOptions *opts,
-      * The QED format associates file length with allocation status,
-      * so a new file (which is empty) must have a length of 0.
-      */
--    ret =3D blk_truncate(blk, 0, true, PREALLOC_MODE_OFF, errp);
-+    ret =3D blk_truncate(blk, 0, true, PREALLOC_MODE_OFF, 0, errp);
-     if (ret < 0) {
-         goto out;
-     }
-diff --git a/block/vdi.c b/block/vdi.c
-index e1a11f2aa0..0c7835ae70 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -875,7 +875,7 @@ static int coroutine_fn vdi_co_do_create(BlockdevCreate=
-Options *create_options,
+ qemu-img info dump:
 =20
-     if (image_type =3D=3D VDI_TYPE_STATIC) {
-         ret =3D blk_truncate(blk, offset + blocks * block_size, false,
--                           PREALLOC_MODE_OFF, errp);
-+                           PREALLOC_MODE_OFF, 0, errp);
-         if (ret < 0) {
-             error_prepend(errp, "Failed to statically allocate file");
-             goto exit;
-diff --git a/block/vhdx.c b/block/vhdx.c
-index 5dfbb2029a..21497f7318 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -1703,13 +1703,13 @@ static int vhdx_create_bat(BlockBackend *blk, BDRVV=
-HDXState *s,
-         /* All zeroes, so we can just extend the file - the end of the BAT
-          * is the furthest thing we have written yet */
-         ret =3D blk_truncate(blk, data_file_offset, false, PREALLOC_MODE_O=
-FF,
--                           errp);
-+                           0, errp);
-         if (ret < 0) {
-             goto exit;
-         }
-     } else if (type =3D=3D VHDX_TYPE_FIXED) {
-         ret =3D blk_truncate(blk, data_file_offset + image_size, false,
--                           PREALLOC_MODE_OFF, errp);
-+                           PREALLOC_MODE_OFF, 0, errp);
-         if (ret < 0) {
-             goto exit;
-         }
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 5de99fe813..8ec18f35a5 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2118,7 +2118,7 @@ static int vmdk_init_extent(BlockBackend *blk,
-     int gd_buf_size;
+-image: TEST_IMG
++image: TEST_DIR/PID-disk
+ file format: IMGFMT
+ virtual size: 1 MiB (1048576 bytes)
+ cluster_size: 65536
+@@ -58,7 +58,7 @@ wrote 262144/262144 bytes at offset 524288
 =20
-     if (flat) {
--        ret =3D blk_truncate(blk, filesize, false, PREALLOC_MODE_OFF, errp=
-);
-+        ret =3D blk_truncate(blk, filesize, false, PREALLOC_MODE_OFF, 0, e=
-rrp);
-         goto exit;
-     }
-     magic =3D cpu_to_be32(VMDK4_MAGIC);
-@@ -2182,7 +2182,7 @@ static int vmdk_init_extent(BlockBackend *blk,
-     }
+ qemu-img info dump:
 =20
-     ret =3D blk_truncate(blk, le64_to_cpu(header.grain_offset) << 9, false=
-,
--                       PREALLOC_MODE_OFF, errp);
-+                       PREALLOC_MODE_OFF, 0, errp);
-     if (ret < 0) {
-         goto exit;
-     }
-@@ -2523,7 +2523,7 @@ static int coroutine_fn vmdk_co_do_create(int64_t siz=
-e,
-     /* bdrv_pwrite write padding zeros to align to sector, we don't need t=
-hat
-      * for description file */
-     if (desc_offset =3D=3D 0) {
--        ret =3D blk_truncate(blk, desc_len, false, PREALLOC_MODE_OFF, errp=
-);
-+        ret =3D blk_truncate(blk, desc_len, false, PREALLOC_MODE_OFF, 0, e=
-rrp);
-         if (ret < 0) {
-             goto exit;
-         }
-diff --git a/block/vpc.c b/block/vpc.c
-index d8141b52da..2d1eade146 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -898,7 +898,7 @@ static int create_fixed_disk(BlockBackend *blk, uint8_t=
- *buf,
-     /* Add footer to total size */
-     total_size +=3D HEADER_SIZE;
+-image: TEST_IMG
++image: TEST_DIR/PID-disk
+ file format: IMGFMT
+ virtual size: 1 MiB (1048576 bytes)
+ cluster_size: 65536
+@@ -98,7 +98,7 @@ Test 4
+ Checking "in-use" flag...
+ qemu-img info dump:
 =20
--    ret =3D blk_truncate(blk, total_size, false, PREALLOC_MODE_OFF, errp);
-+    ret =3D blk_truncate(blk, total_size, false, PREALLOC_MODE_OFF, 0, err=
-p);
-     if (ret < 0) {
-         return ret;
-     }
-diff --git a/blockdev.c b/blockdev.c
-index 5faddaa705..fbe3a06dbf 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2741,7 +2741,7 @@ void qmp_block_resize(bool has_device, const char *de=
-vice,
-     }
+-image: TEST_IMG
++image: TEST_DIR/PID-disk
+ file format: IMGFMT
+ virtual size: 1 MiB (1048576 bytes)
+ cluster_size: 65536
+@@ -143,11 +143,11 @@ Test 5
+ {"execute": "block-dirty-bitmap-add", "arguments": {"disabled": false, "gr=
+anularity": 16384, "name": "bitmap-0", "node": "drive0", "persistent": true=
+}}
+ {"return": {}}
+ Write an unknown bitmap flag '0x4' into a new QCOW2 image at offset 327695
+-qemu-img: Could not open 'TEST_IMG': Bitmap 'bitmap-0' doesn't satisfy the=
+ constraints
++qemu-img: Could not open 'TEST_DIR/PID-disk': Bitmap 'bitmap-0' doesn't sa=
+tisfy the constraints
 =20
-     bdrv_drained_begin(bs);
--    ret =3D blk_truncate(blk, size, false, PREALLOC_MODE_OFF, errp);
-+    ret =3D blk_truncate(blk, size, false, PREALLOC_MODE_OFF, 0, errp);
-     bdrv_drained_end(bs);
+ Unset the unknown bitmap flag '0x4' in the bitmap directory entry:
 =20
- out:
-diff --git a/qemu-img.c b/qemu-img.c
-index 821cbf610e..7f52742ef2 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3866,7 +3866,7 @@ static int img_resize(int argc, char **argv)
-      * resizing, so pass @exact=3Dtrue.  It is of no use to report
-      * success when the image has not actually been resized.
-      */
--    ret =3D blk_truncate(blk, total_size, true, prealloc, &err);
-+    ret =3D blk_truncate(blk, total_size, true, prealloc, 0, &err);
-     if (!ret) {
-         qprintf(quiet, "Image resized.\n");
-     } else {
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 1b7e700020..851f07e8f8 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -1715,7 +1715,7 @@ static int truncate_f(BlockBackend *blk, int argc, ch=
-ar **argv)
-      * exact=3Dtrue.  It is better to err on the "emit more errors" side
-      * than to be overly permissive.
-      */
--    ret =3D blk_truncate(blk, offset, true, PREALLOC_MODE_OFF, &local_err)=
-;
-+    ret =3D blk_truncate(blk, offset, true, PREALLOC_MODE_OFF, 0, &local_e=
-rr);
-     if (ret < 0) {
-         error_report_err(local_err);
-         return ret;
+-image: TEST_IMG
++image: TEST_DIR/PID-disk
+ file format: IMGFMT
+ virtual size: 1 MiB (1048576 bytes)
+ cluster_size: 65536
 --=20
 2.20.1
 
