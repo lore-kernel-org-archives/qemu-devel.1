@@ -2,83 +2,83 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 351A6C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 19:27:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D04C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 19:29:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 020BA2084D
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 19:27:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B43F20736
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 19:29:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JoSCxBgW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 020BA2084D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cTDJYmty"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B43F20736
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQc4M-0004FU-45
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 15:27:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53892)
+	id 1jQc6S-0006AX-52
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 15:29:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54014)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jQc2q-0003Hh-Cx
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:25:28 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jQc3f-00040s-9r
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:26:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jQc2q-0000IZ-0r
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:25:28 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:38360)
+ (envelope-from <alistair23@gmail.com>) id 1jQc3e-0000lS-PH
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:26:19 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:35100)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jQc2m-0000GF-GQ; Mon, 20 Apr 2020 15:25:24 -0400
-Received: by mail-io1-xd44.google.com with SMTP id f19so12378358iog.5;
- Mon, 20 Apr 2020 12:25:23 -0700 (PDT)
+ id 1jQc3e-0000l1-CO; Mon, 20 Apr 2020 15:26:18 -0400
+Received: by mail-il1-x141.google.com with SMTP id b18so11110965ilf.2;
+ Mon, 20 Apr 2020 12:26:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=cn1+441SJgj6F7h5yPCegbnHuFnhd5lmWLOXJ3+cwRQ=;
- b=JoSCxBgWaZJ5zEIThzWY9f287y4tEXxn9mUX8C+8su/WDipY06nd1oByR49izUHy/b
- obl0I1+ueAvNMFumpKbjMY7lof+mLl00rDgzs7WGwwG8gshJKvTnhY3PYUDjFUm35ELa
- PxlJ+wTVMBzUH10AIVSvtbkbpnIlUz5uMIW1Rj4E2CqUte0QPC7FHpkSEVdtlG7ICuwR
- k6sggcs11RvkhNWkLCtTwuPrgaonMIX3FOsJQG95akQmOYhf+tG1fbm7gMrH6HP3UqJ9
- SVXka7Ai9Y/cGGzrwPRSW+PZW0Z5X4PzZ7/6XwfAHdA2xoZr/KNAhrLjAP2ybmWs6uyW
- 405Q==
+ :cc; bh=qrfMgd0VgTcGZ6pYO0K4Qx4gBXVAw0Av/LQIJO21P8s=;
+ b=cTDJYmtyyHFQoj58XsJ4Y4o6u8X22g3ZYsFO/N4bJKTiRtNCZq4QIk0arznjrkO+KG
+ 9g+Ws57/WtTQtSkvZ5qCenSYmZeTLN8o54k6/6HCdxXCihLmvOp5jSvodwbx08N8FiJw
+ LHiY/k2eNHIavaguClAUAWUKwEcVAPzAzw4SFMBX0MA5kkHV10Yxjv36kYkNoORdlizX
+ L8EsZa+Tyf+rBnlJ/MXA3HwiIYU23TvmBjCy97Uwxz70lA+NuieLnh5jYIe7brLeMM8a
+ ArFrs72gbipQ3SQPE6x5dKYsGPM5nN5KoufyJok7UqYvJV45Mh6oabU0U+UO7Ei6UmGZ
+ W1mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=cn1+441SJgj6F7h5yPCegbnHuFnhd5lmWLOXJ3+cwRQ=;
- b=plQfAM2+tp57WAKND1El3xaX2hmr3QfuD3V7bQP0LkKBZD+8UKjMib7a4INfVvxtrH
- TebE19xzan/Q/yuvukRsg/9z6HsF2dzL5pG6cJLwEmN9QRIc66GcwRbldSxAqJe+NOQV
- VXqmgRIgOmTY8MnVh7xF/KEfY5qaYGAXsqNirZjZSBhpXU1UFEdx4tz770+r+CdB5skI
- kXc/RLSbAV1TTtoGQLvYaYazGqj16WKtheUgDO6dkjUQil3dkPe6bKLYTUA/zwFmemc5
- 32ehTkRK7ou0hx/N6zHlrtjhvauMOWo/KnJBiF86YV9xH1GHK3enq2sMh7VYZCkuUC/w
- vHwg==
-X-Gm-Message-State: AGi0PubuE10W359wl59bSMRYzR4C3dKtainF8wTJPpgxvbcM2HklqMHg
- q4m0+CylxnoFH4ALL11iWRBo1EyyZI6el7KG3zk=
-X-Google-Smtp-Source: APiQypISBJHmcnVyi3PFKazNjnVnJzwMpNOAEPHlB9LEcJU1qL/Ssjbz76+hUl1ZccXMVj0v5dbLBRPfaoPzjns7xmQ=
-X-Received: by 2002:a6b:bf83:: with SMTP id
- p125mr10828244iof.118.1587410722508; 
- Mon, 20 Apr 2020 12:25:22 -0700 (PDT)
+ bh=qrfMgd0VgTcGZ6pYO0K4Qx4gBXVAw0Av/LQIJO21P8s=;
+ b=Z2gdPyHFClkIs2sC65lznldRh9Cj8mQSnjhtSXECkPAnUliaLFMiOlrvVCJIQ0xAef
+ kUQD0Kef4d6X8DNJ9OXwrK5CH7IDA/TLDg4JOaUzCujnMUaGWFAmEAP95YljcmxHy2U2
+ rJ/UNReAdtc4/RrS/sGGgzQbpQjELefF4dxcWqOxWWyrzTrwsnrtq77K7U753Kliw3mL
+ CG3/xfuSFV4h917e8Rqq0pET6nfFobmCbyt4KKu8iF1OwSSpiY41bvsfkxH+e67swcM+
+ cFhqyKiAxiKmyLVTOe1NtnxJIutgOZiPOBd/Skq0BvXG/oFFM2+0f5BteLDYGvWHaPG7
+ ui7w==
+X-Gm-Message-State: AGi0PuZ/YY0rBXE0oXZmvcdeYkRzlBn4hJTdCneE4N7RTdwF2c08JNWC
+ 5TILbdnAyF2RLPeIHv10CDDv3vZkWD1RgovmEjM=
+X-Google-Smtp-Source: APiQypKnm3Sb+Khol3cOEvhvV9h/YcvMkeXpwEjo5G32YG9gXUn348knkM6rhCRoSx+L00XZIefa+aRGpRqAjp7pBj8=
+X-Received: by 2002:a92:9a5c:: with SMTP id t89mr17943890ili.267.1587410776700; 
+ Mon, 20 Apr 2020 12:26:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200330082724.120444-1-anup.patel@wdc.com>
- <CAKmqyKMwso5-O3kZVt2oBA9y1BAGNYttzKqWkoU2V5VXi63uHg@mail.gmail.com>
-In-Reply-To: <CAKmqyKMwso5-O3kZVt2oBA9y1BAGNYttzKqWkoU2V5VXi63uHg@mail.gmail.com>
+References: <cover.1583530528.git.alistair.francis@wdc.com>
+ <CAEUhbmUHNLYoJutr3dg0hpEPehuzRD4r6eux1EStZxCknMst0w@mail.gmail.com>
+ <CAEUhbmWEEBJ67R=kktq=93a2h_ROA0C45Baj+Za73jg251W=WQ@mail.gmail.com>
+In-Reply-To: <CAEUhbmWEEBJ67R=kktq=93a2h_ROA0C45Baj+Za73jg251W=WQ@mail.gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 20 Apr 2020 12:16:55 -0700
-Message-ID: <CAKmqyKOBz2=asvtgZ9skwC1CWxrU2Oj30j6RqJPj5N6Ms9R9Pw@mail.gmail.com>
-Subject: Re: [PATCH] riscv: Fix Stage2 SV32 page table walk
-To: Anup Patel <anup.patel@wdc.com>
+Date: Mon, 20 Apr 2020 12:17:49 -0700
+Message-ID: <CAKmqyKNegLq5NG+qr_ayZc-_ks5cddZ1mGGWSPCEQ8tgSkOXTg@mail.gmail.com>
+Subject: Re: [PATCH v3 0/3] hw/riscv: Add a serial property to sifive_u
+To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::d44
+X-Received-From: 2607:f8b0:4864:20::141
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,72 +90,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+ "open list:RISC-V" <qemu-riscv@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 30, 2020 at 9:25 AM Alistair Francis <alistair23@gmail.com> wrote:
+On Wed, Apr 1, 2020 at 10:39 PM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> On Mon, Mar 30, 2020 at 1:28 AM Anup Patel <anup.patel@wdc.com> wrote:
+> On Tue, Mar 24, 2020 at 10:08 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 > >
-> > As-per RISC-V H-Extension v0.5 draft, the Stage2 SV32 page table has
-> > 12bits of VPN[1] and 10bits of VPN[0]. The additional 2bits in VPN[1]
-> > is required to handle the 34bit intermediate physical address coming
-> > from Stage1 SV32 page table. The 12bits of VPN[1] implies that Stage2
-> > SV32 level-0 page table will be 16KB in size with total 4096 enteries
-> > where each entry maps 4MB of memory (same as Stage1 SV32 page table).
+> > Hi Palmer,
 > >
-> > The get_physical_address() function is broken for Stage2 SV32 level-0
-> > page table because it incorrectly computes output physical address for
-> > Stage2 SV32 level-0 page table entry.
+> > On Sat, Mar 7, 2020 at 5:45 AM Alistair Francis
+> > <alistair.francis@wdc.com> wrote:
+> > >
+> > > At present the board serial number is hard-coded to 1, and passed
+> > > to OTP model during initialization. Firmware (FSBL, U-Boot) uses
+> > > the serial number to generate a unique MAC address for the on-chip
+> > > ethernet controller. When multiple QEMU 'sifive_u' instances are
+> > > created and connected to the same subnet, they all have the same
+> > > MAC address hence it creates a unusable network.
+> > >
+> > > A new "serial" property is introduced to specify the board serial
+> > > number. When not given, the default serial number 1 is used.
+> > >
 > >
-> > The root cause of the issue is that get_physical_address() uses the
-> > "widened" variable to compute level-0 physical address mapping which
-> > changes level-0 mapping size (instead of 4MB). We should use the
-> > "widened" variable only for computing index of Stage2 SV32 level-0
-> > page table.
-> >
-> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
->
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> > Could you please take this for v5.0.0?
 
 Applied to the RISC-V tree for 5.1
 
 Alistair
 
 >
-> Alistair
->
-> > ---
-> >  target/riscv/cpu_helper.c | 7 +------
-> >  1 file changed, 1 insertion(+), 6 deletions(-)
-> >
-> > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> > index 50e13a064f..bc80aa87cf 100644
-> > --- a/target/riscv/cpu_helper.c
-> > +++ b/target/riscv/cpu_helper.c
-> > @@ -559,12 +559,7 @@ restart:
-> >              /* for superpage mappings, make a fake leaf PTE for the TLB's
-> >                 benefit. */
-> >              target_ulong vpn = addr >> PGSHIFT;
-> > -            if (i == 0) {
-> > -                *physical = (ppn | (vpn & ((1L << (ptshift + widened)) - 1))) <<
-> > -                             PGSHIFT;
-> > -            } else {
-> > -                *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
-> > -            }
-> > +            *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
-> >
-> >              /* set permissions on the TLB entry */
-> >              if ((pte & PTE_R) || ((pte & PTE_X) && mxr)) {
-> > --
-> > 2.17.1
-> >
-> >
+> Ping?
 
