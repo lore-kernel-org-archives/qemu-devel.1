@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60143C54FCF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 19:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 478E0C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 19:54:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CA62206A1
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 19:53:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0CF92206A1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 19:54:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MWNDr/H3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CA62206A1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WuTm4AHF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CF92206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41479 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQcU3-0008IT-DN
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 15:53:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57948)
+	id 1jQcUv-000115-6n
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 15:54:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58066)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jQcSZ-0006rf-Bm
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:52:03 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jQcT2-0007fn-Pw
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:52:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jQcSY-0002Lo-Mw
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:52:03 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:41513)
+ (envelope-from <alistair23@gmail.com>) id 1jQcT1-00033q-PM
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:52:32 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:33354)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jQcSY-0002Kj-BZ
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:52:02 -0400
-Received: by mail-io1-xd44.google.com with SMTP id b12so12446840ion.8
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 12:52:02 -0700 (PDT)
+ id 1jQcT1-00032T-CE; Mon, 20 Apr 2020 15:52:31 -0400
+Received: by mail-il1-x141.google.com with SMTP id q10so9790980ile.0;
+ Mon, 20 Apr 2020 12:52:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=pjcY1QXbaNzG2IvQn4EnPDJtsg1AoXj6J52LPDHRjQY=;
- b=MWNDr/H3DqSTN4c5DiJ9lZOPCYXzQpTTgPGWLjuSs2A0ej8SGyGEdKAl0wXE9PB4bb
- 6VnCFRvpy5tZsIaSUYdvYSFVa6Q4T4vZMQZLkWM61tQOmevr/jIuwMBKAjf62PQ/ALAX
- aK3ZnifEJxnXjSAe/FDhFlz9eP4X8BwDfys2IIgDlG44FAGVqj3MVjy7q1WbQ8w5g8eU
- OZ2IKfc4a1WRZNxomMJ+hUCw3Ze9qUpankX6nAvfdo2coBl5cU7s7YArZsSNAx67YlzX
- j6aFzPhI1xo9m2A8PYipvSH3DWKtE7rJrsSOiXuPvmODsWAgItT40Bwcmx5OYGrlUWO7
- 0NQQ==
+ :cc; bh=NrxkcGoSw9f+9arw0MSGats/+AxX6hWZ0202mDIbBpU=;
+ b=WuTm4AHFFid/BeHOBLnqSfe25/iZSVybNlLERABFND5z1PDXkX3HJb44iqmL6R86++
+ pOkePpjGwc6YUwdu3plrfSbmmSQ5jU84nYs9Xft+3yDASt7EmaGADKUrCkl3b/SZXGPM
+ 7jKDk2LuiymsLYlG+p+V8luaskrJLVcJFNvb+JPOrZoRISSY30WtSVOn8cNbGaaW9Ga8
+ 17GE+djKzm7qwwAkMRZYLGmEG0QAH+DEDIcpcFRbOkJVB6yNC6ZhcKRe3LqZ4PN9try9
+ rSmEapfCjzNMKF4SyMTQjawnCYBT2Z9l/MKJE+z3i6zTi5JUhKMvCyYrAhHvv5Fx1pu+
+ h56w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=pjcY1QXbaNzG2IvQn4EnPDJtsg1AoXj6J52LPDHRjQY=;
- b=RqnGSzxUFqtfrvfE/ATbULfgR2fw0cgRz5+qgNYvCQ43MLUUaM0ycj8dTHOocE+je6
- EM6MxPiNySgUHQDSowiYIN6TM9jSB/HV1i8dbBnNOp29yIZMneBIlUs4khuZL6fJslmn
- wS5oMyJVvu8B5bnLfkUk+2NRHtFeRXD9VXRZf6ghoPJv8sSoJsBRic2Ccs25IWohfeVq
- TzqjsF/q/P4tVRtoljIK4M/65XX/2r3SJiC3Whi0W+OzeV7780Mf0bcqW1vekVaod5rN
- kbW3Ww1gfxAlrag+moas8DqJ5W44Yl2+Cz3r9LQKZlz2L9pFFOOCaoycF98m5qOMkmky
- +H+w==
-X-Gm-Message-State: AGi0PuYWLxhp1RhIxNovMEwkDcCu0hTBEHKqqq0X1oBLVJnkaGDe2ULv
- CrHlo/GFC4c+cQH6iqoN9aHRu2RdEwJDmWtYsCM=
-X-Google-Smtp-Source: APiQypJGMUe9Uz1yqGdRCMnB6gN6nboq2NxLavM49ZKZv0vHbHnMAuxPwJUYCMV419LNlwC131XnK/YaT88e/IjXgJ8=
-X-Received: by 2002:a02:6414:: with SMTP id t20mr17614281jac.8.1587412321178; 
- Mon, 20 Apr 2020 12:52:01 -0700 (PDT)
+ bh=NrxkcGoSw9f+9arw0MSGats/+AxX6hWZ0202mDIbBpU=;
+ b=U5OtKc2PjCa85YDZypnJtd+YKWscvoJCukrxvRXDJiu96Vh5se24L6UlZ7CXJrNqST
+ ZxbQ3aJ0hNg3RcMKNZB2gjgVFia3kMsGKWpkGw/71Waays2mjIav1KafpZfS4zP888Cl
+ JEHQrQiK4nulVcCAIIX8bXYe7Kir67RL6YWWaf+bsqHR0p4eZje7yW3wJSDiBrWqTLvz
+ lmbf2G34xW1AAjNLltgmAE38rUoMftIRGghnY8MifeJFpx2NE1WuT06iunANjkxhImBa
+ mQgmM/u7243/FbMYfzSZ3oUmUQCasnajQgn2zysh5Yr2A/bbb7A5IWYH/uCkyzBxrXMj
+ Ym3Q==
+X-Gm-Message-State: AGi0PuZ7LIKLee63Y5acL0a1/Ra1Qx6ApPS4zMLtP6xGcHMFTNFB4cLY
+ uJk2SdF4SL4nn5dJtZm5TFDoQn8y8ezQXqKPXwV65q1D
+X-Google-Smtp-Source: APiQypL2yv8G9qLA0OOX1Q/Zk6xLNIh/GkPmAqlCZb/s47kSOUQHlKFTlfIENiUoLXsVLBthH2q69B3VVySOf8CXAb4=
+X-Received: by 2002:a92:d0c6:: with SMTP id y6mr18619565ila.227.1587412349988; 
+ Mon, 20 Apr 2020 12:52:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200402162839.76636-1-me@xcancerberox.com.ar>
- <CAKmqyKMrH=4X-ryFYBgSenaM4H4+HZ-uWbCf2hx8oYiHovFbng@mail.gmail.com>
-In-Reply-To: <CAKmqyKMrH=4X-ryFYBgSenaM4H4+HZ-uWbCf2hx8oYiHovFbng@mail.gmail.com>
+References: <20200419162727.19148-1-edgar.iglesias@gmail.com>
+ <20200419162727.19148-2-edgar.iglesias@gmail.com>
+In-Reply-To: <20200419162727.19148-2-edgar.iglesias@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 20 Apr 2020 12:43:34 -0700
-Message-ID: <CAKmqyKOgaGZUODTiifyxS-_BHG8NbJUnuWzsE=PHsiFip_bVXQ@mail.gmail.com>
-Subject: Re: [PATCH-for-5.1 v2] hw/core/register: Add register_init_block8
- helper.
-To: Joaquin de Andres <me@xcancerberox.com.ar>
+Date: Mon, 20 Apr 2020 12:44:02 -0700
+Message-ID: <CAKmqyKM7jyX538LdZT2dEznxLKwaVpGHCuhNtwuJxFJLtzOueg@mail.gmail.com>
+Subject: Re: [PATCH v1 1/3] device_tree: Allow name wildcards in
+ qemu_fdt_node_path()
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::d44
+X-Received-From: 2607:f8b0:4864:20::141
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,142 +90,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair@alistair23.me>,
+Cc: figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
  Richard Henderson <richard.henderson@linaro.org>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 2, 2020 at 3:45 PM Alistair Francis <alistair23@gmail.com> wrote:
+On Sun, Apr 19, 2020 at 9:27 AM Edgar E. Iglesias
+<edgar.iglesias@gmail.com> wrote:
 >
-> On Thu, Apr 2, 2020 at 9:29 AM Joaquin de Andres <me@xcancerberox.com.ar> wrote:
-> >
-> > There was no support for 8 bits block registers. Changed
-> > register_init_block32 to be generic and static, adding register
-> > size in bits as parameter. Created one helper for each size.
-> >
-> > Signed-off-by: Joaquin de Andres <me@xcancerberox.com.ar>
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 >
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Allow name wildcards in qemu_fdt_node_path(). This is useful
+> to find all nodes with a given compatibility string.
+>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Thanks for the patch. I have applied this to the device tree pull
-request for 5.1.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
+> ---
+>  device_tree.c                | 2 +-
+>  include/sysemu/device_tree.h | 3 +++
+>  2 files changed, 4 insertions(+), 1 deletion(-)
 >
-> Alistair
+> diff --git a/device_tree.c b/device_tree.c
+> index bba6cc2164..f5b4699aed 100644
+> --- a/device_tree.c
+> +++ b/device_tree.c
+> @@ -308,7 +308,7 @@ char **qemu_fdt_node_path(void *fdt, const char *name, char *compat,
+>              offset = len;
+>              break;
+>          }
+> -        if (!strcmp(iter_name, name)) {
+> +        if (!name || !strcmp(iter_name, name)) {
+>              char *path;
 >
-> > ---
-> > This patch is small and I could see that there is not much movement with
-> > the release, so, I let my self send this. Also this is my first patch :)
-> > Reviews are welcome.
-> > ---
-> >  hw/core/register.c    | 46 +++++++++++++++++++++++++++++++++----------
-> >  include/hw/register.h |  8 ++++++++
-> >  2 files changed, 44 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/hw/core/register.c b/hw/core/register.c
-> > index 3c77396587..ddf91eb445 100644
-> > --- a/hw/core/register.c
-> > +++ b/hw/core/register.c
-> > @@ -246,16 +246,18 @@ uint64_t register_read_memory(void *opaque, hwaddr addr,
-> >      return extract64(read_val, 0, size * 8);
-> >  }
-> >
-> > -RegisterInfoArray *register_init_block32(DeviceState *owner,
-> > -                                         const RegisterAccessInfo *rae,
-> > -                                         int num, RegisterInfo *ri,
-> > -                                         uint32_t *data,
-> > -                                         const MemoryRegionOps *ops,
-> > -                                         bool debug_enabled,
-> > -                                         uint64_t memory_size)
-> > +static RegisterInfoArray *register_init_block(DeviceState *owner,
-> > +                                              const RegisterAccessInfo *rae,
-> > +                                              int num, RegisterInfo *ri,
-> > +                                              void *data,
-> > +                                              const MemoryRegionOps *ops,
-> > +                                              bool debug_enabled,
-> > +                                              uint64_t memory_size,
-> > +                                              size_t data_size_bits)
-> >  {
-> >      const char *device_prefix = object_get_typename(OBJECT(owner));
-> >      RegisterInfoArray *r_array = g_new0(RegisterInfoArray, 1);
-> > +    int data_size = data_size_bits >> 3;
-> >      int i;
-> >
-> >      r_array->r = g_new0(RegisterInfo *, num);
-> > @@ -264,12 +266,12 @@ RegisterInfoArray *register_init_block32(DeviceState *owner,
-> >      r_array->prefix = device_prefix;
-> >
-> >      for (i = 0; i < num; i++) {
-> > -        int index = rae[i].addr / 4;
-> > +        int index = rae[i].addr / data_size;
-> >          RegisterInfo *r = &ri[index];
-> >
-> >          *r = (RegisterInfo) {
-> > -            .data = &data[index],
-> > -            .data_size = sizeof(uint32_t),
-> > +            .data = data + data_size * index,
-> > +            .data_size = data_size,
-> >              .access = &rae[i],
-> >              .opaque = owner,
-> >          };
-> > @@ -284,6 +286,30 @@ RegisterInfoArray *register_init_block32(DeviceState *owner,
-> >      return r_array;
-> >  }
-> >
-> > +RegisterInfoArray *register_init_block8(DeviceState *owner,
-> > +                                        const RegisterAccessInfo *rae,
-> > +                                        int num, RegisterInfo *ri,
-> > +                                        uint8_t *data,
-> > +                                        const MemoryRegionOps *ops,
-> > +                                        bool debug_enabled,
-> > +                                        uint64_t memory_size)
-> > +{
-> > +    return register_init_block(owner, rae, num, ri, (void *)
-> > +                               data, ops, debug_enabled, memory_size, 8);
-> > +}
-> > +
-> > +RegisterInfoArray *register_init_block32(DeviceState *owner,
-> > +                                         const RegisterAccessInfo *rae,
-> > +                                         int num, RegisterInfo *ri,
-> > +                                         uint32_t *data,
-> > +                                         const MemoryRegionOps *ops,
-> > +                                         bool debug_enabled,
-> > +                                         uint64_t memory_size)
-> > +{
-> > +    return register_init_block(owner, rae, num, ri, (void *)
-> > +                               data, ops, debug_enabled, memory_size, 32);
-> > +}
-> > +
-> >  void register_finalize_block(RegisterInfoArray *r_array)
-> >  {
-> >      object_unparent(OBJECT(&r_array->mem));
-> > diff --git a/include/hw/register.h b/include/hw/register.h
-> > index 5796584588..5d2c565ae0 100644
-> > --- a/include/hw/register.h
-> > +++ b/include/hw/register.h
-> > @@ -185,6 +185,14 @@ uint64_t register_read_memory(void *opaque, hwaddr addr, unsigned size);
-> >   *          memory region (r_array->mem) the caller should add to a container.
-> >   */
-> >
-> > +RegisterInfoArray *register_init_block8(DeviceState *owner,
-> > +                                        const RegisterAccessInfo *rae,
-> > +                                        int num, RegisterInfo *ri,
-> > +                                        uint8_t *data,
-> > +                                        const MemoryRegionOps *ops,
-> > +                                        bool debug_enabled,
-> > +                                        uint64_t memory_size);
-> > +
-> >  RegisterInfoArray *register_init_block32(DeviceState *owner,
-> >                                           const RegisterAccessInfo *rae,
-> >                                           int num, RegisterInfo *ri,
-> > --
-> > 2.26.0
-> >
-> >
+>              path = g_malloc(path_len);
+> diff --git a/include/sysemu/device_tree.h b/include/sysemu/device_tree.h
+> index c16fd69bc0..7c53ef7634 100644
+> --- a/include/sysemu/device_tree.h
+> +++ b/include/sysemu/device_tree.h
+> @@ -39,6 +39,9 @@ void *load_device_tree_from_sysfs(void);
+>   * NULL. If there is no error but no matching node was found, the
+>   * returned array contains a single element equal to NULL. If an error
+>   * was encountered when parsing the blob, the function returns NULL
+> + *
+> + * @name may be NULL to wildcard names and only match compatibility
+> + * strings.
+>   */
+>  char **qemu_fdt_node_path(void *fdt, const char *name, char *compat,
+>                            Error **errp);
+> --
+> 2.20.1
+>
+>
 
