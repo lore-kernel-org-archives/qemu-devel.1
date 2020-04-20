@@ -2,90 +2,71 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9782EC54FCF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 18:50:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91AF1C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 18:55:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68A4120782
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 18:50:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="q1lay7Fq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68A4120782
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4894720782
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 18:55:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4894720782
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQbV0-0003pR-Fc
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 14:50:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45864 helo=eggs1p.gnu.org)
+	id 1jQbZo-0007RM-9z
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 14:55:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48462 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <luc.michel@greensocs.com>) id 1jQbMm-0007iO-5f
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:42:00 -0400
+ (envelope-from <frederic.konrad@adacore.com>) id 1jQbZ0-0006s0-T4
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:54:39 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <luc.michel@greensocs.com>) id 1jQbMl-0007q0-1l
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:41:59 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:48792)
+ (envelope-from <frederic.konrad@adacore.com>) id 1jQbYw-0007Ze-2H
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:54:36 -0400
+Received: from mel.act-europe.fr ([194.98.77.210]:37396
+ helo=smtp.eu.adacore.com)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1jQbMk-0007og-83
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:41:58 -0400
-Received: from [172.17.10.10] (unknown [172.17.10.10])
- by beetle.greensocs.com (Postfix) with ESMTPSA id F27F096F50;
- Mon, 20 Apr 2020 18:41:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1587408115;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nxxQFtXWFvomTUJ6RK1vSkvMOv/OhZcdJtvyKF0QXoU=;
- b=q1lay7FqKd5+wLxVG+/0LDjAjMb4UrYysljH5e1vffT2FXYROIYvXScE1d+o44pZDX22ql
- w8pqwJz/vbWOFQBQiezJ4jRNlYMX0vVtCGBugiiYkeLWBtFfv0nZr/BmyG0+SqGWU1SYkI
- 4NdMzmnJhu95CD11EbL6rxAj+TPwOD0=
-Subject: Re: [PATCH v2 3/6] target/microblaze: Add the div-zero-exception
- property
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
-References: <20200420175250.25777-1-edgar.iglesias@gmail.com>
- <20200420175250.25777-4-edgar.iglesias@gmail.com>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <67e27771-84d2-3857-3eec-5c589947fbcc@greensocs.com>
-Date: Mon, 20 Apr 2020 20:41:54 +0200
+ (Exim 4.90_1) (envelope-from <frederic.konrad@adacore.com>)
+ id 1jQbYv-0007W9-GW
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 14:54:33 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by filtered-smtp.eu.adacore.com (Postfix) with ESMTP id 6FE2381345;
+ Mon, 20 Apr 2020 20:54:31 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at eu.adacore.com
+Received: from smtp.eu.adacore.com ([127.0.0.1])
+ by localhost (smtp.eu.adacore.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id EvNwWjprxfhN; Mon, 20 Apr 2020 20:54:31 +0200 (CEST)
+Received: from localhost.localdomain (lfbn-tou-1-1471-22.w90-89.abo.wanadoo.fr
+ [90.89.4.22])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by smtp.eu.adacore.com (Postfix) with ESMTPSA id 1D53281339;
+ Mon, 20 Apr 2020 20:54:31 +0200 (CEST)
+Subject: Re: [PATCH v1] target/m68k: fix gdb for m68xxx
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <1587391275-12748-1-git-send-email-frederic.konrad@adacore.com>
+ <877dyadtje.fsf@linaro.org>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <52816d2b-9ace-9933-34d0-1434bc91861f@adacore.com>
+Date: Mon, 20 Apr 2020 20:54:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200420175250.25777-4-edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1587408115;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nxxQFtXWFvomTUJ6RK1vSkvMOv/OhZcdJtvyKF0QXoU=;
- b=b4D2g1HrpOnZtRxUzODLw9BOAQWiZIqGb8UbYvcY5I49AQkI2/7HTtXnxUGF4eLdXbwSii
- GZ4dcT4SpOLbEzTU54tUVJQkSNc2yuN14F4ITM8Lr53IbzY9vE5HxIkh/WvJn+RsOMqbYH
- Vt9vkYFxwQUXdZIo0xH+to99I086rj0=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1587408115; a=rsa-sha256; cv=none;
- b=jzS12l7KPs9KazCAJ/0ZCVLD8BbSB7IfIb0pi8tvUBHyRtt+Ns0yGa3FDrov0vP3fww+x7
- FuR86u2QykCVkDI+CyEke3h20dN3Xl5EaEgznbyHD7SylcQBfRiZIEHgAqlHTgsv2TWovH
- G5nIXWhFgVME6j6QVzLKbwXZ3PftFeg=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=luc smtp.mailfrom=luc.michel@greensocs.com
-Received-SPF: pass client-ip=5.135.226.135;
- envelope-from=luc.michel@greensocs.com; helo=beetle.greensocs.com
+In-Reply-To: <877dyadtje.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=194.98.77.210;
+ envelope-from=frederic.konrad@adacore.com; helo=smtp.eu.adacore.com
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 14:41:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 5.135.226.135
+ 14:54:31
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Received-From: 194.98.77.210
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,82 +78,286 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- frasse.iglesias@gmail.com, alistair@alistair23.me,
- richard.henderson@linaro.org, frederic.konrad@adacore.com, philmd@redhat.com
+Cc: huth@tuxfamily.org, qemu-devel@nongnu.org, laurent@vivier.eu,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ pierre@freepascal.org, f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/20/20 7:52 PM, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> 
-> Add the div-zero-exception property to control if the core
-> traps divizions by zero.
-> 
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 
-> ---
->  target/microblaze/cpu.c       | 4 ++++
->  target/microblaze/cpu.h       | 1 +
->  target/microblaze/op_helper.c | 5 +++--
->  3 files changed, 8 insertions(+), 2 deletions(-)
+Le 4/20/20 à 6:13 PM, Alex Bennée a écrit :
 > 
-> diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-> index 36c20d9724..53e80f4e5d 100644
-> --- a/target/microblaze/cpu.c
-> +++ b/target/microblaze/cpu.c
-> @@ -207,6 +207,8 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
->                                                   PVR2_DOPB_BUS_EXC_MASK : 0) |
->                          (cpu->cfg.iopb_bus_exception ?
->                                                   PVR2_IOPB_BUS_EXC_MASK : 0) |
-> +                        (cpu->cfg.div_zero_exception ?
-> +                                                 PVR2_DIV_ZERO_EXC_MASK : 0) |
->                          (cpu->cfg.illegal_opcode_exception ?
->                                                  PVR2_ILL_OPCODE_EXC_MASK : 0) |
->                          (cpu->cfg.opcode_0_illegal ?
-> @@ -280,6 +282,8 @@ static Property mb_properties[] = {
->                       cfg.iopb_bus_exception, false),
->      DEFINE_PROP_BOOL("ill-opcode-exception", MicroBlazeCPU,
->                       cfg.illegal_opcode_exception, false),
-> +    DEFINE_PROP_BOOL("div-zero-exception", MicroBlazeCPU,
-> +                     cfg.div_zero_exception, false),
->      DEFINE_PROP_BOOL("opcode-0x0-illegal", MicroBlazeCPU,
->                       cfg.opcode_0_illegal, false),
->      DEFINE_PROP_STRING("version", MicroBlazeCPU, cfg.version),
-> diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-> index 71d7317a58..3c07f9b3f7 100644
-> --- a/target/microblaze/cpu.h
-> +++ b/target/microblaze/cpu.h
-> @@ -305,6 +305,7 @@ struct MicroBlazeCPU {
->          bool iopb_bus_exception;
->          bool illegal_opcode_exception;
->          bool opcode_0_illegal;
-> +        bool div_zero_exception;
->          char *version;
->          uint8_t pvr;
->      } cfg;
-> diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
-> index 18677ddfca..f3b17a95b3 100644
-> --- a/target/microblaze/op_helper.c
-> +++ b/target/microblaze/op_helper.c
-> @@ -132,11 +132,12 @@ uint32_t helper_carry(uint32_t a, uint32_t b, uint32_t cf)
->  
->  static inline int div_prepare(CPUMBState *env, uint32_t a, uint32_t b)
->  {
-> +    MicroBlazeCPU *cpu = env_archcpu(env);
-> +
->      if (b == 0) {
->          env->sregs[SR_MSR] |= MSR_DZ;
->  
-> -        if ((env->sregs[SR_MSR] & MSR_EE)
-> -            && !(env->pvr.regs[2] & PVR2_DIV_ZERO_EXC_MASK)) {
-> +        if ((env->sregs[SR_MSR] & MSR_EE) && cpu->cfg.div_zero_exception) {
->              env->sregs[SR_ESR] = ESR_EC_DIVZERO;
->              helper_raise_exception(env, EXCP_HW_EXCP);
->          }
+> frederic.konrad@adacore.com writes:
+> 
+>> From: KONRAD Frederic <frederic.konrad@adacore.com>
+>>
+>> Currently "cf-core.xml" is sent to GDB when using any m68k flavor.  Thing is
+>> it uses the "org.gnu.gdb.coldfire.core" feature name and gdb 8.3 then expects
+>> a coldfire FPU instead of the default m68881 FPU.
+>>
+>> This is not OK because the m68881 floats registers are 96 bits wide so it
+>> crashes GDB with the following error message:
+>>
+>> (gdb) target remote localhost:7960
+>> Remote debugging using localhost:7960
+>> warning: Register "fp0" has an unsupported size (96 bits)
+>> warning: Register "fp1" has an unsupported size (96 bits)
+>> ...
+>> Remote 'g' packet reply is too long (expected 148 bytes, got 180 bytes):    \
+>>    00000000000[...]0000
+>>
+>> With this patch: qemu-system-m68k -M none -cpu m68020 -s -S
+>>
+>> (gdb) tar rem :1234
+>> Remote debugging using :1234
+>> warning: No executable has been specified and target does not support
+>> determining executable automatically.  Try using the "file" command.
+>> 0x00000000 in ?? ()
+>> (gdb) p $fp0
+>> $1 = nan(0xffffffffffffffff)
+>>
+>> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+> 
+> Well it solves the connection issue - but the FP values are still
+> hopelessly broken, from float_convs:
+> 
+>    from single: f32(-0x1.1874b200000000000000p+103:0xf30c3a59)
+> 
+> in gdb
+> 
+>    fp0            <invalid float value> (raw 0x8c3a5900000000004066)
+
+Hi Alex, do you have a reproducer?
+
+With this simple example:
+=========================
+
+.global _start
+.text
+_start:
+         lea val, %a0
+         fmoves (%a0),%fp0
+         fmoves 4(%a0), %fp1
+end:
+         bra end
+
+.align 0x4
+val:
+         .float 0.12345678
+         .float 3.141592653589793
+
+$ m68k-linux-gnu-gcc -g -Wl,-Ttext=0 main.S -mcpu=68020 -nostdlib -o main.elf
+$ m68k-linux-gnu-objdump -d main.elf
+
+main.elf:     file format elf32-m68k
+
+Disassembly of section .text:
+
+00000000 <_start>:
+    0:	41fa 0012      	lea %pc@(14 <val>),%a0
+    4:	f210 4400      	fmoves %a0@,%fp0
+    8:	f228 4480 0004 	fmoves %a0@(4),%fp1
+
+0000000e <end>:
+    e:	6000 fffe      	braw e <end>
+	...
+
+00000014 <val>:
+   14:	3dfc           	.short 0x3dfc
+   16:	d6e9 4049      	addaw %a1@(16457),%a3
+   1a:	0fdb           	bset %d7,%a3@+
+
+I can run the executable in 5.0-rc3 + the patch:
+================================================
+
+$ xxx/qemu-for-upstream.git/m68k-softmmu/qemu-system-m68k --kernel main.elf \
+     -cpu m68020 -s -S -nographic
+
+And a GDB 8.3 I just built:
+===========================
+
+$ xxx/bin/m68k-elf-gdb main.elf
+GNU gdb (GDB) 8.3
+Copyright (C) 2019 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "--host=x86_64-pc-linux-gnu --target=m68k-elf".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+     <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from main.elf...
+(gdb) tar rem :1234
+Remote debugging using :1234
+_start () at main.S:5
+5	        lea val, %a0
+(gdb) b end
+Breakpoint 1 at 0xe: file main.S, line 9.
+(gdb) c
+Continuing.
+
+Breakpoint 1, end () at main.S:9
+9	        bra end
+(gdb) info registers all
+d0             0x0                 0
+d1             0x0                 0
+d2             0x0                 0
+d3             0x0                 0
+d4             0x0                 0
+d5             0x0                 0
+d6             0x0                 0
+d7             0x0                 0
+a0             0x14                0x14 <val>
+a1             0x0                 0x0 <_start>
+a2             0x0                 0x0 <_start>
+a3             0x0                 0x0 <_start>
+a4             0x0                 0x0 <_start>
+a5             0x0                 0x0 <_start>
+fp             0x0                 0x0 <_start>
+sp             0x0                 0x0 <_start>
+ps             0x2700              9984
+pc             0xe                 0xe <end>
+fp0            0.123456783592700958252 (raw 0x3ffb0000fcd6e90000000000)
+fp1            3.14159274101257324219 (raw 0x40000000c90fdb0000000000)
+fp2            nan(0xffffffffffffffff) (raw 0x7fff0000ffffffffffffffff)
+fp3            nan(0xffffffffffffffff) (raw 0x7fff0000ffffffffffffffff)
+fp4            nan(0xffffffffffffffff) (raw 0x7fff0000ffffffffffffffff)
+fp5            nan(0xffffffffffffffff) (raw 0x7fff0000ffffffffffffffff)
+fp6            nan(0xffffffffffffffff) (raw 0x7fff0000ffffffffffffffff)
+fp7            nan(0xffffffffffffffff) (raw 0x7fff0000ffffffffffffffff)
+fpcontrol      0x0                 0
+fpstatus       0x0                 0
+fpiaddr        0x0                 0x0 <_start>
+
+The value doesn't seems to much broken, the monitor gives me:
+
+(qemu) info registers
+D0 = 00000000   A0 = 00000014   F0 = 3ffb fcd6e90000000000  (    0.123457)
+D1 = 00000000   A1 = 00000000   F1 = 4000 c90fdb0000000000  (     3.14159)
+D2 = 00000000   A2 = 00000000   F2 = 7fff ffffffffffffffff  (         nan)
+D3 = 00000000   A3 = 00000000   F3 = 7fff ffffffffffffffff  (         nan)
+D4 = 00000000   A4 = 00000000   F4 = 7fff ffffffffffffffff  (         nan)
+D5 = 00000000   A5 = 00000000   F5 = 7fff ffffffffffffffff  (         nan)
+D6 = 00000000   A6 = 00000000   F6 = 7fff ffffffffffffffff  (         nan)
+D7 = 00000000   A7 = 00000000   F7 = 7fff ffffffffffffffff  (         nan)
+
+Did I miss anything?
+
+Cheers,
+Fred
+
+> 
+>> ---
+>>   configure             |  2 +-
+>>   gdb-xml/m68k-core.xml | 29 +++++++++++++++++++++++++++++
+>>   target/m68k/cpu.c     | 30 +++++++++++++++++++++++++-----
+>>   3 files changed, 55 insertions(+), 6 deletions(-)
+>>   create mode 100644 gdb-xml/m68k-core.xml
+>>
+>> diff --git a/configure b/configure
+>> index 23b5e93..2b07b85 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -7825,7 +7825,7 @@ case "$target_name" in
+>>     ;;
+>>     m68k)
+>>       bflt="yes"
+>> -    gdb_xml_files="cf-core.xml cf-fp.xml m68k-fp.xml"
+>> +    gdb_xml_files="cf-core.xml cf-fp.xml m68k-core.xml m68k-fp.xml"
+>>       TARGET_SYSTBL_ABI=common
+>>     ;;
+>>     microblaze|microblazeel)
+>> diff --git a/gdb-xml/m68k-core.xml b/gdb-xml/m68k-core.xml
+>> new file mode 100644
+>> index 0000000..5b092d2
+>> --- /dev/null
+>> +++ b/gdb-xml/m68k-core.xml
+>> @@ -0,0 +1,29 @@
+>> +<?xml version="1.0"?>
+>> +<!-- Copyright (C) 2008 Free Software Foundation, Inc.
+>> +
+>> +     Copying and distribution of this file, with or without modification,
+>> +     are permitted in any medium without royalty provided the copyright
+>> +     notice and this notice are preserved.  -->
+>> +<!DOCTYPE feature SYSTEM "gdb-target.dtd">
+>> +<feature name="org.gnu.gdb.m68k.core">
+>> +  <reg name="d0" bitsize="32"/>
+>> +  <reg name="d1" bitsize="32"/>
+>> +  <reg name="d2" bitsize="32"/>
+>> +  <reg name="d3" bitsize="32"/>
+>> +  <reg name="d4" bitsize="32"/>
+>> +  <reg name="d5" bitsize="32"/>
+>> +  <reg name="d6" bitsize="32"/>
+>> +  <reg name="d7" bitsize="32"/>
+>> +  <reg name="a0" bitsize="32" type="data_ptr"/>
+>> +  <reg name="a1" bitsize="32" type="data_ptr"/>
+>> +  <reg name="a2" bitsize="32" type="data_ptr"/>
+>> +  <reg name="a3" bitsize="32" type="data_ptr"/>
+>> +  <reg name="a4" bitsize="32" type="data_ptr"/>
+>> +  <reg name="a5" bitsize="32" type="data_ptr"/>
+>> +  <reg name="fp" bitsize="32" type="data_ptr"/>
+>> +  <reg name="sp" bitsize="32" type="data_ptr"/>
+>> +
+>> +  <reg name="ps" bitsize="32"/>
+>> +  <reg name="pc" bitsize="32" type="code_ptr"/>
+>> +
+>> +</feature>
+>> diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+>> index 9445fcd..976e624 100644
+>> --- a/target/m68k/cpu.c
+>> +++ b/target/m68k/cpu.c
+>> @@ -297,6 +297,21 @@ static void m68k_cpu_class_init(ObjectClass *c, void *data)
+>>       dc->vmsd = &vmstate_m68k_cpu;
+>>   }
+>>   
+>> +static void m68k_cpu_class_init_m68k_core(ObjectClass *c, void *data)
+>> +{
+>> +    CPUClass *cc = CPU_CLASS(c);
+>> +
+>> +    cc->gdb_core_xml_file = "m68k-core.xml";
+>> +}
+>> +
+>> +#define DEFINE_M68K_CPU_TYPE_WITH_CLASS(cpu_model, initfn, classinit)      \
+>> +    {                                                                      \
+>> +        .name = M68K_CPU_TYPE_NAME(cpu_model),                             \
+>> +        .instance_init = initfn,                                           \
+>> +        .parent = TYPE_M68K_CPU,                                           \
+>> +        .class_init = classinit,                                           \
+>> +    }
+>> +
+>>   #define DEFINE_M68K_CPU_TYPE(cpu_model, initfn) \
+>>       {                                           \
+>>           .name = M68K_CPU_TYPE_NAME(cpu_model),  \
+>> @@ -314,11 +329,16 @@ static const TypeInfo m68k_cpus_type_infos[] = {
+>>           .class_size = sizeof(M68kCPUClass),
+>>           .class_init = m68k_cpu_class_init,
+>>       },
+>> -    DEFINE_M68K_CPU_TYPE("m68000", m68000_cpu_initfn),
+>> -    DEFINE_M68K_CPU_TYPE("m68020", m68020_cpu_initfn),
+>> -    DEFINE_M68K_CPU_TYPE("m68030", m68030_cpu_initfn),
+>> -    DEFINE_M68K_CPU_TYPE("m68040", m68040_cpu_initfn),
+>> -    DEFINE_M68K_CPU_TYPE("m68060", m68060_cpu_initfn),
+>> +    DEFINE_M68K_CPU_TYPE_WITH_CLASS("m68000", m68000_cpu_initfn,
+>> +                                    m68k_cpu_class_init_m68k_core),
+>> +    DEFINE_M68K_CPU_TYPE_WITH_CLASS("m68020", m68020_cpu_initfn,
+>> +                                    m68k_cpu_class_init_m68k_core),
+>> +    DEFINE_M68K_CPU_TYPE_WITH_CLASS("m68030", m68030_cpu_initfn,
+>> +                                    m68k_cpu_class_init_m68k_core),
+>> +    DEFINE_M68K_CPU_TYPE_WITH_CLASS("m68040", m68040_cpu_initfn,
+>> +                                    m68k_cpu_class_init_m68k_core),
+>> +    DEFINE_M68K_CPU_TYPE_WITH_CLASS("m68060", m68060_cpu_initfn,
+>> +                                    m68k_cpu_class_init_m68k_core),
+>>       DEFINE_M68K_CPU_TYPE("m5206", m5206_cpu_initfn),
+>>       DEFINE_M68K_CPU_TYPE("m5208", m5208_cpu_initfn),
+>>       DEFINE_M68K_CPU_TYPE("cfv4e", cfv4e_cpu_initfn),
+> 
 > 
 
