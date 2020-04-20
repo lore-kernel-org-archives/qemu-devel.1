@@ -2,130 +2,66 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35B4CC3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 07:31:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF39CC3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 07:56:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE3F2206E9
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 07:31:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CS0NcZdl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE3F2206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C51F321927
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 07:56:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C51F321927
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQQuC-0006nv-5Q
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 03:31:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45640 helo=eggs1p.gnu.org)
+	id 1jQRIN-0003pF-U2
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 03:56:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49528 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jQQs4-00043V-JW
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:29:36 -0400
+ (envelope-from <pannengyuan@huawei.com>) id 1jQRHa-0003O0-Jn
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:55:58 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jQQs4-0005iQ-2m
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:29:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28740
- helo=us-smtp-1.mimecast.com)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jQQs3-0005hk-Lr
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:29:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587367774;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=M1IbG15GsUbTPkjODn83krDzE5ZERmLoAzU7XOyfMWo=;
- b=CS0NcZdlYzmHzXrMWR2kAm2Yehmd64828AxaGa2oONNaweFEuEacalFOfv7/tZ/KLbmPST
- ucIx1Whm9rSzIOpnvmWlsDVcCLqIW8ZgKlB9tPKpgindxyFAIK3qU1cO4BsipV0FQtFHmM
- DSrDwvkpJm8JLw++AStmt+CNnLVF70Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-9t7VGohWMhCzXW0jQKoBkA-1; Mon, 20 Apr 2020 03:29:31 -0400
-X-MC-Unique: 9t7VGohWMhCzXW0jQKoBkA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B729C801A26;
- Mon, 20 Apr 2020 07:29:30 +0000 (UTC)
-Received: from [10.36.114.7] (ovpn-114-7.ams2.redhat.com [10.36.114.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6213E27BD8;
- Mon, 20 Apr 2020 07:29:29 +0000 (UTC)
-Subject: Re: [PATCH 6/7] tcg: Remove tcg_gen_gvec_dup{8,16,32,64}i
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200418150411.1831-1-richard.henderson@linaro.org>
- <20200418150411.1831-7-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <5c85fe91-bfbf-2eaa-c835-50e3069d4f8d@redhat.com>
-Date: Mon, 20 Apr 2020 09:29:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (envelope-from <pannengyuan@huawei.com>) id 1jQRHZ-00008X-Fh
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:55:58 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:53364 helo=huawei.com)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
+ id 1jQRHY-0008G0-Jm
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:55:57 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 04BD9769E9D08C232EC0;
+ Mon, 20 Apr 2020 15:55:47 +0800 (CST)
+Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server (TLS) id 14.3.487.0; Mon, 20 Apr
+ 2020 15:55:39 +0800
+Subject: Re: [PATCH v2] scsi-disk: define props in scsi_block_disk to avoid
+ memleaks
+From: Pan Nengyuan <pannengyuan@huawei.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, <fam@euphon.net>
+References: <20200114091634.60856-1-pannengyuan@huawei.com>
+ <5e875870-449e-3f65-60bc-79ba5190d2fb@redhat.com>
+ <a7f349b8-a06b-4eee-67a2-42f082f8c081@huawei.com>
+Message-ID: <e9cfc4f7-bbc4-61b9-ed99-480ed3caa08e@huawei.com>
+Date: Mon, 20 Apr 2020 15:55:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200418150411.1831-7-richard.henderson@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <a7f349b8-a06b-4eee-67a2-42f082f8c081@huawei.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
+X-Originating-IP: [10.184.39.213]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.32;
+ envelope-from=pannengyuan@huawei.com; helo=huawei.com
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 03:29:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+ 03:55:47
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,82 +73,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, zhiwei_liu@c-sky.com, david@gibson.dropbear.id.au
+Cc: Euler Robot <euler.robot@huawei.com>, qemu-devel@nongnu.org,
+ zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18.04.20 17:04, Richard Henderson wrote:
-> These interfaces are now unused.
+Hi Paolo,
+
+On 2/19/2020 3:52 PM, Pan Nengyuan wrote:
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  include/tcg/tcg-op-gvec.h |  5 -----
->  tcg/tcg-op-gvec.c         | 28 ----------------------------
->  2 files changed, 33 deletions(-)
 > 
-> diff --git a/include/tcg/tcg-op-gvec.h b/include/tcg/tcg-op-gvec.h
-> index eb0d47a42b..fa8a0c8d03 100644
-> --- a/include/tcg/tcg-op-gvec.h
-> +++ b/include/tcg/tcg-op-gvec.h
-> @@ -320,11 +320,6 @@ void tcg_gen_gvec_dup_i32(unsigned vece, uint32_t dofs, uint32_t s,
->  void tcg_gen_gvec_dup_i64(unsigned vece, uint32_t dofs, uint32_t s,
->                            uint32_t m, TCGv_i64);
->  
-> -void tcg_gen_gvec_dup8i(uint32_t dofs, uint32_t s, uint32_t m, uint8_t x);
-> -void tcg_gen_gvec_dup16i(uint32_t dofs, uint32_t s, uint32_t m, uint16_t x);
-> -void tcg_gen_gvec_dup32i(uint32_t dofs, uint32_t s, uint32_t m, uint32_t x);
-> -void tcg_gen_gvec_dup64i(uint32_t dofs, uint32_t s, uint32_t m, uint64_t x);
-> -
->  void tcg_gen_gvec_shli(unsigned vece, uint32_t dofs, uint32_t aofs,
->                         int64_t shift, uint32_t oprsz, uint32_t maxsz);
->  void tcg_gen_gvec_shri(unsigned vece, uint32_t dofs, uint32_t aofs,
-> diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-> index de16c027b3..5a6cc19812 100644
-> --- a/tcg/tcg-op-gvec.c
-> +++ b/tcg/tcg-op-gvec.c
-> @@ -1541,34 +1541,6 @@ void tcg_gen_gvec_dup_mem(unsigned vece, uint32_t dofs, uint32_t aofs,
->      }
->  }
->  
-> -void tcg_gen_gvec_dup64i(uint32_t dofs, uint32_t oprsz,
-> -                         uint32_t maxsz, uint64_t x)
-> -{
-> -    check_size_align(oprsz, maxsz, dofs);
-> -    do_dup(MO_64, dofs, oprsz, maxsz, NULL, NULL, x);
-> -}
-> -
-> -void tcg_gen_gvec_dup32i(uint32_t dofs, uint32_t oprsz,
-> -                         uint32_t maxsz, uint32_t x)
-> -{
-> -    check_size_align(oprsz, maxsz, dofs);
-> -    do_dup(MO_32, dofs, oprsz, maxsz, NULL, NULL, x);
-> -}
-> -
-> -void tcg_gen_gvec_dup16i(uint32_t dofs, uint32_t oprsz,
-> -                         uint32_t maxsz, uint16_t x)
-> -{
-> -    check_size_align(oprsz, maxsz, dofs);
-> -    do_dup(MO_16, dofs, oprsz, maxsz, NULL, NULL, x);
-> -}
-> -
-> -void tcg_gen_gvec_dup8i(uint32_t dofs, uint32_t oprsz,
-> -                         uint32_t maxsz, uint8_t x)
-> -{
-> -    check_size_align(oprsz, maxsz, dofs);
-> -    do_dup(MO_8, dofs, oprsz, maxsz, NULL, NULL, x);
-> -}
-> -
->  void tcg_gen_gvec_dup_imm(unsigned vece, uint32_t dofs, uint32_t oprsz,
->                            uint32_t maxsz, uint64_t x)
->  {
+> On 1/22/2020 1:05 AM, Paolo Bonzini wrote:
+>> On 14/01/20 10:16, pannengyuan@huawei.com wrote:
+>>> From: Pan Nengyuan <pannengyuan@huawei.com>
+>>>
+>>> scsi_block_realize() use scsi_realize() to init some props, but
+>>> these props is not defined in scsi_block_disk_properties, so they will
+>>> not be freed.
+>>>
+>>> This patch defines these prop in scsi_block_disk_properties and aslo
+>>> calls scsi_unrealize to avoid memleaks, the leak stack as
+>>> follow(it's easy to reproduce by attaching/detaching scsi-block-disks):
+>>>
+>>> =================================================================
+>>> ==qemu-system-x86_64==32195==ERROR: LeakSanitizer: detected memory leaks
+>>>
+>>> Direct leak of 57 byte(s) in 3 object(s) allocated from:
+>>>   #0 0x7f19f8bed768 (/lib64/libasan.so.5+0xef768)  ??:?
+>>>   #1 0x7f19f64d9445 (/lib64/libglib-2.0.so.0+0x52445)  ??:?
+>>>   #2 0x7f19f64f2d92 (/lib64/libglib-2.0.so.0+0x6bd92)  ??:?
+>>>   #3 0x55975366e596 (qemu-system-x86_64+0x35c0596)  /mnt/sdb/qemu/hw/scsi/scsi-disk.c:2399
+>>>   #4 0x559753671201 (emu-system-x86_64+0x35c3201)  /mnt/sdb/qemu/hw/scsi/scsi-disk.c:2681
+>>>   #5 0x559753687e3e (qemu-system-x86_64+0x35d9e3e)  /mnt/sdb/qemu/hw/scsi/scsi-bus.c:58
+>>>   #6 0x55975368ac44 (qemu-system-x86_64+0x35dcc44)  /mnt/sdb/qemu/hw/scsi/scsi-bus.c:216
+>>>   #7 0x5597532a7840 (qemu-system-x86_64+0x31f9840)  /mnt/sdb/qemu/hw/core/qdev.c:876
+>>>
+>>> Direct leak of 15 byte(s) in 3 object(s) allocated from:
+>>>   #0 0x7f19f8bed768 (/lib64/libasan.so.5+0xef768)  ??:?
+>>>   #1 0x7f19f64d9445 (/lib64/libglib-2.0.so.0+0x52445)  ??:?
+>>>   #2 0x7f19f64f2d92 (/lib64/libglib-2.0.so.0+0x6bd92)  ??:?
+>>>   #3 0x55975366e06f (qemu-system-x86_64+0x35c006f)  /mnt/sdb/qemu/hw/scsi/scsi-disk.c:2388
+>>>   #4 0x559753671201 (qemu-system-x86_64+0x35c3201)  /mnt/sdb/qemu/hw/scsi/scsi-disk.c:2681
+>>>   #5 0x559753687e3e (qemu-system-x86_64+0x35d9e3e)  /mnt/sdb/qemu/hw/scsi/scsi-bus.c:58
+>>>   #6 0x55975368ac44 (qemu-system-x86_64+0x35dcc44)  /mnt/sdb/qemu/hw/scsi/scsi-bus.c:216
+>>>
+>>> @@ -3079,9 +3080,8 @@ static const TypeInfo scsi_cd_info = {
+>>>  
+>>>  #ifdef __linux__
+>>>  static Property scsi_block_properties[] = {
+>>> -    DEFINE_BLOCK_ERROR_PROPERTIES(SCSIDiskState, qdev.conf),         \
+>>> +    DEFINE_SCSI_DISK_PROPERTIES(),.
+>> The properties defined there shouldn't apply to scsi-block.
+>>
+>> Can you explain what exactly is being leaked?
+> 
+> Ohh, I'm sorry, I missed this email and reply it so late.
+> 
+> When we attach a scsi-block disk, the props(version/vender/device_id) are malloced in scsi_realize() which it's called by scsi_block_realize(),
+> but we don't define these props in scsi_block_properties. So these props will not be released when we detach the scsi-block disk.
+> 
+> This patch will reuse scsi_disk_properties to define those props in scsi_block_properties to fix it.
+> Similarly to scsi_hd, this patch aslo set unrealize to call del_boot_device_lchs().
+> 
+> Thanks.
 > 
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Maybe you missed this patch due to my late reply. Actually it will cause a memleak when we attach/detach a scsi-block disk.
 
--- 
-Thanks,
+Reproducer:
+(qemu) device_add virtio-scsi-pci,id=scsi1,bus=pci.0,addr=0x7
+(qemu) drive_add 1 file=/dev/sdc,format=raw,if=none,id=drive-scsi1-0-0-12,cache=none,aio=native
+OK
+(qemu) device_add scsi-block,bus=scsi1.0,channel=0,scsi-id=0,lun=10,share-rw=on,drive=drive-scsi1-0-0-12,id=scsi1-0-0-10
+(qemu) device_del scsi1-0-0-10
+(qemu) drive_del drive-scsi1-0-0-12
 
-David / dhildenb
+I'm not sure why the properties defined shouldn't be applied, can you give some more suggestions?
 
+Thanks.
+
+>>
+>> Paolo
+>>
+>> .
+>>
 
