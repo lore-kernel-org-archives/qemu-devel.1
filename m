@@ -2,68 +2,66 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 901C2C54FCB
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 03:33:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3426AC3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 03:45:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6066320882
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 03:33:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6066320882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id E9EFA2074B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 03:45:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="TH6fbT89"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9EFA2074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQNBd-0001VO-IR
-	for qemu-devel@archiver.kernel.org; Sun, 19 Apr 2020 23:33:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32836 helo=eggs1p.gnu.org)
+	id 1jQNN2-0004NK-1L
+	for qemu-devel@archiver.kernel.org; Sun, 19 Apr 2020 23:45:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34708 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <colin.xu@intel.com>) id 1jQNAY-0000UG-Gp
- for qemu-devel@nongnu.org; Sun, 19 Apr 2020 23:32:27 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jQNMJ-0003uh-MF
+ for qemu-devel@nongnu.org; Sun, 19 Apr 2020 23:44:36 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <colin.xu@intel.com>) id 1jQNAX-00046w-Lc
- for qemu-devel@nongnu.org; Sun, 19 Apr 2020 23:32:26 -0400
-Received: from mga14.intel.com ([192.55.52.115]:58976)
+ (envelope-from <dgibson@ozlabs.org>) id 1jQNMI-0003oq-Sh
+ for qemu-devel@nongnu.org; Sun, 19 Apr 2020 23:44:35 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:33839 helo=ozlabs.org)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <colin.xu@intel.com>)
- id 1jQNAX-00045m-3F
- for qemu-devel@nongnu.org; Sun, 19 Apr 2020 23:32:25 -0400
-IronPort-SDR: 8wlQ6sbBFCOOYfcNdW4A0A3xZp9HcZ3gtpkYtEGHJxNKY2NjPTEIMEqfAPflbSg4tH5VP8IGFG
- wVs1caV8zCyw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
- by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 19 Apr 2020 20:32:23 -0700
-IronPort-SDR: 3s3QQ26f4oiTcdm6xEAHXZ7eHwUSQ4ziT7A/xGdoOb6zE8oL1JOtbQ089op6WrKf+oGCNLeavM
- BRE82v9Ed9rQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,405,1580803200"; d="scan'208";a="300163712"
-Received: from unknown (HELO coxu-arch-shz) ([10.239.160.21])
- by FMSMGA003.fm.intel.com with ESMTP; 19 Apr 2020 20:32:22 -0700
-Date: Mon, 20 Apr 2020 11:32:21 +0800 (CST)
-From: Colin Xu <colin.xu@intel.com>
-X-X-Sender: coxu_arch@coxu-arch-shz
-To: WangBowen <bowen.wang@intel.com>
-Subject: Re: [PATCH] hax: Add hax max vcpu IOCTL and support 64 vcpu
-In-Reply-To: <20200410045751.3448-1-bowen.wang@intel.com>
-Message-ID: <alpine.LNX.2.22.419.2004201131460.21524@coxu-arch-shz>
-References: <20200410045751.3448-1-bowen.wang@intel.com>
-User-Agent: Alpine 2.22 (LNX 419 2020-04-12)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jQNMF-0003hB-Vw
+ for qemu-devel@nongnu.org; Sun, 19 Apr 2020 23:44:34 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 495CHV4HTwz9sSd; Mon, 20 Apr 2020 13:44:22 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1587354262;
+ bh=sisyK/cGft+hFGDW970G+3NnEI1KbFw5yNKz1tKpZ3w=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=TH6fbT89ynaZg/VtciF5mZAr1QPKYk425Tg6rsW1mRkom8Ul2pR3fgddFjViMiAz1
+ FLg/hY0oE7RXkboUb8ik4FpQJwSVmwtStXQEdas+w5V8bYYaGgY8VSCDrwNhaUv63B
+ xXdRGQSrv7c+pM+RCqTu8xqWK8b3/NHGUtLAOErc=
+Date: Mon, 20 Apr 2020 13:41:59 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 3/7] target/ppc: Use tcg_gen_gvec_dup_imm
+Message-ID: <20200420034159.GB2220@umbus.fritz.box>
+References: <20200418150411.1831-1-richard.henderson@linaro.org>
+ <20200418150411.1831-4-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Received-SPF: pass client-ip=192.55.52.115; envelope-from=colin.xu@intel.com;
- helo=mga14.intel.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="jho1yZJdad60DJr+"
+Content-Disposition: inline
+In-Reply-To: <20200418150411.1831-4-richard.henderson@linaro.org>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/19
- 23:32:23
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 192.55.52.115
+ 23:44:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,207 +73,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenchao.wang@intel.com, qemu-devel@nongnu.org, colin.xu@intel.com
+Cc: peter.maydell@linaro.org, zhiwei_liu@c-sky.com, qemu-devel@nongnu.org,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Looks good to me.
 
-Reviewed-by: Colin Xu <colin.xu@intel.com>
+--jho1yZJdad60DJr+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
---
-Best Regards,
-Colin Xu
+On Sat, Apr 18, 2020 at 08:04:07AM -0700, Richard Henderson wrote:
+> We can now unify the implementation of the 3 VSPLTI instructions.
+>=20
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-On Fri, 10 Apr 2020, WangBowen wrote:
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-> This commit tried to obtain max vcpu of haxm driver by calling
-> HAX_IOCTL_CAP_MAX_VCPU before creating the vm so that if using hax as
-> the accelerator and the smp value is larger than the haxm driver
-> supported max value, the program will terminate. Previously, it will
-> create vm and vcpu one by one until haxm reports error. Also, the
-> maximum vcpu value in qemu for haxm is updated from 0x10 to 0x40 in
-> hax-i386.h.
->
-> This patch resolves the issue by calling hax device ioctl
-> HAX_IOCTL_CAP_MAX_VCPU in hax_init and store the min(haxm max, qemu max)
-> in hax_state structure. The value will be compared with smp value in
-> vm_create. (ioctl naming credit to KVM)
->
-> This commit results in if ioctl doesn't exist or occur error, it will
-> continue running but output warning, if smp value is larger than the
-> min(hax max,qemu max), it will terminate and output error message.
->
-> Signed-off-by: WangBowen <bowen.wang@intel.com>
 > ---
-> target/i386/hax-all.c     |  7 +++++--
-> target/i386/hax-i386.h    |  4 +++-
-> target/i386/hax-posix.c   | 29 +++++++++++++++++++++++++++++
-> target/i386/hax-posix.h   |  1 +
-> target/i386/hax-windows.c | 32 ++++++++++++++++++++++++++++++++
-> target/i386/hax-windows.h |  2 ++
-> 6 files changed, 72 insertions(+), 3 deletions(-)
->
-> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-> index a22adec5da..eadfa7c881 100644
-> --- a/target/i386/hax-all.c
-> +++ b/target/i386/hax-all.c
-> @@ -259,8 +259,9 @@ struct hax_vm *hax_vm_create(struct hax_state *hax, int max_cpus)
->         goto error;
->     }
->
-> -    if (max_cpus > HAX_MAX_VCPU) {
-> -        fprintf(stderr, "Maximum VCPU number QEMU supported is %d\n", HAX_MAX_VCPU);
-> +    if (max_cpus > hax->hax_max_vcpu) {
-> +        fprintf(stderr, "Maximum VCPU number QEMU and HAXM driver supported is %d\n",
-> +                hax->hax_max_vcpu);
->         goto error;
->     }
->
-> @@ -332,6 +333,8 @@ static int hax_init(ram_addr_t ram_size, int max_cpus)
->         goto error;
->     }
->
-> +    hax->hax_max_vcpu = hax_max_vcpus_support(hax);
-> +
->     if (!hax_version_support(hax)) {
->         ret = -EINVAL;
->         goto error;
-> diff --git a/target/i386/hax-i386.h b/target/i386/hax-i386.h
-> index 7d988f81da..1ffa8df63a 100644
-> --- a/target/i386/hax-i386.h
-> +++ b/target/i386/hax-i386.h
-> @@ -38,9 +38,10 @@ struct hax_state {
->     struct hax_vm *vm;
->     uint64_t mem_quota;
->     bool supports_64bit_ramblock;
-> +    int hax_max_vcpu;
-> };
->
-> -#define HAX_MAX_VCPU 0x10
-> +#define HAX_MAX_VCPU 0x40
-> #define MAX_VM_ID 0x40
-> #define MAX_VCPU_ID 0x40
->
-> @@ -74,6 +75,7 @@ int hax_notify_qemu_version(hax_fd vm_fd, struct hax_qemu_version *qversion);
-> int hax_set_ram(uint64_t start_pa, uint32_t size, uint64_t host_va, int flags);
->
-> /* Common host function */
-> +int hax_max_vcpus_support(struct hax_state *hax);
-> int hax_host_create_vm(struct hax_state *hax, int *vm_id);
-> hax_fd hax_host_open_vm(struct hax_state *hax, int vm_id);
-> int hax_host_create_vcpu(hax_fd vm_fd, int vcpuid);
-> diff --git a/target/i386/hax-posix.c b/target/i386/hax-posix.c
-> index a5426a6dac..a4f9dce55e 100644
-> --- a/target/i386/hax-posix.c
-> +++ b/target/i386/hax-posix.c
-> @@ -163,6 +163,35 @@ int hax_host_create_vm(struct hax_state *hax, int *vmid)
->     return ret;
-> }
->
-> +int hax_max_vcpus_support(struct hax_state *hax)
+>  target/ppc/translate/vmx-impl.inc.c | 32 ++++++++++++++++-------------
+>  target/ppc/translate/vsx-impl.inc.c |  2 +-
+>  2 files changed, 19 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
+mx-impl.inc.c
+> index 81d5a7a341..403ed3a01c 100644
+> --- a/target/ppc/translate/vmx-impl.inc.c
+> +++ b/target/ppc/translate/vmx-impl.inc.c
+> @@ -1035,21 +1035,25 @@ GEN_VXRFORM_DUAL(vcmpbfp, PPC_ALTIVEC, PPC_NONE, \
+>  GEN_VXRFORM_DUAL(vcmpgtfp, PPC_ALTIVEC, PPC_NONE, \
+>                   vcmpgtud, PPC_NONE, PPC2_ALTIVEC_207)
+> =20
+> -#define GEN_VXFORM_DUPI(name, tcg_op, opc2, opc3)                       \
+> -static void glue(gen_, name)(DisasContext *ctx)                         \
+> -    {                                                                   \
+> -        int simm;                                                       \
+> -        if (unlikely(!ctx->altivec_enabled)) {                          \
+> -            gen_exception(ctx, POWERPC_EXCP_VPU);                       \
+> -            return;                                                     \
+> -        }                                                               \
+> -        simm =3D SIMM5(ctx->opcode);                                    =
+  \
+> -        tcg_op(avr_full_offset(rD(ctx->opcode)), 16, 16, simm);         \
+> +static void gen_vsplti(DisasContext *ctx, int vece)
 > +{
-> +    int ret;
-> +    int vcpu_num = 0;
+> +    int simm;
 > +
-> +    if (hax_invalid_fd(hax->fd)) {
-> +        return vcpu_num;
-> +    }
-> +
-> +    ret = ioctl(hax->fd, HAX_IOCTL_CAP_MAX_VCPU, &vcpu_num);
-> +
-> +    if (ret == 0 && vcpu_num > 0) {
-> +        if (vcpu_num != HAX_MAX_VCPU) {
-> +            fprintf(stderr, "Warning: HAXM driver and QEMU are inconsistent"
-> +                    " in max vcpu number, HAXM driver: %d, QEMU: %d,"
-> +                    " refers to the smaller one.\n", vcpu_num, HAX_MAX_VCPU);
-> +            if (vcpu_num > HAX_MAX_VCPU) {
-> +                vcpu_num = HAX_MAX_VCPU;
-> +            }
-> +        }
-> +    } else {
-> +        vcpu_num = HAX_MAX_VCPU;
-> +        fprintf(stderr, "Warning: HAXM driver doesn't support HAX_IOCTL_CAP_MAX_VCPU,"
-> +                " will refer to max value defined in QEMU\n");
-> +    }
-> +
-> +    return vcpu_num;
+> +    if (unlikely(!ctx->altivec_enabled)) {
+> +        gen_exception(ctx, POWERPC_EXCP_VPU);
+> +        return;
+>      }
+> =20
+> -GEN_VXFORM_DUPI(vspltisb, tcg_gen_gvec_dup8i, 6, 12);
+> -GEN_VXFORM_DUPI(vspltish, tcg_gen_gvec_dup16i, 6, 13);
+> -GEN_VXFORM_DUPI(vspltisw, tcg_gen_gvec_dup32i, 6, 14);
+> +    simm =3D SIMM5(ctx->opcode);
+> +    tcg_gen_gvec_dup_imm(vece, avr_full_offset(rD(ctx->opcode)), 16, 16,=
+ simm);
 > +}
 > +
-> hax_fd hax_host_open_vm(struct hax_state *hax, int vm_id)
-> {
->     hax_fd fd;
-> diff --git a/target/i386/hax-posix.h b/target/i386/hax-posix.h
-> index fb7c64426d..42e58f6fa5 100644
-> --- a/target/i386/hax-posix.h
-> +++ b/target/i386/hax-posix.h
-> @@ -38,6 +38,7 @@ static inline void hax_close_fd(hax_fd fd)
-> #define HAX_IOCTL_CREATE_VM _IOWR(0, 0x21, uint32_t)
-> #define HAX_IOCTL_DESTROY_VM _IOW(0, 0x22, uint32_t)
-> #define HAX_IOCTL_CAPABILITY _IOR(0, 0x23, struct hax_capabilityinfo)
-> +#define HAX_IOCTL_CAP_MAX_VCPU _IOR(0, 0x25, uint32_t)
->
-> #define HAX_VM_IOCTL_VCPU_CREATE _IOWR(0, 0x80, uint32_t)
-> #define HAX_VM_IOCTL_ALLOC_RAM _IOWR(0, 0x81, struct hax_alloc_ram_info)
-> diff --git a/target/i386/hax-windows.c b/target/i386/hax-windows.c
-> index 5729ad9b48..c7816e1950 100644
-> --- a/target/i386/hax-windows.c
-> +++ b/target/i386/hax-windows.c
-> @@ -249,6 +249,38 @@ int hax_host_create_vm(struct hax_state *hax, int *vmid)
->     return 0;
-> }
->
-> +int hax_max_vcpus_support(struct hax_state *hax)
-> +{
-> +    int ret;
-> +    int vcpu_num = 0;
-> +    DWORD dSize = 0;
+> +#define GEN_VXFORM_VSPLTI(name, vece, opc2, opc3) \
+> +static void glue(gen_, name)(DisasContext *ctx) { gen_vsplti(ctx, vece);=
+ }
 > +
-> +    if (hax_invalid_fd(hax->fd)) {
-> +        return vcpu_num;
-> +    }
-> +
-> +    ret = DeviceIoControl(hax->fd,
-> +                          HAX_IOCTL_CAP_MAX_VCPU,
-> +                          NULL, 0, &vcpu_num, sizeof(vcpu_num), &dSize,
-> +                          (LPOVERLAPPED) NULL);
-> +    if (ret && vcpu_num > 0) {
-> +        if (vcpu_num != HAX_MAX_VCPU) {
-> +            fprintf(stderr, "Warning: HAXM driver and QEMU are inconsistent"
-> +                    " in max vcpu number, HAXM driver: %d, QEMU: %d,"
-> +                    " refers to the smaller one.\n", vcpu_num, HAX_MAX_VCPU);
-> +            if (vcpu_num > HAX_MAX_VCPU) {
-> +                vcpu_num = HAX_MAX_VCPU;
-> +            }
-> +        }
-> +    } else {
-> +        vcpu_num = HAX_MAX_VCPU;
-> +        fprintf(stderr, "Warning: HAXM driver doesn't support HAX_IOCTL_CAP_MAX_VCPU,"
-> +                " will refer to max value defined in QEMU\n");
-> +    }
-> +
-> +    return vcpu_num;
-> +}
-> +
-> hax_fd hax_host_open_vm(struct hax_state *hax, int vm_id)
-> {
->     char *vm_name = NULL;
-> diff --git a/target/i386/hax-windows.h b/target/i386/hax-windows.h
-> index 12cbd813dc..c4fa88a2fa 100644
-> --- a/target/i386/hax-windows.h
-> +++ b/target/i386/hax-windows.h
-> @@ -48,6 +48,8 @@ static inline int hax_invalid_fd(hax_fd fd)
->                                          METHOD_BUFFERED, FILE_ANY_ACCESS)
-> #define HAX_IOCTL_CAPABILITY    CTL_CODE(HAX_DEVICE_TYPE, 0x910, \
->                                          METHOD_BUFFERED, FILE_ANY_ACCESS)
-> +#define HAX_IOCTL_CAP_MAX_VCPU  CTL_CODE(HAX_DEVICE_TYPE, 0x917, \
-> +                                         METHOD_BUFFERED, FILE_ANY_ACCESS)
->
-> #define HAX_VM_IOCTL_VCPU_CREATE   CTL_CODE(HAX_DEVICE_TYPE, 0x902, \
->                                             METHOD_BUFFERED, FILE_ANY_ACCESS)
-> -- 
-> 2.24.1
->
->
+> +GEN_VXFORM_VSPLTI(vspltisb, MO_8, 6, 12);
+> +GEN_VXFORM_VSPLTI(vspltish, MO_16, 6, 13);
+> +GEN_VXFORM_VSPLTI(vspltisw, MO_32, 6, 14);
+> =20
+>  #define GEN_VXFORM_NOA(name, opc2, opc3)                                \
+>  static void glue(gen_, name)(DisasContext *ctx)                         \
+> @@ -1559,7 +1563,7 @@ GEN_VXFORM_DUAL(vsldoi, PPC_ALTIVEC, PPC_NONE,
+>  #undef GEN_VXRFORM_DUAL
+>  #undef GEN_VXRFORM1
+>  #undef GEN_VXRFORM
+> -#undef GEN_VXFORM_DUPI
+> +#undef GEN_VXFORM_VSPLTI
+>  #undef GEN_VXFORM_NOA
+>  #undef GEN_VXFORM_UIMM
+>  #undef GEN_VAFORM_PAIRED
+> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+> index 8287e272f5..b518de46db 100644
+> --- a/target/ppc/translate/vsx-impl.inc.c
+> +++ b/target/ppc/translate/vsx-impl.inc.c
+> @@ -1579,7 +1579,7 @@ static void gen_xxspltib(DisasContext *ctx)
+>              return;
+>          }
+>      }
+> -    tcg_gen_gvec_dup8i(vsr_full_offset(rt), 16, 16, uim8);
+> +    tcg_gen_gvec_dup_imm(MO_8, vsr_full_offset(rt), 16, 16, uim8);
+>  }
+> =20
+>  static void gen_xxsldwi(DisasContext *ctx)
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--jho1yZJdad60DJr+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6dGgUACgkQbDjKyiDZ
+s5Kz7xAAjW8yPYfmjwPCtmZjBa1McAWcRhHW05+pm3uMAtreYk6oO1Bh1Ca+oDb7
+KT9Z82ZGsYhGTpUU7kOmcpWba7I1e8B231kaTk8ath3ZKbgFYKkde6qHfyiU6LWd
+KSPfzvqr7YxblERtzCWJzp5wj7CGVTh+yE7tPdzFnNbx49JKIiELBZ15EhG7n4sk
+KR4i6q9oluuTs3hlJDCqbt7kdasnKV7QDLXH47QmgAv/vPXv2mOeaOpvyPvjqsQw
+lGRELFZtww+hiXCi/bhbAVeZqP4oPRBTiBJ95NDMm+DnjwBymTtlJllTtOOnZ5mO
+tmhvsazSLIsO3n4WYOP8NaRNGCtfJx3d0L4xG0GLXCQtpn/TJL3UFHgiPrhemZbQ
+hm3GwhkijTIQX2c8M7WNRuUME2ur1HPm8TUmEkoc4Qo9pntyehna1oV32dMLffvK
++Z9pQslTf4g0NgINPgbuMzsTtyr3XjhX2GIeHtYcgDJTIbZOIKqvrNrwMoQzufPU
+O5E9JVKhdpNrBCodP79iFSVOWeMcPrK0kpxJcuUqoHZ13Uoidxdxtpna1xZVAv6e
+fHJEdUegrcBsk7ypNGmVW1k2Xw7rJxMuDk4+67DDa9j+lpwh6iqX5SFWMV5nMyr5
+BgbKLypQyuV4EHuQlX8DvaqNYYQ5LEiOpOO2qXDRL33SpBGMBro=
+=o4zU
+-----END PGP SIGNATURE-----
+
+--jho1yZJdad60DJr+--
 
