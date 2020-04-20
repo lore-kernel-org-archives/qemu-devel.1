@@ -2,64 +2,52 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C153C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:21:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35028C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:22:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43E0A20CC7
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:21:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43E0A20CC7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0ADC620CC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:22:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ADC620CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQScD-0000J8-FB
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 05:21:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38244 helo=eggs1p.gnu.org)
+	id 1jQSd1-0001R4-8m
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 05:22:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37834 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1jQSaO-0006bb-C7
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:19:29 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jQSZI-0004qy-KN
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:18:21 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1jQSaI-00064n-Jm
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:19:28 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:45050 helo=huawei.com)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jQSZG-0004j7-2T
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:18:20 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48530)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
- id 1jQSaH-0005vU-LT
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:19:22 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id AF04EDB3A2F3C8D8A9E3
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 17:19:15 +0800 (CST)
-Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
- (10.3.19.210) with Microsoft SMTP Server (TLS) id 14.3.487.0; Mon, 20 Apr
- 2020 17:18:45 +0800
-Subject: Re: [PATCH] op_helper: fix some compile warnings
-To: Yoshinori Sato <ysato@users.sourceforge.jp>
-References: <20200420054959.8082-1-pannengyuan@huawei.com>
- <87o8rmv8vb.wl-ysato@users.sourceforge.jp>
-From: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <b55a0120-55bb-eb9b-208c-13a01fb8af06@huawei.com>
-Date: Mon, 20 Apr 2020 17:18:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <87o8rmv8vb.wl-ysato@users.sourceforge.jp>
-Content-Type: text/plain; charset="iso-8859-7"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.184.39.213]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32;
- envelope-from=pannengyuan@huawei.com; helo=huawei.com
+ (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jQSZF-0004hR-Ly; Mon, 20 Apr 2020 05:18:17 -0400
+Received: from dptest2.qa.sw.ru ([10.94.4.71])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jQSZ2-0006Q3-1q; Mon, 20 Apr 2020 12:18:04 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v19 0/4] qcow2: Implement zstd cluster compression method
+Date: Mon, 20 Apr 2020 12:17:53 +0300
+Message-Id: <20200420091757.14102-1-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+Received-SPF: pass client-ip=185.231.240.75;
+ envelope-from=dplotnikov@virtuozzo.com; helo=relay.sw.ru
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 03:55:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 45.249.212.32
+ 05:18:12
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,266 +59,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
- euler.robot@huawei.com
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+v19:
+   04: fix a number of flaws [Eric]
+       * remove rudundant test case descriptions
+       * fix stdout redirect
+       * don't use (())
+       * use peek_file_be instead of od
+       * check $TEST_DIR for spaces and other before using
+       * use $RAND_FILE safer
 
+v18:
+   * 04: add quotes to all file name variables [Vladimir] 
+   * 04: add Vladimir's comment according to "qemu-io write -s"
+         option issue.
 
-On 4/20/2020 4:50 PM, Yoshinori Sato wrote:
-> On Mon, 20 Apr 2020 14:49:59 +0900,
-> Pan Nengyuan wrote:
->>
->> We got the following compile-time warnings(gcc7.3):
->> /mnt/sdb//qemu/target/rx/op_helper.c: In function ¡helper_scmpu¢:
->> /mnt/sdb/qemu/target/rx/op_helper.c:213:24: error: ¡tmp1¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->>      env->psw_c = (tmp0 >= tmp1);
->>                   ~~~~~~^~~~~~~~
->> /mnt/sdb/qemu/target/rx/op_helper.c:213:24: error: ¡tmp0¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->> /mnt/sdb/qemu/target/rx/op_helper.c: In function ¡helper_suntil¢:
->> /mnt/sdb/qemu/target/rx/op_helper.c:299:23: error: ¡tmp¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->>      env->psw_c = (tmp <= env->regs[2]);
->>                   ~~~~~^~~~~~~~~~~~~~~~
->> /mnt/sdb/qemu/target/rx/op_helper.c: In function ¡helper_swhile¢:
->> /mnt/sdb/qemu/target/rx/op_helper.c:318:23: error: ¡tmp¢ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->>      env->psw_c = (tmp <= env->regs[2]);
->>
->> Actually, it looks like a false-positive because it will enter the body of while loop and init it for the first time.
->> Let's change 'while' to 'do .. while' to avoid it.
-> 
-> OK.
-> 
->> Reported-by: Euler Robot <euler.robot@huawei.com>
->> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->> ---
->>  target/rx/op_helper.c | 12 ++++++------
->>  1 file changed, 6 insertions(+), 6 deletions(-)
->>
->> diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
->> index f89d294f2b..b612ab1da8 100644
->> --- a/target/rx/op_helper.c
->> +++ b/target/rx/op_helper.c
->> @@ -201,14 +201,14 @@ void helper_scmpu(CPURXState *env)
->>      if (env->regs[3] == 0) {
->>          return;
->>      }
->> -    while (env->regs[3] != 0) {
->> +    do {
->>          tmp0 = cpu_ldub_data_ra(env, env->regs[1]++, GETPC());
->>          tmp1 = cpu_ldub_data_ra(env, env->regs[2]++, GETPC());
->>          env->regs[3]--;
->>          if (tmp0 != tmp1 || tmp0 == '\0') {
->>              break;
->>          }
->> -    }
->> +    } while (env->regs[3] != 0);
->>      env->psw_z = tmp0 - tmp1;
->>      env->psw_c = (tmp0 >= tmp1);
->>  }
->> @@ -287,14 +287,14 @@ void helper_suntil(CPURXState *env, uint32_t sz)
->>      if (env->regs[3] == 0) {
->>          return ;
->>      }
->> -    while (env->regs[3] != 0) {
->> +    do {
->>          tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
->>          env->regs[1] += 1 << sz;
->>          env->regs[3]--;
->>          if (tmp == env->regs[2]) {
->>              break;
->>          }
->> -    }
->> +    } while (env->regs[3] != 0);
->>      env->psw_z = tmp - env->regs[2];
->>      env->psw_c = (tmp <= env->regs[2]);
->>  }
->> @@ -306,14 +306,14 @@ void helper_swhile(CPURXState *env, uint32_t sz)
->>      if (env->regs[3] == 0) {
->>          return ;
->>      }
->> -    while (env->regs[3] != 0) {
->> +    do {
->>          tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
->>          env->regs[1] += 1 << sz;
->>          env->regs[3]--;
->>          if (tmp != env->regs[2]) {
->>              break;
->>          }
->> -    }
->> +    } while (env->regs[3] != 0);
->>      env->psw_z = env->regs[3];
->>      env->psw_c = (tmp <= env->regs[2]);
->>  }
->> -- 
->> 2.18.2
->>
->>
-> 
-> It looks different result in env->regs[3] is zero.
+v17:
+   * 03: remove incorrect comment in zstd decompress [Vladimir]
+   * 03: remove "paraniod" and rewrite the comment on decompress [Vladimir]
+   * 03: fix dead assignment [Vladimir]
+   * 04: add and remove quotes [Vladimir]
+   * 04: replace long offset form with the short one [Vladimir]
 
-If env->regs[3] is zero, it will return at the begin of these functions:
+v16:
+   * 03: ssize_t for ret, size_t for zstd_ret [Vladimir]
+   * 04: small fixes according to the comments [Vladimir] 
 
-  if (env->regs[3] == 0) {
-      return;
-  }
+v15:
+   * 01: aiming qemu 5.1 [Eric]
+   * 03: change zstd_res definition place [Vladimir]
+   * 04: add two new test cases [Eric]
+         1. test adjacent cluster compression with zstd
+         2. test incompressible cluster processing
+   * 03, 04: many rewording and gramma fixing [Eric]
 
-Thus, the while loop will not be reached.
-In this case, I think 'while' and 'do .. while' will get the same result and it will disappear the warnings.
+v14:
+   * fix bug on compression - looping until compress == 0 [Me]
+   * apply reworked Vladimir's suggestions:
+      1. not mixing ssize_t with size_t
+      2. safe check for ENOMEM in compression part - avoid overflow
+      3. tolerate sanity check allow zstd to make progress only
+         on one of the buffers
+v13:
+   * 03: add progress sanity check to decompression loop [Vladimir]
+     03: add successful decompression check [Me]
 
-> In such a case, nothing changes.
-> 
-> I think that the warning of the uninitialized variable
-> will disappear by fixing as follows.
-> 
+v12:
+   * 03: again, rework compression and decompression loops
+         to make them more correct [Vladimir]
+     03: move assert in compression to more appropriate place
+             [Vladimir]
+v11:
+   * 03: the loops don't need "do{}while" form anymore and
+         the they were buggy (missed "do" in the beginning)
+         replace them with usual "while(){}" loops [Vladimir]
+v10:
+   * 03: fix zstd (de)compressed loops for multi-frame
+         cases [Vladimir]
+v9:
+   * 01: fix error checking and reporting in qcow2_amend compression type part [Vladimir]
+   * 03: replace asserts with -EIO in qcow2_zstd_decompression [Vladimir, Alberto]
+   * 03: reword/amend/add comments, fix typos [Vladimir]
 
-Yes, it also can fix these warnings.
+v8:
+   * 03: switch zstd API from simple to stream [Eric]
+         No need to state a special cluster layout for zstd
+         compressed clusters.
+v7:
+   * use qapi_enum_parse instead of the open-coding [Eric]
+   * fix wording, typos and spelling [Eric]
 
-Thanks.
+v6:
+   * "block/qcow2-threads: fix qcow2_decompress" is removed from the series
+      since it has been accepted by Max already
+   * add compile time checking for Qcow2Header to be a multiple of 8 [Max, Alberto]
+   * report error on qcow2 amending when the compression type is actually chnged [Max]
+   * remove the extra space and the extra new line [Max]
+   * re-arrange acks and signed-off-s [Vladimir]
 
->>From 5de0c54a970e01e96b41870252d0ea54ec61c540 Mon Sep 17 00:00:00 2001
-> From: Yoshinori Sato <ysato@users.sourceforge.jp>
-> Date: Mon, 20 Apr 2020 17:41:04 +0900
-> Subject: [PATCH] target/rx/op_helper: Fix uninitialized warning.
-> 
-> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> ---
->  target/rx/op_helper.c | 101 ++++++++++++++++++++----------------------
->  1 file changed, 49 insertions(+), 52 deletions(-)
-> 
-> diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
-> index f89d294f2b..f84f6c706c 100644
-> --- a/target/rx/op_helper.c
-> +++ b/target/rx/op_helper.c
-> @@ -284,38 +284,36 @@ void helper_suntil(CPURXState *env, uint32_t sz)
->  {
->      uint32_t tmp;
->      tcg_debug_assert(sz < 3);
-> -    if (env->regs[3] == 0) {
-> -        return ;
-> -    }
-> -    while (env->regs[3] != 0) {
-> -        tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
-> -        env->regs[1] += 1 << sz;
-> -        env->regs[3]--;
-> -        if (tmp == env->regs[2]) {
-> -            break;
-> +    if (env->regs[3] > 0) {
-> +        while (env->regs[3] != 0) {
-> +            tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
-> +            env->regs[1] += 1 << sz;
-> +            env->regs[3]--;
-> +            if (tmp == env->regs[2]) {
-> +                break;
-> +            }
->          }
-> +        env->psw_z = tmp - env->regs[2];
-> +        env->psw_c = (tmp <= env->regs[2]);
->      }
-> -    env->psw_z = tmp - env->regs[2];
-> -    env->psw_c = (tmp <= env->regs[2]);
->  }
->  
->  void helper_swhile(CPURXState *env, uint32_t sz)
->  {
->      uint32_t tmp;
->      tcg_debug_assert(sz < 3);
-> -    if (env->regs[3] == 0) {
-> -        return ;
-> -    }
-> -    while (env->regs[3] != 0) {
-> -        tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
-> -        env->regs[1] += 1 << sz;
-> -        env->regs[3]--;
-> -        if (tmp != env->regs[2]) {
-> -            break;
-> +    if (env->regs[3] > 0) {
-> +        while (env->regs[3] != 0) {
-> +            tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
-> +            env->regs[1] += 1 << sz;
-> +            env->regs[3]--;
-> +            if (tmp != env->regs[2]) {
-> +                break;
-> +            }
->          }
-> +        env->psw_z = env->regs[3];
-> +        env->psw_c = (tmp <= env->regs[2]);
->      }
-> -    env->psw_z = env->regs[3];
-> -    env->psw_c = (tmp <= env->regs[2]);
->  }
->  
->  /* accumlator operations */
-> @@ -325,40 +323,39 @@ void helper_rmpa(CPURXState *env, uint32_t sz)
->      int32_t result_h;
->      int64_t tmp0, tmp1;
->  
-> -    if (env->regs[3] == 0) {
-> -        return;
-> -    }
-> -    result_l = env->regs[5];
-> -    result_l <<= 32;
-> -    result_l |= env->regs[4];
-> -    result_h = env->regs[6];
-> -    env->psw_o = 0;
-> +    if (env->regs[3] > 0) {
-> +        result_l = env->regs[5];
-> +        result_l <<= 32;
-> +        result_l |= env->regs[4];
-> +        result_h = env->regs[6];
-> +        env->psw_o = 0;
->  
-> -    while (env->regs[3] != 0) {
-> -        tmp0 = cpu_ldfn[sz](env, env->regs[1], GETPC());
-> -        tmp1 = cpu_ldfn[sz](env, env->regs[2], GETPC());
-> -        tmp0 *= tmp1;
-> -        prev = result_l;
-> -        result_l += tmp0;
-> -        /* carry / bollow */
-> -        if (tmp0 < 0) {
-> -            if (prev > result_l) {
-> -                result_h--;
-> -            }
-> -        } else {
-> -            if (prev < result_l) {
-> -                result_h++;
-> +        while (env->regs[3] != 0) {
-> +            tmp0 = cpu_ldfn[sz](env, env->regs[1], GETPC());
-> +            tmp1 = cpu_ldfn[sz](env, env->regs[2], GETPC());
-> +            tmp0 *= tmp1;
-> +            prev = result_l;
-> +            result_l += tmp0;
-> +            /* carry / bollow */
-> +            if (tmp0 < 0) {
-> +                if (prev > result_l) {
-> +                    result_h--;
-> +                }
-> +            } else {
-> +                if (prev < result_l) {
-> +                    result_h++;
-> +                }
->              }
-> -        }
->  
-> -        env->regs[1] += 1 << sz;
-> -        env->regs[2] += 1 << sz;
-> +            env->regs[1] += 1 << sz;
-> +            env->regs[2] += 1 << sz;
-> +        }
-> +        env->psw_s = result_h;
-> +        env->psw_o = (result_h != 0 && result_h != -1) << 31;
-> +        env->regs[6] = result_h;
-> +        env->regs[5] = result_l >> 32;
-> +        env->regs[4] = result_l & 0xffffffff;
->      }
-> -    env->psw_s = result_h;
-> -    env->psw_o = (result_h != 0 && result_h != -1) << 31;
-> -    env->regs[6] = result_h;
-> -    env->regs[5] = result_l >> 32;
-> -    env->regs[4] = result_l & 0xffffffff;
->  }
->  
->  void helper_racw(CPURXState *env, uint32_t imm)
-> 
+v5:
+   * replace -ENOTSUP with abort in qcow2_co_decompress [Vladimir]
+   * set cluster size for all test cases in the beginning of the 287 test
+
+v4:
+   * the series is rebased on top of 01 "block/qcow2-threads: fix qcow2_decompress"
+   * 01 is just a no-change resend to avoid extra dependencies. Still, it may be merged in separate
+
+v3:
+   * remove redundant max compression type value check [Vladimir, Eric]
+     (the switch below checks everything)
+   * prevent compression type changing on "qemu-img amend" [Vladimir]
+   * remove zstd config setting, since it has been added already by
+     "migration" patches [Vladimir]
+   * change the compression type error message [Vladimir] 
+   * fix alignment and 80-chars exceeding [Vladimir]
+
+v2:
+   * rework compression type setting [Vladimir]
+   * squash iotest changes to the compression type introduction patch [Vladimir, Eric]
+   * fix zstd availability checking in zstd iotest [Vladimir]
+   * remove unnecessry casting [Eric]
+   * remove rudundant checks [Eric]
+   * fix compressed cluster layout in qcow2 spec [Vladimir]
+   * fix wording [Eric, Vladimir]
+   * fix compression type filtering in iotests [Eric]
+
+v1:
+   the initial series
+
+Denis Plotnikov (4):
+  qcow2: introduce compression type feature
+  qcow2: rework the cluster compression routine
+  qcow2: add zstd cluster compression
+  iotests: 287: add qcow2 compression type test
+
+ docs/interop/qcow2.txt           |   1 +
+ configure                        |   2 +-
+ qapi/block-core.json             |  23 +++-
+ block/qcow2.h                    |  20 ++-
+ include/block/block_int.h        |   1 +
+ block/qcow2-threads.c            | 228 +++++++++++++++++++++++++++++--
+ block/qcow2.c                    | 120 ++++++++++++++++
+ tests/qemu-iotests/031.out       |  14 +-
+ tests/qemu-iotests/036.out       |   4 +-
+ tests/qemu-iotests/049.out       | 102 +++++++-------
+ tests/qemu-iotests/060.out       |   1 +
+ tests/qemu-iotests/061.out       |  34 +++--
+ tests/qemu-iotests/065           |  28 ++--
+ tests/qemu-iotests/080           |   2 +-
+ tests/qemu-iotests/144.out       |   4 +-
+ tests/qemu-iotests/182.out       |   2 +-
+ tests/qemu-iotests/242.out       |   5 +
+ tests/qemu-iotests/255.out       |   8 +-
+ tests/qemu-iotests/287           | 153 +++++++++++++++++++++
+ tests/qemu-iotests/287.out       |  67 +++++++++
+ tests/qemu-iotests/common.filter |   3 +-
+ tests/qemu-iotests/group         |   1 +
+ 22 files changed, 715 insertions(+), 108 deletions(-)
+ create mode 100755 tests/qemu-iotests/287
+ create mode 100644 tests/qemu-iotests/287.out
+
+-- 
+2.17.0
+
 
