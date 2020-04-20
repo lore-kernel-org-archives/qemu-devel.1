@@ -2,66 +2,85 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF39CC3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 07:56:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9181C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:33:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C51F321927
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 07:56:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C51F321927
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7438C20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:33:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hTY8IS3X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7438C20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQRIN-0003pF-U2
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 03:56:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49528 helo=eggs1p.gnu.org)
+	id 1jQRsK-0004c2-Ip
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 04:33:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56470 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1jQRHa-0003O0-Jn
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:55:58 -0400
+ (envelope-from <armbru@redhat.com>) id 1jQRrB-0002t2-D6
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:32:45 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1jQRHZ-00008X-Fh
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:55:58 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:53364 helo=huawei.com)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
- id 1jQRHY-0008G0-Jm
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:55:57 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 04BD9769E9D08C232EC0;
- Mon, 20 Apr 2020 15:55:47 +0800 (CST)
-Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
- (10.3.19.211) with Microsoft SMTP Server (TLS) id 14.3.487.0; Mon, 20 Apr
- 2020 15:55:39 +0800
-Subject: Re: [PATCH v2] scsi-disk: define props in scsi_block_disk to avoid
- memleaks
-From: Pan Nengyuan <pannengyuan@huawei.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, <fam@euphon.net>
-References: <20200114091634.60856-1-pannengyuan@huawei.com>
- <5e875870-449e-3f65-60bc-79ba5190d2fb@redhat.com>
- <a7f349b8-a06b-4eee-67a2-42f082f8c081@huawei.com>
-Message-ID: <e9cfc4f7-bbc4-61b9-ed99-480ed3caa08e@huawei.com>
-Date: Mon, 20 Apr 2020 15:55:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <armbru@redhat.com>) id 1jQRr9-0006um-SM
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:32:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49016
+ helo=us-smtp-1.mimecast.com)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jQRr9-0006sl-Fw
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:32:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587371562;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=m0+CdJL/XFx9gkbZZ3J1j8jHjkE2+5dpro1F7ap3j7s=;
+ b=hTY8IS3X6MHb8rW6lbPd/MwzpZeLXWL60hgniVbF0bHC8oF9wob3+OuKyvtOMQtay4YKP1
+ EWvQru6AiU0nrt9G8PppjSVGjRr8EAoZMvmM3w+HhxE8x2GDSPemUt3mwuS4nUlNYIY7xR
+ 3X8b3DcjBYArUl3T6kU65mdbAU7F3FQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-344-nI0LVKH_ONq4iQUgT3TR_w-1; Mon, 20 Apr 2020 04:32:41 -0400
+X-MC-Unique: nI0LVKH_ONq4iQUgT3TR_w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F06FDDB22;
+ Mon, 20 Apr 2020 08:32:39 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C1346A188B;
+ Mon, 20 Apr 2020 08:32:39 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id ACB4F11358C1; Mon, 20 Apr 2020 10:32:36 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 05/11] arm/virt: Fix virt_machine_device_plug_cb() error API
+ violation
+Date: Mon, 20 Apr 2020 10:32:30 +0200
+Message-Id: <20200420083236.19309-6-armbru@redhat.com>
+In-Reply-To: <20200420083236.19309-1-armbru@redhat.com>
+References: <20200420083236.19309-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a7f349b8-a06b-4eee-67a2-42f082f8c081@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.184.39.213]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32;
- envelope-from=pannengyuan@huawei.com; helo=huawei.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 03:55:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 45.249.212.32
+ 04:32:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,89 +92,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Euler Robot <euler.robot@huawei.com>, qemu-devel@nongnu.org,
- zhang.zhanghailiang@huawei.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Paolo,
+The Error ** argument must be NULL, &error_abort, &error_fatal, or a
+pointer to a variable containing NULL.  Passing an argument of the
+latter kind twice without clearing it in between is wrong: if the
+first call sets an error, it no longer points to NULL for the second
+call.
 
-On 2/19/2020 3:52 PM, Pan Nengyuan wrote:
-> 
-> 
-> On 1/22/2020 1:05 AM, Paolo Bonzini wrote:
->> On 14/01/20 10:16, pannengyuan@huawei.com wrote:
->>> From: Pan Nengyuan <pannengyuan@huawei.com>
->>>
->>> scsi_block_realize() use scsi_realize() to init some props, but
->>> these props is not defined in scsi_block_disk_properties, so they will
->>> not be freed.
->>>
->>> This patch defines these prop in scsi_block_disk_properties and aslo
->>> calls scsi_unrealize to avoid memleaks, the leak stack as
->>> follow(it's easy to reproduce by attaching/detaching scsi-block-disks):
->>>
->>> =================================================================
->>> ==qemu-system-x86_64==32195==ERROR: LeakSanitizer: detected memory leaks
->>>
->>> Direct leak of 57 byte(s) in 3 object(s) allocated from:
->>>   #0 0x7f19f8bed768 (/lib64/libasan.so.5+0xef768)  ??:?
->>>   #1 0x7f19f64d9445 (/lib64/libglib-2.0.so.0+0x52445)  ??:?
->>>   #2 0x7f19f64f2d92 (/lib64/libglib-2.0.so.0+0x6bd92)  ??:?
->>>   #3 0x55975366e596 (qemu-system-x86_64+0x35c0596)  /mnt/sdb/qemu/hw/scsi/scsi-disk.c:2399
->>>   #4 0x559753671201 (emu-system-x86_64+0x35c3201)  /mnt/sdb/qemu/hw/scsi/scsi-disk.c:2681
->>>   #5 0x559753687e3e (qemu-system-x86_64+0x35d9e3e)  /mnt/sdb/qemu/hw/scsi/scsi-bus.c:58
->>>   #6 0x55975368ac44 (qemu-system-x86_64+0x35dcc44)  /mnt/sdb/qemu/hw/scsi/scsi-bus.c:216
->>>   #7 0x5597532a7840 (qemu-system-x86_64+0x31f9840)  /mnt/sdb/qemu/hw/core/qdev.c:876
->>>
->>> Direct leak of 15 byte(s) in 3 object(s) allocated from:
->>>   #0 0x7f19f8bed768 (/lib64/libasan.so.5+0xef768)  ??:?
->>>   #1 0x7f19f64d9445 (/lib64/libglib-2.0.so.0+0x52445)  ??:?
->>>   #2 0x7f19f64f2d92 (/lib64/libglib-2.0.so.0+0x6bd92)  ??:?
->>>   #3 0x55975366e06f (qemu-system-x86_64+0x35c006f)  /mnt/sdb/qemu/hw/scsi/scsi-disk.c:2388
->>>   #4 0x559753671201 (qemu-system-x86_64+0x35c3201)  /mnt/sdb/qemu/hw/scsi/scsi-disk.c:2681
->>>   #5 0x559753687e3e (qemu-system-x86_64+0x35d9e3e)  /mnt/sdb/qemu/hw/scsi/scsi-bus.c:58
->>>   #6 0x55975368ac44 (qemu-system-x86_64+0x35dcc44)  /mnt/sdb/qemu/hw/scsi/scsi-bus.c:216
->>>
->>> @@ -3079,9 +3080,8 @@ static const TypeInfo scsi_cd_info = {
->>>  
->>>  #ifdef __linux__
->>>  static Property scsi_block_properties[] = {
->>> -    DEFINE_BLOCK_ERROR_PROPERTIES(SCSIDiskState, qdev.conf),         \
->>> +    DEFINE_SCSI_DISK_PROPERTIES(),.
->> The properties defined there shouldn't apply to scsi-block.
->>
->> Can you explain what exactly is being leaked?
-> 
-> Ohh, I'm sorry, I missed this email and reply it so late.
-> 
-> When we attach a scsi-block disk, the props(version/vender/device_id) are malloced in scsi_realize() which it's called by scsi_block_realize(),
-> but we don't define these props in scsi_block_properties. So these props will not be released when we detach the scsi-block disk.
-> 
-> This patch will reuse scsi_disk_properties to define those props in scsi_block_properties to fix it.
-> Similarly to scsi_hd, this patch aslo set unrealize to call del_boot_device_lchs().
-> 
-> Thanks.
-> 
+virt_machine_device_plug_cb() passes @errp to
+cryptodev_builtin_sym_close_session() in a loop.  Harmless, because
+cryptodev_builtin_sym_close_session() can't actually fail.  Fix by
+dropping its Error ** parameter.
 
-Maybe you missed this patch due to my late reply. Actually it will cause a memleak when we attach/detach a scsi-block disk.
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ hw/arm/virt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Reproducer:
-(qemu) device_add virtio-scsi-pci,id=scsi1,bus=pci.0,addr=0x7
-(qemu) drive_add 1 file=/dev/sdc,format=raw,if=none,id=drive-scsi1-0-0-12,cache=none,aio=native
-OK
-(qemu) device_add scsi-block,bus=scsi1.0,channel=0,scsi-id=0,lun=10,share-rw=on,drive=drive-scsi1-0-0-12,id=scsi1-0-0-10
-(qemu) device_del scsi1-0-0-10
-(qemu) drive_del drive-scsi1-0-0-12
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 7dc96abf72..cca5316256 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1186,7 +1186,7 @@ static void create_smmu(const VirtMachineState *vms,
+     g_free(node);
+ }
+=20
+-static void create_virtio_iommu_dt_bindings(VirtMachineState *vms, Error *=
+*errp)
++static void create_virtio_iommu_dt_bindings(VirtMachineState *vms)
+ {
+     const char compat[] =3D "virtio,pci-iommu";
+     uint16_t bdf =3D vms->virtio_iommu_bdf;
+@@ -2118,7 +2118,7 @@ static void virt_machine_device_plug_cb(HotplugHandle=
+r *hotplug_dev,
+=20
+         vms->iommu =3D VIRT_IOMMU_VIRTIO;
+         vms->virtio_iommu_bdf =3D pci_get_bdf(pdev);
+-        create_virtio_iommu_dt_bindings(vms, errp);
++        create_virtio_iommu_dt_bindings(vms);
+     }
+ }
+=20
+--=20
+2.21.1
 
-I'm not sure why the properties defined shouldn't be applied, can you give some more suggestions?
-
-Thanks.
-
->>
->> Paolo
->>
->> .
->>
 
