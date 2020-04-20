@@ -2,73 +2,67 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D962EC3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:58:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 118BFC3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:59:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD3662070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:58:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD3662070B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
+	by mail.kernel.org (Postfix) with ESMTPS id D072820722
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:59:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="G3EToCVH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D072820722
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQWwW-0002Pd-Tb
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 09:58:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37000 helo=eggs1p.gnu.org)
+	id 1jQWwx-0002r7-08
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 09:59:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38746 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frederic.konrad@adacore.com>) id 1jQWro-000693-2b
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:53:50 -0400
+ (envelope-from <berto@igalia.com>) id 1jQWvx-0001ut-59
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:58:02 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <frederic.konrad@adacore.com>) id 1jQWrm-0003h8-Ml
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:53:43 -0400
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:53235
- helo=smtp.eu.adacore.com)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frederic.konrad@adacore.com>)
- id 1jQWrm-0003bi-2I
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:53:42 -0400
-Received: from localhost (localhost [127.0.0.1])
- by filtered-smtp.eu.adacore.com (Postfix) with ESMTP id 65E87812FD;
- Mon, 20 Apr 2020 15:53:39 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at eu.adacore.com
-Received: from smtp.eu.adacore.com ([127.0.0.1])
- by localhost (smtp.eu.adacore.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MtHipk9WoM_L; Mon, 20 Apr 2020 15:53:39 +0200 (CEST)
-Received: from localhost.localdomain (lfbn-tou-1-1471-22.w90-89.abo.wanadoo.fr
- [90.89.4.22])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by smtp.eu.adacore.com (Postfix) with ESMTPSA id EF1E8812EF;
- Mon, 20 Apr 2020 15:53:38 +0200 (CEST)
-Subject: Re: m68k: gdbstub crashing setting float register on cfv4e cpu
-To: Laurent Vivier <laurent@vivier.eu>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>
-References: <3be54f78-cf6d-af3b-6e1f-e91d146c6a3a@amsat.org>
- <87sgh680qb.fsf@linaro.org> <7922d9aa-f849-7774-7f6e-71ce3dacde43@vivier.eu>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <89badc0e-a008-a9a6-3a20-a4d46808809a@adacore.com>
-Date: Mon, 20 Apr 2020 15:53:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <berto@igalia.com>) id 1jQWvw-00041d-J9
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:58:00 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:54124)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jQWvs-0003Q6-0G; Mon, 20 Apr 2020 09:57:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=ZLIjY+gU19tOKmlfGYIeLELFELQbZKYWj3mZXUb4lBg=; 
+ b=G3EToCVHhTsDzI51Z6is4HZY3Xpkg9rWCm8vxpfjKThc1cCwicQESkwvyWfqGFgEAbS5KZKQdAwzlUvwpbiWonchQegyMhw+s75BxQy+KSBQCz90zadRi89PqadJEOpX1B2G4w/0bmfdVatPkKibDatkoNmqUYEPRhwSw/fouzX15YGn+6bBtPLRANX0/4Avh4hpI+KHMw03epyyLwlNuQ+98TiuXQJmGabaW4F8449TMYcpqqZBrajBYqwhyrXpQDA8YkWBBaqIUBVwOelXDIE7nd02pIvxsBCAPk0KZpnr3NYFm8qrXZdbx6OAjnx09pflnmt3DB06VH/mkDXZPQ==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jQWvm-0007Mq-9i; Mon, 20 Apr 2020 15:57:50 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jQWvm-0000Dp-0I; Mon, 20 Apr 2020 15:57:50 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Subject: Re: [PATCH v4 1/9] block: Add flags to BlockDriver.bdrv_co_truncate()
+In-Reply-To: <20200420133214.28921-2-kwolf@redhat.com>
+References: <20200420133214.28921-1-kwolf@redhat.com>
+ <20200420133214.28921-2-kwolf@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Mon, 20 Apr 2020 15:57:49 +0200
+Message-ID: <w518siqqmxu.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <7922d9aa-f849-7774-7f6e-71ce3dacde43@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a02:2ab8:224:1::a0a:d2;
- envelope-from=frederic.konrad@adacore.com; helo=smtp.eu.adacore.com
-X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a02:2ab8:224:1::a0a:d2
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
+ 08:31:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,98 +74,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- pierre@freepascal.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon 20 Apr 2020 03:32:06 PM CEST, Kevin Wolf wrote:
+> This adds a new BdrvRequestFlags parameter to the .bdrv_co_truncate()
+> driver callbacks, and a supported_truncate_flags field in
+> BlockDriverState that allows drivers to advertise support for request
+> flags in the context of truncate.
+>
+> For now, we always pass 0 and no drivers declare support for any flag.
+>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-Le 4/16/20 à 1:18 PM, Laurent Vivier a écrit :
-> Le 14/04/2020 à 18:56, Alex Bennée a écrit :
->>
->> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
->>
->>> gdbstub/m68k seems broken with floats, previous to refactor commit
->>> a010bdbe719 ("extend GByteArray to read register helpers").
->>>
->>> HEAD at 6fb1603aa2:
->>>
->>> $ qemu-system-m68k -s -S -cpu cfv4e
->>>
->>> ---[GUEST]---
->>>
->>> (gdb) set architecture m68k:cfv4e
->>> The target architecture is assumed to be m68k:cfv4e
->>> (gdb) target remote 172.17.0.1:1234
->>> Remote debugging using 172.17.0.1:1234
->>> (gdb) info float
->>> fp0            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
->>> fp1            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
->>> fp2            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
->>> fp3            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
->>> fp4            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
->>> fp5            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
->>> fp6            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
->>> fp7            -nan(0xfffffffffff7f) (raw 0xffffffffffffff7f)
->>> fpcontrol      0x0                 0
->>> fpstatus       0x0                 0
->>> fpiaddr        0x0                 0x0
->>> (gdb) set $fp0=1
->>> Remote communication error.  Target disconnected.: Connection reset by
->>> peer.
->>
->> With my sha1 debugging test case I get different results depending on
->> the cpu type:
->>
->>    /home/alex/lsrc/qemu.git/tests/guest-debug/run-test.py --gdb /home/alex/src/tools/binutils-gdb.git/builds/all/install/bin/gdb --qemu /home/alex/lsrc/qemu.git/builds/user.static/m68k-linux-user/qemu-m68k --qargs "" --bin tests/tcg/m68k-linux-user/sha1 --test /home/alex/lsrc/qemu.git/tests/tcg/multiarch/gdbstub/sha1.py
->>    GNU gdb (GDB) 10.0.50.20200414-git
->>    Copyright (C) 2020 Free Software Foundation, Inc.
->>    License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
->>    This is free software: you are free to change and redistribute it.
->>    There is NO WARRANTY, to the extent permitted by law.
->>    Type "show copying" and "show warranty" for details.
->>    This GDB was configured as "x86_64-pc-linux-gnu".
->>    Type "show configuration" for configuration details.
->>    For bug reporting instructions, please see:
->>    <http://www.gnu.org/software/gdb/bugs/>.
->>    Find the GDB manual and other documentation resources online at:
->>        <http://www.gnu.org/software/gdb/documentation/>.
->>
->>    For help, type "help".
->>    Type "apropos word" to search for commands related to "word"...
->>    Executed .gdbinit
->>    Reading symbols from tests/tcg/m68k-linux-user/sha1...
->>    Remote debugging using localhost:1234
->>    warning: Register "fp0" has an unsupported size (96 bits)
->>    warning: Register "fp1" has an unsupported size (96 bits)
->>    warning: Register "fp2" has an unsupported size (96 bits)
->>    warning: Register "fp3" has an unsupported size (96 bits)
->>    warning: Register "fp4" has an unsupported size (96 bits)
->>    warning: Register "fp5" has an unsupported size (96 bits)
->>    warning: Register "fp6" has an unsupported size (96 bits)
->>    warning: Register "fp7" has an unsupported size (96 bits)
->>    Remote 'g' packet reply is too long (expected 148 bytes, got 180 bytes): 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000408009f000000000800003407fff0000ffffffffffffffff7fff0000ffffffffffffffff7fff0000ffffffffffffffff7fff0000ffffffffffffffff7fff0000ffffffffffffffff7fff0000ffffffffffffffff7fff0000ffffffffffffffff7fff0000ffffffffffffffff000000000000000000000000
-> 
-> This is a bug in GDB that doesn't support 96bit float registers of 680x0
-> but only 64bit registers of coldfire.
-> 
-> There was a rework of GDB in the past that has broken that and no one
-> noticed. I bisected and found the commit but it was really too complex
-> and difficult to fix.
-
-We worked on that recently, actually the registers are supported in GDB but QEMU
-doesn't send the right register description to GDB.
-
-I've a local patch for that, will send it to the list.
-
-> 
-> To be able to debug remotely m68k I use gdb from etch-m68k in a chroot
-> (or from real hardware).
-> 
-> Thanks,
-> Laurent
-> 
+Berto
 
