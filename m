@@ -2,86 +2,93 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A0E2C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 15:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB234C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 15:26:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6FBC20575
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 15:24:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6F5320775
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 15:26:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FblPVe3g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6FBC20575
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vGxldGO4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6F5320775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQYHu-0004GK-53
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 11:24:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60456 helo=eggs1p.gnu.org)
+	id 1jQYJG-0005aw-Rn
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 11:26:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60938 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jQYHI-0003pO-Cr
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 11:24:08 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jQYIV-0004wx-LO
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 11:25:24 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jQYHH-0000LI-BX
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 11:24:07 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34043
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jQYHG-0000Kb-Qp
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 11:24:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587396245;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=y8ey1M/uqJZkOtKQsKP7oHVU1isoUNVylcTf7jiJ2so=;
- b=FblPVe3gALR24x6ZCi9F+Ytuymgqaib3iYFHh5ovri1u4TUwQvwqM4dJYxO01svKQO7m3c
- g9fD9PKWqEa5XRkYSO7r1e8fu0eDZc6PQMFlUOQFcvEikkymZwUjSraO3l4sOP0HDWSo3O
- ICCm+MtQHI79y5ikq6QwqS4ugHJEQKs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-MHXz6fomNpKIbV05wZeu1A-1; Mon, 20 Apr 2020 11:23:51 -0400
-X-MC-Unique: MHXz6fomNpKIbV05wZeu1A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 697AD149C5;
- Mon, 20 Apr 2020 15:23:49 +0000 (UTC)
-Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 79012129F8E;
- Mon, 20 Apr 2020 15:23:47 +0000 (UTC)
-Subject: Re: [PATCH] fcntl: Add 32bit filesystem mode
-To: "Theodore Y. Ts'o" <tytso@mit.edu>,
- Linus Walleij <linus.walleij@linaro.org>
-References: <20200331133536.3328-1-linus.walleij@linaro.org>
- <20200420151344.GC1080594@mit.edu>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <d3fb73a3-ecf6-6371-783f-24a94eb66c59@redhat.com>
-Date: Mon, 20 Apr 2020 10:23:46 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <alex.bennee@linaro.org>) id 1jQYIU-0001qX-Ll
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 11:25:23 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37550)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jQYIU-0001pn-8M
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 11:25:22 -0400
+Received: by mail-wr1-x444.google.com with SMTP id k1so12714135wrx.4
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 08:25:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=c9Z+R+BQwgTZ+Wzj6wtfASf618/7PJfmSymaypa6pQM=;
+ b=vGxldGO4Og0n749xO9L2qPr4FBINKwCAyY69gV2dzh6iNvhLE328AHDmxErO4Jq09a
+ mUDzQaNZgmIkvrmxuiJO/0mY7ohcEd8gW9nbup5TmbzQIuzKpIypuqDjJ5l2LUQB33pm
+ vY8f80UkfIuJeRHcirQ9AOxk54KEqe5ZgaEeyfbloL5li6m+5MLTJa5VmDew8EXYIYUo
+ d7dPZwSc1yLyDoQLYab4wT2exKz8f6roCmzh6/hFlnTBIZ74yzybEvLgLzGivbUz/4QA
+ KqzPJPJG81F8C0uekAGs/FFLE6EdiwC3p7qJSAsWjECRlYhbY6KDgGytvQ8RniCIYGph
+ jJ0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=c9Z+R+BQwgTZ+Wzj6wtfASf618/7PJfmSymaypa6pQM=;
+ b=iZzFWgfemBKndAI0cxl9+KkUwAYwvc9cCnmFBrjeNNALEgDaahKfysgPqJu3hwRs/+
+ 9T55uVNhY1FYb1+I7TFqPfMx3kVOJp94uIQFP5wojauK0Uo+xiItzf6nIrdM3IG13kZM
+ ruyJBYoxlqZlXNGgz7inQiXflRJ0wMIX10WH7jKOKTEVGhWmuFM9OWF7fWuZxXjxnVdZ
+ jic9bm6DSna8AtM5r4jyroS+uaypmOYrIht0jBfR7EavSnvJITleniLnHvPrqhNKFDsq
+ s4q9MApqapblT9MiIn6nmZ9fcSPz2GXn5nwxaZ8rGHE/AH6BwM7ADK0LQpb7ihy4DvW/
+ AIeA==
+X-Gm-Message-State: AGi0Pubk4ilbZzC8xPHLSUrBBG4dCJPUIr7kllSXkaE09VkLhH6J07Dq
+ eY7bJ8bRs6XA31fKm13GsrqjVw==
+X-Google-Smtp-Source: APiQypI7frLRRkVeSK3t3iTDHFeSSJ3Y4Mbx/u7iDdoNNFKm4DCSN8eT0mxG+4cO/OcX9dz5WY7fmw==
+X-Received: by 2002:a5d:62cc:: with SMTP id o12mr18848295wrv.75.1587396319883; 
+ Mon, 20 Apr 2020 08:25:19 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q1sm1562312wrn.70.2020.04.20.08.25.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Apr 2020 08:25:18 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C8FD01FF7E;
+ Mon, 20 Apr 2020 16:25:17 +0100 (BST)
+References: <20200418155651.3901-1-richard.henderson@linaro.org>
+ <20200418155651.3901-2-richard.henderson@linaro.org>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 1/3] tcg: Improve vector tail clearing
+In-reply-to: <20200418155651.3901-2-richard.henderson@linaro.org>
+Date: Mon, 20 Apr 2020 16:25:17 +0100
+Message-ID: <87imhudvs2.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200420151344.GC1080594@mit.edu>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 09:01:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,48 +100,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, linux-api@vger.kernel.org,
- qemu-devel@nongnu.org, Florian Weimer <fw@deneb.enyo.de>,
- Andreas Dilger <adilger.kernel@dilger.ca>, Andy Lutomirski <luto@kernel.org>,
- linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/20/20 10:13 AM, Theodore Y. Ts'o wrote:
-> On Tue, Mar 31, 2020 at 03:35:36PM +0200, Linus Walleij wrote:
->> It was brought to my attention that this bug from 2018 was
->> still unresolved: 32 bit emulators like QEMU were given
->> 64 bit hashes when running 32 bit emulation on 64 bit systems.
->>
->> This adds a fcntl() operation to set the underlying filesystem
->> into 32bit mode even if the file hanle was opened using 64bit
->> mode without the compat syscalls.
-> 
-> s/hanle/handle/
-> 
-> The API that you've proposed as a way to set the 32-bit mode, but
-> there is no way to clear the 32-bit mode, nor there is a way to get
-> the current status mode.
-> 
-> My suggestion is to add a flag bit for F_GETFD and F_SETFD (set and
-> get file descriptor flags).  Currently the only file descriptor flag
-> is FD_CLOEXEC, so why not add a FD_32BIT_MODE bit?
 
-Also, POSIX is proposing standardizing FD_CLOFORK, which would be 
-another file descriptor flag worth considering in Linux (Solaris and BSD 
-already have it):
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-https://www.austingroupbugs.net/view.php?id=1318
+> Better handling of non-power-of-2 tails as seen with Arm 8-byte
+> vector operations.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-It will be interesting to find how much code (wrongly) assumes it can 
-use a blind assignment of fcntl(fd, F_SETFD, 1) and thereby accidentally 
-wipes out other existing flags, when it should have instead been doing a 
-read-modify-write to protect flags other than FD_CLOEXEC.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> ---
+>  tcg/tcg-op-gvec.c | 82 ++++++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 63 insertions(+), 19 deletions(-)
+>
+> diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
+> index 5a6cc19812..43cac1a0bf 100644
+> --- a/tcg/tcg-op-gvec.c
+> +++ b/tcg/tcg-op-gvec.c
+> @@ -326,11 +326,34 @@ void tcg_gen_gvec_5_ptr(uint32_t dofs, uint32_t aof=
+s, uint32_t bofs,
+>     in units of LNSZ.  This limits the expansion of inline code.  */
+>  static inline bool check_size_impl(uint32_t oprsz, uint32_t lnsz)
+>  {
+> -    if (oprsz % lnsz =3D=3D 0) {
+> -        uint32_t lnct =3D oprsz / lnsz;
+> -        return lnct >=3D 1 && lnct <=3D MAX_UNROLL;
+> +    uint32_t q, r;
+> +
+> +    if (oprsz < lnsz) {
+> +        return false;
+>      }
+> -    return false;
+> +
+> +    q =3D oprsz / lnsz;
+> +    r =3D oprsz % lnsz;
+> +    tcg_debug_assert((r & 7) =3D=3D 0);
+> +
+> +    if (lnsz < 16) {
+> +        /* For sizes below 16, accept no remainder. */
+> +        if (r !=3D 0) {
+> +            return false;
+> +        }
+> +    } else {
+> +        /*
+> +         * Recall that ARM SVE allows vector sizes that are not a
+> +         * power of 2, but always a multiple of 16.  The intent is
+> +         * that e.g. size =3D=3D 80 would be expanded with 2x32 + 1x16.
+> +         * In addition, expand_clr needs to handle a multiple of 8.
+> +         * Thus we can handle the tail with one more operation per
+> +         * diminishing power of 2.
+> +         */
+> +        q +=3D ctpop32(r);
+> +    }
+> +
+> +    return q <=3D MAX_UNROLL;
+>  }
+>=20=20
+>  static void expand_clr(uint32_t dofs, uint32_t maxsz);
+> @@ -402,22 +425,31 @@ static void gen_dup_i64(unsigned vece, TCGv_i64 out=
+, TCGv_i64 in)
+>  static TCGType choose_vector_type(const TCGOpcode *list, unsigned vece,
+>                                    uint32_t size, bool prefer_i64)
+>  {
+> -    if (TCG_TARGET_HAS_v256 && check_size_impl(size, 32)) {
+> -        /*
+> -         * Recall that ARM SVE allows vector sizes that are not a
+> -         * power of 2, but always a multiple of 16.  The intent is
+> -         * that e.g. size =3D=3D 80 would be expanded with 2x32 + 1x16.
+> -         * It is hard to imagine a case in which v256 is supported
+> -         * but v128 is not, but check anyway.
+> -         */
+> -        if (tcg_can_emit_vecop_list(list, TCG_TYPE_V256, vece)
+> -            && (size % 32 =3D=3D 0
+> -                || tcg_can_emit_vecop_list(list, TCG_TYPE_V128, vece))) {
+> -            return TCG_TYPE_V256;
+> -        }
+> +    /*
+> +     * Recall that ARM SVE allows vector sizes that are not a
+> +     * power of 2, but always a multiple of 16.  The intent is
+> +     * that e.g. size =3D=3D 80 would be expanded with 2x32 + 1x16.
+> +     * It is hard to imagine a case in which v256 is supported
+> +     * but v128 is not, but check anyway.
+> +     * In addition, expand_clr needs to handle a multiple of 8.
+> +     */
+> +    if (TCG_TARGET_HAS_v256 &&
+> +        check_size_impl(size, 32) &&
+> +        tcg_can_emit_vecop_list(list, TCG_TYPE_V256, vece) &&
+> +        (!(size & 16) ||
+> +         (TCG_TARGET_HAS_v128 &&
+> +          tcg_can_emit_vecop_list(list, TCG_TYPE_V128, vece))) &&
+> +        (!(size & 8) ||
+> +         (TCG_TARGET_HAS_v64 &&
+> +          tcg_can_emit_vecop_list(list, TCG_TYPE_V64, vece)))) {
+> +        return TCG_TYPE_V256;
+>      }
+> -    if (TCG_TARGET_HAS_v128 && check_size_impl(size, 16)
+> -        && tcg_can_emit_vecop_list(list, TCG_TYPE_V128, vece)) {
+> +    if (TCG_TARGET_HAS_v128 &&
+> +        check_size_impl(size, 16) &&
+> +        tcg_can_emit_vecop_list(list, TCG_TYPE_V128, vece) &&
+> +        (!(size & 8) ||
+> +         (TCG_TARGET_HAS_v64 &&
+> +          tcg_can_emit_vecop_list(list, TCG_TYPE_V64, vece)))) {
+>          return TCG_TYPE_V128;
+>      }
+>      if (TCG_TARGET_HAS_v64 && !prefer_i64 && check_size_impl(size, 8)
+> @@ -432,6 +464,18 @@ static void do_dup_store(TCGType type, uint32_t dofs=
+, uint32_t oprsz,
+>  {
+>      uint32_t i =3D 0;
+>=20=20
+> +    tcg_debug_assert(oprsz >=3D 8);
+> +
+> +    /*
+> +     * This may be expand_clr for the tail of an operation, e.g.
+> +     * oprsz =3D=3D 8 && maxsz =3D=3D 64.  The first 8 bytes of this sto=
+re
+> +     * are misaligned wrt the maximum vector size, so do that first.
+> +     */
+> +    if (dofs & 8) {
+> +        tcg_gen_stl_vec(t_vec, cpu_env, dofs + i, TCG_TYPE_V64);
+> +        i +=3D 8;
+> +    }
+> +
+>      switch (type) {
+>      case TCG_TYPE_V256:
+>          /*
 
+
+--=20
+Alex Benn=C3=A9e
 
