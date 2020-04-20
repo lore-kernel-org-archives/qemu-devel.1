@@ -2,105 +2,84 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 986A0C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 11:29:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E4B2C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 11:39:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 671B02078A
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 11:29:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7D2520857
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 11:39:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W7ZcnQWP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 671B02078A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LbETIOvY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7D2520857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQUby-00045v-Kh
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 07:29:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37708 helo=eggs1p.gnu.org)
+	id 1jQUm9-0008FL-1g
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 07:39:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40218 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jQUbH-0003gn-50
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:28:32 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jQUlP-0007p0-Lv
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:39:00 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jQUbG-0002hU-Ja
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:28:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56256
- helo=us-smtp-1.mimecast.com)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jQUbG-0002h1-7g
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:28:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587382109;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fxEsomGpwdt5h1nj5UdlkOh+yCEg41+Ke/8PWUKKwVM=;
- b=W7ZcnQWP8RPYc6NfIfi8iqqtKOnBFdNGgYHm1HzZx2cltVHV+zJceoM809Bxc/GMj+DqHE
- qQyII88VaOVjYc5ImWLyEgTBjVQ2HZSReJXXLQk31Uzg7yU9ME6rgA8Fmpgb5gDqdOs8NX
- M3xysDFiNLwPsDt1phDJGu4u0D3bLxQ=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-GBYMtm_FMY6Xsonmx64Q2g-1; Mon, 20 Apr 2020 07:28:27 -0400
-X-MC-Unique: GBYMtm_FMY6Xsonmx64Q2g-1
-Received: by mail-ej1-f72.google.com with SMTP id cb22so6135859ejb.12
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 04:28:27 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1jQUlN-0005ZF-Mo
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:38:59 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35891)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jQUlN-0005Yh-A4
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 07:38:57 -0400
+Received: by mail-ot1-x342.google.com with SMTP id b13so7753795oti.3
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 04:38:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=DS+SwsiiAa2IC1Of+N2xMxxQ2Qn8OB6+yF3JDFdmUGw=;
+ b=LbETIOvYzs18kn6+m0ic3svL2kvhfMXbxm1qMe2vEGt8OHLOrYNVoOwsPuWgg4CsEE
+ A8el+FMXMV/XtEtPGn+tQ1aP0cH4rGdrv630f1UeTl/AkMPBkxD6aPck93ucdsf3wnWi
+ 9yudlhuklmM+m6OOvDu+phCj/Wf54YUcLAmJzVoCgrmRvxzrI6md1wsdYhfo/wVytYu/
+ /l6e+DaDbmIvST2a/+i1wiQtKF3W3h0OTCebZPJMuNVzyqGP+b9kxvau7dxTFV1va5NB
+ RxRbYbYxI/Q/Heip8U6dWfx90Q7OyVoJYUg/b6/N33nMFAWgAJgZYYppzcAsVQS9re+/
+ lxYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Tym3BsMzhJaYH/XwL60dGHFaf376eJ6FTLG6eKM+p9w=;
- b=cvcD5Z2V+SvARL8GbqaMF4yMkx5k0O5RhkiJpDrNyvLmtoVgEPSu/Zn5xggK59o903
- rSfY6eSJSvSvaqqfBGHErt0rJXqS7dPo9j2vu3gItk0sg6BijMUwTZlc0G/1CI0yUz8y
- jF1K1UDg6LWMbCbmww1lj4osLwr2FGuAKPyxwzsctsdkx/XOlvJZbRiiUsmBc/0tfXSZ
- +fWsmsJ4w/SJsv/BNKc50V4BmdCf0K+KwjDLTwdVCD+lpwkkDzbYgOyBB8yRX89xhQ7a
- IV44NSwgWIiFi0J/twohTLmJWonkBca/inyzJo0w6jcXir5sLRDFa1axzlXxBGTMTXiz
- 80nA==
-X-Gm-Message-State: AGi0PuaotNciZLhT3YQF9f42v62e6K7fndj1XzkqcqdtZpWo50JzRmTA
- n/rMIET/aA1bDwXmN+u65PioS9naX94jRqLHhCIs/SGbFYIQgR4WUZoksGqhgTUzMsRsxfHBM6O
- olaJNm1k7IXwOTUk=
-X-Received: by 2002:a17:907:42d6:: with SMTP id
- ng6mr15343092ejb.265.1587382106444; 
- Mon, 20 Apr 2020 04:28:26 -0700 (PDT)
-X-Google-Smtp-Source: APiQypK/jf/UDBngqXRvtcBtH88plPvnZUhfi2eoOIHtxf26xmSnNS9KIZBhkeI/sbhK/Bpc0quqcg==
-X-Received: by 2002:a17:907:42d6:: with SMTP id
- ng6mr15343067ejb.265.1587382106157; 
- Mon, 20 Apr 2020 04:28:26 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id g2sm53337edm.77.2020.04.20.04.28.24
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 20 Apr 2020 04:28:25 -0700 (PDT)
-Subject: Re: [PATCH 09/11] target/mips: Always enable CONFIG_SEMIHOSTING
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20200316120049.11225-1-philmd@redhat.com>
- <20200316120049.11225-10-philmd@redhat.com>
- <d07835cf-1021-7399-a28d-09a4a4c225ef@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9a138460-9b08-a8bd-ecc9-78f6b227e972@redhat.com>
-Date: Mon, 20 Apr 2020 13:28:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=DS+SwsiiAa2IC1Of+N2xMxxQ2Qn8OB6+yF3JDFdmUGw=;
+ b=nDQ+CRLIIc9wLeNZWmXjyAv5QYy5YBEaAdDrL9srUemS0GPdKNch8nBNjDxUN1cqi4
+ EZOzJiJrdSpiqyFDJnghhIftSYlFlG2C66qeVycdG/Vu+iNXj3KrazVyytcFIGvyI6vA
+ fCy73I6DNW62T8XByRW4vxfHQ38OriMARkxX5YGaYEabWZ1QBYKH4Tp/Zemcu1d6frfg
+ SvqFxDHXNZMCZcKyWkSgJ7ApuPavJV62j3Mlc8WxdCxSmV4Q+Ecy0714crKqOliNuTQu
+ RDZQTESyskvYV/5+Nln7UXIhIPtPlR/Ci3KyXlksDk9r0udwarx3sB5/A9qdt1+ElF1f
+ plzg==
+X-Gm-Message-State: AGi0PuZJpZHri0+nHdbnHfUS1qjh7mEpqSh28rt5RKMrcgAr5rpJMWGK
+ BPz8EXUG1cJsC732R5QDXfDzMqp09pnV/Z+20zD0cg==
+X-Google-Smtp-Source: APiQypKCWHdZZ2bi+3PbMfM+AZS/gcAmMukvJoqNM4nAXsIul0EznVN8ABNh29yiOVOiUZ8ejQuoJJgLhE64swOJMYs=
+X-Received: by 2002:a05:6830:22dc:: with SMTP id
+ q28mr8717028otc.221.1587382735551; 
+ Mon, 20 Apr 2020 04:38:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d07835cf-1021-7399-a28d-09a4a4c225ef@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 03:29:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200331133536.3328-1-linus.walleij@linaro.org>
+ <CAFEAcA9Gep1HN+7WJHencp9g2uUBLhagxdgjHf-16AOdP5oOjg@mail.gmail.com>
+ <87v9luwgc6.fsf@mid.deneb.enyo.de>
+In-Reply-To: <87v9luwgc6.fsf@mid.deneb.enyo.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Apr 2020 12:38:44 +0100
+Message-ID: <CAFEAcA-No3Z95+UQJZWTxDesd-z_Y5XnyHs6NMpzDo3RVOHQ4w@mail.gmail.com>
+Subject: Re: [PATCH] fcntl: Add 32bit filesystem mode
+To: Florian Weimer <fw@deneb.enyo.de>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
+X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,137 +91,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Theodore Ts'o <tytso@mit.edu>, Linux API <linux-api@vger.kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Andreas Dilger <adilger.kernel@dilger.ca>, Andy Lutomirski <luto@kernel.org>,
+ linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ Ext4 Developers List <linux-ext4@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Paolo,
+On Mon, 20 Apr 2020 at 12:23, Florian Weimer <fw@deneb.enyo.de> wrote:
+>
+> * Peter Maydell:
+>
+> > We open fd 3 to read '.'; we issue the new fcntl, which
+> > succeeds. Then there's some unrelated stuff operating on
+> > stdout. Then we do a getdents64(), but the d_off values
+> > we get back are still 64 bits. The guest binary doesn't
+> > like those, so it fails. My expectation was that we would
+> > get back d_off values here that were in the 32 bit range.
+>
+> What's your file system?
+>
+> I think not all of them have 32-bit hashes (some of them probably
+> can't, particularly in the network-based file system case).
 
-TLDR "how can I select a arch-specific feature?"
+Whoops, good point. I was testing this via lkvm, so it's
+actually using a 9p filesystem... I'll see if I can figure
+out how to test with an ext3 fs, which I think is the one
+we most care about. It would be nice if the flag was
+supported by other fses too, of course.
 
-On 3/18/20 11:31 AM, Paolo Bonzini wrote:
-> On 16/03/20 13:00, Philippe Mathieu-Daud=C3=A9 wrote:
->> diff --git a/default-configs/mips-linux-user-common.mak b/default-config=
-s/mips-linux-user-common.mak
->> new file mode 100644
->> index 0000000000..04947706e8
->> --- /dev/null
->> +++ b/default-configs/mips-linux-user-common.mak
->> @@ -0,0 +1,4 @@
->> +# Common mips*-linux-user CONFIG defines
->> +
->> +# CONFIG_SEMIHOSTING is always required on this architecture
->> +CONFIG_SEMIHOSTING=3Dy
->=20
-> If it is always required, it should be select-ed.
+Appended is the QEMU patch I tested with.
 
-I'm not sure how to do that...
+thanks
+-- PMM
 
-Currently we have in hw/semihosting/Kconfig:
+From 73471e01733dd1d998ff3cd41edebb4c78793193 Mon Sep 17 00:00:00 2001
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Apr 2020 11:54:22 +0100
+Subject: [RFC] linux-user: Use new F_SET_FILE_32BIT_FS fcntl for 32-bit guests
 
-config SEMIHOSTING
-     bool
-     depends on TCG
-     default n
+If the guest is 32 bit then there is a potential problem if the
+host gives us back a 64-bit sized value that we can't fit into
+the ABI the guest requires. This is a theoretical issue for many
+syscalls, but a real issue for directory reads where the host
+is using ext3 or ext4. There the 'offset' values retured via
+the getdents syscall are hashes, and on a 64-bit system they
+will always fill the full 64 bits.
 
-The only per-target generic entry point is minikconf command line.
+Use the F_SET_FILE_32BIT_FS fcntl to tell the kernel to stick
+to 32-bit sized hashes for fds used by the guest.
 
-1/ The less ugly option might be to add an optional target-devices.mak:
-
--- >8 --
-diff --git a/Makefile.target b/Makefile.target
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -5,6 +5,7 @@ BUILD_DIR?=3D$(CURDIR)/..
-  include ../config-host.mak
-  include config-target.mak
-  include $(SRC_PATH)/rules.mak
-+-include $(SRC_PATH)/target/$(TARGET_BASE_ARCH)/target-devices.mak
-
-  ifdef CONFIG_SOFTMMU
-  include config-devices.mak
-diff --git a/target/arm/target-devices.mak b/target/arm/target-devices.mak
-new file mode 100644
---- /dev/null
-+++ b/target/arm/target-devices.mak
-@@ -0,0 +1 @@
-+CONFIG_SEMIHOSTING=3Dy
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
+RFC patch because it depends on the kernel patch to provide
+F_SET_FILE_32BIT_FS, which is still under discussion. All this
+patch does is call the fcntl for every fd the guest opens.
 
-2/ I can have ./configure adding in config-devices.mak:
+ linux-user/syscall.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
--- >8 --
-@@ -7778,6 +7778,7 @@ echo "# Automatically generated by configure - do=20
-not modify" > $config_target_m
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 674f70e70a5..8966d4881bd 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -884,6 +884,28 @@ static inline int host_to_target_sock_type(int host_type)
+     return target_type;
+ }
 
-  bflt=3D"no"
-  mttcg=3D"no"
-+target_require_semihosting=3D"no"
-  interp_prefix1=3D$(echo "$interp_prefix" | sed "s/%M/$target_name/g")
-  gdb_xml_files=3D""
-
-@@ -7806,6 +7807,7 @@ case "$target_name" in
-      TARGET_SYSTBL_ABI=3Dcommon,oabi
-      bflt=3D"yes"
-      mttcg=3D"yes"
-+    target_require_semihosting=3D"yes"
-      gdb_xml_files=3D"arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
-    ;;
-    aarch64|aarch64_be)
-@@ -7813,6 +7815,7 @@ case "$target_name" in
-      TARGET_BASE_ARCH=3Darm
-      bflt=3D"yes"
-      mttcg=3D"yes"
-+    target_require_semihosting=3D"yes"
-      gdb_xml_files=3D"aarch64-core.xml aarch64-fpu.xml arm-core.xml=20
-arm-vfp.xml arm-vfp3.xml arm-neon.xml"
-    ;;
-    cris)
-@@ -8031,7 +8034,10 @@ fi
-  if test "$target_bsd_user" =3D "yes" ; then
-    echo "CONFIG_BSD_USER=3Dy" >> $config_target_mak
-  fi
-
-+if test "$target_require_semihosting" =3D "yes" ; then
-+  echo "$target/config-devices.mak: CONFIG_SEMIHOSTING=3Dy" >>=20
-$config_host_mak
-+fi
----
-
-3/ Or force MINIKCONF_ARGS:
-
----
-if test "$target_require_semihosting" =3D "yes" ; then
-   echo "MINIKCONF_ARGS +=3D CONFIG_SEMIHOSTING=3Dy" >> $config_target_mak
-fi
----
-
-Also note for ARM all configs require it, but for MIPS we only want it=20
-for user-mode.
-
-With 1/ this can be done as:
-
--- >8 --
-diff --git a/target/mips/target-devices.mak b/target/mips/target-devices.ma=
-k
-new file mode 100644
---- /dev/null
-+++ b/target/mips/target-devices.mak
-@@ -0,0 +1,3 @@
-+ifndef CONFIG_SOFTMMU
-+CONFIG_SEMIHOSTING=3Dy
-+endif
----
-
->=20
-> Same for patch 10.
->=20
-> Paolo
->=20
-
++/*
++ * If the guest is using a 32 bit ABI then we should try to ask the kernel
++ * to provide 32-bit offsets in getdents syscalls, as otherwise some
++ * filesystems will return 64-bit hash values which we can't fit into
++ * the field sizes the guest ABI mandates.
++ */
++#ifndef F_SET_FILE_32BIT_FS
++#define F_SET_FILE_32BIT_FS (1024 + 15)
++#endif
++
++static inline void request_32bit_fs(int fd)
++{
++#if HOST_LONG_BITS > TARGET_ABI_BITS
++    /*
++     * Ignore errors, which are likely due to the host kernel being too
++     * old to support this fcntl. We'll try anyway, which might or might
++     * not work, depending on the guest code and on the host filesystem.
++     */
++    fcntl(fd, F_SET_FILE_32BIT_FS);
++#endif
++}
++
+ static abi_ulong target_brk;
+ static abi_ulong target_original_brk;
+ static abi_ulong brk_page;
+@@ -7704,6 +7726,7 @@ static abi_long do_syscall1(void *cpu_env, int
+num, abi_long arg1,
+                                   target_to_host_bitmask(arg2,
+fcntl_flags_tbl),
+                                   arg3));
+         fd_trans_unregister(ret);
++        request_32bit_fs(ret);
+         unlock_user(p, arg1, 0);
+         return ret;
+ #endif
+@@ -7714,6 +7737,7 @@ static abi_long do_syscall1(void *cpu_env, int
+num, abi_long arg1,
+                                   target_to_host_bitmask(arg3,
+fcntl_flags_tbl),
+                                   arg4));
+         fd_trans_unregister(ret);
++        request_32bit_fs(ret);
+         unlock_user(p, arg2, 0);
+         return ret;
+ #if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
+@@ -7725,6 +7749,7 @@ static abi_long do_syscall1(void *cpu_env, int
+num, abi_long arg1,
+     case TARGET_NR_open_by_handle_at:
+         ret = do_open_by_handle_at(arg1, arg2, arg3);
+         fd_trans_unregister(ret);
++        request_32bit_fs(ret);
+         return ret;
+ #endif
+     case TARGET_NR_close:
+@@ -7769,6 +7794,7 @@ static abi_long do_syscall1(void *cpu_env, int
+num, abi_long arg1,
+             return -TARGET_EFAULT;
+         ret = get_errno(creat(p, arg2));
+         fd_trans_unregister(ret);
++        request_32bit_fs(ret);
+         unlock_user(p, arg1, 0);
+         return ret;
+ #endif
+@@ -12393,6 +12419,7 @@ static abi_long do_syscall1(void *cpu_env, int
+num, abi_long arg1,
+         }
+         ret = get_errno(memfd_create(p, arg2));
+         fd_trans_unregister(ret);
++        request_32bit_fs(ret);
+         unlock_user(p, arg1, 0);
+         return ret;
+ #endif
+-- 
+2.20.1
 
