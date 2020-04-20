@@ -2,71 +2,82 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E65C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 19:10:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1605EC3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 19:12:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CC7720736
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 19:10:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CC7720736
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
+	by mail.kernel.org (Postfix) with ESMTPS id CEF1220857
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 19:12:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kyZwTKQn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEF1220857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41049 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQbny-0006Ci-Ai
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 15:10:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51504 helo=eggs1p.gnu.org)
+	id 1jQbpv-0008Om-0S
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 15:12:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51828 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frederic.konrad@adacore.com>) id 1jQbmy-0005kv-Rq
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:09:06 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jQboc-0007Gh-4V
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:10:47 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <frederic.konrad@adacore.com>) id 1jQbmx-0007nM-UR
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:09:04 -0400
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:46445
- helo=smtp.eu.adacore.com)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frederic.konrad@adacore.com>)
- id 1jQbmw-0007iO-W1
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:09:03 -0400
-Received: from localhost (localhost [127.0.0.1])
- by filtered-smtp.eu.adacore.com (Postfix) with ESMTP id 1879A81345;
- Mon, 20 Apr 2020 21:09:01 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at eu.adacore.com
-Received: from smtp.eu.adacore.com ([127.0.0.1])
- by localhost (smtp.eu.adacore.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gS9dn2i2Se7l; Mon, 20 Apr 2020 21:09:01 +0200 (CEST)
-Received: from localhost.localdomain (lfbn-tou-1-1471-22.w90-89.abo.wanadoo.fr
- [90.89.4.22])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by smtp.eu.adacore.com (Postfix) with ESMTPSA id B1B6181339;
- Mon, 20 Apr 2020 21:09:00 +0200 (CEST)
-Subject: Re: [PATCH v1] target/m68k: fix gdb for m68xxx
-To: Laurent Vivier <laurent@vivier.eu>
-References: <1587391275-12748-1-git-send-email-frederic.konrad@adacore.com>
- <429d6d9c-fff7-d64d-3dfb-917d1985ec90@vivier.eu>
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <268c0a26-9ed2-4812-a985-1321e35eb00a@adacore.com>
-Date: Mon, 20 Apr 2020 21:08:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <peter.maydell@linaro.org>) id 1jQbob-0000eb-4K
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:10:45 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44833)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jQboa-0000aX-2X
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 15:10:44 -0400
+Received: by mail-ot1-x342.google.com with SMTP id j4so9107687otr.11
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 12:10:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=P8yPlcsiN05KrZRP9kREIzCaAYz3BNatIa+gv60TYdU=;
+ b=kyZwTKQn93h3ojK+U8q5LYoyOvQ17xOAfaSxkyZOR1IOCu8y3Z9sedm01BuoGYCchi
+ IFD/kuA+FN7AM07nt9IS0l438e5sfBnJ5l1iSh6f46OmYfinDBqT30Boh7mbLCb8X7Hp
+ jf6AjPZFaZVQFRdGIb6r9c1uIbibr9qqku0GP+WwXxVjxcGv947Q64TkleoZqb4tLc0d
+ 2BZTIaJZCn82yJexWPlZteiQYPBjJPRpRQDEdjF4XUhDp7KmGSvY10asjOzcZuHYOrv8
+ H3K+tg2CyOzZaV6t0UXHxhcKlInsokgjle/SNmhDnUpQcZmXxzIaUGj8ALnG0sLAg04K
+ 4Vfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=P8yPlcsiN05KrZRP9kREIzCaAYz3BNatIa+gv60TYdU=;
+ b=Xz/YqiK/b81dN1P/xLzAxKU3oNWBYNU3QUXvM4V0wjSwk2hnv627FkrqoZrE0xOJlW
+ d0lZY7BDvuIKo1GhG5D3q5Ct7+Mkk5wUKJA7YJHne+c8+FLtLl5qhpK9myHO2us/a7kP
+ hn0U28F+u7Fbn+e0n+gNN9q6AsRroTLWvzcnzdYZjTfytccVd05KkxleCCblPc+h9FwA
+ h2wRiH3ihtsbwfiSmAuaXfH1fxZtjOFZ6n3W00kK45Wx57ZVPPvbXvWI7P/n0LzKD3JE
+ tJzp+WyCEHCFTVeKOe2LV6S4t2gM696aegvWEYwph1UwxawwVqdqYAvTGO5aMjGtmAMG
+ NyeQ==
+X-Gm-Message-State: AGi0PuY2xIR1asDQuQXFYFDkr1+hX7SO8RR0Fn0xaR/0GJbpY9EmGziU
+ IL7hJNxsHukSFbLQVdYCJ6JojpgQ9A1Di9IwhJXFZQ==
+X-Google-Smtp-Source: APiQypIyrnNSjvCb54M/GNT/zkuCEqvtyjk6Bhj20izMmdPjmn2hRjUlNCPGSOzJsle61QsWci46/YDLiREJ1AbUCDY=
+X-Received: by 2002:a05:6830:22dc:: with SMTP id
+ q28mr10254358otc.221.1587409841108; 
+ Mon, 20 Apr 2020 12:10:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <429d6d9c-fff7-d64d-3dfb-917d1985ec90@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a02:2ab8:224:1::a0a:d2;
- envelope-from=frederic.konrad@adacore.com; helo=smtp.eu.adacore.com
+References: <20200420175309.75894-1-eblake@redhat.com>
+In-Reply-To: <20200420175309.75894-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Apr 2020 20:10:29 +0100
+Message-ID: <CAFEAcA8z_zQC5f2aD1w0ae=P-D3jHRwj_J3yijv2kwnqoYtKTA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] fix fcntl(F_SETFD) usage
+To: Eric Blake <eblake@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
 X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a02:2ab8:224:1::a0a:d2
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,102 +89,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: huth@tuxfamily.org, alex.bennee@linaro.org, f4bug@amsat.org,
- qemu-devel@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- pierre@freepascal.org
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 20 Apr 2020 at 18:53, Eric Blake <eblake@redhat.com> wrote:
+>
+> As recently pointed out:
+> https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg03133.html
+> code that blindly calls fcntl(fd, F_SETFD, 1) rather than performing a
+> read-modify-write when it intends to add FD_CLOEXEC is broken, in that
+> it can inadvertently clear other bits.
+>
+> Thankfully, the culprits fixed in this series are unlikely to be
+> clearing either FD_CLOFORK (if Linux ever follows Solaris' lead in
+> adding that), or the new FD_32BIT_MODE being proposed (as the fds in
+> question are unlikely to have that set) - but it is still better to
+> write proper code than to set up a bad example prone to copy-and-paste
+> propagation.  And as these usages are not new to 5.0, I don't see any
+> reason against waiting until 5.1 to apply them.
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Le 4/20/20 à 5:46 PM, Laurent Vivier a écrit :
-> Le 20/04/2020 à 16:01, frederic.konrad@adacore.com a écrit :
->> From: KONRAD Frederic <frederic.konrad@adacore.com>
->>
->> Currently "cf-core.xml" is sent to GDB when using any m68k flavor.  Thing is
->> it uses the "org.gnu.gdb.coldfire.core" feature name and gdb 8.3 then expects
->> a coldfire FPU instead of the default m68881 FPU.
-> 
-> 
-> I checked in gdb sources and there is no cf definition.
-> 
-> Moreover if I change only the cf to m68k in QEMU it seems to work in
-> both cases:
-> 
-> diff --git a/gdb-xml/cf-core.xml b/gdb-xml/cf-core.xml
-> index b90af3042c..5b092d26de 100644
-> --- a/gdb-xml/cf-core.xml
-> +++ b/gdb-xml/cf-core.xml
-> @@ -5,7 +5,7 @@
->        are permitted in any medium without royalty provided the copyright
->        notice and this notice are preserved.  -->
->   <!DOCTYPE feature SYSTEM "gdb-target.dtd">
-> -<feature name="org.gnu.gdb.coldfire.core">
-> +<feature name="org.gnu.gdb.m68k.core">
->     <reg name="d0" bitsize="32"/>
->     <reg name="d1" bitsize="32"/>
->     <reg name="d2" bitsize="32"/>
-
-Doesn't that break gdb with coldfire?
-
-> diff --git a/gdb-xml/m68k-fp.xml b/gdb-xml/m68k-fp.xml
-> index 64290d1630..0ef74f7488 100644
-> --- a/gdb-xml/m68k-fp.xml
-> +++ b/gdb-xml/m68k-fp.xml
-> @@ -5,7 +5,7 @@
->        are permitted in any medium without royalty provided the copyright
->        notice and this notice are preserved.  -->
->   <!DOCTYPE feature SYSTEM "gdb-target.dtd">
-> -<feature name="org.gnu.gdb.coldfire.fp">
-> +<feature name="org.gnu.gdb.m68k.fp">
->     <reg name="fp0" bitsize="96" type="float" group="float"/>
->     <reg name="fp1" bitsize="96" type="float" group="float"/>
->     <reg name="fp2" bitsize="96" type="float" group="float"/>
-> 
-> As I have not checked the gdb sources for that, I'd like to have your
-> opinion.
-
-In the GDB 8.3 sources: m68k-tdep.c:1091:
-
-       feature = tdesc_find_feature (info.target_desc,
-				    "org.gnu.gdb.m68k.core");
-       if (feature == NULL)
-	{
-	  feature = tdesc_find_feature (info.target_desc,
-					"org.gnu.gdb.coldfire.core");
-	  if (feature != NULL)
-	    flavour = m68k_coldfire_flavour;
-	}
-
-Hence the change I suggested.  Little later it has also:
-
-       feature = tdesc_find_feature (info.target_desc,
-				    "org.gnu.gdb.coldfire.fp");
-       if (feature != NULL)
-	{
-	  valid_p = 1;
-	  for (i = M68K_FP0_REGNUM; i <= M68K_FPI_REGNUM; i++)
-	    valid_p &= tdesc_numbered_register (feature, tdesc_data, i,
-						m68k_register_names[i]);
-	  if (!valid_p)
-	    {
-	      tdesc_data_cleanup (tdesc_data);
-	      return NULL;
-	    }
-	}
-       else
-	has_fp = 0;
-
-Which is why I didn't made the change you suggested about the m68k-fp.xml but I
-just tried with this additional change and it doesn't seem to hurt.
-
-Cheers,
-Fred
-
-> 
-> Thanks,
-> Laurent
-> 
+thanks
+-- PMM
 
