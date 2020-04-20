@@ -6,88 +6,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ECC6C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:34:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B22C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:34:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B71F2070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:34:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F265D2070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:34:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g7xM7Rkn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B71F2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bl4i68ji"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F265D2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQWZF-0006Iz-KF
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 09:34:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60792 helo=eggs1p.gnu.org)
+	id 1jQWZQ-0006TB-Pi
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 09:34:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60900 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jQWXW-0004J6-Vo
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:48 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jQWXl-0004Mq-3s
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:33:06 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jQWXS-0004Ug-Io
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:46 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40296)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jQWXR-0004Rq-GV
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:41 -0400
-Received: by mail-wr1-x442.google.com with SMTP id k13so10978668wrw.7
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 06:32:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=DZuVaspm+kLFDv4mHFJO2RkTNx/ATyUVE5tqXvqvUy8=;
- b=g7xM7RknAXTwDq4Hg7uyyTHBiH3ClvhuvalBscCa5PzWWfKIYxmzDUQYGJDAPs2lze
- fLeMkjjfPzzflnC0PetAyDosp6j38EGmkn1tVUuIBrzDbxkQa1H9ZDuN0caQ8T2BIqZY
- 28vFsRco83MSK9iLmmCqHjZzHitGs0CoKDmlj+k+dA8zJuaeHQOUY78TGwNEhLN7Atq7
- BT1UbUgNWUSHy26iyzDSWbU7OMaY/JeXDE5PmW9YEV5JO9RjcxmySnXX8CFtjXrChGiP
- Zg0sPFPFlI3kj/IMdBVvlrfgHI6RTbcz/AB9KDQY5B4sixkzuclWPzuJFY5vII90Ny1A
- IiRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=DZuVaspm+kLFDv4mHFJO2RkTNx/ATyUVE5tqXvqvUy8=;
- b=OTChBmULmMqqnbR/YRS/lRtTGt60z2/JOKfHOejqKl77O/dL5yD47bmz4bDMIew/O1
- inBxqGy1gT0Cv9mn127fY/TBUzbcB9qJeEImEiD+//uvGGR95J48u4bxWu9LvDXycD/6
- AdkBHYFsk7VrDUIbbYpiMN8dXA1EahPMRlaiKWwkJDvlKsC9kZCdC3DVBRzbTTUA+epA
- CKj4l8SioyI6bOtC1rVjyLZE46YZNq6K9zPTUgyMALyLuzprwnlsvJ9ef5pMV6GVyt8s
- 9pAyunX3XNYpu1nV0UMIH24rajYsj+4KIka314WTVDVKz8ATbeKmRKBwEbvhhpcu7qCN
- fjOg==
-X-Gm-Message-State: AGi0PuZiY4z35xhWvdlxhQmYa1I++zehUUGbyxRL+MJ1Sb5p4YJcj8vO
- I0us1p+ai+ZP+HwKgfapykGEmw==
-X-Google-Smtp-Source: APiQypIGcH8VJ5xPC18T1RPbVWEjxJ7xV9DLiLAmBydtFPB5pRQc5ZW4Ny8I3dW1N0T0+XqSQSt6nw==
-X-Received: by 2002:adf:fd0a:: with SMTP id e10mr18443400wrr.160.1587389560086; 
- Mon, 20 Apr 2020 06:32:40 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t16sm1431030wmi.27.2020.04.20.06.32.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Apr 2020 06:32:38 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4B6A31FF7E;
- Mon, 20 Apr 2020 14:32:38 +0100 (BST)
-References: <20200418150411.1831-1-richard.henderson@linaro.org>
- <20200418150411.1831-7-richard.henderson@linaro.org>
-User-agent: mu4e 1.4.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 6/7] tcg: Remove tcg_gen_gvec_dup{8,16,32,64}i
-In-reply-to: <20200418150411.1831-7-richard.henderson@linaro.org>
-Date: Mon, 20 Apr 2020 14:32:38 +0100
-Message-ID: <87tv1ee0zt.fsf@linaro.org>
+ (envelope-from <kwolf@redhat.com>) id 1jQWXc-0004he-Uf
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:59 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60680
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jQWXc-0004de-D6
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587389569;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jcer1LVMtRqjIwUaiSpHPGpJOhvpyU4IPvZZtPti7wU=;
+ b=bl4i68jiOLrp0/5CnKKCZrRGdChYkeIwPXxbo+1PrzWTfuGdtMigSm0+o3JQlWLeh8RWV8
+ xtPcFYliAYXYThNTYt5A7dABCdlfbcxeOIlc7eca9d9Tr4ConhVdaE39JykQAVUndT/qRq
+ VsgfEK9HY72CtRYWfkWjNJtEO30KWSc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-285--Ky8TvMcN5OXy8lUZS39mg-1; Mon, 20 Apr 2020 09:32:47 -0400
+X-MC-Unique: -Ky8TvMcN5OXy8lUZS39mg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00CAA802570;
+ Mon, 20 Apr 2020 13:32:46 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-38.ams2.redhat.com [10.36.114.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7A8CF116D9F;
+ Mon, 20 Apr 2020 13:32:44 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v4 7/9] block: truncate: Don't make backing file data visible
+Date: Mon, 20 Apr 2020 15:32:12 +0200
+Message-Id: <20200420133214.28921-8-kwolf@redhat.com>
+In-Reply-To: <20200420133214.28921-1-kwolf@redhat.com>
+References: <20200420133214.28921-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::442
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
+ 01:47:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,89 +88,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org,
- david@gibson.dropbear.id.au, zhiwei_liu@c-sky.com, david@redhat.com
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+When extending the size of an image that has a backing file larger than
+its old size, make sure that the backing file data doesn't become
+visible in the guest, but the added area is properly zeroed out.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Consider the following scenario where the overlay is shorter than its
+backing file:
 
-> These interfaces are now unused.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+    base.qcow2:     AAAAAAAA
+    overlay.qcow2:  BBBB
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+When resizing (extending) overlay.qcow2, the new blocks should not stay
+unallocated and make the additional As from base.qcow2 visible like
+before this patch, but zeros should be read.
 
-> ---
->  include/tcg/tcg-op-gvec.h |  5 -----
->  tcg/tcg-op-gvec.c         | 28 ----------------------------
->  2 files changed, 33 deletions(-)
->
-> diff --git a/include/tcg/tcg-op-gvec.h b/include/tcg/tcg-op-gvec.h
-> index eb0d47a42b..fa8a0c8d03 100644
-> --- a/include/tcg/tcg-op-gvec.h
-> +++ b/include/tcg/tcg-op-gvec.h
-> @@ -320,11 +320,6 @@ void tcg_gen_gvec_dup_i32(unsigned vece, uint32_t do=
-fs, uint32_t s,
->  void tcg_gen_gvec_dup_i64(unsigned vece, uint32_t dofs, uint32_t s,
->                            uint32_t m, TCGv_i64);
->=20=20
-> -void tcg_gen_gvec_dup8i(uint32_t dofs, uint32_t s, uint32_t m, uint8_t x=
-);
-> -void tcg_gen_gvec_dup16i(uint32_t dofs, uint32_t s, uint32_t m, uint16_t=
- x);
-> -void tcg_gen_gvec_dup32i(uint32_t dofs, uint32_t s, uint32_t m, uint32_t=
- x);
-> -void tcg_gen_gvec_dup64i(uint32_t dofs, uint32_t s, uint32_t m, uint64_t=
- x);
-> -
->  void tcg_gen_gvec_shli(unsigned vece, uint32_t dofs, uint32_t aofs,
->                         int64_t shift, uint32_t oprsz, uint32_t maxsz);
->  void tcg_gen_gvec_shri(unsigned vece, uint32_t dofs, uint32_t aofs,
-> diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-> index de16c027b3..5a6cc19812 100644
-> --- a/tcg/tcg-op-gvec.c
-> +++ b/tcg/tcg-op-gvec.c
-> @@ -1541,34 +1541,6 @@ void tcg_gen_gvec_dup_mem(unsigned vece, uint32_t =
-dofs, uint32_t aofs,
->      }
->  }
->=20=20
-> -void tcg_gen_gvec_dup64i(uint32_t dofs, uint32_t oprsz,
-> -                         uint32_t maxsz, uint64_t x)
-> -{
-> -    check_size_align(oprsz, maxsz, dofs);
-> -    do_dup(MO_64, dofs, oprsz, maxsz, NULL, NULL, x);
-> -}
-> -
-> -void tcg_gen_gvec_dup32i(uint32_t dofs, uint32_t oprsz,
-> -                         uint32_t maxsz, uint32_t x)
-> -{
-> -    check_size_align(oprsz, maxsz, dofs);
-> -    do_dup(MO_32, dofs, oprsz, maxsz, NULL, NULL, x);
-> -}
-> -
-> -void tcg_gen_gvec_dup16i(uint32_t dofs, uint32_t oprsz,
-> -                         uint32_t maxsz, uint16_t x)
-> -{
-> -    check_size_align(oprsz, maxsz, dofs);
-> -    do_dup(MO_16, dofs, oprsz, maxsz, NULL, NULL, x);
-> -}
-> -
-> -void tcg_gen_gvec_dup8i(uint32_t dofs, uint32_t oprsz,
-> -                         uint32_t maxsz, uint8_t x)
-> -{
-> -    check_size_align(oprsz, maxsz, dofs);
-> -    do_dup(MO_8, dofs, oprsz, maxsz, NULL, NULL, x);
-> -}
-> -
->  void tcg_gen_gvec_dup_imm(unsigned vece, uint32_t dofs, uint32_t oprsz,
->                            uint32_t maxsz, uint64_t x)
->  {
+A similar case happens with the various variants of a commit job when an
+intermediate file is short (- for unallocated):
 
+    base.qcow2:     A-A-AAAA
+    mid.qcow2:      BB-B
+    top.qcow2:      C--C--C-
 
+After commit top.qcow2 to mid.qcow2, the following happens:
+
+    mid.qcow2:      CB-C00C0 (correct result)
+    mid.qcow2:      CB-C--C- (before this fix)
+
+Without the fix, blocks that previously read as zeros on top.qcow2
+suddenly turn into A.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/io.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/block/io.c b/block/io.c
+index 795075954e..f149dff3ba 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -3394,6 +3394,20 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, =
+int64_t offset, bool exact,
+         goto out;
+     }
+=20
++    /*
++     * If the image has a backing file that is large enough that it would
++     * provide data for the new area, we cannot leave it unallocated becau=
+se
++     * then the backing file content would become visible. Instead, zero-f=
+ill
++     * the area where backing file and new area overlap.
++     *
++     * Note that if the image has a backing file, but was opened without t=
+he
++     * backing file, taking care of keeping things consistent with that ba=
+cking
++     * file is the user's responsibility.
++     */
++    if (new_bytes && bs->backing) {
++        flags |=3D BDRV_REQ_ZERO_WRITE;
++    }
++
+     if (drv->bdrv_co_truncate) {
+         if (flags & ~bs->supported_truncate_flags) {
+             error_setg(errp, "Block driver does not support requested flag=
+s");
 --=20
-Alex Benn=C3=A9e
+2.20.1
+
 
