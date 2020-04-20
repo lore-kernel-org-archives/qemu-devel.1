@@ -2,84 +2,93 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D719C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:06:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B111C38A30
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:08:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6380B20857
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:06:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61C0A205C9
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:08:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ANvuw2KL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6380B20857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="juC8Psjm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61C0A205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQTKH-0005CV-Jh
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 06:06:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50738 helo=eggs1p.gnu.org)
+	id 1jQTM3-0007Gu-GG
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 06:08:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50974 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <igotti@gmail.com>) id 1jQTIX-0003cU-QL
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:05:06 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jQTK2-0005Rd-TR
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:06:39 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <igotti@gmail.com>) id 1jQTIX-0007ih-0L
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:05:05 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:46218)
+ (envelope-from <alex.bennee@linaro.org>) id 1jQTK0-0001ph-QT
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:06:38 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46714)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <igotti@gmail.com>) id 1jQTIW-0007d6-J6
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:05:04 -0400
-Received: by mail-lj1-x242.google.com with SMTP id f18so3213669lja.13
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 03:05:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=qCahw2vz6QYaMfunEj6B1HZkP+WpPZBcP5RC424Py2Y=;
- b=ANvuw2KLX2+hNzPBYlpCl8Ei2tA+JF8KRr/zQIc4UBGs0pg2o9J7zr3/RuSbbaQiG8
- 3Bbg2s6ZmBlNIjsQbAg87NWD2vrA2wbFsWENjqhDz/eAhQj3R5SpOg/PVHl1UaBbxr+B
- BR8h/EjXB85a6+wDS3X3TQrrUWomGLyGG6eNtf01+Fg7h3o0L/BhAteCGxgD3cuHaXPQ
- y9e43rtMPVD1uDHzINOoagvzbBfa+e5a+Kc9hD3FVC0X9rTR6zYkSK802mn7tkH3Pyru
- KnovVQ4Q3fZoTlj/mc3d1LIR/IKtpC0ClDNRsdFSwWcuSx+v/q23m+eXejw5BmIZkj6b
- P2UA==
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jQTK0-0001oK-D4
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:06:36 -0400
+Received: by mail-wr1-x443.google.com with SMTP id f13so11335333wrm.13
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 03:06:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=qLkuo+yG9LGH78ikgI3A72oNvkE3ZZdqCjMu9DZmzc8=;
+ b=juC8PsjmjmJiVOEwnhTdd8d+JQWQ77K8x2sADqRePLX6ThjYd2IFY2QC/Pyk50zslX
+ yQfO38Ld3tQ/Zy5er739Qi9NWH0pRrfFeBLnciDgG8X+QMvi4wi7gEtj3BxNFPuRD223
+ 2Tg1qrwHfeoeg4QTSIhzedlmCt8fxFlOnyeTUDJYpRGvE64N7EbM+MoL9v2KJlg3CXK2
+ rwiRwh/9cP5BmfK3lGiw3dUop9qbbX1FpEC951GX+MXl7cXg6x7ugkO2yrhfFkkWFRxA
+ tczFSDILZ7ZjdzELig+Sxw/aLIq5uDgyw+zDba3BC3uIC0cJY+w3gPaDZIDHA1t6gN7x
+ Yy5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=qCahw2vz6QYaMfunEj6B1HZkP+WpPZBcP5RC424Py2Y=;
- b=FG8DJ3cg975+wV5migmy1xZfrnsRXlmHoCnsVeNGMlNwOh37a2UU0MK8rdoLwjmwFD
- jutiaPj/LGZX2WAdyyVWFzL4xNp2dl9R5b8t67TeE5BKukU91d4AbjkJQ4tK+MI7bdfw
- VlMRhiLbFONGKgY9/mdKIXTWr51Mk6N9NhZjdiNkOaGk5TlUj0TIQokoOeCGI/XXvtDh
- GrdVN8eks7Nlq+H8HvH5vZDtl7pTnvHpK1NjgaJCJzBup6Re9jkAgbcxbqFLaRfw1Abb
- SjtE59ztn3HAgL+c1STu1LO/cJCsAsJT9UXMpJMOi4ywvndzflaFwkwb1xmYGO5iXP3f
- pmMQ==
-X-Gm-Message-State: AGi0PubDqS/vOViD25L3qnFrxU0uVjkWRa+EQ6egQr84I0pgZwEUGUOK
- RKj9UQq2PjcWTVVbpOqJsddnnPxXnwfehRhfH2c=
-X-Google-Smtp-Source: APiQypL296dv5aWUiG6BuTwdIatd5h3e6g/W+XZ1H4U1Ogoba6J9n89TWSXzDuXOjX1tL+AYhHkhPUaUr/A3stgju98=
-X-Received: by 2002:a2e:8745:: with SMTP id q5mr9894412ljj.157.1587377102633; 
- Mon, 20 Apr 2020 03:05:02 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=qLkuo+yG9LGH78ikgI3A72oNvkE3ZZdqCjMu9DZmzc8=;
+ b=BzFgPR8Nz9N/T+JE89iQtpU0nbn+ba0eEU4S9y6pzp44aMOmClXwY8BVFF7VOdkkIM
+ OCqkeO70qnLCE+Lrp5B8LmJxlVquTPWtzdOfaTYst2kSOrt4TfdPgbMC45ETuv+2LfNL
+ tf3CW6z7CLWsVqgaGjGSC7/jE+IVwUQGL382hOKLzzoFg69I/Vwn1/9PxwyYMzwncXpH
+ /n6raK+5hjhBZgI76MJkjC+9yIszWTpU0gGMlsGK1LANRcFmRZ/+kL6+wZUNeXZIqpAO
+ oC5GfTPI3lHdliHW8wftipgXrmfXS9c8UTdvrK/oKSwmJNGcPrOn2tL759nP76gX9IBR
+ /zAw==
+X-Gm-Message-State: AGi0PuaxE0Wrgz9obphQipwzohlqal5Nq/cO0JfF+ykA+4xdk1EZlClF
+ Cm53jbA9sKue66mZwzO1+ZJeKQ==
+X-Google-Smtp-Source: APiQypIUFtKwKAaPZrxUTb7oxMQax5V6YckFwia3mvdGzc7p+4QN4zpmic2l6JB+X+kFvdovRcWdpw==
+X-Received: by 2002:a05:6000:108e:: with SMTP id
+ y14mr19340957wrw.292.1587377193535; 
+ Mon, 20 Apr 2020 03:06:33 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id v10sm555555wrq.45.2020.04.20.03.06.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Apr 2020 03:06:32 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 97C0B1FF7E;
+ Mon, 20 Apr 2020 11:06:31 +0100 (BST)
+References: <20200418150411.1831-1-richard.henderson@linaro.org>
+ <20200418150411.1831-3-richard.henderson@linaro.org>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 2/7] target/s390x: Use tcg_gen_gvec_dup_imm
+In-reply-to: <20200418150411.1831-3-richard.henderson@linaro.org>
+Date: Mon, 20 Apr 2020 11:06:31 +0100
+Message-ID: <875zdufp3s.fsf@linaro.org>
 MIME-Version: 1.0
-References: <CAEme+7FPF+inSJSXQPmuv8Up3Eam0N7fT03zqM-RvcvKsxjfVQ@mail.gmail.com>
- <f4feb648-7dc5-ac54-bc0b-db650dd176f1@vivier.eu>
-In-Reply-To: <f4feb648-7dc5-ac54-bc0b-db650dd176f1@vivier.eu>
-From: Nikolay Igotti <igotti@gmail.com>
-Date: Mon, 20 Apr 2020 13:04:51 +0300
-Message-ID: <CAEme+7EtF6B2+2U_yF2dd-g2m+=S3P5=DL1oLmHfmWw2S7PYAw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] plugins: avoid failing plugin when CPU is inited
- several times
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: multipart/alternative; boundary="00000000000053bd2305a3b6086f"
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=igotti@gmail.com; helo=mail-lj1-x242.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::242
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,239 +100,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, riku.voipio@iki.fi,
- "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org,
+ david@gibson.dropbear.id.au, zhiwei_liu@c-sky.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000053bd2305a3b6086f
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-OK, maybe this version will work better (gmail web interface may be not the
-best one for sending patches):
-----
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-In linux-user multithreaded scenarious CPU could be inited many times with
-the same id,
-so avoid assertions on already present hashtable entry.
+> The gen_gvec_dupi switch is unnecessarily with the new function.
+> Replace it with a local gen_gvec_dup_imm that takes care of the
+> register to offset conversion and length arguments.
+>
+> Drop zero_vec and use use gen_gvec_dup_imm with 0.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Nikolay Igotti <igotti@gmail.com>
----
- plugins/core.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-diff --git a/plugins/core.c b/plugins/core.c
-index 51bfc94787..889cc6441a 100644
---- a/plugins/core.c
-+++ b/plugins/core.c
-@@ -196,13 +196,10 @@ plugin_register_cb_udata(qemu_plugin_id_t id, enum
-qemu_plugin_event ev,
+> ---
+>  target/s390x/translate_vx.inc.c | 41 +++++++--------------------------
+>  1 file changed, 8 insertions(+), 33 deletions(-)
+>
+> diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
+inc.c
+> index 24558cce80..12347f8a03 100644
+> --- a/target/s390x/translate_vx.inc.c
+> +++ b/target/s390x/translate_vx.inc.c
+> @@ -231,8 +231,8 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, uin=
+t8_t reg, TCGv_i64 enr,
+>  #define gen_gvec_mov(v1, v2) \
+>      tcg_gen_gvec_mov(0, vec_full_reg_offset(v1), vec_full_reg_offset(v2)=
+, 16, \
+>                       16)
+> -#define gen_gvec_dup64i(v1, c) \
+> -    tcg_gen_gvec_dup64i(vec_full_reg_offset(v1), 16, 16, c)
+> +#define gen_gvec_dup_imm(es, v1, c) \
+> +    tcg_gen_gvec_dup_imm(es, vec_full_reg_offset(v1), 16, 16, c);
+>  #define gen_gvec_fn_2(fn, es, v1, v2) \
+>      tcg_gen_gvec_##fn(es, vec_full_reg_offset(v1), vec_full_reg_offset(v=
+2), \
+>                        16, 16)
+> @@ -316,31 +316,6 @@ static void gen_gvec128_4_i64(gen_gvec128_4_i64_fn f=
+n, uint8_t d, uint8_t a,
+>          tcg_temp_free_i64(cl);
+>  }
+>=20=20
+> -static void gen_gvec_dupi(uint8_t es, uint8_t reg, uint64_t c)
+> -{
+> -    switch (es) {
+> -    case ES_8:
+> -        tcg_gen_gvec_dup8i(vec_full_reg_offset(reg), 16, 16, c);
+> -        break;
+> -    case ES_16:
+> -        tcg_gen_gvec_dup16i(vec_full_reg_offset(reg), 16, 16, c);
+> -        break;
+> -    case ES_32:
+> -        tcg_gen_gvec_dup32i(vec_full_reg_offset(reg), 16, 16, c);
+> -        break;
+> -    case ES_64:
+> -        gen_gvec_dup64i(reg, c);
+> -        break;
+> -    default:
+> -        g_assert_not_reached();
+> -    }
+> -}
+> -
+> -static void zero_vec(uint8_t reg)
+> -{
+> -    tcg_gen_gvec_dup8i(vec_full_reg_offset(reg), 16, 16, 0);
+> -}
+> -
+>  static void gen_addi2_i64(TCGv_i64 dl, TCGv_i64 dh, TCGv_i64 al, TCGv_i6=
+4 ah,
+>                            uint64_t b)
+>  {
+> @@ -396,8 +371,8 @@ static DisasJumpType op_vgbm(DisasContext *s, DisasOp=
+s *o)
+>           * Masks for both 64 bit elements of the vector are the same.
+>           * Trust tcg to produce a good constant loading.
+>           */
+> -        gen_gvec_dup64i(get_field(s, v1),
+> -                        generate_byte_mask(i2 & 0xff));
+> +        gen_gvec_dup_imm(ES_64, get_field(s, v1),
+> +                         generate_byte_mask(i2 & 0xff));
+>      } else {
+>          TCGv_i64 t =3D tcg_temp_new_i64();
+>=20=20
+> @@ -432,7 +407,7 @@ static DisasJumpType op_vgm(DisasContext *s, DisasOps=
+ *o)
+>          }
+>      }
+>=20=20
+> -    gen_gvec_dupi(es, get_field(s, v1), mask);
+> +    gen_gvec_dup_imm(es, get_field(s, v1), mask);
+>      return DISAS_NEXT;
+>  }
+>=20=20
+> @@ -585,7 +560,7 @@ static DisasJumpType op_vllez(DisasContext *s, DisasO=
+ps *o)
+>=20=20
+>      t =3D tcg_temp_new_i64();
+>      tcg_gen_qemu_ld_i64(t, o->addr1, get_mem_index(s), MO_TE | es);
+> -    zero_vec(get_field(s, v1));
+> +    gen_gvec_dup_imm(es, get_field(s, v1), 0);
+>      write_vec_element_i64(t, get_field(s, v1), enr, es);
+>      tcg_temp_free_i64(t);
+>      return DISAS_NEXT;
+> @@ -892,7 +867,7 @@ static DisasJumpType op_vrepi(DisasContext *s, DisasO=
+ps *o)
+>          return DISAS_NORETURN;
+>      }
+>=20=20
+> -    gen_gvec_dupi(es, get_field(s, v1), data);
+> +    gen_gvec_dup_imm(es, get_field(s, v1), data);
+>      return DISAS_NEXT;
+>  }
+>=20=20
+> @@ -1372,7 +1347,7 @@ static DisasJumpType op_vcksm(DisasContext *s, Disa=
+sOps *o)
+>          read_vec_element_i32(tmp, get_field(s, v2), i, ES_32);
+>          tcg_gen_add2_i32(tmp, sum, sum, sum, tmp, tmp);
+>      }
+> -    zero_vec(get_field(s, v1));
+> +    gen_gvec_dup_imm(ES_32, get_field(s, v1), 0);
+>      write_vec_element_i32(sum, get_field(s, v1), 1, ES_32);
+>=20=20
+>      tcg_temp_free_i32(tmp);
 
- void qemu_plugin_vcpu_init_hook(CPUState *cpu)
- {
--    bool success;
--
-     qemu_rec_mutex_lock(&plugin.lock);
-     plugin_cpu_update__locked(&cpu->cpu_index, NULL, NULL);
--    success =3D g_hash_table_insert(plugin.cpu_ht, &cpu->cpu_index,
-+    g_hash_table_insert(plugin.cpu_ht, &cpu->cpu_index,
-                                   &cpu->cpu_index);
--    g_assert(success);
-     qemu_rec_mutex_unlock(&plugin.lock);
 
-     plugin_vcpu_cb__simple(cpu, QEMU_PLUGIN_EV_VCPU_INIT);
 --=20
-2.24.2 (Apple Git-127)
-
-
-
-On Mon, Apr 20, 2020 at 12:51 PM Laurent Vivier <laurent@vivier.eu> wrote:
-
-> Nikolay,
->
-> the patch seems corrupted by your mailer.
->
-> CC: Alex and Emilio as this code is theirs.
->
-> Thanks,
-> Laurent
->
-> Le 20/04/2020 =C3=A0 11:15, Nikolay Igotti a =C3=A9crit :
-> > In linux-user multithreaded scenarious CPU could be inited many times
-> > with the same id,
-> >
-> > so avoid assertions on already present hashtable entry.
-> >
-> >
-> > Signed-off-by: Nikolay Igotti <igotti@gmail.com <mailto:igotti@gmail.co=
-m
-> >>
-> >
-> > ---
-> >
-> >  plugins/core.c | 5 +----
-> >
-> >  1 file changed, 1 insertion(+), 4 deletions(-)
-> >
-> >
-> > diff --git a/plugins/core.c b/plugins/core.c
-> >
-> > index 51bfc94787..889cc6441a 100644
-> >
-> > --- a/plugins/core.c
-> >
-> > +++ b/plugins/core.c
-> >
-> > @@ -196,13 +196,10 @@ plugin_register_cb_udata(qemu_plugin_id_t id, enu=
-m
-> > qemu_plugin_event ev,
-> >
-> >
-> >
-> >  void qemu_plugin_vcpu_init_hook(CPUState *cpu)
-> >
-> >  {
-> >
-> > -    bool success;
-> >
-> > -
-> >
-> >      qemu_rec_mutex_lock(&plugin.lock);
-> >
-> >      plugin_cpu_update__locked(&cpu->cpu_index, NULL, NULL);
-> >
-> > -    success =3D g_hash_table_insert(plugin.cpu_ht, &cpu->cpu_index,
-> >
-> > +    g_hash_table_insert(plugin.cpu_ht, &cpu->cpu_index,
-> >
-> >                                    &cpu->cpu_index);
-> >
-> > -    g_assert(success);
-> >
-> >      qemu_rec_mutex_unlock(&plugin.lock);
-> >
-> >
-> >
-> >      plugin_vcpu_cb__simple(cpu, QEMU_PLUGIN_EV_VCPU_INIT);
-> >
-> > --
-> >
-> > 2.24.2 (Apple Git-127)
-> >
->
->
-
---00000000000053bd2305a3b6086f
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">OK, maybe this version will work better (gmail web interfa=
-ce may be not the best one for sending patches):<div>----</div><div><br></d=
-iv><div>In linux-user multithreaded scenarious CPU could be inited many tim=
-es with the same id,<br>so avoid assertions on already present hashtable en=
-try.<br><br>Signed-off-by: Nikolay Igotti &lt;<a href=3D"mailto:igotti@gmai=
-l.com">igotti@gmail.com</a>&gt;<br>---<br>=C2=A0plugins/core.c | 5 +----<br=
->=C2=A01 file changed, 1 insertion(+), 4 deletions(-)<br><br>diff --git a/p=
-lugins/core.c b/plugins/core.c<br>index 51bfc94787..889cc6441a 100644<br>--=
-- a/plugins/core.c<br>+++ b/plugins/core.c<br>@@ -196,13 +196,10 @@ plugin_=
-register_cb_udata(qemu_plugin_id_t id, enum qemu_plugin_event ev,<br>=C2=A0=
-<br>=C2=A0void qemu_plugin_vcpu_init_hook(CPUState *cpu)<br>=C2=A0{<br>- =
-=C2=A0 =C2=A0bool success;<br>-<br>=C2=A0 =C2=A0 =C2=A0qemu_rec_mutex_lock(=
-&amp;plugin.lock);<br>=C2=A0 =C2=A0 =C2=A0plugin_cpu_update__locked(&amp;cp=
-u-&gt;cpu_index, NULL, NULL);<br>- =C2=A0 =C2=A0success =3D g_hash_table_in=
-sert(plugin.cpu_ht, &amp;cpu-&gt;cpu_index,<br>+ =C2=A0 =C2=A0g_hash_table_=
-insert(plugin.cpu_ht, &amp;cpu-&gt;cpu_index,<br>=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;cpu-&gt;cpu_index);<br>- =C2=A0 =C2=A0g_ass=
-ert(success);<br>=C2=A0 =C2=A0 =C2=A0qemu_rec_mutex_unlock(&amp;plugin.lock=
-);<br>=C2=A0<br>=C2=A0 =C2=A0 =C2=A0plugin_vcpu_cb__simple(cpu, QEMU_PLUGIN=
-_EV_VCPU_INIT);<br>-- <br>2.24.2 (Apple Git-127)<br><div><br></div><div><br=
-></div></div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D=
-"gmail_attr">On Mon, Apr 20, 2020 at 12:51 PM Laurent Vivier &lt;<a href=3D=
-"mailto:laurent@vivier.eu">laurent@vivier.eu</a>&gt; wrote:<br></div><block=
-quote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1=
-px solid rgb(204,204,204);padding-left:1ex">Nikolay,<br>
-<br>
-the patch seems corrupted by your mailer.<br>
-<br>
-CC: Alex and Emilio as this code is theirs.<br>
-<br>
-Thanks,<br>
-Laurent<br>
-<br>
-Le 20/04/2020 =C3=A0 11:15, Nikolay Igotti a =C3=A9crit=C2=A0:<br>
-&gt; In linux-user multithreaded scenarious CPU could be inited many times<=
-br>
-&gt; with the same id,<br>
-&gt; <br>
-&gt; so avoid assertions on already present hashtable entry.<br>
-&gt; <br>
-&gt; <br>
-&gt; Signed-off-by: Nikolay Igotti &lt;<a href=3D"mailto:igotti@gmail.com" =
-target=3D"_blank">igotti@gmail.com</a> &lt;mailto:<a href=3D"mailto:igotti@=
-gmail.com" target=3D"_blank">igotti@gmail.com</a>&gt;&gt;<br>
-&gt; <br>
-&gt; ---<br>
-&gt; <br>
-&gt; =C2=A0plugins/core.c | 5 +----<br>
-&gt; <br>
-&gt; =C2=A01 file changed, 1 insertion(+), 4 deletions(-)<br>
-&gt; <br>
-&gt; <br>
-&gt; diff --git a/plugins/core.c b/plugins/core.c<br>
-&gt; <br>
-&gt; index 51bfc94787..889cc6441a 100644<br>
-&gt; <br>
-&gt; --- a/plugins/core.c<br>
-&gt; <br>
-&gt; +++ b/plugins/core.c<br>
-&gt; <br>
-&gt; @@ -196,13 +196,10 @@ plugin_register_cb_udata(qemu_plugin_id_t id, en=
-um<br>
-&gt; qemu_plugin_event ev,<br>
-&gt; <br>
-&gt; =C2=A0<br>
-&gt; <br>
-&gt; =C2=A0void qemu_plugin_vcpu_init_hook(CPUState *cpu)<br>
-&gt; <br>
-&gt; =C2=A0{<br>
-&gt; <br>
-&gt; -=C2=A0 =C2=A0 bool success;<br>
-&gt; <br>
-&gt; -<br>
-&gt; <br>
-&gt; =C2=A0=C2=A0 =C2=A0 qemu_rec_mutex_lock(&amp;plugin.lock);<br>
-&gt; <br>
-&gt; =C2=A0=C2=A0 =C2=A0 plugin_cpu_update__locked(&amp;cpu-&gt;cpu_index, =
-NULL, NULL);<br>
-&gt; <br>
-&gt; -=C2=A0 =C2=A0 success =3D g_hash_table_insert(plugin.cpu_ht, &amp;cpu=
--&gt;cpu_index,<br>
-&gt; <br>
-&gt; +=C2=A0 =C2=A0 g_hash_table_insert(plugin.cpu_ht, &amp;cpu-&gt;cpu_ind=
-ex,<br>
-&gt; <br>
-&gt; =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;cpu-&gt;cpu_in=
-dex);<br>
-&gt; <br>
-&gt; -=C2=A0 =C2=A0 g_assert(success);<br>
-&gt; <br>
-&gt; =C2=A0=C2=A0 =C2=A0 qemu_rec_mutex_unlock(&amp;plugin.lock);<br>
-&gt; <br>
-&gt; =C2=A0<br>
-&gt; <br>
-&gt; =C2=A0=C2=A0 =C2=A0 plugin_vcpu_cb__simple(cpu, QEMU_PLUGIN_EV_VCPU_IN=
-IT);<br>
-&gt; <br>
-&gt; --=C2=A0<br>
-&gt; <br>
-&gt; 2.24.2 (Apple Git-127)<br>
-&gt; <br>
-<br>
-</blockquote></div>
-
---00000000000053bd2305a3b6086f--
+Alex Benn=C3=A9e
 
