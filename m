@@ -6,89 +6,88 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED374C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:34:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ECC6C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:34:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5F652070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:34:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B71F2070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:34:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YEvh4GK8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5F652070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g7xM7Rkn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B71F2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQWZ0-0005lm-Q3
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 09:34:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60680 helo=eggs1p.gnu.org)
+	id 1jQWZF-0006Iz-KF
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 09:34:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60792 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jQWXA-00041Y-U9
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:25 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jQWXW-0004J6-Vo
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:48 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jQWXA-0003wv-46
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:24 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39723)
+ (envelope-from <alex.bennee@linaro.org>) id 1jQWXS-0004Ug-Io
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:46 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40296)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jQWX9-0003sD-GO
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:23 -0400
-Received: by mail-wm1-x341.google.com with SMTP id y24so11419613wma.4
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 06:32:23 -0700 (PDT)
+ id 1jQWXR-0004Rq-GV
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 09:32:41 -0400
+Received: by mail-wr1-x442.google.com with SMTP id k13so10978668wrw.7
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 06:32:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=GgX1H+l76Fd5CRuKq+Af0tJ1JB4+gS0PXmfGndyLhHE=;
- b=YEvh4GK8aua5JJ+ow2ZWVXjNAl7It8umKxM5sKHcJDoXI7RF6aWqEV4FA3N5QewjQ6
- g5Xdp6Fps5OvFFuG/Majxt2xPxA9STCCU2DKeh58usO4CJ+F0JEarkBe2CGyvtyZsfPy
- dMQ4ZLjs9wMMLKy16BLhPbikeQeYAFNkEuR3bCRUgzFWZeWJ9NCddcLSFa4VTIWd2wX2
- uJ2O4delWGj4Q/U1xSRQ2zjuUjxpsqxRi3mVzyt016/O5HIELklE9x61IjprSAIoURaK
- Mp+Xqyz7CdDxjkeyHeryTPymo/19+kyT1gbf6Q830PbU58IhmRsJmQZec0DJaZv5RaLh
- /9PQ==
+ bh=DZuVaspm+kLFDv4mHFJO2RkTNx/ATyUVE5tqXvqvUy8=;
+ b=g7xM7RknAXTwDq4Hg7uyyTHBiH3ClvhuvalBscCa5PzWWfKIYxmzDUQYGJDAPs2lze
+ fLeMkjjfPzzflnC0PetAyDosp6j38EGmkn1tVUuIBrzDbxkQa1H9ZDuN0caQ8T2BIqZY
+ 28vFsRco83MSK9iLmmCqHjZzHitGs0CoKDmlj+k+dA8zJuaeHQOUY78TGwNEhLN7Atq7
+ BT1UbUgNWUSHy26iyzDSWbU7OMaY/JeXDE5PmW9YEV5JO9RjcxmySnXX8CFtjXrChGiP
+ Zg0sPFPFlI3kj/IMdBVvlrfgHI6RTbcz/AB9KDQY5B4sixkzuclWPzuJFY5vII90Ny1A
+ IiRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=GgX1H+l76Fd5CRuKq+Af0tJ1JB4+gS0PXmfGndyLhHE=;
- b=IM/Ci/5FC7L2B42Co2zCrWK70kU7hDY73urLl8Cam9g41zKMCljH2BNaBw7HeBlQE3
- RfnynzDWfJcCnFLGRTjpe1gssqzeNFSgxhjCnvLl0DxIK/yB0Cs3b7AfisHNCtJGG4gE
- Ot/LkNu15Hlz1SMv0JV2kdqhNz1BEgoFp6pCJfqxQNOt2Z4Mbgv0rea/+P5aacClZAWs
- Y7lOh/+Z91UeVcu0lsAzJGKEb5FqAXizu7bfnTPo3kzoxL4Wqvdeq2nloI+FR+yZt7ga
- rH6hb9y0uVlm3SVDATYChFblOdzQTV/5adFryr87EG+bE49QLOymCvamjtf6vpeAYV0K
- 5d9A==
-X-Gm-Message-State: AGi0Pub2bPY7FN8FPBmIwS8DpYKmnIvtBWHnDJZ2LRzXMlYDzUREIYFu
- DkPnNxIgmCxxrzrd/CXUeCCWfA==
-X-Google-Smtp-Source: APiQypLDhQS+choU8nh1wmRHXUzhQQ6fLVqvbVfvmw0rmqwzCNFmc4tQsEircJpyUknheGWS68neeQ==
-X-Received: by 2002:a1c:1985:: with SMTP id 127mr7605288wmz.13.1587389541591; 
- Mon, 20 Apr 2020 06:32:21 -0700 (PDT)
+ bh=DZuVaspm+kLFDv4mHFJO2RkTNx/ATyUVE5tqXvqvUy8=;
+ b=OTChBmULmMqqnbR/YRS/lRtTGt60z2/JOKfHOejqKl77O/dL5yD47bmz4bDMIew/O1
+ inBxqGy1gT0Cv9mn127fY/TBUzbcB9qJeEImEiD+//uvGGR95J48u4bxWu9LvDXycD/6
+ AdkBHYFsk7VrDUIbbYpiMN8dXA1EahPMRlaiKWwkJDvlKsC9kZCdC3DVBRzbTTUA+epA
+ CKj4l8SioyI6bOtC1rVjyLZE46YZNq6K9zPTUgyMALyLuzprwnlsvJ9ef5pMV6GVyt8s
+ 9pAyunX3XNYpu1nV0UMIH24rajYsj+4KIka314WTVDVKz8ATbeKmRKBwEbvhhpcu7qCN
+ fjOg==
+X-Gm-Message-State: AGi0PuZiY4z35xhWvdlxhQmYa1I++zehUUGbyxRL+MJ1Sb5p4YJcj8vO
+ I0us1p+ai+ZP+HwKgfapykGEmw==
+X-Google-Smtp-Source: APiQypIGcH8VJ5xPC18T1RPbVWEjxJ7xV9DLiLAmBydtFPB5pRQc5ZW4Ny8I3dW1N0T0+XqSQSt6nw==
+X-Received: by 2002:adf:fd0a:: with SMTP id e10mr18443400wrr.160.1587389560086; 
+ Mon, 20 Apr 2020 06:32:40 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id r17sm1189860wrn.43.2020.04.20.06.32.20
+ by smtp.gmail.com with ESMTPSA id t16sm1431030wmi.27.2020.04.20.06.32.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Apr 2020 06:32:20 -0700 (PDT)
+ Mon, 20 Apr 2020 06:32:38 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 947D01FF7E;
- Mon, 20 Apr 2020 14:32:19 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 4B6A31FF7E;
+ Mon, 20 Apr 2020 14:32:38 +0100 (BST)
 References: <20200418150411.1831-1-richard.henderson@linaro.org>
- <20200418150411.1831-6-richard.henderson@linaro.org>
+ <20200418150411.1831-7-richard.henderson@linaro.org>
 User-agent: mu4e 1.4.1; emacs 28.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 5/7] tcg: Use tcg_gen_gvec_dup_imm in logical
- simplifications
-In-reply-to: <20200418150411.1831-6-richard.henderson@linaro.org>
-Date: Mon, 20 Apr 2020 14:32:19 +0100
-Message-ID: <87wo6ae10c.fsf@linaro.org>
+Subject: Re: [PATCH 6/7] tcg: Remove tcg_gen_gvec_dup{8,16,32,64}i
+In-reply-to: <20200418150411.1831-7-richard.henderson@linaro.org>
+Date: Mon, 20 Apr 2020 14:32:38 +0100
+Message-ID: <87tv1ee0zt.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,60 +108,78 @@ Sender: "Qemu-devel"
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> Replace the outgoing interface.
+> These interfaces are now unused.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  tcg/tcg-op-gvec.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  include/tcg/tcg-op-gvec.h |  5 -----
+>  tcg/tcg-op-gvec.c         | 28 ----------------------------
+>  2 files changed, 33 deletions(-)
 >
+> diff --git a/include/tcg/tcg-op-gvec.h b/include/tcg/tcg-op-gvec.h
+> index eb0d47a42b..fa8a0c8d03 100644
+> --- a/include/tcg/tcg-op-gvec.h
+> +++ b/include/tcg/tcg-op-gvec.h
+> @@ -320,11 +320,6 @@ void tcg_gen_gvec_dup_i32(unsigned vece, uint32_t do=
+fs, uint32_t s,
+>  void tcg_gen_gvec_dup_i64(unsigned vece, uint32_t dofs, uint32_t s,
+>                            uint32_t m, TCGv_i64);
+>=20=20
+> -void tcg_gen_gvec_dup8i(uint32_t dofs, uint32_t s, uint32_t m, uint8_t x=
+);
+> -void tcg_gen_gvec_dup16i(uint32_t dofs, uint32_t s, uint32_t m, uint16_t=
+ x);
+> -void tcg_gen_gvec_dup32i(uint32_t dofs, uint32_t s, uint32_t m, uint32_t=
+ x);
+> -void tcg_gen_gvec_dup64i(uint32_t dofs, uint32_t s, uint32_t m, uint64_t=
+ x);
+> -
+>  void tcg_gen_gvec_shli(unsigned vece, uint32_t dofs, uint32_t aofs,
+>                         int64_t shift, uint32_t oprsz, uint32_t maxsz);
+>  void tcg_gen_gvec_shri(unsigned vece, uint32_t dofs, uint32_t aofs,
 > diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-> index 593bb4542e..de16c027b3 100644
+> index de16c027b3..5a6cc19812 100644
 > --- a/tcg/tcg-op-gvec.c
 > +++ b/tcg/tcg-op-gvec.c
-> @@ -2326,7 +2326,7 @@ void tcg_gen_gvec_xor(unsigned vece, uint32_t dofs,=
- uint32_t aofs,
->      };
->=20=20
->      if (aofs =3D=3D bofs) {
-> -        tcg_gen_gvec_dup8i(dofs, oprsz, maxsz, 0);
-> +        tcg_gen_gvec_dup_imm(MO_64, dofs, oprsz, maxsz, 0);
->      } else {
->          tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g);
+> @@ -1541,34 +1541,6 @@ void tcg_gen_gvec_dup_mem(unsigned vece, uint32_t =
+dofs, uint32_t aofs,
 >      }
-> @@ -2343,7 +2343,7 @@ void tcg_gen_gvec_andc(unsigned vece, uint32_t dofs=
-, uint32_t aofs,
->      };
+>  }
 >=20=20
->      if (aofs =3D=3D bofs) {
-> -        tcg_gen_gvec_dup8i(dofs, oprsz, maxsz, 0);
-> +        tcg_gen_gvec_dup_imm(MO_64, dofs, oprsz, maxsz, 0);
->      } else {
->          tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g);
->      }
-> @@ -2360,7 +2360,7 @@ void tcg_gen_gvec_orc(unsigned vece, uint32_t dofs,=
- uint32_t aofs,
->      };
->=20=20
->      if (aofs =3D=3D bofs) {
-> -        tcg_gen_gvec_dup8i(dofs, oprsz, maxsz, -1);
-> +        tcg_gen_gvec_dup_imm(MO_64, dofs, oprsz, maxsz, -1);
->      } else {
->          tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g);
->      }
-> @@ -2411,7 +2411,7 @@ void tcg_gen_gvec_eqv(unsigned vece, uint32_t dofs,=
- uint32_t aofs,
->      };
->=20=20
->      if (aofs =3D=3D bofs) {
-> -        tcg_gen_gvec_dup8i(dofs, oprsz, maxsz, -1);
-> +        tcg_gen_gvec_dup_imm(MO_64, dofs, oprsz, maxsz, -1);
->      } else {
->          tcg_gen_gvec_3(dofs, aofs, bofs, oprsz, maxsz, &g);
->      }
+> -void tcg_gen_gvec_dup64i(uint32_t dofs, uint32_t oprsz,
+> -                         uint32_t maxsz, uint64_t x)
+> -{
+> -    check_size_align(oprsz, maxsz, dofs);
+> -    do_dup(MO_64, dofs, oprsz, maxsz, NULL, NULL, x);
+> -}
+> -
+> -void tcg_gen_gvec_dup32i(uint32_t dofs, uint32_t oprsz,
+> -                         uint32_t maxsz, uint32_t x)
+> -{
+> -    check_size_align(oprsz, maxsz, dofs);
+> -    do_dup(MO_32, dofs, oprsz, maxsz, NULL, NULL, x);
+> -}
+> -
+> -void tcg_gen_gvec_dup16i(uint32_t dofs, uint32_t oprsz,
+> -                         uint32_t maxsz, uint16_t x)
+> -{
+> -    check_size_align(oprsz, maxsz, dofs);
+> -    do_dup(MO_16, dofs, oprsz, maxsz, NULL, NULL, x);
+> -}
+> -
+> -void tcg_gen_gvec_dup8i(uint32_t dofs, uint32_t oprsz,
+> -                         uint32_t maxsz, uint8_t x)
+> -{
+> -    check_size_align(oprsz, maxsz, dofs);
+> -    do_dup(MO_8, dofs, oprsz, maxsz, NULL, NULL, x);
+> -}
+> -
+>  void tcg_gen_gvec_dup_imm(unsigned vece, uint32_t dofs, uint32_t oprsz,
+>                            uint32_t maxsz, uint64_t x)
+>  {
 
 
 --=20
