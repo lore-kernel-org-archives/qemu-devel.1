@@ -6,74 +6,58 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AD11C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1045C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:51:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFC7720A8B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:49:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFC7720A8B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id B535F20A8B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:51:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B535F20A8B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQS7F-0000br-1i
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 04:49:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59440 helo=eggs1p.gnu.org)
+	id 1jQS9R-0002AK-TH
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 04:51:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59782 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhang.zhanghailiang@huawei.com>) id 1jQS6a-00008N-UQ
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:48:41 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jQS8Z-0001RH-KT
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:50:44 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <zhang.zhanghailiang@huawei.com>) id 1jQS6Z-0006pc-MW
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:48:40 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:36742 helo=huawei.com)
- by eggs1p.gnu.org with esmtps
- (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.90_1)
- (envelope-from <zhang.zhanghailiang@huawei.com>) id 1jQS6Y-0006Vy-VJ
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:48:39 -0400
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.57])
- by Forcepoint Email with ESMTP id 4F43D98CD49B88267A31;
- Mon, 20 Apr 2020 16:48:24 +0800 (CST)
-Received: from dggeme708-chm.china.huawei.com (10.1.199.104) by
- DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Mon, 20 Apr 2020 16:48:23 +0800
-Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
- dggeme708-chm.china.huawei.com (10.1.199.104) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Mon, 20 Apr 2020 16:48:23 +0800
-Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
- dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.1913.007;
- Mon, 20 Apr 2020 16:48:23 +0800
-From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
-To: Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: RE: [PATCH 11/11] migration/colo: Fix qmp_xen_colo_do_checkpoint()
- error handling
-Thread-Topic: [PATCH 11/11] migration/colo: Fix qmp_xen_colo_do_checkpoint()
- error handling
-Thread-Index: AQHWFu5Lx3oLB8QvGEyC5OL8XOq+3KiBsuqA
-Date: Mon, 20 Apr 2020 08:48:23 +0000
-Message-ID: <fd2df283d2824bb28278f2d057b1b0e7@huawei.com>
-References: <20200420083236.19309-1-armbru@redhat.com>
- <20200420083236.19309-12-armbru@redhat.com>
-In-Reply-To: <20200420083236.19309-12-armbru@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.133.214.142]
-Content-Type: text/plain; charset="us-ascii"
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jQS8Y-0000Sy-Cy
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:50:43 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:55088)
+ by eggs1p.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jQS8X-0000Lu-Qz
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:50:42 -0400
+Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
+ [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id D7947E8C47;
+ Mon, 20 Apr 2020 17:50:36 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+ by sakura.ysato.name (Postfix) with ESMTPSA id 0AF0A1C080F;
+ Mon, 20 Apr 2020 17:50:36 +0900 (JST)
+Date: Mon, 20 Apr 2020 17:50:32 +0900
+Message-ID: <87o8rmv8vb.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Pan Nengyuan <pannengyuan@huawei.com>
+Subject: Re: [PATCH] op_helper: fix some compile warnings
+In-Reply-To: <20200420054959.8082-1-pannengyuan@huawei.com>
+References: <20200420054959.8082-1-pannengyuan@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=ISO-8859-7
 Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.255;
- envelope-from=zhang.zhanghailiang@huawei.com; helo=huawei.com
+Received-SPF: softfail client-ip=202.224.55.15;
+ envelope-from=ysato@users.sourceforge.jp; helo=mail03.asahi-net.or.jp
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 04:48:25
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 45.249.212.255
+ 04:50:37
+X-ACL-Warn: Detected OS   = ???
+X-Received-From: 202.224.55.15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,66 +69,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>
+Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
+ euler.robot@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+On Mon, 20 Apr 2020 14:49:59 +0900,
+Pan Nengyuan wrote:
+>=20
+> We got the following compile-time warnings(gcc7.3):
+> /mnt/sdb//qemu/target/rx/op_helper.c: In function =A1helper_scmpu=A2:
+> /mnt/sdb/qemu/target/rx/op_helper.c:213:24: error: =A1tmp1=A2 may be used=
+ uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+>      env->psw_c =3D (tmp0 >=3D tmp1);
+>                   ~~~~~~^~~~~~~~
+> /mnt/sdb/qemu/target/rx/op_helper.c:213:24: error: =A1tmp0=A2 may be used=
+ uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+> /mnt/sdb/qemu/target/rx/op_helper.c: In function =A1helper_suntil=A2:
+> /mnt/sdb/qemu/target/rx/op_helper.c:299:23: error: =A1tmp=A2 may be used =
+uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+>      env->psw_c =3D (tmp <=3D env->regs[2]);
+>                   ~~~~~^~~~~~~~~~~~~~~~
+> /mnt/sdb/qemu/target/rx/op_helper.c: In function =A1helper_swhile=A2:
+> /mnt/sdb/qemu/target/rx/op_helper.c:318:23: error: =A1tmp=A2 may be used =
+uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+>      env->psw_c =3D (tmp <=3D env->regs[2]);
+>=20
+> Actually, it looks like a false-positive because it will enter the body o=
+f while loop and init it for the first time.
+> Let's change 'while' to 'do .. while' to avoid it.
 
-> -----Original Message-----
-> From: Markus Armbruster [mailto:armbru@redhat.com]
-> Sent: Monday, April 20, 2020 4:33 PM
-> To: qemu-devel@nongnu.org
-> Cc: Zhang Chen <chen.zhang@intel.com>; Zhanghailiang
-> <zhang.zhanghailiang@huawei.com>
-> Subject: [PATCH 11/11] migration/colo: Fix qmp_xen_colo_do_checkpoint()
-> error handling
->=20
-> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
-> pointer to a variable containing NULL.  Passing an argument of the
-> latter kind twice without clearing it in between is wrong: if the
-> first call sets an error, it no longer points to NULL for the second
-> call.
->=20
-> qmp_xen_colo_do_checkpoint() passes @errp first to
-> replication_do_checkpoint_all(), and then to
-> colo_notify_filters_event().  If both fail, this will trip the
-> assertion in error_setv().
->=20
-> Similar code in secondary_vm_do_failover() calls
-> colo_notify_filters_event() only after replication_do_checkpoint_all()
-> succeeded.  Do the same here.
->=20
-> Fixes: 0e8818f023616677416840d6ddc880db8de3c967
-> Cc: Zhang Chen <chen.zhang@intel.com>
-> Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+OK.
+
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 > ---
->  migration/colo.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
+>  target/rx/op_helper.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 >=20
-> diff --git a/migration/colo.c b/migration/colo.c
-> index a54ac84f41..1b3493729b 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -263,7 +263,13 @@ ReplicationStatus
-> *qmp_query_xen_replication_status(Error **errp)
->=20
->  void qmp_xen_colo_do_checkpoint(Error **errp)
->  {
-> -    replication_do_checkpoint_all(errp);
-> +    Error *err =3D NULL;
-> +
-> +    replication_do_checkpoint_all(&err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
->      /* Notify all filters of all NIC to do checkpoint */
->      colo_notify_filters_event(COLO_EVENT_CHECKPOINT, errp);
+> diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
+> index f89d294f2b..b612ab1da8 100644
+> --- a/target/rx/op_helper.c
+> +++ b/target/rx/op_helper.c
+> @@ -201,14 +201,14 @@ void helper_scmpu(CPURXState *env)
+>      if (env->regs[3] =3D=3D 0) {
+>          return;
+>      }
+> -    while (env->regs[3] !=3D 0) {
+> +    do {
+>          tmp0 =3D cpu_ldub_data_ra(env, env->regs[1]++, GETPC());
+>          tmp1 =3D cpu_ldub_data_ra(env, env->regs[2]++, GETPC());
+>          env->regs[3]--;
+>          if (tmp0 !=3D tmp1 || tmp0 =3D=3D '\0') {
+>              break;
+>          }
+> -    }
+> +    } while (env->regs[3] !=3D 0);
+>      env->psw_z =3D tmp0 - tmp1;
+>      env->psw_c =3D (tmp0 >=3D tmp1);
 >  }
-> --
-> 2.21.1
+> @@ -287,14 +287,14 @@ void helper_suntil(CPURXState *env, uint32_t sz)
+>      if (env->regs[3] =3D=3D 0) {
+>          return ;
+>      }
+> -    while (env->regs[3] !=3D 0) {
+> +    do {
+>          tmp =3D cpu_ldufn[sz](env, env->regs[1], GETPC());
+>          env->regs[1] +=3D 1 << sz;
+>          env->regs[3]--;
+>          if (tmp =3D=3D env->regs[2]) {
+>              break;
+>          }
+> -    }
+> +    } while (env->regs[3] !=3D 0);
+>      env->psw_z =3D tmp - env->regs[2];
+>      env->psw_c =3D (tmp <=3D env->regs[2]);
+>  }
+> @@ -306,14 +306,14 @@ void helper_swhile(CPURXState *env, uint32_t sz)
+>      if (env->regs[3] =3D=3D 0) {
+>          return ;
+>      }
+> -    while (env->regs[3] !=3D 0) {
+> +    do {
+>          tmp =3D cpu_ldufn[sz](env, env->regs[1], GETPC());
+>          env->regs[1] +=3D 1 << sz;
+>          env->regs[3]--;
+>          if (tmp !=3D env->regs[2]) {
+>              break;
+>          }
+> -    }
+> +    } while (env->regs[3] !=3D 0);
+>      env->psw_z =3D env->regs[3];
+>      env->psw_c =3D (tmp <=3D env->regs[2]);
+>  }
+> --=20
+> 2.18.2
+>=20
+>=20
 
+It looks different result in env->regs[3] is zero.
+In such a case, nothing changes.
+
+I think that the warning of the uninitialized variable
+will disappear by fixing as follows.
+
+=46rom 5de0c54a970e01e96b41870252d0ea54ec61c540 Mon Sep 17 00:00:00 2001
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+Date: Mon, 20 Apr 2020 17:41:04 +0900
+Subject: [PATCH] target/rx/op_helper: Fix uninitialized warning.
+
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+---
+ target/rx/op_helper.c | 101 ++++++++++++++++++++----------------------
+ 1 file changed, 49 insertions(+), 52 deletions(-)
+
+diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
+index f89d294f2b..f84f6c706c 100644
+--- a/target/rx/op_helper.c
++++ b/target/rx/op_helper.c
+@@ -284,38 +284,36 @@ void helper_suntil(CPURXState *env, uint32_t sz)
+ {
+     uint32_t tmp;
+     tcg_debug_assert(sz < 3);
+-    if (env->regs[3] =3D=3D 0) {
+-        return ;
+-    }
+-    while (env->regs[3] !=3D 0) {
+-        tmp =3D cpu_ldufn[sz](env, env->regs[1], GETPC());
+-        env->regs[1] +=3D 1 << sz;
+-        env->regs[3]--;
+-        if (tmp =3D=3D env->regs[2]) {
+-            break;
++    if (env->regs[3] > 0) {
++        while (env->regs[3] !=3D 0) {
++            tmp =3D cpu_ldufn[sz](env, env->regs[1], GETPC());
++            env->regs[1] +=3D 1 << sz;
++            env->regs[3]--;
++            if (tmp =3D=3D env->regs[2]) {
++                break;
++            }
+         }
++        env->psw_z =3D tmp - env->regs[2];
++        env->psw_c =3D (tmp <=3D env->regs[2]);
+     }
+-    env->psw_z =3D tmp - env->regs[2];
+-    env->psw_c =3D (tmp <=3D env->regs[2]);
+ }
+=20
+ void helper_swhile(CPURXState *env, uint32_t sz)
+ {
+     uint32_t tmp;
+     tcg_debug_assert(sz < 3);
+-    if (env->regs[3] =3D=3D 0) {
+-        return ;
+-    }
+-    while (env->regs[3] !=3D 0) {
+-        tmp =3D cpu_ldufn[sz](env, env->regs[1], GETPC());
+-        env->regs[1] +=3D 1 << sz;
+-        env->regs[3]--;
+-        if (tmp !=3D env->regs[2]) {
+-            break;
++    if (env->regs[3] > 0) {
++        while (env->regs[3] !=3D 0) {
++            tmp =3D cpu_ldufn[sz](env, env->regs[1], GETPC());
++            env->regs[1] +=3D 1 << sz;
++            env->regs[3]--;
++            if (tmp !=3D env->regs[2]) {
++                break;
++            }
+         }
++        env->psw_z =3D env->regs[3];
++        env->psw_c =3D (tmp <=3D env->regs[2]);
+     }
+-    env->psw_z =3D env->regs[3];
+-    env->psw_c =3D (tmp <=3D env->regs[2]);
+ }
+=20
+ /* accumlator operations */
+@@ -325,40 +323,39 @@ void helper_rmpa(CPURXState *env, uint32_t sz)
+     int32_t result_h;
+     int64_t tmp0, tmp1;
+=20
+-    if (env->regs[3] =3D=3D 0) {
+-        return;
+-    }
+-    result_l =3D env->regs[5];
+-    result_l <<=3D 32;
+-    result_l |=3D env->regs[4];
+-    result_h =3D env->regs[6];
+-    env->psw_o =3D 0;
++    if (env->regs[3] > 0) {
++        result_l =3D env->regs[5];
++        result_l <<=3D 32;
++        result_l |=3D env->regs[4];
++        result_h =3D env->regs[6];
++        env->psw_o =3D 0;
+=20
+-    while (env->regs[3] !=3D 0) {
+-        tmp0 =3D cpu_ldfn[sz](env, env->regs[1], GETPC());
+-        tmp1 =3D cpu_ldfn[sz](env, env->regs[2], GETPC());
+-        tmp0 *=3D tmp1;
+-        prev =3D result_l;
+-        result_l +=3D tmp0;
+-        /* carry / bollow */
+-        if (tmp0 < 0) {
+-            if (prev > result_l) {
+-                result_h--;
+-            }
+-        } else {
+-            if (prev < result_l) {
+-                result_h++;
++        while (env->regs[3] !=3D 0) {
++            tmp0 =3D cpu_ldfn[sz](env, env->regs[1], GETPC());
++            tmp1 =3D cpu_ldfn[sz](env, env->regs[2], GETPC());
++            tmp0 *=3D tmp1;
++            prev =3D result_l;
++            result_l +=3D tmp0;
++            /* carry / bollow */
++            if (tmp0 < 0) {
++                if (prev > result_l) {
++                    result_h--;
++                }
++            } else {
++                if (prev < result_l) {
++                    result_h++;
++                }
+             }
+-        }
+=20
+-        env->regs[1] +=3D 1 << sz;
+-        env->regs[2] +=3D 1 << sz;
++            env->regs[1] +=3D 1 << sz;
++            env->regs[2] +=3D 1 << sz;
++        }
++        env->psw_s =3D result_h;
++        env->psw_o =3D (result_h !=3D 0 && result_h !=3D -1) << 31;
++        env->regs[6] =3D result_h;
++        env->regs[5] =3D result_l >> 32;
++        env->regs[4] =3D result_l & 0xffffffff;
+     }
+-    env->psw_s =3D result_h;
+-    env->psw_o =3D (result_h !=3D 0 && result_h !=3D -1) << 31;
+-    env->regs[6] =3D result_h;
+-    env->regs[5] =3D result_l >> 32;
+-    env->regs[4] =3D result_l & 0xffffffff;
+ }
+=20
+ void helper_racw(CPURXState *env, uint32_t imm)
+--=20
+2.20.1
+
+--=20
+Yosinori Sato
 
