@@ -2,106 +2,97 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BED8BC3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:57:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B298EC3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:59:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A42820A8B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:57:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 79BAB208E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:59:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tx9kjY7N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A42820A8B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qjx8Z0Ed"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79BAB208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQSEv-0006Dk-PJ
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 04:57:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60890 helo=eggs1p.gnu.org)
+	id 1jQSGt-0007ZK-Jg
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 04:59:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32918 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jQSEM-0005gm-Jo
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:56:43 -0400
+ (envelope-from <xadimgnik@gmail.com>) id 1jQSGG-00076v-TW
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:58:41 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jQSEA-0007ja-6f
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:56:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50625
- helo=us-smtp-1.mimecast.com)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jQSE9-0007j2-PL
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:56:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587372989;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ug0FCDj2BmXteBjRMScwNpB9iAXL6rH1Dgc7Q76ix5o=;
- b=Tx9kjY7N6+6eikS5C0F/18qRZdme0fNThRmamTSkQl8Nr1vjIxdexTSqVXo8E0GTCl+8yH
- ZE02v1SOhdZGukCEST3JzzeYIWonl8bhPdwTXrK74ObARgKxALqSstFjPc/0Qo0TErewAy
- 2ElhPyY8kGuHbU1q35sn7S4JQXf49EY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-cq9a9VJcPHKP0d2rXctwAQ-1; Mon, 20 Apr 2020 04:56:25 -0400
-X-MC-Unique: cq9a9VJcPHKP0d2rXctwAQ-1
-Received: by mail-ej1-f70.google.com with SMTP id nn20so5979093ejb.0
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 01:56:25 -0700 (PDT)
+ (envelope-from <xadimgnik@gmail.com>) id 1jQSGG-00025y-Bl
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:58:40 -0400
+Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:33324)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
+ id 1jQSGF-00022L-F5
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:58:40 -0400
+Received: by mail-ed1-x533.google.com with SMTP id j20so6744405edj.0
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 01:58:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:reply-to:to:cc:references:in-reply-to:subject:date:message-id
+ :mime-version:content-transfer-encoding:content-language
+ :thread-index; bh=l12LqyTH4YgL3udx+mMMxH3mer6k55ySqu3cyDYdhec=;
+ b=Qjx8Z0Ed/kKdXep5rDdvFhr5KVGQog4BiWtrplRP6hSSskyzCXPWh0sTr+5Pl3MOKW
+ ot1j5t9vUjdC0xTr8FtSt3a6gMHp2ZK/lgqqQrWc3Tl8GaQ5jnu4b2zKzyGNLQ+zo+Si
+ gELZtGQTjhMNVtGgM8fHjEtyd2YvM7QfwVBVm9JFk4aenWBS5GwmmoSHSAzXnGwnYk9V
+ e+7sWwg19gPqG43omTfeUJG0GSTPj1tkb/ATOvzk3I40JxqseDUZ8F8I5WZpP07IYKAw
+ 8ujUjxBCyM9jH1e08GsCk6PBoTzW/YI9MNngOH7sOudKp5IhcLccjUg3RvQAu/dj0jLf
+ mYKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=YI9jCELPX87Zw/2Zp1zQ8sWxou56U9PPlk79CnRfs+0=;
- b=MEUgI5pD3lX/aigrA3GLyUPtJyLBygglZmWcqmyLdiSOQKuw1MlcqltzZw5F8xU7bd
- SK0GWIIewaQGpYSDOzPW93aJKnQNWpCne9X8JEboO5OAUqfqALY7pyPCU5PWUOQUqZYo
- Q1ATLFhJtzLK/8ZYq3RjOs1qwJkpKFbnnqQzkLxQlTESR8gt3E3eWU2VffbRkw721nLB
- zt+F/6zDoTxWxQWHz0JY+28/h2uP0d+stRcy4Kt8zDiuniL5Z7e+CYHkMpPECg0LCG2X
- J6vT//qHu3e/RR6o/Nvu1tc/qOvNtsUzGVMZ7FagYlIWqcqPCMxlaC110nfRPTGxLokb
- geyA==
-X-Gm-Message-State: AGi0PuaEJM+EODaMb2VF4tbLio2uS7FYqIsqlGwXAsOP+ApNnHdcgH5d
- IhV1aOyk0A2FaJFfwqZyAqC9EPEram59stAQwp+TMIVznHurAILdFFXDxzQFLn0Wmz7oBkXfgkr
- 9r6VYSJ6wUj5ZeQY=
-X-Received: by 2002:a17:906:6c93:: with SMTP id
- s19mr14666306ejr.135.1587372984472; 
- Mon, 20 Apr 2020 01:56:24 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ2D56ycx4joJt3FrsZ7gq6yPo9zorArt/d/bUGTkFEyHPnU7LIaWaWy2auA8EA0qlFWEoyHw==
-X-Received: by 2002:a17:906:6c93:: with SMTP id
- s19mr14666293ejr.135.1587372984235; 
- Mon, 20 Apr 2020 01:56:24 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id z16sm24394edq.23.2020.04.20.01.56.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 20 Apr 2020 01:56:23 -0700 (PDT)
-Subject: Re: [PATCH 11/11] migration/colo: Fix qmp_xen_colo_do_checkpoint()
- error handling
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+ h=x-gm-message-state:from:reply-to:to:cc:references:in-reply-to
+ :subject:date:message-id:mime-version:content-transfer-encoding
+ :content-language:thread-index;
+ bh=l12LqyTH4YgL3udx+mMMxH3mer6k55ySqu3cyDYdhec=;
+ b=rZH7z0uRnxB1xtueBb1h0Q7PnVurZMf37Z5g14LgplGTzze455kX8lV3A2zPJZyrTt
+ /g5sScs28zIT+hPpkJNO5OYTRoe3+/xfAZR7WVHU7EdyJiEjtSoH4Ejff8Gg6MAK7PRj
+ s6db9eDvlSut27IQweWnXvp/27P3xgMBoQQPHh15O3s7nBlOsqnZAj+0SrdO93cteB7R
+ n+7KKDuitEakWChOibkdhQ649R+9aV1if7GhPX4h0PFzwfzI8aTCkhMCUEgwwiPVPdmr
+ vFVev9n6pFXRIRf0PX0AQ4qIhTdCr3Fw24Gp4FNBmKHw2itKZPVQgXkgoLqopLZuy0nT
+ 3wtw==
+X-Gm-Message-State: AGi0PuaUwePfJK5RmRtRp435FXnlr9iAKbwrCboAQkjZavpbB6LKB6XF
+ 3pYRkmY7flrx4bZNCJ4VUjw=
+X-Google-Smtp-Source: APiQypIKPCo2plSHpjjzSAMNGT9aA4e3L7shMprjSVglVHH/8jSrvmcyN8rO+29d1JFDuoXpyr19cQ==
+X-Received: by 2002:a05:6402:310b:: with SMTP id
+ dc11mr12798473edb.143.1587373117743; 
+ Mon, 20 Apr 2020 01:58:37 -0700 (PDT)
+Received: from CBGR90WXYV0 ([54.239.6.186])
+ by smtp.gmail.com with ESMTPSA id dm15sm21184edb.84.2020.04.20.01.58.36
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 20 Apr 2020 01:58:37 -0700 (PDT)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: "Paul Durrant" <paul@xen.org>
+To: "'Markus Armbruster'" <armbru@redhat.com>,
+	<qemu-devel@nongnu.org>
 References: <20200420083236.19309-1-armbru@redhat.com>
- <20200420083236.19309-12-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <909c738d-3ec0-ed29-9ccc-76a7bd599758@redhat.com>
-Date: Mon, 20 Apr 2020 10:56:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ <20200420083236.19309-10-armbru@redhat.com>
+In-Reply-To: <20200420083236.19309-10-armbru@redhat.com>
+Subject: RE: [PATCH 09/11] xen/pt: Fix flawed conversion to realize()
+Date: Mon, 20 Apr 2020 09:58:35 +0100
+Message-ID: <002201d616f1$e1057910$a3106b30$@xen.org>
 MIME-Version: 1.0
-In-Reply-To: <20200420083236.19309-12-armbru@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 03:29:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: en-gb
+Thread-Index: AQIW6PbL/TFzdKd45gQwHtYhr73cEQJR6tGlp+2CVEA=
+Received-SPF: pass client-ip=2a00:1450:4864:20::533;
+ envelope-from=xadimgnik@gmail.com; helo=mail-ed1-x533.google.com
+X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::533
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,58 +104,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>
+Reply-To: paul@xen.org
+Cc: 'Anthony Perard' <anthony.perard@citrix.com>,
+ xen-devel@lists.xenproject.org, 'Stefano Stabellini' <sstabellini@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/20/20 10:32 AM, Markus Armbruster wrote:
-> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
-> pointer to a variable containing NULL.  Passing an argument of the
-> latter kind twice without clearing it in between is wrong: if the
-> first call sets an error, it no longer points to NULL for the second
-> call.
->=20
-> qmp_xen_colo_do_checkpoint() passes @errp first to
-> replication_do_checkpoint_all(), and then to
-> colo_notify_filters_event().  If both fail, this will trip the
-> assertion in error_setv().
->=20
-> Similar code in secondary_vm_do_failover() calls
-> colo_notify_filters_event() only after replication_do_checkpoint_all()
-> succeeded.  Do the same here.
->=20
-> Fixes: 0e8818f023616677416840d6ddc880db8de3c967
-> Cc: Zhang Chen <chen.zhang@intel.com>
-> Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> -----Original Message-----
+> From: Markus Armbruster <armbru@redhat.com>
+> Sent: 20 April 2020 09:33
+> To: qemu-devel@nongnu.org
+> Cc: Stefano Stabellini <sstabellini@kernel.org>; Anthony Perard <anthony.perard@citrix.com>; Paul
+> Durrant <paul@xen.org>; xen-devel@lists.xenproject.org
+> Subject: [PATCH 09/11] xen/pt: Fix flawed conversion to realize()
+> 
+> The conversion of xen_pt_initfn() to xen_pt_realize() blindly replaced
+> XEN_PT_ERR() by error_setg().  Several error conditions that did not
+> fail xen_pt_initfn() now fail xen_pt_realize().  Unsurprisingly, the
+> cleanup on these errors looks highly suspicious.
+> 
+> Revert the inappropriate replacements.
+> 
+> Fixes: 5a11d0f7549e24a10e178a9dc8ff5e698031d9a6
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: Paul Durrant <paul@xen.org>
+> Cc: xen-devel@lists.xenproject.org
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   migration/colo.c | 8 +++++++-
->   1 file changed, 7 insertions(+), 1 deletion(-)
->=20
-> diff --git a/migration/colo.c b/migration/colo.c
-> index a54ac84f41..1b3493729b 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -263,7 +263,13 @@ ReplicationStatus *qmp_query_xen_replication_status(=
-Error **errp)
->  =20
->   void qmp_xen_colo_do_checkpoint(Error **errp)
->   {
-> -    replication_do_checkpoint_all(errp);
-> +    Error *err =3D NULL;
-> +
-> +    replication_do_checkpoint_all(&err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
->       /* Notify all filters of all NIC to do checkpoint */
->       colo_notify_filters_event(COLO_EVENT_CHECKPOINT, errp);
->   }
->=20
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Paul Durrant <paul@xen.org>
 
 
