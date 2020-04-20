@@ -2,75 +2,101 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 395F0C54FCC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 23:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1140C54FCC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 23:32:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 077CE206F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 23:11:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 077CE206F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id BA5272070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 23:32:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UEPVVx2N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA5272070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQfZl-0007YE-7h
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 19:11:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60202)
+	id 1jQftj-0003eK-OS
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 19:32:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35184)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jQfZ5-000773-1P
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 19:10:59 -0400
+ (envelope-from <peterx@redhat.com>) id 1jQfsp-0003FI-74
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 19:31:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jQfZ4-0006Cy-47
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 19:10:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38356)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jQfZ3-0006Cn-N5
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 19:10:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jQfZ1-0008QK-LX
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 23:10:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 93E082E8106
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 23:10:55 +0000 (UTC)
+ (envelope-from <peterx@redhat.com>) id 1jQfsn-0006A7-MY
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 19:31:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24971
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jQfsn-00069B-5J
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 19:31:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587425479;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=DdDaVg73uo3ruBN3ozINHtmiR6b5dXLmLty8zqenxP4=;
+ b=UEPVVx2Nk9w+4n9NVbUPBjHR0H1mgs4MceaEvZVWd/Tc1t+b/RcPTHAbopYIEPi/59WlVf
+ vagWckfW8efEsZhzVAkn2qpEuEr2aXDK3dszABnuwRshsVmSDBFZkyljSVsPYUtzWEJ8cO
+ OcI7iRYWkF3j2Yw6pXWiJLKmPV5vJLM=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-366-W7lenXXJO-2tTpEExITUUA-1; Mon, 20 Apr 2020 19:31:18 -0400
+X-MC-Unique: W7lenXXJO-2tTpEExITUUA-1
+Received: by mail-qt1-f200.google.com with SMTP id u13so12935968qtk.5
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 16:31:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=FkW32XyDlDe0ksRB5mJvsDKxEM5B5CSQ3QVt3TzHoDU=;
+ b=hhYjR139i5D4+uEj7QghNPKUv3M5pYl6oWJXVC7iAxTWvEjYvLjUjs6oMbfAwaMbTV
+ r2ELX3Jl3cq7JTvxmKP7X7iUinZOt+EAxeGYJhp0XrCOhm/akn75l3ypcN39Xoc2MUzL
+ PVeQN26XAmYftcVWyk2I+A1YDM1DrBWuALmj1SqwJuMFIDwdWrCAdyojSUjvELju0dBZ
+ uBgD0i2V8GR29+6QMmZWTcHGbbG5JtRkaXQeMsC8IuobOdvOI4pBfSIWvHGi9ZEt/tRf
+ d2SlsgiCA8svROp5JaKFSB0U3WT2rqJGbngShv7Ue6lI3t7TgX6Mv9KmrT8xuy4ok6L6
+ dr+A==
+X-Gm-Message-State: AGi0PuYfs1QAkZDAHqGyHQ0/4NUxq+bSBjmq3oR8lzCARz1ZXXUbdIXc
+ pSvzp2DJiyAVsicjB+1IsnHh1FZgZkjyPECUYuSOH3ySG8Z1vcPs5ejYJWWDfG39U9V2FlKHk59
+ tFcg2P6ouTa8E88s=
+X-Received: by 2002:ac8:568b:: with SMTP id h11mr19029901qta.197.1587425477643; 
+ Mon, 20 Apr 2020 16:31:17 -0700 (PDT)
+X-Google-Smtp-Source: APiQypK55ALiHWZi8DgfzKdRRefFIcKNicrwHdy3KWdHEtvtWw0FkPFJs/g/lq4l++2WwsJZ0+emEg==
+X-Received: by 2002:ac8:568b:: with SMTP id h11mr19029873qta.197.1587425477354; 
+ Mon, 20 Apr 2020 16:31:17 -0700 (PDT)
+Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca.
+ [72.137.123.47])
+ by smtp.gmail.com with ESMTPSA id j92sm571745qtd.58.2020.04.20.16.31.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Apr 2020 16:31:16 -0700 (PDT)
+Date: Mon, 20 Apr 2020 19:31:15 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: Question on memory commit during MR finalize()
+Message-ID: <20200420233115.GB420399@xz-x1>
+References: <20200420210049.GA420399@xz-x1>
+ <fe73a74b-2324-68a5-a37f-530a6bb03ebc@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <fe73a74b-2324-68a5-a37f-530a6bb03ebc@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Apr 2020 22:58:26 -0000
-From: Babu Moger <1856335@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: babumoger djdatte h-sieger
-X-Launchpad-Bug-Reporter: Damir (djdatte)
-X-Launchpad-Bug-Modifier: Babu Moger (babumoger)
-References: <157625616239.22064.10423897892496347105.malonedeb@gac.canonical.com>
-Message-Id: <158742350692.19878.6882586493225306144.malone@gac.canonical.com>
-Subject: [Bug 1856335] Re: Cache Layout wrong on many Zen Arch CPUs
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2ee37258dd9fdec4f6dc9af7fd7f9d106414ec20
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/20 19:00:58
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 91.189.90.7
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=peterx@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/20 19:31:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,74 +105,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856335 <1856335@bugs.launchpad.net>
+Cc: Markus Armbruster <armbru@redhat.com>,
+ QEMU Devel Mailing List <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Damir, Example of how to use numa configuration.
--smp 16,maxcpus=3D16,cores=3D16,threads=3D1,sockets=3D1 -numa node,nodeid=
-=3D0,cpus=3D0-7 -numa node,nodeid=3D1,cpus=3D8-15
+On Mon, Apr 20, 2020 at 11:44:11PM +0200, Paolo Bonzini wrote:
+> On 20/04/20 23:00, Peter Xu wrote:
+> >=20
+> > I'm still uncertain how the dirty ring branch can easily trigger this, =
+however
+> > the backtrace looks really odd to me in that we're going to do memory c=
+ommit
+> > and even sending KVM ioctls during finalize(), especially in the RCU th=
+read...
+> > I never expected that.
+>=20
+> Short answer: it is really hard to not trigger finalize() from an RCU
+> callback, and it's the reason why the RCU thread takes the big QEMU lock.
+>=20
+> However, instead of memory_region_transaction_commit,
+> memory_region_finalize probably should do something like
+>=20
+>     --memory_region_transaction_depth;
+>     assert (memory_region_transaction_depth ||
+> =09    (!memory_region_update_pending &&
+>              !ioeventfd_update_pending));
 
-This will help to put all the cores in correct L3 boundary. I strongly
-suggest to use the latest qemu release.
+Ah I see; this makes sense.
 
--- =
+And finally I found the problem, which is indeed the bug in my own tree - I
+forgot to remove the previous changes to flush the dirty ring during mem
+removal (basically that's run_on_cpu() called during a memory commit, that =
+will
+wrongly release the BQL without being noticed).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856335
+Besides above assert, I'm thinking maybe we can also assert on something li=
+ke:
 
-Title:
-  Cache Layout wrong on many Zen Arch CPUs
+  !(memory_region_transaction_depth || memory_region_update_pending ||
+    ioeventfd_update_pending)
 
-Status in QEMU:
-  New
+When releasing BQL (unlock, or qemu_cond_wait() on BQL, which should cover
+run_on_cpu()), so that we can identify misuse of BQL easier like this.
 
-Bug description:
-  AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems
-  to always map Cache ass if it was an 4-Core per CCX CPU, which is
-  incorrect, and costs upwards 30% performance (more realistically 10%)
-  in L3 Cache Layout aware applications.
+Let me know if you like these sanity checks. I can write up a small series =
+if
+you think that's a good idea.
 
-  Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
+Thanks,
 
-  =C2=A0=C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
-  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
-  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'8' threads=3D'1'=
-/>
+--=20
+Peter Xu
 
-  In windows, coreinfo reports correctly:
-
-  ****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
-  ----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
-
-  On a 3-CCX CPU (3960X /w 6 cores and no SMT):
-
-  =C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
-  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
-  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'6' threads=3D'1'=
-/>
-
-  in windows, coreinfo reports incorrectly:
-
-  ****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
-  ----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
-
-  Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm.
-
-  With newer Qemu there is a fix (that does behave correctly) in using the =
-dies parameter:
-  =C2=A0<qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
-
-  The problem is that the dies are exposed differently than how AMD does
-  it natively, they are exposed to Windows as sockets, which means, that
-  if you are nto a business user, you can't ever have a machine with
-  more than two CCX (6 cores) as consumer versions of Windows only
-  supports two sockets. (Should this be reported as a separate bug?)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856335/+subscriptions
 
