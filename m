@@ -2,76 +2,87 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAC6DC3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 16:16:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD94DC3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 16:23:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4D16206F6
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 16:16:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4D16206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 95B1E2074F
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 16:23:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Grt2UG6v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95B1E2074F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQZ64-0001zB-V5
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 12:16:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47024 helo=eggs1p.gnu.org)
+	id 1jQZDA-0004eJ-Pc
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 12:23:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48372 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jQZ5J-00017C-UR
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 12:15:50 -0400
+ (envelope-from <stefanha@redhat.com>) id 1jQZCN-00047x-4r
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 12:23:07 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jQZ5I-00085o-VF
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 12:15:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40348)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jQZ5I-00083u-GP
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 12:15:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jQZ5G-0007Am-7l
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 16:15:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C81AB2E8111
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 16:15:45 +0000 (UTC)
+ (envelope-from <stefanha@redhat.com>) id 1jQZCM-0005Gl-PK
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 12:23:06 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51994
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jQZCM-0005GC-DQ
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 12:23:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587399785;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=v/7ONRnho5hgL0bAXCXHN41RKW9g1UdKFGuzd/aV3uk=;
+ b=Grt2UG6vWgiudfmGwzRgqpPCZYtVFAKJ9R9XlNZZ/IwnsZzEbEGYjAdTMAo4A6h1IXRZgQ
+ /N5vLDWUHApk0rFoa1YABvjrXrpHcbPU4rAV63MUnsXDylYoLetZF3Dy1LiZqq2ZtBTIoD
+ abt5cljid/fMipTzJl8UY1BFH4xkYF0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-354-zyxPovmgMsuYSEXjd2UsZQ-1; Mon, 20 Apr 2020 12:22:58 -0400
+X-MC-Unique: zyxPovmgMsuYSEXjd2UsZQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0A57107B274;
+ Mon, 20 Apr 2020 16:22:56 +0000 (UTC)
+Received: from localhost (ovpn-112-169.ams2.redhat.com [10.36.112.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2E9B45DA7C;
+ Mon, 20 Apr 2020 16:22:55 +0000 (UTC)
+Date: Mon, 20 Apr 2020 17:22:55 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH 5/9] block/io: expand in_flight inc/dec section: simple
+ cases
+Message-ID: <20200420162255.GE7321@stefanha-x1.localdomain>
+References: <20200408093051.9893-1-vsementsov@virtuozzo.com>
+ <20200408093051.9893-6-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Apr 2020 16:00:54 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: pmaydell
-X-Launchpad-Bug-Reporter: Peter Maydell (pmaydell)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-Message-Id: <158739845498.17284.14931679531130317910.malonedeb@wampee.canonical.com>
-Subject: [Bug 1873898] [NEW] arm linux-user: bkpt insn doesn't cause SIGTRAP
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="2e26c9bbd21cdca248baaea29aeffb920afcc32a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a21014275659ab90a05fd2ad1553caa1af93b810
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
+In-Reply-To: <20200408093051.9893-6-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="4Epv4kl9IRBfg3rk"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 12:15:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 91.189.90.7
+ 09:01:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,129 +91,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1873898 <1873898@bugs.launchpad.net>
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+--4Epv4kl9IRBfg3rk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-QEMU's 32-bit arm linux-user mode doesn't correctly turn guest BKPT
-insns into SIGTRAP signals. Test case:
+On Wed, Apr 08, 2020 at 12:30:47PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> It's safer to expand in_flight request to start before enter to
 
-=3D=3D=3Dbegin bkpt.c=3D=3D=3D
-/* test bkpt insn */
+Please explain what exeactly "safer" means.  If I understand correctly
+this is just a refactoring and does not fix bugs that have been hit in
+the real world.
 
-#include <stdlib.h>
-#include <stdio.h>
+Is this just a generate attempt to avoid accidentally performing
+operations that need to happen as part of the request after the dec
+call?
 
-int main(void)
-{
-    printf("breakpoint\n");
-#ifdef __aarch64__
-    __asm__ volatile("brk 0x42\n");
-#else
-    __asm__ volatile("bkpt 0x42\n");
-#endif
-    printf("done\n");
-    return 0;
-}
-=3D=3D=3Dendit=3D=3D=3D
+> @@ -2718,17 +2746,18 @@ bdrv_co_rw_vmstate(BlockDriverState *bs, QEMUIOVe=
+ctor *qiov, int64_t pos,
+>              ret =3D drv->bdrv_save_vmstate(bs, qiov, pos);
+>          }
+>      } else if (bs->file) {
+> -        ret =3D bdrv_co_rw_vmstate(bs->file->bs, qiov, pos, is_read);
+> +        bdrv_inc_in_flight(bs->file->bs);
+> +        ret =3D bdrv_do_rw_vmstate(bs->file->bs, qiov, pos, is_read);
+> +        bdrv_dec_in_flight(bs->file->bs);
 
-Compile with
-$ arm-linux-gnueabihf-gcc -g -Wall -o bkpt-aa32 bkpt.c
-$ aarch64-linux-gnu-gcc -g -Wall -o bkpt-aa64 bkpt.c
+Here we inc/dec...
 
-Contrast aarch64 which delivers the SIGTRAP and arm which doesn't:
+>      }
+> =20
+> -    bdrv_dec_in_flight(bs);
+>      return ret;
+>  }
+> =20
+>  static void coroutine_fn bdrv_co_rw_vmstate_entry(void *opaque)
+>  {
+>      BdrvVmstateCo *co =3D opaque;
+> -    co->ret =3D bdrv_co_rw_vmstate(co->bs, co->qiov, co->pos, co->is_rea=
+d);
+> +    co->ret =3D bdrv_do_rw_vmstate(co->bs, co->qiov, co->pos, co->is_rea=
+d);
 
-$ qemu-aarch64 bkpt-aa64
-breakpoint
-qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-Trace/breakpoint trap (core dumped)
-$ qemu-arm bkpt-aa32
-breakpoint
-done
+...here we don't.  The code is correct, but bdrv_co_rw_vmstate_entry()
+should also document that its caller must inc/dec.
 
-This is because in linux-user/arm/cpu-loop.c we incorrectly treat
-EXCP_BKPT similarly to EXCP_SWI, which means that we actually perform a
-syscall (which one depends on what happens to be in r7...). This code
-has been like this (more or less) since commit 06c949e62a098f in 2006
-which added BKPT in the first place. This is probably because at the
-time the same code path was used to handle both Linux syscalls and
-semihosting calls, and (on M profile) BKPT does imply a semihosting
-call. But these days we've moved handling of semihosting out to an
-entirely different codepath, so we can fix this bug by simply removing
-this handling of EXCP_BKPT and instead making it deliver a SIGTRAP like
-EXCP_DEBUG (as we do already on aarch64).
+> @@ -2950,7 +2994,7 @@ static void coroutine_fn bdrv_flush_co_entry(void *=
+opaque)
+>  {
+>      FlushCo *rwco =3D opaque;
+> =20
+> -    rwco->ret =3D bdrv_co_flush(rwco->bs);
+> +    rwco->ret =3D bdrv_do_flush(rwco->bs);
+>      aio_wait_kick();
+>  }
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+This function should also document that the caller must inc/dec.
 
+--4Epv4kl9IRBfg3rk
+Content-Type: application/pgp-signature; name="signature.asc"
 
-** Tags: arm linux-user
+-----BEGIN PGP SIGNATURE-----
 
--- =
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6dzF4ACgkQnKSrs4Gr
+c8ikQAf+I/Ipo63QbabB6PkX+wgDWdwBEcOqPLGCEq7EEMEIf5vY1MH/twuDJAqH
+cfXwgdpKvM75cwLTC/Wd9Bejqtb7I2dbbl6p7M2QNlHWHwgxqCLnomQ35jA6b0mh
+wdJY/FOC6iWgOGMV2JovRj/D9hBxrh/970vcDIwrZxGbUQNeuA6u/51IqZ2SwJrb
+L7tRuy3WUqa/Qd0BpusZjYo2BPp0qy/ppq//pfSa6HkIzOVsSON/EmQZ5RWAeAvb
+0ZRzZdpwD0mklR5LNb5n6R1SfoQbhIf5SSqh1KtlKDCMU2cX531Tkz6srcjBlFMJ
++mNSikXNuE4A/6nEzQRMzIK+RCELtQ==
+=Kchi
+-----END PGP SIGNATURE-----
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1873898
+--4Epv4kl9IRBfg3rk--
 
-Title:
-  arm linux-user: bkpt insn doesn't cause SIGTRAP
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU's 32-bit arm linux-user mode doesn't correctly turn guest BKPT
-  insns into SIGTRAP signals. Test case:
-
-  =3D=3D=3Dbegin bkpt.c=3D=3D=3D
-  /* test bkpt insn */
-
-  #include <stdlib.h>
-  #include <stdio.h>
-
-  int main(void)
-  {
-      printf("breakpoint\n");
-  #ifdef __aarch64__
-      __asm__ volatile("brk 0x42\n");
-  #else
-      __asm__ volatile("bkpt 0x42\n");
-  #endif
-      printf("done\n");
-      return 0;
-  }
-  =3D=3D=3Dendit=3D=3D=3D
-
-  Compile with
-  $ arm-linux-gnueabihf-gcc -g -Wall -o bkpt-aa32 bkpt.c
-  $ aarch64-linux-gnu-gcc -g -Wall -o bkpt-aa64 bkpt.c
-
-  Contrast aarch64 which delivers the SIGTRAP and arm which doesn't:
-
-  $ qemu-aarch64 bkpt-aa64
-  breakpoint
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  Trace/breakpoint trap (core dumped)
-  $ qemu-arm bkpt-aa32
-  breakpoint
-  done
-
-  This is because in linux-user/arm/cpu-loop.c we incorrectly treat
-  EXCP_BKPT similarly to EXCP_SWI, which means that we actually perform
-  a syscall (which one depends on what happens to be in r7...). This
-  code has been like this (more or less) since commit 06c949e62a098f in
-  2006 which added BKPT in the first place. This is probably because at
-  the time the same code path was used to handle both Linux syscalls and
-  semihosting calls, and (on M profile) BKPT does imply a semihosting
-  call. But these days we've moved handling of semihosting out to an
-  entirely different codepath, so we can fix this bug by simply removing
-  this handling of EXCP_BKPT and instead making it deliver a SIGTRAP
-  like EXCP_DEBUG (as we do already on aarch64).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1873898/+subscriptions
 
