@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 921D7C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:35:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91CE8C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:35:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D5F3206F6
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:35:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 605D1206F6
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 08:35:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X6BIlsUr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D5F3206F6
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZTIydP7w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 605D1206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQRu7-0008N0-FW
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 04:35:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56450 helo=eggs1p.gnu.org)
+	id 1jQRuB-0008VF-FN
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 04:35:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56492 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jQRrA-0002ss-K5
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:32:45 -0400
+ (envelope-from <armbru@redhat.com>) id 1jQRrC-0002u4-Kw
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:32:47 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jQRr9-0006u8-IY
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:32:44 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39918
+ (envelope-from <armbru@redhat.com>) id 1jQRrC-0006yJ-3K
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:32:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28667
  helo=us-smtp-1.mimecast.com)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jQRr9-0006rn-5F
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:32:43 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jQRrB-0006xK-MV
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 04:32:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587371561;
+ s=mimecast20190719; t=1587371565;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VfYN+TU+3RtiZ4Pa1zd3jj/XHqO17tt2OP3Q91CNoWs=;
- b=X6BIlsUreKhnusP6qQuVW9V/eEZoodqW/j4ddQvmO4PF/MQrtJLrxuohvv/Ig2iC6xfXQu
- 48T+Koa90QqnWxtbg6PvshvVZeOtUMOlNmuRN2pEBnZ6J3l19Bt0y5iYw1xnGxM4gp4qUY
- fYJeIVeX7tyzdjESAzt3P/vuRxid/7Q=
+ bh=zizm9RjgByTgrCBzPtpJ+e+xEYQesiEI32NKmLTT0yY=;
+ b=ZTIydP7wlLQeP44+kL5hoYjRBrkuLLwfMGIY4Du0hofHAdcUYwNsYHv27mDrD9R3HuR0Og
+ SGuni1ks/f63ybwOcJf9/qLg44o8MHZTJoJXoet4hdLiSS5MnVex1LWBGI/vQVXW5OJGxb
+ Byhhhs9UZP2pOpXJCVRpC2Jk4V37P+Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-20-WkZyR802NJyUqnMCV0zhEQ-1; Mon, 20 Apr 2020 04:32:39 -0400
-X-MC-Unique: WkZyR802NJyUqnMCV0zhEQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-438-EAj6ecJYPCiwZdc19PnMpg-1; Mon, 20 Apr 2020 04:32:43 -0400
+X-MC-Unique: EAj6ecJYPCiwZdc19PnMpg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74AEF800D53
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 08:32:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71BDD107ACC4
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 08:32:42 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 425F810027A8;
- Mon, 20 Apr 2020 08:32:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C04715C28F;
+ Mon, 20 Apr 2020 08:32:39 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A9A2A11358C0; Mon, 20 Apr 2020 10:32:36 +0200 (CEST)
+ id B452511358C3; Mon, 20 Apr 2020 10:32:36 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 04/11] cpus: Proper range-checking for -icount shift=N
-Date: Mon, 20 Apr 2020 10:32:29 +0200
-Message-Id: <20200420083236.19309-5-armbru@redhat.com>
+Subject: [PATCH 07/11] bochs-display: Fix vgamem=SIZE error handling
+Date: Mon, 20 Apr 2020 10:32:32 +0200
+Message-Id: <20200420083236.19309-8-armbru@redhat.com>
 In-Reply-To: <20200420083236.19309-1-armbru@redhat.com>
 References: <20200420083236.19309-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 03:29:18
+ 04:32:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,55 +91,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-timers_state.icount_time_shift must be in [0,63] to avoid undefined
-behavior when shifting by it, e.g. in cpu_icount_to_ns().
-icount_adjust() clamps it to [0,MAX_ICOUNT_SHIFT], with
-MAX_ICOUNT_SHIFT =3D 10.  configure_icount() doesn't.  Fix that.
+bochs_display_realize() rejects out-of-range vgamem.  The error
+handling is broken:
 
-Fixes: a8bfac37085c3372366d722f131a7e18d664ee4d
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+    $ qemu-system-x86_64 -S -display none -monitor stdio
+    QEMU 4.2.93 monitor - type 'help' for more information
+    (qemu) device_add bochs-display,vgamem=3D1
+    Error: bochs-display: video memory too small
+    (qemu) device_add bochs-display,vgamem=3D1
+    RAMBlock "0000:00:04.0/bochs-display-vram" already registered, abort!
+    Aborted (core dumped)
+
+Cause: bochs_display_realize() neglects to bail out after setting the
+error.  Fix that.
+
+Fixes: 765c94290863eef1fc4a67819d452cc13b7854a1
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- cpus.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ hw/display/bochs-display.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/cpus.c b/cpus.c
-index 1b542b37f9..5670c96bcf 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qemu/config-file.h"
-+#include "qemu/cutils.h"
- #include "migration/vmstate.h"
- #include "monitor/monitor.h"
- #include "qapi/error.h"
-@@ -801,7 +802,6 @@ void configure_icount(QemuOpts *opts, Error **errp)
-     bool sleep =3D qemu_opt_get_bool(opts, "sleep", true);
-     bool align =3D qemu_opt_get_bool(opts, "align", false);
-     long time_shift =3D -1;
--    char *rem_str =3D NULL;
+diff --git a/hw/display/bochs-display.c b/hw/display/bochs-display.c
+index 70eb619ef4..e763a0a72d 100644
+--- a/hw/display/bochs-display.c
++++ b/hw/display/bochs-display.c
+@@ -267,16 +267,18 @@ static void bochs_display_realize(PCIDevice *dev, Err=
+or **errp)
+     Object *obj =3D OBJECT(dev);
+     int ret;
 =20
-     if (!option && qemu_opt_get(opts, "align")) {
-         error_setg(errp, "Please specify shift option when using align");
-@@ -814,9 +814,8 @@ void configure_icount(QemuOpts *opts, Error **errp)
+-    s->con =3D graphic_console_init(DEVICE(dev), 0, &bochs_display_gfx_ops=
+, s);
+-
+     if (s->vgamem < 4 * MiB) {
+         error_setg(errp, "bochs-display: video memory too small");
++        return;
      }
+     if (s->vgamem > 256 * MiB) {
+         error_setg(errp, "bochs-display: video memory too big");
++        return;
+     }
+     s->vgamem =3D pow2ceil(s->vgamem);
 =20
-     if (strcmp(option, "auto") !=3D 0) {
--        errno =3D 0;
--        time_shift =3D strtol(option, &rem_str, 0);
--        if (errno !=3D 0 || *rem_str !=3D '\0' || !strlen(option)) {
-+        if (qemu_strtol(option, NULL, 0, &time_shift) < 0
-+            || time_shift < 0 || time_shift > MAX_ICOUNT_SHIFT) {
-             error_setg(errp, "icount: Invalid shift value");
-             return;
-         }
++    s->con =3D graphic_console_init(DEVICE(dev), 0, &bochs_display_gfx_ops=
+, s);
++
+     memory_region_init_ram(&s->vram, obj, "bochs-display-vram", s->vgamem,
+                            &error_fatal);
+     memory_region_init_io(&s->vbe, obj, &bochs_display_vbe_ops, s,
 --=20
 2.21.1
 
