@@ -2,85 +2,84 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA56C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:05:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D719C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:06:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0023520857
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:05:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6380B20857
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 10:06:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VPiVDN4q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0023520857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ANvuw2KL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6380B20857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQTJG-0004Li-0g
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 06:05:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50626 helo=eggs1p.gnu.org)
+	id 1jQTKH-0005CV-Jh
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 06:06:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50738 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jQTI3-00033i-UY
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:04:40 -0400
+ (envelope-from <igotti@gmail.com>) id 1jQTIX-0003cU-QL
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:05:06 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jQTI2-0006Bb-Bi
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:04:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37581
- helo=us-smtp-1.mimecast.com)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jQTI1-00068g-VI
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:04:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587377072;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Rd8ck0rG+VWuzFUfCUtC6WQUhQmJdODGU2whSWDpkIs=;
- b=VPiVDN4q8AlvP45hwCWaEp0Ko0JbnVz0VgNJ0XcZSZitGV5LpM43V9h0Lunem9udEUaf4X
- rmY4B9YtYpoaRVPILtVa/65Q/ejgKRcIwNshNlZaEjol0wwjKeQ03VONZA01F8wFUvq6Zy
- haPFWFJCkQ4bsLu0HtMcFoMmovDz4+k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-Mc9FX2lBPEibQ-G84ty2Dw-1; Mon, 20 Apr 2020 06:04:08 -0400
-X-MC-Unique: Mc9FX2lBPEibQ-G84ty2Dw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 550DB18C8C02;
- Mon, 20 Apr 2020 10:04:06 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.47])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B053A188D;
- Mon, 20 Apr 2020 10:03:53 +0000 (UTC)
-Date: Mon, 20 Apr 2020 11:03:50 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Chen Qun <kuhn.chenqun@huawei.com>
-Subject: Re: [PATCH] block/iscsi:fix heap-buffer-overflow in iscsi_aio_ioctl_cb
-Message-ID: <20200420100350.GL346737@redhat.com>
-References: <20200418062602.10776-1-kuhn.chenqun@huawei.com>
+ (envelope-from <igotti@gmail.com>) id 1jQTIX-0007ih-0L
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:05:05 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:46218)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <igotti@gmail.com>) id 1jQTIW-0007d6-J6
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:05:04 -0400
+Received: by mail-lj1-x242.google.com with SMTP id f18so3213669lja.13
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 03:05:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=qCahw2vz6QYaMfunEj6B1HZkP+WpPZBcP5RC424Py2Y=;
+ b=ANvuw2KLX2+hNzPBYlpCl8Ei2tA+JF8KRr/zQIc4UBGs0pg2o9J7zr3/RuSbbaQiG8
+ 3Bbg2s6ZmBlNIjsQbAg87NWD2vrA2wbFsWENjqhDz/eAhQj3R5SpOg/PVHl1UaBbxr+B
+ BR8h/EjXB85a6+wDS3X3TQrrUWomGLyGG6eNtf01+Fg7h3o0L/BhAteCGxgD3cuHaXPQ
+ y9e43rtMPVD1uDHzINOoagvzbBfa+e5a+Kc9hD3FVC0X9rTR6zYkSK802mn7tkH3Pyru
+ KnovVQ4Q3fZoTlj/mc3d1LIR/IKtpC0ClDNRsdFSwWcuSx+v/q23m+eXejw5BmIZkj6b
+ P2UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=qCahw2vz6QYaMfunEj6B1HZkP+WpPZBcP5RC424Py2Y=;
+ b=FG8DJ3cg975+wV5migmy1xZfrnsRXlmHoCnsVeNGMlNwOh37a2UU0MK8rdoLwjmwFD
+ jutiaPj/LGZX2WAdyyVWFzL4xNp2dl9R5b8t67TeE5BKukU91d4AbjkJQ4tK+MI7bdfw
+ VlMRhiLbFONGKgY9/mdKIXTWr51Mk6N9NhZjdiNkOaGk5TlUj0TIQokoOeCGI/XXvtDh
+ GrdVN8eks7Nlq+H8HvH5vZDtl7pTnvHpK1NjgaJCJzBup6Re9jkAgbcxbqFLaRfw1Abb
+ SjtE59ztn3HAgL+c1STu1LO/cJCsAsJT9UXMpJMOi4ywvndzflaFwkwb1xmYGO5iXP3f
+ pmMQ==
+X-Gm-Message-State: AGi0PubDqS/vOViD25L3qnFrxU0uVjkWRa+EQ6egQr84I0pgZwEUGUOK
+ RKj9UQq2PjcWTVVbpOqJsddnnPxXnwfehRhfH2c=
+X-Google-Smtp-Source: APiQypL296dv5aWUiG6BuTwdIatd5h3e6g/W+XZ1H4U1Ogoba6J9n89TWSXzDuXOjX1tL+AYhHkhPUaUr/A3stgju98=
+X-Received: by 2002:a2e:8745:: with SMTP id q5mr9894412ljj.157.1587377102633; 
+ Mon, 20 Apr 2020 03:05:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200418062602.10776-1-kuhn.chenqun@huawei.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 03:29:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+References: <CAEme+7FPF+inSJSXQPmuv8Up3Eam0N7fT03zqM-RvcvKsxjfVQ@mail.gmail.com>
+ <f4feb648-7dc5-ac54-bc0b-db650dd176f1@vivier.eu>
+In-Reply-To: <f4feb648-7dc5-ac54-bc0b-db650dd176f1@vivier.eu>
+From: Nikolay Igotti <igotti@gmail.com>
+Date: Mon, 20 Apr 2020 13:04:51 +0300
+Message-ID: <CAEme+7EtF6B2+2U_yF2dd-g2m+=S3P5=DL1oLmHfmWw2S7PYAw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] plugins: avoid failing plugin when CPU is inited
+ several times
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: multipart/alternative; boundary="00000000000053bd2305a3b6086f"
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=igotti@gmail.com; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,113 +91,239 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, zhang.zhanghailiang@huawei.com,
- qemu-block@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>,
- qemu-trivial@nongnu.org, Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org,
- Prasad J Pandit <ppandit@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Euler Robot <euler.robot@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, riku.voipio@iki.fi,
+ "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Apr 18, 2020 at 02:26:02PM +0800, Chen Qun wrote:
-> There is an overflow, the source 'datain.data[2]' is 100 bytes,
->  but the 'ss' is 252 bytes.This may cause a security issue because
->  we can access a lot of unrelated memory data.
->=20
-> The len for sbp copy data should take the minimum of mx_sb_len and
->  sb_len_wr, not the maximum.
->=20
-> If we use iscsi device for VM backend storage, ASAN show stack:
->=20
-> READ of size 252 at 0xfffd149dcfc4 thread T0
->     #0 0xaaad433d0d34 in __asan_memcpy (aarch64-softmmu/qemu-system-aarch=
-64+0x2cb0d34)
->     #1 0xaaad45f9d6d0 in iscsi_aio_ioctl_cb /qemu/block/iscsi.c:996:9
->     #2 0xfffd1af0e2dc  (/usr/lib64/iscsi/libiscsi.so.8+0xe2dc)
->     #3 0xfffd1af0d174  (/usr/lib64/iscsi/libiscsi.so.8+0xd174)
->     #4 0xfffd1af19fac  (/usr/lib64/iscsi/libiscsi.so.8+0x19fac)
->     #5 0xaaad45f9acc8 in iscsi_process_read /qemu/block/iscsi.c:403:5
->     #6 0xaaad4623733c in aio_dispatch_handler /qemu/util/aio-posix.c:467:=
-9
->     #7 0xaaad4622f350 in aio_dispatch_handlers /qemu/util/aio-posix.c:510=
-:20
->     #8 0xaaad4622f350 in aio_dispatch /qemu/util/aio-posix.c:520
->     #9 0xaaad46215944 in aio_ctx_dispatch /qemu/util/async.c:298:5
->     #10 0xfffd1bed12f4 in g_main_context_dispatch (/lib64/libglib-2.0.so.=
-0+0x512f4)
->     #11 0xaaad46227de0 in glib_pollfds_poll /qemu/util/main-loop.c:219:9
->     #12 0xaaad46227de0 in os_host_main_loop_wait /qemu/util/main-loop.c:2=
-42
->     #13 0xaaad46227de0 in main_loop_wait /qemu/util/main-loop.c:518
->     #14 0xaaad43d9d60c in qemu_main_loop /qemu/softmmu/vl.c:1662:9
->     #15 0xaaad4607a5b0 in main /qemu/softmmu/main.c:49:5
->     #16 0xfffd1a460b9c in __libc_start_main (/lib64/libc.so.6+0x20b9c)
->     #17 0xaaad43320740 in _start (aarch64-softmmu/qemu-system-aarch64+0x2=
-c00740)
->=20
-> 0xfffd149dcfc4 is located 0 bytes to the right of 100-byte region [0xfffd=
-149dcf60,0xfffd149dcfc4)
-> allocated by thread T0 here:
->     #0 0xaaad433d1e70 in __interceptor_malloc (aarch64-softmmu/qemu-syste=
-m-aarch64+0x2cb1e70)
->     #1 0xfffd1af0e254  (/usr/lib64/iscsi/libiscsi.so.8+0xe254)
->     #2 0xfffd1af0d174  (/usr/lib64/iscsi/libiscsi.so.8+0xd174)
->     #3 0xfffd1af19fac  (/usr/lib64/iscsi/libiscsi.so.8+0x19fac)
->     #4 0xaaad45f9acc8 in iscsi_process_read /qemu/block/iscsi.c:403:5
->     #5 0xaaad4623733c in aio_dispatch_handler /qemu/util/aio-posix.c:467:=
-9
->     #6 0xaaad4622f350 in aio_dispatch_handlers /qemu/util/aio-posix.c:510=
-:20
->     #7 0xaaad4622f350 in aio_dispatch /qemu/util/aio-posix.c:520
->     #8 0xaaad46215944 in aio_ctx_dispatch /qemu/util/async.c:298:5
->     #9 0xfffd1bed12f4 in g_main_context_dispatch (/lib64/libglib-2.0.so.0=
-+0x512f4)
->     #10 0xaaad46227de0 in glib_pollfds_poll /qemu/util/main-loop.c:219:9
->     #11 0xaaad46227de0 in os_host_main_loop_wait /qemu/util/main-loop.c:2=
-42
->     #12 0xaaad46227de0 in main_loop_wait /qemu/util/main-loop.c:518
->     #13 0xaaad43d9d60c in qemu_main_loop /qemu/softmmu/vl.c:1662:9
->     #14 0xaaad4607a5b0 in main /qemu/softmmu/main.c:49:5
->     #15 0xfffd1a460b9c in __libc_start_main (/lib64/libc.so.6+0x20b9c)
->     #16 0xaaad43320740 in _start (aarch64-softmmu/qemu-system-aarch64+0x2=
-c00740)
->=20
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> v1->v2:
-> Use MIN() macro for mx_sb_len and sb_len_wr.
-> (Base comments from Michael S. Tsirkin, Stefan Hajnoczi, Kevin Wolf)
->=20
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Prasad J Pandit <ppandit@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Peter Lieven <pl@kamp.de>
-> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> Cc: qemu-block@nongnu.org
-> ---
->  block/iscsi.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+--00000000000053bd2305a3b6086f
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+OK, maybe this version will work better (gmail web interface may be not the
+best one for sending patches):
+----
 
-I think it is resonable to include this in 5.0 too.
+In linux-user multithreaded scenarious CPU could be inited many times with
+the same id,
+so avoid assertions on already present hashtable entry.
 
-Regards,
-Daniel
+Signed-off-by: Nikolay Igotti <igotti@gmail.com>
+---
+ plugins/core.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/plugins/core.c b/plugins/core.c
+index 51bfc94787..889cc6441a 100644
+--- a/plugins/core.c
++++ b/plugins/core.c
+@@ -196,13 +196,10 @@ plugin_register_cb_udata(qemu_plugin_id_t id, enum
+qemu_plugin_event ev,
+
+ void qemu_plugin_vcpu_init_hook(CPUState *cpu)
+ {
+-    bool success;
+-
+     qemu_rec_mutex_lock(&plugin.lock);
+     plugin_cpu_update__locked(&cpu->cpu_index, NULL, NULL);
+-    success =3D g_hash_table_insert(plugin.cpu_ht, &cpu->cpu_index,
++    g_hash_table_insert(plugin.cpu_ht, &cpu->cpu_index,
+                                   &cpu->cpu_index);
+-    g_assert(success);
+     qemu_rec_mutex_unlock(&plugin.lock);
+
+     plugin_vcpu_cb__simple(cpu, QEMU_PLUGIN_EV_VCPU_INIT);
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+2.24.2 (Apple Git-127)
 
+
+
+On Mon, Apr 20, 2020 at 12:51 PM Laurent Vivier <laurent@vivier.eu> wrote:
+
+> Nikolay,
+>
+> the patch seems corrupted by your mailer.
+>
+> CC: Alex and Emilio as this code is theirs.
+>
+> Thanks,
+> Laurent
+>
+> Le 20/04/2020 =C3=A0 11:15, Nikolay Igotti a =C3=A9crit :
+> > In linux-user multithreaded scenarious CPU could be inited many times
+> > with the same id,
+> >
+> > so avoid assertions on already present hashtable entry.
+> >
+> >
+> > Signed-off-by: Nikolay Igotti <igotti@gmail.com <mailto:igotti@gmail.co=
+m
+> >>
+> >
+> > ---
+> >
+> >  plugins/core.c | 5 +----
+> >
+> >  1 file changed, 1 insertion(+), 4 deletions(-)
+> >
+> >
+> > diff --git a/plugins/core.c b/plugins/core.c
+> >
+> > index 51bfc94787..889cc6441a 100644
+> >
+> > --- a/plugins/core.c
+> >
+> > +++ b/plugins/core.c
+> >
+> > @@ -196,13 +196,10 @@ plugin_register_cb_udata(qemu_plugin_id_t id, enu=
+m
+> > qemu_plugin_event ev,
+> >
+> >
+> >
+> >  void qemu_plugin_vcpu_init_hook(CPUState *cpu)
+> >
+> >  {
+> >
+> > -    bool success;
+> >
+> > -
+> >
+> >      qemu_rec_mutex_lock(&plugin.lock);
+> >
+> >      plugin_cpu_update__locked(&cpu->cpu_index, NULL, NULL);
+> >
+> > -    success =3D g_hash_table_insert(plugin.cpu_ht, &cpu->cpu_index,
+> >
+> > +    g_hash_table_insert(plugin.cpu_ht, &cpu->cpu_index,
+> >
+> >                                    &cpu->cpu_index);
+> >
+> > -    g_assert(success);
+> >
+> >      qemu_rec_mutex_unlock(&plugin.lock);
+> >
+> >
+> >
+> >      plugin_vcpu_cb__simple(cpu, QEMU_PLUGIN_EV_VCPU_INIT);
+> >
+> > --
+> >
+> > 2.24.2 (Apple Git-127)
+> >
+>
+>
+
+--00000000000053bd2305a3b6086f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">OK, maybe this version will work better (gmail web interfa=
+ce may be not the best one for sending patches):<div>----</div><div><br></d=
+iv><div>In linux-user multithreaded scenarious CPU could be inited many tim=
+es with the same id,<br>so avoid assertions on already present hashtable en=
+try.<br><br>Signed-off-by: Nikolay Igotti &lt;<a href=3D"mailto:igotti@gmai=
+l.com">igotti@gmail.com</a>&gt;<br>---<br>=C2=A0plugins/core.c | 5 +----<br=
+>=C2=A01 file changed, 1 insertion(+), 4 deletions(-)<br><br>diff --git a/p=
+lugins/core.c b/plugins/core.c<br>index 51bfc94787..889cc6441a 100644<br>--=
+- a/plugins/core.c<br>+++ b/plugins/core.c<br>@@ -196,13 +196,10 @@ plugin_=
+register_cb_udata(qemu_plugin_id_t id, enum qemu_plugin_event ev,<br>=C2=A0=
+<br>=C2=A0void qemu_plugin_vcpu_init_hook(CPUState *cpu)<br>=C2=A0{<br>- =
+=C2=A0 =C2=A0bool success;<br>-<br>=C2=A0 =C2=A0 =C2=A0qemu_rec_mutex_lock(=
+&amp;plugin.lock);<br>=C2=A0 =C2=A0 =C2=A0plugin_cpu_update__locked(&amp;cp=
+u-&gt;cpu_index, NULL, NULL);<br>- =C2=A0 =C2=A0success =3D g_hash_table_in=
+sert(plugin.cpu_ht, &amp;cpu-&gt;cpu_index,<br>+ =C2=A0 =C2=A0g_hash_table_=
+insert(plugin.cpu_ht, &amp;cpu-&gt;cpu_index,<br>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;cpu-&gt;cpu_index);<br>- =C2=A0 =C2=A0g_ass=
+ert(success);<br>=C2=A0 =C2=A0 =C2=A0qemu_rec_mutex_unlock(&amp;plugin.lock=
+);<br>=C2=A0<br>=C2=A0 =C2=A0 =C2=A0plugin_vcpu_cb__simple(cpu, QEMU_PLUGIN=
+_EV_VCPU_INIT);<br>-- <br>2.24.2 (Apple Git-127)<br><div><br></div><div><br=
+></div></div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D=
+"gmail_attr">On Mon, Apr 20, 2020 at 12:51 PM Laurent Vivier &lt;<a href=3D=
+"mailto:laurent@vivier.eu">laurent@vivier.eu</a>&gt; wrote:<br></div><block=
+quote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1=
+px solid rgb(204,204,204);padding-left:1ex">Nikolay,<br>
+<br>
+the patch seems corrupted by your mailer.<br>
+<br>
+CC: Alex and Emilio as this code is theirs.<br>
+<br>
+Thanks,<br>
+Laurent<br>
+<br>
+Le 20/04/2020 =C3=A0 11:15, Nikolay Igotti a =C3=A9crit=C2=A0:<br>
+&gt; In linux-user multithreaded scenarious CPU could be inited many times<=
+br>
+&gt; with the same id,<br>
+&gt; <br>
+&gt; so avoid assertions on already present hashtable entry.<br>
+&gt; <br>
+&gt; <br>
+&gt; Signed-off-by: Nikolay Igotti &lt;<a href=3D"mailto:igotti@gmail.com" =
+target=3D"_blank">igotti@gmail.com</a> &lt;mailto:<a href=3D"mailto:igotti@=
+gmail.com" target=3D"_blank">igotti@gmail.com</a>&gt;&gt;<br>
+&gt; <br>
+&gt; ---<br>
+&gt; <br>
+&gt; =C2=A0plugins/core.c | 5 +----<br>
+&gt; <br>
+&gt; =C2=A01 file changed, 1 insertion(+), 4 deletions(-)<br>
+&gt; <br>
+&gt; <br>
+&gt; diff --git a/plugins/core.c b/plugins/core.c<br>
+&gt; <br>
+&gt; index 51bfc94787..889cc6441a 100644<br>
+&gt; <br>
+&gt; --- a/plugins/core.c<br>
+&gt; <br>
+&gt; +++ b/plugins/core.c<br>
+&gt; <br>
+&gt; @@ -196,13 +196,10 @@ plugin_register_cb_udata(qemu_plugin_id_t id, en=
+um<br>
+&gt; qemu_plugin_event ev,<br>
+&gt; <br>
+&gt; =C2=A0<br>
+&gt; <br>
+&gt; =C2=A0void qemu_plugin_vcpu_init_hook(CPUState *cpu)<br>
+&gt; <br>
+&gt; =C2=A0{<br>
+&gt; <br>
+&gt; -=C2=A0 =C2=A0 bool success;<br>
+&gt; <br>
+&gt; -<br>
+&gt; <br>
+&gt; =C2=A0=C2=A0 =C2=A0 qemu_rec_mutex_lock(&amp;plugin.lock);<br>
+&gt; <br>
+&gt; =C2=A0=C2=A0 =C2=A0 plugin_cpu_update__locked(&amp;cpu-&gt;cpu_index, =
+NULL, NULL);<br>
+&gt; <br>
+&gt; -=C2=A0 =C2=A0 success =3D g_hash_table_insert(plugin.cpu_ht, &amp;cpu=
+-&gt;cpu_index,<br>
+&gt; <br>
+&gt; +=C2=A0 =C2=A0 g_hash_table_insert(plugin.cpu_ht, &amp;cpu-&gt;cpu_ind=
+ex,<br>
+&gt; <br>
+&gt; =C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;cpu-&gt;cpu_in=
+dex);<br>
+&gt; <br>
+&gt; -=C2=A0 =C2=A0 g_assert(success);<br>
+&gt; <br>
+&gt; =C2=A0=C2=A0 =C2=A0 qemu_rec_mutex_unlock(&amp;plugin.lock);<br>
+&gt; <br>
+&gt; =C2=A0<br>
+&gt; <br>
+&gt; =C2=A0=C2=A0 =C2=A0 plugin_vcpu_cb__simple(cpu, QEMU_PLUGIN_EV_VCPU_IN=
+IT);<br>
+&gt; <br>
+&gt; --=C2=A0<br>
+&gt; <br>
+&gt; 2.24.2 (Apple Git-127)<br>
+&gt; <br>
+<br>
+</blockquote></div>
+
+--00000000000053bd2305a3b6086f--
 
