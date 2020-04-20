@@ -2,83 +2,177 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07259C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:45:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61091C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:51:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5495206E9
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:45:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 05882206E9
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 13:51:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N311CnBf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5495206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="FQ8+KLes";
+	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="FQ8+KLes"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05882206E9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQWk0-000059-R3
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 09:45:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44086 helo=eggs1p.gnu.org)
+	id 1jQWpJ-0003b0-Ry
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 09:51:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58306 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lulu@redhat.com>) id 1jQSpT-000414-Sk
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:35:04 -0400
+ (envelope-from <Szabolcs.Nagy@arm.com>) id 1jQTuf-0006pY-74
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:44:29 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <lulu@redhat.com>) id 1jQSpS-0004RH-SS
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:35:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53476
- helo=us-smtp-1.mimecast.com)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jQSpS-0004Qs-EY
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:35:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587375301;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bJFKinKLHaZGvttsOWXRknWuJtcBwLotFDvA1gN9HN0=;
- b=N311CnBfcbqdnWNTAHaMApVyE7M9xh2mC+f3uSdrnwxwmfrLv6IdK2SaPGTxanOp5u0t3I
- L4TwO4zPrOfqlAt6APiHaY+cYU7UNORcHaTV9CJjLgpLoplN0VZONhC1qBO9a2xm2B59MV
- cqn9io2KS37vvP6DJI+wq6tEQsE1tYM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-u-HPlV3NN022kKgYdGuDCA-1; Mon, 20 Apr 2020 05:33:53 -0400
-X-MC-Unique: u-HPlV3NN022kKgYdGuDCA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 985331005513;
- Mon, 20 Apr 2020 09:33:50 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-12-243.pek2.redhat.com [10.72.12.243])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0CF0692FA1;
- Mon, 20 Apr 2020 09:33:31 +0000 (UTC)
-From: Cindy Lu <lulu@redhat.com>
-To: mst@redhat.com, armbru@redhat.com, eblake@redhat.com, cohuck@redhat.com,
- jasowang@redhat.com
-Subject: [RFC v1 2/4] vhost-vdpa: introduce vhost-vdpa net client
-Date: Mon, 20 Apr 2020 17:32:39 +0800
-Message-Id: <20200420093241.4238-3-lulu@redhat.com>
-In-Reply-To: <20200420093241.4238-1-lulu@redhat.com>
-References: <20200420093241.4238-1-lulu@redhat.com>
+ (envelope-from <Szabolcs.Nagy@arm.com>) id 1jQTud-0007ey-Ee
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:44:28 -0400
+Received: from mail-vi1eur05on2056.outbound.protection.outlook.com
+ ([40.107.21.56]:20033 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Szabolcs.Nagy@arm.com>)
+ id 1jQTuc-0007bu-HZ
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 06:44:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pvcXzd494JKhyRsd2rPpybtfKtx34IDVK2punL9p/vs=;
+ b=FQ8+KLesY04Hun2MeFe8zLFLuI9adj/xgMxbqhUp+iH6VVeVak/jU+6LqT0Rr9vVkVzM1rLwiKfPG8GE+QdJMU+NPsT/hHv14ttEW7xhbfW2MTwNWTNWKxqpMdV3H6mlmqymuE0/7F+DQisRKWL6dljAEb0tyteDAX3ZADyQwks=
+Received: from DB7PR05CA0070.eurprd05.prod.outlook.com (2603:10a6:10:2e::47)
+ by AM6PR08MB3237.eurprd08.prod.outlook.com (2603:10a6:209:4c::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.29; Mon, 20 Apr
+ 2020 10:29:18 +0000
+Received: from DB5EUR03FT033.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:10:2e:cafe::28) by DB7PR05CA0070.outlook.office365.com
+ (2603:10a6:10:2e::47) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.25 via Frontend
+ Transport; Mon, 20 Apr 2020 10:29:18 +0000
+Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; nongnu.org; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;nongnu.org; dmarc=bestguesspass action=none
+ header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ DB5EUR03FT033.mail.protection.outlook.com (10.152.20.76) with
+ Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2900.18 via Frontend Transport; Mon, 20 Apr 2020 10:29:17 +0000
+Received: ("Tessian outbound 76e9a4cf1540:v53");
+ Mon, 20 Apr 2020 10:29:17 +0000
+X-CheckRecipientChecked: true
+X-CR-MTA-CID: 4f9fc8c862c322e6
+X-CR-MTA-TID: 64aa7808
+Received: from 4b4ac23e4fb9.1
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com id
+ 939926B4-5EE1-4890-B9DE-60B0028F3E26.1; 
+ Mon, 20 Apr 2020 10:29:12 +0000
+Received: from EUR03-AM5-obe.outbound.protection.outlook.com
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 4b4ac23e4fb9.1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+ Mon, 20 Apr 2020 10:29:12 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DSQUlr3Nv9kcmbLaBTngcSxhjFlRiS4pahEfevBHscT4lvh6KR+qxgfVF5mxLufwU1LfRQ7s8iP7XdBxUyFi6ZvzH8nGtZd3OpIYHEkxY8QLKumQl3kGOWBzyLoGm3/hHUeIXXQ9piDV8MqOLeMnK8cIJcM/6qocIEYyn7Qcqcyw4ZW8sTkdYU6oQXvmvwYealK2kv6siGbjG4vqFWh3jIvqH8TL/iFqN3pcHyCLhdidh1/ZDvp0IUfDlYBHaW+OuSiXag5NzhPuSrBTmByCO7ad+pYUtDqtLzCGn+3IJR+AwKcsZpUkQEIVcqQjcJsK1t4sCEs1pJOGFJ+Omf+I2Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pvcXzd494JKhyRsd2rPpybtfKtx34IDVK2punL9p/vs=;
+ b=FYooqhutrBv1dQKnKCgW19ETeLUofuYsqAz/qYpgj+ic7ousAbIte+ZrgpFhV2jMi2EffA/RLZT4S1rOCxCDw29cmNbb2ygfWWAK/iXtt/shXyXApqm5maFPqaazol6rR6+H2ceWjsIYJLHK2TM/uLMXzUmmIdVPshuURZUwYwH24mKGh/QzkDS7PTgnqJjeodO8xXwPb6kkk6aXP+Y3rvDosp+i4KGlrg+7rAGpz32ARehaQ8BL4GRxg7wXFlIXFe2AdMdzR/UcDBN/lVURfmvhtENBeOm4MkeSmfTQNCkCe/AqH/f5pUOdv7qUZlWHHye6SPPcs01QPxkxiRsHcw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pvcXzd494JKhyRsd2rPpybtfKtx34IDVK2punL9p/vs=;
+ b=FQ8+KLesY04Hun2MeFe8zLFLuI9adj/xgMxbqhUp+iH6VVeVak/jU+6LqT0Rr9vVkVzM1rLwiKfPG8GE+QdJMU+NPsT/hHv14ttEW7xhbfW2MTwNWTNWKxqpMdV3H6mlmqymuE0/7F+DQisRKWL6dljAEb0tyteDAX3ZADyQwks=
+Authentication-Results-Original: spf=none (sender IP is )
+ smtp.mailfrom=Szabolcs.Nagy@arm.com; 
+Received: from AM6PR08MB3047.eurprd08.prod.outlook.com (2603:10a6:209:4c::23)
+ by AM6PR08MB3912.eurprd08.prod.outlook.com (2603:10a6:20b:86::33)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.28; Mon, 20 Apr
+ 2020 10:29:10 +0000
+Received: from AM6PR08MB3047.eurprd08.prod.outlook.com
+ ([fe80::49fd:6ded:4da7:8862]) by AM6PR08MB3047.eurprd08.prod.outlook.com
+ ([fe80::49fd:6ded:4da7:8862%7]) with mapi id 15.20.2921.027; Mon, 20 Apr 2020
+ 10:29:10 +0000
+Date: Mon, 20 Apr 2020 11:29:02 +0100
+From: Szabolcs Nagy <szabolcs.nagy@arm.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: tst-arm-mte bug: PSTATE.TCO is cleared on exceptions
+Message-ID: <20200420102902.GE15401@arm.com>
+Content-Type: multipart/mixed; boundary="r5Pyd7+fXNt84Ff3"
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: SN4PR0401CA0032.namprd04.prod.outlook.com
+ (2603:10b6:803:2a::18) To AM6PR08MB3047.eurprd08.prod.outlook.com
+ (2603:10a6:209:4c::23)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=lulu@redhat.com;
- helo=us-smtp-1.mimecast.com
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from arm.com (217.140.106.55) by
+ SN4PR0401CA0032.namprd04.prod.outlook.com (2603:10b6:803:2a::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.25 via Frontend
+ Transport; Mon, 20 Apr 2020 10:29:09 +0000
+X-Originating-IP: [217.140.106.55]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 8bbfba04-fc87-4198-6ad9-08d7e515ae67
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3912:|AM6PR08MB3237:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3237C98F51FE0264A9A32272EDD40@AM6PR08MB3237.eurprd08.prod.outlook.com>
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Oob-TLC-OOBClassifiers: OLM:6108;OLM:6108;
+X-Forefront-PRVS: 03793408BA
+X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255; CTRY:; LANG:en;
+ SCL:1; SRV:; IPV:NLI; SFV:NSPM; H:AM6PR08MB3047.eurprd08.prod.outlook.com;
+ PTR:; CAT:NONE; SFTY:;
+ SFS:(10009020)(4636009)(376002)(136003)(396003)(39860400002)(366004)(346002)(235185007)(5660300002)(33656002)(6666004)(16526019)(478600001)(44832011)(4326008)(966005)(1076003)(36756003)(8886007)(2906002)(186003)(44144004)(8676002)(7696005)(66556008)(66476007)(66616009)(66946007)(316002)(86362001)(8936002)(81156014)(33964004)(26005)(52116002)(6916009)(2616005)(956004)(55016002)(2700100001);
+ DIR:OUT; SFP:1101; 
+Received-SPF: None (protection.outlook.com: arm.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: TcM6pq18e36deVUUxzfm86bztKcY5CuJVmeM5npLffHYfd/xp5tVFUcVvR3t0kmr9RNJiIzKFlPtbK2XqSsJm7kwkkWK6if4XODt3DLVy+PPgSsy3F/nnZdF+qcAOR3Rfh/aCr+4PubEx2EPlTcwzZ1eVQ/sO2HytuC/FcJTmO4WeLUfVpNrMIC+H+L2BIvqMqIxpwKboHhGTbWq2UcHENCBV+mSK7j0yav+9V9Tsf4kNdkLDkqnK3zaM9uPv9lpqalr3atGsnf1dw0at6bszdQ5hEkTEKjsdnzVRLowE/XTlKYYyiLUm8gTTz2Ykt9yCscQiyLVmQ+i8Cko3u3aJK8W/kRJzLpL/z2HAu/gtmLhqt+3gjxyuJWl2KDcb+W/bCFL/vcHdoqCbcI3ugU/ZIUtZxA5LAk2Rr6hUg1otStHPhAFRlHUbSGjhOQCZldjWxHLVO3QLLgArcCaAhPx3+muN21N7th/Fu84mn+NVU7rCpMP3AfAGP/+ffW4R6YsESc1XYnMZDpRNDfz77OiBMoHU5KW6iBulnrnt36zpq6RW9eLjQzcaMSK63oF5rmi
+X-MS-Exchange-AntiSpam-MessageData: WxlcoHugV6VyOm6jXTehjE7NdQgA/ihNWv0qIU7iblE9/sC5BED2iSggLyVxN62BzvIN3w1Yekde8rPcvy8j4+BNBIQ0YocEWb4z8MgQjc/qqtlIlT9WZnaNHqIq6ls8uXoEbcBscSlVkYjTYO8Adg==
+X-MS-Exchange-Transport-Forked: True
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3912
+Original-Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Szabolcs.Nagy@arm.com; 
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: DB5EUR03FT033.eop-EUR03.prod.protection.outlook.com
+X-Forefront-Antispam-Report: CIP:63.35.35.123; CTRY:IE; LANG:en; SCL:1; SRV:;
+ IPV:CAL; SFV:NSPM; H:64aa7808-outbound-1.mta.getcheckrecipient.com;
+ PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com; CAT:NONE; SFTY:;
+ SFS:(10009020)(4636009)(376002)(136003)(346002)(396003)(39860400002)(46966005)(47076004)(6666004)(8886007)(1076003)(5660300002)(235185007)(55016002)(8936002)(8676002)(33656002)(81156014)(2906002)(4326008)(6862004)(36756003)(86362001)(336012)(956004)(186003)(2616005)(478600001)(16526019)(82740400003)(66616009)(70206006)(70586007)(81166007)(44144004)(356005)(44832011)(316002)(7696005)(33964004)(966005)(26005)(2700100001);
+ DIR:OUT; SFP:1101; 
+X-MS-Office365-Filtering-Correlation-Id-Prvs: 0e12f43d-145f-41ab-9913-08d7e515a9d1
+X-Forefront-PRVS: 03793408BA
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0PHL0y2o6j5VViAagRPLl756b57wQypqsfnDlHOuP117JQMmAEc2IYefODnnsSBFfgVPE+he6e4VMvdvh2hOyiHLuA9Mh7EtbU0QS1OCXVXo8hdIKkLI46CgrvpFwjzZz1Kt1BoXJRxUoacApDeFxtTruX8RpYolq+Ea4KsE8gOMJ8T70vlLde815NywGKTf3ELltuQAHSMcsWoyh9ojAVMlBi0/Hsl7JROBdSiX1JYKEG/z0Dg64oHmeIhoN1h7rX5OyqRccUQJMHwmQC+rOWHt4LlIX5gD1/9y9p9teFajouYrT5+Yz8N/Lqp3ASlE+Us+W0W5YhRBlicEDx3fBcsMTlxPqrMCTN07dvLEoTqMnxDpSEcxPhehgmyS45Wve+u8fND4qeHQn6fNFwOp6FaJKTtKt0JMOoptkJdyHyquYMwOYRS8faY0trI7q6Z0Fr4ary3gHo0bJ5P5k40BDC8iKxZuTL6RW/ZXAx7LqgVQYHNkXuyG2DvSJvcti+Gm7QR1xPXMpVcimcEzcMgKXHMtcyhvpmUNsEFxfatxZjTA8iI7ifhUfcnvygtXMkhiQ2VnYq7rGiaMFnLtD0/VYWgmyxv7V4chLvcKE19h/Styq+AOzfjkdP23F5McXZNc
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Apr 2020 10:29:17.9221 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8bbfba04-fc87-4198-6ad9-08d7e515ae67
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d; Ip=[63.35.35.123];
+ Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3237
+Received-SPF: pass client-ip=40.107.21.56; envelope-from=Szabolcs.Nagy@arm.com;
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 03:29:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
-X-Mailman-Approved-At: Mon, 20 Apr 2020 09:36:04 -0400
+ 06:44:22
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.21.56
+X-Mailman-Approved-At: Mon, 20 Apr 2020 09:36:03 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,377 +184,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
- saugatm@xilinx.com, lulu@redhat.com, hanand@xilinx.com, hch@infradead.org,
- eperezma@redhat.com, jgg@mellanox.com, shahafs@mellanox.com,
- kevin.tian@intel.com, parav@mellanox.com, vmireyno@marvell.com,
- cunming.liang@intel.com, gdawar@xilinx.com, jiri@mellanox.com,
- xiao.w.wang@intel.com, stefanha@redhat.com, zhihong.wang@intel.com,
- aadam@redhat.com, rdunlap@infradead.org, maxime.coquelin@redhat.com,
- lingshan.zhu@intel.com
+Cc: nd@arm.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch set introduces a new net client type: vhost-vdpa.
-vhost-vdpa net client will set up a vDPA device which is svhostdevpecified
-by a "vhostdev" parameter.
+--r5Pyd7+fXNt84Ff3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-Author: Tiwei Bie
-Signed-off-by: Cindy Lu <lulu@redhat.com>
----
- include/net/vhost-vdpa.h |  18 ++++
- include/net/vhost_net.h  |   1 +
- net/Makefile.objs        |   2 +-
- net/clients.h            |   2 +
- net/net.c                |   1 +
- net/vhost-vdpa.c         | 211 +++++++++++++++++++++++++++++++++++++++
- qapi/net.json            |  21 +++-
- 7 files changed, 253 insertions(+), 3 deletions(-)
- create mode 100644 include/net/vhost-vdpa.h
- create mode 100644 net/vhost-vdpa.c
+i'm using the branch at
 
-diff --git a/include/net/vhost-vdpa.h b/include/net/vhost-vdpa.h
-new file mode 100644
-index 0000000000..9ddd538dad
---- /dev/null
-+++ b/include/net/vhost-vdpa.h
-@@ -0,0 +1,18 @@
-+/*
-+ * vhost-vdpa.h
-+ *
-+ * Copyright(c) 2017 Intel Corporation. All rights reserved.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or late=
-r.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef VHOST_VDPA_H
-+#define VHOST_VDPA_H
-+
-+struct vhost_net;
-+struct vhost_net *vhost_vdpa_get_vhost_net(NetClientState *nc);
-+uint64_t vhost_vdpa_get_acked_features(NetClientState *nc);
-+
-+#endif /* VHOST_VDPA_H */
-diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
-index 77e47398c4..6f3a624cf7 100644
---- a/include/net/vhost_net.h
-+++ b/include/net/vhost_net.h
-@@ -39,5 +39,6 @@ int vhost_set_vring_enable(NetClientState * nc, int enabl=
-e);
- uint64_t vhost_net_get_acked_features(VHostNetState *net);
-=20
- int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu);
-+int vhost_set_state(NetClientState *nc, int state);
-=20
- #endif
-diff --git a/net/Makefile.objs b/net/Makefile.objs
-index c5d076d19c..da459cfc19 100644
---- a/net/Makefile.objs
-+++ b/net/Makefile.objs
-@@ -26,7 +26,7 @@ tap-obj-$(CONFIG_SOLARIS) =3D tap-solaris.o
- tap-obj-y ?=3D tap-stub.o
- common-obj-$(CONFIG_POSIX) +=3D tap.o $(tap-obj-y)
- common-obj-$(CONFIG_WIN32) +=3D tap-win32.o
--
-+common-obj-$(CONFIG_VHOST_KERNEL) +=3D vhost-vdpa.o
- vde.o-libs =3D $(VDE_LIBS)
-=20
- common-obj-$(CONFIG_CAN_BUS) +=3D can/
-diff --git a/net/clients.h b/net/clients.h
-index a6ef267e19..92f9b59aed 100644
---- a/net/clients.h
-+++ b/net/clients.h
-@@ -61,4 +61,6 @@ int net_init_netmap(const Netdev *netdev, const char *nam=
-e,
- int net_init_vhost_user(const Netdev *netdev, const char *name,
-                         NetClientState *peer, Error **errp);
-=20
-+int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
-+                        NetClientState *peer, Error **errp);
- #endif /* QEMU_NET_CLIENTS_H */
-diff --git a/net/net.c b/net/net.c
-index ac5080dda1..2beb95388a 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -964,6 +964,7 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIV=
-ER__MAX])(
-         [NET_CLIENT_DRIVER_HUBPORT]   =3D net_init_hubport,
- #ifdef CONFIG_VHOST_NET_USER
-         [NET_CLIENT_DRIVER_VHOST_USER] =3D net_init_vhost_user,
-+        [NET_CLIENT_DRIVER_VHOST_VDPA] =3D net_init_vhost_vdpa,
- #endif
- #ifdef CONFIG_L2TPV3
-         [NET_CLIENT_DRIVER_L2TPV3]    =3D net_init_l2tpv3,
-diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-new file mode 100644
-index 0000000000..5daeba0b76
---- /dev/null
-+++ b/net/vhost-vdpa.c
-@@ -0,0 +1,211 @@
-+/*
-+ * vhost-vdpa.c
-+ *
-+ * Copyright(c) 2017-2018 Intel Corporation. All rights reserved.
-+ * Copyright(c) 2020 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or late=
-r.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "clients.h"
-+#include "net/vhost_net.h"
-+#include "net/vhost-vdpa.h"
-+#include "hw/virtio/vhost-vdpa.h"
-+#include "chardev/char-fe.h"
-+#include "qemu/config-file.h"
-+#include "qemu/error-report.h"
-+#include "qemu/option.h"
-+#include "qapi/error.h"
-+#include "trace.h"
-+#include <linux/vfio.h>
-+#include <sys/ioctl.h>
-+#include <err.h>
-+#include <linux/virtio_net.h>
-+
-+
-+typedef struct VhostVDPAState {
-+    NetClientState nc;
-+    struct vhost_vdpa vhost_vdpa;
-+    VHostNetState *vhost_net;
-+    uint64_t acked_features;
-+    bool started;
-+} VhostVDPAState;
-+
-+VHostNetState *vhost_vdpa_get_vhost_net(NetClientState *nc)
-+{
-+    VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
-+    assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
-+    return s->vhost_net;
-+}
-+
-+uint64_t vhost_vdpa_get_acked_features(NetClientState *nc)
-+{
-+    VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
-+    assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
-+    return s->acked_features;
-+}
-+
-+static void vhost_vdpa_stop(NetClientState *ncs)
-+{
-+    VhostVDPAState *s;
-+
-+    assert(ncs->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
-+
-+    s =3D DO_UPCAST(VhostVDPAState, nc, ncs);
-+
-+    if (s->vhost_net) {
-+        /* save acked features */
-+        uint64_t features =3D vhost_net_get_acked_features(s->vhost_net);
-+        if (features) {
-+            s->acked_features =3D features;
-+         }
-+        vhost_net_cleanup(s->vhost_net);
-+    }
-+}
-+
-+static int vhost_vdpa_start(NetClientState *ncs, void *be)
-+{
-+    VhostNetOptions options;
-+    struct vhost_net *net =3D NULL;
-+    VhostVDPAState *s;
-+
-+    options.backend_type =3D VHOST_BACKEND_TYPE_VDPA;
-+
-+    assert(ncs->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
-+
-+    s =3D DO_UPCAST(VhostVDPAState, nc, ncs);
-+
-+    options.net_backend =3D ncs;
-+    options.opaque      =3D be;
-+    options.busyloop_timeout =3D 0;
-+    net =3D vhost_net_init(&options);
-+    if (!net) {
-+        error_report("failed to init vhost_net for queue");
-+        goto err;
-+     }
-+
-+     if (s->vhost_net) {
-+        vhost_net_cleanup(s->vhost_net);
-+        g_free(s->vhost_net);
-+     }
-+     s->vhost_net =3D net;
-+
-+    return 0;
-+
-+err:
-+    if (net) {
-+        vhost_net_cleanup(net);
-+    }
-+    vhost_vdpa_stop(ncs);
-+    return -1;
-+}
-+static void vhost_vdpa_cleanup(NetClientState *nc)
-+{
-+    VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
-+
-+    if (s->vhost_net) {
-+        vhost_net_cleanup(s->vhost_net);
-+        g_free(s->vhost_net);
-+        s->vhost_net =3D NULL;
-+    }
-+
-+    qemu_purge_queued_packets(nc);
-+}
-+
-+static bool vhost_vdpa_has_vnet_hdr(NetClientState *nc)
-+{
-+    assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
-+
-+    return true;
-+}
-+
-+static bool vhost_vdpa_has_ufo(NetClientState *nc)
-+{
-+    assert(nc->info->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
-+    VhostVDPAState *s =3D DO_UPCAST(VhostVDPAState, nc, nc);
-+    uint64_t  features =3D 0;
-+
-+    features |=3D (1ULL << VIRTIO_NET_F_HOST_UFO);
-+    features =3D vhost_net_get_features(s->vhost_net, features);
-+    return !!(features & (1ULL << VIRTIO_NET_F_HOST_UFO));
-+
-+}
-+
-+static NetClientInfo net_vhost_vdpa_info =3D {
-+        .type =3D NET_CLIENT_DRIVER_VHOST_VDPA,
-+        .size =3D sizeof(VhostVDPAState),
-+        .cleanup =3D vhost_vdpa_cleanup,
-+        .has_vnet_hdr =3D vhost_vdpa_has_vnet_hdr,
-+        .has_ufo =3D vhost_vdpa_has_ufo,
-+};
-+
-+static int net_vhost_vdpa_init(NetClientState *peer, const char *device,
-+                               const char *name, const char *vhostdev)
-+{
-+    NetClientState *nc =3D NULL;
-+    VhostVDPAState *s;
-+    int vdpa_device_fd;
-+    assert(name);
-+
-+    nc =3D qemu_new_net_client(&net_vhost_vdpa_info, peer, device, name);
-+    snprintf(nc->info_str, sizeof(nc->info_str), "vhost-vdpa");
-+    nc->queue_index =3D 0;
-+
-+    s =3D DO_UPCAST(VhostVDPAState, nc, nc);
-+
-+    vdpa_device_fd =3D open(vhostdev, O_RDWR);
-+    if (vdpa_device_fd =3D=3D -1) {
-+        return -errno;
-+    }
-+    s->vhost_vdpa.device_fd =3D vdpa_device_fd;
-+    vhost_vdpa_start(nc, (void *)&s->vhost_vdpa);
-+
-+    assert(s->vhost_net);
-+
-+    return 0;
-+}
-+
-+static int net_vhost_check_net(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    const char *name =3D opaque;
-+    const char *driver, *netdev;
-+
-+    driver =3D qemu_opt_get(opts, "driver");
-+    netdev =3D qemu_opt_get(opts, "netdev");
-+
-+    if (!driver || !netdev) {
-+        return 0;
-+    }
-+
-+    if (strcmp(netdev, name) =3D=3D 0 &&
-+        !g_str_has_prefix(driver, "virtio-net-")) {
-+        error_setg(errp, "vhost-vdpa requires frontend driver virtio-net-*=
-");
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
-+                        NetClientState *peer, Error **errp)
-+{
-+    const NetdevVhostVDPAOptions *vhost_vdpa_opts;
-+
-+    assert(netdev->type =3D=3D NET_CLIENT_DRIVER_VHOST_VDPA);
-+    vhost_vdpa_opts =3D &netdev->u.vhost_vdpa;
-+
-+    /* verify net frontend */
-+    if (qemu_opts_foreach(qemu_find_opts("device"), net_vhost_check_net,
-+                          (char *)name, errp)) {
-+        return -1;
-+    }
-+
-+
-+    return net_vhost_vdpa_init(peer, "vhost_vdpa", name,
-+                               vhost_vdpa_opts->vhostdev);
-+
-+    return 0;
-+}
-diff --git a/qapi/net.json b/qapi/net.json
-index 335295be50..35a5ccee39 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -441,6 +441,22 @@
-     '*queues':        'int' } }
-=20
- ##
-+# @NetdevVhostVDPAOptions:
-+#
-+# Vhost-vdpa network backend
-+#
-+# @vhostdev: name of a mdev dev path in sysfs
-+#
-+# @queues: number of queues to be created for multiqueue vhost-vdpa
-+#          (default: 1) (Since 2.11)
-+#
-+# Since: 2.11
-+##
-+{ 'struct': 'NetdevVhostVDPAOptions',
-+  'data': {
-+    '*vhostdev':     'str',
-+    '*queues':       'int' } }
-+##
- # @NetClientDriver:
- #
- # Available netdev drivers.
-@@ -451,7 +467,7 @@
- ##
- { 'enum': 'NetClientDriver',
-   'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
--            'bridge', 'hubport', 'netmap', 'vhost-user' ] }
-+            'bridge', 'hubport', 'netmap', 'vhost-user', 'vhost-vdpa' ] }
-=20
- ##
- # @Netdev:
-@@ -479,7 +495,8 @@
-     'bridge':   'NetdevBridgeOptions',
-     'hubport':  'NetdevHubPortOptions',
-     'netmap':   'NetdevNetmapOptions',
--    'vhost-user': 'NetdevVhostUserOptions' } }
-+    'vhost-user': 'NetdevVhostUserOptions',
-+    'vhost-vdpa': 'NetdevVhostVDPAOptions' } }
-=20
- ##
- # @NetLegacy:
---=20
-2.21.1
+https://github.com/rth7680/qemu/tree/tgt-arm-mte
 
+to test armv8.5-a mte and hope this is ok to report bugs here.
+
+i'm doing tests in qemu-system-aarch64 with linux userspace
+code and it seems TCO bit gets cleared after syscalls or other
+kernel entry, but PSTATE is expected to be restored, so i
+suspect it is a qemu bug.
+
+i think the architecture saves/restores PSTATE using SPSR_ELx
+on exceptions.
+
+i used the linux branch
+https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/log/?h=devel/mte-v2
+
+attached a reproducer that segfaults in qemu but should work.
+
+thanks.
+
+--r5Pyd7+fXNt84Ff3
+Content-Type: text/x-csrc; charset=utf-8
+Content-Disposition: attachment; filename="bug.c"
+
+// CFLAGS = -march=armv8.5-a+memtag
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/prctl.h>
+
+#define TAG_SHIFT 56
+
+#ifndef PROT_MTE
+#define PROT_MTE 0x20
+#endif
+#ifndef PR_SET_TAGGED_ADDR_CTRL
+#define PR_SET_TAGGED_ADDR_CTRL 55
+#define PR_GET_TAGGED_ADDR_CTRL 56
+#define PR_TAGGED_ADDR_ENABLE 1UL
+#endif
+#ifndef PR_MTE_TCF_SYNC
+#define PR_MTE_TCF_SYNC 2UL
+#define PR_MTE_TAG_SHIFT 3
+#endif
+
+int main()
+{
+	if (prctl(PR_SET_TAGGED_ADDR_CTRL, PR_TAGGED_ADDR_ENABLE|PR_MTE_TCF_SYNC|(0xffff << PR_MTE_TAG_SHIFT), 0, 0, 0))
+		abort();
+
+	unsigned long *a = mmap(0, 1<<12, PROT_READ|PROT_WRITE|PROT_MTE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+	if (a == MAP_FAILED)
+		abort();
+
+	// tag ptr a
+	a = (void*)((unsigned long)a|(1UL<<TAG_SHIFT));
+
+	// tag memory a[0], a[1]
+	asm volatile ("stg %1, %0" : "=Q"(*a) : "r"(a));
+
+	// turn tag checks off
+	asm volatile ("msr tco, 1");
+
+	a[0]=1; // ok
+	a[1]=2; // ok
+	a[2]=3; // tag mismatch but tco==1 so ok
+
+	write(1, "foo\n", 4);
+
+	// PSTATE.TCO (bit 25) should be still set after the syscall
+	unsigned long x;
+	asm volatile ("mrs %0, tco" : "=r"(x));
+	printf("tco = 0x%lx\n", x);
+
+	a[3]=4; // tag mismatch, segfaults if tco==0
+	return 0;
+}
+
+--r5Pyd7+fXNt84Ff3--
 
