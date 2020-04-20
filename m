@@ -6,115 +6,125 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B48C54FCC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 07:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 277DAC3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 07:30:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B227A20BED
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 07:26:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6293206E9
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 07:30:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ktylaURl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B227A20BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NhngOQao"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6293206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQQoz-00033V-Pc
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 03:26:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45078 helo=eggs1p.gnu.org)
+	id 1jQQsd-0004TR-3e
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 03:30:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45572 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQQoG-0002KB-61
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:25:41 -0400
+ (envelope-from <david@redhat.com>) id 1jQQrk-0003hh-Sf
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:29:17 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQQoE-0001CA-Oi
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:25:39 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:43066)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQQoE-0001A1-CV
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:25:38 -0400
-Received: by mail-ed1-x542.google.com with SMTP id p16so1933578edm.10
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 00:25:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=aH/KnVnj+CC50R3TvHIxeVyWVAu1zzzwHnXnwkNRYXc=;
- b=ktylaURlB+O8iXN0nrY5GEKIlXxCmn3CQrxUpG1vsEmNpOms26WNV6BnbxKshbJ75A
- tbJWm4L2f6wZgrisuor8jFWMMx9XCI6OHkeRQma9JoocUcTN+nJA0CC1Fh0FeZk0tBUk
- wTV1mY2wE5BsY9hxEYtAoAGNfpOuoRraGUDPsGKBmIuJ0hGPHNWOoZSqz1IFiwwfNqw4
- w7O985n8lz6Oti4tVXWAa1bc2hAA6z4QruztomEfxRqFn9TT/NGJcd9pHc3w7BLoAdVT
- o0RV/C0VZe1tUd1hi5UwC7ukpKMfC/Lz1wrxUGFAgSfzUNUwAmXjRlfaHDFbqBK47Oh+
- Xz4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=aH/KnVnj+CC50R3TvHIxeVyWVAu1zzzwHnXnwkNRYXc=;
- b=MV0nemHYFnFzKgtVpVYzZrUTFsWvnzah/XVz46LKQV9elFF7cHjWYQP+oU0JgNjm/P
- HzGr/XDTCxu3ERc1T9JzOpr6TKcbpb9ScbiAVy/0qqLI3L19vnXiM15Kmo/8bK/0POaC
- 15S8s7o7KNB8rc8RrPXP0hjkbW6x/wMmfTsXc4aw+ThopC+03wAKlW8rJCzASan3cwzP
- 4Q3rhjuKxBW0WGFdJ2zfi+G6wkvEiU5H7paDDcuKyKRxDVcBiPO8fzLKK6Rvo0UgoHA+
- S5x6q7vWE+zIcTDXjAcRd4fO9KuTjI3XDkaqkATZyR274QyvNSyNGgEZGbO6ko2hs+bM
- gQ/A==
-X-Gm-Message-State: AGi0PuZ0YiFfsu0QNCTuXlq6jMzsPSCupR4qe0BVXzmC5cA0QvybEG+1
- olXxwdxDrS+Gn39Sh0XkK+U=
-X-Google-Smtp-Source: APiQypIDr+ZbTfK992nowlqr/tST/BQwQTY/4LoXoYvggaUL+Xc9dB6SPaNw8Jn140cYm2f+GhClFA==
-X-Received: by 2002:a50:e8cc:: with SMTP id l12mr13368404edn.204.1587367536742; 
- Mon, 20 Apr 2020 00:25:36 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id l7sm53008ejx.82.2020.04.20.00.25.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 20 Apr 2020 00:25:36 -0700 (PDT)
-Subject: Re: [PATCH v2 4/6] dwc-hsotg USB host controller emulation
-To: Paul Zimmerman <pauldzim@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
-References: <20200329001705.15966-1-pauldzim@gmail.com>
- <20200329001705.15966-5-pauldzim@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <2a1d3776-0a6b-360e-0c71-9b48fda8dd98@amsat.org>
-Date: Mon, 20 Apr 2020 09:25:34 +0200
+ (envelope-from <david@redhat.com>) id 1jQQrj-0005SS-6i
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:29:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38948
+ helo=us-smtp-1.mimecast.com)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jQQri-0005Rd-Ni
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 03:29:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587367753;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Th2R33s/Q93/7KDLTWo4z+ClukKFDbaTUV//s3PBikQ=;
+ b=NhngOQaoFzW3j9DOaa6q4W/x74qF8DxjfQdkqpH92EVMcoCntDSG2FTRbGNQPXnWNvvu/W
+ gOvo/w5XNmskmQGtdzWvEfVU/ryRNNQcgaMepPbJXgA6rIj4DP0RRfV89Bs93Heixg5Cng
+ JpCU2nyncEI+ukqiSDPGYbzTt+pP4OU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-58nkqaKjMKikKKj66qb_Mg-1; Mon, 20 Apr 2020 03:29:11 -0400
+X-MC-Unique: 58nkqaKjMKikKKj66qb_Mg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A929107ACC9;
+ Mon, 20 Apr 2020 07:29:09 +0000 (UTC)
+Received: from [10.36.114.7] (ovpn-114-7.ams2.redhat.com [10.36.114.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EDC7E5C1C3;
+ Mon, 20 Apr 2020 07:29:07 +0000 (UTC)
+Subject: Re: [PATCH 2/7] target/s390x: Use tcg_gen_gvec_dup_imm
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200418150411.1831-1-richard.henderson@linaro.org>
+ <20200418150411.1831-3-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <d5c0ab35-c186-c7e9-9d24-6e686a59df1b@redhat.com>
+Date: Mon, 20 Apr 2020 09:29:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200329001705.15966-5-pauldzim@gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200418150411.1831-3-richard.henderson@linaro.org>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x542.google.com
-X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::542
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
+ 03:29:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,87 +136,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: peter.maydell@linaro.org, zhiwei_liu@c-sky.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/29/20 1:17 AM, Paul Zimmerman wrote:
-> Add the dwc-hsotg (dwc2) USB host controller emulation code.
-> Based on hw/usb/hcd-ehci.c and hw/usb/hcd-ohci.c.
+On 18.04.20 17:04, Richard Henderson wrote:
+> The gen_gvec_dupi switch is unnecessarily with the new function.
+> Replace it with a local gen_gvec_dup_imm that takes care of the
+> register to offset conversion and length arguments.
 > 
-> Note that to use this with the dwc-otg driver in the Raspbian
-> kernel, you must pass the option "dwc_otg.fiq_fsm_enable=0" on
-> the kernel command line.
+> Drop zero_vec and use use gen_gvec_dup_imm with 0.
 > 
-> Emulation of slave mode and of descriptor-DMA mode has not been
-> implemented yet. These modes are seldom used.
-> 
-> I have used some on-line sources of information while developing
-> this emulation, including:
-> 
-> http://www.capital-micro.com/PDF/CME-M7_Family_User_Guide_EN.pdf
-> has a pretty complete description of the controller starting on
-> page 370.
-> 
-> https://sourceforge.net/p/wive-ng/wive-ng-mt/ci/master/tree/docs/DataSheets/RT3050_5x_V2.0_081408_0902.pdf
-> has a description of the controller registers starting on page
-> 130.
-> 
-> Signed-off-by: Paul Zimmerman <pauldzim@gmail.com>
-> ---
->  hw/usb/hcd-dwc2.c   | 1301 +++++++++++++++++++++++++++++++++++++++++++
->  hw/usb/trace-events |   47 ++
->  2 files changed, 1348 insertions(+)
->  create mode 100644 hw/usb/hcd-dwc2.c
-[...]
-> +static void dwc2_hreg2_write(void *ptr, hwaddr addr, uint64_t val,
-> +                             unsigned size)
-> +{
-> +    uint64_t orig = val;
-> +
-> +    /* TODO - implement FIFOs to support slave mode */
-> +    val &= 0xffffffff;
-> +    trace_usb_dwc2_hreg2_write(addr, addr >> 12, orig, 0, val);
-> +}
-> +
-[...]
- +
-> +static const MemoryRegionOps dwc2_mmio_hreg2_ops = {
-> +    .read = dwc2_hreg2_read,
-> +    .write = dwc2_hreg2_write,
-> +    .valid.min_access_size = 4,
-> +    .valid.max_access_size = 4,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +};
-[...]
-> +static void dwc2_init(DWC2State *s, DeviceState *dev)
-> +{
-> +    s->usb_frame_time = NANOSECONDS_PER_SECOND / 1000;          /* 1000000 */
-> +    if (NANOSECONDS_PER_SECOND >= USB_HZ_FS) {
-> +        s->usb_bit_time = NANOSECONDS_PER_SECOND / USB_HZ_FS;   /* 83.3 */
-> +    } else {
-> +        s->usb_bit_time = 1;
-> +    }
-> +
-> +    s->fi = 11999;
-> +
-> +    memory_region_init(&s->mem, OBJECT(dev), "dwc2", DWC2_MMIO_SIZE);
-> +    memory_region_init_io(&s->mem_glbreg, OBJECT(dev), &dwc2_mmio_glbreg_ops, s,
-> +                          "global", 0x70);
-> +    memory_region_init_io(&s->mem_fszreg, OBJECT(dev), &dwc2_mmio_fszreg_ops, s,
-> +                          "hptxfsiz", 0x4);
-> +    memory_region_init_io(&s->mem_hreg0, OBJECT(dev), &dwc2_mmio_hreg0_ops, s,
-> +                          "host", 0x44);
-> +    memory_region_init_io(&s->mem_hreg1, OBJECT(dev), &dwc2_mmio_hreg1_ops, s,
-> +                          "host channels", 0x20 * NB_CHAN);
-> +    memory_region_init_io(&s->mem_pcgreg, OBJECT(dev), &dwc2_mmio_pcgreg_ops, s,
-> +                          "power/clock", 0x8);
-> +    memory_region_init_io(&s->mem_hreg2, OBJECT(dev), &dwc2_mmio_hreg2_ops, s,
-> +                          "host fifos", NB_CHAN * 0x1000);
-[...]
-What is this region used for? 64KB of packet buffer sram? I'm wondering
-if this shouldn't be created with a memory_region_init_ram() call actually.
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Nice cleanup, thanks!
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+
+-- 
+Thanks,
+
+David / dhildenb
 
 
