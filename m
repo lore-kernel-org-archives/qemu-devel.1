@@ -6,83 +6,81 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E417C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 14:14:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0949C3A5A0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 14:17:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57CF920B1F
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 14:14:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B49520B1F
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 14:17:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZo7vKIe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57CF920B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e7niXEAb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B49520B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQXBY-0006uB-H6
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 10:14:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43836 helo=eggs1p.gnu.org)
+	id 1jQXEU-0001oJ-NG
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 10:17:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44304 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jQXAf-0005py-Aj
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 10:13:14 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jQXDq-0001PQ-Gj
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 10:16:30 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jQXAe-0000jJ-8Q
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 10:13:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31040
- helo=us-smtp-1.mimecast.com)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jQXAd-0000e3-L2
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 10:13:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587391989;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=upgZfHQPc+HrjbtbJkZjyDq2+PrCjWbIWR0YLVu16rw=;
- b=ZZo7vKIe+td996Y2/ENiM+iEZKg8lgZ/zA9Cgg17UcLFuWSpC+cWByHfmuNUrP+XS6fk2l
- jotvu2QLAq32zTBC2fulWYbMEWjGJ+2Gz9oSxaY9nXrnOSBfUAFeS1z7r2+7vdoMRZlSNZ
- p2k1JHkkE7qpKH7JWhkaBBEnMXcFwRU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-aZFES6-QMNyPYIpW7JL0fw-1; Mon, 20 Apr 2020 10:13:07 -0400
-X-MC-Unique: aZFES6-QMNyPYIpW7JL0fw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62F37800D5C;
- Mon, 20 Apr 2020 14:13:06 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
- [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0B72B60C80;
- Mon, 20 Apr 2020 14:13:05 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id BC83516E2C; Mon, 20 Apr 2020 16:13:03 +0200 (CEST)
-Date: Mon, 20 Apr 2020 16:13:03 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [edk2-discuss] Load Option passing. Either bugs or my confusion.
-Message-ID: <20200420141303.dxjqgvmzglrjtsly@sirius.home.kraxel.org>
-References: <623b1855-285c-cce3-c806-c17e5fd217ea@redhat.com>
- <5211.1586899245384995995@groups.io>
- <a972450d-8834-ae87-e4e3-5263a41d1735@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jQXDp-0003wF-7Y
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 10:16:30 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35761)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jQXDo-0003th-GQ
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 10:16:28 -0400
+Received: by mail-ot1-x344.google.com with SMTP id e20so8218087otl.2
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 07:16:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=hkugNSUCGf3cfZwlCyGaI8wXlqNC6+5VcP9fYiHhc0U=;
+ b=e7niXEAbvSRqBiTADpU10S+vy4G0bJXBzYiUiFy5BWhFqfEMVtUDiCJOEnu2rpkC9S
+ LyVWdkIAW/SWnQiTC00fJFmcDe24MOWwkIhMXXqS9nuJl7u/4dloA+yiSxbfKU4VSBYa
+ 9MSeXDwaJRtoxKAD5Vzul/GQiMlAFppl1Abk97ibf15Wlh5x6V8QLVzNq3c7wZgsvfvG
+ bvFopOpQItIRPZLoSmt75oyXA4x9vH3RMILgIQcCHH53mqZYXvzjVwZlytmgSJMnntKK
+ vUxcBi4plcfCLwH5OLsgPS8PDzvfYvkBL9l4D7yI+M98cCgsBNlFvz8AKqLkTE+oeoQ2
+ 3/Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=hkugNSUCGf3cfZwlCyGaI8wXlqNC6+5VcP9fYiHhc0U=;
+ b=tUfb/PJJ5UU7K/kzK6dp26Mo5H55T3wSjEvMtItQslju2VEDcd85gl89ZgbZgFLxds
+ 26kt9wIqZKz5ePb+1NjWDaWg34RjNWS6SWdEnVH7BLMz5hWH5N8jSaK/Nipq8RjxdFMV
+ nUDA7p/QSJpawmQXQRaYF9IAtinSChhAhQSjiQ3ptiUXNvokw1HA8DyaDBgply2MyZeA
+ cBRjEH2TRXBMpDDUFRAhWN4E+fbhc+9k6sLmYF8lP/mfz9crKwzxo18pbzWDJRqlYQcP
+ Eg6Zk3ON9lO2ErW3IB/SSo6jMiUwxvfr2qzLPOQLnMDqUc8eWVmqnHXd+JD27Eh5E/om
+ h33Q==
+X-Gm-Message-State: AGi0PuZ3y/4SW6Lewg9CO1AmTBSWF887Ijcu4tPALZpN/RrpH0R7wWEj
+ jyx0w/isZ7GVh/3g4dhab+LqybVNhsMDH4Ee47z5IQ==
+X-Google-Smtp-Source: APiQypIp1ELmzB5fG9uX2pq2H9g1KwYn5DLvW7xYOQHxUmsRNv0kKcTM1U3+9AGGZkAeL5s2GwWGOE1UtDZR/44XhdQ=
+X-Received: by 2002:a05:6830:22dc:: with SMTP id
+ q28mr9240147otc.221.1587392185768; 
+ Mon, 20 Apr 2020 07:16:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a972450d-8834-ae87-e4e3-5263a41d1735@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 04:32:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <20200331133536.3328-1-linus.walleij@linaro.org>
+ <CAFEAcA9Gep1HN+7WJHencp9g2uUBLhagxdgjHf-16AOdP5oOjg@mail.gmail.com>
+ <87v9luwgc6.fsf@mid.deneb.enyo.de>
+ <CAFEAcA-No3Z95+UQJZWTxDesd-z_Y5XnyHs6NMpzDo3RVOHQ4w@mail.gmail.com>
+In-Reply-To: <CAFEAcA-No3Z95+UQJZWTxDesd-z_Y5XnyHs6NMpzDo3RVOHQ4w@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Apr 2020 15:16:14 +0100
+Message-ID: <CAFEAcA-ExeobtFswHPh3krV0K_9HdJmS7eJ2hvtzET+Hho6ESw@mail.gmail.com>
+Subject: Re: [PATCH] fcntl: Add 32bit filesystem mode
+To: Florian Weimer <fw@deneb.enyo.de>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,34 +92,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hou Qiming <hqm03ster@gmail.com>,
- edk2-devel-groups-io <devel@edk2.groups.io>,
- qemu devel list <qemu-devel@nongnu.org>, discuss@edk2.groups.io,
- valerij zaporogeci <vlrzprgts@gmail.com>
+Cc: Theodore Ts'o <tytso@mit.edu>, Linux API <linux-api@vger.kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Andreas Dilger <adilger.kernel@dilger.ca>, Andy Lutomirski <luto@kernel.org>,
+ linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ Ext4 Developers List <linux-ext4@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+On Mon, 20 Apr 2020 at 12:38, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Whoops, good point. I was testing this via lkvm, so it's
+> actually using a 9p filesystem... I'll see if I can figure
+> out how to test with an ext3 fs, which I think is the one
+> we most care about.
 
-> So I would say that the symptom you see is a QEMU v4.1.0 regression. The
-> QemuRamfbGraphicsOutputSetMode() function in the OVMF ramfb driver
-> certainly needs the QemuFwCfgWriteBytes() call to work, for changing the
-> resolution.
+After some effort wrestling with kvmtool (which assumes that
+if you provide it a disk image then you must have wanted that
+to be your rootfs and can only be persuaded otherwise via
+some undocumented and arcane options), I did a test with ext4:
 
-Oh?  QemuRamfbGraphicsOutputSetMode() can be called multiple times?
-How does that happen?
+bash-4.4# /qemu-no-fix /readdir-bug
+dir=0x76108
+readdir(dir)=(nil)
+errno=75: Value too large for defined data type
+bash-4.4# /qemu-fixed /readdir-bug
+dir=0x76108
+readdir(dir)=0x76128
+errno=0: Success
 
-> (1) Registering a device reset handler in QEMU seems sufficient, so that
-> QEMU forget about the currently shared RAMFB area at platform reset.
+(where the host kernel has Linus' fcntl patch, qemu-no-fix
+is a current-git-master QEMU and qemu-fixed is one with
+the patch in my previous email).
 
-That happens.  After system reset you can write configuration again (once).
+So for Linus' patch:
 
-The guest os should not play with ramfb.  It is supposed to be setup by
-the firmware (ovmf driver or vgabios rom) as boot display, then never be
-re-configured again ...
+Tested-by: Peter Maydell <peter.maydell@linaro.org>
 
-cheers,
-  Gerd
+If 9pfs could be persuaded to honour the fcntl flag too
+that would be really nice.
 
+thanks
+-- PMM
 
