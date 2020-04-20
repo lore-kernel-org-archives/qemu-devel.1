@@ -2,94 +2,88 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5BC7C3A5A0
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 14:54:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D082C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 14:54:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 808AC206F6
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 14:54:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2890B206F6
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 14:54:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T7a+Lm1I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 808AC206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TTULF9BZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2890B206F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQXoP-0007Ln-MZ
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 10:54:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52166 helo=eggs1p.gnu.org)
+	id 1jQXov-0008C2-9B
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 10:54:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52472 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jQXmg-0005UT-NN
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 10:52:43 -0400
+ (envelope-from <eblake@redhat.com>) id 1jQXoC-0007Jr-5B
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 10:54:04 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jQXmg-0002tU-0f
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 10:52:30 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:45731)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jQXmf-0002sj-Eo
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 10:52:29 -0400
-Received: by mail-pl1-x641.google.com with SMTP id t4so4019408plq.12
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 07:52:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=J+uwfEwyRnK8DOL9JKG81u9mxQBFG59HTmCjsFLrV6o=;
- b=T7a+Lm1I8/Ninpijn6kXG8hQFXulrNN8JVW2Ejwu8cFf1745EvAS4grKxdj4F3HYTh
- V6aaKQH+6zQUP6DpykClExswA7yzi46Erh6+pHn+rImAa3I23u+VFY7dbFwC8rhOB22A
- prRWQr//Pv0PipYBmllPoHnh7yauRGGjtTiikcmtON/C83a+8L6AuaO9QBVe8ey4Z7D8
- cYht1i2Cgqgr2g/lIWgQlt0bASnTX0jsVeEEBY1gLEPI0m8lHHZQI87xVh8JFsXAj9WZ
- Twg7EJUPigPkmrMmXD6PcTjjpaf25pm2OwuOCXCaCBW3QTKgRzUMBEFdGAa5S2CCpJCe
- KN/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=J+uwfEwyRnK8DOL9JKG81u9mxQBFG59HTmCjsFLrV6o=;
- b=dQqBRstxdBnakvuTHAJtJkPWzZHgu+KouVrHVgDOZ7YNiFkqjgMgJ2xmqSVwV5xw3m
- FLsVBZjz4slaUasEBJfLho6minzuIFY9bwFiHpJ2McoFWsBsfbhTEihMlbw3HBBtP0Aw
- tDbfxjF604Kxkkjz95Zfl1UH6XkGRr6havUq/c8jQkl7VGyOLPtzx6TnXoQQb3yRyoAr
- QJZNked9U231Inr3+bXFxWnp/NQ9tFtA/Pu9/tqM/O3g7H7Y7azDyrhB4D9LMZJVVKr+
- dlrHn94+cuwI9qbbESbx+FR3nphysAplVKURrEXBTPy+S9bOu0zkUe4zb11Ghozbsqil
- kdCg==
-X-Gm-Message-State: AGi0PuYF1IOHDhw5PsT6xXDYFOEKE4T49wScl9LYInkL3BLwsyWg14+Z
- wURdnXat4s9HAzqt+KlBLwxmcg==
-X-Google-Smtp-Source: APiQypLniQ1IPquR0CbJf0QHMFDE4Ok9/JZCP+jCDa2/OHtoEdoXzbFQWUGES4Dfk+ZmcZBIVLKafQ==
-X-Received: by 2002:a17:902:aa84:: with SMTP id
- d4mr17581824plr.158.1587394348049; 
- Mon, 20 Apr 2020 07:52:28 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id n23sm1366924pjq.18.2020.04.20.07.52.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 20 Apr 2020 07:52:27 -0700 (PDT)
-Subject: Re: [PATCH 7/7] tcg: Add tcg_gen_gvec_dup_tl
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20200418150411.1831-1-richard.henderson@linaro.org>
- <20200418150411.1831-8-richard.henderson@linaro.org>
- <9dbf61fc-7689-605f-a4ee-0b17e852192a@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e90bcb7b-f26b-4a17-7d9e-022a7da41223@linaro.org>
-Date: Mon, 20 Apr 2020 07:52:25 -0700
+ (envelope-from <eblake@redhat.com>) id 1jQXoB-0004jJ-Jh
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 10:54:03 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60338
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jQXoB-0004gR-6Q
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 10:54:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587394442;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cHla7/0fqJN0xvAHmbJzMdg9/slOHDcGCRxkml7MEyg=;
+ b=TTULF9BZjomGuNvXCj952U7jQa7lw+G/rml8M9Y5/SKTp3IB3AFH52+t9HPVKIR+h5U5+R
+ PWLHBnP0A+QpgRpyIfJHvGykISv6M1eWTxuIbsih8oZ5BdvFUHxTjVqegJCUM214FFPP7Y
+ jvchryd9T5izzfGm6ZtPkA2GJNeHR3k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-116-TCr0QfBmNSWAm1-FWmce4w-1; Mon, 20 Apr 2020 10:54:00 -0400
+X-MC-Unique: TCr0QfBmNSWAm1-FWmce4w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41762805744;
+ Mon, 20 Apr 2020 14:53:59 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2AE6D120AFD;
+ Mon, 20 Apr 2020 14:53:55 +0000 (UTC)
+Subject: Re: [PATCH v1 2/2] migration/xbzrle: add encoding rate
+To: Wei Wang <wei.w.wang@intel.com>, qemu-devel@nongnu.org,
+ quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+References: <1587352003-3312-1-git-send-email-wei.w.wang@intel.com>
+ <1587352003-3312-3-git-send-email-wei.w.wang@intel.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <c291eede-8187-5f95-7939-3bdcf4a832e2@redhat.com>
+Date: Mon, 20 Apr 2020 09:53:54 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <9dbf61fc-7689-605f-a4ee-0b17e852192a@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1587352003-3312-3-git-send-email-wei.w.wang@intel.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
-X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::641
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
+ 09:01:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,23 +95,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, zhiwei_liu@c-sky.com, david@gibson.dropbear.id.au
+Cc: gloryxiao@tencent.com, kevin.tian@intel.com, yi.y.sun@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/20/20 12:30 AM, David Hildenbrand wrote:
->> +#if TARGET_LONG_BITS == 64
->> +# define tcg_gen_gvec_dup_tl  tcg_gen_gvec_dup_i64
->> +#else
->> +# define tcg_gen_gvec_dup_tl  tcg_gen_gvec_dup_i32
->> +#endif
->> +
+On 4/19/20 10:06 PM, Wei Wang wrote:
+> Users may need to check the xbzrle encoding rate to know if the guest
+> memory is xbzrle encoding-friendly, and dynamically turn off the
+> encoding if the encoding rate is low.
 > 
-> Any user in mind?
+> Signed-off-by: Yi Sun <yi.y.sun@intel.com>
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> ---
 
-riscv -- the in-progress patches have some ifdefs that could be avoided.
+In addition to Dan's review comments,
 
+> +++ b/qapi/migration.json
+> @@ -70,6 +70,8 @@
+>   #
+>   # @cache-miss-rate: rate of cache miss (since 2.1)
+>   #
+> +# @encoding-rate: rate of cache miss
 
-r~
+This is missing a '(since 5.1)' tag.
+
+> +#
+>   # @overflow: number of overflows
+>   #
+>   # Since: 1.2
+> @@ -77,7 +79,7 @@
+>   { 'struct': 'XBZRLECacheStats',
+>     'data': {'cache-size': 'int', 'encoded_size': 'int', 'pages': 'int',
+>              'cache-miss': 'int', 'cache-miss-rate': 'number',
+> -           'overflow': 'int' } }
+> +           'encoding-rate': 'number', 'overflow': 'int' } }
+>   
+>   ##
+>   # @CompressionStats:
+> @@ -337,6 +339,7 @@
+>   #             "pages":2444343,
+>   #             "cache-miss":2244,
+>   #             "cache-miss-rate":0.123,
+> +#             "encoding-rate":80.1,
+>   #             "overflow":34434
+>   #          }
+>   #       }
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
