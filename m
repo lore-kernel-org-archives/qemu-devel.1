@@ -2,55 +2,89 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33901C3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C027C3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:26:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0807920CC7
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:23:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0807920CC7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1474E20CC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 09:26:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XNCPO0Z4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1474E20CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQSdt-0002Wk-73
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 05:23:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37844 helo=eggs1p.gnu.org)
+	id 1jQSgz-0004lE-6q
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 05:26:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40500 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jQSZJ-0004ry-54
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:18:21 -0400
+ (envelope-from <berrange@redhat.com>) id 1jQSg2-0004CW-Bk
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:25:18 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jQSZG-0004jJ-6V
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:18:20 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48532)
- by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jQSZF-0004hS-MG; Mon, 20 Apr 2020 05:18:17 -0400
-Received: from dptest2.qa.sw.ru ([10.94.4.71])
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jQSZ3-0006Q3-Bs; Mon, 20 Apr 2020 12:18:05 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v19 3/4] qcow2: add zstd cluster compression
-Date: Mon, 20 Apr 2020 12:17:56 +0300
-Message-Id: <20200420091757.14102-4-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20200420091757.14102-1-dplotnikov@virtuozzo.com>
-References: <20200420091757.14102-1-dplotnikov@virtuozzo.com>
-Received-SPF: pass client-ip=185.231.240.75;
- envelope-from=dplotnikov@virtuozzo.com; helo=relay.sw.ru
+ (envelope-from <berrange@redhat.com>) id 1jQSg1-00039o-85
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:25:17 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34881
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jQSg0-00037b-MT
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 05:25:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587374715;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JrlOmzbNXPhWWKQxKIf0lYPtQ7X7s7L/yzJ7wOrgMKY=;
+ b=XNCPO0Z4J0hVq03jdSiljFgeJRBnwR74VY9TCPfwEurMdE9eRAn7mhepzDPgOEtmsSbO9B
+ OkNIaxCruT3W3uRyv6BUrlNEjjAnaJBKRpJtD2RpgwLoT8oc6GMszBC5MuC0fVuPVF4eEf
+ yTVpNJTc3RsS/QaNDdwl5Qjn8Oyzenc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-45-j4zIN6E2OQGSWc_K2MxDpA-1; Mon, 20 Apr 2020 05:25:13 -0400
+X-MC-Unique: j4zIN6E2OQGSWc_K2MxDpA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4FEA800D53;
+ Mon, 20 Apr 2020 09:25:11 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A1C7727BD9;
+ Mon, 20 Apr 2020 09:25:02 +0000 (UTC)
+Date: Mon, 20 Apr 2020 10:24:59 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH] Add a new PIIX option to control PCI hot unplugging of
+ devices on non-root buses
+Message-ID: <20200420092459.GF346737@redhat.com>
+References: <1587136411-200885-1-git-send-email-ani.sinha@nutanix.com>
+ <20200417112620-mutt-send-email-mst@kernel.org>
+ <2A13ACCD-BD24-41FB-B6EA-2804F7C1FF1D@nutanix.com>
+ <20200417120732-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20200417120732-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs1p.gnu.org: First seen = 2020/04/20
- 05:18:12
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Received-From: 185.231.240.75
+ 01:47:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,315 +96,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Ani Sinha <ani.sinha@nutanix.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-zstd significantly reduces cluster compression time.
-It provides better compression performance maintaining
-the same level of the compression ratio in comparison with
-zlib, which, at the moment, is the only compression
-method available.
+On Fri, Apr 17, 2020 at 12:09:00PM -0400, Michael S. Tsirkin wrote:
+> On Fri, Apr 17, 2020 at 03:36:14PM +0000, Ani Sinha wrote:
+> >=20
+> >=20
+> > > On Apr 17, 2020, at 8:57 PM, Michael S. Tsirkin <mst@redhat.com> wrot=
+e:
+> > >=20
+> > > Is there a real reason to do this? Can't we just limit the
+> > > hotplug control to pcie ports? At some point I'd like us to
+> > > start leaving piix alone..
+> >=20
+> > Yes we really need this feature as want to be able to hot plug devices =
+into the guest but prevent customers from hot unplugging them from say Wind=
+ows system tray.
+> >=20
+> > ani
+>=20
+> Problem is, I think this is not something we can support with pcie or shp=
+c.
+> I'm reluctant to add features that only ACPI can support,
+> we are trying to phase that out.
 
-The performance test results:
-Test compresses and decompresses qemu qcow2 image with just
-installed rhel-7.6 guest.
-Image cluster size: 64K. Image on disk size: 2.2G
+From the upstream POV, there's been no decision / agreement to phase
+out PIIX, this is purely a RHEL downstream decision & plan. If other
+distros / users have a different POV, and find the feature useful, we
+should accept the patch if it meets the normal QEMU patch requirements.
 
-The test was conducted with brd disk to reduce the influence
-of disk subsystem to the test results.
-The results is given in seconds.
-
-compress cmd:
-  time ./qemu-img convert -O qcow2 -c -o compression_type=[zlib|zstd]
-                  src.img [zlib|zstd]_compressed.img
-decompress cmd
-  time ./qemu-img convert -O qcow2
-                  [zlib|zstd]_compressed.img uncompressed.img
-
-           compression               decompression
-         zlib       zstd           zlib         zstd
-------------------------------------------------------------
-real     65.5       16.3 (-75 %)    1.9          1.6 (-16 %)
-user     65.0       15.8            5.3          2.5
-sys       3.3        0.2            2.0          2.0
-
-Both ZLIB and ZSTD gave the same compression ratio: 1.57
-compressed image size in both cases: 1.4G
-
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-QAPI part:
-Acked-by: Markus Armbruster <armbru@redhat.com>
----
- docs/interop/qcow2.txt |   1 +
- configure              |   2 +-
- qapi/block-core.json   |   3 +-
- block/qcow2-threads.c  | 157 +++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c          |   7 ++
- 5 files changed, 168 insertions(+), 2 deletions(-)
-
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index 640e0eca40..18a77f737e 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -209,6 +209,7 @@ version 2.
- 
-                     Available compression type values:
-                         0: zlib <https://www.zlib.net/>
-+                        1: zstd <http://github.com/facebook/zstd>
- 
- 
- === Header padding ===
-diff --git a/configure b/configure
-index 23b5e93752..4e3a1690ea 100755
---- a/configure
-+++ b/configure
-@@ -1861,7 +1861,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   lzfse           support of lzfse compression library
-                   (for reading lzfse-compressed dmg images)
-   zstd            support for zstd compression library
--                  (for migration compression)
-+                  (for migration compression and qcow2 cluster compression)
-   seccomp         seccomp support
-   coroutine-pool  coroutine freelist (better performance)
-   glusterfs       GlusterFS backend
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 1522e2983f..6fbacddab2 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -4293,11 +4293,12 @@
- # Compression type used in qcow2 image file
- #
- # @zlib: zlib compression, see <http://zlib.net/>
-+# @zstd: zstd compression, see <http://github.com/facebook/zstd>
- #
- # Since: 5.1
- ##
- { 'enum': 'Qcow2CompressionType',
--  'data': [ 'zlib' ] }
-+  'data': [ 'zlib', { 'name': 'zstd', 'if': 'defined(CONFIG_ZSTD)' } ] }
- 
- ##
- # @BlockdevCreateOptionsQcow2:
-diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-index 7dbaf53489..0525718704 100644
---- a/block/qcow2-threads.c
-+++ b/block/qcow2-threads.c
-@@ -28,6 +28,11 @@
- #define ZLIB_CONST
- #include <zlib.h>
- 
-+#ifdef CONFIG_ZSTD
-+#include <zstd.h>
-+#include <zstd_errors.h>
-+#endif
-+
- #include "qcow2.h"
- #include "block/thread-pool.h"
- #include "crypto.h"
-@@ -166,6 +171,148 @@ static ssize_t qcow2_zlib_decompress(void *dest, size_t dest_size,
-     return ret;
- }
- 
-+#ifdef CONFIG_ZSTD
-+
-+/*
-+ * qcow2_zstd_compress()
-+ *
-+ * Compress @src_size bytes of data using zstd compression method
-+ *
-+ * @dest - destination buffer, @dest_size bytes
-+ * @src - source buffer, @src_size bytes
-+ *
-+ * Returns: compressed size on success
-+ *          -ENOMEM destination buffer is not enough to store compressed data
-+ *          -EIO    on any other error
-+ */
-+static ssize_t qcow2_zstd_compress(void *dest, size_t dest_size,
-+                                   const void *src, size_t src_size)
-+{
-+    ssize_t ret;
-+    ZSTD_outBuffer output = { dest, dest_size, 0 };
-+    ZSTD_inBuffer input = { src, src_size, 0 };
-+    ZSTD_CCtx *cctx = ZSTD_createCCtx();
-+
-+    if (!cctx) {
-+        return -EIO;
-+    }
-+    /*
-+     * Use the zstd streamed interface for symmetry with decompression,
-+     * where streaming is essential since we don't record the exact
-+     * compressed size.
-+     *
-+     * In the loop, we try to compress all the data into one zstd frame.
-+     * ZSTD_compressStream2 potentially can finish a frame earlier
-+     * than the full input data is consumed. That's why we are looping
-+     * until all the input data is consumed.
-+     */
-+    while (input.pos < input.size) {
-+        size_t zstd_ret;
-+        /*
-+         * ZSTD spec: "You must continue calling ZSTD_compressStream2()
-+         * with ZSTD_e_end until it returns 0, at which point you are
-+         * free to start a new frame". We assume that "start a new frame"
-+         * means call ZSTD_compressStream2 in the very beginning or when
-+         * ZSTD_compressStream2 has returned with 0.
-+         */
-+        do {
-+            zstd_ret = ZSTD_compressStream2(cctx, &output, &input, ZSTD_e_end);
-+
-+            if (ZSTD_isError(zstd_ret)) {
-+                ret = -EIO;
-+                goto out;
-+            }
-+            /* Dest buffer isn't big enough to store compressed content */
-+            if (zstd_ret > output.size - output.pos) {
-+                ret = -ENOMEM;
-+                goto out;
-+            }
-+        } while (zstd_ret);
-+    }
-+    /* make sure we can safely return compressed buffer size with ssize_t */
-+    assert(output.pos <= SSIZE_MAX);
-+    ret = output.pos;
-+out:
-+    ZSTD_freeCCtx(cctx);
-+    return ret;
-+}
-+
-+/*
-+ * qcow2_zstd_decompress()
-+ *
-+ * Decompress some data (not more than @src_size bytes) to produce exactly
-+ * @dest_size bytes using zstd compression method
-+ *
-+ * @dest - destination buffer, @dest_size bytes
-+ * @src - source buffer, @src_size bytes
-+ *
-+ * Returns: 0 on success
-+ *          -EIO on any error
-+ */
-+static ssize_t qcow2_zstd_decompress(void *dest, size_t dest_size,
-+                                     const void *src, size_t src_size)
-+{
-+    size_t zstd_ret = 0;
-+    ssize_t ret = 0;
-+    ZSTD_outBuffer output = { dest, dest_size, 0 };
-+    ZSTD_inBuffer input = { src, src_size, 0 };
-+    ZSTD_DCtx *dctx = ZSTD_createDCtx();
-+
-+    if (!dctx) {
-+        return -EIO;
-+    }
-+
-+    /*
-+     * The compressed stream from the input buffer may consist of more
-+     * than one zstd frame. So we iterate until we get a fully
-+     * uncompressed cluster.
-+     * From zstd docs related to ZSTD_decompressStream:
-+     * "return : 0 when a frame is completely decoded and fully flushed"
-+     * We suppose that this means: each time ZSTD_decompressStream reads
-+     * only ONE full frame and returns 0 if and only if that frame
-+     * is completely decoded and flushed. Only after returning 0,
-+     * ZSTD_decompressStream reads another ONE full frame.
-+     */
-+    while (output.pos < output.size) {
-+        size_t last_in_pos = input.pos;
-+        size_t last_out_pos = output.pos;
-+        zstd_ret = ZSTD_decompressStream(dctx, &output, &input);
-+
-+        if (ZSTD_isError(zstd_ret)) {
-+            ret = -EIO;
-+            break;
-+        }
-+
-+        /*
-+         * The ZSTD manual is vague about what to do if it reads
-+         * the buffer partially, and we don't want to get stuck
-+         * in an infinite loop where ZSTD_decompressStream
-+         * returns > 0 waiting for another input chunk. So, we add
-+         * a check which ensures that the loop makes some progress
-+         * on each step.
-+         */
-+        if (last_in_pos >= input.pos &&
-+            last_out_pos >= output.pos) {
-+            ret = -EIO;
-+            break;
-+        }
-+    }
-+    /*
-+     * Make sure that we have the frame fully flushed here
-+     * if not, we somehow managed to get uncompressed cluster
-+     * greater then the cluster size, possibly because of its
-+     * damage.
-+     */
-+    if (zstd_ret > 0) {
-+        ret = -EIO;
-+    }
-+
-+    ZSTD_freeDCtx(dctx);
-+    assert(ret == 0 || ret == -EIO);
-+    return ret;
-+}
-+#endif
-+
- static int qcow2_compress_pool_func(void *opaque)
- {
-     Qcow2CompressData *data = opaque;
-@@ -217,6 +364,11 @@ qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
-         fn = qcow2_zlib_compress;
-         break;
- 
-+#ifdef CONFIG_ZSTD
-+    case QCOW2_COMPRESSION_TYPE_ZSTD:
-+        fn = qcow2_zstd_compress;
-+        break;
-+#endif
-     default:
-         abort();
-     }
-@@ -249,6 +401,11 @@ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
-         fn = qcow2_zlib_decompress;
-         break;
- 
-+#ifdef CONFIG_ZSTD
-+    case QCOW2_COMPRESSION_TYPE_ZSTD:
-+        fn = qcow2_zstd_decompress;
-+        break;
-+#endif
-     default:
-         abort();
-     }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 9c0b20c912..21f281b7f8 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1246,6 +1246,9 @@ static int validate_compression_type(BDRVQcow2State *s, Error **errp)
- {
-     switch (s->compression_type) {
-     case QCOW2_COMPRESSION_TYPE_ZLIB:
-+#ifdef CONFIG_ZSTD
-+    case QCOW2_COMPRESSION_TYPE_ZSTD:
-+#endif
-         break;
- 
-     default:
-@@ -3478,6 +3481,10 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
-         }
- 
-         switch (qcow2_opts->compression_type) {
-+#ifdef CONFIG_ZSTD
-+        case QCOW2_COMPRESSION_TYPE_ZSTD:
-+            break;
-+#endif
-         default:
-             error_setg(errp, "Unknown compression type");
-             goto out;
--- 
-2.17.0
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
