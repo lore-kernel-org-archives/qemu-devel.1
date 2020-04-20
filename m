@@ -2,84 +2,93 @@ Return-Path: <SRS0=IvAo=6E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 008CAC3815B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 15:31:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 907BDC3815B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 15:34:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC0CE206F6
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 15:31:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56B39206F6
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Apr 2020 15:34:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ah1shf4H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC0CE206F6
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h1QihZer"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56B39206F6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQYOc-0000Sm-Ty
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 11:31:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33952 helo=eggs1p.gnu.org)
+	id 1jQYR9-00021L-Ih
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 11:34:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35058 helo=eggs1p.gnu.org)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jQYMm-00074K-Fd
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 11:29:51 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jQYPD-0000yA-3Z
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 11:32:32 -0400
 Received: from Debian-exim by eggs1p.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jQYMk-0004Sv-Qe
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 11:29:48 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41245)
+ (envelope-from <alex.bennee@linaro.org>) id 1jQYPC-0006tj-6R
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 11:32:18 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42944)
  by eggs1p.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jQYMk-0004Qr-Cq
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 11:29:46 -0400
-Received: by mail-oi1-x243.google.com with SMTP id k9so9097501oia.8
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 08:29:44 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jQYPB-0006tc-KA
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 11:32:17 -0400
+Received: by mail-wr1-x443.google.com with SMTP id j2so12701721wrs.9
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 08:32:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=zPPXb24P1AsNF2EzClAYbclgmVA23VofI5lKiseqe7g=;
- b=ah1shf4HSg/nvJ8s11qa+8NLytbbP2+0zc73p3ql5uknLz2DKkaIN1AMLSCXwCoQOB
- IUUNGwz+DoPmYxblBA9qILxBrLosv/D5rtRuJKby1Q4gjKAmckfomvUUsaxvzuo6jCH7
- aqihy/dQmta8H50f6yKPqN3XUmS/+txHciVu9yA68j+iORY3e1prjo7HcQUuAGQuPNiY
- PGTV2YlVJsylE2iPM1M8tfX9pefTk9qQqdQ487KHyPq8P4aNDCrnsRG15PRdri0HFVwW
- ZE0FWBNlj7vf1iMsuc68NqPtwGh0j3Lhp1LaYo9d+oCYclxukpkYlCbsI9dAVjkynYI2
- 77SA==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=V6CkytLXtaK/zpdm6da/X9dXbFBOf6zpw63lSP2hing=;
+ b=h1QihZerJUkxZ06yi9wYA91ClW29EdwYqZf3VQId7PX5mP4813CPQlME73qFShtV/n
+ MeVZP04wORnWnYqOMlvwxvOOOXGKUUZ6yvfrM/mWAmqSpfaxuBF0nQjVz/gQqxKEAREK
+ ZV8KD0wQnBbjKIggahXkYFaBywC7OARwJEgyHuyhXrhVPYSiCpIc2lnU61UfiTQ0dcRe
+ DhrR48i27mwHjWjV7bu6b4gO4Ge9OFUUp43UQBLSQrNbob8CgE/OLfVD7lqkwAY4Jy8F
+ WigtJBQgUrU+ZOwGtXvhn0HF3LoEY3/3eDrl5PJc8d4UavZJAKFeJ6sUB6dfwNKaH5fF
+ zAKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=zPPXb24P1AsNF2EzClAYbclgmVA23VofI5lKiseqe7g=;
- b=n2oEb0DdrkTcnR3gmNJLwz5AMYs+4aE+6lB1pV4c4FMPaqWc2aNicEELLnGNE9GZbi
- U6LcjOn0qNXZeQKJODSw1JrFl3S4A8VCqZNuhl0b2UBv9BimrOrJGAUCruAGw5wnMqfI
- zmebjX/sPoCn+99gnR2s05Ud/61kB3wjwjanfxYZs6EDEREtjDq/xG3i/VHqIKnzDTYH
- 8Wd8a5jIeWK+Pd+DpfJRR4NqZbYPgzlZWc0xr/IKimkDLem1zebfDn8zC9SlVO+jxJnv
- wZ0M8nKi670C3vq04mfZMK5r8XK2zJnEUOGDkwCmU3zUKoilBKYr+EAujGzHbHdnVSfo
- Ognw==
-X-Gm-Message-State: AGi0PubI2wN2MBYJlAsimMPErT0UkdNfxVI9VQcTA8ON2U9YQbfXTcB6
- aamqqtA6BBVgwC1Ace9VZb3beCRqHQc7MSkPL5BA0g==
-X-Google-Smtp-Source: APiQypJiq2K2V4ldr/J8WQcI/YqsUZiz1LKQorCqjmJgGRBjKTVuRpqVwN+xWRf8OGxvvJhbxblTyskx5LHJFx1jgWY=
-X-Received: by 2002:aca:3a8a:: with SMTP id
- h132mr10490068oia.146.1587396583373; 
- Mon, 20 Apr 2020 08:29:43 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=V6CkytLXtaK/zpdm6da/X9dXbFBOf6zpw63lSP2hing=;
+ b=M3qZXiL5ZhlLxWgPJ0ffxXpgda+9EYdSCQqLaglGYV7/xzxNrvl+mSV7847Rf7Nj3c
+ 1lnJuVY/fvmE+qAApHIzJLCcFWbbxmCIIs1I1zaAks7PQ2WPx4YCu1Vlc5LUpU475RWv
+ AA+nEcCRbMQsPTrrbaiLWmJnNefUQHCzvFIpWjHF9Wyxi0TY+xCgBzQR7kUQpCvVLtuv
+ HCzF2hjq2aAOJw9q5ve0O6KmduZ6yPhr/Hv7YyELafmlo2HEXwsonbBAPfi5JuQ1Df5z
+ Q8BFKAVpscNfuXS2tGbNbaBG1tRqPY5NIsHxT+n83ChWt71UesgcfPrMnu3lkZWU+5ZR
+ lgtg==
+X-Gm-Message-State: AGi0Puaav2kmcm9bA92j+pi/CWfvjp4rVk2+/mAurj9Cbyt3um0ibtPJ
+ rytWT8o1sEVQyHQGilOCNaxxjg==
+X-Google-Smtp-Source: APiQypJidgy7qfmuLmHdVe4qSh/x0W4HMCWeAUw2wDz8D27BQCc1FXSRv1UDMZhR9BIYXLBSrF3hQA==
+X-Received: by 2002:adf:e84f:: with SMTP id d15mr12791258wrn.296.1587396735924; 
+ Mon, 20 Apr 2020 08:32:15 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 145sm1871610wma.1.2020.04.20.08.32.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Apr 2020 08:32:14 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 29A8B1FF7E;
+ Mon, 20 Apr 2020 16:32:14 +0100 (BST)
+References: <20200418155651.3901-1-richard.henderson@linaro.org>
+ <20200418155651.3901-4-richard.henderson@linaro.org>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 3/3] target/arm: Use clear_vec_high more effectively
+In-reply-to: <20200418155651.3901-4-richard.henderson@linaro.org>
+Date: Mon, 20 Apr 2020 16:32:14 +0100
+Message-ID: <87d082dvgh.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20200331133536.3328-1-linus.walleij@linaro.org>
- <20200420151344.GC1080594@mit.edu>
- <d3fb73a3-ecf6-6371-783f-24a94eb66c59@redhat.com>
-In-Reply-To: <d3fb73a3-ecf6-6371-783f-24a94eb66c59@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Apr 2020 16:29:32 +0100
-Message-ID: <CAFEAcA9BQQah2vVfnwO4-3m4eHv9QtfvjvDpTdw+SmqicsDOMA@mail.gmail.com>
-Subject: Re: [PATCH] fcntl: Add 32bit filesystem mode
-To: Eric Blake <eblake@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs1p.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::243
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,24 +100,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Theodore Y. Ts'o" <tytso@mit.edu>, Linux API <linux-api@vger.kernel.org>,
- Linus Walleij <linus.walleij@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Florian Weimer <fw@deneb.enyo.de>,
- Andreas Dilger <adilger.kernel@dilger.ca>, Andy Lutomirski <luto@kernel.org>,
- linux-fsdevel <linux-fsdevel@vger.kernel.org>,
- Ext4 Developers List <linux-ext4@vger.kernel.org>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 20 Apr 2020 at 16:24, Eric Blake <eblake@redhat.com> wrote:
-> It will be interesting to find how much code (wrongly) assumes it can
-> use a blind assignment of fcntl(fd, F_SETFD, 1) and thereby accidentally
-> wipes out other existing flags, when it should have instead been doing a
-> read-modify-write to protect flags other than FD_CLOEXEC.
 
-For instance, a quick grep shows 4 instances of this in QEMU :-)
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-thanks
--- PMM
+> Do not explicitly store zero to the NEON high part
+> when we can pass !is_q to clear_vec_high.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  target/arm/translate-a64.c | 59 +++++++++++++++++++++++---------------
+>  1 file changed, 36 insertions(+), 23 deletions(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index d57aa54d6a..bf82a2e115 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -948,11 +948,10 @@ static void do_fp_ld(DisasContext *s, int destidx, =
+TCGv_i64 tcg_addr, int size)
+>  {
+>      /* This always zero-extends and writes to a full 128 bit wide vector=
+ */
+>      TCGv_i64 tmplo =3D tcg_temp_new_i64();
+> -    TCGv_i64 tmphi;
+> +    TCGv_i64 tmphi =3D NULL;
+>=20=20
+>      if (size < 4) {
+>          MemOp memop =3D s->be_data + size;
+> -        tmphi =3D tcg_const_i64(0);
+>          tcg_gen_qemu_ld_i64(tmplo, tcg_addr, get_mem_index(s), memop);
+>      } else {
+>          bool be =3D s->be_data =3D=3D MO_BE;
+> @@ -970,12 +969,13 @@ static void do_fp_ld(DisasContext *s, int destidx, =
+TCGv_i64 tcg_addr, int size)
+>      }
+>=20=20
+>      tcg_gen_st_i64(tmplo, cpu_env, fp_reg_offset(s, destidx, MO_64));
+> -    tcg_gen_st_i64(tmphi, cpu_env, fp_reg_hi_offset(s, destidx));
+> -
+>      tcg_temp_free_i64(tmplo);
+> -    tcg_temp_free_i64(tmphi);
+>=20=20
+> -    clear_vec_high(s, true, destidx);
+> +    if (tmphi) {
+> +        tcg_gen_st_i64(tmphi, cpu_env, fp_reg_hi_offset(s, destidx));
+> +        tcg_temp_free_i64(tmphi);
+> +    }
+> +    clear_vec_high(s, tmphi !=3D NULL, destidx);
+>  }
+>=20=20
+>  /*
+> @@ -6969,8 +6969,8 @@ static void disas_simd_ext(DisasContext *s, uint32_=
+t insn)
+>          return;
+>      }
+>=20=20
+> -    tcg_resh =3D tcg_temp_new_i64();
+>      tcg_resl =3D tcg_temp_new_i64();
+> +    tcg_resh =3D NULL;
+>=20=20
+>      /* Vd gets bits starting at pos bits into Vm:Vn. This is
+>       * either extracting 128 bits from a 128:128 concatenation, or
+> @@ -6982,7 +6982,6 @@ static void disas_simd_ext(DisasContext *s, uint32_=
+t insn)
+>              read_vec_element(s, tcg_resh, rm, 0, MO_64);
+>              do_ext64(s, tcg_resh, tcg_resl, pos);
+>          }
+> -        tcg_gen_movi_i64(tcg_resh, 0);
+>      } else {
+>          TCGv_i64 tcg_hh;
+>          typedef struct {
+> @@ -6997,6 +6996,7 @@ static void disas_simd_ext(DisasContext *s, uint32_=
+t insn)
+>              pos -=3D 64;
+>          }
+>=20=20
+> +        tcg_resh =3D tcg_temp_new_i64();
+>          read_vec_element(s, tcg_resl, elt->reg, elt->elt, MO_64);
+>          elt++;
+>          read_vec_element(s, tcg_resh, elt->reg, elt->elt, MO_64);
+> @@ -7012,9 +7012,12 @@ static void disas_simd_ext(DisasContext *s, uint32=
+_t insn)
+>=20=20
+>      write_vec_element(s, tcg_resl, rd, 0, MO_64);
+>      tcg_temp_free_i64(tcg_resl);
+> -    write_vec_element(s, tcg_resh, rd, 1, MO_64);
+> -    tcg_temp_free_i64(tcg_resh);
+> -    clear_vec_high(s, true, rd);
+> +
+> +    if (is_q) {
+> +        write_vec_element(s, tcg_resh, rd, 1, MO_64);
+> +        tcg_temp_free_i64(tcg_resh);
+> +    }
+> +    clear_vec_high(s, is_q, rd);
+>  }
+>=20=20
+>  /* TBL/TBX
+> @@ -7051,17 +7054,21 @@ static void disas_simd_tb(DisasContext *s, uint32=
+_t insn)
+>       * the input.
+>       */
+>      tcg_resl =3D tcg_temp_new_i64();
+> -    tcg_resh =3D tcg_temp_new_i64();
+> +    tcg_resh =3D NULL;
+>=20=20
+>      if (is_tblx) {
+>          read_vec_element(s, tcg_resl, rd, 0, MO_64);
+>      } else {
+>          tcg_gen_movi_i64(tcg_resl, 0);
+>      }
+> -    if (is_tblx && is_q) {
+> -        read_vec_element(s, tcg_resh, rd, 1, MO_64);
+> -    } else {
+> -        tcg_gen_movi_i64(tcg_resh, 0);
+> +
+> +    if (is_q) {
+> +        tcg_resh =3D tcg_temp_new_i64();
+> +        if (is_tblx) {
+> +            read_vec_element(s, tcg_resh, rd, 1, MO_64);
+> +        } else {
+> +            tcg_gen_movi_i64(tcg_resh, 0);
+> +        }
+>      }
+>=20=20
+>      tcg_idx =3D tcg_temp_new_i64();
+> @@ -7081,9 +7088,12 @@ static void disas_simd_tb(DisasContext *s, uint32_=
+t insn)
+>=20=20
+>      write_vec_element(s, tcg_resl, rd, 0, MO_64);
+>      tcg_temp_free_i64(tcg_resl);
+> -    write_vec_element(s, tcg_resh, rd, 1, MO_64);
+> -    tcg_temp_free_i64(tcg_resh);
+> -    clear_vec_high(s, true, rd);
+> +
+> +    if (is_q) {
+> +        write_vec_element(s, tcg_resh, rd, 1, MO_64);
+> +        tcg_temp_free_i64(tcg_resh);
+> +    }
+> +    clear_vec_high(s, is_q, rd);
+>  }
+>=20=20
+>  /* ZIP/UZP/TRN
+> @@ -7120,7 +7130,7 @@ static void disas_simd_zip_trn(DisasContext *s, uin=
+t32_t insn)
+>      }
+>=20=20
+>      tcg_resl =3D tcg_const_i64(0);
+> -    tcg_resh =3D tcg_const_i64(0);
+> +    tcg_resh =3D is_q ? tcg_const_i64(0) : NULL;
+>      tcg_res =3D tcg_temp_new_i64();
+>=20=20
+>      for (i =3D 0; i < elements; i++) {
+> @@ -7171,9 +7181,12 @@ static void disas_simd_zip_trn(DisasContext *s, ui=
+nt32_t insn)
+>=20=20
+>      write_vec_element(s, tcg_resl, rd, 0, MO_64);
+>      tcg_temp_free_i64(tcg_resl);
+> -    write_vec_element(s, tcg_resh, rd, 1, MO_64);
+> -    tcg_temp_free_i64(tcg_resh);
+> -    clear_vec_high(s, true, rd);
+> +
+> +    if (is_q) {
+> +        write_vec_element(s, tcg_resh, rd, 1, MO_64);
+> +        tcg_temp_free_i64(tcg_resh);
+> +    }
+> +    clear_vec_high(s, is_q, rd);
+>  }
+>=20=20
+>  /*
+
+
+--=20
+Alex Benn=C3=A9e
 
