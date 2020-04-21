@@ -4,48 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 840CFC54FC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:09:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17E92C54FC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:10:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A4662068F
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:09:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A4662068F
+	by mail.kernel.org (Postfix) with ESMTPS id DFE4920753
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:10:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFE4920753
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQseF-0002G0-Eg
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 09:09:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44798)
+	id 1jQsfJ-0003TF-4B
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 09:10:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44824)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jQsXn-0008FT-SS
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:02:32 -0400
+ id 1jQsXp-0008Hm-BM
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:02:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jQsXl-0002YY-Sb
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:02:31 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3675 helo=huawei.com)
+ id 1jQsXo-0002bE-Ap
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:02:33 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3747 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jQsXb-00025M-V8; Tue, 21 Apr 2020 09:02:20 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 626ED2F3EE0BC60B7043;
- Tue, 21 Apr 2020 21:02:14 +0800 (CST)
+ id 1jQsXk-0002Rh-PR; Tue, 21 Apr 2020 09:02:29 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 7140EC00DC3629278D59;
+ Tue, 21 Apr 2020 21:02:24 +0800 (CST)
 Received: from S00345302A-PC.china.huawei.com (10.47.91.160) by
  DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 21 Apr 2020 21:02:05 +0800
+ 14.3.487.0; Tue, 21 Apr 2020 21:02:17 +0800
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
  <imammedo@redhat.com>
-Subject: [PATCH v4 4/7] hw/arm/virt: Add nvdimm hotplug support
-Date: Tue, 21 Apr 2020 13:59:31 +0100
-Message-ID: <20200421125934.14952-5-shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v4 7/7] tests/acpi: add expected tables for bios-tables-test
+Date: Tue, 21 Apr 2020 13:59:34 +0100
+Message-ID: <20200421125934.14952-8-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20200421125934.14952-1-shameerali.kolothum.thodi@huawei.com>
 References: <20200421125934.14952-1-shameerali.kolothum.thodi@huawei.com>
@@ -53,11 +53,11 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.47.91.160]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
+Received-SPF: pass client-ip=45.249.212.191;
  envelope-from=shameerali.kolothum.thodi@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 09:01:59
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 09:02:04
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 45.249.212.190
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,151 +76,97 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds support for nvdimm hotplug events through GED
-and enables nvdimm for the arm/virt. Now Guests with ACPI
-can have both cold and hot plug of nvdimms.
+Because of the following changes, the expeacted tables for bios-tables-test
+needs to be updated.
 
-Hot removal functionality is not yet supported.
+1. Changed NVDIM DSM output buffer AML code.
+2. Updated arm/virt test_acpi_virt_tcg_memhp() to add pc-dimm/nvdimm
 
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- docs/specs/acpi_hw_reduced_hotplug.rst |  3 ++-
- hw/acpi/generic_event_device.c         | 15 ++++++++++++++-
- hw/arm/virt.c                          | 16 +++++++++++-----
- include/hw/acpi/generic_event_device.h |  1 +
- 4 files changed, 28 insertions(+), 7 deletions(-)
+ tests/data/acpi/pc/SSDT.dimmpxm             | Bin 685 -> 734 bytes
+ tests/data/acpi/q35/SSDT.dimmpxm            | Bin 685 -> 734 bytes
+ tests/data/acpi/virt/DSDT.memhp             | Bin 6644 -> 6668 bytes
+ tests/data/acpi/virt/NFIT.memhp             | Bin 0 -> 224 bytes
+ tests/data/acpi/virt/SSDT.memhp             | Bin 0 -> 736 bytes
+ tests/qtest/bios-tables-test-allowed-diff.h |   5 -----
+ 6 files changed, 5 deletions(-)
 
-diff --git a/docs/specs/acpi_hw_reduced_hotplug.rst b/docs/specs/acpi_hw_reduced_hotplug.rst
-index 911a98255b..0bd3f9399f 100644
---- a/docs/specs/acpi_hw_reduced_hotplug.rst
-+++ b/docs/specs/acpi_hw_reduced_hotplug.rst
-@@ -63,7 +63,8 @@ GED IO interface (4 byte access)
-     bits:
-        0: Memory hotplug event
-        1: System power down event
--    2-31: Reserved
-+       2: NVDIMM hotplug event
-+    3-31: Reserved
- 
- **write_access:**
- 
-diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-index 021ed2bf23..5d17f78a1e 100644
---- a/hw/acpi/generic_event_device.c
-+++ b/hw/acpi/generic_event_device.c
-@@ -16,6 +16,7 @@
- #include "hw/acpi/generic_event_device.h"
- #include "hw/irq.h"
- #include "hw/mem/pc-dimm.h"
-+#include "hw/mem/nvdimm.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
- #include "qemu/error-report.h"
-@@ -23,6 +24,7 @@
- static const uint32_t ged_supported_events[] = {
-     ACPI_GED_MEM_HOTPLUG_EVT,
-     ACPI_GED_PWR_DOWN_EVT,
-+    ACPI_GED_NVDIMM_HOTPLUG_EVT,
- };
- 
- /*
-@@ -110,6 +112,11 @@ void build_ged_aml(Aml *table, const char *name, HotplugHandler *hotplug_dev,
-                            aml_notify(aml_name(ACPI_POWER_BUTTON_DEVICE),
-                                       aml_int(0x80)));
-                 break;
-+            case ACPI_GED_NVDIMM_HOTPLUG_EVT:
-+                aml_append(if_ctx,
-+                           aml_notify(aml_name("\\_SB.NVDR"),
-+                                      aml_int(0x80)));
-+                break;
-             default:
-                 /*
-                  * Please make sure all the events in ged_supported_events[]
-@@ -175,7 +182,11 @@ static void acpi_ged_device_plug_cb(HotplugHandler *hotplug_dev,
-     AcpiGedState *s = ACPI_GED(hotplug_dev);
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
--        acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp);
-+        if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
-+            nvdimm_acpi_plug_cb(hotplug_dev, dev);
-+        } else {
-+            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp);
-+        }
-     } else {
-         error_setg(errp, "virt: device plug request for unsupported device"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-@@ -192,6 +203,8 @@ static void acpi_ged_send_event(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
-         sel = ACPI_GED_MEM_HOTPLUG_EVT;
-     } else if (ev & ACPI_POWER_DOWN_STATUS) {
-         sel = ACPI_GED_PWR_DOWN_EVT;
-+    } else if (ev & ACPI_NVDIMM_HOTPLUG_STATUS) {
-+        sel = ACPI_GED_NVDIMM_HOTPLUG_EVT;
-     } else {
-         /* Unknown event. Return without generating interrupt. */
-         warn_report("GED: Unsupported event %d. No irq injected", ev);
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 8a2beaf650..da4994c55a 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -549,6 +549,10 @@ static inline DeviceState *create_acpi_ged(VirtMachineState *vms)
-         event |= ACPI_GED_MEM_HOTPLUG_EVT;
-     }
- 
-+    if (ms->nvdimms_state->is_enabled) {
-+        event |= ACPI_GED_NVDIMM_HOTPLUG_EVT;
-+    }
-+
-     dev = qdev_create(NULL, TYPE_ACPI_GED);
-     qdev_prop_set_uint32(dev, "ged-event", event);
- 
-@@ -2070,19 +2074,20 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                  Error **errp)
- {
-     VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-+    const MachineState *ms = MACHINE(hotplug_dev);
-     const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
- 
--    if (is_nvdimm) {
--        error_setg(errp, "nvdimm is not yet supported");
--        return;
--    }
--
-     if (!vms->acpi_dev) {
-         error_setg(errp,
-                    "memory hotplug is not enabled: missing acpi-ged device");
-         return;
-     }
- 
-+    if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
-+        error_setg(errp, "nvdimm is not enabled: add 'nvdimm=on' to '-M'");
-+        return;
-+    }
-+
-     pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
- }
- 
-@@ -2227,6 +2232,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     hc->plug = virt_machine_device_plug_cb;
-     hc->unplug_request = virt_machine_device_unplug_request_cb;
-     mc->numa_mem_supported = true;
-+    mc->nvdimm_supported = true;
-     mc->auto_enable_numa_with_memhp = true;
-     mc->default_ram_id = "mach-virt.ram";
- 
-diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
-index d157eac088..9eb86ca4fd 100644
---- a/include/hw/acpi/generic_event_device.h
-+++ b/include/hw/acpi/generic_event_device.h
-@@ -82,6 +82,7 @@
-  */
- #define ACPI_GED_MEM_HOTPLUG_EVT   0x1
- #define ACPI_GED_PWR_DOWN_EVT      0x2
-+#define ACPI_GED_NVDIMM_HOTPLUG_EVT 0x4
- 
- typedef struct GEDState {
-     MemoryRegion io;
+diff --git a/tests/data/acpi/pc/SSDT.dimmpxm b/tests/data/acpi/pc/SSDT.dimmpxm
+index 8ba0e67cb72daa81a65da4906d37a5e0f4af1fd4..ac55387d57e48adb99eb738a102308688a262fb8 100644
+GIT binary patch
+delta 125
+zcmZ3>dXJSWIM^lR9uortW7tG4X>Nb5nD}6)_~<4#t%(LAOunKU-FO)N7nn^=<l-n`
+zNa6@_3Uw1?W@IQ3WMW8PBs(=Jv7oub-^DQ`iJ=1|$G}jW4x-abla{0xR3>sUGbBa}
+TgA_0%`UAz6fQZcnjJAvbW$GgJ
+
+delta 76
+zcmcb|x|WqIIM^j*EfWI+W57f%X>LFDnD}6)_~<5A^@#=|Og=&z-FO(~3Mv!1m>CkI
+dh5cO|Ll_eMokHD;1(_H?bo!F?%?lZA83Fei6ZHT9
+
+diff --git a/tests/data/acpi/q35/SSDT.dimmpxm b/tests/data/acpi/q35/SSDT.dimmpxm
+index 2d5b721bcf9c398feb6d005761f898015042e8a4..98e6f0e3f3bb02dd419e36bdd1db9b94c728c406 100644
+GIT binary patch
+delta 125
+zcmZ3>dXJSWIM^lR9uortquWF-X>Nb5nD}6)_~<4#t%(LAOunKU-FO)N7nn^=<l-n`
+zNa6@_3Uw1?W@IQ3WMW8PBs(=Jv7oub-^DQ`iJ=1|$G}jW4x-abla{0xR3>sUGbBa}
+TgA_0%`UAz6fQZcnjJAvbUiu>C
+
+delta 76
+zcmcb|x|WqIIM^j*EfWI+qr*flX>LFDnD}6)_~<5A^@#=|Og=&z-FO(~3Mv!1m>CkI
+dh5cO|Ll_eMokHD;1(_H?bo!F?%?lZA83FS;6XgH^
+
+diff --git a/tests/data/acpi/virt/DSDT.memhp b/tests/data/acpi/virt/DSDT.memhp
+index c527ac4739af3df3c3e042bf91c412033a2b73c3..730e95a46d2cce0af011ffc051d7342beb8f1328 100644
+GIT binary patch
+delta 66
+zcmexj++)J!66_MfBgMeL^l>7WG*kP$jq2<oOpaWW4Mc*Od{`#8h!~455Sv_`z{SGA
+W#nKj|7a!~t?-%A0w0WzDJu3iIl@a3r
+
+delta 43
+zcmeA%`C`oF66_N4MUsJmsc|BgG*kbajq2<oOr9K*4Mc(&O(wUB7;io=V#^8u9B2%1
+
+diff --git a/tests/data/acpi/virt/NFIT.memhp b/tests/data/acpi/virt/NFIT.memhp
+index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..738c6f74c0ce7dc329cc72cc7b930460ceb9b6a0 100644
+GIT binary patch
+literal 224
+zcmeZs^9*^wz`($G(aGQ0BUr&HBEZ=XD8>jB1F=Cg1XwVzFffCeAhF8JAJRT=DREfi
+z%xf&Mz2`Pir~{&ofdfQyG(dQa3<eBL5GGJRD~JV_hYBH45Sv&S0)VR88W<T6HiHy}
+Pn+P#5Laay9LzoEwN>da8
+
+literal 0
+HcmV?d00001
+
+diff --git a/tests/data/acpi/virt/SSDT.memhp b/tests/data/acpi/virt/SSDT.memhp
+index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..db61d6733284c90153e0e2c1d6c2ac25c22b1d84 100644
+GIT binary patch
+literal 736
+zcmZWnJ&4m_7=F{1Ynryuv=ve6ky!_O6-025G-+(0NlTIzAqUNmw7s^&hj$JlLfadz
+zo*?wXEh3U083lL2&DF`tL2x*5cM%-K?@e*=T;7-Od*1JPpXcE-P1*XE0AOy_+fvgM
+z^q#D08a)F*{Xs{<UJ!5W_RV_VUNo;$++h1nRnCi2N3B+OYEW)p(j~E#Ct5=j2lh<w
+zsBOprWHMZeo(xfgK^6-3Jc~$Dw-i;d=M@B!O}W(&j7HBCl&&rbifG)Q{Yu;OVvHKC
+zhAy;a(VG2EhgX9s5Wd6}qVI*9t2gKT^UuY*!Oz|I&iYQc9Zcy)W;5{P^^1q=PetkY
+zi~8|h?Stp6FUJq7Z!;2~Kj&8~7KGfZffHVN77XAd7&#DTf-yvVl8FmLrl^eUp)@i^
+zZDHkU@N&YXf};stvz!2U<k0hpkDAE<T^*oaF6D-|PhE~B;IUS{s~{)g6EHlxcIvt0
+zaEXRISRw|nKg2$K>_tQJ#O0FU+9ezSw@vROEagI9HnmiQA&>UP6JQO~5}~Z64Mnvw
+zY+ErcAR}x9XE39S5im?~i@}LFCFj@yO3@`)kSxrd1o2Hog_0x3J#f(n8@M!%1lT2q
+z6Jm8#juK%h-|N%mEE@9&_-9pypc>!7*C8JuYZjQl__`2oA({8ccl~|O@$5xK?^Ua8
+nUz82zqC>`BY*Tb6M!7_p|2F_GvB7H_Joz7<WbrFft6!x*uUOFm
+
+literal 0
+HcmV?d00001
+
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index 862c49e675..dfb8523c8b 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1,6 +1 @@
+ /* List of comma-separated changed AML files to ignore */
+-"tests/data/acpi/pc/SSDT.dimmpxm",
+-"tests/data/acpi/q35/SSDT.dimmpxm",
+-"tests/data/acpi/virt/DSDT.memhp",
+-"tests/data/acpi/virt/SSDT.memhp",
+-"tests/data/acpi/virt/NFIT.memhp",
 -- 
 2.17.1
 
