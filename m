@@ -2,90 +2,85 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DB5C54FCC
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 17:55:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38979C54FC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 18:01:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7599620663
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 17:55:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE5D4206D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 18:01:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dabbelt-com.20150623.gappssmtp.com header.i=@dabbelt-com.20150623.gappssmtp.com header.b="i8wmBIrN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7599620663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R4LPYUUr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE5D4206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQx7M-000477-1k
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 13:55:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39026)
+	id 1jQxDV-0007sg-Ie
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 14:01:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39992)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1jQx6c-0003Wo-0A
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 13:54:46 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jQxCN-00070s-IH
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 14:00:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1jQx6b-0006gD-3d
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 13:54:45 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:38410)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <palmer@dabbelt.com>)
- id 1jQx6a-0006fw-Ks
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 13:54:44 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id t40so1701559pjb.3
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 10:54:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=dabbelt-com.20150623.gappssmtp.com; s=20150623;
- h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
- :content-transfer-encoding;
- bh=pbQLfZNEmk9NwdxdIe4YCL2SDI8JoZiPsUPFarsQOac=;
- b=i8wmBIrN7Q0sIAyUiDXmSMc7jA5ll3kdUTJNk37hC3KU3HzeZIzdTt5cvMo2YMC57r
- GlbxR1gtkfgnfNbs82s3rfCtl4wFVT2Hfeplh8so8oOQKyIug2DGuq/vQTEv81gwWb3Z
- Tcs4tLKnXdFu8p4iPbz0ixbDWICK0WIKgTKor5Go44NudPvLwX/G/YeqFwQpRnZfsGyn
- s6KlTiIcdU2CF8ZRE0UOSEsrtcGQcyTahZ6t+byWHwFZjjZXQnpCVajTWvJmPaall7bw
- zxWuOLkngZP7Zm0yR3Nur5anXREgzwEcIx1kujdMoVepst0/K7Zppb4bKFYz5q5yZt7z
- mvXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=pbQLfZNEmk9NwdxdIe4YCL2SDI8JoZiPsUPFarsQOac=;
- b=IiI+dP3maX+2TLXjj7u79+9mOQSy8FXpoCkakoBCRSf6KWS7DVQNTcheg6kqTQDEyC
- e2XgjWqwHXKRrV0FuGdcX4LD1Gom23v9RG6zCxaaGQiK+4mqoc/HFoMuugox2bGstDuc
- BkMGENar209wWAwrrmS7tz1BDcYAN1jfSC7GV+hC3T/JDpSseuR3BX7b61119uWI/pnK
- gcPus/uIwHIE6lxFMu0WDuEM/dR7/Ld2luSeyUNXEGbGJVQzOje96EEtaPbdFL5uQVtE
- aF/4rOVWqBevaYkd768rEoGYD/6JZdMMyLa87e4IwQY31lwekzOISwDQ0x0zFEpLufdF
- HEUg==
-X-Gm-Message-State: AGi0PubP630ZkbF10bGevObNRWKjdj+DsGhNLhKIzkZXkm03vzJ0d+u6
- mAJoWv9a+fvRvfk8BOejgqyqlw==
-X-Google-Smtp-Source: APiQypIpqxeLv7B95SubW5UpwkpHIok3NoWXLw8+JbsbRgrGgq7bhiYABjXOfdvgq0B4oW2zGCjGjA==
-X-Received: by 2002:a17:90a:f197:: with SMTP id
- bv23mr6858320pjb.3.1587491682541; 
- Tue, 21 Apr 2020 10:54:42 -0700 (PDT)
-Received: from localhost (76-210-143-223.lightspeed.sntcca.sbcglobal.net.
- [76.210.143.223])
- by smtp.gmail.com with ESMTPSA id o99sm3056275pjo.8.2020.04.21.10.54.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Apr 2020 10:54:42 -0700 (PDT)
-Date: Tue, 21 Apr 2020 10:54:42 -0700 (PDT)
-X-Google-Original-Date: Tue, 21 Apr 2020 10:54:21 PDT (-0700)
-Subject: Re: [PATCH v3 0/3] hw/riscv: Add a serial property to sifive_u
-In-Reply-To: <CAKmqyKNvZYu0-VEf8HB_chbB_mD2DxsmCo5_p9Csx=KE8gbiGQ@mail.gmail.com>
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: alistair23@gmail.com
-Message-ID: <mhng-6e844dae-bb4e-4385-8351-c1916d3b1983@palmerdabbelt-glaptop1>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=palmer@dabbelt.com; helo=mail-pj1-x1041.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::1041
+ (envelope-from <dgilbert@redhat.com>) id 1jQxCK-0004Cu-3l
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 14:00:42 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46882
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jQxCJ-0004B6-Ij
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 14:00:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587492037;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xwpNrYKj/zzgQ1bzbyDvID/w73eI2bj4wJvZ0HwZmO0=;
+ b=R4LPYUUrz78vwFbbcZm3Bvj+1nPkcWDyqzrVdNGRkmmp/LncO97cIKCEEgJb/biweuHO+I
+ J4V1O2wnTo1TcqWMN8ieZuZlTINK4MBzL+3IFx3Cu8S7rpVuVx4qxOlnW1EqGTVz2zZtA2
+ DuN9X4WJ9zyhWIc2HQ8XxLVfQdhLn5k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-483-aB9XF869Mta-plaDVrrYDw-1; Tue, 21 Apr 2020 14:00:35 -0400
+X-MC-Unique: aB9XF869Mta-plaDVrrYDw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE8F2107ACC7;
+ Tue, 21 Apr 2020 18:00:30 +0000 (UTC)
+Received: from work-vm (ovpn-115-8.ams2.redhat.com [10.36.115.8])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 307161001B09;
+ Tue, 21 Apr 2020 18:00:26 +0000 (UTC)
+Date: Tue, 21 Apr 2020 19:00:24 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [RFC PATCH 03/17] hw/misc/temp-sensor: Add 'info temp' HMP command
+Message-ID: <20200421180024.GL3029@work-vm>
+References: <20200421121626.23791-1-f4bug@amsat.org>
+ <20200421121626.23791-4-f4bug@amsat.org>
+MIME-Version: 1.0
+In-Reply-To: <20200421121626.23791-4-f4bug@amsat.org>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 01:28:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,56 +92,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, bmeng.cn@gmail.com,
- Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ qemu-block@nongnu.org, qemu-trivial@nongnu.org,
+ Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 Apr 2020 10:40:05 PDT (-0700), alistair23@gmail.com wrote:
-> On Mon, Apr 20, 2020 at 7:17 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->>
->> On Tue, Apr 21, 2020 at 3:26 AM Alistair Francis <alistair23@gmail.com> wrote:
->> >
->> > On Wed, Apr 1, 2020 at 10:39 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->> > >
->> > > On Tue, Mar 24, 2020 at 10:08 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->> > > >
->> > > > Hi Palmer,
->> > > >
->> > > > On Sat, Mar 7, 2020 at 5:45 AM Alistair Francis
->> > > > <alistair.francis@wdc.com> wrote:
->> > > > >
->> > > > > At present the board serial number is hard-coded to 1, and passed
->> > > > > to OTP model during initialization. Firmware (FSBL, U-Boot) uses
->> > > > > the serial number to generate a unique MAC address for the on-chip
->> > > > > ethernet controller. When multiple QEMU 'sifive_u' instances are
->> > > > > created and connected to the same subnet, they all have the same
->> > > > > MAC address hence it creates a unusable network.
->> > > > >
->> > > > > A new "serial" property is introduced to specify the board serial
->> > > > > number. When not given, the default serial number 1 is used.
->> > > > >
->> > > >
->> > > > Could you please take this for v5.0.0?
->> >
->> > Applied to the RISC-V tree for 5.1
->> >
->>
->> Sigh, this patch was submitted on Mar 7 and that is before soft freeze ...
->>
->> Any chance to get this in 5.0?
->
-> That is up to Palmer. I'm only taking over PRs after the 5.0 release.
+* Philippe Mathieu-Daud=E9 (f4bug@amsat.org) wrote:
+> Add a command to display current devices temperature in the monitor:
+>=20
+>   (qemu) info temp
+>   Temperatures (in C):
+>   videocore                          25.00
+>   bcm2835-thermal-0                  25.00
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 
-Oh, sorry, I just saw this.  I though I'd sent out this in a PR weeks ago, but
-it looks like I didn't actually send it out.  I'm not sure if 5.0 is still
-open, but I'll send a PR out now...
+How do I set the temperature?
 
->
-> Alistair
->
->>
->> Regards,
->> Bin
+> ---
+>  include/monitor/hmp.h |  1 +
+>  hw/misc/temp-sensor.c | 29 +++++++++++++++++++++++++++++
+>  hmp-commands-info.hx  | 11 +++++++++++
+>  3 files changed, 41 insertions(+)
+>=20
+> diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+> index e33ca5a911..f023230bd1 100644
+> --- a/include/monitor/hmp.h
+> +++ b/include/monitor/hmp.h
+> @@ -129,5 +129,6 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict =
+*qdict);
+>  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+>  void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+>  void hmp_info_sev(Monitor *mon, const QDict *qdict);
+> +void hmp_info_temp(Monitor *mon, const QDict *qdict);
+> =20
+>  #endif
+> diff --git a/hw/misc/temp-sensor.c b/hw/misc/temp-sensor.c
+> index 27750c533d..5f591bd9c3 100644
+> --- a/hw/misc/temp-sensor.c
+> +++ b/hw/misc/temp-sensor.c
+> @@ -12,6 +12,8 @@
+>  #include "hw/misc/temp-sensor.h"
+>  #include "qapi/qapi-commands-misc.h"
+>  #include "qapi/error.h"
+> +#include "monitor/monitor.h"
+> +#include "monitor/hmp.h"
+> =20
+>  static int query_temperature_sensors_foreach(Object *obj, void *opaque)
+>  {
+> @@ -59,6 +61,33 @@ TemperatureSensorList *qmp_query_temperature_sensors(E=
+rror **errp)
+>      return list;
+>  }
+> =20
+> +void hmp_info_temp(Monitor *mon, const QDict *qdict)
+> +{
+> +    TemperatureSensorList *list, *sensor;
+> +    Error *err =3D NULL;
+> +
+> +    list =3D qmp_query_temperature_sensors(&err);
+> +    if (!list) {
+> +        monitor_printf(mon, "No temperature sensors\n");
+> +        return;
+> +    }
+> +    if (err) {
+> +        monitor_printf(mon, "Error while getting temperatures: %s\n",
+> +                       error_get_pretty(err));
+> +        error_free(err);
+
+Maybe use hmp_handle_error
+
+> +        goto out;
+> +    }
+> +
+> +    monitor_printf(mon, "Temperatures (in C):\n");
+> +    for (sensor =3D list; sensor; sensor =3D sensor->next) {
+> +        monitor_printf(mon, "%-33s %6.2f\n", sensor->value->name,
+> +                       sensor->value->temperature);
+
+See my question on the earlier patch; I'm curious here whether we want
+device name, and then subname within that device.
+
+Dave
+
+> +    }
+> +
+> +out:
+> +    qapi_free_TemperatureSensorList(list);
+> +}
+> +
+>  static TypeInfo tempsensor_interface_type_info =3D {
+>      .name =3D TYPE_TEMPSENSOR_INTERFACE,
+>      .parent =3D TYPE_INTERFACE,
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index ca5198438d..77f1c43ce3 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -880,4 +880,15 @@ SRST
+>      Show SEV information.
+>  ERST
+> =20
+> +    {
+> +        .name       =3D "temp",
+> +        .args_type  =3D "",
+> +        .params     =3D "",
+> +        .help       =3D "show device temperatures",
+> +        .cmd        =3D hmp_info_temp,
+> +    },
+> =20
+> +SRST
+> +  ``info temp``
+> +    Show device temperatures.
+> +ERST
+> --=20
+> 2.21.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
