@@ -2,78 +2,88 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0205CC54FD0
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 11:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5D72C54FC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 12:07:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7EA8206F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 11:51:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7EA8206F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id AC9B0206D4
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 12:07:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cuZJ4a7k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC9B0206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQrRK-0004g1-Rg
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 07:51:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55528)
+	id 1jQrgU-0000km-N9
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 08:07:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57524)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jQrQO-00045N-8z
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 07:50:48 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jQrfW-0007gE-Bh
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 08:06:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jQrQK-0005t5-1Y
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 07:50:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37728)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jQrQJ-0005sP-Iq
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 07:50:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jQrQG-0005PF-Su
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 11:50:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D10C22E8104
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 11:50:40 +0000 (UTC)
+ (envelope-from <dgilbert@redhat.com>) id 1jQrfV-0005nm-2x
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 08:06:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59465
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jQrfU-0005lc-I6
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 08:06:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587470781;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1s3/Ds8XmK4JR0gA/g0XdG3tAFRqlFLKanToM9VHJOw=;
+ b=cuZJ4a7kGFrMYxaLVUNq9jXPNZ9oDusuMB3d3z3Y/sp6iry4wxOwbDqx61Yo4Pj/GIrcri
+ m5LRtuRExHaJtQjFhcogCPdolLBhMekDIktBZfd9QPvHVRuTJMxEMq0D15/25zAH6HQcJc
+ 1B1obtH01C/MGUTGlTnf8IYh27HLiL0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-87-8q7FkXvNNNubhNQR2p2nTw-1; Tue, 21 Apr 2020 08:06:17 -0400
+X-MC-Unique: 8q7FkXvNNNubhNQR2p2nTw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8EFF140D;
+ Tue, 21 Apr 2020 12:06:14 +0000 (UTC)
+Received: from work-vm (ovpn-115-8.ams2.redhat.com [10.36.115.8])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A69910372D5;
+ Tue, 21 Apr 2020 12:05:46 +0000 (UTC)
+Date: Tue, 21 Apr 2020 13:05:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Subject: Re: [PATCH 5/7] qapi: add filter-node-name to block-stream
+Message-ID: <20200421120544.GI3029@work-vm>
+References: <1587407806-109784-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1587407806-109784-6-git-send-email-andrey.shinkevich@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1587407806-109784-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Apr 2020 11:45:28 -0000
-From: Philipp Eppelt <1871842@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: babumoger e-philipp ehabkost imammedo
-X-Launchpad-Bug-Reporter: Philipp Eppelt (e-philipp)
-X-Launchpad-Bug-Modifier: Philipp Eppelt (e-philipp)
-References: <158643709116.17430.15995069125716778943.malonedeb@wampee.canonical.com>
- <20200417215345.64800.73351.stgit@localhost.localdomain>
-Message-Id: <30a0794e-de41-1188-94bc-611f257f622e@kernkonzept.com>
-Subject: Re: [Bug 1871842] [v2 PATCH] target/i386: Fix the CPUID leaf
- CPUID_Fn80000008
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="aad6b57d58e2f621954298e262c1cc904860f5d2";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d178793a63660bc73c8e298c0ef1f525c6d1dfd4
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 07:50:41
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 91.189.90.7
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 04:54:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,205 +92,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1871842 <1871842@bugs.launchpad.net>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+ armbru@redhat.com, qemu-devel@nongnu.org, den@openvz.org, mreitz@redhat.com,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
-
-thanks for the patch, I tested it in my setup and I'm seeing numbers
-that make sense.
-
-However, I can create a setup which places the value 02h* into the
-ApicIdSize field, which is reserved. However, I deem this a
-configuration issue as well.
-
-* -cpu EPYC-v2 -smp 4,cores=3D4 --> 0x8000_0008[ECX] =3D 0x2003
-
-Cheers,
-Philipp
-
-On 4/17/20 11:55 PM, Babu Moger wrote:
-> CPUID leaf CPUID_Fn80000008_ECX provides information about the
-> number of threads supported by the processor. It was found that
-> the field ApicIdSize(bits 15-12) was not set correctly.
-> =
-
-> ApicIdSize is defined as the number of bits required to represent
-> all the ApicId values within a package.
-> =
-
-> Valid Values: Value Description
-> 3h-0h		Reserved.
-> 4h		up to 16 threads.
-> 5h		up to 32 threads.
-> 6h		up to 64 threads.
-> 7h		up to 128 threads.
-> Fh-8h		Reserved.
-> =
-
-> Fix the bit appropriately.
-> =
-
-> This came up during following thread.
-> https://lore.kernel.org/qemu-devel/158643709116.17430.1599506912571677894=
-3.malonedeb@wampee.canonical.com/#t
-> =
-
-> Refer the Processor Programming Reference (PPR) for AMD Family 17h
-> Model 01h, Revision B1 Processors. The documentation is available
-> from the bugzilla Link below.
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D206537
-> =
-
-> Reported-by: Philipp Eppelt <1871842@bugs.launchpad.net>
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
+* Andrey Shinkevich (andrey.shinkevich@virtuozzo.com) wrote:
+> Provide the possibility to pass the 'filter-node-name' parameter to the
+> block-stream job as it is done for the commit block job.
+>=20
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 > ---
-> v2: =
+>  block/stream.c            | 5 +++--
+>  blockdev.c                | 8 +++++++-
+>  include/block/block_int.h | 7 ++++++-
+>  monitor/hmp-cmds.c        | 4 ++--
+>  qapi/block-core.json      | 6 ++++++
+>  5 files changed, 24 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/block/stream.c b/block/stream.c
+> index d8b4bbe..fab7923 100644
+> --- a/block/stream.c
+> +++ b/block/stream.c
+> @@ -229,7 +229,9 @@ static const BlockJobDriver stream_job_driver =3D {
+>  void stream_start(const char *job_id, BlockDriverState *bs,
+>                    BlockDriverState *base, const char *backing_file_str,
+>                    int creation_flags, int64_t speed,
+> -                  BlockdevOnError on_error, Error **errp)
+> +                  BlockdevOnError on_error,
+> +                  const char *filter_node_name,
+> +                  Error **errp)
+>  {
+>      StreamBlockJob *s;
+>      BlockDriverState *iter;
+> @@ -265,7 +267,6 @@ void stream_start(const char *job_id, BlockDriverStat=
+e *bs,
+>      } else {
+>          bdrv_unfreeze_chain(bottom_cow_node, above_base);
+>      }
+> -
+>      /* Prevent concurrent jobs trying to modify the graph structure here=
+, we
+>       * already have our own plans. Also don't allow resize as the image =
+size is
+>       * queried only at the job start and then cached. */
+> diff --git a/blockdev.c b/blockdev.c
+> index 72d28ce..f275a64 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -3242,6 +3242,7 @@ void qmp_block_stream(bool has_job_id, const char *=
+job_id, const char *device,
+>                        bool has_backing_file, const char *backing_file,
+>                        bool has_speed, int64_t speed,
+>                        bool has_on_error, BlockdevOnError on_error,
+> +                      bool has_filter_node_name, const char *filter_node=
+_name,
+>                        bool has_auto_finalize, bool auto_finalize,
+>                        bool has_auto_dismiss, bool auto_dismiss,
+>                        Error **errp)
+> @@ -3257,6 +3258,10 @@ void qmp_block_stream(bool has_job_id, const char =
+*job_id, const char *device,
+>          on_error =3D BLOCKDEV_ON_ERROR_REPORT;
+>      }
+> =20
+> +    if (!has_filter_node_name) {
+> +        filter_node_name =3D NULL;
+> +    }
+> +
+>      bs =3D bdrv_lookup_bs(device, device, errp);
+>      if (!bs) {
+>          return;
+> @@ -3324,7 +3329,8 @@ void qmp_block_stream(bool has_job_id, const char *=
+job_id, const char *device,
+>      }
+> =20
+>      stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
+> -                 job_flags, has_speed ? speed : 0, on_error, &local_err)=
+;
+> +                 job_flags, has_speed ? speed : 0, on_error,
+> +                 filter_node_name, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          goto out;
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 993bafc..5ac4891 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -1052,6 +1052,9 @@ int is_windows_drive(const char *filename);
+>   *                  See @BlockJobCreateFlags
+>   * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
+>   * @on_error: The action to take upon error.
+> + * @filter_node_name: The node name that should be assigned to the filte=
+r
+> + * driver that the commit job inserts into the graph above @bs. NULL mea=
+ns
+> + * that a node name should be autogenerated.
+>   * @errp: Error object.
+>   *
+>   * Start a streaming operation on @bs.  Clusters that are unallocated
+> @@ -1064,7 +1067,9 @@ int is_windows_drive(const char *filename);
+>  void stream_start(const char *job_id, BlockDriverState *bs,
+>                    BlockDriverState *base, const char *backing_file_str,
+>                    int creation_flags, int64_t speed,
+> -                  BlockdevOnError on_error, Error **errp);
+> +                  BlockdevOnError on_error,
+> +                  const char *filter_node_name,
+> +                  Error **errp);
+> =20
+>  /**
+>   * commit_start:
+> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> index 5ca3ebe..0432ac9 100644
+> --- a/monitor/hmp-cmds.c
+> +++ b/monitor/hmp-cmds.c
+> @@ -2044,8 +2044,8 @@ void hmp_block_stream(Monitor *mon, const QDict *qd=
+ict)
+> =20
+>      qmp_block_stream(true, device, device, base !=3D NULL, base, false, =
+NULL,
+>                       false, NULL, qdict_haskey(qdict, "speed"), speed, t=
+rue,
+> -                     BLOCKDEV_ON_ERROR_REPORT, false, false, false, fals=
+e,
+> -                     &error);
+> +                     BLOCKDEV_ON_ERROR_REPORT, false, NULL, false, false=
+,
+> +                     false, false, &error);
+> =20
+>      hmp_handle_error(mon, &error);
 
->   Used env->pkg_offset for bits 15:12 which is already available.
-> =
+That's moved now into block/monitor/block-hmp-cmds.c
+Feel free to add the extra parameter to the HMP side as well!
 
->  target/i386/cpu.c |   15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
-> =
+Dave
 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 90ffc5f..5e5a605 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -5830,11 +5830,20 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t ind=
-ex, uint32_t count,
->              *eax =3D cpu->phys_bits;
->          }
->          *ebx =3D env->features[FEAT_8000_0008_EBX];
-> -        *ecx =3D 0;
-> -        *edx =3D 0;
->          if (cs->nr_cores * cs->nr_threads > 1) {
-> -            *ecx |=3D (cs->nr_cores * cs->nr_threads) - 1;
-> +            /*
-> +             * Bits 15:12 is "The number of bits in the initial
-> +             * Core::X86::Apic::ApicId[ApicId] value that indicate
-> +             * thread ID within a package". This is already stored at
-> +             * CPUX86State::pkg_offset.
-> +             * Bits 7:0 is "The number of threads in the package is NC+1"
-> +             */
-> +            *ecx =3D (env->pkg_offset << 12) |
-> +                   ((cs->nr_cores * cs->nr_threads) - 1);
-> +        } else {
-> +            *ecx =3D 0;
->          }
-> +        *edx =3D 0;
->          break;
->      case 0x8000000A:
->          if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM) {
-> =
+>  }
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 3c54717..169f8ea 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -2552,6 +2552,11 @@
+>  #            'stop' and 'enospc' can only be used if the block device
+>  #            supports io-status (see BlockInfo).  Since 1.3.
+>  #
+> +# @filter-node-name: the node name that should be assigned to the
+> +#                    filter driver that the stream job inserts into the =
+graph
+> +#                    above @device. If this option is not given, a node =
+name is
+> +#                    autogenerated. (Since: 5.0)
+> +#
+>  # @auto-finalize: When false, this job will wait in a PENDING state afte=
+r it has
+>  #                 finished its work, waiting for @block-job-finalize bef=
+ore
+>  #                 making any block graph changes.
+> @@ -2581,6 +2586,7 @@
+>    'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
+>              '*base-node': 'str', '*backing-file': 'str', '*speed': 'int'=
+,
+>              '*on-error': 'BlockdevOnError',
+> +            '*filter-node-name': 'str',
+>              '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
+> =20
+>  ##
+> --=20
+> 1.8.3.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-
--- =
-
-philipp.eppelt@kernkonzept.com - Tel. 0351-41 883 221
-http://www.kernkonzept.com
-
-Kernkonzept GmbH.  Sitz: Dresden.  Amtsgericht Dresden, HRB 31129.
-Gesch=C3=A4ftsf=C3=BChrer: Dr.-Ing. Michael Hohmuth
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1871842
-
-Title:
-  AMD CPUID leaf 0x8000'0008 reported number of cores  inconsistent with
-  ACPI.MADT
-
-Status in QEMU:
-  New
-
-Bug description:
-  Setup:
-  CPU: AMD EPYC-v2 or host's EPYC cpu
-  Linux 64-bit fedora host; Kernel version 5.5.15-200.fc31
-  qemu version: self build
-  git-head: f3bac27cc1e303e1860cc55b9b6889ba39dee587
-  config: Configured with: '../configure' '--target-list=3Dx86_64-softmmu,m=
-ips64el-softmmu,mips64-softmmu,mipsel-softmmu,mips-softmmu,i386-softmmu,aar=
-ch64-softmmu,arm-softmmu' '--prefix=3D/opt/qemu-master'
-
-  Cmdline: =
-
-  qemu-system-x86_64 -kernel /home/peppelt/code/l4/internal/.build-x86_64/b=
-in/amd64_gen/bootstrap -append "" -initrd "./fiasco/.build-x86_64/fiasco , =
-... " -serial stdio -nographic -monitor none -nographic -monitor none -cpu =
-EPYC-v2 -m 4G -smp 4 =
-
-
-  Issue:
-  We are developing an microkernel operating system called L4Re. We recentl=
-y got an AMD EPYC server for testing and we couldn't execute SMP tests of o=
-ur system when running Linux + qemu + VM w/ L4Re.
-  In fact, the kernel did not recognize any APs at all. On AMD CPUs the ker=
-nel checks for the number of cores reported in CPUID leaf 0x8000_0008.ECX[N=
-C] or [ApicIdSize].  [0][1]
-
-  The physical machine reports for leaf 0x8000_0008:  EAX: 0x3030 EBX: 0x18=
-cf757 ECX: 0x703f EDX: 0x1000
-  The lower four bits of ECX are the [NC] field and all set.
-
-  When querying inside qemu with -enable-kvm -cpu host -smp 4 (basically as=
- replacement and addition to the above cmdline) the CPUID leaf shows: EAX: =
-0x3024, EBX: 0x1001000, ECX: 0x0, EDX: 0x0
-  Note, ECX is zero. Indicating that this is no SMP capabale CPU.
-
-  I'm debugging it using my local machine and the QEMU provided EPYC-v2
-  CPU model and it is reproducible there as well and reports:  EAX:
-  0x3028, EBX: 0x0, ECX: 0x0, EDX: 0x0
-
-  I checked other AMD based CPU models (phenom, opteron_g3/g5) and they beh=
-ave the same. [2] shows the CPUID 0x8000'0008 handling in the QEMU source.
-  I believe that behavior here is wrong as ECX[NC] should report the number=
- of cores per processor, as stated in the AMD manual [2] p.584. In my under=
-standing -smp 4 should then lead to ECX[NC] =3D 0x3.
-
-  The following table shows my findings with the -smp option:
-  Option | Qemu guest observed ECX value
-  -smp 4 | 0x0
-  -smp 4,cores=3D4  | 0x3
-  -smp 4,cores=3D2,thread=3D2 | 0x3
-  -smp 4,cores=3D4,threads=3D2 | QEMU boot error: topology false.
-
-  Now, I'm asking myself how the terminology of the AMD manual maps to QEMU=
-'s -smp option.
-  Obviously, nr_cores and nr_threads correspond to the cores and threads op=
-tions on the cmdline and cores * threads <=3D 4 (in this example), but what=
- corresponds the X in -smp X to?
-
-  Querying 0x8000'0008 on the physical processor results in different
-  reports than quering QEMU's model as does it with -enable-kvm -cpu
-  host.
-
-  Furthermore, the ACPI.MADT shows 4 local APICs to be present while the
-  CPU leave reports a single core processor.
-
-  This leads me to the conclusion that CPUID 0x8000'0008.ECX reports the
-  wrong number.
-
-  =
-
-  Please let me know, if you need more information from my side.
-
-  =
-
-  [0] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
-28e2b879cbbd19/src/kern/ia32/kernel_thread-ia32.cpp#L109
-  [1] https://github.com/kernkonzept/fiasco/blob/522ccc5f29ab120213cf02d713=
-28e2b879cbbd19/src/kern/ia32/cpu-ia32.cpp#L1120
-  [2] https://github.com/qemu/qemu/blob/f2a8261110c32c4dccd84e774d8dd7a0524=
-e00fb/target/i386/cpu.c#L5835
-  [3] https://www.amd.com/system/files/TechDocs/24594.pdf
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1871842/+subscriptions
 
