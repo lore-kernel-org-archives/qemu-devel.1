@@ -7,79 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03058C54FC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:22:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB619C54FCC
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:22:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B140F206F4
+	by mail.kernel.org (Postfix) with ESMTPS id 6F45B206E9
 	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:22:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IXMbUQeA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B140F206F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PSRR2Ohw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F45B206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQvfS-0001x8-RI
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 12:22:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54004)
+	id 1jQvfR-0001xM-Tw
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 12:22:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54008)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jQveG-0000mZ-O7
+ (envelope-from <peterx@redhat.com>) id 1jQveI-0000mf-Gl
  for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jQveB-00045y-Tw
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:24 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28741
+ (envelope-from <peterx@redhat.com>) id 1jQveD-00046X-EP
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:26 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55633
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jQveB-00045G-IM
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:19 -0400
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jQveD-00046F-2x
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587486078;
+ s=mimecast20190719; t=1587486080;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=I0YrSfJZG3OCin0XwLpQsE2WSkg0EXuV6HT6X0zjKVY=;
- b=IXMbUQeAyP0w2hQa/+ubzem/zA6rxKSMwAFUp9qBFzj3/69c//7yBAnujJsAxPeRNgxMWm
- tAiPhJkSCDIGBf9U09R4DROXAA1dIEKnFy5r4IQKIdnAwjXHXnQyFb6DLsKFby9mR/SOBK
- 78ixMGIrWaaYwuhvry9juDV0F5uVHRg=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-bTONjKJXMB-TwcXF8KhEnQ-1; Tue, 21 Apr 2020 12:21:16 -0400
-X-MC-Unique: bTONjKJXMB-TwcXF8KhEnQ-1
-Received: by mail-qt1-f197.google.com with SMTP id f56so15324186qte.18
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 09:21:16 -0700 (PDT)
+ bh=ZWARAODmBStGiYrFPvbCFJNkPOytrLfsKcpWRULN7JI=;
+ b=PSRR2OhwcWkW6Ig5qrCmQqUmw9Ac/ckFRA0kCEzHQybdY8/xo05oyNDTV5Vb4jnozQAaVC
+ oyQsHd57ppccsob/okAC5uGDvZbJmYc8+H+qRp4RnnjkATWIJkCktiUjGCMruZBhcfpoBH
+ NrO/6YOXTItzhD7ARi88LTZHPC6lJ54=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-w_v2Gy5NPiOCpfR1i78Bcg-1; Tue, 21 Apr 2020 12:21:18 -0400
+X-MC-Unique: w_v2Gy5NPiOCpfR1i78Bcg-1
+Received: by mail-qk1-f200.google.com with SMTP id a187so14579401qkg.18
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 09:21:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ZpjWesWQtez4RVwbFQXrjywWOT0CDQMzNzTMHASVusg=;
- b=O01WSumiTLzz4EHYyFzd+jU9zEALDwNITCMz2rzZXwPA9v7LhB+Ow3uTM3yuGhDDnA
- 7PPnlT0JqcjytwSocnlkFztftYwuBMZMU9DrqgMJN+cSNh722Ya+Q/Z0YKV+ebWtTyEh
- m+MC+90SgKvs2ptpxNWrX/VXWWW1GlF6ANE6XFcc1o6qp0Kk5FAke0GUuTo4GsaZFZPw
- 9DxSusHic3kuJhMLW560rqSgiRFSVhxUie8z+YVaQF1AyKpbnCkTC12ing+PPRve34do
- Af5MknXR0FgtoGpxmDDinJWeBh2hPGVTlBRuyJBnevcBa19nqe0i03tpa778s/bcV/yS
- HJqQ==
-X-Gm-Message-State: AGi0PubE/OE5EvKp9tCyF+CycSTxhgPIsSc7iI7O63Ecw+p//JhJFyAx
- yB92KX15NOS9SHwryW6PrF17UWa28f1PgsWlBoWNcPcZPmRoDb3iJhFqAliWfmNafu42WJF3QqZ
- wbJQkSfQ30BB4gjw=
-X-Received: by 2002:a0c:f883:: with SMTP id u3mr20841115qvn.86.1587486075659; 
- Tue, 21 Apr 2020 09:21:15 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI4ZYxDlkw7lZXId1vwb0Snhu5C16MYvVeIRWGMGcHSua539raQFqse1kuOWbXHqS8a+pp4MQ==
-X-Received: by 2002:a0c:f883:: with SMTP id u3mr20841022qvn.86.1587486074472; 
- Tue, 21 Apr 2020 09:21:14 -0700 (PDT)
+ bh=O9l/BvBydUlEJUjD9a9P0sgBp3L6+LGe0OTTKmSjbXg=;
+ b=bKus1GnmzFSuur0nj5DTS/UNgZAA/uxRJ7jz8BTSXQpPdLulOPNlpPQ7kjTeU9eNdL
+ glomsxa7cEvz9IIxiKfEZ3GYalr7lZUo3IcaAeKeFOUZmwXqIWhO5z1w6TQaATTRZhiB
+ k21wGwWtVrS6/Qd3iq84XGkXCgEMz6e56Aft7dLX1O/o4SXHZtmfDx+EGWuTCa4oIZe2
+ X1OrUNd3fRW3/M7sTBAVD7AO8MbJzNqKgg3aBoq5iNNPwb0sXE+EjN4fBnil0FI4rQ0G
+ MFihFhX7UzmYmXMWX+gA2fxq2QJvtrQZD2TMo881Le4dHr/i/l2I0oqbgmVzZ+kUOqiI
+ lwUw==
+X-Gm-Message-State: AGi0PuYvhzRjHxr6tERzUGOBoJosO6wJ+aleRSD3RFUB21ccq28p8/4a
+ FE6XnI8KzsZQkptwyNduuCdSVI9gOdAdJJ8fOdw27GFDLbZtS5fUUBMEv0Fq36EfwFtBBscVdch
+ 8Qu0kamf5GLA8PjI=
+X-Received: by 2002:a05:620a:228:: with SMTP id
+ u8mr22773764qkm.309.1587486077885; 
+ Tue, 21 Apr 2020 09:21:17 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJwmIMZM1MbMcC9Qf5/Wp3f7cgLATEQeVTID+i/5dJRNXJOjG/HWTnMlDs5xF3EQ1P+tlfhWA==
+X-Received: by 2002:a05:620a:228:: with SMTP id
+ u8mr22773736qkm.309.1587486077630; 
+ Tue, 21 Apr 2020 09:21:17 -0700 (PDT)
 Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id k43sm2111531qtk.67.2020.04.21.09.21.13
+ by smtp.gmail.com with ESMTPSA id h2sm2043688qkh.91.2020.04.21.09.21.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Apr 2020 09:21:13 -0700 (PDT)
+ Tue, 21 Apr 2020 09:21:17 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/8] memory: Introduce memory_region_transaction_{push|pop}()
-Date: Tue, 21 Apr 2020 12:21:01 -0400
-Message-Id: <20200421162108.594796-2-peterx@redhat.com>
+Subject: [PATCH 2/8] memory: Don't do topology update in memory finalize()
+Date: Tue, 21 Apr 2020 12:21:02 -0400
+Message-Id: <20200421162108.594796-3-peterx@redhat.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200421162108.594796-1-peterx@redhat.com>
 References: <20200421162108.594796-1-peterx@redhat.com>
@@ -88,11 +90,11 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=peterx@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 01:28:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 03:31:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,53 +112,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-memory_region_transaction_{begin|commit}() could be too big when finalizing=
- a
-memory region.  E.g., we should never attempt to update address space topol=
-ogy
-during the finalize() of a memory region.  Provide helpers for further use.
+Topology update could be wrongly triggered in memory region finalize() if
+there's bug somewhere else.  It'll be a very confusing stack when it
+happens (e.g., sending KVM ioctl within the RCU thread, and we'll observe i=
+t
+only until it fails!).
 
+Instead of that, we use the push()/pop() helper to avoid memory transaction
+commit, at the same time we use assertions to make sure there's no pending
+updates or it's a nested transaction, so it could fail even earlier and in =
+a
+more explicit way.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- memory.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ memory.c | 23 +++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
 
 diff --git a/memory.c b/memory.c
-index 601b749906..e5d634d648 100644
+index e5d634d648..fea427f43f 100644
 --- a/memory.c
 +++ b/memory.c
-@@ -1054,10 +1054,20 @@ static void address_space_update_topology(AddressSp=
-ace *as)
-     address_space_set_flatview(as);
- }
+@@ -171,6 +171,12 @@ struct MemoryRegionIoeventfd {
+     EventNotifier *e;
+ };
 =20
-+static void memory_region_transaction_push(void)
++/* Returns whether there's any pending memory updates */
++static bool memory_region_has_pending_update(void)
 +{
-+    memory_region_transaction_depth++;
++    return memory_region_update_pending || ioeventfd_update_pending;
 +}
 +
-+static void memory_region_transaction_pop(void)
-+{
-+    memory_region_transaction_depth--;
-+}
-+
- void memory_region_transaction_begin(void)
+ static bool memory_region_ioeventfd_before(MemoryRegionIoeventfd *a,
+                                            MemoryRegionIoeventfd *b)
  {
-     qemu_flush_coalesced_mmio_buffer();
--    ++memory_region_transaction_depth;
+@@ -1730,12 +1736,25 @@ static void memory_region_finalize(Object *obj)
+      * and cause an infinite loop.
+      */
+     mr->enabled =3D false;
+-    memory_region_transaction_begin();
++
++    /*
++     * Use push()/pop() instead of begin()/commit() to make sure below blo=
+ck
++     * won't trigger any topology update (which should never happen, but i=
+t's
++     * still a safety belt).
++     */
 +    memory_region_transaction_push();
- }
-=20
- void memory_region_transaction_commit(void)
-@@ -1067,7 +1077,7 @@ void memory_region_transaction_commit(void)
-     assert(memory_region_transaction_depth);
-     assert(qemu_mutex_iothread_locked());
-=20
--    --memory_region_transaction_depth;
+     while (!QTAILQ_EMPTY(&mr->subregions)) {
+         MemoryRegion *subregion =3D QTAILQ_FIRST(&mr->subregions);
+         memory_region_del_subregion(mr, subregion);
+     }
+-    memory_region_transaction_commit();
 +    memory_region_transaction_pop();
-     if (!memory_region_transaction_depth) {
-         if (memory_region_update_pending) {
-             flatviews_reset();
++
++    /*
++     * Make sure we're either in a nested transaction or there must have n=
+o
++     * pending updates due to memory_region_del_subregion() above.
++     */
++    assert(memory_region_transaction_depth ||
++           !memory_region_has_pending_update());
+=20
+     mr->destructor(mr);
+     memory_region_clear_coalescing(mr);
 --=20
 2.24.1
 
