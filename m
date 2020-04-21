@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A91C54FC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 392F2C54FD0
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:24:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B27D20753
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:23:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 05AEF2087E
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:24:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I828Jxlh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B27D20753
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UjttNA5J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05AEF2087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQsrh-0005tj-K2
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 09:23:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48484)
+	id 1jQsst-0007bE-3S
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 09:24:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48532)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jQsob-0001Gt-Mx
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:19:54 -0400
+ (envelope-from <philmd@redhat.com>) id 1jQsoh-0001Qk-6k
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jQsob-0007k3-2G
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:19:53 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43705
+ (envelope-from <philmd@redhat.com>) id 1jQsog-0007sB-5I
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:19:58 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42063
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jQsoa-0007ei-LJ
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:19:52 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jQsoe-0007px-NV
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:19:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587475191;
+ s=mimecast20190719; t=1587475196;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qfG1iMoMuVJK3ytJuPp4jkcsIuLSkap1NwXNvJU0GUg=;
- b=I828JxlhqWpiHP91/W7hiQrC6LAMtFc3NtNsNPvP35vH4iaD4u3AvfbjOwbknzOz985Qgc
- nhCcNblcZXup2Xr51VM0Dt9lzvY1C3MDzpQWHBN06+e8NSnYCKek1cvgblauU5tpV+YcxP
- Q9+Rt3ghqh57DiQBBOfMOc0cZHw8f9I=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-145-W7h8QfvDPuSKiMbXVDAFFQ-1; Tue, 21 Apr 2020 09:19:49 -0400
-X-MC-Unique: W7h8QfvDPuSKiMbXVDAFFQ-1
-Received: by mail-wr1-f70.google.com with SMTP id m5so7459070wru.15
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 06:19:49 -0700 (PDT)
+ bh=pU9wiDrqb1FbUODn1z0R5OZvX82oaKZlJ+qXZZecY0U=;
+ b=UjttNA5JE4WsRwj3ywUDZc2Pz+325cotcMVNFGmrIcTRLL/buJh8OETAPiNMMeXl7PP+Ce
+ 86uysHToH+nBiZ1cz8PHSg5sRp5O6U+2BBBvqTlcavDKonyyn7yUYi2kWmJ17ZpDbrjb5V
+ EviFvPkqa26/70Xo+IRHJDvgBrotEeg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-341-cv26NbiHMpWrg9RP8jQbmg-1; Tue, 21 Apr 2020 09:19:54 -0400
+X-MC-Unique: cv26NbiHMpWrg9RP8jQbmg-1
+Received: by mail-wm1-f71.google.com with SMTP id l21so1443584wmh.2
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 06:19:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=A6xQD+3rOPF5ujK6YzLWEuyxUGl4uZx+Lu/2zv1O3wM=;
- b=kkJ1WflIoATLcfFHKzcPih8jQpk3HgVwsvKYJkiO3adOYC96oRhsQCXR37qen8qDJZ
- OGsjI9gNVm7ywGc1B/nUu8evBxLnPHJVXtn/qKs2tJ7XZZNcqMp7xgqSw4NumpMf67Pc
- Nr/NBG5DRNc77S7USORx6jSMIP2TeCBrtmL4alTIx+LAAR90pK4YNKj0NuLKIlpCjezC
- d0yRKHWgKeJYzcoEKBf3efVaCTKrymAQCa+U76FC64y5tVh7Xs8pd/7wZjsjNGyBQwO5
- 9y7zhCZaoiaKiPV6alxkzPpwyvVMKkQDb451PnIsFw8/zhV99g+WXgsRcV3hzdvdIbWs
- JGrA==
-X-Gm-Message-State: AGi0PuaOfjsj8UAuNBdLyQ+En/LHJp6kOJfyEJvCGrrRfKSfxyaDmFHA
- H9At4EAFA4CnKLbaAckvxIKktiu2YR0T6hf3w9kTHBE8FyUTc0roBaKIf11TNSj3wMGJU21qP8g
- 9ts5W0lpq8m+EN74=
-X-Received: by 2002:adf:aad4:: with SMTP id i20mr20368771wrc.47.1587475188189; 
- Tue, 21 Apr 2020 06:19:48 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKQ45wjdIi2JB7mTGs5QgEoycKoGnml4/LCG6bAVS7Yhekx7ffdfLPkoBCKsiqu3f0PLxQrAQ==
-X-Received: by 2002:adf:aad4:: with SMTP id i20mr20368754wrc.47.1587475187984; 
- Tue, 21 Apr 2020 06:19:47 -0700 (PDT)
+ bh=Zqzb/pshEzW1fPo5MmdJgyS/wpMg+nvvsoa+3p+thQ0=;
+ b=ekjQ3M7iKWg4bLD1vzkq6VzqVtWHWqbqBFdA4wZz3391Hg69eG6m8gtbJuFfuVUdbP
+ zJpWw6duQY92jLoU5V9ocuQvyQ8woyIAFUzadI2kVQ0Db39HFIc50x67U9us/BQ/gCyX
+ CxTQAhhCFAexlTDoi85yCObJHJh/gUYNGOBessePaC6DkGk8roZzDmJblHORP1OzrPhB
+ 1W48mc4YJbk14gUfRpTYMlmZ6WRhKypw+pQhrT/GEF8zVL6fAw1sFOp6vhSNk+bbSjwJ
+ ElhWrdmVc/hguek6I4IDZ35qvIZkP3JWXD3GJ703688JVd7I7hDxwXQX4nnvhouTreMA
+ xgJg==
+X-Gm-Message-State: AGi0PubipywO28iiZiEORgKXgKlUWhdvcHs7XGFjo1WUBzSCJe6og5mo
+ Lcldilcyq8VwM7i+p1qYHDUykz+q7TWl6WTCPfLQvDpDSNDr0fMKjEyilWkHZYetexTdlKYRMV5
+ Qkcbqkv9ocDpqSB0=
+X-Received: by 2002:adf:e282:: with SMTP id v2mr24137576wri.329.1587475193001; 
+ Tue, 21 Apr 2020 06:19:53 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJi8RM6ZFcZImP1v+szj5GX0ylJ5Ta9bTGS/vimyu/dAjz0CEoRCbjwXiMnWKdnATOybQwPIQ==
+X-Received: by 2002:adf:e282:: with SMTP id v2mr24137559wri.329.1587475192830; 
+ Tue, 21 Apr 2020 06:19:52 -0700 (PDT)
 Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id q184sm3549887wma.25.2020.04.21.06.19.47
+ by smtp.gmail.com with ESMTPSA id y10sm3395269wma.5.2020.04.21.06.19.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Apr 2020 06:19:47 -0700 (PDT)
+ Tue, 21 Apr 2020 06:19:52 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/6] target/arm/cpu: Use ARRAY_SIZE() to iterate over
- ARMCPUInfo[]
-Date: Tue, 21 Apr 2020 15:19:24 +0200
-Message-Id: <20200421131926.12116-5-philmd@redhat.com>
+Subject: [PATCH 5/6] target/arm/cpu: Update coding style to make checkpatch.pl
+ happy
+Date: Tue, 21 Apr 2020 15:19:25 +0200
+Message-Id: <20200421131926.12116-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200421131926.12116-1-philmd@redhat.com>
 References: <20200421131926.12116-1-philmd@redhat.com>
@@ -114,73 +114,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+We will move this code in the next commit. Clean it up
+first to avoid checkpatch.pl errors.
+
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- target/arm/cpu.c   | 8 +++-----
- target/arm/cpu64.c | 8 +++-----
- 2 files changed, 6 insertions(+), 10 deletions(-)
+ target/arm/cpu.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 6c84e99a38..9023d9e2cf 100644
+index 9023d9e2cf..1ddf850f00 100644
 --- a/target/arm/cpu.c
 +++ b/target/arm/cpu.c
-@@ -2735,7 +2735,6 @@ static const ARMCPUInfo arm_cpus[] =3D {
-     { .name =3D "any",         .initfn =3D arm_max_initfn },
- #endif
- #endif
--    { .name =3D NULL }
- };
+@@ -582,7 +582,8 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, in=
+t interrupt_request)
+     CPUARMState *env =3D &cpu->env;
+     bool ret =3D false;
 =20
- static Property arm_cpu_properties[] =3D {
-@@ -2883,14 +2882,13 @@ static const TypeInfo idau_interface_type_info =3D =
-{
-=20
- static void arm_cpu_register_types(void)
+-    /* ARMv7-M interrupt masking works differently than -A or -R.
++    /*
++     * ARMv7-M interrupt masking works differently than -A or -R.
+      * There is no FIQ/IRQ distinction. Instead of I and F bits
+      * masking FIQ and IRQ interrupts, an exception is taken only
+      * if it is higher priority than the current execution priority
+@@ -1902,7 +1903,8 @@ static void arm1026_initfn(Object *obj)
+ static void arm1136_r2_initfn(Object *obj)
  {
--    const ARMCPUInfo *info =3D arm_cpus;
-+    size_t i;
-=20
-     type_register_static(&arm_cpu_type_info);
-     type_register_static(&idau_interface_type_info);
-=20
--    while (info->name) {
--        arm_cpu_register(info);
--        info++;
-+    for (i =3D 0; i < ARRAY_SIZE(arm_cpus); ++i) {
-+        arm_cpu_register(&arm_cpus[i]);
-     }
-=20
- #ifdef CONFIG_KVM
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index e89388378b..5daafba937 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -733,7 +733,6 @@ static const ARMCPUInfo aarch64_cpus[] =3D {
-     { .name =3D "cortex-a53",         .initfn =3D aarch64_a53_initfn },
-     { .name =3D "cortex-a72",         .initfn =3D aarch64_a72_initfn },
-     { .name =3D "max",                .initfn =3D aarch64_max_initfn },
--    { .name =3D NULL }
- };
-=20
- static bool aarch64_cpu_get_aarch64(Object *obj, Error **errp)
-@@ -839,13 +838,12 @@ static const TypeInfo aarch64_cpu_type_info =3D {
-=20
- static void aarch64_cpu_register_types(void)
- {
--    const ARMCPUInfo *info =3D aarch64_cpus;
-+    size_t i;
-=20
-     type_register_static(&aarch64_cpu_type_info);
-=20
--    while (info->name) {
--        aarch64_cpu_register(info);
--        info++;
-+    for (i =3D 0; i < ARRAY_SIZE(aarch64_cpus); ++i) {
-+        aarch64_cpu_register(&aarch64_cpus[i]);
-     }
- }
-=20
+     ARMCPU *cpu =3D ARM_CPU(obj);
+-    /* What qemu calls "arm1136_r2" is actually the 1136 r0p2, ie an
++    /*
++     * What qemu calls "arm1136_r2" is actually the 1136 r0p2, ie an
+      * older core than plain "arm1136". In particular this does not
+      * have the v6K features.
+      * These ID register values are correct for 1136 but may be wrong
+@@ -2688,7 +2690,8 @@ static const ARMCPUInfo arm_cpus[] =3D {
+     { .name =3D "arm926",      .initfn =3D arm926_initfn },
+     { .name =3D "arm946",      .initfn =3D arm946_initfn },
+     { .name =3D "arm1026",     .initfn =3D arm1026_initfn },
+-    /* What QEMU calls "arm1136-r2" is actually the 1136 r0p2, i.e. an
++    /*
++     * What QEMU calls "arm1136-r2" is actually the 1136 r0p2, i.e. an
+      * older core than plain "arm1136". In particular this does not
+      * have the v6K features.
+      */
 --=20
 2.21.1
 
