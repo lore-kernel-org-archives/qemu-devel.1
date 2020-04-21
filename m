@@ -2,88 +2,93 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DEAAC54FC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 19:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D721DC54FCC
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 19:20:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E87A20656
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 19:20:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E6B320656
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 19:20:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pN2E2m6q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E87A20656
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SOb6vy7j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E6B320656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQyRr-00014B-1a
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 15:20:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52078)
+	id 1jQyRv-0001F0-HS
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 15:20:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52132)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1jQyQZ-0007hA-RY
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 15:19:28 -0400
+ (envelope-from <palmerdabbelt@google.com>) id 1jQyQj-0007vq-BH
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 15:19:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1jQyQY-0007gc-Ad
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 15:19:27 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:42382)
+ (envelope-from <palmerdabbelt@google.com>) id 1jQyQi-0007mf-MK
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 15:19:37 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:41021)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <palmerdabbelt@google.com>)
- id 1jQyQX-0007dW-Sx
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 15:19:25 -0400
-Received: by mail-pl1-x643.google.com with SMTP id v2so5622102plp.9
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 12:19:23 -0700 (PDT)
+ id 1jQyQi-0007lt-9f
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 15:19:36 -0400
+Received: by mail-pf1-x441.google.com with SMTP id b8so7041064pfp.8
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 12:19:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=subject:date:message-id:mime-version:content-transfer-encoding:cc
- :from:to; bh=d2aQTDRAnh1W1uDd73pKIcIBYgis36iQt06EI8YmDrs=;
- b=pN2E2m6qSoaom/4RWEWGJIAiKglZBsnOOAJkYLDW0TFi0GRqtF+NL5qzXlwGjA8g43
- M3ulH0EpM/ibrYAnNsEhiK8fDYXxIqH0lWxbhmRq+CosYiW8seSWR/0hHHPe0AK0//GQ
- PnF+Q/b6MdjHym2cb6K92xGz4EiNquim42F0XMbQOTOU6BgaTqrFi4b8F8GVX/hbRh48
- NFjRJNYr4FX6k/mmmXqjYfBEbigeCbXTvdp3DnOwkCmPtUW50t0BPkWyqFgulMZ7UkjX
- sLWavhJ8/0BacVDd8weZH0RYey2sfjeJOVRiaeP5RnUIy5KJuWxEhNAt3joNM7JBOV24
- nrhg==
+ h=subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding:cc:from:to;
+ bh=J18hrsuxLmsCXXOrk6dxkfjT6yK/2TCdOo0otnuZFwo=;
+ b=SOb6vy7jD+6hYjXUQqfSx8XeXQx38unn+uuxgVMkImPseS54ll88fyF9psRdiKCy4D
+ rCFCPj5m/vZzw8zLccO57PyQSTuu0s2Cr6UFQRYdMjlAuV8QnQCXssADkW/4kVj8eNoV
+ eig03ISZgRy/LMv0eb8Oev4voVoVIZgarE+mgXqDGFjbgeI+bG5LFRmGjX9YBASsOPkS
+ kdK1It83tUp19NY7EeM0HBuS4FymiWamo6pbu2+DnwdZr1i3oyrl61f2WBnG/YDAPmUo
+ 6P09GFkdoWHwI03VY84xqsPUllOeEfxvrfp3XJSb/ZWJ3wNqZzWr3cT2fQB5wT48DfLc
+ wkeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:date:message-id:mime-version
- :content-transfer-encoding:cc:from:to;
- bh=d2aQTDRAnh1W1uDd73pKIcIBYgis36iQt06EI8YmDrs=;
- b=er7nrCXGXkLODcotofz3vb+nOu2Uq+WR9VEBaHkTyFJM6bU7H925hWf5v/d5eyuOiH
- k+CO3KmxDV2UPKuo+1ETt7rW0yEJp+PLai8/15eY17W/TgHrdsOQsHQlbyC5mbrjpYVe
- knRpM9zk+plZe9kgn04rSIzsVSfr3uUBx2ShdfwXbIFiK2LV91vhZpuTjokRbYxznaO8
- FHMmcEnZm8Ji0o+85/hU/Kapvz71ZUJmFo+3iyMXOf2/4HNsLXB0D9sgbTFH7dG6YhbU
- LH8ZgbC8ZbqodJ7nTq6EtB97FrS89xHop/tjhuJRdF+pyTff+hjSjCBtlpTndShVE4BW
- GDVg==
-X-Gm-Message-State: AGi0PubQlG1RNLuY+V839LHgd936yxlWOsPUEdAfIZR/V5KB4N0rAsNx
- KtskHxgSTUMRmpXeFZCXO7iiug==
-X-Google-Smtp-Source: APiQypLI5c5Cdk+yBJuabxDSseVYoNfNLx75Kl68Jw+Bwvhm+JFcUoaBmn2gMpXS6O7U2JMQmYBSsw==
-X-Received: by 2002:a17:902:7886:: with SMTP id
- q6mr23086848pll.237.1587496761677; 
- Tue, 21 Apr 2020 12:19:21 -0700 (PDT)
+ h=x-gm-message-state:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding:cc:from:to;
+ bh=J18hrsuxLmsCXXOrk6dxkfjT6yK/2TCdOo0otnuZFwo=;
+ b=j64rRHtX//B3ta7me6AD6TEJy1kOxwV7CkHnhT3HerfAIW5yv0vOJYNqg4Ug9KA9Kv
+ Z9GslOx/UWE3c423gwxqIPVPefKL73ezKzGA/ng8P72s/F/v48d0IFGHoAIDXznKuMiX
+ uP268gNVJ3HOtZC2YIDSoyn1KxVjmGisXF9/zAma3vNy/qpONVLZSrjnz1vs9V7Tj3I6
+ wvIu91CzDrtY8iT6vigsgDLBxC6Oj3RkG5oZEAdMFs/+Mv/9OWKXRCt6DZOoVXp5IYnB
+ 3/caQ/d9GZjHi2JmGNU/Uqy4h4IBXJXX+YJZDhrAVm8M1//xaTt20n6vdKpxawO313EL
+ oHUQ==
+X-Gm-Message-State: AGi0PuZxAIOIJuV3aBTnSEowHuPUIgRMcGK8QQgOf8O9YM3qFjGBs0gz
+ tRoy7ALayiPyFjmyuh+gZCahsg==
+X-Google-Smtp-Source: APiQypJxkkLvXrt96+FhIfK0RUUlmrsD1hpL9sUDTNr4iwbieYWFxkxbP9GU923uJCkahCvgU+xdJg==
+X-Received: by 2002:aa7:9e49:: with SMTP id z9mr22812291pfq.225.1587496774828; 
+ Tue, 21 Apr 2020 12:19:34 -0700 (PDT)
 Received: from localhost (76-210-143-223.lightspeed.sntcca.sbcglobal.net.
  [76.210.143.223])
- by smtp.gmail.com with ESMTPSA id y187sm3193810pfg.16.2020.04.21.12.19.20
+ by smtp.gmail.com with ESMTPSA id p68sm3101993pfb.89.2020.04.21.12.19.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Apr 2020 12:19:21 -0700 (PDT)
-Subject: [PULL] RISC-V Patches for 5.0-rc4
-Date: Tue, 21 Apr 2020 12:09:55 -0700
-Message-Id: <20200421191001.92644-1-palmerdabbelt@google.com>
+ Tue, 21 Apr 2020 12:19:34 -0700 (PDT)
+Subject: [PULL 6/6] riscv/sifive_u: Add a serial property to the sifive_u
+ machine
+Date: Tue, 21 Apr 2020 12:10:01 -0700
+Message-Id: <20200421191001.92644-7-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.26.1.301.g55bc3eb7cb9-goog
+In-Reply-To: <20200421191001.92644-1-palmerdabbelt@google.com>
+References: <20200421191001.92644-1-palmerdabbelt@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org,
+ Bin Meng <bmeng.cn@gmail.com>, Palmer Dabbelt <palmerdabbelt@google.com>,
+ Alistair Francis <alistair.francis@wdc.com>
 From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=palmerdabbelt@google.com; helo=mail-pl1-x643.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=palmerdabbelt@google.com; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::643
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,49 +104,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 20038cd7a8412feeb49c01f6ede89e36c8995472:
+From: Bin Meng <bmeng.cn@gmail.com>
 
-  Update version for v5.0.0-rc3 release (2020-04-15 20:51:54 +0100)
+At present the board serial number is hard-coded to 1, and passed
+to OTP model during initialization. Firmware (FSBL, U-Boot) uses
+the serial number to generate a unique MAC address for the on-chip
+ethernet controller. When multiple QEMU 'sifive_u' instances are
+created and connected to the same subnet, they all have the same
+MAC address hence it creates a unusable network.
 
-are available in the Git repository at:
+A new "serial" property is introduced to specify the board serial
+number. When not given, the default serial number 1 is used.
 
-  git@github.com:palmer-dabbelt/qemu.git tags/riscv-for-master-5.0-rc4
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <1573916930-19068-1-git-send-email-bmeng.cn@gmail.com>
+[ Changed by AF:
+ - Use the SoC's serial property to pass the info to the SoC
+ - Fixup commit title
+ - Rebase on file restructuring
+]
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
+---
+ hw/riscv/sifive_u.c         | 20 ++++++++++++++++++++
+ include/hw/riscv/sifive_u.h |  1 +
+ 2 files changed, 21 insertions(+)
 
-for you to fetch changes up to 8a7ce6ac908a8ef30d6a81fe8334c3c942670949:
-
-  riscv/sifive_u: Add a serial property to the sifive_u machine (2020-04-21 10:54:59 -0700)
-
-----------------------------------------------------------------
-RISC-V Patches for 5.0-rc4
-
-This contains handful of patches that I'd like to target for 5.0.  I know it's
-a bit late, I thought I'd already sent these out but must have managed to miss
-doing so.  The patches include:
-
-* A handful of fixes to PTE lookups related to H-mode support.
-* The addition of a serial number fo the SiFive U implementetaion, which allows
-  bootloaders to generate a sane MAC address.
-
-These pass "make check" and boot Linux for me.
-
-----------------------------------------------------------------
-Peter: Sorry I dropped the ball here.  I can understand if it's too late for
-5.0, but if there's still going to be an rc4 then I'd love to have these
-included.
-----------------------------------------------------------------
-Alistair Francis (5):
-      target/riscv: Don't set write permissions on dirty PTEs
-      riscv: Don't use stage-2 PTE lookup protection flags
-      riscv: AND stage-1 and stage-2 protection flags
-      riscv/sifive_u: Fix up file ordering
-      riscv/sifive_u: Add a serial property to the sifive_u SoC
-
-Bin Meng (1):
-      riscv/sifive_u: Add a serial property to the sifive_u machine
-
- hw/riscv/sifive_u.c         | 137 ++++++++++++++++++++++++++------------------
- include/hw/riscv/sifive_u.h |   3 +
- target/riscv/cpu_helper.c   |  17 +++---
- 3 files changed, 94 insertions(+), 63 deletions(-)
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 9bfd16d2bb..eb0abcae89 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -34,6 +34,7 @@
+ #include "qemu/log.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
++#include "qapi/visitor.h"
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+ #include "hw/sysbus.h"
+@@ -326,6 +327,8 @@ static void sifive_u_machine_init(MachineState *machine)
+     object_initialize_child(OBJECT(machine), "soc", &s->soc,
+                             sizeof(s->soc), TYPE_RISCV_U_SOC,
+                             &error_abort, NULL);
++    object_property_set_uint(OBJECT(&s->soc), s->serial, "serial",
++                            &error_abort);
+     object_property_set_bool(OBJECT(&s->soc), true, "realized",
+                             &error_abort);
+ 
+@@ -417,6 +420,18 @@ static void sifive_u_machine_set_start_in_flash(Object *obj, bool value, Error *
+     s->start_in_flash = value;
+ }
+ 
++static void sifive_u_machine_get_serial(Object *obj, Visitor *v, const char *name,
++                                void *opaque, Error **errp)
++{
++    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
++}
++
++static void sifive_u_machine_set_serial(Object *obj, Visitor *v, const char *name,
++                                void *opaque, Error **errp)
++{
++    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
++}
++
+ static void sifive_u_machine_instance_init(Object *obj)
+ {
+     SiFiveUState *s = RISCV_U_MACHINE(obj);
+@@ -428,6 +443,11 @@ static void sifive_u_machine_instance_init(Object *obj)
+                                     "Set on to tell QEMU's ROM to jump to " \
+                                     "flash. Otherwise QEMU will jump to DRAM",
+                                     NULL);
++
++    s->serial = OTP_SERIAL;
++    object_property_add(obj, "serial", "uint32", sifive_u_machine_get_serial,
++                        sifive_u_machine_set_serial, NULL, &s->serial, NULL);
++    object_property_set_description(obj, "serial", "Board serial number", NULL);
+ }
+ 
+ 
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index a2baa1de5f..16c297ec5f 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -61,6 +61,7 @@ typedef struct SiFiveUState {
+     int fdt_size;
+ 
+     bool start_in_flash;
++    uint32_t serial;
+ } SiFiveUState;
+ 
+ enum {
+-- 
+2.26.1.301.g55bc3eb7cb9-goog
 
 
