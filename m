@@ -2,83 +2,141 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48DB9C54FC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 15:50:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0A4DC54FC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 15:55:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DFE52064C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 15:50:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 812FC206E9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 15:55:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UtTpQgjK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DFE52064C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F9RGjuGR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 812FC206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQv9y-0001ZG-Ud
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 11:50:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48158)
+	id 1jQvFW-0005AT-7s
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 11:55:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49246)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jQv7x-0008CD-Bs
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:48:01 -0400
+ (envelope-from <lvivier@redhat.com>) id 1jQvEX-0004En-LN
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jQv7v-0008T6-MN
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:48:01 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57526
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <lvivier@redhat.com>) id 1jQvEV-0006Jj-S7
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:54:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27650
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jQv7v-0008Sg-91
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:47:59 -0400
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1jQvEV-0006Gv-6q
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:54:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587484077;
+ s=mimecast20190719; t=1587484485;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wPwb4x4cd+R4RX8OqtFGynxiKePNqZR0NvZBNGYP3jQ=;
- b=UtTpQgjKS4mCNXyXZJkf8reZRiMhZo1Pw9UG2QNRJtfbFhpuTTAdXVXWJ121rgqIe7lKYZ
- oPgZ5wsGKuvwHaSC6St+q2os9xFZCjk99rdn93COwh5FvOxOkLHYCXht5bysveKQqVP2hy
- uLYIA8eAZ0+aSR+Z2kl+HMyp82w/tqk=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=4p2IhvLMEKTISDYlmmwFEJ0dIG3ccYHI1lDnFKZc8hE=;
+ b=F9RGjuGRMUlxDvVWlF5NC4/TUzE7in+T9PJCN1uhuZc/HsfL/Ocib6yxdTUH8jgkuht+bO
+ rSTfJcEv5YFb0GAOXNz2iOZX9yWReUoeP6jIEixWfn7qrsrZZFLbAvx7c0zullgrPDTyeY
+ XsAb58rEAL7uV9hlUOBnWAStYOqjvJs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-alZCC0GiMcqXaa89HOIS-A-1; Tue, 21 Apr 2020 11:47:55 -0400
-X-MC-Unique: alZCC0GiMcqXaa89HOIS-A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-147-UPYdj5rxMpaIs4Nn95Hs2g-1; Tue, 21 Apr 2020 11:54:41 -0400
+X-MC-Unique: UPYdj5rxMpaIs4Nn95Hs2g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F414DB60;
- Tue, 21 Apr 2020 15:47:54 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-112-155.ams2.redhat.com [10.36.112.155])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2629B5C1B2;
- Tue, 21 Apr 2020 15:47:51 +0000 (UTC)
-Date: Tue, 21 Apr 2020 17:47:50 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Klaus Birkelund Jensen <its@irrelevant.dk>
-Subject: Re: [PATCH v2 00/16] nvme: refactoring and cleanups
-Message-ID: <20200421154750.GC22440@linux.fritz.box>
-References: <20200415130159.611361-1-its@irrelevant.dk>
- <20200420173832.GA10592@redsun51.ssa.fujisawa.hgst.com>
- <20200421063850.wayw2eytcywio6tr@apples.localdomain>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96909107ACC9;
+ Tue, 21 Apr 2020 15:54:38 +0000 (UTC)
+Received: from [10.36.114.254] (ovpn-114-254.ams2.redhat.com [10.36.114.254])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DF88F1001920;
+ Tue, 21 Apr 2020 15:54:15 +0000 (UTC)
+Subject: Re: [RFC v1 3/4] vhost-vdpa: implement vhost-vdpa backend
+To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, armbru@redhat.com,
+ eblake@redhat.com, cohuck@redhat.com, jasowang@redhat.com
+References: <20200420093241.4238-1-lulu@redhat.com>
+ <20200420093241.4238-4-lulu@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <4e1cc5db-0578-4c6b-afce-da6aebcf24c6@redhat.com>
+Date: Tue, 21 Apr 2020 17:54:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200421063850.wayw2eytcywio6tr@apples.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200420093241.4238-4-lulu@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 01:28:51
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=lvivier@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 04:54:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,30 +148,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beata Michalska <beata.michalska@linaro.org>, qemu-block@nongnu.org,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
+ saugatm@xilinx.com, maxime.coquelin@redhat.com, hch@infradead.org,
+ eperezma@redhat.com, jgg@mellanox.com, shahafs@mellanox.com,
+ kevin.tian@intel.com, parav@mellanox.com, vmireyno@marvell.com,
+ cunming.liang@intel.com, gdawar@xilinx.com, jiri@mellanox.com,
+ xiao.w.wang@intel.com, stefanha@redhat.com, zhihong.wang@intel.com,
+ aadam@redhat.com, rdunlap@infradead.org, hanand@xilinx.com,
+ lingshan.zhu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 21.04.2020 um 08:38 hat Klaus Birkelund Jensen geschrieben:
-> On Apr 21 02:38, Keith Busch wrote:
-> > The series looks good to me.
-> >=20
-> > Reviewed-by: Keith Busch <kbusch@kernel.org>
->=20
-> Thanks for the review Keith!
->=20
-> Kevin, should I rebase this on block-next? I think it might have some
-> conflicts with the PMR patch that went in previously.
+On 20/04/2020 11:32, Cindy Lu wrote:
+> Currently we have 2 types of vhost backends in QEMU: vhost kernel and
+> vhost-user. The above patch provides a generic device for vDPA purpose,
+> this vDPA device exposes to user space a non-vendor-specific configuration
+> interface for setting up a vhost HW accelerator, this patch set introduces
+> a third vhost backend called vhost-vdpa based on the vDPA interface.
+> 
+> Vhost-vdpa usage:
+> 
+>   qemu-system-x86_64 -cpu host -enable-kvm \
+>     ......
+>   -netdev type=vhost-vdpa,vhostdev=/dev/vhost-vdpa-id,id=vhost-vdpa0 \
+>   -device virtio-net-pci,netdev=vhost-vdpa0,page-per-vq=on \
+> 
+> Author: Tiwei Bie
 
-The series doesn't apply at the moment anyway, I assume it's because of
-the PMR patch. So yes, I would appreciate a rebase.
+Use "git commit --author" to set that.
 
-Kevin
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>  hw/net/vhost_net.c                |  43 ++++
+>  hw/net/virtio-net.c               |   9 +
+>  hw/virtio/Makefile.objs           |   2 +-
+>  hw/virtio/vhost-backend.c         |   3 +
+>  hw/virtio/vhost-vdpa.c            | 379 ++++++++++++++++++++++++++++++
+>  hw/virtio/vhost.c                 |   5 +
+>  include/hw/virtio/vhost-backend.h |   6 +-
+>  include/hw/virtio/vhost-vdpa.h    |  14 ++
+>  8 files changed, 459 insertions(+), 2 deletions(-)
+>  create mode 100644 hw/virtio/vhost-vdpa.c
+>  create mode 100644 include/hw/virtio/vhost-vdpa.h
+> 
+> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+> index 4096d64aaf..0d13fda2fc 100644
+> --- a/hw/net/vhost_net.c
+> +++ b/hw/net/vhost_net.c
+...
+> @@ -434,6 +462,10 @@ VHostNetState *get_vhost_net(NetClientState *nc)
+>          assert(vhost_net);
+>          break;
+>  #endif
+> +    case NET_CLIENT_DRIVER_VHOST_VDPA:
+> +        vhost_net = vhost_vdpa_get_vhost_net(nc);
+> +        assert(vhost_net);
+> +        break;
+
+This should be inside a "#ifdef".
+
+Thanks,
+Laurent
 
 
