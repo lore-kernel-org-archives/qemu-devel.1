@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8950BC54FCC
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:26:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4202C54FD0
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:26:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DB3F206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:26:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7BDEE206F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:26:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J3X+W+9Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DB3F206E9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xb6DoRYK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BDEE206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQvik-0007Cu-SU
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 12:26:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54090)
+	id 1jQvio-0007J5-4x
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 12:26:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54038)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jQveU-00017t-U0
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:39 -0400
+ (envelope-from <peterx@redhat.com>) id 1jQveL-0000qS-Cj
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jQveT-0004EF-9V
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:38 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46842
+ (envelope-from <peterx@redhat.com>) id 1jQveK-0004BI-L6
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:29 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43958
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jQveS-0004Dr-SK
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:36 -0400
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jQveK-00049p-7e
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587486096;
+ s=mimecast20190719; t=1587486086;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BDz7lahVpSsYjchGZFQF0Q24z99LRn1XXRfOl+p2CyQ=;
- b=J3X+W+9Y15776KKxo6upsaAB5rsb385JVHyMtCoezerUHcQ09eua1ttQh6GouyCmXgxFN6
- L2Y/usn9pWRAqYUfZXu+B6q/svfsf555vh1RWVQM86le9i0rnEEa6HTX/C8nhr7aGQkLIA
- Dx/ZB5y4urN3kP23HXJtCl2AqTGaOQM=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-U_NGFeJjPsevu8n8VQpUKQ-1; Tue, 21 Apr 2020 12:21:34 -0400
-X-MC-Unique: U_NGFeJjPsevu8n8VQpUKQ-1
-Received: by mail-qv1-f71.google.com with SMTP id ck5so14259883qvb.18
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 09:21:34 -0700 (PDT)
+ bh=wfxPjer3693hNyeNhfCTsgqPk6evPUCTajLlOJ7juug=;
+ b=Xb6DoRYKa3qZd9WzVEw9m+aTDPfZsH/B62tLa89BV1ZYlohXg+ds01JpAhevddaJTVa3K5
+ CuUj9Hu6qLBRuRZAUfzfKuC4eW/FAHyodwVhk2fMTmFHhENZuSA0cvdWJ7tCM5Bz6OOfg4
+ pinZGTmZ7FudUW7P6n3w58MafZpVwCo=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-228-Cw98MCrjM6O0BF4Wks1YIA-1; Tue, 21 Apr 2020 12:21:24 -0400
+X-MC-Unique: Cw98MCrjM6O0BF4Wks1YIA-1
+Received: by mail-qk1-f197.google.com with SMTP id f187so14601955qkd.11
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 09:21:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Xr430nT3TegA7cHuep87EtnygKrdKqkDIQZx40c9Vks=;
- b=EcukyQoAEHZ9oplOhnfFWtB/eeBtlX4CEreNrsHIPldAr6DBaWRydF9UQj5cV0M77A
- qo5X4EeFuhfxJ+ltPIFAR9H4PqVvNLDbaZ/K1SDMUiSAHi5cPHrkekWIIl5HOxPyKddS
- 7R4lPFw4BZQiuAx2xxaKIktGlWgFoeWK+em6V+WMVGr79l1cyIV3jzuu782aHkAbUbX1
- gXebepDQcWsS2QGW26i3y4+qKvyJBlRuhYB8V6IDsLp8OyIORvAZ564vY3pb0PXbdX90
- mScUHL8WdrUZa68YUJwCGODwMbUF63vtpjTWvXZMMCqwXrAFnK18BmjEwrZDgvwc5YNf
- znhQ==
-X-Gm-Message-State: AGi0PuajuppigOyXOkIuMOLF6ojvzwAQivI4jZAymPJts0bVklToUii0
- xn6A/v+NuPYyPwJr3XAoaTa6/okErlE4Q8G5SwihjPoMll4xw1r7QROFg+zBqNBpKIeBmmqKtFS
- zcyhEcbWIcjeHcn8=
-X-Received: by 2002:a37:8a87:: with SMTP id m129mr7695450qkd.250.1587486093605; 
- Tue, 21 Apr 2020 09:21:33 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIwFZPkauDJAzhQKNhpSqCPX+CMXXtH4VIYb3UHXOy6bqkE6uZXNcrK9yZf1DZEY9lEM/ex6g==
-X-Received: by 2002:a37:8a87:: with SMTP id m129mr7695432qkd.250.1587486093386; 
- Tue, 21 Apr 2020 09:21:33 -0700 (PDT)
+ bh=ul0LDfa/tHiLxLabo660k4W93ALf8ff07OzkSYpgBqo=;
+ b=q9P0fx6hWfqgHYWbrzCidDvcyt8lSKE2arTzaGHCTLihRZGPtutiOJQVHKgQfRaaz9
+ Smsv/f5TU9+BteCM/bX7rWwloJW4rPgHKMuqbwM6io8LM3qeGl3Mw9HFeFhTUvqMBlhc
+ 45Uro+gtJxB3wfq8iVs/jsPWlcIBGrxTyYDz9pN63FKNyZnIyP5FmkOe/e86lS0OJGrN
+ t8QHqsn6tye+yID7emTgfsbI/w7C0h/74DHBO2U/5G1eyh/5eSWbu/8zrtpsJLzLdWoA
+ MLSmFTwrAQ9EzTbtfO8a34GN8c7ICCCtzJfZgIwxzLt5c8B0C9nb8kOLaA3cYeeXmxm2
+ MYyw==
+X-Gm-Message-State: AGi0PubA0CeRL1ntmDmyjveGQS0NXQ3PI17Vv660OMRkdmYko7XWaNbc
+ dfKyxB72+e3Kjt4mnSeuY96y51VRmPl65cvgIe0aaIhNA2Lbq4lCz4C6u0w2Olu3azejjI0CcMM
+ 5ev4tjFTF7duej0s=
+X-Received: by 2002:a37:9f47:: with SMTP id i68mr22316537qke.356.1587486084251; 
+ Tue, 21 Apr 2020 09:21:24 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLLDAMpxE+jbOaakotFGhzVpCp0dQ3NIYrW9cCU826rFnBmgn1FJZN/LXc9VBILD0WxKjJ/UA==
+X-Received: by 2002:a37:9f47:: with SMTP id i68mr22316510qke.356.1587486084027; 
+ Tue, 21 Apr 2020 09:21:24 -0700 (PDT)
 Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id i42sm2106688qtc.83.2020.04.21.09.21.32
+ by smtp.gmail.com with ESMTPSA id u17sm2065530qka.0.2020.04.21.09.21.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Apr 2020 09:21:32 -0700 (PDT)
+ Tue, 21 Apr 2020 09:21:23 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 7/8] memory: Assert on no ongoing memory transaction before
- release BQL
-Date: Tue, 21 Apr 2020 12:21:07 -0400
-Message-Id: <20200421162108.594796-8-peterx@redhat.com>
+Subject: [PATCH 4/8] cpus: Introduce qemu_cond_timedwait_iothread()
+Date: Tue, 21 Apr 2020 12:21:04 -0400
+Message-Id: <20200421162108.594796-5-peterx@redhat.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200421162108.594796-1-peterx@redhat.com>
 References: <20200421162108.594796-1-peterx@redhat.com>
@@ -89,11 +88,11 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=peterx@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 01:28:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 03:31:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,71 +110,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make sure we don't have any more ongoing memory transaction when releasing =
-the
-BQL.  This will trigger an abort if we misuse the QEMU memory model, e.g., =
-when
-calling run_on_cpu() during a memory commit.
+This is the sister function of qemu_cond_wait_iothread().  Use it at the on=
+ly
+place where we do cond_timedwait() on BQL.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- cpus.c                         | 2 ++
- include/exec/memory-internal.h | 1 +
- memory.c                       | 6 ++++++
- 3 files changed, 9 insertions(+)
+ cpus.c                   | 9 +++++++--
+ include/qemu/main-loop.h | 7 +++++++
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/cpus.c b/cpus.c
-index 48aa295fea..8c82556ff4 100644
+index 00f6e361af..263eddc8b0 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -43,6 +43,7 @@
- #include "sysemu/hvf.h"
- #include "sysemu/whpx.h"
- #include "exec/exec-all.h"
-+#include "exec/memory-internal.h"
-=20
- #include "qemu/thread.h"
- #include "qemu/plugin.h"
-@@ -1834,6 +1835,7 @@ void qemu_mutex_lock_iothread_impl(const char *file, =
-int line)
-=20
- static void qemu_mutex_unlock_iothread_prepare(void)
- {
-+    assert(!memory_region_has_pending_transaction());
+@@ -726,8 +726,8 @@ static void cpu_throttle_thread(CPUState *cpu, run_on_c=
+pu_data opaque)
+     endtime_ns =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + sleeptime_ns;
+     while (sleeptime_ns > 0 && !cpu->stop) {
+         if (sleeptime_ns > SCALE_MS) {
+-            qemu_cond_timedwait(cpu->halt_cond, &qemu_global_mutex,
+-                                sleeptime_ns / SCALE_MS);
++            qemu_cond_timedwait_iothread(cpu->halt_cond,
++                                         sleeptime_ns / SCALE_MS);
+         } else {
+             qemu_mutex_unlock_iothread();
+             g_usleep(sleeptime_ns / SCALE_US);
+@@ -1844,6 +1844,11 @@ void qemu_cond_wait_iothread(QemuCond *cond)
+     qemu_cond_wait(cond, &qemu_global_mutex);
  }
 =20
- void qemu_mutex_unlock_iothread(void)
-diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.=
-h
-index 9fcc2af25c..3124b91c4b 100644
---- a/include/exec/memory-internal.h
-+++ b/include/exec/memory-internal.h
-@@ -35,6 +35,7 @@ static inline AddressSpaceDispatch *address_space_to_disp=
-atch(AddressSpace *as)
-=20
- FlatView *address_space_get_flatview(AddressSpace *as);
- void flatview_unref(FlatView *view);
-+bool memory_region_has_pending_transaction(void);
-=20
- extern const MemoryRegionOps unassigned_mem_ops;
-=20
-diff --git a/memory.c b/memory.c
-index fea427f43f..2f8dc9721f 100644
---- a/memory.c
-+++ b/memory.c
-@@ -177,6 +177,12 @@ static bool memory_region_has_pending_update(void)
-     return memory_region_update_pending || ioeventfd_update_pending;
- }
-=20
-+bool memory_region_has_pending_transaction(void)
++void qemu_cond_timedwait_iothread(QemuCond *cond, int ms)
 +{
-+    return memory_region_transaction_depth ||
-+        memory_region_has_pending_update();
++    qemu_cond_timedwait(cond, &qemu_global_mutex, ms);
 +}
 +
- static bool memory_region_ioeventfd_before(MemoryRegionIoeventfd *a,
-                                            MemoryRegionIoeventfd *b)
+ static bool all_vcpus_paused(void)
  {
+     CPUState *cpu;
+diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
+index a6d20b0719..a0e59c5563 100644
+--- a/include/qemu/main-loop.h
++++ b/include/qemu/main-loop.h
+@@ -303,6 +303,13 @@ void qemu_mutex_unlock_iothread(void);
+  */
+ void qemu_cond_wait_iothread(QemuCond *cond);
+=20
++/*
++ * qemu_cond_timedwait_iothread: Wait on condition for the main loop mutex
++ *
++ * This is the same as qemu_cond_wait_iothread() but allows a timeout.
++ */
++void qemu_cond_timedwait_iothread(QemuCond *cond, int ms);
++
+ /* internal interfaces */
+=20
+ void qemu_fd_register(int fd);
 --=20
 2.24.1
 
