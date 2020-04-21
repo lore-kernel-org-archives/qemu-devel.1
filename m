@@ -2,123 +2,86 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BC2CC2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 08:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B455FC54FC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 08:30:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15EEF206B8
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 08:26:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 839C92084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 08:30:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="o6SGXNJN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15EEF206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MTCYtXy+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 839C92084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQoEe-0004Ul-9v
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 04:26:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50032)
+	id 1jQoIp-0006gS-O5
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 04:30:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51320)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jQoDy-00044T-B6
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:25:46 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jQoHt-00060U-U1
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:29:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jQoDx-0001Co-51
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:25:45 -0400
-Received: from mail-eopbgr80105.outbound.protection.outlook.com
- ([40.107.8.105]:11006 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jQoDw-0001AP-DR; Tue, 21 Apr 2020 04:25:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MjRAazfov72V/n7W6SqVLVYce2QJ6r09BUCqX23nYkHh/gxHqd7wiZzA8PJkMyqdgrz4lF/cPwV6jqzyS1eOnBhmYf4bjZYTjpu+MSTVJ53cGB+d2Podk4da2lU3JDG2XRjWlNQUoJSj1J9TJmlPJbgS313smkyQV6BWkRf6xI6fs0YrOQovy4MajjWwrfLF7k/NJT0kCVyTr2/k9tM5XNwBgleIkJUU33e5RkULsqPWe17BC7I3Jff4dT4XDduuvtFpaQLx0IOEFDVi9yMnHP1A2wzyidFBfOmSNwV9d01Hp3De/3fhtuX4xz2P+9EbLhmzaBEhG0tG/hpH5FiGRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=op56URYBy9Ue00QC+SHBj4649f54378dD8LsSRZV/3w=;
- b=hTa8BBhHFz8wunwWHbtsU2XlO9/nbnyOBy2yH/NpbTaYps3ABvo7ARae9BuqjGzlyDL3WsYJb/33VtQd7+9A0qINubtLiQCekbYMnQlVFDqzPubjsAEABJukU2fingK8GaIXlS5y+x+8rpaGIw+RwF9k2xnp6wCk1ISGFc1W+SNVVkRU+vdquTTWDZaUoeBWHaOhLMxLg7khF79F4NknT2jCn2frF7ESl+l697+bo2XAAXkB5CAz7gfIBokDfiHU8bISvIwJpQeAM4W0tdVSTxmFKRgOrwbH1nz/5MFIiaedDICGB169Ti7bLP8FmcbrE/N62Jh/5x/PDNWbV32VzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=op56URYBy9Ue00QC+SHBj4649f54378dD8LsSRZV/3w=;
- b=o6SGXNJNC3+X+ZKnPpHdkQThradoS1VFh53bbvzWc/Oidk1ODyJqEG8cKaLK2FG7F2fpTUhqpNxbYvWeFGW1BQJLfvFd6EnBChY3+gIyAf9BQ9fishDlub78UN1/L/UVSJn0mSL8Z9jWh9LCQUxKAi9j/mG/Hnh3xMWzgrRGYEA=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5493.eurprd08.prod.outlook.com (2603:10a6:20b:102::11)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.27; Tue, 21 Apr
- 2020 08:25:40 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2921.027; Tue, 21 Apr 2020
- 08:25:40 +0000
-Subject: Re: [PATCH v4 2/9] block: Add flags to bdrv(_co)_truncate()
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200420133214.28921-1-kwolf@redhat.com>
- <20200420133214.28921-3-kwolf@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200421112537133
-Message-ID: <8964e423-36f3-77d2-dbf1-ed5490e911b7@virtuozzo.com>
-Date: Tue, 21 Apr 2020 11:25:37 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200420133214.28921-3-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM4PR0202CA0009.eurprd02.prod.outlook.com
- (2603:10a6:200:89::19) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <cohuck@redhat.com>) id 1jQoHr-0004uf-Fh
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:29:49 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45044
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jQoHq-0004pw-S1
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:29:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587457785;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VRMYN7CIs0pAKBhamwvbihiYtE6DgFdpHTC0hECnLuA=;
+ b=MTCYtXy+T1nDvwaAkghBZdD6aFNg3lCTU3Xx+/GYr6f6sYKi6HVIJEPHlgyQwyZmDVq+dK
+ L7GVizTC2aHQ1o71jlvZFn1KxshAYyz3KjfoMx2Z9gDy6upM7ge8uxXVFarJMTtWX2uk8l
+ FxzKc5+fN5UbHiXpxavnCALuG8UlP+U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-375-AZWfMrv9PFakLUbqsD_uUg-1; Tue, 21 Apr 2020 04:29:43 -0400
+X-MC-Unique: AZWfMrv9PFakLUbqsD_uUg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 414DB1050908;
+ Tue, 21 Apr 2020 08:29:42 +0000 (UTC)
+Received: from gondolin (ovpn-112-226.ams2.redhat.com [10.36.112.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 15E3C60C63;
+ Tue, 21 Apr 2020 08:29:40 +0000 (UTC)
+Date: Tue, 21 Apr 2020 10:29:37 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Jared Rossi <jrossi@linux.ibm.com>
+Subject: Re: [PATCH 1/1] vfio-ccw: Enable transparent CCW IPL from DASD
+Message-ID: <20200421102937.511fde3a.cohuck@redhat.com>
+In-Reply-To: <2fe2e12dee1799afee088bed88e6c671@linux.vnet.ibm.com>
+References: <20200417183838.11796-1-jrossi@linux.ibm.com>
+ <20200417183838.11796-2-jrossi@linux.ibm.com>
+ <20200420142617.5e255265.cohuck@redhat.com>
+ <20200420142917.206d36a5.cohuck@redhat.com>
+ <2fe2e12dee1799afee088bed88e6c671@linux.vnet.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.142) by
- AM4PR0202CA0009.eurprd02.prod.outlook.com (2603:10a6:200:89::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.25 via Frontend
- Transport; Tue, 21 Apr 2020 08:25:39 +0000
-X-Tagtoolbar-Keys: D20200421112537133
-X-Originating-IP: [185.215.60.142]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 914bbc32-1288-41ab-5a46-08d7e5cd933e
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5493:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB549327882B6E5A2BA2B1EB33C1D50@AM7PR08MB5493.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2887;
-X-Forefront-PRVS: 038002787A
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(136003)(346002)(39850400004)(376002)(366004)(396003)(4326008)(956004)(8676002)(8936002)(2616005)(5660300002)(81156014)(31696002)(316002)(478600001)(86362001)(16576012)(186003)(31686004)(16526019)(26005)(36756003)(6486002)(2906002)(66946007)(66476007)(52116002)(66556008);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ihx62PrKOH+i9vG0dvLLihlpFMAazHDx4Grn737fK643NlqBOS/xjWrL+yblNINcGretYFDctK2YfCJ4toC5a9eBkmSQXqV6jLQ5Mx1te1A9SAKIT+YgjHW97vuYs5hvk1COw3nYX/D7QksCzV9xwTOc52EP+nPPvMrcIAEJhkmr0/YQfXql4sawNXXCp4w1J7hhUr3GmxQ4x0KCDc5elj91zw+n1DsbDtCOwpa5z5QcZ1J+fEpqdZ4OkPmioFrII6gG/nNTvWnKVK9Bk5Xp91eGTXTcGWCVxAwAAHhEXKnMtokcLLiD3OueO2mBnpiitRxZimty8j6ibhG4/4iMt2O3MpM7LCzi1t6eqDAeylrLhljLPJWSv0/99r6+5jevSz1cyyFrZk9F07j6Iz2qbeirN2BFHbshmUA5Ly/N4LvmyTUkPPtuKr++NSIZrnuI
-X-MS-Exchange-AntiSpam-MessageData: fuZjwn47MWChaFH3tZv/mAc4xgzvSF48pLs1KZLGO/GGVjk0aTDoP/lckw+s9Z21rF9VyRkU41FIblYMYTGiY9EpVENweRA0CnKGsAehRkIT5+YhJrvoX94NOSpMMJQA2WtIj4hGQ2qWf8AMAZrTrg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 914bbc32-1288-41ab-5a46-08d7e5cd933e
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2020 08:25:39.9300 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sj5wM0dFbhb9Flv/E3gD6ufteiogSWk7X0On4MfF9aBtqbl0k3zZsznMvL0HCvIenNUOk8vA/WPJKkvo4syImkH8r98sktFWlHEL/sHOnXg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5493
-Received-SPF: pass client-ip=40.107.8.105;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 04:25:41
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.8.105
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 01:28:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,48 +93,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berto@igalia.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Eric Farman <farman@linux.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-20.04.2020 16:32, Kevin Wolf wrote:
-> Now that block drivers can support flags for .bdrv_co_truncate, expose
-> the parameter in the node level interfaces bdrv_co_truncate() and
-> bdrv_truncate().
+On Mon, 20 Apr 2020 18:35:58 -0400
+Jared Rossi <jrossi@linux.ibm.com> wrote:
+
+> On 2020-04-20 08:29, Cornelia Huck wrote:
+> > On Mon, 20 Apr 2020 14:26:17 +0200
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> >   
+> >> On Fri, 17 Apr 2020 14:38:38 -0400
+> >> Jared Rossi <jrossi@linux.ibm.com> wrote:
+> >>   
+> >> > Remove the explicit prefetch check when using vfio-ccw devices.
+> >> > This check is not needed as all Linux channel programs are intended
+> >> > to use prefetch and will be executed in the same way regardless.  
+> >> 
+> >> As already commented on the Linux patch: Can we log something, so this
+> >> is debuggable if this statement does not hold true in the future?
+> >>   
 > 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Agreed.  I will work on debugging improvements so that any future issues
+> related to unintended prefetching are more clearly logged.
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Great.
 
-> ---
+> 
+> >> >
+> >> > Signed-off-by: Jared Rossi <jrossi@linux.ibm.com>
+> >> > ---
+> >> >  hw/vfio/ccw.c | 13 +++----------
+> >> >  1 file changed, 3 insertions(+), 10 deletions(-)
+> >> >
+> >> > diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> >> > index 50cc2ec75c..e649377b68 100644
+> >> > --- a/hw/vfio/ccw.c
+> >> > +++ b/hw/vfio/ccw.c
+> >> > @@ -74,16 +74,9 @@ static IOInstEnding vfio_ccw_handle_request(SubchDev *sch)
+> >> >      struct ccw_io_region *region = vcdev->io_region;
+> >> >      int ret;
+> >> >
+> >> > -    if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH)) {
+> >> > -        if (!(vcdev->force_orb_pfch)) {
+> >> > -            warn_once_pfch(vcdev, sch, "requires PFCH flag set");
+> >> > -            sch_gen_unit_exception(sch);
+> >> > -            css_inject_io_interrupt(sch);
+> >> > -            return IOINST_CC_EXPECTED;
+> >> > -        } else {
+> >> > -            sch->orb.ctrl0 |= ORB_CTRL0_MASK_PFCH;
+> >> > -            warn_once_pfch(vcdev, sch, "PFCH flag forced");
+> >> > -        }
+> >> > +    if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH) && vcdev->force_orb_pfch) {
+> >> > +        sch->orb.ctrl0 |= ORB_CTRL0_MASK_PFCH;
+> >> > +        warn_once_pfch(vcdev, sch, "PFCH flag forced");
+> >> >      }  
+> >> 
+> >> What happens when you run it with an old kernel? I guess the I/O is
+> >> only rejected later (after a trip into the kernel), but has that path
+> >> ever been tested?
+> >>   
+> 
+> Yes, this was tested and you are correct that the kernel will reject the 
+> I/O unless
+> the corresponding patch is also applied there.  I will revisit this path 
+> while I'm
+> updating the logging to ensure that any potential interactions are 
+> appropriately
+> considered.
 
-[..]
+I've looked at the code again and it seems that the kernel will end up
+signaling -EOPNOTSUPP to us on that case, which causes the same unit
+exception as without this patch, so we should be all good.
 
-> @@ -4169,7 +4170,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
->           new_file_size = allocation_start +
->                           nb_new_data_clusters * s->cluster_size;
->           /* Image file grows, so @exact does not matter */
-> -        ret = bdrv_co_truncate(bs->file, new_file_size, false, prealloc, errp);
-> +        ret = bdrv_co_truncate(bs->file, new_file_size, false, prealloc, 0, errp);
+> 
+> >> >
+> >> >      QEMU_BUILD_BUG_ON(sizeof(region->orb_area) != sizeof(ORB));  
+> >>   
+> > 
+> > Oh, and do we want to deprecate the force prefetch interface in the
+> > future? We probably need to wait a bit, until the kernel changes have
+> > become widely available.  
+> 
+> Yes, I think we will want to deprecate it at an appropriate time in the 
+> future.
+> 
 
-over-80 line
-
->           if (ret < 0) {
->               error_prepend(errp, "Failed to resize underlying file: ");
->               qcow2_free_clusters(bs, allocation_start,
-> @@ -4348,7 +4349,7 @@ qcow2_co_pwritev_compressed_part(BlockDriverState *bs,
->           if (len < 0) {
->               return len;
->           }
-> -        return bdrv_co_truncate(bs->file, len, false, PREALLOC_MODE_OFF, NULL);
-> +        return bdrv_co_truncate(bs->file, len, false, PREALLOC_MODE_OFF, 0, NULL);
-
-and this one
-
-
-
--- 
-Best regards,
-Vladimir
 
