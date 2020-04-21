@@ -2,105 +2,62 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4B0BC54FC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 840CFC54FC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:09:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6FBA206F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:07:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6FBA206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A4662068F
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:09:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A4662068F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQscs-0000BZ-SG
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 09:07:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45462)
+	id 1jQseF-0002G0-Eg
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 09:09:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44798)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <farman@linux.ibm.com>) id 1jQsaE-000442-VR
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:05:04 -0400
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1jQsXn-0008FT-SS
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:02:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <farman@linux.ibm.com>) id 1jQsaD-0004HB-HR
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:05:02 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:26048
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1jQsXl-0002YY-Sb
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:02:31 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3675 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <farman@linux.ibm.com>)
- id 1jQsaD-0004Dy-2A; Tue, 21 Apr 2020 09:05:01 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 03LD4KWw017839; Tue, 21 Apr 2020 09:04:58 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30hycnbu61-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Apr 2020 09:04:58 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03LD4ds7019784;
- Tue, 21 Apr 2020 09:04:57 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30hycnbu4s-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Apr 2020 09:04:57 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03LD4m34031970;
- Tue, 21 Apr 2020 13:04:55 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com
- (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
- by ppma02dal.us.ibm.com with ESMTP id 30fs66qmdv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Apr 2020 13:04:55 +0000
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 03LD4sAF50659690
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 21 Apr 2020 13:04:54 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id F4001C6059;
- Tue, 21 Apr 2020 13:04:53 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 03C72C605B;
- Tue, 21 Apr 2020 13:04:52 +0000 (GMT)
-Received: from [9.65.251.67] (unknown [9.65.251.67])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 21 Apr 2020 13:04:52 +0000 (GMT)
-Subject: Re: [PATCH v3 6/7] s390x/css: Refactor the css_queue_crw() routine
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200417023440.70514-1-farman@linux.ibm.com>
- <20200417023440.70514-7-farman@linux.ibm.com>
- <20200421142834.16f5ea16.cohuck@redhat.com>
-From: Eric Farman <farman@linux.ibm.com>
-Message-ID: <ecd45274-0116-72b4-44f5-818032e14ebf@linux.ibm.com>
-Date: Tue, 21 Apr 2020 09:04:52 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1jQsXb-00025M-V8; Tue, 21 Apr 2020 09:02:20 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 626ED2F3EE0BC60B7043;
+ Tue, 21 Apr 2020 21:02:14 +0800 (CST)
+Received: from S00345302A-PC.china.huawei.com (10.47.91.160) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 21 Apr 2020 21:02:05 +0800
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
+ <imammedo@redhat.com>
+Subject: [PATCH v4 4/7] hw/arm/virt: Add nvdimm hotplug support
+Date: Tue, 21 Apr 2020 13:59:31 +0100
+Message-ID: <20200421125934.14952-5-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
+In-Reply-To: <20200421125934.14952-1-shameerali.kolothum.thodi@huawei.com>
+References: <20200421125934.14952-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200421142834.16f5ea16.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-21_05:2020-04-20,
- 2020-04-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0
- spamscore=0 clxscore=1015 impostorscore=0 bulkscore=0 adultscore=0
- malwarescore=0 lowpriorityscore=0 mlxlogscore=999 priorityscore=1501
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004210100
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=farman@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 09:04:58
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+Content-Type: text/plain
+X-Originating-IP: [10.47.91.160]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190;
+ envelope-from=shameerali.kolothum.thodi@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 09:01:59
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,98 +69,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
- qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
- Jared Rossi <jrossi@linux.ibm.com>
+Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com, mst@redhat.com,
+ linuxarm@huawei.com, xuwei5@hisilicon.com, shannon.zhaosl@gmail.com,
+ prime.zeng@hisilicon.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This adds support for nvdimm hotplug events through GED
+and enables nvdimm for the arm/virt. Now Guests with ACPI
+can have both cold and hot plug of nvdimms.
+
+Hot removal functionality is not yet supported.
+
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+---
+ docs/specs/acpi_hw_reduced_hotplug.rst |  3 ++-
+ hw/acpi/generic_event_device.c         | 15 ++++++++++++++-
+ hw/arm/virt.c                          | 16 +++++++++++-----
+ include/hw/acpi/generic_event_device.h |  1 +
+ 4 files changed, 28 insertions(+), 7 deletions(-)
+
+diff --git a/docs/specs/acpi_hw_reduced_hotplug.rst b/docs/specs/acpi_hw_reduced_hotplug.rst
+index 911a98255b..0bd3f9399f 100644
+--- a/docs/specs/acpi_hw_reduced_hotplug.rst
++++ b/docs/specs/acpi_hw_reduced_hotplug.rst
+@@ -63,7 +63,8 @@ GED IO interface (4 byte access)
+     bits:
+        0: Memory hotplug event
+        1: System power down event
+-    2-31: Reserved
++       2: NVDIMM hotplug event
++    3-31: Reserved
+ 
+ **write_access:**
+ 
+diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
+index 021ed2bf23..5d17f78a1e 100644
+--- a/hw/acpi/generic_event_device.c
++++ b/hw/acpi/generic_event_device.c
+@@ -16,6 +16,7 @@
+ #include "hw/acpi/generic_event_device.h"
+ #include "hw/irq.h"
+ #include "hw/mem/pc-dimm.h"
++#include "hw/mem/nvdimm.h"
+ #include "hw/qdev-properties.h"
+ #include "migration/vmstate.h"
+ #include "qemu/error-report.h"
+@@ -23,6 +24,7 @@
+ static const uint32_t ged_supported_events[] = {
+     ACPI_GED_MEM_HOTPLUG_EVT,
+     ACPI_GED_PWR_DOWN_EVT,
++    ACPI_GED_NVDIMM_HOTPLUG_EVT,
+ };
+ 
+ /*
+@@ -110,6 +112,11 @@ void build_ged_aml(Aml *table, const char *name, HotplugHandler *hotplug_dev,
+                            aml_notify(aml_name(ACPI_POWER_BUTTON_DEVICE),
+                                       aml_int(0x80)));
+                 break;
++            case ACPI_GED_NVDIMM_HOTPLUG_EVT:
++                aml_append(if_ctx,
++                           aml_notify(aml_name("\\_SB.NVDR"),
++                                      aml_int(0x80)));
++                break;
+             default:
+                 /*
+                  * Please make sure all the events in ged_supported_events[]
+@@ -175,7 +182,11 @@ static void acpi_ged_device_plug_cb(HotplugHandler *hotplug_dev,
+     AcpiGedState *s = ACPI_GED(hotplug_dev);
+ 
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+-        acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp);
++        if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
++            nvdimm_acpi_plug_cb(hotplug_dev, dev);
++        } else {
++            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp);
++        }
+     } else {
+         error_setg(errp, "virt: device plug request for unsupported device"
+                    " type: %s", object_get_typename(OBJECT(dev)));
+@@ -192,6 +203,8 @@ static void acpi_ged_send_event(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
+         sel = ACPI_GED_MEM_HOTPLUG_EVT;
+     } else if (ev & ACPI_POWER_DOWN_STATUS) {
+         sel = ACPI_GED_PWR_DOWN_EVT;
++    } else if (ev & ACPI_NVDIMM_HOTPLUG_STATUS) {
++        sel = ACPI_GED_NVDIMM_HOTPLUG_EVT;
+     } else {
+         /* Unknown event. Return without generating interrupt. */
+         warn_report("GED: Unsupported event %d. No irq injected", ev);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 8a2beaf650..da4994c55a 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -549,6 +549,10 @@ static inline DeviceState *create_acpi_ged(VirtMachineState *vms)
+         event |= ACPI_GED_MEM_HOTPLUG_EVT;
+     }
+ 
++    if (ms->nvdimms_state->is_enabled) {
++        event |= ACPI_GED_NVDIMM_HOTPLUG_EVT;
++    }
++
+     dev = qdev_create(NULL, TYPE_ACPI_GED);
+     qdev_prop_set_uint32(dev, "ged-event", event);
+ 
+@@ -2070,19 +2074,20 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+                                  Error **errp)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
++    const MachineState *ms = MACHINE(hotplug_dev);
+     const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+ 
+-    if (is_nvdimm) {
+-        error_setg(errp, "nvdimm is not yet supported");
+-        return;
+-    }
+-
+     if (!vms->acpi_dev) {
+         error_setg(errp,
+                    "memory hotplug is not enabled: missing acpi-ged device");
+         return;
+     }
+ 
++    if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
++        error_setg(errp, "nvdimm is not enabled: add 'nvdimm=on' to '-M'");
++        return;
++    }
++
+     pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
+ }
+ 
+@@ -2227,6 +2232,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     hc->plug = virt_machine_device_plug_cb;
+     hc->unplug_request = virt_machine_device_unplug_request_cb;
+     mc->numa_mem_supported = true;
++    mc->nvdimm_supported = true;
+     mc->auto_enable_numa_with_memhp = true;
+     mc->default_ram_id = "mach-virt.ram";
+ 
+diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
+index d157eac088..9eb86ca4fd 100644
+--- a/include/hw/acpi/generic_event_device.h
++++ b/include/hw/acpi/generic_event_device.h
+@@ -82,6 +82,7 @@
+  */
+ #define ACPI_GED_MEM_HOTPLUG_EVT   0x1
+ #define ACPI_GED_PWR_DOWN_EVT      0x2
++#define ACPI_GED_NVDIMM_HOTPLUG_EVT 0x4
+ 
+ typedef struct GEDState {
+     MemoryRegion io;
+-- 
+2.17.1
 
 
-On 4/21/20 8:28 AM, Cornelia Huck wrote:
-> On Fri, 17 Apr 2020 04:34:39 +0200
-> Eric Farman <farman@linux.ibm.com> wrote:
-> 
->> We have a use case (vfio-ccw) where a CRW is already built and
->> ready to use.  Rather than teasing out the components just to
->> reassemble it later, let's rework this code so we can queue a
->> fully-qualified CRW directly.
->>
->> Signed-off-by: Eric Farman <farman@linux.ibm.com>
->> ---
->>  hw/s390x/css.c         | 44 ++++++++++++++++++++++++++++--------------
->>  include/hw/s390x/css.h |  1 +
->>  2 files changed, 30 insertions(+), 15 deletions(-)
->>
->> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
->> index a44faa3549..a72c09adbe 100644
->> --- a/hw/s390x/css.c
->> +++ b/hw/s390x/css.c
->> @@ -2170,30 +2170,23 @@ void css_subch_assign(uint8_t cssid, uint8_t ssid, uint16_t schid,
->>      }
->>  }
->>  
->> -void css_queue_crw(uint8_t rsc, uint8_t erc, int solicited,
->> -                   int chain, uint16_t rsid)
->> +void css_queue_crw_cont(CRW crw)
-> 
-> Don't really like this name, as it makes me think of 'continuation'
-> instead of 'container'.
-> 
-> css_queue_crw_container?
-> css_crw_add_to_queue?
-> 
-> Naming is hard :(
-
-Yeah, I don't like it either.  Just took it from the variable "crw_cont"
-in the original code, but it does seem more like a continuation.  Since
-the "container" is something built in that routine, maybe the
-"add_to_queue" variant fits better.
-
-> 
->>  {
->>      CrwContainer *crw_cont;
->>  
->> -    trace_css_crw(rsc, erc, rsid, chain ? "(chained)" : "");
->> +    trace_css_crw((crw.flags & CRW_FLAGS_MASK_RSC) >> 8,
->> +                  crw.flags & CRW_FLAGS_MASK_ERC,
->> +                  crw.rsid,
->> +                  (crw.flags & CRW_FLAGS_MASK_C) ? "(chained)" : "");
->> +
->>      /* TODO: Maybe use a static crw pool? */
->>      crw_cont = g_try_new0(CrwContainer, 1);
->>      if (!crw_cont) {
->>          channel_subsys.crws_lost = true;
->>          return;
-> 
-> Now that we actually pass something in, do we want to inform the caller
-> whether the crw was queued or not?
-
-Hrm...  Well I guess we could use it to break out of our loop in patch
-7.  But for the existing callers of css_queue_crw(), it doesn't provide
-much value to anyone but css_generate_css_crws().  I'll poke at this a bit.
-
-> 
->>      }
->> -    crw_cont->crw.flags = (rsc << 8) | erc;
->> -    if (solicited) {
->> -        crw_cont->crw.flags |= CRW_FLAGS_MASK_S;
->> -    }
->> -    if (chain) {
->> -        crw_cont->crw.flags |= CRW_FLAGS_MASK_C;
->> -    }
->> -    crw_cont->crw.rsid = rsid;
->> -    if (channel_subsys.crws_lost) {
->> -        crw_cont->crw.flags |= CRW_FLAGS_MASK_R;
->> -        channel_subsys.crws_lost = false;
->> -    }
->> +
->> +    crw_cont->crw = crw;
->>  
->>      QTAILQ_INSERT_TAIL(&channel_subsys.pending_crws, crw_cont, sibling);
->>  
-> 
-> Generally, looks sane to me.
-> 
 
