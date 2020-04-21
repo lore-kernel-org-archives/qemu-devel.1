@@ -2,79 +2,94 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79590C54FC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 17:03:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3812CC54FC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 17:43:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FC81206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 17:03:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED945206D9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 17:43:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ejNAeK7O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FC81206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y9m4CD85"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED945206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQwIy-0001rH-BR
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 13:03:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60994)
+	id 1jQwvW-00055k-Jr
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 13:43:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37492)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1jQwIE-0001RS-Rb
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 13:02:43 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jQwuS-0003zH-PU
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 13:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1jQwID-0002vH-KX
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 13:02:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33959
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1jQwIB-0002p9-EO
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 13:02:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587488556;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Sd7P9j7+qRTdkSrai+v3sQLzTQm13BqzZkEdh5l0EJ8=;
- b=ejNAeK7OmMosA41HtcrV7+uaYCnCIA8YpjB8VTpRJGvw9kMXF30Ynx2vF24KcaHrKQUOzR
- J+3RD8w4kpC4TRSMYq1PzDltAjihuAOsn/dd4CuDkxreu3MCmmvwowy10ckswsXlGmNqr8
- RwdxE7gl+PELmhR9euKunCC6S2/Kwp8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-hRqPObuGOOaMhYwlb7HKLA-1; Tue, 21 Apr 2020 13:02:34 -0400
-X-MC-Unique: hRqPObuGOOaMhYwlb7HKLA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 221E38017FC;
- Tue, 21 Apr 2020 17:02:33 +0000 (UTC)
-Received: from localhost (unknown [10.36.110.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 04E6F19C70;
- Tue, 21 Apr 2020 17:02:28 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.0?] slirp: update to fix CVE-2020-1983
-Date: Tue, 21 Apr 2020 19:02:27 +0200
-Message-Id: <20200421170227.843555-1-marcandre.lureau@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1jQwuQ-0002zD-Vt
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 13:42:12 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39676)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jQwuQ-0002x2-IZ
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 13:42:10 -0400
+Received: by mail-pl1-x643.google.com with SMTP id k18so5509995pll.6
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 10:42:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=X4z+AKfq0+UWGtv24j1yk/qNn7FI9ECJ0STdJw3q7/A=;
+ b=Y9m4CD85qkEBHqmbO1B0mBiSArURI9ZbKBK3l5zKht0ufkbANdwHjELxI8PwY0vTmh
+ bIh8uUkDYsZCEiXDPBWkCQFqFlKq3QmhoY1emmxflWvc4IKFawmhVP8HR2nd/d1i1O2k
+ ozKxIcJCfF0S5/FGX8G6zxHvCS32Nxg35d3jqKqfSG6gud9nYeG0QgOlUvQYFx+IvqT6
+ HXlOFdlNxXv2Pnl5f0pYeqkK4fgNpLQ5L/s8zD/Iv04gJOMhrnJZsv3xhmYy0w5jCtVC
+ WpAZz3402lkfzVRTIDGMX0VUK5Kk82H72Rh7weZJqs8gXKM1IZr38y6I82yzOcuGwD3d
+ V3jA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=X4z+AKfq0+UWGtv24j1yk/qNn7FI9ECJ0STdJw3q7/A=;
+ b=Rse4co/LsRf4LvCTaHCC+oEcsr+DRauBRLX1OzOAXBct9H+D3EobINae9Yg/0iZvjT
+ AoB3MoghLYYkBcBQftpCM07AXk5dxSgkh+UwhEsonySy/fQcNL2LAHkUuM8xVicGLHHf
+ khQ/FetFFN2oXUm5sulKC59ZMc+1w0EUyt3tNR3fZmYcHgoqGz5a8ShzjcKAEMcW7LmA
+ 2hJOX1Oxj+ymLWCX9ZrdxfH+htLc8EgNvr5jSoE+3abqSgFPucqaPG5OQcKIy4Np+/eC
+ z1rtcRWi2XbAgHDDuxOSYORkaQbjKxpb5Yt4TgbomUWSOZxZcnQyMG0QxLY4o6YGD9Ki
+ 01mQ==
+X-Gm-Message-State: AGi0PuZRAVlLuqis0O0w7206gGaUt45PKddPNLNJmngw0lXf4fW56GRZ
+ pBoh0KJizkLH0LD1+/0MjrXJJA==
+X-Google-Smtp-Source: APiQypIepJ0vb23WkPJq+rcMOpZSBWVyORcjmyFMw5Z4CByHFf4EGbbocnBShuDiDmqPxlUJ2LQfQg==
+X-Received: by 2002:a17:90a:f418:: with SMTP id
+ ch24mr6873878pjb.68.1587490928509; 
+ Tue, 21 Apr 2020 10:42:08 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id e66sm2930152pfa.69.2020.04.21.10.42.07
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 21 Apr 2020 10:42:07 -0700 (PDT)
+Subject: Re: [PATCH] tests/tcg: use EXTRA_RUNS to run gdbtests
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200420133455.25401-1-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <96764801-30e7-ccd7-2387-643a2703d335@linaro.org>
+Date: Tue, 21 Apr 2020 10:42:05 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=marcandre.lureau@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 11:47:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+In-Reply-To: <20200420133455.25401-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,38 +101,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: samuel.thibault@ens-lyon.org, philmd@redhat.com,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an update on the stable-4.2 branch of libslirp.git:
+On 4/20/20 6:34 AM, Alex Bennée wrote:
+> With --enable-plugins the gdb tests confuse things somewhat as the
+> plugin code attempts to enumerate tests with non-existent binaries.
+> Fortunately we already have a mechanism for these extra tests that
+> don't automatically include their own binaries. Use that mechanism and
+> drop the unneeded .PHONY declarations.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  tests/tcg/aarch64/Makefile.target   | 5 ++---
+>  tests/tcg/cris/Makefile.target      | 1 +
+>  tests/tcg/multiarch/Makefile.target | 5 ++---
+>  3 files changed, 5 insertions(+), 6 deletions(-)
 
-git shortlog 55ab21c9a3..2faae0f778f81
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Marc-Andr=C3=A9 Lureau (1):
-      Fix use-afte-free in ip_reass() (CVE-2020-1983)
-
-CVE-2020-1983 is actually a follow up fix for commit
-126c04acbabd7ad32c2b018fe10dfac2a3bc1210 ("Fix heap overflow in
-ip_reass on big packet input") which was was included in qemu
-v4.1 (commit e1a4a24d262ba5ac74ea1795adb3ab1cd574c7fb "slirp: update
-with CVE-2019-14378 fix").
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- slirp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/slirp b/slirp
-index 55ab21c9a36..2faae0f778f 160000
---- a/slirp
-+++ b/slirp
-@@ -1 +1 @@
--Subproject commit 55ab21c9a36852915b81f1b41ebaf3b6509dd8ba
-+Subproject commit 2faae0f778f818fadc873308f983289df697eb93
---=20
-2.26.0.106.g9fadedd637
-
+r~
 
