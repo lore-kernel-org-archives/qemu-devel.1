@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E669C54FC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 09:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9FCDC2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 09:45:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04256206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 09:44:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 742E52070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 09:45:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iZp5E2Y3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04256206E9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PVh1fAYq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 742E52070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQpRf-0007jj-2k
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 05:43:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37494)
+	id 1jQpTG-0002Ig-Fi
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 05:45:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37478)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQpQB-0005jF-Jv
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 05:42:29 -0400
+ id 1jQpQ7-0005hw-Ud
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 05:42:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQpQ9-0004dw-Oo
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 05:42:26 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:45495)
+ id 1jQpQ5-0004Xf-K9
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 05:42:23 -0400
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:52943)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQpQ8-0004aL-6E; Tue, 21 Apr 2020 05:42:25 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id t14so15645194wrw.12;
- Tue, 21 Apr 2020 02:42:23 -0700 (PDT)
+ id 1jQpQ5-0004Vp-6O; Tue, 21 Apr 2020 05:42:21 -0400
+Received: by mail-wm1-x32c.google.com with SMTP id 188so2806542wmc.2;
+ Tue, 21 Apr 2020 02:42:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=96oLntjjoqhOPf+EtI3IXmVFJF9aW7sLCnox450L/Po=;
- b=iZp5E2Y3ExAAlUIYBUgTr2PWBZZ8j2bklma4Qk9dhh7zEX7QXajB7OHyyX4l3qVCi7
- 1Vl2znquzHo5g5160DrBeq/n2Npa7fCLJm2gWQbF1Mf+XbBeMOPT8MzH3gixiQP4Gi1S
- o5daMPMtxZpBlsRIjKvhhUmQprESnV44om+iE8DaEz6+Ywku0ePiqFDCC3bf51dF2uU0
- rqWEZiJbPe8QCxYBOxpX5l8GMHUHr/ZyoRw8tZZzCaBWwXrU4eerB4YUK9Ji3HN13oyn
- 5klRIJM4fIjIXeoI9nRQzd7o/twt7WXgvInYgpVgbpjE10EttZrRevJjoklcUmXz96bI
- mZOw==
+ bh=8G62XSTUPNKZGFwOZugFbJOa4c1ZSiwyEE9S8xUHdlI=;
+ b=PVh1fAYqEy5lq4uKVL8+41Br7557qI5TISw7YOUxuJncoClwfzgWIEGfNELHo7oSIJ
+ Pg6mRIc8Ozct1Eo0FfyUCcPxqvar1B+vBdhdXPrAXHBSyplgNZLPTYjKVj3Ira6ip4Px
+ 9qzSfwxw5XhmUjuXrpC3Z6kDReKZ69O2eCED7l/1Cn92iXAVl857G9IGmKaKBc7OEjT6
+ NhQd23ZweM7jBq+JmzNwgxwi+22ajGqt4ZgaqcnRYt7jIdZXpYCIOhKdsgXLUYVtjLKh
+ FkzIEX6I2QcrE1AIdDtxyvUcI1lSwIO7C2YJ0pheaQ4uMN9Agq7/zjn0v4CDkuVufOfU
+ H64A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=96oLntjjoqhOPf+EtI3IXmVFJF9aW7sLCnox450L/Po=;
- b=Hg5KW/GtGAKYf0/jjK6Il5Mr8AEdiv2379dIdiNJ45T954Yvuecl8DL1HxgYohjRng
- /JBQEtZdh7bCHUnux5p4hfwGO3ozIlbkQFvHH+qUaZJ6+KdvoLxAENyXtm9flQ3jxNAp
- mGAYJIL6kRnfeaNSbfdEgEIPm1Xry0iOynST1xKYx7AueVXvWo6uhNKy1ySwRHyFyAlx
- Xn4DKDDiQSdILxChncpbmQY432PYOM/1AXjdwqiMrhXSI153hD9qUzjHpWlL5uout6n+
- 94gvv9zH+/V043BgENulGuCI+taBXASd5fv7W3AK3+15/M8vUJ/8GCoACZcFluIudjZ4
- rl9w==
-X-Gm-Message-State: AGi0PuYLETKkTrwW/E4vpR9g3fG9yRoRlZFKeadLUQjXvxr5fj2DQPI7
- cNXVrTfYusGKGdbqxOHUpupxIDbOOmU=
-X-Google-Smtp-Source: APiQypJm7BgnP7XDy42rErTcRewogUVFVcxhNHjVfl6dY1G/KphXQxGl+02+FvoS5GYY4+/+iQKbKg==
-X-Received: by 2002:a5d:654f:: with SMTP id z15mr24137450wrv.338.1587462141832; 
- Tue, 21 Apr 2020 02:42:21 -0700 (PDT)
+ bh=8G62XSTUPNKZGFwOZugFbJOa4c1ZSiwyEE9S8xUHdlI=;
+ b=pDWcYxJknGfTQ/Q8cQUIR9g9F3qb0e6oWz4A17rVYqdA6rBRad6mqxPscMz9k2Wbsc
+ eX6ZpMb1yCO9xixvHStM8Qwk1byaE3O6hbRLEcHu16svlFuq3AB2gomeQX2/h3eBmZ6O
+ 2z+JIFeSaKNpcnIlH9AeSy3vqzlaUm1N9803PU5BA8PB1HohaZHt7QAR6MFHyM4Z1RAS
+ Qac9afMYyyAHbPECVCo3l027NBsgOxF/kyK9lBbF7QmcDhNlWEk9kF2Ph0sE9dTQQ42k
+ eFQ59U49WBlokSEFtV5f6g4W2ggP5AjV9VYBKhS8ho3sczwoG4Bbt0wVAvNPb5MjJwsC
+ KYpw==
+X-Gm-Message-State: AGi0PuY60DyXxlmpHqCbHLokVFIc52eQAuyPHR8x4+g/oIWSKx5wZhej
+ sBwy4wt/Hfsxrw/kTzxToTIRZSFS53U=
+X-Google-Smtp-Source: APiQypLAAqTSX8s4h8hglYTTj4twY7Y6E9o/+GhFMgXGxwvaPEEELZ8d+709MxN6XlIbCLQPTcGCeQ==
+X-Received: by 2002:a7b:c858:: with SMTP id c24mr4220857wml.51.1587462139381; 
+ Tue, 21 Apr 2020 02:42:19 -0700 (PDT)
 Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id b22sm3082814wmj.1.2020.04.21.02.42.20
+ by smtp.gmail.com with ESMTPSA id b22sm3082814wmj.1.2020.04.21.02.42.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Apr 2020 02:42:21 -0700 (PDT)
+ Tue, 21 Apr 2020 02:42:18 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/4] scripts/qmp: Use Python 3 interpreter
-Date: Tue, 21 Apr 2020 11:42:15 +0200
-Message-Id: <20200421094216.24927-4-f4bug@amsat.org>
+Subject: [PATCH 1/4] MAINTAINERS: Cover the GDB Python scripts in the gdbstub
+ section
+Date: Tue, 21 Apr 2020 11:42:13 +0200
+Message-Id: <20200421094216.24927-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200421094216.24927-1-f4bug@amsat.org>
 References: <20200421094216.24927-1-f4bug@amsat.org>
@@ -82,12 +83,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42a.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32c.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::42a
+X-Received-From: 2a00:1450:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,54 +111,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Keep an eye on these "same same, but different" files.
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- scripts/qmp/qom-get  | 2 +-
- scripts/qmp/qom-list | 2 +-
- scripts/qmp/qom-set  | 2 +-
- scripts/qmp/qom-tree | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+Cc: "Alex Bennée" <alex.bennee@linaro.org>
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/scripts/qmp/qom-get b/scripts/qmp/qom-get
-index 007b4cd442..72ccd79330 100755
---- a/scripts/qmp/qom-get
-+++ b/scripts/qmp/qom-get
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/python3
- ##
- # QEMU Object Model test tools
- #
-diff --git a/scripts/qmp/qom-list b/scripts/qmp/qom-list
-index 03bda3446b..5b8f9fd855 100755
---- a/scripts/qmp/qom-list
-+++ b/scripts/qmp/qom-list
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/python3
- ##
- # QEMU Object Model test tools
- #
-diff --git a/scripts/qmp/qom-set b/scripts/qmp/qom-set
-index c37fe78b00..b475e397fc 100755
---- a/scripts/qmp/qom-set
-+++ b/scripts/qmp/qom-set
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/python3
- ##
- # QEMU Object Model test tools
- #
-diff --git a/scripts/qmp/qom-tree b/scripts/qmp/qom-tree
-index 1c8acf61e7..86233fa211 100755
---- a/scripts/qmp/qom-tree
-+++ b/scripts/qmp/qom-tree
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/python3
- ##
- # QEMU Object Model test tools
- #
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8cbc1fac2b..7a7f2b9c31 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2083,6 +2083,7 @@ R: Philippe Mathieu-Daudé <philmd@redhat.com>
+ S: Maintained
+ F: gdbstub*
+ F: gdb-xml/
++F: scripts/qemugdb/
+ 
+ Memory API
+ M: Paolo Bonzini <pbonzini@redhat.com>
 -- 
 2.21.1
 
