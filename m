@@ -7,81 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB619C54FCC
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:22:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA302C54FCC
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:22:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F45B206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:22:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80058206E9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:22:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PSRR2Ohw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F45B206E9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FrUmBqap"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80058206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQvfR-0001xM-Tw
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 12:22:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54008)
+	id 1jQvfc-0002Gd-Bl
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 12:22:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54062)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jQveI-0000mf-Gl
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:26 -0400
+ (envelope-from <peterx@redhat.com>) id 1jQveP-0000xz-GJ
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jQveD-00046X-EP
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:26 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55633
+ (envelope-from <peterx@redhat.com>) id 1jQveN-0004Ce-RH
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:33 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34482
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jQveD-00046F-2x
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:21 -0400
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jQveN-0004C4-Cf
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:21:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587486080;
+ s=mimecast20190719; t=1587486090;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZWARAODmBStGiYrFPvbCFJNkPOytrLfsKcpWRULN7JI=;
- b=PSRR2OhwcWkW6Ig5qrCmQqUmw9Ac/ckFRA0kCEzHQybdY8/xo05oyNDTV5Vb4jnozQAaVC
- oyQsHd57ppccsob/okAC5uGDvZbJmYc8+H+qRp4RnnjkATWIJkCktiUjGCMruZBhcfpoBH
- NrO/6YOXTItzhD7ARi88LTZHPC6lJ54=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-230-w_v2Gy5NPiOCpfR1i78Bcg-1; Tue, 21 Apr 2020 12:21:18 -0400
-X-MC-Unique: w_v2Gy5NPiOCpfR1i78Bcg-1
-Received: by mail-qk1-f200.google.com with SMTP id a187so14579401qkg.18
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 09:21:18 -0700 (PDT)
+ bh=122YOYw144hc6vkPSvZo4NtonS9ahelmjBfjzv+fw7s=;
+ b=FrUmBqap3sIw5NYm891rFQr1iuSJHUOWoKeuxFpGU25HjRbnISyXNcL3VGrJTXmBCTVQYY
+ ht1LDo547WMCDHT38DrFW1kmYWNRvW12p0eWeYYiUa/ODCbQitqbT4Xx8MtZ3KXigL9gaY
+ z0YaME+xt5QUbwPEXHuacyiLlfe6RqI=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-ULJNS5A2NWu3yyjC7oTesg-1; Tue, 21 Apr 2020 12:21:28 -0400
+X-MC-Unique: ULJNS5A2NWu3yyjC7oTesg-1
+Received: by mail-qt1-f199.google.com with SMTP id z3so1824873qtb.6
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 09:21:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=O9l/BvBydUlEJUjD9a9P0sgBp3L6+LGe0OTTKmSjbXg=;
- b=bKus1GnmzFSuur0nj5DTS/UNgZAA/uxRJ7jz8BTSXQpPdLulOPNlpPQ7kjTeU9eNdL
- glomsxa7cEvz9IIxiKfEZ3GYalr7lZUo3IcaAeKeFOUZmwXqIWhO5z1w6TQaATTRZhiB
- k21wGwWtVrS6/Qd3iq84XGkXCgEMz6e56Aft7dLX1O/o4SXHZtmfDx+EGWuTCa4oIZe2
- X1OrUNd3fRW3/M7sTBAVD7AO8MbJzNqKgg3aBoq5iNNPwb0sXE+EjN4fBnil0FI4rQ0G
- MFihFhX7UzmYmXMWX+gA2fxq2QJvtrQZD2TMo881Le4dHr/i/l2I0oqbgmVzZ+kUOqiI
- lwUw==
-X-Gm-Message-State: AGi0PuYvhzRjHxr6tERzUGOBoJosO6wJ+aleRSD3RFUB21ccq28p8/4a
- FE6XnI8KzsZQkptwyNduuCdSVI9gOdAdJJ8fOdw27GFDLbZtS5fUUBMEv0Fq36EfwFtBBscVdch
- 8Qu0kamf5GLA8PjI=
-X-Received: by 2002:a05:620a:228:: with SMTP id
- u8mr22773764qkm.309.1587486077885; 
- Tue, 21 Apr 2020 09:21:17 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJwmIMZM1MbMcC9Qf5/Wp3f7cgLATEQeVTID+i/5dJRNXJOjG/HWTnMlDs5xF3EQ1P+tlfhWA==
-X-Received: by 2002:a05:620a:228:: with SMTP id
- u8mr22773736qkm.309.1587486077630; 
- Tue, 21 Apr 2020 09:21:17 -0700 (PDT)
+ bh=Hc5q36gUSYxDngylBJ7eysmU7ygS+hXagQQ/ZJe8Efk=;
+ b=rqgArRHfBX7ox2+g4/xFjbPVqTtE0/mkviTrI6qgTgWDnVBPKPGWjBBfhAlXFiu3V8
+ 7FmzTucszjMjVjYTCKk/D9LlBF8KECdh804p08v2Z7zH3L+vncM1x+IUnq5iLKlRyYNS
+ t6t7oy5CsPWVv79AI9GQd6wln/F+y+a1b6SS/YGxiX99QznJhYsY6DShuY46ID4se/Mb
+ lcnFBFtzBr5TTwoNVItvfjsWnb3vHnwk/2dVNK7RwIPuriPKmvC79UKxMBE+WN2ey+sp
+ gQLWI96y8q9mKZxWA3+G4uMY4oTRLfRv04FjQ73YUPxcF5ABoJIG7jlzeX+BRX+seIUi
+ HLZQ==
+X-Gm-Message-State: AGi0PuYI5H31jBSvbmb/aJHn7h7IWCbaD5yNZakzC0tkIR9x1DXrKG4j
+ TRTFAYbn0clg2wIamPd0ECHVNXhD3C7aTshtNI9Pj6FSbdh7Zk5RE8IGKW/qaqpeVBDAnMfROKO
+ GAVBa45QIO67hdmY=
+X-Received: by 2002:aed:3445:: with SMTP id w63mr21724892qtd.183.1587486087444; 
+ Tue, 21 Apr 2020 09:21:27 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIxIGg6zFdz3rLUrny1hQomxwk+/LiFR4emedwHUM5IUYKXKRVTDERRA5i9cgwnIjDks1GIng==
+X-Received: by 2002:aed:3445:: with SMTP id w63mr21724869qtd.183.1587486087133; 
+ Tue, 21 Apr 2020 09:21:27 -0700 (PDT)
 Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id h2sm2043688qkh.91.2020.04.21.09.21.16
+ by smtp.gmail.com with ESMTPSA id r128sm2002105qke.95.2020.04.21.09.21.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Apr 2020 09:21:17 -0700 (PDT)
+ Tue, 21 Apr 2020 09:21:26 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/8] memory: Don't do topology update in memory finalize()
-Date: Tue, 21 Apr 2020 12:21:02 -0400
-Message-Id: <20200421162108.594796-3-peterx@redhat.com>
+Subject: [PATCH 5/8] cpus: Remove the mutex parameter from do_run_on_cpu()
+Date: Tue, 21 Apr 2020 12:21:05 -0400
+Message-Id: <20200421162108.594796-6-peterx@redhat.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200421162108.594796-1-peterx@redhat.com>
 References: <20200421162108.594796-1-peterx@redhat.com>
@@ -112,72 +110,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Topology update could be wrongly triggered in memory region finalize() if
-there's bug somewhere else.  It'll be a very confusing stack when it
-happens (e.g., sending KVM ioctl within the RCU thread, and we'll observe i=
-t
-only until it fails!).
+We must use the BQL for do_run_on_cpu() without much choice, it means the
+parameter is helpless.  Remove it.  Meanwhile use the newly introduced
+qemu_cond_wait_iothread() in do_run_on_cpu().
 
-Instead of that, we use the push()/pop() helper to avoid memory transaction
-commit, at the same time we use assertions to make sure there's no pending
-updates or it's a nested transaction, so it could fail even earlier and in =
-a
-more explicit way.
-
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- memory.c | 23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+ cpus-common.c         | 5 ++---
+ cpus.c                | 2 +-
+ include/hw/core/cpu.h | 4 +---
+ 3 files changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/memory.c b/memory.c
-index e5d634d648..fea427f43f 100644
---- a/memory.c
-+++ b/memory.c
-@@ -171,6 +171,12 @@ struct MemoryRegionIoeventfd {
-     EventNotifier *e;
- };
+diff --git a/cpus-common.c b/cpus-common.c
+index eaf590cb38..4fc11b4e1c 100644
+--- a/cpus-common.c
++++ b/cpus-common.c
+@@ -121,8 +121,7 @@ static void queue_work_on_cpu(CPUState *cpu, struct qem=
+u_work_item *wi)
+     qemu_cpu_kick(cpu);
+ }
 =20
-+/* Returns whether there's any pending memory updates */
-+static bool memory_region_has_pending_update(void)
-+{
-+    return memory_region_update_pending || ioeventfd_update_pending;
-+}
-+
- static bool memory_region_ioeventfd_before(MemoryRegionIoeventfd *a,
-                                            MemoryRegionIoeventfd *b)
+-void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data da=
+ta,
+-                   QemuMutex *mutex)
++void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data da=
+ta)
  {
-@@ -1730,12 +1736,25 @@ static void memory_region_finalize(Object *obj)
-      * and cause an infinite loop.
-      */
-     mr->enabled =3D false;
--    memory_region_transaction_begin();
-+
-+    /*
-+     * Use push()/pop() instead of begin()/commit() to make sure below blo=
-ck
-+     * won't trigger any topology update (which should never happen, but i=
-t's
-+     * still a safety belt).
-+     */
-+    memory_region_transaction_push();
-     while (!QTAILQ_EMPTY(&mr->subregions)) {
-         MemoryRegion *subregion =3D QTAILQ_FIRST(&mr->subregions);
-         memory_region_del_subregion(mr, subregion);
-     }
--    memory_region_transaction_commit();
-+    memory_region_transaction_pop();
-+
-+    /*
-+     * Make sure we're either in a nested transaction or there must have n=
-o
-+     * pending updates due to memory_region_del_subregion() above.
-+     */
-+    assert(memory_region_transaction_depth ||
-+           !memory_region_has_pending_update());
+     struct qemu_work_item wi;
 =20
-     mr->destructor(mr);
-     memory_region_clear_coalescing(mr);
+@@ -141,7 +140,7 @@ void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func,=
+ run_on_cpu_data data,
+     while (!atomic_mb_read(&wi.done)) {
+         CPUState *self_cpu =3D current_cpu;
+=20
+-        qemu_cond_wait(&qemu_work_cond, mutex);
++        qemu_cond_wait_iothread(&qemu_work_cond);
+         current_cpu =3D self_cpu;
+     }
+ }
+diff --git a/cpus.c b/cpus.c
+index 263eddc8b0..5cbc3f30de 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1140,7 +1140,7 @@ void qemu_init_cpu_loop(void)
+=20
+ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+ {
+-    do_run_on_cpu(cpu, func, data, &qemu_global_mutex);
++    do_run_on_cpu(cpu, func, data);
+ }
+=20
+ static void qemu_kvm_destroy_vcpu(CPUState *cpu)
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 5bf94d28cf..b26fdb5ab8 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -734,12 +734,10 @@ bool cpu_is_stopped(CPUState *cpu);
+  * @cpu: The vCPU to run on.
+  * @func: The function to be executed.
+  * @data: Data to pass to the function.
+- * @mutex: Mutex to release while waiting for @func to run.
+  *
+  * Used internally in the implementation of run_on_cpu.
+  */
+-void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data da=
+ta,
+-                   QemuMutex *mutex);
++void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data da=
+ta);
+=20
+ /**
+  * run_on_cpu:
 --=20
 2.24.1
 
