@@ -7,118 +7,119 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B13FC54FD0
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 11:35:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E968CC54FD0
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 11:40:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0007F2064C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 11:35:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1BA52064C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 11:40:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="XWJLFOtk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0007F2064C
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="NgjR7nAh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1BA52064C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56095 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQrBF-0007e9-4P
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 07:35:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53628)
+	id 1jQrGP-0000tL-R6
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 07:40:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54204)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jQrAR-0006sF-Eo
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 07:34:19 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jQrFe-0000Ol-IU
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 07:39:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jQrAP-00081e-6V
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 07:34:18 -0400
-Received: from mail-am6eur05on2121.outbound.protection.outlook.com
- ([40.107.22.121]:19424 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jQrFc-0007vX-RA
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 07:39:41 -0400
+Received: from mail-vi1eur05on20710.outbound.protection.outlook.com
+ ([2a01:111:f400:7d00::710]:6520
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jQrAO-0007yC-DS; Tue, 21 Apr 2020 07:34:16 -0400
+ id 1jQrFc-0007pT-2A; Tue, 21 Apr 2020 07:39:40 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TDWM3QAEVarO1RQUo5p/ebbgFL48Wqezt4YytdwMDdDCFpd9rhyHrHJYY2+eEYyUa8fNbaPtI/xObe6i00ML15c4EKwHUmWFEsGcahsidsHZDG+RDoj55/4QWe9SchlxCwW+5NoVS3x//dsDz6mvkJQFItg7Q6SLn59fkzwVdGIIyUBrwWgR8/Mv7qZPeeRgdgn4ddfT844c4kvw5HJTjOQx4DNwA/i2faRuvwOBa//85F4A7lwTxp9ATSBoAR0pndIhYXwd01ba7h69f4WdRX0nzHWnAzRaAHnQpybaB6MF14Icv1UE9hDd/hLY851xWQ/gQitR4wvxhp2/z86f8Q==
+ b=X95/fSwENeEe285veMa0sm1qVyK5Q/NqWhElrIXp0bU7V9bWWo7ys5lF1vCgH5VR3Rua+n1MOCRkTljuDaG+ap7Ukv5m+n9cIbifRnvL5wbz7SPaJI83BuGEIvRMTsxrrE0x7bBe+vpEk5IBu3C3CFVktQUe8+NYGy68x2kMIlmMUIElf1hp6aPkV/+52P3kX6+1qc8eZ5QIy1msof4VEUxyTKVLL5d2raud0hYFIUe1TS4iNOYRURCYtL6RDXX6OQXSetl9h2RJ3A/kF/6WaYf+CaSbn3fQMsmUjeem1zd96TAen2HAGWEspBaeap0a5h+vqZ8Nve156kSrg+/1HA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xT5xjGJQSV4UFCS1ilpJyA1nuzx5TEUtF0GHkN1qjEk=;
- b=OAj99z/J5mlBXbK6lr8ylT5P7Yt0YRHHvnS8yCe7mnT7brXcp5vU3LbH3fjl+8C8e+Y4AVr8NIu5wDFrtHm2qIjWba9rA5cOC9XQ9gv7c14rDgdOn4NtHAkkxwe+B72EaOMrQhcRcGFMrxwuExQVCdr79ZfzBHcEhFnu4h9Zx7A7SAvCvfDFZ67U5oau2LUD9HKI4ZM6m2pNQdh6KJcX/Zu/AYEjxMxauSIvX0WH9pl7Yjvk1eUG4Nb55+IudPE+jK4QqWnO0rrfQ9kJQWxwKz4yDqNoa4sWX1rvir+emVXiw0sOXP6e9qj7jp0uT9CyMI1AQQP9eDXfEP66Zj3ReA==
+ bh=wmnhpIBY7DF3ds5pHPvG7w5cJahJHzLrB1RNLzupS4A=;
+ b=QClWbtAm45mn4Q2AHnTvWIOZL5cftyiQMxhRz1gNhWRHxiQP+0JgrGoheEKJwjy1GrTlhN6sTFZeQXLkHpMKweqaPBWMuxYLFvBrk9+fKLRVycqCqzHlkllc0aGTl4IMKinYdjpBkE8cwrZigEGIJxjKgKfANPkHtuXCNp+l1Jtne3Ook1OpZ/0nWz/ddIfvRbpfcJAufAuYyu3y14inyQ2F0A2jXNILZ0cPJoy5srn4Wu+9KDDM9PqTpbs+YJg8gmFS2KGuB9ZQGX294qB5ZaHattjXfuuVQf6yTkoShU6VBVFdvMZXAo2fT6PHqi5sEghYVzpQ2xxdyGf5EZR3dg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xT5xjGJQSV4UFCS1ilpJyA1nuzx5TEUtF0GHkN1qjEk=;
- b=XWJLFOtkjxsq1mtwJpRcNVtilHZJ3Dx+PcTqcVZ3CgfvZgwt2AHf0ZrH54ljaavpzoz3BP4q03FVTPK3C7GsTmDSnHP/GD5M1LeMH8j3Ci5qEEQRx2f5bfIBtT5LFL88lcjS8B205TWc1Nsd5NXulmGfD/7GPTXxiW4lwq7gqKM=
+ bh=wmnhpIBY7DF3ds5pHPvG7w5cJahJHzLrB1RNLzupS4A=;
+ b=NgjR7nAhX6fZd1LwQG6ewSHNBwv0ArylZetzC25Sq8fR0EEr64ADrtgziTSQWHEITaFn+IyHO0jKMT+N5kcscwW17KXE+Q1QztYMAczbe3ggT3XQ1V3rl2MKo9njNIxT3+8gZG990nyHhuOlPIpZiXtPddhFc0DnTMJC50PFXaI=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=vsementsov@virtuozzo.com; 
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5432.eurprd08.prod.outlook.com (2603:10a6:20b:10b::23)
+ by AM7PR08MB5320.eurprd08.prod.outlook.com (2603:10a6:20b:103::24)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.29; Tue, 21 Apr
- 2020 11:34:11 +0000
+ 2020 11:39:36 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2921.027; Tue, 21 Apr 2020
- 11:34:11 +0000
-Subject: Re: [PATCH v4 8/9] iotests: Filter testfiles out in img_info_log()
+ 11:39:36 +0000
+Subject: Re: [PATCH v4 9/9] iotests: Test committing to short backing file
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 References: <20200420133214.28921-1-kwolf@redhat.com>
- <20200420133214.28921-9-kwolf@redhat.com>
+ <20200420133214.28921-10-kwolf@redhat.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200421143409683
-Message-ID: <19cee1b2-6a00-2fad-cbf0-7fa08b7ce0a6@virtuozzo.com>
-Date: Tue, 21 Apr 2020 14:34:09 +0300
+X-Tagtoolbar-Keys: D20200421143934467
+Message-ID: <3cb44f78-93cd-b25b-9df1-72ded8e5fc8c@virtuozzo.com>
+Date: Tue, 21 Apr 2020 14:39:34 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
-In-Reply-To: <20200420133214.28921-9-kwolf@redhat.com>
+In-Reply-To: <20200420133214.28921-10-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR01CA0116.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:168::21) To AM7PR08MB5494.eurprd08.prod.outlook.com
+X-ClientProxiedBy: FR2P281CA0020.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:14::7) To AM7PR08MB5494.eurprd08.prod.outlook.com
  (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from [192.168.100.2] (185.215.60.142) by
- AM0PR01CA0116.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.27 via Frontend
- Transport; Tue, 21 Apr 2020 11:34:10 +0000
-X-Tagtoolbar-Keys: D20200421143409683
+ FR2P281CA0020.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2921.29 via Frontend Transport; Tue, 21 Apr 2020 11:39:35 +0000
+X-Tagtoolbar-Keys: D20200421143934467
 X-Originating-IP: [185.215.60.142]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3b05a7e3-fa69-49b3-416e-08d7e5e7e949
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5432:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5432BEDE47959A0E94DE99A8C1D50@AM7PR08MB5432.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
+X-MS-Office365-Filtering-Correlation-Id: 2d7dd104-6671-4bc6-8771-08d7e5e8ab0d
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5320:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB53203B50AF45B898210F9517C1D50@AM7PR08MB5320.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-Forefront-PRVS: 038002787A
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(10019020)(4636009)(136003)(366004)(346002)(396003)(39850400004)(376002)(26005)(86362001)(478600001)(36756003)(4326008)(8936002)(81156014)(31696002)(8676002)(2616005)(16526019)(186003)(16576012)(31686004)(316002)(52116002)(66556008)(6486002)(66476007)(956004)(66946007)(5660300002)(2906002);
+ SFS:(10019020)(4636009)(376002)(346002)(366004)(136003)(39850400004)(396003)(478600001)(66946007)(66556008)(8676002)(8936002)(66476007)(4326008)(81156014)(86362001)(26005)(16576012)(316002)(31686004)(6486002)(52116002)(36756003)(2906002)(956004)(186003)(2616005)(31696002)(16526019)(5660300002)(2004002);
  DIR:OUT; SFP:1102; 
 Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ADpXFlRCrWcIIuS49GgtsAWCPs3vFsohaoDhcT3pnmlMGGFIjTflV7ePH3G56TR7Uzvgyu/a3chJcRiAeR8YrwTvxHtB6mHkIBoyfmqQmL1Jl7WLqLcyuanU3LOZ1nojdUO0s9mv5ob6VBe0JnuF0fdT/LmCdASe/zQ5nGyyo9XjVIgUTp9nAP4jYB0x6yCBa0T1rCz0scKVG3jLc/SQVbh0DVkZIS7Gi1tGgruvemFsm25yS/23FMWGFL+LLMPB5xMfj37xE3o9Li4j9nYOmldvN0az7v/NvIcHG9TvVx3cua4vaUBioPHLi4O6Qm8tYDSlY0zDNLBnsjLZSFNSLsMel3A9am/0OK3rs0NPcm+aHMsbwuSHsUQpg52s7u6OZ8amI8KkHCtBUkAYSl94Q4iOPSOZs4v3UpxjvFemAUf5aTqkqrNfEyL7uItbrVE3
-X-MS-Exchange-AntiSpam-MessageData: DVHWA1HniAwUdCd6zzt+2sHmAbk1TbPZRDR6FXfOOZOLv/HvLriouKMgXb2JBr7txsOuoNObkVvVI7c5uvONfHpDw66oXiQ900lyQgUTz5VDHqnzBg4ErS+CJKdzvp8VqGPjWLXqL+Qpvzy8n9hJqg==
+X-Microsoft-Antispam-Message-Info: E1qPw8HLNdwXHVkto8vkc86FcxuMFnkreIRv/lXsLZuhIYWC6u/qWP+eNQ7WCtVrLC8UllbKYJNN5w//pBQdMGCxfJ81HnQtHL9spjrbi14nkIS9hiaQ79ulWeGzlvDR0Scvz02n+jGGDnpByYnNfwHKH7xm7PYi8eiX3kSWrM3nPXWXHOQUbZekyohE4yR3R2C/sp2KAYmO3BH4WJHQWvEAcS2kxrhB/7qB/vy5jHkAf6zs2uhTRucNVSJeAXWC5KTYDepFzzkgOLLXtTgxAf89FNjU8+RwTjvgQkwlcNT0vUpESeYRt3zop2qiT1a6UbZ1JC5BUGDgySl9o9vyH4GWnzVVmgQhPhNp1geHhIdFCZoFi2iILmFuJs39tjs6QwXTD2iqc2rryBmeQ9HUQbLmrga4UqgXulTv/CC3tFmIaMF/384mT1PnDerRTY6WDdA0p8RrWBF8NoFk1SPJNa0PCQ2P0+wwBxDA2vdJoV+L5+HHRmH51HAdmyp8hbOMDYN1tUi1NXM/+TPi4rhdq6QhT/G3HBxWX/Y4Sx1xVXbBQbFPKEUyLwLHkoyBU8yt
+X-MS-Exchange-AntiSpam-MessageData: CjEIyInAX9aD2VbEJTrp+rq9YbSNujid/58vIULuzQc/cZBHTLjeMkioPJDVXu6iaGBd2Eyf1XXQtiUQ/Bb8gHTO0wc3N9eGn2ED/2SzuGnxCu4Z/KqZcMT+JMc6oX14dPAf2AexTSnxCYayxmTuHg==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3b05a7e3-fa69-49b3-416e-08d7e5e7e949
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2020 11:34:11.2124 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2d7dd104-6671-4bc6-8771-08d7e5e8ab0d
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2020 11:39:36.2363 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Y/zm4X4f14Xv99hWvmJhTCzJgthS9RaqGVdsl9mOITLHDvg07Gk8jdO6ehQgtxp4kzApZ7QzBT25/SCut0ove1NkkskcuDOO7m0drSG6Ywk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5432
-Received-SPF: pass client-ip=40.107.22.121;
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7qldZPvD429VyhBRi4QlEU+/imADz65CKP2iMcXfAVTrcCaPV4pUrr27xGEvdkYe7xcSY37kbneHBJVcJUw9azREETyIKKSO79kWQszdO+s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5320
+Received-SPF: pass client-ip=2a01:111:f400:7d00::710;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 07:34:12
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.22.121
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a01:111:f400:7d00::710
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -136,151 +137,56 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 20.04.2020 16:32, Kevin Wolf wrote:
-> This changes the output of some files where instead of filter_img_info()
-> now filter_testfiles() takes precedence, so update the reference output.
-> 
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Tested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->   tests/qemu-iotests/iotests.py |  5 ++++-
->   tests/qemu-iotests/206.out    | 12 ++++++------
->   tests/qemu-iotests/242.out    | 12 ++++++------
->   3 files changed, 16 insertions(+), 13 deletions(-)
+>   tests/qemu-iotests/274     | 152 ++++++++++++++++++++++++++++
+>   tests/qemu-iotests/274.out | 202 +++++++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/group   |   1 +
+>   3 files changed, 355 insertions(+)
+>   create mode 100755 tests/qemu-iotests/274
+>   create mode 100644 tests/qemu-iotests/274.out
 > 
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index 7bc4934cd2..3eaf29411b 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -152,7 +152,10 @@ def img_info_log(filename, filter_path=None, imgopts=False, extra_args=[]):
->       output = qemu_img_pipe(*args)
->       if not filter_path:
->           filter_path = filename
-> -    log(filter_img_info(output, filter_path))
+> diff --git a/tests/qemu-iotests/274 b/tests/qemu-iotests/274
+> new file mode 100755
+> index 0000000000..30463e54e7
+> --- /dev/null
+> +++ b/tests/qemu-iotests/274
+> @@ -0,0 +1,152 @@
+> +#!/usr/bin/env python3
+> +#
+> +# Copyright (C) 2019 Red Hat, Inc.
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
+> +# Creator/Owner: Kevin Wolf <kwolf@redhat.com>
+> +#
+> +# Some tests for short backing files and short overlays
 > +
-> +    output = filter_testfiles(output)
-> +    output = filter_img_info(output, filter_path)
-> +    log(output)
+> +import iotests
+> +import os
+> +
+> +iotests.verify_image_format(supported_fmts=['qcow2'])
+> +iotests.verify_platform(['linux'])
+> +
+> +size_short = 1 * 1024 * 1024
+> +size_long = 2 * 1024 * 1024
+> +size_diff = size_long - size_short
 
-Looks weird for me, because filter_img_info is used only in img_info_log, and seems to be the function, which specifically prepare img_info output for printing. So, isn't it better to improve filter_img_info itself?
-
-Hmm, qemu_io_log do the same thing, it uses filter_testfiles, and filter_qemu_io.. So, at least you are not the first.
-
-Still, for applying several filters, seems better to use filters=[] argument of log, like in qemu_io_log.
-
->   
->   def qemu_io(*args):
->       '''Run qemu-io and return the stdout data'''
-> diff --git a/tests/qemu-iotests/206.out b/tests/qemu-iotests/206.out
-> index 61e7241e0b..adde82f9b8 100644
-> --- a/tests/qemu-iotests/206.out
-> +++ b/tests/qemu-iotests/206.out
-> @@ -12,7 +12,7 @@
->   {"execute": "job-dismiss", "arguments": {"id": "job0"}}
->   {"return": {}}
->   
-> -image: TEST_IMG
-> +image: TEST_DIR/PID-t.IMGFMT
-
-Honestly, doesn't look as improvement.. But not a problem of course.
-
->   file format: IMGFMT
->   virtual size: 128 MiB (134217728 bytes)
->   cluster_size: 65536
-> @@ -34,7 +34,7 @@ Format specific information:
->   {"execute": "job-dismiss", "arguments": {"id": "job0"}}
->   {"return": {}}
->   
-> -image: TEST_IMG
-> +image: TEST_DIR/PID-t.IMGFMT
->   file format: IMGFMT
->   virtual size: 64 MiB (67108864 bytes)
->   cluster_size: 65536
-> @@ -56,7 +56,7 @@ Format specific information:
->   {"execute": "job-dismiss", "arguments": {"id": "job0"}}
->   {"return": {}}
->   
-> -image: TEST_IMG
-> +image: TEST_DIR/PID-t.IMGFMT
->   file format: IMGFMT
->   virtual size: 32 MiB (33554432 bytes)
->   cluster_size: 2097152
-> @@ -78,11 +78,11 @@ Format specific information:
->   {"execute": "job-dismiss", "arguments": {"id": "job0"}}
->   {"return": {}}
->   
-> -image: TEST_IMG
-> +image: TEST_DIR/PID-t.IMGFMT
->   file format: IMGFMT
->   virtual size: 32 MiB (33554432 bytes)
->   cluster_size: 512
-> -backing file: TEST_IMG.base
-> +backing file: TEST_DIR/PID-t.IMGFMT.base
->   backing file format: IMGFMT
->   Format specific information:
->       compat: 0.10
-> @@ -95,7 +95,7 @@ Format specific information:
->   {"execute": "job-dismiss", "arguments": {"id": "job0"}}
->   {"return": {}}
->   
-> -image: TEST_IMG
-> +image: TEST_DIR/PID-t.IMGFMT
->   file format: IMGFMT
->   virtual size: 32 MiB (33554432 bytes)
->   encrypted: yes
-> diff --git a/tests/qemu-iotests/242.out b/tests/qemu-iotests/242.out
-> index 7ac8404d11..0cc3a78bb2 100644
-> --- a/tests/qemu-iotests/242.out
-> +++ b/tests/qemu-iotests/242.out
-> @@ -6,7 +6,7 @@ wrote 262144/262144 bytes at offset 0
->   
->   qemu-img info dump:
->   
-> -image: TEST_IMG
-> +image: TEST_DIR/PID-disk
->   file format: IMGFMT
->   virtual size: 1 MiB (1048576 bytes)
->   cluster_size: 65536
-> @@ -26,7 +26,7 @@ wrote 262144/262144 bytes at offset 262144
->   
->   qemu-img info dump:
->   
-> -image: TEST_IMG
-> +image: TEST_DIR/PID-disk
->   file format: IMGFMT
->   virtual size: 1 MiB (1048576 bytes)
->   cluster_size: 65536
-> @@ -58,7 +58,7 @@ wrote 262144/262144 bytes at offset 524288
->   
->   qemu-img info dump:
->   
-> -image: TEST_IMG
-> +image: TEST_DIR/PID-disk
->   file format: IMGFMT
->   virtual size: 1 MiB (1048576 bytes)
->   cluster_size: 65536
-> @@ -98,7 +98,7 @@ Test 4
->   Checking "in-use" flag...
->   qemu-img info dump:
->   
-> -image: TEST_IMG
-> +image: TEST_DIR/PID-disk
->   file format: IMGFMT
->   virtual size: 1 MiB (1048576 bytes)
->   cluster_size: 65536
-> @@ -143,11 +143,11 @@ Test 5
->   {"execute": "block-dirty-bitmap-add", "arguments": {"disabled": false, "granularity": 16384, "name": "bitmap-0", "node": "drive0", "persistent": true}}
->   {"return": {}}
->   Write an unknown bitmap flag '0x4' into a new QCOW2 image at offset 327695
-> -qemu-img: Could not open 'TEST_IMG': Bitmap 'bitmap-0' doesn't satisfy the constraints
-> +qemu-img: Could not open 'TEST_DIR/PID-disk': Bitmap 'bitmap-0' doesn't satisfy the constraints
->   
->   Unset the unknown bitmap flag '0x4' in the bitmap directory entry:
->   
-> -image: TEST_IMG
-> +image: TEST_DIR/PID-disk
->   file format: IMGFMT
->   virtual size: 1 MiB (1048576 bytes)
->   cluster_size: 65536
-> 
+Would be good to add unaligned-to-cluster testcase.
 
 
 -- 
