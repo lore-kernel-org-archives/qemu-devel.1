@@ -2,87 +2,121 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A585C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 05:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA174C54FCC
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 06:27:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 650F42084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 05:30:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9773E206D6
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 06:27:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uacgkyc+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 650F42084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mKz86htW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9773E206D6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQlTw-00037b-Hu
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 01:30:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43768)
+	id 1jQmNS-0005yS-MX
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 02:27:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jQlT2-0002Fz-58
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 01:29:08 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jQmLx-0004ot-GL
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 02:25:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jQlSy-0003BT-34
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 01:29:07 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56781
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jQlSw-00034p-MC
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 01:29:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587446940;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Lh6uMsNnpCI8EjsvqOLxi8U+g15XPBB8ybsLw2pVu4A=;
- b=Uacgkyc+9jDSwdWx/iztz2PG1Z5ymtkHyJ+YDP8I0wWdUH33UjLi/r37dgCCpw5evZUGtk
- o2S7DN0BcSbF/XfMlNlrgYrHkonCCPBV05tYbtIzKwTCrrCAfylPQYigjNWA2RgAGKGJJm
- bn/YhyUXSlRjBvmi8puvTRrqb8lCffg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-468-G3BtEZa_N1ePhiCorRm2uQ-1; Tue, 21 Apr 2020 01:28:58 -0400
-X-MC-Unique: G3BtEZa_N1ePhiCorRm2uQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39AC9801E53;
- Tue, 21 Apr 2020 05:28:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 05A2D19C58;
- Tue, 21 Apr 2020 05:28:57 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7773211358BC; Tue, 21 Apr 2020 07:28:55 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH 2/4] smbus: Fix spd_data_generate() error API violation
-References: <20200420132826.8879-1-armbru@redhat.com>
- <20200420132826.8879-3-armbru@redhat.com>
- <alpine.BSF.2.22.395.2004201613040.29873@zero.eik.bme.hu>
-Date: Tue, 21 Apr 2020 07:28:55 +0200
-In-Reply-To: <alpine.BSF.2.22.395.2004201613040.29873@zero.eik.bme.hu>
- (BALATON Zoltan's message of "Mon, 20 Apr 2020 16:20:37 +0200 (CEST)")
-Message-ID: <87h7xd5rvs.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jQmLx-0008Kp-3I
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 02:25:53 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54047)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jQmLw-0008HX-LB
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 02:25:52 -0400
+Received: by mail-wm1-x342.google.com with SMTP id t63so2199171wmt.3
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 23:25:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=oMhaLB0D3FZSrLtBgMOThNEzfHHqOWhL1q0atzWNPJI=;
+ b=mKz86htWw2Oqw5S5h1eY5dZImwmm2yOlohXaplPtdGJ183eSNnd4vHTFHaF/GtJFz4
+ yJAkux8KjtJZNxyZz9THL0CXB3fkVZgYDNhWMXy7o9sgvVVr9d1b9XziRdx2GYITQbUL
+ G3rvv1M/SxlagJ9WixULCacSylF9/bDkB5p7bp8P0MV+b6W1+DnaHGI1/wWtZAtIiber
+ dGkr6GhZ0SRwgMrmW3LTKzLEZY5mR4QYsS6jW8bst+2A3ybjPu1NZgJtSNDZ7pN4bBz+
+ GXiWr6M5ZZE6s/tcIf7WriusaYQJhvWRULYgoQFlNWX5eGYiA3h9knbft6zLcEMYh0Q8
+ D/mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=oMhaLB0D3FZSrLtBgMOThNEzfHHqOWhL1q0atzWNPJI=;
+ b=tgxLM1xSl4WpqxwAFbxepv683HqMrJ5z9xKF2xNX42iVAdAkSsiU38P5cbmJO52tD/
+ QaKboCGWq/N/sTueha0CniCoWfNpwjRXny6ZPX45YIRf6HMAYnPADaSPXUaAOxhRVEc9
+ J4G5HOxdbcEnyv9qQvdD36lvMga4XILKZ0C+37yvjn7U4boS7lzjW5wxl63IHNQFGd3V
+ /bwny9jsB5pPMdPVuSYGSFF2W/1Fk0H/yMcnjIAer0PVP720GX0nJ3G8WJoyBJ9PXeZ6
+ bwunUMQsArWBs+NFHKaW488qLMsueBp/Qk9zzrU414q99FUkGa9DBQzQxyq+JF1xzDWI
+ /HKw==
+X-Gm-Message-State: AGi0PubV+w4gleUYlgsjKD71uyxf5E+/V9teuUV+3PrkX28xh+pNQE4b
+ 7IBQFPHzJdvkSToktiM/xfXi/3TLKIE=
+X-Google-Smtp-Source: APiQypLULKtUcmPTbSt6CedEWmUrjBfTK4uttZDJ8jcIJ06881sOaQkTzLrp+RXiRO0p1y5/wFcNFA==
+X-Received: by 2002:a05:600c:2:: with SMTP id g2mr3298804wmc.85.1587450350089; 
+ Mon, 20 Apr 2020 23:25:50 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id n6sm2088207wmc.28.2020.04.20.23.25.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 20 Apr 2020 23:25:49 -0700 (PDT)
+Subject: Re: [PATCH v3 6/7] wire in the dwc-hsotg (dwc2) USB host controller
+ emulation
+To: Paul Zimmerman <pauldzim@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+References: <20200421014551.10426-1-pauldzim@gmail.com>
+ <20200421014551.10426-7-pauldzim@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <f9ab000d-ef03-5925-991a-a5503cdba4f6@amsat.org>
+Date: Tue, 21 Apr 2020 08:25:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/20 23:40:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+In-Reply-To: <20200421014551.10426-7-pauldzim@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,86 +128,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-BALATON Zoltan <balaton@eik.bme.hu> writes:
+On 4/21/20 3:45 AM, Paul Zimmerman wrote:
+> Wire the dwc-hsotg (dwc2) emulation into Qemu
+> 
+> Signed-off-by: Paul Zimmerman <pauldzim@gmail.com>
+> ---
+>  hw/arm/bcm2835_peripherals.c         | 21 ++++++++++++++++++++-
+>  hw/usb/Kconfig                       |  5 +++++
+>  hw/usb/Makefile.objs                 |  1 +
+>  include/hw/arm/bcm2835_peripherals.h |  3 ++-
+>  4 files changed, 28 insertions(+), 2 deletions(-)
+> 
 
-> On Mon, 20 Apr 2020, Markus Armbruster wrote:
->> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
->> pointer to a variable containing NULL.  Passing an argument of the
->> latter kind twice without clearing it in between is wrong: if the
->> first call sets an error, it no longer points to NULL for the second
->> call.
->>
->> spd_data_generate() can pass @errp to error_setg() more than once when
->> it adjusts both memory size and type.  Harmless, because no caller
->> passes anything that needs adjusting.  Until the previous commit,
->> sam460ex passed types that needed adjusting, but not sizes.
->>
->> spd_data_generate()'s contract is rather awkward:
->>
->>    If everything's fine, return non-null and don't set an error.
->>
->>    Else, if memory size or type need adjusting, return non-null and
->>    set an error describing the adjustment.
->>
->>    Else, return null and set an error reporting why no data can be
->>    generated.
->>
->> Its callers treat the error as a warning even when null is returned.
->> They don't create the "smbus-eeprom" device then.  Suspicious.
->
-> The idea here again is to make it work if there's a way it could work
-> rather than throw back an error to user and bail. This is for user
-> convenience in the likely case the user knows nothing about the board
-> or SPD data restrictions.
+This part ...
 
-We're in perfect agreement that the user of QEMU should not need to know
-anything about memory type and number of banks.  QEMU should pick a
-sensible configuration for any memory size it supports.
+> diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+> index 464348ba14..d4d8c37c28 100644
+> --- a/hw/usb/Kconfig
+> +++ b/hw/usb/Kconfig
+> @@ -46,6 +46,11 @@ config USB_MUSB
+>      bool
+>      select USB
+>  
+> +config USB_DWC2
+> +    bool
+> +    default y
+> +    select USB
+> +
+>  config TUSB6010
+>      bool
+>      select USB_MUSB
+> diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
+> index 66835e5bf7..fa5c3fa1b8 100644
+> --- a/hw/usb/Makefile.objs
+> +++ b/hw/usb/Makefile.objs
+> @@ -12,6 +12,7 @@ common-obj-$(CONFIG_USB_EHCI_SYSBUS) += hcd-ehci-sysbus.o
+>  common-obj-$(CONFIG_USB_XHCI) += hcd-xhci.o
+>  common-obj-$(CONFIG_USB_XHCI_NEC) += hcd-xhci-nec.o
+>  common-obj-$(CONFIG_USB_MUSB) += hcd-musb.o
+> +common-obj-$(CONFIG_USB_DWC2) += hcd-dwc2.o
+>  
+>  common-obj-$(CONFIG_TUSB6010) += tusb6010.o
+>  common-obj-$(CONFIG_IMX)      += chipidea.o
 
->                           You seem to disagree with this
-
-Here's what I actually disagree with:
-
-1. QEMU warning the user about its choice of memory type, but only
-sometimes.  Why warn?  There is nothing wrong, and there is nothing the
-user can do to avoid the condition that triggers the warning.
-
-2. QEMU changing the user's memory size.  Yes, I understand that's an
-attempt to be helpful, but I prefer my tools not to second-guess my
-intent.
-
->                                                          and want to
-> remove all such logic from everywhere. Despite the title of this patch
-> it's not just fixing error API usage but removing those fix ups.
-
-I'm removing unused code that is also broken.  If you want to keep it,
-please fix it, and provide a user and/or a unit test.  Without that, it
-is a trap for future callers.
-
-> If Error cannot be used for this could you change error_setg to
-> warn_report and keep the fix ups untouched? That fixes the problem
-> with error (although leaves no chance to board code to handle
-> errors). Maybe fix Error to be usable for what it's intended for
-> rather than removing cases it can't handle.
-
-Error is designed for errors, not warnings.
-
-A function either succeeds (no error) or fails (one error).
-
-It can be pressed into service for warnings (you did, although in a
-buggy way).  You still can return at most one Error per Error **
-parameter.  If you need multiple warnings, use multiple parameters
-(ugh!).  You could also try to squash multiple warnings into one the
-hints mechanism.
-
-I'd advise against combining warn_report() and Error ** in one function.
-A function should either take care of talking to the user completely, or
-leave it to its caller completely.
-
+... belongs to patch #4 'USB host controller emulation'.
 
