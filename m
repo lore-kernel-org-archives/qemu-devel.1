@@ -7,76 +7,77 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CDAC2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 07:49:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43E61C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 07:50:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EEC92074B
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 07:49:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F83E2074B
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 07:50:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s1zo8Fek"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EEC92074B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FN9C3JFC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F83E2074B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQnen-0006Yx-9f
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 03:49:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40346)
+	id 1jQnfN-0007Su-5n
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 03:50:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQnUx-00020L-B1
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 03:39:27 -0400
+ id 1jQneA-0006C1-7H
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 03:48:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQnUw-0002dF-Qe
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 03:39:15 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40001)
+ id 1jQne9-0004O6-D1
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 03:48:46 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38408)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQnUw-0002Xt-9u; Tue, 21 Apr 2020 03:39:14 -0400
-Received: by mail-wm1-x342.google.com with SMTP id u16so2461480wmc.5;
- Tue, 21 Apr 2020 00:39:13 -0700 (PDT)
+ id 1jQne9-0004Nq-0Q; Tue, 21 Apr 2020 03:48:45 -0400
+Received: by mail-wr1-x441.google.com with SMTP id k11so15311842wrp.5;
+ Tue, 21 Apr 2020 00:48:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=/MQG4xsj6uyqf1WR9HI/UGL2KbiMtfmovPkUPXitTwc=;
- b=s1zo8FekJ1efuOSUoEqcRkQU2n5oubFA1FnFJb6LLP3g3tPp8vweBO9iKRUfzcohsa
- 7aqgbMzKBiZEjhjKrSWk0nnb6MbYexCxYnHU5IojT8jCZ3UYjuwKlSfKjX6UpDkrUlWE
- Mry1bzF2rOF4+RS1ZNewNDbTOgHXBmcgAl+0xgWjGqvPZCGtsJYbZJvDUslNGSVqfV6M
- GDQEGmXuLo/ZOQ+l5CQT7B27FgFCargE85sRj19h5GISu7Ju4Q8gGJwC1MwEdzm9y3Q1
- oT3/Lq6L0qaKGNX0iNpbSvETlDROn17LPvTMi0DZY0T9RpNBVvubEJJ9Yg8ZCGoC/0Lh
- qWEg==
+ bh=ARY8md8kDV/6pR/vUEHOaG+riA8bBkDmxyOF7Yvl8EE=;
+ b=FN9C3JFCNiLxY6TMWHEYWYrk+S533RX3QSiyUNzFHCOvx+X48MxGIQZRStvhoRpVro
+ D9gHHtIH5uinggY+GC3aAybDLwRPDhRHRmzI0VuKA0FXOwn3RMwDdfiYpZEQnjSaRFf0
+ i9faVt9ff4Vi4ntIUfBgAB7FrsgjFGqTc5N3ipSJBGsQqUQkZ376mtkp3HK95S8L2CCb
+ CZ4NmfmzOY+x8iv5nYenOWlEXVk+U5wMd6MIIBryvb6ZyKcL04PjLmgxxIpOvpxj3TAZ
+ XCRt/C4W/hEBSJPYPeQ1dREQo25mrxXexOjbGU6ySnIpma4vKXv2a2hOBSyML31Mv+YG
+ 4CWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=/MQG4xsj6uyqf1WR9HI/UGL2KbiMtfmovPkUPXitTwc=;
- b=Ry6c1vY7/kPxnAjgqQLjnPGFEJtIwhzJBlhPf3yj+Fud9wKs1EejNIZ5iBdrDYP13X
- q29BBs3X4kZc0OzJth8Z9pHYl0DFCwaF8gBQOZAdzDhHutuM+dQHCi2LqypmKnkCJts3
- 9buU+oHPIkyVMjTGE8WKm5PtX2w0+D5e4WzJ60pid8ifqN+FhLITaEK2jW2xHqeg1Hh6
- KrJQY5+bQqNH5NSEIOgwadYk2TFGtO+nn6N7VDQOJZj/7KUKv3rr7TGQh+VRCAJbBuz9
- Sqb6NPDNXKFEh+XGMw0fQqoSGKTmtO5VJcye6DurA6p8kRuZMYh5A/iYj2n+9ei5ik9T
- 7NnQ==
-X-Gm-Message-State: AGi0PuagNazJj3TuWvH2pagcxGq6Sf6d/LuFlvGuE83rwFoaKw2EjNG0
- ewTFD1s9HSxmcNoXjWsZlAU=
-X-Google-Smtp-Source: APiQypJ042gSOffZeIO1m2SV9/lTahIQEog2oxSDnye3v/dP4AMOie6BZSJFuTcZrceEnDiftpICzA==
-X-Received: by 2002:a1c:9a16:: with SMTP id c22mr3340186wme.38.1587454752358; 
- Tue, 21 Apr 2020 00:39:12 -0700 (PDT)
+ bh=ARY8md8kDV/6pR/vUEHOaG+riA8bBkDmxyOF7Yvl8EE=;
+ b=q+c79iLNy9J5O7Fl/EFq689qxB+YDn72RR82PIbfPzMOSMJytMDVKC0z4j/wxNDwd9
+ //NX4EDMB7teX0g3OrPSolWs010XppA0DNcfcBABFZV27M5uPJUkBhr+Z7hUbfka+6DM
+ 6ue/7IpHpKa984nS6uv5XIu0ZGlnE6QZexlnI9pj8coGty1LZm6ZD8297ufhQQHXSxkC
+ aYzwZ9CTYyUCr1yKTppwbw2EVT6FB9e0VlLchhq+Yv8Umw+Ky4KJALnyLJxfgJLNwFFN
+ u2VwC827+CGMx2frqH/xSs0/huputEnFOfz1L63bfGra5PxXrugR9+M5mVIJbOAw3ZSb
+ lgSg==
+X-Gm-Message-State: AGi0PuYR+AnaZeUxGGytE6E3apSlv/fybxEN4h1gRZhbGul7kGAh5bYi
+ E6hJPY6fcFaLpIQKEmfUlEI=
+X-Google-Smtp-Source: APiQypIhdHeveHcVrKiVVH5ve+MT4l0rnq2AfdsiE4s0bmvvsMoIRHmDrUVjumJld4WF1QJ8CqgIZw==
+X-Received: by 2002:adf:fa41:: with SMTP id y1mr22091237wrr.131.1587455323233; 
+ Tue, 21 Apr 2020 00:48:43 -0700 (PDT)
 Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id k23sm2339779wmi.46.2020.04.21.00.39.11
+ by smtp.gmail.com with ESMTPSA id p7sm2692753wrf.31.2020.04.21.00.48.42
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 21 Apr 2020 00:39:11 -0700 (PDT)
-Subject: Re: [PATCH 2/4] linux-user/arm: Remove bogus SVC 0xf0002 handling
+ Tue, 21 Apr 2020 00:48:42 -0700 (PDT)
+Subject: Re: [PATCH 1/4] linux-user/arm: BKPT should cause SIGTRAP, not be a
+ syscall
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org
 References: <20200420212206.12776-1-peter.maydell@linaro.org>
- <20200420212206.12776-3-peter.maydell@linaro.org>
+ <20200420212206.12776-2-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Autocrypt: addr=f4bug@amsat.org; keydata=
  mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
@@ -101,21 +102,21 @@ Autocrypt: addr=f4bug@amsat.org; keydata=
  K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
  n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
  CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <ac5152f5-be5e-0c07-aa36-0ce326981bb7@amsat.org>
-Date: Tue, 21 Apr 2020 09:39:10 +0200
+Message-ID: <66f1e3c3-13f3-cf66-68e8-281260e420e7@amsat.org>
+Date: Tue, 21 Apr 2020 09:48:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200420212206.12776-3-peter.maydell@linaro.org>
+In-Reply-To: <20200420212206.12776-2-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,48 +135,85 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 4/20/20 11:22 PM, Peter Maydell wrote:
-> We incorrectly treat SVC 0xf0002 as a cacheflush request (which is a
-> NOP for QEMU).  This is the wrong syscall number, because in the
-> svc-immediate OABI syscall numbers are all offset by the
-> ARM_SYSCALL_BASE value and so the correct insn is SVC 0x9f0002.
-> (This is handled further down in the code with the other Arm-specific
-> syscalls like NR_breakpoint.)
+> In linux-user/arm/cpu-loop.c we incorrectly treat EXCP_BKPT similarly
+> to EXCP_SWI, which means that if the guest executes a BKPT insn then
+> QEMU will perform a syscall for it (which syscall depends on what
+> value happens to be in r7...). The correct behaviour is that the
+> guest process should take a SIGTRAP.
 > 
-> When this code was initially added in commit 6f1f31c069b20611 in
-> 2004, ARM_NR_cacheflush was defined as (ARM_SYSCALL_BASE + 0xf0000 + 2)
-> so the value in the comparison took account of the extra 0x900000
-> offset. In commit fbb4a2e371f2fa7 in 2008, the ARM_SYSCALL_BASE
-> was removed from the definition of ARM_NR_cacheflush and handling
-> for this group of syscalls was added below the point where we subtract
-> ARM_SYSCALL_BASE from the SVC immediate value. However that commit
-> forgot to remove the now-obsolete earlier handling code.
+> This code has been like this (more or less) since commit
+> 06c949e62a098f in 2006 which added BKPT in the first place.  This is
+> probably because at the time the same code path was used to handle
+> both Linux syscalls and semihosting calls, and (on M profile) BKPT
+> with a suitable magic number is used for semihosting calls.  But
+> these days we've moved handling of semihosting out to an entirely
+> different codepath, so we can fix this bug by simply removing this
+> handling of EXCP_BKPT and instead making it deliver a SIGTRAP like
+> EXCP_DEBUG (as we do already on aarch64).
+> 
+> Reported-by: <omerg681@gmail.com>
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1873898
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  linux-user/arm/cpu_loop.c | 30 ++++++++----------------------
+>  1 file changed, 8 insertions(+), 22 deletions(-)
+> 
+> diff --git a/linux-user/arm/cpu_loop.c b/linux-user/arm/cpu_loop.c
+> index cf618daa1ca..82d0dd3c312 100644
+> --- a/linux-user/arm/cpu_loop.c
+> +++ b/linux-user/arm/cpu_loop.c
+> @@ -295,32 +295,17 @@ void cpu_loop(CPUARMState *env)
+>              }
+>              break;
+>          case EXCP_SWI:
+> -        case EXCP_BKPT:
+>              {
+>                  env->eabi = 1;
+>                  /* system call */
+> -                if (trapnr == EXCP_BKPT) {
+> -                    if (env->thumb) {
+> -                        /* FIXME - what to do if get_user() fails? */
+> -                        get_user_code_u16(insn, env->regs[15], env);
+> -                        n = insn & 0xff;
+> -                        env->regs[15] += 2;
+> -                    } else {
+> -                        /* FIXME - what to do if get_user() fails? */
+> -                        get_user_code_u32(insn, env->regs[15], env);
+> -                        n = (insn & 0xf) | ((insn >> 4) & 0xff0);
+> -                        env->regs[15] += 4;
+> -                    }
+> +                if (env->thumb) {
+> +                    /* FIXME - what to do if get_user() fails? */
+> +                    get_user_code_u16(insn, env->regs[15] - 2, env);
+> +                    n = insn & 0xff;
+>                  } else {
+> -                    if (env->thumb) {
+> -                        /* FIXME - what to do if get_user() fails? */
+> -                        get_user_code_u16(insn, env->regs[15] - 2, env);
+> -                        n = insn & 0xff;
+> -                    } else {
+> -                        /* FIXME - what to do if get_user() fails? */
+> -                        get_user_code_u32(insn, env->regs[15] - 4, env);
+> -                        n = insn & 0xffffff;
+> -                    }
+> +                    /* FIXME - what to do if get_user() fails? */
+> +                    get_user_code_u32(insn, env->regs[15] - 4, env);
+> +                    n = insn & 0xffffff;
+>                  }
 
-I imagine you wrote this patch wearing an archeologist hat =)
+I couldn't find a git-diff option to display this change in an obvious way.
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> 
-> Remove the spurious ARM_NR_cacheflush condition.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  linux-user/arm/cpu_loop.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/linux-user/arm/cpu_loop.c b/linux-user/arm/cpu_loop.c
-> index 82d0dd3c312..025887d6b86 100644
-> --- a/linux-user/arm/cpu_loop.c
-> +++ b/linux-user/arm/cpu_loop.c
-> @@ -308,9 +308,7 @@ void cpu_loop(CPUARMState *env)
->                      n = insn & 0xffffff;
->                  }
 >  
-> -                if (n == ARM_NR_cacheflush) {
-> -                    /* nop */
-> -                } else if (n == 0 || n >= ARM_SYSCALL_BASE || env->thumb) {
-> +                if (n == 0 || n >= ARM_SYSCALL_BASE || env->thumb) {
->                      /* linux syscall */
->                      if (env->thumb || n == 0) {
->                          n = env->regs[7];
+>                  if (n == ARM_NR_cacheflush) {
+> @@ -396,6 +381,7 @@ void cpu_loop(CPUARMState *env)
+>              }
+>              break;
+>          case EXCP_DEBUG:
+> +        case EXCP_BKPT:
+>          excp_debug:
+>              info.si_signo = TARGET_SIGTRAP;
+>              info.si_errno = 0;
 > 
 
