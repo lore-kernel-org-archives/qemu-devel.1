@@ -2,93 +2,82 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3417C54FD0
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 12:31:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC51C54FC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 12:34:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E0192070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 12:31:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 160872071C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 12:34:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fzVKn+D0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E0192070B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RzTQKZGt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 160872071C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQs47-0003bZ-I7
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 08:31:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59282)
+	id 1jQs6H-0006JP-4z
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 08:34:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33298)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQrpf-0005YM-P5
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 08:16:56 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jQs17-0007eQ-UY
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 08:28:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQrpf-0006e7-4H
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 08:16:55 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34061)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQrpe-0006V0-JR; Tue, 21 Apr 2020 08:16:54 -0400
-Received: by mail-wm1-x342.google.com with SMTP id v4so2389855wme.1;
- Tue, 21 Apr 2020 05:16:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=MYojzKJL3MzJX+X4CMNSUQHgAXt7TO+oqY6sRewqpC0=;
- b=fzVKn+D0xJbCPZzxfr5U2LpSjA4e1Y0zk1LtDoVL1TsYHRVgw0xYnPTsmuQLzlQAgW
- BX5BjKAf9yW34McU2o5Jr/EW38HwcUonDKiIt/ZUyALW5NT1a2/xJhILFAs1RgYDyHPr
- 3L65KM+7dS0/A3SQc8W53lPviMVGnBpPqQ6eQLRyLIDiIOha7YyU64KnyQ096unvROwW
- OyABNYsOcFBVJiZeCRXwsvU7FYLZ+C5Fl9ZJns290xdf+HpdmCr6xC3BSY7WNq2Y4e1w
- f1d0ntp9la7vUXrYpFxj0BNOCAq6tgEd6lNd3e0GgTPEaPRw1FWnvskEGDTLBJybPnPB
- Ik+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=MYojzKJL3MzJX+X4CMNSUQHgAXt7TO+oqY6sRewqpC0=;
- b=loImYDtebiY4Uiv3C6D+EDYpECycvoU+VcasgoO1TwehOwJnjOE4rExDt7HOpG7+kK
- Evy16PXqMDCee03f1qMTIZ86KQZg75JErrA40cW4Q/Lvxk4ad4lfpBQ5YXP3eR3esQvC
- clM/QIOmcLUur+eW3+87SnXUutjjfntxq8upywE6VNIFESAkk/CnzpQOgNiQqkRn2pDw
- Fwk6P+SNc/ahugIX2IpHqykmCDzHB392YKgU6r2qDmfb+RxhSyAJvkxXs88r8wGbyGrt
- tlNWooAFT28CUUzhrmyOpptopEGl2z8z5vnE+lA8V6hR1hN5d76LDHOXq6P6aJLuksUS
- zCIQ==
-X-Gm-Message-State: AGi0PuaVnMbRL4OACjRDUEVnRimT5shBvoayurWlBDsMzKqA80qRbQ1v
- EeELzlhbv9AmuwdJ3XaYXKk8gCv0jXo=
-X-Google-Smtp-Source: APiQypLGUzA5fTPwIDwshylPJXVc2vLwZbwTc2zBEuIOwVWZEqL+BjA6yfsM/73YDpi4q3ZnYR9P3A==
-X-Received: by 2002:a1c:2dc7:: with SMTP id t190mr4368526wmt.129.1587471411914; 
- Tue, 21 Apr 2020 05:16:51 -0700 (PDT)
-Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id z76sm3761140wmc.9.2020.04.21.05.16.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Apr 2020 05:16:51 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 12/17] hw/misc/bcm2835_property: Hold the temperature in
- the device state
-Date: Tue, 21 Apr 2020 14:16:21 +0200
-Message-Id: <20200421121626.23791-13-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200421121626.23791-1-f4bug@amsat.org>
-References: <20200421121626.23791-1-f4bug@amsat.org>
+ (envelope-from <cohuck@redhat.com>) id 1jQs17-0008UH-9Y
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 08:28:45 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43283
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jQs16-0008SQ-QB
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 08:28:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587472124;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=R1Wvv/v68P5zT6J+Nxeap+2ELWlledQycb/9xEl3RDQ=;
+ b=RzTQKZGt/H4dgv+pc2kU/kOmwUP///4YdQijMKOc83fcNprH59JjGIeUq0rpOeMnNa+8yL
+ J1npCXYHWf8DUQlvwkTO/pLQbNvC9N9uLccgBGzu97csNHaZm5vqAK77gAwhM8AI0Oq8pC
+ B3DyAQrbH+RqHnlVzWPWi6UBdc/gExA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-kEPbwe5gMPSFtod9Us8r6g-1; Tue, 21 Apr 2020 08:28:40 -0400
+X-MC-Unique: kEPbwe5gMPSFtod9Us8r6g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DC911853896;
+ Tue, 21 Apr 2020 12:28:39 +0000 (UTC)
+Received: from gondolin (ovpn-112-226.ams2.redhat.com [10.36.112.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7A7F2B3A6B;
+ Tue, 21 Apr 2020 12:28:37 +0000 (UTC)
+Date: Tue, 21 Apr 2020 14:28:34 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Eric Farman <farman@linux.ibm.com>
+Subject: Re: [PATCH v3 6/7] s390x/css: Refactor the css_queue_crw() routine
+Message-ID: <20200421142834.16f5ea16.cohuck@redhat.com>
+In-Reply-To: <20200417023440.70514-7-farman@linux.ibm.com>
+References: <20200417023440.70514-1-farman@linux.ibm.com>
+ <20200417023440.70514-7-farman@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::342
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 01:28:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,78 +89,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- qemu-block@nongnu.org, qemu-trivial@nongnu.org,
- Michael Tokarev <mjt@tls.msk.ru>, Markus Armbruster <armbru@redhat.com>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>, John Snow <jsnow@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
+ qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ Jared Rossi <jrossi@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to modify this variable, move it to the device state.
+On Fri, 17 Apr 2020 04:34:39 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/misc/bcm2835_property.h | 1 +
- hw/misc/bcm2835_property.c         | 8 +++++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
+> We have a use case (vfio-ccw) where a CRW is already built and
+> ready to use.  Rather than teasing out the components just to
+> reassemble it later, let's rework this code so we can queue a
+> fully-qualified CRW directly.
+> 
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>  hw/s390x/css.c         | 44 ++++++++++++++++++++++++++++--------------
+>  include/hw/s390x/css.h |  1 +
+>  2 files changed, 30 insertions(+), 15 deletions(-)
+> 
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index a44faa3549..a72c09adbe 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -2170,30 +2170,23 @@ void css_subch_assign(uint8_t cssid, uint8_t ssid, uint16_t schid,
+>      }
+>  }
+>  
+> -void css_queue_crw(uint8_t rsc, uint8_t erc, int solicited,
+> -                   int chain, uint16_t rsid)
+> +void css_queue_crw_cont(CRW crw)
 
-diff --git a/include/hw/misc/bcm2835_property.h b/include/hw/misc/bcm2835_property.h
-index b321f22499..010ad39ed0 100644
---- a/include/hw/misc/bcm2835_property.h
-+++ b/include/hw/misc/bcm2835_property.h
-@@ -31,6 +31,7 @@ typedef struct {
-     uint32_t board_rev;
-     uint32_t addr;
-     bool pending;
-+    float64 temp_mC;
- } BCM2835PropertyState;
- 
- #endif
-diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
-index 3e228ca0ae..bbe80affd4 100644
---- a/hw/misc/bcm2835_property.c
-+++ b/hw/misc/bcm2835_property.c
-@@ -143,7 +143,7 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
-         /* Temperature */
- 
-         case 0x00030006: /* Get temperature */
--            stl_le_phys(&s->dma_as, value + 16, 25000);
-+            stl_le_phys(&s->dma_as, value + 16, s->temp_mC);
-             resplen = 8;
-             break;
- 
-@@ -361,12 +361,13 @@ static const MemoryRegionOps bcm2835_property_ops = {
- 
- static const VMStateDescription vmstate_bcm2835_property = {
-     .name = TYPE_BCM2835_PROPERTY,
--    .version_id = 1,
--    .minimum_version_id = 1,
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-     .fields      = (VMStateField[]) {
-         VMSTATE_MACADDR(macaddr, BCM2835PropertyState),
-         VMSTATE_UINT32(addr, BCM2835PropertyState),
-         VMSTATE_BOOL(pending, BCM2835PropertyState),
-+        VMSTATE_FLOAT64(temp_mC, BCM2835PropertyState),
-         VMSTATE_END_OF_LIST()
-     }
- };
-@@ -375,6 +376,7 @@ static void bcm2835_property_init(Object *obj)
- {
-     BCM2835PropertyState *s = BCM2835_PROPERTY(obj);
- 
-+    s->temp_mC = 25e3;
-     memory_region_init_io(&s->iomem, OBJECT(s), &bcm2835_property_ops, s,
-                           TYPE_BCM2835_PROPERTY, 0x10);
-     sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
--- 
-2.21.1
+Don't really like this name, as it makes me think of 'continuation'
+instead of 'container'.
+
+css_queue_crw_container?
+css_crw_add_to_queue?
+
+Naming is hard :(
+
+>  {
+>      CrwContainer *crw_cont;
+>  
+> -    trace_css_crw(rsc, erc, rsid, chain ? "(chained)" : "");
+> +    trace_css_crw((crw.flags & CRW_FLAGS_MASK_RSC) >> 8,
+> +                  crw.flags & CRW_FLAGS_MASK_ERC,
+> +                  crw.rsid,
+> +                  (crw.flags & CRW_FLAGS_MASK_C) ? "(chained)" : "");
+> +
+>      /* TODO: Maybe use a static crw pool? */
+>      crw_cont = g_try_new0(CrwContainer, 1);
+>      if (!crw_cont) {
+>          channel_subsys.crws_lost = true;
+>          return;
+
+Now that we actually pass something in, do we want to inform the caller
+whether the crw was queued or not?
+
+>      }
+> -    crw_cont->crw.flags = (rsc << 8) | erc;
+> -    if (solicited) {
+> -        crw_cont->crw.flags |= CRW_FLAGS_MASK_S;
+> -    }
+> -    if (chain) {
+> -        crw_cont->crw.flags |= CRW_FLAGS_MASK_C;
+> -    }
+> -    crw_cont->crw.rsid = rsid;
+> -    if (channel_subsys.crws_lost) {
+> -        crw_cont->crw.flags |= CRW_FLAGS_MASK_R;
+> -        channel_subsys.crws_lost = false;
+> -    }
+> +
+> +    crw_cont->crw = crw;
+>  
+>      QTAILQ_INSERT_TAIL(&channel_subsys.pending_crws, crw_cont, sibling);
+>  
+
+Generally, looks sane to me.
 
 
