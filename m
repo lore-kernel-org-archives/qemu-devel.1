@@ -2,141 +2,92 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99AF8C54FCC
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 15:48:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D843BC54FC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 15:50:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DB5A2064C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 15:48:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C6B02064C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 15:50:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VqLrh/3v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DB5A2064C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IXny1Qlv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C6B02064C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQv8X-00007p-Ng
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 11:48:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48120)
+	id 1jQv9u-0001Tk-SC
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 11:50:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48288)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1jQv7m-00087Z-1O
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:47:50 -0400
+ (envelope-from <stefanha@gmail.com>) id 1jQv8v-0000bd-GD
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:49:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1jQv7k-0008M1-Sm
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:47:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39335
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jQv7k-0008LO-D8
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:47:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587484066;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=6i8NrgDSuBc871B3psLg5D08YR62VZ4pD5CFc9cwF3Y=;
- b=VqLrh/3vhV2P4YPO+ut+vUUPX0vcrMz56o8UvPAlh9jwidp3KmTGuY9snvgQCbidmvjMWw
- afxZzvP93DF9XuM0CIT0F50owKuIOOmBpdAdOvyyIK5zSNu9HYcfrN1rPORqhZ7Yf3spZf
- PIqGr8MSoZkmcsmTgO+gnHTIetC0EC4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28--jAl7SKbPkCwEMsWNXFVNw-1; Tue, 21 Apr 2020 11:47:45 -0400
-X-MC-Unique: -jAl7SKbPkCwEMsWNXFVNw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A429E190B2A0;
- Tue, 21 Apr 2020 15:47:42 +0000 (UTC)
-Received: from [10.36.114.254] (ovpn-114-254.ams2.redhat.com [10.36.114.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1255260C63;
- Tue, 21 Apr 2020 15:47:21 +0000 (UTC)
-Subject: Re: [RFC v1 2/4] vhost-vdpa: introduce vhost-vdpa net client
-To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, armbru@redhat.com,
- eblake@redhat.com, cohuck@redhat.com, jasowang@redhat.com
-References: <20200420093241.4238-1-lulu@redhat.com>
- <20200420093241.4238-3-lulu@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <6934c4db-4bdb-2f01-3920-9d33c69a5ac9@redhat.com>
-Date: Tue, 21 Apr 2020 17:47:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <stefanha@gmail.com>) id 1jQv8r-0000c5-Iq
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:49:01 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40137)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jQv8r-0000b2-4D
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:48:57 -0400
+Received: by mail-wm1-x344.google.com with SMTP id u16so4241921wmc.5
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 08:48:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=C+N4SGmnDiVF7RY+rbNoZ50HoX2fb1nnIIoeuSDfDWA=;
+ b=IXny1QlvexJIsbQMMhnqKeJu8KLIEOz0IYC41OhS2cYpSQ2pn0QmJzjNo7YXzbdz4X
+ vVHY/le/J1FKuyvyQ3JyrkoxsHrZBkmcTfxOE+jmudAjyYxnB/fSw0FEziApOQ9TdJe3
+ FozRlQnxKXuiNuHM+o5prBDC/oBn4T20SCUY+Sq61Erv/o+pkaOCOUU/5q6tt7gFoZmc
+ 3mKJHSWTL6N1F/AVXlG+iGfz+047BWxPYIFn9SfXo1pmn8U140MGFBwhwkRDfdXiEUcc
+ nSy9qE/r6AlwTeMgR7hvBDQ4/CZa7sZO7NCZrU7C3slV5qp9rzFPjkXq6NiKMENee5B2
+ K18g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=C+N4SGmnDiVF7RY+rbNoZ50HoX2fb1nnIIoeuSDfDWA=;
+ b=trwPj75o4gpl6TMtKwlXX1KihSkRFOWPmeDwaQMLvVfyYBlJxC26Qa8qzQmf56s7b8
+ 8/BsPquAO/UO//+pv50WF2+f6hYou0LICdG6UN/zO+tUoTJdlQRJ+3yvwFJq21npG6bH
+ uBBHXOluegYaY5WmF/nXywArZLD9rOy4ISDoxMaKhrUf5XGApZNDBi7KYb2xzcgf8wES
+ K3vudwNz4fefAFNJnnYDNDZyj3/yppYnjG0ADnCxj6r8Ewu9Soh777ZCFJKW2pNkQWgp
+ ST5jI4cPqyWO/i9FvED1KeNy0JSFdqHLe0svRHLunZHz42JZmf6+h9ql/Zp0XlytlY9V
+ yNxw==
+X-Gm-Message-State: AGi0PubT07/3JPG9ZqUELq1t9XtexGP+uYRiVvkrMXqBWZZnOStw4FOF
+ iomY3sd6IwaDWegC9EtevWk=
+X-Google-Smtp-Source: APiQypKXwi5mBFvJfOFFzhEm1q80eYmhBZuElOOXffICC1RcztvvXpFxhvKURZVQW9rO5xl/JaGvQA==
+X-Received: by 2002:a1c:4346:: with SMTP id q67mr5431111wma.162.1587484135583; 
+ Tue, 21 Apr 2020 08:48:55 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id b12sm4602048wro.18.2020.04.21.08.48.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 21 Apr 2020 08:48:53 -0700 (PDT)
+Date: Tue, 21 Apr 2020 16:48:52 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Subject: Re: [Qemu-devel] Should memory hotplug work with vhost-user backends?
+Message-ID: <20200421154852.GB47385@stefanha-x1.localdomain>
+References: <6EF9E5BE-2FBF-4CC4-BA1F-AE55ADD82A6E@nutanix.com>
+ <20190703100431.GA17523@stefanha-x1.localdomain>
+ <20200410002116.GA7478@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20200420093241.4238-3-lulu@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=lvivier@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 11:47:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="4SFOXa2GPu3tIq4H"
+Content-Disposition: inline
+In-Reply-To: <20200410002116.GA7478@localhost.localdomain>
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=stefanha@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,144 +99,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
- saugatm@xilinx.com, maxime.coquelin@redhat.com, hch@infradead.org,
- eperezma@redhat.com, jgg@mellanox.com, shahafs@mellanox.com,
- kevin.tian@intel.com, parav@mellanox.com, vmireyno@marvell.com,
- cunming.liang@intel.com, gdawar@xilinx.com, jiri@mellanox.com,
- xiao.w.wang@intel.com, stefanha@redhat.com, zhihong.wang@intel.com,
- aadam@redhat.com, rdunlap@infradead.org, hanand@xilinx.com,
- lingshan.zhu@intel.com
+Cc: dgilbert@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/04/2020 11:32, Cindy Lu wrote:
-> This patch set introduces a new net client type: vhost-vdpa.
-> vhost-vdpa net client will set up a vDPA device which is svhostdevpecified
-> by a "vhostdev" parameter.
-> 
-> Author: Tiwei Bie
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> ---
->  include/net/vhost-vdpa.h |  18 ++++
->  include/net/vhost_net.h  |   1 +
->  net/Makefile.objs        |   2 +-
->  net/clients.h            |   2 +
->  net/net.c                |   1 +
->  net/vhost-vdpa.c         | 211 +++++++++++++++++++++++++++++++++++++++
->  qapi/net.json            |  21 +++-
->  7 files changed, 253 insertions(+), 3 deletions(-)
->  create mode 100644 include/net/vhost-vdpa.h
->  create mode 100644 net/vhost-vdpa.c
-> 
-> diff --git a/include/net/vhost-vdpa.h b/include/net/vhost-vdpa.h
-> new file mode 100644
-> index 0000000000..9ddd538dad
-> --- /dev/null
-> +++ b/include/net/vhost-vdpa.h
-> @@ -0,0 +1,18 @@
-> +/*
-> + * vhost-vdpa.h
-> + *
-> + * Copyright(c) 2017 Intel Corporation. All rights reserved.
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#ifndef VHOST_VDPA_H
-> +#define VHOST_VDPA_H
-> +
-> +struct vhost_net;
-> +struct vhost_net *vhost_vdpa_get_vhost_net(NetClientState *nc);
-> +uint64_t vhost_vdpa_get_acked_features(NetClientState *nc);
-> +
-> +#endif /* VHOST_VDPA_H */
-> diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
-> index 77e47398c4..6f3a624cf7 100644
-> --- a/include/net/vhost_net.h
-> +++ b/include/net/vhost_net.h
-> @@ -39,5 +39,6 @@ int vhost_set_vring_enable(NetClientState * nc, int enable);
->  uint64_t vhost_net_get_acked_features(VHostNetState *net);
->  
->  int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu);
-> +int vhost_set_state(NetClientState *nc, int state);
->  
->  #endif
-> diff --git a/net/Makefile.objs b/net/Makefile.objs
-> index c5d076d19c..da459cfc19 100644
-> --- a/net/Makefile.objs
-> +++ b/net/Makefile.objs
-> @@ -26,7 +26,7 @@ tap-obj-$(CONFIG_SOLARIS) = tap-solaris.o
->  tap-obj-y ?= tap-stub.o
->  common-obj-$(CONFIG_POSIX) += tap.o $(tap-obj-y)
->  common-obj-$(CONFIG_WIN32) += tap-win32.o
-> -
-> +common-obj-$(CONFIG_VHOST_KERNEL) += vhost-vdpa.o
 
-should it be CONFIG_VHOST_NET_USER as you use net_init_vhost_vdpa()
-below inside a "#ifdef CONFIG_VHOST_NET_USER"?
+--4SFOXa2GPu3tIq4H
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Why don't you define a CONFIG_VHOST_VDPA?
+On Thu, Apr 09, 2020 at 08:21:16PM -0400, Raphael Norwitz wrote:
+> On Wed, Jul 03, 2019 at 11:04:31AM +0100, Stefan Hajnoczi wrote:
+> > On Tue, Jul 02, 2019 at 10:08:54PM +0000, Raphael Norwitz wrote:
+> > > For background I am trying to work around a ram slot limit imposed by=
+ the vhost-user protocol. We are having trouble reconciling the comment her=
+e: https://github.com/qemu/qemu/blob/master/hw/virtio/vhost-user.c#L333  th=
+at =E2=80=9CFor non-vring specific requests, like VHOST_USER_SET_MEM_TABLE.=
+, we just need to send it once the first time=E2=80=9D and the high level i=
+mplementation of memory hot-add, which calls set_mem_table every time a VM =
+hot adds memory.
+> > >=20
+> > > A few questions:
+> > > 1.
+> > > What exactly is the check `if (vhost_user_one_time_request(msg->hdr.r=
+equest) && dev->vq_index !=3D 0)` for? In the message for commit b931bfbf04=
+2983f311b3b09894d8030b2755a638, which introduced the check, I see it says =
+=E2=80=9Cnon-vring specific messages[, which should] be sent only once=E2=
+=80=9D and gives VHOST_USER_SET_MEM_TABLE as an example one such message. T=
+he `vhost_user_one_time_request()` call clearly checks whether this type of=
+ message is the kind of message is supposed to be sent once of which VHOST_=
+USER_SET_MEM_TABLE is one. Why, then, does this commit add the check if `de=
+v->vq_index !=3D 0`? It seems like there is a latent assumption that after =
+the first call dev->vq_index should be set to some value greater than one, =
+however for many cases such as vhost-user-scsi devices we can see this is c=
+learly not the case https://github.com/qemu/qemu/blob/master/hw/scsi/vhost-=
+user-scsi.c#L95. Is this check then =E2=80=98broken=E2=80=99 for such devic=
+es?
+> > >=20
+> > > 2.
+> > > If this check is indeed broken for such devices, and set_mem_table ca=
+ll is only supposed to be run once for such devices, is the ability to call=
+ it multiple times technically a bug for devices such as vhost-user-scsci d=
+evices? If so, this would imply that the existing ability to hot add memory=
+ to vhost-user-scsi devices is by extension technically a bug/unintended be=
+havior. Is this the case?
+> >=20
+> > Hi Raphael,
+> > David Gilbert and I recently came to the conclusion that memory hotplug
+> > is not safe in vhost-user device backends built using libvhost-user.
+>=20
+> Hi David, Sefan,
+>=20
+> Just want to follow up here. Sorry - I know this was a while ago.
+>=20
+> I am looking to add postcopy migration support for my patch set lifting
+> the vhost-user max ram slots limitation
+> (https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg06641.html)
+> and it seems the most convienient way to do this would be to add support
+> for my new protocol feature in libvhost-user and then test with
+> vhost-user-bridge.
+>=20
+> I've briefly looked through the libvhost-user code and the hot-add path
+> looks safe enough to me (or at least no more broken than the regular
+> vhost-user memory hot-add path).
+>=20
+> Can you elaborate a little more about why memory hot-add is unsafe with
+> vhost-user device backends built with libvhost-user, as opposed to those
+> using the raw vhost-user protocol semantics?
 
->  vde.o-libs = $(VDE_LIBS)
->  
->  common-obj-$(CONFIG_CAN_BUS) += can/
-> diff --git a/net/clients.h b/net/clients.h
-> index a6ef267e19..92f9b59aed 100644
-> --- a/net/clients.h
-> +++ b/net/clients.h
-> @@ -61,4 +61,6 @@ int net_init_netmap(const Netdev *netdev, const char *name,
->  int net_init_vhost_user(const Netdev *netdev, const char *name,
->                          NetClientState *peer, Error **errp);
->  
-> +int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
-> +                        NetClientState *peer, Error **errp);
->  #endif /* QEMU_NET_CLIENTS_H */
-> diff --git a/net/net.c b/net/net.c
-> index ac5080dda1..2beb95388a 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -964,6 +964,7 @@ static int (* const net_client_init_fun[NET_CLIENT_DRIVER__MAX])(
->          [NET_CLIENT_DRIVER_HUBPORT]   = net_init_hubport,
->  #ifdef CONFIG_VHOST_NET_USER          ^^^^^^^^^^^^^^^^^^^^^
-                   here
+The libvhost-user problem is that the library is mostly designed for a
+single-threaded event loop that handles all virtqueue and vhost-user
+protocol activity.
 
->          [NET_CLIENT_DRIVER_VHOST_USER] = net_init_vhost_user,
-> +        [NET_CLIENT_DRIVER_VHOST_VDPA] = net_init_vhost_vdpa,
->  #endif
->  #ifdef CONFIG_L2TPV3
->          [NET_CLIENT_DRIVER_L2TPV3]    = net_init_l2tpv3,
-> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-> new file mode 100644
-> index 0000000000..5daeba0b76
-> --- /dev/null
-> +++ b/net/vhost-vdpa.c
-...
-> +static int net_vhost_check_net(void *opaque, QemuOpts *opts, Error **errp)
-> +{
-> +    const char *name = opaque;
-> +    const char *driver, *netdev;
-> +
-> +    driver = qemu_opt_get(opts, "driver");
-> +    netdev = qemu_opt_get(opts, "netdev");
-> +
-> +    if (!driver || !netdev) {
-> +        return 0;
-> +    }
-> +
-> +    if (strcmp(netdev, name) == 0 &&
-> +        !g_str_has_prefix(driver, "virtio-net-")) {
-> +        error_setg(errp, "vhost-vdpa requires frontend driver virtio-net-*");
-> +        return -1;
-> +    }
->
+As soon as virtqueues are handled by dedicated threads there are race
+conditions between the virtqueue threads and the vhost-user protocol
+thread.
 
-So perhaps you can build the file only if CONFIG_VIRTIO_NET is set?
+A virtqueue thread may or may not have an up-to-date view of memory
+translation.  This can result in it missing memory that is currently
+being hotplugged and continuing to access memory that has been removed.
 
-Thanks,
-Laurent
+Dave might have additional comments.
 
+Stefan
+
+--4SFOXa2GPu3tIq4H
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6fFeQACgkQnKSrs4Gr
+c8h86QgAuh/UQjyUh26yDUG1Bp4TVpFYQ3kX7cpKUiBuiJhtACumqsZ0kI9rl37r
+I+ZGb1GA8stdvz9cgflI1Rt0xbCYRe5thVayvVcNLBNsILL8BbP5sVsN1wd7CzEb
+mW8teF/1n4v50YzMLGGSqjW+yAd6mwGOrN6obUKzexfHUHg8+E/LuQieiz1PU+mA
+uzHNxW2jx19fK8SCXx7LdncArSzwefwxuKqsCY42yl78kBPtMtHHDs2eRe2jbI1G
+v1dB3toLZaFWGPmSczawUJ1SSlyR5mN6mMJQXoJ5q98hrWWOUAtiH9t4fdFroTXL
+dPlLRmflOCf+Wo5GMETRWFrO7g+BOw==
+=W10g
+-----END PGP SIGNATURE-----
+
+--4SFOXa2GPu3tIq4H--
 
