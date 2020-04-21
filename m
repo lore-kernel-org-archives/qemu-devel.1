@@ -2,88 +2,88 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84EA7C54FCC
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 21:50:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64794C54FCC
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 21:57:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49200206D9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 21:50:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28A05206D9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 21:57:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ky44pJQw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49200206D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DLb1gI3S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28A05206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jR0mp-0005DH-8m
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 17:50:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51092)
+	id 1jR0t7-0007on-8I
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 17:57:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48646)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anthoine.bourgeois@gmail.com>) id 1jR0lv-0004nS-DV
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 17:49:39 -0400
+ (envelope-from <eblake@redhat.com>) id 1jR0sO-0007Js-3V
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 17:56:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <anthoine.bourgeois@gmail.com>) id 1jR0ls-0006st-9z
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 17:49:38 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41534)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <anthoine.bourgeois@gmail.com>)
- id 1jR0lr-0006ml-Pk
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 17:49:35 -0400
-Received: by mail-wr1-x442.google.com with SMTP id g13so12994wrb.8
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 14:49:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=hxPz1+FV0NyZSt3UlOe4Pt8nN7VD9hUNy9KsDhU6z3U=;
- b=Ky44pJQwK1Uj5tBPWiJ7RpnKTPL7s80fa+99mURtxsWwTjd9efaNbhBJnOzC3xP31C
- DUkTSFVU8fZ8v+GQ45mL3rzNF3PcmDroyDuGSS97OeC2M1zo1pjCwMJRpSnSYa2IEACa
- HfonsjoWxH8z4mbpBvyzKGDnI2RPCde8s6djyoimmvvvJ09wOFqT/uSVAWasBck/DfJr
- jBZaj6G3ZNNIx9joO7ThUXKTaojix7bV5BiJdDlAt+SYwDI968Ovs+hUGDEEZCv3H688
- MklyQSl+QvR6lJtA8/GXqUylHOVUlNUt4I8xMIAI5oc+OkGYwWwpHSalHg+oQbI740a7
- uvww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=hxPz1+FV0NyZSt3UlOe4Pt8nN7VD9hUNy9KsDhU6z3U=;
- b=f+PeBIiLlKzgExIYfvXOSlORFRvOZ2xxmX54wS6IV2VIXekPR+f7iOEcCWZmhaxmGI
- cN8OpfwXtnkE4Yx+QK/7x2KT2U/HKjEyz3WCEca7cbtrMvyowNU4nb0YmFUrsbPj/TWt
- VlC0eQwMyceS/s2Lj+6GLLLwa+VOTclWOCfSMXKYLc5vN4FEobAY4TOmFStU/b364bMe
- CgAvuCfXCj1gMK+z1kVY8KEQdlCQ9S35hGL5EKDmnVHNPAKhainuoRx47XqCyLbwiYiu
- i0XxBKZiQo9tB4pXBvpOKzh+Ltv2spRugu6vXb4KzAeI0rnLKeUIJVELRJMdDfk4+YMa
- AkTg==
-X-Gm-Message-State: AGi0PuZFKNPgLwLo+EGWTNmex8VGc/QK/fOt9hZKPMt4bjc7Yvu2MRAx
- mPYlCgfsTMAxuBYRIiYqbcw=
-X-Google-Smtp-Source: APiQypINmV7DUR/U9mubNJVbkNPvVVUxYRiCh/PXLqi7w8mRs8T1QgmxNVR3CeoWhP4rJGOyl7CpXg==
-X-Received: by 2002:a5d:4b90:: with SMTP id b16mr27723224wrt.16.1587505773171; 
- Tue, 21 Apr 2020 14:49:33 -0700 (PDT)
-Received: from hobbes.blade-group.net
- ([2a01:e35:2fb2:a0d0:6d28:3d72:693e:c474])
- by smtp.gmail.com with ESMTPSA id z1sm5051596wmf.15.2020.04.21.14.49.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Apr 2020 14:49:32 -0700 (PDT)
-From: Anthoine Bourgeois <anthoine.bourgeois@gmail.com>
-To: "Michael S . Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH] virtio-vga: fix virtio-vga bar ordering
-Date: Tue, 21 Apr 2020 23:48:53 +0200
-Message-Id: <20200421214853.14412-1-anthoine.bourgeois@gmail.com>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <eblake@redhat.com>) id 1jR0sM-0007qT-V3
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 17:56:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36235
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jR0sM-0007ll-53
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 17:56:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587506177;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8lwKx1HWhAiPOW9KeyheDzm5PqAlGxEr4wcO1dTivrA=;
+ b=DLb1gI3SLkCDO59+PodnD3cxgFfLTpNLxNmy34v60U+Mtp3MIuUr/ejM6pIAaVtoJp94bV
+ d2PiwTITDDbUkj9FJuCsxMealKYThqz7QAGJ6BH/Cj24uzZBYAXsXYVFixDQS3RJj/ZbnH
+ EmiUUABaRyTD3mM8KwNmaBgugyJ97oI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-286-Y4UxBVOlNP6ObbKgL5po6A-1; Tue, 21 Apr 2020 17:56:13 -0400
+X-MC-Unique: Y4UxBVOlNP6ObbKgL5po6A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEC95800D53;
+ Tue, 21 Apr 2020 21:56:11 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8974AA18AC;
+ Tue, 21 Apr 2020 21:56:07 +0000 (UTC)
+Subject: Re: [PATCH v2 2/6] block/nbd-client: drop max_block restriction from
+ discard
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200401150112.9557-1-vsementsov@virtuozzo.com>
+ <20200401150112.9557-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <e3253b06-4bff-970d-9b9b-32da6bf652b8@redhat.com>
+Date: Tue, 21 Apr 2020 16:56:06 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=anthoine.bourgeois@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::442
+In-Reply-To: <20200401150112.9557-3-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 15:21:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,53 +95,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With virtio-vga, pci bar are reordered. Bar #2 is used for compatibility
-with stdvga. By default, bar #2 is used by virtio modern io bar.
-This bar is the last one introduce in the virtio pci bar layout and it's
-crushed by the virtio-vga reordering. So virtio-vga and
-modern-pio-notify are incompatible because virtio-vga failed to
-initialize with this option.
+On 4/1/20 10:01 AM, Vladimir Sementsov-Ogievskiy wrote:
+> NBD spec is updated, so that max_block doesn't relate to
+> NBD_CMD_TRIM. So, drop the restriction.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   block/nbd.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
-This fix exchange the modern io bar with the modern memory bar,
-replacing the msix bar that is never impacted anyway.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Signed-off-by: Anthoine Bourgeois <anthoine.bourgeois@gmail.com>
----
- hw/display/virtio-vga.c | 2 +-
- hw/virtio/virtio-pci.c  | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+I might tweak the commit message of 1/6 and here to call out the NBD 
+spec commit id (nbd.git 9f30fedb), but that doesn't change the patch proper.
 
-diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
-index 2b4c2aa126..f5f8737c60 100644
---- a/hw/display/virtio-vga.c
-+++ b/hw/display/virtio-vga.c
-@@ -113,7 +113,7 @@ static void virtio_vga_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-      * the stdvga mmio registers at the start of bar #2.
-      */
-     vpci_dev->modern_mem_bar_idx = 2;
--    vpci_dev->msix_bar_idx = 4;
-+    vpci_dev->modern_io_bar_idx = 4;
- 
-     if (!(vpci_dev->flags & VIRTIO_PCI_FLAG_PAGE_PER_VQ)) {
-         /*
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 4cb784389c..9c5efaa06e 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1705,6 +1705,7 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
-      *
-      *   region 0   --  virtio legacy io bar
-      *   region 1   --  msi-x bar
-+     *   region 2   --  virtio modern io bar
-      *   region 4+5 --  virtio modern memory (64bit) bar
-      *
-      */
+> 
+> diff --git a/block/nbd.c b/block/nbd.c
+> index d4d518a780..4ac23c8f62 100644
+> --- a/block/nbd.c
+> +++ b/block/nbd.c
+> @@ -1955,7 +1955,7 @@ static void nbd_refresh_limits(BlockDriverState *bs, Error **errp)
+>       }
+>   
+>       bs->bl.request_alignment = min;
+> -    bs->bl.max_pdiscard = max;
+> +    bs->bl.max_pdiscard = QEMU_ALIGN_DOWN(INT_MAX, min);
+>       bs->bl.max_pwrite_zeroes = max;
+>       bs->bl.max_transfer = max;
+>   
+> 
+
 -- 
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
