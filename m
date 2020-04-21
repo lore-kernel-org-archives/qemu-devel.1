@@ -2,137 +2,87 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DF88C54FC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 15:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE622C54FD0
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 15:04:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20BB2206D6
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 15:03:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A71A7206D6
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 15:04:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mi1/9WbH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20BB2206D6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fRuS1jGw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A71A7206D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQuQf-0001d2-NB
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 11:03:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40686)
+	id 1jQuRd-0002rL-1K
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 11:04:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40794)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1jQuPF-0000wV-7W
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:01:49 -0400
+ (envelope-from <berrange@redhat.com>) id 1jQuQ1-0001aM-O6
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:02:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1jQuP9-0005Gs-QJ
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:01:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22112
+ (envelope-from <berrange@redhat.com>) id 1jQuQ1-0006bp-4f
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:02:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49765
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jQuP8-0005Ag-J0
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:01:43 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jQuQ0-0006Re-O7
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 11:02:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587481300;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1587481351;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=e1oBvMJEpRbjY+Cfd76SlKvlp8nsqc1I+yYqQ+pF1es=;
- b=Mi1/9WbHQGhHJXnpcQAukMbOJFctghcM0wJIuJU5dPR+RGWARwOCyhBwfx/h8qw2QgV1BE
- VI8hiSWLM+Rcy/fBntkWkbqNJjMEH8ZyJ9yDzHE1YtJNGuWLBdqkd+DKpOgwqaQFQ4yb4x
- gLxKwsJSaRgtL8buPJM+JLovGG3zggc=
+ in-reply-to:in-reply-to:references:references;
+ bh=iAQoQWdVW1JyGJlQl7ojuMgLcXykfnBeBb3NKTXWiiI=;
+ b=fRuS1jGwPl9v0xTpn0bc13Tq7SXr2ShuqbSQStP9P5g+XGxhnBQGNcr6LmsvWy2aafw5Vs
+ gO2/5K7LRCazPWuPe9zKu15ZiZSByOsjOnVzAwkXZcPR5g+CqBDzF3nXTZQkN++4dkHyW0
+ jlm7y2q6vl1yWeDNEB2KAIt5MQv5jVo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-3hD1GLOxO5mQ-1YBY5Hv_A-1; Tue, 21 Apr 2020 11:01:38 -0400
-X-MC-Unique: 3hD1GLOxO5mQ-1YBY5Hv_A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-113-9KrN4s41Ma6VCFH-xoHegg-1; Tue, 21 Apr 2020 11:02:13 -0400
+X-MC-Unique: 9KrN4s41Ma6VCFH-xoHegg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5BDC18B9FC3;
- Tue, 21 Apr 2020 15:01:35 +0000 (UTC)
-Received: from [10.36.114.254] (ovpn-114-254.ams2.redhat.com [10.36.114.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 150DE5DA85;
- Tue, 21 Apr 2020 15:01:13 +0000 (UTC)
-Subject: Re: [RFC v1 1/4] net: Introduce qemu_get_peer
-To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, armbru@redhat.com,
- eblake@redhat.com, cohuck@redhat.com, jasowang@redhat.com
-References: <20200420093241.4238-1-lulu@redhat.com>
- <20200420093241.4238-2-lulu@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <f0d0b3a8-b013-61c6-286c-b8212d1ced7a@redhat.com>
-Date: Tue, 21 Apr 2020 17:01:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33998DBA3;
+ Tue, 21 Apr 2020 15:02:12 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E3E75C1B2;
+ Tue, 21 Apr 2020 15:02:03 +0000 (UTC)
+Date: Tue, 21 Apr 2020 16:02:01 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Ani Sinha <ani.sinha@nutanix.com>
+Subject: Re: [PATCH] Add a new PIIX option to control PCI hot unplugging of
+ devices on non-root buses
+Message-ID: <20200421150201.GI479771@redhat.com>
+References: <1587136411-200885-1-git-send-email-ani.sinha@nutanix.com>
+ <20200417112620-mutt-send-email-mst@kernel.org>
+ <2A13ACCD-BD24-41FB-B6EA-2804F7C1FF1D@nutanix.com>
+ <20200417120732-mutt-send-email-mst@kernel.org>
+ <20200420092459.GF346737@redhat.com>
+ <20200420105936-mutt-send-email-mst@kernel.org>
+ <07BC06B8-34F6-4C46-ACCE-DD7A4CBA9BC7@nutanix.com>
 MIME-Version: 1.0
-In-Reply-To: <20200420093241.4238-2-lulu@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <07BC06B8-34F6-4C46-ACCE-DD7A4CBA9BC7@nutanix.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=lvivier@redhat.com;
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 04:54:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -148,47 +98,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
- saugatm@xilinx.com, maxime.coquelin@redhat.com, hch@infradead.org,
- eperezma@redhat.com, jgg@mellanox.com, shahafs@mellanox.com,
- kevin.tian@intel.com, parav@mellanox.com, vmireyno@marvell.com,
- cunming.liang@intel.com, gdawar@xilinx.com, jiri@mellanox.com,
- xiao.w.wang@intel.com, stefanha@redhat.com, zhihong.wang@intel.com,
- aadam@redhat.com, rdunlap@infradead.org, hanand@xilinx.com,
- lingshan.zhu@intel.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/04/2020 11:32, Cindy Lu wrote:
-> This is a small function  that can get the peer from given NetClientState and queue_index
-> 
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> ---
->  hw/net/vhost_net.c | 16 ++++++++++------
->  include/net/net.h  |  1 +
->  net/net.c          |  6 ++++++
->  3 files changed, 17 insertions(+), 6 deletions(-)
-> 
-...
-> diff --git a/net/net.c b/net/net.c
-> index 84aa6d8d00..ac5080dda1 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -324,6 +324,12 @@ void *qemu_get_nic_opaque(NetClientState *nc)
->  
->      return nic->opaque;
->  }
-> +NetClientState *qemu_get_peer(NetClientState *nc, int queue_index)
-> +{
-> +    NetClientState *ncs  =  nc + queue_index;
-> +    assert(ncs != NULL);
+On Tue, Apr 21, 2020 at 02:45:04PM +0000, Ani Sinha wrote:
+>=20
+>=20
+> > On Apr 20, 2020, at 8:32 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >=20
+> > But I for one would like to focus on keeping PIIX stable
+> > and focus development on q35.  Not bloating PIIX with lots of new
+> > features is IMHO a good way to do that.
+>=20
+> Does this mean this patch is a no-go then? :(
 
-This will not assert if nc is NULL and queue_index != 0.
+I'd support this patch, as I don't think it can really be described as
+bloat or destabalizing. It is just adding a simple property to
+conditionalize existing functionality.  Telling people to switch to Q35
+is unreasonable as it is not a simple 1-1 conversion from existing use
+of PIIX. Q35 has much higher complexity in its configuration, has higher
+memory overhead per VM too, and lacks certain features of PIIX too.
 
-You should check value of nc and then calculate ncs.
-
-Thanks,
-Laurent
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
