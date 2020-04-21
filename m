@@ -2,84 +2,82 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC7D5C54FCC
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 01:35:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DA9EC38A30
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 01:48:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A97D20782
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 01:35:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 471F12078C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 01:48:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kp0Jto/+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A97D20782
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vZgACKX6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 471F12078C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQhok-00028W-NW
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 21:35:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60346)
+	id 1jQi13-0005oy-5y
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 21:48:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33690)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1jQhns-0001T8-Cw
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:34:34 -0400
+ (envelope-from <pauldzim@gmail.com>) id 1jQhzl-0004zF-Df
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:46:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1jQhni-0000x5-Kf
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:34:24 -0400
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:33445)
+ (envelope-from <pauldzim@gmail.com>) id 1jQhzi-0002kM-VX
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:46:40 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41152)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jQhni-0000vF-5b; Mon, 20 Apr 2020 21:34:14 -0400
-Received: by mail-yb1-xb43.google.com with SMTP id e17so6524299ybq.0;
- Mon, 20 Apr 2020 18:34:13 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
+ id 1jQhzi-0002hY-Iy
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:46:38 -0400
+Received: by mail-pf1-x442.google.com with SMTP id b8so5876694pfp.8
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 18:46:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=W8ZFHS9omzGT3JRqbPGa8jzkw69mxVTDGVTWbskdKDA=;
- b=kp0Jto/+Ou7WIQkWOWMghZVaPeJPdj84l0IYL8QaPoA84mYU6YTlXW/qppy2Vg/1PK
- YN/H730P1e9yLW8060f1odiPTubMbOvT7l4UJ6z8NDPzob+h0M5XGb3mv7sgzF+Z6Feu
- Vvx/rcdbB3Ar+4C295gyiMrP0NtumX6Ui9vn4zXfZjmYndp952Zes/uUBOIhozY3X/A6
- 15wkkZrsdcMbW0oJ/ewqOpaL+GIHq8HcuSge0fkN7Dpfs84/Vq+fy5ExKh1EZJ5pFZLn
- CatXi+yNXaUhQNdcFcEzv32D4kb1/ZVT7iW9rniUJW7w/BTpDTDJyfT3r31pvl7m4xWk
- yRZw==
+ h=from:to:cc:subject:date:message-id;
+ bh=DeaBBNccBsxKwa1DBmtWLzNxQiDSBmBraKPWAiPilN8=;
+ b=vZgACKX6MAw1EgH8dOnh7YyKxxqSfiWMjJOsVty35BU3O+qb2lE/9lftTdQJYShHm0
+ 7CHdyCPIzq7VxHF4blTDeGWA7g5GktLR6IjdNwyTOOxHK466NDXn83yacEJAJmaNE1Tm
+ /tyxfIypTDHD1Qu1QlZOMyQWJZFymBhLt6LqpwY1fxB8JGBxolekZc46CiQbjS127WgF
+ lXqZTSO0qfmgpwUxQgF3fTedmkTqjlLYPK1fP4bhfGn8HFx5/1xXoKlD2yu+t6An9pBI
+ npcL0QEd+XWJlG3umZC9h0a1IYVDq8+CwD3jUPYRlSZDkk9cVrkx6DRx3eoiw05qWug7
+ XxUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=W8ZFHS9omzGT3JRqbPGa8jzkw69mxVTDGVTWbskdKDA=;
- b=s+UQlij8jry+razftrA5YMTa/cSkAQzCD43dC9qxZAb1Nbgt7ezhN5x40sNjPpaQou
- 22Q38H3hd1Z+PRShZvm0MCr46/A+RVtdV5oNi1olw3iAbQVHCiMXGmmuyPl2BonIzUwi
- MLm17dsSH4cZ1UdaaRgGE653JzMlc9uGJpcRxS+t6sUm50EqsufNnXVYmt4hmW639hQ7
- kfb2rQ9zAh58bNwiRMV8k0RVTJ+qV0maLFTqc0NkRN92OrW5WxoNgBxbNAuuVF+oQoiF
- VsFdoDQzhbroJV/E+IqlOzEBE4nKv6Pxec/6wmIOnnZonQCJjupVOtEXKkcMKjwndbLU
- hz8g==
-X-Gm-Message-State: AGi0PuZ/xs0F0rziPLs1rIyGnjTah27XizKuO/vbBn5fb7JqTC2Louhx
- tR1t0H9DmgObhYe6gQT8AIrNST58HMOoZxftgzE=
-X-Google-Smtp-Source: APiQypJq/8MyY9XupCRTIAHjzB4KMbssSiT2I1rvLuiBLHTNGw8nhL5vUBbvQJMnoKqZbLOxwB0Enr3AJaOp3j2sSb4=
-X-Received: by 2002:a05:6902:686:: with SMTP id
- i6mr21502902ybt.56.1587432852162; 
- Mon, 20 Apr 2020 18:34:12 -0700 (PDT)
-MIME-Version: 1.0
-References: <1587389038-1549-1-git-send-email-bmeng.cn@gmail.com>
- <CAKmqyKMzUzHC1FhV6ccjswjRvQH_h6DuUwEWjte4CAEmxPOKDg@mail.gmail.com>
-In-Reply-To: <CAKmqyKMzUzHC1FhV6ccjswjRvQH_h6DuUwEWjte4CAEmxPOKDg@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Tue, 21 Apr 2020 09:34:01 +0800
-Message-ID: <CAEUhbmUTEVPF6f91SqrXL-_M-G_Jg2D29cBjbCs1YBGm2fk6QA@mail.gmail.com>
-Subject: Re: [PATCH] roms: opensbi: Upgrade from v0.6 to v0.7
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b43;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb43.google.com
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=DeaBBNccBsxKwa1DBmtWLzNxQiDSBmBraKPWAiPilN8=;
+ b=DXPicFIT9r4hFmjcvB5sxYBwFBvjamCYwyogSVfxQUNnR0lPO/82cjqqpMpaSF6uvH
+ eIgUoKhWBy/llvUvY1ub9+jZRsOaDpxeALPwoRbBufTpkzt2+3+GhfShQR4yHXwQCvmu
+ N9+ULHib23oiJW5BTIP51VqSlBSS8JCb3OhjMZpZYsNZ8DHGRsScwYqKx5CccE6b6KqQ
+ FY5Fetr5la5rIud2QDt1Ex9eyesr640PrImPiXvion5ecrqMAnJZxWtN/EpLtn9MQ+ie
+ Pm8YDZyNxaasZAx4Xi00uawZG5EPrOYGErf2vABujs83qcBP0Jd7lSZo89mMk3oMnAHr
+ qoNg==
+X-Gm-Message-State: AGi0Pua8UmXNy+Z8QT+Rt6Fd9Gc3IK4YyeZEYxEnQOyMMnw++L2zVL/q
+ HzTZIqLxtJBXcCuu2oAAwwY=
+X-Google-Smtp-Source: APiQypJX6cu5/yX39qqA/ZaqP9PJaKn/LQST3dg/aivoKFmLkfRHjV+kTz2YUnHtQcYhNiNerRsfYA==
+X-Received: by 2002:a62:1a0d:: with SMTP id a13mr2375035pfa.229.1587433595841; 
+ Mon, 20 Apr 2020 18:46:35 -0700 (PDT)
+Received: from localhost.localdomain ([75.167.104.59])
+ by smtp.gmail.com with ESMTPSA id q11sm654868pgs.25.2020.04.20.18.46.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Apr 2020 18:46:35 -0700 (PDT)
+From: Paul Zimmerman <pauldzim@gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: [PATCH v3 0/7] dwc-hsotg (aka dwc2) USB host controller emulation
+Date: Mon, 20 Apr 2020 18:45:44 -0700
+Message-Id: <20200421014551.10426-1-pauldzim@gmail.com>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=pauldzim@gmail.com; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::b43
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,145 +89,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Paul Zimmerman <pauldzim@gmail.com>, John Snow <jsnow@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alistair,
+Since I'm sure everyone is just sitting around waiting for 5.0 to
+release ;) I thought I would submit v3 of my dwc-hsotg series. I
+think I have taken everyone's requests/comments into account, except
+for Peter's request to use the macros from registerfields.h to access
+the registers. I think that would be more work than I'm willing to
+put in at the moment.
 
-On Tue, Apr 21, 2020 at 2:41 AM Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Mon, Apr 20, 2020 at 6:25 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> >
-> > Upgrade OpenSBI from v0.6 to v0.7 and the pre-built bios images.
-> >
-> > The v0.7 release includes the following commits:
-> >
-> > f64f4b9 lib: Add a new platform feature to bringup secondary harts
-> > b677a9b lib: Implement hart hotplug
-> > 5b48240 lib: Add possible hart status values
-> > e3f69fc lib: Implement Hart State Management (HSM) SBI extension
-> > 6704216 lib: Check MSIP bit after returning from WFI
-> > 82ae8e8 makefile: Do setup of the install target more flexible
-> > e1a5b73 platform: sifive: fu540: allow sv32 as an mmu-type
-> > 8c83fb2 lib: Fix return type of sbi_hsm_hart_started()
-> > 00d332b include: Move bits related defines and macros to sbi_bitops.h
-> > a148996 include: sbi_bitops: More useful bit operations
-> > 4a603eb platform: kendryte/k210: Set per-HART stack size to 8KB
-> > 678c3c3 include: sbi_scratch: Set per-HART scratch size to 4KB
-> > 2abc55b lib: Sort build objects in alphabetical order
-> > 6e87507 platform: ae350: Sort build objects in alphabetical order
-> > 650c0e5 lib: sbi: Fix coding style issues
-> > 078686d lib: serial: Fix coding style issues
-> > 3226bd9 lib: Simple bitmap library
-> > c741abc include: Simple hartmask library
-> > d6d7e18 lib: sbi_init: Don't allow HARTID greater than SBI_HARTMASK_MAX_BITS
-> > a4a6a81 lib: Introduce SBI_TLB_INFO_INIT() helper macro
-> > d963164 lib: sbi_tlb: Use sbi_hartmask in sbi_tlb_info
-> > 71d2b83 lib: Move all coldboot wait APIs to sbi_init.c
-> > 2b945fc lib: sbi_init: Use hartmask for coldboot wait
-> > 44ce5b9 include: Remove disabled_hart_mask from sbi_platform
-> > 2db381f lib: Introduce sbi_hsm_hart_started_mask() API
-> > 61f7768 lib: sbi_ecall_legacy: Use sbi_hsm_hart_started_mask() API
-> > 466fecb lib: sbi_system: Use sbi_hsm_hart_started_mask() API
-> > 9aad831 lib: sbi_ipi: Use sbi_hsm_hart_started_mask() API
-> > eede1aa lib: sbi_hart: Remove HART available mask and related APIs
-> > 757bb44 docs: Remove out-of-date documentation
-> > 86d37bb lib: sbi: Fix misaligned trap handling
-> > ffdc858 platform: ariane-fpga: Change license for ariane-fpga from GPL-2.0 to BSD-2
-> > 4b2f594 sbi: Add definitions for true/false
-> > 0cfe49a libfdt: Add INT32_MAX and UINT32_MAX in libfdt_env.h
-> > baac7e0 libfdt: Upgrade to v1.5.1 release
-> > f92147c include: Make sbi_hart_id_to_scratch() as macro
-> > eeae3d9 firmware: fw_base: Optimize _hartid_to_scratch() implementation
-> > 16e7071 lib: sbi_hsm: Optimize sbi_hsm_hart_get_state() implementation
-> > 823345e include: Make sbi_current_hartid() as macro in riscv_asm.h
-> > 9aabba2 Makefile: Fix distclean make target
-> > 9275ed3 platform: ariane-fpga: Set per-HART stack size to 8KB
-> > 2343efd platform: Set per-HART stack size to 8KB in the template platform codes
-> > 72a0628 platform: Use one unified per-HART stack size macro for all platforms
-> > 327ba36 scripts: Cover sifive/fu540 in the 32-bit build
-> > 5fbcd62 lib: sbi: Update pmp_get() to return decoded size directly
-> > dce8846 libfdt: Compile fdt_addresses.c
-> > fcb1ded lib: utils: Add a fdt_reserved_memory_fixup() helper
-> > 666be6d platform: Clean up include header files
-> > 6af5576 lib: utils: Move PLIC DT fix up codes to fdt_helper.c
-> > e846ce1 platform: andes/ae350: Fix up DT for reserved memory
-> > 8135520 platform: ariane-fpga: Fix up DT for reserved memory
-> > c9a5268 platform: qemu/virt: Fix up DT for reserved memory
-> > 6f9bb83 platform: sifive/fu540: Fix up DT for reserved memory
-> > 1071f05 platform: sifive/fu540: Remove "stdout-path" fix-up
-> > dd9439f lib: utils: Add a fdt_cpu_fixup() helper
-> > 3f1c847 platform: sifive/fu540: Replace cpu0 node fix-up with the new helper
-> > db6a2b5 lib: utils: Add a general device tree fix-up helper
-> > 3f8d754 platform: Update to call general DT fix-up helper
-> > 87a7ef7 lib: sbi_scratch: Introduce HART id to scratch table
-> > e23d3ba include: Simplify HART id to scratch macro
-> > 19bd531 lib: sbi_hsm: Simplify hart_get_state() and hart_started() APIs
-> > 3ebfe0e lib: sbi_tlb: Simplify sbi_tlb_entry_process() function
-> > 209134d lib: Handle failure of sbi_hartid_to_scratch() API
-> > bd6ef02 include: sbi_platform: Improve sbi_platform_hart_disabled() API
-> > c9f60fc lib: sbi_scratch: Don't set hartid_to_scratch table for disabled HART
-> > 680b098 lib: sbi_hsm: Don't use sbi_platform_hart_count() API
-> > db187d6 lib: sbi_hsm: Remove scratch parameter from hart_started_mask() API
-> > 814f38d lib: sbi_hsm: Don't use sbi_platform_hart_disabled() API
-> > 75eec9d lib: Don't use sbi_platform_hart_count() API
-> > c51f02c include: sbi_platform: Introduce HART index to HART id table
-> > 315a877 platform: sifive/fu540: Remove FU540_ENABLED_HART_MASK option
-> > a0c88dd lib: Fix sbi_ecall_register_extension to prevent extension IDs overlap
-> > 9a74a64 lib: Check MSIP bit after returning from WFI
-> > 5968894 platform: Move ariane standalone fpga project to its own project
-> > ed265b4 platform: fpga/ariane: Remove redundant plic address macros
-> > fb84879 platform: Add OpenPiton platform support
-> > d1d6560 platform: fpga/common: Add a fdt parsing helper functions
-> > 040e4e2 lib: utils: Move fdt fixup helper routines to a different file
-> > 4c37451 platform: openpiton: Read the device configurations from device tree
-> > 4d93586 lib: prevent coldboot_lottery from overflowing
-> > 550ba88 scripts: Extend create-binary-archive.sh for unified binary tar ball
-> > 160c885 lib: utils: Improve fdt_cpu_fixup() implementation
-> > 1de66d1 lib: Optimize unpriv load/store implementation
-> > 626467c lib: Remove scratch parameter from unpriv load/store functions
-> > cb78a48 lib: sbi_trap: Remove scratch parameter from sbi_trap_redirect()
-> > d11c79c lib: sbi_emulate_csr: Remove scratch and hartid parameter
-> > 5a7bd0c lib: sbi_illegal_insn: Remove mcause, scratch and hartid parameters
-> > fe37d7d lib: sbi_misaligned_ldst: Remove mcause, scratch and hartid parameters
-> > 7487116 lib: sbi_ecall: Remove mcause, scratch and hartid parameters
-> > 40b221b lib: sbi_trap: Simplify sbi_trap_handler() API
-> > 7b211ff include: sbi_platform: Remove priv parameter from hart_start() callback
-> > 5b6957e include: Use more consistent name for atomic xchg() and cmpxchg()
-> > dd0f21c lib: sbi_scratch: Introduce sbi_scratch_last_hartid() API
-> > 54b2779 include: sbi_tlb: Remove scratch parameter from sbi_tlb_request()
-> > 9e52a45 include: sbi_ipi: Remove scratch parameter from most functions
-> > ec0d80f include: sbi_system: Remove scratch parameter and redundant functions
-> > 0a28ea5 include: sbi_timer: Remove scratch parameter from most funcitons
-> > 648507a include: sbi_console: Remove scratch parameter from sbi_dprintf()
-> > e5a7f55 platform: thead/c910: Use HSM extension to boot secondary cores
-> > f281de8 lib: irqchip/plic: Fix maximum priority threshold value
-> > 6c7922e lib: Support vector extension
-> > 615587c docs: Update README about supported SBI versions
-> > 66d0184 lib: Allow overriding SBI implementation ID
-> > 9f1b72c include: Bump-up version to 0.7
-> >
-> > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
->
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->
-> Can you share a git branch with this patch? From memory these binary
-> patches don't apply well from emails.
+This patch series adds emulation for the dwc-hsotg USB controller,
+which is used on the Raspberry Pi 3 and earlier, as well as a number
+of other development boards. The main benefit for Raspberry Pi is that
+this enables networking on these boards, since the network adapter is
+attached via USB.
 
-Sure. Please grab the bits from http://github.com/lbmeng/qemu opensbi branch.
+The emulation is working quite well, I have tested with USB network,
+mass storage, mouse, keyboard, and tablet. I have tested with the dwc2
+driver in the upstream Linux kernel, and with the dwc-otg driver in the
+Raspbian kernel.
 
-You can also use patchwork to help with your custodian work.
-http://patchwork.ozlabs.org/project/qemu-devel/patch/1587389038-1549-1-git-send-email-bmeng.cn@gmail.com/
+One remaining issue is that USB host passthrough does not work. I tried
+connecting to a USB stick on the host, but the device generates babble
+errors and does not work. This is because the dwc-hsotg controller only
+has one root port, so a full-speed dev-hub device is always connected
+to it, and high-speed USB devices on the host do not work at full-speed
+on the guest. (I have WIP code to add high-speed support to dev-hub to
+fix this.)
 
-Click on the "mbox" button to download the patch and apply it.
+The patch series also includes a very basic emulation of the MPHI
+device on the Raspberry Pi SOC, which provides the FIQ interrupt that
+is used by the dwc-otg driver in the Raspbian kernel. But that driver
+still does not work in full FIQ mode, so it is necessary to add a
+parameter to the kernel command line ("dwc_otg.fiq_fsm_enable=0") to
+make it work.
 
-Regards,
-Bin
+I have used some online sources of information while developing this
+emulation, including:
+
+http://www.capital-micro.com/PDF/CME-M7_Family_User_Guide_EN.pdf
+which has a pretty complete description of the controller starting
+on page 370.
+
+https://sourceforge.net/p/wive-ng/wive-ng-mt/ci/master/tree/docs/DataSheets/RT3050_5x_V2.0_081408_0902.pdf
+which has a description of the controller registers starting on
+page 130.
+
+Changes v2-v3:
+  - Fixed the high-speed frame time emulation so that high-speed
+    mouse/tablet will work correctly once we have high-speed hub
+    support.
+  - Added a "usb_version" property to the dwc-hsotg controller, to
+    allow choosing whether the controller emulates a USB 1 full-speed
+    host or a USB 2 high-speed host.
+  - Added a test for a working dwc-hsotg controller to the raspi2
+    acceptance test, requested by Philippe M.
+  - Added #defines for the register array sizes, instead of hard-
+    coding them in multiple places.
+  - Removed the NB_PORTS #define and the associated iteration code,
+    since the controller only supports a single root port.
+  - Removed some unused fields from the controller state struct.
+  - Added pointers to some online documentation to the top of
+    hcd-dwc2.c, requested by Peter M.
+  - Reworked the init/realize code to remove some confusing function
+    names, requested by Peter M.
+  - Added VMStateDescription structs for the controller and MPHI
+    state, requested by Peter M (untested).
+
+Changes v1-v2:
+  - Fixed checkpatch errors/warnings, except for dwc2-regs.h since
+    that is a direct import from the Linux kernel.
+  - Switched from debug printfs to tracepoints in hcd-dwc2.c, on the
+    advice of Gerd. I just dropped the debug prints in bcm2835_mphi.c,
+    since I didn't consider them very useful.
+  - Updated a couple of the commit messages with more info.
+
+Thanks for your time,
+Paul
+
+---
+
+Paul Zimmerman (7):
+  raspi: add BCM2835 SOC MPHI emulation
+  dwc-hsotg (dwc2) USB host controller register definitions
+  dwc-hsotg (dwc2) USB host controller state definitions
+  dwc-hsotg (dwc2) USB host controller emulation
+  usb: add short-packet handling to usb-storage driver
+  wire in the dwc-hsotg (dwc2) USB host controller emulation
+  raspi2 acceptance test: add check for functional dwc-hsotg (dwc2) USB host
+
+ hw/arm/bcm2835_peripherals.c           |   38 +-
+ hw/misc/Makefile.objs                  |    1 +
+ hw/misc/bcm2835_mphi.c                 |  190 ++++
+ hw/usb/Kconfig                         |    5 +
+ hw/usb/Makefile.objs                   |    1 +
+ hw/usb/dev-storage.c                   |   15 +-
+ hw/usb/hcd-dwc2.c                      | 1372 ++++++++++++++++++++++++
+ hw/usb/hcd-dwc2.h                      |  184 ++++
+ hw/usb/trace-events                    |   47 +
+ include/hw/arm/bcm2835_peripherals.h   |    5 +-
+ include/hw/misc/bcm2835_mphi.h         |   48 +
+ include/hw/usb/dwc2-regs.h             |  895 ++++++++++++++++
+ tests/acceptance/boot_linux_console.py |    9 +-
+ 13 files changed, 2805 insertions(+), 5 deletions(-)
+ create mode 100644 hw/misc/bcm2835_mphi.c
+ create mode 100644 hw/usb/hcd-dwc2.c
+ create mode 100644 hw/usb/hcd-dwc2.h
+ create mode 100644 include/hw/misc/bcm2835_mphi.h
+ create mode 100644 include/hw/usb/dwc2-regs.h
+
+-- 
+2.17.1
 
