@@ -2,86 +2,87 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20FC3C38A30
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 01:49:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 968C9C38A30
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 01:50:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDEC92078C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 01:49:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BDE12078C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 01:50:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DcB1CVwF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDEC92078C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rv14OwFQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BDE12078C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQi20-00070o-T2
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 21:49:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33752)
+	id 1jQi3P-00012n-A9
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 21:50:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33906)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pauldzim@gmail.com>) id 1jQi0A-0005JA-9y
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:47:06 -0400
+ (envelope-from <pauldzim@gmail.com>) id 1jQi0e-00060y-Kn
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:47:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <pauldzim@gmail.com>) id 1jQi09-0003NB-Ci
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:47:06 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35464)
+ (envelope-from <pauldzim@gmail.com>) id 1jQi0Z-0004H9-Mt
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:47:36 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44204)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
- id 1jQi09-0003LM-0Y
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:47:05 -0400
-Received: by mail-pg1-x541.google.com with SMTP id t11so6031486pgg.2
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 18:47:04 -0700 (PDT)
+ id 1jQi0Z-0004Fb-8r
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:47:31 -0400
+Received: by mail-pg1-x544.google.com with SMTP id q18so2486294pgm.11
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 18:47:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=O/2wTU3XwgcDuIXzSAL6G+T/creDeWSuhzs/HV7uMf0=;
- b=DcB1CVwF+KDZSvIcENVg/cGgnjCPzjyqC7fqa+puzPSmw0+Yik0k5a6JXoFrK2RNrg
- CUn1kBo90eZJ+jG1xI1JPbMXZA5SiBnpxdtug+QTfo/lQZA28idpzTwEHqGKZH3ABrft
- yw1nJ5m5s5pM0cI0hhoTQlbLIcWHs/EwtFRID5ekQOf6A2NM31lvpFrvEfyn5NwOrCWF
- dZ565U79Kc7iolZl1tzmKjBfJR1X0bvRS6ltPtQi1pGoTuAijWx8qvjnLf9xReESYmN7
- qMroO/iPymDS43O0ENtyk3/kYwQ/zZR54axWr+4UioCTPZZw4kIi9qm/iJBb/TqYS73L
- fJjw==
+ bh=2mctS/izGd8OkuOqf0kzc8Rvfr0dbhZLjK3vZLX3NeI=;
+ b=rv14OwFQgYaaw/5kUrAp3Do5n/eTvEDmqTjGiJeIng9hCimaCTm5Gz4wqM8qaHSJN2
+ tnzq3zr5Ihz/v5QpochIDknb9EZc9qihfV6vpNPsd3w2/hYN8CZrwoR6CG/rmMBI9PtF
+ IHgxGuUN1G1ppWjPsHj/1SVeYAUlB3AnPOWWEptV21RGuFYXdymE9Te/fsoJv+NQLCL5
+ QOOEXkyHrXgt0f/TpNFyTrdjw/L5yNpGzCd80E75Z8uNW92+NEO26d/YywbosvnQ7PxS
+ 7le0HoftYteI07E+cMRCY8l8v5cjmoL7NZLWti/abgASLKtoMFCHgOZcrjvkBvBWFG9Z
+ 2c9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=O/2wTU3XwgcDuIXzSAL6G+T/creDeWSuhzs/HV7uMf0=;
- b=YPKBcC/aKpS5yJ22CFGsSH8zhfh7OZqwVDF6pg0pI9JfvUehcfyXFbxCJaGC8g+DsW
- INqi+eyXZA/qtKWycd1nXFBUui5MSDyP8KHXdis0vcwUdqbcFHQNGk4ERPbbjRwo+OOn
- aSbm6rniZKeq0pDfDz1ZcheVnHwdw8f4AsTv5XVoivrnXXsKmpj5K1Xp3sma14rHdOLJ
- 6ngmR3cD6wyVjgFcUIpYSnCoktKJsXWLh55oFtPcgXHOSQCr/MexrdPoXS4Rq4PAhTfZ
- hNEPv5bpR7VwdA/8DJufcTgkXQ88J5Pxh5PKltwJggkWbPsy1OgUQlhUcJPeI2OmDSA9
- F2wQ==
-X-Gm-Message-State: AGi0PuYF+ffJ1SK10GbwPKBiWFtKgsI6V41Wi5JaS9HudG8lai/IF76k
- 8p2s1tuaVIpzZZHqCL5a7Z4=
-X-Google-Smtp-Source: APiQypJAAhAzCt71foeMMalvDee5UiW5PQ6OPw+qGKyD60DJAhOCjOdfKJADoy2RS5+/B2LcjoROfw==
-X-Received: by 2002:a62:838d:: with SMTP id h135mr1979752pfe.81.1587433623519; 
- Mon, 20 Apr 2020 18:47:03 -0700 (PDT)
+ bh=2mctS/izGd8OkuOqf0kzc8Rvfr0dbhZLjK3vZLX3NeI=;
+ b=eYlIzgO4VFRnURBby3xtUANY3gB+7BAv/gkd1wiHygF4OFxLQNoUVHKZghE+3Ezl0M
+ VLHns1CganokoW/pOPyA30z9U7FC1juW0t2TcYBuldKgjp81Q1r1PtlWh6TYafBa5Z42
+ iAPfPyD2IJD2Yknh+JuT+QnHGIzDhaw7SkzPE44nd12i7ONmiP0Jtxha/t+8LS24KCV8
+ OHQMERRgjIRuinafmQ1CLkyAR/ovvNm+MwXtKN4Zd8owhzDyodh+AhtVQlK1w5mWYxfu
+ yKAJePQfvhVwW/76nb09jwhRhQhnuoRCphQLonMJ9btETuRUMMf9OQXZmieNtMlqLHnV
+ LVgg==
+X-Gm-Message-State: AGi0PuYjLbqCy5Y4fsUuVl4ZXm/EG5RE3peOJH0Og2AW00dZZxlSlTjt
+ uSUVTGJcWF0ubCtOcXixu0k=
+X-Google-Smtp-Source: APiQypKZHaMr22sLcyiYtzGO4uW9S8Jcs6Cu0PAyMHPqDPThyJjJHxo5XHUfQy4jI6zzG5b2qgnaRQ==
+X-Received: by 2002:a63:e841:: with SMTP id a1mr20136159pgk.64.1587433649640; 
+ Mon, 20 Apr 2020 18:47:29 -0700 (PDT)
 Received: from localhost.localdomain ([75.167.104.59])
- by smtp.gmail.com with ESMTPSA id q11sm654868pgs.25.2020.04.20.18.47.02
+ by smtp.gmail.com with ESMTPSA id q11sm654868pgs.25.2020.04.20.18.47.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Apr 2020 18:47:03 -0700 (PDT)
+ Mon, 20 Apr 2020 18:47:29 -0700 (PDT)
 From: Paul Zimmerman <pauldzim@gmail.com>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH v3 1/7] raspi: add BCM2835 SOC MPHI emulation
-Date: Mon, 20 Apr 2020 18:45:45 -0700
-Message-Id: <20200421014551.10426-2-pauldzim@gmail.com>
+Subject: [PATCH v3 2/7] dwc-hsotg (dwc2) USB host controller register
+ definitions
+Date: Mon, 20 Apr 2020 18:45:46 -0700
+Message-Id: <20200421014551.10426-3-pauldzim@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200421014551.10426-1-pauldzim@gmail.com>
 References: <20200421014551.10426-1-pauldzim@gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
- envelope-from=pauldzim@gmail.com; helo=mail-pg1-x541.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=pauldzim@gmail.com; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::541
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,339 +102,918 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add BCM2835 SOC MPHI (Message-based Parallel Host Interface)
-emulation. It is very basic, only providing the FIQ interrupt
-needed to allow the dwc-otg USB host controller driver in the
-Raspbian kernel to function.
+Import the dwc-hsotg (dwc2) register definitions file from the
+Linux kernel. This is a copy of drivers/usb/dwc2/hw.h from the
+mainline Linux kernel, the only changes being two instances of
+'u32' changed to 'uint32_t' to  allow it to compile.
 
 Signed-off-by: Paul Zimmerman <pauldzim@gmail.com>
 ---
- hw/arm/bcm2835_peripherals.c         |  17 +++
- hw/misc/Makefile.objs                |   1 +
- hw/misc/bcm2835_mphi.c               | 190 +++++++++++++++++++++++++++
- include/hw/arm/bcm2835_peripherals.h |   2 +
- include/hw/misc/bcm2835_mphi.h       |  48 +++++++
- 5 files changed, 258 insertions(+)
- create mode 100644 hw/misc/bcm2835_mphi.c
- create mode 100644 include/hw/misc/bcm2835_mphi.h
+ include/hw/usb/dwc2-regs.h | 895 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 895 insertions(+)
+ create mode 100644 include/hw/usb/dwc2-regs.h
 
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index edcaa4916d..5e2c832d95 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -124,6 +124,10 @@ static void bcm2835_peripherals_init(Object *obj)
-     sysbus_init_child_obj(obj, "gpio", &s->gpio, sizeof(s->gpio),
-                           TYPE_BCM2835_GPIO);
- 
-+    /* Mphi */
-+    sysbus_init_child_obj(obj, "mphi", &s->mphi, sizeof(s->mphi),
-+                          TYPE_BCM2835_MPHI);
-+
-     object_property_add_const_link(OBJECT(&s->gpio), "sdbus-sdhci",
-                                    OBJECT(&s->sdhci.sdbus), &error_abort);
-     object_property_add_const_link(OBJECT(&s->gpio), "sdbus-sdhost",
-@@ -368,6 +372,19 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    /* Mphi */
-+    object_property_set_bool(OBJECT(&s->mphi), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    memory_region_add_subregion(&s->peri_mr, MPHI_OFFSET,
-+                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->mphi), 0));
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->mphi), 0,
-+        qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
-+                               INTERRUPT_HOSTPORT));
-+
-     create_unimp(s, &s->armtmr, "bcm2835-sp804", ARMCTRL_TIMER0_1_OFFSET, 0x40);
-     create_unimp(s, &s->cprman, "bcm2835-cprman", CPRMAN_OFFSET, 0x1000);
-     create_unimp(s, &s->a2w, "bcm2835-a2w", A2W_OFFSET, 0x1000);
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 68aae2eabb..91085cc21b 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -57,6 +57,7 @@ common-obj-$(CONFIG_OMAP) += omap_l4.o
- common-obj-$(CONFIG_OMAP) += omap_sdrc.o
- common-obj-$(CONFIG_OMAP) += omap_tap.o
- common-obj-$(CONFIG_RASPI) += bcm2835_mbox.o
-+common-obj-$(CONFIG_RASPI) += bcm2835_mphi.o
- common-obj-$(CONFIG_RASPI) += bcm2835_property.o
- common-obj-$(CONFIG_RASPI) += bcm2835_rng.o
- common-obj-$(CONFIG_RASPI) += bcm2835_thermal.o
-diff --git a/hw/misc/bcm2835_mphi.c b/hw/misc/bcm2835_mphi.c
+diff --git a/include/hw/usb/dwc2-regs.h b/include/hw/usb/dwc2-regs.h
 new file mode 100644
-index 0000000000..66fc4a9cd3
+index 0000000000..96dc07fb6f
 --- /dev/null
-+++ b/hw/misc/bcm2835_mphi.c
-@@ -0,0 +1,190 @@
++++ b/include/hw/usb/dwc2-regs.h
+@@ -0,0 +1,895 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
 +/*
-+ * BCM2835 SOC MPHI emulation
++ * hw.h - DesignWare HS OTG Controller hardware definitions
 + *
-+ * Very basic emulation, only providing the FIQ interrupt needed to
-+ * allow the dwc-otg USB host controller driver in the Raspbian kernel
-+ * to function.
++ * Copyright 2004-2013 Synopsys, Inc.
 + *
-+ * Copyright (c) 2020 Paul Zimmerman <pauldzim@gmail.com>
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions, and the following disclaimer,
++ *    without modification.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. The names of the above-listed copyright holders may not be used
++ *    to endorse or promote products derived from this software without
++ *    specific prior written permission.
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
++ * ALTERNATIVELY, this software may be distributed under the terms of the
++ * GNU General Public License ("GPL") as published by the Free Software
++ * Foundation; either version 2 of the License, or (at your option) any
++ * later version.
 + *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
++ * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
++ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
++ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
++ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
++ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
++ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
++ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
++ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
++ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 + */
 +
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/misc/bcm2835_mphi.h"
-+#include "migration/vmstate.h"
-+#include "qemu/error-report.h"
-+#include "qemu/main-loop.h"
++#ifndef __DWC2_HW_H__
++#define __DWC2_HW_H__
 +
-+static inline void mphi_raise_irq(BCM2835MphiState *s)
-+{
-+    qemu_set_irq(s->irq, 1);
-+}
++#define HSOTG_REG(x)	(x)
 +
-+static inline void mphi_lower_irq(BCM2835MphiState *s)
-+{
-+    qemu_set_irq(s->irq, 0);
-+}
++#define GOTGCTL				HSOTG_REG(0x000)
++#define GOTGCTL_CHIRPEN			BIT(27)
++#define GOTGCTL_MULT_VALID_BC_MASK	(0x1f << 22)
++#define GOTGCTL_MULT_VALID_BC_SHIFT	22
++#define GOTGCTL_OTGVER			BIT(20)
++#define GOTGCTL_BSESVLD			BIT(19)
++#define GOTGCTL_ASESVLD			BIT(18)
++#define GOTGCTL_DBNC_SHORT		BIT(17)
++#define GOTGCTL_CONID_B			BIT(16)
++#define GOTGCTL_DBNCE_FLTR_BYPASS	BIT(15)
++#define GOTGCTL_DEVHNPEN		BIT(11)
++#define GOTGCTL_HSTSETHNPEN		BIT(10)
++#define GOTGCTL_HNPREQ			BIT(9)
++#define GOTGCTL_HSTNEGSCS		BIT(8)
++#define GOTGCTL_SESREQ			BIT(1)
++#define GOTGCTL_SESREQSCS		BIT(0)
 +
-+static uint64_t mphi_reg_read(void *ptr, hwaddr addr, unsigned size)
-+{
-+    BCM2835MphiState *s = ptr;
-+    uint32_t reg = s->regbase + addr;
-+    uint32_t val = 0;
++#define GOTGINT				HSOTG_REG(0x004)
++#define GOTGINT_DBNCE_DONE		BIT(19)
++#define GOTGINT_A_DEV_TOUT_CHG		BIT(18)
++#define GOTGINT_HST_NEG_DET		BIT(17)
++#define GOTGINT_HST_NEG_SUC_STS_CHNG	BIT(9)
++#define GOTGINT_SES_REQ_SUC_STS_CHNG	BIT(8)
++#define GOTGINT_SES_END_DET		BIT(2)
 +
-+    switch (reg) {
-+    case 0x28:  /* outdda */
-+        val = s->outdda;
-+        break;
-+    case 0x2c:  /* outddb */
-+        val = s->outddb;
-+        break;
-+    case 0x4c:  /* ctrl */
-+        val = s->ctrl;
-+        val |= 1 << 17;
-+        break;
-+    case 0x50:  /* intstat */
-+        val = s->intstat;
-+        break;
-+    case 0x1f0: /* swirq_set */
-+        val = s->swirq_set;
-+        break;
-+    case 0x1f4: /* swirq_clr */
-+        val = s->swirq_clr;
-+        break;
-+    default:
-+        break;
-+    }
++#define GAHBCFG				HSOTG_REG(0x008)
++#define GAHBCFG_AHB_SINGLE		BIT(23)
++#define GAHBCFG_NOTI_ALL_DMA_WRIT	BIT(22)
++#define GAHBCFG_REM_MEM_SUPP		BIT(21)
++#define GAHBCFG_P_TXF_EMP_LVL		BIT(8)
++#define GAHBCFG_NP_TXF_EMP_LVL		BIT(7)
++#define GAHBCFG_DMA_EN			BIT(5)
++#define GAHBCFG_HBSTLEN_MASK		(0xf << 1)
++#define GAHBCFG_HBSTLEN_SHIFT		1
++#define GAHBCFG_HBSTLEN_SINGLE		0
++#define GAHBCFG_HBSTLEN_INCR		1
++#define GAHBCFG_HBSTLEN_INCR4		3
++#define GAHBCFG_HBSTLEN_INCR8		5
++#define GAHBCFG_HBSTLEN_INCR16		7
++#define GAHBCFG_GLBL_INTR_EN		BIT(0)
++#define GAHBCFG_CTRL_MASK		(GAHBCFG_P_TXF_EMP_LVL | \
++					 GAHBCFG_NP_TXF_EMP_LVL | \
++					 GAHBCFG_DMA_EN | \
++					 GAHBCFG_GLBL_INTR_EN)
 +
-+    return val;
-+}
++#define GUSBCFG				HSOTG_REG(0x00C)
++#define GUSBCFG_FORCEDEVMODE		BIT(30)
++#define GUSBCFG_FORCEHOSTMODE		BIT(29)
++#define GUSBCFG_TXENDDELAY		BIT(28)
++#define GUSBCFG_ICTRAFFICPULLREMOVE	BIT(27)
++#define GUSBCFG_ICUSBCAP		BIT(26)
++#define GUSBCFG_ULPI_INT_PROT_DIS	BIT(25)
++#define GUSBCFG_INDICATORPASSTHROUGH	BIT(24)
++#define GUSBCFG_INDICATORCOMPLEMENT	BIT(23)
++#define GUSBCFG_TERMSELDLPULSE		BIT(22)
++#define GUSBCFG_ULPI_INT_VBUS_IND	BIT(21)
++#define GUSBCFG_ULPI_EXT_VBUS_DRV	BIT(20)
++#define GUSBCFG_ULPI_CLK_SUSP_M		BIT(19)
++#define GUSBCFG_ULPI_AUTO_RES		BIT(18)
++#define GUSBCFG_ULPI_FS_LS		BIT(17)
++#define GUSBCFG_OTG_UTMI_FS_SEL		BIT(16)
++#define GUSBCFG_PHY_LP_CLK_SEL		BIT(15)
++#define GUSBCFG_USBTRDTIM_MASK		(0xf << 10)
++#define GUSBCFG_USBTRDTIM_SHIFT		10
++#define GUSBCFG_HNPCAP			BIT(9)
++#define GUSBCFG_SRPCAP			BIT(8)
++#define GUSBCFG_DDRSEL			BIT(7)
++#define GUSBCFG_PHYSEL			BIT(6)
++#define GUSBCFG_FSINTF			BIT(5)
++#define GUSBCFG_ULPI_UTMI_SEL		BIT(4)
++#define GUSBCFG_PHYIF16			BIT(3)
++#define GUSBCFG_PHYIF8			(0 << 3)
++#define GUSBCFG_TOUTCAL_MASK		(0x7 << 0)
++#define GUSBCFG_TOUTCAL_SHIFT		0
++#define GUSBCFG_TOUTCAL_LIMIT		0x7
++#define GUSBCFG_TOUTCAL(_x)		((_x) << 0)
 +
-+static void mphi_reg_write(void *ptr, hwaddr addr, uint64_t val, unsigned size)
-+{
-+    BCM2835MphiState *s = ptr;
-+    uint32_t reg = s->regbase + addr;
-+    int do_irq = 0;
++#define GRSTCTL				HSOTG_REG(0x010)
++#define GRSTCTL_AHBIDLE			BIT(31)
++#define GRSTCTL_DMAREQ			BIT(30)
++#define GRSTCTL_TXFNUM_MASK		(0x1f << 6)
++#define GRSTCTL_TXFNUM_SHIFT		6
++#define GRSTCTL_TXFNUM_LIMIT		0x1f
++#define GRSTCTL_TXFNUM(_x)		((_x) << 6)
++#define GRSTCTL_TXFFLSH			BIT(5)
++#define GRSTCTL_RXFFLSH			BIT(4)
++#define GRSTCTL_IN_TKNQ_FLSH		BIT(3)
++#define GRSTCTL_FRMCNTRRST		BIT(2)
++#define GRSTCTL_HSFTRST			BIT(1)
++#define GRSTCTL_CSFTRST			BIT(0)
 +
-+    val &= 0xffffffff;
++#define GINTSTS				HSOTG_REG(0x014)
++#define GINTMSK				HSOTG_REG(0x018)
++#define GINTSTS_WKUPINT			BIT(31)
++#define GINTSTS_SESSREQINT		BIT(30)
++#define GINTSTS_DISCONNINT		BIT(29)
++#define GINTSTS_CONIDSTSCHNG		BIT(28)
++#define GINTSTS_LPMTRANRCVD		BIT(27)
++#define GINTSTS_PTXFEMP			BIT(26)
++#define GINTSTS_HCHINT			BIT(25)
++#define GINTSTS_PRTINT			BIT(24)
++#define GINTSTS_RESETDET		BIT(23)
++#define GINTSTS_FET_SUSP		BIT(22)
++#define GINTSTS_INCOMPL_IP		BIT(21)
++#define GINTSTS_INCOMPL_SOOUT		BIT(21)
++#define GINTSTS_INCOMPL_SOIN		BIT(20)
++#define GINTSTS_OEPINT			BIT(19)
++#define GINTSTS_IEPINT			BIT(18)
++#define GINTSTS_EPMIS			BIT(17)
++#define GINTSTS_RESTOREDONE		BIT(16)
++#define GINTSTS_EOPF			BIT(15)
++#define GINTSTS_ISOUTDROP		BIT(14)
++#define GINTSTS_ENUMDONE		BIT(13)
++#define GINTSTS_USBRST			BIT(12)
++#define GINTSTS_USBSUSP			BIT(11)
++#define GINTSTS_ERLYSUSP		BIT(10)
++#define GINTSTS_I2CINT			BIT(9)
++#define GINTSTS_ULPI_CK_INT		BIT(8)
++#define GINTSTS_GOUTNAKEFF		BIT(7)
++#define GINTSTS_GINNAKEFF		BIT(6)
++#define GINTSTS_NPTXFEMP		BIT(5)
++#define GINTSTS_RXFLVL			BIT(4)
++#define GINTSTS_SOF			BIT(3)
++#define GINTSTS_OTGINT			BIT(2)
++#define GINTSTS_MODEMIS			BIT(1)
++#define GINTSTS_CURMODE_HOST		BIT(0)
 +
-+    switch (reg) {
-+    case 0x28:  /* outdda */
-+        s->outdda = val;
-+        break;
-+    case 0x2c:  /* outddb */
-+        s->outddb = val;
-+        if (val & (1 << 29)) {
-+            do_irq = 1;
-+        }
-+        break;
-+    case 0x4c:  /* ctrl */
-+        s->ctrl = val;
-+        if (val & (1 << 16)) {
-+            do_irq = -1;
-+        }
-+        break;
-+    case 0x50:  /* intstat */
-+        s->intstat = val;
-+        if (val & ((1 << 16) | (1 << 29))) {
-+            do_irq = -1;
-+        }
-+        break;
-+    case 0x1f0: /* swirq_set */
-+        s->swirq_set = val;
-+        do_irq = 1;
-+        break;
-+    case 0x1f4: /* swirq_clr */
-+        s->swirq_clr = val;
-+        do_irq = -1;
-+        break;
-+    default:
-+        break;
-+    }
++#define GRXSTSR				HSOTG_REG(0x01C)
++#define GRXSTSP				HSOTG_REG(0x020)
++#define GRXSTS_FN_MASK			(0x7f << 25)
++#define GRXSTS_FN_SHIFT			25
++#define GRXSTS_PKTSTS_MASK		(0xf << 17)
++#define GRXSTS_PKTSTS_SHIFT		17
++#define GRXSTS_PKTSTS_GLOBALOUTNAK	1
++#define GRXSTS_PKTSTS_OUTRX		2
++#define GRXSTS_PKTSTS_HCHIN		2
++#define GRXSTS_PKTSTS_OUTDONE		3
++#define GRXSTS_PKTSTS_HCHIN_XFER_COMP	3
++#define GRXSTS_PKTSTS_SETUPDONE		4
++#define GRXSTS_PKTSTS_DATATOGGLEERR	5
++#define GRXSTS_PKTSTS_SETUPRX		6
++#define GRXSTS_PKTSTS_HCHHALTED		7
++#define GRXSTS_HCHNUM_MASK		(0xf << 0)
++#define GRXSTS_HCHNUM_SHIFT		0
++#define GRXSTS_DPID_MASK		(0x3 << 15)
++#define GRXSTS_DPID_SHIFT		15
++#define GRXSTS_BYTECNT_MASK		(0x7ff << 4)
++#define GRXSTS_BYTECNT_SHIFT		4
++#define GRXSTS_EPNUM_MASK		(0xf << 0)
++#define GRXSTS_EPNUM_SHIFT		0
 +
-+    if (do_irq > 0) {
-+        mphi_raise_irq(s);
-+    } else if (do_irq < 0) {
-+        mphi_lower_irq(s);
-+    }
-+}
++#define GRXFSIZ				HSOTG_REG(0x024)
++#define GRXFSIZ_DEPTH_MASK		(0xffff << 0)
++#define GRXFSIZ_DEPTH_SHIFT		0
 +
-+static const MemoryRegionOps mphi_mmio_ops = {
-+    .read = mphi_reg_read,
-+    .write = mphi_reg_write,
-+    .valid.min_access_size = 4,
-+    .valid.max_access_size = 4,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
++#define GNPTXFSIZ			HSOTG_REG(0x028)
++/* Use FIFOSIZE_* constants to access this register */
 +
-+static void mphi_reset(DeviceState *dev)
-+{
-+}
++#define GNPTXSTS			HSOTG_REG(0x02C)
++#define GNPTXSTS_NP_TXQ_TOP_MASK		(0x7f << 24)
++#define GNPTXSTS_NP_TXQ_TOP_SHIFT		24
++#define GNPTXSTS_NP_TXQ_SPC_AVAIL_MASK		(0xff << 16)
++#define GNPTXSTS_NP_TXQ_SPC_AVAIL_SHIFT		16
++#define GNPTXSTS_NP_TXQ_SPC_AVAIL_GET(_v)	(((_v) >> 16) & 0xff)
++#define GNPTXSTS_NP_TXF_SPC_AVAIL_MASK		(0xffff << 0)
++#define GNPTXSTS_NP_TXF_SPC_AVAIL_SHIFT		0
++#define GNPTXSTS_NP_TXF_SPC_AVAIL_GET(_v)	(((_v) >> 0) & 0xffff)
 +
-+static void mphi_realize(DeviceState *dev, Error **errp)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+    BCM2835MphiState *s = BCM2835_MPHI(dev);
++#define GI2CCTL				HSOTG_REG(0x0030)
++#define GI2CCTL_BSYDNE			BIT(31)
++#define GI2CCTL_RW			BIT(30)
++#define GI2CCTL_I2CDATSE0		BIT(28)
++#define GI2CCTL_I2CDEVADDR_MASK		(0x3 << 26)
++#define GI2CCTL_I2CDEVADDR_SHIFT	26
++#define GI2CCTL_I2CSUSPCTL		BIT(25)
++#define GI2CCTL_ACK			BIT(24)
++#define GI2CCTL_I2CEN			BIT(23)
++#define GI2CCTL_ADDR_MASK		(0x7f << 16)
++#define GI2CCTL_ADDR_SHIFT		16
++#define GI2CCTL_REGADDR_MASK		(0xff << 8)
++#define GI2CCTL_REGADDR_SHIFT		8
++#define GI2CCTL_RWDATA_MASK		(0xff << 0)
++#define GI2CCTL_RWDATA_SHIFT		0
 +
-+    sysbus_init_irq(sbd, &s->irq);
-+}
++#define GPVNDCTL			HSOTG_REG(0x0034)
++#define GGPIO				HSOTG_REG(0x0038)
++#define GGPIO_STM32_OTG_GCCFG_PWRDWN	BIT(16)
 +
-+static void mphi_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    BCM2835MphiState *s = BCM2835_MPHI(obj);
++#define GUID				HSOTG_REG(0x003c)
++#define GSNPSID				HSOTG_REG(0x0040)
++#define GHWCFG1				HSOTG_REG(0x0044)
++#define GSNPSID_ID_MASK			GENMASK(31, 16)
 +
-+    s->regbase = 0;
-+    memory_region_init(&s->mem, obj, "mphi", MPHI_MMIO_SIZE);
-+    memory_region_init_io(&s->mem_reg, obj, &mphi_mmio_ops, s, "global", 0x200);
-+    memory_region_add_subregion(&s->mem, s->regbase, &s->mem_reg);
-+    sysbus_init_mmio(sbd, &s->mem);
-+}
++#define GHWCFG2				HSOTG_REG(0x0048)
++#define GHWCFG2_OTG_ENABLE_IC_USB		BIT(31)
++#define GHWCFG2_DEV_TOKEN_Q_DEPTH_MASK		(0x1f << 26)
++#define GHWCFG2_DEV_TOKEN_Q_DEPTH_SHIFT		26
++#define GHWCFG2_HOST_PERIO_TX_Q_DEPTH_MASK	(0x3 << 24)
++#define GHWCFG2_HOST_PERIO_TX_Q_DEPTH_SHIFT	24
++#define GHWCFG2_NONPERIO_TX_Q_DEPTH_MASK	(0x3 << 22)
++#define GHWCFG2_NONPERIO_TX_Q_DEPTH_SHIFT	22
++#define GHWCFG2_MULTI_PROC_INT			BIT(20)
++#define GHWCFG2_DYNAMIC_FIFO			BIT(19)
++#define GHWCFG2_PERIO_EP_SUPPORTED		BIT(18)
++#define GHWCFG2_NUM_HOST_CHAN_MASK		(0xf << 14)
++#define GHWCFG2_NUM_HOST_CHAN_SHIFT		14
++#define GHWCFG2_NUM_DEV_EP_MASK			(0xf << 10)
++#define GHWCFG2_NUM_DEV_EP_SHIFT		10
++#define GHWCFG2_FS_PHY_TYPE_MASK		(0x3 << 8)
++#define GHWCFG2_FS_PHY_TYPE_SHIFT		8
++#define GHWCFG2_FS_PHY_TYPE_NOT_SUPPORTED	0
++#define GHWCFG2_FS_PHY_TYPE_DEDICATED		1
++#define GHWCFG2_FS_PHY_TYPE_SHARED_UTMI		2
++#define GHWCFG2_FS_PHY_TYPE_SHARED_ULPI		3
++#define GHWCFG2_HS_PHY_TYPE_MASK		(0x3 << 6)
++#define GHWCFG2_HS_PHY_TYPE_SHIFT		6
++#define GHWCFG2_HS_PHY_TYPE_NOT_SUPPORTED	0
++#define GHWCFG2_HS_PHY_TYPE_UTMI		1
++#define GHWCFG2_HS_PHY_TYPE_ULPI		2
++#define GHWCFG2_HS_PHY_TYPE_UTMI_ULPI		3
++#define GHWCFG2_POINT2POINT			BIT(5)
++#define GHWCFG2_ARCHITECTURE_MASK		(0x3 << 3)
++#define GHWCFG2_ARCHITECTURE_SHIFT		3
++#define GHWCFG2_SLAVE_ONLY_ARCH			0
++#define GHWCFG2_EXT_DMA_ARCH			1
++#define GHWCFG2_INT_DMA_ARCH			2
++#define GHWCFG2_OP_MODE_MASK			(0x7 << 0)
++#define GHWCFG2_OP_MODE_SHIFT			0
++#define GHWCFG2_OP_MODE_HNP_SRP_CAPABLE		0
++#define GHWCFG2_OP_MODE_SRP_ONLY_CAPABLE	1
++#define GHWCFG2_OP_MODE_NO_HNP_SRP_CAPABLE	2
++#define GHWCFG2_OP_MODE_SRP_CAPABLE_DEVICE	3
++#define GHWCFG2_OP_MODE_NO_SRP_CAPABLE_DEVICE	4
++#define GHWCFG2_OP_MODE_SRP_CAPABLE_HOST	5
++#define GHWCFG2_OP_MODE_NO_SRP_CAPABLE_HOST	6
++#define GHWCFG2_OP_MODE_UNDEFINED		7
 +
-+const VMStateDescription vmstate_mphi_state = {
-+    .name = "mphi",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT16(regbase, BCM2835MphiState),
-+        VMSTATE_UINT32(outdda, BCM2835MphiState),
-+        VMSTATE_UINT32(outddb, BCM2835MphiState),
-+        VMSTATE_UINT32(ctrl, BCM2835MphiState),
-+        VMSTATE_UINT32(intstat, BCM2835MphiState),
-+        VMSTATE_UINT32(swirq_set, BCM2835MphiState),
-+        VMSTATE_UINT32(swirq_clr, BCM2835MphiState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
++#define GHWCFG3				HSOTG_REG(0x004c)
++#define GHWCFG3_DFIFO_DEPTH_MASK		(0xffff << 16)
++#define GHWCFG3_DFIFO_DEPTH_SHIFT		16
++#define GHWCFG3_OTG_LPM_EN			BIT(15)
++#define GHWCFG3_BC_SUPPORT			BIT(14)
++#define GHWCFG3_OTG_ENABLE_HSIC			BIT(13)
++#define GHWCFG3_ADP_SUPP			BIT(12)
++#define GHWCFG3_SYNCH_RESET_TYPE		BIT(11)
++#define GHWCFG3_OPTIONAL_FEATURES		BIT(10)
++#define GHWCFG3_VENDOR_CTRL_IF			BIT(9)
++#define GHWCFG3_I2C				BIT(8)
++#define GHWCFG3_OTG_FUNC			BIT(7)
++#define GHWCFG3_PACKET_SIZE_CNTR_WIDTH_MASK	(0x7 << 4)
++#define GHWCFG3_PACKET_SIZE_CNTR_WIDTH_SHIFT	4
++#define GHWCFG3_XFER_SIZE_CNTR_WIDTH_MASK	(0xf << 0)
++#define GHWCFG3_XFER_SIZE_CNTR_WIDTH_SHIFT	0
 +
-+static void mphi_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
++#define GHWCFG4				HSOTG_REG(0x0050)
++#define GHWCFG4_DESC_DMA_DYN			BIT(31)
++#define GHWCFG4_DESC_DMA			BIT(30)
++#define GHWCFG4_NUM_IN_EPS_MASK			(0xf << 26)
++#define GHWCFG4_NUM_IN_EPS_SHIFT		26
++#define GHWCFG4_DED_FIFO_EN			BIT(25)
++#define GHWCFG4_DED_FIFO_SHIFT		25
++#define GHWCFG4_SESSION_END_FILT_EN		BIT(24)
++#define GHWCFG4_B_VALID_FILT_EN			BIT(23)
++#define GHWCFG4_A_VALID_FILT_EN			BIT(22)
++#define GHWCFG4_VBUS_VALID_FILT_EN		BIT(21)
++#define GHWCFG4_IDDIG_FILT_EN			BIT(20)
++#define GHWCFG4_NUM_DEV_MODE_CTRL_EP_MASK	(0xf << 16)
++#define GHWCFG4_NUM_DEV_MODE_CTRL_EP_SHIFT	16
++#define GHWCFG4_UTMI_PHY_DATA_WIDTH_MASK	(0x3 << 14)
++#define GHWCFG4_UTMI_PHY_DATA_WIDTH_SHIFT	14
++#define GHWCFG4_UTMI_PHY_DATA_WIDTH_8		0
++#define GHWCFG4_UTMI_PHY_DATA_WIDTH_16		1
++#define GHWCFG4_UTMI_PHY_DATA_WIDTH_8_OR_16	2
++#define GHWCFG4_ACG_SUPPORTED			BIT(12)
++#define GHWCFG4_IPG_ISOC_SUPPORTED		BIT(11)
++#define GHWCFG4_SERVICE_INTERVAL_SUPPORTED      BIT(10)
++#define GHWCFG4_XHIBER				BIT(7)
++#define GHWCFG4_HIBER				BIT(6)
++#define GHWCFG4_MIN_AHB_FREQ			BIT(5)
++#define GHWCFG4_POWER_OPTIMIZ			BIT(4)
++#define GHWCFG4_NUM_DEV_PERIO_IN_EP_MASK	(0xf << 0)
++#define GHWCFG4_NUM_DEV_PERIO_IN_EP_SHIFT	0
 +
-+    dc->realize = mphi_realize;
-+    dc->reset = mphi_reset;
-+    dc->vmsd = &vmstate_mphi_state;
-+}
++#define GLPMCFG				HSOTG_REG(0x0054)
++#define GLPMCFG_INVSELHSIC		BIT(31)
++#define GLPMCFG_HSICCON			BIT(30)
++#define GLPMCFG_RSTRSLPSTS		BIT(29)
++#define GLPMCFG_ENBESL			BIT(28)
++#define GLPMCFG_LPM_RETRYCNT_STS_MASK	(0x7 << 25)
++#define GLPMCFG_LPM_RETRYCNT_STS_SHIFT	25
++#define GLPMCFG_SNDLPM			BIT(24)
++#define GLPMCFG_RETRY_CNT_MASK		(0x7 << 21)
++#define GLPMCFG_RETRY_CNT_SHIFT		21
++#define GLPMCFG_LPM_REJECT_CTRL_CONTROL	BIT(21)
++#define GLPMCFG_LPM_ACCEPT_CTRL_ISOC	BIT(22)
++#define GLPMCFG_LPM_CHNL_INDX_MASK	(0xf << 17)
++#define GLPMCFG_LPM_CHNL_INDX_SHIFT	17
++#define GLPMCFG_L1RESUMEOK		BIT(16)
++#define GLPMCFG_SLPSTS			BIT(15)
++#define GLPMCFG_COREL1RES_MASK		(0x3 << 13)
++#define GLPMCFG_COREL1RES_SHIFT		13
++#define GLPMCFG_HIRD_THRES_MASK		(0x1f << 8)
++#define GLPMCFG_HIRD_THRES_SHIFT	8
++#define GLPMCFG_HIRD_THRES_EN		(0x10 << 8)
++#define GLPMCFG_ENBLSLPM		BIT(7)
++#define GLPMCFG_BREMOTEWAKE		BIT(6)
++#define GLPMCFG_HIRD_MASK		(0xf << 2)
++#define GLPMCFG_HIRD_SHIFT		2
++#define GLPMCFG_APPL1RES		BIT(1)
++#define GLPMCFG_LPMCAP			BIT(0)
 +
-+static const TypeInfo bcm2835_mphi_type_info = {
-+    .name          = TYPE_BCM2835_MPHI,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(BCM2835MphiState),
-+    .instance_init = mphi_init,
-+    .class_init    = mphi_class_init,
-+};
++#define GPWRDN				HSOTG_REG(0x0058)
++#define GPWRDN_MULT_VAL_ID_BC_MASK	(0x1f << 24)
++#define GPWRDN_MULT_VAL_ID_BC_SHIFT	24
++#define GPWRDN_ADP_INT			BIT(23)
++#define GPWRDN_BSESSVLD			BIT(22)
++#define GPWRDN_IDSTS			BIT(21)
++#define GPWRDN_LINESTATE_MASK		(0x3 << 19)
++#define GPWRDN_LINESTATE_SHIFT		19
++#define GPWRDN_STS_CHGINT_MSK		BIT(18)
++#define GPWRDN_STS_CHGINT		BIT(17)
++#define GPWRDN_SRP_DET_MSK		BIT(16)
++#define GPWRDN_SRP_DET			BIT(15)
++#define GPWRDN_CONNECT_DET_MSK		BIT(14)
++#define GPWRDN_CONNECT_DET		BIT(13)
++#define GPWRDN_DISCONN_DET_MSK		BIT(12)
++#define GPWRDN_DISCONN_DET		BIT(11)
++#define GPWRDN_RST_DET_MSK		BIT(10)
++#define GPWRDN_RST_DET			BIT(9)
++#define GPWRDN_LNSTSCHG_MSK		BIT(8)
++#define GPWRDN_LNSTSCHG			BIT(7)
++#define GPWRDN_DIS_VBUS			BIT(6)
++#define GPWRDN_PWRDNSWTCH		BIT(5)
++#define GPWRDN_PWRDNRSTN		BIT(4)
++#define GPWRDN_PWRDNCLMP		BIT(3)
++#define GPWRDN_RESTORE			BIT(2)
++#define GPWRDN_PMUACTV			BIT(1)
++#define GPWRDN_PMUINTSEL		BIT(0)
 +
-+static void bcm2835_mphi_register_types(void)
-+{
-+    type_register_static(&bcm2835_mphi_type_info);
-+}
++#define GDFIFOCFG			HSOTG_REG(0x005c)
++#define GDFIFOCFG_EPINFOBASE_MASK	(0xffff << 16)
++#define GDFIFOCFG_EPINFOBASE_SHIFT	16
++#define GDFIFOCFG_GDFIFOCFG_MASK	(0xffff << 0)
++#define GDFIFOCFG_GDFIFOCFG_SHIFT	0
 +
-+type_init(bcm2835_mphi_register_types)
-diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
-index 2e8655a7c2..7a7a8f6141 100644
---- a/include/hw/arm/bcm2835_peripherals.h
-+++ b/include/hw/arm/bcm2835_peripherals.h
-@@ -21,6 +21,7 @@
- #include "hw/misc/bcm2835_property.h"
- #include "hw/misc/bcm2835_rng.h"
- #include "hw/misc/bcm2835_mbox.h"
-+#include "hw/misc/bcm2835_mphi.h"
- #include "hw/misc/bcm2835_thermal.h"
- #include "hw/sd/sdhci.h"
- #include "hw/sd/bcm2835_sdhost.h"
-@@ -42,6 +43,7 @@ typedef struct BCM2835PeripheralState {
-     qemu_irq irq, fiq;
- 
-     BCM2835SystemTimerState systmr;
-+    BCM2835MphiState mphi;
-     UnimplementedDeviceState armtmr;
-     UnimplementedDeviceState cprman;
-     UnimplementedDeviceState a2w;
-diff --git a/include/hw/misc/bcm2835_mphi.h b/include/hw/misc/bcm2835_mphi.h
-new file mode 100644
-index 0000000000..6d070b04a5
---- /dev/null
-+++ b/include/hw/misc/bcm2835_mphi.h
-@@ -0,0 +1,48 @@
-+/*
-+ * BCM2835 SOC MPHI state definitions
-+ *
-+ * Copyright (c) 2020 Paul Zimmerman <pauldzim@gmail.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
++#define ADPCTL				HSOTG_REG(0x0060)
++#define ADPCTL_AR_MASK			(0x3 << 27)
++#define ADPCTL_AR_SHIFT			27
++#define ADPCTL_ADP_TMOUT_INT_MSK	BIT(26)
++#define ADPCTL_ADP_SNS_INT_MSK		BIT(25)
++#define ADPCTL_ADP_PRB_INT_MSK		BIT(24)
++#define ADPCTL_ADP_TMOUT_INT		BIT(23)
++#define ADPCTL_ADP_SNS_INT		BIT(22)
++#define ADPCTL_ADP_PRB_INT		BIT(21)
++#define ADPCTL_ADPENA			BIT(20)
++#define ADPCTL_ADPRES			BIT(19)
++#define ADPCTL_ENASNS			BIT(18)
++#define ADPCTL_ENAPRB			BIT(17)
++#define ADPCTL_RTIM_MASK		(0x7ff << 6)
++#define ADPCTL_RTIM_SHIFT		6
++#define ADPCTL_PRB_PER_MASK		(0x3 << 4)
++#define ADPCTL_PRB_PER_SHIFT		4
++#define ADPCTL_PRB_DELTA_MASK		(0x3 << 2)
++#define ADPCTL_PRB_DELTA_SHIFT		2
++#define ADPCTL_PRB_DSCHRG_MASK		(0x3 << 0)
++#define ADPCTL_PRB_DSCHRG_SHIFT		0
++
++#define GREFCLK				    HSOTG_REG(0x0064)
++#define GREFCLK_REFCLKPER_MASK		    (0x1ffff << 15)
++#define GREFCLK_REFCLKPER_SHIFT		    15
++#define GREFCLK_REF_CLK_MODE		    BIT(14)
++#define GREFCLK_SOF_CNT_WKUP_ALERT_MASK	    (0x3ff)
++#define GREFCLK_SOF_CNT_WKUP_ALERT_SHIFT    0
++
++#define GINTMSK2			HSOTG_REG(0x0068)
++#define GINTMSK2_WKUP_ALERT_INT_MSK	BIT(0)
++
++#define GINTSTS2			HSOTG_REG(0x006c)
++#define GINTSTS2_WKUP_ALERT_INT		BIT(0)
++
++#define HPTXFSIZ			HSOTG_REG(0x100)
++/* Use FIFOSIZE_* constants to access this register */
++
++#define DPTXFSIZN(_a)			HSOTG_REG(0x104 + (((_a) - 1) * 4))
++/* Use FIFOSIZE_* constants to access this register */
++
++/* These apply to the GNPTXFSIZ, HPTXFSIZ and DPTXFSIZN registers */
++#define FIFOSIZE_DEPTH_MASK		(0xffff << 16)
++#define FIFOSIZE_DEPTH_SHIFT		16
++#define FIFOSIZE_STARTADDR_MASK		(0xffff << 0)
++#define FIFOSIZE_STARTADDR_SHIFT	0
++#define FIFOSIZE_DEPTH_GET(_x)		(((_x) >> 16) & 0xffff)
++
++/* Device mode registers */
++
++#define DCFG				HSOTG_REG(0x800)
++#define DCFG_DESCDMA_EN			BIT(23)
++#define DCFG_EPMISCNT_MASK		(0x1f << 18)
++#define DCFG_EPMISCNT_SHIFT		18
++#define DCFG_EPMISCNT_LIMIT		0x1f
++#define DCFG_EPMISCNT(_x)		((_x) << 18)
++#define DCFG_IPG_ISOC_SUPPORDED		BIT(17)
++#define DCFG_PERFRINT_MASK		(0x3 << 11)
++#define DCFG_PERFRINT_SHIFT		11
++#define DCFG_PERFRINT_LIMIT		0x3
++#define DCFG_PERFRINT(_x)		((_x) << 11)
++#define DCFG_DEVADDR_MASK		(0x7f << 4)
++#define DCFG_DEVADDR_SHIFT		4
++#define DCFG_DEVADDR_LIMIT		0x7f
++#define DCFG_DEVADDR(_x)		((_x) << 4)
++#define DCFG_NZ_STS_OUT_HSHK		BIT(2)
++#define DCFG_DEVSPD_MASK		(0x3 << 0)
++#define DCFG_DEVSPD_SHIFT		0
++#define DCFG_DEVSPD_HS			0
++#define DCFG_DEVSPD_FS			1
++#define DCFG_DEVSPD_LS			2
++#define DCFG_DEVSPD_FS48		3
++
++#define DCTL				HSOTG_REG(0x804)
++#define DCTL_SERVICE_INTERVAL_SUPPORTED BIT(19)
++#define DCTL_PWRONPRGDONE		BIT(11)
++#define DCTL_CGOUTNAK			BIT(10)
++#define DCTL_SGOUTNAK			BIT(9)
++#define DCTL_CGNPINNAK			BIT(8)
++#define DCTL_SGNPINNAK			BIT(7)
++#define DCTL_TSTCTL_MASK		(0x7 << 4)
++#define DCTL_TSTCTL_SHIFT		4
++#define DCTL_GOUTNAKSTS			BIT(3)
++#define DCTL_GNPINNAKSTS		BIT(2)
++#define DCTL_SFTDISCON			BIT(1)
++#define DCTL_RMTWKUPSIG			BIT(0)
++
++#define DSTS				HSOTG_REG(0x808)
++#define DSTS_SOFFN_MASK			(0x3fff << 8)
++#define DSTS_SOFFN_SHIFT		8
++#define DSTS_SOFFN_LIMIT		0x3fff
++#define DSTS_SOFFN(_x)			((_x) << 8)
++#define DSTS_ERRATICERR			BIT(3)
++#define DSTS_ENUMSPD_MASK		(0x3 << 1)
++#define DSTS_ENUMSPD_SHIFT		1
++#define DSTS_ENUMSPD_HS			0
++#define DSTS_ENUMSPD_FS			1
++#define DSTS_ENUMSPD_LS			2
++#define DSTS_ENUMSPD_FS48		3
++#define DSTS_SUSPSTS			BIT(0)
++
++#define DIEPMSK				HSOTG_REG(0x810)
++#define DIEPMSK_NAKMSK			BIT(13)
++#define DIEPMSK_BNAININTRMSK		BIT(9)
++#define DIEPMSK_TXFIFOUNDRNMSK		BIT(8)
++#define DIEPMSK_TXFIFOEMPTY		BIT(7)
++#define DIEPMSK_INEPNAKEFFMSK		BIT(6)
++#define DIEPMSK_INTKNEPMISMSK		BIT(5)
++#define DIEPMSK_INTKNTXFEMPMSK		BIT(4)
++#define DIEPMSK_TIMEOUTMSK		BIT(3)
++#define DIEPMSK_AHBERRMSK		BIT(2)
++#define DIEPMSK_EPDISBLDMSK		BIT(1)
++#define DIEPMSK_XFERCOMPLMSK		BIT(0)
++
++#define DOEPMSK				HSOTG_REG(0x814)
++#define DOEPMSK_BNAMSK			BIT(9)
++#define DOEPMSK_BACK2BACKSETUP		BIT(6)
++#define DOEPMSK_STSPHSERCVDMSK		BIT(5)
++#define DOEPMSK_OUTTKNEPDISMSK		BIT(4)
++#define DOEPMSK_SETUPMSK		BIT(3)
++#define DOEPMSK_AHBERRMSK		BIT(2)
++#define DOEPMSK_EPDISBLDMSK		BIT(1)
++#define DOEPMSK_XFERCOMPLMSK		BIT(0)
++
++#define DAINT				HSOTG_REG(0x818)
++#define DAINTMSK			HSOTG_REG(0x81C)
++#define DAINT_OUTEP_SHIFT		16
++#define DAINT_OUTEP(_x)			(1 << ((_x) + 16))
++#define DAINT_INEP(_x)			(1 << (_x))
++
++#define DTKNQR1				HSOTG_REG(0x820)
++#define DTKNQR2				HSOTG_REG(0x824)
++#define DTKNQR3				HSOTG_REG(0x830)
++#define DTKNQR4				HSOTG_REG(0x834)
++#define DIEPEMPMSK			HSOTG_REG(0x834)
++
++#define DVBUSDIS			HSOTG_REG(0x828)
++#define DVBUSPULSE			HSOTG_REG(0x82C)
++
++#define DIEPCTL0			HSOTG_REG(0x900)
++#define DIEPCTL(_a)			HSOTG_REG(0x900 + ((_a) * 0x20))
++
++#define DOEPCTL0			HSOTG_REG(0xB00)
++#define DOEPCTL(_a)			HSOTG_REG(0xB00 + ((_a) * 0x20))
++
++/* EP0 specialness:
++ * bits[29..28] - reserved (no SetD0PID, SetD1PID)
++ * bits[25..22] - should always be zero, this isn't a periodic endpoint
++ * bits[10..0]  - MPS setting different for EP0
 + */
++#define D0EPCTL_MPS_MASK		(0x3 << 0)
++#define D0EPCTL_MPS_SHIFT		0
++#define D0EPCTL_MPS_64			0
++#define D0EPCTL_MPS_32			1
++#define D0EPCTL_MPS_16			2
++#define D0EPCTL_MPS_8			3
 +
-+#ifndef HW_MISC_BCM2835_MPHI_H
-+#define HW_MISC_BCM2835_MPHI_H
++#define DXEPCTL_EPENA			BIT(31)
++#define DXEPCTL_EPDIS			BIT(30)
++#define DXEPCTL_SETD1PID		BIT(29)
++#define DXEPCTL_SETODDFR		BIT(29)
++#define DXEPCTL_SETD0PID		BIT(28)
++#define DXEPCTL_SETEVENFR		BIT(28)
++#define DXEPCTL_SNAK			BIT(27)
++#define DXEPCTL_CNAK			BIT(26)
++#define DXEPCTL_TXFNUM_MASK		(0xf << 22)
++#define DXEPCTL_TXFNUM_SHIFT		22
++#define DXEPCTL_TXFNUM_LIMIT		0xf
++#define DXEPCTL_TXFNUM(_x)		((_x) << 22)
++#define DXEPCTL_STALL			BIT(21)
++#define DXEPCTL_SNP			BIT(20)
++#define DXEPCTL_EPTYPE_MASK		(0x3 << 18)
++#define DXEPCTL_EPTYPE_CONTROL		(0x0 << 18)
++#define DXEPCTL_EPTYPE_ISO		(0x1 << 18)
++#define DXEPCTL_EPTYPE_BULK		(0x2 << 18)
++#define DXEPCTL_EPTYPE_INTERRUPT	(0x3 << 18)
 +
-+#include "hw/irq.h"
-+#include "hw/sysbus.h"
-+#include "sysemu/dma.h"
++#define DXEPCTL_NAKSTS			BIT(17)
++#define DXEPCTL_DPID			BIT(16)
++#define DXEPCTL_EOFRNUM			BIT(16)
++#define DXEPCTL_USBACTEP		BIT(15)
++#define DXEPCTL_NEXTEP_MASK		(0xf << 11)
++#define DXEPCTL_NEXTEP_SHIFT		11
++#define DXEPCTL_NEXTEP_LIMIT		0xf
++#define DXEPCTL_NEXTEP(_x)		((_x) << 11)
++#define DXEPCTL_MPS_MASK		(0x7ff << 0)
++#define DXEPCTL_MPS_SHIFT		0
++#define DXEPCTL_MPS_LIMIT		0x7ff
++#define DXEPCTL_MPS(_x)			((_x) << 0)
 +
-+#define MPHI_MMIO_SIZE      0x1000
++#define DIEPINT(_a)			HSOTG_REG(0x908 + ((_a) * 0x20))
++#define DOEPINT(_a)			HSOTG_REG(0xB08 + ((_a) * 0x20))
++#define DXEPINT_SETUP_RCVD		BIT(15)
++#define DXEPINT_NYETINTRPT		BIT(14)
++#define DXEPINT_NAKINTRPT		BIT(13)
++#define DXEPINT_BBLEERRINTRPT		BIT(12)
++#define DXEPINT_PKTDRPSTS		BIT(11)
++#define DXEPINT_BNAINTR			BIT(9)
++#define DXEPINT_TXFIFOUNDRN		BIT(8)
++#define DXEPINT_OUTPKTERR		BIT(8)
++#define DXEPINT_TXFEMP			BIT(7)
++#define DXEPINT_INEPNAKEFF		BIT(6)
++#define DXEPINT_BACK2BACKSETUP		BIT(6)
++#define DXEPINT_INTKNEPMIS		BIT(5)
++#define DXEPINT_STSPHSERCVD		BIT(5)
++#define DXEPINT_INTKNTXFEMP		BIT(4)
++#define DXEPINT_OUTTKNEPDIS		BIT(4)
++#define DXEPINT_TIMEOUT			BIT(3)
++#define DXEPINT_SETUP			BIT(3)
++#define DXEPINT_AHBERR			BIT(2)
++#define DXEPINT_EPDISBLD		BIT(1)
++#define DXEPINT_XFERCOMPL		BIT(0)
 +
-+typedef struct BCM2835MphiState BCM2835MphiState;
++#define DIEPTSIZ0			HSOTG_REG(0x910)
++#define DIEPTSIZ0_PKTCNT_MASK		(0x3 << 19)
++#define DIEPTSIZ0_PKTCNT_SHIFT		19
++#define DIEPTSIZ0_PKTCNT_LIMIT		0x3
++#define DIEPTSIZ0_PKTCNT(_x)		((_x) << 19)
++#define DIEPTSIZ0_XFERSIZE_MASK		(0x7f << 0)
++#define DIEPTSIZ0_XFERSIZE_SHIFT	0
++#define DIEPTSIZ0_XFERSIZE_LIMIT	0x7f
++#define DIEPTSIZ0_XFERSIZE(_x)		((_x) << 0)
 +
-+struct BCM2835MphiState {
-+    SysBusDevice parent_obj;
-+    qemu_irq irq;
-+    MemoryRegion mem;
-+    MemoryRegion mem_reg;
-+    uint16_t regbase;
++#define DOEPTSIZ0			HSOTG_REG(0xB10)
++#define DOEPTSIZ0_SUPCNT_MASK		(0x3 << 29)
++#define DOEPTSIZ0_SUPCNT_SHIFT		29
++#define DOEPTSIZ0_SUPCNT_LIMIT		0x3
++#define DOEPTSIZ0_SUPCNT(_x)		((_x) << 29)
++#define DOEPTSIZ0_PKTCNT		BIT(19)
++#define DOEPTSIZ0_XFERSIZE_MASK		(0x7f << 0)
++#define DOEPTSIZ0_XFERSIZE_SHIFT	0
 +
-+    uint32_t outdda;
-+    uint32_t outddb;
-+    uint32_t ctrl;
-+    uint32_t intstat;
-+    uint32_t swirq_set;
-+    uint32_t swirq_clr;
-+};
++#define DIEPTSIZ(_a)			HSOTG_REG(0x910 + ((_a) * 0x20))
++#define DOEPTSIZ(_a)			HSOTG_REG(0xB10 + ((_a) * 0x20))
++#define DXEPTSIZ_MC_MASK		(0x3 << 29)
++#define DXEPTSIZ_MC_SHIFT		29
++#define DXEPTSIZ_MC_LIMIT		0x3
++#define DXEPTSIZ_MC(_x)			((_x) << 29)
++#define DXEPTSIZ_PKTCNT_MASK		(0x3ff << 19)
++#define DXEPTSIZ_PKTCNT_SHIFT		19
++#define DXEPTSIZ_PKTCNT_LIMIT		0x3ff
++#define DXEPTSIZ_PKTCNT_GET(_v)		(((_v) >> 19) & 0x3ff)
++#define DXEPTSIZ_PKTCNT(_x)		((_x) << 19)
++#define DXEPTSIZ_XFERSIZE_MASK		(0x7ffff << 0)
++#define DXEPTSIZ_XFERSIZE_SHIFT		0
++#define DXEPTSIZ_XFERSIZE_LIMIT		0x7ffff
++#define DXEPTSIZ_XFERSIZE_GET(_v)	(((_v) >> 0) & 0x7ffff)
++#define DXEPTSIZ_XFERSIZE(_x)		((_x) << 0)
 +
-+#define TYPE_BCM2835_MPHI   "bcm2835-mphi"
++#define DIEPDMA(_a)			HSOTG_REG(0x914 + ((_a) * 0x20))
++#define DOEPDMA(_a)			HSOTG_REG(0xB14 + ((_a) * 0x20))
 +
-+#define BCM2835_MPHI(obj) \
-+    OBJECT_CHECK(BCM2835MphiState, (obj), TYPE_BCM2835_MPHI)
++#define DTXFSTS(_a)			HSOTG_REG(0x918 + ((_a) * 0x20))
 +
-+#endif
++#define PCGCTL				HSOTG_REG(0x0e00)
++#define PCGCTL_IF_DEV_MODE		BIT(31)
++#define PCGCTL_P2HD_PRT_SPD_MASK	(0x3 << 29)
++#define PCGCTL_P2HD_PRT_SPD_SHIFT	29
++#define PCGCTL_P2HD_DEV_ENUM_SPD_MASK	(0x3 << 27)
++#define PCGCTL_P2HD_DEV_ENUM_SPD_SHIFT	27
++#define PCGCTL_MAC_DEV_ADDR_MASK	(0x7f << 20)
++#define PCGCTL_MAC_DEV_ADDR_SHIFT	20
++#define PCGCTL_MAX_TERMSEL		BIT(19)
++#define PCGCTL_MAX_XCVRSELECT_MASK	(0x3 << 17)
++#define PCGCTL_MAX_XCVRSELECT_SHIFT	17
++#define PCGCTL_PORT_POWER		BIT(16)
++#define PCGCTL_PRT_CLK_SEL_MASK		(0x3 << 14)
++#define PCGCTL_PRT_CLK_SEL_SHIFT	14
++#define PCGCTL_ESS_REG_RESTORED		BIT(13)
++#define PCGCTL_EXTND_HIBER_SWITCH	BIT(12)
++#define PCGCTL_EXTND_HIBER_PWRCLMP	BIT(11)
++#define PCGCTL_ENBL_EXTND_HIBER		BIT(10)
++#define PCGCTL_RESTOREMODE		BIT(9)
++#define PCGCTL_RESETAFTSUSP		BIT(8)
++#define PCGCTL_DEEP_SLEEP		BIT(7)
++#define PCGCTL_PHY_IN_SLEEP		BIT(6)
++#define PCGCTL_ENBL_SLEEP_GATING	BIT(5)
++#define PCGCTL_RSTPDWNMODULE		BIT(3)
++#define PCGCTL_PWRCLMP			BIT(2)
++#define PCGCTL_GATEHCLK			BIT(1)
++#define PCGCTL_STOPPCLK			BIT(0)
++
++#define PCGCCTL1                        HSOTG_REG(0xe04)
++#define PCGCCTL1_TIMER                  (0x3 << 1)
++#define PCGCCTL1_GATEEN                 BIT(0)
++
++#define EPFIFO(_a)			HSOTG_REG(0x1000 + ((_a) * 0x1000))
++
++/* Host Mode Registers */
++
++#define HCFG				HSOTG_REG(0x0400)
++#define HCFG_MODECHTIMEN		BIT(31)
++#define HCFG_PERSCHEDENA		BIT(26)
++#define HCFG_FRLISTEN_MASK		(0x3 << 24)
++#define HCFG_FRLISTEN_SHIFT		24
++#define HCFG_FRLISTEN_8				(0 << 24)
++#define FRLISTEN_8_SIZE				8
++#define HCFG_FRLISTEN_16			BIT(24)
++#define FRLISTEN_16_SIZE			16
++#define HCFG_FRLISTEN_32			(2 << 24)
++#define FRLISTEN_32_SIZE			32
++#define HCFG_FRLISTEN_64			(3 << 24)
++#define FRLISTEN_64_SIZE			64
++#define HCFG_DESCDMA			BIT(23)
++#define HCFG_RESVALID_MASK		(0xff << 8)
++#define HCFG_RESVALID_SHIFT		8
++#define HCFG_ENA32KHZ			BIT(7)
++#define HCFG_FSLSSUPP			BIT(2)
++#define HCFG_FSLSPCLKSEL_MASK		(0x3 << 0)
++#define HCFG_FSLSPCLKSEL_SHIFT		0
++#define HCFG_FSLSPCLKSEL_30_60_MHZ	0
++#define HCFG_FSLSPCLKSEL_48_MHZ		1
++#define HCFG_FSLSPCLKSEL_6_MHZ		2
++
++#define HFIR				HSOTG_REG(0x0404)
++#define HFIR_FRINT_MASK			(0xffff << 0)
++#define HFIR_FRINT_SHIFT		0
++#define HFIR_RLDCTRL			BIT(16)
++
++#define HFNUM				HSOTG_REG(0x0408)
++#define HFNUM_FRREM_MASK		(0xffff << 16)
++#define HFNUM_FRREM_SHIFT		16
++#define HFNUM_FRNUM_MASK		(0xffff << 0)
++#define HFNUM_FRNUM_SHIFT		0
++#define HFNUM_MAX_FRNUM			0x3fff
++
++#define HPTXSTS				HSOTG_REG(0x0410)
++#define TXSTS_QTOP_ODD			BIT(31)
++#define TXSTS_QTOP_CHNEP_MASK		(0xf << 27)
++#define TXSTS_QTOP_CHNEP_SHIFT		27
++#define TXSTS_QTOP_TOKEN_MASK		(0x3 << 25)
++#define TXSTS_QTOP_TOKEN_SHIFT		25
++#define TXSTS_QTOP_TERMINATE		BIT(24)
++#define TXSTS_QSPCAVAIL_MASK		(0xff << 16)
++#define TXSTS_QSPCAVAIL_SHIFT		16
++#define TXSTS_FSPCAVAIL_MASK		(0xffff << 0)
++#define TXSTS_FSPCAVAIL_SHIFT		0
++
++#define HAINT				HSOTG_REG(0x0414)
++#define HAINTMSK			HSOTG_REG(0x0418)
++#define HFLBADDR			HSOTG_REG(0x041c)
++
++#define HPRT0				HSOTG_REG(0x0440)
++#define HPRT0_SPD_MASK			(0x3 << 17)
++#define HPRT0_SPD_SHIFT			17
++#define HPRT0_SPD_HIGH_SPEED		0
++#define HPRT0_SPD_FULL_SPEED		1
++#define HPRT0_SPD_LOW_SPEED		2
++#define HPRT0_TSTCTL_MASK		(0xf << 13)
++#define HPRT0_TSTCTL_SHIFT		13
++#define HPRT0_PWR			BIT(12)
++#define HPRT0_LNSTS_MASK		(0x3 << 10)
++#define HPRT0_LNSTS_SHIFT		10
++#define HPRT0_RST			BIT(8)
++#define HPRT0_SUSP			BIT(7)
++#define HPRT0_RES			BIT(6)
++#define HPRT0_OVRCURRCHG		BIT(5)
++#define HPRT0_OVRCURRACT		BIT(4)
++#define HPRT0_ENACHG			BIT(3)
++#define HPRT0_ENA			BIT(2)
++#define HPRT0_CONNDET			BIT(1)
++#define HPRT0_CONNSTS			BIT(0)
++
++#define HCCHAR(_ch)			HSOTG_REG(0x0500 + 0x20 * (_ch))
++#define HCCHAR_CHENA			BIT(31)
++#define HCCHAR_CHDIS			BIT(30)
++#define HCCHAR_ODDFRM			BIT(29)
++#define HCCHAR_DEVADDR_MASK		(0x7f << 22)
++#define HCCHAR_DEVADDR_SHIFT		22
++#define HCCHAR_MULTICNT_MASK		(0x3 << 20)
++#define HCCHAR_MULTICNT_SHIFT		20
++#define HCCHAR_EPTYPE_MASK		(0x3 << 18)
++#define HCCHAR_EPTYPE_SHIFT		18
++#define HCCHAR_LSPDDEV			BIT(17)
++#define HCCHAR_EPDIR			BIT(15)
++#define HCCHAR_EPNUM_MASK		(0xf << 11)
++#define HCCHAR_EPNUM_SHIFT		11
++#define HCCHAR_MPS_MASK			(0x7ff << 0)
++#define HCCHAR_MPS_SHIFT		0
++
++#define HCSPLT(_ch)			HSOTG_REG(0x0504 + 0x20 * (_ch))
++#define HCSPLT_SPLTENA			BIT(31)
++#define HCSPLT_COMPSPLT			BIT(16)
++#define HCSPLT_XACTPOS_MASK		(0x3 << 14)
++#define HCSPLT_XACTPOS_SHIFT		14
++#define HCSPLT_XACTPOS_MID		0
++#define HCSPLT_XACTPOS_END		1
++#define HCSPLT_XACTPOS_BEGIN		2
++#define HCSPLT_XACTPOS_ALL		3
++#define HCSPLT_HUBADDR_MASK		(0x7f << 7)
++#define HCSPLT_HUBADDR_SHIFT		7
++#define HCSPLT_PRTADDR_MASK		(0x7f << 0)
++#define HCSPLT_PRTADDR_SHIFT		0
++
++#define HCINT(_ch)			HSOTG_REG(0x0508 + 0x20 * (_ch))
++#define HCINTMSK(_ch)			HSOTG_REG(0x050c + 0x20 * (_ch))
++#define HCINTMSK_RESERVED14_31		(0x3ffff << 14)
++#define HCINTMSK_FRM_LIST_ROLL		BIT(13)
++#define HCINTMSK_XCS_XACT		BIT(12)
++#define HCINTMSK_BNA			BIT(11)
++#define HCINTMSK_DATATGLERR		BIT(10)
++#define HCINTMSK_FRMOVRUN		BIT(9)
++#define HCINTMSK_BBLERR			BIT(8)
++#define HCINTMSK_XACTERR		BIT(7)
++#define HCINTMSK_NYET			BIT(6)
++#define HCINTMSK_ACK			BIT(5)
++#define HCINTMSK_NAK			BIT(4)
++#define HCINTMSK_STALL			BIT(3)
++#define HCINTMSK_AHBERR			BIT(2)
++#define HCINTMSK_CHHLTD			BIT(1)
++#define HCINTMSK_XFERCOMPL		BIT(0)
++
++#define HCTSIZ(_ch)			HSOTG_REG(0x0510 + 0x20 * (_ch))
++#define TSIZ_DOPNG			BIT(31)
++#define TSIZ_SC_MC_PID_MASK		(0x3 << 29)
++#define TSIZ_SC_MC_PID_SHIFT		29
++#define TSIZ_SC_MC_PID_DATA0		0
++#define TSIZ_SC_MC_PID_DATA2		1
++#define TSIZ_SC_MC_PID_DATA1		2
++#define TSIZ_SC_MC_PID_MDATA		3
++#define TSIZ_SC_MC_PID_SETUP		3
++#define TSIZ_PKTCNT_MASK		(0x3ff << 19)
++#define TSIZ_PKTCNT_SHIFT		19
++#define TSIZ_NTD_MASK			(0xff << 8)
++#define TSIZ_NTD_SHIFT			8
++#define TSIZ_SCHINFO_MASK		(0xff << 0)
++#define TSIZ_SCHINFO_SHIFT		0
++#define TSIZ_XFERSIZE_MASK		(0x7ffff << 0)
++#define TSIZ_XFERSIZE_SHIFT		0
++
++#define HCDMA(_ch)			HSOTG_REG(0x0514 + 0x20 * (_ch))
++
++#define HCDMAB(_ch)			HSOTG_REG(0x051c + 0x20 * (_ch))
++
++#define HCFIFO(_ch)			HSOTG_REG(0x1000 + 0x1000 * (_ch))
++
++/**
++ * struct dwc2_dma_desc - DMA descriptor structure,
++ * used for both host and gadget modes
++ *
++ * @status: DMA descriptor status quadlet
++ * @buf:    DMA descriptor data buffer pointer
++ *
++ * DMA Descriptor structure contains two quadlets:
++ * Status quadlet and Data buffer pointer.
++ */
++struct dwc2_dma_desc {
++	uint32_t status;
++	uint32_t buf;
++} __packed;
++
++/* Host Mode DMA descriptor status quadlet */
++
++#define HOST_DMA_A			BIT(31)
++#define HOST_DMA_STS_MASK		(0x3 << 28)
++#define HOST_DMA_STS_SHIFT		28
++#define HOST_DMA_STS_PKTERR		BIT(28)
++#define HOST_DMA_EOL			BIT(26)
++#define HOST_DMA_IOC			BIT(25)
++#define HOST_DMA_SUP			BIT(24)
++#define HOST_DMA_ALT_QTD		BIT(23)
++#define HOST_DMA_QTD_OFFSET_MASK	(0x3f << 17)
++#define HOST_DMA_QTD_OFFSET_SHIFT	17
++#define HOST_DMA_ISOC_NBYTES_MASK	(0xfff << 0)
++#define HOST_DMA_ISOC_NBYTES_SHIFT	0
++#define HOST_DMA_NBYTES_MASK		(0x1ffff << 0)
++#define HOST_DMA_NBYTES_SHIFT		0
++#define HOST_DMA_NBYTES_LIMIT		131071
++
++/* Device Mode DMA descriptor status quadlet */
++
++#define DEV_DMA_BUFF_STS_MASK		(0x3 << 30)
++#define DEV_DMA_BUFF_STS_SHIFT		30
++#define DEV_DMA_BUFF_STS_HREADY		0
++#define DEV_DMA_BUFF_STS_DMABUSY	1
++#define DEV_DMA_BUFF_STS_DMADONE	2
++#define DEV_DMA_BUFF_STS_HBUSY		3
++#define DEV_DMA_STS_MASK		(0x3 << 28)
++#define DEV_DMA_STS_SHIFT		28
++#define DEV_DMA_STS_SUCC		0
++#define DEV_DMA_STS_BUFF_FLUSH		1
++#define DEV_DMA_STS_BUFF_ERR		3
++#define DEV_DMA_L			BIT(27)
++#define DEV_DMA_SHORT			BIT(26)
++#define DEV_DMA_IOC			BIT(25)
++#define DEV_DMA_SR			BIT(24)
++#define DEV_DMA_MTRF			BIT(23)
++#define DEV_DMA_ISOC_PID_MASK		(0x3 << 23)
++#define DEV_DMA_ISOC_PID_SHIFT		23
++#define DEV_DMA_ISOC_PID_DATA0		0
++#define DEV_DMA_ISOC_PID_DATA2		1
++#define DEV_DMA_ISOC_PID_DATA1		2
++#define DEV_DMA_ISOC_PID_MDATA		3
++#define DEV_DMA_ISOC_FRNUM_MASK		(0x7ff << 12)
++#define DEV_DMA_ISOC_FRNUM_SHIFT	12
++#define DEV_DMA_ISOC_TX_NBYTES_MASK	(0xfff << 0)
++#define DEV_DMA_ISOC_TX_NBYTES_LIMIT	0xfff
++#define DEV_DMA_ISOC_RX_NBYTES_MASK	(0x7ff << 0)
++#define DEV_DMA_ISOC_RX_NBYTES_LIMIT	0x7ff
++#define DEV_DMA_ISOC_NBYTES_SHIFT	0
++#define DEV_DMA_NBYTES_MASK		(0xffff << 0)
++#define DEV_DMA_NBYTES_SHIFT		0
++#define DEV_DMA_NBYTES_LIMIT		0xffff
++
++#define MAX_DMA_DESC_NUM_GENERIC	64
++#define MAX_DMA_DESC_NUM_HS_ISOC	256
++
++#endif /* __DWC2_HW_H__ */
 -- 
 2.17.1
 
