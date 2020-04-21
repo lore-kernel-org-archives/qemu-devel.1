@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA924C54FD0
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 12:19:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB30C54FD0
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 12:20:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B61DF206A5
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 12:19:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 660612075E
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 12:20:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jy8aISSO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B61DF206A5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bAp23JYa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 660612075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQrrf-0008Em-O8
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 08:18:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59104)
+	id 1jQrtN-0002Wg-Fc
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 08:20:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59016)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQrpV-0005AK-DF
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 08:16:45 -0400
+ id 1jQrpO-0004vG-9R
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 08:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQrpU-0006DL-UL
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 08:16:45 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39746)
+ id 1jQrpN-00065F-S1
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 08:16:38 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45001)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jQrpU-0006B5-HG; Tue, 21 Apr 2020 08:16:44 -0400
-Received: by mail-wr1-x441.google.com with SMTP id b11so16192155wrs.6;
- Tue, 21 Apr 2020 05:16:43 -0700 (PDT)
+ id 1jQrpN-00061L-Ez; Tue, 21 Apr 2020 08:16:37 -0400
+Received: by mail-wr1-x441.google.com with SMTP id d17so16173787wrg.11;
+ Tue, 21 Apr 2020 05:16:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=9frTWORwoZW0igeAZ1RXaslrznC6xIFQopqjx+iyoJ4=;
- b=Jy8aISSO9mAH6DEX7PgZAbbFPpnz8qQOpSBTdbT0Zo4AAEBL+o5p4GUNMtweMYSaGh
- ikB2eMudeWP5n3oviEJ5lFEAVCRJCer+b1VklP7SmLoxCaRps3SiiyYBQRnX1j/DkJg/
- DtbTqX6X/m9qLCs+viF0KkIkOhHR6S1Oj45L6oE8sAXrpaiClUJeka0rouKofKRJBEo8
- CUkFCMtabI1vm4gHllXIxWIzly0Mmr2qZZqFeIaUABKWBdS034Mi2CCMD0Yf+fQ+AKp4
- Fbn0wJYvrK9VEXOvArmlraxbPs8jXBJ3HIOveVsmUB8RhM/MqF+uGoBEPOQljJWwY70a
- e2rw==
+ bh=5z6HGxXR+98mfge1lDQbmcUEQ1irNfVSb4DhyuqpZaU=;
+ b=bAp23JYaCjwPAvB20SfhIgBDbx6C2LP1jcIxFZdesmm5CNqtQjmvrxKPNqqP7BJbIG
+ xc8ea4Am7UtCPSX8zEeL9qz8j/Mwasv20Iz3jiCxr/e1Ty+r8Cy1fz7gjmtwv51xJH8d
+ k99YHg+ts04ei7hyzs9s4yMUN7b4ya4D9re0hGHYu/gu+jfE1K7jV5KwLtJjdRCg/8R6
+ rRtpjSaUf7FZO3GyNDpjfhCA2EUcCRqRbhNk1H/zbX6bqdnIW1uNGPouypS/McB0BG4Y
+ e9eIqk6ik7kW6Zu9b3dsWvWIbt0PWlzrEruFYwosWl9LqFnp4Smu4mVrbxNPlslRMbD3
+ W2QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=9frTWORwoZW0igeAZ1RXaslrznC6xIFQopqjx+iyoJ4=;
- b=cDYsiLFg+HRVP/0G/NRztQ0bcWw7LH6Y+mcGM/EG9hlBJgG/YHxUVTUiAg/PDtq0mk
- KgQEiNAxBT5FxgENTlEnZ+hrm/7y5RJeRoKHzR3+2rYIHd6VrlKXFgE8LAEncV5v1m/k
- pOqXc3qySmLDk7+462OJ19tXMF/5WcFkTqwUDxaxAWxZkpONtJxX2OyhyQQ/EmRdNTiF
- InIM4hIZnXELiLrDGuJpUndA3yIOrSItKOGYkLd9R44r97E8mi8fwEFm9jVsZhYlKx8T
- ilegiHap76l3nTploXIGQusYiw3HAcWptBH0OaS1tZdsB++PUyJ15A04rneTYU/kOE13
- gzVg==
-X-Gm-Message-State: AGi0PuZQ8TpnmDwiMxS/jKqQS3ig495mBFyWTO8P8gx2ZdesXJLIURrr
- yex3q3PvVeCLReiGJTqpb06wVivTJZQ=
-X-Google-Smtp-Source: APiQypLh+DQtRvRShV5urHKpQIWQgY1sdAMBTcs8jaJl8+gJRWqQQvBc54o/x6gyjiNkow+JssEiMA==
-X-Received: by 2002:a5d:5224:: with SMTP id i4mr23837459wra.1.1587471402031;
- Tue, 21 Apr 2020 05:16:42 -0700 (PDT)
+ bh=5z6HGxXR+98mfge1lDQbmcUEQ1irNfVSb4DhyuqpZaU=;
+ b=dSZ/iJ9FHct6hDNvwTNAF7PE4bT17IecMwnq9i1EWuwXODrC+Kcjmlkyh7xBZlpvji
+ dMtf5rw/cAoNTmXvaivdzjFS4//OWB/ncPsfrjEdkCn4P6rvEdioxf/zbBr5ajXTriYb
+ WIfX9FuNi+zanEysO0woMFpw9BfyaI3Mtop5TSKG48tSSHGU7osvzGEezuVXhXp7xH5C
+ s3fy1+nXdXasd5XWlhk/4OOPlHjBqesCgmkKLM+JYRl2oC9eZLYL7v9wMKT35DCo9LqF
+ eCqNOb/KXpU5frCA/iRQEsv2nKFfx7XwhVe2QDvt3c/Yxml8ktIKKcGgPTMZ73Paq7kd
+ 6Fhw==
+X-Gm-Message-State: AGi0PuZLBJa/MH2b9P2FmIDecKj6jWuzPcvXxPdNshqA1WecudLdzKG5
+ KAuCurk6zD6tH8XbKFeai/1ksKErPVA=
+X-Google-Smtp-Source: APiQypI4s/Kkq1rMeyVksOLK2llygXFyIhCp/kfFEg8wtT6F/ttM/xv5ay28NezwrJ+0zwl9mdAlhQ==
+X-Received: by 2002:adf:eecc:: with SMTP id a12mr23369459wrp.112.1587471394924; 
+ Tue, 21 Apr 2020 05:16:34 -0700 (PDT)
 Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id z76sm3761140wmc.9.2020.04.21.05.16.40
+ by smtp.gmail.com with ESMTPSA id z76sm3761140wmc.9.2020.04.21.05.16.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Apr 2020 05:16:41 -0700 (PDT)
+ Tue, 21 Apr 2020 05:16:34 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 07/17] hw/misc/tmp421: Extract get_temp_mC() helper
-Date: Tue, 21 Apr 2020 14:16:16 +0200
-Message-Id: <20200421121626.23791-8-f4bug@amsat.org>
+Subject: [RFC PATCH 03/17] hw/misc/temp-sensor: Add 'info temp' HMP command
+Date: Tue, 21 Apr 2020 14:16:12 +0200
+Message-Id: <20200421121626.23791-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200421121626.23791-1-f4bug@amsat.org>
 References: <20200421121626.23791-1-f4bug@amsat.org>
@@ -113,49 +113,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since we are going to reuse this code, extract it first.
+Add a command to display current devices temperature in the monitor:
+
+  (qemu) info temp
+  Temperatures (in C):
+  videocore                          25.00
+  bcm2835-thermal-0                  25.00
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/misc/tmp421.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ include/monitor/hmp.h |  1 +
+ hw/misc/temp-sensor.c | 29 +++++++++++++++++++++++++++++
+ hmp-commands-info.hx  | 11 +++++++++++
+ 3 files changed, 41 insertions(+)
 
-diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
-index 04c3b3ca6e..8003356307 100644
---- a/hw/misc/tmp421.c
-+++ b/hw/misc/tmp421.c
-@@ -112,12 +112,19 @@ typedef struct TMP421Class {
- static const int32_t mins[2] = { -40000, -55000 };
- static const int32_t maxs[2] = { 127000, 150000 };
+diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+index e33ca5a911..f023230bd1 100644
+--- a/include/monitor/hmp.h
++++ b/include/monitor/hmp.h
+@@ -129,5 +129,6 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+ void hmp_info_sev(Monitor *mon, const QDict *qdict);
++void hmp_info_temp(Monitor *mon, const QDict *qdict);
  
-+static int64_t get_temp_mC(TMP421State *s, unsigned int id)
+ #endif
+diff --git a/hw/misc/temp-sensor.c b/hw/misc/temp-sensor.c
+index 27750c533d..5f591bd9c3 100644
+--- a/hw/misc/temp-sensor.c
++++ b/hw/misc/temp-sensor.c
+@@ -12,6 +12,8 @@
+ #include "hw/misc/temp-sensor.h"
+ #include "qapi/qapi-commands-misc.h"
+ #include "qapi/error.h"
++#include "monitor/monitor.h"
++#include "monitor/hmp.h"
+ 
+ static int query_temperature_sensors_foreach(Object *obj, void *opaque)
+ {
+@@ -59,6 +61,33 @@ TemperatureSensorList *qmp_query_temperature_sensors(Error **errp)
+     return list;
+ }
+ 
++void hmp_info_temp(Monitor *mon, const QDict *qdict)
 +{
-+    bool ext_range = (s->config[0] & TMP421_CONFIG_RANGE);
-+    int offset = ext_range * 64 * 256;
++    TemperatureSensorList *list, *sensor;
++    Error *err = NULL;
 +
-+    assert(id < SENSORS_COUNT);
++    list = qmp_query_temperature_sensors(&err);
++    if (!list) {
++        monitor_printf(mon, "No temperature sensors\n");
++        return;
++    }
++    if (err) {
++        monitor_printf(mon, "Error while getting temperatures: %s\n",
++                       error_get_pretty(err));
++        error_free(err);
++        goto out;
++    }
 +
-+    return ((s->temperature[id] - offset) * 1000 + 128) / 256;
++    monitor_printf(mon, "Temperatures (in C):\n");
++    for (sensor = list; sensor; sensor = sensor->next) {
++        monitor_printf(mon, "%-33s %6.2f\n", sensor->value->name,
++                       sensor->value->temperature);
++    }
++
++out:
++    qapi_free_TemperatureSensorList(list);
 +}
 +
- static void tmp421_get_temperature(Object *obj, Visitor *v, const char *name,
-                                    void *opaque, Error **errp)
- {
--    TMP421State *s = TMP421(obj);
--    bool ext_range = (s->config[0] & TMP421_CONFIG_RANGE);
--    int offset = ext_range * 64 * 256;
-     int64_t value;
-     int tempid;
+ static TypeInfo tempsensor_interface_type_info = {
+     .name = TYPE_TEMPSENSOR_INTERFACE,
+     .parent = TYPE_INTERFACE,
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index ca5198438d..77f1c43ce3 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -880,4 +880,15 @@ SRST
+     Show SEV information.
+ ERST
  
-@@ -131,7 +138,7 @@ static void tmp421_get_temperature(Object *obj, Visitor *v, const char *name,
-         return;
-     }
++    {
++        .name       = "temp",
++        .args_type  = "",
++        .params     = "",
++        .help       = "show device temperatures",
++        .cmd        = hmp_info_temp,
++    },
  
--    value = ((s->temperature[tempid] - offset) * 1000 + 128) / 256;
-+    value = get_temp_mC(TMP421(obj), tempid);
- 
-     visit_type_int(v, name, &value, errp);
- }
++SRST
++  ``info temp``
++    Show device temperatures.
++ERST
 -- 
 2.21.1
 
