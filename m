@@ -2,85 +2,86 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD92C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 09:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 741C0C2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 09:27:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45B9620857
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 09:20:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D97520857
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 09:27:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LcvcHcOa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45B9620857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MxNUwCuV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D97520857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQp4r-0003yC-Fu
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 05:20:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33784)
+	id 1jQpBK-0006j8-Bz
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 05:27:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34920)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jQp46-0003Kp-T5
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 05:19:39 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jQpAJ-0005zc-FL
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 05:26:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jQp46-0007Oc-9n
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 05:19:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29778
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jQp45-0007ON-Sm
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 05:19:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587460776;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IZd1/rhBCrtOHTgOtEteJvzWcWIajqnxjXWaNdPAVgo=;
- b=LcvcHcOaoiIJsNwZ3UhOGRc53DpGd7FXDptjzY9hD5ez2uQgnIKRYZXGWJ42eMJFx35fuE
- 4UDdGPVnLedj7RR+w+7xPaPpzIzT4caLaJpnpQwhnWPyIcRASYjWB4vmfobu4P5XsGrz7a
- qEccaQlDfNPjIC3coPo79y1KzUPk1hY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-249-7XmqNaDaNRCnnHdvFQ4tTQ-1; Tue, 21 Apr 2020 05:19:33 -0400
-X-MC-Unique: 7XmqNaDaNRCnnHdvFQ4tTQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70509107B283;
- Tue, 21 Apr 2020 09:19:32 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
- [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0AD6128981;
- Tue, 21 Apr 2020 09:19:31 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 2136116E16; Tue, 21 Apr 2020 11:19:31 +0200 (CEST)
-Date: Tue, 21 Apr 2020 11:19:31 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Klaus Jensen <its@irrelevant.dk>
-Subject: Re: [PATCH v7 46/48] pci: allocate pci id for nvme
-Message-ID: <20200421091931.zvxqtftza2e33rwu@sirius.home.kraxel.org>
-References: <20200415055140.466900-1-its@irrelevant.dk>
- <20200415055140.466900-47-its@irrelevant.dk>
+ (envelope-from <peter.maydell@linaro.org>) id 1jQpAI-0008LZ-LF
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 05:26:03 -0400
+Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:37170)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jQpAI-0008JO-95
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 05:26:02 -0400
+Received: by mail-oi1-x22e.google.com with SMTP id r25so11483377oij.4
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 02:26:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UPjpJyUqfB86AekmP/ca6VfUaN7XihiTn81Pa18qXEM=;
+ b=MxNUwCuVHN8BGtcIcIAyzEpWIEwy1gWzwfFI4IhVivm9NIkCevGmzbVzJqM4P63VmI
+ ezvLALipz1oEnAIG4j8YHTbiByilQ9tw+IMYWOechWS+6zd1OizMTTffkzEOOkJJet+5
+ k1PwAG53WERyblZJNdf4j6sU3t7VvemDpmo2WftibRlwu4MD7pxpSB95GXl+VAMH4YQJ
+ 1Ts7ai0eI8DZ/uaEGd31OT/ttMjr504XzqWtgecZGAyIvvwqYUhFQXjzFMpXR5+3QCca
+ 43Le40O/JGyz4EslEPO2Hw1BnmWOVzRDCqvzNIjb30zAxo7lb6cjRRkSNImTwYFovfFv
+ sgCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UPjpJyUqfB86AekmP/ca6VfUaN7XihiTn81Pa18qXEM=;
+ b=kxb3zsg3qggEJE+6WTLKhrpzrUJ4HTNOolZfawKP36SjgF4723vHI72jNCXvv9sk7/
+ JWCTOUomnPxDQxcLMzb1bdyeUAEw1H2gyUpt4EU5ByfGl4/nPZ9v+aBQqH9KXklcn2OB
+ DXoOCdkuVNRzoYvGsGspnsODurJKBm8IW5wCqOA9MxwiJEwPQacFP1n2YSuLImC/6dLO
+ pP4MHsPfxlHz7UEj8yycRmvo8AlUV9k8tDmGEDH5JFxdF9ZF9P0XG4n/zoY+sOY45iA/
+ xL721iEbw/AVyXBSa4fsH8fhkUAYIgvkV0ZCG1zMIUCewROsrzCd57VQbDQnowyF+tmj
+ UkAw==
+X-Gm-Message-State: AGi0PuZfLJ/e9dVI59n8+qBe3GGICi8x5hV+UDlU4ZCnrRXYpoSwi62C
+ 8vzWNZOsyTrXWHoqsqcZFLY1SQ0OEM4RdZTn2YYzlw==
+X-Google-Smtp-Source: APiQypIy2xKxqZQXkqDy1rZ7aJ8qOKwK+zM9HrnWbSBJ4V3v4HhO4IAUUWMcoXJLQtobKXhF7Kn5XraH5djX6Pk58ZQ=
+X-Received: by 2002:aca:c751:: with SMTP id x78mr2517267oif.163.1587461160779; 
+ Tue, 21 Apr 2020 02:26:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200415055140.466900-47-its@irrelevant.dk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 04:54:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200413220100.18628-1-f4bug@amsat.org>
+ <CAFEAcA8kF1dhR0k2kgEr-KxBspxcqLXxVqWcMadDns3-SYKrAQ@mail.gmail.com>
+ <alpine.BSF.2.22.395.2004151923090.92157@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2004151934110.92157@zero.eik.bme.hu>
+ <20200421091552.77uogz2qwc7y4cxg@sirius.home.kraxel.org>
+In-Reply-To: <20200421091552.77uogz2qwc7y4cxg@sirius.home.kraxel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Apr 2020 10:25:49 +0100
+Message-ID: <CAFEAcA_vW0uzJ8icr2iHS9e8TVu67ue9ZBEuXU1Me1KC2aXtJQ@mail.gmail.com>
+Subject: Re: [PATCH-for-5.0 v2] hw/display/sm501: Avoid heap overflow in
+ sm501_2d_operation()
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::22e;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22e.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::22e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,29 +93,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>,
+ qemu-stable <qemu-stable@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Zhang Zi Ming <1015138407@qq.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Apr 15, 2020 at 07:51:38AM +0200, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
->=20
-> The emulated nvme device (hw/block/nvme.c) is currently using an
-> internal Intel device id.
->=20
-> Prepare to change that by allocating a device id under the 1b36 (Red
-> Hat, Inc.) vendor id.
->=20
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Acked-by: Keith Busch <kbusch@kernel.org>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+On Tue, 21 Apr 2020 at 10:16, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> cirrus stopped using pointers years ago, exactly for the reasons
+> outlined above.  Conversion was pretty straight forward.
+>
+> commit 026aeffcb4752054830ba203020ed6eb05bcaba8
+> Author: Gerd Hoffmann <kraxel@redhat.com>
+> Date:   Wed Mar 15 11:47:52 2017 +0100
+>
+>     cirrus: stop passing around dst pointers in the blitter
+>
+>     Instead pass around the address (aka offset into vga memory).  Calculate
+>     the pointer in the rop_* functions, after applying the mask to the
+>     address, to make sure the address stays within the valid range.
 
-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+Aha, thanks for bringing up the prior art. (Did anybody benchmark
+whether there was a noticeable performance impact for that cirrus
+change? My guess is that there wouldn't be much/any because the memory
+operations will dominate and you get to do the masking operation more
+or less for free, but guesses are notoriously unreliable when it
+comes to performance :-) )
 
+thanks
+-- PMM
 
