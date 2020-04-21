@@ -2,115 +2,95 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA929C54FC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 18:39:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89458C54FCC
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 19:14:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F393206D9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 18:39:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF799206D9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 19:14:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="Jick/49l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F393206D9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q8FYAaTY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF799206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQxnu-0003rk-Ge
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 14:39:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44326)
+	id 1jQyLc-0005Yh-Dt
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 15:14:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50820)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alxndr@bu.edu>) id 1jQxmJ-0002aD-Uj
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 14:38:04 -0400
+ (envelope-from <pauldzim@gmail.com>) id 1jQyKo-00057d-GJ
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 15:13:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alxndr@bu.edu>) id 1jQxmI-0001as-Gk
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 14:37:51 -0400
-Received: from mail-dm6nam12on2104.outbound.protection.outlook.com
- ([40.107.243.104]:9184 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jQxmH-0001Zx-7v
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 14:37:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TKDCjHTheBgManGCvw6PsjHHRybj/dfmreoMixUBMSfSO7CMrax31PCTFXo/jNoq1OHLthZaLYTIjmCiuTyGZkEP1wwCdMP5NEik7A5KRdNdKvW2GYRi2FEsPe8GMqrGO8edUxXAcwpcKwJ9VcuyV9iipsyXPEh5xI4CZ/tB6yYGZOxq+ZfZMd+C9hc3g9MtZ+ga3+V4rabhoxwRXJJdmCHaNsAF1ZmvCJgvavWseBsVxy+p1vWkFqUSwwccUXc/BBXrocu/O3gdeZzzBLLf3gBMFN8uAJ4cQwFKfOCc+zGP8O560s2TUNjkudhcWVcqzBo6wxOlh5cAAiN5HPImIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oJh7POinFxOKrlCb+sVefUd8xHNMZS69SJYrcAgJZ3Q=;
- b=OmurEXXC7N0Wh24YZuTV4SkDJjFv0lL7qYkb+if95xo1QYRQ+5xGjF6zwtL+R5SXBTuUtDkKL3qaleH0ycfn4kqoiycnnu6gTZcOxeENG1O/252GCvHXLJNtfTp/qj4QwsJc0YYHLDZLOlYmc8f+ewTsEHfL9KQFX4o3CRzZGkFa0NQaqwNA1iiLGJZMojcGhTDO2yen4ADjTvPjoPg+tWWQFSI/4JRX9hlrJmQOknWVdEI6jEFz+1fiatAh24RHPfvUmboNs41JgjOM2MMwQz9J6QufB1PhUcnnQn9z2Ei9GJNbRtcuxdIyQruaMUTbGwTChVzSOco1+nfz5oleBg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
- header.d=bu.edu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oJh7POinFxOKrlCb+sVefUd8xHNMZS69SJYrcAgJZ3Q=;
- b=Jick/49llloJgU7CSsv8znjHY0EIrMo8tiFDr4f/awRPgp4dv0dBesweedfwRmYzGE00uhYC2c9F0SzniqBFcJ8QCAG+RrT/hp0cFnKCYsKOPToPE4n5a8FwW7ri59TiLA6xg0D09ZosFQvc3nbLXnv85uMpKHwq8kI7fEnLcYc=
-Authentication-Results: spf=none (sender IP is ) smtp.mailfrom=alxndr@bu.edu; 
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
- by SN6PR03MB3999.namprd03.prod.outlook.com (2603:10b6:805:c2::24)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.29; Tue, 21 Apr
- 2020 18:22:43 +0000
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::640a:1123:37c1:42db]) by SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::640a:1123:37c1:42db%3]) with mapi id 15.20.2921.027; Tue, 21 Apr 2020
- 18:22:43 +0000
-From: Alexander Bulekov <alxndr@bu.edu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] fuzz: select fuzz target using executable name
-Date: Tue, 21 Apr 2020 14:22:30 -0400
-Message-Id: <20200421182230.6313-1-alxndr@bu.edu>
-X-Mailer: git-send-email 2.25.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MN2PR04CA0026.namprd04.prod.outlook.com
- (2603:10b6:208:d4::39) To SN6PR03MB3871.namprd03.prod.outlook.com
- (2603:10b6:805:6d::32)
+ (envelope-from <pauldzim@gmail.com>) id 1jQyKn-00018h-IZ
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 15:13:30 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:55913)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
+ id 1jQyKn-00015a-3v
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 15:13:29 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id a32so1771206pje.5
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 12:13:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ToCopmRtqIqbkCLzyjj4W92sScJsLrQBCI3+f4OqXEE=;
+ b=q8FYAaTYqvjHRi0NLCErDczeS2Oef0C7pSRlKrN9eZLEztKffrw2m5qNapU8uT9BHu
+ JZMVgF/pIj4Ryy0c7L2tFwe/aL2AoxFrKHNfZ8VKzO5Lf/3Uu/bePUfiV1uHEEf3A1cw
+ iMDQQFoS4FJ3v3tF5iMNX8WQ4aO56U8Q6TOoc/kzWknezBopjHk35yWZ7NJNKJUEygah
+ RawO+evS8RS3l3+CZaXSukQb5G6LtWUU4RN8MfHj0z8fX7+lmth6UAuwlZHTYNmD22aZ
+ 08aN45uUg0YwkUWBeWnWVVl0H4PVq5ZzK2g2nlsZeczhx/Hz0fREYcQu2LxOjMo7Oa2X
+ cpvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ToCopmRtqIqbkCLzyjj4W92sScJsLrQBCI3+f4OqXEE=;
+ b=BX9kpG75v5C5VhsX/y7uZx2QPOaG6/Xd+qUYgeLWxbedl9dD9Uj5fRHUdTfbF38Asp
+ Hnxg/RSdBEbmS2LIC48ILpy5oPfaj1orcZLZZv0E4vGu4jXEEpPWKzH/Dlx/P+1rPmQV
+ ozLprHxOQY26IohBorJRu07okpB677OlD6srVSQfmBWm8V213DummhE+TX5Vrs1J1gbn
+ woXVI9JPZZEnSBPpKa22u4QnmtbYDCthqi94aB0dMwC4h0AbXjFA3tCiBD2MXCqg6ios
+ Yj5FoMxc4j3HJJ2eFH0sD21agCxfcp2rrcnjkHNTBmhJeDBf8cB6Wwee98HH7o0ArfUx
+ /Qgg==
+X-Gm-Message-State: AGi0PuYWZrMjqjMeJbv985lIDNlE7mhradCkizon4x3jrewSlfCOohil
+ stgghC31agAfKvSGwiZuIC8=
+X-Google-Smtp-Source: APiQypKvughncRWdEO1vsxKgJQHPuc2A79NteepgdpDaKlhS5WjkJJqOtEOFdN4OAzc1yWoS125tPw==
+X-Received: by 2002:a17:902:82c4:: with SMTP id
+ u4mr22210939plz.219.1587496407522; 
+ Tue, 21 Apr 2020 12:13:27 -0700 (PDT)
+Received: from [192.168.0.3] ([75.167.104.59])
+ by smtp.gmail.com with ESMTPSA id j134sm2854925pgc.7.2020.04.21.12.13.26
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 21 Apr 2020 12:13:27 -0700 (PDT)
+Subject: Re: [PATCH] hw/usb/hcd-dwc2: Simplified I/O memory regions
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200421071333.24706-1-f4bug@amsat.org>
+From: Paul Zimmerman <pauldzim@gmail.com>
+Message-ID: <4ab8a2f0-8b55-c96c-e827-3d3e739e7cc7@gmail.com>
+Date: Tue, 21 Apr 2020 12:13:25 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mozz.bu.edu (128.197.127.33) by
- MN2PR04CA0026.namprd04.prod.outlook.com (2603:10b6:208:d4::39) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2921.27 via Frontend Transport; Tue, 21 Apr 2020 18:22:42 +0000
-X-Mailer: git-send-email 2.25.0
-X-Originating-IP: [128.197.127.33]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7672f39f-0447-4fcb-ebcd-08d7e620fba3
-X-MS-TrafficTypeDiagnostic: SN6PR03MB3999:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR03MB399966811BDDD337D827454CBAD50@SN6PR03MB3999.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:159;
-X-Forefront-PRVS: 038002787A
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(396003)(39860400002)(376002)(366004)(346002)(136003)(6666004)(54906003)(66476007)(6916009)(75432002)(4326008)(316002)(7696005)(786003)(26005)(6486002)(956004)(2616005)(52116002)(186003)(16526019)(86362001)(8936002)(66556008)(36756003)(81156014)(478600001)(8676002)(5660300002)(66946007)(1076003)(2906002);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: bu.edu does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: VPukrlC3Og0ADD3BEpV91WErGQHuqy5yMZQDn7gdlMD4zArOWS3/mP3dED/gTTjHJykfQp1EjGFu5Tlwqz9V9D9hbBL0rzCND4trQcd1fflHD5vNcIuyUSwektvxC7OkpBNbCW0dSsRu0r+5nuE+XlDW1KuPZEvcINFvIL5eEE4jQk42nprgXeqGWRI+8UacgZxmyHHAvdG5SVOfbax74UWtZFO6aN30fNak7KsYsRHXQpF/RYGCrQeY15EhGvB3VjF8IwqdfytYp/Z7VTfruoPHXwZlAwkKyUWw9d0I+9AhqWo8MxMf4VjH9RNY8av5dWO2J+VlpsK+PnxtaZIPGpNEJm7Nyy0hgCZxsqT7GPodFChD+Tv3ZOhS4oiSMWJrUz90ZSdJx4HJIulqtQB5QuDDyPQ/5SmoLmZ9/JFC5RA0ZbuyZXqFxaIGma7k9mva
-X-MS-Exchange-AntiSpam-MessageData: Jx/nGtwsAB4wPshOkss8KDZ+3PNE3//rLdllW0t5VH+ltqqXPd80ghOhCxRCDXvJHiBDsv1MeG1jiQGSrMma9JTH/tpHJndRDc7z2RgIHHMM9m0UI/4hMbUz4vd0fsvtRtRp8jOwKFRijkfaj/6ssQ==
-X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7672f39f-0447-4fcb-ebcd-08d7e620fba3
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2020 18:22:43.5288 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: V0zyIGe5J66BtO5/wZY8oI4tX6wBSv3GGIDTlpi+bsMQ/RboSTDIVOAWIK0iq3y9
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB3999
-Received-SPF: pass client-ip=40.107.243.104; envelope-from=alxndr@bu.edu;
- helo=NAM12-DM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 14:37:47
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.243.104
+In-Reply-To: <20200421071333.24706-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=pauldzim@gmail.com; helo=mail-pj1-x1043.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,68 +102,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Alexander Bulekov <alxndr@bu.edu>, Bandan Das <bsd@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The fuzzers are built into a binary (e.g. qemu-fuzz-i386). To select the
-device to fuzz/fuzz target, we usually use the --fuzz-target= argument.
-This commit allows the fuzz-target to be specified using the name of the
-executable. If the executable name ends with -target-FUZZ_TARGET, then
-we select the fuzz target based on this name, rather than the
---fuzz-target argument. This is useful for systems such as oss-fuzz
-where we don't have control of the arguments passed to the fuzzer.
+On 4/21/20 12:13 AM, Philippe Mathieu-Daudé wrote:
+> Use 1 container holding 2 regions:
+> - I/O registers
+> - FIFOs
+> 
+> Remove all the static base addresses.
+> 
+> Name address space.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+> Sometime a patch is cleaner/quicker than explanations.
+> Suggestion to be squashed on patch:
+> 'dwc-hsotg (dwc2) USB host controller emulation'
+> 
+> Further simplificatio would be to move some exploded read/write
+> functions directly into dwc2_hsotg_read/write.
+> 
+> Based-on: <20200421014551.10426-1-pauldzim@gmail.com>
+> ---
+>   hw/usb/hcd-dwc2.h |  17 +----
+>   hw/usb/hcd-dwc2.c | 181 ++++++++++++++++++++++------------------------
+>   2 files changed, 88 insertions(+), 110 deletions(-)
 
-Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
----
- tests/qtest/fuzz/fuzz.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+<snip>
 
-diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
-index 0d78ac8d36..c6932cec4a 100644
---- a/tests/qtest/fuzz/fuzz.c
-+++ b/tests/qtest/fuzz/fuzz.c
-@@ -91,6 +91,7 @@ static void usage(char *path)
-         printf(" * %s  : %s\n", tmp->target->name,
-                 tmp->target->description);
-     }
-+    printf("Alternatively, add -target-FUZZ_TARGET to the executable name\n");
-     exit(0);
- }
- 
-@@ -143,18 +144,20 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
-     module_call_init(MODULE_INIT_QOM);
-     module_call_init(MODULE_INIT_LIBQOS);
- 
--    if (*argc <= 1) {
-+    target_name = strstr(**argv, "-target-");
-+    if (target_name) {        /* The binary name specifies the target */
-+                target_name += strlen("-target-");
-+    } else if (*argc > 1) {  /* The target is specified as an argument */
-+        target_name = (*argv)[1];
-+        if (!strstr(target_name, "--fuzz-target=")) {
-+            usage(**argv);
-+        }
-+        target_name += strlen("--fuzz-target=");
-+    } else {
-         usage(**argv);
-     }
- 
-     /* Identify the fuzz target */
--    target_name = (*argv)[1];
--    if (!strstr(target_name, "--fuzz-target=")) {
--        usage(**argv);
--    }
--
--    target_name += strlen("--fuzz-target=");
--
-     fuzz_target = fuzz_get_target(target_name);
-     if (!fuzz_target) {
-         usage(**argv);
--- 
-2.25.0
+Ooh, yes, that looks much cleaner and simpler, thanks! I will test this
+and fold it into the next version of the patch.
 
+>   static Property dwc2_usb_properties[] = {
+>       DEFINE_PROP_UINT32("usb_version", DWC2State, usb_version, 2),
+> +    /* FIXME isn't 'usb_version=2' const? */
+
+This allows to switch between full-speed and high-speed at boot time,
+which I've found very useful for testing purposes.
+
+> +    DEFINE_PROP_END_OF_LIST()
+>   };
+>   
+>   static void dwc2_class_init(ObjectClass *klass, void *data)
+
+Thanks,
+Paul
 
