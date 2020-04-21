@@ -2,63 +2,125 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9507C54FD0
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 799DBC54FD0
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:06:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE805206F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:06:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE805206F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 423DA206F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:06:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="NkQblebc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 423DA206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQsbC-0005F9-Pp
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 09:06:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44670)
+	id 1jQsbT-0005TQ-EB
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 09:06:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45402)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jQsXb-00085I-PI
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:02:20 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jQsa0-0003cR-SY
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:04:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jQsXa-0002Fc-QX
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:02:19 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3745 helo=huawei.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jQsZz-0003z9-05
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:04:47 -0400
+Received: from mail-eopbgr20134.outbound.protection.outlook.com
+ ([40.107.2.134]:63662 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jQsXW-0001py-Vr; Tue, 21 Apr 2020 09:02:16 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 282EDB33DE35D86207BE;
- Tue, 21 Apr 2020 21:02:04 +0800 (CST)
-Received: from S00345302A-PC.china.huawei.com (10.47.91.160) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 21 Apr 2020 21:01:55 +0800
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
- <imammedo@redhat.com>
-Subject: [PATCH v4 1/7] hw/acpi/nvdimm: Fix for NVDIMM incorrect DSM output
- buffer length
-Date: Tue, 21 Apr 2020 13:59:28 +0100
-Message-ID: <20200421125934.14952-2-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
-In-Reply-To: <20200421125934.14952-1-shameerali.kolothum.thodi@huawei.com>
-References: <20200421125934.14952-1-shameerali.kolothum.thodi@huawei.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jQsZy-0003tw-3T; Tue, 21 Apr 2020 09:04:46 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=abgSCjK2M1aJO8UgGNRm+6VXDL9OdCkbeqM4F9O1xhKzjC1g3q4fZ8WXDDbwSnm0wH7dH0Mn6rz42kR+29pTQKdPew+nzdMkWUvr5NHFn0wKsvZSFBW24mL6mK5SaFGRvom4aquc1M3MGP0M9Lwdprml+eyRlVCnrhxP3q2OMrOaX/aQlanXFAj4oDnnzlN5w3fwflPWU4hVXdLGSJGROqWvZWCV82A+edZKwt2SwYebI2fmugC8SMETL0bdLFjiPe1SoFtyGktt6a22EDB+6ElPXzwWaDTuelzmIFjWxkxcknSXMdKsnMxPyICHpoQQA9tWm5M+aNbutWmUsdZA9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QzsF9olHd3eTEd+oZLq6Z7Gad+aUBnvAuno+k4yCWP0=;
+ b=m2b+jJvR9S/g/Gcu4/SQdEDGM72kC6hKe+vsG1NlsyXREbG1g52dpsSmoLSh0E6QLm7rkdKRS99N37MMbgKs/56rX5d4O1h2VR46ZDYHKL198AqNhzUTJqzW974tAJCoclXIF1AZQN9qAsK+aQpycJS+O17xbFrIUl91YmljA2rNgjwkUkkbXiRGfF+siwGUKkQiywzOCTdOhtpBAuThLM9Y99ZgeefIJEZ40vWg+5/XO7okjAVdvpK4YrfXf+5icE+fsH7YKr7Do6SbuTrFaEP6C7vjdMr32EJcF8L1dhVlrVrz4B3psr7nXqmiUI5Czp1AcdZMLbU6kqM7yAmSlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QzsF9olHd3eTEd+oZLq6Z7Gad+aUBnvAuno+k4yCWP0=;
+ b=NkQblebc8rVSnww6YyMyIUct1sye1MYjwPZELIW7eyejLfLMFRtpAEPNDBNmSt/+e0Pp7A3QTqko840ylNZcRzCFUanB58J8jyJbSJ1bWQVBDCABecYzg6QrGovwB3f9Nr2m81TZ1Vmvv2xOKxryUbsY8O7p0cUk1W1caFHYRKg=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5352.eurprd08.prod.outlook.com (2603:10a6:20b:10e::8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.27; Tue, 21 Apr
+ 2020 13:04:43 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2921.027; Tue, 21 Apr 2020
+ 13:04:43 +0000
+Subject: Re: [PATCH v3 01/10] iotests/277: use dot slash for
+ nbd-fault-injector.py running
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20200421073601.28710-1-vsementsov@virtuozzo.com>
+ <20200421073601.28710-2-vsementsov@virtuozzo.com>
+ <80af4905-332c-228c-cf3d-0b00d098a7d3@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200421160441033
+Message-ID: <7f25ac0b-049d-46c1-53ce-0dd4850456cc@virtuozzo.com>
+Date: Tue, 21 Apr 2020 16:04:41 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <80af4905-332c-228c-cf3d-0b00d098a7d3@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM3PR07CA0056.eurprd07.prod.outlook.com
+ (2603:10a6:207:4::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.47.91.160]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191;
- envelope-from=shameerali.kolothum.thodi@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 09:02:04
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 45.249.212.191
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.142) by
+ AM3PR07CA0056.eurprd07.prod.outlook.com (2603:10a6:207:4::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2937.9 via Frontend Transport; Tue, 21 Apr 2020 13:04:42 +0000
+X-Tagtoolbar-Keys: D20200421160441033
+X-Originating-IP: [185.215.60.142]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: bb10243c-c812-4da1-9907-08d7e5f48ef9
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5352:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5352300C19B2A40071F62049C1D50@AM7PR08MB5352.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1002;
+X-Forefront-PRVS: 038002787A
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(376002)(39850400004)(366004)(346002)(396003)(136003)(478600001)(66946007)(66556008)(66476007)(81156014)(2906002)(8936002)(36756003)(16526019)(52116002)(2616005)(86362001)(186003)(26005)(956004)(8676002)(6486002)(31686004)(4326008)(31696002)(316002)(16576012)(53546011)(5660300002);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +OHipZoL3E3kHBbL7lN7o0MXruRCk+UaCjuSFLd2CxjK5bSssES2Lms37i2Kf9skU4YxHYZQkroagOeFdUiqVVPbZQk5ideLjeKpKGmEZjbA4J+4REGFNy3SWDmW/z5BHgK4JY0QsYYUOskkJ3EMm9NwFTSUAl1d+5Z8OtE26NMvn01c5NRnQUF30I1eLlVfMMFBoyHjON8qc19h+w9o7q+3BC7xEF26jT1tYhvHqjHdLrzUs27+jAoJJ/h6i+vBubKCL/VWB8mjGzSxRKaFxlJPbpT7jN/fzCPLEAR+JPMlCreEX+DUOFxqbUBckdMizS+GJNdT4/Ky8NPrv4+0m2slmkuaJAFqxa1p5aSocDsQk885xyLMg6CjRco9BEMu59iVGF/OLeAUFYtO6trVwlS8Zfu9Lyk/o7ykfySXj/2a0MjfJxUttYba7napKDj5
+X-MS-Exchange-AntiSpam-MessageData: qzNEkgHAk4LJWcqVlJ10Q50kixD9KZu/uWFTfMJMhCOjWoPS0gpLEfPZxGeDpBg8loxSNP6FzJKlgSShXxO9bbQItNLpx/aNdZ0n4fhmwB8xH543MWybhv3Bw7TbGCKOZLY1t0mTFbQFxR7PYJ95Ww==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb10243c-c812-4da1-9907-08d7e5f48ef9
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2020 13:04:43.1340 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0D9c2sCZs913oFcHkguQDqDNuoZzDY51OnIc0pdTpsVmMiHjfPH27c3suARI8IQShf62DwbsfvkSm9UKmTfZE4LvDHF685RqnAtnRcOOgPI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5352
+Received-SPF: pass client-ip=40.107.2.134;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 09:04:43
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.2.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,110 +132,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com, mst@redhat.com,
- linuxarm@huawei.com, xuwei5@hisilicon.com, shannon.zhaosl@gmail.com,
- prime.zeng@hisilicon.com, lersek@redhat.com
+Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As per ACPI spec 6.3, Table 19-419 Object Conversion Rules, if
-the Buffer Field <= to the size of an Integer (in bits), it will
-be treated as an integer. Moreover, the integer size depends on
-DSDT tables revision number. If revision number is < 2, integer
-size is 32 bits, otherwise it is 64 bits. Current NVDIMM common
-DSM aml code (NCAL) uses CreateField() for creating DSM output
-buffer. This creates an issue in arm/virt platform where DSDT
-revision number is 2 and results in DSM buffer with a wrong
-size(8 bytes) gets returned when actual length is < 8 bytes.
-This causes guest kernel to report,
+21.04.2020 15:54, Eric Blake wrote:
+> On 4/21/20 2:35 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Somehow, this doesn't work if you just call ./277. But check 277 works.
+>> We are going to new iotests running framework, which will consider test
+>> files as self-executable, so let's just change it now.
+> 
+> This is a rather vague explanation. 
 
-"nfit ACPI0012:00: found a zero length table '0' parsing nfit"
+Yes, because I didn't understand why does it work with check:) But you make it clean.
 
-In order to fix this, aml code is now modified such that it builds
-the DSM output buffer in a byte by byte fashion when length is
-smaller than Integer size.
+> I'd prefer something a bit more forthcoming, maybe:
+> 
+> If you run './check 277', check includes common.config which adjusts $PATH to include '.' first, and therefore finds nbd-fault-injector.py on PATH.  But if you run './277' directly, there is nothing to adjust PATH, and if '.' is not already on your PATH by other means, the test fails because the executable is not found.  Adjust how we invoke the helper executable to avoid needing a PATH search in the first place.
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
----
- hw/acpi/nvdimm.c                            | 40 +++++++++++++++++++--
- tests/qtest/bios-tables-test-allowed-diff.h |  2 ++
- 2 files changed, 39 insertions(+), 3 deletions(-)
+That's better of course.
 
-diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-index eb6a37b14e..df0790719a 100644
---- a/hw/acpi/nvdimm.c
-+++ b/hw/acpi/nvdimm.c
-@@ -938,6 +938,7 @@ static void nvdimm_build_common_dsm(Aml *dev)
-     Aml *method, *ifctx, *function, *handle, *uuid, *dsm_mem, *elsectx2;
-     Aml *elsectx, *unsupport, *unpatched, *expected_uuid, *uuid_invalid;
-     Aml *pckg, *pckg_index, *pckg_buf, *field, *dsm_out_buf, *dsm_out_buf_size;
-+    Aml *whilectx, *offset;
-     uint8_t byte_list[1];
- 
-     method = aml_method(NVDIMM_COMMON_DSM, 5, AML_SERIALIZED);
-@@ -1091,13 +1092,46 @@ static void nvdimm_build_common_dsm(Aml *dev)
-     /* RLEN is not included in the payload returned to guest. */
-     aml_append(method, aml_subtract(aml_name(NVDIMM_DSM_OUT_BUF_SIZE),
-                aml_int(4), dsm_out_buf_size));
-+
-+    /*
-+     * As per ACPI spec 6.3, Table 19-419 Object Conversion Rules, if
-+     * the Buffer Field <= to the size of an Integer (in bits), it will
-+     * be treated as an integer. Moreover, the integer size depends on
-+     * DSDT tables revision number. If revision number is < 2, integer
-+     * size is 32 bits, otherwise it is 64 bits.
-+     * Because of this CreateField() canot be used if RLEN < Integer Size.
-+     *
-+     * Also please note that APCI ASL operator SizeOf() doesn't support
-+     * Integer and there isn't any other way to figure out the Integer
-+     * size. Hence we assume 8 byte as Integer size and if RLEN < 8 bytes,
-+     * build dsm_out_buf byte by byte.
-+     */
-+    ifctx = aml_if(aml_lless(dsm_out_buf_size, aml_int(8)));
-+    offset = aml_local(2);
-+    aml_append(ifctx, aml_store(aml_int(0), offset));
-+    aml_append(ifctx, aml_name_decl("TBUF", aml_buffer(1, NULL)));
-+    aml_append(ifctx, aml_store(aml_buffer(0, NULL), dsm_out_buf));
-+
-+    whilectx = aml_while(aml_lless(offset, dsm_out_buf_size));
-+    /* Copy 1 byte at offset from ODAT to temporary buffer(TBUF). */
-+    aml_append(whilectx, aml_store(aml_derefof(aml_index(
-+                                   aml_name(NVDIMM_DSM_OUT_BUF), offset)),
-+                                   aml_index(aml_name("TBUF"), aml_int(0))));
-+    aml_append(whilectx, aml_concatenate(dsm_out_buf, aml_name("TBUF"),
-+                                         dsm_out_buf));
-+    aml_append(whilectx, aml_increment(offset));
-+    aml_append(ifctx, whilectx);
-+
-+    aml_append(ifctx, aml_return(dsm_out_buf));
-+    aml_append(method, ifctx);
-+
-+    /* If RLEN >= Integer size, just use CreateField() operator */
-     aml_append(method, aml_store(aml_shiftleft(dsm_out_buf_size, aml_int(3)),
-                                  dsm_out_buf_size));
-     aml_append(method, aml_create_field(aml_name(NVDIMM_DSM_OUT_BUF),
-                aml_int(0), dsm_out_buf_size, "OBUF"));
--    aml_append(method, aml_concatenate(aml_buffer(0, NULL), aml_name("OBUF"),
--                                       dsm_out_buf));
--    aml_append(method, aml_return(dsm_out_buf));
-+    aml_append(method, aml_return(aml_name("OBUF")));
-+
-     aml_append(dev, method);
- }
- 
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index dfb8523c8b..eb8bae1407 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1 +1,3 @@
- /* List of comma-separated changed AML files to ignore */
-+"tests/data/acpi/pc/SSDT.dimmpxm",
-+"tests/data/acpi/q35/SSDT.dimmpxm",
+> 
+> 
+> At any rate, while the commit message could be improved, the fix itself is reasonable.
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
+
+
 -- 
-2.17.1
-
-
+Best regards,
+Vladimir
 
