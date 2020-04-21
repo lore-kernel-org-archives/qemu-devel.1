@@ -2,69 +2,80 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33EE0C54FCC
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 22:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F4EC2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 22:50:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07FA3206D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 22:23:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07FA3206D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 760FF206E9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 22:50:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RpAYEMaN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 760FF206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jR1Im-0006d4-4F
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 18:23:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42634)
+	id 1jR1ix-0004P0-JW
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 18:50:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45464)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jR1Hn-0005gx-QJ
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 18:22:36 -0400
+ (envelope-from <eblake@redhat.com>) id 1jR1hj-0003rV-Rr
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 18:49:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jR1Hj-0001kw-0n
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 18:22:35 -0400
-Resent-Date: Tue, 21 Apr 2020 18:22:35 -0400
-Resent-Message-Id: <E1jR1Hj-0001kw-0n@eggs.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21345)
+ (envelope-from <eblake@redhat.com>) id 1jR1hi-00062F-LQ
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 18:49:23 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40499
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jR1Hi-0001av-FO; Tue, 21 Apr 2020 18:22:30 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1587507742; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=I5xPd3ZrrOibpDqvkCsgOdMkgQiBCyREVdAGfYNwbwpFSfOKExxcPS205iiurSH5Vt9Pa1DCQ1lmfsrOzzHHXjeHZrMrFP4FsrkcGJU9goHfZjgaNOQmwbHd30s16k0A51jQ7B+6oAtqb5cT1l8ytc2ktJtGt3mrvwIQ6ctK9B4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1587507742;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=ZDnOxj23sSp+96biq2Wkn8WUN/P0xbtZdrlnRFpAa0c=; 
- b=m9UelKsRJKjl8cIB7YCkbiqQ5QlTlKkqQYiLxU+LCvuZtBXzzn73p+DIjNC03Ps1ZCChIDI9yifpS5LNXGefG0azpdcj6i49H+07NM8fN6lBG7o9v5/k6XfnhNR8Y11Y/THw2UWrqR0dsEec9zOMgAYTWEvEWjmWQd/1RwR3VJU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1587507739331774.5214041004855;
- Tue, 21 Apr 2020 15:22:19 -0700 (PDT)
-In-Reply-To: <20200421212019.170707-1-eblake@redhat.com>
-Subject: Re: [PATCH v2 0/6] qemu-img: Add convert --bitmaps
-Message-ID: <158750773797.29038.4153256722909003079@39012742ff91>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jR1hh-0005ks-Tf
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 18:49:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587509358;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NEkmEU+AzANqs9/z/HMD4awHIPZByi0g9ZXIoAJ14cg=;
+ b=RpAYEMaNPYaCKy5iMsVvaXwscSqC/ltAx6qZnzmlrjqA+iRCmGQPekSAe1bDH2awoaVZPY
+ 6dMyri+aLsQ/LS1uqZbZVQEYMnj0HLkM0NPe3puulkJImsWbWniy6CyvXdpSBDXBbuAVJs
+ SDnh+uSX0y/REoNIwkkTZP5xKFr4S9Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-276-0Dw26MV9MlyuCPshUN7FPQ-1; Tue, 21 Apr 2020 18:49:16 -0400
+X-MC-Unique: 0Dw26MV9MlyuCPshUN7FPQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D6EC5A099;
+ Tue, 21 Apr 2020 22:49:15 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5BF58B3A60;
+ Tue, 21 Apr 2020 22:49:14 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] fixup! qemu-img: Add bitmap sub-command
+Date: Tue, 21 Apr 2020 17:49:11 -0500
+Message-Id: <20200421224911.178024-1-eblake@redhat.com>
+In-Reply-To: <158750773797.29038.4153256722909003079@39012742ff91>
+References: <158750773797.29038.4153256722909003079@39012742ff91>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: eblake@redhat.com
-Date: Tue, 21 Apr 2020 15:22:19 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 16:35:08
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 136.143.188.53
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 17:20:31
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,54 +87,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
 Cc: nsoffer@redhat.com, kwolf@redhat.com, jsnow@redhat.com,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQyMTIxMjAxOS4xNzA3
-MDctMS1lYmxha2VAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
-Y2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tlci1p
-bWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVk
-b3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIExJTksgICAgcWVt
-dS1lZGlkLmV4ZQogIExJTksgICAgcWVtdS1nYS5leGUKL3RtcC9xZW11LXRlc3Qvc3JjL3FlbXUt
-aW1nLmM6IEluIGZ1bmN0aW9uICdpbWdfYml0bWFwJzoKL3RtcC9xZW11LXRlc3Qvc3JjL3FlbXUt
-aW1nLmM6NDU3OTo0NDogZXJyb3I6IHBhc3NpbmcgYXJndW1lbnQgMyBvZiAncWVtdV9zdHJ0b3N6
-JyBmcm9tIGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGUgWy1XZXJyb3I9aW5jb21wYXRpYmxlLXBv
-aW50ZXItdHlwZXNdCiAgICAgICAgICAgICBpZiAocWVtdV9zdHJ0b3N6KG9wdGFyZywgTlVMTCwg
-JmdyYW51bGFyaXR5KSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIF5+fn5+fn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3RtcC9xZW11LXRlc3Qvc3Jj
-L3FlbXUtaW1nLmM6Mzc6Ci0tLQogaW50IHFlbXVfc3RydG9zeihjb25zdCBjaGFyICpucHRyLCBj
-b25zdCBjaGFyICoqZW5kLCB1aW50NjRfdCAqcmVzdWx0KTsKICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfn5+fn5+fn5+fl5+fn5+fgpjYzE6IGFs
-bCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlOiAqKiogWy90bXAvcWVtdS10
-ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IHFlbXUtaW1nLm9dIEVycm9yIDEKbWFrZTogKioqIFdhaXRp
-bmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxh
-c3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjY0LCBpbiA8bW9k
-dWxlPgotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnBy
-b2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2Vy
-JywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ZTA2YWJmYTQ3ZmMy
-NDU0MDk3MjY0YWM4MjFjNWRjZWInLCAnLXUnLCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdz
-ZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAn
-RVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAn
-REVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2Nj
-YWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zh
-ci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWQ5ZXNp
-amNsL3NyYy9kb2NrZXItc3JjLjIwMjAtMDQtMjEtMTguMTguNTkuMTk0NDU6L3Zhci90bXAvcWVt
-dTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cn
-XScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVs
-PWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ZTA2YWJmYTQ3ZmMyNDU0MDk3MjY0YWM4MjFjNWRjZWIK
-bWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0
-b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtZDllc2lqY2wvc3JjJwptYWtlOiAqKiog
-W2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgM20xOS43Njdz
-CnVzZXIgICAgMG04Ljk1N3MKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9w
-YXRjaGV3Lm9yZy9sb2dzLzIwMjAwNDIxMjEyMDE5LjE3MDcwNy0xLWVibGFrZUByZWRoYXQuY29t
-L3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQ
-bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+
+Squash this into patch 3/6 to fix docker-test-mingw@fedora
+
+ qemu-img.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/qemu-img.c b/qemu-img.c
+index 6cfc1f52ef98..cc87eaf12778 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -4529,7 +4529,7 @@ static int img_bitmap(int argc, char **argv)
+     BlockBackend *blk =3D NULL, *src =3D NULL;
+     BlockDriverState *bs =3D NULL, *src_bs =3D NULL;
+     bool image_opts =3D false;
+-    unsigned long granularity =3D 0;
++    uint64_t granularity =3D 0;
+     bool add =3D false, remove =3D false, clear =3D false;
+     bool enable =3D false, disable =3D false, add_disabled =3D false;
+     const char *merge =3D NULL;
+--=20
+2.26.2
+
 
