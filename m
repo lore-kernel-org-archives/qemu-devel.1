@@ -6,64 +6,63 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9EBEC2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 08:58:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B51EFC2BA19
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 08:59:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5F38206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 08:58:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80E91206D9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 08:59:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gG+LTR4b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5F38206E9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gK+4LDJO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80E91206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQojx-0005hI-QO
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 04:58:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57310)
+	id 1jQok9-0006AP-Me
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 04:59:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57426)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jQofb-0007pX-B7
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:54:19 -0400
+ (envelope-from <david@redhat.com>) id 1jQofw-0008AR-9v
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:54:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jQofa-00019k-PB
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:54:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44980
+ (envelope-from <david@redhat.com>) id 1jQofv-0001hR-SX
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:54:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20553
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jQofa-00018q-CR
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:54:18 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jQofv-0001g1-Gp
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:54:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587459257;
+ s=mimecast20190719; t=1587459278;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PiYdaufXH/OcHgyja+9iT9AeZgtrLODnqhTcI1EwYAg=;
- b=gG+LTR4bX9tgPrdAYc/8B9XrTlsowMs+h0ITKJN4oEh18b1Anks+B47KDz3QSqhUZRpsMT
- iZ6Q0kmRjAV22bbH18DHs/GxvSMTvJRp61Y5sLklgzElOQVsbup3z3NainkQWI9dp+/he5
- 0z2D8oxAqAYXED2HVHvJvP6qOhhOzJk=
+ bh=6SjjE1hP+kC4ESv3vq5BAN1iuJe4xS50e87aSvh0BdU=;
+ b=gK+4LDJOGJFenr1w2Md0Si2vkkg+zSNvEqtg8uH5CLae57cuq1eQZnpbpt9ulg/ksK7k0I
+ fRyuxAkFnawm/yQ0n2JBFmiIDiYcRoEtEXS/9yzaDXZ1NVMFDnSJp5bPP3LX7h7qxw88NM
+ YF1VHgREeOc+72WBIYhOAatg5rlL67w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-5B3mA3g4NdOKDmIDStIK1A-1; Tue, 21 Apr 2020 04:54:16 -0400
-X-MC-Unique: 5B3mA3g4NdOKDmIDStIK1A-1
+ us-mta-245-BPPl0aU-Nea36dh5mCMAFg-1; Tue, 21 Apr 2020 04:54:37 -0400
+X-MC-Unique: BPPl0aU-Nea36dh5mCMAFg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33CC9107ACCC;
- Tue, 21 Apr 2020 08:54:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2016B8017FD;
+ Tue, 21 Apr 2020 08:54:36 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-245.ams2.redhat.com [10.36.113.245])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 71064100EBB9;
- Tue, 21 Apr 2020 08:54:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9CDA81036D27;
+ Tue, 21 Apr 2020 08:54:27 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 07/13] migration/ram: Discard RAM when growing RAM blocks
- after ram_postcopy_incoming_init()
-Date: Tue, 21 Apr 2020 10:52:54 +0200
-Message-Id: <20200421085300.7734-8-david@redhat.com>
+Subject: [PATCH v4 11/13] migration/multifd: Print used_length of memory block
+Date: Tue, 21 Apr 2020 10:52:58 +0200
+Message-Id: <20200421085300.7734-12-david@redhat.com>
 In-Reply-To: <20200421085300.7734-1-david@redhat.com>
 References: <20200421085300.7734-1-david@redhat.com>
 MIME-Version: 1.0
@@ -98,86 +97,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In case we grow our RAM after ram_postcopy_incoming_init() (e.g., when
-synchronizing the RAM block state with the migration source), the resized
-part would not get discarded. Let's perform that when being notified
-about a resize while postcopy has been advised, but is not listening
-yet. With precopy, the process is as following:
+We actually want to print the used_length, against which we check.
 
-1. VM created
-- RAM blocks are created
-2. Incomming migration started
-- Postcopy is advised
-- All pages in RAM blocks are discarded
-3. Precopy starts
-- RAM blocks are resized to match the size on the migration source.
-- RAM pages from precopy stream are loaded
-- Uffd handler is registered, postcopy starts listening
-4. Guest started, postcopy running
-- Pagefaults get resolved, pages get placed
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Juan Quintela <quintela@redhat.com>
 Cc: Peter Xu <peterx@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- migration/ram.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ migration/multifd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index d587ecbd92..2704d32def 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3756,6 +3756,7 @@ static SaveVMHandlers savevm_ram_handlers =3D {
- static void ram_mig_ram_block_resized(RAMBlockNotifier *n, void *host,
-                                       size_t old_size, size_t new_size)
- {
-+    PostcopyState ps =3D postcopy_state_get();
-     ram_addr_t offset;
-     Error *err =3D NULL;
-     RAMBlock *rb =3D qemu_ram_block_from_host(host, false, &offset);
-@@ -3776,6 +3777,35 @@ static void ram_mig_ram_block_resized(RAMBlockNotifi=
-er *n, void *host,
-         error_free(err);
-         migration_cancel();
-     }
-+
-+    switch (ps) {
-+    case POSTCOPY_INCOMING_ADVISE:
-+        /*
-+         * Update what ram_postcopy_incoming_init()->init_range() does at =
-the
-+         * time postcopy was advised. Syncing RAM blocks with the source w=
-ill
-+         * result in RAM resizes.
-+         */
-+        if (old_size < new_size) {
-+            if (ram_discard_range(rb->idstr, old_size, new_size - old_size=
-)) {
-+                error_report("RAM block '%s' discard of resized RAM failed=
-",
-+                             rb->idstr);
-+            }
-+        }
-+        break;
-+    case POSTCOPY_INCOMING_NONE:
-+    case POSTCOPY_INCOMING_RUNNING:
-+    case POSTCOPY_INCOMING_END:
-+        /*
-+         * Once our guest is running, postcopy does no longer care about
-+         * resizes. When growing, the new memory was not available on the
-+         * source, no handler needed.
-+         */
-+        break;
-+    default:
-+        error_report("RAM block '%s' resized during postcopy state: %d",
-+                     rb->idstr, ps);
-+        exit(-1);
-+    }
- }
-=20
- static RAMBlockNotifier ram_mig_ram_notifier =3D {
+diff --git a/migration/multifd.c b/migration/multifd.c
+index cb6a4a3ab8..4f65c871a9 100644
+--- a/migration/multifd.c
++++ b/migration/multifd.c
+@@ -356,7 +356,7 @@ static int multifd_recv_unfill_packet(MultiFDRecvParams=
+ *p, Error **errp)
+         if (offset > (block->used_length - qemu_target_page_size())) {
+             error_setg(errp, "multifd: offset too long %" PRIu64
+                        " (max " RAM_ADDR_FMT ")",
+-                       offset, block->max_length);
++                       offset, block->used_length);
+             return -1;
+         }
+         p->pages->iov[i].iov_base =3D block->host + offset;
 --=20
 2.25.1
 
