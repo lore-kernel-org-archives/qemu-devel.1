@@ -2,82 +2,91 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20889C54FC9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:05:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA03C54FC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:09:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB4CD2068F
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:05:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 222372068F
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 16:09:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="coRWtQIx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB4CD2068F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=blastwave.org header.i=@blastwave.org header.b="SVS+8u++"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 222372068F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=blastwave.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQvOg-00079k-Rn
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 12:05:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51020)
+	id 1jQvT7-00013E-2h
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 12:09:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51864)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jQvNB-0005oV-6h
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:03:45 -0400
+ (envelope-from <dclarke@blastwave.org>) id 1jQvSL-0000U7-9Z
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:09:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jQvN9-0004Te-Hn
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:03:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32098
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jQvN8-0004Rc-Tr
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:03:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587485021;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UNhZfMZLfUpkrSJ6F0fZJwxj64l3eDG3YGO1ZPSsYy0=;
- b=coRWtQIxdJZoMCFEDZPmggvlWbo3f7ju08NRglGYGzVBrVtpDXnZZ3j5RUQmrkDtKQziaa
- iGLt5FHMlPKgnCUfE1nQKxaEoxBHwEodF0Mr8xHhBHX3bAuE7KhCTCc/rN1CmxnhoZUxih
- 1ac5IEkVWt7TJ0bf2GaQ/tPcAWxD2gk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-zhHIp4cCO7qgQswcXFrW0w-1; Tue, 21 Apr 2020 12:03:39 -0400
-X-MC-Unique: zhHIp4cCO7qgQswcXFrW0w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93F78102C864;
- Tue, 21 Apr 2020 16:03:38 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-112-155.ams2.redhat.com [10.36.112.155])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E40BF5C1B2;
- Tue, 21 Apr 2020 16:03:36 +0000 (UTC)
-Date: Tue, 21 Apr 2020 18:03:35 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v3 04/10] iotests/check: move QEMU_VXHS_PROG to common.rc
-Message-ID: <20200421160335.GD22440@linux.fritz.box>
-References: <20200421073601.28710-1-vsementsov@virtuozzo.com>
- <20200421073601.28710-5-vsementsov@virtuozzo.com>
+ (envelope-from <dclarke@blastwave.org>) id 1jQvSJ-00018h-8Q
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 12:09:04 -0400
+Received: from mail.oetec.com ([108.160.241.186]:37798)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dclarke@blastwave.org>)
+ id 1jQvSH-000155-DS; Tue, 21 Apr 2020 12:09:01 -0400
+X-oetec-MailScanner-From: dclarke@blastwave.org
+X-oetec-MailScanner-SpamCheck: not spam, SpamAssassin (not cached,
+ score=-1.199, required 6, autolearn=not spam, ALL_TRUSTED -1.00,
+ DKIM_SIGNED 0.10, DKIM_VALID -0.10, DKIM_VALID_AU -0.10,
+ DKIM_VALID_EF -0.10, URIBL_BLOCKED 0.00)
+X-oetec-MailScanner: Found to be clean
+X-oetec-MailScanner-ID: 03LG7dtT021650
+X-oetec-MailScanner-Information: Please contact oetec for more information
+Received: from [172.16.35.3]
+ (CPEf81d0f84cb23-CMf81d0f84cb20.cpe.net.cable.rogers.com [99.253.169.68])
+ (authenticated bits=0)
+ by mail.oetec.com (8.15.2/8.15.2/Debian-8) with ESMTPSA id 03LG7dtT021650
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+ Tue, 21 Apr 2020 12:07:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=blastwave.org;
+ s=default; t=1587485262;
+ bh=0H7HiWR+nssbP1E1ioSxW/yOKENmA56h3YFvGRPHpdQ=;
+ h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+ b=SVS+8u++0+eu+DXNdaao8H01nPLCocMqpNPYcx9DnGcXLIZaw1wNO2xuqUX6NZfmM
+ vFUOruWwZw6aJvW4np5/gy4jZMXWDT9hoqC8B7OXv11sXWXLQtLhxxKQKgvvdO2jk0
+ CNG/FaLDySLvYc9svaCZjjkMMcaTcAH8p9NnPSHa2naU0pkuvlI2cN/yxInG4P+uU3
+ MjXVr08ihBD4XUlBlKyyXf3S3+dBOZ+TNm+44GxqbQ2mwkL8amYjImiIsKV9Zt/tYe
+ wLhaiNxhVOkjIk1+cB4zj1P0o56wO149Ds5IzcZT4R9jNFHwPx5yVaF4Kg43fj9OLd
+ jDNlPOxeOoAYA==
+Subject: Re: [PATCH-for-5.0?] target/ppc: Fix TCG temporary leaks in
+ gen_slbia()
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Nicholas Piggin <npiggin@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <20200417090749.14310-1-f4bug@amsat.org>
+ <CAFEAcA-aj77=19d+8jmoWYXBDdm=U8eV8CsHpovMN8bE9uNSvg@mail.gmail.com>
+ <dcf67e87-da27-68ee-0dd8-5b94edb84291@blastwave.org>
+ <1918bd79-2e30-a578-c34e-683eab724c67@amsat.org>
+From: Dennis Clarke <dclarke@blastwave.org>
+Message-ID: <0dd1ec76-6d57-a4bb-96be-cc30caa00254@blastwave.org>
+Date: Tue, 21 Apr 2020 12:07:39 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:74.0) Gecko/20100101
+ Thunderbird/74.0
 MIME-Version: 1.0
-In-Reply-To: <20200421073601.28710-5-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 11:47:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+In-Reply-To: <1918bd79-2e30-a578-c34e-683eab724c67@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=108.160.241.186;
+ envelope-from=dclarke@blastwave.org; helo=mail.oetec.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 12:08:59
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Received-From: 108.160.241.186
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,21 +98,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 21.04.2020 um 09:35 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> QEMU_VXHS_PROG is used only in common.rc. So, move it to common.rc,
-> simplifying a bit further conversion of check into python
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 2020-04-21 03:17, Philippe Mathieu-Daudé wrote:
+> On 4/21/20 12:53 AM, Dennis Clarke wrote:
+>> On 4/20/20 6:56 PM, Peter Maydell wrote:
+>>> On Fri, 17 Apr 2020 at 10:08, Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> wrote:
+>>>>
+>>>> This fixes:
+>>>>
+>>>>     $ qemu-system-ppc64 \
+>>>>     -machine pseries-4.1 -cpu power9 \
+>>>>     -smp 4 -m 12G -accel tcg ...
+>>>>     ...
+>>>>     Quiescing Open Firmware ...
+>>>>     Booting Linux via __start() @ 0x0000000002000000 ...
+>>>>     Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
+>>>>     Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
+>>>>     Opcode 1f 12 0f 00 (7ce003e4) leaked temporaries
+>>>>
+>>>> [*] https://www.mail-archive.com/qemu-discuss@nongnu.org/msg05400.html
+>>>>
+>>>> Fixes: 0418bf78fe8 ("Fix ISA v3.0 (POWER9) slbia implementation")
+>>>> Reported-by: Dennis Clarke <dclarke@blastwave.org>
+>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>
+>>> I propose to apply this patch for 5.0 rc4 (as well as the
+>>> ppc pullreq already sent), since the iscsi bugfix means
+>>> we need an rc4 anyway. Any objections?
+>>>
+>>
+>> I have been running rc3 with this patch fine for some days now.  Both
+>> with and without a debug enabled build wherein the performance
+>> difference between the two is obvious.
+> 
+> Thanks for testing it! Can we use your:
+> 
+> Tested-by: Dennis Clarke <dclarke@blastwave.org>
+> 
+> tag?
 
-This feels inconsistent when every other QEMU_*_PROG stays in check. Is
-QEMU_VXHS_PROG really so different?
 
-Kevin
+Of course.  Even "running fine by that old UNIX guy" if you want.
 
+
+-- 
+Dennis Clarke
+RISC-V/SPARC/PPC/ARM/CISC
+UNIX and Linux spoken
+GreyBeard and suspenders optional
 
