@@ -2,87 +2,122 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A45C54FCC
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:12:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD1BC54FD0
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:13:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 384012076A
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:12:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 62B892076A
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 13:13:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MVYT4bJY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 384012076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Xn6RzJqU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62B892076A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQshM-0005hS-DW
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 09:12:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45034)
+	id 1jQsi6-0006bE-J3
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 09:13:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1jQsYW-00019N-Ip
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:03:17 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jQsh8-0005fV-Sl
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:12:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1jQsYR-00034S-Pj
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:03:15 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52842
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jQsYR-00031Y-9Z
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:03:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587474189;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TiL1gvWmNe67InoDmmjUD0KEQwrxgISySTFxbtW1GOQ=;
- b=MVYT4bJYFORZZz6KuFn61sMAtoVtOzy86o3I+/BWHwIVV1Y9kF7r/dDhT++v6mlG4fPjDW
- qyAbGI4ImgodDQRF3mI7j0qU+zNevUE3zm02zEF5yqb7zg1GxMMx3YnYoyDLv68Py9jPK6
- 90opCzSYx06pV6s2j12d1iGxLBOjwBM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-tIO59JKKN_K94JkmQXWTxg-1; Tue, 21 Apr 2020 09:03:02 -0400
-X-MC-Unique: tIO59JKKN_K94JkmQXWTxg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53FEB8017F3;
- Tue, 21 Apr 2020 13:03:01 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-115-52.ams2.redhat.com
- [10.36.115.52])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 483955DA7C;
- Tue, 21 Apr 2020 13:02:56 +0000 (UTC)
-Subject: Re: [edk2-discuss] Load Option passing. Either bugs or my confusion.
-To: Gerd Hoffmann <kraxel@redhat.com>
-References: <623b1855-285c-cce3-c806-c17e5fd217ea@redhat.com>
- <5211.1586899245384995995@groups.io>
- <a972450d-8834-ae87-e4e3-5263a41d1735@redhat.com>
- <20200420141303.dxjqgvmzglrjtsly@sirius.home.kraxel.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <9aed493a-2187-cacd-5631-54fb9973509c@redhat.com>
-Date: Tue, 21 Apr 2020 15:02:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
-MIME-Version: 1.0
-In-Reply-To: <20200420141303.dxjqgvmzglrjtsly@sirius.home.kraxel.org>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jQsh7-0000f8-8m
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 09:12:09 -0400
+Received: from mail-eopbgr60122.outbound.protection.outlook.com
+ ([40.107.6.122]:32578 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jQsh6-0000eA-Fx; Tue, 21 Apr 2020 09:12:08 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SNlCiObzRUZRHlw/kBEyE7fMEWki2+7Sh0AlLBv9R/cwL2r4ts0pZ5ZFVAefnFMb6InXzdICOeXes/HD6tAbPExr2TcTRpw8UegRNO0xImYwMQEm4UFYIAxokykzA05ob639SaRRL3ESEvEpf0XW9VcJ+3cn73KQIkbIzn3/sqrwyo7Y/7KUrbVrwfW9SXOjRCbJnS99mDTQZTYmGoCcqmVxe4rCpk61PDfVFi0V4XW+/caw5VQccgr9OpgyWEmZdDKec/xYnv0fcD2PnRv6V882VexxerRAyT5Nfq4DJHqLZ/v/UIoUhAJPdjFTWRY2XD5reKt9k8UueKJvw23RSA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sPtJ/uM7J1EG9YhfPlhoCyn/qgNBjgg8asKcDxOqYxk=;
+ b=EWTrh+Rdu71wmZmo3l4+IAZJOS/fy6ZtfAZ4fSqEf08jeW4A68rtctL2KBbTplcuTTeNHcINl30a6OLT7JrmVt/OneHxQ9ilNqIlAi8q0vmfTYbAERxkjqu/ksfWAERSUE9yp+OKh8NPZknnqf2FiOuwuEqbFmEBJhSQKqVGNTt/XalHKKsmUsbqwArCZxZFuS3O79WO6z0Ubnx1rkBjRWrC9VyuCNPXQ41QQ8CG23ezHHEOWqUMFaRVdNk2jTF/2lPNhjrL2o25+dBQzVoVNfQop7w5PSjFNaw1xbJ7qRnGLwHfkOHZcgJOYGVlg0ro0Q/f1EW1nLnU4sN3fjhWXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sPtJ/uM7J1EG9YhfPlhoCyn/qgNBjgg8asKcDxOqYxk=;
+ b=Xn6RzJqU561NdLVFuV8EWF9hKAVL2kfn1OD2yhNi1n74G3UR2W3lw11ZLVy4cu4xQd0lM4Iw6709lcs7TvBPUu8ChE1TS/c+0/xuqyidvWrHQdz3c7sHigMW2JbhdMHXIIbQGDoOuOWvZ7r69eEu6Dp2CWWLJEF0fTUCuuwN0mc=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5495.eurprd08.prod.outlook.com (2603:10a6:20b:104::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.26; Tue, 21 Apr
+ 2020 13:12:05 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2921.027; Tue, 21 Apr 2020
+ 13:12:05 +0000
+Subject: Re: [PATCH 0/7] Apply COR-filter to the block-stream permanently
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <1587407806-109784-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200421161203483
+Message-ID: <f91a8d20-b60b-7fe9-443a-875b6232af46@virtuozzo.com>
+Date: Tue, 21 Apr 2020 16:12:03 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <1587407806-109784-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 01:28:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+X-ClientProxiedBy: FR2P281CA0025.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:14::12) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.142) by
+ FR2P281CA0025.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2921.27 via Frontend Transport; Tue, 21 Apr 2020 13:12:04 +0000
+X-Tagtoolbar-Keys: D20200421161203483
+X-Originating-IP: [185.215.60.142]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a69148f5-ce2b-45e3-a57a-08d7e5f596c4
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5495:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5495102A4EEA5AEA15E5A870C1D50@AM7PR08MB5495.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 038002787A
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(39850400004)(396003)(376002)(346002)(136003)(366004)(31686004)(966005)(5660300002)(26005)(52116002)(8936002)(66556008)(81156014)(8676002)(16576012)(86362001)(66476007)(16526019)(31696002)(66946007)(478600001)(186003)(316002)(6486002)(4326008)(107886003)(2616005)(2906002)(956004)(36756003);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: hXW9mlprWPDQwVCs8SibQPHy6D100OQ1IxnXDHKjgn0N1Isymh6d5SqM/LClcjsb+diS8dRuOLy6Z3KtSLOPou59w+TJZV2/T6ubhkU22BRfofdUErKs3X9os6CxxeVGTzWfeE+G1emrJ25OtRt2UiEvdYA6amlOgPvAgx/XlWunPyXdvGSBXHUYg4hR+kVtrXmjSEPTDchSypc1/HljCpjvoSu13KQf8AmKWCktEbD0FyzwvAy2c6p748xTLuoNTrDiuxiloT7olvMCRDcn0OJxWb3rZO0L+tOpSMXgIuEmjjCPRbZLFeSBVyldRADzruAIPt43L8u2lzcv2HmaYgMzbsirMin8Gg5duT8jnLyQGMTxjNy9ngQcddkNCZZgi8/lnPPjRK198qoTaIr/liDh+xliTNmvRhCSuBqE9cV8x9x2+lkowQwW9/5DzmR/KQYIS3iNEOA2J8VWYVcG/USB6T4Tll483BzlLd4eyKf1wIyTGkuR34pgKjIlZ+3Z
+X-MS-Exchange-AntiSpam-MessageData: 6NkOthY8XuiaTVoscX+G1xZWMwHCAHKhUcnnYnveN/H08FRY7zRjw6WdoUJw5/A6cb59pyDQth+alF9ISBoV8PRwKV+K+MA0PHuJZUvKa1U8Z0OO7X4W8VIIP2cliKcvk973IGacLBuT0RRGsiHYAQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a69148f5-ce2b-45e3-a57a-08d7e5f596c4
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2020 13:12:05.7244 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: z0IKajJrGcJYeDUohOVodYrOiqrsmZJgc/DheguMErDOZ/E1mepEIGvkAVjb2L8Znl+1lXe1Y67YIruh5tZnimoLekYQDEtLorsy9/wIG7o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5495
+Received-SPF: pass client-ip=40.107.6.122;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 09:12:06
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.6.122
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,71 +129,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hou Qiming <hqm03ster@gmail.com>,
- edk2-devel-groups-io <devel@edk2.groups.io>,
- qemu devel list <qemu-devel@nongnu.org>, discuss@edk2.groups.io,
- valerij zaporogeci <vlrzprgts@gmail.com>
+Cc: kwolf@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, den@openvz.org,
+ mreitz@redhat.com, jsnow@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/20/20 16:13, Gerd Hoffmann wrote:
->   Hi,
->
->> So I would say that the symptom you see is a QEMU v4.1.0 regression.
->> The QemuRamfbGraphicsOutputSetMode() function in the OVMF ramfb
->> driver certainly needs the QemuFwCfgWriteBytes() call to work, for
->> changing the resolution.
->
-> Oh?  QemuRamfbGraphicsOutputSetMode() can be called multiple times?
-> How does that happen?
+20.04.2020 21:36, Andrey Shinkevich wrote:
+> Note: this series is based on the one "block: Deal with filters"
+>        by Max Reitz that can be found in the branches:
+> 
+>        https://git.xanclic.moe/XanClic/qemu child-access-functions-v6
+>        https://github.com/XanClic/qemu child-access-functions-v6
 
-QemuRamfbGraphicsOutputSetMode() is the "SetMode" member function of the
-EFI_GRAPHICS_OUTPUT_PROTOCOL instance that QemuRamfbDxe produces.
+Would be very good to not make a dependency and keep the series parallel. I believe, that we can proceed with this series taking a small subset of Max's series.
 
-This is a standard protocol; UEFI drivers and applications are free to
-locate it and to use it.
+> 
+>        When running iotests, apply "char-socket: Fix race condition"
+>        to avoid sporadic segmentation faults.
+> 
+> With this series, all the block-stream COR operations pass through
+> the COR-filter.
+> 
+> Andrey Shinkevich (7):
+>    block: prepare block-stream for using COR-filter
+>    stream: exclude a link to filter from freezing
+>    block: protect parallel jobs from overlapping
+>    copy-on-read: Support refreshing filename
+>    qapi: add filter-node-name to block-stream
+>    iotests: prepare 245 for using filter in block-stream
+>    block: apply COR-filter to block-stream jobs
+> 
+>   block/copy-on-read.c       |   7 ++
+>   block/stream.c             | 170 +++++++++++++++++++++++++++++++++++++++------
+>   blockdev.c                 |  15 +++-
+>   blockjob.c                 |  15 +++-
+>   include/block/block_int.h  |   7 +-
+>   monitor/hmp-cmds.c         |   4 +-
+>   qapi/block-core.json       |   6 ++
+>   tests/qemu-iotests/030     |   6 +-
+>   tests/qemu-iotests/141.out |   2 +-
+>   tests/qemu-iotests/245     |  15 ++--
+>   10 files changed, 210 insertions(+), 37 deletions(-)
+> 
 
-(1) When you launch OVMF, you get the splash screen in a particular
-resolution. This resolution:
-- is configured by OvmfPkg/PlatformDxe,
-- is inherited by an OS boot loader,
-- is reconfigurable with OvmfPkg/PlatformDxe, for the next boot, via the
-  Setup TUI,
-- defaults to 800x600 (taking effect when no particular choice is
-  configured).
 
-(2) UiApp -- the Setup TUI itself -- uses its own resolution. Under
-OVMF, this resolution is fixed 640x480. When UiApp is entered,
-ultimately a call is made to QemuRamfbGraphicsOutputSetMode() -- i.e., a
-GOP.SetMode() member function -- for setting this 640x480 resolution.
-
-Using the following command:
-
-  qemu-system-x86_64 \
-    -nodefaults \
-    -boot menu=on,splash-time=5000 \
-    -enable-kvm \
-    -device ramfb \
-    -drive if=pflash,readonly,format=raw,file=$PREFIX/share/qemu/edk2-x86_64-code.fd \
-    -drive if=pflash,snapshot,format=raw,file=$PREFIX/share/qemu/edk2-i386-vars.fd \
-    -debugcon file:ovmf.log \
-    -global isa-debugcon.iobase=0x402
-
-when you first see the progress bar, the graphical resolution (1) is
-800x600. Accordingly, QEMU prints to stderr:
-
-> ramfb_fw_cfg_write: 800x600 @ 0x6702000
-
-Once you hit ESC to interrupt the progress bar and to enter the Setup
-TUI, UiApp switches to resolution (2), 640x480. QEMU prints:
-
-> ramfb_fw_cfg_write: 640x480 @ 0x6702000
-> ramfb_fw_cfg_write: resolution locked, change rejected
-
-And you get garbage in the Setup window.
-
-Thanks,
-Laszlo
-
+-- 
+Best regards,
+Vladimir
 
