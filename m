@@ -2,76 +2,87 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E12CC55183
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 14:18:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF1CC54FC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 14:33:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CA37206B9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 14:18:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CA37206B9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+	by mail.kernel.org (Postfix) with ESMTPS id 96931206D4
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 14:33:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UqgY4r6G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96931206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQtit-0007Ze-VX
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 10:18:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58842)
+	id 1jQtxZ-0004ym-Kq
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 10:33:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34508)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jQtgk-0005ai-7l
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 10:15:51 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1jQtwP-0004Xk-Ox
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 10:32:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jQtgj-0004T4-Ca
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 10:15:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44568)
+ (envelope-from <bmeng.cn@gmail.com>) id 1jQtwO-0001Yp-TD
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 10:32:01 -0400
+Received: from mail-yb1-xb35.google.com ([2607:f8b0:4864:20::b35]:44328)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jQtgi-0004SD-Up
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 10:15:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jQtgg-0003Ck-Ug
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 14:15:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C1C052E8108
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 14:15:46 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jQtwO-0001Uz-Gq
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 10:32:00 -0400
+Received: by mail-yb1-xb35.google.com with SMTP id o139so7416485ybc.11
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 07:31:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=WwEo6nIIuucBzY59Z8eeDYudjPrSpXnXgvcRUvBkjCk=;
+ b=UqgY4r6G0FqT3fDppH7W1Qb3cpqchRu7QrBgvornSj4XT21TZ1cK/BFsBrv44M4cFf
+ 3j/BicP+NV0QIBleLgIr4m3SwN/OodYj9f4t4FRAItAi5r+NqyqiYeCkjb3cb0ODqqwN
+ ygiqg3EG4hrHw3mNvmdoj+i6w8e1wmpkIjX5GjcO3qfQzYmyjHw+z1s4xbMwnz7xY/ci
+ rezAWY/yEkvfqLNTJKdinb5BRLRqdVCsy4pOmWiTTvPF6HkXEjAoF+7SSb5tTeQBMkET
+ UqlHg7s9QmAXpcb7BwJ+slJk0R5RCpEjkx1YB/axS17JT79Puk0QMn0uJk06TtGpddP+
+ TVNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=WwEo6nIIuucBzY59Z8eeDYudjPrSpXnXgvcRUvBkjCk=;
+ b=KONEUd/04lKCOLKziAJLcwCjyFq/PkrzFn8cZ/XiDFhsHIh1ksN2WQ8gSBxz8oR/9e
+ 5HCfbecXRLfxH+2zmYChNX03JsmgRW3EuZiylu66RGncm3Ikn/kf4pD99VJFMDDAPuGY
+ nzCv4uiL49BpQBxgYPSqHa2Om+T9OuXzoCZbdgvWBi9gqIMvtIjXX3EYpvb/s/4B3LML
+ d0A3qJHGWvcVgU2ezuj9Kq511IpzUIzd3mYCRmW/Bl+ctwooX0EU8daJexY6GULfVMPc
+ pOJ0R+DbEFcvDH4Ai2Vuir2n1cq/FuyA0ramrEpl00HTZkl8eWUjdQTDnWgQvD5+Eseq
+ hVXw==
+X-Gm-Message-State: AGi0PuaApyXAbyS2x23ob3uPYqUUIOLFCSLic4QoWr/wAEZ4ozTsFQci
+ P3/ssxrq553v020mN8OAI9OQCAlWGrs+lDyr5fE=
+X-Google-Smtp-Source: APiQypJXmIHwhRZgpwbKcZ6uVtrrHq1yQrQLCPxxyTX0RUlRa6mIoynSMQMNSkgZMZPMnJ3z4Wsq9QAWKjk4YC6Jbi8=
+X-Received: by 2002:a25:d646:: with SMTP id n67mr26662008ybg.65.1587479519158; 
+ Tue, 21 Apr 2020 07:31:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Apr 2020 14:08:27 -0000
-From: Martin Liska <mliska@suse.cz>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mliska pmaydell
-X-Launchpad-Bug-Reporter: Martin Liska (mliska)
-X-Launchpad-Bug-Modifier: Martin Liska (mliska)
-References: <158747496330.1952.6391008472811579405.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158747810737.3682.13558386960580540022.malone@soybean.canonical.com>
-Subject: [Bug 1874073] Re: openrisc_sim.c:87:42: error: 'cpu_irqs[0]' may be
- used uninitialized in this function [-Werror=maybe-uninitialized]
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="aad6b57d58e2f621954298e262c1cc904860f5d2";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d33fefa8f4371cb89c696d8eee476087ec94c706
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 07:50:41
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 91.189.90.7
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Tue, 21 Apr 2020 22:31:48 +0800
+Message-ID: <CAEUhbmUuRCDWMKZdgNNX43G4wfLvzgHcMuT=36JO_q8LnAVisg@mail.gmail.com>
+Subject: hw/net/cadence_gem: TX checksum offload does not work for fragmented
+ packets
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ Jason Wang <jasowang@redhat.com>, 
+ "Peter A. G. Crosthwaite" <peter.crosthwaite@petalogix.com>,
+ John Linn <john.linn@xilinx.com>, 
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b35;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb35.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::b35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,49 +91,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1874073 <1874073@bugs.launchpad.net>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Note that our -Wmaybe-uninitialized warnings tends to report false positive=
-s. We have a rich meta bug for it:
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D24639
+Hi,
 
-That's why it can't prove the variable is initialized in all possible
-execution paths.
+The cadence_gem does the TX checksum offload by:
 
-** Bug watch added: GCC Bugzilla #24639
-   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D24639
+                /* Is checksum offload enabled? */
+                if (s->regs[GEM_DMACFG] & GEM_DMACFG_TXCSUM_OFFL) {
+                    net_checksum_calculate(tx_packet, total_bytes);
+                }
 
--- =
+However this will only work for non-fragmented packets. For fragmented
+packets, it just corrupts the packets by inserting wrong checksum to
+the fist fragment, or corrupts the data to be sent in other fragments
+than the first one.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1874073
+Any idea of how to solve this cleanly?
 
-Title:
-  openrisc_sim.c:87:42: error: 'cpu_irqs[0]' may be used uninitialized
-  in this function [-Werror=3Dmaybe-uninitialized]
-
-Status in QEMU:
-  New
-
-Bug description:
-  I see the warning since gcc10:
-
-  static void openrisc_sim_init(MachineState *machine):
-  ...
-      qemu_irq *cpu_irqs[2];
-  ...
-
-  =
-
-      serial_mm_init(get_system_memory(), 0x90000000, 0, serial_irq,
-                     115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
-
-  I would initialize cpu_irqs[2] with {}.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1874073/+subscriptions
+Regards,
+Bin
 
