@@ -5,74 +5,75 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F26FC54FCB
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 01:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 705BFC38A30
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 01:56:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29AD42078C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 01:54:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B9E02084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 01:56:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1ufUuY0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29AD42078C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vM2nY2C/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B9E02084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQi7Q-0007oR-An
-	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 21:54:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34160)
+	id 1jQi99-0001bj-E7
+	for qemu-devel@archiver.kernel.org; Mon, 20 Apr 2020 21:56:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34278)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pauldzim@gmail.com>) id 1jQi1S-0006rZ-Kl
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:48:26 -0400
+ (envelope-from <pauldzim@gmail.com>) id 1jQi20-0007b3-JL
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:49:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <pauldzim@gmail.com>) id 1jQi1S-0005VJ-5a
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:48:26 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:33141)
+ (envelope-from <pauldzim@gmail.com>) id 1jQi20-0006bk-4c
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:49:00 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37457)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
- id 1jQi1R-0005U8-QL
- for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:48:25 -0400
-Received: by mail-pg1-x541.google.com with SMTP id d17so6037843pgo.0
- for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 18:48:25 -0700 (PDT)
+ id 1jQi1z-0006Zj-OC
+ for qemu-devel@nongnu.org; Mon, 20 Apr 2020 21:48:59 -0400
+Received: by mail-pg1-x541.google.com with SMTP id r4so6027734pgg.4
+ for <qemu-devel@nongnu.org>; Mon, 20 Apr 2020 18:48:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=PXKXjtVVrrXV5MvzLqoNhi8atJWdX4WMW2e8oHa6A4c=;
- b=I1ufUuY0NM0+i95ebcliC4UvksZSVIbfSiqAlGGA3OK12a9czxxNC3flwNI7qUbWhQ
- oCEPED+crdEsD4tNWfTpJVDCnlJ8rK6MpGIDDsmb2f8g2JSIEiVl7XrTQBcAljBAljs/
- oFXts8JLR7PhS8ba3kAEM7Qds/NAbcE5FTJ3IBcIC7f7M1Mcnl3/WYHpEByO6e+S7v+X
- A56PJO7HO5UjymYKWeAGOTomurEntECAdT2zZ69AtPWsGLhwckJOkg6Sthvlq/QsugzO
- h1ciozn8HVNYG5gBAvlC2BdlahNwQqavazX5vxpZqiZoehiIcZJbiElhDwsjJM3DQ7I7
- nsoA==
+ bh=FS2O63iko+vF5p7kOKGCLXMwPEY/QkzawKDVLWYlL7A=;
+ b=vM2nY2C/D2Y1Qz+yl4LnAuVf+rKjFibG6t7SrQjEOYTPA9fr6jJiD+EsuaZJRtF9U8
+ LQanFe70zfNI/OZQH3sjL19sL9LYukViOFzBafNUNXOOjL0cshFesoylS9S6/C9DQkap
+ 4mCkYPV94txJyDnu2UCyxxCPXXnHr/0eljm+KK3fqVPnfQZaGdQpO4VseIBOSiQ7fjdH
+ rC8bnSIAOiK4GAT7OtKS/qIWfP+f5NhgV3v5YW2uNIhm1yd92v4tRx2wykuVPAmu8n97
+ Q0ZIX2Spu0B5Io8TeNrLPXRIM6Hp8VP0yUx/+McS3x7tc8d+/9Ua+uf6hv58f0Xl/Oio
+ Z/MQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=PXKXjtVVrrXV5MvzLqoNhi8atJWdX4WMW2e8oHa6A4c=;
- b=qSqBXCVqCUWEl5MmmKaDzs32vO9lswv83DjZExWvMg7iH7aWFGYxjz2CspZ0oFr4KY
- XiQxRONbWQ9yJvEXEiA+4o+tNBKIL5VYJ0IXYeIC38gVvy2mMvkM9/iU2S5mH6Tpvfyz
- H6ZFFYSf0ixyHOB/hSIUjId8RbgNofa1N0uwJeQFugTAAnAbh32GAx7J+ck5ThD6JVH4
- mGUEE0fHXW06a0m1GUCaV+uldIDh5eJkHc4RPabk1xgaHqcsNXaVomnYvCU1VwR1Q9qf
- 1PSIy/8WAKCeVoV8ZBXfzVP+N8bya+fUwOxC0I7GXTGcyx0hYTrqTkNDrTym+U7Kjelo
- VTpg==
-X-Gm-Message-State: AGi0Puaxz66rKRHmZSLwZlNJ3X5rs40uFgZY4g8x1CDrba0hQ1a76Wuw
- ZK3qfPjj8WFcixo7ran/MhM=
-X-Google-Smtp-Source: APiQypLOC3f2O2axV9o+1oStq1at+WwnH4KL0n9JtHukJ62Kem2U7ypHhbbJk2s7j5F5Zcgs05IxWw==
-X-Received: by 2002:a62:e414:: with SMTP id r20mr19110066pfh.96.1587433704581; 
- Mon, 20 Apr 2020 18:48:24 -0700 (PDT)
+ bh=FS2O63iko+vF5p7kOKGCLXMwPEY/QkzawKDVLWYlL7A=;
+ b=JRZ2moKaz8Nat1iHVnJKtzIshx12rc1SK9ki6XCDlQlcrjgVsEtXLGyz5BrI7dK6kD
+ DTswynIW8sylMvc2DngKQuiMwy8//+8YFRJkZmyb55E734taARN1SW67gnVrXPGHicYb
+ 818MjB5ElJJeGYSMXqYmXAOPQ199wbxy9w2APh/J+4ryk+VLz/PTd2MyYJU5TjyMn6ia
+ yS3Au2BV8cqCspvePlzYOdhF3sfaBUCXx6eXubGXMaTnuTIFkldL1+nNUmJsiinuZ6e0
+ SgF3MKjMlzrI+WIIidhLJeVwiO70qusx4aCnavduq3CUgkFs8sJmB0XUqG+KPR0iI2Bm
+ 2pGg==
+X-Gm-Message-State: AGi0PubRBLX1TushMQrED/ch8q0fELjyvDqwhDjqD1JWMzQ/WGREcu0v
+ N92nEEEOlwghtgeG+PyjavU=
+X-Google-Smtp-Source: APiQypKuTxfpliE2WWh23lgqwyzBebJfAVVdU/dqFodDNW8JqGXCKbLT8exC5MQCScbYQpLGJMZmUg==
+X-Received: by 2002:a62:18cc:: with SMTP id 195mr20254739pfy.135.1587433738632; 
+ Mon, 20 Apr 2020 18:48:58 -0700 (PDT)
 Received: from localhost.localdomain ([75.167.104.59])
- by smtp.gmail.com with ESMTPSA id q11sm654868pgs.25.2020.04.20.18.48.23
+ by smtp.gmail.com with ESMTPSA id q11sm654868pgs.25.2020.04.20.18.48.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Apr 2020 18:48:24 -0700 (PDT)
+ Mon, 20 Apr 2020 18:48:58 -0700 (PDT)
 From: Paul Zimmerman <pauldzim@gmail.com>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH v3 5/7] usb: add short-packet handling to usb-storage driver
-Date: Mon, 20 Apr 2020 18:45:49 -0700
-Message-Id: <20200421014551.10426-6-pauldzim@gmail.com>
+Subject: [PATCH v3 7/7] raspi2 acceptance test: add test for dwc-hsotg (dwc2)
+ USB host
+Date: Mon, 20 Apr 2020 18:45:51 -0700
+Message-Id: <20200421014551.10426-8-pauldzim@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200421014551.10426-1-pauldzim@gmail.com>
 References: <20200421014551.10426-1-pauldzim@gmail.com>
@@ -101,72 +102,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The dwc-hsotg (dwc2) USB host depends on a short packet to
-indicate the end of an IN transfer. The usb-storage driver
-currently doesn't provide this, so fix it.
-
-I have tested this change rather extensively using a PC
-emulation with xhci, ehci, and uhci controllers, and have
-not observed any regressions.
+Add a check for functional dwc-hsotg (dwc2) USB host emulation to
+the Raspi 2 acceptance test
 
 Signed-off-by: Paul Zimmerman <pauldzim@gmail.com>
 ---
- hw/usb/dev-storage.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ tests/acceptance/boot_linux_console.py | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index 5c4b57b06b..ae3c550042 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -229,6 +229,9 @@ static void usb_msd_copy_data(MSDState *s, USBPacket *p)
-     usb_packet_copy(p, scsi_req_get_buf(s->req) + s->scsi_off, len);
-     s->scsi_len -= len;
-     s->scsi_off += len;
-+    if (len > s->data_len) {
-+        len = s->data_len;
-+    }
-     s->data_len -= len;
-     if (s->scsi_len == 0 || s->data_len == 0) {
-         scsi_req_continue(s->req);
-@@ -303,6 +306,9 @@ static void usb_msd_command_complete(SCSIRequest *req, uint32_t status, size_t r
-             if (s->data_len) {
-                 int len = (p->iov.size - p->actual_length);
-                 usb_packet_skip(p, len);
-+                if (len > s->data_len) {
-+                    len = s->data_len;
-+                }
-                 s->data_len -= len;
-             }
-             if (s->data_len == 0) {
-@@ -469,6 +475,9 @@ static void usb_msd_handle_data(USBDevice *dev, USBPacket *p)
-                 int len = p->iov.size - p->actual_length;
-                 if (len) {
-                     usb_packet_skip(p, len);
-+                    if (len > s->data_len) {
-+                        len = s->data_len;
-+                    }
-                     s->data_len -= len;
-                     if (s->data_len == 0) {
-                         s->mode = USB_MSDM_CSW;
-@@ -528,13 +537,17 @@ static void usb_msd_handle_data(USBDevice *dev, USBPacket *p)
-                 int len = p->iov.size - p->actual_length;
-                 if (len) {
-                     usb_packet_skip(p, len);
-+                    if (len > s->data_len) {
-+                        len = s->data_len;
-+                    }
-                     s->data_len -= len;
-                     if (s->data_len == 0) {
-                         s->mode = USB_MSDM_CSW;
-                     }
-                 }
-             }
--            if (p->actual_length < p->iov.size) {
-+            if (p->actual_length < p->iov.size && (p->short_not_ok ||
-+                    s->scsi_len >= p->ep->max_packet_size)) {
-                 DPRINTF("Deferring packet %p [wait data-in]\n", p);
-                 s->packet = p;
-                 p->status = USB_RET_ASYNC;
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index f825cd9ef5..efa4803642 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -373,13 +373,18 @@ class BootLinuxConsole(Test):
+ 
+         self.vm.set_console()
+         kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
+-                               serial_kernel_cmdline[uart_id])
++                               serial_kernel_cmdline[uart_id] +
++                               ' root=/dev/mmcblk0p2 rootwait ' +
++                               'dwc_otg.fiq_fsm_enable=0')
+         self.vm.add_args('-kernel', kernel_path,
+                          '-dtb', dtb_path,
+-                         '-append', kernel_command_line)
++                         '-append', kernel_command_line,
++                         '-device', 'usb-kbd')
+         self.vm.launch()
+         console_pattern = 'Kernel command line: %s' % kernel_command_line
+         self.wait_for_console_pattern(console_pattern)
++        console_pattern = 'Product: QEMU USB Keyboard'
++        self.wait_for_console_pattern(console_pattern)
+ 
+     def test_arm_raspi2_uart0(self):
+         """
 -- 
 2.17.1
 
