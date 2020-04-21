@@ -2,99 +2,94 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 179C3C54FD0
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 10:44:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E10C54FC9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 10:45:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9E9820672
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 10:44:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2913820672
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 10:45:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="caeA6dut"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9E9820672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uWx4oyGC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2913820672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQqOG-0007B3-1y
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 06:44:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47020)
+	id 1jQqOx-0007uv-9E
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 06:45:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47138)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jQqNT-0006W8-GH
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 06:43:43 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jQqNy-00074R-75
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 06:44:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jQqNR-0005qv-TB
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 06:43:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22417
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jQqNR-0005m3-Cq
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 06:43:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587465819;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kH/F0axOrC/o+aiFlg2n2ZV58NVvWjU2DpJUR2+XN+8=;
- b=caeA6dutoTIwKsepQgkzCi99gGHkntXAJE3L4tEepouJeJzTHuAm5E1geZ6U7Sh8Rq+zAr
- LJyo5m1Dc9G4cJd0kldbYp2swdVem62Phai18x54T/D/UvvI61TlGhQMU0u+a+uVhTKah+
- nLV996kmY0jD4Dt7BuKPZxCdV3yo6Jo=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-SvskckoVMdeHzyUbBmmU6Q-1; Tue, 21 Apr 2020 06:43:37 -0400
-X-MC-Unique: SvskckoVMdeHzyUbBmmU6Q-1
-Received: by mail-qk1-f198.google.com with SMTP id i2so7183095qkl.5
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 03:43:37 -0700 (PDT)
+ (envelope-from <alex.bennee@linaro.org>) id 1jQqNm-0006WN-O3
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 06:44:13 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41567)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jQqNm-0006TO-Bg
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 06:44:02 -0400
+Received: by mail-wr1-x442.google.com with SMTP id g13so13867321wrb.8
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 03:44:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=80hlV0Sh9Ka+anWigr63uCM/Wn3bkFpbqyYQySB9lT4=;
+ b=uWx4oyGC5McPvO7ttrNerMAYOSghN+qV4XSGaKHw61UrnGGoAFHnxJ7oYC4m80s0hH
+ RfGZhCz2bKXW5REGC1AAHkEhI/N2RGkTv1jrhMJOHVq/NUqc27p3ko1U0Jw/gh20wgDN
+ IJAWN/E0nyOi7FJYMFpkKDzIS6sEuIv1HEeONQDj6qhLzZflRAo4nCFB8wrIPisXamSx
+ gC4uvCBjhPXXkCwGZbrzC4PdGjPRITKSoQm1+IMaHoOOJp4ibj+cQpk36n1d2DzgNOiT
+ WWBkWsz5yWunqqJfkD9faE7nCU1ePHWTCAKv66fEpT4qrlV2OoBpbYonLCBK4EFSmxzS
+ Q8dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=ELz7qIcneEuECgFv7IAnbU8vwsmSq1t1SLmxdkwXQYk=;
- b=gZA9Tf7f6/Bgj8BxnlLDn5ZuObpW9O7ssKGYRhFO2rgMHoHdDu/S73rjGVAKC2B/sX
- j2Sd557vIUwjtxMfvDouvsB7Oc2KYx5mFX9iajJnixCd6ZGW2zrikaMaLB+57Fpn0opR
- WEPDiAISmOiKpn5jU4JALOfOh2YLgtIknhrIzKGdJ+HjESD30Y0G8z3Pu0K+0PgFc7DE
- z3Ubva7H+2IeLJmcgfWyfG4z7fZgHt5w0QI+noDdHMBl7Imm/eUyleca5b68FyIbCaB5
- 4qY7flX5b28xwSePKmtv9GB6mFjWxPfqJcjA2iYBwkuh1w+/21X3Yu/rfDwZrTLaHTnr
- b3IA==
-X-Gm-Message-State: AGi0PuYBuDuNLXvr+mN49zPtMfk61jWN+O6qUGe5+5CqbZJZe9aiv3CE
- njTGSXW/5PVRt7h0Bx4WFhmmcTvdOUJCHBeJ48FlTlirLLc7UMoQs+Uv0DJ1Obbaof72vu61jel
- JlhP8ci9k+AM7CPQ=
-X-Received: by 2002:a0c:ba83:: with SMTP id x3mr20073652qvf.83.1587465817435; 
- Tue, 21 Apr 2020 03:43:37 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIlkyaQ5VTbEH1zvGTcOL8186o8zbgMXKehohvdWN4GRBnk1baM/wfWSmbkc++/Eh1H6Q1+Zg==
-X-Received: by 2002:a0c:ba83:: with SMTP id x3mr20073631qvf.83.1587465817201; 
- Tue, 21 Apr 2020 03:43:37 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id q6sm1508266qte.72.2020.04.21.03.43.36
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=80hlV0Sh9Ka+anWigr63uCM/Wn3bkFpbqyYQySB9lT4=;
+ b=Yz31gqRmofamvL1o69dxcV5q1Z0W4+usb78DEOABgW4l2Ha1c/rfDPhVaeYn9z0e5r
+ AByLMxyik4Vyi+/57oIHMNQRSiv5uNwC/OX6jo4qLGei4/DI9kYKOFT1pAdx6uXTPL29
+ Uzkb6UFeoW/BeE8O+TNPyT+PAIk/ruW2IXtEuC0a31/Jwbgbj/R6RRJROeV2J1zhSrRg
+ KabCQXxzr8TuD1YmitUaX0h7MiaTVDvD69Tc/KQ2F/fdO/ko3f9ThlYBZI7ZSn1cPxkU
+ Ls1TDNg1vFMfLTukqHfGBzf8LaDdGBXVZ9hQeh9bTDNIl4gCYaCJiHs11F3sKC5EKOk9
+ 2zng==
+X-Gm-Message-State: AGi0PuZ2X0zqwYcLzLznDKpUREKY9Z8uh77gS3ENR9aNOtFN0P5ffF2G
+ Jf3uN4hcPll1YvL/C7NuUuwVIg==
+X-Google-Smtp-Source: APiQypIAujuEWun3HQ8G04MmS3vzXy1lUdVT7IxoAS6xdziWezOY6FSyK4ST8tqZ+Ggpyq4j/o2urg==
+X-Received: by 2002:a5d:4e45:: with SMTP id r5mr3024180wrt.26.1587465840943;
+ Tue, 21 Apr 2020 03:44:00 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id y9sm2865223wmm.26.2020.04.21.03.43.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Apr 2020 03:43:36 -0700 (PDT)
-Date: Tue, 21 Apr 2020 06:43:34 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Question on memory commit during MR finalize()
-Message-ID: <20200421104334.GC420399@xz-x1>
-References: <20200420210049.GA420399@xz-x1>
- <fe73a74b-2324-68a5-a37f-530a6bb03ebc@redhat.com>
- <20200420233115.GB420399@xz-x1>
- <5ed295a3-9e4a-0dca-adc6-5361dc78a83c@redhat.com>
+ Tue, 21 Apr 2020 03:43:59 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 1A34A1FF7E;
+ Tue, 21 Apr 2020 11:43:59 +0100 (BST)
+References: <20200421094216.24927-1-f4bug@amsat.org>
+ <20200421094216.24927-2-f4bug@amsat.org>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH 1/4] MAINTAINERS: Cover the GDB Python scripts in the
+ gdbstub section
+In-reply-to: <20200421094216.24927-2-f4bug@amsat.org>
+Date: Tue, 21 Apr 2020 11:43:59 +0100
+Message-ID: <87y2qpce4w.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <5ed295a3-9e4a-0dca-adc6-5361dc78a83c@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=peterx@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 03:31:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,50 +101,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>,
- QEMU Devel Mailing List <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Apr 21, 2020 at 11:43:36AM +0200, Paolo Bonzini wrote:
-> On 21/04/20 01:31, Peter Xu wrote:
-> >>
-> >> However, instead of memory_region_transaction_commit,
-> >> memory_region_finalize probably should do something like
-> >>
-> >>     --memory_region_transaction_depth;
-> >>     assert (memory_region_transaction_depth ||
-> >> =09    (!memory_region_update_pending &&
-> >>              !ioeventfd_update_pending));
-> > Ah I see; this makes sense.
-> >=20
-> > And finally I found the problem, which is indeed the bug in my own tree=
- - I
-> > forgot to remove the previous changes to flush the dirty ring during me=
-m
-> > removal (basically that's run_on_cpu() called during a memory commit, t=
-hat will
-> > wrongly release the BQL without being noticed).
-> >=20
-> > Besides above assert, I'm thinking maybe we can also assert on somethin=
-g like:
-> >=20
-> >   !(memory_region_transaction_depth || memory_region_update_pending ||
-> >     ioeventfd_update_pending)
-> >=20
-> > When releasing BQL (unlock, or qemu_cond_wait() on BQL, which should co=
-ver
-> > run_on_cpu()), so that we can identify misuse of BQL easier like this.
->=20
-> Asserting invariants around lock release are an interesting concept, but
-> I'm not sure where to insert them exactly.  But it would be great if you
-> would like to introduce an assert_empty_memory_transaction() function
-> with the assertion I quoted above.
 
-Let me give it a shot later today. :)
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+
+> Keep an eye on these "same same, but different" files.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+> Cc: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
+
+Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 8cbc1fac2b..7a7f2b9c31 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2083,6 +2083,7 @@ R: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>  S: Maintained
+>  F: gdbstub*
+>  F: gdb-xml/
+> +F: scripts/qemugdb/
+>=20=20
+>  Memory API
+>  M: Paolo Bonzini <pbonzini@redhat.com>
+
 
 --=20
-Peter Xu
-
+Alex Benn=C3=A9e
 
