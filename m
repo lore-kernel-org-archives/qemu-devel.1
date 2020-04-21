@@ -2,136 +2,90 @@ Return-Path: <SRS0=H2wg=6F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 377F6C2BA19
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 08:44:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 570FCC55182
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 08:44:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3DB72098B
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 08:44:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 161A72072D
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Apr 2020 08:44:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gMlbRpiC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3DB72098B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ADyKfMrc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 161A72072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jQoVe-00039j-1K
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 04:44:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54038)
+	id 1jQoVw-0003iB-5N
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 04:44:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54094)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1jQoUe-0001pF-2h
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:43:00 -0400
+ (envelope-from <lulu@redhat.com>) id 1jQoUo-0001zC-8r
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:43:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1jQoUd-0002JV-P0
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:42:59 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29837
+ (envelope-from <lulu@redhat.com>) id 1jQoUn-0002Th-2H
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:43:10 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22021
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jQoUd-0002IV-DM
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:42:59 -0400
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jQoUm-0002Sy-LB
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 04:43:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587458577;
+ s=mimecast20190719; t=1587458588;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=fr4yueI8eOstaxvHJ1Rcwbdw752EEzTDnU61WZk8j6Y=;
- b=gMlbRpiCZKbp/IM9RXtTLs+rbYFPFUsjnfxlyAVXzacoD9YN6/4JkdpNuxGoRCrLbJ/pS7
- YLyELq0yLWtQ+Dp75kg1zxREmrGVXdBu5iucxNoNrPOhdywIKtJbvwaAdMxn5JDyYE8vl3
- ahUKp1CiFzw6Xgjmews+tTaeuB3WHvc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-P_j-qc7NM3m2nwICk9ULXQ-1; Tue, 21 Apr 2020 04:42:54 -0400
-X-MC-Unique: P_j-qc7NM3m2nwICk9ULXQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4458DB64;
- Tue, 21 Apr 2020 08:42:52 +0000 (UTC)
-Received: from [10.36.114.254] (ovpn-114-254.ams2.redhat.com [10.36.114.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E3C2439C;
- Tue, 21 Apr 2020 08:42:30 +0000 (UTC)
-Subject: Re: [RFC v2 0/6] hmp,qmp: Add some commands to introspect virtio
- devices
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200420104145.205297-1-lvivier@redhat.com>
- <20200420155512.GB29316@linux.fritz.box>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <d14235b5-bb06-88d6-09a4-f6a8af0d979c@redhat.com>
-Date: Tue, 21 Apr 2020 10:42:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ in-reply-to:in-reply-to:references:references;
+ bh=AvcAgPnrKup1HE6AR/JSXCVBa02rH1+as1JX5Cj3QC0=;
+ b=ADyKfMrc721xHqX1fSzGSGuJRM9aC/buSOo8mybQIXXAHd4ffcDkmLpvw3ij37oTsSHUDF
+ 6tUu/JsM3b7nced6aPxsEpbpE3Gnc94tCphJGaFaaz7ELO0ArdLoExDIowuVtRiy/NUs+I
+ M26oK5URz1CstRMHTdQJnhoz0BOEJuA=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-87-dj34ICsxNrOCFiHNlOf9Lg-1; Tue, 21 Apr 2020 04:43:05 -0400
+X-MC-Unique: dj34ICsxNrOCFiHNlOf9Lg-1
+Received: by mail-pf1-f199.google.com with SMTP id 84so8313580pfx.20
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 01:43:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=AvcAgPnrKup1HE6AR/JSXCVBa02rH1+as1JX5Cj3QC0=;
+ b=b55akYKElNT7b/uoJ0TmJOCfc0zyji/oHX+0Sxoa0tiHqGKDDvw2kCe4s12dLp7GIY
+ 0Wl0+ZfbRVwaWtuaOrq84qm2bhGGQEN6U0dYBAwywrwzjXe59/VySzvmnmeZde3zz2NS
+ zTQr91WYz/Aquw17PLbjoHzJBK9vFQd/xIx3updTtBPjJqIvHbSs1bj5lhY5Qjldzfvk
+ aLFe030uS5KfjEDWooCygw3NpQzdpxexqH1+S7v4GeYsrIauNplxqRiJu/G/U78WWCCE
+ 3ass0HUJ/ikgTQj1G0ByDly1pVDkZuduFrlGLJ6YgOyyTNe1vosxDaaUWbqg/rscdkJJ
+ edbQ==
+X-Gm-Message-State: AGi0Pua2HL71ZZtmc9H89CskDMe5nH+46BuAeN3TKZROh6tgEgiEuzVv
+ RMFgEjrKZtqJHHGFyFtCjSatu5CuOtL0tQ1ZyBUuQWC6eg1lxsOY8P1GlPAC2BxtBUcn8rvcZTc
+ Y6jvhrC3/cVhoTAROZvY69ZJUyU7lmfU=
+X-Received: by 2002:a17:90a:8994:: with SMTP id
+ v20mr4385765pjn.76.1587458584904; 
+ Tue, 21 Apr 2020 01:43:04 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIJ+k1DrFkElCqR/GG4Zu7R55hy9VOAU4IYNoN0HL/FFbPsrYC4SKzjJGx1+Hewx7nFOsBMIK6jgJ2msCv0nO8=
+X-Received: by 2002:a17:90a:8994:: with SMTP id
+ v20mr4385718pjn.76.1587458584582; 
+ Tue, 21 Apr 2020 01:43:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200420155512.GB29316@linux.fritz.box>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <20200420093241.4238-1-lulu@redhat.com>
+ <20200420093241.4238-5-lulu@redhat.com>
+ <c70efeb6-e664-2f5b-dc90-8929f1033e35@redhat.com>
+In-Reply-To: <c70efeb6-e664-2f5b-dc90-8929f1033e35@redhat.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Tue, 21 Apr 2020 16:42:53 +0800
+Message-ID: <CACLfguW4xHTAKp+RysqNBs06TBEVTDNisrz-4WodzuNGybxe_A@mail.gmail.com>
+Subject: Re: [RFC v1 4/4] vhost: introduce vhost_set_vring_ready method
+To: Jason Wang <jasowang@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=lvivier@redhat.com;
+Content-Type: multipart/alternative; boundary="00000000000007aaf105a3c90127"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=lulu@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/21 01:28:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -147,34 +101,574 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- Amit Shah <amit@kernel.org>, Markus Armbruster <armbru@redhat.com>,
- Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: cohuck@redhat.com, Michael Tsirkin <mst@redhat.com>, mhabets@solarflare.com,
+ qemu-devel@nongnu.org, hanand@xilinx.com, rob.miller@broadcom.com,
+ saugatm@xilinx.com, armbru@redhat.com, hch@infradead.org,
+ Eugenio Perez Martin <eperezma@redhat.com>, jgg@mellanox.com,
+ shahafs@mellanox.com, kevin.tian@intel.com, parav@mellanox.com,
+ vmireyno@marvell.com, "Liang, Cunming" <cunming.liang@intel.com>,
+ gdawar@xilinx.com, jiri@mellanox.com, xiao.w.wang@intel.com,
+ stefanha@redhat.com, "Wang, Zhihong" <zhihong.wang@intel.com>,
+ Ariel Adam <aadam@redhat.com>, rdunlap@infradead.org,
+ maxime.coquelin@redhat.com, "Zhu, Lingshan" <lingshan.zhu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/04/2020 17:55, Kevin Wolf wrote:
-> Am 20.04.2020 um 12:41 hat Laurent Vivier geschrieben:
->> This series introduces new QMP/HMP commands to dump the status
->> of a a virtio device at different levels.
-> 
-> What is the intended use case for these commands?
-> 
-> If it's just for debugging, should we add a x-debug- prefix to the QMP
-> commands to avoid making it a stable interface for which we must keep
-> backwards compatibility?
+--00000000000007aaf105a3c90127
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Yes, it's just for debugging so I will add a x-debug- prefix.
+On Tue, Apr 21, 2020 at 12:00 PM Jason Wang <jasowang@redhat.com> wrote:
 
-Thanks,
-Laurent
+>
+> On 2020/4/20 =E4=B8=8B=E5=8D=885:32, Cindy Lu wrote:
+> > From: Jason Wang <jasowang@redhat.com>
+> >
+> > Vhost-vdpa introduces VHOST_VDPA_SET_VRING_ENABLE which complies the
+> > semantic of queue_enable defined in virtio spec. This method can be
+> > used for preventing device from executing request for a specific
+> > virtqueue. This patch introduces the vhost_ops for this.
+> >
+> > Note that, we've already had vhost_set_vring_enable which has different
+> > semantic which allows to enable or disable a specific virtqueue for
+> > some kinds of vhost backends. E.g vhost-user use this to changes the
+> > number of active queue pairs.
+>
+>
+> This patch seems to mix fours things, please use dedicated patches for:
+>
+> 1) introduce queue_enabled method for virtio-bus
+> 2) implement queue_enabled for virtio-pci
+> 3) introduce vhost_set_vring_ready method for vhost ops
+> 4) implement vhost_set_vring_ready for vdpa (need to be squashed into
+> the patch of vhost-vdpa).
+>
+> Thanks
+>
+> Sure, Will fix this
+
+>
+> >
+> > Author: Jason Wang <jasowang@redhat.com>
+> > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > ---
+> >   hw/net/vhost_net-stub.c           |  5 +++++
+> >   hw/net/vhost_net.c                | 16 ++++++++++++++++
+> >   hw/virtio/vhost-vdpa.c            |  9 +++------
+> >   hw/virtio/virtio-pci.c            | 13 +++++++++++++
+> >   hw/virtio/virtio.c                |  6 ++++++
+> >   include/hw/virtio/vhost-backend.h |  2 ++
+> >   include/hw/virtio/virtio-bus.h    |  4 ++++
+> >   include/net/vhost_net.h           |  1 +
+> >   8 files changed, 50 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/hw/net/vhost_net-stub.c b/hw/net/vhost_net-stub.c
+> > index aac0e98228..f5ef1e3055 100644
+> > --- a/hw/net/vhost_net-stub.c
+> > +++ b/hw/net/vhost_net-stub.c
+> > @@ -86,6 +86,11 @@ int vhost_set_vring_enable(NetClientState *nc, int
+> enable)
+> >       return 0;
+> >   }
+> >
+> > +int vhost_set_vring_ready(NetClientState *nc)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> >   int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
+> >   {
+> >       return 0;
+> > diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+> > index 0d13fda2fc..463e333531 100644
+> > --- a/hw/net/vhost_net.c
+> > +++ b/hw/net/vhost_net.c
+> > @@ -380,6 +380,10 @@ int vhost_net_start(VirtIODevice *dev,
+> NetClientState *ncs,
+> >                   goto err_start;
+> >               }
+> >           }
+> > +
+> > +        if (virtio_queue_enabled(dev, i)) {
+> > +            vhost_set_vring_ready(peer);
+> > +        }
+> >       }
+> >
+> >       return 0;
+> > @@ -487,6 +491,18 @@ int vhost_set_vring_enable(NetClientState *nc, int
+> enable)
+> >       return 0;
+> >   }
+> >
+> > +int vhost_set_vring_ready(NetClientState *nc)
+> > +{
+> > +    VHostNetState *net =3D get_vhost_net(nc);
+> > +    const VhostOps *vhost_ops =3D net->dev.vhost_ops;
+> > +
+> > +    if (vhost_ops && vhost_ops->vhost_set_vring_ready) {
+> > +        return vhost_ops->vhost_set_vring_ready(&net->dev);
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> >   int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
+> >   {
+> >       const VhostOps *vhost_ops =3D net->dev.vhost_ops;
+> > diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+> > index 213b327600..49224ef9f8 100644
+> > --- a/hw/virtio/vhost-vdpa.c
+> > +++ b/hw/virtio/vhost-vdpa.c
+> > @@ -325,18 +325,15 @@ static int vhost_vdpa_get_vq_index(struct
+> vhost_dev *dev, int idx)
+> >       return idx - dev->vq_index;
+> >   }
+> >
+> > -static int vhost_vdpa_set_vring_enable(struct vhost_dev *dev, int
+> enable)
+> > +static int vhost_vdpa_set_vring_ready(struct vhost_dev *dev)
+> >   {
+> >       int i;
+> >
+> >       for (i =3D 0; i < dev->nvqs; ++i) {
+> >           struct vhost_vring_state state =3D {
+> >               .index =3D dev->vq_index + i,
+> > -            .num   =3D enable,
+> > +            .num =3D 1,
+> >           };
+> > -
+> > -        state.num =3D 1;
+> > -
+> >           vhost_vdpa_call(dev, VHOST_VDPA_SET_VRING_ENABLE, &state);
+> >       }
+> >
+> > @@ -368,7 +365,7 @@ const VhostOps vdpa_ops =3D {
+> >           .vhost_set_owner =3D vhost_vdpa_set_owner,
+> >           .vhost_reset_device =3D vhost_vdpa_reset_device,
+> >           .vhost_get_vq_index =3D vhost_vdpa_get_vq_index,
+> > -        .vhost_set_vring_enable =3D vhost_vdpa_set_vring_enable,
+> > +        .vhost_set_vring_ready =3D vhost_vdpa_set_vring_ready,
+> >           .vhost_requires_shm_log =3D NULL,
+> >           .vhost_migration_done =3D NULL,
+> >           .vhost_backend_can_merge =3D NULL,
+> > diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> > index c6b47a9c73..4aaf5d953e 100644
+> > --- a/hw/virtio/virtio-pci.c
+> > +++ b/hw/virtio/virtio-pci.c
+> > @@ -1103,6 +1103,18 @@ static AddressSpace
+> *virtio_pci_get_dma_as(DeviceState *d)
+> >       return pci_get_address_space(dev);
+> >   }
+> >
+> > +static bool virtio_pci_queue_enabled(DeviceState *d, int n)
+> > +{
+> > +    VirtIOPCIProxy *proxy =3D VIRTIO_PCI(d);
+> > +    VirtIODevice *vdev =3D virtio_bus_get_device(&proxy->bus);
+> > +
+> > +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+> > +        return proxy->vqs[vdev->queue_sel].enabled;
+> > +    }
+> > +
+> > +    return virtio_queue_get_desc_addr(vdev, n) !=3D 0;
+> > +}
+> > +
+> >   static int virtio_pci_add_mem_cap(VirtIOPCIProxy *proxy,
+> >                                      struct virtio_pci_cap *cap)
+> >   {
+> > @@ -2053,6 +2065,7 @@ static void virtio_pci_bus_class_init(ObjectClass
+> *klass, void *data)
+> >       k->ioeventfd_enabled =3D virtio_pci_ioeventfd_enabled;
+> >       k->ioeventfd_assign =3D virtio_pci_ioeventfd_assign;
+> >       k->get_dma_as =3D virtio_pci_get_dma_as;
+> > +    k->queue_enabled =3D virtio_pci_queue_enabled;
+> >   }
+> >
+> >   static const TypeInfo virtio_pci_bus_info =3D {
+> > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> > index 04716b5f6c..09732a8836 100644
+> > --- a/hw/virtio/virtio.c
+> > +++ b/hw/virtio/virtio.c
+> > @@ -3169,6 +3169,12 @@ hwaddr virtio_queue_get_desc_addr(VirtIODevice
+> *vdev, int n)
+> >
+> >   bool virtio_queue_enabled(VirtIODevice *vdev, int n)
+> >   {
+> > +    BusState *qbus =3D qdev_get_parent_bus(DEVICE(vdev));
+> > +    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
+> > +
+> > +    if (k->queue_enabled)
+> > +        return k->queue_enabled(qbus->parent, n);
+> > +
+> >       return virtio_queue_get_desc_addr(vdev, n) !=3D 0;
+> >   }
+> >
+> > diff --git a/include/hw/virtio/vhost-backend.h
+> b/include/hw/virtio/vhost-backend.h
+> > index d81bd9885f..ce8de6d308 100644
+> > --- a/include/hw/virtio/vhost-backend.h
+> > +++ b/include/hw/virtio/vhost-backend.h
+> > @@ -78,6 +78,7 @@ typedef int (*vhost_reset_device_op)(struct vhost_dev
+> *dev);
+> >   typedef int (*vhost_get_vq_index_op)(struct vhost_dev *dev, int idx);
+> >   typedef int (*vhost_set_vring_enable_op)(struct vhost_dev *dev,
+> >                                            int enable);
+> > +typedef int (*vhost_set_vring_ready_op)(struct vhost_dev *dev);
+> >   typedef bool (*vhost_requires_shm_log_op)(struct vhost_dev *dev);
+> >   typedef int (*vhost_migration_done_op)(struct vhost_dev *dev,
+> >                                          char *mac_addr);
+> > @@ -140,6 +141,7 @@ typedef struct VhostOps {
+> >       vhost_reset_device_op vhost_reset_device;
+> >       vhost_get_vq_index_op vhost_get_vq_index;
+> >       vhost_set_vring_enable_op vhost_set_vring_enable;
+> > +    vhost_set_vring_ready_op vhost_set_vring_ready;
+> >       vhost_requires_shm_log_op vhost_requires_shm_log;
+> >       vhost_migration_done_op vhost_migration_done;
+> >       vhost_backend_can_merge_op vhost_backend_can_merge;
+> > diff --git a/include/hw/virtio/virtio-bus.h
+> b/include/hw/virtio/virtio-bus.h
+> > index 38c9399cd4..0f6f215925 100644
+> > --- a/include/hw/virtio/virtio-bus.h
+> > +++ b/include/hw/virtio/virtio-bus.h
+> > @@ -83,6 +83,10 @@ typedef struct VirtioBusClass {
+> >        */
+> >       int (*ioeventfd_assign)(DeviceState *d, EventNotifier *notifier,
+> >                               int n, bool assign);
+> > +    /*
+> > +     * Whether queue number n is enabled.
+> > +     */
+> > +    bool (*queue_enabled)(DeviceState *d, int n);
+> >       /*
+> >        * Does the transport have variable vring alignment?
+> >        * (ie can it ever call virtio_queue_set_align()?)
+> > diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
+> > index 6f3a624cf7..db473ff4d2 100644
+> > --- a/include/net/vhost_net.h
+> > +++ b/include/net/vhost_net.h
+> > @@ -35,6 +35,7 @@ int vhost_net_notify_migration_done(VHostNetState
+> *net, char* mac_addr);
+> >   VHostNetState *get_vhost_net(NetClientState *nc);
+> >
+> >   int vhost_set_vring_enable(NetClientState * nc, int enable);
+> > +int vhost_set_vring_ready(NetClientState * nc);
+> >
+> >   uint64_t vhost_net_get_acked_features(VHostNetState *net);
+> >
+>
+>
+
+--00000000000007aaf105a3c90127
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Apr 21, 2020 at 12:00 PM Jaso=
+n Wang &lt;<a href=3D"mailto:jasowang@redhat.com">jasowang@redhat.com</a>&g=
+t; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0p=
+x 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><br>
+On 2020/4/20 =E4=B8=8B=E5=8D=885:32, Cindy Lu wrote:<br>
+&gt; From: Jason Wang &lt;<a href=3D"mailto:jasowang@redhat.com" target=3D"=
+_blank">jasowang@redhat.com</a>&gt;<br>
+&gt;<br>
+&gt; Vhost-vdpa introduces VHOST_VDPA_SET_VRING_ENABLE which complies the<b=
+r>
+&gt; semantic of queue_enable defined in virtio spec. This method can be<br=
+>
+&gt; used for preventing device from executing request for a specific<br>
+&gt; virtqueue. This patch introduces the vhost_ops for this.<br>
+&gt;<br>
+&gt; Note that, we&#39;ve already had vhost_set_vring_enable which has diff=
+erent<br>
+&gt; semantic which allows to enable or disable a specific virtqueue for<br=
+>
+&gt; some kinds of vhost backends. E.g vhost-user use this to changes the<b=
+r>
+&gt; number of active queue pairs.<br>
+<br>
+<br>
+This patch seems to mix fours things, please use dedicated patches for:<br>
+<br>
+1) introduce queue_enabled method for virtio-bus<br>
+2) implement queue_enabled for virtio-pci<br>
+3) introduce vhost_set_vring_ready method for vhost ops<br>
+4) implement vhost_set_vring_ready for vdpa (need to be squashed into <br>
+the patch of vhost-vdpa).<br>
+<br>
+Thanks<br>
+<br></blockquote><div>Sure, Will fix this=C2=A0=C2=A0</div><blockquote clas=
+s=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid r=
+gb(204,204,204);padding-left:1ex">
+<br>
+&gt;<br>
+&gt; Author: Jason Wang &lt;<a href=3D"mailto:jasowang@redhat.com" target=
+=3D"_blank">jasowang@redhat.com</a>&gt;<br>
+&gt; Signed-off-by: Jason Wang &lt;<a href=3D"mailto:jasowang@redhat.com" t=
+arget=3D"_blank">jasowang@redhat.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 =C2=A0hw/net/vhost_net-stub.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0|=C2=A0 5 +++++<br>
+&gt;=C2=A0 =C2=A0hw/net/vhost_net.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 | 16 ++++++++++++++++<br>
+&gt;=C2=A0 =C2=A0hw/virtio/vhost-vdpa.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 |=C2=A0 9 +++------<br>
+&gt;=C2=A0 =C2=A0hw/virtio/virtio-pci.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 | 13 +++++++++++++<br>
+&gt;=C2=A0 =C2=A0hw/virtio/virtio.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 |=C2=A0 6 ++++++<br>
+&gt;=C2=A0 =C2=A0include/hw/virtio/vhost-backend.h |=C2=A0 2 ++<br>
+&gt;=C2=A0 =C2=A0include/hw/virtio/virtio-bus.h=C2=A0 =C2=A0 |=C2=A0 4 ++++=
+<br>
+&gt;=C2=A0 =C2=A0include/net/vhost_net.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0|=C2=A0 1 +<br>
+&gt;=C2=A0 =C2=A08 files changed, 50 insertions(+), 6 deletions(-)<br>
+&gt;<br>
+&gt; diff --git a/hw/net/vhost_net-stub.c b/hw/net/vhost_net-stub.c<br>
+&gt; index aac0e98228..f5ef1e3055 100644<br>
+&gt; --- a/hw/net/vhost_net-stub.c<br>
+&gt; +++ b/hw/net/vhost_net-stub.c<br>
+&gt; @@ -86,6 +86,11 @@ int vhost_set_vring_enable(NetClientState *nc, int =
+enable)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;<br>
+&gt;=C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt; +int vhost_set_vring_ready(NetClientState *nc)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 return 0;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt;=C2=A0 =C2=A0int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)=
+<br>
+&gt;=C2=A0 =C2=A0{<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;<br>
+&gt; diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c<br>
+&gt; index 0d13fda2fc..463e333531 100644<br>
+&gt; --- a/hw/net/vhost_net.c<br>
+&gt; +++ b/hw/net/vhost_net.c<br>
+&gt; @@ -380,6 +380,10 @@ int vhost_net_start(VirtIODevice *dev, NetClientS=
+tate *ncs,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0go=
+to err_start;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (virtio_queue_enabled(dev, i)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 vhost_set_vring_ready(peer)=
+;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;<br>
+&gt; @@ -487,6 +491,18 @@ int vhost_set_vring_enable(NetClientState *nc, in=
+t enable)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;<br>
+&gt;=C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt; +int vhost_set_vring_ready(NetClientState *nc)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VHostNetState *net =3D get_vhost_net(nc);<br>
+&gt; +=C2=A0 =C2=A0 const VhostOps *vhost_ops =3D net-&gt;dev.vhost_ops;<br=
+>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (vhost_ops &amp;&amp; vhost_ops-&gt;vhost_set_vring_=
+ready) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return vhost_ops-&gt;vhost_set_vring_read=
+y(&amp;net-&gt;dev);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 return 0;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt;=C2=A0 =C2=A0int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)=
+<br>
+&gt;=C2=A0 =C2=A0{<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0const VhostOps *vhost_ops =3D net-&gt;dev.vh=
+ost_ops;<br>
+&gt; diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c<br>
+&gt; index 213b327600..49224ef9f8 100644<br>
+&gt; --- a/hw/virtio/vhost-vdpa.c<br>
+&gt; +++ b/hw/virtio/vhost-vdpa.c<br>
+&gt; @@ -325,18 +325,15 @@ static int vhost_vdpa_get_vq_index(struct vhost_=
+dev *dev, int idx)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0return idx - dev-&gt;vq_index;<br>
+&gt;=C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt; -static int vhost_vdpa_set_vring_enable(struct vhost_dev *dev, int ena=
+ble)<br>
+&gt; +static int vhost_vdpa_set_vring_ready(struct vhost_dev *dev)<br>
+&gt;=C2=A0 =C2=A0{<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0int i;<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0for (i =3D 0; i &lt; dev-&gt;nvqs; ++i) {<br=
+>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struct vhost_vring_state state=
+ =3D {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.index =3D dev-&=
+gt;vq_index + i,<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 .num=C2=A0 =C2=A0=3D enable=
+,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 .num =3D 1,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0};<br>
+&gt; -<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 state.num =3D 1;<br>
+&gt; -<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vhost_vdpa_call(dev, VHOST_VDP=
+A_SET_VRING_ENABLE, &amp;state);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt; @@ -368,7 +365,7 @@ const VhostOps vdpa_ops =3D {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.vhost_set_owner =3D vhost_vdp=
+a_set_owner,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.vhost_reset_device =3D vhost_=
+vdpa_reset_device,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.vhost_get_vq_index =3D vhost_=
+vdpa_get_vq_index,<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 .vhost_set_vring_enable =3D vhost_vdpa_se=
+t_vring_enable,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .vhost_set_vring_ready =3D vhost_vdpa_set=
+_vring_ready,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.vhost_requires_shm_log =3D NU=
+LL,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.vhost_migration_done =3D NULL=
+,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.vhost_backend_can_merge =3D N=
+ULL,<br>
+&gt; diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c<br>
+&gt; index c6b47a9c73..4aaf5d953e 100644<br>
+&gt; --- a/hw/virtio/virtio-pci.c<br>
+&gt; +++ b/hw/virtio/virtio-pci.c<br>
+&gt; @@ -1103,6 +1103,18 @@ static AddressSpace *virtio_pci_get_dma_as(Devi=
+ceState *d)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0return pci_get_address_space(dev);<br>
+&gt;=C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt; +static bool virtio_pci_queue_enabled(DeviceState *d, int n)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VirtIOPCIProxy *proxy =3D VIRTIO_PCI(d);<br>
+&gt; +=C2=A0 =C2=A0 VirtIODevice *vdev =3D virtio_bus_get_device(&amp;proxy=
+-&gt;bus);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) =
+{<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return proxy-&gt;vqs[vdev-&gt;queue_sel].=
+enabled;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 return virtio_queue_get_desc_addr(vdev, n) !=3D 0;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt;=C2=A0 =C2=A0static int virtio_pci_add_mem_cap(VirtIOPCIProxy *proxy,<b=
+r>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct virti=
+o_pci_cap *cap)<br>
+&gt;=C2=A0 =C2=A0{<br>
+&gt; @@ -2053,6 +2065,7 @@ static void virtio_pci_bus_class_init(ObjectClas=
+s *klass, void *data)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0k-&gt;ioeventfd_enabled =3D virtio_pci_ioeve=
+ntfd_enabled;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0k-&gt;ioeventfd_assign =3D virtio_pci_ioeven=
+tfd_assign;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0k-&gt;get_dma_as =3D virtio_pci_get_dma_as;<=
+br>
+&gt; +=C2=A0 =C2=A0 k-&gt;queue_enabled =3D virtio_pci_queue_enabled;<br>
+&gt;=C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt;=C2=A0 =C2=A0static const TypeInfo virtio_pci_bus_info =3D {<br>
+&gt; diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c<br>
+&gt; index 04716b5f6c..09732a8836 100644<br>
+&gt; --- a/hw/virtio/virtio.c<br>
+&gt; +++ b/hw/virtio/virtio.c<br>
+&gt; @@ -3169,6 +3169,12 @@ hwaddr virtio_queue_get_desc_addr(VirtIODevice =
+*vdev, int n)<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt;=C2=A0 =C2=A0bool virtio_queue_enabled(VirtIODevice *vdev, int n)<br>
+&gt;=C2=A0 =C2=A0{<br>
+&gt; +=C2=A0 =C2=A0 BusState *qbus =3D qdev_get_parent_bus(DEVICE(vdev));<b=
+r>
+&gt; +=C2=A0 =C2=A0 VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (k-&gt;queue_enabled)<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return k-&gt;queue_enabled(qbus-&gt;paren=
+t, n);<br>
+&gt; +<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0return virtio_queue_get_desc_addr(vdev, n) !=
+=3D 0;<br>
+&gt;=C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt; diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vho=
+st-backend.h<br>
+&gt; index d81bd9885f..ce8de6d308 100644<br>
+&gt; --- a/include/hw/virtio/vhost-backend.h<br>
+&gt; +++ b/include/hw/virtio/vhost-backend.h<br>
+&gt; @@ -78,6 +78,7 @@ typedef int (*vhost_reset_device_op)(struct vhost_de=
+v *dev);<br>
+&gt;=C2=A0 =C2=A0typedef int (*vhost_get_vq_index_op)(struct vhost_dev *dev=
+, int idx);<br>
+&gt;=C2=A0 =C2=A0typedef int (*vhost_set_vring_enable_op)(struct vhost_dev =
+*dev,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 int enable);<br>
+&gt; +typedef int (*vhost_set_vring_ready_op)(struct vhost_dev *dev);<br>
+&gt;=C2=A0 =C2=A0typedef bool (*vhost_requires_shm_log_op)(struct vhost_dev=
+ *dev);<br>
+&gt;=C2=A0 =C2=A0typedef int (*vhost_migration_done_op)(struct vhost_dev *d=
+ev,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 char *mac_addr);<br>
+&gt; @@ -140,6 +141,7 @@ typedef struct VhostOps {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0vhost_reset_device_op vhost_reset_device;<br=
+>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0vhost_get_vq_index_op vhost_get_vq_index;<br=
+>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0vhost_set_vring_enable_op vhost_set_vring_en=
+able;<br>
+&gt; +=C2=A0 =C2=A0 vhost_set_vring_ready_op vhost_set_vring_ready;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0vhost_requires_shm_log_op vhost_requires_shm=
+_log;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0vhost_migration_done_op vhost_migration_done=
+;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0vhost_backend_can_merge_op vhost_backend_can=
+_merge;<br>
+&gt; diff --git a/include/hw/virtio/virtio-bus.h b/include/hw/virtio/virtio=
+-bus.h<br>
+&gt; index 38c9399cd4..0f6f215925 100644<br>
+&gt; --- a/include/hw/virtio/virtio-bus.h<br>
+&gt; +++ b/include/hw/virtio/virtio-bus.h<br>
+&gt; @@ -83,6 +83,10 @@ typedef struct VirtioBusClass {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 */<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0int (*ioeventfd_assign)(DeviceState *d, Even=
+tNotifier *notifier,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int n, bool assign);<br>
+&gt; +=C2=A0 =C2=A0 /*<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* Whether queue number n is enabled.<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0*/<br>
+&gt; +=C2=A0 =C2=A0 bool (*queue_enabled)(DeviceState *d, int n);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0/*<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 * Does the transport have variable vring al=
+ignment?<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 * (ie can it ever call virtio_queue_set_ali=
+gn()?)<br>
+&gt; diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h<br>
+&gt; index 6f3a624cf7..db473ff4d2 100644<br>
+&gt; --- a/include/net/vhost_net.h<br>
+&gt; +++ b/include/net/vhost_net.h<br>
+&gt; @@ -35,6 +35,7 @@ int vhost_net_notify_migration_done(VHostNetState *n=
+et, char* mac_addr);<br>
+&gt;=C2=A0 =C2=A0VHostNetState *get_vhost_net(NetClientState *nc);<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt;=C2=A0 =C2=A0int vhost_set_vring_enable(NetClientState * nc, int enable=
+);<br>
+&gt; +int vhost_set_vring_ready(NetClientState * nc);<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt;=C2=A0 =C2=A0uint64_t vhost_net_get_acked_features(VHostNetState *net);=
+<br>
+&gt;=C2=A0 =C2=A0<br>
+<br>
+</blockquote></div></div>
+
+--00000000000007aaf105a3c90127--
 
 
