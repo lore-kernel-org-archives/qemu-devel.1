@@ -2,94 +2,65 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60F54C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 19:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C233C5518E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 19:50:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 239FF20767
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 19:44:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sjDEicQ+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 239FF20767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2FF4B2071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 19:50:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FF4B2071E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRLHw-0002uP-94
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 15:44:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50974)
+	id 1jRLNv-0005f6-BT
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 15:50:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53392)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jRLHG-0002UB-U9
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:43:23 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1jRLLz-0004RY-GC
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:48:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jRLHD-0003QR-01
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:43:22 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36541)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jRLHC-0003Q4-Fq
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:43:18 -0400
-Received: by mail-wr1-x441.google.com with SMTP id d15so2368936wrx.3
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 12:43:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=QW/BZTp0oKnOcCvNjq+2L2V11dGvFweiquRWPQef9QA=;
- b=sjDEicQ+dH5ZQcBjC4epZ/Dgn4G9Bo5vJTy2QqJ6mFIdxHvrJxc9SE+XkqtABE2LEA
- XnRGx1WOgQFK3C0S5WxALJfj1zLdyfP8rfjXWeYF38YMrPvMj6VE4DMKzoi7bKrnCqNv
- Qz6UcOnuYgXHyA2ciEgDLb6ti8sPQGQd58Lry+1K3v5SLya9/MHeqAQy6PzFimwpnLC7
- DUWBblH68d56NaNXJorDebkC+y3izii0WNC4E13fkHWPhKcHmXVxrXvDlDgBSoTR4pIf
- NESHZXik/rCU+tAkJ1x3BVq0cWjmTAjePAfYd+7PvvbCj56qIemb9xYpc+WuwvotT/Fl
- v0cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=QW/BZTp0oKnOcCvNjq+2L2V11dGvFweiquRWPQef9QA=;
- b=EGOc3Kvx4H1baJ+Pqgzn9UZwFZywgQFGsVJxUXS4RzLRVLgOf+vocIyqylsljHm+G5
- mTJS+aKrnCQGAfjiLnIjS9zp2uBiCOK++zGaLSCpEAJ8RNX5XmwupRzwdxo2dkNiXCFM
- YZxEsH8UQVQ2sIwr2Ek3IlENWVk9w8olru2i9KVcczB6XFULMEgiKLL4fp5tTaZ5/NF3
- T+su2KEBxoXP38JP6x/EL0i/FtKiaXoXDL5fyvkK98BArYFOb8k6xB6dTmyNDmDoqrtW
- pafcX7CcOdf90Ri28QeNEYYE5pdj101ygmsa1vcU4bKCs5d1sKQGiXoPFSJ4QOLEW2JW
- 4njQ==
-X-Gm-Message-State: AGi0PuYF6KuSGDdxxqfsrGIRfMkcyIry/dcxCEmCQfAevgtAj8Z9hW1m
- 3+rn0aqIkLQUs79PScEOUlKkEW45ChA=
-X-Google-Smtp-Source: APiQypKvKI6I7gcAiwgRTnYF0RFqAyyB7r1wq42XmvuUazIT5JI51ebDkv8iywNIYOwYCrHWtifuRA==
-X-Received: by 2002:adf:ca0e:: with SMTP id o14mr781616wrh.254.1587584596675; 
- Wed, 22 Apr 2020 12:43:16 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id k14sm295394wrp.53.2020.04.22.12.43.15
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Apr 2020 12:43:15 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B3CE71FF7E;
- Wed, 22 Apr 2020 20:43:14 +0100 (BST)
-References: <20200422011722.13287-1-richard.henderson@linaro.org>
- <20200422011722.13287-25-richard.henderson@linaro.org>
-User-agent: mu4e 1.4.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 24/36] tcg/i386: Use tcg_constant_vec with tcg vec
- expanders
-In-reply-to: <20200422011722.13287-25-richard.henderson@linaro.org>
-Date: Wed, 22 Apr 2020 20:43:14 +0100
-Message-ID: <87imhrb92l.fsf@linaro.org>
+ (envelope-from <balaton@eik.bme.hu>) id 1jRLLx-0004JX-Px
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:48:14 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:15113)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jRLLx-00049i-A6; Wed, 22 Apr 2020 15:48:13 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 715DC746333;
+ Wed, 22 Apr 2020 21:48:09 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 37845746331; Wed, 22 Apr 2020 21:48:09 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 3630774633E;
+ Wed, 22 Apr 2020 21:48:09 +0200 (CEST)
+Date: Wed, 22 Apr 2020 21:48:09 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: qemu 4.2.0 audiodev soundhw
+In-Reply-To: <7a90dead-ff67-589c-81a9-826c4d0bd86e@redhat.com>
+Message-ID: <alpine.BSF.2.22.395.2004222132390.22480@zero.eik.bme.hu>
+References: <CA+enFJ=UmKNam-7T5J6UM6JGY7wy492MNm-d_-qKf7rLa818TQ@mail.gmail.com>
+ <CAFEAcA_GqNAS-5+081vhpvn=Zk4qbD-SJz5SmN8s5_1_zerpAA@mail.gmail.com>
+ <20200420144433.upkagl3qi3nc2lsj@sirius.home.kraxel.org>
+ <CA+enFJkFN7B=-6k44Sb8XC2yAy2EGWoLCDMW0tA=GwwaxaspyA@mail.gmail.com>
+ <d6c04095-8ea7-30c2-29f1-61c26aed835a@wisemo.com>
+ <7a90dead-ff67-589c-81a9-826c4d0bd86e@redhat.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::441
+Content-Type: multipart/mixed;
+ boundary="3866299591-1963249636-1587584889=:22480"
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 15:32:04
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,106 +72,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel <qemu-devel@nongnu.org>, Jakob Bohm <jb-gnumlists@wisemo.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-discuss@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+--3866299591-1963249636-1587584889=:22480
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  tcg/i386/tcg-target.inc.c | 26 +++++++++++++-------------
->  1 file changed, 13 insertions(+), 13 deletions(-)
+On Wed, 22 Apr 2020, Philippe Mathieu-Daudé wrote:
+> Hi Jakob,
 >
-> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-> index 9cb627d6eb..deace219d2 100644
-> --- a/tcg/i386/tcg-target.inc.c
-> +++ b/tcg/i386/tcg-target.inc.c
-> @@ -3452,7 +3452,7 @@ static void expand_vec_sari(TCGType type, unsigned =
-vece,
->  static void expand_vec_mul(TCGType type, unsigned vece,
->                             TCGv_vec v0, TCGv_vec v1, TCGv_vec v2)
->  {
-> -    TCGv_vec t1, t2, t3, t4;
-> +    TCGv_vec t1, t2, t3, t4, zero;
->=20=20
->      tcg_debug_assert(vece =3D=3D MO_8);
->=20=20
-> @@ -3470,11 +3470,11 @@ static void expand_vec_mul(TCGType type, unsigned=
- vece,
->      case TCG_TYPE_V64:
->          t1 =3D tcg_temp_new_vec(TCG_TYPE_V128);
->          t2 =3D tcg_temp_new_vec(TCG_TYPE_V128);
-> -        tcg_gen_dup16i_vec(t2, 0);
-> +        zero =3D tcg_constant_vec(TCG_TYPE_V128, MO_8, 0);
->          vec_gen_3(INDEX_op_x86_punpckl_vec, TCG_TYPE_V128, MO_8,
-> -                  tcgv_vec_arg(t1), tcgv_vec_arg(v1), tcgv_vec_arg(t2));
-> +                  tcgv_vec_arg(t1), tcgv_vec_arg(v1), tcgv_vec_arg(zero)=
-);
->          vec_gen_3(INDEX_op_x86_punpckl_vec, TCG_TYPE_V128, MO_8,
-> -                  tcgv_vec_arg(t2), tcgv_vec_arg(t2), tcgv_vec_arg(v2));
-> +                  tcgv_vec_arg(t2), tcgv_vec_arg(zero), tcgv_vec_arg(v2)=
-);
->          tcg_gen_mul_vec(MO_16, t1, t1, t2);
->          tcg_gen_shri_vec(MO_16, t1, t1, 8);
->          vec_gen_3(INDEX_op_x86_packus_vec, TCG_TYPE_V128, MO_8,
-> @@ -3489,15 +3489,15 @@ static void expand_vec_mul(TCGType type, unsigned=
- vece,
->          t2 =3D tcg_temp_new_vec(type);
->          t3 =3D tcg_temp_new_vec(type);
->          t4 =3D tcg_temp_new_vec(type);
-> -        tcg_gen_dup16i_vec(t4, 0);
-> +        zero =3D tcg_constant_vec(TCG_TYPE_V128, MO_8, 0);
->          vec_gen_3(INDEX_op_x86_punpckl_vec, type, MO_8,
-> -                  tcgv_vec_arg(t1), tcgv_vec_arg(v1), tcgv_vec_arg(t4));
-> +                  tcgv_vec_arg(t1), tcgv_vec_arg(v1), tcgv_vec_arg(zero)=
-);
->          vec_gen_3(INDEX_op_x86_punpckl_vec, type, MO_8,
-> -                  tcgv_vec_arg(t2), tcgv_vec_arg(t4), tcgv_vec_arg(v2));
-> +                  tcgv_vec_arg(t2), tcgv_vec_arg(zero), tcgv_vec_arg(v2)=
-);
->          vec_gen_3(INDEX_op_x86_punpckh_vec, type, MO_8,
-> -                  tcgv_vec_arg(t3), tcgv_vec_arg(v1), tcgv_vec_arg(t4));
-> +                  tcgv_vec_arg(t3), tcgv_vec_arg(v1), tcgv_vec_arg(zero)=
-);
->          vec_gen_3(INDEX_op_x86_punpckh_vec, type, MO_8,
-> -                  tcgv_vec_arg(t4), tcgv_vec_arg(t4), tcgv_vec_arg(v2));
-> +                  tcgv_vec_arg(t4), tcgv_vec_arg(zero), tcgv_vec_arg(v2)=
-);
->          tcg_gen_mul_vec(MO_16, t1, t1, t2);
->          tcg_gen_mul_vec(MO_16, t3, t3, t4);
->          tcg_gen_shri_vec(MO_16, t1, t1, 8);
-> @@ -3525,7 +3525,7 @@ static bool expand_vec_cmp_noinv(TCGType type, unsi=
-gned vece, TCGv_vec v0,
->          NEED_UMIN =3D 8,
->          NEED_UMAX =3D 16,
->      };
-> -    TCGv_vec t1, t2;
-> +    TCGv_vec t1, t2, t3;
->      uint8_t fixup;
->=20=20
->      switch (cond) {
-> @@ -3596,9 +3596,9 @@ static bool expand_vec_cmp_noinv(TCGType type, unsi=
-gned vece, TCGv_vec v0,
->      } else if (fixup & NEED_BIAS) {
->          t1 =3D tcg_temp_new_vec(type);
->          t2 =3D tcg_temp_new_vec(type);
-> -        tcg_gen_dupi_vec(vece, t2, 1ull << ((8 << vece) - 1));
-> -        tcg_gen_sub_vec(vece, t1, v1, t2);
-> -        tcg_gen_sub_vec(vece, t2, v2, t2);
-> +        t3 =3D tcg_constant_vec(type, vece, 1ull << ((8 << vece) - 1));
-> +        tcg_gen_sub_vec(vece, t1, v1, t3);
-> +        tcg_gen_sub_vec(vece, t2, v2, t3);
->          v1 =3D t1;
->          v2 =3D t2;
->          cond =3D tcg_signed_cond(cond);
+> On 4/21/20 12:06 AM, Jakob Bohm wrote:
+> [...]
+>> 
+>> In fact, over the years, I have found it excruciatingly difficult to find
+>> valid qemu documentation, as each feature effort tends to leave behind
+>> half-updated pages and a bunch of uncoordinated messages about what may or
+>> may not have been implemented in unspecified versions.
+> I feel your pain and agree.
+>
+> How can this get improved?
+>
+> Keeping the command line backward compatible is not an easy task.
+>
+> There is a quite important effort in progress to improve the documentation.
+>
+> Users reporting bad/incomplete/outdated documentation would help and motivate 
+> developers to fix it. That would reduce the gap between developers 
+> implementing features and users.
+>
+> Do you other have suggestions about what should be improved?
 
+Not related to audio but something as simple as adding a disk is almost 
+impossible for a newbie. See this thread for example:
 
---=20
-Alex Benn=C3=A9e
+https://lists.nongnu.org/archive/html/qemu-ppc/2020-04/msg00324.html
+
+or this forum post:
+
+https://www.emaculation.com/forum/viewtopic.php?f=34&t=10598
+
+This should be easy to do but even I don't know what's the preferred 
+option now and how to use it correctly. Fortunately the -hda and -cdrom 
+options still work for some machines, although they produce a warning 
+which I tend to ignore as long as it works or go for the long way which is 
+impossible to type so I have to save it in a script:
+
+-drive if=none,id=hd,file=harddisk.img,format=raw \
+-device ide-hd,drive=hd,bus=ide.0
+
+Probably there should be some sensible way to use QEMU from the command 
+line and have some options that work and won't change all the time.
+
+The current situation may be because the CLI and monitor interface that 
+are primarily human interfaces are abused by management software as an API 
+although probably those should use some real API instead to control QEMU 
+and leave the human interface to humans which then can be less arcane and 
+have more convenience options. However splitting human and software 
+interfaces would probably result in them diverging and human interface 
+being neglected and bitrotting so these should be somehow still based on 
+some common ground and any change in machine interface should make sure 
+human interface is not broken by it.
+
+Regards,
+BALATON Zoltan
+--3866299591-1963249636-1587584889=:22480--
 
