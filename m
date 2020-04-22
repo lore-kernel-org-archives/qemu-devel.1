@@ -2,60 +2,122 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F037C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 14:28:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B558C54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 14:29:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F380D2076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 14:28:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F380D2076E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 027E6206D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 14:29:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="C2s0FdM5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 027E6206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRGMP-0005gB-4u
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 10:28:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59042)
+	id 1jRGNq-0006tg-7B
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 10:29:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59718)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jRGLg-0004f6-6d
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 10:27:36 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jRGNE-0006TG-6E
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 10:29:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jRGLc-0007oP-VP
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 10:27:34 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:18453)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jRGNC-0001Q1-JT
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 10:29:11 -0400
+Received: from mail-eopbgr40092.outbound.protection.outlook.com
+ ([40.107.4.92]:27579 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jRGLc-0007me-D1; Wed, 22 Apr 2020 10:27:32 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 2ED48746333;
- Wed, 22 Apr 2020 16:27:29 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id EFBCF74632F; Wed, 22 Apr 2020 16:27:28 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id EE32E746324;
- Wed, 22 Apr 2020 16:27:28 +0200 (CEST)
-Date: Wed, 22 Apr 2020 16:27:28 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v2 2/4] smbus: Fix spd_data_generate() error API violation
-In-Reply-To: <20200422134815.1584-3-armbru@redhat.com>
-Message-ID: <alpine.BSF.2.22.395.2004221622140.19234@zero.eik.bme.hu>
-References: <20200422134815.1584-1-armbru@redhat.com>
- <20200422134815.1584-3-armbru@redhat.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jRGNB-0001Ir-SD; Wed, 22 Apr 2020 10:29:10 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Mu3lkE0siS1BzfWBEe9nLFPtT5XIo90Qwd8bXRbtkRGHnktk42k+MCh5G5jXmYkAtpnmGIg3nnVWdgD+4D/OKrktX7vf2VpHhZNPIvBTuFRm4Nsy4b4CeUCMIRmjD5/Iu7SbhfrQlSlrOcGb00N3WDvg2rQhaRxdGcA6mnmFtA6Vcl3WjRwsdhUeBEyJveVqR6ZKrKFvRCcJngrQvfgZQrW1e0cytXAk1qhS1xcCQUoB8vyN9Ze8NznOvN888RMNQnq1Edm+PBVvQIhmSCn2e17Zze321VYnTa29+gZ4fVE2D7b8T3aklyyCa9rG5t0XlT8t37ya7ZrWp5v8ovxyAw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xu9sMcx33wsvAKaC1d2lVkQFHHqqw60D1JDgzClD83g=;
+ b=X3NJ7zpGTPlCirc0oB8F6d3304w25R+MGCGDOoMfOSypn9PFtk/EF6m5HzBdWbblW4TNWxRuYf2dI74bo4grHtms4mNKhP/Jx6mAmSwefhtrDmqXzWG0GS7COQ2R263Yb64w78IyNFFoZFudh42EyqxVqSklWDzEOQ8/qQXJDPMClu4HZ1og09xxpDrto8QBrA4v6xMpkorL2AHWw2k5X0iqhWFJf/VwPevjsmX9oBlVhLh/OlBhrVxn1MZ86kNpsfrYIx03nzKns/RSKt3W9rZHDZWa7H51xuetzWR9cEtYO3biRq6klrlsxuVq0Cu1skmhTHu5Z/mClyl5/CN1qw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xu9sMcx33wsvAKaC1d2lVkQFHHqqw60D1JDgzClD83g=;
+ b=C2s0FdM5f10fM8m+0b/08bGzwGM234Hzek4hkiBIiYNvXIzuIPtyDpHRjr9XJ5xNVd+5iODid+8KXp1FPf0RwbLfQabasq4ei2+LLJz7R3RZqbenS+yUiDg3izOhCVmESJmg/KfjnEgstbUDZ5c9iwLzAe8NBuL9eZOmwCjKpZQ=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5511.eurprd08.prod.outlook.com (2603:10a6:20b:10d::12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Wed, 22 Apr
+ 2020 14:29:06 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.012; Wed, 22 Apr 2020
+ 14:29:06 +0000
+Subject: Re: [RFC 0/3] 64bit block-layer part I
+To: qemu-block@nongnu.org
+References: <20200330141818.31294-1-vsementsov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200422172902671
+Message-ID: <572e78c6-f346-58e8-98cd-1b355e5bb33b@virtuozzo.com>
+Date: Wed, 22 Apr 2020 17:29:02 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200330141818.31294-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM3PR07CA0118.eurprd07.prod.outlook.com
+ (2603:10a6:207:7::28) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 10:27:29
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 152.66.115.2
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.157) by
+ AM3PR07CA0118.eurprd07.prod.outlook.com (2603:10a6:207:7::28) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2937.10 via Frontend Transport; Wed, 22 Apr 2020 14:29:04 +0000
+X-Tagtoolbar-Keys: D20200422172902671
+X-Originating-IP: [185.215.60.157]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 0288682f-782c-48c2-2afc-08d7e6c9835f
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5511:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5511D493CA1C332AFCF3999BC1D20@AM7PR08MB5511.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
+X-Forefront-PRVS: 03818C953D
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(39840400004)(366004)(136003)(346002)(376002)(186003)(81156014)(5660300002)(66946007)(52116002)(2906002)(66556008)(66476007)(7416002)(31686004)(26005)(8936002)(478600001)(316002)(16576012)(8676002)(16526019)(86362001)(36756003)(31696002)(6486002)(6916009)(956004)(2616005)(4326008)(107886003);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: X1n2KAB8vUO4W7WTWrdxpWasaeAHHsdfauXGYa9wulcwVoOC9GVOp2lUJ0mMMTEzai79N+66LxocNSig1wzFTQ9h1juivaZhUEcM6MrzoQOw6Mu3Djtb8hRM4yTj06eb4vz07Dmyt2Ltosf8J3DRE7wTEaAymh5m6Vm0/YWATM2OZ4p+gIzMzng7LkwMLterF9UJMjEv1krbta/ofrXFJXhDooPIvt99scsHAd/gRbWVnlkcMDDGx1dK7/ucFED79DVGpq5KKkEjFazs/jypTtjlQn50o/U+dV1lwU3mZVx0MHqYwVTXP2DHhGmWV8VCzHSaRyCHHIRSI1vUo0RSEQYKz1RtZmZafdVLazSMDEeLV1jKEdABa80OdzDR5Ly12YuGAEx4KzufNJAk44NO6EEDmSUkUJnxpRN08i+WcYdCrtpAKf7j1K6t1YeOJtx8
+X-MS-Exchange-AntiSpam-MessageData: NI8HiR/11MVdo1uIDIrqDJdsf11jbYPlsztHd8SnoGfRKk3OMLAzmF0jMXpfURo5Gm8pOpHwXPZTUBguLtkSuErc7O7zbzl0S24cfdHrd168bDtexYXd5152mqWvdI5AgdDbrGs7qqQ762aXl/kJug==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0288682f-782c-48c2-2afc-08d7e6c9835f
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2020 14:29:06.5102 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: i5K5QOwHWm0OYwrOU+FXh5dL6fNoOdDlBLxJQ/rt801MgvbuG/Mqfx1ifH5NDdApfHv7sXHIcCqI1n08QGloUUtt5HJuXB68RdUOXpFi2iY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5511
+Received-SPF: pass client-ip=40.107.4.92;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 10:29:07
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.4.92
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,186 +129,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: fam@euphon.net, kwolf@redhat.com, berto@igalia.com, stefanha@redhat.com,
+ pavel.dovgaluk@ispras.ru, sw@weilnetz.de, pl@kamp.de, qemu-devel@nongnu.org,
+ mreitz@redhat.com, jsnow@redhat.com, ronniesahlberg@gmail.com, den@openvz.org,
+ pbonzini@redhat.com, dillaman@redhat.com, ari@tuxera.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 22 Apr 2020, Markus Armbruster wrote:
-> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
-> pointer to a variable containing NULL.  Passing an argument of the
-> latter kind twice without clearing it in between is wrong: if the
-> first call sets an error, it no longer points to NULL for the second
-> call.
->
-> spd_data_generate() can pass @errp to error_setg() more than once when
-> it adjusts both memory size and type.  Harmless, because no caller
-> passes anything that needs adjusting.  Until the previous commit,
-> sam460ex passed types that needed adjusting, but not sizes.
->
-> spd_data_generate()'s contract is rather awkward:
->
->    If everything's fine, return non-null and don't set an error.
->
->    Else, if memory size or type need adjusting, return non-null and
->    set an error describing the adjustment.
->
->    Else, return null and set an error reporting why no data can be
->    generated.
->
-> Its callers treat the error as a warning even when null is returned.
-> They don't create the "smbus-eeprom" device then.  Suspicious.
->
-> Since the previous commit, only "everything's fine" can actually
-> happen.  Drop the unused code and simplify the callers.  This gets rid
-> of the error API violation.
+Any thoughts here? I need to resend to update some more functions as patchew said.
 
-This leaves board code no chance to recover from values given by user that 
-won't fit without duplicating checks that this function does. Also this 
-will abort without giving meaningful errors if an invalid value does get 
-through and result in a crash which is not used friendly. So I don't like 
-this but if others think this is acceptable maybe at least unit test 
-should be adjusted to make sure aborts cannot be triggered by user for 
-values that are not usually tested during development.
+Is it OK in general? Or should we instead convert everything to uint64_t ?
 
-Regards,
-BALATON Zoltan
+30.03.2020 17:18, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all!
+> 
+> There is an idea to make NBD protocol extension to support 64bit
+> write-zero/discard/block-status commands (commands, which doesn't
+> transfer user data). It's needed to increase performance of zeroing
+> large ranges (up to the whole image). Zeroing of the whole image is used
+> as first step of mirror job, qemu-img convert, it should be also used at
+> start of backup actually..
+> 
+> We need to support it in block-layer, so we want 64bit write_zeros.
+> Currently driver handler now have int bytes parameter.
+> 
+> write_zeros path goes through normal pwritev, so we need 64bit write,
+> and then we need 64bit read for symmetry, and better, let's make all io
+> path work with 64bit bytes parameter.
+> 
+> Actually most of block-layer already have 64bit parameters: offset is
+> sometimes int64_t and sometimes uint64_t. bytes parameter is one of
+> int64_t, uint64_t, int, unsigned int...
+> 
+> I think we need one type for all of this, and this one type is int64_t.
+> Signed int64_t is a bit better than uint64_t: you can use same variable
+> to get some result (including error < 0) and than reuse it as an
+> argument without any type conversion.
+> 
+> So, I propose, as a first step, convert all uint64_t parameters to
+> int64_t.
+> 
+> Still, I don't have good idea of how to split this into more than 3
+> patches, so, this is an RFC.
+> 
+> What's next?
+> 
+> Converting write_zero and discard is not as simple: we can't just
+> s/int/uint64_t/, as some functions may use some int variables for
+> calculations and this will be broken by something larger than int.
+> 
+> So, I think the simplest way is to add .bdrv_co_pwritev_zeros64 and
+> .bdrv_co_pdiscard64 and update drivers one-by-one. If at some point all
+> drivers updated - drop unused 32bit functions, and then drop "64" suffix
+> from API. If not - we'll live with both APIs.
+> 
+> Another thing to do is updating default limiting of request (currently
+> they are limited to INT_MAX).
+> 
+> Then we may move some drivers to 64bit discard/write_zero: I think about
+> qcow2, file-posix and nbd (as a proof-of-concept for already proposed
+> NBD extension).
+> 
+> Any ideas?
+> 
+> Vladimir Sementsov-Ogievskiy (3):
+>    block: use int64_t as bytes type in tracked requests
+>    block/io: convert generic io path to use int64_t parameters
+>    block: use int64_t instead of uint64_t in driver handlers
+> 
+>   include/block/block.h     |  8 ++--
+>   include/block/block_int.h | 52 ++++++++++-----------
+>   block/backup-top.c        |  5 +-
+>   block/blkdebug.c          |  4 +-
+>   block/blklogwrites.c      |  4 +-
+>   block/blkreplay.c         |  4 +-
+>   block/blkverify.c         |  6 +--
+>   block/bochs.c             |  2 +-
+>   block/cloop.c             |  2 +-
+>   block/commit.c            |  2 +-
+>   block/copy-on-read.c      |  4 +-
+>   block/crypto.c            |  4 +-
+>   block/curl.c              |  2 +-
+>   block/dmg.c               |  2 +-
+>   block/file-posix.c        | 18 ++++----
+>   block/filter-compress.c   |  6 +--
+>   block/io.c                | 97 ++++++++++++++++++++-------------------
+>   block/iscsi.c             | 12 ++---
+>   block/mirror.c            |  4 +-
+>   block/nbd.c               |  8 ++--
+>   block/nfs.c               |  8 ++--
+>   block/null.c              |  8 ++--
+>   block/nvme.c              |  4 +-
+>   block/qcow.c              | 12 ++---
+>   block/qcow2.c             | 18 ++++----
+>   block/quorum.c            |  8 ++--
+>   block/raw-format.c        | 28 +++++------
+>   block/rbd.c               |  4 +-
+>   block/throttle.c          |  4 +-
+>   block/vdi.c               |  4 +-
+>   block/vmdk.c              |  8 ++--
+>   block/vpc.c               |  4 +-
+>   block/vvfat.c             |  6 +--
+>   tests/test-bdrv-drain.c   |  8 ++--
+>   block/trace-events        | 14 +++---
+>   35 files changed, 192 insertions(+), 192 deletions(-)
+> 
 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
-> include/hw/i2c/smbus_eeprom.h |  2 +-
-> hw/i2c/smbus_eeprom.c         | 30 ++++--------------------------
-> hw/mips/mips_fulong2e.c       | 10 ++--------
-> hw/ppc/sam460ex.c             | 12 +++---------
-> 4 files changed, 10 insertions(+), 44 deletions(-)
->
-> diff --git a/include/hw/i2c/smbus_eeprom.h b/include/hw/i2c/smbus_eeprom.h
-> index 15e2151b50..68b0063ab6 100644
-> --- a/include/hw/i2c/smbus_eeprom.h
-> +++ b/include/hw/i2c/smbus_eeprom.h
-> @@ -31,6 +31,6 @@ void smbus_eeprom_init(I2CBus *bus, int nb_eeprom,
->                        const uint8_t *eeprom_spd, int size);
->
-> enum sdram_type { SDR = 0x4, DDR = 0x7, DDR2 = 0x8 };
-> -uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t size, Error **errp);
-> +uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t size);
->
-> #endif
-> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-> index 5adf3b15b5..07fbbf87f1 100644
-> --- a/hw/i2c/smbus_eeprom.c
-> +++ b/hw/i2c/smbus_eeprom.c
-> @@ -195,8 +195,7 @@ void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
-> }
->
-> /* Generate SDRAM SPD EEPROM data describing a module of type and size */
-> -uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t ram_size,
-> -                           Error **errp)
-> +uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t ram_size)
-> {
->     uint8_t *spd;
->     uint8_t nbanks;
-> @@ -222,29 +221,10 @@ uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t ram_size,
->         g_assert_not_reached();
->     }
->     size = ram_size >> 20; /* work in terms of megabytes */
-> -    if (size < 4) {
-> -        error_setg(errp, "SDRAM size is too small");
-> -        return NULL;
-> -    }
->     sz_log2 = 31 - clz32(size);
->     size = 1U << sz_log2;
-> -    if (ram_size > size * MiB) {
-> -        error_setg(errp, "SDRAM size 0x"RAM_ADDR_FMT" is not a power of 2, "
-> -                   "truncating to %u MB", ram_size, size);
-> -    }
-> -    if (sz_log2 < min_log2) {
-> -        error_setg(errp,
-> -                   "Memory size is too small for SDRAM type, adjusting type");
-> -        if (size >= 32) {
-> -            type = DDR;
-> -            min_log2 = 5;
-> -            max_log2 = 12;
-> -        } else {
-> -            type = SDR;
-> -            min_log2 = 2;
-> -            max_log2 = 9;
-> -        }
-> -    }
-> +    assert(ram_size == size * MiB);
-> +    assert(sz_log2 >= min_log2);
->
->     nbanks = 1;
->     while (sz_log2 > max_log2 && nbanks < 8) {
-> @@ -252,9 +232,7 @@ uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t ram_size,
->         nbanks++;
->     }
->
-> -    if (size > (1ULL << sz_log2) * nbanks) {
-> -        error_setg(errp, "Memory size is too big for SDRAM, truncating");
-> -    }
-> +    assert(size == (1ULL << sz_log2) * nbanks);
->
->     /* split to 2 banks if possible to avoid a bug in MIPS Malta firmware */
->     if (nbanks == 1 && sz_log2 > min_log2) {
-> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-> index 5040afd581..ef02d54b33 100644
-> --- a/hw/mips/mips_fulong2e.c
-> +++ b/hw/mips/mips_fulong2e.c
-> @@ -297,7 +297,6 @@ static void mips_fulong2e_init(MachineState *machine)
->     MemoryRegion *bios = g_new(MemoryRegion, 1);
->     long bios_size;
->     uint8_t *spd_data;
-> -    Error *err = NULL;
->     int64_t kernel_entry;
->     PCIBus *pci_bus;
->     ISABus *isa_bus;
-> @@ -377,13 +376,8 @@ static void mips_fulong2e_init(MachineState *machine)
->     }
->
->     /* Populate SPD eeprom data */
-> -    spd_data = spd_data_generate(DDR, machine->ram_size, &err);
-> -    if (err) {
-> -        warn_report_err(err);
-> -    }
-> -    if (spd_data) {
-> -        smbus_eeprom_init_one(smbus, 0x50, spd_data);
-> -    }
-> +    spd_data = spd_data_generate(DDR, machine->ram_size);
-> +    smbus_eeprom_init_one(smbus, 0x50, spd_data);
->
->     mc146818_rtc_init(isa_bus, 2000, NULL);
->
-> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-> index 1e3eaac0db..42a8c9fb7f 100644
-> --- a/hw/ppc/sam460ex.c
-> +++ b/hw/ppc/sam460ex.c
-> @@ -292,7 +292,6 @@ static void sam460ex_init(MachineState *machine)
->     SysBusDevice *sbdev;
->     struct boot_info *boot_info;
->     uint8_t *spd_data;
-> -    Error *err = NULL;
->     int success;
->
->     cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
-> @@ -336,14 +335,9 @@ static void sam460ex_init(MachineState *machine)
->     i2c = PPC4xx_I2C(dev)->bus;
->     /* SPD EEPROM on RAM module */
->     spd_data = spd_data_generate(ram_sizes[0] < 128 * MiB ? DDR : DDR2,
-> -                                 ram_sizes[0], &err);
-> -    if (err) {
-> -        warn_report_err(err);
-> -    }
-> -    if (spd_data) {
-> -        spd_data[20] = 4; /* SO-DIMM module */
-> -        smbus_eeprom_init_one(i2c, 0x50, spd_data);
-> -    }
-> +                                 ram_sizes[0]);
-> +    spd_data[20] = 4; /* SO-DIMM module */
-> +    smbus_eeprom_init_one(i2c, 0x50, spd_data);
->     /* RTC */
->     i2c_create_slave(i2c, "m41t80", 0x68);
->
->
+
+-- 
+Best regards,
+Vladimir
 
