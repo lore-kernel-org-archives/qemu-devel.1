@@ -1,95 +1,90 @@
 Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.4 required=3.0 tests=DEAR_SOMETHING,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4C15C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:20:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D32E1C54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:22:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 995E620776
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:20:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DAB92082E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:22:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A35fbFmG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 995E620776
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EqcEwM55"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DAB92082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRI72-000206-O4
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:20:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60100)
+	id 1jRI9F-0004tm-PF
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:22:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59842)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jRI5T-0000CW-Rm
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:19:00 -0400
+ (envelope-from <stefanha@gmail.com>) id 1jRI54-0007sC-GW
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:18:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jRI5S-00057o-TC
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:18:59 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43726)
+ (envelope-from <stefanha@gmail.com>) id 1jRI4p-0000wh-Kb
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:18:34 -0400
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:51668)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jRI5S-0004qV-Ej
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:18:58 -0400
-Received: by mail-wr1-x444.google.com with SMTP id i10so3110377wrv.10
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 09:18:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=hpgsEjy9MMe1+3vn6+bFysJu3O8VbUl3PxUk99MjPis=;
- b=A35fbFmGdEec21EWyCrihDNfQVrCB4bW5dbm/HFw1nCe0xB9ZUNwAB8uTj33z2DPbD
- bAElOSK1X/oiluKFTgFp65KvtSiputIxHdN/iwocs2hYTmaC2aRC8/OFAzlqCJxUE7jI
- qDWnmtDpy6JKBDnNEaX+IOeQnje7gaEJR28SUgn1J4lPm75+/Fa68K5UxBDDC4Y8V/Lb
- VNX7+U4V1brbEdsJTeApvQhTYEIOznEsa1YrJ/qTiTY0BODoVSS3o7yhIQ/e1NwLweBY
- rQaZ+PfoyvQSpQ/UkP72PkIxnQfQdPcQQ/bqRr2K+hY95ULUK2cScqojH5mMJoONA2sZ
- HE+g==
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jRI4p-0000dR-6y; Wed, 22 Apr 2020 12:18:19 -0400
+Received: by mail-wm1-x336.google.com with SMTP id x4so3065850wmj.1;
+ Wed, 22 Apr 2020 09:18:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=o07n5auFQtbWMeOi+T/XpGNeJDKGraAPFTqT1F32lDE=;
+ b=EqcEwM55qcum9P4ZYpoH82lL5PLLqmX3IMFxhU+cMFTsaqRCuSQHQ8WnoZJI1uuoqZ
+ V+7d65C4NziGyhPnY725XwHgnMJ4TGqCDcN7OdrJ5urQR6/GDyivuRRz3X1dMpE1S3Rh
+ 13uv4RDtxk/MIZbADiz/BD8NK5ah8XlB5afQMfTLlk7w+Ckla8gq03SRFswEbxR9pM9D
+ vldjju7+waAqQxM8CJuNSCSrwInOSM6xRpwd1M10kseSUD8eSK3W+bUxI2F5AGueXWxo
+ NGuGIcFXKIuuqmMmEldDsbAMOULdO9u3OrAsk0WuLuIBKUvFACUpJJwyTxcoYx4nR7FX
+ ujxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=hpgsEjy9MMe1+3vn6+bFysJu3O8VbUl3PxUk99MjPis=;
- b=jLwKMKxfd3YhuPEJelEyIHr4geuMY1app9+fzTo9gKCLDF1dSUuG9bcYLjv8LDELQB
- V0o9Y5P95aPvCY9+IYiKPDxEdAIs6+9IQATqeJ7VK6qzVLRDtobLe7+HIvfOwI6O/Sod
- jJRsj/eN1T9IPM+/SvU8ocK7Oe5zkEt9gafzvxTRr9ev/n+hAaYC7d1CDB/HmS08f9o4
- XDZq6q8jHkytZIi68EgChESlv7e0cIMuqcJfUXAbypinzd0x3VhkTfk/WfaY++CTUJHt
- ozi0x7dfH2MYHg7YiGrvh6UvVRrON5k+MTH88xOWWk3WpuM9HDtX7o1S1N9y+st9ql7x
- T67w==
-X-Gm-Message-State: AGi0Pua8tie4Rm0SePPkvQIWJtN+zX6Vs6EhnZgWbustrHtfN+v11P9F
- c7ZJ019Cr1TEw4+ZtW6L+sKIQI5binY=
-X-Google-Smtp-Source: APiQypIfEtIae3DrcGRWcpuPA1o5XJdPJacC3GE7HwqV2C00aNR6Y1jai+vy7q13KBxJky45k9ZcFQ==
-X-Received: by 2002:a5d:4246:: with SMTP id s6mr30804148wrr.421.1587572336743; 
- Wed, 22 Apr 2020 09:18:56 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id j4sm8919469wrm.85.2020.04.22.09.18.55
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=o07n5auFQtbWMeOi+T/XpGNeJDKGraAPFTqT1F32lDE=;
+ b=Jyrgai+eRgWL9LMS9wpxGpo/+A4C6CHVAFr2RXnDfLiQw02wd5UQJslxh+FbePGQN4
+ Yda8UBN8oX5mrhVATbq5rpwaxjdio89X6lj6CSuwR0xtw68DJsDu3rMDrnm6cnn4ONbO
+ 2EmeEDMSkmIAqOEvGe/ln5ogocpmN/HXH6oHOk8djuVz3Auhc74Bw4tmWoyFKmQVBfJ4
+ vNf5gjFD29mGEKLN3y35Fhf7vCidaXDzjaDbPaacTgjGRc9qZErs9Ab+NgjBigQmLzzB
+ o1lC/FaiCSxnPGSTXHe1R3wECfheC+OMXiH2fOhs6N9ioU/lIEjI9zFig6NVLqPp6KNF
+ uFdg==
+X-Gm-Message-State: AGi0PuaNRMK7kPNK4ecUMQwJy97EK2TFYc+kSGUXiVNRlMPXowyI0A2f
+ c+orqUuTx+rxQl9F6/7JTuk=
+X-Google-Smtp-Source: APiQypLlH9FTGhSrlOa+mKeAI3e8X8qt+ZWv+P7kYHi3C8PdMmZlk0wkU836r4SSYoIGGKXWoUT2bw==
+X-Received: by 2002:a1c:492:: with SMTP id 140mr12024967wme.9.1587572295620;
+ Wed, 22 Apr 2020 09:18:15 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id y5sm9201785wru.15.2020.04.22.09.18.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Apr 2020 09:18:55 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C64661FF7E;
- Wed, 22 Apr 2020 17:18:54 +0100 (BST)
-References: <20200422011722.13287-1-richard.henderson@linaro.org>
- <20200422011722.13287-14-richard.henderson@linaro.org>
-User-agent: mu4e 1.4.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 13/36] tcg: Use tcg_constant_{i32,i64} with tcg int
- expanders
-In-reply-to: <20200422011722.13287-14-richard.henderson@linaro.org>
-Date: Wed, 22 Apr 2020 17:18:54 +0100
-Message-ID: <87k127cx3l.fsf@linaro.org>
+ Wed, 22 Apr 2020 09:18:14 -0700 (PDT)
+Date: Wed, 22 Apr 2020 17:18:13 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: janine.schneider@fau.de
+Subject: Re: Integration of qemu-img
+Message-ID: <20200422161813.GI47385@stefanha-x1.localdomain>
+References: <00fc01d61256$35f849c0$a1e8dd40$@fau.de>
+ <877dyfc1if.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="v2/QI0iRXglpx0hK"
+Content-Disposition: inline
+In-Reply-To: <877dyfc1if.fsf@dusky.pond.sub.org>
+Received-SPF: pass client-ip=2a00:1450:4864:20::336;
+ envelope-from=stefanha@gmail.com; helo=mail-wm1-x336.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::336
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,57 +96,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+--v2/QI0iRXglpx0hK
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  include/tcg/tcg-op.h |  13 +--
->  tcg/tcg-op.c         | 216 ++++++++++++++++++++-----------------------
->  2 files changed, 100 insertions(+), 129 deletions(-)
->
-> diff --git a/include/tcg/tcg-op.h b/include/tcg/tcg-op.h
-> index 230db6e022..11ed9192f7 100644
-> --- a/include/tcg/tcg-op.h
-> +++ b/include/tcg/tcg-op.h
-<snip>
-> @@ -1468,12 +1441,17 @@ void tcg_gen_brcond_i64(TCGCond cond, TCGv_i64 ar=
-g1, TCGv_i64 arg2, TCGLabel *l)
->=20=20
->  void tcg_gen_brcondi_i64(TCGCond cond, TCGv_i64 arg1, int64_t arg2, TCGL=
-abel *l)
->  {
-> -    if (cond =3D=3D TCG_COND_ALWAYS) {
-> +    if (TCG_TARGET_REG_BITS =3D=3D 64) {
-> +        tcg_gen_brcond_i64(cond, arg1, tcg_constant_i64(arg2), l);
-> +    } else if (cond =3D=3D TCG_COND_ALWAYS) {
->          tcg_gen_br(l);
->      } else if (cond !=3D TCG_COND_NEVER) {
-> -        TCGv_i64 t0 =3D tcg_const_i64(arg2);
-> -        tcg_gen_brcond_i64(cond, arg1, t0, l);
-> -        tcg_temp_free_i64(t0);
-> +        l->refs++;
+On Thu, Apr 16, 2020 at 09:50:48AM +0200, Markus Armbruster wrote:
+> Cc: qemu-block
+>=20
+> <janine.schneider@fau.de> writes:
+>=20
+> > Dear Sir or Madam,
+> >
+> > =20
+> >
+> > I am a PhD student at the Friedrich-Alexander-University Erlangen-N=FCr=
+nberg
+> > in Bavaria Germany and I am currently working on an open-source forensic
+> > analysis tool. I would like to use qemu-img for converting virtual disc=
+s to
+> > raw files and to get virtual disc information. By now I tried to create=
+ a
+> > qemu-img DLL with the qemu source code you provide on your website, but=
+ I am
+> > unable to compile it properly. Therefore, I would like to ask you if th=
+ere
+> > is a simple solution to integrate qemu-img to other C++ projects? Or is
+> > there a precompiled qemu-img DLL which I could use? Thank you very much=
+ for
+> > your support.
 
-Hmm is this a separate fix?
+Can you simply spawn a qemu-img process from your application?  That
+would be much easier than trying to build it as a library and link it
+into your application.
 
-> +        tcg_gen_op6ii_i32(INDEX_op_brcond2_i32,
-> +                          TCGV_LOW(arg1), TCGV_HIGH(arg1),
-> +                          tcg_constant_i32(arg2),
-> +                          tcg_constant_i32(arg2 >> 32),
-> +                          cond, label_arg(l));
->      }
->  }
-<snip>
+qemu-img has --output=3Djson exactly for this case.  It will let you parse
+the output as JSON.
 
-otherwise lgtm:
+Stefan
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+--v2/QI0iRXglpx0hK
+Content-Type: application/pgp-signature; name="signature.asc"
 
---=20
-Alex Benn=C3=A9e
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6gbkUACgkQnKSrs4Gr
+c8gZSwgAp0zCeBhRw7d1yHpSV1SBhhJTHWOmjo057ztozDjs1kijTAlx4jtRhxPp
+Q+PLdv325DV/B4IfjpNaTiSunEPrlWjq1/8TXy8OMGrl5+cqzl2AHvTQC+c91Qhr
+tXJQZua+RONy7sxQLfenIh0ZfuS9iaOT7jhhVVbJu9MGh2Bokf2PvNxzpkdcygME
+kpF5eRPE889m645Lr4tPEmja73fDRy7fk79nl2k7HiNGSCslRndETW2QN4F/budZ
+Ef8vhH2A1vZUGNqNX/qKz/ajvsUo81lQnhb25C40sK1ut9Q5js2o8jnd3JbXLC7A
+Yx74HTlEH4/DmgKYmXo9LCF8J16bjg==
+=9TqJ
+-----END PGP SIGNATURE-----
+
+--v2/QI0iRXglpx0hK--
 
