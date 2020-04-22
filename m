@@ -2,106 +2,86 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D18AC54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 820E8C54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:31:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18A0220767
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:29:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4673620767
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:31:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ug+ixpIL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18A0220767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IkycKxU1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4673620767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRIFa-00031p-9r
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:29:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38198)
+	id 1jRIHX-00051I-EM
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:31:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38782)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRIEk-0002Nn-Ts
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:28:35 -0400
+ (envelope-from <lersek@redhat.com>) id 1jRIGd-00048q-N4
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:30:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRIEk-0001n2-8C
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:28:34 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57484
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <lersek@redhat.com>) id 1jRIGc-0006Ox-Lp
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:30:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31724
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRIEj-0001dy-Qk
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:28:33 -0400
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jRIGc-0006NE-7b
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:30:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587572912;
+ s=mimecast20190719; t=1587573028;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EhhJOgkvvgqWnCQhfPTHhYvZqwUPRLVCqsjEJV5ms8g=;
- b=Ug+ixpILvQxyCequawLCFfDN/W+yLTkvaleM11JfB5eqmZ2HAdqJlXXW+UqICigPm5xqCR
- A44CNxp9QJpQifkveQPHGQ/p5TfEDtDYR9COMmxN3QBBwvux4SUoW0I2DPwkbKYNbRI8YE
- y8UN3zjNiuY8+tKOD5+J1rZe2F+UG/8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-Js2wZ7LeOci8T7Ha-ssWHw-1; Wed, 22 Apr 2020 12:28:30 -0400
-X-MC-Unique: Js2wZ7LeOci8T7Ha-ssWHw-1
-Received: by mail-wr1-f70.google.com with SMTP id v9so1312021wrt.7
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 09:28:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6LqgKd+F2jQRZ5qu50Gpb8LaVWo0UzWevkBvO5TN73s=;
- b=RdcUFGKHi8egdl1TXqmwODn5r3B8PO0lK9hrXI54oLZiFsOGB81kyioAiJPSw0bZB1
- mVwjh6ULI9ygrmkiYsaly4AuxY1loir/qZLJIQbyutoB7qKta1lwwKXjZEcuJHlz3niw
- lcgH5FrIlX0vIraeKmBCQfcVvktWDPMRgxLkU0Btj3tvwoO7d7R4jg1wZ1paOck31EO6
- WrT/mgjE3WoB143Udkwq1FBcmRLyF35jBiJwtESBHYnqXi5//tpm0aZAaKKDZjJOY2Ov
- uVgsHXfHhuQjg+z2aplbAlRQsA4XymBjKDftAS0Iuco6vr0if1ZmKs36JYTc/WjFmcTi
- ZYpQ==
-X-Gm-Message-State: AGi0PubxO2icko26F+c1vQFa+Yhyn11muZPg8DmhRc+rLp7cXZmgb3T1
- k7Uv3UFRwDMJHidocaPCOoLBLdP5e2yKTltqkWQfoZrvIH7mebZ7Pe96ClrAXVZHBV/+Kv3oFGZ
- HWjW1a+faTE02NhY=
-X-Received: by 2002:adf:f004:: with SMTP id j4mr14458987wro.123.1587572908855; 
- Wed, 22 Apr 2020 09:28:28 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI83ZBZgi4i3aJN4JmYjAIgPadTp3BKV26m1QdlLaDf0uz5FO14ANwKF6rcQffsk56FJMWy6g==
-X-Received: by 2002:adf:f004:: with SMTP id j4mr14458969wro.123.1587572908602; 
- Wed, 22 Apr 2020 09:28:28 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id s18sm9600653wra.94.2020.04.22.09.28.27
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 22 Apr 2020 09:28:28 -0700 (PDT)
-Subject: Re: [PATCH v2 12/14] tests/test-logging: Fix test for -dfilter
- 0..0xffffffffffffffff
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200422130719.28225-1-armbru@redhat.com>
- <20200422130719.28225-13-armbru@redhat.com>
- <8b72369a-482c-a32f-648d-050c22dadf2e@redhat.com>
- <3b33f4de-dfeb-416f-1e48-ddb73153205d@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8622b0a0-67ad-8580-a507-496b0d3d4dff@redhat.com>
-Date: Wed, 22 Apr 2020 18:28:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=eHuPo+oWwhaRFVdxLpxGszuod8LX9A5oNrrUEAwqcug=;
+ b=IkycKxU1IX/WEC9Vi6mT1prhJCPlwol9/cGgZfOS9bxUafwKad08Ec9RHkqw3KwdlvibEA
+ YsWZ4Cf5ggO3EmCbXZuB8oazzGCpjn9Aj+uKwAvr0ZKGcbuOrooqBjNNT81KWCPPDx7st5
+ XXLnio8ft1lDkT6O9phBLYl/Lv6Kxbc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-1ZboeywsMUOrlf7Mk-CAqg-1; Wed, 22 Apr 2020 12:30:26 -0400
+X-MC-Unique: 1ZboeywsMUOrlf7Mk-CAqg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E1851084438;
+ Wed, 22 Apr 2020 16:30:25 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-154.ams2.redhat.com
+ [10.36.113.154])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9FDB2600DB;
+ Wed, 22 Apr 2020 16:30:18 +0000 (UTC)
+Subject: Re: [PATCH 3/5] ramfb: don't update RAMFBState on errors
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200422100211.30614-1-kraxel@redhat.com>
+ <20200422100211.30614-4-kraxel@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <29becc2d-a777-8bea-f5b6-32094f456f3e@redhat.com>
+Date: Wed, 22 Apr 2020 18:30:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <3b33f4de-dfeb-416f-1e48-ddb73153205d@redhat.com>
+In-Reply-To: <20200422100211.30614-4-kraxel@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:57:52
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=lersek@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 04:15:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,54 +93,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>, hqm03ster@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/22/20 4:49 PM, Eric Blake wrote:
-> On 4/22/20 8:35 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hi Markus,
->>
->> On 4/22/20 3:07 PM, Markus Armbruster wrote:
->>> Fixes: 58e19e6e7914354242a67442d0006f9e31684d1a
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>> ---
->>> =C2=A0 tests/test-logging.c | 4 ++--
->>> =C2=A0 1 file changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/tests/test-logging.c b/tests/test-logging.c
->>> index 6387e4933f..8580b82420 100644
->>> --- a/tests/test-logging.c
->>> +++ b/tests/test-logging.c
->>> @@ -73,10 +73,10 @@ static void test_parse_range(void)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_assert(qemu_log_in_addr_range(UINT64_M=
-AX));
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_assert_false(qemu_log_in_addr_range(UI=
-NT64_MAX - 1));
->>> -=C2=A0=C2=A0=C2=A0 qemu_set_dfilter_ranges("0..0xffffffffffffffff", &e=
-rr);
->>> +=C2=A0=C2=A0=C2=A0 qemu_set_dfilter_ranges("0..0xffffffffffffffff", &e=
-rror_abort);
->>
->> Why sometime use this form, ...
->=20
-> This call must not produce an error (if it does, the test aborts,=20
-> proving we had a bug).
->=20
->>
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_assert(qemu_log_in_addr_range(0));
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_assert(qemu_log_in_addr_range(UINT64_M=
-AX));
->>> -
->>> +
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_set_dfilter_ranges("2..1", &err);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_free_or_abort(&err);
->>
->> ... and then this other form?
->=20
-> This call must produce an error (if we do not diagnose the caller's=20
-> error, our code is buggy, and the test must fail)
+On 04/22/20 12:02, Gerd Hoffmann wrote:
+> Store width & height & surface in local variables.  Update RAMFBState
+> with the new values only in case the ramfb_create_display_surface() call
+> succeeds.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/display/ramfb.c | 25 ++++++++++++++++---------
+>  1 file changed, 16 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
+> index 9d41c2ad2868..fbe959147dc9 100644
+> --- a/hw/display/ramfb.c
+> +++ b/hw/display/ramfb.c
+> @@ -71,20 +71,27 @@ static DisplaySurface *ramfb_create_display_surface(int width, int height,
+>  static void ramfb_fw_cfg_write(void *dev, off_t offset, size_t len)
+>  {
+>      RAMFBState *s = dev;
+> -    uint32_t fourcc, format;
+> +    DisplaySurface *surface;
+> +    uint32_t fourcc, format, width, height;
+>      hwaddr stride, addr;
+>  
+> -    s->width  = be32_to_cpu(s->cfg.width);
+> -    s->height = be32_to_cpu(s->cfg.height);
+> -    stride    = be32_to_cpu(s->cfg.stride);
+> -    fourcc    = be32_to_cpu(s->cfg.fourcc);
+> -    addr      = be64_to_cpu(s->cfg.addr);
+> -    format    = qemu_drm_format_to_pixman(fourcc);
+> +    width  = be32_to_cpu(s->cfg.width);
+> +    height = be32_to_cpu(s->cfg.height);
+> +    stride = be32_to_cpu(s->cfg.stride);
+> +    fourcc = be32_to_cpu(s->cfg.fourcc);
+> +    addr   = be64_to_cpu(s->cfg.addr);
+> +    format = qemu_drm_format_to_pixman(fourcc);
+>  
+>      fprintf(stderr, "%s: %dx%d @ 0x%" PRIx64 "\n", __func__,
+>              s->width, s->height, addr);
+> -    s->ds = ramfb_create_display_surface(s->width, s->height,
+> -                                         format, stride, addr);
+> +    surface = ramfb_create_display_surface(width, height,
+> +                                           format, stride, addr);
+> +    if (!surface)
+> +        return;
 
-Ah OK it makes sense, thanks!
+A warning message here, or inside ramfb_create_display_surface(), could
+be nice; but I agree it's not required at all.
+
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks
+Laszlo
+
+> +
+> +    s->width = width;
+> +    s->height = height;
+> +    s->ds = surface;
+>  }
+>  
+>  void ramfb_display_update(QemuConsole *con, RAMFBState *s)
+> 
 
 
