@@ -2,90 +2,79 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B46C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 22:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99878C55185
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 22:18:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16F802076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 22:04:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nKHC1p+A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16F802076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 645F52077D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 22:18:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 645F52077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRNTQ-0007gT-9A
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 18:04:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59040)
+	id 1jRNhc-0003Zl-FX
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 18:18:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34834)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anthoine.bourgeois@gmail.com>) id 1jRNST-0007G3-26
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 18:03:05 -0400
+ (envelope-from <jonathan.derrick@intel.com>) id 1jRNh0-000356-1N
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 18:18:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <anthoine.bourgeois@gmail.com>) id 1jRNSS-0002IM-1L
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 18:03:04 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40020)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <anthoine.bourgeois@gmail.com>)
- id 1jRNSR-0002DE-Kt
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 18:03:03 -0400
-Received: by mail-wr1-x443.google.com with SMTP id k13so4450008wrw.7
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 15:03:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=1u1uCjEwWDSciclXAdwZl8LcamUjIYmXboaSy5WJT5U=;
- b=nKHC1p+A0bcXC1z8bUS4VVGDUE6rW8auvy1JZkA1qXu0J3FtUiQjV/JmfqfCCZ8dGd
- 6RXqBh7Ygx/Gp3a8BKiBXxQ5vVGGtGi+Jgblc/AHlbwYZXqNdfM40FEmxNjJG9eTiZTY
- L7LMOdOZlH9dIv1uHKV4PVLxiXer99SvY8a9MQ8hqtpw7a5PM1llIAawjylv702Xugnk
- pZMHJ4MwHj6x79eAWySD//2hSsi62ZgWm44nKFRz2uOM8ZnE+dcJi9L+vjxGP3Hij6cS
- 5kE5RuERv1QAdIbhUugBsVKb3+5JsyDEQIxG1Iuc5+D1Y0jiuoGITOqCwL4vFo/pyCOB
- SKpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=1u1uCjEwWDSciclXAdwZl8LcamUjIYmXboaSy5WJT5U=;
- b=bN4ifybcIx+yCayNh7IeOliFmNLn4SXZv7Hw3rLGmn6DqIv0IdmbO3GvDQESLwivAx
- U0Qzc2TGZ6c/85TGZ0ah+/ZWd5C4m73xGksEnaV5UZskL/+0pdmLMfX21Xg9RKSoB17y
- oHNiRreUXZIe95KjmdATgWZtdpF8L/GtzzJahNNTyiPO5av4MN3pJCNrJQM1sq/dCrav
- 2OirH8YXbsU3wmviWwr57pmKGNLHwhXBF9vjsSdAOaW4/Tb6wPzXC0mqZ0vshZy+fZ3p
- Wjgm+X0qpq4dl3svz/X3dQxGs2Udjlx/N4UB2/R8diTQ9a+9SLNEgb8HADoe8jq1emDA
- U3FA==
-X-Gm-Message-State: AGi0PubFCFsvCzwBlzTslEvQPg0O/6TuYqay2CDDNCayla3KAL6mOVFj
- cjRKN+H9MX/rKndAc3InnSY=
-X-Google-Smtp-Source: APiQypJJ2qIpax03DizOdAKy/thSLv+qJ5t6Z5rnM0j6tJLnt65Wv/+v2Zuec1zS0QP13xmMB0TDDw==
-X-Received: by 2002:adf:f8c6:: with SMTP id f6mr1381792wrq.276.1587592981984; 
- Wed, 22 Apr 2020 15:03:01 -0700 (PDT)
-Received: from gmail.com ([2a01:e35:2fb2:a0d0:6d28:3d72:693e:c474])
- by smtp.gmail.com with ESMTPSA id f18sm812043wrq.29.2020.04.22.15.03.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Apr 2020 15:03:01 -0700 (PDT)
-Date: Thu, 23 Apr 2020 00:02:58 +0200
-From: Anthoine Bourgeois <anthoine.bourgeois@gmail.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH] virtio-vga: fix virtio-vga bar ordering
-Message-ID: <20200422220257.GA17009@gmail.com>
-References: <20200421214853.14412-1-anthoine.bourgeois@gmail.com>
- <20200422104657.4fnzkp66l2c2m2cw@sirius.home.kraxel.org>
+ (envelope-from <jonathan.derrick@intel.com>) id 1jRNgy-0003lV-TD
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 18:18:05 -0400
+Received: from mga07.intel.com ([134.134.136.100]:4671)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jonathan.derrick@intel.com>)
+ id 1jRNgy-0003Z1-CQ
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 18:18:04 -0400
+IronPort-SDR: Q6b2r/qH46ilDovB0wqFIyri6zBsHSe+tGfEkjHTZqqS9u42b62/hfLllTshvIi9sPYVQdZ8q+
+ qOr9GYHM+lmw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 22 Apr 2020 15:17:58 -0700
+IronPort-SDR: p1Ujg028c0lEOtoOttEuV1B4Ci6ZYBuIeJr51EE8NcHpOqSLEvo26mU61JJyGMSAfakGOKq/1R
+ UiNBPa6rxSQA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,304,1583222400"; d="scan'208";a="255788029"
+Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
+ by orsmga003.jf.intel.com with ESMTP; 22 Apr 2020 15:17:58 -0700
+Received: from orsmsx122.amr.corp.intel.com (10.22.225.227) by
+ ORSMSX101.amr.corp.intel.com (10.22.225.128) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 22 Apr 2020 15:17:57 -0700
+Received: from orsmsx101.amr.corp.intel.com ([169.254.8.204]) by
+ ORSMSX122.amr.corp.intel.com ([169.254.11.34]) with mapi id 14.03.0439.000;
+ Wed, 22 Apr 2020 15:17:57 -0700
+From: "Derrick, Jonathan" <jonathan.derrick@intel.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Re: [PATCH for QEMU] hw/vfio: Add VMD Passthrough Quirk
+Thread-Topic: [PATCH for QEMU] hw/vfio: Add VMD Passthrough Quirk
+Thread-Index: AQHWGMtyZw4X1Uq3s0+HhumXVtYMzKiGH9SAgAALrAA=
+Date: Wed, 22 Apr 2020 22:17:56 +0000
+Message-ID: <48e2ef3f6f843d533e4f3cdb83da9be5184768e6.camel@intel.com>
+References: <158759136841.3922.4821101148440128786@39012742ff91>
+In-Reply-To: <158759136841.3922.4821101148440128786@39012742ff91>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.255.7.252]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EC102D38D2895946AC9731BC742461CF@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20200422104657.4fnzkp66l2c2m2cw@sirius.home.kraxel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=anthoine.bourgeois@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::443
+Received-SPF: pass client-ip=134.134.136.100;
+ envelope-from=jonathan.derrick@intel.com; helo=mga07.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 18:17:58
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Received-From: 134.134.136.100
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,57 +86,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: "Jakowski, Andrzej" <andrzej.jakowski@intel.com>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "lorenzo.pieralisi@arm.com" <lorenzo.pieralisi@arm.com>,
+ "helgaas@kernel.org" <helgaas@kernel.org>,
+ "virtualization@lists.linux-foundation.org"
+ <virtualization@lists.linux-foundation.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Apr 22, 2020 at 12:46:57PM +0200, Gerd Hoffmann wrote:
->> This fix exchange the modern io bar with the modern memory bar,
->> replacing the msix bar that is never impacted anyway.
->
->Well, msix was placed in bar 4 intentionally.  That keeps bar 1 (default
->msix location) free, so we have the option to turn bar 0 (vga compat
->vram) into a 64bit bar without shuffling around things.
-
-That's a really good reason I didn't think of.
-Just a question, why didn't we choose the virtio-vga order to avoid
-shuffling from the beginning? Vga came after and we keep the
-compatibility ?
-
->
->> -    vpci_dev->msix_bar_idx = 4;
->
->Please don't.
->
->> +    vpci_dev->modern_io_bar_idx = 4;
->
->We can use bar 5 instead.
->
->Alternatively just throw an error saying that modern-pio-notify is not
->supported.
-
-As you like. I sent a v2 with modern_io_bar_idx to 5 but I can do a v3
-with an error thrown.
-
->
->> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
->> index 4cb784389c..9c5efaa06e 100644
->> --- a/hw/virtio/virtio-pci.c
->> +++ b/hw/virtio/virtio-pci.c
->> @@ -1705,6 +1705,7 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
->>       *
->>       *   region 0   --  virtio legacy io bar
->>       *   region 1   --  msi-x bar
->> +     *   region 2   --  virtio modern io bar
->>       *   region 4+5 --  virtio modern memory (64bit) bar
->
->Separate patch please.  Also worth noting that the modern io bar is off
->by default.
-
-Done.
-
-Thank you,
-Anthoine
-
+T24gV2VkLCAyMDIwLTA0LTIyIGF0IDE0OjM2IC0wNzAwLCBuby1yZXBseUBwYXRjaGV3Lm9yZyB3
+cm90ZToNCj4gUGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQyMjE3
+MTMwNS4xMDkyMy0xLWpvbmF0aGFuLmRlcnJpY2tAaW50ZWwuY29tLw0KPiANCj4gDQo+IA0KPiBI
+aSwNCj4gDQo+IFRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgYXNhbiBidWlsZCB0ZXN0LiBQbGVhc2Ug
+ZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQNCj4gdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5
+b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdA0K
+PiBsb2NhbGx5Lg0KPiANCj4gPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQ0KPiAjIS9iaW4vYmFz
+aA0KPiBleHBvcnQgQVJDSD14ODZfNjQNCj4gbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBO
+RVRXT1JLPTENCj4gdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRfTElT
+VD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQ0KPiA9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQ0KPiANCj4gICBDQyAgICAgIHFlbXUtaW8tY21kcy5vDQo+ICAgQ0MgICAgICByZXBsaWNhdGlv
+bi5vDQo+IEluIGZpbGUgaW5jbHVkZWQgZnJvbSBody92ZmlvL3RyYWNlLmM6NToNCj4gL3RtcC9x
+ZW11LXRlc3QvYnVpbGQvaHcvdmZpby90cmFjZS5oOjIzNDg6MTIwOiBlcnJvcjogZXhwZWN0ZWQg
+JyknDQo+ICAgICAgICAgcWVtdV9sb2coIiVkQCV6dS4lMDZ6dTp2ZmlvX3BjaV92bWRfcXVpcmtf
+c2hhZG93X3JlZ3MgIiAiJXMgbWVtYmFyMV9waHlzPTB4JSJQUkl4NjQiIG1lbWJhcjJfcGh5cz0w
+eCUiUFJJeDY0IiAiXG4iLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIF4NCj4gDQoNCkl0J3MgdGhlIGV4dHJhICIgYXQgdGhl
+IGVuZCwgd2hpY2ggd2lsbCBiZSBmaXhlZCBpbiB2Mg0KVGhhbmtzIGZvciB0aGUgc2FuaXR5IGNo
+ZWNrDQoNCg==
 
