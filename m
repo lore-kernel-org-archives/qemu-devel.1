@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E8AC5518A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:12:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A79E4C55189
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:12:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C9702070B
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:12:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C9702070B
+	by mail.kernel.org (Postfix) with ESMTPS id 7CCFF206CD
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:12:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CCFF206CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jR9YM-0005ZM-4X
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 03:12:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39534)
+	id 1jR9Yd-00068a-Le
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 03:12:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39502)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jR9Vv-0000dE-1u
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:09:43 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jR9Vu-0007Jl-0Z
+ (envelope-from <its@irrelevant.dk>) id 1jR9Vt-0000ap-JO
  for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:09:42 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:60258)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
+ (envelope-from <its@irrelevant.dk>) id 1jR9Vs-0007Hz-Nr
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:09:41 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:60188)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jR9Vq-0007DE-8F; Wed, 22 Apr 2020 03:09:38 -0400
+ id 1jR9Vo-00078Y-NE; Wed, 22 Apr 2020 03:09:36 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 9C319BFD4F;
- Wed, 22 Apr 2020 07:09:36 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 758D4BF758;
+ Wed, 22 Apr 2020 07:09:33 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 08/16] nvme: remove redundant cmbloc/cmbsz members
-Date: Wed, 22 Apr 2020 09:09:19 +0200
-Message-Id: <20200422070927.373048-9-its@irrelevant.dk>
+Subject: [PATCH v3 01/16] nvme: fix pci doorbell size calculation
+Date: Wed, 22 Apr 2020 09:09:12 +0200
+Message-Id: <20200422070927.373048-2-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200422070927.373048-1-its@irrelevant.dk>
 References: <20200422070927.373048-1-its@irrelevant.dk>
@@ -75,60 +75,54 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
+The size of the BAR is 0x1000 (main registers) + 8 bytes for each
+queue. Currently, the size of the BAR is calculated like so:
+
+    n->reg_size = pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
+
+Since the 'num_queues' parameter already accounts for the admin queue,
+this should in any case not need to be incremented by one. Also, the
+size should be initialized to (0x1000).
+
+    n->reg_size = pow2ceil(0x1000 + 2 * n->num_queues * 4);
+
+This, with the default value of num_queues (64), we will set aside room
+for 1 admin queue and 63 I/O queues (4 bytes per doorbell, 2 doorbells
+per queue).
+
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Keith Busch <kbusch@kernel.org>
 ---
- hw/block/nvme.c | 7 ++-----
- hw/block/nvme.h | 2 --
- 2 files changed, 2 insertions(+), 7 deletions(-)
+ hw/block/nvme.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 4450d8473361..c9dddc6c803a 100644
+index 9b453423cf2c..1d7d7fb3c67a 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -77,7 +77,7 @@ static bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr)
+@@ -54,6 +54,9 @@
+ #include "trace.h"
+ #include "nvme.h"
  
- static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
- {
--    if (n->cmbsz && nvme_addr_is_cmb(n, addr)) {
-+    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr)) {
-         memcpy(buf, (void *)&n->cmbuf[addr - n->ctrl_mem.addr], size);
-         return;
-     }
-@@ -171,7 +171,7 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
-     if (unlikely(!prp1)) {
-         trace_pci_nvme_err_invalid_prp();
-         return NVME_INVALID_FIELD | NVME_DNR;
--    } else if (n->cmbsz && prp1 >= n->ctrl_mem.addr &&
-+    } else if (n->bar.cmbsz && prp1 >= n->ctrl_mem.addr &&
-                prp1 < n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size)) {
-         qsg->nsg = 0;
-         qemu_iovec_init(iov, num_prps);
-@@ -1483,9 +1483,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-         NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
-         NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
++#define NVME_REG_SIZE 0x1000
++#define NVME_DB_SIZE  4
++
+ #define NVME_GUEST_ERR(trace, fmt, ...) \
+     do { \
+         (trace_##trace)(__VA_ARGS__); \
+@@ -1403,7 +1406,9 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+     pcie_endpoint_cap_init(pci_dev, 0x80);
  
--        n->cmbloc = n->bar.cmbloc;
--        n->cmbsz = n->bar.cmbsz;
--
-         n->cmbuf = g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
-         memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
-                               "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 215896191988..c1bb2a4994b6 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -90,8 +90,6 @@ typedef struct NvmeCtrl {
-     uint32_t    num_namespaces;
-     uint32_t    max_q_ents;
-     uint64_t    ns_size;
--    uint32_t    cmbsz;
--    uint32_t    cmbloc;
-     uint8_t     *cmbuf;
-     uint64_t    irq_status;
-     uint64_t    host_timestamp;                 /* Timestamp sent by the host */
+     n->num_namespaces = 1;
+-    n->reg_size = pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
++
++    /* num_queues is really number of pairs, so each has two doorbells */
++    n->reg_size = pow2ceil(NVME_REG_SIZE + 2 * n->num_queues * NVME_DB_SIZE);
+     n->ns_size = bs_size / (uint64_t)n->num_namespaces;
+ 
+     n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
 -- 
 2.26.2
 
