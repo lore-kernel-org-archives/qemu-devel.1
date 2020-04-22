@@ -2,84 +2,90 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 089FBC55189
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 12:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBE6CC55185
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 12:49:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B71920787
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 12:49:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8785220787
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 12:49:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nFTISvY3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B71920787
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ULXrX9ug"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8785220787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jREoI-00027R-Nw
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 08:49:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40212)
+	id 1jREoL-0002Bn-Mk
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 08:49:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40246)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jREnP-0001EL-3L
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 08:48:07 -0400
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jREnU-0001H3-Pj
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 08:48:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jREnM-0006ef-Oj
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 08:48:05 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37296)
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jREnS-0006qg-US
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 08:48:11 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:35763)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jREnK-0006Yp-Oi
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 08:48:03 -0400
-Received: by mail-oi1-x241.google.com with SMTP id r25so1766875oij.4
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 05:48:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=tJu+dheAQXgGwmJsve9C9rYr4L0AwGPYVm54F6Li038=;
- b=nFTISvY3ym4cW2WUuJNuw29ZDY54qn9D5pBWSRwNIensLP7d+YKOxgN0Lx7/CrqeRb
- CFxMCuaWjYwhtB9iUVXS2u9/rTlb/tZGAiB/Se4O9SQi2x31/mKevpuVFxZLwXKAA9ge
- zueS4+sr2o/b3RzFaXmsq19Upy5jdVufBTS37LzGdWo2H1P0BBfWsrrI6ovc4fIF651f
- 0U2Fl5Q+pxIKSH382IccEsRcBicg54AhvjeQO+e//HqH2v3l+OjaxtVeZyeycrdyvOfz
- F+m/HFDZoqghY+d5EKTpm7didenx/11DMPSLhf9uIib5U+wHQboAm9IW0o1KwYx9R7po
- ysNw==
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jREnO-0006dG-4p; Wed, 22 Apr 2020 08:48:06 -0400
+Received: by mail-lf1-x141.google.com with SMTP id r17so1556988lff.2;
+ Wed, 22 Apr 2020 05:48:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=+kmyptpxbUuU4GRghYpX15dLM0lMSpZ2ih8UKXX09Dk=;
+ b=ULXrX9ugJjUVXu6tUZeclDGc3HkcqciiWXEzYBfNs2Ygb6P8Z+WGOcwcpSOIQLp7D3
+ jsD5cunRUs0NF5JgmE0YIB+tS13blrwK8C+IJM9mBkExXUZl2mRQs5c7q106tsp85SUW
+ PIhdw9ezD5O6TFuiG3PHMD10iNyWwANHjNMRfEilvgEkLf16DITwVoKNr+zFntwzXtlb
+ dGu/LgOD+7Glgke7KPIxwDSubVQrHRDqwHIkRNo994y44v16TT5LisH9nOx+XBocbsuI
+ i+BrEcRj2bnXwCSced14rsJbz/+WDVeCnJcQCkyYfSZ/MPsCpZ5TRanc9OoGRj6Y/4z0
+ u8pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=tJu+dheAQXgGwmJsve9C9rYr4L0AwGPYVm54F6Li038=;
- b=AqeXWGcO8xiLErnu85nm6gTCxDeX7py660+FlKvrzzMxsrWXjS2mIgL7NxsVtLRg2U
- U9DUL9trabywPPD+Kp8jxBBDFMRN3nm4DS8VLGrI1aCtfcan2uDRtpxmeyUhkC7VxCvY
- KnYS66tLZjCH9iSINPVP2uvOwZfnILba/H7hqSHu+gHa+CiPxalYTCnCD8OjZfPCbNqq
- g/a56JdL/BpDVQett7WNaMM9gbMewZ+M3VPxTYPh1ueF4C/tnpJ7cDqNtZoSHwF5vs34
- +XA5uxPHmcQdniAHWxRSUoR61O0ABuNNJWRajvs5gWnR91vL+nU4V3QjUdY5Uz9xQl2J
- UqLg==
-X-Gm-Message-State: AGi0PuaRRvjXE4F7rozUvANzanirebJncfYD8NgO/rgiPVu9A0vvNCHZ
- S1q8khTYlay/YlSOFMG6XvXz0fMim+VDKwLbo+qmOQ==
-X-Google-Smtp-Source: APiQypIm4a6xzGr01Fm1jXQvTczXy3VP+yOfZENT9CpEQwDTxnfLLvXo29dt37Tdl+4D1YQQtMKkIeNU8efAdqjrYCw=
-X-Received: by 2002:aca:3a8a:: with SMTP id h132mr6368777oia.146.1587559681331; 
- Wed, 22 Apr 2020 05:48:01 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=+kmyptpxbUuU4GRghYpX15dLM0lMSpZ2ih8UKXX09Dk=;
+ b=jbxROuEPOk1XWkSQD9yMlt0DAnlKsgG9kdD3VCsHh9FlLeCi1YQVQnUJ5aT9LAMUlB
+ 0PbdckMp+F9awZ594UeRo8duklXwz+rZqKrBtNYInsVPC5noihD04Q2WRDdPfV89VAjS
+ lTfIVGSwkM/JEJTaHMX4EeU8nf4bXvfR4qXO0Wzhql0qg9ig02zZF2Q6kiIMaGZ5qPrw
+ xlGpNBs5gE6HbZkkCqrVqmn0KZpIVhdZJZjl60z4VvM5x21AxxCb1TQmlZ0HSgO1+L1T
+ Afqdb+SZ/716+Bouzejq8VE8r60EXqr3YUg+mos0Fq3ZsG306EUUaFzppaBImNU1GhAF
+ 0lww==
+X-Gm-Message-State: AGi0PuZ4qildRYFJURPqgKCbOcAzjuhOfXelL3BWrGOldI3up2K2MNu9
+ sSCsIyNPQa8uBxs43Mg0GSU=
+X-Google-Smtp-Source: APiQypJg+cepf+oeYWKqDZ2mQLSTLtX3tU7xZHF5Y/u4g0MVhvZchrbb6mwjqp0vdjinvFvql8TNrQ==
+X-Received: by 2002:ac2:420c:: with SMTP id y12mr17186443lfh.26.1587559683117; 
+ Wed, 22 Apr 2020 05:48:03 -0700 (PDT)
+Received: from localhost (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id l4sm3491696ljc.107.2020.04.22.05.48.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 22 Apr 2020 05:48:02 -0700 (PDT)
+Date: Wed, 22 Apr 2020 14:49:13 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH for-5.0?] target/arm: Fix ID_MMFR4 value on AArch64 'max'
+ CPU
+Message-ID: <20200422124913.GJ2669@toto>
+References: <20200422124501.28015-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-References: <20200421170227.843555-1-marcandre.lureau@redhat.com>
- <CAFEAcA85GEfDiwo8a9r00x1e6a5d6UDw6LJiYPkm0EstMtccOQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA85GEfDiwo8a9r00x1e6a5d6UDw6LJiYPkm0EstMtccOQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 22 Apr 2020 13:47:49 +0100
-Message-ID: <CAFEAcA8Cy4LYO+44bTf82JHtuM13XiSvUhUE-mwbL97kd8Uh_g@mail.gmail.com>
-Subject: Re: [PATCH for-5.0?] slirp: update to fix CVE-2020-1983
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200422124501.28015-1-peter.maydell@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::241
+X-Received-From: 2a00:1450:4864:20::141
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,41 +97,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Laurent Desnogues <laurent.desnogues@gmail.com>, qemu-arm@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 Apr 2020 at 20:19, Peter Maydell <peter.maydell@linaro.org> wrot=
-e:
->
-> On Tue, 21 Apr 2020 at 18:03, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@redhat.com> wrote:
-> >
-> > This is an update on the stable-4.2 branch of libslirp.git:
-> >
-> > git shortlog 55ab21c9a3..2faae0f778f81
-> >
-> > Marc-Andr=C3=A9 Lureau (1):
-> >       Fix use-afte-free in ip_reass() (CVE-2020-1983)
-> >
-> > CVE-2020-1983 is actually a follow up fix for commit
-> > 126c04acbabd7ad32c2b018fe10dfac2a3bc1210 ("Fix heap overflow in
-> > ip_reass on big packet input") which was was included in qemu
-> > v4.1 (commit e1a4a24d262ba5ac74ea1795adb3ab1cd574c7fb "slirp: update
-> > with CVE-2019-14378 fix").
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> Hi; thanks for putting together this stable-branch update.
-> I've run it through my test setup and it's fine; I'm just
-> going to wait a little until I push it to master just in case
-> anybody wants to speak up with an opinion/objection.
-> I'll do that tomorrow afternoon UK time and then tag rc4.
+On Wed, Apr 22, 2020 at 01:45:01PM +0100, Peter Maydell wrote:
+> In commit 41a4bf1feab098da4cd the added code to set the CNP
+> field in ID_MMFR4 for the AArch64 'max' CPU had a typo
+> where it used the wrong variable name, resulting in ID_MMFR4
+> fields AC2, XNX and LSM being wrong. Fix the typo.
+> 
+> Fixes: 41a4bf1feab098da4cd
+> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 
-Now applied to master, thanks.
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
--- PMM
+
+
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> maybe 5.0 just because it's so trivial. I dunno...
+> 
+> There's also an error where we use the uint32_t u variable
+> to update the 64-bit ID_AA64DFR0 register, but that's harmless
+> because as it happens the top 32 bits of that register are
+> all zeroes anyway, so we can just fix that in 5.1.
+> 
+>  target/arm/cpu64.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index 62d36f9e8d3..95d0c8c101a 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -705,7 +705,7 @@ static void aarch64_max_initfn(Object *obj)
+>          u = cpu->isar.id_mmfr4;
+>          u = FIELD_DP32(u, ID_MMFR4, HPDS, 1); /* AA32HPD */
+>          u = FIELD_DP32(u, ID_MMFR4, AC2, 1); /* ACTLR2, HACTLR2 */
+> -        u = FIELD_DP32(t, ID_MMFR4, CNP, 1); /* TTCNP */
+> +        u = FIELD_DP32(u, ID_MMFR4, CNP, 1); /* TTCNP */
+>          cpu->isar.id_mmfr4 = u;
+>  
+>          u = cpu->isar.id_aa64dfr0;
+> -- 
+> 2.20.1
+> 
+> 
 
