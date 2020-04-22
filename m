@@ -6,65 +6,66 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC6B4C55185
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:18:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E805EC54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:19:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86333206EC
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:18:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1E56206EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:19:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O2fe2bML"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86333206EC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b6LvxNc1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1E56206EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRFH0-0002su-KN
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 09:18:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46918)
+	id 1jRFI6-0004FG-OT
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 09:19:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46964)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jRF6C-0003rq-8s
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:07:33 -0400
+ (envelope-from <armbru@redhat.com>) id 1jRF6E-0003vS-0L
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:07:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jRF69-0003uS-P5
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:07:30 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22906
+ (envelope-from <armbru@redhat.com>) id 1jRF6C-00041w-Mt
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:07:33 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29263
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jRF69-0003sl-A8
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:07:29 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jRF6C-0003xh-7R
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:07:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587560848;
+ s=mimecast20190719; t=1587560850;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Ld/bBsfDpttrTV0PKzMSzSLeV9H2V1HonsYLEXv6m2Y=;
- b=O2fe2bMLKJu1z2RSPCb5BfSefSHEk0CowqHntbA5In4GqL6CX2VTQ+ykGUntvVzYLSg7bq
- 5p4mzrC/L4DXoytVz6cG6E0erQTQFq0LiPzj1/mXWfhoBz+eAYTN77SS7eeKbppv9v2pNY
- hgwngT2WTWW31BFjUgX49+ARuGirhzo=
+ bh=sueXh/OLDF/vK9gMNelEOqsem9lXh2AuWecravX7H6s=;
+ b=b6LvxNc1uPRi1Lo1EWlI+cXMF3u7uX3RSaVziGIWUcAT6QOUNDqZbVzBVIIYpvjU7zng3a
+ 2wevYMDbqIRCsZv2bH2b6YJEciM7FahSDR7tx5RNSyMuqdpLDp8GLQaw4AgBaJ6Yu8WIlN
+ 9bznuzIWiXXtwXuv6TWm3H01gRgRsVw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-tipvEGmDP0-F5p9IolmMqg-1; Wed, 22 Apr 2020 09:07:26 -0400
-X-MC-Unique: tipvEGmDP0-F5p9IolmMqg-1
+ us-mta-507-67EzW1g2OnaPx_8RheMedw-1; Wed, 22 Apr 2020 09:07:28 -0400
+X-MC-Unique: 67EzW1g2OnaPx_8RheMedw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12C158017FF
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 13:07:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9281A18CA246
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 13:07:27 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 23AA8277C8;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 28C5927BD7;
  Wed, 22 Apr 2020 13:07:23 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 155CC11358C3; Wed, 22 Apr 2020 15:07:20 +0200 (CEST)
+ id 18CF711358C4; Wed, 22 Apr 2020 15:07:20 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 07/14] bochs-display: Fix vgamem=SIZE error handling
-Date: Wed, 22 Apr 2020 15:07:12 +0200
-Message-Id: <20200422130719.28225-8-armbru@redhat.com>
+Subject: [PATCH v2 08/14] virtio-net: Fix duplex=... and speed=... error
+ handling
+Date: Wed, 22 Apr 2020 15:07:13 +0200
+Message-Id: <20200422130719.28225-9-armbru@redhat.com>
 In-Reply-To: <20200422130719.28225-1-armbru@redhat.com>
 References: <20200422130719.28225-1-armbru@redhat.com>
 MIME-Version: 1.0
@@ -73,11 +74,11 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:57:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:12:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,62 +90,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-bochs_display_realize() rejects out-of-range vgamem.  The error
-handling is broken:
+virtio_net_device_realize() rejects invalid duplex and speed values.
+The error handling is broken:
 
-    $ qemu-system-x86_64 -S -display none -monitor stdio
+    $ ../qemu/bld-sani/x86_64-softmmu/qemu-system-x86_64 -S -display none -=
+monitor stdio
     QEMU 4.2.93 monitor - type 'help' for more information
-    (qemu) device_add bochs-display,vgamem=3D1
-    Error: bochs-display: video memory too small
-    (qemu) device_add bochs-display,vgamem=3D1
-    RAMBlock "0000:00:04.0/bochs-display-vram" already registered, abort!
-    Aborted (core dumped)
+    (qemu) device_add virtio-net,duplex=3Dx
+    Error: 'duplex' must be 'half' or 'full'
+    (qemu) c
+    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+    =3D=3D15654=3D=3DERROR: AddressSanitizer: heap-use-after-free on addres=
+s 0x62e000014590 at pc 0x560b75c8dc13 bp 0x7fffdf1a6950 sp 0x7fffdf1a6940
+    READ of size 8 at 0x62e000014590 thread T0
+=09#0 0x560b75c8dc12 in object_dynamic_cast_assert /work/armbru/qemu/qom/ob=
+ject.c:826
+=09#1 0x560b74c38ac0 in virtio_vmstate_change /work/armbru/qemu/hw/virtio/v=
+irtio.c:3210
+=09#2 0x560b74d9765e in vm_state_notify /work/armbru/qemu/softmmu/vl.c:1271
+=09#3 0x560b7494ba72 in vm_prepare_start /work/armbru/qemu/cpus.c:2156
+=09#4 0x560b7494bacd in vm_start /work/armbru/qemu/cpus.c:2162
+=09#5 0x560b75a7d890 in qmp_cont /work/armbru/qemu/monitor/qmp-cmds.c:160
+=09#6 0x560b75a8d70a in hmp_cont /work/armbru/qemu/monitor/hmp-cmds.c:1043
+=09#7 0x560b75a799f2 in handle_hmp_command /work/armbru/qemu/monitor/hmp.c:=
+1082
+    [...]
 
-Cause: bochs_display_realize() neglects to bail out after setting the
-error.  Fix that.
+    0x62e000014590 is located 33168 bytes inside of 42288-byte region [0x62=
+e00000c400,0x62e000016930)
+    freed by thread T1 here:
+=09#0 0x7feadd39491f in __interceptor_free (/lib64/libasan.so.5+0x10d91f)
+=09#1 0x7feadcebcd7c in g_free (/lib64/libglib-2.0.so.0+0x55d7c)
+=09#2 0x560b75c8fd40 in object_unref /work/armbru/qemu/qom/object.c:1128
+=09#3 0x560b7498a625 in memory_region_unref /work/armbru/qemu/memory.c:1762
+=09#4 0x560b74999fa4 in do_address_space_destroy /work/armbru/qemu/memory.c=
+:2788
+=09#5 0x560b762362fc in call_rcu_thread /work/armbru/qemu/util/rcu.c:283
+=09#6 0x560b761c8884 in qemu_thread_start /work/armbru/qemu/util/qemu-threa=
+d-posix.c:519
+=09#7 0x7fead9be34bf in start_thread (/lib64/libpthread.so.0+0x84bf)
 
-Fixes: 765c94290863eef1fc4a67819d452cc13b7854a1
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+    previously allocated by thread T0 here:
+=09#0 0x7feadd394d18 in __interceptor_malloc (/lib64/libasan.so.5+0x10dd18)
+=09#1 0x7feadcebcc88 in g_malloc (/lib64/libglib-2.0.so.0+0x55c88)
+=09#2 0x560b75c8cf8a in object_new /work/armbru/qemu/qom/object.c:699
+=09#3 0x560b75010ad9 in qdev_device_add /work/armbru/qemu/qdev-monitor.c:65=
+4
+=09#4 0x560b750120c2 in qmp_device_add /work/armbru/qemu/qdev-monitor.c:805
+=09#5 0x560b75012c1b in hmp_device_add /work/armbru/qemu/qdev-monitor.c:905
+    [...]
+    =3D=3D15654=3D=3DABORTING
+
+Cause: virtio_net_device_realize() neglects to bail out after setting
+the error.  Fix that.
+
+Fixes: 9473939ed7addcaaeb8fde5c093918fb7fa0919c
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/display/bochs-display.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ hw/net/virtio-net.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/hw/display/bochs-display.c b/hw/display/bochs-display.c
-index 70eb619ef4..e763a0a72d 100644
---- a/hw/display/bochs-display.c
-+++ b/hw/display/bochs-display.c
-@@ -267,16 +267,18 @@ static void bochs_display_realize(PCIDevice *dev, Err=
-or **errp)
-     Object *obj =3D OBJECT(dev);
-     int ret;
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index a46e3b37a7..b52ff4ab63 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -2947,6 +2947,7 @@ static void virtio_net_device_realize(DeviceState *de=
+v, Error **errp)
+             n->net_conf.duplex =3D DUPLEX_FULL;
+         } else {
+             error_setg(errp, "'duplex' must be 'half' or 'full'");
++            return;
+         }
+         n->host_features |=3D (1ULL << VIRTIO_NET_F_SPEED_DUPLEX);
+     } else {
+@@ -2955,7 +2956,9 @@ static void virtio_net_device_realize(DeviceState *de=
+v, Error **errp)
 =20
--    s->con =3D graphic_console_init(DEVICE(dev), 0, &bochs_display_gfx_ops=
-, s);
--
-     if (s->vgamem < 4 * MiB) {
-         error_setg(errp, "bochs-display: video memory too small");
+     if (n->net_conf.speed < SPEED_UNKNOWN) {
+         error_setg(errp, "'speed' must be between 0 and INT_MAX");
+-    } else if (n->net_conf.speed >=3D 0) {
 +        return;
++    }
++    if (n->net_conf.speed >=3D 0) {
+         n->host_features |=3D (1ULL << VIRTIO_NET_F_SPEED_DUPLEX);
      }
-     if (s->vgamem > 256 * MiB) {
-         error_setg(errp, "bochs-display: video memory too big");
-+        return;
-     }
-     s->vgamem =3D pow2ceil(s->vgamem);
 =20
-+    s->con =3D graphic_console_init(DEVICE(dev), 0, &bochs_display_gfx_ops=
-, s);
-+
-     memory_region_init_ram(&s->vram, obj, "bochs-display-vram", s->vgamem,
-                            &error_fatal);
-     memory_region_init_io(&s->vbe, obj, &bochs_display_vbe_ops, s,
 --=20
 2.21.1
 
