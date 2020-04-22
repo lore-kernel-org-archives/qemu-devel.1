@@ -7,88 +7,89 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BDF6C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 19:41:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60F54C54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 19:44:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C57E720767
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 19:41:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 239FF20767
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 19:44:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vSP7kavp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C57E720767
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sjDEicQ+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 239FF20767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRLFf-0001Nc-0I
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 15:41:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49880)
+	id 1jRLHw-0002uP-94
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 15:44:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50974)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jRLF2-0000sW-3l
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:41:04 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jRLHG-0002UB-U9
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:43:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jRLF1-00089t-DZ
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:41:03 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45979)
+ (envelope-from <alex.bennee@linaro.org>) id 1jRLHD-0003QR-01
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:43:22 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36541)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jRLF0-000864-SN
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:41:03 -0400
-Received: by mail-wr1-x444.google.com with SMTP id t14so3939124wrw.12
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 12:41:02 -0700 (PDT)
+ id 1jRLHC-0003Q4-Fq
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:43:18 -0400
+Received: by mail-wr1-x441.google.com with SMTP id d15so2368936wrx.3
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 12:43:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=5yzR0d/XcE/IlonCZd7Wm3SojkywcWQXoF/pQzoX3z0=;
- b=vSP7kavpn/2JYQG7fNn30kNdHXgOqHP98+oQEfUdzuYcf9RWfwMby9my4XfTvwz7qa
- OqZ9pqSqePwBu2/2xsTsQhswajdHAEzgNiUPGvCKYjGVc0gCxHtTJuSKOneI7lZzQ+J1
- PLjnpBaptiEit45ZvbqC58xB7Y1jxj+jbehIxB8FW501depYNm4+Tc6hz4bLKZ+xqG7v
- /wreoLaPBDJTezP5ocfzC+7rYX2U/0YwBFhodETwiAh1IwAfIsw1ZrS4Yi0iO7ROY+LW
- 3ku9xJvv6m3Cng3cn/kfjex4Vd/wJA7dvaWQevRi+0Cn74+y8jsVvo65+2rPFrFtihhz
- Ktrg==
+ bh=QW/BZTp0oKnOcCvNjq+2L2V11dGvFweiquRWPQef9QA=;
+ b=sjDEicQ+dH5ZQcBjC4epZ/Dgn4G9Bo5vJTy2QqJ6mFIdxHvrJxc9SE+XkqtABE2LEA
+ XnRGx1WOgQFK3C0S5WxALJfj1zLdyfP8rfjXWeYF38YMrPvMj6VE4DMKzoi7bKrnCqNv
+ Qz6UcOnuYgXHyA2ciEgDLb6ti8sPQGQd58Lry+1K3v5SLya9/MHeqAQy6PzFimwpnLC7
+ DUWBblH68d56NaNXJorDebkC+y3izii0WNC4E13fkHWPhKcHmXVxrXvDlDgBSoTR4pIf
+ NESHZXik/rCU+tAkJ1x3BVq0cWjmTAjePAfYd+7PvvbCj56qIemb9xYpc+WuwvotT/Fl
+ v0cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=5yzR0d/XcE/IlonCZd7Wm3SojkywcWQXoF/pQzoX3z0=;
- b=BKn/m7Rl6rHRtPzaR+C8CuT1VeUU1p3u1+xp+Y75rAekLQcPoUZi96G1XiwAdnoq1k
- BSFCBa65culG3fPB2hvJj/lT0EPqPd50MfEJ6w76Gg4oDd9fDEIZAZWg1sHAC+Gis9IR
- muMlkmDNB2jqGkKH67Tpw73Cb4TMPbMeAAeMNS73PvUZD0u/GWDyRFWugxp9HLH7wrqa
- FhmcDtJyh2wqY8e/imsPs5FF3tMsAUg1SEgm3k7SZlzUOVrZboMNR+ztd85Iy3i5elCM
- R3X4VzHeuD26FbcEh/MsFg3ucYB3ZuxHLrqdRpS8E/nkN6xUBhCYvG6ChqDlXnDrH99m
- JYgQ==
-X-Gm-Message-State: AGi0PuZM8t5R5dnt4Fvc21J95mlI+bSKEPtLXEOceXGPmrxcBqUhDT4X
- 19FzO9dOPPDzFe2klxVVWnpC+g==
-X-Google-Smtp-Source: APiQypLW9bKgEOVZISv/co1USgNp75DFj+X0wEqyeuhHIME0rTw61DXy5rqMgyRLDHi+2qmOxEEBLA==
-X-Received: by 2002:adf:df8c:: with SMTP id z12mr782595wrl.116.1587584460785; 
- Wed, 22 Apr 2020 12:41:00 -0700 (PDT)
+ bh=QW/BZTp0oKnOcCvNjq+2L2V11dGvFweiquRWPQef9QA=;
+ b=EGOc3Kvx4H1baJ+Pqgzn9UZwFZywgQFGsVJxUXS4RzLRVLgOf+vocIyqylsljHm+G5
+ mTJS+aKrnCQGAfjiLnIjS9zp2uBiCOK++zGaLSCpEAJ8RNX5XmwupRzwdxo2dkNiXCFM
+ YZxEsH8UQVQ2sIwr2Ek3IlENWVk9w8olru2i9KVcczB6XFULMEgiKLL4fp5tTaZ5/NF3
+ T+su2KEBxoXP38JP6x/EL0i/FtKiaXoXDL5fyvkK98BArYFOb8k6xB6dTmyNDmDoqrtW
+ pafcX7CcOdf90Ri28QeNEYYE5pdj101ygmsa1vcU4bKCs5d1sKQGiXoPFSJ4QOLEW2JW
+ 4njQ==
+X-Gm-Message-State: AGi0PuYF6KuSGDdxxqfsrGIRfMkcyIry/dcxCEmCQfAevgtAj8Z9hW1m
+ 3+rn0aqIkLQUs79PScEOUlKkEW45ChA=
+X-Google-Smtp-Source: APiQypKvKI6I7gcAiwgRTnYF0RFqAyyB7r1wq42XmvuUazIT5JI51ebDkv8iywNIYOwYCrHWtifuRA==
+X-Received: by 2002:adf:ca0e:: with SMTP id o14mr781616wrh.254.1587584596675; 
+ Wed, 22 Apr 2020 12:43:16 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id w11sm361816wmi.32.2020.04.22.12.40.59
+ by smtp.gmail.com with ESMTPSA id k14sm295394wrp.53.2020.04.22.12.43.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Apr 2020 12:40:59 -0700 (PDT)
+ Wed, 22 Apr 2020 12:43:15 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 28C7A1FF7E;
- Wed, 22 Apr 2020 20:40:59 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id B3CE71FF7E;
+ Wed, 22 Apr 2020 20:43:14 +0100 (BST)
 References: <20200422011722.13287-1-richard.henderson@linaro.org>
- <20200422011722.13287-24-richard.henderson@linaro.org>
+ <20200422011722.13287-25-richard.henderson@linaro.org>
 User-agent: mu4e 1.4.1; emacs 28.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 23/36] tcg: Add tcg_reg_alloc_dup2
-In-reply-to: <20200422011722.13287-24-richard.henderson@linaro.org>
-Date: Wed, 22 Apr 2020 20:40:59 +0100
-Message-ID: <87lfmnb96c.fsf@linaro.org>
+Subject: Re: [PATCH v2 24/36] tcg/i386: Use tcg_constant_vec with tcg vec
+ expanders
+In-reply-to: <20200422011722.13287-25-richard.henderson@linaro.org>
+Date: Wed, 22 Apr 2020 20:43:14 +0100
+Message-ID: <87imhrb92l.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,40 +109,97 @@ Sender: "Qemu-devel"
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> There are several ways we can expand a vector dup of a 64-bit
-> element on a 32-bit host.
->
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  tcg/tcg.c | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 88 insertions(+)
->
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index fc1c97d586..d712d19842 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -3870,6 +3870,91 @@ static void tcg_reg_alloc_op(TCGContext *s, const =
-TCGOp *op)
->      }
->  }
->=20=20
-> +static void tcg_reg_alloc_dup2(TCGContext *s, const TCGOp *op)
-> +{
-> +    const TCGLifeData arg_life =3D op->life;
-> +    TCGTemp *ots, *itsl, *itsh;
-> +    TCGType vtype =3D TCGOP_VECL(op) + TCG_TYPE_V64;
-> +
-> +    /* This opcode is only valid for 32-bit hosts, for 64-bit elements. =
-*/
-> +    tcg_debug_assert(TCG_TARGET_REG_BITS =3D=3D 32);
-
-Given this maybe the whole function should be in a #if
-TCG_TARGET_REG_BITS =3D=3D 32 protection. Most of the other parts of the
-code that refer to this have something similar.
-
-Otherwise:
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  tcg/i386/tcg-target.inc.c | 26 +++++++++++++-------------
+>  1 file changed, 13 insertions(+), 13 deletions(-)
+>
+> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+> index 9cb627d6eb..deace219d2 100644
+> --- a/tcg/i386/tcg-target.inc.c
+> +++ b/tcg/i386/tcg-target.inc.c
+> @@ -3452,7 +3452,7 @@ static void expand_vec_sari(TCGType type, unsigned =
+vece,
+>  static void expand_vec_mul(TCGType type, unsigned vece,
+>                             TCGv_vec v0, TCGv_vec v1, TCGv_vec v2)
+>  {
+> -    TCGv_vec t1, t2, t3, t4;
+> +    TCGv_vec t1, t2, t3, t4, zero;
+>=20=20
+>      tcg_debug_assert(vece =3D=3D MO_8);
+>=20=20
+> @@ -3470,11 +3470,11 @@ static void expand_vec_mul(TCGType type, unsigned=
+ vece,
+>      case TCG_TYPE_V64:
+>          t1 =3D tcg_temp_new_vec(TCG_TYPE_V128);
+>          t2 =3D tcg_temp_new_vec(TCG_TYPE_V128);
+> -        tcg_gen_dup16i_vec(t2, 0);
+> +        zero =3D tcg_constant_vec(TCG_TYPE_V128, MO_8, 0);
+>          vec_gen_3(INDEX_op_x86_punpckl_vec, TCG_TYPE_V128, MO_8,
+> -                  tcgv_vec_arg(t1), tcgv_vec_arg(v1), tcgv_vec_arg(t2));
+> +                  tcgv_vec_arg(t1), tcgv_vec_arg(v1), tcgv_vec_arg(zero)=
+);
+>          vec_gen_3(INDEX_op_x86_punpckl_vec, TCG_TYPE_V128, MO_8,
+> -                  tcgv_vec_arg(t2), tcgv_vec_arg(t2), tcgv_vec_arg(v2));
+> +                  tcgv_vec_arg(t2), tcgv_vec_arg(zero), tcgv_vec_arg(v2)=
+);
+>          tcg_gen_mul_vec(MO_16, t1, t1, t2);
+>          tcg_gen_shri_vec(MO_16, t1, t1, 8);
+>          vec_gen_3(INDEX_op_x86_packus_vec, TCG_TYPE_V128, MO_8,
+> @@ -3489,15 +3489,15 @@ static void expand_vec_mul(TCGType type, unsigned=
+ vece,
+>          t2 =3D tcg_temp_new_vec(type);
+>          t3 =3D tcg_temp_new_vec(type);
+>          t4 =3D tcg_temp_new_vec(type);
+> -        tcg_gen_dup16i_vec(t4, 0);
+> +        zero =3D tcg_constant_vec(TCG_TYPE_V128, MO_8, 0);
+>          vec_gen_3(INDEX_op_x86_punpckl_vec, type, MO_8,
+> -                  tcgv_vec_arg(t1), tcgv_vec_arg(v1), tcgv_vec_arg(t4));
+> +                  tcgv_vec_arg(t1), tcgv_vec_arg(v1), tcgv_vec_arg(zero)=
+);
+>          vec_gen_3(INDEX_op_x86_punpckl_vec, type, MO_8,
+> -                  tcgv_vec_arg(t2), tcgv_vec_arg(t4), tcgv_vec_arg(v2));
+> +                  tcgv_vec_arg(t2), tcgv_vec_arg(zero), tcgv_vec_arg(v2)=
+);
+>          vec_gen_3(INDEX_op_x86_punpckh_vec, type, MO_8,
+> -                  tcgv_vec_arg(t3), tcgv_vec_arg(v1), tcgv_vec_arg(t4));
+> +                  tcgv_vec_arg(t3), tcgv_vec_arg(v1), tcgv_vec_arg(zero)=
+);
+>          vec_gen_3(INDEX_op_x86_punpckh_vec, type, MO_8,
+> -                  tcgv_vec_arg(t4), tcgv_vec_arg(t4), tcgv_vec_arg(v2));
+> +                  tcgv_vec_arg(t4), tcgv_vec_arg(zero), tcgv_vec_arg(v2)=
+);
+>          tcg_gen_mul_vec(MO_16, t1, t1, t2);
+>          tcg_gen_mul_vec(MO_16, t3, t3, t4);
+>          tcg_gen_shri_vec(MO_16, t1, t1, 8);
+> @@ -3525,7 +3525,7 @@ static bool expand_vec_cmp_noinv(TCGType type, unsi=
+gned vece, TCGv_vec v0,
+>          NEED_UMIN =3D 8,
+>          NEED_UMAX =3D 16,
+>      };
+> -    TCGv_vec t1, t2;
+> +    TCGv_vec t1, t2, t3;
+>      uint8_t fixup;
+>=20=20
+>      switch (cond) {
+> @@ -3596,9 +3596,9 @@ static bool expand_vec_cmp_noinv(TCGType type, unsi=
+gned vece, TCGv_vec v0,
+>      } else if (fixup & NEED_BIAS) {
+>          t1 =3D tcg_temp_new_vec(type);
+>          t2 =3D tcg_temp_new_vec(type);
+> -        tcg_gen_dupi_vec(vece, t2, 1ull << ((8 << vece) - 1));
+> -        tcg_gen_sub_vec(vece, t1, v1, t2);
+> -        tcg_gen_sub_vec(vece, t2, v2, t2);
+> +        t3 =3D tcg_constant_vec(type, vece, 1ull << ((8 << vece) - 1));
+> +        tcg_gen_sub_vec(vece, t1, v1, t3);
+> +        tcg_gen_sub_vec(vece, t2, v2, t3);
+>          v1 =3D t1;
+>          v2 =3D t2;
+>          cond =3D tcg_signed_cond(cond);
+
 
 --=20
 Alex Benn=C3=A9e
