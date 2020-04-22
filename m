@@ -2,82 +2,79 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A914CC54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 17:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC91C5518B
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 17:28:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7695F20776
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 17:28:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69CB020776
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 17:28:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="InO9ItUW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7695F20776
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DUustaVL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69CB020776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRJAX-0004u4-K5
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 13:28:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34236)
+	id 1jRJAY-0004tK-Dm
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 13:28:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34220)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jRJ6V-0006zi-65
+ (envelope-from <pbonzini@redhat.com>) id 1jRJ6U-0006yu-Dc
  for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:24:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jRJ6R-0004OW-65
+ (envelope-from <pbonzini@redhat.com>) id 1jRJ6Q-0004Mn-5e
  for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:24:06 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23038
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46966
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jRJ6Q-0004Ne-Ps
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:24:02 -0400
+ id 1jRJ6P-0004HU-OA
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:24:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587576242;
+ s=mimecast20190719; t=1587576237;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TuB60exFZOVxc3L6T8y64lcDmB9bKM9IPSAni+oZjKg=;
- b=InO9ItUWYQ6EWspESg5jlI6UUn4RrYxX4nZvQHNXgTKEs8sXqEgM6aFBtAJVQfJN6roWYb
- HKz1pQ35U/w8vn3i0Fnq211wsDilRAcPZifRtgDMP6o0cED0utmNJVVCYz9PCZCu+iKjPq
- NEx0TUNwRsaeLNYIhMbuKu0kECyG1u4=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=xlNrq2Tb8WbiWsAlU80j8YtQWYybFIPf9j0sLO+2Ess=;
+ b=DUustaVLhbx5o81AMLhmbzDgY2cDEQ8cqlkhqPi+jhfDKvAWiUquGsqfOPqN7C6fHSqqWf
+ HEZsySC+wTwQfS9ED93oRvxdbw93/z4FXqOCPi9cksRoLsfk7aImpUjYqdwCzh1MxgBTXA
+ hKNtHnHCxzm+alHgnHCcKFuzoY+Oksk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-350-dntXZBs_PIi2xQ9pk0oIBg-1; Wed, 22 Apr 2020 13:23:58 -0400
-X-MC-Unique: dntXZBs_PIi2xQ9pk0oIBg-1
+ us-mta-411-LkXPM9_1ORiJaqLGuQNDaQ-1; Wed, 22 Apr 2020 13:23:54 -0400
+X-MC-Unique: LkXPM9_1ORiJaqLGuQNDaQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73F56DB60;
- Wed, 22 Apr 2020 17:23:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E86A41005510;
+ Wed, 22 Apr 2020 17:23:52 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E10476084B;
- Wed, 22 Apr 2020 17:23:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5D2B86084B;
+ Wed, 22 Apr 2020 17:23:52 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 6/8] run-coverity-scan: use --no-update-tools in docker run
-Date: Wed, 22 Apr 2020 13:23:49 -0400
-Message-Id: <20200422172351.26583-7-pbonzini@redhat.com>
-In-Reply-To: <20200422172351.26583-1-pbonzini@redhat.com>
-References: <20200422172351.26583-1-pbonzini@redhat.com>
+Subject: [PATCH 0/8] run-coverity-scan: misc improvements,
+ especially for docker mode
+Date: Wed, 22 Apr 2020 13:23:43 -0400
+Message-Id: <20200422172351.26583-1-pbonzini@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:57:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 09:07:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,55 +91,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tools are already updated via the docker build.
+These include:
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- scripts/coverity-scan/run-coverity-scan | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+1) podman support through tests/docker/docker.py
 
-diff --git a/scripts/coverity-scan/run-coverity-scan b/scripts/coverity-sca=
-n/run-coverity-scan
-index 9403429849..0c2c0e4087 100755
---- a/scripts/coverity-scan/run-coverity-scan
-+++ b/scripts/coverity-scan/run-coverity-scan
-@@ -318,17 +318,16 @@ if [ "$DOCKER" =3D yes ]; then
-     fi
-     echo "Archiving sources to be analyzed..."
-     ./scripts/archive-source.sh "$SECRETDIR/qemu-sources.tgz"
-+    ARGS=3D"--no-update-tools"
-     if [ "$DRYRUN" =3D yes ]; then
--        DRYRUNARG=3D--dry-run
-+        ARGS=3D"$ARGS --dry-run"
-     fi
-     echo "Running scanner..."
-     # If we need to capture the output tarball, get the inner run to
-     # save it to the secrets directory so we can copy it out before the
-     # directory is cleaned up.
-     if [ ! -z "$RESULTSTARBALL" ]; then
--        RTARGS=3D"--results-tarball /work/cov-int.tar.xz"
--    else
--        RTARGS=3D""
-+        ARGS=3D"$ARGS --results-tarball /work/cov-int.tar.xz"
-     fi
-     # Arrange for this docker run to get access to the sources with -v.
-     # We pass through all the configuration from the outer script to the i=
-nner.
-@@ -336,8 +335,8 @@ if [ "$DOCKER" =3D yes ]; then
-     tests/docker/docker.py run -it --env COVERITY_EMAIL --env COVERITY_BUI=
-LD_CMD \
-            -v "$SECRETDIR:/work" coverity-scanner \
-            ./run-coverity-scan --version "$VERSION" \
--           --description "$DESCRIPTION" $DRYRUNARG --tokenfile /work/token=
- \
--           --srcdir /qemu --src-tarball /work/qemu-sources.tgz $RTARGS
-+           --description "$DESCRIPTION" $ARGS --tokenfile /work/token \
-+           --srcdir /qemu --src-tarball /work/qemu-sources.tgz
-     if [ ! -z "$RESULTSTARBALL" ]; then
-         echo "Copying results tarball to $RESULTSTARBALL..."
-         cp "$SECRETDIR/cov-int.tar.xz" "$RESULTSTARBALL"
+2) avoiding repeated downloading of the tools in the container, by
+   sharing the cache with the host
+
+3) support for --update-tools-only --docker (though unlike regular
+   --update-tools-only it must be run from within a QEMU source tree)
+
+4) not related to docker mode, but used by it, a new --no-update-tools
+   option that does not check for tool updates
+
+5) the ability to get the Coverity token from git configuration, and
+   also to have email from git configuration if it is not equal to
+   user.email.
+
+Patches 1 and 2 are tweaks to tests/docker/docker.py, while the others
+are for run-coverity-scan.
+
+Paolo Bonzini (8):
+  docker.py/build: support -t and -f arguments
+  docker.py/build: support binary files in --extra-files
+  run-coverity-scan: get Coverity token and email from special git
+    config section
+  run-coverity-scan: use docker.py
+  run-coverity-scan: add --no-update-tools option
+  run-coverity-scan: use --no-update-tools in docker run
+  run-coverity-scan: download tools outside the container
+  run-coverity-scan: support --update-tools-only --docker
+
+ scripts/coverity-scan/coverity-scan.docker |   3 +-
+ scripts/coverity-scan/run-coverity-scan    | 126 +++++++++++++--------
+ tests/docker/Makefile.include              |   2 +-
+ tests/docker/docker.py                     |  14 ++-
+ 4 files changed, 88 insertions(+), 57 deletions(-)
+
 --=20
 2.18.2
-
 
 
