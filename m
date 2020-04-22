@@ -2,85 +2,88 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FD69C55185
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCD86C54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:54:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A8742076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:53:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 94C7220767
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:54:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U31XYpnJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A8742076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZASpJX0h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94C7220767
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRHh8-0008Qd-7I
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 11:53:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45758)
+	id 1jRHiE-0000qx-Pm
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 11:54:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46996)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jRHe8-0005Hn-0e
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:50:56 -0400
+ (envelope-from <stefanha@gmail.com>) id 1jRHgm-00089Z-6F
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:53:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jRHe6-0002P7-K6
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:50:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50147
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jRHe6-0002LJ-5u
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:50:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587570640;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qeocPWnoUecVKSU2mpoeBgxiNe1VFqH34X1iR+W941g=;
- b=U31XYpnJL3yY7WYkusjgVnAhxRA1VbBgfJCFDGfPG101kHN7O3g23qK+A4EVFtnm4PyJ16
- mTFPy/E8afGuVWnLonZ1LPw2jMZyQlsUQeGGxyMfe/3Znev+IDrNlYSMC17EEwzNqHy38f
- 9DtcCW62FvChEhWw+SVyfUiqegXXoIg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-67-1WnXrZGFN5eEUuiRoT-hYQ-1; Wed, 22 Apr 2020 11:50:38 -0400
-X-MC-Unique: 1WnXrZGFN5eEUuiRoT-hYQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7E9983DB37;
- Wed, 22 Apr 2020 15:50:37 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C6DD05D710;
- Wed, 22 Apr 2020 15:50:36 +0000 (UTC)
-Date: Wed, 22 Apr 2020 16:50:34 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Alexey Krasikov <alex-krasikov@yandex-team.ru>
-Subject: Re: [PATCH 1/2] crypto/secret: fix inconsequential errors.
-Message-ID: <20200422155034.GI587120@redhat.com>
-References: <20200415201336.24195-1-alex-krasikov@yandex-team.ru>
+ (envelope-from <stefanha@gmail.com>) id 1jRHgl-0007HU-Em
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:53:27 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39989)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jRHgj-0007AM-QH; Wed, 22 Apr 2020 11:53:25 -0400
+Received: by mail-wm1-x343.google.com with SMTP id u16so2970216wmc.5;
+ Wed, 22 Apr 2020 08:53:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=G/qiYYAA7cGuZBD16g6HwW/FSx1MLrSAor6/NWBzOi4=;
+ b=ZASpJX0hV5BJYXY7WudUnuZwliDrdQkIS8vaH/FEnT7Uec7xsjlxZImoVtGxjBHnPZ
+ ABd19MP0UvcBwkHbhPxrPM2kbk5WVl1hPF8n4ehYSxmnxeP383YEfs6JvUxCbxcB1qWM
+ VxcyQNpCIzrXf1bjWSrcVYpB4rB/ThN3cRcJ0GiyM7ccmKSCbGKr6WgJB4frPhQkwMlk
+ fAQBKfE4EvDET+rNIa92s6MitbaOauqhxZ27s4JGW2QsDlKPwtBCetqqdBVGP3Ujpi+R
+ mt4RIs1Ljq4WHKA/oYUyntUXtQ4SVlvHHDpAnaUqJxlRB8liAS2U022Q4xFekDq4/hce
+ oqQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=G/qiYYAA7cGuZBD16g6HwW/FSx1MLrSAor6/NWBzOi4=;
+ b=k0bUHrVb6P99TbdeDdD2TEQXzcre2TdIYSPLQEpEeRnhb2HqECdlCDuXbYD8qbqC0p
+ F47lNSYWXrd5e91QMoKuI/6cImpfPgCrfPNXtoyb0P2gcN8CHK3uMRAtggnYjWR/lVU4
+ 1KG604mPmcr8pwU7KmzikFikvc24a0c/eZ/X6Dd9WFoMqSMb0CVl85bD3lBWnj58hy7a
+ Af2W9MIBfZo3BBVlbLo25zY0lxiCDzFgkAjwAObY4nTB115jYg3TDA0xZYPY35F+82Zo
+ z95nrDubdmwXcn3ENyrwVOs3LojSZpOx8R06iPU27/Hqvq7i6QXftpPm+rWue+lfKtHv
+ BY7Q==
+X-Gm-Message-State: AGi0PuZT7l01lgQeMcXPOVzhZnisacfcK5+prbrNujtjGAAbaiCkQuvy
+ 4KRfHO4gSEGserIiLSqGw8A=
+X-Google-Smtp-Source: APiQypIf3OZTZybnSfX5AOmCe8e6jYqsgKw5bh1l+ty3vK/gEMNVaJ9rzGkuow2niC7VCfVqb3ij2Q==
+X-Received: by 2002:a1c:40c4:: with SMTP id n187mr10893889wma.28.1587570803934; 
+ Wed, 22 Apr 2020 08:53:23 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id a9sm7876704wmm.38.2020.04.22.08.53.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 22 Apr 2020 08:53:22 -0700 (PDT)
+Date: Wed, 22 Apr 2020 16:53:21 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [RFC 0/3] 64bit block-layer part I
+Message-ID: <20200422155321.GF47385@stefanha-x1.localdomain>
+References: <20200330141818.31294-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20200415201336.24195-1-alex-krasikov@yandex-team.ru>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="CXFpZVxO6m2Ol4tQ"
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 09:07:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <20200330141818.31294-1-vsementsov@virtuozzo.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=stefanha@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,38 +95,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru
+Cc: fam@euphon.net, kwolf@redhat.com, pavel.dovgaluk@ispras.ru,
+ qemu-block@nongnu.org, sw@weilnetz.de, pl@kamp.de, qemu-devel@nongnu.org,
+ mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org,
+ ronniesahlberg@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Apr 15, 2020 at 11:13:35PM +0300, Alexey Krasikov wrote:
-> * change condition from QCRYPTO_SECRET_FORMAT_RAW
->   to QCRYPTO_SECRET_FORMAT_BASE64 in if-operator, because
->   this is potencial error if you add another format value.
 
-I'll drop the bullet point.
+--CXFpZVxO6m2Ol4tQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Mar 30, 2020 at 05:18:15PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Hi all!
 >=20
-> Signed-off-by: Alexey Krasikov <alex-krasikov@yandex-team.ru>
-> ---
->  crypto/secret.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> There is an idea to make NBD protocol extension to support 64bit
+> write-zero/discard/block-status commands (commands, which doesn't
+> transfer user data). It's needed to increase performance of zeroing
+> large ranges (up to the whole image). Zeroing of the whole image is used
+> as first step of mirror job, qemu-img convert, it should be also used at
+> start of backup actually..
+>=20
+> We need to support it in block-layer, so we want 64bit write_zeros.
+> Currently driver handler now have int bytes parameter.
+>=20
+> write_zeros path goes through normal pwritev, so we need 64bit write,
+> and then we need 64bit read for symmetry, and better, let's make all io
+> path work with 64bit bytes parameter.
+>=20
+> Actually most of block-layer already have 64bit parameters: offset is
+> sometimes int64_t and sometimes uint64_t. bytes parameter is one of
+> int64_t, uint64_t, int, unsigned int...
+>=20
+> I think we need one type for all of this, and this one type is int64_t.
+> Signed int64_t is a bit better than uint64_t: you can use same variable
+> to get some result (including error < 0) and than reuse it as an
+> argument without any type conversion.
+>=20
+> So, I propose, as a first step, convert all uint64_t parameters to
+> int64_t.
+>=20
+> Still, I don't have good idea of how to split this into more than 3
+> patches, so, this is an RFC.
+>=20
+> What's next?
+>=20
+> Converting write_zero and discard is not as simple: we can't just
+> s/int/uint64_t/, as some functions may use some int variables for
+> calculations and this will be broken by something larger than int.
+>=20
+> So, I think the simplest way is to add .bdrv_co_pwritev_zeros64 and
+> .bdrv_co_pdiscard64 and update drivers one-by-one. If at some point all
+> drivers updated - drop unused 32bit functions, and then drop "64" suffix
+> from API. If not - we'll live with both APIs.
+>=20
+> Another thing to do is updating default limiting of request (currently
+> they are limited to INT_MAX).
+>=20
+> Then we may move some drivers to 64bit discard/write_zero: I think about
+> qcow2, file-posix and nbd (as a proof-of-concept for already proposed
+> NBD extension).
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Sounds good to me.  This is a good series to merge early in the QEMU 5.1
+release cycle.  That way we'll have time to catch any issues.
 
-and queued.
+Stefan
 
+--CXFpZVxO6m2Ol4tQ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6gaHEACgkQnKSrs4Gr
+c8hlXQf+IVm/gexcMzoq6L9KRx+q95Fj0Q/0SbVdOgmWY5FzwHYBOosH9sGv9snp
+Ab2X4bmw7ucmLD5uJrAzTIltjn4RRmZrQVjZdog3KSIfxhfK1DOF6Wk6x8ualpOW
+L/wRHHTY7mWcSo3SJINYycU0Go8DZq/CszLLYnxVufu0S78EW+dN4lCFstymjptP
+DwU0IoXtqw9OGi+vWKjz7nvHKNe5JdArYS1Sh9dNOHRg9tkmLTkJtdLXbiUOvWpb
+otJ2RSksE/+crbr0LHF1GE/tPubXNr7d+B/8mxzkGlZ2ONB7RK4RoDxkzqX1kh1Q
+aCgruH0IFMoc23AFZjZfq7UKe5OMTw==
+=Wl+/
+-----END PGP SIGNATURE-----
+
+--CXFpZVxO6m2Ol4tQ--
 
