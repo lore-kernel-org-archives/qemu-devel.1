@@ -2,94 +2,99 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C289C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:34:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76839C54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:34:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9DAE2076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:34:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42D682076E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:34:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dixfeh3t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9DAE2076E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fhwXBZYY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42D682076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRFWI-0000Ag-Rw
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 09:34:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59164)
+	id 1jRFWM-0000Ka-2r
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 09:34:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59444)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRFU6-0006IV-Lt
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:32:27 -0400
+ (envelope-from <philmd@redhat.com>) id 1jRFUS-0006aW-FW
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:32:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRFTw-00020j-4m
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:32:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53628
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jRFUQ-0003JC-Sl
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:32:35 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28887
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRFTv-0001rz-Lm
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:32:03 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRFUQ-0003Bj-DF
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:32:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587562321;
+ s=mimecast20190719; t=1587562352;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=XUlKyT73AlkHFlQ8zqyTxGozcuh5OB4qVGei5hmsoHw=;
- b=dixfeh3t4sZwYUHsF1Meg05AEJIZCjUqu4I2zUDwtdQdLUj4Ql6UTfVIRS37FQlcVDv2xJ
- ECWPjNlVRu3zQ7ggmZVGdZ2X1vMEag2or23Hv47rReT3Tt272IZB9yUDPvKkS0Twryti7N
- xC/Y4ekxwLM9m/i/eFu2avNiU++NzD8=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=OeM0cBach7mM1Er+F+BdNF9X8Ccb7WYWiy4rdEvvNOc=;
+ b=fhwXBZYYHAaORZhy3KrTdCLre+3U7SdFr54J5qyq8YEuTBMUOFLmv8PoTggTasErViO/IR
+ 1aUu6e50LJh6azFRcOOG8w7UxE/oBIxtA18cNVeZzwEmRYUCSeshPyTzWU5wpxqCnv7nQy
+ UwrJmi51O/ypmwcqloEmdIIIsaqdjqA=
 Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
  [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-Vdnokx-WOi-fTFc5gYt35A-1; Wed, 22 Apr 2020 09:31:56 -0400
-X-MC-Unique: Vdnokx-WOi-fTFc5gYt35A-1
-Received: by mail-wm1-f70.google.com with SMTP id 14so789745wmo.9
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 06:31:56 -0700 (PDT)
+ us-mta-435-SUqi1fXZO-eFEuGd0RIbXQ-1; Wed, 22 Apr 2020 09:32:31 -0400
+X-MC-Unique: SUqi1fXZO-eFEuGd0RIbXQ-1
+Received: by mail-wm1-f70.google.com with SMTP id q5so793036wmc.9
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 06:32:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=zqmfue2UwrwiHNMR4TPo8N6a37zrjxPCjDQGfvWFQLs=;
- b=GZhs0adHdR8sbvuwoR3Prp5SpLnzaXaxABGHX8Vq5EQJdbiLDNB6DaKXC1mqoHM0AF
- hGPRhjaizkVGOb6F+ae5nVtcxU1kmIU22TeUPAz05m32xklGtriZ2GmQl9W4IlsCmg4U
- zNzkoi8LCo43MYLzxZBr9lZKH91Bvg1C7ib7Nn3A7PqbkGe6JKenE5DuyyUOrdbqjPZb
- ZOdiNo5UqIK7YXlEAbXgxacaG7yncusVNjWePvJYObAUVSVk4rDrL/ZppOmY6GbwYm1m
- 6yMs+39xp0a4L1TVguMT8FWsTWxkapbhUz01gwdABT4p6AcX3wFSEINlkkbZ2MKvDsGa
- R9rw==
-X-Gm-Message-State: AGi0PuYfQ2WJNqwJUT9zYPeCxrbZQtIoo1NmyYTT7AKyHS64S4jDQMnl
- iZxJerkH5bIEuopb7JwXdbA7Kp273rVyWDazICKxouufjdvZZApjtvSsOwfVfjSxtsabJtPsv3t
- o8v2HEE+SVVwmgWI=
-X-Received: by 2002:a5d:4d8f:: with SMTP id b15mr29991371wru.107.1587562315278; 
- Wed, 22 Apr 2020 06:31:55 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLyOb25132StkCLkHX76Eh5KmJs4V9ysBdaVfZ86rojqHY1LjtJXpThxFsh99WOQlyoK7dstQ==
-X-Received: by 2002:a5d:4d8f:: with SMTP id b15mr29991348wru.107.1587562314953; 
- Wed, 22 Apr 2020 06:31:54 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=vqpHgk+Qg3xtVikhp88gaWQSBTFh1RmAeJyt0Yb24RI=;
+ b=CQKVG5Fmm00sxEXkqJO/6kVF2cFqvv03QXCDmx63Jq8BIA66rFxZLZ8J4vJJKvk5aW
+ lbk2K2TZGLSbVE+VkCrICcGQj4L6q6kkC4+xhIGO6Ky1la5bOmGS5cEnS6cGl1/5woYt
+ AAXW2NU8szi21TMlIj6Tnt0vhOTLegds6dDmlwL1YdvZAEoKcekbThRorVd4LxDEU1LZ
+ CjP0e5d25isJipF6f6M9p19CVofW+Ht6R8fPGHb+Ltnje1zujxlsJcjVA0WaKIuKrlwt
+ B+996JrGIX+02i6fLTZRfbU/CBupX8n02GvBPEK6YrxauYE45QLh2+i0VlOH2n0y2a0U
+ ztHw==
+X-Gm-Message-State: AGi0PuYdQPuo7/RvcP6OOHPUTVcVJULUpQN8u4wW1wg4QiRgdJh4GIeB
+ sWRm43KYjNrWTKRU9FxsimdrW55n5GJZIxaSHlhUilmyh5uLDBmyiIVPC4JhJvEk7ugdYkydSB7
+ YfDDUYpwtOqFxhS0=
+X-Received: by 2002:adf:f2c5:: with SMTP id d5mr15624567wrp.285.1587562349781; 
+ Wed, 22 Apr 2020 06:32:29 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKqP2JZu0BSj/TOBCxs0BuAVzdLzpqe0YF5jw7OFRSHEkPS9oqHh93G6IaEAztiWfHc587sIQ==
+X-Received: by 2002:adf:f2c5:: with SMTP id d5mr15624548wrp.285.1587562349602; 
+ Wed, 22 Apr 2020 06:32:29 -0700 (PDT)
 Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id j3sm8165750wrw.28.2020.04.22.06.31.53
+ by smtp.gmail.com with ESMTPSA id h2sm8578677wro.9.2020.04.22.06.32.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Apr 2020 06:31:54 -0700 (PDT)
+ Wed, 22 Apr 2020 06:32:28 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/9] misc: Trivial static code analyzer fixes
-Date: Wed, 22 Apr 2020 15:31:43 +0200
-Message-Id: <20200422133152.16770-1-philmd@redhat.com>
+Subject: [PATCH v3 7/9] hw/gpio/aspeed_gpio: Remove dead assignment
+Date: Wed, 22 Apr 2020 15:31:50 +0200
+Message-Id: <20200422133152.16770-8-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200422133152.16770-1-philmd@redhat.com>
+References: <20200422133152.16770-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 09:07:24
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:12:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,54 +106,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
+ Andrew Jeffery <andrew@aj.id.au>,
+ "open list:ASPEED BMCs" <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix trivial warnings reported by the Clang static code analyzer.
+Fix warning reported by Clang static code analyzer:
 
-Only patch #2 'blockdev: Remove dead assignment' misses review.
+  hw/gpio/aspeed_gpio.c:717:18: warning: Value stored to 'g_idx' during its=
+ initialization is never read
+      int set_idx, g_idx =3D *group_idx;
+                   ^~~~~   ~~~~~~~~~~
 
-The official Clang static code analyzer documentation is on:
-https://clang-analyzer.llvm.org/
+Reported-by: Clang Static Analyzer
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/gpio/aspeed_gpio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Fedora I simply used it as:
-
-  $ sudo dnf install clang-analyzer
-  $ ../configure
-  $ scan-build make
-
-Since v2:
-- Based on lvivier/trivial-patches-for-5.1
-- Removed dup patches from Kuhn Chenqun
-Since v1:
-- Addressed Markus/Zoltan/Aleksandar review comments
-
-Philippe Mathieu-Daud=C3=A9 (9):
-  block: Avoid dead assignment
-  blockdev: Remove dead assignment
-  hw/i2c/pm_smbus: Remove dead assignment
-  hw/input/adb-kbd: Remove dead assignment
-  hw/ide/sii3112: Remove dead assignment
-  hw/isa/i82378: Remove dead assignment
-  hw/gpio/aspeed_gpio: Remove dead assignment
-  hw/timer/stm32f2xx_timer: Remove dead assignment
-  hw/timer/pxa2xx_timer: Add assertion to silent static analyzer warning
-
- block.c                    | 2 +-
- blockdev.c                 | 2 +-
- hw/gpio/aspeed_gpio.c      | 2 +-
- hw/i2c/pm_smbus.c          | 1 -
- hw/ide/sii3112.c           | 5 +++--
- hw/input/adb-kbd.c         | 6 +-----
- hw/isa/i82378.c            | 8 ++++----
- hw/timer/pxa2xx_timer.c    | 1 +
- hw/timer/stm32f2xx_timer.c | 1 -
- 9 files changed, 12 insertions(+), 16 deletions(-)
-
+diff --git a/hw/gpio/aspeed_gpio.c b/hw/gpio/aspeed_gpio.c
+index 41e11ea9b0..bd19db31f4 100644
+--- a/hw/gpio/aspeed_gpio.c
++++ b/hw/gpio/aspeed_gpio.c
+@@ -714,7 +714,7 @@ static void aspeed_gpio_write(void *opaque, hwaddr offs=
+et, uint64_t data,
+ static int get_set_idx(AspeedGPIOState *s, const char *group, int *group_i=
+dx)
+ {
+     AspeedGPIOClass *agc =3D ASPEED_GPIO_GET_CLASS(s);
+-    int set_idx, g_idx =3D *group_idx;
++    int set_idx, g_idx;
+=20
+     for (set_idx =3D 0; set_idx < agc->nr_gpio_sets; set_idx++) {
+         const GPIOSetProperties *set_props =3D &agc->props[set_idx];
 --=20
 2.21.1
 
