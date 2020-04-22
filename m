@@ -2,85 +2,86 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E655C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 17:54:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7133C54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 17:58:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D10852075A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 17:54:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92E772075A
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 17:58:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="edA1MqOQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D10852075A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cBIr2fZ7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92E772075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRJZw-0005gK-0C
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 13:54:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42352)
+	id 1jRJdJ-00017c-Kc
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 13:58:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43578)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jRJYv-0004ME-RW
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:53:33 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jRJcT-0000fC-1H
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:57:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jRJYu-0002sL-Ky
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:53:29 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44298)
+ (envelope-from <alex.bennee@linaro.org>) id 1jRJcS-00018d-Ai
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:57:08 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37747)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jRJYu-0002nX-76
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:53:28 -0400
-Received: by mail-wr1-x444.google.com with SMTP id d17so3506269wrg.11
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 10:53:27 -0700 (PDT)
+ id 1jRJcR-000131-QC
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:57:08 -0400
+Received: by mail-wr1-x444.google.com with SMTP id k1so3559654wrx.4
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 10:57:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=lL23JNais+S1Wv4htiWPpsaEuqFsq39lDCTDj5GHckA=;
- b=edA1MqOQZMedMcqC5NqYMdIu2uJ853NKsBHNkUQu2Gxz0IkEWmDq2SjKNf36DTVyQQ
- dp2wj4XX2F03fULidtOcXJom7JbPyJ2JpyW7L+mM41wQYUUqVEvEGj5ZlnTF4C10UH5R
- 340n/MhT89NJXZ34nTPGbF42214TnF1ffXgzij4vIwhzZzc4yQJmjzj8juWqcukhFEVQ
- TAPLJ1h6UipzNRsDfIOCH7kMkL8U1dnS0u5YgH+0NrXZM5k/gpLR02jByQOfnbRjzXET
- T5friyR3BERYAgkQi1Lqy2EuM8Iog3c4FT0+G8D+anyr9z0W7WMnpo5aQDCSicQ17Trj
- btrA==
+ bh=ZqSO1eqqXFB6zFA+keKPaZ3VSOTmZx4d4OEEtxuVrZw=;
+ b=cBIr2fZ7CIUyKeWxXwfs0nOMV2BAwiubHCGn42jtmIZoB5d+t8BUaIgm6CdktAuVnA
+ 9nL+UgQRLqNTB/LN+uI0BgWnMX3BXJY5W7j1fkzzoQVY9EzDQm1tLe1JcrgRqUrSKiLt
+ LhAON3Me2JWBtSc0zQ0utqfGrQ+LTko7VbFFS+ft3fJcHm6qAmYid5ZLzpMw7CzLNcjX
+ 5I19NZ9xPVjw2ps/svir1iVgUMpzMJ3c51E84vEPgR1HJT5Z8hg+vZWIWzo2/nxFi1nA
+ 4AWO7ZXE1e4VXfcESQXRzmV+OA4iFm0MrkexSy7lGDJZA0mFCH76aQek5KAimzcZ5mER
+ kMEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=lL23JNais+S1Wv4htiWPpsaEuqFsq39lDCTDj5GHckA=;
- b=VMqDFpGtm0UArBvwoCPuN0P9U8pWx3N9wVOQtsHWPd303GwwWY7NVj0Uot+ykoW15a
- 6wAU9c6Mur2HE6f9ngqtF7NDsoMSJyHvRWoItl/4egHrqY8Q9x5QnaCKHYIttPqf1O0t
- XRzjm6dt+GKaGZG5cEao6r82wbMuTbEZIyqmkosVq4tFK9pSI0rSLbpgY3VJdCeqWGzA
- f72nXDzH78HEPTgVGqlsRTCEntJssbADfZAAfattr9A07m9wfA+JAEaJtX9tEcgA0E1p
- n28YPNorN4gSaNKN/LZ9BR5BIFT36Y2K0lAaF+o/JG0Oxw+Ui1G3vM89jfUTpt8Z09Pn
- OlcQ==
-X-Gm-Message-State: AGi0PubkDSL1R5+rvFH87qLixxHqrODUhi33rEkrSzBdikbqZisN61lK
- NnehEbJh1Y6GP5cyt0VLb80zDQ==
-X-Google-Smtp-Source: APiQypJIzDNv4P9V9/EgbHsbcAYG5M8Kg19XlHTSGN8lWc1+wTGWsYNny+XXEMhtKbf/QkX/RhY1tQ==
-X-Received: by 2002:a05:6000:1044:: with SMTP id
- c4mr228588wrx.57.1587578005637; 
- Wed, 22 Apr 2020 10:53:25 -0700 (PDT)
+ bh=ZqSO1eqqXFB6zFA+keKPaZ3VSOTmZx4d4OEEtxuVrZw=;
+ b=H9gu69Whse2fMEBIfNN3GEU2j2I8QtSDquhpLm/FvE6X72ERNzOLdK50QNBNigk28C
+ +yXOJIyNsa/tDjcqpC8Fs/ZFl6j/vCC47APNn6ueFc7OoJ+Iel1078B6/L0QgBxmv8wd
+ 0JyfXRKnkqjx9Rae0dBCDWdwxI0wlX6/M07ocjpOu3sMs8BhemnNcGw5B6PKr36j8n3+
+ BFMul1FgUMMg2aDfdG42ivT/M31vTgJgqC4Kg2+XTbykR4Ldojt2ZaE4eihJwpDUVdaH
+ tJPMdJV+iIJEQ3WAiiGXhzbGk5nPwCwOK4YVUJrNgLhtJFJhabsQ7zJthiP19y4ytGxC
+ Tegw==
+X-Gm-Message-State: AGi0PuZSBwNEUcqghE0DrNJr6URIqgbrPIFLcIEnpHkqdCMfSfn6KiXj
+ QM4TR4sO+dzEe03pwEl1vQ+T8/U3DkQ=
+X-Google-Smtp-Source: APiQypKcSzNITZbU1gjLseNYI7N4aKGvvaUDv4TXxl9N8/21aWIqWODa+iDg3HyJ4dPvvCRw5PCvTQ==
+X-Received: by 2002:adf:f5c4:: with SMTP id k4mr242205wrp.294.1587578226063;
+ Wed, 22 Apr 2020 10:57:06 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 145sm71292wma.1.2020.04.22.10.53.24
+ by smtp.gmail.com with ESMTPSA id j68sm9218922wrj.32.2020.04.22.10.57.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Apr 2020 10:53:24 -0700 (PDT)
+ Wed, 22 Apr 2020 10:57:05 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3FAAD1FF7E;
- Wed, 22 Apr 2020 18:53:23 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 4947C1FF7E;
+ Wed, 22 Apr 2020 18:57:04 +0100 (BST)
 References: <20200422011722.13287-1-richard.henderson@linaro.org>
- <20200422011722.13287-18-richard.henderson@linaro.org>
+ <20200422011722.13287-14-richard.henderson@linaro.org>
+ <87k127cx3l.fsf@linaro.org>
+ <b0e95ae2-657d-8d74-686d-17375c090e02@linaro.org>
 User-agent: mu4e 1.4.1; emacs 28.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 17/36] tcg/optimize: Adjust TempOptInfo allocation
-In-reply-to: <20200422011722.13287-18-richard.henderson@linaro.org>
-Date: Wed, 22 Apr 2020 18:53:23 +0100
-Message-ID: <878sincsq4.fsf@linaro.org>
+Subject: Re: [PATCH v2 13/36] tcg: Use tcg_constant_{i32,i64} with tcg int
+ expanders
+In-reply-to: <b0e95ae2-657d-8d74-686d-17375c090e02@linaro.org>
+Date: Wed, 22 Apr 2020 18:57:04 +0100
+Message-ID: <875zdrcsjz.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -109,134 +110,40 @@ Sender: "Qemu-devel"
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> Do not allocate a large block for indexing.  Instead, allocate
-> for each temporary as they are seen.
+> On 4/22/20 9:18 AM, Alex Benn=C3=A9e wrote:
+>>>  void tcg_gen_brcondi_i64(TCGCond cond, TCGv_i64 arg1, int64_t arg2, TC=
+GLabel *l)
+>>>  {
+>>> -    if (cond =3D=3D TCG_COND_ALWAYS) {
+>>> +    if (TCG_TARGET_REG_BITS =3D=3D 64) {
+>>> +        tcg_gen_brcond_i64(cond, arg1, tcg_constant_i64(arg2), l);
+>>> +    } else if (cond =3D=3D TCG_COND_ALWAYS) {
+>>>          tcg_gen_br(l);
+>>>      } else if (cond !=3D TCG_COND_NEVER) {
+>>> -        TCGv_i64 t0 =3D tcg_const_i64(arg2);
+>>> -        tcg_gen_brcond_i64(cond, arg1, t0, l);
+>>> -        tcg_temp_free_i64(t0);
+>>> +        l->refs++;
+>>=20
+>> Hmm is this a separate fix?
 >
-> In general, this will use less memory, if we consider that most
-> TBs do not touch every target register.  This also allows us to
-> allocate TempOptInfo for new temps created during optimization.
+> No, it's expanding what tcg_gen_brcond_i64 would do for TCG_TARGET_REG_BI=
+TS =3D=3D 32.
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  tcg/optimize.c | 60 ++++++++++++++++++++++++++++----------------------
->  1 file changed, 34 insertions(+), 26 deletions(-)
+>>> +        tcg_gen_op6ii_i32(INDEX_op_brcond2_i32,
+>>> +                          TCGV_LOW(arg1), TCGV_HIGH(arg1),
+>>> +                          tcg_constant_i32(arg2),
+>>> +                          tcg_constant_i32(arg2 >> 32),
+>>> +                          cond, label_arg(l));
 >
-> diff --git a/tcg/optimize.c b/tcg/optimize.c
-> index b86bf3d707..d36d7e1d7f 100644
-> --- a/tcg/optimize.c
-> +++ b/tcg/optimize.c
-> @@ -89,35 +89,41 @@ static void reset_temp(TCGArg arg)
->  }
->=20=20
->  /* Initialize and activate a temporary.  */
-> -static void init_ts_info(TempOptInfo *infos,
-> -                         TCGTempSet *temps_used, TCGTemp *ts)
-> +static void init_ts_info(TCGTempSet *temps_used, TCGTemp *ts)
->  {
->      size_t idx =3D temp_idx(ts);
-> -    if (!test_bit(idx, temps_used->l)) {
-> -        TempOptInfo *ti =3D &infos[idx];
-> +    TempOptInfo *ti;
->=20=20
-> +    if (test_bit(idx, temps_used->l)) {
-> +        return;
-> +    }
-> +    set_bit(idx, temps_used->l);
-> +
-> +    ti =3D ts->state_ptr;
-> +    if (ti =3D=3D NULL) {
-> +        ti =3D tcg_malloc(sizeof(TempOptInfo));
->          ts->state_ptr =3D ti;
-> -        ti->next_copy =3D ts;
-> -        ti->prev_copy =3D ts;
-> -        if (ts->kind =3D=3D TEMP_CONST) {
-> -            ti->is_const =3D true;
-> -            ti->val =3D ti->mask =3D ts->val;
-> -            if (TCG_TARGET_REG_BITS > 32 && ts->type =3D=3D TCG_TYPE_I32=
-) {
-> -                /* High bits of a 32-bit quantity are garbage.  */
-> -                ti->mask |=3D ~0xffffffffull;
-> -            }
-> -        } else {
-> -            ti->is_const =3D false;
-> -            ti->mask =3D -1;
-> +    }
-> +
-> +    ti->next_copy =3D ts;
-> +    ti->prev_copy =3D ts;
-> +    if (ts->kind =3D=3D TEMP_CONST) {
-> +        ti->is_const =3D true;
-> +        ti->val =3D ts->val;
-> +        ti->mask =3D ts->val;
-> +        if (TCG_TARGET_REG_BITS > 32 && ts->type =3D=3D TCG_TYPE_I32) {
-> +            /* High bits of a 32-bit quantity are garbage.  */
-> +            ti->mask |=3D ~0xffffffffull;
->          }
-> -        set_bit(idx, temps_used->l);
-> +    } else {
-> +        ti->is_const =3D false;
-> +        ti->mask =3D -1;
->      }
->  }
->=20=20
-> -static void init_arg_info(TempOptInfo *infos,
-> -                          TCGTempSet *temps_used, TCGArg arg)
-> +static void init_arg_info(TCGTempSet *temps_used, TCGArg arg)
->  {
-> -    init_ts_info(infos, temps_used, arg_temp(arg));
-> +    init_ts_info(temps_used, arg_temp(arg));
->  }
->=20=20
->  static TCGTemp *find_better_copy(TCGContext *s, TCGTemp *ts)
-> @@ -603,9 +609,8 @@ static bool swap_commutative2(TCGArg *p1, TCGArg *p2)
->  /* Propagate constants and copies, fold constant expressions. */
->  void tcg_optimize(TCGContext *s)
->  {
-> -    int nb_temps, nb_globals;
-> +    int nb_temps, nb_globals, i;
->      TCGOp *op, *op_next, *prev_mb =3D NULL;
-> -    TempOptInfo *infos;
->      TCGTempSet temps_used;
->=20=20
->      /* Array VALS has an element for each temp.
-> @@ -615,12 +620,15 @@ void tcg_optimize(TCGContext *s)
->=20=20
->      nb_temps =3D s->nb_temps;
->      nb_globals =3D s->nb_globals;
-> +
->      bitmap_zero(temps_used.l, nb_temps);
-> -    infos =3D tcg_malloc(sizeof(TempOptInfo) * nb_temps);
-> +    for (i =3D 0; i < nb_temps; ++i) {
-> +        s->temps[i].state_ptr =3D NULL;
-> +    }
->=20=20
->      QTAILQ_FOREACH_SAFE(op, &s->ops, link, op_next) {
->          tcg_target_ulong mask, partmask, affected;
-> -        int nb_oargs, nb_iargs, i;
-> +        int nb_oargs, nb_iargs;
->          TCGArg tmp;
->          TCGOpcode opc =3D op->opc;
->          const TCGOpDef *def =3D &tcg_op_defs[opc];
-> @@ -633,14 +641,14 @@ void tcg_optimize(TCGContext *s)
->              for (i =3D 0; i < nb_oargs + nb_iargs; i++) {
->                  TCGTemp *ts =3D arg_temp(op->args[i]);
->                  if (ts) {
-> -                    init_ts_info(infos, &temps_used, ts);
-> +                    init_ts_info(&temps_used, ts);
->                  }
->              }
->          } else {
->              nb_oargs =3D def->nb_oargs;
->              nb_iargs =3D def->nb_iargs;
->              for (i =3D 0; i < nb_oargs + nb_iargs; i++) {
-> -                init_arg_info(infos, &temps_used, op->args[i]);
-> +                init_arg_info(&temps_used, op->args[i]);
->              }
->          }
+> Because we have two separate TCGv_i32, from tcg_constant_i32(), which can=
+not be
+> packaged up with TCGV_HIGH/LOW.
+>
+>
+> r~
 
+OK I see that now - the r-b stands ;-)
 
 --=20
 Alex Benn=C3=A9e
