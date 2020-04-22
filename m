@@ -2,93 +2,81 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9378C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:22:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77037C54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:23:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B22932074B
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:22:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3065B2074B
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:23:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WXw/t3X/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B22932074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D4z4vt8s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3065B2074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRHCg-0002gw-S7
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 11:22:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33386)
+	id 1jRHE2-0005DE-IP
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 11:23:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34960)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jRH8G-0006vt-RX
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:17:49 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jRHC7-0002pn-IX
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:21:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jRH8F-0000Gp-P3
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:17:48 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46159)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jRH8E-0000Aq-74
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:17:47 -0400
-Received: by mail-wr1-x442.google.com with SMTP id f13so2821786wrm.13
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 08:17:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=SgT1MYpmMlIMmAUCQWQwGZSb6RD4feIljOC4VXSqalg=;
- b=WXw/t3X/ixtWOHDX1y2fQ/QIZ1RPiNALL/n6TRRkARarWIe053+jmeJeDP+5OtQfgg
- bFsToloa4vZPGmGmOB4/7az5r23DPoet7o9i+tEEvSGDWwfGIlTIiyCFwMudShR27Lv8
- fFWqiVovZwsg7MFq71z0E9nLdvkzhUXZpUoYq7XvG8bE4ocKeJ/UbXa7hH4STyAupAKU
- 0D0HV72Tqra0mZc0BumxGRHL7WiTLP1UloSQTR3NKPudzQJXLCmSJ5Cp7Gz58zt9ELha
- FDcUA7jZ/Q/lkMpBb05EEjwaztYL4NjYMWHzvplUZRwhY6WNOJ741chk91fh2gEsnD7O
- KUIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=SgT1MYpmMlIMmAUCQWQwGZSb6RD4feIljOC4VXSqalg=;
- b=EMyY3pLhNaYrqrtI3UlQsm92iHL0Ak7ItHYMgJ+dL+Pw7IHHl7s4PUlVtVdPbMuIOR
- HBVKCEQFl+QCYuyUbgXUzAEePRLVbUvz30VCSuYF6k6i3Ap8T7cdxHl9J5PBBO4Xj3UM
- a56kLCCJYz2ac9mNd7bPqVWc8Ac8tZuOL6/lfYjyGuxV6H3FUJmbHRkOkaEkzml1nsej
- B92aPX9q5LQHKJljSDUjhsQ7F4FxUVu7SycJiWdjilzFwSFIhg605SJzisM7FmcEgbGQ
- 7nNgRXmpUTR8/iW76Az9E1ejzACt1GZfCNWLZfU+4xh+02r/2EIj5+fP92YeNmCiCflN
- EhaA==
-X-Gm-Message-State: AGi0PuajS7pKp+Lj7/ad8gFDuLUWjtpTt0DiJhAUBUGTl0Bza8wv68qM
- udEfwjV+OyFEPgG+UsWZqlfxtw==
-X-Google-Smtp-Source: APiQypLwE5jibvRrEVD811uEVBlzT/xqjv8bdpFNsclpTHUWv+aGliiSOsjlQv/2LZQTDk5KQrtsGw==
-X-Received: by 2002:adf:efd1:: with SMTP id i17mr683657wrp.161.1587568657589; 
- Wed, 22 Apr 2020 08:17:37 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u184sm8618530wmb.13.2020.04.22.08.17.36
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Apr 2020 08:17:36 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5ED8E1FF7E;
- Wed, 22 Apr 2020 16:17:35 +0100 (BST)
-References: <20200422011722.13287-1-richard.henderson@linaro.org>
- <20200422011722.13287-12-richard.henderson@linaro.org>
-User-agent: mu4e 1.4.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 11/36] tcg: Introduce TYPE_CONST temporaries
-In-reply-to: <20200422011722.13287-12-richard.henderson@linaro.org>
-Date: Wed, 22 Apr 2020 16:17:35 +0100
-Message-ID: <87pnbzczxs.fsf@linaro.org>
+ (envelope-from <kwolf@redhat.com>) id 1jRHC5-00039G-EO
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:21:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36255
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jRHC5-00037a-09
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:21:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587568904;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pH7NlI4TajwgZUNQLCPncWKNPnFOCtEyeAYT0qJDHME=;
+ b=D4z4vt8sv1ouyKmnLfw/NSFuAP2zij78OhfacSadzFO+xZ3tYkOpnQvGqYaAQ4o80sCEKi
+ WYvNj2k0wZynmJTUeKRK709cpAwRMcipuHx4ZxY6MQ6KN0K5knO1IobVzfPae9f3/VGkhj
+ WwiMumX5NV9XVd1ashZ9mJqTR2qa9qs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-358-vBOfrOrvNcm46Mo578THiw-1; Wed, 22 Apr 2020 11:21:42 -0400
+X-MC-Unique: vBOfrOrvNcm46Mo578THiw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40AEB190D341;
+ Wed, 22 Apr 2020 15:21:41 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-212.ams2.redhat.com
+ [10.36.114.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BC8B7600D2;
+ Wed, 22 Apr 2020 15:21:39 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v5 2/9] block: Add flags to bdrv(_co)_truncate()
+Date: Wed, 22 Apr 2020 17:21:22 +0200
+Message-Id: <20200422152129.167074-3-kwolf@redhat.com>
+In-Reply-To: <20200422152129.167074-1-kwolf@redhat.com>
+References: <20200422152129.167074-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::442
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 04:15:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,276 +88,383 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Now that block drivers can support flags for .bdrv_co_truncate, expose
+the parameter in the node level interfaces bdrv_co_truncate() and
+bdrv_truncate().
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+---
+ include/block/block.h       |  5 +++--
+ block/block-backend.c       |  2 +-
+ block/crypto.c              |  2 +-
+ block/io.c                  | 12 +++++++-----
+ block/parallels.c           |  6 +++---
+ block/qcow.c                |  4 ++--
+ block/qcow2-refcount.c      |  2 +-
+ block/qcow2.c               | 15 +++++++++------
+ block/raw-format.c          |  2 +-
+ block/vhdx-log.c            |  2 +-
+ block/vhdx.c                |  2 +-
+ block/vmdk.c                |  2 +-
+ tests/test-block-iothread.c |  6 +++---
+ 13 files changed, 34 insertions(+), 28 deletions(-)
 
-> These will hold a single constant for the duration of the TB.
-> They are hashed, so that each value has one temp across the TB.
->
-> Not used yet, this is all infrastructure.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  include/tcg/tcg.h |  27 ++++++++++-
->  tcg/optimize.c    |  40 ++++++++++-------
->  tcg/tcg-op-vec.c  |  17 +++++++
->  tcg/tcg.c         | 111 +++++++++++++++++++++++++++++++++++++++++-----
->  4 files changed, 166 insertions(+), 29 deletions(-)
->
-> diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
-> index 27e1b509a6..f72530dfda 100644
-> --- a/include/tcg/tcg.h
-> +++ b/include/tcg/tcg.h
-> @@ -489,6 +489,8 @@ typedef enum TCGTempKind {
->      TEMP_GLOBAL,
->      /* Temp is in a fixed register. */
->      TEMP_FIXED,
-> +    /* Temp is a fixed constant. */
-> +    TEMP_CONST,
->  } TCGTempKind;
->=20=20
->  typedef struct TCGTemp {
-> @@ -664,6 +666,7 @@ struct TCGContext {
->      QSIMPLEQ_HEAD(, TCGOp) plugin_ops;
->  #endif
->=20=20
-> +    GHashTable *const_table[TCG_TYPE_COUNT];
->      TCGTempSet free_temps[TCG_TYPE_COUNT * 2];
->      TCGTemp temps[TCG_MAX_TEMPS]; /* globals first, temps after */
->=20=20
-> @@ -680,7 +683,7 @@ struct TCGContext {
->=20=20
->  static inline bool temp_readonly(TCGTemp *ts)
->  {
-> -    return ts->kind =3D=3D TEMP_FIXED;
-> +    return ts->kind >=3D TEMP_FIXED;
-
-I should have clarified in the previous patch - TEMP_FIXED is a fixed
-value, e.g. env or other internal pointer which we won't be overwriting
-or otherwise trashing anywhere in the block?
-
->  }
->=20=20
->  extern TCGContext tcg_init_ctx;
-> @@ -1038,6 +1041,7 @@ TCGOp *tcg_op_insert_after(TCGContext *s, TCGOp *op=
-, TCGOpcode opc);
->=20=20
->  void tcg_optimize(TCGContext *s);
->=20=20
-> +/* Allocate a new temporary and initialize it with a constant. */
->  TCGv_i32 tcg_const_i32(int32_t val);
->  TCGv_i64 tcg_const_i64(int64_t val);
->  TCGv_i32 tcg_const_local_i32(int32_t val);
-> @@ -1047,6 +1051,27 @@ TCGv_vec tcg_const_ones_vec(TCGType);
->  TCGv_vec tcg_const_zeros_vec_matching(TCGv_vec);
->  TCGv_vec tcg_const_ones_vec_matching(TCGv_vec);
->=20=20
-> +/*
-> + * Locate or create a read-only temporary that is a constant.
-> + * This kind of temporary need not and should not be freed.
-> + */
-> +TCGTemp *tcg_constant_internal(TCGType type, tcg_target_long val);
-> +
-> +static inline TCGv_i32 tcg_constant_i32(int32_t val)
-> +{
-> +    return temp_tcgv_i32(tcg_constant_internal(TCG_TYPE_I32, val));
-> +}
-> +
-> +static inline TCGv_i64 tcg_constant_i64(int64_t val)
-> +{
-> +    if (TCG_TARGET_REG_BITS =3D=3D 32) {
-> +        qemu_build_not_reached();
-> +    }
-> +    return temp_tcgv_i64(tcg_constant_internal(TCG_TYPE_I64, val));
-> +}
-> +
-> +TCGv_vec tcg_constant_vec(TCGType type, unsigned vece, int64_t val);
-> +
->  #if UINTPTR_MAX =3D=3D UINT32_MAX
->  # define tcg_const_ptr(x)        ((TCGv_ptr)tcg_const_i32((intptr_t)(x)))
->  # define tcg_const_local_ptr(x)  ((TCGv_ptr)tcg_const_local_i32((intptr_=
-t)(x)))
-> diff --git a/tcg/optimize.c b/tcg/optimize.c
-> index afb4a9a5a9..effb47eefd 100644
-> --- a/tcg/optimize.c
-> +++ b/tcg/optimize.c
-> @@ -99,8 +99,17 @@ static void init_ts_info(struct tcg_temp_info *infos,
->          ts->state_ptr =3D ti;
->          ti->next_copy =3D ts;
->          ti->prev_copy =3D ts;
-> -        ti->is_const =3D false;
-> -        ti->mask =3D -1;
-> +        if (ts->kind =3D=3D TEMP_CONST) {
-> +            ti->is_const =3D true;
-> +            ti->val =3D ti->mask =3D ts->val;
-> +            if (TCG_TARGET_REG_BITS > 32 && ts->type =3D=3D TCG_TYPE_I32=
-) {
-> +                /* High bits of a 32-bit quantity are garbage.  */
-> +                ti->mask |=3D ~0xffffffffull;
-> +            }
-> +        } else {
-> +            ti->is_const =3D false;
-> +            ti->mask =3D -1;
-> +        }
->          set_bit(idx, temps_used->l);
->      }
->  }
-> @@ -113,31 +122,28 @@ static void init_arg_info(struct tcg_temp_info *inf=
-os,
->=20=20
->  static TCGTemp *find_better_copy(TCGContext *s, TCGTemp *ts)
->  {
-> -    TCGTemp *i;
-> +    TCGTemp *i, *g, *l;
->=20=20
-> -    /* If this is already a global, we can't do better. */
-> -    if (ts->kind >=3D TEMP_GLOBAL) {
-> +    /* If this is already readonly, we can't do better. */
-> +    if (temp_readonly(ts)) {
->          return ts;
->      }
->=20=20
-> -    /* Search for a global first. */
-> +    g =3D l =3D NULL;
->      for (i =3D ts_info(ts)->next_copy; i !=3D ts; i =3D ts_info(i)->next=
-_copy) {
-> -        if (i->kind >=3D TEMP_GLOBAL) {
-> +        if (temp_readonly(i)) {
->              return i;
-> -        }
-> -    }
-> -
-> -    /* If it is a temp, search for a temp local. */
-> -    if (ts->kind =3D=3D TEMP_NORMAL) {
-> -        for (i =3D ts_info(ts)->next_copy; i !=3D ts; i =3D ts_info(i)->=
-next_copy) {
-> -            if (i->kind >=3D TEMP_LOCAL) {
-> -                return i;
-> +        } else if (i->kind > ts->kind) {
-> +            if (i->kind =3D=3D TEMP_GLOBAL) {
-> +                g =3D i;
-> +            } else if (i->kind =3D=3D TEMP_LOCAL) {
-> +                l =3D i;
->              }
->          }
->      }
->=20=20
-> -    /* Failure to find a better representation, return the same temp. */
-> -    return ts;
-> +    /* If we didn't find a better representation, return the same temp. =
-*/
-> +    return g ? g : l ? l : ts;
->  }
->=20=20
->  static bool ts_are_copies(TCGTemp *ts1, TCGTemp *ts2)
-> diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
-> index b6937e8d64..f3927089a7 100644
-> --- a/tcg/tcg-op-vec.c
-> +++ b/tcg/tcg-op-vec.c
-> @@ -209,6 +209,23 @@ static void vec_gen_op3(TCGOpcode opc, unsigned vece,
->      vec_gen_3(opc, type, vece, temp_arg(rt), temp_arg(at), temp_arg(bt));
->  }
->=20=20
-> +TCGv_vec tcg_constant_vec(TCGType type, unsigned vece, int64_t val)
-> +{
-> +    val =3D dup_const(vece, val);
-> +
-> +    /*
-> +     * For MO_64 constants that can't be represented in tcg_target_long,
-> +     * we must use INDEX_op_dup2_vec, which requires a non-const tempora=
-ry.
-> +     */
-> +    if (TCG_TARGET_REG_BITS =3D=3D 32 &&
-> +        val !=3D deposit64(val, 32, 32, val) &&
-> +        val !=3D (uint64_t)(int32_t)val) {
-> +        g_assert_not_reached();
-> +    }
-> +
-> +    return temp_tcgv_vec(tcg_constant_internal(type, val));
-> +}
-> +
->  void tcg_gen_mov_vec(TCGv_vec r, TCGv_vec a)
->  {
->      if (r !=3D a) {
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index 92b3767097..59beb2bf29 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -1127,6 +1127,7 @@ void tcg_func_start(TCGContext *s)
->=20=20
->      /* No temps have been previously allocated for size or locality.  */
->      memset(s->free_temps, 0, sizeof(s->free_temps));
-> +    memset(s->const_table, 0, sizeof(s->const_table));
->=20=20
->      s->nb_ops =3D 0;
->      s->nb_labels =3D 0;
-> @@ -1199,13 +1200,19 @@ TCGTemp *tcg_global_mem_new_internal(TCGType type=
-, TCGv_ptr base,
->      bigendian =3D 1;
->  #endif
->=20=20
-> -    if (base_ts->kind !=3D TEMP_FIXED) {
-> +    switch (base_ts->kind) {
-> +    case TEMP_FIXED:
-> +        break;
-> +    case TEMP_GLOBAL:
->          /* We do not support double-indirect registers.  */
->          tcg_debug_assert(!base_ts->indirect_reg);
->          base_ts->indirect_base =3D 1;
->          s->nb_indirects +=3D (TCG_TARGET_REG_BITS =3D=3D 32 && type =3D=
-=3D TCG_TYPE_I64
->                              ? 2 : 1);
->          indirect_reg =3D 1;
-> +        break;
-> +    default:
-> +        g_assert_not_reached();
->      }
->=20=20
->      if (TCG_TARGET_REG_BITS =3D=3D 32 && type =3D=3D TCG_TYPE_I64) {
-> @@ -1346,6 +1353,37 @@ void tcg_temp_free_internal(TCGTemp *ts)
->      set_bit(idx, s->free_temps[k].l);
->  }
->=20=20
-> +TCGTemp *tcg_constant_internal(TCGType type, tcg_target_long val)
-> +{
-> +    TCGContext *s =3D tcg_ctx;
-> +    GHashTable *h =3D s->const_table[type];
-> +    TCGTemp *ts;
-> +
-> +    if (h =3D=3D NULL) {
-> +        if (sizeof(tcg_target_long) =3D=3D sizeof(gint64)) {
-> +            h =3D g_hash_table_new(g_int64_hash, g_int64_equal);
-> +        } else if (sizeof(tcg_target_long) =3D=3D sizeof(gint)) {
-> +            h =3D g_hash_table_new(g_int_hash, g_int_equal);
-> +        } else {
-> +            qemu_build_not_reached();
-> +        }
-> +        s->const_table[type] =3D h;
-> +    }
-> +
-> +    ts =3D g_hash_table_lookup(h, &val);
-> +    if (ts =3D=3D NULL) {
-> +        ts =3D tcg_temp_alloc(s);
-> +        ts->base_type =3D type;
-> +        ts->type =3D type;
-> +        ts->kind =3D TEMP_CONST;
-> +        ts->temp_allocated =3D 1;
-> +        ts->val =3D val;
-> +        g_hash_table_insert(h, &ts->val, ts);
-
-I worried about the efficiency of using a hash table for a low number of
-constants but glib's implementation starts with 8 buckets and then
-scales up so it seems a reasonable approach.
-
-Anyway:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+diff --git a/include/block/block.h b/include/block/block.h
+index b05995fe9c..8b62429aa4 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -339,9 +339,10 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverS=
+tate *bs,
+ void bdrv_refresh_filename(BlockDriverState *bs);
+=20
+ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset, bool e=
+xact,
+-                                  PreallocMode prealloc, Error **errp);
++                                  PreallocMode prealloc, BdrvRequestFlags =
+flags,
++                                  Error **errp);
+ int bdrv_truncate(BdrvChild *child, int64_t offset, bool exact,
+-                  PreallocMode prealloc, Error **errp);
++                  PreallocMode prealloc, BdrvRequestFlags flags, Error **e=
+rrp);
+=20
+ int64_t bdrv_nb_sectors(BlockDriverState *bs);
+ int64_t bdrv_getlength(BlockDriverState *bs);
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 38ae413826..8be20060d3 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -2144,7 +2144,7 @@ int blk_truncate(BlockBackend *blk, int64_t offset, b=
+ool exact,
+         return -ENOMEDIUM;
+     }
+=20
+-    return bdrv_truncate(blk->root, offset, exact, prealloc, errp);
++    return bdrv_truncate(blk->root, offset, exact, prealloc, 0, errp);
+ }
+=20
+ int blk_save_vmstate(BlockBackend *blk, const uint8_t *buf,
+diff --git a/block/crypto.c b/block/crypto.c
+index 3721a8495c..ab33545c92 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -313,7 +313,7 @@ block_crypto_co_truncate(BlockDriverState *bs, int64_t =
+offset, bool exact,
+=20
+     offset +=3D payload_offset;
+=20
+-    return bdrv_co_truncate(bs->file, offset, exact, prealloc, errp);
++    return bdrv_co_truncate(bs->file, offset, exact, prealloc, 0, errp);
+ }
+=20
+ static void block_crypto_close(BlockDriverState *bs)
+diff --git a/block/io.c b/block/io.c
+index 04ac5cf023..795075954e 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -3339,12 +3339,12 @@ static void bdrv_parent_cb_resize(BlockDriverState =
+*bs)
+  * 'offset' bytes in length.
+  */
+ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset, bool e=
+xact,
+-                                  PreallocMode prealloc, Error **errp)
++                                  PreallocMode prealloc, BdrvRequestFlags =
+flags,
++                                  Error **errp)
+ {
+     BlockDriverState *bs =3D child->bs;
+     BlockDriver *drv =3D bs->drv;
+     BdrvTrackedRequest req;
+-    BdrvRequestFlags flags =3D 0;
+     int64_t old_size, new_bytes;
+     int ret;
+=20
+@@ -3402,7 +3402,7 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, i=
+nt64_t offset, bool exact,
+         }
+         ret =3D drv->bdrv_co_truncate(bs, offset, exact, prealloc, flags, =
+errp);
+     } else if (bs->file && drv->is_filter) {
+-        ret =3D bdrv_co_truncate(bs->file, offset, exact, prealloc, errp);
++        ret =3D bdrv_co_truncate(bs->file, offset, exact, prealloc, flags,=
+ errp);
+     } else {
+         error_setg(errp, "Image format driver does not support resize");
+         ret =3D -ENOTSUP;
+@@ -3435,6 +3435,7 @@ typedef struct TruncateCo {
+     int64_t offset;
+     bool exact;
+     PreallocMode prealloc;
++    BdrvRequestFlags flags;
+     Error **errp;
+     int ret;
+ } TruncateCo;
+@@ -3443,12 +3444,12 @@ static void coroutine_fn bdrv_truncate_co_entry(voi=
+d *opaque)
+ {
+     TruncateCo *tco =3D opaque;
+     tco->ret =3D bdrv_co_truncate(tco->child, tco->offset, tco->exact,
+-                                tco->prealloc, tco->errp);
++                                tco->prealloc, tco->flags, tco->errp);
+     aio_wait_kick();
+ }
+=20
+ int bdrv_truncate(BdrvChild *child, int64_t offset, bool exact,
+-                  PreallocMode prealloc, Error **errp)
++                  PreallocMode prealloc, BdrvRequestFlags flags, Error **e=
+rrp)
+ {
+     Coroutine *co;
+     TruncateCo tco =3D {
+@@ -3456,6 +3457,7 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, b=
+ool exact,
+         .offset     =3D offset,
+         .exact      =3D exact,
+         .prealloc   =3D prealloc,
++        .flags      =3D flags,
+         .errp       =3D errp,
+         .ret        =3D NOT_DONE,
+     };
+diff --git a/block/parallels.c b/block/parallels.c
+index 6d4ed77f16..2be92cf417 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -203,7 +203,7 @@ static int64_t allocate_clusters(BlockDriverState *bs, =
+int64_t sector_num,
+         } else {
+             ret =3D bdrv_truncate(bs->file,
+                                 (s->data_end + space) << BDRV_SECTOR_BITS,
+-                                false, PREALLOC_MODE_OFF, NULL);
++                                false, PREALLOC_MODE_OFF, 0, NULL);
+         }
+         if (ret < 0) {
+             return ret;
+@@ -493,7 +493,7 @@ static int coroutine_fn parallels_co_check(BlockDriverS=
+tate *bs,
+              * That means we have to pass exact=3Dtrue.
+              */
+             ret =3D bdrv_truncate(bs->file, res->image_end_offset, true,
+-                                PREALLOC_MODE_OFF, &local_err);
++                                PREALLOC_MODE_OFF, 0, &local_err);
+             if (ret < 0) {
+                 error_report_err(local_err);
+                 res->check_errors++;
+@@ -889,7 +889,7 @@ static void parallels_close(BlockDriverState *bs)
+=20
+         /* errors are ignored, so we might as well pass exact=3Dtrue */
+         bdrv_truncate(bs->file, s->data_end << BDRV_SECTOR_BITS, true,
+-                      PREALLOC_MODE_OFF, NULL);
++                      PREALLOC_MODE_OFF, 0, NULL);
+     }
+=20
+     g_free(s->bat_dirty_bmap);
+diff --git a/block/qcow.c b/block/qcow.c
+index 8973e4e565..6b5f2269f0 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -480,7 +480,7 @@ static int get_cluster_offset(BlockDriverState *bs,
+                     return -E2BIG;
+                 }
+                 ret =3D bdrv_truncate(bs->file, cluster_offset + s->cluste=
+r_size,
+-                                    false, PREALLOC_MODE_OFF, NULL);
++                                    false, PREALLOC_MODE_OFF, 0, NULL);
+                 if (ret < 0) {
+                     return ret;
+                 }
+@@ -1035,7 +1035,7 @@ static int qcow_make_empty(BlockDriverState *bs)
+             l1_length) < 0)
+         return -1;
+     ret =3D bdrv_truncate(bs->file, s->l1_table_offset + l1_length, false,
+-                        PREALLOC_MODE_OFF, NULL);
++                        PREALLOC_MODE_OFF, 0, NULL);
+     if (ret < 0)
+         return ret;
+=20
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 7ef1c0e42a..d9650b9b6c 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2018,7 +2018,7 @@ static int check_refblocks(BlockDriverState *bs, Bdrv=
+CheckResult *res,
+                 }
+=20
+                 ret =3D bdrv_truncate(bs->file, offset + s->cluster_size, =
+false,
+-                                    PREALLOC_MODE_OFF, &local_err);
++                                    PREALLOC_MODE_OFF, 0, &local_err);
+                 if (ret < 0) {
+                     error_report_err(local_err);
+                     goto resize_fail;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 0b406b22fb..c5b0711357 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3095,7 +3095,7 @@ static int coroutine_fn preallocate_co(BlockDriverSta=
+te *bs, uint64_t offset,
+             mode =3D PREALLOC_MODE_OFF;
+         }
+         ret =3D bdrv_co_truncate(s->data_file, host_offset + cur_bytes, fa=
+lse,
+-                               mode, errp);
++                               mode, 0, errp);
+         if (ret < 0) {
+             return ret;
+         }
+@@ -4061,7 +4061,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriver=
+State *bs, int64_t offset,
+              * always fulfilled, so there is no need to pass it on.)
+              */
+             bdrv_co_truncate(bs->file, (last_cluster + 1) * s->cluster_siz=
+e,
+-                             false, PREALLOC_MODE_OFF, &local_err);
++                             false, PREALLOC_MODE_OFF, 0, &local_err);
+             if (local_err) {
+                 warn_reportf_err(local_err,
+                                  "Failed to truncate the tail of the image=
+: ");
+@@ -4083,7 +4083,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriver=
+State *bs, int64_t offset,
+              * file should be resized to the exact target size, too,
+              * so we pass @exact here.
+              */
+-            ret =3D bdrv_co_truncate(s->data_file, offset, exact, prealloc=
+, errp);
++            ret =3D bdrv_co_truncate(s->data_file, offset, exact, prealloc=
+, 0,
++                                   errp);
+             if (ret < 0) {
+                 goto fail;
+             }
+@@ -4169,7 +4170,8 @@ static int coroutine_fn qcow2_co_truncate(BlockDriver=
+State *bs, int64_t offset,
+         new_file_size =3D allocation_start +
+                         nb_new_data_clusters * s->cluster_size;
+         /* Image file grows, so @exact does not matter */
+-        ret =3D bdrv_co_truncate(bs->file, new_file_size, false, prealloc,=
+ errp);
++        ret =3D bdrv_co_truncate(bs->file, new_file_size, false, prealloc,=
+ 0,
++                               errp);
+         if (ret < 0) {
+             error_prepend(errp, "Failed to resize underlying file: ");
+             qcow2_free_clusters(bs, allocation_start,
+@@ -4348,7 +4350,8 @@ qcow2_co_pwritev_compressed_part(BlockDriverState *bs=
+,
+         if (len < 0) {
+             return len;
+         }
+-        return bdrv_co_truncate(bs->file, len, false, PREALLOC_MODE_OFF, N=
+ULL);
++        return bdrv_co_truncate(bs->file, len, false, PREALLOC_MODE_OFF, 0=
+,
++                                NULL);
+     }
+=20
+     if (offset_into_cluster(s, offset)) {
+@@ -4563,7 +4566,7 @@ static int make_completely_empty(BlockDriverState *bs=
+)
+     }
+=20
+     ret =3D bdrv_truncate(bs->file, (3 + l1_clusters) * s->cluster_size, f=
+alse,
+-                        PREALLOC_MODE_OFF, &local_err);
++                        PREALLOC_MODE_OFF, 0, &local_err);
+     if (ret < 0) {
+         error_report_err(local_err);
+         goto fail;
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 9331368f43..3465c9a865 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -387,7 +387,7 @@ static int coroutine_fn raw_co_truncate(BlockDriverStat=
+e *bs, int64_t offset,
+=20
+     s->size =3D offset;
+     offset +=3D s->offset;
+-    return bdrv_co_truncate(bs->file, offset, exact, prealloc, errp);
++    return bdrv_co_truncate(bs->file, offset, exact, prealloc, 0, errp);
+ }
+=20
+ static void raw_eject(BlockDriverState *bs, bool eject_flag)
+diff --git a/block/vhdx-log.c b/block/vhdx-log.c
+index 13a49c2a33..404fb5f3cb 100644
+--- a/block/vhdx-log.c
++++ b/block/vhdx-log.c
+@@ -558,7 +558,7 @@ static int vhdx_log_flush(BlockDriverState *bs, BDRVVHD=
+XState *s,
+                     goto exit;
+                 }
+                 ret =3D bdrv_truncate(bs->file, new_file_size, false,
+-                                    PREALLOC_MODE_OFF, NULL);
++                                    PREALLOC_MODE_OFF, 0, NULL);
+                 if (ret < 0) {
+                     goto exit;
+                 }
+diff --git a/block/vhdx.c b/block/vhdx.c
+index 33e57cd656..5dfbb2029a 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -1264,7 +1264,7 @@ static int vhdx_allocate_block(BlockDriverState *bs, =
+BDRVVHDXState *s,
+     }
+=20
+     return bdrv_truncate(bs->file, *new_offset + s->block_size, false,
+-                         PREALLOC_MODE_OFF, NULL);
++                         PREALLOC_MODE_OFF, 0, NULL);
+ }
+=20
+ /*
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 218d9c9800..5de99fe813 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -2077,7 +2077,7 @@ vmdk_co_pwritev_compressed(BlockDriverState *bs, uint=
+64_t offset,
+             }
+             length =3D QEMU_ALIGN_UP(length, BDRV_SECTOR_SIZE);
+             ret =3D bdrv_truncate(s->extents[i].file, length, false,
+-                                PREALLOC_MODE_OFF, NULL);
++                                PREALLOC_MODE_OFF, 0, NULL);
+             if (ret < 0) {
+                 return ret;
+             }
+diff --git a/tests/test-block-iothread.c b/tests/test-block-iothread.c
+index 2f3b76323d..71e9bce3b1 100644
+--- a/tests/test-block-iothread.c
++++ b/tests/test-block-iothread.c
+@@ -186,18 +186,18 @@ static void test_sync_op_truncate(BdrvChild *c)
+     int ret;
+=20
+     /* Normal success path */
+-    ret =3D bdrv_truncate(c, 65536, false, PREALLOC_MODE_OFF, NULL);
++    ret =3D bdrv_truncate(c, 65536, false, PREALLOC_MODE_OFF, 0, NULL);
+     g_assert_cmpint(ret, =3D=3D, 0);
+=20
+     /* Early error: Negative offset */
+-    ret =3D bdrv_truncate(c, -2, false, PREALLOC_MODE_OFF, NULL);
++    ret =3D bdrv_truncate(c, -2, false, PREALLOC_MODE_OFF, 0, NULL);
+     g_assert_cmpint(ret, =3D=3D, -EINVAL);
+=20
+     /* Error: Read-only image */
+     c->bs->read_only =3D true;
+     c->bs->open_flags &=3D ~BDRV_O_RDWR;
+=20
+-    ret =3D bdrv_truncate(c, 65536, false, PREALLOC_MODE_OFF, NULL);
++    ret =3D bdrv_truncate(c, 65536, false, PREALLOC_MODE_OFF, 0, NULL);
+     g_assert_cmpint(ret, =3D=3D, -EACCES);
+=20
+     c->bs->read_only =3D false;
 --=20
-Alex Benn=C3=A9e
+2.25.3
+
 
