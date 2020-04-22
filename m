@@ -2,91 +2,102 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89961C55185
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:06:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5810DC55185
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:07:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55F5720776
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:06:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CDF620776
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:07:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qhxeuw6j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55F5720776
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SFtX8zSA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CDF620776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRHtb-0004G7-EC
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:06:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50828)
+	id 1jRHtt-0004XI-AW
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:07:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52088)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jRHoE-0006vE-Q7
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:01:12 -0400
+ (envelope-from <philmd@redhat.com>) id 1jRHra-0001k4-8v
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:04:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jRHoD-0000Ov-FZ
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:01:10 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:53956)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jRHoC-0000K1-UF
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:01:09 -0400
-Received: by mail-wm1-x333.google.com with SMTP id t63so2968564wmt.3
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 09:01:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=JXtxeNhSPsuNv0Lq5sMm9wLumsAwhFG99DQ1uYmkY6o=;
- b=qhxeuw6jEsOBHUywt+Ai3YO+Qd61jaXaYoVW9Ydng/sqSKSyxesuwOCKb1adp2PPdr
- NYR4pG88b+UhAruNOvhT8xpCMrIg04XL1yKeZNIIeMBIx3wFXAjJGP+/CaLFMNLfcaaU
- yzxfyYEn46pItPnkRoAnfN2AnectgY2lSQmTQB016N5osQivH/ltX5FvHjAfW+Zf1WVo
- /1Rt5N61hpbAzDU77KIlUW/u/XlYTMlHa2Ww1A3zzdgrxphBliYygEohri8t1VIDgUdz
- zRWMX9IslI5IESzaGPRlcufFLQNFKriEwiVYkK7NCoqo2skPG8gbSuJs5Vj8viZVDbBD
- CqLQ==
+ (envelope-from <philmd@redhat.com>) id 1jRHrT-0003fA-H9
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:04:37 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25701
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRHrS-0003Cs-IG
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:04:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587571464;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=yJgg3e6ZdBdbAdXq1rNpGr9QWOUH8cnG66yxh4yXYXI=;
+ b=SFtX8zSA3q08y+r0rKSFv499oRD0CNdehYSAX2gqclzAaHb9hYHHwTgkD4Xmf+8tB5R3dJ
+ GNOw7eSG6rrzxV4iKS+ieblkEEPhimVVsf6DbULnL7fS2dv2snBy/l6Wa52R9LJhJs/6iC
+ S2lr37M3lHZQIFmBCfn3YxFd0oGRiSk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-53-R8XwUbz_O4eMOZewhdKQWA-1; Wed, 22 Apr 2020 12:04:21 -0400
+X-MC-Unique: R8XwUbz_O4eMOZewhdKQWA-1
+Received: by mail-wr1-f71.google.com with SMTP id r11so1264859wrx.21
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 09:04:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=JXtxeNhSPsuNv0Lq5sMm9wLumsAwhFG99DQ1uYmkY6o=;
- b=Xga90NjYHN/wI58Ik4Nki6nb9l2eb/iZFbBdEfyodb9SP6PIiVQlZ4E6NCVd6QnbST
- tADyZghoe7hXOEk6mIK6xG8Q6PX1rVqK9Hf8qrEgz95g64CFEbzag78EFplG3ynwL4au
- P9+rM9QAW03yYa+pu4PoV09b5JZcVpsr9mRLAxr9JuTve2otzvwPCrafNIdLJ0W3/zbg
- 1sgIkvm983cQJkQAHuR+KWKxH2kDF4jx9UzmjCE4rdWViBO8S6s1NOla9aWajul3w/Vz
- u5M6PufuqYHxA3jzVETBsU7GlyXjChwE0hxB4P9Fo7WIwSlA8Lud3Fv0czDdDHXf9iL8
- FFpg==
-X-Gm-Message-State: AGi0PubwttxOP7Qynj/hbra0LpJCxBw4342mAuVftP5Jj6jSfUvTzoSz
- HnSyywTsB416rltIO46B0UA=
-X-Google-Smtp-Source: APiQypLgp4H5ZJubPW4QmAz7niYvmFgZbuSy2Fd5OuRiUy9uwUECvmjiXozOwhxhOFLxVS6Epi4x1Q==
-X-Received: by 2002:a05:600c:295a:: with SMTP id
- n26mr12423080wmd.16.1587571267164; 
- Wed, 22 Apr 2020 09:01:07 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id v131sm8649979wmb.19.2020.04.22.09.01.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Apr 2020 09:01:05 -0700 (PDT)
-Date: Wed, 22 Apr 2020 17:01:03 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: FYI GitHub pull request / issue tracker lockdown bot
-Message-ID: <20200422160103.GG47385@stefanha-x1.localdomain>
-References: <20200403142213.GO559148@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=PysFP9Eo7yZhh/HmFyG2n+ZPfLAUd+R7KTs5AfN+pc0=;
+ b=VsRHZYjuaqAUyT+RGNOuJ7F3v9/vWx9DKShwyb0ruQrbWx3HqaGH80L96TllWSfUDo
+ MQ0jPwXPhWJxQO0Hs+jhO3+VGPw1+62n8xsKHrNCsL5gQNFRE3TG1y52t7JH0lZx+MmR
+ aXsi0NwTnVVqA52NXqpMEl4GqEhOg4Oso7ppucqSNOwmJKOhlaq/f88rR+kgBBKUQoY2
+ eFF5l0Vai0UpVk0KpZYlL5tPS+X8hdm/1GUEYDj/Gt5lWF7KDYvqnetwOTMWNTGdVX3U
+ oOw1Zhq5wVrPDYJx2wg0ycIkgfliz08R8DOowHCMq6ujVNr+GA4DVNnQ4y22xAnsUAJ2
+ LNXA==
+X-Gm-Message-State: AGi0PuYooiW6Sbq0EVqcZdlkyChYCklGwiyRzThIRNEj/VS5RAcQlkEp
+ x9ymWjTZJKhZrgC47dU7UeSrl2V/P9LbAy2yb7h+NLdrica3jvf/Z6t+gRNxzaN07yZSovfeb/F
+ a3eS+iLZhoCiUwGg=
+X-Received: by 2002:adf:cc8d:: with SMTP id p13mr31766146wrj.114.1587571460351; 
+ Wed, 22 Apr 2020 09:04:20 -0700 (PDT)
+X-Google-Smtp-Source: APiQypL5KEnbpAcrgHdimWLJR58SuA5pF3PI9cBMhVMF6A1B7VBOUcjgs1gmxw6bKdsHNRxSP9yVZQ==
+X-Received: by 2002:adf:cc8d:: with SMTP id p13mr31766116wrj.114.1587571460106; 
+ Wed, 22 Apr 2020 09:04:20 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id t2sm8710524wmt.15.2020.04.22.09.04.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 22 Apr 2020 09:04:19 -0700 (PDT)
+Subject: Re: [PATCH 1/2] crypto/secret: fix inconsequential errors.
+To: Alexey Krasikov <alex-krasikov@yandex-team.ru>, berrange@redhat.com,
+ qemu-devel@nongnu.org
+References: <20200415201336.24195-1-alex-krasikov@yandex-team.ru>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f19e117f-6dfb-fdfc-12ef-e21ec98baedd@redhat.com>
+Date: Wed, 22 Apr 2020 18:04:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Cgrdyab2wu3Akvjd"
-Content-Disposition: inline
-In-Reply-To: <20200403142213.GO559148@redhat.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::333;
- envelope-from=stefanha@gmail.com; helo=mail-wm1-x333.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::333
+In-Reply-To: <20200415201336.24195-1-alex-krasikov@yandex-team.ru>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:12:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,77 +109,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, alex.bennee@linaro.org,
- qemu-devel@nongnu.org
+Cc: yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 4/15/20 10:13 PM, Alexey Krasikov wrote:
+> * change condition from QCRYPTO_SECRET_FORMAT_RAW
+>    to QCRYPTO_SECRET_FORMAT_BASE64 in if-operator, because
+>    this is potencial error if you add another format value.
+>=20
+> Signed-off-by: Alexey Krasikov <alex-krasikov@yandex-team.ru>
+> ---
+>   crypto/secret.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/crypto/secret.c b/crypto/secret.c
+> index 1cf0ad0ce8..546b965afe 100644
+> --- a/crypto/secret.c
+> +++ b/crypto/secret.c
+> @@ -204,7 +204,7 @@ qcrypto_secret_prop_set_loaded(Object *obj,
+>               input =3D output;
+>               inputlen =3D outputlen;
+>           } else {
+> -            if (secret->format !=3D QCRYPTO_SECRET_FORMAT_RAW) {
+> +            if (secret->format =3D=3D QCRYPTO_SECRET_FORMAT_BASE64) {
+>                   qcrypto_secret_decode(input, inputlen,
+>                                         &output, &outputlen, &local_err);
+>                   g_free(input);
+>=20
 
---Cgrdyab2wu3Akvjd
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-On Fri, Apr 03, 2020 at 03:22:13PM +0100, Daniel P. Berrang=E9 wrote:
-> QEMU, like libvirt, has a github.com project which contains automated
-> read-only mirrors of QEMU repositories.
->=20
->   https://github.com/qemu/
->=20
-> An unfortunate side effect of this is that some users will try to open
-> pull requests against these mirrors. These get ignored until eventually
-> someone notices and closes the request. QEMU has had about 90 prs opened
-> over the years.
->=20
->   https://github.com/qemu/qemu/pulls
->=20
-> The same applies to the issue tracker, but fortunately github lets
-> projects disable this feature, which QEMU has done.
->=20
-> I have recently discovered that there is a nice 3rd party bot for github
-> which can autorespond to pull requests with a friendly comment, close the
-> request, and then lock it to prevent further comments.
->=20
->   https://github.com/apps/repo-lockdown
->=20
-> I'm setting this up for libvirt and it was suggested QEMU can probably
-> benefit from it too as an example see:
->=20
->   https://github.com/libvirt/test/issues/2
->   https://github.com/libvirt/test/pull/3
->=20
->=20
-> Configuration just requires creation of a ".github/lockdown.yml" file
-> which provides the friendly message to add to the merge requests. This
-> can be either done per-repository, or a special repo can be created
-> called ".github" and this will apply to all repos within the project.
->=20
-> Ideally each repo would have a CONTRIBUTING.md file created too, since
-> both GitHub and GitLab will direct users to this file for guidelines
-> on how to contribute.
->=20
-> I don't have time right now to do this for QEMU, so consider this email
-> a friendly suggestion for some other interested person to do for QEMU...
-
-Ping Alex and Paolo, who have access to github.com/qemu.
-
-Stefan
-
---Cgrdyab2wu3Akvjd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6gaj8ACgkQnKSrs4Gr
-c8hscAf/U34LF1LV59hrMbQCRZ8La84yqAPiuMmib1QorOKN/kowaCxjkyArEXjp
-InQxbL1Y36tiHm5INqoOfVlggowDwYm0376+kjeVoVmSgiVv+iKqymNa2pNxfsLG
-+RC5xXPrBRHcS+KQKNOaMY4pC4yl2NaltjNN4qYrzhFhkAngLja16MS5DOwe7XGv
-FNEGCQveTRcx8xkdMd4eN5Sb3TOe98rpcpya7PkOfHtjm5uEgjSrhitkxqOfAHJS
-v+36/SKh7i7Yl42CpwCAa9oQWhpBo42Ti4GWDIzs6p659h95rfiRnfbAlVQfSZdb
-wjqTpS29+39YrSzYmtXv72SzsU4QEA==
-=nwkP
------END PGP SIGNATURE-----
-
---Cgrdyab2wu3Akvjd--
 
