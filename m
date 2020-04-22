@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 921B0C5518A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:10:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10213C5518B
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:11:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 641902070B
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:10:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 641902070B
+	by mail.kernel.org (Postfix) with ESMTPS id D5CC1206CD
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:11:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5CC1206CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jR9X6-0002a0-H8
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 03:10:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39518)
+	id 1jR9XC-0002mr-0r
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 03:11:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39482)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jR9Vu-0000bc-4w
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:09:42 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jR9Vt-0007J0-Ap
+ (envelope-from <its@irrelevant.dk>) id 1jR9Vt-0000Zj-0l
  for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:09:41 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:60252)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
+ (envelope-from <its@irrelevant.dk>) id 1jR9Vr-0007HD-8G
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:09:40 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:60208)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jR9Vq-0007D0-3u; Wed, 22 Apr 2020 03:09:38 -0400
+ id 1jR9Vp-0007AM-4u; Wed, 22 Apr 2020 03:09:37 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id BED95BFD3D;
- Wed, 22 Apr 2020 07:09:35 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 80D80BFBB8;
+ Wed, 22 Apr 2020 07:09:34 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 06/16] nvme: refactor nvme_addr_read
-Date: Wed, 22 Apr 2020 09:09:17 +0200
-Message-Id: <20200422070927.373048-7-its@irrelevant.dk>
+Subject: [PATCH v3 03/16] nvme: remove superfluous breaks
+Date: Wed, 22 Apr 2020 09:09:14 +0200
+Message-Id: <20200422070927.373048-4-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200422070927.373048-1-its@irrelevant.dk>
 References: <20200422070927.373048-1-its@irrelevant.dk>
@@ -68,56 +68,48 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
  Max Reitz <mreitz@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
  Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
  Maxim Levitsky <mlevitsk@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsky@redhat.com>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Pull the controller memory buffer check to its own function. The check
-will be used on its own in later patches.
+These break statements was left over when commit 3036a626e9ef ("nvme:
+add Get/Set Feature Timestamp support") was merged.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsky@redhat.com>
 Reviewed-by: Keith Busch <kbusch@kernel.org>
 ---
- hw/block/nvme.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ hw/block/nvme.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 4aa45f511118..5605875e2614 100644
+index 6702812ecdd1..f67499d85f3a 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -66,14 +66,22 @@
- 
- static void nvme_process_sq(void *opaque);
- 
-+static bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr)
-+{
-+    hwaddr low = n->ctrl_mem.addr;
-+    hwaddr hi  = n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size);
-+
-+    return addr >= low && addr < hi;
-+}
-+
- static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
- {
--    if (n->cmbsz && addr >= n->ctrl_mem.addr &&
--                addr < (n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size))) {
-+    if (n->cmbsz && nvme_addr_is_cmb(n, addr)) {
-         memcpy(buf, (void *)&n->cmbuf[addr - n->ctrl_mem.addr], size);
--    } else {
--        pci_dma_read(&n->parent_obj, addr, buf, size);
-+        return;
-     }
-+
-+    pci_dma_read(&n->parent_obj, addr, buf, size);
- }
- 
- static int nvme_check_sqid(NvmeCtrl *n, uint16_t sqid)
+@@ -802,7 +802,6 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+         break;
+     case NVME_TIMESTAMP:
+         return nvme_get_feature_timestamp(n, cmd);
+-        break;
+     default:
+         trace_pci_nvme_err_invalid_getfeat(dw10);
+         return NVME_INVALID_FIELD | NVME_DNR;
+@@ -846,11 +845,8 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+         req->cqe.result =
+             cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16));
+         break;
+-
+     case NVME_TIMESTAMP:
+         return nvme_set_feature_timestamp(n, cmd);
+-        break;
+-
+     default:
+         trace_pci_nvme_err_invalid_setfeat(dw10);
+         return NVME_INVALID_FIELD | NVME_DNR;
 -- 
 2.26.2
 
