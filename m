@@ -1,76 +1,88 @@
 Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD14AC5518A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:47:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71AF9C5518A
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:54:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C805206E9
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:47:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C805206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 368E0206E9
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:54:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tL8ZriwB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 368E0206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45741 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRA6g-0001Wh-LK
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 03:47:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36920)
+	id 1jRAD7-00059B-8u
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 03:54:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40160)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jRA5W-0000zT-PH
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:46:31 -0400
+ (envelope-from <hqm03ster@gmail.com>) id 1jRABy-0004he-Ga
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:53:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jRA5V-0005ey-A4
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:46:30 -0400
-Received: from mga04.intel.com ([192.55.52.120]:64955)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1jRA5U-0004kV-Nj
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:46:28 -0400
-IronPort-SDR: W2YOH/747jm6Et0rjWLLZuv2JaKmlHEwRkFoPLDD4IMGvM1BoJZXkQMsrh6Neyf0acssHfM3s0
- hI0dC2TnpWkw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Apr 2020 00:46:17 -0700
-IronPort-SDR: IiqeFspJ0CdB38qBX6Cd2a66HZX2GAU621wxqs2QmfifCRoH56m9KszWZEuthNv39GbncIKt4K
- Qz6f47zS8OYQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,412,1580803200"; d="scan'208";a="279929982"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by fmsmga004.fm.intel.com with ESMTP; 22 Apr 2020 00:46:09 -0700
-Date: Wed, 22 Apr 2020 03:36:28 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
- VFIO live migration
-Message-ID: <20200422073628.GA12879@joy-OptiPlex-7040>
-References: <20200413055201.27053-1-yan.y.zhao@intel.com>
- <20200417104450.2d2f2fa9.cohuck@redhat.com>
- <20200417095202.GD16688@joy-OptiPlex-7040>
- <20200417132457.45d91fe3.cohuck@redhat.com>
- <20200420012457.GE16688@joy-OptiPlex-7040>
- <20200420165600.4951ae82@w520.home>
- <20200421023718.GA12111@joy-OptiPlex-7040>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D86DF06@SHSMSX104.ccr.corp.intel.com>
+ (envelope-from <hqm03ster@gmail.com>) id 1jRABx-0005Or-FQ
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:53:09 -0400
+Received: from mail-qk1-x731.google.com ([2607:f8b0:4864:20::731]:38958)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <hqm03ster@gmail.com>)
+ id 1jRABx-0005Jx-2a
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:53:09 -0400
+Received: by mail-qk1-x731.google.com with SMTP id b62so1481467qkf.6
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 00:53:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=fYeL9vUWeChobEKoh6rG429sf9VPqrXbw/mMaENVjmg=;
+ b=tL8ZriwBDCdUqaABNUofVRwE8aHc3cNNOXd1pFoyC3MdEg5abt5q7lST1v6qh/XNBS
+ uUKFqUIQp47kzmQHmPand/Pt8D05kK4m8NdTjdxCN1MZEsyTv/EWT7a1OS7w1YuK6I7u
+ 1BocZk5XcVM7BfVPDgOZt2uW1wKGwRfYtc0keZOZ7ZqH22+tvDgqZrExUwJwtYnTyEH1
+ MFpoDCyqkkbf70Y3/Ot+CHTt5jIOtrg5UC3waWNJdp6PAFn+usHIyS5c5awG+/eYvy7j
+ AYpQo/VGRib17Sk0h17UW6fe8wCs2ZZZHwQkbp7Wt/9tCCCQDLUXRdv/29innhnVsxZK
+ f9VA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=fYeL9vUWeChobEKoh6rG429sf9VPqrXbw/mMaENVjmg=;
+ b=i2x1FFIcHD4sPTP6cNNT8ABIxZYGycxkZlGJnweNeEOLFftZJDtlA43UZDdcZ6uDhA
+ zxqiGhhJ3UzJJO+LS/OR+4x9y4vbj+Jk8rvBLAT2zVVyBziLpKly1a0tzov8TeReLCvq
+ rLKXDgrHxSgDmG2zXXEvVLDdV9mvxS0oz4v/6RjJWLxEhgqkLHsEA5cT7iMMGHd0cUFc
+ a8coHFJb06sR/k6Ur0khVO9T9ZjjdvffCE1EiggYlKc55WXEY1MrMtyvhFujFEzXtSv6
+ PsBhkVneQVwpB2OheoNCZvZ34EOUcGa+SVx0/69jWEm3nE9789b3de/iaXI0k3IqhQBU
+ sgWg==
+X-Gm-Message-State: AGi0PuadG1kdbpaxFnWsINMsv2s5ygvo3lEMK2ULUeQTmh4jGVR4IP/o
+ gbn7bJXyhos6URN4FEbpQosJ9lT0VLIXMHRbPUI=
+X-Google-Smtp-Source: APiQypJdDamshdABJXoB5xF+xPVeUfJGOGvJUQ98JtH4ACzANIdBsyDAV+qBbx4zwFklVRCSbAVSiGyV9RwcEXEassc=
+X-Received: by 2002:a05:620a:22b1:: with SMTP id
+ p17mr25349293qkh.249.1587541986972; 
+ Wed, 22 Apr 2020 00:53:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D86DF06@SHSMSX104.ccr.corp.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=192.55.52.120; envelope-from=yan.y.zhao@intel.com;
- helo=mga04.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 03:46:17
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 192.55.52.120
+References: <623b1855-285c-cce3-c806-c17e5fd217ea@redhat.com>
+ <5211.1586899245384995995@groups.io>
+ <a972450d-8834-ae87-e4e3-5263a41d1735@redhat.com>
+ <20200420141303.dxjqgvmzglrjtsly@sirius.home.kraxel.org>
+ <9aed493a-2187-cacd-5631-54fb9973509c@redhat.com>
+In-Reply-To: <9aed493a-2187-cacd-5631-54fb9973509c@redhat.com>
+From: Hou Qiming <hqm03ster@gmail.com>
+Date: Wed, 22 Apr 2020 15:42:34 +0800
+Message-ID: <CABSdmrm2qp=nMdu7N7kxxS9PVA25_pfnK_F3EimLuq8twPKjgg@mail.gmail.com>
+Subject: Re: [edk2-discuss] Load Option passing. Either bugs or my confusion.
+To: Laszlo Ersek <lersek@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000003319d205a3dc6c48"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::731;
+ envelope-from=hqm03ster@gmail.com; helo=mail-qk1-x731.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::731
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,272 +94,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
- "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "Yang, Ziye" <ziye.yang@intel.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
- "Zeng, Xin" <xin.zeng@intel.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
- "Liu, Changpeng" <changpeng.liu@intel.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "dinechin@redhat.com" <dinechin@redhat.com>,
- "He, Shaopeng" <shaopeng.he@intel.com>
+Cc: edk2-devel-groups-io <devel@edk2.groups.io>,
+ qemu devel list <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ discuss@edk2.groups.io, valerij zaporogeci <vlrzprgts@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Apr 21, 2020 at 08:08:49PM +0800, Tian, Kevin wrote:
-> > From: Yan Zhao
-> > Sent: Tuesday, April 21, 2020 10:37 AM
-> > 
-> > On Tue, Apr 21, 2020 at 06:56:00AM +0800, Alex Williamson wrote:
-> > > On Sun, 19 Apr 2020 21:24:57 -0400
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >
-> > > > On Fri, Apr 17, 2020 at 07:24:57PM +0800, Cornelia Huck wrote:
-> > > > > On Fri, 17 Apr 2020 05:52:02 -0400
-> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > >
-> > > > > > On Fri, Apr 17, 2020 at 04:44:50PM +0800, Cornelia Huck wrote:
-> > > > > > > On Mon, 13 Apr 2020 01:52:01 -0400
-> > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > > >
-> > > > > > > > This patchset introduces a migration_version attribute under sysfs
-> > of VFIO
-> > > > > > > > Mediated devices.
-> > > > > > > >
-> > > > > > > > This migration_version attribute is used to check migration
-> > compatibility
-> > > > > > > > between two mdev devices.
-> > > > > > > >
-> > > > > > > > Currently, it has two locations:
-> > > > > > > > (1) under mdev_type node,
-> > > > > > > >     which can be used even before device creation, but only for
-> > mdev
-> > > > > > > >     devices of the same mdev type.
-> > > > > > > > (2) under mdev device node,
-> > > > > > > >     which can only be used after the mdev devices are created, but
-> > the src
-> > > > > > > >     and target mdev devices are not necessarily be of the same
-> > mdev type
-> > > > > > > > (The second location is newly added in v5, in order to keep
-> > consistent
-> > > > > > > > with the migration_version node for migratable pass-though
-> > devices)
-> > > > > > >
-> > > > > > > What is the relationship between those two attributes?
-> > > > > > >
-> > > > > > (1) is for mdev devices specifically, and (2) is provided to keep the
-> > same
-> > > > > > sysfs interface as with non-mdev cases. so (2) is for both mdev
-> > devices and
-> > > > > > non-mdev devices.
-> > > > > >
-> > > > > > in future, if we enable vfio-pci vendor ops, (i.e. a non-mdev device
-> > > > > > is binding to vfio-pci, but is able to register migration region and do
-> > > > > > migration transactions from a vendor provided affiliate driver),
-> > > > > > the vendor driver would export (2) directly, under device node.
-> > > > > > It is not able to provide (1) as there're no mdev devices involved.
-> > > > >
-> > > > > Ok, creating an alternate attribute for non-mdev devices makes sense.
-> > > > > However, wouldn't that rather be a case (3)? The change here only
-> > > > > refers to mdev devices.
-> > > > >
-> > > > as you pointed below, (3) and (2) serve the same purpose.
-> > > > and I think a possible usage is to migrate between a non-mdev device and
-> > > > an mdev device. so I think it's better for them both to use (2) rather
-> > > > than creating (3).
-> > >
-> > > An mdev type is meant to define a software compatible interface, so in
-> > > the case of mdev->mdev migration, doesn't migrating to a different type
-> > > fail the most basic of compatibility tests that we expect userspace to
-> > > perform?  IOW, if two mdev types are migration compatible, it seems a
-> > > prerequisite to that is that they provide the same software interface,
-> > > which means they should be the same mdev type.
-> > >
-> > > In the hybrid cases of mdev->phys or phys->mdev, how does a
-> > management
-> > > tool begin to even guess what might be compatible?  Are we expecting
-> > > libvirt to probe ever device with this attribute in the system?  Is
-> > > there going to be a new class hierarchy created to enumerate all
-> > > possible migrate-able devices?
-> > >
-> > yes, management tool needs to guess and test migration compatible
-> > between two devices. But I think it's not the problem only for
-> > mdev->phys or phys->mdev. even for mdev->mdev, management tool needs
-> > to
-> > first assume that the two mdevs have the same type of parent devices
-> > (e.g.their pciids are equal). otherwise, it's still enumerating
-> > possibilities.
-> > 
-> > on the other hand, for two mdevs,
-> > mdev1 from pdev1, its mdev_type is 1/2 of pdev1;
-> > mdev2 from pdev2, its mdev_type is 1/4 of pdev2;
-> > if pdev2 is exactly 2 times of pdev1, why not allow migration between
-> > mdev1 <-> mdev2.
-> 
-> How could the manage tool figure out that 1/2 of pdev1 is equivalent 
-> to 1/4 of pdev2? If we really want to allow such thing happen, the best
-> choice is to report the same mdev type on both pdev1 and pdev2.
-I think that's exactly the value of this migration_version interface.
-the management tool can take advantage of this interface to know if two
-devices are migration compatible, no matter they are mdevs, non-mdevs,
-or mix.
+--0000000000003319d205a3dc6c48
+Content-Type: text/plain; charset="UTF-8"
 
-as I know, (please correct me if not right), current libvirt still
-requires manually generating mdev devices, and it just duplicates src vm
-configuration to the target vm.
-for libvirt, currently it's always phys->phys and mdev->mdev (and of the
-same mdev type).
-But it does not justify that hybrid cases should not be allowed. otherwise,
-why do we need to introduce this migration_version interface and leave
-the judgement of migration compatibility to vendor driver? why not simply
-set the criteria to something like "pciids of parent devices are equal,
-and mdev types are equal" ?
+A little off topic thing: isn't the default resolution supposed to be
+1024x768? This is the Microsoft regulation which all my physical devices
+seem to follow:
+
+https://docs.microsoft.com/en-us/windows-hardware/test/hlk/testref/6afc8979-df62-4d86-8f6a-99f05bbdc7f3
+
+And when the user provides an EDID one should parse it and set the default
+resolution to match it. But that's a less important feature.
 
 
-> btw mdev<->phys just brings trouble to upper stack as Alex pointed out. 
-could you help me understand why it will bring trouble to upper stack?
+On Tue, Apr 21, 2020 at 9:03 PM Laszlo Ersek <lersek@redhat.com> wrote:
 
-I think it just needs to read src migration_version under src dev node,
-and test it in target migration version under target dev node. 
-
-after all, through this interface we just help the upper layer
-knowing available options through reading and testing, and they decide
-to use it or not.
-
-> Can we simplify the requirement by allowing only mdev<->mdev and 
-> phys<->phys migration? If an customer does want to migrate between a 
-> mdev and phys, he could wrap physical device into a wrapped mdev 
-> instance (with the same type as the source mdev) instead of using vendor 
-> ops. Doing so does add some burden but if mdev<->phys is not dominant 
-> usage then such tradeoff might be worthywhile...
+> On 04/20/20 16:13, Gerd Hoffmann wrote:
+> >   Hi,
+> >
+> >> So I would say that the symptom you see is a QEMU v4.1.0 regression.
+> >> The QemuRamfbGraphicsOutputSetMode() function in the OVMF ramfb
+> >> driver certainly needs the QemuFwCfgWriteBytes() call to work, for
+> >> changing the resolution.
+> >
+> > Oh?  QemuRamfbGraphicsOutputSetMode() can be called multiple times?
+> > How does that happen?
 >
-If the interfaces for phys<->phys and mdev<->mdev are consistent, it makes no
-difference to phys<->mdev, right?
-I think the vendor string for a mdev device is something like:
-"Parent PCIID + mdev type + software version", and
-that for a phys device is something like:
-"PCIID + software version".
-as long as we don't migrate between devices from different vendors, it's
-easy for vendor driver to tell if a phys device is migration compatible
-to a mdev device according it supports it or not.
+> QemuRamfbGraphicsOutputSetMode() is the "SetMode" member function of the
+> EFI_GRAPHICS_OUTPUT_PROTOCOL instance that QemuRamfbDxe produces.
+>
+> This is a standard protocol; UEFI drivers and applications are free to
+> locate it and to use it.
+>
+> (1) When you launch OVMF, you get the splash screen in a particular
+> resolution. This resolution:
+> - is configured by OvmfPkg/PlatformDxe,
+> - is inherited by an OS boot loader,
+> - is reconfigurable with OvmfPkg/PlatformDxe, for the next boot, via the
+>   Setup TUI,
+> - defaults to 800x600 (taking effect when no particular choice is
+>   configured).
+>
+> (2) UiApp -- the Setup TUI itself -- uses its own resolution. Under
+> OVMF, this resolution is fixed 640x480. When UiApp is entered,
+> ultimately a call is made to QemuRamfbGraphicsOutputSetMode() -- i.e., a
+> GOP.SetMode() member function -- for setting this 640x480 resolution.
+>
+> Using the following command:
+>
+>   qemu-system-x86_64 \
+>     -nodefaults \
+>     -boot menu=on,splash-time=5000 \
+>     -enable-kvm \
+>     -device ramfb \
+>     -drive
+> if=pflash,readonly,format=raw,file=$PREFIX/share/qemu/edk2-x86_64-code.fd \
+>     -drive
+> if=pflash,snapshot,format=raw,file=$PREFIX/share/qemu/edk2-i386-vars.fd \
+>     -debugcon file:ovmf.log \
+>     -global isa-debugcon.iobase=0x402
+>
+> when you first see the progress bar, the graphical resolution (1) is
+> 800x600. Accordingly, QEMU prints to stderr:
+>
+> > ramfb_fw_cfg_write: 800x600 @ 0x6702000
+>
+> Once you hit ESC to interrupt the progress bar and to enter the Setup
+> TUI, UiApp switches to resolution (2), 640x480. QEMU prints:
+>
+> > ramfb_fw_cfg_write: 640x480 @ 0x6702000
+> > ramfb_fw_cfg_write: resolution locked, change rejected
+>
+> And you get garbage in the Setup window.
+>
+> Thanks,
+> Laszlo
+>
+>
 
+--0000000000003319d205a3dc6c48
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks
-Yan
-> 
-> > 
-> > 
-> > > I agree that there was a gap in the previous proposal for non-mdev
-> > > devices, but I think this bring a lot of questions that we need to
-> > > puzzle through and libvirt will need to re-evaluate how they might
-> > > decide to pick a migration target device.  For example, I'm sure
-> > > libvirt would reject any policy decisions regarding picking a physical
-> > > device versus an mdev device.  Had we previously left it that only a
-> > > layer above libvirt would select a target device and libvirt only tests
-> > > compatibility to that target device?
-> > I'm not sure if there's a layer above libvirt would select a target
-> > device. but if there is such a layer (even it's human), we need to
-> > provide an interface for them to know whether their decision is suitable
-> > for migration. The migration_version interface provides a potential to
-> > allow mdev->phys migration, even libvirt may currently reject it.
-> > 
-> > 
-> > > We also need to consider that this expands the namespace.  If we no
-> > > longer require matching types as the first level of comparison, then
-> > > vendor migration strings can theoretically collide.  How do we
-> > > coordinate that can't happen?  Thanks,
-> > yes, it's indeed a problem.
-> > could only allowing migration beteen devices from the same vendor be a
-> > good
-> > prerequisite?
-> > 
-> > Thanks
-> > Yan
-> > >
-> > > > > > > Is existence (and compatibility) of (1) a pre-req for possible
-> > > > > > > existence (and compatibility) of (2)?
-> > > > > > >
-> > > > > > no. (2) does not reply on (1).
-> > > > >
-> > > > > Hm. Non-existence of (1) seems to imply "this type does not support
-> > > > > migration". If an mdev created for such a type suddenly does support
-> > > > > migration, it feels a bit odd.
-> > > > >
-> > > > yes. but I think if the condition happens, it should be reported a bug
-> > > > to vendor driver.
-> > > > should I add a line in the doc like "vendor driver should ensure that the
-> > > > migration compatibility from migration_version under mdev_type should
-> > be
-> > > > consistent with that from migration_version under device node" ?
-> > > >
-> > > > > (It obviously cannot be a prereq for what I called (3) above.)
-> > > > >
-> > > > > >
-> > > > > > > Does userspace need to check (1) or can it completely rely on (2), if
-> > > > > > > it so chooses?
-> > > > > > >
-> > > > > > I think it can completely reply on (2) if compatibility check before
-> > > > > > mdev creation is not required.
-> > > > > >
-> > > > > > > If devices with a different mdev type are indeed compatible, it
-> > seems
-> > > > > > > userspace can only find out after the devices have actually been
-> > > > > > > created, as (1) does not apply?
-> > > > > > yes, I think so.
-> > > > >
-> > > > > How useful would it be for userspace to even look at (1) in that case?
-> > > > > It only knows if things have a chance of working if it actually goes
-> > > > > ahead and creates devices.
-> > > > >
-> > > > hmm, is it useful for userspace to test the migration_version under mdev
-> > > > type before it knows what mdev device to generate ?
-> > > > like when the userspace wants to migrate an mdev device in src vm,
-> > > > but it has not created target vm and the target mdev device.
-> > > >
-> > > > > >
-> > > > > > > One of my worries is that the existence of an attribute with the
-> > same
-> > > > > > > name in two similar locations might lead to confusion. But maybe it
-> > > > > > > isn't a problem.
-> > > > > > >
-> > > > > > Yes, I have the same feeling. but as (2) is for sysfs interface
-> > > > > > consistency, to make it transparent to userspace tools like libvirt,
-> > > > > > I guess the same name is necessary?
-> > > > >
-> > > > > What do we actually need here, I wonder? (1) and (2) seem to serve
-> > > > > slightly different purposes, while (2) and what I called (3) have the
-> > > > > same purpose. Is it important to userspace that (1) and (2) have the
-> > > > > same name?
-> > > > so change (1) to migration_type_version and (2) to
-> > > > migration_instance_version?
-> > > > But as they are under different locations, could that location imply
-> > > > enough information?
-> > > >
-> > > >
-> > > > Thanks
-> > > > Yan
-> > > >
-> > > >
-> > >
-> > _______________________________________________
-> > intel-gvt-dev mailing list
-> > intel-gvt-dev@lists.freedesktop.org
-> > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+<div dir=3D"ltr"><div>A little off topic thing: isn&#39;t the default resol=
+ution supposed to be 1024x768? This is the Microsoft regulation which all m=
+y physical devices seem to follow:<br></div><div><br></div><div><a href=3D"=
+https://docs.microsoft.com/en-us/windows-hardware/test/hlk/testref/6afc8979=
+-df62-4d86-8f6a-99f05bbdc7f3">https://docs.microsoft.com/en-us/windows-hard=
+ware/test/hlk/testref/6afc8979-df62-4d86-8f6a-99f05bbdc7f3</a></div><div><b=
+r></div><div>And when the user provides an EDID one should parse it and set=
+ the default resolution to match it. But that&#39;s a less important featur=
+e.<br></div><div><br></div></div><br><div class=3D"gmail_quote"><div dir=3D=
+"ltr" class=3D"gmail_attr">On Tue, Apr 21, 2020 at 9:03 PM Laszlo Ersek &lt=
+;<a href=3D"mailto:lersek@redhat.com">lersek@redhat.com</a>&gt; wrote:<br><=
+/div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bo=
+rder-left:1px solid rgb(204,204,204);padding-left:1ex">On 04/20/20 16:13, G=
+erd Hoffmann wrote:<br>
+&gt;=C2=A0 =C2=A0Hi,<br>
+&gt;<br>
+&gt;&gt; So I would say that the symptom you see is a QEMU v4.1.0 regressio=
+n.<br>
+&gt;&gt; The QemuRamfbGraphicsOutputSetMode() function in the OVMF ramfb<br=
+>
+&gt;&gt; driver certainly needs the QemuFwCfgWriteBytes() call to work, for=
+<br>
+&gt;&gt; changing the resolution.<br>
+&gt;<br>
+&gt; Oh?=C2=A0 QemuRamfbGraphicsOutputSetMode() can be called multiple time=
+s?<br>
+&gt; How does that happen?<br>
+<br>
+QemuRamfbGraphicsOutputSetMode() is the &quot;SetMode&quot; member function=
+ of the<br>
+EFI_GRAPHICS_OUTPUT_PROTOCOL instance that QemuRamfbDxe produces.<br>
+<br>
+This is a standard protocol; UEFI drivers and applications are free to<br>
+locate it and to use it.<br>
+<br>
+(1) When you launch OVMF, you get the splash screen in a particular<br>
+resolution. This resolution:<br>
+- is configured by OvmfPkg/PlatformDxe,<br>
+- is inherited by an OS boot loader,<br>
+- is reconfigurable with OvmfPkg/PlatformDxe, for the next boot, via the<br=
+>
+=C2=A0 Setup TUI,<br>
+- defaults to 800x600 (taking effect when no particular choice is<br>
+=C2=A0 configured).<br>
+<br>
+(2) UiApp -- the Setup TUI itself -- uses its own resolution. Under<br>
+OVMF, this resolution is fixed 640x480. When UiApp is entered,<br>
+ultimately a call is made to QemuRamfbGraphicsOutputSetMode() -- i.e., a<br=
+>
+GOP.SetMode() member function -- for setting this 640x480 resolution.<br>
+<br>
+Using the following command:<br>
+<br>
+=C2=A0 qemu-system-x86_64 \<br>
+=C2=A0 =C2=A0 -nodefaults \<br>
+=C2=A0 =C2=A0 -boot menu=3Don,splash-time=3D5000 \<br>
+=C2=A0 =C2=A0 -enable-kvm \<br>
+=C2=A0 =C2=A0 -device ramfb \<br>
+=C2=A0 =C2=A0 -drive if=3Dpflash,readonly,format=3Draw,file=3D$PREFIX/share=
+/qemu/edk2-x86_64-code.fd \<br>
+=C2=A0 =C2=A0 -drive if=3Dpflash,snapshot,format=3Draw,file=3D$PREFIX/share=
+/qemu/edk2-i386-vars.fd \<br>
+=C2=A0 =C2=A0 -debugcon file:ovmf.log \<br>
+=C2=A0 =C2=A0 -global isa-debugcon.iobase=3D0x402<br>
+<br>
+when you first see the progress bar, the graphical resolution (1) is<br>
+800x600. Accordingly, QEMU prints to stderr:<br>
+<br>
+&gt; ramfb_fw_cfg_write: 800x600 @ 0x6702000<br>
+<br>
+Once you hit ESC to interrupt the progress bar and to enter the Setup<br>
+TUI, UiApp switches to resolution (2), 640x480. QEMU prints:<br>
+<br>
+&gt; ramfb_fw_cfg_write: 640x480 @ 0x6702000<br>
+&gt; ramfb_fw_cfg_write: resolution locked, change rejected<br>
+<br>
+And you get garbage in the Setup window.<br>
+<br>
+Thanks,<br>
+Laszlo<br>
+<br>
+</blockquote></div>
+
+--0000000000003319d205a3dc6c48--
 
