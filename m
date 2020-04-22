@@ -2,92 +2,87 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA4EC54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:09:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47231C54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:17:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1666620774
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:09:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B10F2076E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:17:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DLJPYhHX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1666620774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hbe3mPTr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B10F2076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRHw3-00077s-9s
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:09:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52920)
+	id 1jRI3u-0006Ia-3J
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:17:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jRHth-0004j6-IU
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:06:49 -0400
+ (envelope-from <eblake@redhat.com>) id 1jRI1B-0003Ve-CM
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:14:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jRHth-0001cY-83
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:06:49 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53940)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jRHtc-0001Qv-5V; Wed, 22 Apr 2020 12:06:44 -0400
-Received: by mail-wm1-x342.google.com with SMTP id t63so2993371wmt.3;
- Wed, 22 Apr 2020 09:06:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=1lna5gTgWOeZGs1DR8Skjzz0QrxTfKJV0wqCOhQXZ4c=;
- b=DLJPYhHXbT3xCL3USFzv412GGy9LcukZLGXEKCKvT6Dy1JXAOoo7VOLV+DdtFAmPUN
- KecacajBw3GF+2PmaBxGVlzkNY2JiY0NV2mcNQUlZ+0NzGLLkRjmQCNieTy3n+ObV8Ig
- v2+byD51HT1xt7ofH9bf2V+Q3YeUrdqqSjKgcQiDOtb1WPmSTUcvpbBWGt2MSHMzHaYk
- uiZU8M8un4c3BofNUcPl8w7AdBIqCdCaLsjZniCU2Y/xdNj/hopoIydOD41BiW1FA6p/
- cFVRLwn/Pgmx7vFrcp6t4LYb6y6bRUdJDePJKmv46Cs+yer5Is6LoYZX4/1GCuyNJAIQ
- 29Fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=1lna5gTgWOeZGs1DR8Skjzz0QrxTfKJV0wqCOhQXZ4c=;
- b=EKpbAbN+eyPRHLhkhzwWvgXes2/BUhJSeEetWg/FpyWKZ/r0MmIW18hhyZZfiupvW/
- hPcJKOzJ7yBVfC2kjNGIcOTd3cIn+xuy/UL3Q7C8C3lI0pCV5HM1hvWaD2v3HepdFb3T
- 3J5B/jbNS1+ZXCac10AStHPsO6PgTThnUSAfYk7s7xfS4D4hzkNs80wtTW6LyB4Vx1Le
- 87O1CA68fPVNUdDzf9k4V4D/ew0IjbNH8zLs7fE9JhXn/Y3WFCqJcrAIxMFIvnexPSTQ
- 3CJyPxL1fs7A/3o7pFtDx7LimfrUS6DGQ0rsxzmffiY6lHoaKzm0G5zED3xIZ06EKv0r
- q7bw==
-X-Gm-Message-State: AGi0PuZ+5dbLM2FnhD4bnIqvScEIRXppG0E+5lTe5mPIrhJhFIvgMwxf
- tWnzjOfcQwVxt7fiXhDGDw0=
-X-Google-Smtp-Source: APiQypKKanCqyxkGPe/DxZAERzdXd+j4Hcsplcw5hOSIJX1t6mlggznvRNTFZ4Q48CXYiwYwj1ggmQ==
-X-Received: by 2002:a1c:154:: with SMTP id 81mr11160414wmb.48.1587571601839;
- Wed, 22 Apr 2020 09:06:41 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id 74sm9283731wrk.30.2020.04.22.09.06.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Apr 2020 09:06:40 -0700 (PDT)
-Date: Wed, 22 Apr 2020 17:06:39 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 5/9] block/io: expand in_flight inc/dec section: simple
- cases
-Message-ID: <20200422160639.GH47385@stefanha-x1.localdomain>
-References: <20200408093051.9893-1-vsementsov@virtuozzo.com>
- <20200408093051.9893-6-vsementsov@virtuozzo.com>
- <20200420162255.GE7321@stefanha-x1.localdomain>
- <67b95ad8-2a19-5698-d683-f799c024cb01@virtuozzo.com>
+ (envelope-from <eblake@redhat.com>) id 1jRI1A-0004So-M0
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:14:33 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52851
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jRI1A-0004IV-76
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:14:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587572071;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KO7RMM3PauNN+PRJAliJJqxjVKn2lt92tzsxUz6ovVM=;
+ b=Hbe3mPTrO0Sr++gNBw7c6dzHBuchKmGi9uq/ivfOzphhc/z/EzFr/frQwwDOfTAuktOrH1
+ Mq1gtMEa8ZaIkz7K0TIubIlyHSXedsXXGxU90XDIdlVZzVRatROpDkJZDzTEscwP3V1Lw/
+ 8phdaXr7hLlJsO8RM1HgGXdGIv9DxBk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-207-RJ_z4rgwPE-mqoi-GOh1nA-1; Wed, 22 Apr 2020 12:14:26 -0400
+X-MC-Unique: RJ_z4rgwPE-mqoi-GOh1nA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A2A8100CC89;
+ Wed, 22 Apr 2020 16:14:25 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E37160610;
+ Wed, 22 Apr 2020 16:14:12 +0000 (UTC)
+Subject: Re: [PATCH v5 4/9] qcow2: Support BDRV_REQ_ZERO_WRITE for truncate
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200422152129.167074-1-kwolf@redhat.com>
+ <20200422152129.167074-5-kwolf@redhat.com>
+ <84c6ca49-aef3-adf4-2efe-68357dd20ce8@redhat.com>
+ <20200422155835.GC7155@linux.fritz.box>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <20d12788-2d62-12a4-0949-f29594054026@redhat.com>
+Date: Wed, 22 Apr 2020 11:14:11 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="EemXnrF2ob+xzFeB"
-Content-Disposition: inline
-In-Reply-To: <67b95ad8-2a19-5698-d683-f799c024cb01@virtuozzo.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=stefanha@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::342
+In-Reply-To: <20200422155835.GC7155@linux.fritz.box>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:12:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,75 +94,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com,
- Stefan Hajnoczi <stefanha@redhat.com>, den@openvz.org
+Cc: vsementsov@virtuozzo.com, berto@igalia.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 4/22/20 10:58 AM, Kevin Wolf wrote:
 
---EemXnrF2ob+xzFeB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>>> @@ -4214,6 +4215,35 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+>>>            g_assert_not_reached();
+>>>        }
+>>> +    if ((flags & BDRV_REQ_ZERO_WRITE) && offset > old_length) {
+>>> +        uint64_t zero_start = QEMU_ALIGN_UP(old_length, s->cluster_size);
+>>> +        uint64_t zero_end = QEMU_ALIGN_UP(offset, s->cluster_size);
+>>
+>> This rounds up beyond the new size...
+>>
+>>> +
+>>> +        /* Use zero clusters as much as we can */
+>>> +        ret = qcow2_cluster_zeroize(bs, zero_start, zero_end - zero_start, 0);
+>>
+>> and then requests that the extra be zeroed.  Does that always work, even
+>> when it results in pdrv_co_pwrite_zeroes beyond the end of s->data_file?
+> 
+> You mean the data_file_is_raw() path in qcow2_cluster_zeroize()? It's
+> currently not a code path that is run because we only set
+> BDRV_REQ_ZERO_WRITE for truncate if the image has a backing file, and
+> data_file_is_raw() doesn't work with backing files.
 
-On Wed, Apr 22, 2020 at 04:47:07PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> 20.04.2020 19:22, Stefan Hajnoczi wrote:
-> > On Wed, Apr 08, 2020 at 12:30:47PM +0300, Vladimir Sementsov-Ogievskiy =
-wrote:
-> > > It's safer to expand in_flight request to start before enter to
-> >=20
-> > Please explain what exeactly "safer" means.  If I understand correctly
-> > this is just a refactoring and does not fix bugs that have been hit in
-> > the real world.
-> >=20
-> > Is this just a generate attempt to avoid accidentally performing
-> > operations that need to happen as part of the request after the dec
-> > call?
->=20
-> Consider write.
->=20
-> It's possible, that qemu_coroutine_enter only schedules execution, assume=
- such case.
-> Then we may possibly have the following:
->=20
-> 1. Somehow check that we are not in drained section in outer code
->=20
-> 2. call bdrv_pwritev(), assuming that it will increse in_flight, which wi=
-ll protect us from starting drained section
->=20
-> 3. it calls bdrv_prwv_co -> bdrv_coroutine_enter (not yet increased in_fl=
-ight)
->=20
-> 4. assume coroutine not yet actually entered, only scheduled, and we go t=
-o some code, which starts drained section (as in_flight is zero)
->=20
-> 5. scheduled coroutine starts, and blindly increases in_flight, and we ar=
-e in drained section with in_flight request.
->=20
-> The series does the same thing for block/io.c like Kevin's "block: Fix bl=
-k->in_flight during blk_wait_while_drained()" for blk layer.
+Good point.
 
-Please include this in the commit description.  Thanks!
+> 
+> But hypothetically, if someone called truncate with BDRV_REQ_ZERO_WRITE
+> for such a file, I think it would fail.
+> 
+>> If so,
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>
+>> otherwise, you may have to treat the tail specially, the same way you
+>> treated an unaligned head.
+> 
+> Actually, do I even need to round the tail?
+> 
+>      /* Caller must pass aligned values, except at image end */
+>      assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
+>      assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
+>             end_offset == bs->total_sectors << BDRV_SECTOR_BITS);
+> 
+> So qcow2_cluster_zeroize() seems to accept the unaligned tail. It would
+> still set the zero flag for the partial last cluster and for the
+> external data file, bdrv_co_pwrite_zeroes() would have the correct size.
 
-Stefan
+Then I'm in favor of NOT rounding the tail.  That's an easy enough 
+change and we've now justified that it does what we want, so R-b stands 
+with that one-line tweak.
 
---EemXnrF2ob+xzFeB
-Content-Type: application/pgp-signature; name="signature.asc"
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6ga48ACgkQnKSrs4Gr
-c8gqwQf+N51Jvfl6eeRMeFLHsXfB+G/Tq4yFcN2qZlfq+Ztzj2wggtKYpudMbsmC
-evyTErRCKS1/DpvmmJMwjAFyX2A/DnujVhefrY3ELjZnTUzpNAYO3IMHvstPegGw
-6NoeRMILfFs0zYU3hn1ta5miZ0K1YvniUGMlbmQGf4E3VN9PczaQY/hQsIfNMp+X
-ZcHVAGNDc4ZWblUz5G7ZVpgULdh4hR9n700ofYe+kSOSzvA3F82EjGE/DdeTE6Y/
-DFsS6nAo9Kf7bgCzjtK3bZpXAgQkpm/3sPr5nMwiOXc8LZANreRZfJ2H43EXdnZ1
-fHCW9IvvEYgPNZnZsdZym5Lgc+9+tg==
-=sqNn
------END PGP SIGNATURE-----
-
---EemXnrF2ob+xzFeB--
 
