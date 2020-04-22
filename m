@@ -2,94 +2,89 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE9F6C55189
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 09:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC40C55189
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 09:51:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 989312071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 09:46:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B57A42073A
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 09:51:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="aryA2ORM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 989312071E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e0voYnOo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B57A42073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRBxM-00048e-6m
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 05:46:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54794)
+	id 1jRC2r-0006qS-Uh
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 05:51:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33354)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1jRBs7-00025O-4i
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 05:40:47 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1jRC22-00061K-51
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 05:51:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1jRBs5-0006Ys-Sg
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 05:40:46 -0400
-Received: from mout.web.de ([217.72.192.78]:48859)
+ (envelope-from <bmeng.cn@gmail.com>) id 1jRC21-0004Op-G0
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 05:51:01 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:39265)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jRBs5-0006Tr-4Q
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 05:40:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1587548430;
- bh=5bcn+DatzMy5m6CIOMhkFLL9Ccn+4atXUc9D9snmyfs=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=aryA2ORM+Tyq/QwD7aGnOKcEdD3Fl/ksDtzM6yWYigLezLq2SSwM/pgnu49S4UM7v
- KrSvnCI+lkRSfY+4n0E7NA1VcXR+GBIoE913ZZjVcwAoD4pH8gqjxXbsmVqWrhIgtE
- 7bL39VmmJZmTUG1Mr3X5KV/WcPhkFoQtGAL+sWbM=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([88.130.61.91]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0Ldn6l-1ikBx719Ih-00j3RE; Wed, 22
- Apr 2020 11:40:30 +0200
-Date: Wed, 22 Apr 2020 11:40:20 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: "Zhang, Chen" <chen.zhang@intel.com>
-Subject: Re: [PATCH 1/3] net/colo-compare.c: Create event_bh with the right
- AioContext
-Message-ID: <20200422114020.3d479899@luklap>
-In-Reply-To: <0a075de2dc2f4e8c919478762e9a97da@intel.com>
-References: <cover.1586370737.git.lukasstraub2@web.de>
- <b86f80bb47ac66b73b2afe80218c9913722c606a.1586370737.git.lukasstraub2@web.de>
- <5ab3bd6649a44354b087c31bb9fcd5a4@intel.com>
- <20200422104325.64659930@luklap>
- <0a075de2dc2f4e8c919478762e9a97da@intel.com>
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jRC1w-0003om-Ea; Wed, 22 Apr 2020 05:50:56 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id h205so866929ybg.6;
+ Wed, 22 Apr 2020 02:50:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=vCGKSikB8D27wNRtSYvzPVc7FAOx9psLBPWO7a1IF5w=;
+ b=e0voYnOoVNefUOci216v9TGAk0mtegRRHiF4a7iseODkYmtMEf//2iz4B2S5+BiE40
+ rxnXFA6vqqdnWjSxz1PJzci/SB4+3DMI/6qJTHgLSIeytQQro4g9cq4JRx/3+FcXfAf0
+ 5/TqR0cAyAjsXYzceyAgn3arD0mABzyfRZkfHnLvFL7ajCDENTB+DbXnK5eAQLVliBBj
+ XSgFEqN46nMERNZqtNSgKXmbZ7JmWjRp5662hrc3PyUCHB0nkqcyMlP3jwEUswYwfjta
+ WeS4HVIEQrm8yixuo2kfZbnpzc2zjWb2fqnz1NgRoK86SOUYsAxnPmkjFbmsBqz/K4bo
+ 76vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=vCGKSikB8D27wNRtSYvzPVc7FAOx9psLBPWO7a1IF5w=;
+ b=sst27IpZypGHVCuCeAij5FfNHsi1OBARZBsyj2Mx7jiJymrkjyM5PRYZCmStkpNCJF
+ RCCJtBDOvrkdKMmRbv6IKrqC4G82ezV1derKM953pkvNb92qXhzgCil39C0z51g/2+Ch
+ mQgLv8P7a1aQScwv6HCmznt1l4siBhGh6Lx80N/u5WmH2YotgqUB1svaZnev+twCH7w4
+ kkz8s02mUAj4OPwciKZYu1/EOrSBeVR+TvG5hcHsBNnE6gJ1HdxSOQHycnv9HlUHr6aH
+ TYZQa0WryLt/6gsYDFJGhuTs9JPwKgZttqQSyW99CEPLrKTedxThfvpOd3+RrXUQqIfB
+ qJfw==
+X-Gm-Message-State: AGi0Pub8+kZLATYjRO7xTzUG8fXmVl07kdxcOqT3lAq06wjVNK4R4/Ob
+ DwnKsBNB+1y063R2k4H07Q5L/IrExpo7kSR+IRY=
+X-Google-Smtp-Source: APiQypLWDD8yJODVA4FZ5xQp44cm3IYxQH91RnPUM6BJ6TrHX4gsVx7moS1u+pr1v9lhn97zlOHr3OhpPdigGR87/8M=
+X-Received: by 2002:a25:738a:: with SMTP id o132mr4991773ybc.490.1587549053747; 
+ Wed, 22 Apr 2020 02:50:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/yVfpQnu4iKR5ZifMJO5K22v";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:se4OTynVvPYdVtkj8VSlZgrfYx4ivRHvopko7TwExr+mFkXDYtJ
- 77mF12Zl57zuXqC6jIAHwJuI6xsDF0zcLM0M77ioqWWGHm8ND3mgl0kjFlWrJoXlA/umtek
- auPCSvMtwvEJYvQMlMXquRFqZ+AvLR3/AysxoExH4u2epQkNG05tDiTbG0I3UCRThYEMWgb
- Xpznoi7DeOtGr12X8jzAA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:JWRfYkvPXrs=:saU+/Pe5Uh63D28GvZOAHF
- B7E4j4iVzj3d9TKZjdh2rGatO90+ieq9MN5/EF7KwwKxSqIASyjrxj2WVO8J5xmCRpic4Khog
- Cej/hY9aTw9NWzTsOWBgNfVzrOhuu7abErWShenqWUuLIGZmAOMMAqq/cAgs9o5JeCG2jmH0Y
- HYtOPBMTuUbBX5HbQ9nuiWSlKLW2uEPImE03bzcMHJwwx7sYO/NEZPkicinSyTVVuWl2GDgRi
- nlo1Jze/9CrLOyperchqUb32tQ9wYmtJGL8QC21EZ/zHksDBaSakJbNAZWL6FsvQLiIFyy6eF
- 8xD6Qk0F5v0LtM+pNbNZFfu4Sm8REI72lIdV95jtaWibqNvB8nCQjnUCNU5pjZN3MzOxiC7da
- XVYc3S13mTHgJHAXBimpuKSGVwcEhMM8BE03i7Y1mIbNQmTAgxPY86z3bLch25jMonMGJna7W
- sSAsoQBMuascgMCvLpjafzcgn5EMJrJBwJ1/4+vNJKGpQ+532LRuwrJuUHi7SL8bb/ToOLMnF
- dJnFx2oXKg2dCz4O+tbeuRbR1RS5DFjraZPX3XCXRSwUY1ZwQipm8xTAnZFJRg1iDWTA2G80I
- eMfS5sOLOfFjDCd2RhLkXfURnDxQycjJRKiREfuQ588MivwPlutm+2U7JHbhsPiUyLki1uVJS
- Ag+uf1ai34gfO6eaxFl05HTvMc6mAJP7XPmhno3LDwyTenV93BVHDP0Vwan09oTwNHXV1hduu
- 0P3BJ5+PgnF4VhKPMi7SPKtEDVBWHS35L4EkHtakXcAi5VjpyS/MqQDvXnkVWSRryhHng7txe
- zUdgbXvbkXlGwB+xBTkpH7Z+RhVCl3yZKeBNXV34o2utRHAWWeuq1PGuPaQ0dT0sdO6iv3MhM
- LRCb2Rw/hdT5e0zos6B63iWRXkCRvSlSuSfYQncUHv3WvJgP7/79v6dQRBvN3N5XqkxS8Y2RY
- MxgWx7GRhgTA4UFRtXaXK1Ai9vYmLG0D+tUuTi7zf0UwA9GjgKt61h8uO5ggB8CNDbfBV+dIk
- 9WWC5ikrtIv8d47nzJMpTWZGDCjTGukZneG50c5hqCiUArmT1xCnN+9mRmxfzzDIB/8XEpESA
- ihrSUWxZ23Nnyu1wPeHB4L1dwgMJTgpQQEZT5pWLWrehSMNYftehD+piVEqwXWRl+nhN4ccZq
- /xx30+iq/Lp6cR9RtkWOCKJ1TW5evIsjWHF6yrrROm6Hqevg8mzh5jqkw0y8ZuvYiWXw/dN1a
- ul99XW/nL5dexhQUF
-Received-SPF: pass client-ip=217.72.192.78; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 05:40:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.78
+References: <1587389038-1549-1-git-send-email-bmeng.cn@gmail.com>
+ <CAKmqyKMzUzHC1FhV6ccjswjRvQH_h6DuUwEWjte4CAEmxPOKDg@mail.gmail.com>
+ <CAEUhbmUTEVPF6f91SqrXL-_M-G_Jg2D29cBjbCs1YBGm2fk6QA@mail.gmail.com>
+ <CAEUhbmWsNmTTTFz66M4sK-pEtEMOhfoYzCHYVyEF4AJ2X02twA@mail.gmail.com>
+ <bd7da39b-4ece-7e72-a0a0-1d401c3b8c34@redhat.com>
+In-Reply-To: <bd7da39b-4ece-7e72-a0a0-1d401c3b8c34@redhat.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Wed, 22 Apr 2020 17:50:42 +0800
+Message-ID: <CAEUhbmWCNGTn34wGSUvbwAbuY15VeDPPnFF2em4=XKEH5kReKw@mail.gmail.com>
+Subject: Re: [PATCH] roms: opensbi: Upgrade from v0.6 to v0.7
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, 
+ Anup Patel <anup.patel@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb42.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::b42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,140 +96,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/yVfpQnu4iKR5ZifMJO5K22v
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Apr 22, 2020 at 4:15 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> On 4/22/20 3:30 AM, Bin Meng wrote:
+> > Hi Alistair,
+> >
+> > On Tue, Apr 21, 2020 at 9:34 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+> >>
+> >> Hi Alistair,
+> >>
+> >> On Tue, Apr 21, 2020 at 2:41 AM Alistair Francis <alistair23@gmail.com=
+> wrote:
+> >>>
+> >>> On Mon, Apr 20, 2020 at 6:25 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+> >>>>
+> >>>> Upgrade OpenSBI from v0.6 to v0.7 and the pre-built bios images.
+> >>>>
+> >>>> The v0.7 release includes the following commits:
+> >>>>
+> >>>> f64f4b9 lib: Add a new platform feature to bringup secondary harts
+> >>>> b677a9b lib: Implement hart hotplug
+> >>>> 5b48240 lib: Add possible hart status values
+> >>>> e3f69fc lib: Implement Hart State Management (HSM) SBI extension
+> >>>> 6704216 lib: Check MSIP bit after returning from WFI
+> [...]
+> >>>> 6c7922e lib: Support vector extension
+> >>>> 615587c docs: Update README about supported SBI versions
+> >>>> 66d0184 lib: Allow overriding SBI implementation ID
+> >>>> 9f1b72c include: Bump-up version to 0.7
+>
+> The git-short-log in the commit message is very appreciated, thanks.
+>
+> >>>>
+> >>>> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> >>>
+> >>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> >>>
+> >>> Can you share a git branch with this patch? From memory these binary
+> >>> patches don't apply well from emails.
+>
+> Indeed. These patches are good candidate to use the 'git-format-patch
+> --no-binary' option with a link to a git repository to fetch the full
+> commit:
+>
 
-On Wed, 22 Apr 2020 09:03:00 +0000
-"Zhang, Chen" <chen.zhang@intel.com> wrote:
+Some other project mailing lists do not prevent binary patch mails. If
+this is QEMU convention, I suggest we document this in
+https://wiki.qemu.org/Contribute/SubmitAPatch.
 
-> > -----Original Message-----
-> > From: Lukas Straub <lukasstraub2@web.de>
-> > Sent: Wednesday, April 22, 2020 4:43 PM
-> > To: Zhang, Chen <chen.zhang@intel.com>
-> > Cc: qemu-devel <qemu-devel@nongnu.org>; Li Zhijian
-> > <lizhijian@cn.fujitsu.com>; Jason Wang <jasowang@redhat.com>; Marc-
-> > Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>; Paolo Bonzini
-> > <pbonzini@redhat.com>
-> > Subject: Re: [PATCH 1/3] net/colo-compare.c: Create event_bh with the r=
-ight
-> > AioContext
-> >=20
-> > On Wed, 22 Apr 2020 08:29:39 +0000
-> > "Zhang, Chen" <chen.zhang@intel.com> wrote:
-> >  =20
-> > > > -----Original Message-----
-> > > > From: Lukas Straub <lukasstraub2@web.de>
-> > > > Sent: Thursday, April 9, 2020 2:34 AM
-> > > > To: qemu-devel <qemu-devel@nongnu.org>
-> > > > Cc: Zhang, Chen <chen.zhang@intel.com>; Li Zhijian
-> > > > <lizhijian@cn.fujitsu.com>; Jason Wang <jasowang@redhat.com>; Marc-
-> > > > Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>; Paolo Bonzini
-> > > > <pbonzini@redhat.com>
-> > > > Subject: [PATCH 1/3] net/colo-compare.c: Create event_bh with the
-> > > > right AioContext
-> > > >
-> > > > qemu_bh_new will set the bh to be executed in the main loop. This
-> > > > causes problems as colo_compare_handle_event assumes that it has
-> > > > exclusive access the queues, which are also accessed in the
-> > > > iothread. It also assumes that it runs in a different thread than
-> > > > the caller and takes the appropriate locks.
-> > > >
-> > > > Create the bh with the AioContext of the iothread to fulfill these
-> > > > assumptions.
-> > > > =20
-> > >
-> > > Looks good for me, I assume it will increase performance. Do you have=
- =20
-> > related data?
-> >=20
-> > No, this fixes several crashes because the queues where accessed
-> > concurrently from multiple threads. Sorry for my bad wording. =20
->=20
-> Can you describe some details about the crash? Step by step?
-> Maybe I can re-produce and test it for this patch.
+>    --no-binary
+>      Do not output contents of changes in binary files,
+>      instead display a notice that those files changed.
+>      Patches generated using this option cannot be applied
+>      properly, but they are still useful for code review.
+>
+> >>
+> >> Sure. Please grab the bits from http://github.com/lbmeng/qemu opensbi =
+branch.
+> >>
+> >> You can also use patchwork to help with your custodian work.
+> >> http://patchwork.ozlabs.org/project/qemu-devel/patch/1587389038-1549-1=
+-git-send-email-bmeng.cn@gmail.com/
+> >>
+> >> Click on the "mbox" button to download the patch and apply it.
+> >
+> > Will this be 5.0, or 5.1?
+>
+> Unlikely 5.1, too late.
 
-There is no clear test case. For me the crashes happened after 1-20h of run=
-time
-with lots of checkpoints (800ms) and some network traffic. The coredump alw=
-ays
-showed that two threads where doing operations on the queues simultaneously.
-Unfortunately, I don't have the coredumps anymore.
+I am fine. Just wanted to know the strategy of which QEMU release to
+ship which OpenSBI release. +Anup in case he has some comments.
 
 Regards,
-Lukas Straub
-
-> Thanks
-> Zhang Chen
->=20
-> >=20
-> > Regards,
-> > Lukas Straub
-> >  =20
-> > > Thanks
-> > > Zhang Chen
-> > > =20
-> > > > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> > > > ---
-> > > >  net/colo-compare.c | 3 ++-
-> > > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/net/colo-compare.c b/net/colo-compare.c index
-> > > > 10c0239f9d..1de4220fe2 100644
-> > > > --- a/net/colo-compare.c
-> > > > +++ b/net/colo-compare.c
-> > > > @@ -890,6 +890,7 @@ static void colo_compare_handle_event(void
-> > > > *opaque)
-> > > >
-> > > >  static void colo_compare_iothread(CompareState *s)  {
-> > > > +    AioContext *ctx =3D iothread_get_aio_context(s->iothread);
-> > > >      object_ref(OBJECT(s->iothread));
-> > > >      s->worker_context =3D iothread_get_g_main_context(s->iothread);
-> > > >
-> > > > @@ -906,7 +907,7 @@ static void colo_compare_iothread(CompareState =
-=20
-> > *s) =20
-> > > >      }
-> > > >
-> > > >      colo_compare_timer_init(s);
-> > > > -    s->event_bh =3D qemu_bh_new(colo_compare_handle_event, s);
-> > > > +    s->event_bh =3D aio_bh_new(ctx, colo_compare_handle_event, s);
-> > > >  }
-> > > >
-> > > >  static char *compare_get_pri_indev(Object *obj, Error **errp)
-> > > > --
-> > > > 2.20.1 =20
-> > > =20
->=20
-
-
---Sig_/yVfpQnu4iKR5ZifMJO5K22v
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl6gEQQACgkQNasLKJxd
-slj7XxAAl9sYGKtokkkbRkB+geV5n+q8KJsTKWsPn6pDBk9LUAqpS2jvol1Jiba7
-EkchMKTy98zJMXb4IXiBNvPkFdV8uQCjC1iAikgspL3VyM0HHN9tR++e8W/exLTC
-jMB3lcrtDM80CpcmbyRmcqeeu+rNjzwaFiPPp6Ytywsfc1vwDfTq7lNrE84vnelB
-wX64FldB8ffTG9hysXregqNZq51sPMtaaoCOVM4Pl8JVuR1bpXYxdBjqD9cQWl0L
-ALP6Qw2adAUU9f+fkNzylmktD8irA9IfcCEPzQDtThpISvtqetPkcUhAHEUUFdpC
-7dNnshf0eEtPQlGwWWaU+WL3cfnO+ABfcjhpIkeyF8eVANtOY62Rwr9LaiflNwNC
-+qGXz/C8gR5V9Ans/8sWL6fVcHdFoTvYo9nGTsdzJUOjPpkMnvcNwj/CcMR445S8
-Zupo+lidtTDddVf8zyfQYZlLlnsCS+IZiCLk6jx/8i3JA+47dnrONnWiyK/ZI38q
-NEQIupyoNoc762KlpoaxsZOAAJVV9o/2HUx9Yt+V1pne4SOLkqksFJNmNS2p0tUH
-TdYlbqV3r6HkBl1PdxIG+vVX7mOdvLw2Ji6Z3kT9Famo6/NeGrbWfaG7dZUeKryU
-odW96Cs+b7CJBrc8UIIVletcADDYfwCHjvuubql2klro3HFrLek=
-=iNtO
------END PGP SIGNATURE-----
-
---Sig_/yVfpQnu4iKR5ZifMJO5K22v--
+Bin
 
