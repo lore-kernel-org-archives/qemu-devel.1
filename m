@@ -2,101 +2,124 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1AE9C55189
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 11:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B6EC55189
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 11:36:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9943D20781
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 11:27:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AA9D20784
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 11:36:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hRr3CxuG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9943D20781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="uiZpYhwN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AA9D20784
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRDXg-00024w-Nj
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 07:27:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59514)
+	id 1jRDgG-0005MZ-8V
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 07:36:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35754)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRDWb-0000V3-Oy
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 07:26:45 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jRDfQ-0004uR-8h
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 07:35:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRDWa-00044a-JW
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 07:26:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38444
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRDWa-0003w5-4k
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 07:26:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587554798;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cawM04ElyiHP1EMJi7Z+U+tTQby5nuVH6HHuFpZge0U=;
- b=hRr3CxuGg1vSxxaRNlM9svbQM9lrYlQQv0zh8c5rn9FIHEFI3LaZp5lpM70wpkD9Trre/n
- e0MCMGyZzINTBEmZ6vuWzPskSuTY/CT/9FdxyHPWaCfzWv9q80zI31HVFgJKsPQndp6wAc
- b+jtN74xV7YeNLb8ibfzixB89t+lbkg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-oF7qzS-2NA2NVRhlE8TMAQ-1; Wed, 22 Apr 2020 07:26:37 -0400
-X-MC-Unique: oF7qzS-2NA2NVRhlE8TMAQ-1
-Received: by mail-wr1-f72.google.com with SMTP id p16so880612wro.16
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 04:26:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=B7RZLlPW3eIPV3kxfLKDG3xa/XEQ1D7wJaes+8h+iOQ=;
- b=PpEpzZw1J4N1cRz6ABjiQ/Hg/+KHErJocHNqx847+B1mtkvfFXz0WaHkITnw6ekgDd
- N+/o0c8JBihWi36UjbRpk5Wh1vHVq8thSJerdKLLf8b46eq+UTM+1lI+FzzxExHJwC/A
- g8WME/Zh7KGDUlW/5jWyF+U0MUpFZdg+UQlho5RlrIV2dHOuDgwRotm/JRCRJZfTdrLa
- CCjtJyRP0LJgv23f0LGgRZKcp58WAr5RIcohn9LMiNAsgnCAWivZBusVS4Qv3SIIFRbM
- 2gPD94rIoDvti5N/NBb+uKAtmLIxkUS0SYkdX+Qkmv9pn40fLKorYosr1jWkXb5eyXuW
- Ghig==
-X-Gm-Message-State: AGi0PuY/fwBbKpn4ZcFUNvLQmGK+v2EE19tH+uOrVGErf6RYr7fKlluS
- oG3neqRqYAbQp8yiFnqD0RlNB3fmkrgmHRtuwTKTd++RTfSRLv3zVExeiTcwpE/EgfuovHLMMRw
- 5AHxSNQzikIU0d/A=
-X-Received: by 2002:a1c:48c:: with SMTP id 134mr9480291wme.47.1587554795606;
- Wed, 22 Apr 2020 04:26:35 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKzLoV3PbjzQLdCMdRQsew/vG83PBU8RnztFrCUvK+4YkttEEBa7FigJOB9pgIgqUXC6mtuSg==
-X-Received: by 2002:a1c:48c:: with SMTP id 134mr9480268wme.47.1587554795340;
- Wed, 22 Apr 2020 04:26:35 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id d133sm8341214wmc.27.2020.04.22.04.26.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 22 Apr 2020 04:26:34 -0700 (PDT)
-Subject: Re: [PATCH] vfio-helpers: Free QEMUVFIOState in qemu_vfio_close()
-To: Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org
-References: <04cb6cb30a49cabd5ff8e6c094c0d13572de9fb1.1587551421.git.mprivozn@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9b4d9cd7-1222-cee3-a1a9-4435a2efa4e2@redhat.com>
-Date: Wed, 22 Apr 2020 13:26:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <04cb6cb30a49cabd5ff8e6c094c0d13572de9fb1.1587551421.git.mprivozn@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jRDfD-00062h-UT
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 07:35:48 -0400
+Received: from mail-eopbgr80110.outbound.protection.outlook.com
+ ([40.107.8.110]:35042 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jRDfA-0005gr-2s; Wed, 22 Apr 2020 07:35:32 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=S1imP1d3VZJ6ftG3LMmtCYntNApDiCkpLKwolfGnY7ELEj6ge1ngadCAne5zsFD4TPqJzAli/4tifjSgu/GdzVBaZ5OI2tbTjhqdQ1ieU51QbMDIQlLTqjSIc2p1Eq+tvfxaohAO6fN/wkpTmZjSJ4spguPxqwIvAoTjMYxOR4n9QfnSbM8E/LseGbaTY6kOFa93hMbJ6HxtS3OLEH3xmfDEEzhWPpQ3jzu2WC3gLf02HNt2AmTnR3KN2W2iTEe7FPYRnmkg+6OX3NBJPGLKL/ORwKsYg9+JFU5vHbzbTKRn94vPE4xKuGlywIIe0AvtYRCE8/aLNBnHssdQ7WVsVA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6DMwP5VtH0ff0i4iYqMKgbxzEDexKhSGyTSOgxRVFHg=;
+ b=mcpZR9yEubif2pko1tKzpCkCzHBfCNKntJZFioQwpaGKy5y6zfAS+WfOh4t8JK+Osd5SeI+0vhK3G9TmGWD9J8rnjk9O2YF1z4+zxPXm9ylmBGSgmz02d53CkvG/2furOO9JXzKi7luYPTkCRpToFEmte1EuP/wzwGcru5t+HU8IhWH4zyv45eKsLywzvwvA/Os5uT7/lqN57pyRtTLOHxhNNyCFUh3V39+28TV3bp6WZtjn/mnX0nLJj30XMLh8tRtdDehWxVnSZW6HJrnGUJ1s0wPse1zisdd8luyHOqMVdAmGL4B6j8mIEUKLlWvAoEslJtBYuUDo/T7KTjHC2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6DMwP5VtH0ff0i4iYqMKgbxzEDexKhSGyTSOgxRVFHg=;
+ b=uiZpYhwNsPNp4TEheSbmYh5PTK5CGhTSAYw0YGLWXgQWcgSdbjyoEnJBHw1IV2vvstpTfp6QMshLtBzJE6/zDhw27cMFIx9TGYt4MPhXQEpU5dWDOChi/DfMogt6kIOXuMFLLUsvFndf5o27kuOTnR8dQjqi+VdvaaUDTbMuF2k=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5368.eurprd08.prod.outlook.com (2603:10a6:20b:103::17)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.27; Wed, 22 Apr
+ 2020 11:35:27 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.012; Wed, 22 Apr 2020
+ 11:35:27 +0000
+Subject: Re: [PATCH v4 20/30] qcow2: Add subcluster support to
+ discard_in_l2_slice()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1584468723.git.berto@igalia.com>
+ <99b45e3beb4a38b17eb50fcde1e09cdefdb99724.1584468723.git.berto@igalia.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200422143525726
+Message-ID: <2f284a39-64b8-ca64-4465-12f9f0f8f7e5@virtuozzo.com>
+Date: Wed, 22 Apr 2020 14:35:25 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <99b45e3beb4a38b17eb50fcde1e09cdefdb99724.1584468723.git.berto@igalia.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 04:15:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0005.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a::15) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.157) by
+ FR2P281CA0005.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2921.26 via Frontend Transport; Wed, 22 Apr 2020 11:35:27 +0000
+X-Tagtoolbar-Keys: D20200422143525726
+X-Originating-IP: [185.215.60.157]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 01e25af5-532b-4f3b-ebbf-08d7e6b14145
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5368:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB53680FB98AF18CC67780E6DEC1D20@AM7PR08MB5368.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1122;
+X-Forefront-PRVS: 03818C953D
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(4636009)(136003)(39840400004)(376002)(366004)(346002)(396003)(31696002)(478600001)(5660300002)(54906003)(6486002)(4326008)(107886003)(16526019)(186003)(36756003)(66476007)(66556008)(66946007)(2616005)(26005)(86362001)(316002)(956004)(16576012)(8676002)(81156014)(31686004)(52116002)(8936002)(2906002);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: W1DkmUr7pinyWiQeE/lkAxx37WRQ8yl8acp4SIlLp6x7Yr5vc/USjdShpUDA1wb4pJN211yaiLtyzXyZdr8RR3sGDZYG9sqMI+URebF0UK0T3nGjuSMAR5LuSwVKuXwzWSs73Xu+SsYmWEA9Yze+5HF24qS1Of1mcpFrBXj/A68rwshg5JN0zt0irRQmB5JQhmDBARJsgqZAu6196wcNFO9wk5EeEVjnEW2MNfuC0BsWFF4lP0eyudMeWSDr+PUlanE9mNJ7xz5hzXO0imhZdMLmLA4Y8zefveMZjLvc+8mo9okS6+VX4Zs5RGHSpVzDdzRVT5dP9r1uexPKD/CT/szU5QN5Y+q4hSvu2j9Bs7PI72y69qArzB3BY8sCZlTZlctAqOniFmrQYDOGedoRJcotg5Wx0s48sze4OvkMGPSf7YXgJkVXlwsGQ1Xmko36
+X-MS-Exchange-AntiSpam-MessageData: E8uWcgK93zU6m3WnCXU9WPJoZpHzZVi7D5mLS3PrJURF22dypmrRlen6BfMkzmF+lSmpR2iurNztE+hronj/Fc3w7ZEVpmNSnFb5Qg9R/sativ4g2cjK9ho8xln8/3R4rk78q1InSxdOXlAR9jo2Iw==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 01e25af5-532b-4f3b-ebbf-08d7e6b14145
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2020 11:35:27.6648 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iFvlwioZssICQWs0PVAg5fC1oI+sBRckWXfNz0TheKgJE8EwzkpnuKcClKPYiPH+k32QE+6Nq0MN6mzqzqaoRrMPkDdUJFjR9k3bqJeuDJk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5368
+Received-SPF: pass client-ip=40.107.8.110;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 07:35:28
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.8.110
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,101 +131,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Michal,
-
-On 4/22/20 12:30 PM, Michal Privoznik wrote:
-> The qemu_vfio_open_pci() allocates this QEMUVFIOState structure
-> but free counterpart is missing. Since we already have
-> qemu_vfio_close() which does cleanup of the state, it looks like
-> a perfect place to free the structure too. However, to avoid
-> confusing rename the function to make it explicit that the passed
-> structure is also freed.
->=20
-> =3D=3D167296=3D=3D 528 (360 direct, 168 indirect) bytes in 1 blocks are d=
-efinitely lost in loss record 8,504 of 8,908
-> =3D=3D167296=3D=3D    at 0x4837B86: calloc (vg_replace_malloc.c:762)
-> =3D=3D167296=3D=3D    by 0x4B8F6A0: g_malloc0 (in /usr/lib64/libglib-2.0.=
-so.0.6000.7)
-> =3D=3D167296=3D=3D    by 0xA7F532: qemu_vfio_open_pci (vfio-helpers.c:428=
-)
-> =3D=3D167296=3D=3D    by 0x989595: nvme_init (nvme.c:606)
-> =3D=3D167296=3D=3D    by 0x989EB0: nvme_file_open (nvme.c:795)
-> =3D=3D167296=3D=3D    by 0x8F9D04: bdrv_open_driver (block.c:1466)
-> =3D=3D167296=3D=3D    by 0x8FA6E1: bdrv_open_common (block.c:1744)
-> =3D=3D167296=3D=3D    by 0x8FDC73: bdrv_open_inherit (block.c:3291)
-> =3D=3D167296=3D=3D    by 0x8FE1B5: bdrv_open (block.c:3384)
-> =3D=3D167296=3D=3D    by 0x5EE828: bds_tree_init (blockdev.c:663)
-> =3D=3D167296=3D=3D    by 0x5F57F8: qmp_blockdev_add (blockdev.c:3746)
-> =3D=3D167296=3D=3D    by 0x5666DC: configure_blockdev (vl.c:1047)
->=20
-> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+17.03.2020 21:16, Alberto Garcia wrote:
+> Two changes are needed in this function:
+> 
+> 1) A full discard deallocates a cluster so we can skip the operation if
+>     it is already unallocated. With extended L2 entries however if any
+>     of the subclusters has the 'all zeroes' bit set then we have to
+>     clear it.
+> 
+> 2) Setting the QCOW_OFLAG_ZERO bit of the L2 entry is forbidden if an
+>     image has extended L2 entries. Instead, the individual 'all zeroes'
+>     bits must be used.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->   block/nvme.c                | 2 +-
->   include/qemu/vfio-helpers.h | 2 +-
->   util/vfio-helpers.c         | 3 ++-
->   3 files changed, 4 insertions(+), 3 deletions(-)
->=20
-> diff --git a/block/nvme.c b/block/nvme.c
-> index 7b7c0cc5d6..7e00c4f1a7 100644
-> --- a/block/nvme.c
-> +++ b/block/nvme.c
-> @@ -766,7 +766,7 @@ static void nvme_close(BlockDriverState *bs)
->                              false, NULL, NULL);
->       event_notifier_cleanup(&s->irq_notifier);
->       qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SI=
-ZE);
-> -    qemu_vfio_close(s->vfio);
-> +    qemu_vfio_close_and_free(s->vfio);
->  =20
->       g_free(s->device);
->   }
-> diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
-> index 1f057c2b9e..c96a0b1963 100644
-> --- a/include/qemu/vfio-helpers.h
-> +++ b/include/qemu/vfio-helpers.h
-> @@ -16,7 +16,7 @@
->   typedef struct QEMUVFIOState QEMUVFIOState;
->  =20
->   QEMUVFIOState *qemu_vfio_open_pci(const char *device, Error **errp);
-> -void qemu_vfio_close(QEMUVFIOState *s);
-> +void qemu_vfio_close_and_free(QEMUVFIOState *s);
->   int qemu_vfio_dma_map(QEMUVFIOState *s, void *host, size_t size,
->                         bool temporary, uint64_t *iova_list);
->   int qemu_vfio_dma_reset_temporary(QEMUVFIOState *s);
-> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-> index ddd9a96e76..4c525d245b 100644
-> --- a/util/vfio-helpers.c
-> +++ b/util/vfio-helpers.c
-> @@ -706,7 +706,7 @@ static void qemu_vfio_reset(QEMUVFIOState *s)
->   }
->  =20
->   /* Close and free the VFIO resources. */
+>   block/qcow2-cluster.c | 18 +++++++++++++++---
+>   1 file changed, 15 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index 746006a117..824c710760 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -1790,12 +1790,20 @@ static int discard_in_l2_slice(BlockDriverState *bs, uint64_t offset,
+>            * TODO We might want to use bdrv_block_status(bs) here, but we're
+>            * holding s->lock, so that doesn't work today.
+>            *
+> -         * If full_discard is true, the sector should not read back as zeroes,
+> +         * If full_discard is true, the cluster should not read back as zeroes,
+>            * but rather fall through to the backing file.
+>            */
+>           switch (qcow2_get_cluster_type(bs, old_l2_entry)) {
+>           case QCOW2_CLUSTER_UNALLOCATED:
+> -            if (full_discard || !bs->backing) {
+> +            if (full_discard) {
+> +                /* If the image has extended L2 entries we can only
+> +                 * skip this operation if the L2 bitmap is zero. */
+> +                uint64_t bitmap = has_subclusters(s) ?
+> +                    get_l2_bitmap(s, l2_slice, l2_index + i) : 0;
+> +                if (bitmap == 0) {
+> +                    continue;
+> +                }
+> +            } else if (!bs->backing) {
+>                   continue;
+>               }
 
-The comment already says 'close and free', I don't think it is worth=20
-renaming the function.
+Hmm, so you do continue if full_discard is false AND bitmap != 0 & !bs->backing,
+but you do not continue if full_discard is true AND bitmap != 0 & !bs->backing (as you will not go to "else") branch.
 
-> -void qemu_vfio_close(QEMUVFIOState *s)
-> +void qemu_vfio_close_and_free(QEMUVFIOState *s)
->   {
->       int i;
->  =20
-> @@ -721,4 +721,5 @@ void qemu_vfio_close(QEMUVFIOState *s)
->       close(s->device);
->       close(s->group);
->       close(s->container);
-> +    g_free(s);
+Seems it's a mistake.
 
-Good catch.
+I think, correct condition is
 
-Preferably not renaming:
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+if (!bs->backing || full_discard && !get_l2_bitmap(s, l2_slice, l2_index + i))
 
->   }
->=20
+, but, for doing so we also need
 
+
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -565,6 +565,7 @@ static inline uint64_t get_l2_entry(BDRVQcow2State *s, uint64_t *l2_slice,
+      return be64_to_cpu(l2_slice[idx]);
+  }
+
++/* Return l2-entry bitmap if image has subclusters and 0 otherwise. */
+  static inline uint64_t get_l2_bitmap(BDRVQcow2State *s, uint64_t *l2_slice,
+                                       int idx)
+  {
+@@ -572,7 +573,6 @@ static inline uint64_t get_l2_bitmap(BDRVQcow2State *s, uint64_t *l2_slice,
+          idx *= l2_entry_size(s) / sizeof(uint64_t);
+          return be64_to_cpu(l2_slice[idx + 1]);
+      } else {
+-        /* For convenience only; the caller should ignore this value. */
+          return 0;
+      }
+  }
+
+or if you don't want, keep it explicit
+
+if (!bs->backing || full_discard && (!has_subclusters(s) || !get_l2_bitmap(s, l2_slice, l2_index + i)))
+
+
+=====
+
+In case QCOW2_CLUSTER_ZERO_PLAIN, worth assert !has_subclusters(s) or mark image corrupted ?
+
+>               break;
+> @@ -1817,7 +1825,11 @@ static int discard_in_l2_slice(BlockDriverState *bs, uint64_t offset,
+>   
+>           /* First remove L2 entries */
+>           qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
+> -        if (!full_discard && s->qcow_version >= 3) {
+> +        if (has_subclusters(s)) {
+> +            set_l2_entry(s, l2_slice, l2_index + i, 0);
+> +            set_l2_bitmap(s, l2_slice, l2_index + i,
+> +                          full_discard ? 0 : QCOW_L2_BITMAP_ALL_ZEROES);
+> +        } else if (!full_discard && s->qcow_version >= 3) {
+>               set_l2_entry(s, l2_slice, l2_index + i, QCOW_OFLAG_ZERO);
+>           } else {
+>               set_l2_entry(s, l2_slice, l2_index + i, 0);
+> 
+
+
+-- 
+Best regards,
+Vladimir
 
