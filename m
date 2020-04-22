@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FDBCC55189
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB46C5518A
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:14:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E274B206CD
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:14:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E274B206CD
+	by mail.kernel.org (Postfix) with ESMTPS id D5F81206CD
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:14:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5F81206CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jR9aI-0008DA-Ud
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 03:14:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39526)
+	id 1jR9ay-0000VM-16
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 03:14:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39532)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jR9Vv-0000cF-K3
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:09:44 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jR9Vv-0000d4-0P
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:09:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jR9Vt-0007JE-JZ
+ (envelope-from <its@irrelevant.dk>) id 1jR9Vt-0007JX-Rd
  for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:09:42 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:60254)
+Received: from charlie.dont.surf ([128.199.63.193]:60250)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jR9Vq-0007D6-65; Wed, 22 Apr 2020 03:09:38 -0400
+ id 1jR9Vq-0007D1-64; Wed, 22 Apr 2020 03:09:38 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 3806CBFD3E;
- Wed, 22 Apr 2020 07:09:36 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 58C04BFD37;
+ Wed, 22 Apr 2020 07:09:35 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 07/16] nvme: add max_ioqpairs device parameter
-Date: Wed, 22 Apr 2020 09:09:18 +0200
-Message-Id: <20200422070927.373048-8-its@irrelevant.dk>
+Subject: [PATCH v3 05/16] nvme: use constants in identify
+Date: Wed, 22 Apr 2020 09:09:16 +0200
+Message-Id: <20200422070927.373048-6-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200422070927.373048-1-its@irrelevant.dk>
 References: <20200422070927.373048-1-its@irrelevant.dk>
@@ -75,177 +75,62 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-The num_queues device paramater has a slightly confusing meaning because
-it accounts for the admin queue pair which is not really optional.
-Secondly, it is really a maximum value of queues allowed.
-
-Add a new max_ioqpairs parameter that only accounts for I/O queue pairs,
-but keep num_queues for compatibility.
-
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Keith Busch <kbusch@kernel.org>
 ---
- hw/block/nvme.c | 48 +++++++++++++++++++++++++++++-------------------
- hw/block/nvme.h |  6 ++++--
- 2 files changed, 33 insertions(+), 21 deletions(-)
+ hw/block/nvme.c      | 8 ++++----
+ include/block/nvme.h | 8 ++++++++
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 5605875e2614..4450d8473361 100644
+index 382275e466fe..4aa45f511118 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -20,7 +20,7 @@
-  *      -device nvme,drive=<drive_id>,serial=<serial>,id=<id[optional]>, \
-  *              cmb_size_mb=<cmb_size_mb[optional]>, \
-  *              [pmrdev=<mem_backend_file_id>,] \
-- *              num_queues=<N[optional]>
-+ *              max_ioqpairs=<N[optional]>
-  *
-  * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
-  * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
-@@ -36,6 +36,7 @@
+@@ -693,7 +693,7 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeIdentify *c)
  
- #include "qemu/osdep.h"
- #include "qemu/units.h"
-+#include "qemu/error-report.h"
- #include "hw/block/block.h"
- #include "hw/pci/msix.h"
- #include "hw/pci/pci.h"
-@@ -86,12 +87,12 @@ static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
- 
- static int nvme_check_sqid(NvmeCtrl *n, uint16_t sqid)
+ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
  {
--    return sqid < n->params.num_queues && n->sq[sqid] != NULL ? 0 : -1;
-+    return sqid < n->params.max_ioqpairs + 1 && n->sq[sqid] != NULL ? 0 : -1;
- }
+-    static const int data_len = 4 * KiB;
++    static const int data_len = NVME_IDENTIFY_DATA_SIZE;
+     uint32_t min_nsid = le32_to_cpu(c->nsid);
+     uint64_t prp1 = le64_to_cpu(c->prp1);
+     uint64_t prp2 = le64_to_cpu(c->prp2);
+@@ -723,11 +723,11 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
+     NvmeIdentify *c = (NvmeIdentify *)cmd;
  
- static int nvme_check_cqid(NvmeCtrl *n, uint16_t cqid)
- {
--    return cqid < n->params.num_queues && n->cq[cqid] != NULL ? 0 : -1;
-+    return cqid < n->params.max_ioqpairs + 1 && n->cq[cqid] != NULL ? 0 : -1;
- }
+     switch (le32_to_cpu(c->cns)) {
+-    case 0x00:
++    case NVME_ID_CNS_NS:
+         return nvme_identify_ns(n, c);
+-    case 0x01:
++    case NVME_ID_CNS_CTRL:
+         return nvme_identify_ctrl(n, c);
+-    case 0x02:
++    case NVME_ID_CNS_NS_ACTIVE_LIST:
+         return nvme_identify_nslist(n, c);
+     default:
+         trace_pci_nvme_err_invalid_identify_cns(le32_to_cpu(c->cns));
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 5525c8e34308..1720ee1d5158 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -705,6 +705,14 @@ typedef struct NvmePSD {
+     uint8_t     resv[16];
+ } NvmePSD;
  
- static void nvme_inc_cq_tail(NvmeCQueue *cq)
-@@ -653,7 +654,7 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeCmd *cmd)
-         trace_pci_nvme_err_invalid_create_cq_addr(prp1);
-         return NVME_INVALID_FIELD | NVME_DNR;
-     }
--    if (unlikely(vector > n->params.num_queues)) {
-+    if (unlikely(vector > n->params.max_ioqpairs + 1)) {
-         trace_pci_nvme_err_invalid_create_cq_vector(vector);
-         return NVME_INVALID_IRQ_VECTOR | NVME_DNR;
-     }
-@@ -805,8 +806,8 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-         trace_pci_nvme_getfeat_vwcache(result ? "enabled" : "disabled");
-         break;
-     case NVME_NUMBER_OF_QUEUES:
--        result = cpu_to_le32((n->params.num_queues - 2) |
--                             ((n->params.num_queues - 2) << 16));
-+        result = cpu_to_le32((n->params.max_ioqpairs - 1) |
-+                             ((n->params.max_ioqpairs - 1) << 16));
-         trace_pci_nvme_getfeat_numq(result);
-         break;
-     case NVME_TIMESTAMP:
-@@ -850,10 +851,10 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-     case NVME_NUMBER_OF_QUEUES:
-         trace_pci_nvme_setfeat_numq((dw11 & 0xFFFF) + 1,
-                                     ((dw11 >> 16) & 0xFFFF) + 1,
--                                    n->params.num_queues - 1,
--                                    n->params.num_queues - 1);
--        req->cqe.result = cpu_to_le32((n->params.num_queues - 2) |
--                                      ((n->params.num_queues - 2) << 16));
-+                                    n->params.max_ioqpairs,
-+                                    n->params.max_ioqpairs);
-+        req->cqe.result = cpu_to_le32((n->params.max_ioqpairs - 1) |
-+                                      ((n->params.max_ioqpairs - 1) << 16));
-         break;
-     case NVME_TIMESTAMP:
-         return nvme_set_feature_timestamp(n, cmd);
-@@ -924,12 +925,12 @@ static void nvme_clear_ctrl(NvmeCtrl *n)
- 
-     blk_drain(n->conf.blk);
- 
--    for (i = 0; i < n->params.num_queues; i++) {
-+    for (i = 0; i < n->params.max_ioqpairs + 1; i++) {
-         if (n->sq[i] != NULL) {
-             nvme_free_sq(n->sq[i], n);
-         }
-     }
--    for (i = 0; i < n->params.num_queues; i++) {
-+    for (i = 0; i < n->params.max_ioqpairs + 1; i++) {
-         if (n->cq[i] != NULL) {
-             nvme_free_cq(n->cq[i], n);
-         }
-@@ -1360,8 +1361,17 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-     int64_t bs_size;
-     uint8_t *pci_conf;
- 
--    if (!n->params.num_queues) {
--        error_setg(errp, "num_queues can't be zero");
-+    if (n->params.num_queues) {
-+        warn_report("num_queues is deprecated; please use max_ioqpairs "
-+                    "instead");
++#define NVME_IDENTIFY_DATA_SIZE 4096
 +
-+        n->params.max_ioqpairs = n->params.num_queues - 1;
-+    }
++enum {
++    NVME_ID_CNS_NS             = 0x0,
++    NVME_ID_CNS_CTRL           = 0x1,
++    NVME_ID_CNS_NS_ACTIVE_LIST = 0x2,
++};
 +
-+    if (n->params.max_ioqpairs < 1 ||
-+        n->params.max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
-+        error_setg(errp, "max_ioqpairs must be between 1 and %d",
-+                   PCI_MSIX_FLAGS_QSIZE);
-         return;
-     }
- 
-@@ -1411,21 +1421,21 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
- 
-     n->num_namespaces = 1;
- 
--    /* num_queues is really number of pairs, so each has two doorbells */
-+    /* add one to max_ioqpairs to account for the admin queue pair */
-     n->reg_size = pow2ceil(NVME_REG_SIZE +
--                           2 * n->params.num_queues * NVME_DB_SIZE);
-+                           2 * (n->params.max_ioqpairs + 1) * NVME_DB_SIZE);
-     n->ns_size = bs_size / (uint64_t)n->num_namespaces;
- 
-     n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
--    n->sq = g_new0(NvmeSQueue *, n->params.num_queues);
--    n->cq = g_new0(NvmeCQueue *, n->params.num_queues);
-+    n->sq = g_new0(NvmeSQueue *, n->params.max_ioqpairs + 1);
-+    n->cq = g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
- 
-     memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
-                           "nvme", n->reg_size);
-     pci_register_bar(pci_dev, 0,
-         PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
-         &n->iomem);
--    msix_init_exclusive_bar(pci_dev, n->params.num_queues, 4, NULL);
-+    msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL);
- 
-     id->vid = cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
-     id->ssvid = cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VENDOR_ID));
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 7cb1d5e31870..215896191988 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -6,13 +6,15 @@
- #define DEFINE_NVME_PROPERTIES(_state, _props) \
-     DEFINE_PROP_STRING("serial", _state, _props.serial), \
-     DEFINE_PROP_UINT32("cmb_size_mb", _state, _props.cmb_size_mb, 0), \
--    DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 64), \
-+    DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 0), \
-+    DEFINE_PROP_UINT32("max_ioqpairs", _state, _props.max_ioqpairs, 64), \
-     DEFINE_PROP_LINK("pmrdev", _state, pmrdev, TYPE_MEMORY_BACKEND, \
-                      HostMemoryBackend *)
- 
- typedef struct NvmeParams {
-     char     *serial;
--    uint32_t num_queues;
-+    uint32_t num_queues; /* deprecated since 5.1 */
-+    uint32_t max_ioqpairs;
-     uint32_t cmb_size_mb;
- } NvmeParams;
- 
+ typedef struct NvmeIdCtrl {
+     uint16_t    vid;
+     uint16_t    ssvid;
 -- 
 2.26.2
 
