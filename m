@@ -4,89 +4,87 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64595C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 04:44:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 751DBC38A30
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 04:45:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CDBD206D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 04:44:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 39B6B2072D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 04:45:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L6aI8/Aa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CDBD206D4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tdEcW4t6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39B6B2072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41591 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jR7F4-0000u2-Aj
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 00:44:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50674)
+	id 1jR7GL-0002Ta-CM
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 00:45:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50554)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jR74n-0000v5-JR
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 00:33:38 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jR74k-0005gj-8o
+ (envelope-from <richard.henderson@linaro.org>) id 1jR74k-0000oC-ON
  for qemu-devel@nongnu.org; Wed, 22 Apr 2020 00:33:33 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44020)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
+ (envelope-from <richard.henderson@linaro.org>) id 1jR74i-0005aI-Pg
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 00:33:30 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:35405)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jR74j-0005cB-PS
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 00:33:29 -0400
-Received: by mail-pl1-x641.google.com with SMTP id z6so427160plk.10
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 21:33:29 -0700 (PDT)
+ id 1jR74i-0005Ux-Bj
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 00:33:28 -0400
+Received: by mail-pf1-x443.google.com with SMTP id r14so454096pfg.2
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 21:33:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=9amWqshE7k/NAq9a276bjEryeqReUJxYJNXk6wnm0Gs=;
- b=L6aI8/AaePKUmLWkH5eJ5ORLDsUfOSxjqUkGmV1d5iecMehEqtqzbzVWEM0INGaFht
- b+hNdyq5yecu2WYRVpK7WcBSch99brb3memU+hc6J7LEurbG/VG6I8z/A3hyRVEgkR4r
- zp9d3r0cEwWfJbbtWbzSDFwGqN0piODENwe5pxaaGe3D29SB3BKx+511gZrZ0+PIpF0w
- J13qS15xS3xwXEJTO35S1I9Q2WLYB99UMnBsOmb4vIWETVUA5UcR6HuEwag4EQ0hs5eA
- gcJUpjdz4dqukuCameZY8vi8aoGkCu9FNvrGM6skhqkiF6uTREDSxuVAZ5/Zm8jftOBQ
- VHoA==
+ bh=4tSyrjuk3Om51Zcagt3t6yh4FkYKfOOT3yWLv6tJ2Vs=;
+ b=tdEcW4t6iHlzfHZT7MTd+nowW120rfdwA2OWXW5lqAGzmrZSFDwmt+9n3UmPfoAos4
+ eqUEb+ZQd+XyrEp7acgd9JM1ZfU10GoY8T9KRHdujmvKCfxVwVHyBKljXimnCsJRCUM+
+ xCWBT9TDkC47pnwCghsS8QNiqmwZnNzev7VjiPJJ3dHwVw82nOq9FpLDIWkHQpOdIWWu
+ T9upG/pVuPXfen905x9u1FgVNC0eLnPpms3RNdCoRhZApYoaDM0yPI8gkh9BgWNxDf3J
+ rm6iksS38MZLlCGNFKp0trbfMT2g/SYSqIxl9QGoKQxZli1skpOMGuD0jSz/wDOqTp9i
+ TWpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=9amWqshE7k/NAq9a276bjEryeqReUJxYJNXk6wnm0Gs=;
- b=o60PsqbSm+6eq0apFFfyUreAaWQtJxmeOPxI1+h0iknhHTAfU4JDo9RwC75jZ8KvpN
- n0GovQ/Z0SGb036Qhjv64UGHksISlJ8xYDMAa7wMBwYHFmnK3rFFwBt1ZvQK9LeT3LNG
- t8Pt/+0fqLoLVZq39gxuKWMUcxLnvVdZaNwdqPy0HCNs7rLcm5wtRjk0tEtPiw8ayl6i
- lM2ZkV5ZYrJmqa1ZExObyOk0gIvymCTIQ6qRzqmsLFSrMZQ9Uc3HkIALp3eRADINcU/O
- Q03ZbLHHzfv0GVeedJHPng/hObT7kYC43tfYvLGKZGx147hhQwFK1KDkDeHUwC3nF3Ed
- UUSg==
-X-Gm-Message-State: AGi0Pubhk+6si54GZTvKHCnPh2SGKSKS1VoSqmqpLhRbu5JXd6Igs1Qh
- CsxwTFaMcH5mBunVC9hnaMttqrAn/sI=
-X-Google-Smtp-Source: APiQypImJXQa8GXnCKl9mpE5INUfoBfDNVzBuvdmaSK2kSasCmE5dRarP/7/0vYW+XoL+rH2ced+Gw==
-X-Received: by 2002:a17:90a:1da6:: with SMTP id
- v35mr10044180pjv.44.1587530007896; 
- Tue, 21 Apr 2020 21:33:27 -0700 (PDT)
+ bh=4tSyrjuk3Om51Zcagt3t6yh4FkYKfOOT3yWLv6tJ2Vs=;
+ b=MhozP3gsdWlFNehjaVvbDPyeV57xzq30+8YSIT/6zTXWF4ySuYFI3PAPBOu1deqPHZ
+ iUQarw18q+r8M6NbqWRZs0BT+z7pEfRoj5FDnd6omz6t1RG810Dhgrqglt3OB1O9oQHM
+ b+j1OeM0DsgDuPhwr+d1M24p03X+aF5LpOJYfk6gLUWocIfGJyU6Z2WatjZxV2ookXbt
+ mu6Wm2KnsMIBsbgcE1/opQXFBZJIQzDffUU3+/q+Oqjf7MNLn4rBxweOwCCsMRjov7P0
+ BTHeX7cUUnmDTjNTDouqHOafsypGBnjN7pkRDe7EubcmwDZu8pMMgn18E7gpxnL9fSml
+ W2Lw==
+X-Gm-Message-State: AGi0PuZgbRhY60NhlJiigkEnpE1E0TNy+v6TeADPL5E8J3ppLy6pffJw
+ SIhuRNT3YK6WcFQIhpXv5LOjtz/Fux8=
+X-Google-Smtp-Source: APiQypKtr8/C4SlpQJ0c534bfN/b474X/K2Pp7fRgYiWSZ6yeQS+j0jPPD7XiPEVegy136ob7oqxSg==
+X-Received: by 2002:aa7:9724:: with SMTP id k4mr10964808pfg.309.1587530006550; 
+ Tue, 21 Apr 2020 21:33:26 -0700 (PDT)
 Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
  [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id l137sm4129613pfd.107.2020.04.21.21.33.26
+ by smtp.gmail.com with ESMTPSA id l137sm4129613pfd.107.2020.04.21.21.33.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Apr 2020 21:33:26 -0700 (PDT)
+ Tue, 21 Apr 2020 21:33:25 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 12/18] target/arm: Use SVEContLdSt for multi-register
- contiguous loads
-Date: Tue, 21 Apr 2020 21:33:03 -0700
-Message-Id: <20200422043309.18430-13-richard.henderson@linaro.org>
+Subject: [PATCH v3 11/18] target/arm: Handle watchpoints in sve_ld1_r
+Date: Tue, 21 Apr 2020 21:33:02 -0700
+Message-Id: <20200422043309.18430-12-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200422043309.18430-1-richard.henderson@linaro.org>
 References: <20200422043309.18430-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::641
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,361 +101,113 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Handle all of the watchpoints for active elements all at once,
+before we've modified the vector register.  This removes the
+TLB_WATCHPOINT bit from page[].flags, which means that we can
+use the normal fast path via RAM.
+
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/sve_helper.c | 223 ++++++++++++++--------------------------
- 1 file changed, 79 insertions(+), 144 deletions(-)
+ target/arm/sve_helper.c | 72 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 71 insertions(+), 1 deletion(-)
 
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 7992a569b0..9365e32646 100644
+index 6bae342a17..7992a569b0 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -4449,27 +4449,28 @@ static inline bool test_host_page(void *host)
+@@ -4371,6 +4371,70 @@ static bool sve_cont_ldst_pages(SVEContLdSt *info, SVEContFault fault,
+     return have_work;
  }
  
- /*
-- * Common helper for all contiguous one-register predicated loads.
-+ * Common helper for all contiguous 1,2,3,4-register predicated stores.
-  */
- static inline QEMU_ALWAYS_INLINE
--void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-+void sve_ldN_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-                uint32_t desc, const uintptr_t retaddr,
--               const int esz, const int msz,
-+               const int esz, const int msz, const int N,
-                sve_ldst1_host_fn *host_fn,
-                sve_ldst1_tlb_fn *tlb_fn)
- {
-     const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
--    void *vd = &env->vfp.zregs[rd];
-     const intptr_t reg_max = simd_oprsz(desc);
-     intptr_t reg_off, reg_last, mem_off;
-     SVEContLdSt info;
-     void *host;
--    int flags;
-+    int flags, i;
- 
-     /* Find the active elements.  */
--    if (!sve_cont_ldst_elements(&info, addr, vg, reg_max, esz, 1 << msz)) {
-+    if (!sve_cont_ldst_elements(&info, addr, vg, reg_max, esz, N << msz)) {
-         /* The entire predicate was false; no load occurs.  */
--        memset(vd, 0, reg_max);
-+        for (i = 0; i < N; ++i) {
-+            memset(&env->vfp.zregs[(rd + i) & 31], 0, reg_max);
-+        }
-         return;
-     }
- 
-@@ -4477,7 +4478,7 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-     sve_cont_ldst_pages(&info, FAULT_ALL, env, addr, MMU_DATA_LOAD, retaddr);
- 
-     /* Handle watchpoints for all active elements. */
--    sve_cont_ldst_watchpoints(&info, env, vg, addr, 1 << esz, 1 << msz,
-+    sve_cont_ldst_watchpoints(&info, env, vg, addr, 1 << esz, N << msz,
-                               BP_MEM_READ, retaddr);
- 
-     /* TODO: MTE check. */
-@@ -4493,9 +4494,8 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-          * which for ARM will raise SyncExternal.  Perform the load
-          * into scratch memory to preserve register state until the end.
-          */
--        ARMVectorReg scratch;
-+        ARMVectorReg scratch[4] = { };
- 
--        memset(&scratch, 0, reg_max);
-         mem_off = info.mem_off_first[0];
-         reg_off = info.reg_off_first[0];
-         reg_last = info.reg_off_last[1];
-@@ -4510,21 +4510,29 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-             uint64_t pg = vg[reg_off >> 6];
-             do {
-                 if ((pg >> (reg_off & 63)) & 1) {
--                    tlb_fn(env, &scratch, reg_off, addr + mem_off, retaddr);
-+                    for (i = 0; i < N; ++i) {
-+                        tlb_fn(env, &scratch[i], reg_off,
-+                               addr + mem_off + (i << msz), retaddr);
-+                    }
-                 }
-                 reg_off += 1 << esz;
--                mem_off += 1 << msz;
-+                mem_off += N << msz;
-             } while (reg_off & 63);
-         } while (reg_off <= reg_last);
- 
--        memcpy(vd, &scratch, reg_max);
-+        for (i = 0; i < N; ++i) {
-+            memcpy(&env->vfp.zregs[(rd + i) & 31], &scratch[i], reg_max);
-+        }
-         return;
- #endif
-     }
- 
-     /* The entire operation is in RAM, on valid pages. */
- 
--    memset(vd, 0, reg_max);
-+    for (i = 0; i < N; ++i) {
-+        memset(&env->vfp.zregs[(rd + i) & 31], 0, reg_max);
++static void sve_cont_ldst_watchpoints(SVEContLdSt *info, CPUARMState *env,
++                                      uint64_t *vg, target_ulong addr,
++                                      int esize, int msize, int wp_access,
++                                      uintptr_t retaddr)
++{
++#ifndef CONFIG_USER_ONLY
++    intptr_t mem_off, reg_off, reg_last;
++    int flags0 = info->page[0].flags;
++    int flags1 = info->page[1].flags;
++
++    if (likely(!((flags0 | flags1) & TLB_WATCHPOINT))) {
++        return;
 +    }
 +
-     mem_off = info.mem_off_first[0];
-     reg_off = info.reg_off_first[0];
-     reg_last = info.reg_off_last[0];
-@@ -4534,10 +4542,13 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-         uint64_t pg = vg[reg_off >> 6];
-         do {
-             if ((pg >> (reg_off & 63)) & 1) {
--                host_fn(vd, reg_off, host + mem_off);
-+                for (i = 0; i < N; ++i) {
-+                    host_fn(&env->vfp.zregs[(rd + i) & 31], reg_off,
-+                            host + mem_off + (i << msz));
++    /* Indicate that watchpoints are handled. */
++    info->page[0].flags = flags0 & ~TLB_WATCHPOINT;
++    info->page[1].flags = flags1 & ~TLB_WATCHPOINT;
++
++    if (flags0 & TLB_WATCHPOINT) {
++        mem_off = info->mem_off_first[0];
++        reg_off = info->reg_off_first[0];
++        reg_last = info->reg_off_last[0];
++
++        while (reg_off <= reg_last) {
++            uint64_t pg = vg[reg_off >> 6];
++            do {
++                if ((pg >> (reg_off & 63)) & 1) {
++                    cpu_check_watchpoint(env_cpu(env), addr + mem_off,
++                                         msize, info->page[0].attrs,
++                                         wp_access, retaddr);
 +                }
-             }
-             reg_off += 1 << esz;
--            mem_off += 1 << msz;
-+            mem_off += N << msz;
-         } while (reg_off <= reg_last && (reg_off & 63));
-     }
- 
-@@ -4547,7 +4558,11 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-      */
-     mem_off = info.mem_off_split;
-     if (unlikely(mem_off >= 0)) {
--        tlb_fn(env, vd, info.reg_off_split, addr + mem_off, retaddr);
-+        reg_off = info.reg_off_split;
-+        for (i = 0; i < N; ++i) {
-+            tlb_fn(env, &env->vfp.zregs[(rd + i) & 31], reg_off,
-+                   addr + mem_off + (i << msz), retaddr);
++                reg_off += esize;
++                mem_off += msize;
++            } while (reg_off <= reg_last && (reg_off & 63));
 +        }
-     }
++    }
++
++    mem_off = info->mem_off_split;
++    if (mem_off >= 0) {
++        cpu_check_watchpoint(env_cpu(env), addr + mem_off, msize,
++                             info->page[0].attrs, wp_access, retaddr);
++    }
++
++    mem_off = info->mem_off_first[1];
++    if ((flags1 & TLB_WATCHPOINT) && mem_off >= 0) {
++        reg_off = info->reg_off_first[1];
++        reg_last = info->reg_off_last[1];
++
++        do {
++            uint64_t pg = vg[reg_off >> 6];
++            do {
++                if ((pg >> (reg_off & 63)) & 1) {
++                    cpu_check_watchpoint(env_cpu(env), addr + mem_off,
++                                         msize, info->page[1].attrs,
++                                         wp_access, retaddr);
++                }
++                reg_off += esize;
++                mem_off += msize;
++            } while (reg_off & 63);
++        } while (reg_off <= reg_last);
++    }
++#endif
++}
++
+ /*
+  * The result of tlb_vaddr_to_host for user-only is just g2h(x),
+  * which is always non-null.  Elide the useless test.
+@@ -4412,13 +4476,19 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
+     /* Probe the page(s).  Exit with exception for any invalid page. */
+     sve_cont_ldst_pages(&info, FAULT_ALL, env, addr, MMU_DATA_LOAD, retaddr);
  
-     mem_off = info.mem_off_first[1];
-@@ -4560,10 +4575,13 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-             uint64_t pg = vg[reg_off >> 6];
-             do {
-                 if ((pg >> (reg_off & 63)) & 1) {
--                    host_fn(vd, reg_off, host + mem_off);
-+                    for (i = 0; i < N; ++i) {
-+                        host_fn(&env->vfp.zregs[(rd + i) & 31], reg_off,
-+                                host + mem_off + (i << msz));
-+                    }
-                 }
-                 reg_off += 1 << esz;
--                mem_off += 1 << msz;
-+                mem_off += N << msz;
-             } while (reg_off & 63);
-         } while (reg_off <= reg_last);
-     }
-@@ -4573,7 +4591,7 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
- void HELPER(sve_##NAME##_r)(CPUARMState *env, void *vg,        \
-                             target_ulong addr, uint32_t desc)  \
- {                                                              \
--    sve_ld1_r(env, vg, addr, desc, GETPC(), ESZ, 0,            \
-+    sve_ldN_r(env, vg, addr, desc, GETPC(), ESZ, MO_8, 1,      \
-               sve_##NAME##_host, sve_##NAME##_tlb);            \
- }
- 
-@@ -4581,159 +4599,76 @@ void HELPER(sve_##NAME##_r)(CPUARMState *env, void *vg,        \
- void HELPER(sve_##NAME##_le_r)(CPUARMState *env, void *vg,        \
-                                target_ulong addr, uint32_t desc)  \
- {                                                                 \
--    sve_ld1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,             \
-+    sve_ldN_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, 1,          \
-               sve_##NAME##_le_host, sve_##NAME##_le_tlb);         \
- }                                                                 \
- void HELPER(sve_##NAME##_be_r)(CPUARMState *env, void *vg,        \
-                                target_ulong addr, uint32_t desc)  \
- {                                                                 \
--    sve_ld1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,             \
-+    sve_ldN_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, 1,          \
-               sve_##NAME##_be_host, sve_##NAME##_be_tlb);         \
- }
- 
--DO_LD1_1(ld1bb,  0)
--DO_LD1_1(ld1bhu, 1)
--DO_LD1_1(ld1bhs, 1)
--DO_LD1_1(ld1bsu, 2)
--DO_LD1_1(ld1bss, 2)
--DO_LD1_1(ld1bdu, 3)
--DO_LD1_1(ld1bds, 3)
-+DO_LD1_1(ld1bb,  MO_8)
-+DO_LD1_1(ld1bhu, MO_16)
-+DO_LD1_1(ld1bhs, MO_16)
-+DO_LD1_1(ld1bsu, MO_32)
-+DO_LD1_1(ld1bss, MO_32)
-+DO_LD1_1(ld1bdu, MO_64)
-+DO_LD1_1(ld1bds, MO_64)
- 
--DO_LD1_2(ld1hh,  1, 1)
--DO_LD1_2(ld1hsu, 2, 1)
--DO_LD1_2(ld1hss, 2, 1)
--DO_LD1_2(ld1hdu, 3, 1)
--DO_LD1_2(ld1hds, 3, 1)
-+DO_LD1_2(ld1hh,  MO_16, MO_16)
-+DO_LD1_2(ld1hsu, MO_32, MO_16)
-+DO_LD1_2(ld1hss, MO_32, MO_16)
-+DO_LD1_2(ld1hdu, MO_64, MO_16)
-+DO_LD1_2(ld1hds, MO_64, MO_16)
- 
--DO_LD1_2(ld1ss,  2, 2)
--DO_LD1_2(ld1sdu, 3, 2)
--DO_LD1_2(ld1sds, 3, 2)
-+DO_LD1_2(ld1ss,  MO_32, MO_32)
-+DO_LD1_2(ld1sdu, MO_64, MO_32)
-+DO_LD1_2(ld1sds, MO_64, MO_32)
- 
--DO_LD1_2(ld1dd,  3, 3)
-+DO_LD1_2(ld1dd,  MO_64, MO_64)
- 
- #undef DO_LD1_1
- #undef DO_LD1_2
- 
--/*
-- * Common helpers for all contiguous 2,3,4-register predicated loads.
-- */
--static void sve_ld2_r(CPUARMState *env, void *vg, target_ulong addr,
--                      uint32_t desc, int size, uintptr_t ra,
--                      sve_ldst1_tlb_fn *tlb_fn)
--{
--    const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
--    intptr_t i, oprsz = simd_oprsz(desc);
--    ARMVectorReg scratch[2] = { };
--
--    for (i = 0; i < oprsz; ) {
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
--        do {
--            if (pg & 1) {
--                tlb_fn(env, &scratch[0], i, addr, ra);
--                tlb_fn(env, &scratch[1], i, addr + size, ra);
--            }
--            i += size, pg >>= size;
--            addr += 2 * size;
--        } while (i & 15);
--    }
--
--    /* Wait until all exceptions have been raised to write back.  */
--    memcpy(&env->vfp.zregs[rd], &scratch[0], oprsz);
--    memcpy(&env->vfp.zregs[(rd + 1) & 31], &scratch[1], oprsz);
--}
--
--static void sve_ld3_r(CPUARMState *env, void *vg, target_ulong addr,
--                      uint32_t desc, int size, uintptr_t ra,
--                      sve_ldst1_tlb_fn *tlb_fn)
--{
--    const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
--    intptr_t i, oprsz = simd_oprsz(desc);
--    ARMVectorReg scratch[3] = { };
--
--    for (i = 0; i < oprsz; ) {
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
--        do {
--            if (pg & 1) {
--                tlb_fn(env, &scratch[0], i, addr, ra);
--                tlb_fn(env, &scratch[1], i, addr + size, ra);
--                tlb_fn(env, &scratch[2], i, addr + 2 * size, ra);
--            }
--            i += size, pg >>= size;
--            addr += 3 * size;
--        } while (i & 15);
--    }
--
--    /* Wait until all exceptions have been raised to write back.  */
--    memcpy(&env->vfp.zregs[rd], &scratch[0], oprsz);
--    memcpy(&env->vfp.zregs[(rd + 1) & 31], &scratch[1], oprsz);
--    memcpy(&env->vfp.zregs[(rd + 2) & 31], &scratch[2], oprsz);
--}
--
--static void sve_ld4_r(CPUARMState *env, void *vg, target_ulong addr,
--                      uint32_t desc, int size, uintptr_t ra,
--                      sve_ldst1_tlb_fn *tlb_fn)
--{
--    const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
--    intptr_t i, oprsz = simd_oprsz(desc);
--    ARMVectorReg scratch[4] = { };
--
--    for (i = 0; i < oprsz; ) {
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
--        do {
--            if (pg & 1) {
--                tlb_fn(env, &scratch[0], i, addr, ra);
--                tlb_fn(env, &scratch[1], i, addr + size, ra);
--                tlb_fn(env, &scratch[2], i, addr + 2 * size, ra);
--                tlb_fn(env, &scratch[3], i, addr + 3 * size, ra);
--            }
--            i += size, pg >>= size;
--            addr += 4 * size;
--        } while (i & 15);
--    }
--
--    /* Wait until all exceptions have been raised to write back.  */
--    memcpy(&env->vfp.zregs[rd], &scratch[0], oprsz);
--    memcpy(&env->vfp.zregs[(rd + 1) & 31], &scratch[1], oprsz);
--    memcpy(&env->vfp.zregs[(rd + 2) & 31], &scratch[2], oprsz);
--    memcpy(&env->vfp.zregs[(rd + 3) & 31], &scratch[3], oprsz);
--}
--
- #define DO_LDN_1(N) \
--void QEMU_FLATTEN HELPER(sve_ld##N##bb_r) \
--    (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)  \
--{                                                                   \
--    sve_ld##N##_r(env, vg, addr, desc, 1, GETPC(), sve_ld1bb_tlb);  \
-+void HELPER(sve_ld##N##bb_r)(CPUARMState *env, void *vg,        \
-+                             target_ulong addr, uint32_t desc)  \
-+{                                                               \
-+    sve_ldN_r(env, vg, addr, desc, GETPC(), MO_8, MO_8, N,      \
-+              sve_ld1bb_host, sve_ld1bb_tlb);                   \
- }
- 
--#define DO_LDN_2(N, SUFF, SIZE)                                       \
--void QEMU_FLATTEN HELPER(sve_ld##N##SUFF##_le_r)                      \
--    (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
-+#define DO_LDN_2(N, SUFF, ESZ) \
-+void HELPER(sve_ld##N##SUFF##_le_r)(CPUARMState *env, void *vg,       \
-+                                    target_ulong addr, uint32_t desc) \
- {                                                                     \
--    sve_ld##N##_r(env, vg, addr, desc, SIZE, GETPC(),                 \
--                  sve_ld1##SUFF##_le_tlb);                            \
-+    sve_ldN_r(env, vg, addr, desc, GETPC(), ESZ, ESZ, N,              \
-+              sve_ld1##SUFF##_le_host, sve_ld1##SUFF##_le_tlb);       \
- }                                                                     \
--void QEMU_FLATTEN HELPER(sve_ld##N##SUFF##_be_r)                      \
--    (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
-+void HELPER(sve_ld##N##SUFF##_be_r)(CPUARMState *env, void *vg,       \
-+                                    target_ulong addr, uint32_t desc) \
- {                                                                     \
--    sve_ld##N##_r(env, vg, addr, desc, SIZE, GETPC(),                 \
--                  sve_ld1##SUFF##_be_tlb);                            \
-+    sve_ldN_r(env, vg, addr, desc, GETPC(), ESZ, ESZ, N,              \
-+              sve_ld1##SUFF##_be_host, sve_ld1##SUFF##_be_tlb);       \
- }
- 
- DO_LDN_1(2)
- DO_LDN_1(3)
- DO_LDN_1(4)
- 
--DO_LDN_2(2, hh, 2)
--DO_LDN_2(3, hh, 2)
--DO_LDN_2(4, hh, 2)
-+DO_LDN_2(2, hh, MO_16)
-+DO_LDN_2(3, hh, MO_16)
-+DO_LDN_2(4, hh, MO_16)
- 
--DO_LDN_2(2, ss, 4)
--DO_LDN_2(3, ss, 4)
--DO_LDN_2(4, ss, 4)
-+DO_LDN_2(2, ss, MO_32)
-+DO_LDN_2(3, ss, MO_32)
-+DO_LDN_2(4, ss, MO_32)
- 
--DO_LDN_2(2, dd, 8)
--DO_LDN_2(3, dd, 8)
--DO_LDN_2(4, dd, 8)
-+DO_LDN_2(2, dd, MO_64)
-+DO_LDN_2(3, dd, MO_64)
-+DO_LDN_2(4, dd, MO_64)
- 
- #undef DO_LDN_1
- #undef DO_LDN_2
++    /* Handle watchpoints for all active elements. */
++    sve_cont_ldst_watchpoints(&info, env, vg, addr, 1 << esz, 1 << msz,
++                              BP_MEM_READ, retaddr);
++
++    /* TODO: MTE check. */
++
+     flags = info.page[0].flags | info.page[1].flags;
+     if (unlikely(flags != 0)) {
+ #ifdef CONFIG_USER_ONLY
+         g_assert_not_reached();
+ #else
+         /*
+-         * At least one page includes MMIO (or watchpoints).
++         * At least one page includes MMIO.
+          * Any bus operation can fail with cpu_transaction_failed,
+          * which for ARM will raise SyncExternal.  Perform the load
+          * into scratch memory to preserve register state until the end.
 -- 
 2.20.1
 
