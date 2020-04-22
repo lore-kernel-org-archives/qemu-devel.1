@@ -2,83 +2,91 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23458C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89961C55185
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:06:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE8BD20774
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:59:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55F5720776
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:06:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VrCjjPAo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE8BD20774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qhxeuw6j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55F5720776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRHn3-0005z7-3p
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 11:59:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49300)
+	id 1jRHtb-0004G7-EC
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:06:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50828)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jRHls-00054M-Ou
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:58:45 -0400
+ (envelope-from <stefanha@gmail.com>) id 1jRHoE-0006vE-Q7
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:01:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jRHls-0007po-AJ
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:58:44 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28072
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jRHlr-0007mp-Tr
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:58:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587571123;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=gzdgeiR4U9K1nATTtiIwhBJv9YF2ZWUtyl4wAYxfQmA=;
- b=VrCjjPAowxO/4p6y4o1/O+wMrYcFBgO3nQAuLhOwgaYC2GnCvx7qOulxDxH+ofDeoL7lSA
- H8tvIx+cRuV+5X2PFpCAXdKz1UjigzjutA5Tooz1ib8ronMsJEbxHdBXfbPm15LQKSikFB
- c0dq+9WTc1DlOTSyvU7BJ8xQ8lzkkCQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-504-FBzJNEpeM9Csk8zViYjCVw-1; Wed, 22 Apr 2020 11:58:39 -0400
-X-MC-Unique: FBzJNEpeM9Csk8zViYjCVw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 233418017F6;
- Wed, 22 Apr 2020 15:58:38 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-212.ams2.redhat.com [10.36.114.212])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AFAD96084A;
- Wed, 22 Apr 2020 15:58:36 +0000 (UTC)
-Date: Wed, 22 Apr 2020 17:58:35 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v5 4/9] qcow2: Support BDRV_REQ_ZERO_WRITE for truncate
-Message-ID: <20200422155835.GC7155@linux.fritz.box>
-References: <20200422152129.167074-1-kwolf@redhat.com>
- <20200422152129.167074-5-kwolf@redhat.com>
- <84c6ca49-aef3-adf4-2efe-68357dd20ce8@redhat.com>
+ (envelope-from <stefanha@gmail.com>) id 1jRHoD-0000Ov-FZ
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:01:10 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:53956)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jRHoC-0000K1-UF
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:01:09 -0400
+Received: by mail-wm1-x333.google.com with SMTP id t63so2968564wmt.3
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 09:01:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=JXtxeNhSPsuNv0Lq5sMm9wLumsAwhFG99DQ1uYmkY6o=;
+ b=qhxeuw6jEsOBHUywt+Ai3YO+Qd61jaXaYoVW9Ydng/sqSKSyxesuwOCKb1adp2PPdr
+ NYR4pG88b+UhAruNOvhT8xpCMrIg04XL1yKeZNIIeMBIx3wFXAjJGP+/CaLFMNLfcaaU
+ yzxfyYEn46pItPnkRoAnfN2AnectgY2lSQmTQB016N5osQivH/ltX5FvHjAfW+Zf1WVo
+ /1Rt5N61hpbAzDU77KIlUW/u/XlYTMlHa2Ww1A3zzdgrxphBliYygEohri8t1VIDgUdz
+ zRWMX9IslI5IESzaGPRlcufFLQNFKriEwiVYkK7NCoqo2skPG8gbSuJs5Vj8viZVDbBD
+ CqLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=JXtxeNhSPsuNv0Lq5sMm9wLumsAwhFG99DQ1uYmkY6o=;
+ b=Xga90NjYHN/wI58Ik4Nki6nb9l2eb/iZFbBdEfyodb9SP6PIiVQlZ4E6NCVd6QnbST
+ tADyZghoe7hXOEk6mIK6xG8Q6PX1rVqK9Hf8qrEgz95g64CFEbzag78EFplG3ynwL4au
+ P9+rM9QAW03yYa+pu4PoV09b5JZcVpsr9mRLAxr9JuTve2otzvwPCrafNIdLJ0W3/zbg
+ 1sgIkvm983cQJkQAHuR+KWKxH2kDF4jx9UzmjCE4rdWViBO8S6s1NOla9aWajul3w/Vz
+ u5M6PufuqYHxA3jzVETBsU7GlyXjChwE0hxB4P9Fo7WIwSlA8Lud3Fv0czDdDHXf9iL8
+ FFpg==
+X-Gm-Message-State: AGi0PubwttxOP7Qynj/hbra0LpJCxBw4342mAuVftP5Jj6jSfUvTzoSz
+ HnSyywTsB416rltIO46B0UA=
+X-Google-Smtp-Source: APiQypLgp4H5ZJubPW4QmAz7niYvmFgZbuSy2Fd5OuRiUy9uwUECvmjiXozOwhxhOFLxVS6Epi4x1Q==
+X-Received: by 2002:a05:600c:295a:: with SMTP id
+ n26mr12423080wmd.16.1587571267164; 
+ Wed, 22 Apr 2020 09:01:07 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id v131sm8649979wmb.19.2020.04.22.09.01.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 22 Apr 2020 09:01:05 -0700 (PDT)
+Date: Wed, 22 Apr 2020 17:01:03 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: FYI GitHub pull request / issue tracker lockdown bot
+Message-ID: <20200422160103.GG47385@stefanha-x1.localdomain>
+References: <20200403142213.GO559148@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <84c6ca49-aef3-adf4-2efe-68357dd20ce8@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Cgrdyab2wu3Akvjd"
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:57:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+In-Reply-To: <20200403142213.GO559148@redhat.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::333;
+ envelope-from=stefanha@gmail.com; helo=mail-wm1-x333.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::333
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,71 +98,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, berto@igalia.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, alex.bennee@linaro.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 22.04.2020 um 17:33 hat Eric Blake geschrieben:
-> On 4/22/20 10:21 AM, Kevin Wolf wrote:
-> > If BDRV_REQ_ZERO_WRITE is set and we're extending the image, calling
-> > qcow2_cluster_zeroize() with flags=3D0 does the right thing: It doesn't
-> > undo any previous preallocation, but just adds the zero flag to all
-> > relevant L2 entries. If an external data file is in use, a write_zeroes
-> > request to the data file is made instead.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >   block/qcow2.c | 30 ++++++++++++++++++++++++++++++
-> >   1 file changed, 30 insertions(+)
-> >=20
+
+--Cgrdyab2wu3Akvjd
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Apr 03, 2020 at 03:22:13PM +0100, Daniel P. Berrang=E9 wrote:
+> QEMU, like libvirt, has a github.com project which contains automated
+> read-only mirrors of QEMU repositories.
 >=20
-> > @@ -4214,6 +4215,35 @@ static int coroutine_fn qcow2_co_truncate(BlockD=
-riverState *bs, int64_t offset,
-> >           g_assert_not_reached();
-> >       }
-> > +    if ((flags & BDRV_REQ_ZERO_WRITE) && offset > old_length) {
-> > +        uint64_t zero_start =3D QEMU_ALIGN_UP(old_length, s->cluster_s=
-ize);
-> > +        uint64_t zero_end =3D QEMU_ALIGN_UP(offset, s->cluster_size);
+>   https://github.com/qemu/
 >=20
-> This rounds up beyond the new size...
+> An unfortunate side effect of this is that some users will try to open
+> pull requests against these mirrors. These get ignored until eventually
+> someone notices and closes the request. QEMU has had about 90 prs opened
+> over the years.
 >=20
-> > +
-> > +        /* Use zero clusters as much as we can */
-> > +        ret =3D qcow2_cluster_zeroize(bs, zero_start, zero_end - zero_=
-start, 0);
+>   https://github.com/qemu/qemu/pulls
 >=20
-> and then requests that the extra be zeroed.  Does that always work, even
-> when it results in pdrv_co_pwrite_zeroes beyond the end of s->data_file?
-
-You mean the data_file_is_raw() path in qcow2_cluster_zeroize()? It's
-currently not a code path that is run because we only set
-BDRV_REQ_ZERO_WRITE for truncate if the image has a backing file, and
-data_file_is_raw() doesn't work with backing files.
-
-But hypothetically, if someone called truncate with BDRV_REQ_ZERO_WRITE
-for such a file, I think it would fail.
-
-> If so,
+> The same applies to the issue tracker, but fortunately github lets
+> projects disable this feature, which QEMU has done.
 >=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> I have recently discovered that there is a nice 3rd party bot for github
+> which can autorespond to pull requests with a friendly comment, close the
+> request, and then lock it to prevent further comments.
 >=20
-> otherwise, you may have to treat the tail specially, the same way you
-> treated an unaligned head.
+>   https://github.com/apps/repo-lockdown
+>=20
+> I'm setting this up for libvirt and it was suggested QEMU can probably
+> benefit from it too as an example see:
+>=20
+>   https://github.com/libvirt/test/issues/2
+>   https://github.com/libvirt/test/pull/3
+>=20
+>=20
+> Configuration just requires creation of a ".github/lockdown.yml" file
+> which provides the friendly message to add to the merge requests. This
+> can be either done per-repository, or a special repo can be created
+> called ".github" and this will apply to all repos within the project.
+>=20
+> Ideally each repo would have a CONTRIBUTING.md file created too, since
+> both GitHub and GitLab will direct users to this file for guidelines
+> on how to contribute.
+>=20
+> I don't have time right now to do this for QEMU, so consider this email
+> a friendly suggestion for some other interested person to do for QEMU...
 
-Actually, do I even need to round the tail?
+Ping Alex and Paolo, who have access to github.com/qemu.
 
-    /* Caller must pass aligned values, except at image end */
-    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
-    assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
-           end_offset =3D=3D bs->total_sectors << BDRV_SECTOR_BITS);
+Stefan
 
-So qcow2_cluster_zeroize() seems to accept the unaligned tail. It would
-still set the zero flag for the partial last cluster and for the
-external data file, bdrv_co_pwrite_zeroes() would have the correct size.
+--Cgrdyab2wu3Akvjd
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Kevin
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6gaj8ACgkQnKSrs4Gr
+c8hscAf/U34LF1LV59hrMbQCRZ8La84yqAPiuMmib1QorOKN/kowaCxjkyArEXjp
+InQxbL1Y36tiHm5INqoOfVlggowDwYm0376+kjeVoVmSgiVv+iKqymNa2pNxfsLG
++RC5xXPrBRHcS+KQKNOaMY4pC4yl2NaltjNN4qYrzhFhkAngLja16MS5DOwe7XGv
+FNEGCQveTRcx8xkdMd4eN5Sb3TOe98rpcpya7PkOfHtjm5uEgjSrhitkxqOfAHJS
+v+36/SKh7i7Yl42CpwCAa9oQWhpBo42Ti4GWDIzs6p659h95rfiRnfbAlVQfSZdb
+wjqTpS29+39YrSzYmtXv72SzsU4QEA==
+=nwkP
+-----END PGP SIGNATURE-----
+
+--Cgrdyab2wu3Akvjd--
 
