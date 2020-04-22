@@ -2,87 +2,94 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B4DC5518E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:19:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4C15C54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:20:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAFB7214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:19:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 995E620776
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:20:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TP+txR+g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAFB7214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A35fbFmG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 995E620776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRI5o-00009w-PI
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:19:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59544)
+	id 1jRI72-000206-O4
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:20:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60100)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1jRI4R-000770-GO
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:17:56 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jRI5T-0000CW-Rm
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:19:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1jRI4K-0006On-1v
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:17:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59586
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jRI4J-0006Cs-GH
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:17:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587572266;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mKtwDxPfL3e/6bu1rhr1RdOYmK5oQKqr3TvbbqSUpuY=;
- b=TP+txR+g3/BYRbPOG+SGyc5HyfdS4X6dlOAiuf77D2YzD3hJLWtB58cgAFi8Vy9dDGTgEy
- 5c7eEmrPtUGtHzdIGKhUaHyN9W/F50RkFihtTLMkQT1vXbW1PQs6OgH3pRVHRTSIL6brPd
- 97IhdJd52k8MqrX+CciZ6eaIpRtTQtg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-LO_cKapDNuW1FJ6ifKS1pg-1; Wed, 22 Apr 2020 12:17:44 -0400
-X-MC-Unique: LO_cKapDNuW1FJ6ifKS1pg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6A33107ACC4;
- Wed, 22 Apr 2020 16:17:43 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-154.ams2.redhat.com
- [10.36.113.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0577D1010403;
- Wed, 22 Apr 2020 16:17:35 +0000 (UTC)
-Subject: Re: [PATCH 1/5] Revert "hw/display/ramfb: initialize fw-config space
- with xres/ yres"
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20200422100211.30614-1-kraxel@redhat.com>
- <20200422100211.30614-2-kraxel@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <633bb8fd-a19e-7c72-76c0-da8c27f4d8da@redhat.com>
-Date: Wed, 22 Apr 2020 18:17:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <alex.bennee@linaro.org>) id 1jRI5S-00057o-TC
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:18:59 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43726)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jRI5S-0004qV-Ej
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:18:58 -0400
+Received: by mail-wr1-x444.google.com with SMTP id i10so3110377wrv.10
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 09:18:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=hpgsEjy9MMe1+3vn6+bFysJu3O8VbUl3PxUk99MjPis=;
+ b=A35fbFmGdEec21EWyCrihDNfQVrCB4bW5dbm/HFw1nCe0xB9ZUNwAB8uTj33z2DPbD
+ bAElOSK1X/oiluKFTgFp65KvtSiputIxHdN/iwocs2hYTmaC2aRC8/OFAzlqCJxUE7jI
+ qDWnmtDpy6JKBDnNEaX+IOeQnje7gaEJR28SUgn1J4lPm75+/Fa68K5UxBDDC4Y8V/Lb
+ VNX7+U4V1brbEdsJTeApvQhTYEIOznEsa1YrJ/qTiTY0BODoVSS3o7yhIQ/e1NwLweBY
+ rQaZ+PfoyvQSpQ/UkP72PkIxnQfQdPcQQ/bqRr2K+hY95ULUK2cScqojH5mMJoONA2sZ
+ HE+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=hpgsEjy9MMe1+3vn6+bFysJu3O8VbUl3PxUk99MjPis=;
+ b=jLwKMKxfd3YhuPEJelEyIHr4geuMY1app9+fzTo9gKCLDF1dSUuG9bcYLjv8LDELQB
+ V0o9Y5P95aPvCY9+IYiKPDxEdAIs6+9IQATqeJ7VK6qzVLRDtobLe7+HIvfOwI6O/Sod
+ jJRsj/eN1T9IPM+/SvU8ocK7Oe5zkEt9gafzvxTRr9ev/n+hAaYC7d1CDB/HmS08f9o4
+ XDZq6q8jHkytZIi68EgChESlv7e0cIMuqcJfUXAbypinzd0x3VhkTfk/WfaY++CTUJHt
+ ozi0x7dfH2MYHg7YiGrvh6UvVRrON5k+MTH88xOWWk3WpuM9HDtX7o1S1N9y+st9ql7x
+ T67w==
+X-Gm-Message-State: AGi0Pua8tie4Rm0SePPkvQIWJtN+zX6Vs6EhnZgWbustrHtfN+v11P9F
+ c7ZJ019Cr1TEw4+ZtW6L+sKIQI5binY=
+X-Google-Smtp-Source: APiQypIfEtIae3DrcGRWcpuPA1o5XJdPJacC3GE7HwqV2C00aNR6Y1jai+vy7q13KBxJky45k9ZcFQ==
+X-Received: by 2002:a5d:4246:: with SMTP id s6mr30804148wrr.421.1587572336743; 
+ Wed, 22 Apr 2020 09:18:56 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j4sm8919469wrm.85.2020.04.22.09.18.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 22 Apr 2020 09:18:55 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C64661FF7E;
+ Wed, 22 Apr 2020 17:18:54 +0100 (BST)
+References: <20200422011722.13287-1-richard.henderson@linaro.org>
+ <20200422011722.13287-14-richard.henderson@linaro.org>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2 13/36] tcg: Use tcg_constant_{i32,i64} with tcg int
+ expanders
+In-reply-to: <20200422011722.13287-14-richard.henderson@linaro.org>
+Date: Wed, 22 Apr 2020 17:18:54 +0100
+Message-ID: <87k127cx3l.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200422100211.30614-2-kraxel@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=lersek@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 09:07:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,176 +101,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>, hqm03ster@gmail.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/22/20 12:02, Gerd Hoffmann wrote:
-> This reverts commit f79081b4b71b72640bedd40a7cd76f864c8287f1.
-> 
-> Patch has broken byteorder handling: RAMFBCfg fields are in bigendian
-> byteorder, the reset function doesn't care so native byteorder is used
-> instead.  Given this went unnoticed so far the feature is obviously
-> unused, so just revert the patch.
-> 
-> Cc: Hou Qiming <hqm03ster@gmail.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  include/hw/display/ramfb.h    |  2 +-
->  hw/display/ramfb-standalone.c | 12 +-----------
->  hw/display/ramfb.c            | 16 +---------------
->  hw/vfio/display.c             |  4 ++--
->  stubs/ramfb.c                 |  2 +-
->  5 files changed, 6 insertions(+), 30 deletions(-)
-
-Acked-by: Laszlo Ersek <lersek@redhat.com>
-
-
-> diff --git a/include/hw/display/ramfb.h b/include/hw/display/ramfb.h
-> index f6c2de93b222..b33a2c467b28 100644
-> --- a/include/hw/display/ramfb.h
-> +++ b/include/hw/display/ramfb.h
-> @@ -4,7 +4,7 @@
->  /* ramfb.c */
->  typedef struct RAMFBState RAMFBState;
->  void ramfb_display_update(QemuConsole *con, RAMFBState *s);
-> -RAMFBState *ramfb_setup(DeviceState *dev, Error **errp);
-> +RAMFBState *ramfb_setup(Error **errp);
->  
->  /* ramfb-standalone.c */
->  #define TYPE_RAMFB_DEVICE "ramfb"
-> diff --git a/hw/display/ramfb-standalone.c b/hw/display/ramfb-standalone.c
-> index d76a9d0fe2c9..b18db97eeb1b 100644
-> --- a/hw/display/ramfb-standalone.c
-> +++ b/hw/display/ramfb-standalone.c
-> @@ -3,7 +3,6 @@
->  #include "qemu/module.h"
->  #include "hw/loader.h"
->  #include "hw/qdev-properties.h"
-> -#include "hw/isa/isa.h"
->  #include "hw/display/ramfb.h"
->  #include "ui/console.h"
->  
-> @@ -13,8 +12,6 @@ typedef struct RAMFBStandaloneState {
->      SysBusDevice parent_obj;
->      QemuConsole *con;
->      RAMFBState *state;
-> -    uint32_t xres;
-> -    uint32_t yres;
->  } RAMFBStandaloneState;
->  
->  static void display_update_wrapper(void *dev)
-> @@ -37,22 +34,15 @@ static void ramfb_realizefn(DeviceState *dev, Error **errp)
->      RAMFBStandaloneState *ramfb = RAMFB(dev);
->  
->      ramfb->con = graphic_console_init(dev, 0, &wrapper_ops, dev);
-> -    ramfb->state = ramfb_setup(dev, errp);
-> +    ramfb->state = ramfb_setup(errp);
->  }
->  
-> -static Property ramfb_properties[] = {
-> -    DEFINE_PROP_UINT32("xres", RAMFBStandaloneState, xres, 0),
-> -    DEFINE_PROP_UINT32("yres", RAMFBStandaloneState, yres, 0),
-> -    DEFINE_PROP_END_OF_LIST(),
-> -};
-> -
->  static void ramfb_class_initfn(ObjectClass *klass, void *data)
+>  include/tcg/tcg-op.h |  13 +--
+>  tcg/tcg-op.c         | 216 ++++++++++++++++++++-----------------------
+>  2 files changed, 100 insertions(+), 129 deletions(-)
+>
+> diff --git a/include/tcg/tcg-op.h b/include/tcg/tcg-op.h
+> index 230db6e022..11ed9192f7 100644
+> --- a/include/tcg/tcg-op.h
+> +++ b/include/tcg/tcg-op.h
+<snip>
+> @@ -1468,12 +1441,17 @@ void tcg_gen_brcond_i64(TCGCond cond, TCGv_i64 ar=
+g1, TCGv_i64 arg2, TCGLabel *l)
+>=20=20
+>  void tcg_gen_brcondi_i64(TCGCond cond, TCGv_i64 arg1, int64_t arg2, TCGL=
+abel *l)
 >  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
->  
->      set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
->      dc->realize = ramfb_realizefn;
-> -    device_class_set_props(dc, ramfb_properties);
->      dc->desc = "ram framebuffer standalone device";
->      dc->user_creatable = true;
->  }
-> diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
-> index 7ba07c80f6e1..bd4746dc1768 100644
-> --- a/hw/display/ramfb.c
-> +++ b/hw/display/ramfb.c
-> @@ -13,7 +13,6 @@
->  
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
-> -#include "qemu/option.h"
->  #include "hw/loader.h"
->  #include "hw/display/ramfb.h"
->  #include "ui/console.h"
-> @@ -31,7 +30,6 @@ struct QEMU_PACKED RAMFBCfg {
->  struct RAMFBState {
->      DisplaySurface *ds;
->      uint32_t width, height;
-> -    uint32_t starting_width, starting_height;
->      struct RAMFBCfg cfg;
->      bool locked;
->  };
-> @@ -117,11 +115,9 @@ static void ramfb_reset(void *opaque)
->      RAMFBState *s = (RAMFBState *)opaque;
->      s->locked = false;
->      memset(&s->cfg, 0, sizeof(s->cfg));
-> -    s->cfg.width = s->starting_width;
-> -    s->cfg.height = s->starting_height;
->  }
->  
-> -RAMFBState *ramfb_setup(DeviceState* dev, Error **errp)
-> +RAMFBState *ramfb_setup(Error **errp)
->  {
->      FWCfgState *fw_cfg = fw_cfg_find();
->      RAMFBState *s;
-> @@ -133,16 +129,6 @@ RAMFBState *ramfb_setup(DeviceState* dev, Error **errp)
->  
->      s = g_new0(RAMFBState, 1);
->  
-> -    const char *s_fb_width = qemu_opt_get(dev->opts, "xres");
-> -    const char *s_fb_height = qemu_opt_get(dev->opts, "yres");
-> -    if (s_fb_width) {
-> -        s->cfg.width = atoi(s_fb_width);
-> -        s->starting_width = s->cfg.width;
-> -    }
-> -    if (s_fb_height) {
-> -        s->cfg.height = atoi(s_fb_height);
-> -        s->starting_height = s->cfg.height;
-> -    }
->      s->locked = false;
->  
->      rom_add_vga("vgabios-ramfb.bin");
-> diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-> index f4977c66e1b5..a57a22674d62 100644
-> --- a/hw/vfio/display.c
-> +++ b/hw/vfio/display.c
-> @@ -353,7 +353,7 @@ static int vfio_display_dmabuf_init(VFIOPCIDevice *vdev, Error **errp)
->                                            &vfio_display_dmabuf_ops,
->                                            vdev);
->      if (vdev->enable_ramfb) {
-> -        vdev->dpy->ramfb = ramfb_setup(DEVICE(vdev), errp);
-> +        vdev->dpy->ramfb = ramfb_setup(errp);
+> -    if (cond =3D=3D TCG_COND_ALWAYS) {
+> +    if (TCG_TARGET_REG_BITS =3D=3D 64) {
+> +        tcg_gen_brcond_i64(cond, arg1, tcg_constant_i64(arg2), l);
+> +    } else if (cond =3D=3D TCG_COND_ALWAYS) {
+>          tcg_gen_br(l);
+>      } else if (cond !=3D TCG_COND_NEVER) {
+> -        TCGv_i64 t0 =3D tcg_const_i64(arg2);
+> -        tcg_gen_brcond_i64(cond, arg1, t0, l);
+> -        tcg_temp_free_i64(t0);
+> +        l->refs++;
+
+Hmm is this a separate fix?
+
+> +        tcg_gen_op6ii_i32(INDEX_op_brcond2_i32,
+> +                          TCGV_LOW(arg1), TCGV_HIGH(arg1),
+> +                          tcg_constant_i32(arg2),
+> +                          tcg_constant_i32(arg2 >> 32),
+> +                          cond, label_arg(l));
 >      }
->      vfio_display_edid_init(vdev);
->      return 0;
-> @@ -479,7 +479,7 @@ static int vfio_display_region_init(VFIOPCIDevice *vdev, Error **errp)
->                                            &vfio_display_region_ops,
->                                            vdev);
->      if (vdev->enable_ramfb) {
-> -        vdev->dpy->ramfb = ramfb_setup(DEVICE(vdev), errp);
-> +        vdev->dpy->ramfb = ramfb_setup(errp);
->      }
->      return 0;
 >  }
-> diff --git a/stubs/ramfb.c b/stubs/ramfb.c
-> index 0799093a5d6e..48143f33542f 100644
-> --- a/stubs/ramfb.c
-> +++ b/stubs/ramfb.c
-> @@ -6,7 +6,7 @@ void ramfb_display_update(QemuConsole *con, RAMFBState *s)
->  {
->  }
->  
-> -RAMFBState *ramfb_setup(DeviceState* dev, Error **errp)
-> +RAMFBState *ramfb_setup(Error **errp)
->  {
->      error_setg(errp, "ramfb support not available");
->      return NULL;
-> 
+<snip>
 
+otherwise lgtm:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
 
