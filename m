@@ -2,102 +2,83 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC60C55189
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 08:10:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 286ACC55189
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 08:15:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D847D2071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 08:10:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D8945206E9
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 08:15:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iUJ1t4dN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D847D2071E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KgQV9sbj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8945206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRAT3-0004ai-1V
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 04:10:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48020)
+	id 1jRAY1-0007n0-1g
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 04:15:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRAS2-0003v0-PU
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 04:09:47 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1jRAXB-000725-3I
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 04:15:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRAS0-0004nh-He
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 04:09:46 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38521
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mlevitsk@redhat.com>) id 1jRAXA-0001d9-Dw
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 04:15:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59434
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRARz-0004gP-Vq
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 04:09:44 -0400
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jRAXA-0001cl-0r
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 04:15:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587542982;
+ s=mimecast20190719; t=1587543303;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LCTZ8XfKc2zjU6sSZpZ6JoYtMDaGXNJZO4v0NqUWau0=;
- b=iUJ1t4dNlsyrTqJNbXdKqxBAdxs3LfCShbzyHOqpP6O3WVdyNXiYG51N23bcoAxgozEulj
- 3LZLD+atPd71JKG65UWDdC7BZcfOtcmGvF40yGCkTa5wKyu85ZC3AwaCQrN6xABFbB/jQ7
- BJspTaqt06X5fm6oB8XRntt/w3HkAJk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-bds4lQ74OVyfG4YpIVRHCw-1; Wed, 22 Apr 2020 04:09:40 -0400
-X-MC-Unique: bds4lQ74OVyfG4YpIVRHCw-1
-Received: by mail-wr1-f71.google.com with SMTP id d17so659007wrr.17
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 01:09:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=LCTZ8XfKc2zjU6sSZpZ6JoYtMDaGXNJZO4v0NqUWau0=;
- b=RhfJNzfcVtID/mEAVcYpQINR8Uwx03dQxhxNJi6c6DCrUxeolWkeZtv9KPEglJCkzU
- ROMB/F6FJzsQR+nb4g61AX61nMt39AOYHGtbSjYjeRr9M/UN4wWl5lv1OVYg1Q1/NWhz
- jVieVv/EcYS0xzTXqPRzuDnW5qdCSQ2KzyOX48e2lIwjZcX/Z3s9b35BdCOgZYtXm+3w
- NW8sfFVN6RXZYXIVchTJYbkmsQXGawTR57bJzPbU9+cnFfuyehRc6vLW8/xqUJhImrde
- uZVvsW7wnoTc7Sz5vH0X9nh/SKSzzDpuYnOEElN4YUbYAPEZ0fXwX13rKZY1jEHLR3du
- rURw==
-X-Gm-Message-State: AGi0PubARN4SG/cVah2SeYTD1UJES75t4bcD2S4bfWOj+BBEDLSMH0Ee
- iQvjrX9IZoaP2EV6AzQ3VL3miUNLDOSHmMs87dIS0RWyGnKVMD3VRyUoIuKIiz/6NiqCokTTpUa
- lBn+X5s2FXLesrp8=
-X-Received: by 2002:a7b:c850:: with SMTP id c16mr8698616wml.108.1587542979679; 
- Wed, 22 Apr 2020 01:09:39 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLff8F0nq6sHBNttG3xuSP/Q4A3Q6khEeqON/+MyoEB7d1j7znjQiK3Yk5S8YZ92nzndXTyRw==
-X-Received: by 2002:a7b:c850:: with SMTP id c16mr8698583wml.108.1587542979342; 
- Wed, 22 Apr 2020 01:09:39 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id b85sm7006961wmb.21.2020.04.22.01.09.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 22 Apr 2020 01:09:38 -0700 (PDT)
-Subject: Re: [PATCH v3 15/16] nvme: factor out cmb/pmr setup
+ bh=lWcM1ow2dX6ki0Rv6xcCnvEZMOlZrvG9yZGohyLkcHw=;
+ b=KgQV9sbjGf2JEKuN51ioUzifIorMXrD8i5PKWe1Psau51lGgLpuQPbH3yBCXvEazz27iZT
+ uE8lm6gfatS1YlCAV0yzQXq55oWivRmZsyu7KBteWNjerSpldJLDA/2iswGpyayFYZcE9o
+ EyaM6hhUQRB3+bPbH2lhSN5MsBohB5o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-458-RzeaYFr8Nq-EYDVWkR_XaQ-1; Wed, 22 Apr 2020 04:14:59 -0400
+X-MC-Unique: RzeaYFr8Nq-EYDVWkR_XaQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBF57800D53;
+ Wed, 22 Apr 2020 08:14:57 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.218])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5F069B3A76;
+ Wed, 22 Apr 2020 08:14:55 +0000 (UTC)
+Message-ID: <47310be83a83e4cf97a996b9d98990e908327e3c.camel@redhat.com>
+Subject: Re: [PATCH v3 04/16] nvme: move device parameters to separate struct
+From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
+Date: Wed, 22 Apr 2020 11:14:54 +0300
+In-Reply-To: <20200422070927.373048-5-its@irrelevant.dk>
 References: <20200422070927.373048-1-its@irrelevant.dk>
- <20200422070927.373048-16-its@irrelevant.dk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b07e9238-40a5-e806-5523-74b084ee198a@redhat.com>
-Date: Wed, 22 Apr 2020 10:09:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200422070927.373048-16-its@irrelevant.dk>
-Content-Language: en-US
+ <20200422070927.373048-5-its@irrelevant.dk>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:12:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 04:15:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,56 +94,244 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
  Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
  Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
  Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+ Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/22/20 9:09 AM, Klaus Jensen wrote:
+On Wed, 2020-04-22 at 09:09 +0200, Klaus Jensen wrote:
 > From: Klaus Jensen <k.jensen@samsung.com>
 > 
+> Move device configuration parameters to separate struct to make it
+> explicit what is configurable and what is set internally.
+> 
+> Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
 > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 > ---
->   hw/block/nvme.c | 146 ++++++++++++++++++++++++++----------------------
->   1 file changed, 79 insertions(+), 67 deletions(-)
+>  hw/block/nvme.c | 49 ++++++++++++++++++++++++-------------------------
+>  hw/block/nvme.h | 18 +++++++++++++++---
+>  2 files changed, 39 insertions(+), 28 deletions(-)
 > 
 > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 5dddb97a7394..bc4f6b20045b 100644
+> index f67499d85f3a..382275e466fe 100644
 > --- a/hw/block/nvme.c
 > +++ b/hw/block/nvme.c
-> @@ -57,6 +57,7 @@
->   
->   #define NVME_REG_SIZE 0x1000
->   #define NVME_DB_SIZE  4
-> +#define NVME_CMB_BIR 2
->   
->   #define NVME_GUEST_ERR(trace, fmt, ...) \
->       do { \
-> @@ -1436,6 +1437,78 @@ static void nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
->       id_ns->nuse = id_ns->ncap;
->   }
-[...]
->   static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
->   {
->       uint8_t *pci_conf = pci_dev->config;
-> @@ -1450,6 +1523,12 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
->       pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
->                        PCI_BASE_ADDRESS_MEM_TYPE_64, &n->iomem);
->       msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL);
-> +
+> @@ -78,12 +78,12 @@ static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
+>  
+>  static int nvme_check_sqid(NvmeCtrl *n, uint16_t sqid)
+>  {
+> -    return sqid < n->num_queues && n->sq[sqid] != NULL ? 0 : -1;
+> +    return sqid < n->params.num_queues && n->sq[sqid] != NULL ? 0 : -1;
+>  }
+>  
+>  static int nvme_check_cqid(NvmeCtrl *n, uint16_t cqid)
+>  {
+> -    return cqid < n->num_queues && n->cq[cqid] != NULL ? 0 : -1;
+> +    return cqid < n->params.num_queues && n->cq[cqid] != NULL ? 0 : -1;
+>  }
+>  
+>  static void nvme_inc_cq_tail(NvmeCQueue *cq)
+> @@ -645,7 +645,7 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeCmd *cmd)
+>          trace_pci_nvme_err_invalid_create_cq_addr(prp1);
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+> -    if (unlikely(vector > n->num_queues)) {
+> +    if (unlikely(vector > n->params.num_queues)) {
+>          trace_pci_nvme_err_invalid_create_cq_vector(vector);
+>          return NVME_INVALID_IRQ_VECTOR | NVME_DNR;
+>      }
+> @@ -797,7 +797,8 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          trace_pci_nvme_getfeat_vwcache(result ? "enabled" : "disabled");
+>          break;
+>      case NVME_NUMBER_OF_QUEUES:
+> -        result = cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16));
+> +        result = cpu_to_le32((n->params.num_queues - 2) |
+> +                             ((n->params.num_queues - 2) << 16));
+>          trace_pci_nvme_getfeat_numq(result);
+>          break;
+>      case NVME_TIMESTAMP:
+> @@ -841,9 +842,10 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>      case NVME_NUMBER_OF_QUEUES:
+>          trace_pci_nvme_setfeat_numq((dw11 & 0xFFFF) + 1,
+>                                      ((dw11 >> 16) & 0xFFFF) + 1,
+> -                                    n->num_queues - 1, n->num_queues - 1);
+> -        req->cqe.result =
+> -            cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16));
+> +                                    n->params.num_queues - 1,
+> +                                    n->params.num_queues - 1);
+> +        req->cqe.result = cpu_to_le32((n->params.num_queues - 2) |
+> +                                      ((n->params.num_queues - 2) << 16));
+>          break;
+>      case NVME_TIMESTAMP:
+>          return nvme_set_feature_timestamp(n, cmd);
+> @@ -914,12 +916,12 @@ static void nvme_clear_ctrl(NvmeCtrl *n)
+>  
+>      blk_drain(n->conf.blk);
+>  
+> -    for (i = 0; i < n->num_queues; i++) {
+> +    for (i = 0; i < n->params.num_queues; i++) {
+>          if (n->sq[i] != NULL) {
+>              nvme_free_sq(n->sq[i], n);
+>          }
+>      }
+> -    for (i = 0; i < n->num_queues; i++) {
+> +    for (i = 0; i < n->params.num_queues; i++) {
+>          if (n->cq[i] != NULL) {
+>              nvme_free_cq(n->cq[i], n);
+>          }
+> @@ -1350,7 +1352,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>      int64_t bs_size;
+>      uint8_t *pci_conf;
+>  
+> -    if (!n->num_queues) {
+> +    if (!n->params.num_queues) {
+>          error_setg(errp, "num_queues can't be zero");
+>          return;
+>      }
+> @@ -1366,12 +1368,12 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>          return;
+>      }
+>  
+> -    if (!n->serial) {
+> +    if (!n->params.serial) {
+>          error_setg(errp, "serial property not set");
+>          return;
+>      }
+>  
+> -    if (!n->cmb_size_mb && n->pmrdev) {
+> +    if (!n->params.cmb_size_mb && n->pmrdev) {
+>          if (host_memory_backend_is_mapped(n->pmrdev)) {
+>              char *path = object_get_canonical_path_component(OBJECT(n->pmrdev));
+>              error_setg(errp, "can't use already busy memdev: %s", path);
+> @@ -1402,25 +1404,26 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>      n->num_namespaces = 1;
+>  
+>      /* num_queues is really number of pairs, so each has two doorbells */
+> -    n->reg_size = pow2ceil(NVME_REG_SIZE + 2 * n->num_queues * NVME_DB_SIZE);
+> +    n->reg_size = pow2ceil(NVME_REG_SIZE +
+> +                           2 * n->params.num_queues * NVME_DB_SIZE);
+>      n->ns_size = bs_size / (uint64_t)n->num_namespaces;
+>  
+>      n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
+> -    n->sq = g_new0(NvmeSQueue *, n->num_queues);
+> -    n->cq = g_new0(NvmeCQueue *, n->num_queues);
+> +    n->sq = g_new0(NvmeSQueue *, n->params.num_queues);
+> +    n->cq = g_new0(NvmeCQueue *, n->params.num_queues);
+>  
+>      memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
+>                            "nvme", n->reg_size);
+>      pci_register_bar(pci_dev, 0,
+>          PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
+>          &n->iomem);
+> -    msix_init_exclusive_bar(pci_dev, n->num_queues, 4, NULL);
+> +    msix_init_exclusive_bar(pci_dev, n->params.num_queues, 4, NULL);
+>  
+>      id->vid = cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
+>      id->ssvid = cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VENDOR_ID));
+>      strpadcpy((char *)id->mn, sizeof(id->mn), "QEMU NVMe Ctrl", ' ');
+>      strpadcpy((char *)id->fr, sizeof(id->fr), "1.0", ' ');
+> -    strpadcpy((char *)id->sn, sizeof(id->sn), n->serial, ' ');
+> +    strpadcpy((char *)id->sn, sizeof(id->sn), n->params.serial, ' ');
+>      id->rab = 6;
+>      id->ieee[0] = 0x00;
+>      id->ieee[1] = 0x02;
+> @@ -1449,7 +1452,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>      n->bar.vs = 0x00010200;
+>      n->bar.intmc = n->bar.intms = 0;
+>  
+> -    if (n->cmb_size_mb) {
 > +    if (n->params.cmb_size_mb) {
-> +        nvme_init_cmb(n, pci_dev);
-> +    } else if (n->pmrdev) {
-> +        nvme_init_pmr(n, pci_dev);
+>  
+>          NVME_CMBLOC_SET_BIR(n->bar.cmbloc, 2);
+>          NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
+> @@ -1460,7 +1463,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>          NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
+>          NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
+>          NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
+> -        NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->cmb_size_mb);
+> +        NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
+>  
+>          n->cmbloc = n->bar.cmbloc;
+>          n->cmbsz = n->bar.cmbsz;
+> @@ -1544,7 +1547,7 @@ static void nvme_exit(PCIDevice *pci_dev)
+>      g_free(n->cq);
+>      g_free(n->sq);
+>  
+> -    if (n->cmb_size_mb) {
+> +    if (n->params.cmb_size_mb) {
+>          g_free(n->cmbuf);
+>      }
+>  
+> @@ -1556,11 +1559,7 @@ static void nvme_exit(PCIDevice *pci_dev)
+>  
+>  static Property nvme_props[] = {
+>      DEFINE_BLOCK_PROPERTIES(NvmeCtrl, conf),
+> -    DEFINE_PROP_LINK("pmrdev", NvmeCtrl, pmrdev, TYPE_MEMORY_BACKEND,
+> -                     HostMemoryBackend *),
+> -    DEFINE_PROP_STRING("serial", NvmeCtrl, serial),
+> -    DEFINE_PROP_UINT32("cmb_size_mb", NvmeCtrl, cmb_size_mb, 0),
+> -    DEFINE_PROP_UINT32("num_queues", NvmeCtrl, num_queues, 64),
+> +    DEFINE_NVME_PROPERTIES(NvmeCtrl, params),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index 6520a9f0bead..7cb1d5e31870 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -1,7 +1,21 @@
+>  #ifndef HW_NVME_H
+>  #define HW_NVME_H
+> +
+>  #include "block/nvme.h"
+>  
+> +#define DEFINE_NVME_PROPERTIES(_state, _props) \
+> +    DEFINE_PROP_STRING("serial", _state, _props.serial), \
+> +    DEFINE_PROP_UINT32("cmb_size_mb", _state, _props.cmb_size_mb, 0), \
+> +    DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 64), \
+> +    DEFINE_PROP_LINK("pmrdev", _state, pmrdev, TYPE_MEMORY_BACKEND, \
+> +                     HostMemoryBackend *)
+> +
+> +typedef struct NvmeParams {
+> +    char     *serial;
+> +    uint32_t num_queues;
+> +    uint32_t cmb_size_mb;
+> +} NvmeParams;
+> +
+>  typedef struct NvmeAsyncEvent {
+>      QSIMPLEQ_ENTRY(NvmeAsyncEvent) entry;
+>      NvmeAerResult result;
+> @@ -63,6 +77,7 @@ typedef struct NvmeCtrl {
+>      MemoryRegion ctrl_mem;
+>      NvmeBar      bar;
+>      BlockConf    conf;
+> +    NvmeParams   params;
+>  
+>      uint32_t    page_size;
+>      uint16_t    page_bits;
+> @@ -71,10 +86,8 @@ typedef struct NvmeCtrl {
+>      uint16_t    sqe_size;
+>      uint32_t    reg_size;
+>      uint32_t    num_namespaces;
+> -    uint32_t    num_queues;
+>      uint32_t    max_q_ents;
+>      uint64_t    ns_size;
+> -    uint32_t    cmb_size_mb;
+>      uint32_t    cmbsz;
+>      uint32_t    cmbloc;
+>      uint8_t     *cmbuf;
+> @@ -82,7 +95,6 @@ typedef struct NvmeCtrl {
+>      uint64_t    host_timestamp;                 /* Timestamp sent by the host */
+>      uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
+>  
+> -    char            *serial;
+>      HostMemoryBackend *pmrdev;
+>  
+>      NvmeNamespace   *namespaces;
+Looks OK.
 
-Why not splitting this in 2 trivial patches? The easiest a patch is to 
-review, the less likely bug can be missed. Here I'm scrolling over 2 
-different blocks so to feel confident I'm not missing something I'd have 
-to manually edit and re-do your patch.
-
-> +    }
->   }
->   
-[...]
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Best regards,
+	Maxim Levitsky
 
 
