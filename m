@@ -2,102 +2,78 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB6FC5518A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 10:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE5FC5518A
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 10:33:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 562BD20781
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 10:27:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF0152075A
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 10:33:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QTK7vaBr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 562BD20781
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RFqjCGfu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF0152075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRCbe-0000eD-IG
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 06:27:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55380)
+	id 1jRChQ-0003Ip-1C
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 06:33:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57946)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRCad-0008PM-1B
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 06:26:47 -0400
+ (envelope-from <mprivozn@redhat.com>) id 1jRCg8-0001wj-8b
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 06:32:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRCac-0001dq-4v
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 06:26:46 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44266
+ (envelope-from <mprivozn@redhat.com>) id 1jRCg5-0001zQ-F7
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 06:32:27 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34825
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRCab-0001Wk-Ny
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 06:26:45 -0400
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1jRCg3-0001lb-VI
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 06:32:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587551204;
+ s=mimecast20190719; t=1587551542;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Vu4GZGPqpWaVXTxSTo+lfJSeFZFnJF3Y9FIwDSRzpwk=;
- b=QTK7vaBrukEmnimHMNcU6rKGgIeqM5X76uR6bK1zL8TvBnOtMa225ikTLNmTWc9N2uYU+m
- 2fvDGif+FYPzr6ZpRJU4W7qNMwZb/+HaeqlpENpDlEDkHVmQt76cIiBgnM9t4Prh2nGL66
- GTAX6TIJe902SYfsXGN2pKB/nEZ5vn8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65--mEeEXWvPNeU97DNtTIdbg-1; Wed, 22 Apr 2020 06:26:42 -0400
-X-MC-Unique: -mEeEXWvPNeU97DNtTIdbg-1
-Received: by mail-wr1-f72.google.com with SMTP id q10so822594wrv.10
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 03:26:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Wp+lKFgC006ZVm8r4AYLF2fJZc45QuAbKLEBEcG3USI=;
- b=T8no9lGDUaiwHnm/YP5WaIiAJNA52tQ0UKIZfTGTEuYxnwyUEVSqyH1soNK3/F2W+z
- VCuwQTXL0MStvD3UHWZrcHyTFs4I/u4pNkTXNSnnekKNCR685eSY3SbXAtb4CpLkDM1N
- PqSfHslHOW3S6YzZfpnw01xXcGisqyWNALZYJwqR+Gs0AJl3XuQJy4QttfXIQHVAL1PD
- zxg941rBUXey9iL43vU/HIBz6E7wzLERxIfXslILQRb7FG2FSjuBx0aQgVX1lVA4bjq9
- b5buigvGW2nxtmiBVVKfWtJHQpyX79zzoV81OBz/VVkTpsaj//QkLA1R+3CrZfeEZs6k
- 2vWA==
-X-Gm-Message-State: AGi0Pubvqn9fHRQAQG4VjH/DnlZR4qWhxSLfxXI+Zvdab3wqtmqqZV0i
- aWTwvunFjMtBTlQOzUmAlh+ImDuYUozq5RgtSBI2RKMARtJCVN2fueoCrW56G8xva7KoXqv98VM
- r32zmWS3Lq9cad+w=
-X-Received: by 2002:a1c:9c0a:: with SMTP id f10mr9801501wme.139.1587551201598; 
- Wed, 22 Apr 2020 03:26:41 -0700 (PDT)
-X-Google-Smtp-Source: APiQypICUGiSzIP8nb6GBh2ks4XA7flGckzQaJZ9GJikW/vrXW0aFMfKfPAb7sH7UXDKRfUBHj0wOQ==
-X-Received: by 2002:a1c:9c0a:: with SMTP id f10mr9801471wme.139.1587551201209; 
- Wed, 22 Apr 2020 03:26:41 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id 5sm6793423wmg.34.2020.04.22.03.26.40
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 22 Apr 2020 03:26:40 -0700 (PDT)
-Subject: Re: [PATCH 5/5] ramfb: drop leftover debug message
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20200422100211.30614-1-kraxel@redhat.com>
- <20200422100211.30614-6-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9cd1b1be-7caf-c41c-c143-c1cc0855a062@redhat.com>
-Date: Wed, 22 Apr 2020 12:26:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ content-transfer-encoding:content-transfer-encoding;
+ bh=EA5m1e8tPUQV/7F5915rUPgFXLJ1efSqTe2C2O/TVPM=;
+ b=RFqjCGfu8sWkg5i4ocv/3+by8WCp0QV/hl8AK3lQ73R20prtXpGyUMdCDLV3NqH/rO6PmL
+ X3FoVud2C2NGMjLpGd1sfT2Ptewxnny/atNt77TnaPF62R+gmJwktUwzRAPxs/J1bnj+Nx
+ bI4PwV7DyY9QXUQU1AcvQQpHaVehRYo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-228-GF2QtEvrM8WItEWny5yjwQ-1; Wed, 22 Apr 2020 06:31:05 -0400
+X-MC-Unique: GF2QtEvrM8WItEWny5yjwQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56A461937FC0;
+ Wed, 22 Apr 2020 10:31:04 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.194.164])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 22E0560BF3;
+ Wed, 22 Apr 2020 10:30:57 +0000 (UTC)
+From: Michal Privoznik <mprivozn@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] vfio-helpers: Free QEMUVFIOState in qemu_vfio_close()
+Date: Wed, 22 Apr 2020 12:30:48 +0200
+Message-Id: <04cb6cb30a49cabd5ff8e6c094c0d13572de9fb1.1587551421.git.mprivozn@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200422100211.30614-6-kraxel@redhat.com>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mprivozn@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:12:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:57:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,38 +85,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>, lersek@redhat.com,
- hqm03ster@gmail.com
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/22/20 12:02 PM, Gerd Hoffmann wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->   hw/display/ramfb.c | 2 --
->   1 file changed, 2 deletions(-)
->=20
-> diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
-> index d1b1cb9bb294..be884c9ea837 100644
-> --- a/hw/display/ramfb.c
-> +++ b/hw/display/ramfb.c
-> @@ -88,8 +88,6 @@ static void ramfb_fw_cfg_write(void *dev, off_t offset,=
- size_t len)
->       addr   =3D be64_to_cpu(s->cfg.addr);
->       format =3D qemu_drm_format_to_pixman(fourcc);
->  =20
-> -    fprintf(stderr, "%s: %dx%d @ 0x%" PRIx64 "\n", __func__,
-> -            s->width, s->height, addr);
->       surface =3D ramfb_create_display_surface(width, height,
->                                              format, stride, addr);
->       if (!surface)
->=20
+The qemu_vfio_open_pci() allocates this QEMUVFIOState structure
+but free counterpart is missing. Since we already have
+qemu_vfio_close() which does cleanup of the state, it looks like
+a perfect place to free the structure too. However, to avoid
+confusing rename the function to make it explicit that the passed
+structure is also freed.
 
-I'd move this before patch #3/5 "ramfb: don't update RAMFBState on=20
-errors". Anyway,
+=3D=3D167296=3D=3D 528 (360 direct, 168 indirect) bytes in 1 blocks are def=
+initely lost in loss record 8,504 of 8,908
+=3D=3D167296=3D=3D    at 0x4837B86: calloc (vg_replace_malloc.c:762)
+=3D=3D167296=3D=3D    by 0x4B8F6A0: g_malloc0 (in /usr/lib64/libglib-2.0.so=
+.0.6000.7)
+=3D=3D167296=3D=3D    by 0xA7F532: qemu_vfio_open_pci (vfio-helpers.c:428)
+=3D=3D167296=3D=3D    by 0x989595: nvme_init (nvme.c:606)
+=3D=3D167296=3D=3D    by 0x989EB0: nvme_file_open (nvme.c:795)
+=3D=3D167296=3D=3D    by 0x8F9D04: bdrv_open_driver (block.c:1466)
+=3D=3D167296=3D=3D    by 0x8FA6E1: bdrv_open_common (block.c:1744)
+=3D=3D167296=3D=3D    by 0x8FDC73: bdrv_open_inherit (block.c:3291)
+=3D=3D167296=3D=3D    by 0x8FE1B5: bdrv_open (block.c:3384)
+=3D=3D167296=3D=3D    by 0x5EE828: bds_tree_init (blockdev.c:663)
+=3D=3D167296=3D=3D    by 0x5F57F8: qmp_blockdev_add (blockdev.c:3746)
+=3D=3D167296=3D=3D    by 0x5666DC: configure_blockdev (vl.c:1047)
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+---
+ block/nvme.c                | 2 +-
+ include/qemu/vfio-helpers.h | 2 +-
+ util/vfio-helpers.c         | 3 ++-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/block/nvme.c b/block/nvme.c
+index 7b7c0cc5d6..7e00c4f1a7 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -766,7 +766,7 @@ static void nvme_close(BlockDriverState *bs)
+                            false, NULL, NULL);
+     event_notifier_cleanup(&s->irq_notifier);
+     qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE)=
+;
+-    qemu_vfio_close(s->vfio);
++    qemu_vfio_close_and_free(s->vfio);
+=20
+     g_free(s->device);
+ }
+diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
+index 1f057c2b9e..c96a0b1963 100644
+--- a/include/qemu/vfio-helpers.h
++++ b/include/qemu/vfio-helpers.h
+@@ -16,7 +16,7 @@
+ typedef struct QEMUVFIOState QEMUVFIOState;
+=20
+ QEMUVFIOState *qemu_vfio_open_pci(const char *device, Error **errp);
+-void qemu_vfio_close(QEMUVFIOState *s);
++void qemu_vfio_close_and_free(QEMUVFIOState *s);
+ int qemu_vfio_dma_map(QEMUVFIOState *s, void *host, size_t size,
+                       bool temporary, uint64_t *iova_list);
+ int qemu_vfio_dma_reset_temporary(QEMUVFIOState *s);
+diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+index ddd9a96e76..4c525d245b 100644
+--- a/util/vfio-helpers.c
++++ b/util/vfio-helpers.c
+@@ -706,7 +706,7 @@ static void qemu_vfio_reset(QEMUVFIOState *s)
+ }
+=20
+ /* Close and free the VFIO resources. */
+-void qemu_vfio_close(QEMUVFIOState *s)
++void qemu_vfio_close_and_free(QEMUVFIOState *s)
+ {
+     int i;
+=20
+@@ -721,4 +721,5 @@ void qemu_vfio_close(QEMUVFIOState *s)
+     close(s->device);
+     close(s->group);
+     close(s->container);
++    g_free(s);
+ }
+--=20
+2.25.3
 
 
