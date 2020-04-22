@@ -7,82 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23392C55185
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:34:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B3EC54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:34:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D47962076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:34:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 621A32076E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:34:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iNiwjnjl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D47962076E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DGa5zq6/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 621A32076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRFWT-0000eP-P3
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 09:34:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59402)
+	id 1jRFWi-0001CT-Fx
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 09:34:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59324)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRFUP-0006VL-ON
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:32:35 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRFUM-00036i-AB
+ (envelope-from <philmd@redhat.com>) id 1jRFUL-0006Px-By
  for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:32:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21864
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
+ (envelope-from <philmd@redhat.com>) id 1jRFUD-0002iB-H3
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:32:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46055
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRFUL-00032c-Rn
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:32:29 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRFUD-0002de-3B
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:32:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587562348;
+ s=mimecast20190719; t=1587562340;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Flbegfe+XvQdIALgmwjud+bmSRqDw+xWJxrHvvD5T5c=;
- b=iNiwjnjl37XE94rLwo8a2bZjfZOMwhUClEss3Kvi318ESsk3t/fycrV6g8rjDkCYBGAVwZ
- 3H7VhucekKB6IGQQzKoNao5Utnqwx8UiHG0rhufdXL1/Cp+uYoJt7gVhKJObNtwqcSEF38
- Pr/rVhAI6dVMhmsxYrckPBxxtIg8lMU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-MJLkgs73OHGSiNB18O8OKQ-1; Wed, 22 Apr 2020 09:32:26 -0400
-X-MC-Unique: MJLkgs73OHGSiNB18O8OKQ-1
-Received: by mail-wr1-f70.google.com with SMTP id m5so1038733wru.15
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 06:32:25 -0700 (PDT)
+ bh=LVOONsEpk4U6LFttK9TygLseO38jIaZn5oKoHqGQGaQ=;
+ b=DGa5zq6/loepDv1SiBtTTiHN5SI2ISvlt4yLBpUwTPmdyhxSGndXMrPSuto+EuHS0TCf3t
+ /Mkz73XAGzXoWm7vniFeS7Fv4OmB3AF3dbNOVvS+n67xmBf+ok1K83w+Gn3a94G7EEyVps
+ fuGm3uuoR5O1ETy7t7OHfzfDi2OeMAU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-238-KrUF0xuuNamI_2HKTRkaxw-1; Wed, 22 Apr 2020 09:32:16 -0400
+X-MC-Unique: KrUF0xuuNamI_2HKTRkaxw-1
+Received: by mail-wm1-f72.google.com with SMTP id n17so807264wmi.3
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 06:32:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=IDUYtKOADkWG3CN25Uq5JJobV9Wdj+VxIMt3IxDdn/o=;
- b=JglobhJhsqNJJ+WooicgLoDMJ0rYCbc+R0S4XooRxjs8tmvlWg8kSd4biQnGO/qTZQ
- xuqZMya/sB4wGfhP/x4PQsp9EjVFb02HiG3q4BOdPfUlpFtRTffgWi/SOxLoia0GxDoJ
- LTZnPyB/NZfOOp7/lJ0rW5VSF9rkzd5KyZGGhgZ0xmd/JciR9V/qLqvS5cp3ip8nN3DO
- 5tJs1etl3zP/uKI2MLKtSBJ3kNyhMihG6lrOl8sb6fzSn8CKV43UeM4dyN1V6M9Jr9Xt
- JjpOP7kKtbK8r+UuxC/VABTruPn3op+vMfuIZkUC8ssqIVFIYRZsxwSRvTyuDxQQLvwz
- HgsQ==
-X-Gm-Message-State: AGi0PuahOTq8owNYO9StUbChMPfP3VT0FxF78xxyR54FF4JIP3uZrEbZ
- bW6O2ak5sQoJSkgrdKB26iNt0ao3s3sKSMBt+vRLGo83uTke4TPNaggGFvE97kbQtQzKtUf6FhN
- VGSlRm0oRL9V4llc=
-X-Received: by 2002:a05:600c:2941:: with SMTP id
- n1mr10810675wmd.25.1587562344696; 
- Wed, 22 Apr 2020 06:32:24 -0700 (PDT)
-X-Google-Smtp-Source: APiQypK7XDTD/6gL7xOy+W7IIyAp8MGKyH7Nh9z0DkzZBiiFlF4pLRNLxX+BVWqJa70s13YF7ZBNHA==
-X-Received: by 2002:a05:600c:2941:: with SMTP id
- n1mr10810659wmd.25.1587562344515; 
- Wed, 22 Apr 2020 06:32:24 -0700 (PDT)
+ bh=S6WvnF67wihOHFujRWuSLGe59jb6c00JiTbf8Rd3b+M=;
+ b=oFChc74oD2vcU6aFmzLdsQg64Sm1niu1D2hERc9QoOcnOUUTwgnUtabvSG/w7PJgA4
+ N69vdYDh+4jNVG9pMlOdCmuaodAre1rYQuR7wnMx5wn88tMlKDMOlIgGlAAYVjwFxdH7
+ IknpamDCj3sLb3MLI9FHKUWo30L30lCNyI0hfcu+8Uloph/q9YazeOuGa/I3PandOfda
+ t3thIkwDFObFQclrWfWL8brHd/xtIg95EtY0tAXYa/NKtH+JSPpdJuIIWW56s6gg+kD4
+ 2Vaf+a1p53rCd2h2d6sp8jjKiKKUYEPk9SBM05p//nSzHKpQ9t8uNVkO3Jf3USSbBCSZ
+ qvRw==
+X-Gm-Message-State: AGi0PuYLbexdEOfVpLPjBhq6LtA1n+5LKy+BzZv3toZs8ITZObD/UE49
+ Wi93yX1uYm3tZDpM3lx1gBxH3AJj6YHtUnzsZMt/H2sV4oz4urCBTgnaT4k4X7x4Yqn4BOx2TdO
+ AafYRixCNtdCLy0g=
+X-Received: by 2002:a5d:5304:: with SMTP id e4mr28251639wrv.87.1587562335036; 
+ Wed, 22 Apr 2020 06:32:15 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKTeUTC6gkp8EoASB2jIwR7sEykaxaGUnt172xGztNTXm45k8P9Url5pwWP/8pb2/MDtjPKRA==
+X-Received: by 2002:a5d:5304:: with SMTP id e4mr28251626wrv.87.1587562334830; 
+ Wed, 22 Apr 2020 06:32:14 -0700 (PDT)
 Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id z1sm7749395wmf.15.2020.04.22.06.32.23
+ by smtp.gmail.com with ESMTPSA id f63sm7542662wma.47.2020.04.22.06.32.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Apr 2020 06:32:23 -0700 (PDT)
+ Wed, 22 Apr 2020 06:32:14 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 6/9] hw/isa/i82378: Remove dead assignment
-Date: Wed, 22 Apr 2020 15:31:49 +0200
-Message-Id: <20200422133152.16770-7-philmd@redhat.com>
+Subject: [PATCH v3 4/9] hw/input/adb-kbd: Remove dead assignment
+Date: Wed, 22 Apr 2020 15:31:47 +0200
+Message-Id: <20200422133152.16770-5-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200422133152.16770-1-philmd@redhat.com>
 References: <20200422133152.16770-1-philmd@redhat.com>
@@ -108,61 +106,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Alistair Francis <alistair.francis@wdc.com>,
- "open list:PReP" <qemu-ppc@nongnu.org>,
+Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "open list:Old World g3beige" <qemu-ppc@nongnu.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rename the unique variable assigned as 'pit' which better
-represents what it holds, to fix a warning reported by the
-Clang static code analyzer:
+Since commit 5a1f49718 the 'olen' variable is not really
+used. Remove it to fix a warning reported by Clang static
+code analyzer:
 
-    CC      hw/isa/i82378.o
-  hw/isa/i82378.c:108:5: warning: Value stored to 'isa' is never read
-      isa =3D isa_create_simple(isabus, "i82374");
-      ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    CC      hw/input/adb-kbd.o
+  hw/input/adb-kbd.c:200:5: warning: Value stored to 'olen' is never read
+      olen =3D 0;
+      ^      ~
 
+Fixes: 5a1f49718 (adb: add support for QKeyCode)
 Reported-by: Clang Static Analyzer
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Suggested-by: BALATON Zoltan <balaton@eik.bme.hu>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/isa/i82378.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/input/adb-kbd.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
-index dcb6b479ea..d9e6c7fa00 100644
---- a/hw/isa/i82378.c
-+++ b/hw/isa/i82378.c
-@@ -67,7 +67,7 @@ static void i82378_realize(PCIDevice *pci, Error **errp)
-     I82378State *s =3D I82378(dev);
-     uint8_t *pci_conf;
-     ISABus *isabus;
--    ISADevice *isa;
-+    ISADevice *pit;
+diff --git a/hw/input/adb-kbd.c b/hw/input/adb-kbd.c
+index 0ba8207589..a6d5c9b7c9 100644
+--- a/hw/input/adb-kbd.c
++++ b/hw/input/adb-kbd.c
+@@ -195,9 +195,7 @@ static int adb_kbd_poll(ADBDevice *d, uint8_t *obuf)
+ {
+     KBDState *s =3D ADB_KEYBOARD(d);
+     int keycode;
+-    int olen;
 =20
-     pci_conf =3D pci->config;
-     pci_set_word(pci_conf + PCI_COMMAND,
-@@ -99,13 +99,13 @@ static void i82378_realize(PCIDevice *pci, Error **errp=
-)
-     isa_bus_irqs(isabus, s->i8259);
+-    olen =3D 0;
+     if (s->count =3D=3D 0) {
+         return 0;
+     }
+@@ -216,7 +214,6 @@ static int adb_kbd_poll(ADBDevice *d, uint8_t *obuf)
+     if (keycode =3D=3D 0x7f) {
+         obuf[0] =3D 0x7f;
+         obuf[1] =3D 0x7f;
+-        olen =3D 2;
+     } else {
+         obuf[0] =3D keycode;
+         /* NOTE: the power key key-up is the two byte sequence 0xff 0xff;
+@@ -224,10 +221,9 @@ static int adb_kbd_poll(ADBDevice *d, uint8_t *obuf)
+          * byte, but choose not to bother.
+          */
+         obuf[1] =3D 0xff;
+-        olen =3D 2;
+     }
 =20
-     /* 1 82C54 (pit) */
--    isa =3D i8254_pit_init(isabus, 0x40, 0, NULL);
-+    pit =3D i8254_pit_init(isabus, 0x40, 0, NULL);
-=20
-     /* speaker */
--    pcspk_init(isabus, isa);
-+    pcspk_init(isabus, pit);
-=20
-     /* 2 82C37 (dma) */
--    isa =3D isa_create_simple(isabus, "i82374");
-+    isa_create_simple(isabus, "i82374");
+-    return olen;
++    return 2;
  }
 =20
- static void i82378_init(Object *obj)
+ static int adb_kbd_request(ADBDevice *d, uint8_t *obuf,
 --=20
 2.21.1
 
