@@ -2,63 +2,86 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A01E5C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 19:34:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E4DCC54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 19:34:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BC0820767
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 19:34:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BC0820767
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 03C4D20767
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 19:34:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y6Z6tjNj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03C4D20767
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRL8D-0005BJ-Gd
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 15:34:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46286)
+	id 1jRL8m-0005xZ-55
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 15:34:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jRL6Q-0003XL-Dc
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:32:10 -0400
+ (envelope-from <eblake@redhat.com>) id 1jRL7X-0004f4-Mk
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:33:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jRL6O-0006Bz-Jz
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:32:09 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:39036)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jRL6N-000664-Vc; Wed, 22 Apr 2020 15:32:08 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 2DD1074633E;
- Wed, 22 Apr 2020 21:32:04 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id F2F58746335; Wed, 22 Apr 2020 21:32:03 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id F1789746333;
- Wed, 22 Apr 2020 21:32:03 +0200 (CEST)
-Date: Wed, 22 Apr 2020 21:32:03 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 2/4] smbus: Fix spd_data_generate() error API violation
-In-Reply-To: <0af0e0f0-8127-da83-d9d2-89a3fe28f778@redhat.com>
-Message-ID: <alpine.BSF.2.22.395.2004222053070.22480@zero.eik.bme.hu>
-References: <20200422134815.1584-1-armbru@redhat.com>
- <20200422134815.1584-3-armbru@redhat.com>
- <alpine.BSF.2.22.395.2004221622140.19234@zero.eik.bme.hu>
- <0af0e0f0-8127-da83-d9d2-89a3fe28f778@redhat.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <eblake@redhat.com>) id 1jRL7J-00077M-Lp
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:33:19 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31364
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jRL7J-000753-25
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 15:33:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587583983;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ERxdDVa5oRVkc0/Dwv5Qm8XSe2G6G0g5zcmMIbq09wI=;
+ b=Y6Z6tjNjiOQAQefBnUOAS5unK5j6TDCAi7J4qPJbvXrVNTXjjYJrRW/L1hAPu5+OU8YM0u
+ u32BMA25in9cqmGdk9w3T1V50dg9WUe2O/8sGXZvMHH5CF9de3kX+8qoJwgUl7W/5lvb1G
+ OnB+DC5rvxU7v8pe3KZKMdf+XgHjAuc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-250-PCJoDGBHMeCmNZkHjp-ltA-1; Wed, 22 Apr 2020 15:32:58 -0400
+X-MC-Unique: PCJoDGBHMeCmNZkHjp-ltA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A7B713FE;
+ Wed, 22 Apr 2020 19:32:56 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 37C426084A;
+ Wed, 22 Apr 2020 19:32:47 +0000 (UTC)
+Subject: Re: [RFC 0/3] 64bit block-layer part I
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200330141818.31294-1-vsementsov@virtuozzo.com>
+ <2f3d6f44-0e1c-0999-7e22-752262f5a735@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <68af8eba-2e1b-5e7d-195f-884ef27dc56e@redhat.com>
+Date: Wed, 22 Apr 2020 14:32:47 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-1537099632-1587583923=:22480"
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 15:32:04
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 152.66.115.2
+In-Reply-To: <2f3d6f44-0e1c-0999-7e22-752262f5a735@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:57:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,93 +93,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, berto@igalia.com, stefanha@redhat.com,
+ pavel.dovgaluk@ispras.ru, sw@weilnetz.de, pl@kamp.de, qemu-devel@nongnu.org,
+ mreitz@redhat.com, jsnow@redhat.com, ronniesahlberg@gmail.com, den@openvz.org,
+ pbonzini@redhat.com, dillaman@redhat.com, ari@tuxera.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On 4/22/20 1:24 PM, Vladimir Sementsov-Ogievskiy wrote:
 
---3866299591-1537099632-1587583923=:22480
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: 8BIT
+>> So, I think the simplest way is to add .bdrv_co_pwritev_zeros64 and
+>> .bdrv_co_pdiscard64 and update drivers one-by-one. If at some point all
+>> drivers updated - drop unused 32bit functions, and then drop "64" suffix
+>> from API. If not - we'll live with both APIs.
+> 
+> Hmm. Or, maybe nothing dangerous if we convert it to 64bit, and add 
+> comment,
+> that function is not actually prepared for 64bit bytes and depends on
+> max_transfer/max_zeroes being <= INT_MAX ?
+> 
+> Or, maybe better, keep old functions as is and add 64bit wrappers, which
+> assert that bytes < INT_MAX, and call old function? This is clean, driver
+> maybe updated later on demand, and we don't need extra API. If no 
+> objections,
+> I'll try this way in the next version.
 
-On Wed, 22 Apr 2020, Philippe Mathieu-Daudé wrote:
-> On 4/22/20 4:27 PM, BALATON Zoltan wrote:
->> On Wed, 22 Apr 2020, Markus Armbruster wrote:
->>> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
->>> pointer to a variable containing NULL.  Passing an argument of the
->>> latter kind twice without clearing it in between is wrong: if the
->>> first call sets an error, it no longer points to NULL for the second
->>> call.
->>> 
->>> spd_data_generate() can pass @errp to error_setg() more than once when
->>> it adjusts both memory size and type.  Harmless, because no caller
->>> passes anything that needs adjusting.  Until the previous commit,
->>> sam460ex passed types that needed adjusting, but not sizes.
->>> 
->>> spd_data_generate()'s contract is rather awkward:
->>> 
->>>    If everything's fine, return non-null and don't set an error.
->>> 
->>>    Else, if memory size or type need adjusting, return non-null and
->>>    set an error describing the adjustment.
->>> 
->>>    Else, return null and set an error reporting why no data can be
->>>    generated.
->>> 
->>> Its callers treat the error as a warning even when null is returned.
->>> They don't create the "smbus-eeprom" device then.  Suspicious.
->>> 
->>> Since the previous commit, only "everything's fine" can actually
->>> happen.  Drop the unused code and simplify the callers.  This gets rid
->>> of the error API violation.
->> 
->> This leaves board code no chance to recover from values given by user that 
->> won't fit without duplicating checks that this function does. Also this 
->> will abort without giving meaningful errors if an invalid value does get 
->> through and result in a crash which is not used friendly. So I don't like 
->> this but if others think this is acceptable maybe at least unit test should 
->> be adjusted to make sure aborts cannot be triggered by user for values that 
->> are not usually tested during development.
->
-> Agreed. Do you have an example (or more) to better show Markus this code use? 
-> So we can add tests.
+That approach sounds good; it matches how we added flags and iov 
+support, as well as how we transitioned from sector interfaces over to 
+byte interfaces: we added a new .bdrv_ callback for the drivers that 
+could take advantage of the increased interface, without having to touch 
+the older drivers using the old callbacks, then only later finally got 
+rid of the old interfaces as we modernized other drivers.  There's still 
+the issue of how much we convert in the initial series - even if adding 
+a new wrapper makes it easier to patch only one driver at a time, it's 
+not nice to leave the job half-done by not visiting all of the drivers 
+eventually.
 
-After Markus's patches probably nothing uses it any more but this comes 
-with the result that previously giving some random value such as -m 100 
-did produce a working sam460ex machine after some warnings but now it just 
-thows back some errors to the user which may or may not be helpful to 
-them.
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-> Personally I'd use a script to generate a dumb static array of all possible 
-> sizes...
-
-Maybe testing with the biggest valid value such as -m 2048 (that's 
-commonly used probably) and an invalid value such as -m 100 might be 
-enough. Testing all possible values might take too long and would not test 
-what happens with invalid values. Ideally those invalud values should also 
-work like before a0258e4afa but should at least give a meaningful warning 
-so the user can fix the command line without too much head scratching. 
-Actually that commit was from Igor not from Marcus so sorry for 
-attributing that to Marcus too, I remembered wrong.
-
-By the way you could argue that on real machine you cannot plug certain 
-combinations of memory modules so it's enough to model that but I think 
-QEMU does not have to be that strict and also support configs that cannot 
-happen on real hadware but would work. This might be useful for example if 
-you have some ammount of memory to set aside for a VM on a host but that's 
-not a size that exists in memory modules on real hardware. This also works 
-on pc machine in qemu-system-i386 for example: it accepts -m 100 and does 
-its best to create a machine with such unrealistic size. The sam460ex did 
-the same (within SoC's limits) and before a0258e4afa -m 100 was fixed up 
-to 96 MB which is now not possible due to change in QEMU internal APIs. 
-This probably isn't important enough to worth the extra effort to support 
-but would have been nice to preserve.
-
-Regards,
-BALATON Zoltan
---3866299591-1537099632-1587583923=:22480--
 
