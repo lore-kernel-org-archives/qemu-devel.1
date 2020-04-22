@@ -7,85 +7,85 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4EC8C55186
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 01:20:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C0DC54FD0
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 01:20:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E3D5206D5
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 01:20:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08401206D5
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 01:20:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dtym6svX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E3D5206D5
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nBy7+FcR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08401206D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jR440-0006Ti-Gl
-	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 21:20:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33750)
+	id 1jR447-0006hA-3o
+	for qemu-devel@archiver.kernel.org; Tue, 21 Apr 2020 21:20:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34150)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jR415-00014Y-HR
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 21:17:31 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jR41A-0001EK-Pf
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 21:17:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jR414-0001DM-RP
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 21:17:31 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:51597)
+ (envelope-from <richard.henderson@linaro.org>) id 1jR41A-0001T0-6E
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 21:17:36 -0400
+Received: from mail-pg1-x529.google.com ([2607:f8b0:4864:20::529]:41537)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jR414-00018W-Ds
- for qemu-devel@nongnu.org; Tue, 21 Apr 2020 21:17:30 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id mq3so151098pjb.1
- for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 18:17:30 -0700 (PDT)
+ id 1jR419-0001QO-O0
+ for qemu-devel@nongnu.org; Tue, 21 Apr 2020 21:17:35 -0400
+Received: by mail-pg1-x529.google.com with SMTP id h69so248095pgc.8
+ for <qemu-devel@nongnu.org>; Tue, 21 Apr 2020 18:17:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=J8tKD8Dhorc/rZ7Pqa63r7FVSLYqB5ObHvXNIyPd1G0=;
- b=dtym6svXNRG09FaGUE3ydgDPAHdq75PwjHlZmkv9dUpKnow+5xOQ6iVrmPRH/++edq
- BknPQcOJVlIbfmhzPIpKnUwU9EL/wglHYLXgV0IUzYV4E+jQgOxArKBEuRtWu6W4G/Jg
- NHhkrn1CYkkyIWFlXiu837rH8LLL9/ZfTulbnhtL8t5URgZvy4qlI1Qs3EJ7+1fYN+zr
- A/Age6F5/g97RPCdvrXm1PdAupRPNjHV2eVvsZ5qwO2eR70jkQzsYuuezWvCTN9fwSoH
- Bx1o70Y7/XayfEvlQhG0QdCcTR9e7aEXRUEh17jmJ7/YtnVTGkGjdX0959lY63X+fXhM
- iT+g==
+ bh=NV6lL8g5TLJgWVXBQ3cW0c77O/M78yXELJw+3HhuoJg=;
+ b=nBy7+FcRzgMRoTxKgdfaIZHCF1SI8fiXB7VxHNAuFh1eBlF5E1H5nmRBHqd/QiRP0m
+ R+kDS5bkJa47cGt57QKpt2qkKDGGt1GPYjoC3+8jXswL8Xv5i3m+i/HBfcKY+Zdb45ZJ
+ 8jGTai1iic5OSIm1c0HAgtOIXqIFR0TTzhHFYOdGyWbScRgcOwSpYTG2HtVXoGjfK8wc
+ yhwOqIVkOGA8/os4p/DwWTEWOja0tYRbU6+i1OGnFbcpzWXe5SR0nDKSUDSES3QT8yuq
+ W2xpzZUIMgHVkJ1t9b+ChPSMVG6+k8M11XGnarP1znAE/z1t/MorcWj8JEeH+PB9Ljzd
+ eRsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=J8tKD8Dhorc/rZ7Pqa63r7FVSLYqB5ObHvXNIyPd1G0=;
- b=a31qhfr4F6UlPsplkGoNp4vwdDPo4ango/9Y3WkbLVTofOfP+5SuS2osaw52T4rSEu
- VkEgL58qsDKvlEX/9vvi3b26pX4vWU5CkmtsLK1DnjeQ4e8B5SktN1jZYq3PsSxBmznT
- F5Lx8oC6zal4H70X4R0UCX6/EITBg+SJAWG3lKs6Sf/jxMy/LLDP6ab4nAmT155UiDZX
- Nv73cx2WdaW238VG+ZoQz/H10om3ZFJlUf2caamJ7yOzST3mvImJhIVXtp7lOe7vHFpJ
- Gd6yPtnnQFDOiVdXGcpDgAczNrTjC/UDSBSne/Gpb4FdtQmGHTy7kWCUgf3Xoe5Hnr5V
- Bsfw==
-X-Gm-Message-State: AGi0PubHn2k2WSRqsy7dSsVifdSMvXFpLcpf3PRuiO/9DeaBq4wPguWJ
- tLGD0k6HfqMHmVL4zZXvMq7ZI1hyy20=
-X-Google-Smtp-Source: APiQypJ5opnTHkF4yu5J+qJkhXapaO4wW2DLmcV8a98hcilSst+pF13UpudIfYxdhQBm4cQDZVJXJw==
-X-Received: by 2002:a17:90a:a484:: with SMTP id
- z4mr8656936pjp.40.1587518248653; 
- Tue, 21 Apr 2020 18:17:28 -0700 (PDT)
+ bh=NV6lL8g5TLJgWVXBQ3cW0c77O/M78yXELJw+3HhuoJg=;
+ b=i+as9VmeiQZ+60gFgWV1+MrjCAWkCNzhqa2CweczsjIxYHY3px8vkaXmRi9pGE81mC
+ zwNP0HSL/bGPv7DR9BmK40wVoL5M965AoWD7iIP5RhN3U7soy5xKmytww+6cVpoycWIL
+ 5kEr59u6ayOx5AFpgtZBFCWLrq+ezVH54WaLm36VYH4NwzyiuUmaFZV7Yszc56dpRvbF
+ xdsV0o/voRtFzdNJJk6NrB5ihG7XSTlcqtq3Hq+hhWl5ZW3sVTNSeQtDGacB9xpZTWXU
+ ltWnImzPY87MEQft/slJsJ6hg6RpnQbGaKnv/w2cHlSiYBKW573W1+17IUfHVZ/U3O4e
+ 5e8g==
+X-Gm-Message-State: AGi0PubuNffszlYOPQoug5fJrXUv34/oUG+3YeUxN4vj9XcA/dUCTQ21
+ mnMQpZcU/wonBEUV3nH4CwJ9LC8LATo=
+X-Google-Smtp-Source: APiQypIuDdKF59vtjKbckrAfT0VZZWEZ3yz0T5nV9CEVRioTFaH/JxsMh2b4KFozkn5AdKWCwi80iA==
+X-Received: by 2002:a63:2e03:: with SMTP id u3mr24561951pgu.121.1587518253576; 
+ Tue, 21 Apr 2020 18:17:33 -0700 (PDT)
 Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
  [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id m4sm3673561pfm.26.2020.04.21.18.17.27
+ by smtp.gmail.com with ESMTPSA id m4sm3673561pfm.26.2020.04.21.18.17.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Apr 2020 18:17:28 -0700 (PDT)
+ Tue, 21 Apr 2020 18:17:32 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 03/36] target/ppc: Use tcg_gen_gvec_dup_imm
-Date: Tue, 21 Apr 2020 18:16:49 -0700
-Message-Id: <20200422011722.13287-4-richard.henderson@linaro.org>
+Subject: [PATCH v2 07/36] tcg: Add tcg_gen_gvec_dup_tl
+Date: Tue, 21 Apr 2020 18:16:53 -0700
+Message-Id: <20200422011722.13287-8-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200422011722.13287-1-richard.henderson@linaro.org>
 References: <20200422011722.13287-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::529;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x529.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::1043
+X-Received-From: 2607:f8b0:4864:20::529
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,85 +97,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: alex.bennee@linaro.org, LIU Zhiwei <zhiwei_liu@c-sky.com>,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We can now unify the implementation of the 3 VSPLTI instructions.
+For use when a target needs to pass a configure-specific
+target_ulong value to duplicate.
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/ppc/translate/vmx-impl.inc.c | 32 ++++++++++++++++-------------
- target/ppc/translate/vsx-impl.inc.c |  2 +-
- 2 files changed, 19 insertions(+), 15 deletions(-)
+ include/tcg/tcg-op-gvec.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 81d5a7a341..403ed3a01c 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -1035,21 +1035,25 @@ GEN_VXRFORM_DUAL(vcmpbfp, PPC_ALTIVEC, PPC_NONE, \
- GEN_VXRFORM_DUAL(vcmpgtfp, PPC_ALTIVEC, PPC_NONE, \
-                  vcmpgtud, PPC_NONE, PPC2_ALTIVEC_207)
+diff --git a/include/tcg/tcg-op-gvec.h b/include/tcg/tcg-op-gvec.h
+index fa8a0c8d03..d89f91f40e 100644
+--- a/include/tcg/tcg-op-gvec.h
++++ b/include/tcg/tcg-op-gvec.h
+@@ -320,6 +320,12 @@ void tcg_gen_gvec_dup_i32(unsigned vece, uint32_t dofs, uint32_t s,
+ void tcg_gen_gvec_dup_i64(unsigned vece, uint32_t dofs, uint32_t s,
+                           uint32_t m, TCGv_i64);
  
--#define GEN_VXFORM_DUPI(name, tcg_op, opc2, opc3)                       \
--static void glue(gen_, name)(DisasContext *ctx)                         \
--    {                                                                   \
--        int simm;                                                       \
--        if (unlikely(!ctx->altivec_enabled)) {                          \
--            gen_exception(ctx, POWERPC_EXCP_VPU);                       \
--            return;                                                     \
--        }                                                               \
--        simm = SIMM5(ctx->opcode);                                      \
--        tcg_op(avr_full_offset(rD(ctx->opcode)), 16, 16, simm);         \
-+static void gen_vsplti(DisasContext *ctx, int vece)
-+{
-+    int simm;
++#if TARGET_LONG_BITS == 64
++# define tcg_gen_gvec_dup_tl  tcg_gen_gvec_dup_i64
++#else
++# define tcg_gen_gvec_dup_tl  tcg_gen_gvec_dup_i32
++#endif
 +
-+    if (unlikely(!ctx->altivec_enabled)) {
-+        gen_exception(ctx, POWERPC_EXCP_VPU);
-+        return;
-     }
- 
--GEN_VXFORM_DUPI(vspltisb, tcg_gen_gvec_dup8i, 6, 12);
--GEN_VXFORM_DUPI(vspltish, tcg_gen_gvec_dup16i, 6, 13);
--GEN_VXFORM_DUPI(vspltisw, tcg_gen_gvec_dup32i, 6, 14);
-+    simm = SIMM5(ctx->opcode);
-+    tcg_gen_gvec_dup_imm(vece, avr_full_offset(rD(ctx->opcode)), 16, 16, simm);
-+}
-+
-+#define GEN_VXFORM_VSPLTI(name, vece, opc2, opc3) \
-+static void glue(gen_, name)(DisasContext *ctx) { gen_vsplti(ctx, vece); }
-+
-+GEN_VXFORM_VSPLTI(vspltisb, MO_8, 6, 12);
-+GEN_VXFORM_VSPLTI(vspltish, MO_16, 6, 13);
-+GEN_VXFORM_VSPLTI(vspltisw, MO_32, 6, 14);
- 
- #define GEN_VXFORM_NOA(name, opc2, opc3)                                \
- static void glue(gen_, name)(DisasContext *ctx)                         \
-@@ -1559,7 +1563,7 @@ GEN_VXFORM_DUAL(vsldoi, PPC_ALTIVEC, PPC_NONE,
- #undef GEN_VXRFORM_DUAL
- #undef GEN_VXRFORM1
- #undef GEN_VXRFORM
--#undef GEN_VXFORM_DUPI
-+#undef GEN_VXFORM_VSPLTI
- #undef GEN_VXFORM_NOA
- #undef GEN_VXFORM_UIMM
- #undef GEN_VAFORM_PAIRED
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 8287e272f5..b518de46db 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -1579,7 +1579,7 @@ static void gen_xxspltib(DisasContext *ctx)
-             return;
-         }
-     }
--    tcg_gen_gvec_dup8i(vsr_full_offset(rt), 16, 16, uim8);
-+    tcg_gen_gvec_dup_imm(MO_8, vsr_full_offset(rt), 16, 16, uim8);
- }
- 
- static void gen_xxsldwi(DisasContext *ctx)
+ void tcg_gen_gvec_shli(unsigned vece, uint32_t dofs, uint32_t aofs,
+                        int64_t shift, uint32_t oprsz, uint32_t maxsz);
+ void tcg_gen_gvec_shri(unsigned vece, uint32_t dofs, uint32_t aofs,
 -- 
 2.20.1
 
