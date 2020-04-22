@@ -7,66 +7,65 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E890BC5518B
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 17:29:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B947C54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 17:31:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7462620706
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 17:29:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9EDD20706
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 17:31:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TW45bl3P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7462620706
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ExqITkhj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9EDD20706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRJCA-0006rs-ER
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 13:29:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34240)
+	id 1jRJDn-0000FD-04
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 13:31:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34244)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jRJ6V-0006zz-CL
+ (envelope-from <pbonzini@redhat.com>) id 1jRJ6V-00070H-Jh
  for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:24:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jRJ6S-0004Ot-Di
+ (envelope-from <pbonzini@redhat.com>) id 1jRJ6R-0004OP-4q
  for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:24:07 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46272
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50820
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jRJ6S-0004Oi-27
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:24:04 -0400
+ id 1jRJ6P-0004JN-OE
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 13:24:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587576243;
+ s=mimecast20190719; t=1587576239;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QURyugqsBfA9ZpZvz1fnKy9b+23158RatjoiGUDeC9M=;
- b=TW45bl3POljHDCdVICjSQQiggps8fLEkTf3xd+8GFE9vRe15vfvfU5DlE0sBLrAZ5Ipqh1
- GogJ4sD2i9cP491PTzRJNrmW7jhHNtRzGgPsyzjFsvxjgqTaGqj5gLBL8EXxSIXxKEqh3F
- 8lmiPz2HoL66uKAHHYjg17k6D4RbID4=
+ bh=Qo/78xll3eTysL0pv7Kk3fEWiAu3sqbSrU00zi1Q9jc=;
+ b=ExqITkhjebr+Okhi5es5KYteH014y/KOd3Hjb9teEYOWhOKD4sRU2OO+93bLMMlzX1t1kp
+ M7VZFGvlQIpQGPOQzVgQcXDojm8bRqgZXeTPyqUCS00pi6XnSPC4mVrjfKodNnWGM0LHYe
+ yY6L9y0XJlDKWoryHS+QeNuDpGZ0ZzA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-121-PDc78mVMN6iH6WfH64G-aA-1; Wed, 22 Apr 2020 13:23:56 -0400
-X-MC-Unique: PDc78mVMN6iH6WfH64G-aA-1
+ us-mta-476-fOJeiifTMBygC1A09ybFZQ-1; Wed, 22 Apr 2020 13:23:57 -0400
+X-MC-Unique: fOJeiifTMBygC1A09ybFZQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34E66800FF0;
- Wed, 22 Apr 2020 17:23:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B073B190B2A8;
+ Wed, 22 Apr 2020 17:23:56 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9F5196084B;
- Wed, 22 Apr 2020 17:23:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 293BA6084B;
+ Wed, 22 Apr 2020 17:23:56 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/8] run-coverity-scan: get Coverity token and email from
- special git config section
-Date: Wed, 22 Apr 2020 13:23:46 -0400
-Message-Id: <20200422172351.26583-4-pbonzini@redhat.com>
+Subject: [PATCH 5/8] run-coverity-scan: add --no-update-tools option
+Date: Wed, 22 Apr 2020 13:23:48 -0400
+Message-Id: <20200422172351.26583-6-pbonzini@redhat.com>
 In-Reply-To: <20200422172351.26583-1-pbonzini@redhat.com>
 References: <20200422172351.26583-1-pbonzini@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
@@ -74,11 +73,11 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:12:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 04:15:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,106 +94,118 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Support a [coverity] section in .git/config.  It can be used to retrieve th=
-e
-token and also, if it is different from user.email, the username of the
-submitter.
+Provide a quick way to skip building the container while we figure out how
+to get caching right.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- scripts/coverity-scan/run-coverity-scan | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ scripts/coverity-scan/run-coverity-scan | 37 +++++++++++++++----------
+ 1 file changed, 23 insertions(+), 14 deletions(-)
 
 diff --git a/scripts/coverity-scan/run-coverity-scan b/scripts/coverity-sca=
 n/run-coverity-scan
-index 2e067ef5cf..f7325b570c 100755
+index ae1fc7ae76..9403429849 100755
 --- a/scripts/coverity-scan/run-coverity-scan
 +++ b/scripts/coverity-scan/run-coverity-scan
-@@ -41,9 +41,10 @@
- #                   is intended mainly for internal use by the Docker supp=
-ort
- #
- # User-specifiable environment variables:
--#  COVERITY_TOKEN -- Coverity token
-+#  COVERITY_TOKEN -- Coverity token (default: looks at your
-+#                    coverity.token config)
- #  COVERITY_EMAIL -- the email address to use for uploads (default:
--#                    looks at your git user.email config)
-+#                    looks at your git coverity.email or user.email config=
-)
- #  COVERITY_BUILD_CMD -- make command (default: 'make -jN' where N is
- #                    number of CPUs as determined by 'nproc')
- #  COVERITY_TOOL_BASE -- set to directory to put coverity tools
-@@ -62,7 +63,7 @@ check_upload_permissions() {
+@@ -31,6 +31,7 @@
+ #   --dry-run : run the tools, but don't actually do the upload
+ #   --docker : create and work inside a docker container
+ #   --update-tools-only : update the cached copy of the tools, but don't r=
+un them
++#   --no-update-tools : do not update the cached copy of the tools
+ #   --tokenfile : file to read Coverity token from
+ #   --version ver : specify version being analyzed (default: ask git)
+ #   --description desc : specify description of this version (default: ask=
+ git)
+@@ -128,7 +129,7 @@ update_coverity_tools () {
 =20
-     echo "Checking upload permissions..."
+ # Check user-provided environment variables and arguments
+ DRYRUN=3Dno
+-UPDATE_ONLY=3Dno
++UPDATE=3Dyes
+ DOCKER=3Dno
 =20
--    if ! up_perm=3D"$(wget https://scan.coverity.com/api/upload_permitted =
---post-data "token=3D$PROJTOKEN&project=3D$PROJNAME" -q -O -)"; then
-+    if ! up_perm=3D"$(wget https://scan.coverity.com/api/upload_permitted =
---post-data "token=3D$COVERITY_TOKEN&project=3D$PROJNAME" -q -O -)"; then
-         echo "Coverity Scan API access denied: bad token?"
-         exit 1
-     fi
-@@ -100,14 +101,14 @@ update_coverity_tools () {
-     cd "$COVERITY_TOOL_BASE"
-=20
-     echo "Checking for new version of coverity build tools..."
--    wget https://scan.coverity.com/download/linux64 --post-data "token=3D$=
-PROJTOKEN&project=3D$PROJNAME&md5=3D1" -O coverity_tool.md5.new
-+    wget https://scan.coverity.com/download/linux64 --post-data "token=3D$=
-COVERITY_TOKEN&project=3D$PROJNAME&md5=3D1" -O coverity_tool.md5.new
-=20
-     if ! cmp -s coverity_tool.md5 coverity_tool.md5.new; then
-         # out of date md5 or no md5: download new build tool
-         # blow away the old build tool
-         echo "Downloading coverity build tools..."
-         rm -rf coverity_tool coverity_tool.tgz
--        wget https://scan.coverity.com/download/linux64 --post-data "token=
-=3D$PROJTOKEN&project=3D$PROJNAME" -O coverity_tool.tgz
-+        wget https://scan.coverity.com/download/linux64 --post-data "token=
-=3D$COVERITY_TOKEN&project=3D$PROJNAME" -O coverity_tool.tgz
-         if ! (cat coverity_tool.md5.new; echo "  coverity_tool.tgz") | md5=
-sum -c --status; then
-             echo "Downloaded tarball didn't match md5sum!"
-             exit 1
-@@ -205,6 +206,9 @@ while [ "$#" -ge 1 ]; do
-     esac
- done
-=20
-+if [ -z "$COVERITY_TOKEN" ]; then
-+    COVERITY_TOKEN=3D"$(git config coverity.token)"
-+fi
- if [ -z "$COVERITY_TOKEN" ]; then
-     echo "COVERITY_TOKEN environment variable not set"
-     exit 1
-@@ -225,7 +229,6 @@ if [ -z "$SRCDIR" ]; then
-     SRCDIR=3D"$PWD"
- fi
-=20
--PROJTOKEN=3D"$COVERITY_TOKEN"
+ while [ "$#" -ge 1 ]; do
+@@ -137,9 +138,13 @@ while [ "$#" -ge 1 ]; do
+             shift
+             DRYRUN=3Dyes
+             ;;
++        --no-update-tools)
++            shift
++            UPDATE=3Dno
++            ;;
+         --update-tools-only)
+             shift
+-            UPDATE_ONLY=3Dyes
++            UPDATE=3Donly
+             ;;
+         --version)
+             shift
+@@ -238,12 +243,12 @@ fi
  PROJNAME=3DQEMU
  TARBALL=3Dcov-int.tar.xz
 =20
-@@ -268,6 +271,9 @@ if [ -z "$DESCRIPTION" ]; then
-     DESCRIPTION=3D"$(git rev-parse HEAD)"
+-if [ "$UPDATE_ONLY" =3D yes ] && [ "$DOCKER" =3D yes ]; then
++if [ "$UPDATE" =3D only ] && [ "$DOCKER" =3D yes ]; then
+     echo "Combining --docker and --update-only is not supported"
+     exit 1
  fi
 =20
-+if [ -z "$COVERITY_EMAIL" ]; then
-+    COVERITY_EMAIL=3D"$(git config coverity.email)"
+-if [ "$UPDATE_ONLY" =3D yes ]; then
++if [ "$UPDATE" =3D only ]; then
+     # Just do the tools update; we don't need to check whether
+     # we are in a source tree or have upload rights for this,
+     # so do it before some of the command line and source tree checks.
+@@ -286,7 +291,6 @@ fi
+=20
+ # Run ourselves inside docker if that's what the user wants
+ if [ "$DOCKER" =3D yes ]; then
+-    # build docker container including the coverity-scan tools
+     # Put the Coverity token into a temporary file that only
+     # we have read access to, and then pass it to docker build
+     # using a volume.  A volume is enough for the token not to
+@@ -301,14 +305,17 @@ if [ "$DOCKER" =3D yes ]; then
+     echo "Created temporary directory $SECRETDIR"
+     SECRET=3D"$SECRETDIR/token"
+     echo "$COVERITY_TOKEN" > "$SECRET"
+-    echo "Building docker container..."
+-    # TODO: This re-downloads the tools every time, rather than
+-    # caching and reusing the image produced with the downloaded tools.
+-    # Not sure why.
+-    tests/docker/docker.py --engine ${DOCKER_ENGINE} build \
+-                   -t coverity-scanner -f scripts/coverity-scan/coverity-s=
+can.docker \
+-                   -v "$SECRETDIR:/work" \
+-                   --extra-files scripts/coverity-scan/run-coverity-scan
++    if [ "$UPDATE" !=3D no ]; then
++        # build docker container including the coverity-scan tools
++        echo "Building docker container..."
++        # TODO: This re-downloads the tools every time, rather than
++        # caching and reusing the image produced with the downloaded tools=
+.
++        # Not sure why.
++        tests/docker/docker.py --engine ${DOCKER_ENGINE} build \
++                       -t coverity-scanner -f scripts/coverity-scan/coveri=
+ty-scan.docker \
++                       -v "$SECRETDIR:/work" \
++                       --extra-files scripts/coverity-scan/run-coverity-sc=
+an
++    fi
+     echo "Archiving sources to be analyzed..."
+     ./scripts/archive-source.sh "$SECRETDIR/qemu-sources.tgz"
+     if [ "$DRYRUN" =3D yes ]; then
+@@ -343,7 +350,9 @@ fi
+=20
+ check_upload_permissions
+=20
+-update_coverity_tools
++if [ "$UPDATE" !=3D no ]; then
++    update_coverity_tools
 +fi
- if [ -z "$COVERITY_EMAIL" ]; then
-     COVERITY_EMAIL=3D"$(git config user.email)"
- fi
-@@ -393,7 +399,7 @@ if [ "$DRYRUN" =3D yes ]; then
-     exit 0
- fi
 =20
--curl --form token=3D"$PROJTOKEN" --form email=3D"$COVERITY_EMAIL" \
-+curl --form token=3D"$COVERITY_TOKEN" --form email=3D"$COVERITY_EMAIL" \
-      --form file=3D@"$TARBALL" --form version=3D"$VERSION" \
-      --form description=3D"$DESCRIPTION" \
-      https://scan.coverity.com/builds?project=3D"$PROJNAME"
+ TOOLBIN=3D"$(cd "$COVERITY_TOOL_BASE" && echo $PWD/coverity_tool/cov-analy=
+sis-*/bin)"
+=20
 --=20
 2.18.2
 
