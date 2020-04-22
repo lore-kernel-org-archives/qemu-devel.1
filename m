@@ -2,98 +2,132 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80CB2C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 14:11:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A33A1C55185
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 14:16:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DDE12077D
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 14:11:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DDE12077D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ehu.eus
+	by mail.kernel.org (Postfix) with ESMTPS id 5B9BC2082E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 14:16:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WJqyqIZ+";
+	dkim=pass (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="imcmWhg0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B9BC2082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRG6D-0000Xd-Ci
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 10:11:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50590)
+	id 1jRGB9-0002oD-EH
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 10:16:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53454)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <unai.martinezcorral@ehu.eus>) id 1jRG4z-0006Qi-2L
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 10:10:21 -0400
+ (envelope-from <steplong@quicinc.com>) id 1jRGAB-000213-Iu
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 10:15:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <unai.martinezcorral@ehu.eus>) id 1jRG4w-0001Lb-N8
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 10:10:19 -0400
-Received: from smtp.lg.ehu.es ([158.227.0.66]:28425 helo=smtp.ehu.eus)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <unai.martinezcorral@ehu.eus>)
- id 1jRG4w-0001E9-4s
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 10:10:18 -0400
-Received: from imsva2.lgp.ehu.es (imsva2.lgp.ehu.es [10.0.3.246])
- by postfix.smtp2.imsva2 (Postfix) with ESMTPS id B51DA786A
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 16:10:08 +0200 (CEST)
-Received: from imsva2.lgp.ehu.es (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 766405A05B
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 16:10:08 +0200 (CEST)
-Received: from imsva2.lgp.ehu.es (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5D0405A067
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 16:10:08 +0200 (CEST)
-Received: from smtp.ehu.eus (unknown [10.0.100.76])
- by imsva2.lgp.ehu.es (Postfix) with ESMTPS
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 16:10:08 +0200 (CEST)
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com
- [209.85.166.178]) by smtp2 (Postfix) with ESMTPSA id 20A86786A
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 16:10:07 +0200 (CEST)
-Received: by mail-il1-f178.google.com with SMTP id t12so1979960ile.9
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 07:10:07 -0700 (PDT)
-X-Gm-Message-State: AGi0PuYYJa3oMSas6sTND1Rbkd6WTtu17H09MpeX0aIq4L3wQU1D3FL3
- jAi6Jf/9EApvIgQ/8aRsrbCtHmHciqFERwV3uw==
-X-Google-Smtp-Source: APiQypKZwXBeu7/7FSQ8Kx+ikyTV9YYyMp8x9g5KJkGvh6lyFQ13EbvBwj7opSh4ml86BHw8l/BoAynCiQF5XjowJLY=
-X-Received: by 2002:a92:4a11:: with SMTP id m17mr25697389ilf.125.1587564606648; 
- Wed, 22 Apr 2020 07:10:06 -0700 (PDT)
+ (envelope-from <steplong@quicinc.com>) id 1jRGAB-0006Zy-0a
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 10:15:43 -0400
+Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:62920)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
+ id 1jRGA7-0006UH-UD; Wed, 22 Apr 2020 10:15:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1587564939; x=1619100939;
+ h=from:to:cc:subject:date:message-id:mime-version;
+ bh=x/bD3v9/g7N7ULFi9YlR+bQD5qLdylVk7Hd1N2CWjFg=;
+ b=WJqyqIZ+/72Iq5MvQ+1hGz3jypMUq1BiB+MqgVmNWwEDr84S54/K1N9M
+ LGszeT+ye0EL+7IodNMGCV2TQIDW36An72eJVJPePfw3WRvaepxW1BDES
+ by2vUsMNO5A5lfqYJmlo0tHjoVtY4SccVX4buQjxktC0Jon6grynuQVXH E=;
+Received: from unknown (HELO ironmsg03-sd.qualcomm.com) ([10.53.140.143])
+ by alexa-out-sd-01.qualcomm.com with ESMTP; 22 Apr 2020 07:15:35 -0700
+Received: from nasanexm01a.na.qualcomm.com ([10.85.0.81])
+ by ironmsg03-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 22 Apr 2020 07:15:35 -0700
+Received: from nasanexm03e.na.qualcomm.com (10.85.0.48) by
+ nasanexm01a.na.qualcomm.com (10.85.0.81) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Wed, 22 Apr 2020 07:15:35 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm03e.na.qualcomm.com (10.85.0.48) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2 via Frontend Transport; Wed, 22 Apr 2020 07:15:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bq82mahdxjVKHXkrIZoBUagHbhAAgtYxfuv3xXVovU9Qa5ACKdts3pJMk8D5AfKJINVzhScC7LW4yrGn8HqeiHrwgHr5FqtHQRDVOmm+h9m1JtAWnGvQdWgyokocT35nDr4xzK5BtE9D01sFNXncBbr++pVfOAvWgfbo2EwjjgPEVARuO/h5KSRvnON/g2Mif5aOOqjpWbd5KnZYSNzMDCXlPLBqyMEctxfcrglAqazT7kdYAKRfRMUfrthaGFpzYhsycYU63nSyfd2O5hjRjZv/tHItwE1Q6glLd96Blbi6dUl2P2CSFH3wpxiRwgZP26rbzu7lcZtwDtxH9uRzEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nyWAbxKhDFkXqaPj9PcOSGJ/bx9EbOnHsBnmQ8nLqvo=;
+ b=csVQxmfKnGSfqhpd2vjWN3U9xx3ur3jR+vC9PHI2fLZfjKAJxQ2VoLcaUr91PpoM/KPjT6h2vWLAR/HbAPsGqF5CMYlQrkJpBh7LKxZ74H76+VKeCtBwYoBIWcdLZewhHKkoYfHNIELcn+LE0gMm24+8e0vyUAVYaReJOCfKhhvpPuX240LjyegUTiF4w8MtgJ2oZN0jBwj6IXwIvxtFdmCxnUREm5ehlNVwAwc2kLM/3BeGZTqS1jPhxyxa/e5YhVeV3In5BFgN9pOw7IV4O5OTdpLgwx88K2ZEOo5AZQinV8EvyU8fkfTQT/icwW8fU0/HMNogCGWaxdWI84NPHA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nyWAbxKhDFkXqaPj9PcOSGJ/bx9EbOnHsBnmQ8nLqvo=;
+ b=imcmWhg0WzvsMVfX73a5oZSwTOdjDd2mdMI2KCNdPEgcXqjHwP2jHpyM7dZzTAvIiiYvO/nNcRajTnrebR13RfGyEli44PBTxPZ2yQevFFyeHQf4zPS/6hGuYSP3G1Wm6kcHjwl/fqH7Kf0QKyMBW1oSKM4SSDhtzaVFtb/g9oM=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=steplong@quicinc.com; 
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24) by MWHPR0201MB3628.namprd02.prod.outlook.com
+ (2603:10b6:301:78::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.29; Wed, 22 Apr
+ 2020 14:15:31 +0000
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::10ad:5df5:d575:1f37]) by MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::10ad:5df5:d575:1f37%3]) with mapi id 15.20.2921.030; Wed, 22 Apr 2020
+ 14:15:31 +0000
+From: Stephen Long <steplong@quicinc.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH v2] target/arm: Implement SVE2 FMMLA
+Date: Wed, 22 Apr 2020 10:15:16 -0400
+Message-ID: <20200422141516.7977-1-steplong@quicinc.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR04CA0014.namprd04.prod.outlook.com
+ (2603:10b6:208:d4::27) To MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24)
 MIME-Version: 1.0
-References: <20200309190110.GA31@669c1c222ef4>
-In-Reply-To: <20200309190110.GA31@669c1c222ef4>
-From: Unai Martinez Corral <unai.martinezcorral@ehu.eus>
-Date: Wed, 22 Apr 2020 16:09:55 +0200
-X-Gmail-Original-Message-ID: <CAGZZdDGC=iMzU61c01pAc3s=7m1x_pMoLhCWYZjRbhWTUh_mVQ@mail.gmail.com>
-Message-ID: <CAGZZdDGC=iMzU61c01pAc3s=7m1x_pMoLhCWYZjRbhWTUh_mVQ@mail.gmail.com>
-Subject: Re: [PATCH v10 0/10] qemu-binfmt-conf.sh
-To: =?UTF-8?Q?Unai_Mart=C3=ADnez_Corral?= <unai.martinezcorral@ehu.eus>
-Content-Type: multipart/alternative; boundary="0000000000006ff99505a3e1b095"
-X-Greylist: ACL 192 matched, not delayed by milter-greylist-4.6.2 (smtp2
- [10.0.100.76]); Wed, 22 Apr 2020 16:10:08 +0200 (CEST)
-X-TM-AS-GCONF: 00
-X-TM-AS-Product-Ver: IMSVA-9.1.0.1631-8.5.0.1020-25372.000
-X-TM-AS-Result: No--14.456-7.0-31-10
-X-imss-scan-details: No--14.456-7.0-31-10
-X-TMASE-Version: IMSVA-9.1.0.1631-8.5.1020-25372.000
-X-TMASE-Result: 10--14.456000-10.000000
-X-TMASE-MatchedRID: QaEEGqyHmzGgBUTSh64wSSnjDVPUYtjj7euC4HkicftJqBAKh+jZlxlK
- ij+pdw5jEpEeINQNSwoKcKXSCIuKCZkroZMnoDef5Qo03mEdwAGOz/LLJUcaHs8DuAI4aSPIhGz
- G3wY/cLfX2ShWG+0/HgiTaqhm0PakKTXyPkeuRzWkvaQteDAtwjh4aiF3uCM2Q5TpvuefFlbv6F
- j2Xtj47BslYB8FoBoPYZmVzHZLJkOc/9pZkfoowWo/fCejPesrtvjn5WNmIymBg28VlCpesQVM9
- kPsaYx4cYtEjWFsw1Gqip2P6LkJlN6mdwOBRvHdggra2NOo2i3naaW2UTafyGJGTIGsciLK2VC1
- QWKKKPqz6Hv+vbt8wZ/1E0FCiPKnpljg/F9ExYTB6S7ffS3ea27BSyDZmAnxoIQ2gxbMUIfIeAQ
- ugZMNBOgRT1AWDrqIukYDZ80I8WgkVm0IjglhHYVMtEwAWsdcXs5nqGvDCfOFWqzbguZvSIYMM3
- r3suSeX2P70OPfEVBtu21XpQLmylUOzfoovIJKdfk9ZxDdshYXaMhZSeVFDDs61woVLQQE8LoCm
- 5O9DPPL+jAsMSmcUfjDlA9c5qydUuluVE/y9/RoUArKobkzYiPx0viUmdeuyaqtcUsWOxbW6RH7
- zrNXXOLzNWBegCW21WdIO+NJS/n52SN33UuAAKiYnCRZ5YNfz1YRopIey+9QraqT74UQxgU1sPb
- nZ/IiFhpRR80FcqBgfP3Y2AC5zL1T/UAncWTUj7uV0Vrl0STRlOrL6hHfGHD1UQdjqlRhRsYH1W
- Tcu8Ar+h4+kNbHnw==
-X-TMASE-SNAP-Result: 1.821001.0001-0-1-12:0,22:0,33:0,34:0-0
-X-Greylist: Sender IP whitelisted, Sender succeeded SMTP AUTH, not delayed by
- milter-greylist-4.6.2 (postfix.smtp2.imsva2 [10.0.100.76]);
- Wed, 22 Apr 2020 16:10:08 +0200 (CEST)
-Received-SPF: pass client-ip=158.227.0.66;
- envelope-from=unai.martinezcorral@ehu.eus; helo=smtp.ehu.eus
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 10:10:08
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Received-From: 158.227.0.66
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from DESKTOP-L2LA14H.localdomain (108.176.222.2) by
+ MN2PR04CA0014.namprd04.prod.outlook.com (2603:10b6:208:d4::27) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2937.13 via Frontend Transport; Wed, 22 Apr 2020 14:15:30 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [108.176.222.2]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e6c39eba-744b-442b-e7fa-08d7e6c79d9c
+X-MS-TrafficTypeDiagnostic: MWHPR0201MB3628:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <MWHPR0201MB3628E0B10C8AACFCBD3921F5C7D20@MWHPR0201MB3628.namprd02.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:489;
+X-Forefront-PRVS: 03818C953D
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MWHPR0201MB3547.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(10019020)(366004)(136003)(39850400004)(346002)(396003)(376002)(66946007)(6916009)(1076003)(66556008)(5660300002)(6666004)(4326008)(16526019)(6486002)(81156014)(107886003)(6512007)(8676002)(52116002)(316002)(478600001)(66476007)(186003)(86362001)(36756003)(956004)(26005)(6506007)(8936002)(2616005)(2906002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: PlEhlgq6qQcVSCJuRF+hr28qdGp1EVv2mR63xptYHZ3QeTasoK7omK8kbLtovfdSOuFTQnEcIY/iywYbmhePEGf6WlJBHQpM1UjpgMQnix6vgq0swoYiVY2kRFdJ3VwutVUQ+eoz40iW1nOJJXYq0M+QXUuPa2bSthk/gxXzW/hbuWIjrTV3RuMo8YLk7oXBHdSViy2I5oWMJnKdmC4GdPCZx0vNs9bA93dDQlok9dD9LuUsEtxW4TjPkzjpzkFUrcS6/5bdGXWrtS39XQ+HcoYrA39GSa+QHY5tVuETYcfB4jeXoCXg/hMEUrFoaT7KcXVdNoI+03UvkJSFOuj4jZw7UcFEcCTmdgQL7+r1qexrNvx0cbP68AJcfSGOmznP6hQdd4Rr6T2IE6FgEcwzKmYyX4p0vXfrNa7koQ06rEUAP/b34p7Ht9RiT7BMJhYv
+X-MS-Exchange-AntiSpam-MessageData: yyi55tz0WlTTmR19zkpzq1Y52fZjIGvv/e94z2da8g0SQxmHYfem5ah9Ft5WLgsdmcYQ9FZXzkbcQ861+hmN0jyq6kCSDi+pyBzf/EGHJA+SrGj4wtyzRlUM6c/1N4QJ7w1OnU7UM6/VOx8s7IKk8g==
+X-MS-Exchange-CrossTenant-Network-Message-Id: e6c39eba-744b-442b-e7fa-08d7e6c79d9c
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2020 14:15:31.5299 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yuy3IKXjAbgeoeoBLCGgFeJno2uCRC2Xd7O8SfypMfOVc/DjA25ufnUTbIYlr9UvaEjXxVwaoy5KkYCiq0czww==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR0201MB3628
+X-OriginatorOrg: quicinc.com
+Received-SPF: pass client-ip=199.106.114.38; envelope-from=steplong@quicinc.com;
+ helo=alexa-out-sd-01.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 10:15:36
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Received-From: 199.106.114.38
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,244 +139,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: unai.martinezcorral@ehu.eus
-Cc: riku.voipio@iki.fi, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-arm@nongnu.org, richard.henderson@linaro.org, apazos@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000006ff99505a3e1b095
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Stephen Long <steplong@quicinc.com>
 
-Hi,
+I'm guessing endianness doesn't matter because we are writing to the
+corresponding 32-bit/64-bit in the destination register.
+---
+ target/arm/cpu.h           | 10 +++++++++
+ target/arm/helper-sve.h    |  3 +++
+ target/arm/sve.decode      |  4 ++++
+ target/arm/sve_helper.c    | 44 ++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 29 +++++++++++++++++++++++++
+ 5 files changed, 90 insertions(+)
 
-I'd like to request this patchset to be kept on hold. As discussed in
-https://github.com/dbhi/qus/issues/4, the current "family-based" logic of
-'qemu-binfmt-conf.sh' does not work for aarch64-only hosts. It is assumed
-that all aarch64 hosts can natively execute arm or armhf binaries. However,
-this is not true anymore. Some high end devices, such as ThunderX or
-ThunderX2, are 64-bit only.
-
-It was tested that splitting family 'arm' to 'arm' and 'arm64' does work:
-https://github.com/umarcor/qemu/commit/699f972f665bb6dfd05e1c89ff83adb9834a=
-1bb2.
-However, such solution breaks backwards compatibility and it will register
-unnecessary interpreters on hosts which do support both 32-bit and 64-bit.
-Hence, I'd like to add some option for users to tell that a host is 64-bit
-only. Alternatively, we might have an automatic test to detect it. I'd be
-glad to hear any suggestion.
-
-Regards
-
-Unai
-
-El lun., 9 mar. 2020 a las 20:01, Unai Martinez-Corral
-(<unai.martinezcorral@ehui.eus>) escribi=C3=B3:
-
-> Hi,
->
-> This series reworks qemu-binfmt-conf.sh:
->
-> * Argument <CPU> from option '--systemd' is generalized to <TARGETS>, and
-> it is
->   accepted for any mode (default, debian or systemd). It can be a single
-> target
->   arch or a list of them.
-> * Option '-r|--clear' is added, which allows to remove an already
-> registered
->   target interpreter or a list of them. The implementation is functional
-> but
->   partial. Please, see the corresponding commit.
-> * Option '-t|--test' is added, which allows to execute the CHECK accordin=
-g
->   to the provided arguments, but no interpreter is configured.
-> * Support to set options through environment variables: QEMU_TARGETS,
-> QEMU_PATH,
->   QEMU_SUFFIX, QEMU_PERSISTENT, QEMU_CREDENTIAL, QEMU_CLEAR and QEMU_TEST=
-.
->
-> The following changes are not backward compatible:
->
-> * Option '--persistent' no longer requires/accepts an argument.
-> * Option '--credential' no longer requires/accepts an argument.
-> * Option '--systemd' no longer requires/accepts an argument.
-> * Option '--qemu-path' is renamed to '--path'.
-> * Option '--qemu-suffix' is renamed to '--suffix'.
->
-> The functionality of all of them is untouched. Changes are related to
-> syntax only.
->
-> v10
->
-> * Split style related commit
->
-> v9
->
-> * Make style coherent with the dominant pattern
->
-> v8:
->
-> * Fix typos and address review comments
->
-> v7:
->
-> * Check that a interpreter exists before trying to remove it.
->
-> v6:
->
-> * Don't need to use "find".
-> * Put the ";;" at the same position.
-> * Set BINFMT_CLEAR to ':', to allow --test to work with --clear.
-> * Do not show DEBIANDIR and SYSTEMDDIR in the Env-variable column.
->
-> Based on:
->
-> * [PATCH v5 0/10] qemu-binfmt-conf.sh
->    * should have been [PATCH v5 0/9] qemu-binfmt-conf.sh
-> * [PATCH v4 0/10] qemu-binfmt-conf.sh
-> * [PATCH v3 0/10] qemu-binfmt-conf.sh
-> * [PATCH v2] qemu-binfmt-conf.sh: add CPUS, add --reset, make -p and -c
-> boolean (no arg)
-> * [PATCH] qemu-binfmt-conf.sh: add CPUS, add --reset, make -p and -c
-> boolean (no arg)
-> * scripts/qemu-binfmt-conf.sh: allow clearing of entries
->
-> Regards
->
-> Unai Martinez-Corral (10):
->       qemu-binfmt-conf.sh: enforce style consistency
->       qemu-binfmt-conf.sh: enforce safe tests
->       qemu-binfmt-conf.sh: make opts -p and -c boolean
->       qemu-binfmt-conf.sh: add QEMU_CREDENTIAL and QEMU_PERSISTENT
->       qemu-binfmt-conf.sh: use the same presentation format as for qemu-*
->       qemu-binfmt-conf.sh: remove 'qemu' prefix from cli options
->       qemu-binfmt-conf.sh: honour QEMU_PATH and/or QEMU_SUFFIX
->       qemu-binfmt-conf.sh: generalize <CPU> to positional TARGETS
->       qemu-binfmt-conf.sh: add option --clear
->       qemu-binfmt-conf.sh: add --test
->
-> scripts/qemu-binfmt-conf.sh | 221
-> 1 file changed, 138 insertions(+), 83 deletions(-i)
->
-
---0000000000006ff99505a3e1b095
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div><div><div>Hi,<br><br></div>I&#39;d like to request th=
-is patchset to be kept on hold. As discussed in <a href=3D"https://github.c=
-om/dbhi/qus/issues/4">https://github.com/dbhi/qus/issues/4</a>, the current=
- &quot;family-based&quot; logic of &#39;qemu-binfmt-conf.sh&#39; does not w=
-ork for aarch64-only hosts. It is assumed that all aarch64 hosts can native=
-ly execute arm or armhf binaries. However, this is not true anymore. Some h=
-igh end devices, such as ThunderX or ThunderX2, are 64-bit only.<br><br></d=
-iv>It was tested that splitting family &#39;arm&#39; to &#39;arm&#39; and &=
-#39;arm64&#39; does work: <a href=3D"https://github.com/umarcor/qemu/commit=
-/699f972f665bb6dfd05e1c89ff83adb9834a1bb2">https://github.com/umarcor/qemu/=
-commit/699f972f665bb6dfd05e1c89ff83adb9834a1bb2</a>. However, such solution=
- breaks backwards compatibility and it will register unnecessary interprete=
-rs on hosts which do support both 32-bit and 64-bit. Hence, I&#39;d like to=
- add some option for users to tell that a host is 64-bit only. Alternativel=
-y, we might have an automatic test to detect it. I&#39;d be glad to hear an=
-y suggestion.<br><br></div><div>Regards</div><div><br></div><div>Unai<br></=
-div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_at=
-tr">El lun., 9 mar. 2020 a las 20:01, Unai Martinez-Corral (&lt;unai.martin=
-ezcorral@ehui.eus&gt;) escribi=C3=B3:<br></div><blockquote class=3D"gmail_q=
-uote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,2=
-04);padding-left:1ex">Hi,<br>
-<br>
-This series reworks qemu-binfmt-conf.sh:<br>
-<br>
-* Argument &lt;CPU&gt; from option &#39;--systemd&#39; is generalized to &l=
-t;TARGETS&gt;, and it is<br>
-=C2=A0 accepted for any mode (default, debian or systemd). It can be a sing=
-le target<br>
-=C2=A0 arch or a list of them.<br>
-* Option &#39;-r|--clear&#39; is added, which allows to remove an already r=
-egistered<br>
-=C2=A0 target interpreter or a list of them. The implementation is function=
-al but<br>
-=C2=A0 partial. Please, see the corresponding commit.<br>
-* Option &#39;-t|--test&#39; is added, which allows to execute the CHECK ac=
-cording<br>
-=C2=A0 to the provided arguments, but no interpreter is configured.<br>
-* Support to set options through environment variables: QEMU_TARGETS, QEMU_=
-PATH,<br>
-=C2=A0 QEMU_SUFFIX, QEMU_PERSISTENT, QEMU_CREDENTIAL, QEMU_CLEAR and QEMU_T=
-EST.<br>
-<br>
-The following changes are not backward compatible:<br>
-<br>
-* Option &#39;--persistent&#39; no longer requires/accepts an argument.<br>
-* Option &#39;--credential&#39; no longer requires/accepts an argument.<br>
-* Option &#39;--systemd&#39; no longer requires/accepts an argument.<br>
-* Option &#39;--qemu-path&#39; is renamed to &#39;--path&#39;.<br>
-* Option &#39;--qemu-suffix&#39; is renamed to &#39;--suffix&#39;.<br>
-<br>
-The functionality of all of them is untouched. Changes are related to synta=
-x only.<br>
-<br>
-v10<br>
-<br>
-* Split style related commit<br>
-<br>
-v9<br>
-<br>
-* Make style coherent with the dominant pattern<br>
-<br>
-v8:<br>
-<br>
-* Fix typos and address review comments<br>
-<br>
-v7:<br>
-<br>
-* Check that a interpreter exists before trying to remove it.<br>
-<br>
-v6:<br>
-<br>
-* Don&#39;t need to use &quot;find&quot;.<br>
-* Put the &quot;;;&quot; at the same position.<br>
-* Set BINFMT_CLEAR to &#39;:&#39;, to allow --test to work with --clear.<br=
->
-* Do not show DEBIANDIR and SYSTEMDDIR in the Env-variable column.<br>
-<br>
-Based on:<br>
-<br>
-* [PATCH v5 0/10] qemu-binfmt-conf.sh<br>
-=C2=A0 =C2=A0* should have been [PATCH v5 0/9] qemu-binfmt-conf.sh<br>
-* [PATCH v4 0/10] qemu-binfmt-conf.sh<br>
-* [PATCH v3 0/10] qemu-binfmt-conf.sh<br>
-* [PATCH v2] qemu-binfmt-conf.sh: add CPUS, add --reset, make -p and -c boo=
-lean (no arg)<br>
-* [PATCH] qemu-binfmt-conf.sh: add CPUS, add --reset, make -p and -c boolea=
-n (no arg)<br>
-* scripts/qemu-binfmt-conf.sh: allow clearing of entries<br>
-<br>
-Regards<br>
-<br>
-Unai Martinez-Corral (10):<br>
-=C2=A0 =C2=A0 =C2=A0 qemu-binfmt-conf.sh: enforce style consistency<br>
-=C2=A0 =C2=A0 =C2=A0 qemu-binfmt-conf.sh: enforce safe tests<br>
-=C2=A0 =C2=A0 =C2=A0 qemu-binfmt-conf.sh: make opts -p and -c boolean<br>
-=C2=A0 =C2=A0 =C2=A0 qemu-binfmt-conf.sh: add QEMU_CREDENTIAL and QEMU_PERS=
-ISTENT<br>
-=C2=A0 =C2=A0 =C2=A0 qemu-binfmt-conf.sh: use the same presentation format =
-as for qemu-*<br>
-=C2=A0 =C2=A0 =C2=A0 qemu-binfmt-conf.sh: remove &#39;qemu&#39; prefix from=
- cli options<br>
-=C2=A0 =C2=A0 =C2=A0 qemu-binfmt-conf.sh: honour QEMU_PATH and/or QEMU_SUFF=
-IX<br>
-=C2=A0 =C2=A0 =C2=A0 qemu-binfmt-conf.sh: generalize &lt;CPU&gt; to positio=
-nal TARGETS<br>
-=C2=A0 =C2=A0 =C2=A0 qemu-binfmt-conf.sh: add option --clear<br>
-=C2=A0 =C2=A0 =C2=A0 qemu-binfmt-conf.sh: add --test<br>
-<br>
-scripts/qemu-binfmt-conf.sh | 221<br>
-1 file changed, 138 insertions(+), 83 deletions(-i)<br>
-</blockquote></div>
-
---0000000000006ff99505a3e1b095--
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index b7c7946771..d41c4a08c0 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3870,6 +3870,16 @@ static inline bool isar_feature_aa64_sve2_bitperm(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64zfr0, ID_AA64ZFR0, BITPERM) != 0;
+ }
+ 
++static inline bool isar_feature_aa64_sve2_f32mm(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64zfr0, ID_AA64ZFR0, F32MM) != 0;
++}
++
++static inline bool isar_feature_aa64_sve2_f64mm(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64zfr0, ID_AA64ZFR0, F64MM) != 0;
++}
++
+ /*
+  * Feature tests for "does this exist in either 32-bit or 64-bit?"
+  */
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index ea53750141..8104d23c5f 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -2683,3 +2683,6 @@ DEF_HELPER_FLAGS_5(sve2_sqrdcmlah_zzzz_s, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve2_sqrdcmlah_zzzz_d, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_6(fmmla_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(fmmla_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, ptr, i32)
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+index 95c73c665a..dd987da648 100644
+--- a/target/arm/sve.decode
++++ b/target/arm/sve.decode
+@@ -1383,3 +1383,7 @@ UMLSLT_zzzw     01000100 .. 0 ..... 010 111 ..... .....  @rda_rn_rm
+ 
+ CMLA_zzzz       01000100 esz:2 0 rm:5 0010 rot:2 rn:5 rd:5  ra=%reg_movprfx
+ SQRDCMLAH_zzzz  01000100 esz:2 0 rm:5 0011 rot:2 rn:5 rd:5  ra=%reg_movprfx
++
++### SVE2 floating point matrix multiply accumulate
++
++FMMLA           01100100 .. 1 ..... 111001 ..... .....  @rda_rn_rm
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index b392a87aef..4646107f2e 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -7389,3 +7389,47 @@ void HELPER(sve2_histseg)(void *vd, void *vn, void *vm, uint32_t desc)
+         *(uint64_t *)(vd + i + 8) = out1;
+     }
+ }
++
++#define DO_FP_MATRIX_MUL(NAME, TYPE, MUL, ADD)                              \
++void HELPER(NAME)(void *vd, void *va, void *vn, void *vm,                   \
++                     void *status, uint32_t desc)                           \
++{                                                                           \
++    intptr_t s;                                                             \
++    intptr_t opr_sz = simd_oprsz(desc) / (sizeof(TYPE) >> 2);               \
++                                                                            \
++    for (s = 0; s < opr_sz; ++s) {                                          \
++        TYPE *n = vn + s * (sizeof(TYPE) >> 2);                             \
++        TYPE *m = vm + s * (sizeof(TYPE) >> 2);                             \
++        TYPE *a = va + s * (sizeof(TYPE) >> 2);                             \
++        TYPE *d = vd + s * (sizeof(TYPE) >> 2);                             \
++                                                                            \
++        TYPE n00 = n[0], n01 = n[1], n10 = n[2], n11 = n[3];                \
++        TYPE m00 = m[0], m01 = m[1], m10 = m[2], m11 = m[3];                \
++        TYPE p0, p1, results[4];                                            \
++                                                                            \
++        /* i = 0, j = 0 */                                                  \
++        p0 = MUL(n00, m00, status);                                         \
++        p1 = MUL(n01, m01, status);                                         \
++        results[0] = ADD(a[0], ADD(p0, p1, status), status);                \
++                                                                            \
++        /* i = 0, j = 1 */                                                  \
++        p0 = MUL(n00, m10, status);                                         \
++        p1 = MUL(n01, m11, status);                                         \
++        results[1] = ADD(a[1], ADD(p0, p1, status), status);                \
++                                                                            \
++        /* i = 1, j = 0 */                                                  \
++        p0 = MUL(n10, m00, status);                                         \
++        p1 = MUL(n11, m01, status);                                         \
++        results[2] = ADD(a[2], ADD(p0, p1, status), status);                \
++                                                                            \
++        /* i = 1, j = 1 */                                                  \
++        p0 = MUL(n10, m10, status);                                         \
++        p1 = MUL(n11, m11, status);                                         \
++        results[3] = ADD(a[3], ADD(p0, p1, status), status);                \
++                                                                            \
++        memcpy(d, results, sizeof(TYPE) * 4);                               \
++    }                                                                       \
++}
++
++DO_FP_MATRIX_MUL(fmmla_s, float32, float32_mul, float32_add)
++DO_FP_MATRIX_MUL(fmmla_d, float64, float64_mul, float64_add)
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index 0cbb35c691..29532424c1 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -7615,6 +7615,35 @@ static bool do_sve2_zzzz_fn(DisasContext *s, int rd, int rn, int rm, int ra,
+     return true;
+ }
+ 
++static bool trans_FMMLA(DisasContext *s, arg_rrrr_esz *a)
++{
++    if (a->esz < MO_32) {
++        return false;
++    }
++
++    if (a->esz == MO_32 && !dc_isar_feature(aa64_sve2_f32mm, s)) {
++        return false;
++    }
++
++    if (a->esz == MO_64 && !dc_isar_feature(aa64_sve2_f64mm, s)) {
++        return false;
++    }
++
++    static gen_helper_gvec_4_ptr * const fns[2] = {
++        gen_helper_fmmla_s, gen_helper_fmmla_d
++    };
++    if (sve_access_check(s)) {
++        unsigned vsz = vec_full_reg_size(s);
++        TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
++        tcg_gen_gvec_4_ptr(vec_full_reg_offset(s, a->rd),
++                           vec_full_reg_offset(s, a->ra),
++                           vec_full_reg_offset(s, a->rn),
++                           vec_full_reg_offset(s, a->rm),
++                           status, vsz, vsz, 0, fns[a->esz - 2]);
++    }
++    return true;
++}
++
+ static bool do_sqdmlal_zzzw(DisasContext *s, arg_rrrr_esz *a,
+                             bool sel1, bool sel2)
+ {
+-- 
+2.17.1
 
 
