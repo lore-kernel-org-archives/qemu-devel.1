@@ -2,81 +2,85 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E001C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:33:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A1CC54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:34:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A07E2076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:33:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D9722076E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:34:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IdoYnT1b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A07E2076E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tg3axDH2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D9722076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRHNH-0001HO-Kc
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 11:33:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35126)
+	id 1jRHO4-0001vu-GW
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 11:34:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39368)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jRHCZ-0003Ny-0O
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:22:15 -0400
+ (envelope-from <berrange@redhat.com>) id 1jRHMv-000140-5V
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:32:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jRHCI-0003rz-J2
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:22:14 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53970
+ (envelope-from <berrange@redhat.com>) id 1jRHMs-0005Bi-QC
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:32:56 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23212
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jRHCI-0003ny-4T
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:21:58 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jRHMp-000557-Am
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:32:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587568916;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1587569568;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xdDfyxpw0DLE3qzk+qJsiuNkCHfexex05JP86Gguhzs=;
- b=IdoYnT1bsHyNDx0+tfxtwN08Yb0mgg/egf4eeMH6oVBDPuGFTR0pE3T0KW1qNs/Uy0/cwS
- 5qfr0CG7u0rUqsE21tjx1MwR5MzZcBEMBj70i+6E9UhOV9CByeR0t05Md9KvnU32eCUr6U
- 4LgQZKtJtkR92+OXslcqfODIQrNygDw=
+ bh=Gb6ErjXe6EyRPRXSqVLXphl/V47FFvgahYS8/TIO9ow=;
+ b=Tg3axDH2PK5zGOry3Y0o/T6nHhAwOgFQiJdZOqRKdzli4ul76Y0EeUT0gAbxKdDlbhbFTr
+ RZOvhqy8SJ7sHXFlfWrOMsk7pZp3PMh89CK+PMBw8DqdqQaVifzUcgWjCcdsa98rCdCoX1
+ lwuxZ1j4GV9UoP/Cd2tRPB089VracRc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-451-cIPaqXHePGaeTRxUiAzIIA-1; Wed, 22 Apr 2020 11:21:51 -0400
-X-MC-Unique: cIPaqXHePGaeTRxUiAzIIA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-262-jwRcHLPoN1yFZFIMC6egzg-1; Wed, 22 Apr 2020 11:32:38 -0400
+X-MC-Unique: jwRcHLPoN1yFZFIMC6egzg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 367EC8005B4;
- Wed, 22 Apr 2020 15:21:50 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-114-212.ams2.redhat.com
- [10.36.114.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B43CA600D2;
- Wed, 22 Apr 2020 15:21:48 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v5 7/9] block: truncate: Don't make backing file data visible
-Date: Wed, 22 Apr 2020 17:21:27 +0200
-Message-Id: <20200422152129.167074-8-kwolf@redhat.com>
-In-Reply-To: <20200422152129.167074-1-kwolf@redhat.com>
-References: <20200422152129.167074-1-kwolf@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4AA080BE32;
+ Wed, 22 Apr 2020 15:32:37 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 84ED85C1D4;
+ Wed, 22 Apr 2020 15:32:36 +0000 (UTC)
+Date: Wed, 22 Apr 2020 16:32:33 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Alexey Krasikov <alex-krasikov@yandex-team.ru>
+Subject: Re: [RFC PATCH v2 1/5] crypto/secret: rename to secret_interface.
+Message-ID: <20200422153233.GE587120@redhat.com>
+References: <20200415222525.4022-1-alex-krasikov@yandex-team.ru>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200415222525.4022-1-alex-krasikov@yandex-team.ru>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:12:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:57:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,79 +92,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-devel@nongnu.org, mreitz@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When extending the size of an image that has a backing file larger than
-its old size, make sure that the backing file data doesn't become
-visible in the guest, but the added area is properly zeroed out.
+On Thu, Apr 16, 2020 at 01:25:21AM +0300, Alexey Krasikov wrote:
+> * Rename for future division into subclasses. Most part of the interface
+>   will remain in basic common class.
 
-Consider the following scenario where the overlay is shorter than its
-backing file:
+You don't need to put bullet points in the commit message, just
+have the text.
 
-    base.qcow2:     AAAAAAAA
-    overlay.qcow2:  BBBB
+>=20
+> Signed-off-by: Alexey Krasikov <alex-krasikov@yandex-team.ru>
+> ---
+>  crypto/{secret.c =3D> secret_interface.c}         | 0
+>  include/crypto/{secret.h =3D> secret_interface.h} | 0
+>  2 files changed, 0 insertions(+), 0 deletions(-)
+>  rename crypto/{secret.c =3D> secret_interface.c} (100%)
+>  rename include/crypto/{secret.h =3D> secret_interface.h} (100%)
 
-When resizing (extending) overlay.qcow2, the new blocks should not stay
-unallocated and make the additional As from base.qcow2 visible like
-before this patch, but zeros should be read.
+This breaks the build because Makefile.objs doesn't reference
+the new filename, and likewise other files doing #include
+don't work.
 
-A similar case happens with the various variants of a commit job when an
-intermediate file is short (- for unallocated):
+I don't think renaming actually makes sense in the first place,
+because you then add the original files back again in a later
+patch.
 
-    base.qcow2:     A-A-AAAA
-    mid.qcow2:      BB-B
-    top.qcow2:      C--C--C-
+You need to just have a patch which introduces secret_interface.{ch}
+without killing the original secret.{c,h} entirely.  The key point is
+that QEMU must successfully compile on each individual patch in the
+series, otherwise it breaks "git bisect" usage.
 
-After commit top.qcow2 to mid.qcow2, the following happens:
+Also, since the object is called "SecretCommon",the filenames
+should match that "secret_common.{ch}"
 
-    mid.qcow2:      CB-C00C0 (correct result)
-    mid.qcow2:      CB-C--C- (before this fix)
 
-Without the fix, blocks that previously read as zeros on top.qcow2
-suddenly turn into A.
-
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
----
- block/io.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/block/io.c b/block/io.c
-index 795075954e..8fbb607515 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -3394,6 +3394,20 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, =
-int64_t offset, bool exact,
-         goto out;
-     }
-=20
-+    /*
-+     * If the image has a backing file that is large enough that it would
-+     * provide data for the new area, we cannot leave it unallocated becau=
-se
-+     * then the backing file content would become visible. Instead, zero-f=
-ill
-+     * the new area.
-+     *
-+     * Note that if the image has a backing file, but was opened without t=
-he
-+     * backing file, taking care of keeping things consistent with that ba=
-cking
-+     * file is the user's responsibility.
-+     */
-+    if (new_bytes && bs->backing) {
-+        flags |=3D BDRV_REQ_ZERO_WRITE;
-+    }
-+
-     if (drv->bdrv_co_truncate) {
-         if (flags & ~bs->supported_truncate_flags) {
-             error_setg(errp, "Block driver does not support requested flag=
-s");
+Regards,
+Daniel
 --=20
-2.25.3
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
