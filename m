@@ -1,90 +1,106 @@
 Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.4 required=3.0 tests=DEAR_SOMETHING,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D32E1C54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0284C54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:25:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DAB92082E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:22:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5524D2076E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:25:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EqcEwM55"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DAB92082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IXHQm6ZA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5524D2076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRI9F-0004tm-PF
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:22:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59842)
+	id 1jRIBO-00078L-Gl
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:25:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35656)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jRI54-0007sC-GW
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:18:35 -0400
+ (envelope-from <philmd@redhat.com>) id 1jRIAT-0006DZ-Ut
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:24:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jRI4p-0000wh-Kb
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:18:34 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:51668)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jRI4p-0000dR-6y; Wed, 22 Apr 2020 12:18:19 -0400
-Received: by mail-wm1-x336.google.com with SMTP id x4so3065850wmj.1;
- Wed, 22 Apr 2020 09:18:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=o07n5auFQtbWMeOi+T/XpGNeJDKGraAPFTqT1F32lDE=;
- b=EqcEwM55qcum9P4ZYpoH82lL5PLLqmX3IMFxhU+cMFTsaqRCuSQHQ8WnoZJI1uuoqZ
- V+7d65C4NziGyhPnY725XwHgnMJ4TGqCDcN7OdrJ5urQR6/GDyivuRRz3X1dMpE1S3Rh
- 13uv4RDtxk/MIZbADiz/BD8NK5ah8XlB5afQMfTLlk7w+Ckla8gq03SRFswEbxR9pM9D
- vldjju7+waAqQxM8CJuNSCSrwInOSM6xRpwd1M10kseSUD8eSK3W+bUxI2F5AGueXWxo
- NGuGIcFXKIuuqmMmEldDsbAMOULdO9u3OrAsk0WuLuIBKUvFACUpJJwyTxcoYx4nR7FX
- ujxg==
+ (envelope-from <philmd@redhat.com>) id 1jRIAS-00030F-Bz
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:24:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42144
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRIAO-0002V6-AY
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:24:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587572642;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=35qdBk7jI1Uo9ppP5dIhgF2Y+LAOFocWgucYcFjzavE=;
+ b=IXHQm6ZAe/e0XGk2Uy7J2iXHzvybRgrItHJ/+93bi5cb0JlrLEuqnu+04+ygQuFdWUXAHq
+ VKF7YwVxF9qxH5m8Wu92kBeyXQq8lBtp5XfWN/dqVamKneSxIk82tIWwKnYfywCTM7XHGe
+ +vthTaNPJvfrjo52Wf1bw1iItnNyGOU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-431-7dGxoKHsMny-6p8GDYXWbg-1; Wed, 22 Apr 2020 12:24:01 -0400
+X-MC-Unique: 7dGxoKHsMny-6p8GDYXWbg-1
+Received: by mail-wm1-f70.google.com with SMTP id n17so1061346wmi.3
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 09:24:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=o07n5auFQtbWMeOi+T/XpGNeJDKGraAPFTqT1F32lDE=;
- b=Jyrgai+eRgWL9LMS9wpxGpo/+A4C6CHVAFr2RXnDfLiQw02wd5UQJslxh+FbePGQN4
- Yda8UBN8oX5mrhVATbq5rpwaxjdio89X6lj6CSuwR0xtw68DJsDu3rMDrnm6cnn4ONbO
- 2EmeEDMSkmIAqOEvGe/ln5ogocpmN/HXH6oHOk8djuVz3Auhc74Bw4tmWoyFKmQVBfJ4
- vNf5gjFD29mGEKLN3y35Fhf7vCidaXDzjaDbPaacTgjGRc9qZErs9Ab+NgjBigQmLzzB
- o1lC/FaiCSxnPGSTXHe1R3wECfheC+OMXiH2fOhs6N9ioU/lIEjI9zFig6NVLqPp6KNF
- uFdg==
-X-Gm-Message-State: AGi0PuaNRMK7kPNK4ecUMQwJy97EK2TFYc+kSGUXiVNRlMPXowyI0A2f
- c+orqUuTx+rxQl9F6/7JTuk=
-X-Google-Smtp-Source: APiQypLlH9FTGhSrlOa+mKeAI3e8X8qt+ZWv+P7kYHi3C8PdMmZlk0wkU836r4SSYoIGGKXWoUT2bw==
-X-Received: by 2002:a1c:492:: with SMTP id 140mr12024967wme.9.1587572295620;
- Wed, 22 Apr 2020 09:18:15 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id y5sm9201785wru.15.2020.04.22.09.18.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Apr 2020 09:18:14 -0700 (PDT)
-Date: Wed, 22 Apr 2020 17:18:13 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: janine.schneider@fau.de
-Subject: Re: Integration of qemu-img
-Message-ID: <20200422161813.GI47385@stefanha-x1.localdomain>
-References: <00fc01d61256$35f849c0$a1e8dd40$@fau.de>
- <877dyfc1if.fsf@dusky.pond.sub.org>
+ h=x-gm-message-state:subject:to:references:cc:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=p/gx0VDGZL7TB4UuCbzyfM7cMOTYJDsxwFrh5uA0Gj4=;
+ b=RDTGqH2JqM2iYwUuV5y0kNpr3MTkmJWPredRzoS64nQOwkzqjnjKvwZn4iF+Nl9alx
+ pUKgTRrh3vzrxrPzFYSVlERte5wmi6guLrLRKH3So/wzfV4nUOqoSjMvDkkpqnGItWQp
+ +/tF6eX92sKK8jsOlQXyGOQcSIASyVaHnipNBL6z8l/uLmp1nVGk/N5L44ZnnsX9hM8A
+ QbZ+vGuT95tZXpChhz/gx63X2U0g1M+mGWbMwF5GatGhSbyGGzIGHxMNIoaqQGlOYTu7
+ ATODAT+OdVQ5m+wfyAC0K1ZktyMYIclS77VqPxA5L4Zou+ZDJV+aSa4iZxUzKttiE6nP
+ oJ9Q==
+X-Gm-Message-State: AGi0Pubkx/xjWrn4/1ZcBJdlf97D6x2cKA0feDGUEs5JPXDF/H1Dq9BU
+ ZThs2aZ7R6TDHoub6+2ZEWPGYQL8MRXA7eSKd7lKvGPMGtJExb5OO2WBTRMov2fUZVS7xL7AYkR
+ vZZTNPFN4UcTF5vg=
+X-Received: by 2002:adf:ee4c:: with SMTP id w12mr33811708wro.347.1587572639411; 
+ Wed, 22 Apr 2020 09:23:59 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLe+zOZg6zQ4RQpFgsEA36VG7QCbuUkgVLhOMVEWkLKX3/i5neH2eQLmBoPs51BcYxCA8dOEw==
+X-Received: by 2002:adf:ee4c:: with SMTP id w12mr33811681wro.347.1587572639176; 
+ Wed, 22 Apr 2020 09:23:59 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id f2sm9173599wro.59.2020.04.22.09.23.58
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 22 Apr 2020 09:23:58 -0700 (PDT)
+Subject: Re: qemu 4.2.0 audiodev soundhw
+To: Jakob Bohm <jb-gnumlists@wisemo.com>, qemu-discuss@nongnu.org
+References: <CA+enFJ=UmKNam-7T5J6UM6JGY7wy492MNm-d_-qKf7rLa818TQ@mail.gmail.com>
+ <CAFEAcA_GqNAS-5+081vhpvn=Zk4qbD-SJz5SmN8s5_1_zerpAA@mail.gmail.com>
+ <20200420144433.upkagl3qi3nc2lsj@sirius.home.kraxel.org>
+ <CA+enFJkFN7B=-6k44Sb8XC2yAy2EGWoLCDMW0tA=GwwaxaspyA@mail.gmail.com>
+ <d6c04095-8ea7-30c2-29f1-61c26aed835a@wisemo.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <7a90dead-ff67-589c-81a9-826c4d0bd86e@redhat.com>
+Date: Wed, 22 Apr 2020 18:23:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="v2/QI0iRXglpx0hK"
-Content-Disposition: inline
-In-Reply-To: <877dyfc1if.fsf@dusky.pond.sub.org>
-Received-SPF: pass client-ip=2a00:1450:4864:20::336;
- envelope-from=stefanha@gmail.com; helo=mail-wm1-x336.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::336
+In-Reply-To: <d6c04095-8ea7-30c2-29f1-61c26aed835a@wisemo.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 09:07:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,65 +112,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Jakob,
 
---v2/QI0iRXglpx0hK
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Apr 16, 2020 at 09:50:48AM +0200, Markus Armbruster wrote:
-> Cc: qemu-block
+On 4/21/20 12:06 AM, Jakob Bohm wrote:
+[...]
 >=20
-> <janine.schneider@fau.de> writes:
+> In fact, over the years, I have found it excruciatingly difficult to find
+> valid qemu documentation, as each feature effort tends to leave behind
+> half-updated pages and a bunch of uncoordinated messages about what may o=
+r
+> may not have been implemented in unspecified versions.
+I feel your pain and agree.
+
+How can this get improved?
+
+Keeping the command line backward compatible is not an easy task.
+
+There is a quite important effort in progress to improve the documentation.
+
+Users reporting bad/incomplete/outdated documentation would help and=20
+motivate developers to fix it. That would reduce the gap between=20
+developers implementing features and users.
+
+Do you other have suggestions about what should be improved?
+
+Thanks,
+
+Phil.
+
 >=20
-> > Dear Sir or Madam,
-> >
-> > =20
-> >
-> > I am a PhD student at the Friedrich-Alexander-University Erlangen-N=FCr=
-nberg
-> > in Bavaria Germany and I am currently working on an open-source forensic
-> > analysis tool. I would like to use qemu-img for converting virtual disc=
-s to
-> > raw files and to get virtual disc information. By now I tried to create=
- a
-> > qemu-img DLL with the qemu source code you provide on your website, but=
- I am
-> > unable to compile it properly. Therefore, I would like to ask you if th=
-ere
-> > is a simple solution to integrate qemu-img to other C++ projects? Or is
-> > there a precompiled qemu-img DLL which I could use? Thank you very much=
- for
-> > your support.
+> On 20/04/2020 19:54, Idar Lund wrote:
+>> Hi,
+>>
+>> Thanks for your response!
+>>
+>> Yes, I agree with you on the options. If you guys decide on (3), I=20
+>> would suggest to make it dynamically like this; "-soundhw=20
+>> hda,audiodev=3Dsound1". This would then copy the 'audiodev' (and=20
+>> possible other) parameter(s) to the '-device' option.
+>>
+>> My personal preference would be to recommend option number 1.
+>> The reason for this is that maintaining a shortcut like this makes it=20
+>> hard to maintain for developers when adding features and fixes bugs on=
+=20
+>> other options. And of course documentation maintainers :)
+>> The second reason as I see it is that people tend to create a .sh=20
+>> script or similar to start their qemu virtual machines if they don't=20
+>> use libvirt/xml schema. And for that, a more verbose command would=20
+>> actually be easier to maintain for users since we then know where to=20
+>> put parameters like this.
+>>
+>> -Idar
+>>
+>> On Mon, Apr 20, 2020 at 4:44 PM Gerd Hoffmann <kraxel@redhat.com=20
+>> <mailto:kraxel@redhat.com>> wrote:
+>>
+>> =C2=A0=C2=A0=C2=A0 On Fri, Apr 17, 2020 at 12:15:30PM +0100, Peter Mayde=
+ll wrote:
+>> =C2=A0=C2=A0=C2=A0 > On Fri, 17 Apr 2020 at 12:08, Idar Lund <idarlund@g=
+mail.com
+>> =C2=A0=C2=A0=C2=A0 <mailto:idarlund@gmail.com>> wrote:
+>> =C2=A0=C2=A0=C2=A0 > > I'm using qemu-system-x86_64 with the following o=
+ptions:
+>> =C2=A0=C2=A0=C2=A0 > > -audiodev pa,id=3Dsound1,server=3D/run/user/1000/=
+pulse/native \
+>> =C2=A0=C2=A0=C2=A0 > > -soundhw hda
+>> =C2=A0=C2=A0=C2=A0 > >
+>> =C2=A0=C2=A0=C2=A0 > > After upgrade to 4.2.0 (qemu-4.2.0-7.fc32) I get =
+the following
+>> =C2=A0=C2=A0=C2=A0 warning:
+>> =C2=A0=C2=A0=C2=A0 > > (qemu) audio: Device hda: audiodev default parame=
+ter is
+>> =C2=A0=C2=A0=C2=A0 deprecated, please specify audiodev=3Dsound1
+>> =C2=A0=C2=A0=C2=A0 > >
+>> =C2=A0=C2=A0=C2=A0 > > The documentation `man qemu-system-x86_64` seems =
+to not
+>> =C2=A0=C2=A0=C2=A0 reflect this.
+>> =C2=A0=C2=A0=C2=A0 > > How am I supposed to use audiodev and soundhw?
+>> =C2=A0=C2=A0=C2=A0 >
+>> =C2=A0=C2=A0=C2=A0 > This looks like another question for you, Gerd...
+>>
+>> =C2=A0=C2=A0=C2=A0 Hmm, good question how to proceed here best ...
+>>
+>> =C2=A0=C2=A0=C2=A0 "-soundhw hda" is a shortcut for "-device intel-hda -=
+device
+>> =C2=A0=C2=A0=C2=A0 hda-duplex"
+>>
+>> =C2=A0=C2=A0=C2=A0 You can use "-device intel-hda -device hda-duplex,aud=
+iodev=3Dsound1" to
+>> =C2=A0=C2=A0=C2=A0 make the warning go away.=C2=A0 That is pretty verbos=
+e when compared to
+>> =C2=A0=C2=A0=C2=A0 "-soundhw hda" though ...
+>>
+>> =C2=A0=C2=A0=C2=A0 So the options I see are:
+>>
+>> =C2=A0=C2=A0=C2=A0 =C2=A0 (1) deprecate the -soundhw shortcut, expect us=
+ers to use -device
+>> =C2=A0=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 instead.
+>> =C2=A0=C2=A0=C2=A0 =C2=A0 (2) have -soundhw lookup the audiodev and add =
+it automatically.
+>> =C2=A0=C2=A0=C2=A0 Works
+>> =C2=A0=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 only with a single audiodev, but=
+ that isn't different from what
+>> =C2=A0=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 we have today.=C2=A0 If you want=
+ do more complicated things you
+>> =C2=A0=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 already have to use the more ver=
+bose -device command line.
+>> =C2=A0=C2=A0=C2=A0 =C2=A0 (3) add audiodev option to -soundhw.
+>>
+>> =C2=A0=C2=A0=C2=A0 I don't like (3) much, our command line is already me=
+ssy enough.
+>> =C2=A0=C2=A0=C2=A0 So my
+>> =C2=A0=C2=A0=C2=A0 personal preference would be (1) or (2) ...
+>>
+>=20
+> Enjoy
+>=20
+> Jakob
 
-Can you simply spawn a qemu-img process from your application?  That
-would be much easier than trying to build it as a library and link it
-into your application.
-
-qemu-img has --output=3Djson exactly for this case.  It will let you parse
-the output as JSON.
-
-Stefan
-
---v2/QI0iRXglpx0hK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6gbkUACgkQnKSrs4Gr
-c8gZSwgAp0zCeBhRw7d1yHpSV1SBhhJTHWOmjo057ztozDjs1kijTAlx4jtRhxPp
-Q+PLdv325DV/B4IfjpNaTiSunEPrlWjq1/8TXy8OMGrl5+cqzl2AHvTQC+c91Qhr
-tXJQZua+RONy7sxQLfenIh0ZfuS9iaOT7jhhVVbJu9MGh2Bokf2PvNxzpkdcygME
-kpF5eRPE889m645Lr4tPEmja73fDRy7fk79nl2k7HiNGSCslRndETW2QN4F/budZ
-Ef8vhH2A1vZUGNqNX/qKz/ajvsUo81lQnhb25C40sK1ut9Q5js2o8jnd3JbXLC7A
-Yx74HTlEH4/DmgKYmXo9LCF8J16bjg==
-=9TqJ
------END PGP SIGNATURE-----
-
---v2/QI0iRXglpx0hK--
 
