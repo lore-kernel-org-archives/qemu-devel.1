@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F21C55189
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE4CC5518B
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:19:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59C29206CD
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:18:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59C29206CD
+	by mail.kernel.org (Postfix) with ESMTPS id 654F5206E9
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 07:19:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 654F5206E9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jR9dx-0004P0-Ig
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 03:18:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39818)
+	id 1jR9fe-0006Rx-HT
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 03:19:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39876)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jR9WE-0001M6-6l
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:10:02 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jR9WH-0001T4-56
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:10:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jR9WC-0007vL-P6
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:10:01 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:60280)
+ (envelope-from <its@irrelevant.dk>) id 1jR9WG-000862-OX
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 03:10:04 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:60348)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jR9WB-0007Ew-7p; Wed, 22 Apr 2020 03:09:59 -0400
+ id 1jR9WD-0007Hq-Ff; Wed, 22 Apr 2020 03:10:01 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 6DC4EBF758;
- Wed, 22 Apr 2020 07:09:37 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id CAF07BFD3D;
+ Wed, 22 Apr 2020 07:09:39 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 10/16] nvme: factor out device state setup
-Date: Wed, 22 Apr 2020 09:09:21 +0200
-Message-Id: <20200422070927.373048-11-its@irrelevant.dk>
+Subject: [PATCH v3 16/16] nvme: factor out controller identify setup
+Date: Wed, 22 Apr 2020 09:09:27 +0200
+Message-Id: <20200422070927.373048-17-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200422070927.373048-1-its@irrelevant.dk>
 References: <20200422070927.373048-1-its@irrelevant.dk>
@@ -80,58 +80,80 @@ Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Keith Busch <kbusch@kernel.org>
 ---
- hw/block/nvme.c | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+ hw/block/nvme.c | 50 ++++++++++++++++++++++++++-----------------------
+ 1 file changed, 27 insertions(+), 23 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 658d20e9448a..29cca6e95114 100644
+index bc4f6b20045b..5916d6501ce7 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -1397,6 +1397,17 @@ static void nvme_check_constraints(NvmeCtrl *n, Error **errp)
+@@ -1531,32 +1531,11 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
      }
  }
  
-+static void nvme_init_state(NvmeCtrl *n)
-+{
-+    n->num_namespaces = 1;
-+    /* add one to max_ioqpairs to account for the admin queue pair */
-+    n->reg_size = pow2ceil(NVME_REG_SIZE +
-+                           2 * (n->params.max_ioqpairs + 1) * NVME_DB_SIZE);
-+    n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
-+    n->sq = g_new0(NvmeSQueue *, n->params.max_ioqpairs + 1);
-+    n->cq = g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
+-static void nvme_realize(PCIDevice *pci_dev, Error **errp)
++static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+ {
+-    NvmeCtrl *n = NVME(pci_dev);
+     NvmeIdCtrl *id = &n->id_ctrl;
+-    Error *local_err = NULL;
++    uint8_t *pci_conf = pci_dev->config;
+ 
+-    int i;
+-    uint8_t *pci_conf;
+-
+-    nvme_check_constraints(n, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-
+-    nvme_init_state(n);
+-
+-    nvme_init_blk(n, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-
+-    nvme_init_pci(n, pci_dev);
+-
+-    pci_conf = pci_dev->config;
+     id->vid = cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
+     id->ssvid = cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VENDOR_ID));
+     strpadcpy((char *)id->mn, sizeof(id->mn), "QEMU NVMe Ctrl", ' ');
+@@ -1589,6 +1568,31 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+ 
+     n->bar.vs = 0x00010200;
+     n->bar.intmc = n->bar.intms = 0;
 +}
 +
- static void nvme_realize(PCIDevice *pci_dev, Error **errp)
- {
-     NvmeCtrl *n = NVME(pci_dev);
-@@ -1413,6 +1424,8 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-         return;
-     }
- 
-+    nvme_init_state(n);
++static void nvme_realize(PCIDevice *pci_dev, Error **errp)
++{
++    NvmeCtrl *n = NVME(pci_dev);
++    Error *local_err = NULL;
 +
-     bs_size = blk_getlength(n->conf.blk);
-     if (bs_size < 0) {
-         error_setg(errp, "could not get backing file size");
-@@ -1431,17 +1444,8 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-     pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
-     pcie_endpoint_cap_init(pci_dev, 0x80);
++    int i;
++
++    nvme_check_constraints(n, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++
++    nvme_init_state(n);
++    nvme_init_blk(n, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    nvme_init_pci(n, pci_dev);
++    nvme_init_ctrl(n, pci_dev);
  
--    n->num_namespaces = 1;
--
--    /* add one to max_ioqpairs to account for the admin queue pair */
--    n->reg_size = pow2ceil(NVME_REG_SIZE +
--                           2 * (n->params.max_ioqpairs + 1) * NVME_DB_SIZE);
-     n->ns_size = bs_size / (uint64_t)n->num_namespaces;
- 
--    n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
--    n->sq = g_new0(NvmeSQueue *, n->params.max_ioqpairs + 1);
--    n->cq = g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
--
-     memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
-                           "nvme", n->reg_size);
-     pci_register_bar(pci_dev, 0,
+     for (i = 0; i < n->num_namespaces; i++) {
+         nvme_init_namespace(n, &n->namespaces[i], &local_err);
 -- 
 2.26.2
 
