@@ -2,85 +2,90 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D995C55185
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3DFBC54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:41:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B2AD2076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:38:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CCA72076E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:41:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mv+mF416"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B2AD2076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZEh0g948"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CCA72076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRHRx-0007W6-Gw
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 11:38:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41182)
+	id 1jRHUy-0000zO-QN
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 11:41:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42708)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jRHRH-0006tD-0m
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:37:27 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jRHUE-0000MY-73
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:40:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jRHRG-0005gl-Kp
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:37:26 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40846)
+ (envelope-from <alex.bennee@linaro.org>) id 1jRHUC-0006f2-AS
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:40:29 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54366)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jRHRF-0005Qr-09; Wed, 22 Apr 2020 11:37:25 -0400
-Received: by mail-wm1-x341.google.com with SMTP id u16so2907790wmc.5;
- Wed, 22 Apr 2020 08:37:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=IwF9K0dMPQeUU9IVlN/o/KXLfjpUlazL+/rfRsoXZBI=;
- b=Mv+mF416YQoaCYGmPjulCRmhEZLxEb9SkvaJ79rhNckekcYOykVQc2urjxMwGDVMtL
- K1zl+3ApSEM4hVITlI8zq16DTbe89v0lv+IHMSaVLZvEHd08zHhX7vpwI1VlaQ6/S8zW
- YshtpI11dVVBQ4uPVcypsGNPRcvm4x0siTpxYX2DODE1zravqFsmvJXLOjYhNgOUapnN
- Wm+hG33pBgY2fTvzZpuxe3E6b8Q0v6AOx9r+pgVyApreSmzyIEG8jZNlCLN4wtsRfbLt
- uQG7LTLyrEcWp0Zqb55VkChimzxahY/3Y86+t6bME8FrK8H5sLgrdJcf8ELVS2FSzlDX
- HULw==
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jRHUA-0006VE-8O
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:40:26 -0400
+Received: by mail-wm1-x341.google.com with SMTP id h2so2879547wmb.4
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 08:40:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=VyeGp+GZB4z6ZDmQWpBpKc2/dzm7QYfBD8AdN8oeVMs=;
+ b=ZEh0g948XmvJ9f/J2VPmGdI5w7CKBzgWryXh8O57wPTX0fkNuyDMMxyTE89oFOOSMA
+ yDQZ7P7GNHjPHgK/ITU/8hKQ4Z8+ouiNHj8exttWyKut1j0o8saicV1vfkhFU+UasHtl
+ 560EDdgy+UkLowyuBhauj6PNyfdlT/dGyeFvoWhd6lwcHYize2WjNqbcpR/469NV6n3u
+ W9MB8sHOMvTxhiexQLvTzEVoEjTd7RCFFmMhdETSncFnXB/1xLSFqSZKynVv9CNBoN+p
+ a8MhCY9IxiWjpUvpYkT9ZejShUNVAVu1WTeBN6ojvtIT4y3irxRBPEI7oINotHgVgc9L
+ krEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=IwF9K0dMPQeUU9IVlN/o/KXLfjpUlazL+/rfRsoXZBI=;
- b=pcbzGd0NGSFeB1h2PnqRRdSFhsRVo6FCAh+Py2lQDk1kQ4sfJIxLDlejJM4+MwYBPf
- Q5Kal/5r6NMCQOv4B6S7nMa22JxWEri3qdRI/m0tAYIYvMpJsM8NgpyVCkhUydaJcj92
- 4j0ytSJjQRBBdzu/ugxvt2lOJcT1uIwnkymlaqpFemdqSETYjbqg2XFBrtGy9dmKZR9r
- TMF9+sIM1tMO0m6xqpZJZbt7vuAdfr5+q5P8xGRYoQARXEKCYjb2VDRn54vdasG45Mbg
- beNdu5/Fy8yR2MfTRXcZatpEfG61KrXDO3+21VOsaVaDftiJi0evq/putvnhpQ6/OdfZ
- P4Ow==
-X-Gm-Message-State: AGi0PuZNKUbXWjJv4ZooMtz9l18vAT6VjtEGEGV8YD8olDYsNJGw3/2J
- efpO9vecx7EF/RHG/NbcbvU=
-X-Google-Smtp-Source: APiQypIjDTuPYo96AWgGZmjMcKfTkBu9QxfRaTaZMxBWjhmKbao7zEyfRKuv8dUb2Kf/ESz1c5VRCg==
-X-Received: by 2002:a1c:a512:: with SMTP id o18mr10826862wme.138.1587569842917; 
- Wed, 22 Apr 2020 08:37:22 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id n2sm9694928wrq.74.2020.04.22.08.37.21
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=VyeGp+GZB4z6ZDmQWpBpKc2/dzm7QYfBD8AdN8oeVMs=;
+ b=mfRuY+YMZKHErdHYE1ST7Bvi9BX89jI7E/GTYt7j1CFZH0zNf2LbKrjzELd1diK+GL
+ AxnRPVhIp3BknNdOYI9dk8W3TTcbXoZntx2AsnNij6C6tBcIpaBlDNsHZ6huiuGjjWAM
+ IPZKr125EK1VcyDludeKmPvOAs7cvvKt8to2CIJnErNc+aN0ONc0LLRhDbklGPvGZYqk
+ bLpL9FTfmAZB3xEa8Pugq/QlMtx8+xrfKxC6XHr9GMToOKh0knS5JhaRLk4DT77Vm2on
+ ILfj3zq/zWFLYyMTllHHlg/3G4+fL91ns8fKpGWGRRuzJCLdAH9TLEsLcFZ6D7Jf5u8y
+ o7WA==
+X-Gm-Message-State: AGi0Pual1qDHGU43n3MMVIXpab2if0544htpU8aziz833Jnb3JDH0Ryf
+ AGaUSFstaJBa8fK6nHKNoeTy3g==
+X-Google-Smtp-Source: APiQypKEht3f+vx4JncvOz1T+nlBV39Tdd8G/ioFbLTz2eMtWjm/jtE6DFKBAg1qw7OKI30XDeyrUg==
+X-Received: by 2002:a1c:bd8b:: with SMTP id
+ n133mr11833568wmf.175.1587570024065; 
+ Wed, 22 Apr 2020 08:40:24 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u17sm10621749wra.63.2020.04.22.08.40.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Apr 2020 08:37:21 -0700 (PDT)
-Date: Wed, 22 Apr 2020 16:37:20 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 1/3] block: use int64_t as bytes type in tracked requests
-Message-ID: <20200422153720.GD47385@stefanha-x1.localdomain>
-References: <20200330141818.31294-1-vsementsov@virtuozzo.com>
- <20200330141818.31294-2-vsementsov@virtuozzo.com>
+ Wed, 22 Apr 2020 08:40:23 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 252D71FF7E;
+ Wed, 22 Apr 2020 16:40:22 +0100 (BST)
+References: <20200422011722.13287-1-richard.henderson@linaro.org>
+ <20200422011722.13287-13-richard.henderson@linaro.org>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2 12/36] tcg: Use tcg_constant_i32 with icount expander
+In-reply-to: <20200422011722.13287-13-richard.henderson@linaro.org>
+Date: Wed, 22 Apr 2020 16:40:22 +0100
+Message-ID: <87mu73cyvt.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Q0rSlbzrZN6k9QnT"
-Content-Disposition: inline
-In-Reply-To: <20200330141818.31294-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=stefanha@gmail.com; helo=mail-wm1-x341.google.com
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
@@ -96,47 +101,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, pavel.dovgaluk@ispras.ru,
- qemu-block@nongnu.org, sw@weilnetz.de, pl@kamp.de, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org,
- ronniesahlberg@gmail.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---Q0rSlbzrZN6k9QnT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-On Mon, Mar 30, 2020 at 05:18:16PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> We are generally moving to int64_t for both offset and bytes paramaters
-> on all io paths. Convert tracked requests now.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> We must do this before we adjust how tcg_out_movi_i32,
+> lest the under-the-hood poking that we do be broken.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  include/block/block_int.h |  4 ++--
->  block/io.c                | 11 ++++++-----
->  2 files changed, 8 insertions(+), 7 deletions(-)
+>  include/exec/gen-icount.h | 25 +++++++++++++------------
+>  1 file changed, 13 insertions(+), 12 deletions(-)
+>
+> diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+> index 822c43cfd3..404732518a 100644
+> --- a/include/exec/gen-icount.h
+> +++ b/include/exec/gen-icount.h
+> @@ -34,7 +34,7 @@ static inline void gen_io_end(void)
+>=20=20
+>  static inline void gen_tb_start(TranslationBlock *tb)
+>  {
+> -    TCGv_i32 count, imm;
+> +    TCGv_i32 count;
+>=20=20
+>      tcg_ctx->exitreq_label =3D gen_new_label();
+>      if (tb_cflags(tb) & CF_USE_ICOUNT) {
+> @@ -48,15 +48,13 @@ static inline void gen_tb_start(TranslationBlock *tb)
+>                     offsetof(ArchCPU, env));
+>=20=20
+>      if (tb_cflags(tb) & CF_USE_ICOUNT) {
+> -        imm =3D tcg_temp_new_i32();
+> -        /* We emit a movi with a dummy immediate argument. Keep the insn=
+ index
+> -         * of the movi so that we later (when we know the actual insn co=
+unt)
+> -         * can update the immediate argument with the actual insn count.=
+  */
+> -        tcg_gen_movi_i32(imm, 0xdeadbeef);
+> +        /*
+> +         * We emit a sub with a dummy immediate argument. Keep the insn =
+index
+> +         * of the sub so that we later (when we know the actual insn cou=
+nt)
+> +         * can update the argument with the actual insn count.
+> +         */
+> +        tcg_gen_sub_i32(count, count, tcg_constant_i32(0));
+>          icount_start_insn =3D tcg_last_op();
+> -
+> -        tcg_gen_sub_i32(count, count, imm);
+> -        tcg_temp_free_i32(imm);
+>      }
+>=20=20
+>      tcg_gen_brcondi_i32(TCG_COND_LT, count, 0, tcg_ctx->exitreq_label);
+> @@ -74,9 +72,12 @@ static inline void gen_tb_start(TranslationBlock *tb)
+>  static inline void gen_tb_end(TranslationBlock *tb, int num_insns)
+>  {
+>      if (tb_cflags(tb) & CF_USE_ICOUNT) {
+> -        /* Update the num_insn immediate parameter now that we know
+> -         * the actual insn count.  */
+> -        tcg_set_insn_param(icount_start_insn, 1, num_insns);
+> +        /*
+> +         * Update the num_insn immediate parameter now that we know
+> +         * the actual insn count.
+> +         */
+> +        tcg_set_insn_param(icount_start_insn, 2,
+> +                           tcgv_i32_arg(tcg_constant_i32(num_insns)));
+>      }
+>=20=20
+>      gen_set_label(tcg_ctx->exitreq_label);
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---Q0rSlbzrZN6k9QnT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6gZLAACgkQnKSrs4Gr
-c8gPUwf+NRZ5gSJpq082P5lczNwuHyAB2LPxZg4HDGYpiz1XC9LwVqSgFMYlZ3TR
-vpXyTYraCrrjoHhCXqQPkiGJTRTvhMQ1z+eWChqieoux/GCn89fyzSIeEGHZaT4Q
-rdVuxADnCPCvOzqICbVOTcRDa3BzPLqAi7q3qzaRvisZOSuFl6w6/NR2Lgj+ci/7
-j2Di3Bz3PS11fhDchJl+k89HVnI9uwxUKLMv8qIDRU90Bm61Sf07HvCIUD//usy3
-wkaVgiOPNSCoJCJaQjDyIWZV9SNtR6VFBmSk4cpKR1RhODVk/08Z+1YAcuwK0j1s
-GG6/y3ZiKBvYnevhE5S+2P9hf7+H8A==
-=adHK
------END PGP SIGNATURE-----
-
---Q0rSlbzrZN6k9QnT--
+--=20
+Alex Benn=C3=A9e
 
