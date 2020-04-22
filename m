@@ -2,87 +2,86 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19167C55185
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:48:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D6EAC54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:50:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D397E20767
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:48:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3330B20767
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 15:50:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CJEFHOS5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D397E20767
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fRIxLRqW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3330B20767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRHcM-00039E-2A
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 11:48:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44300)
+	id 1jRHdR-0003w6-V3
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 11:50:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jRHaK-0002T6-81
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:46:49 -0400
+ (envelope-from <berrange@redhat.com>) id 1jRHb2-0002jU-9N
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:47:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jRHaI-0004sP-MK
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:46:47 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54218
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <berrange@redhat.com>) id 1jRHb0-0005Vy-Mi
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:47:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57546
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jRHaG-0004qv-SU
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:46:45 -0400
+ id 1jRHb0-0005TZ-9k
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 11:47:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587570402;
+ s=mimecast20190719; t=1587570449;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=J6rwUkyqTLyTYchbHOTdKVSU9+eVXRRF1sbrkFJcvtU=;
- b=CJEFHOS5OqtUBiBj6N+Y5+qd5IYmtl+erojt47x+1DxcZ2DQ2exQMojxyDC+tktelfAUsC
- v1Fc+w+60xObtkwyyTYzUt4h2tsoiUQj9pSnOIjJ88eG+o4OotxnZ95EBCY1debwABj9Nb
- E2YD+qYGLVDlrveqY/93G9ZVr8YNOF8=
+ bh=jM41HvtLlJ0VkiCF0k5O9PUEaTcPkXsd52WfPyhYYuo=;
+ b=fRIxLRqWTc6LEt6MyvxhY5AcTqwI3/XBuAuvmjKs+LcCzSc3jSQW9dWBnnRdKTCOYncH+F
+ etkNB7SDnueiwow06zMo7pU6l/u1JrS3PwlFOknp6ccC2V3Dt7KIevk6elhiBHx+OPSRwB
+ QO1xfi9RILR/O6c4kbFiny5uKygpO3E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-u--OVmeLPQ6SCU2G9D8wlQ-1; Wed, 22 Apr 2020 11:46:35 -0400
-X-MC-Unique: u--OVmeLPQ6SCU2G9D8wlQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-465-Bqm8hmDcO4uCdBfUKbqYmQ-1; Wed, 22 Apr 2020 11:47:25 -0400
+X-MC-Unique: Bqm8hmDcO4uCdBfUKbqYmQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F37E1922965;
- Wed, 22 Apr 2020 15:46:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87B62DBA6;
+ Wed, 22 Apr 2020 15:47:24 +0000 (UTC)
 Received: from redhat.com (unknown [10.36.110.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0437B1000327;
- Wed, 22 Apr 2020 15:46:32 +0000 (UTC)
-Date: Wed, 22 Apr 2020 16:46:30 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E6AC5D706;
+ Wed, 22 Apr 2020 15:47:23 +0000 (UTC)
+Date: Wed, 22 Apr 2020 16:47:20 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Alexey Krasikov <alex-krasikov@yandex-team.ru>
-Subject: Re: [RFC PATCH v2 4/5] crypto/linux_keyring: add 'syskey' secret
- object.
-Message-ID: <20200422154630.GF587120@redhat.com>
+Subject: Re: [RFC PATCH v2 5/5] test-crypto-secret: add 'syskey' object tests.
+Message-ID: <20200422154720.GG587120@redhat.com>
 References: <20200415222525.4022-1-alex-krasikov@yandex-team.ru>
- <20200415222525.4022-4-alex-krasikov@yandex-team.ru>
+ <20200415222525.4022-5-alex-krasikov@yandex-team.ru>
 MIME-Version: 1.0
-In-Reply-To: <20200415222525.4022-4-alex-krasikov@yandex-team.ru>
+In-Reply-To: <20200415222525.4022-5-alex-krasikov@yandex-team.ru>
 User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:57:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 09:07:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,259 +99,187 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 16, 2020 at 01:25:24AM +0300, Alexey Krasikov wrote:
-> * Add the ability for the secret object to obtain secret data from the
->   Linux in-kernel key managment and retention facility, as an extra optio=
-n
->   to the existing ones: reading from a file or passing directly as a
->   string.
->=20
->   The secret is identified by the key serial number.  The upper layers
->   need to instantiate the key and make sure the QEMU process has access
->   rights to read it.
+On Thu, Apr 16, 2020 at 01:25:25AM +0300, Alexey Krasikov wrote:
+> * test_secret_seckey_bad_key_access_right() is not working yet.
+>   We don't know yet if this due a bag in the Linux kernel or
+>   whether it's normal syscall behavior.
+>   We've requested information from kernel maintainer.
 >=20
 > Signed-off-by: Alexey Krasikov <alex-krasikov@yandex-team.ru>
 > ---
->  crypto/Makefile.objs           |   1 +
->  crypto/linux_keyring.c         | 140 +++++++++++++++++++++++++++++++++
->  include/crypto/linux_keyring.h |  38 +++++++++
->  3 files changed, 179 insertions(+)
->  create mode 100644 crypto/linux_keyring.c
->  create mode 100644 include/crypto/linux_keyring.h
-
-Can we call these  secret_keyring.{c,h}
-
-> diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-> index 3ae0dfd1a4..7fc354a8d5 100644
-> --- a/crypto/Makefile.objs
-> +++ b/crypto/Makefile.objs
-> @@ -19,6 +19,7 @@ crypto-obj-y +=3D tlscredspsk.o
->  crypto-obj-y +=3D tlscredsx509.o
->  crypto-obj-y +=3D tlssession.o
->  crypto-obj-y +=3D secret_interface.o
-> +crypto-obj-y +=3D linux_keyring.o
-
-I'd expect to see a configure check for deciding whether or not
-to build the keyring code, and then have $(CONFIG_SECRET_KEYRING)
-variable used here.
-
->  crypto-obj-y +=3D secret.o
->  crypto-obj-y +=3D pbkdf.o
->  crypto-obj-$(CONFIG_NETTLE) +=3D pbkdf-nettle.o
-> diff --git a/crypto/linux_keyring.c b/crypto/linux_keyring.c
-> new file mode 100644
-> index 0000000000..7950d4c12d
-> --- /dev/null
-> +++ b/crypto/linux_keyring.c
-> @@ -0,0 +1,140 @@
-> +#ifdef __NR_keyctl
-> +
-> +#include "qemu/osdep.h"
-> +#include <asm/unistd.h>
-> +#include <linux/keyctl.h>
-> +#include "qapi/error.h"
-> +#include "qom/object_interfaces.h"
-> +#include "trace.h"
+>  tests/test-crypto-secret.c | 138 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 138 insertions(+)
+>=20
+> diff --git a/tests/test-crypto-secret.c b/tests/test-crypto-secret.c
+> index 13fc6c4c75..6b17fe3a81 100644
+> --- a/tests/test-crypto-secret.c
+> +++ b/tests/test-crypto-secret.c
+> @@ -22,8 +22,10 @@
+> =20
+>  #include "crypto/init.h"
+>  #include "crypto/secret.h"
 > +#include "crypto/linux_keyring.h"
+>  #include "qapi/error.h"
+>  #include "qemu/module.h"
+> +#include <keyutils.h>
+> =20
+>  static void test_secret_direct(void)
+>  {
+> @@ -125,6 +127,132 @@ static void test_secret_indirect_emptyfile(void)
+>  }
+> =20
+> =20
+> +#define DESCRIPTION "qemu_test_secret"
+> +#define PAYLOAD "Test Payload"
 > +
 > +
-> +static inline
-> +long keyctl_read(key_serial_t key, uint8_t *buffer, size_t buflen)
+> +static void test_secret_seckey_good(void)
 > +{
-> +    return syscall(__NR_keyctl, KEYCTL_READ, key, buffer, buflen, 0);
+> +    char key_str[16];
+> +    Object *sec;
+> +    key_serial_t key =3D add_key("user", DESCRIPTION, PAYLOAD,
+> +                               strlen(PAYLOAD), KEY_SPEC_PROCESS_KEYRING=
+);
+> +
+> +    g_assert(key >=3D 0);
+> +
+> +    snprintf(key_str, sizeof(key_str), "0x%08x", key);
+> +    sec =3D object_new_with_props(
+> +        TYPE_QCRYPTO_SECRET_LINUX_KEYRING,
+> +        object_get_objects_root(),
+> +        "sec0",
+> +        &error_abort,
+> +        "serial", key_str,
+> +        NULL);
+> +
+> +    assert(0 <=3D keyctl_unlink(key, KEY_SPEC_PROCESS_KEYRING));
+> +    char *pw =3D qcrypto_secret_lookup_as_utf8("sec0",
+> +                                             &error_abort);
+> +    g_assert_cmpstr(pw, =3D=3D, PAYLOAD);
+> +
+> +    object_unparent(sec);
+> +    g_free(pw);
 > +}
 > +
 > +
-> +static
-> +long keyctl_read_alloc(key_serial_t key, uint8_t **buffer)
+> +static void test_secret_seckey_revoked_key(void)
 > +{
-> +    uint8_t *loc_buf;
-> +    long retcode =3D keyctl_read(key, NULL, 0);
-> +    if (retcode <=3D 0) {
-> +        return retcode;
-> +    }
-> +    loc_buf =3D g_malloc(retcode);
-
-We generally prefer  g_new0 to guarantee zero-initialization
-
-> +    retcode =3D keyctl_read(key, loc_buf, retcode);
+> +    char key_str[16];
+> +    Object *sec;
+> +    key_serial_t key =3D add_key("user", DESCRIPTION, PAYLOAD,
+> +                               strlen(PAYLOAD), KEY_SPEC_PROCESS_KEYRING=
+);
+> +    g_assert(key >=3D 0);
+> +    g_assert_false(keyctl_revoke(key));
 > +
-> +    if (retcode >=3D 0) {
-> +        *buffer =3D loc_buf;
-> +    } else {
-> +        g_free(loc_buf);
-> +    }
-> +    return retcode;
+> +    snprintf(key_str, sizeof(key_str), "0x%08x", key);
+> +    sec =3D object_new_with_props(
+> +        TYPE_QCRYPTO_SECRET_LINUX_KEYRING,
+> +        object_get_objects_root(),
+> +        "sec0",
+> +        NULL,
+> +        "serial", key_str,
+> +        NULL);
+> +
+> +    g_assert(errno =3D=3D EKEYREVOKED);
+> +    g_assert(sec =3D=3D NULL);
+> +
+> +    keyctl_unlink(key, KEY_SPEC_PROCESS_KEYRING);
 > +}
 > +
 > +
-> +static void
-> +qcrypto_secret_linux_load_data(Object   *obj,
-> +                               uint8_t  **output,
-> +                               size_t   *outputlen,
-> +                               Error    **errp)
+> +static void test_secret_seckey_expired_key(void)
 > +{
-> +    QCryptoSecretLinuxKeyring *secret =3D QCRYPTO_SECRET_LINUX_KEYRING(o=
-bj);
-> +    uint8_t  *buffer =3D NULL;
-> +    long     retcode;
+> +    char key_str[16];
+> +    Object *sec;
+> +    key_serial_t key =3D add_key("user", DESCRIPTION, PAYLOAD,
+> +                               strlen(PAYLOAD), KEY_SPEC_PROCESS_KEYRING=
+);
+> +    g_assert(key >=3D 0);
+> +    g_assert_false(keyctl_set_timeout(key, 1));
+> +    sleep(1);
 > +
-> +    *output    =3D NULL;
-> +    *outputlen =3D 0;
+> +    snprintf(key_str, sizeof(key_str), "0x%08x", key);
+> +    sec =3D object_new_with_props(
+> +        TYPE_QCRYPTO_SECRET_LINUX_KEYRING,
+> +        object_get_objects_root(),
+> +        "sec0",
+> +        NULL,
+> +        "serial", key_str,
+> +        NULL);
 > +
-> +    if (secret->serial) {
-> +        retcode =3D keyctl_read_alloc(secret->serial, &buffer);
-> +        if (retcode < 0) {
-> +          error_setg_errno(errp, errno,
-> +                     "Unable to read serial key %08x",
-> +                     secret->serial);
-> +          return;
-> +        } else {
-> +          *outputlen =3D retcode;
-> +          *output    =3D buffer;
-> +        }
-
-IMHO, we should just be passing outputlen & output straight
-into keyctl_read_alloc, except then I think keyctl_read_alloc
-is pointless. So just inline its logic into this method.
-
-> +    } else {
-> +      error_setg(errp, "Either 'serial' must be provided");
-
-Indent is a bit off, and the error message text doesn't make sense
-
-Just use
-
- "'serial' parameter must be provided"
-
-> +    }
+> +    g_assert(errno =3D=3D EKEYEXPIRED);
+> +    g_assert(sec =3D=3D NULL);
+> +
+> +    keyctl_unlink(key, KEY_SPEC_PROCESS_KEYRING);
 > +}
 > +
 > +
-> +static void
-> +qcrypto_secret_prop_set_key(Object     *obj,   Visitor *v,
-> +                            const char *name,  void    *opaque,
-> +                            Error      **errp)
+> +static void test_secret_seckey_bad_serial_key(void)
 > +{
-> +    QCryptoSecretLinuxKeyring *secret =3D QCRYPTO_SECRET_LINUX_KEYRING(o=
-bj);
-> +    int32_t value;
-> +    visit_type_int32(v, name, &value, errp);
-> +    if (!value) {
-> +        error_setg(errp, "The 'serial' should be not equal 0");
-> +    }
-> +    secret->serial =3D value;
+> +    Object *sec;
+> +
+> +    sec =3D object_new_with_props(
+> +        TYPE_QCRYPTO_SECRET,
+> +        object_get_objects_root(),
+> +        "sec0",
+> +        NULL,
+> +        "serial", "1",
+> +        NULL);
+> +
+> +    g_assert(errno =3D=3D ENOKEY);
+> +    g_assert(sec =3D=3D NULL);
 > +}
 > +
 > +
-> +static void
-> +qcrypto_secret_prop_get_key(Object     *obj,   Visitor *v,
-> +                            const char *name,  void    *opaque,
-> +                            Error      **errp)
+> +static void test_secret_seckey_bad_key_access_right(void)
 > +{
-> +    QCryptoSecretLinuxKeyring *secret =3D QCRYPTO_SECRET_LINUX_KEYRING(o=
-bj);
-> +    int32_t value =3D secret->serial;
-> +    visit_type_int32(v, name, &value, errp);
+> +    char key_str[16];
+> +    Object *sec;
+> +    key_serial_t key =3D add_key("user", DESCRIPTION, PAYLOAD,
+> +                               strlen(PAYLOAD), KEY_SPEC_PROCESS_KEYRING=
+);
+> +    g_assert(key >=3D 0);
+> +    g_assert_false(keyctl_setperm(key, KEY_POS_ALL & (~KEY_POS_READ)));
+> +
+> +    snprintf(key_str, sizeof(key_str), "0x%08x", key);
+> +
+> +    sec =3D object_new_with_props(
+> +        TYPE_QCRYPTO_SECRET_LINUX_KEYRING,
+> +        object_get_objects_root(),
+> +        "sec0",
+> +        NULL,
+> +        "serial", key_str,
+> +        NULL);
+> +
+> +    g_assert(errno =3D=3D EACCES);
+> +    g_assert(sec =3D=3D NULL);
+> +
+> +    keyctl_unlink(key, KEY_SPEC_PROCESS_KEYRING);
 > +}
 > +
 > +
-> +static void
-> +qcrypto_secret_linux_complete(UserCreatable *uc, Error **errp)
-> +{
-> +    object_property_set_bool(OBJECT(uc), true, "loaded", errp);
-> +}
-> +
-> +
-> +static void
-> +qcrypto_secret_linux_class_init(ObjectClass *oc, void *data)
-> +{
-> +    QCryptoSecretCommonClass *sic =3D QCRYPTO_SECRET_COMMON_CLASS(oc);
-> +    sic->load_data =3D qcrypto_secret_linux_load_data;
-> +
-> +    UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
-> +    ucc->complete =3D qcrypto_secret_linux_complete;
-> +
-> +    object_class_property_add(oc, "serial", "key_serial_t",
-> +                                  qcrypto_secret_prop_get_key,
-> +                                  qcrypto_secret_prop_set_key,
-> +                                  NULL, NULL, NULL);
-> +}
-> +
-> +
-> +static const TypeInfo qcrypto_secret_info =3D {
-> +    .parent        =3D TYPE_QCRYPTO_SECRET_COMMON,
-> +    .name          =3D TYPE_QCRYPTO_SECRET_LINUX_KEYRING,
-> +    .instance_size =3D sizeof(QCryptoSecretLinuxKeyring),
-> +    .class_size    =3D sizeof(QCryptoSecretLinuxKeyringClass),
-> +    .class_init    =3D qcrypto_secret_linux_class_init,
-> +    .interfaces    =3D (InterfaceInfo[]) {
-> +        { TYPE_USER_CREATABLE },
-> +        { }
-> +    }
-> +};
-> +
-> +
-> +static void
-> +qcrypto_secret_register_types(void)
-> +{
-> +    type_register_static(&qcrypto_secret_info);
-> +}
-> +
-> +
-> +type_init(qcrypto_secret_register_types);
-> +
-> +#endif /* __NR_keyctl */
-> diff --git a/include/crypto/linux_keyring.h b/include/crypto/linux_keyrin=
-g.h
-> new file mode 100644
-> index 0000000000..2618b34444
-> --- /dev/null
-> +++ b/include/crypto/linux_keyring.h
-> @@ -0,0 +1,38 @@
-> +#ifndef QCRYPTO_SECRET_LINUX_KEYRING_H
-> +#define QCRYPTO_SECRET_LINUX_KEYRING_H
-> +
-> +#ifdef __NR_keyctl
-> +
-> +#include "qapi/qapi-types-crypto.h"
-> +#include "qom/object.h"
-> +#include "crypto/secret_interface.h"
-> +
-> +#define TYPE_QCRYPTO_SECRET_LINUX_KEYRING "syskey"
-> +#define QCRYPTO_SECRET_LINUX_KEYRING(obj) \
-> +    OBJECT_CHECK(QCryptoSecretLinuxKeyring, (obj), \
-> +                 TYPE_QCRYPTO_SECRET_LINUX_KEYRING)
-> +#define QCRYPTO_SECRET_LINUX_KEYRING_CLASS(class) \
-> +    OBJECT_CLASS_CHECK(QCryptoSecretLinuxKeyringClass, \
-> +                       (class), TYPE_QCRYPTO_SECRET_LINUX_KEYRING)
-> +#define QCRYPTO_SECRET_LINUX_KEYRING_GET_CLASS(class) \
-> +    OBJECT_GET_CLASS(QCryptoSecretLinuxKeyringClass, \
-> +                     (class), TYPE_QCRYPTO_SECRET_LINUX_KEYRING)
-> +
-> +typedef struct QCryptoSecretLinux QCryptoSecretLinux;
-> +typedef struct QCryptoSecretLinuxClass QCryptoSecretLinuxClass;
-> +
-> +typedef int32_t key_serial_t;
+>  static void test_secret_noconv_base64_good(void)
+>  {
+>      Object *sec =3D object_new_with_props(
+> @@ -425,6 +553,16 @@ int main(int argc, char **argv)
+>                      test_secret_indirect_badfile);
+>      g_test_add_func("/crypto/secret/indirect/emptyfile",
+>                      test_secret_indirect_emptyfile);
+> +    g_test_add_func("/crypto/secret/seckey/good",
+> +                    test_secret_seckey_good);
+> +    g_test_add_func("/crypto/secret/seckey/revoked_key",
+> +                    test_secret_seckey_revoked_key);
+> +    g_test_add_func("/crypto/secret/seckey/expired_key",
+> +                    test_secret_seckey_expired_key);
+> +    g_test_add_func("/crypto/secret/seckey/bad_serial_key",
+> +                    test_secret_seckey_bad_serial_key);
+> +    g_test_add_func("/crypto/secret/seckey/bad_key_access_right",
+> +                    test_secret_seckey_bad_key_access_right);
 
-IMHO, just use the int32_t type inline throughout, and skip the
-key_serial_t , as this typename clashes with typenames I see
-in /usr/include
+Again, we'll need to make this all conditional based on the result
+of a configure check to avoid breaking non-Linux.
 
-> +
-> +typedef struct QCryptoSecretLinuxKeyring {
-> +    QCryptoSecretCommon  parent;
-> +    key_serial_t         serial;
-> +} QCryptoSecretLinuxKeyring;
-> +
-> +
-> +typedef struct QCryptoSecretLinuxKeyringClass {
-> +    QCryptoSecretCommonClass  parent;
-> +} QCryptoSecretLinuxKeyringClass;
-> +
-> +#endif /* __NR_keyctl */
-> +
-> +#endif /* QCRYPTO_SECRET_LINUX_KEYRING_H */
 
 Regards,
 Daniel
