@@ -2,86 +2,95 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC4F7C55189
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 09:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25723C55189
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 09:22:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BE3620735
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 09:13:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA249206D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 09:22:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Al4ki30B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BE3620735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BoPOI82+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA249206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRBRZ-0004wP-I8
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 05:13:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41414)
+	id 1jRBaT-0008UB-2w
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 05:22:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45070)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jRBQa-0004VH-Lo
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 05:12:22 -0400
+ (envelope-from <lulu@redhat.com>) id 1jRBZm-00084j-Nw
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 05:21:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jRBQZ-0000V7-0k
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 05:12:20 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33915)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jRBQY-0000QB-GO
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 05:12:18 -0400
-Received: by mail-wm1-x342.google.com with SMTP id v4so4405926wme.1
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 02:12:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=+5SvUSocQ16vavAyCCi86Tqqylqdf38GWnn4J678WG8=;
- b=Al4ki30BExko3rQ7ilHTeJXVz/xnLodxvmdQbcZNbWDJhwZkZ4qKbkjCKSKRbXgP40
- 6iI7fFy8VPkUiSyg7QtAXlG0QPOse9Fbr7gQ71LRlcL3mvU7ATVFqlv9SOHi1C36rCIF
- Bok12Kwz5cCagzDEEZEH/6aWJhu9AFm1X9R1wCq2qKs66Lgy8s4eoHGeAcjJFLQIcK32
- vZE3NjtdHJqqGNDkZ1zvCr6nSWExIuARiMzQzdCFe+2niTjP41DPY0yy0LY9HVXSCvSf
- gWGsLmSInrzOXITWgwAFXfD8nb1DrQ3sR9CHiqOQJjTNIg1UiZeutwGwJU5rxJ4vqO6K
- hAjA==
+ (envelope-from <lulu@redhat.com>) id 1jRBZk-0008DL-H9
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 05:21:50 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52138
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1jRBZj-00089s-BP
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 05:21:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587547305;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4IolfGC/AeWoPCnPq9Y+JeeGRdzhTUW/7rrnWBYFLkE=;
+ b=BoPOI82+iDgfV2K8Hntcm8cW+hi7+Cz9vWIY4WMf/4RUpyEOnM35pTSq5QeG0Ho5zDdVQF
+ ZwxEWoImF4WmIeLNrOIYQtL3Y0bAV+TSHq5v/qQtEZxJJdR1fP3DCgWM8lOFn77wB0NCHv
+ ePlaUCaFoH1FtYknvFDgxDScf4iESZA=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-35-y_SLIHPZNF-4OcemPS_TdQ-1; Wed, 22 Apr 2020 05:21:44 -0400
+X-MC-Unique: y_SLIHPZNF-4OcemPS_TdQ-1
+Received: by mail-pf1-f199.google.com with SMTP id 84so1504353pfx.20
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 02:21:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=+5SvUSocQ16vavAyCCi86Tqqylqdf38GWnn4J678WG8=;
- b=jMHLAr3OTd/A9mj9jNeXDD+yzA7SiER6FpoLAcdLsjhKnczVtr2m7OiGbpJjOpqAd/
- rH81x+/JLMtlFxclp9UiqLCPYUu0oVARTSZPqQo4nqSulkfsLYJifAisJmSF/Yk6I5lb
- pCi433/UvywB8jrQ3O/RXDwqHrbouPvsFhYbOxcmnCn+1dJejUYKN6nNdV6cj1PRRlRr
- yN8Qmb68nWnXB2+rIx2VlbX6n60rTCX9AcoVHf2a31bYUxCgf0isCmA/62zKdK/zZzLF
- bdV8/8JSguMEh09493gUwFik/Y+wrxc76m3de1UEc7FnK8y1lQKaONNDcajXBKNMj0Jr
- Bu6A==
-X-Gm-Message-State: AGi0Pub5Llfbf3zdPiXqPI9p1W9GKIt9gYs9jBesD8Ubsce1mN2Mbe5f
- w9hIYvvp0NBx0G3YqS6uSPMH2HVq813Ue8dKlx0=
-X-Google-Smtp-Source: APiQypL3eT8nFOmc1fyALD9/LHHTpUkRfDy8xsn7Ph6ngj63nQo0WdaWLQJes2PuvlEERfF2EBtjZv05kbRzokY75YE=
-X-Received: by 2002:a7b:c74d:: with SMTP id w13mr9064777wmk.36.1587546736815; 
- Wed, 22 Apr 2020 02:12:16 -0700 (PDT)
+ bh=0gaFCUjCiJBcubWdy5N7In/xylyQVQxo1Gay4kHfiiI=;
+ b=XKVPUdbDwHfONX5cDq4RKqhRmHr2IqjNuNnp+Ip+woUrvpknEAX3NBNAmVUT8Fpfhq
+ EsWiOgAiy69gDQcDcKBOUpLsdN8mmioytHnMYyKbPO3XbYyVQ4FgzRnzAgk7RALvk55H
+ brDIM+6Ze0Utyf6iB3xTrPpPVwzrSsUNmgrJF1+4SG+CQl41Qqg0HafF/7B9kOR9Jfpb
+ stzBk5ixHaJgxbZy+/RSEQFRN0R7UgcAGaaRWglB3o8REdkSy96Lfc6Z8aMbwqDp3rcE
+ xKvRs7Zv+FnIvF1l+U6VzelXZp8RqsvYl1uz8S4LEZrH/30N+9d+Z+UPFeM/v68QDdlu
+ eDCw==
+X-Gm-Message-State: AGi0PuZPjMuQj14LxM7BKl5r7y0dayBhU8nKRIy5JYVZBNqOJ+ylQmFO
+ CcSURHbsaNQ09KKrswJ0UE7MEhR2tcLZOjITAsRBYMKmPyy1/P5XURxWM6DCw4x8TW0PJZnKmSp
+ NGSe7r1NQS9DyOZXjJm6tlzZdfrNvG9Q=
+X-Received: by 2002:a17:902:d303:: with SMTP id
+ b3mr10094205plc.12.1587547302956; 
+ Wed, 22 Apr 2020 02:21:42 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJ45dIZeLjuX/qZjYMWAtf0r0XpV2gGaL51vLFbrrivL5m6pErccaa6mJ4u9sZz1+Z+DRovEjg3rF3sVAc8Wko=
+X-Received: by 2002:a17:902:d303:: with SMTP id
+ b3mr10094165plc.12.1587547302631; 
+ Wed, 22 Apr 2020 02:21:42 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a1c:28c3:0:0:0:0:0 with HTTP; Wed, 22 Apr 2020 02:12:16
- -0700 (PDT)
-In-Reply-To: <20200422011722.13287-21-richard.henderson@linaro.org>
-References: <20200422011722.13287-1-richard.henderson@linaro.org>
- <20200422011722.13287-21-richard.henderson@linaro.org>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Wed, 22 Apr 2020 11:12:16 +0200
-Message-ID: <CAHiYmc4GMkNteMDRE2j7uqsMzhJc5BE3qXmr9DzdeCFjsVZopw@mail.gmail.com>
-Subject: Re: [PATCH v2 20/36] tcg: Remove movi and dupi opcodes
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000004ff1aa05a3dd8715"
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::342
+References: <20200420093241.4238-1-lulu@redhat.com>
+ <20200420093241.4238-3-lulu@redhat.com>
+ <6934c4db-4bdb-2f01-3920-9d33c69a5ac9@redhat.com>
+In-Reply-To: <6934c4db-4bdb-2f01-3920-9d33c69a5ac9@redhat.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Wed, 22 Apr 2020 17:21:31 +0800
+Message-ID: <CACLfguUcdrvHCpHCnh=kXUepR9EQDb+4UJ5xZN+rhsi57G0DVA@mail.gmail.com>
+Subject: Re: [RFC v1 2/4] vhost-vdpa: introduce vhost-vdpa net client
+To: Laurent Vivier <lvivier@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=lulu@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:12:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,695 +102,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "alex.bennee@linaro.org" <alex.bennee@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: rdunlap@infradead.org, Michael Tsirkin <mst@redhat.com>,
+ mhabets@solarflare.com, qemu-devel@nongnu.org, rob.miller@broadcom.com,
+ saugatm@xilinx.com, Markus Armbruster <armbru@redhat.com>, hch@infradead.org,
+ Eugenio Perez Martin <eperezma@redhat.com>, jgg@mellanox.com,
+ Jason Wang <jasowang@redhat.com>, shahafs@mellanox.com, kevin.tian@intel.com,
+ parav@mellanox.com, vmireyno@marvell.com, "Liang,
+ Cunming" <cunming.liang@intel.com>, gdawar@xilinx.com, jiri@mellanox.com,
+ xiao.w.wang@intel.com, Stefan Hajnoczi <stefanha@redhat.com>, "Wang,
+ Zhihong" <zhihong.wang@intel.com>,
+ Maxime Coquelin <maxime.coquelin@redhat.com>, Ariel Adam <aadam@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, hanand@xilinx.com, "Zhu,
+ Lingshan" <lingshan.zhu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000004ff1aa05a3dd8715
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Tue, Apr 21, 2020 at 11:47 PM Laurent Vivier <lvivier@redhat.com> wrote:
+>
+> On 20/04/2020 11:32, Cindy Lu wrote:
+> > This patch set introduces a new net client type: vhost-vdpa.
+> > vhost-vdpa net client will set up a vDPA device which is svhostdevpecif=
+ied
+> > by a "vhostdev" parameter.
+> >
+> > Author: Tiwei Bie
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >  include/net/vhost-vdpa.h |  18 ++++
+> >  include/net/vhost_net.h  |   1 +
+> >  net/Makefile.objs        |   2 +-
+> >  net/clients.h            |   2 +
+> >  net/net.c                |   1 +
+> >  net/vhost-vdpa.c         | 211 +++++++++++++++++++++++++++++++++++++++
+> >  qapi/net.json            |  21 +++-
+> >  7 files changed, 253 insertions(+), 3 deletions(-)
+> >  create mode 100644 include/net/vhost-vdpa.h
+> >  create mode 100644 net/vhost-vdpa.c
+> >
+> > diff --git a/include/net/vhost-vdpa.h b/include/net/vhost-vdpa.h
+> > new file mode 100644
+> > index 0000000000..9ddd538dad
+> > --- /dev/null
+> > +++ b/include/net/vhost-vdpa.h
+> > @@ -0,0 +1,18 @@
+> > +/*
+> > + * vhost-vdpa.h
+> > + *
+> > + * Copyright(c) 2017 Intel Corporation. All rights reserved.
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> > + * See the COPYING file in the top-level directory.
+> > + *
+> > + */
+> > +
+> > +#ifndef VHOST_VDPA_H
+> > +#define VHOST_VDPA_H
+> > +
+> > +struct vhost_net;
+> > +struct vhost_net *vhost_vdpa_get_vhost_net(NetClientState *nc);
+> > +uint64_t vhost_vdpa_get_acked_features(NetClientState *nc);
+> > +
+> > +#endif /* VHOST_VDPA_H */
+> > diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
+> > index 77e47398c4..6f3a624cf7 100644
+> > --- a/include/net/vhost_net.h
+> > +++ b/include/net/vhost_net.h
+> > @@ -39,5 +39,6 @@ int vhost_set_vring_enable(NetClientState * nc, int e=
+nable);
+> >  uint64_t vhost_net_get_acked_features(VHostNetState *net);
+> >
+> >  int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu);
+> > +int vhost_set_state(NetClientState *nc, int state);
+> >
+> >  #endif
+> > diff --git a/net/Makefile.objs b/net/Makefile.objs
+> > index c5d076d19c..da459cfc19 100644
+> > --- a/net/Makefile.objs
+> > +++ b/net/Makefile.objs
+> > @@ -26,7 +26,7 @@ tap-obj-$(CONFIG_SOLARIS) =3D tap-solaris.o
+> >  tap-obj-y ?=3D tap-stub.o
+> >  common-obj-$(CONFIG_POSIX) +=3D tap.o $(tap-obj-y)
+> >  common-obj-$(CONFIG_WIN32) +=3D tap-win32.o
+> > -
+> > +common-obj-$(CONFIG_VHOST_KERNEL) +=3D vhost-vdpa.o
+>
+> should it be CONFIG_VHOST_NET_USER as you use net_init_vhost_vdpa()
+> below inside a "#ifdef CONFIG_VHOST_NET_USER"?
+>
+> Why don't you define a CONFIG_VHOST_VDPA?
+>
+Thanks Laurent for point it out,  There is no dependence between
+CONFIG_VHOST_NET_USER and vDPA,
+So I will implement a new macro specific for vDPA
 
-=D1=81=D1=80=D0=B5=D0=B4=D0=B0, 22. =D0=B0=D0=BF=D1=80=D0=B8=D0=BB 2020., R=
-ichard Henderson <richard.henderson@linaro.org> =D1=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >  vde.o-libs =3D $(VDE_LIBS)
+> >
+> >  common-obj-$(CONFIG_CAN_BUS) +=3D can/
+> > diff --git a/net/clients.h b/net/clients.h
+> > index a6ef267e19..92f9b59aed 100644
+> > --- a/net/clients.h
+> > +++ b/net/clients.h
+> > @@ -61,4 +61,6 @@ int net_init_netmap(const Netdev *netdev, const char =
+*name,
+> >  int net_init_vhost_user(const Netdev *netdev, const char *name,
+> >                          NetClientState *peer, Error **errp);
+> >
+> > +int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
+> > +                        NetClientState *peer, Error **errp);
+> >  #endif /* QEMU_NET_CLIENTS_H */
+> > diff --git a/net/net.c b/net/net.c
+> > index ac5080dda1..2beb95388a 100644
+> > --- a/net/net.c
+> > +++ b/net/net.c
+> > @@ -964,6 +964,7 @@ static int (* const net_client_init_fun[NET_CLIENT_=
+DRIVER__MAX])(
+> >          [NET_CLIENT_DRIVER_HUBPORT]   =3D net_init_hubport,
+> >  #ifdef CONFIG_VHOST_NET_USER          ^^^^^^^^^^^^^^^^^^^^^
+>                    here
+>
+> >          [NET_CLIENT_DRIVER_VHOST_USER] =3D net_init_vhost_user,
+> > +        [NET_CLIENT_DRIVER_VHOST_VDPA] =3D net_init_vhost_vdpa,
+> >  #endif
+> >  #ifdef CONFIG_L2TPV3
+> >          [NET_CLIENT_DRIVER_L2TPV3]    =3D net_init_l2tpv3,
+> > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> > new file mode 100644
+> > index 0000000000..5daeba0b76
+> > --- /dev/null
+> > +++ b/net/vhost-vdpa.c
+> ...
+> > +static int net_vhost_check_net(void *opaque, QemuOpts *opts, Error **e=
+rrp)
+> > +{
+> > +    const char *name =3D opaque;
+> > +    const char *driver, *netdev;
+> > +
+> > +    driver =3D qemu_opt_get(opts, "driver");
+> > +    netdev =3D qemu_opt_get(opts, "netdev");
+> > +
+> > +    if (!driver || !netdev) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    if (strcmp(netdev, name) =3D=3D 0 &&
+> > +        !g_str_has_prefix(driver, "virtio-net-")) {
+> > +        error_setg(errp, "vhost-vdpa requires frontend driver virtio-n=
+et-*");
+> > +        return -1;
+> > +    }
+> >
+>
+> So perhaps you can build the file only if CONFIG_VIRTIO_NET is set?
+>
+> Thanks,
+> Laurent
+>
+Thanks, There will be a new macro specific for vDPA
 
-> These are now completely covered by mov from a
-> TYPE_CONST temporary.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-
-
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-
-
->  include/tcg/tcg-opc.h        |  3 ---
->  tcg/aarch64/tcg-target.inc.c |  3 ---
->  tcg/arm/tcg-target.inc.c     |  1 -
->  tcg/i386/tcg-target.inc.c    |  3 ---
->  tcg/mips/tcg-target.inc.c    |  2 --
->  tcg/optimize.c               |  4 ----
->  tcg/ppc/tcg-target.inc.c     |  3 ---
->  tcg/riscv/tcg-target.inc.c   |  2 --
->  tcg/s390/tcg-target.inc.c    |  2 --
->  tcg/sparc/tcg-target.inc.c   |  2 --
->  tcg/tcg-op-vec.c             |  1 -
->  tcg/tcg.c                    | 18 +-----------------
->  tcg/tci/tcg-target.inc.c     |  2 --
->  13 files changed, 1 insertion(+), 45 deletions(-)
->
-> diff --git a/include/tcg/tcg-opc.h b/include/tcg/tcg-opc.h
-> index 7dee9b38f7..4a9cbf5426 100644
-> --- a/include/tcg/tcg-opc.h
-> +++ b/include/tcg/tcg-opc.h
-> @@ -45,7 +45,6 @@ DEF(br, 0, 0, 1, TCG_OPF_BB_END)
->  DEF(mb, 0, 0, 1, 0)
->
->  DEF(mov_i32, 1, 1, 0, TCG_OPF_NOT_PRESENT)
-> -DEF(movi_i32, 1, 0, 1, TCG_OPF_NOT_PRESENT)
->  DEF(setcond_i32, 1, 2, 1, 0)
->  DEF(movcond_i32, 1, 4, 1, IMPL(TCG_TARGET_HAS_movcond_i32))
->  /* load/store */
-> @@ -110,7 +109,6 @@ DEF(ctz_i32, 1, 2, 0, IMPL(TCG_TARGET_HAS_ctz_i32))
->  DEF(ctpop_i32, 1, 1, 0, IMPL(TCG_TARGET_HAS_ctpop_i32))
->
->  DEF(mov_i64, 1, 1, 0, TCG_OPF_64BIT | TCG_OPF_NOT_PRESENT)
-> -DEF(movi_i64, 1, 0, 1, TCG_OPF_64BIT | TCG_OPF_NOT_PRESENT)
->  DEF(setcond_i64, 1, 2, 1, IMPL64)
->  DEF(movcond_i64, 1, 4, 1, IMPL64 | IMPL(TCG_TARGET_HAS_movcond_i64))
->  /* load/store */
-> @@ -215,7 +213,6 @@ DEF(qemu_st_i64, 0, TLADDR_ARGS + DATA64_ARGS, 1,
->  #define IMPLVEC  TCG_OPF_VECTOR | IMPL(TCG_TARGET_MAYBE_vec)
->
->  DEF(mov_vec, 1, 1, 0, TCG_OPF_VECTOR | TCG_OPF_NOT_PRESENT)
-> -DEF(dupi_vec, 1, 0, 1, TCG_OPF_VECTOR | TCG_OPF_NOT_PRESENT)
->
->  DEF(dup_vec, 1, 1, 0, IMPLVEC)
->  DEF(dup2_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_REG_BITS =3D=3D 32))
-> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-> index 843fd0ca69..7918aeb9d5 100644
-> --- a/tcg/aarch64/tcg-target.inc.c
-> +++ b/tcg/aarch64/tcg-target.inc.c
-> @@ -2261,8 +2261,6 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc=
-,
->
->      case INDEX_op_mov_i32:  /* Always emitted via tcg_out_mov.  */
->      case INDEX_op_mov_i64:
-> -    case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.  */
-> -    case INDEX_op_movi_i64:
->      case INDEX_op_call:     /* Always emitted via tcg_out_call.  */
->      default:
->          g_assert_not_reached();
-> @@ -2467,7 +2465,6 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode
-> opc,
->          break;
->
->      case INDEX_op_mov_vec:  /* Always emitted via tcg_out_mov.  */
-> -    case INDEX_op_dupi_vec: /* Always emitted via tcg_out_movi.  */
->      case INDEX_op_dup_vec:  /* Always emitted via tcg_out_dup_vec.  */
->      default:
->          g_assert_not_reached();
-> diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-> index 6aa7757aac..b967499fa4 100644
-> --- a/tcg/arm/tcg-target.inc.c
-> +++ b/tcg/arm/tcg-target.inc.c
-> @@ -2068,7 +2068,6 @@ static inline void tcg_out_op(TCGContext *s,
-> TCGOpcode opc,
->          break;
->
->      case INDEX_op_mov_i32:  /* Always emitted via tcg_out_mov.  */
-> -    case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.  */
->      case INDEX_op_call:     /* Always emitted via tcg_out_call.  */
->      default:
->          tcg_abort();
-> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-> index ec083bddcf..320a4bddd1 100644
-> --- a/tcg/i386/tcg-target.inc.c
-> +++ b/tcg/i386/tcg-target.inc.c
-> @@ -2678,8 +2678,6 @@ static inline void tcg_out_op(TCGContext *s,
-> TCGOpcode opc,
->          break;
->      case INDEX_op_mov_i32:  /* Always emitted via tcg_out_mov.  */
->      case INDEX_op_mov_i64:
-> -    case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.  */
-> -    case INDEX_op_movi_i64:
->      case INDEX_op_call:     /* Always emitted via tcg_out_call.  */
->      default:
->          tcg_abort();
-> @@ -2965,7 +2963,6 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode
-> opc,
->          break;
->
->      case INDEX_op_mov_vec:  /* Always emitted via tcg_out_mov.  */
-> -    case INDEX_op_dupi_vec: /* Always emitted via tcg_out_movi.  */
->      case INDEX_op_dup_vec:  /* Always emitted via tcg_out_dup_vec.  */
->      default:
->          g_assert_not_reached();
-> diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-> index 4d32ebc1df..09dc5a94fa 100644
-> --- a/tcg/mips/tcg-target.inc.c
-> +++ b/tcg/mips/tcg-target.inc.c
-> @@ -2155,8 +2155,6 @@ static inline void tcg_out_op(TCGContext *s,
-> TCGOpcode opc,
->          break;
->      case INDEX_op_mov_i32:  /* Always emitted via tcg_out_mov.  */
->      case INDEX_op_mov_i64:
-> -    case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.  */
-> -    case INDEX_op_movi_i64:
->      case INDEX_op_call:     /* Always emitted via tcg_out_call.  */
->      default:
->          tcg_abort();
-> diff --git a/tcg/optimize.c b/tcg/optimize.c
-> index dd5187be31..9a2c945dbe 100644
-> --- a/tcg/optimize.c
-> +++ b/tcg/optimize.c
-> @@ -1099,10 +1099,6 @@ void tcg_optimize(TCGContext *s)
->          CASE_OP_32_64_VEC(mov):
->              tcg_opt_gen_mov(s, op, op->args[0], op->args[1]);
->              break;
-> -        CASE_OP_32_64(movi):
-> -        case INDEX_op_dupi_vec:
-> -            tcg_opt_gen_movi(s, &temps_used, op, op->args[0],
-> op->args[1]);
-> -            break;
->
->          case INDEX_op_dup_vec:
->              if (arg_is_const(op->args[1])) {
-> diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-> index ee1f9227c1..fb390ad978 100644
-> --- a/tcg/ppc/tcg-target.inc.c
-> +++ b/tcg/ppc/tcg-target.inc.c
-> @@ -2967,8 +2967,6 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc=
-,
-> const TCGArg *args,
->
->      case INDEX_op_mov_i32:   /* Always emitted via tcg_out_mov.  */
->      case INDEX_op_mov_i64:
-> -    case INDEX_op_movi_i32:  /* Always emitted via tcg_out_movi.  */
-> -    case INDEX_op_movi_i64:
->      case INDEX_op_call:      /* Always emitted via tcg_out_call.  */
->      default:
->          tcg_abort();
-> @@ -3310,7 +3308,6 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode
-> opc,
->          return;
->
->      case INDEX_op_mov_vec:  /* Always emitted via tcg_out_mov.  */
-> -    case INDEX_op_dupi_vec: /* Always emitted via tcg_out_movi.  */
->      case INDEX_op_dup_vec:  /* Always emitted via tcg_out_dup_vec.  */
->      default:
->          g_assert_not_reached();
-> diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
-> index 2bc0ba71f2..ec609272ad 100644
-> --- a/tcg/riscv/tcg-target.inc.c
-> +++ b/tcg/riscv/tcg-target.inc.c
-> @@ -1606,8 +1606,6 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc=
-,
->
->      case INDEX_op_mov_i32:  /* Always emitted via tcg_out_mov.  */
->      case INDEX_op_mov_i64:
-> -    case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.  */
-> -    case INDEX_op_movi_i64:
->      case INDEX_op_call:     /* Always emitted via tcg_out_call.  */
->      default:
->          g_assert_not_reached();
-> diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-> index b07e9ff7d6..f6b003a700 100644
-> --- a/tcg/s390/tcg-target.inc.c
-> +++ b/tcg/s390/tcg-target.inc.c
-> @@ -2310,8 +2310,6 @@ static inline void tcg_out_op(TCGContext *s,
-> TCGOpcode opc,
->
->      case INDEX_op_mov_i32:  /* Always emitted via tcg_out_mov.  */
->      case INDEX_op_mov_i64:
-> -    case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.  */
-> -    case INDEX_op_movi_i64:
->      case INDEX_op_call:     /* Always emitted via tcg_out_call.  */
->      default:
->          tcg_abort();
-> diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
-> index 65fddb310d..0808b79eee 100644
-> --- a/tcg/sparc/tcg-target.inc.c
-> +++ b/tcg/sparc/tcg-target.inc.c
-> @@ -1591,8 +1591,6 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc=
-,
->
->      case INDEX_op_mov_i32:  /* Always emitted via tcg_out_mov.  */
->      case INDEX_op_mov_i64:
-> -    case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.  */
-> -    case INDEX_op_movi_i64:
->      case INDEX_op_call:     /* Always emitted via tcg_out_call.  */
->      default:
->          tcg_abort();
-> diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
-> index 655b3ae32d..6343046e18 100644
-> --- a/tcg/tcg-op-vec.c
-> +++ b/tcg/tcg-op-vec.c
-> @@ -83,7 +83,6 @@ bool tcg_can_emit_vecop_list(const TCGOpcode *list,
->          case INDEX_op_xor_vec:
->          case INDEX_op_mov_vec:
->          case INDEX_op_dup_vec:
-> -        case INDEX_op_dupi_vec:
->          case INDEX_op_dup2_vec:
->          case INDEX_op_ld_vec:
->          case INDEX_op_st_vec:
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index 59beb2bf29..adb71f16ae 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -1463,7 +1463,6 @@ bool tcg_op_supported(TCGOpcode op)
->          return TCG_TARGET_HAS_goto_ptr;
->
->      case INDEX_op_mov_i32:
-> -    case INDEX_op_movi_i32:
->      case INDEX_op_setcond_i32:
->      case INDEX_op_brcond_i32:
->      case INDEX_op_ld8u_i32:
-> @@ -1557,7 +1556,6 @@ bool tcg_op_supported(TCGOpcode op)
->          return TCG_TARGET_REG_BITS =3D=3D 32;
->
->      case INDEX_op_mov_i64:
-> -    case INDEX_op_movi_i64:
->      case INDEX_op_setcond_i64:
->      case INDEX_op_brcond_i64:
->      case INDEX_op_ld8u_i64:
-> @@ -1663,7 +1661,6 @@ bool tcg_op_supported(TCGOpcode op)
->
->      case INDEX_op_mov_vec:
->      case INDEX_op_dup_vec:
-> -    case INDEX_op_dupi_vec:
->      case INDEX_op_dupm_vec:
->      case INDEX_op_ld_vec:
->      case INDEX_op_st_vec:
-> @@ -3447,7 +3444,7 @@ static void tcg_reg_alloc_bb_end(TCGContext *s,
-> TCGRegSet allocated_regs)
->  }
->
->  /*
-> - * Specialized code generation for INDEX_op_movi_*.
-> + * Specialized code generation for INDEX_op_mov_* with a constant.
->   */
->  static void tcg_reg_alloc_do_movi(TCGContext *s, TCGTemp *ots,
->                                    tcg_target_ulong val, TCGLifeData
-> arg_life,
-> @@ -3470,14 +3467,6 @@ static void tcg_reg_alloc_do_movi(TCGContext *s,
-> TCGTemp *ots,
->      }
->  }
->
-> -static void tcg_reg_alloc_movi(TCGContext *s, const TCGOp *op)
-> -{
-> -    TCGTemp *ots =3D arg_temp(op->args[0]);
-> -    tcg_target_ulong val =3D op->args[1];
-> -
-> -    tcg_reg_alloc_do_movi(s, ots, val, op->life, op->output_pref[0]);
-> -}
-> -
->  /*
->   * Specialized code generation for INDEX_op_mov_*.
->   */
-> @@ -4263,11 +4252,6 @@ int tcg_gen_code(TCGContext *s, TranslationBlock
-> *tb)
->          case INDEX_op_mov_vec:
->              tcg_reg_alloc_mov(s, op);
->              break;
-> -        case INDEX_op_movi_i32:
-> -        case INDEX_op_movi_i64:
-> -        case INDEX_op_dupi_vec:
-> -            tcg_reg_alloc_movi(s, op);
-> -            break;
->          case INDEX_op_dup_vec:
->              tcg_reg_alloc_dup(s, op);
->              break;
-> diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c
-> index 1f1639df0d..b796f4fc19 100644
-> --- a/tcg/tci/tcg-target.inc.c
-> +++ b/tcg/tci/tcg-target.inc.c
-> @@ -815,8 +815,6 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
-> const TCGArg *args,
->          break;
->      case INDEX_op_mov_i32:  /* Always emitted via tcg_out_mov.  */
->      case INDEX_op_mov_i64:
-> -    case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.  */
-> -    case INDEX_op_movi_i64:
->      case INDEX_op_call:     /* Always emitted via tcg_out_call.  */
->      default:
->          tcg_abort();
-> --
-> 2.20.1
->
->
->
-
---0000000000004ff1aa05a3dd8715
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>=D1=81=D1=80=D0=B5=D0=B4=D0=B0, 22. =D0=B0=D0=BF=D1=80=D0=B8=D0=BB =
-2020., Richard Henderson &lt;<a href=3D"mailto:richard.henderson@linaro.org=
-">richard.henderson@linaro.org</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=
-=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br><blockquote class=3D"gmail_quote" st=
-yle=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">These=
- are now completely covered by mov from a<br>
-TYPE_CONST temporary.<br>
-<br>
-Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
-naro.org">richard.henderson@linaro.org</a>&gt;<br>
----</blockquote><div><br></div><div><span style=3D"color:rgb(34,34,34);font=
--size:14px;line-height:22.1200008392334px">Reviewed-by: Aleksandar Markovic=
- &lt;</span><a href=3D"mailto:aleksandar.qemu.devel@gmail.com" target=3D"_b=
-lank" style=3D"font-size:14px;line-height:22.1200008392334px">aleksandar.qe=
-mu.devel@gmail.<wbr>com</a><span style=3D"color:rgb(34,34,34);font-size:14p=
-x;line-height:22.1200008392334px">&gt;</span></div><div>=C2=A0<br></div><bl=
-ockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #=
-ccc solid;padding-left:1ex">
-=C2=A0include/tcg/tcg-opc.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 3 ---<br>
-=C2=A0tcg/aarch64/tcg-target.inc.c |=C2=A0 3 ---<br>
-=C2=A0tcg/arm/tcg-target.inc.c=C2=A0 =C2=A0 =C2=A0|=C2=A0 1 -<br>
-=C2=A0tcg/i386/tcg-target.inc.c=C2=A0 =C2=A0 |=C2=A0 3 ---<br>
-=C2=A0tcg/mips/tcg-target.inc.c=C2=A0 =C2=A0 |=C2=A0 2 --<br>
-=C2=A0tcg/optimize.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-|=C2=A0 4 ----<br>
-=C2=A0tcg/ppc/tcg-target.inc.c=C2=A0 =C2=A0 =C2=A0|=C2=A0 3 ---<br>
-=C2=A0tcg/riscv/tcg-target.inc.c=C2=A0 =C2=A0|=C2=A0 2 --<br>
-=C2=A0tcg/s390/tcg-target.inc.c=C2=A0 =C2=A0 |=C2=A0 2 --<br>
-=C2=A0tcg/sparc/tcg-target.inc.c=C2=A0 =C2=A0|=C2=A0 2 --<br>
-=C2=A0tcg/tcg-op-vec.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
-=A0 1 -<br>
-=C2=A0tcg/tcg.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 | 18 +-----------------<br>
-=C2=A0tcg/tci/tcg-target.inc.c=C2=A0 =C2=A0 =C2=A0|=C2=A0 2 --<br>
-=C2=A013 files changed, 1 insertion(+), 45 deletions(-)<br>
-<br>
-diff --git a/include/tcg/tcg-opc.h b/include/tcg/tcg-opc.h<br>
-index 7dee9b38f7..4a9cbf5426 100644<br>
---- a/include/tcg/tcg-opc.h<br>
-+++ b/include/tcg/tcg-opc.h<br>
-@@ -45,7 +45,6 @@ DEF(br, 0, 0, 1, TCG_OPF_BB_END)<br>
-=C2=A0DEF(mb, 0, 0, 1, 0)<br>
-<br>
-=C2=A0DEF(mov_i32, 1, 1, 0, TCG_OPF_NOT_PRESENT)<br>
--DEF(movi_i32, 1, 0, 1, TCG_OPF_NOT_PRESENT)<br>
-=C2=A0DEF(setcond_i32, 1, 2, 1, 0)<br>
-=C2=A0DEF(movcond_i32, 1, 4, 1, IMPL(TCG_TARGET_HAS_movcond_<wbr>i32))<br>
-=C2=A0/* load/store */<br>
-@@ -110,7 +109,6 @@ DEF(ctz_i32, 1, 2, 0, IMPL(TCG_TARGET_HAS_ctz_i32))<br>
-=C2=A0DEF(ctpop_i32, 1, 1, 0, IMPL(TCG_TARGET_HAS_ctpop_i32)<wbr>)<br>
-<br>
-=C2=A0DEF(mov_i64, 1, 1, 0, TCG_OPF_64BIT | TCG_OPF_NOT_PRESENT)<br>
--DEF(movi_i64, 1, 0, 1, TCG_OPF_64BIT | TCG_OPF_NOT_PRESENT)<br>
-=C2=A0DEF(setcond_i64, 1, 2, 1, IMPL64)<br>
-=C2=A0DEF(movcond_i64, 1, 4, 1, IMPL64 | IMPL(TCG_TARGET_HAS_movcond_<wbr>i=
-64))<br>
-=C2=A0/* load/store */<br>
-@@ -215,7 +213,6 @@ DEF(qemu_st_i64, 0, TLADDR_ARGS + DATA64_ARGS, 1,<br>
-=C2=A0#define IMPLVEC=C2=A0 TCG_OPF_VECTOR | IMPL(TCG_TARGET_MAYBE_vec)<br>
-<br>
-=C2=A0DEF(mov_vec, 1, 1, 0, TCG_OPF_VECTOR | TCG_OPF_NOT_PRESENT)<br>
--DEF(dupi_vec, 1, 0, 1, TCG_OPF_VECTOR | TCG_OPF_NOT_PRESENT)<br>
-<br>
-=C2=A0DEF(dup_vec, 1, 1, 0, IMPLVEC)<br>
-=C2=A0DEF(dup2_vec, 1, 2, 0, IMPLVEC | IMPL(TCG_TARGET_REG_BITS =3D=3D 32))=
-<br>
-diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c<br=
->
-index 843fd0ca69..7918aeb9d5 100644<br>
---- a/tcg/aarch64/tcg-target.inc.c<br>
-+++ b/tcg/aarch64/tcg-target.inc.c<br>
-@@ -2261,8 +2261,6 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,<=
-br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i32:=C2=A0 /* Always emitted via tcg_=
-out_mov.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i64:<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.=
-=C2=A0 */<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i64:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_call:=C2=A0 =C2=A0 =C2=A0/* Always emitte=
-d via tcg_out_call.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0g_assert_not_reached();<br>
-@@ -2467,7 +2465,6 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode o=
-pc,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_vec:=C2=A0 /* Always emitted via tcg_=
-out_mov.=C2=A0 */<br>
--=C2=A0 =C2=A0 case INDEX_op_dupi_vec: /* Always emitted via tcg_out_movi.=
-=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_dup_vec:=C2=A0 /* Always emitted via tcg_=
-out_dup_vec.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0g_assert_not_reached();<br>
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c<br>
-index 6aa7757aac..b967499fa4 100644<br>
---- a/tcg/arm/tcg-target.inc.c<br>
-+++ b/tcg/arm/tcg-target.inc.c<br>
-@@ -2068,7 +2068,6 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcod=
-e opc,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i32:=C2=A0 /* Always emitted via tcg_=
-out_mov.=C2=A0 */<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.=
-=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_call:=C2=A0 =C2=A0 =C2=A0/* Always emitte=
-d via tcg_out_call.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_abort();<br>
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c<br>
-index ec083bddcf..320a4bddd1 100644<br>
---- a/tcg/i386/tcg-target.inc.c<br>
-+++ b/tcg/i386/tcg-target.inc.c<br>
-@@ -2678,8 +2678,6 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcod=
-e opc,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i32:=C2=A0 /* Always emitted via tcg_=
-out_mov.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i64:<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.=
-=C2=A0 */<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i64:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_call:=C2=A0 =C2=A0 =C2=A0/* Always emitte=
-d via tcg_out_call.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_abort();<br>
-@@ -2965,7 +2963,6 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode o=
-pc,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_vec:=C2=A0 /* Always emitted via tcg_=
-out_mov.=C2=A0 */<br>
--=C2=A0 =C2=A0 case INDEX_op_dupi_vec: /* Always emitted via tcg_out_movi.=
-=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_dup_vec:=C2=A0 /* Always emitted via tcg_=
-out_dup_vec.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0g_assert_not_reached();<br>
-diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c<br>
-index 4d32ebc1df..09dc5a94fa 100644<br>
---- a/tcg/mips/tcg-target.inc.c<br>
-+++ b/tcg/mips/tcg-target.inc.c<br>
-@@ -2155,8 +2155,6 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcod=
-e opc,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i32:=C2=A0 /* Always emitted via tcg_=
-out_mov.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i64:<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.=
-=C2=A0 */<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i64:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_call:=C2=A0 =C2=A0 =C2=A0/* Always emitte=
-d via tcg_out_call.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_abort();<br>
-diff --git a/tcg/optimize.c b/tcg/optimize.c<br>
-index dd5187be31..9a2c945dbe 100644<br>
---- a/tcg/optimize.c<br>
-+++ b/tcg/optimize.c<br>
-@@ -1099,10 +1099,6 @@ void tcg_optimize(TCGContext *s)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0CASE_OP_32_64_VEC(mov):<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_opt_gen_mov(s, op, op-&=
-gt;args[0], op-&gt;args[1]);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 CASE_OP_32_64(movi):<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case INDEX_op_dupi_vec:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_opt_gen_movi(s, &amp;temps_u=
-sed, op, op-&gt;args[0], op-&gt;args[1]);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case INDEX_op_dup_vec:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (arg_is_const(op-&gt;arg=
-s[1])) {<br>
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c<br>
-index ee1f9227c1..fb390ad978 100644<br>
---- a/tcg/ppc/tcg-target.inc.c<br>
-+++ b/tcg/ppc/tcg-target.inc.c<br>
-@@ -2967,8 +2967,6 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, =
-const TCGArg *args,<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i32:=C2=A0 =C2=A0/* Always emitted vi=
-a tcg_out_mov.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i64:<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i32:=C2=A0 /* Always emitted via tcg_out_=
-movi.=C2=A0 */<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i64:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_call:=C2=A0 =C2=A0 =C2=A0 /* Always emitt=
-ed via tcg_out_call.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_abort();<br>
-@@ -3310,7 +3308,6 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode o=
-pc,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_vec:=C2=A0 /* Always emitted via tcg_=
-out_mov.=C2=A0 */<br>
--=C2=A0 =C2=A0 case INDEX_op_dupi_vec: /* Always emitted via tcg_out_movi.=
-=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_dup_vec:=C2=A0 /* Always emitted via tcg_=
-out_dup_vec.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0g_assert_not_reached();<br>
-diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c<br>
-index 2bc0ba71f2..ec609272ad 100644<br>
---- a/tcg/riscv/tcg-target.inc.c<br>
-+++ b/tcg/riscv/tcg-target.inc.c<br>
-@@ -1606,8 +1606,6 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,<=
-br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i32:=C2=A0 /* Always emitted via tcg_=
-out_mov.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i64:<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.=
-=C2=A0 */<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i64:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_call:=C2=A0 =C2=A0 =C2=A0/* Always emitte=
-d via tcg_out_call.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0g_assert_not_reached();<br>
-diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c<br>
-index b07e9ff7d6..f6b003a700 100644<br>
---- a/tcg/s390/tcg-target.inc.c<br>
-+++ b/tcg/s390/tcg-target.inc.c<br>
-@@ -2310,8 +2310,6 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcod=
-e opc,<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i32:=C2=A0 /* Always emitted via tcg_=
-out_mov.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i64:<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.=
-=C2=A0 */<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i64:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_call:=C2=A0 =C2=A0 =C2=A0/* Always emitte=
-d via tcg_out_call.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_abort();<br>
-diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c<br>
-index 65fddb310d..0808b79eee 100644<br>
---- a/tcg/sparc/tcg-target.inc.c<br>
-+++ b/tcg/sparc/tcg-target.inc.c<br>
-@@ -1591,8 +1591,6 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,<=
-br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i32:=C2=A0 /* Always emitted via tcg_=
-out_mov.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i64:<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.=
-=C2=A0 */<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i64:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_call:=C2=A0 =C2=A0 =C2=A0/* Always emitte=
-d via tcg_out_call.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_abort();<br>
-diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c<br>
-index 655b3ae32d..6343046e18 100644<br>
---- a/tcg/tcg-op-vec.c<br>
-+++ b/tcg/tcg-op-vec.c<br>
-@@ -83,7 +83,6 @@ bool tcg_can_emit_vecop_list(const TCGOpcode *list,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case INDEX_op_xor_vec:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_vec:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case INDEX_op_dup_vec:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case INDEX_op_dupi_vec:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case INDEX_op_dup2_vec:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case INDEX_op_ld_vec:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case INDEX_op_st_vec:<br>
-diff --git a/tcg/tcg.c b/tcg/tcg.c<br>
-index 59beb2bf29..adb71f16ae 100644<br>
---- a/tcg/tcg.c<br>
-+++ b/tcg/tcg.c<br>
-@@ -1463,7 +1463,6 @@ bool tcg_op_supported(TCGOpcode op)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return TCG_TARGET_HAS_goto_ptr;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i32:<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i32:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_setcond_i32:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_brcond_i32:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_ld8u_i32:<br>
-@@ -1557,7 +1556,6 @@ bool tcg_op_supported(TCGOpcode op)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return TCG_TARGET_REG_BITS =3D=3D 32;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i64:<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i64:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_setcond_i64:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_brcond_i64:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_ld8u_i64:<br>
-@@ -1663,7 +1661,6 @@ bool tcg_op_supported(TCGOpcode op)<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_vec:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_dup_vec:<br>
--=C2=A0 =C2=A0 case INDEX_op_dupi_vec:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_dupm_vec:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_ld_vec:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_st_vec:<br>
-@@ -3447,7 +3444,7 @@ static void tcg_reg_alloc_bb_end(<wbr>TCGContext *s, =
-TCGRegSet allocated_regs)<br>
-=C2=A0}<br>
-<br>
-=C2=A0/*<br>
-- * Specialized code generation for INDEX_op_movi_*.<br>
-+ * Specialized code generation for INDEX_op_mov_* with a constant.<br>
-=C2=A0 */<br>
-=C2=A0static void tcg_reg_alloc_do_movi(<wbr>TCGContext *s, TCGTemp *ots,<b=
-r>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_target_ulong val, T=
-CGLifeData arg_life,<br>
-@@ -3470,14 +3467,6 @@ static void tcg_reg_alloc_do_movi(<wbr>TCGContext *s=
-, TCGTemp *ots,<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0}<br>
-<br>
--static void tcg_reg_alloc_movi(TCGContext *s, const TCGOp *op)<br>
--{<br>
--=C2=A0 =C2=A0 TCGTemp *ots =3D arg_temp(op-&gt;args[0]);<br>
--=C2=A0 =C2=A0 tcg_target_ulong val =3D op-&gt;args[1];<br>
--<br>
--=C2=A0 =C2=A0 tcg_reg_alloc_do_movi(s, ots, val, op-&gt;life, op-&gt;outpu=
-t_pref[0]);<br>
--}<br>
--<br>
-=C2=A0/*<br>
-=C2=A0 * Specialized code generation for INDEX_op_mov_*.<br>
-=C2=A0 */<br>
-@@ -4263,11 +4252,6 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb=
-)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_vec:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_reg_alloc_mov(s, op);<b=
-r>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case INDEX_op_movi_i32:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case INDEX_op_movi_i64:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case INDEX_op_dupi_vec:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_reg_alloc_movi(s, op);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case INDEX_op_dup_vec:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_reg_alloc_dup(s, op);<b=
-r>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c<br>
-index 1f1639df0d..b796f4fc19 100644<br>
---- a/tcg/tci/tcg-target.inc.c<br>
-+++ b/tcg/tci/tcg-target.inc.c<br>
-@@ -815,8 +815,6 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, co=
-nst TCGArg *args,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i32:=C2=A0 /* Always emitted via tcg_=
-out_mov.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_mov_i64:<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i32: /* Always emitted via tcg_out_movi.=
-=C2=A0 */<br>
--=C2=A0 =C2=A0 case INDEX_op_movi_i64:<br>
-=C2=A0 =C2=A0 =C2=A0case INDEX_op_call:=C2=A0 =C2=A0 =C2=A0/* Always emitte=
-d via tcg_out_call.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_abort();<br>
--- <br>
-2.20.1<br>
-<br>
-<br>
-</blockquote>
-
---0000000000004ff1aa05a3dd8715--
 
