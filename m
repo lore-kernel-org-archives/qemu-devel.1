@@ -2,83 +2,88 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BEC6C55185
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 18:15:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B72C54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 18:22:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C06A20767
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 18:15:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80F4F20882
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 18:22:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YZepO5vv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C06A20767
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LlGg2cAP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80F4F20882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRJuP-0002kF-IR
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 14:15:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47966)
+	id 1jRK17-00060G-Ky
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 14:22:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50782)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jRJsY-0001Z4-W0
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 14:13:48 -0400
+ (envelope-from <alexander.duyck@gmail.com>) id 1jRJzU-0004vS-J2
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 14:20:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jRJsY-0005s7-Hi
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 14:13:46 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:41155)
+ (envelope-from <alexander.duyck@gmail.com>) id 1jRJzT-0001jP-TD
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 14:20:56 -0400
+Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:38826)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jRJsV-0005ar-Fs; Wed, 22 Apr 2020 14:13:43 -0400
-Received: by mail-io1-xd41.google.com with SMTP id b12so3430590ion.8;
- Wed, 22 Apr 2020 11:13:36 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
+ id 1jRJzT-0001ds-D3
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 14:20:55 -0400
+Received: by mail-qv1-xf42.google.com with SMTP id t8so1399273qvw.5
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 11:20:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=attfnDxbRHujPfbbN2DK1mOiaYNsAEHnOKl1Ksh1vfE=;
- b=YZepO5vvnj+VToYyKCn+fHhD7dEEDcMpraWJ4x64UB/pQvdU830s7aYcRdi3hq2Fvy
- A2dao0ly3m1W/tSC8SeFQsrGmKG0kjDZ1U+9ZkAvWcXn4VefbzQxucz1G+dQ6DjqqQDe
- 7uryIkIS/Orsxpo/2LQ8uIExy2jP++zVRAQd0asLP4uQ5nDe0Z4jmVut21IKDCdG7FfW
- PFFXaSShyLNDGYw4LHtQMNxUx4BSS9vJC9xUb0kd+ALm2hiSL7b/3uctAXTc80GYimDs
- 3Y9bz5ATzmx7Pq2S9UiV1ZvseaOzA8+eBF/dKPm2oJaGkjydkRK6LlY9ynmujaW/JeOf
- ciPw==
+ h=subject:from:to:cc:date:message-id:user-agent:mime-version
+ :content-transfer-encoding;
+ bh=/Zs9OmZianAaaUzo9zN00eGQ9xYS/iIR1p2LN3oNe0A=;
+ b=LlGg2cAPGYp7xksYqBtzoRvXXA/FZMs69DFpXHGqkQbS3racb6InLVMM/A5FnzFhNn
+ uE892zWGWEbFfa7uY4ao3NwMm36Ru6lDcOUk7/idHgg1Nrsp6MKc3FiRNY/GVDUWz0BC
+ z29greYh76y6lYuIyeZpPeYxVypw7pCk2T2T+Cf7R3bfCQbzx48JE//KPXyAqORU7SBI
+ SzkInLxUE817ISSo7etWvDuBP6IMw6rX/0YQKXJIvq8jc6UW5NMH+XYgmhOkxYmT2Pi0
+ yDuyyAj+pL2dx8zLI2nBbRrJGFCRFnseWv5Fi8ScdBxNFOTrO6LG1nttCOdioMqe3gIm
+ rdQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=attfnDxbRHujPfbbN2DK1mOiaYNsAEHnOKl1Ksh1vfE=;
- b=URvuFG6dSKFzjJ9Kcq2VtBAJbr44aB2v/iyXbU4mLp5nBunCNGAuRCaLjjtVT3qgib
- /EHLHEZQkfRzCkNJA+pzYPl/WZ//sLT/Kogo5At5W05vvCN6ymbXmP7Dy43a4FrZJMWQ
- tOI+iX7FB9b+AwkFCVXweE2edA0kKXXb30KlTlteOaWUhWpVvJjtC67dH/rGx3I5GIWm
- d+A/2ax6rsk8A2VHlzWvb31R1euTizhlClyqoVGGKMP+dPXe8BO5tKlh/gR4Mb0XsbGT
- uglOTlLMgMQiuyhe3dp9eNkQ4J/29VFllLqiWnBn+MpQ9TUT6wwGQnJZBTG+aPMqtSXT
- ps1g==
-X-Gm-Message-State: AGi0PuaLpb6UlgevErD4K+rWqk8evPzO+jsIfpnOzzQtWirQT6Vx6AOn
- nl3zi02nSZSZBqZ3nqSnBCsEU4nkTHItftd8YS4=
-X-Google-Smtp-Source: APiQypK0BuUi5uABE/lfret8iIDuVzgAGlzvmi4ko9MWTvGAjCajwnJVyjU2ELzWxQhzhysqFI2wBiOAjXpRx2hNbrQ=
-X-Received: by 2002:a02:6243:: with SMTP id d64mr15047851jac.135.1587579215541; 
- Wed, 22 Apr 2020 11:13:35 -0700 (PDT)
+ h=x-gm-message-state:subject:from:to:cc:date:message-id:user-agent
+ :mime-version:content-transfer-encoding;
+ bh=/Zs9OmZianAaaUzo9zN00eGQ9xYS/iIR1p2LN3oNe0A=;
+ b=QJucqomtxjCTiL0GyHw1e8IqANWZbnYyJXhHAR0g0nVWvIa4VRXyX1BI37T8ulE0Ll
+ Tli2iutMTnwXEWIMxMpzm40KwiSgifJ5WKAQU8VU77Dd44CCJq0ZlMh9S1IItceMNdOE
+ rYq6/1h6Dj1hzzTgwl6cNbzvLbCMvDhNzDIl7A5SSPI4kLQy022k/XjuCypYmS7w4I0P
+ KnD3sztYakB5yqfPuWjD76cz8G6ibNQHjf3d4VsqADRHsZ3UxWl2vpkM6HucwdcrYOCV
+ jp1yMzE1ftbb7AQK1vN9luREtNeWu7FD2Mj59AwO0+qYvjJAEPCkGg+lVX67fVqdlY9n
+ g6WA==
+X-Gm-Message-State: AGi0PuaCfD509PZP1qeiHxKKjyOGC3hZaofvIdLw5fDeBdNv4C148+1O
+ mA4rTdzfwLHKsMdIo6/W6mU=
+X-Google-Smtp-Source: APiQypKS6RlLXFK5MegYBW4SWlQb6Y8j7VLWgK0X5Fs8vYnZlleYFNPoRip94wyl9pmmnplKSc0JYg==
+X-Received: by 2002:a0c:e786:: with SMTP id x6mr213813qvn.11.1587579653704;
+ Wed, 22 Apr 2020 11:20:53 -0700 (PDT)
+Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
+ by smtp.gmail.com with ESMTPSA id o13sm4491143qke.77.2020.04.22.11.20.52
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 22 Apr 2020 11:20:53 -0700 (PDT)
+Subject: [PATCH v21 QEMU 0/5] virtio-balloon: add support for free page
+ reporting
+From: Alexander Duyck <alexander.duyck@gmail.com>
+To: david@redhat.com, mst@redhat.com
+Date: Wed, 22 Apr 2020 11:20:51 -0700
+Message-ID: <20200422181649.12258.37077.stgit@localhost.localdomain>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-References: <20200412020830.607-1-zhiwei_liu@c-sky.com>
- <f6dc4fa7-fed5-28a1-5922-68e9a0510de5@c-sky.com>
- <bf6b46c3-cc39-1b4a-4ae4-9de894721f04@linaro.org>
-In-Reply-To: <bf6b46c3-cc39-1b4a-4ae4-9de894721f04@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 22 Apr 2020 11:05:05 -0700
-Message-ID: <CAKmqyKMZ9x+PXOxnFqE5e-h+cCZjJThEBjJip_OCppjX71DSrg@mail.gmail.com>
-Subject: Re: [PATCH] linux-user/riscv: fix up struct target_ucontext definition
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f42;
+ envelope-from=alexander.duyck@gmail.com; helo=mail-qv1-xf42.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::d41
+X-Received-From: 2607:f8b0:4864:20::f42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,68 +95,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Riku Voipio <riku.voipio@iki.fi>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wxy194768@alibaba-inc.com, Laurent Vivier <laurent@vivier.eu>,
- wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Apr 21, 2020 at 9:10 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 4/21/20 7:34 PM, LIU Zhiwei wrote:
-> > Ping.
-> >
-> > When I port RISU, I find this bug. I can't get the correct registers from the
-> > struct ucontext_t parameter in the signal handler.
->
-> The RISC-V Linux ABI will need to be extended to handle RVV state.
->
-> There is room in your sigcontext structure:
->
-> > struct __riscv_q_ext_state {
-> >         __u64 f[64] __attribute__((aligned(16)));
-> >         __u32 fcsr;
-> >         /*
-> >          * Reserved for expansion of sigcontext structure.  Currently zeroed
-> >          * upon signal, and must be zero upon sigreturn.
-> >          */
-> >         __u32 reserved[3];
-> > };
->
-> in uc->uc_mcontext.sc_fpregs.q.
->
-> That reserved field is going to have to be used in some way.
+This series provides an asynchronous means of reporting free guest pages
+to QEMU through virtio-balloon so that the memory associated with those
+pages can be dropped and reused by other processes and/or guests on the
+host. Using this it is possible to avoid unnecessary I/O to disk and
+greatly improve performance in the case of memory overcommit on the host.
 
-Just to clarify, this patch is still correct right?
+As of April 7th this functionality has been enabled in Linus's kernel
+tree[1] and so I am submitting the QEMU pieces for inclusion.
 
-It looks good to me.
+[1]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b0c504f154718904ae49349147e3b7e6ae91ffdc
 
-Alistair
+Changes from v17:
+Fixed typo in patch 1 title
+Addressed white-space issues reported via checkpatch
+Added braces {} for two if statements to match expected coding style
 
->
-> My suggestion is to use some sort of extendable record list, akin to AArch64:
->
-> struct _aarch64_ctx {
->         __u32 magic;
->         __u32 size;
-> };
->
-> One of the 3 zeros could be the total size of the extensions, so that it's easy
-> to validate the size or memcpy the lot without parsing each individual record.
->  The other two zeros could be the first header of the next record.  Which in
-> this case also allows the payload of that first record to be aligned mod 16,
-> which could come in handy.
->
-> Talk to the risc-v kernel engineers and come up with a plan that includes room
-> for the next architecture extension as well.  They may have already done so,
-> but I'm not monitoring the correct mailing list to know.
->
->
-> r~
->
+Changes from v18:
+Updated patches 2 and 3 based on input from dhildenb
+Added comment to patch 2 describing what keeps us from reporting a bad page
+Added patch to address issue with ROM devices being directly writable
+
+Changes from v19:
+Added std-headers change to match changes pushed for linux kernel headers
+Added patch to remove "report" from page hinting code paths
+Updated comment to better explain why we disable hints w/ page poisoning
+Removed code that was modifying config size for poison vs hinting
+Dropped x-page-poison property
+Added code to bounds check the reported region vs the RAM block
+Dropped patch for ROM devices as that was already pulled in by Paolo
+
+Changes from v20:
+Rearranged patches to push Linux header sync patches to front
+Removed association between free page hinting and VIRTIO_BALLOON_F_PAGE_POISON
+Added code to enable VIRTIO_BALLOON_F_PAGE_POISON if page reporting is enabled
+Fixed possible resource leak if poison or qemu_balloon_is_inhibited return true
+Updated cover page comments
+
+---
+
+Alexander Duyck (5):
+      linux-headers: Update to allow renaming of free_page_report_cmd_id
+      linux-headers: update to contain virito-balloon free page reporting
+      virtio-balloon: Replace free page hinting references to 'report' with 'hint'
+      virtio-balloon: Implement support for page poison tracking feature
+      virtio-balloon: Provide an interface for free page reporting
+
+
+ hw/virtio/virtio-balloon.c                      |  151 +++++++++++++++++------
+ include/hw/virtio/virtio-balloon.h              |   23 ++--
+ include/standard-headers/linux/virtio_balloon.h |   12 ++
+ 3 files changed, 136 insertions(+), 50 deletions(-)
+
+--
 
