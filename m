@@ -2,90 +2,92 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D13BEC54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:37:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 220F5C55185
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:43:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92C5D2082E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:37:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF2CA2082E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 16:43:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FncwCgLb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92C5D2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Myb7vrRr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF2CA2082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRINm-0008MV-Pi
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:37:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42782)
+	id 1jRISk-0003wt-11
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 12:43:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44632)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jRIN0-0007k1-NX
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:37:07 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jRIRt-0002wG-LL
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:42:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jRIN0-0005Xt-43
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:37:06 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53248)
+ (envelope-from <richard.henderson@linaro.org>) id 1jRIRt-0000nF-00
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:42:09 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33275)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jRIMz-0005TD-Nb
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:37:05 -0400
-Received: by mail-wm1-x344.google.com with SMTP id t63so3122884wmt.3
- for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 09:37:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=/rXlD3QLOa0hkB9/1gelb3El8JJx59Gu4hwU3hKka4U=;
- b=FncwCgLb+ulnMpU5gCKBZr8NqH30ASlW2oqybtzRuTwWGx3LlW5R8X6g/PxOfC1SAH
- PTjgCgoqT6xFL3XwWZx7oh5QH8X13fE163Sw7ClVgU1s0mrC9sjKI9UvsCh8AzKf0rlP
- Pj0FWU4mGGqW6e3Xp4kBqbbm1JWInz3BEuJcXO5nWCFpjIs4gNFlme0ppbZS7orGZ397
- HN2HzwzytPuVw/ZkzRZtOkgDf0KnSacNolbPMYi0yxpOcWi/oHRY8Hp56+FwXyn4zSgv
- vY7X6CzszZBKSnMiAqn86eUzAAGYz20vVQFTbFrbPXIsvgU8ad2vW2ujMsGvUTCDmFF6
- aiYA==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jRIRs-0000jB-Ef
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 12:42:08 -0400
+Received: by mail-pf1-x444.google.com with SMTP id x77so1386706pfc.0
+ for <qemu-devel@nongnu.org>; Wed, 22 Apr 2020 09:42:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=4vUvFaUSrdPMIJvLsS9HqHtNdnLVoK8IeRuxUZ/s17E=;
+ b=Myb7vrRr3EsGGpi7aPF3R/bfKs57WvUR0XzdFgXxz3x20DpgFZSzH7PSLcDKLkgloZ
+ EtCBfWAbT5CULytZ6XSPcoRYuIh1VYSzMi654Sy/GKVjzBySoh22+DxMaDRdlVH+DHUe
+ rJMByBVpLTduZ3w/uaf2YN2IHgZ1HTCFQxLslbMHuLLz8D+lGZPitMNo/1Vwf83NxxxC
+ CxXL/k+FEkioXparhcqny+CrdS5CfdXDjztoQfsThK7kSEj3RQNigzZfMxl+Zgh9LQ5I
+ GDCllOQjNQh2djuqmeZUnoZGWduWB1f0YmjnYJ5bQAQJC5Reg2LMnd1JYvZODHlMIeJ5
+ l/bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=/rXlD3QLOa0hkB9/1gelb3El8JJx59Gu4hwU3hKka4U=;
- b=NtBaGQqJOCF1f3Ur27EeSsVC4zI95dYvJ6ri5928FVPU1WooJCGvVdrD+xkkNBQiSt
- O9jewroPl9aQtUu4eol5FOR6cw8GTkkqTfS8SxLPPgaj9IykChXRbWbCR67HXiiPKiS4
- WcDn/5jq9T5ADTu56yieUJB1C36B92vvlMOM3w+xaPnKKmAQaAmVMPQbnVW2WPNV9maK
- WGcorO4DSJKA+f0Cb6qxwYOHAZ91QKsdL6J9AyKujViudjtNDdCaQd5qGqjVtQGjaHQz
- lK9zl3O8R32DbOnWlZu3UVp6d6quYJRxLcYvry1ZG8m7lMju2/NFYbq8Ix1T7L7WLA9M
- qjjQ==
-X-Gm-Message-State: AGi0PuZRi0yJatCWp6aF0Zd/QjW2hVRXvRWdf4Gkme5qiZwEqh6hv9ec
- /z/fSAwNuhr/3CNva5eCIM0=
-X-Google-Smtp-Source: APiQypJArzp8ErLstDyP89689dEEEv5h8/Pq6lFvPPCsXdZY7UVhRX28yTc2MSJmBRsVX1ka/+E+CA==
-X-Received: by 2002:a1c:668a:: with SMTP id a132mr11855441wmc.46.1587573424281; 
- Wed, 22 Apr 2020 09:37:04 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id q17sm8080812wmj.45.2020.04.22.09.37.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Apr 2020 09:37:03 -0700 (PDT)
-Date: Wed, 22 Apr 2020 17:37:01 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Alexander Bulekov <alxndr@bu.edu>
-Subject: Re: [PATCH] fuzz: select fuzz target using executable name
-Message-ID: <20200422163701.GK47385@stefanha-x1.localdomain>
-References: <20200421182230.6313-1-alxndr@bu.edu>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=4vUvFaUSrdPMIJvLsS9HqHtNdnLVoK8IeRuxUZ/s17E=;
+ b=Ym6pnyQGlWsxv2gvkcLFfqFt/Ms44THsk9+hTVQaqC2eXFs1ZtJdBgZqb56zAlUb5j
+ jbq2J4jA6iaZReNNUn9G2JqN7RzjhYNN6qqgbKDJUqRBjLZ/UFFcTk8dQJbTg5tMddyg
+ Q0ug0pXnVmywQv/R0GkVfS7q0Y15D+/+n7M/18yVPiWa3ji3cCM1UOnrvCYiZ9Ea7fHN
+ WGdXBIyKjRoFGSmD0e7UqwzpSknayeWQsA27VPOpcBv/laGqyXq6sOWhcRj6P6ff0ZcY
+ wjhmdFlK4sbdpH/Rt7JpKGR+JIf77LTuXiPlp6u3zwh4fWqby6hpUA5uWp6PvvE1VKkQ
+ 3SZA==
+X-Gm-Message-State: AGi0Puahz3mhV6eB3N8YXe/e5SSxZ0bqPafni89oZBKThEFoAmYw2ILM
+ DTLdE3z3RmTFUBtPChgomN9ahA==
+X-Google-Smtp-Source: APiQypJ2BA1vRYh9DAonCreyqa48gAR6XG70FVvVZhXGZ0g9+ZNj/7G4L25kVjsDSz6954MO47EU4g==
+X-Received: by 2002:a63:1566:: with SMTP id 38mr28432171pgv.355.1587573726686; 
+ Wed, 22 Apr 2020 09:42:06 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id z7sm5830149pff.47.2020.04.22.09.42.05
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 22 Apr 2020 09:42:05 -0700 (PDT)
+Subject: Re: [PATCH v2] target/arm: Implement SVE2 FMMLA
+To: Stephen Long <steplong@quicinc.com>, qemu-devel@nongnu.org
+References: <20200422141516.7977-1-steplong@quicinc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <399f890b-8265-2a82-f9de-ab1d7b95f6cc@linaro.org>
+Date: Wed, 22 Apr 2020 09:42:04 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="5mZBmBd1ZkdwT1ny"
-Content-Disposition: inline
-In-Reply-To: <20200421182230.6313-1-alxndr@bu.edu>
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=stefanha@gmail.com; helo=mail-wm1-x344.google.com
+In-Reply-To: <20200422141516.7977-1-steplong@quicinc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,54 +99,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Bandan Das <bsd@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-arm@nongnu.org, apazos@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---5mZBmBd1ZkdwT1ny
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Apr 21, 2020 at 02:22:30PM -0400, Alexander Bulekov wrote:
-> The fuzzers are built into a binary (e.g. qemu-fuzz-i386). To select the
-> device to fuzz/fuzz target, we usually use the --fuzz-target=3D argument.
-> This commit allows the fuzz-target to be specified using the name of the
-> executable. If the executable name ends with -target-FUZZ_TARGET, then
-> we select the fuzz target based on this name, rather than the
-> --fuzz-target argument. This is useful for systems such as oss-fuzz
-> where we don't have control of the arguments passed to the fuzzer.
->=20
-> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+On 4/22/20 7:15 AM, Stephen Long wrote:
+> Signed-off-by: Stephen Long <steplong@quicinc.com>
+> 
+> I'm guessing endianness doesn't matter because we are writing to the
+> corresponding 32-bit/64-bit in the destination register.
 > ---
->  tests/qtest/fuzz/fuzz.c | 19 +++++++++++--------
->  1 file changed, 11 insertions(+), 8 deletions(-)
+>  target/arm/cpu.h           | 10 +++++++++
+>  target/arm/helper-sve.h    |  3 +++
+>  target/arm/sve.decode      |  4 ++++
+>  target/arm/sve_helper.c    | 44 ++++++++++++++++++++++++++++++++++++++
+>  target/arm/translate-sve.c | 29 +++++++++++++++++++++++++
+>  5 files changed, 90 insertions(+)
 
-I fixed the indentation when merging.
+Endianness does matter for 32-bit, as we are writing into a host-endian 64-bit
+quantity.  I was being over-brief in my earlier reply.
 
-Thanks, applied to my master tree:
-https://github.com/stefanha/qemu/commits/master
 
-Stefan
+> +        TYPE p0, p1, results[4];                                            \
+> +                                                                            \
+> +        /* i = 0, j = 0 */                                                  \
+> +        p0 = MUL(n00, m00, status);                                         \
+> +        p1 = MUL(n01, m01, status);                                         \
+> +        results[0] = ADD(a[0], ADD(p0, p1, status), status);                \
+> +                                                                            \
+> +        /* i = 0, j = 1 */                                                  \
+> +        p0 = MUL(n00, m10, status);                                         \
+> +        p1 = MUL(n01, m11, status);                                         \
+> +        results[1] = ADD(a[1], ADD(p0, p1, status), status);                \
+> +                                                                            \
+> +        /* i = 1, j = 0 */                                                  \
+> +        p0 = MUL(n10, m00, status);                                         \
+> +        p1 = MUL(n11, m01, status);                                         \
+> +        results[2] = ADD(a[2], ADD(p0, p1, status), status);                \
+> +                                                                            \
+> +        /* i = 1, j = 1 */                                                  \
+> +        p0 = MUL(n10, m10, status);                                         \
+> +        p1 = MUL(n11, m11, status);                                         \
+> +        results[3] = ADD(a[3], ADD(p0, p1, status), status);                \
+> +                                                                            \
+> +        memcpy(d, results, sizeof(TYPE) * 4);                               \
 
---5mZBmBd1ZkdwT1ny
-Content-Type: application/pgp-signature; name="signature.asc"
+There's no need for the result array -- we have already read the inputs, so we
+can write back the result straight away.
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6gcq0ACgkQnKSrs4Gr
-c8gYHAf/c6TRkVLAD5ac7xJ4AsW7Xb3xykcMpZ7FyMdqDp9t4UveVP6qP7gj05xp
-1F2iQZ30kDFg8Ssfzl1iXLK9B/3hueCdDqJu9TS12+uG+r7H+S7bTOU9HmXd68OT
-hhglYC6Arui3bmjF/Oc0vnbO57ZyHkbzigwz7+yQO4lSQ2ZaAJQ1UfsUMzQXLPMS
-JdfLjFK/2u1Uc+Rm2ao4oMr8wxFl+lTIfPTrzzWJWRZlxPw6cFfYhNxWC8kJ5aGp
-RJHkDgpR27IPJ4YJF/yFCn8SEoX9+P8VHGA2sdkUeyFclrLOF0rGMsRH0zDjTkrE
-u2xOu2BfC5LlyKCIbiN6NlCIk2AsuQ==
-=ln5R
------END PGP SIGNATURE-----
-
---5mZBmBd1ZkdwT1ny--
+r~
 
