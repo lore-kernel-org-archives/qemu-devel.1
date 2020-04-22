@@ -2,70 +2,71 @@ Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5452FC55189
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 08:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E057C55186
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 08:41:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BD4A206B9
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 08:32:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BD4A206B9
+	by mail.kernel.org (Postfix) with ESMTPS id 4EE57206B9
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 08:41:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EE57206B9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRAnw-0006d9-Au
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 04:32:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58908)
+	id 1jRAx4-0001LG-En
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 04:41:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42448)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1jRAn7-000652-9K
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 04:31:33 -0400
+ (envelope-from <chen.zhang@intel.com>) id 1jRAwD-0000uc-Ml
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 04:40:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1jRAmy-0006g1-VJ
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 04:31:33 -0400
-Received: from mga04.intel.com ([192.55.52.120]:3013)
+ (envelope-from <chen.zhang@intel.com>) id 1jRAwB-0006w0-To
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 04:40:56 -0400
+Received: from mga12.intel.com ([192.55.52.136]:1406)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jRAmy-0006Xg-CU
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 04:31:24 -0400
-IronPort-SDR: ek9ofdexBRU9vlbIA8+sX1IZUJwaW2y6oD8eS7HwKuDBBsxUwGxVOxCkZscj3qLqiJ0+WBA7D8
- RCTMwqQujsrQ==
+ id 1jRAwB-0006d7-AE
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 04:40:55 -0400
+IronPort-SDR: jPQWLMTitcwHLG3eNQ2+2XXxjwN+6isBwBBG2Kyeam+UMFmjzBVsFKgO1dUDgsh0qYIX1Xq+Ou
+ iJt2JoFmdOAw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Apr 2020 01:31:21 -0700
-IronPort-SDR: v4jRfK+fdpYg/rDJ5Q0vtv3FljuVc/P4l1XA46WESTJL/OhoPH5DWBahRdIKtzF3Di+nQDRkpK
- HocBxNnpH1jg==
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 22 Apr 2020 01:40:49 -0700
+IronPort-SDR: 6Cq3owy30Djpho4/h4A0xqB1Ev0ky1etZ8/1kyq8beC4ViZbB4tzjt9YFf69Bba/rIPwa+tc9S
+ pQJZ9EwiGSPQ==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,413,1580803200"; d="scan'208";a="365614981"
+X-IronPort-AV: E=Sophos;i="5.72,413,1580803200"; d="scan'208";a="255567348"
 Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
- by fmsmga001.fm.intel.com with ESMTP; 22 Apr 2020 01:31:21 -0700
-Received: from shsmsx603.ccr.corp.intel.com (10.109.6.143) by
+ by orsmga003.jf.intel.com with ESMTP; 22 Apr 2020 01:40:49 -0700
+Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
  FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 22 Apr 2020 01:31:21 -0700
+ id 14.3.439.0; Wed, 22 Apr 2020 01:40:43 -0700
 Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX603.ccr.corp.intel.com (10.109.6.143) with Microsoft SMTP Server
+ SHSMSX601.ccr.corp.intel.com (10.109.6.141) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 22 Apr 2020 16:31:19 +0800
+ 15.1.1713.5; Wed, 22 Apr 2020 16:40:41 +0800
 Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
  SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Wed, 22 Apr 2020 16:31:19 +0800
+ Wed, 22 Apr 2020 16:40:41 +0800
 From: "Zhang, Chen" <chen.zhang@intel.com>
 To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>
-Subject: RE: [PATCH 2/3] chardev/char.c: Use qemu_co_sleep_ns if in coroutine
-Thread-Topic: [PATCH 2/3] chardev/char.c: Use qemu_co_sleep_ns if in coroutine
-Thread-Index: AQHWDdRNnkCIsDBxXE6FbsLyxcPo8qiE5N3A
-Date: Wed, 22 Apr 2020 08:31:19 +0000
-Message-ID: <0ec3fe8fb159493fa7f08bf7484116a0@intel.com>
+Subject: RE: [PATCH 3/3] net/colo-compare.c: Fix deadlock
+Thread-Topic: [PATCH 3/3] net/colo-compare.c: Fix deadlock
+Thread-Index: AQHWDdRPpJe1JU6JkUms+S6o6peNRqiE52lA
+Date: Wed, 22 Apr 2020 08:40:40 +0000
+Message-ID: <43db66be4b41426e97cf086b0a5d4784@intel.com>
 References: <cover.1586370737.git.lukasstraub2@web.de>
- <f231c9abc706f5825e41c0fbaa4fc82de1121435.1586370737.git.lukasstraub2@web.de>
-In-Reply-To: <f231c9abc706f5825e41c0fbaa4fc82de1121435.1586370737.git.lukasstraub2@web.de>
+ <87c2f42b46f93fb89867f82e45aa2689eff98432.1586370737.git.lukasstraub2@web.de>
+In-Reply-To: <87c2f42b46f93fb89867f82e45aa2689eff98432.1586370737.git.lukasstraub2@web.de>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -77,11 +78,11 @@ x-originating-ip: [10.239.127.36]
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Received-SPF: pass client-ip=192.55.52.120; envelope-from=chen.zhang@intel.com;
- helo=mga04.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 03:46:17
+Received-SPF: pass client-ip=192.55.52.136; envelope-from=chen.zhang@intel.com;
+ helo=mga12.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 04:29:42
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 192.55.52.120
+X-Received-From: 192.55.52.136
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,45 +111,178 @@ Sender: "Qemu-devel"
 > <lizhijian@cn.fujitsu.com>; Jason Wang <jasowang@redhat.com>; Marc-
 > Andr=E9 Lureau <marcandre.lureau@redhat.com>; Paolo Bonzini
 > <pbonzini@redhat.com>
-> Subject: [PATCH 2/3] chardev/char.c: Use qemu_co_sleep_ns if in coroutine
+> Subject: [PATCH 3/3] net/colo-compare.c: Fix deadlock
 >=20
-> This will be needed in the next patch.
+> The chr_out chardev is connected to a filter-redirector running in the ma=
+in
+> loop. qemu_chr_fe_write_all might block here in compare_chr_send if the
+> (socket-)buffer is full.
+> If another filter-redirector in the main loop want's to send data to chr_=
+pri_in
+> it might also block if the buffer is full. This leads to a deadlock becau=
+se both
+> event loops get blocked.
 >=20
+> Fix this by converting compare_chr_send to a coroutine and return error i=
+f it
+> is in use.
+>=20
+
+I have tested this series, running fine currently.
+Can you share performance data after this patch?
+
+Thanks
+Zhang Chen
+
 > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-
-
-Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-
 > ---
->  chardev/char.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  net/colo-compare.c | 82
+> +++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 71 insertions(+), 11 deletions(-)
 >=20
-> diff --git a/chardev/char.c b/chardev/char.c index 04075389bf..51ad0dc6b3
-> 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -38,6 +38,7 @@
->  #include "qemu/module.h"
->  #include "qemu/option.h"
->  #include "qemu/id.h"
+> diff --git a/net/colo-compare.c b/net/colo-compare.c index
+> 1de4220fe2..82787d3055 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -32,6 +32,9 @@
+>  #include "migration/migration.h"
+>  #include "util.h"
+>=20
+> +#include "block/aio-wait.h"
 > +#include "qemu/coroutine.h"
+> +
+>  #define TYPE_COLO_COMPARE "colo-compare"
+>  #define COLO_COMPARE(obj) \
+>      OBJECT_CHECK(CompareState, (obj), TYPE_COLO_COMPARE) @@ -77,6
+> +80,17 @@ static int event_unhandled_count;
+>   *                    |packet  |  |packet  +    |packet  | |packet  +
+>   *                    +--------+  +--------+    +--------+ +--------+
+>   */
+> +
+> +typedef struct SendCo {
+> +    Coroutine *co;
+> +    uint8_t *buf;
+> +    uint32_t size;
+> +    uint32_t vnet_hdr_len;
+> +    bool notify_remote_frame;
+> +    bool done;
+> +    int ret;
+> +} SendCo;
+> +
+>  typedef struct CompareState {
+>      Object parent;
 >=20
->  #include "chardev/char-mux.h"
+> @@ -91,6 +105,7 @@ typedef struct CompareState {
+>      SocketReadState pri_rs;
+>      SocketReadState sec_rs;
+>      SocketReadState notify_rs;
+> +    SendCo sendco;
+>      bool vnet_hdr;
+>      uint32_t compare_timeout;
+>      uint32_t expired_scan_cycle;
+> @@ -699,19 +714,17 @@ static void colo_compare_connection(void
+> *opaque, void *user_data)
+>      }
+>  }
 >=20
-> @@ -119,7 +120,11 @@ static int qemu_chr_write_buffer(Chardev *s,
->      retry:
->          res =3D cc->chr_write(s, buf + *offset, len - *offset);
->          if (res < 0 && errno =3D=3D EAGAIN && write_all) {
-> -            g_usleep(100);
-> +            if (qemu_in_coroutine()) {
-> +                qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 100000);
-> +            } else {
-> +                g_usleep(100);
-> +            }
->              goto retry;
->          }
+> -static int compare_chr_send(CompareState *s,
+> -                            const uint8_t *buf,
+> -                            uint32_t size,
+> -                            uint32_t vnet_hdr_len,
+> -                            bool notify_remote_frame)
+> +static void coroutine_fn _compare_chr_send(void *opaque)
+>  {
+> +    CompareState *s =3D opaque;
+> +    SendCo *sendco =3D &s->sendco;
+> +    const uint8_t *buf =3D sendco->buf;
+> +    uint32_t size =3D sendco->size;
+> +    uint32_t vnet_hdr_len =3D sendco->vnet_hdr_len;
+> +    bool notify_remote_frame =3D sendco->notify_remote_frame;
+>      int ret =3D 0;
+>      uint32_t len =3D htonl(size);
 >=20
+> -    if (!size) {
+> -        return 0;
+> -    }
+> -
+>      if (notify_remote_frame) {
+>          ret =3D qemu_chr_fe_write_all(&s->chr_notify_dev,
+>                                      (uint8_t *)&len, @@ -754,10 +767,50 =
+@@ static int
+> compare_chr_send(CompareState *s,
+>          goto err;
+>      }
+>=20
+> -    return 0;
+> +    sendco->ret =3D 0;
+> +    goto out;
+>=20
+>  err:
+> -    return ret < 0 ? ret : -EIO;
+> +    sendco->ret =3D ret < 0 ? ret : -EIO;
+> +out:
+> +    sendco->co =3D NULL;
+> +    g_free(sendco->buf);
+> +    sendco->buf =3D NULL;
+> +    sendco->done =3D true;
+> +    aio_wait_kick();
+> +}
+> +
+> +static int compare_chr_send(CompareState *s,
+> +                            const uint8_t *buf,
+> +                            uint32_t size,
+> +                            uint32_t vnet_hdr_len,
+> +                            bool notify_remote_frame) {
+> +    SendCo *sendco =3D &s->sendco;
+> +
+> +    if (!size) {
+> +        return 0;
+> +    }
+> +
+> +    if (sendco->done) {
+> +        sendco->co =3D qemu_coroutine_create(_compare_chr_send, s);
+> +        sendco->buf =3D g_malloc(size);
+> +        sendco->size =3D size;
+> +        sendco->vnet_hdr_len =3D vnet_hdr_len;
+> +        sendco->notify_remote_frame =3D notify_remote_frame;
+> +        sendco->done =3D false;
+> +        memcpy(sendco->buf, buf, size);
+> +        qemu_coroutine_enter(sendco->co);
+> +        if (sendco->done) {
+> +            /* report early errors */
+> +            return sendco->ret;
+> +        } else {
+> +            /* else assume success */
+> +            return 0;
+> +        }
+> +    }
+> +
+> +    return -ENOBUFS;
+>  }
+>=20
+>  static int compare_chr_can_read(void *opaque) @@ -1146,6 +1199,8 @@
+> static void colo_compare_complete(UserCreatable *uc, Error **errp)
+>      CompareState *s =3D COLO_COMPARE(uc);
+>      Chardev *chr;
+>=20
+> +    s->sendco.done =3D true;
+> +
+>      if (!s->pri_indev || !s->sec_indev || !s->outdev || !s->iothread) {
+>          error_setg(errp, "colo compare needs 'primary_in' ,"
+>                     "'secondary_in','outdev','iothread' property set"); @=
+@ -1281,6
+> +1336,11 @@ static void colo_compare_finalize(Object *obj)
+>      CompareState *s =3D COLO_COMPARE(obj);
+>      CompareState *tmp =3D NULL;
+>=20
+> +    AioContext *ctx =3D iothread_get_aio_context(s->iothread);
+> +    aio_context_acquire(ctx);
+> +    AIO_WAIT_WHILE(ctx, !s->sendco.done);
+> +    aio_context_release(ctx);
+> +
+>      qemu_chr_fe_deinit(&s->chr_pri_in, false);
+>      qemu_chr_fe_deinit(&s->chr_sec_in, false);
+>      qemu_chr_fe_deinit(&s->chr_out, false);
 > --
 > 2.20.1
-
 
