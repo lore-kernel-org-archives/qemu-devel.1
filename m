@@ -6,78 +6,79 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9255FC54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF55FC54FCB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CF872073A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:50:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7813320774
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 13:52:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cAor98Nn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CF872073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VdO1TvxH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7813320774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRFlk-0002kw-HU
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 09:50:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39468)
+	id 1jRFnM-0005dF-PQ
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 09:52:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39508)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jRFjk-00008d-Oi
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:48:26 -0400
+ (envelope-from <armbru@redhat.com>) id 1jRFjm-0000C3-PJ
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:48:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jRFji-000896-G4
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:48:23 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37432
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1jRFjk-0008F6-9Q
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:48:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36900
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jRFjh-00084T-U2
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:48:22 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jRFjj-0008AE-SC
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 09:48:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587563300;
+ s=mimecast20190719; t=1587563302;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cfTlLXtoGanxq3ON/PmXohAadgw+dyYLdekRQbAtnks=;
- b=cAor98Nnhw+MOeARumw6SjCPNu3cXYwum236D8nnn6PG2eYKYWuOhOiRS53viwhP0+THNb
- UAt1cryr/qA9CG5D4JI2pVPhV9+zP4b/84XjS2sCuOBf4GIb3jE2otGKXOxlrwdHUq/+oG
- LbglJWp7MVHjVxI7XWhlIaq6VPGnEPs=
+ bh=wTkkZ0baNr2PlF+36UnREU+T0co/N68a0grMAwtmAHg=;
+ b=VdO1TvxHwANlpOpu+wDaunu2uKVrpLYFUhngkvYSwZ+KxowIXwiFI/Wf6T2GGV76gMOUAv
+ wIVzKvwg+YrzXZO32NXXQLbyOElXRIXvp0ELoYkFxqi6K8jSe9ms9K08dRGbJnhHMd20eq
+ hmczIlSf6ZkykMrYaZMK8x/gAd4Nzkk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-pmaZnJSVPniW2U4bk3QMHQ-1; Wed, 22 Apr 2020 09:48:19 -0400
-X-MC-Unique: pmaZnJSVPniW2U4bk3QMHQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-28-qS4tS5Z-NLmamLmmeDkMwA-1; Wed, 22 Apr 2020 09:48:18 -0400
+X-MC-Unique: qS4tS5Z-NLmamLmmeDkMwA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 117418010FB;
- Wed, 22 Apr 2020 13:48:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D58A4DB60;
+ Wed, 22 Apr 2020 13:48:17 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7ADC8600DE;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A5F360C87;
  Wed, 22 Apr 2020 13:48:17 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id CF29811358BD; Wed, 22 Apr 2020 15:48:15 +0200 (CEST)
+ id DAA6E11358BF; Wed, 22 Apr 2020 15:48:15 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/4] sam460ex: Suppress useless warning on -m 32 and -m 64
-Date: Wed, 22 Apr 2020 15:48:12 +0200
-Message-Id: <20200422134815.1584-2-armbru@redhat.com>
+Subject: [PATCH v2 3/4] bamboo,
+ sam460ex: Tidy up error message for unsupported RAM size
+Date: Wed, 22 Apr 2020 15:48:14 +0200
+Message-Id: <20200422134815.1584-4-armbru@redhat.com>
 In-Reply-To: <20200422134815.1584-1-armbru@redhat.com>
 References: <20200422134815.1584-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 02:57:52
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 04:15:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,40 +96,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Requesting 32 or 64 MiB of RAM with the sam460ex machine type produces
-a useless warning:
+Improve
 
-    qemu-system-ppc: warning: Memory size is too small for SDRAM type, adju=
-sting type
+    $ ppc-softmmu/qemu-system-ppc -M sam460ex -m 4096
+    qemu-system-ppc: Max 1 banks of 2048 ,1024 ,512 ,256 ,128 ,64 ,32 MB DI=
+MM/bank supported
+    qemu-system-ppc: Possible valid RAM size: 2048
 
-This is because sam460ex_init() asks spd_data_generate() for DDR2,
-which is impossible, so spd_data_generate() corrects it to DDR.
+to
 
-The warning goes back to commit 08fd99179a "sam460ex: Clean up SPD
-EEPROM creation".
-
-Make sam460ex_init() pass the correct SDRAM type to get rid of the
-warning.
+    qemu-system-ppc: at most 1 bank of 2048, 1024, 512, 256, 128, 64, 32 Mi=
+B each supported
+    Possible valid RAM size: 1024 MiB
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/ppc/sam460ex.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/ppc/ppc4xx_devs.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-index 898453cf30..1e3eaac0db 100644
---- a/hw/ppc/sam460ex.c
-+++ b/hw/ppc/sam460ex.c
-@@ -335,7 +335,8 @@ static void sam460ex_init(MachineState *machine)
-     dev =3D sysbus_create_simple(TYPE_PPC4xx_I2C, 0x4ef600700, uic[0][2]);
-     i2c =3D PPC4xx_I2C(dev)->bus;
-     /* SPD EEPROM on RAM module */
--    spd_data =3D spd_data_generate(DDR2, ram_sizes[0], &err);
-+    spd_data =3D spd_data_generate(ram_sizes[0] < 128 * MiB ? DDR : DDR2,
-+                                 ram_sizes[0], &err);
-     if (err) {
-         warn_report_err(err);
-     }
+diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+index 3376c43ff5..f1651e04d9 100644
+--- a/hw/ppc/ppc4xx_devs.c
++++ b/hw/ppc/ppc4xx_devs.c
+@@ -716,11 +716,11 @@ void ppc4xx_sdram_banks(MemoryRegion *ram, int nr_ban=
+ks,
+         for (i =3D 0; sdram_bank_sizes[i]; i++) {
+             g_string_append_printf(s, "%" PRIi64 "%s",
+                                    sdram_bank_sizes[i] / MiB,
+-                                   sdram_bank_sizes[i + 1] ? " ," : "");
++                                   sdram_bank_sizes[i + 1] ? ", " : "");
+         }
+-        error_report("Max %d banks of %s MB DIMM/bank supported",
+-            nr_banks, s->str);
+-        error_report("Possible valid RAM size: %" PRIi64,
++        error_report("at most %d bank%s of %s MiB each supported",
++                     nr_banks, nr_banks =3D=3D 1 ? "" : "s", s->str);
++        error_printf("Possible valid RAM size: %" PRIi64 " MiB \n",
+             used_size ? used_size / MiB : sdram_bank_sizes[i - 1] / MiB);
+=20
+         g_string_free(s, true);
 --=20
 2.21.1
 
