@@ -2,105 +2,90 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF08C2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 07:24:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10549C55191
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 07:31:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 359C220736
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 07:24:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UkVEH8qI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 359C220736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DAEE7208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 07:31:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAEE7208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRWDP-00006C-EB
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 03:24:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43918)
+	id 1jRWKG-0003G9-2D
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 03:31:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45882)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRWCm-00084f-F0
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 03:23:28 -0400
+ (envelope-from <chen.zhang@intel.com>) id 1jRWJO-000254-NG
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 03:30:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRWCl-0004sE-TD
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 03:23:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54144
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRWCl-0004ry-GU
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 03:23:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587626606;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dKCuMmBmzndHaHTW8o0diLeOHeBb2mtLY3I87hgef/g=;
- b=UkVEH8qI5GKKydIRK65PLLNVjiVqA4hVB7/rLBteeJctz+L4pGdYRP/ZR69iIUqvYh1p6e
- LH+P/T9AGhIAGzlZdkx3nJOAswrTNCWnBkdG+J8LlpCtwLNYNwD+lVTbgZuUmEMIUTaH6W
- WlJKUvz9btrkeDse3l9dOlSPM0605xo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-372-yZqOtUlpOMmlEj7cnoZvdw-1; Thu, 23 Apr 2020 03:23:20 -0400
-X-MC-Unique: yZqOtUlpOMmlEj7cnoZvdw-1
-Received: by mail-wr1-f71.google.com with SMTP id p2so2403929wrx.12
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 00:23:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=IX24VkSMnMN0fAjeVbMI3N9QgAuh8E9Jat5sq+clf+w=;
- b=m0oPOHmX25fprOGt+AXeTeX1RWOIAKi4HTFuJjKkRPny1DHBvBw8J87mpSxom28SA6
- 6eiocR54nH33+VmQNRi3EtE9Dhc9I/5a9CXNq9M2ADjWRneVZbTtF1dNHG8P7IWLEP66
- UZYSwpor+6ZccPrBvOEvmiGMS4aDByreUOlv76pA0w6MTOXnZOZ0EMCmjcU6PLCm/Xcc
- 6P97hk30StQWftGZ+hLhiJlN941ostvq4MlYlBilOuthRzifHhexGUTI9f+X8eZVImVx
- 8Oiub+Pa7zmlD8H/VNcAW/fJGvkW2I7ut/tbNZftJ4s/FRmYh/3H65Vivr9JGg7q7u7A
- N/hQ==
-X-Gm-Message-State: AGi0PubczyiGHM/MH/y+vrfYbXcJRwz5XNUJwgEg6Y4YC6khahNSiU/i
- /W9RCOVb4M90G7vOl/8dKWYztNdUWIwpz/Ui4kjQ0U8OhVJm6MqUK41+0TVmZ87MrJoDdXiDG/c
- 3MIUHvVwh7HDYLoY=
-X-Received: by 2002:a05:600c:2f17:: with SMTP id
- r23mr2444636wmn.81.1587626598502; 
- Thu, 23 Apr 2020 00:23:18 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIVG76gVZoYNeC92GMgCGIg6QP1SeceQaFxP5ikqxBWjhugrTx7kNK/19c8YRnkXhIR91VlAg==
-X-Received: by 2002:a05:600c:2f17:: with SMTP id
- r23mr2444596wmn.81.1587626598125; 
- Thu, 23 Apr 2020 00:23:18 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id w10sm2487034wrg.52.2020.04.23.00.23.15
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Apr 2020 00:23:16 -0700 (PDT)
-Subject: Re: [PATCH 2/6] target/arm: Make set_feature() available for other
- files
-To: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
-References: <20200421131926.12116-1-philmd@redhat.com>
- <20200421131926.12116-3-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <04770c4b-285f-031d-7c2a-5b2f477ac40e@redhat.com>
-Date: Thu, 23 Apr 2020 09:23:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200421131926.12116-3-philmd@redhat.com>
+ (envelope-from <chen.zhang@intel.com>) id 1jRWJN-00014C-1d
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 03:30:17 -0400
+Received: from mga02.intel.com ([134.134.136.20]:8173)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jRWJL-00011L-T1
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 03:30:16 -0400
+IronPort-SDR: +sPSEdCkNLlxnFc0bU8k2HibiqjMCcFU0kNM8KPoci+Mx+/AqOlit0nJ7vTRjW2d9gx9h3XE1I
+ R+dqnGeqSFxw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 23 Apr 2020 00:30:12 -0700
+IronPort-SDR: wDUs1ObBnVK8AJyJFdVey6xgRZ1ZKCZdg3XTSpV1+xGV1o3xHw7fQtAeGAUvisIGEj+HyD14Yi
+ ZzsDiiz387HA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,306,1583222400"; d="scan'208";a="457415532"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+ by fmsmga006.fm.intel.com with ESMTP; 23 Apr 2020 00:30:12 -0700
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 23 Apr 2020 00:29:58 -0700
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ SHSMSX605.ccr.corp.intel.com (10.109.6.215) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Thu, 23 Apr 2020 15:29:56 +0800
+Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
+ SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
+ Thu, 23 Apr 2020 15:29:56 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: RE: [PATCH 1/3] net/colo-compare.c: Create event_bh with the right
+ AioContext
+Thread-Topic: [PATCH 1/3] net/colo-compare.c: Create event_bh with the right
+ AioContext
+Thread-Index: AQHWDdROWO/1QHY6Ok6COLp0/RhfnqiE5E6A//9+GYCAAIrasP//hQ0AgAHzMCA=
+Date: Thu, 23 Apr 2020 07:29:56 +0000
+Message-ID: <8d0e2a591f1d48baa84d79e7a0f1cbb6@intel.com>
+References: <cover.1586370737.git.lukasstraub2@web.de>
+ <b86f80bb47ac66b73b2afe80218c9913722c606a.1586370737.git.lukasstraub2@web.de>
+ <5ab3bd6649a44354b087c31bb9fcd5a4@intel.com>	<20200422104325.64659930@luklap>
+ <0a075de2dc2f4e8c919478762e9a97da@intel.com> <20200422114020.3d479899@luklap>
+In-Reply-To: <20200422114020.3d479899@luklap>
+Accept-Language: en-US
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 03:23:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Received-SPF: pass client-ip=134.134.136.20; envelope-from=chen.zhang@intel.com;
+ helo=mga02.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 03:30:13
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Received-From: 134.134.136.20
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,136 +97,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- qemu-arm@nongnu.org, Eric Auger <eric.auger@redhat.com>
+Cc: =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/21/20 3:19 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> From: Thomas Huth <thuth@redhat.com>
->=20
-> Move the common set_feature() and unset_feature() functions
-> from cpu.c and cpu64.c to cpu.h.
->=20
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Message-ID: <20190921150420.30743-2-thuth@redhat.com>
-> [PMD: Split Thomas's patch in two: set_feature, cpu_register (later)]
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->   target/arm/cpu.h   | 10 ++++++++++
->   target/arm/cpu.c   | 10 ----------
->   target/arm/cpu64.c | 11 +----------
->   3 files changed, 11 insertions(+), 20 deletions(-)
->=20
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 8b9f2961ba..5e32fe7518 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -696,6 +696,16 @@ typedef struct CPUARMState {
->       void *gicv3state;
->   } CPUARMState;
->  =20
-> +static inline void set_feature(CPUARMState *env, int feature)
-> +{
-> +    env->features |=3D 1ULL << feature;
-> +}
-> +
-> +static inline void unset_feature(CPUARMState *env, int feature)
-> +{
-> +    env->features &=3D ~(1ULL << feature);
-> +}
-
-Nack sigh... This still doesn't work:
-
-target/arm/kvm64.c: At top level:
-target/arm/kvm64.c:450:20: error: conflicting types for =E2=80=98set_featur=
-e=E2=80=99
-  static inline void set_feature(uint64_t *features, int feature)
-                     ^~~~~~~~~~~
-In file included from include/sysemu/kvm.h:252:0,
-                  from target/arm/kvm64.c:27:
-target/arm/cpu.h:699:20: note: previous definition of =E2=80=98set_feature=
-=E2=80=99 was here
-  static inline void set_feature(CPUARMState *env, int feature)
-                     ^~~~~~~~~~~
-target/arm/kvm64.c:455:20: error: conflicting types for =E2=80=98unset_feat=
-ure=E2=80=99
-  static inline void unset_feature(uint64_t *features, int feature)
-                     ^~~~~~~~~~~~~
-In file included from include/sysemu/kvm.h:252:0,
-                  from target/arm/kvm64.c:27:
-target/arm/cpu.h:704:20: note: previous definition of =E2=80=98unset_featur=
-e=E2=80=99=20
-was here
-  static inline void unset_feature(CPUARMState *env, int feature)
-                     ^~~~~~~~~~~~~
-rules.mak:69: recipe for target 'target/arm/kvm64.o' failed
-make: *** [target/arm/kvm64.o] Error 1
-
-> +
->   /**
->    * ARMELChangeHookFn:
->    * type of a function which can be registered via arm_register_el_chang=
-e_hook()
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index a79f233b17..37f18d1648 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -724,16 +724,6 @@ static bool arm_cpu_virtio_is_big_endian(CPUState *c=
-s)
->  =20
->   #endif
->  =20
-> -static inline void set_feature(CPUARMState *env, int feature)
-> -{
-> -    env->features |=3D 1ULL << feature;
-> -}
-> -
-> -static inline void unset_feature(CPUARMState *env, int feature)
-> -{
-> -    env->features &=3D ~(1ULL << feature);
-> -}
-> -
->   static int
->   print_insn_thumb1(bfd_vma pc, disassemble_info *info)
->   {
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 62d36f9e8d..622082eae2 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -21,6 +21,7 @@
->   #include "qemu/osdep.h"
->   #include "qapi/error.h"
->   #include "cpu.h"
-> +#include "internals.h"
-
-This include is not necessary.
-
->   #include "qemu/module.h"
->   #if !defined(CONFIG_USER_ONLY)
->   #include "hw/loader.h"
-> @@ -29,16 +30,6 @@
->   #include "kvm_arm.h"
->   #include "qapi/visitor.h"
->  =20
-> -static inline void set_feature(CPUARMState *env, int feature)
-> -{
-> -    env->features |=3D 1ULL << feature;
-> -}
-> -
-> -static inline void unset_feature(CPUARMState *env, int feature)
-> -{
-> -    env->features &=3D ~(1ULL << feature);
-> -}
-> -
->   #ifndef CONFIG_USER_ONLY
->   static uint64_t a57_a53_l2ctlr_read(CPUARMState *env, const ARMCPRegInf=
-o *ri)
->   {
->=20
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTHVrYXMgU3RyYXViIDxs
+dWthc3N0cmF1YjJAd2ViLmRlPg0KPiBTZW50OiBXZWRuZXNkYXksIEFwcmlsIDIyLCAyMDIwIDU6
+NDAgUE0NCj4gVG86IFpoYW5nLCBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT4NCj4gQ2M6IHFl
+bXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz47IExpIFpoaWppYW4NCj4gPGxpemhpamlh
+bkBjbi5mdWppdHN1LmNvbT47IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhhdC5jb20+OyBNYXJj
+LQ0KPiBBbmRyw6kgTHVyZWF1IDxtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20+OyBQYW9sbyBC
+b256aW5pDQo+IDxwYm9uemluaUByZWRoYXQuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIDEv
+M10gbmV0L2NvbG8tY29tcGFyZS5jOiBDcmVhdGUgZXZlbnRfYmggd2l0aCB0aGUgcmlnaHQNCj4g
+QWlvQ29udGV4dA0KPiANCj4gT24gV2VkLCAyMiBBcHIgMjAyMCAwOTowMzowMCArMDAwMA0KPiAi
+WmhhbmcsIENoZW4iIDxjaGVuLnpoYW5nQGludGVsLmNvbT4gd3JvdGU6DQo+IA0KPiA+ID4gLS0t
+LS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+IEZyb206IEx1a2FzIFN0cmF1YiA8bHVrYXNz
+dHJhdWIyQHdlYi5kZT4NCj4gPiA+IFNlbnQ6IFdlZG5lc2RheSwgQXByaWwgMjIsIDIwMjAgNDo0
+MyBQTQ0KPiA+ID4gVG86IFpoYW5nLCBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT4NCj4gPiA+
+IENjOiBxZW11LWRldmVsIDxxZW11LWRldmVsQG5vbmdudS5vcmc+OyBMaSBaaGlqaWFuDQo+ID4g
+PiA8bGl6aGlqaWFuQGNuLmZ1aml0c3UuY29tPjsgSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0
+LmNvbT47IE1hcmMtDQo+ID4gPiBBbmRyw6kgTHVyZWF1IDxtYXJjYW5kcmUubHVyZWF1QHJlZGhh
+dC5jb20+OyBQYW9sbyBCb256aW5pDQo+ID4gPiA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCj4gPiA+
+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggMS8zXSBuZXQvY29sby1jb21wYXJlLmM6IENyZWF0ZSBldmVu
+dF9iaCB3aXRoDQo+ID4gPiB0aGUgcmlnaHQgQWlvQ29udGV4dA0KPiA+ID4NCj4gPiA+IE9uIFdl
+ZCwgMjIgQXByIDIwMjAgMDg6Mjk6MzkgKzAwMDANCj4gPiA+ICJaaGFuZywgQ2hlbiIgPGNoZW4u
+emhhbmdAaW50ZWwuY29tPiB3cm90ZToNCj4gPiA+DQo+ID4gPiA+ID4gLS0tLS1PcmlnaW5hbCBN
+ZXNzYWdlLS0tLS0NCj4gPiA+ID4gPiBGcm9tOiBMdWthcyBTdHJhdWIgPGx1a2Fzc3RyYXViMkB3
+ZWIuZGU+DQo+ID4gPiA+ID4gU2VudDogVGh1cnNkYXksIEFwcmlsIDksIDIwMjAgMjozNCBBTQ0K
+PiA+ID4gPiA+IFRvOiBxZW11LWRldmVsIDxxZW11LWRldmVsQG5vbmdudS5vcmc+DQo+ID4gPiA+
+ID4gQ2M6IFpoYW5nLCBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT47IExpIFpoaWppYW4NCj4g
+PiA+ID4gPiA8bGl6aGlqaWFuQGNuLmZ1aml0c3UuY29tPjsgSmFzb24gV2FuZyA8amFzb3dhbmdA
+cmVkaGF0LmNvbT47DQo+ID4gPiA+ID4gTWFyYy0gQW5kcsOpIEx1cmVhdSA8bWFyY2FuZHJlLmx1
+cmVhdUByZWRoYXQuY29tPjsgUGFvbG8gQm9uemluaQ0KPiA+ID4gPiA+IDxwYm9uemluaUByZWRo
+YXQuY29tPg0KPiA+ID4gPiA+IFN1YmplY3Q6IFtQQVRDSCAxLzNdIG5ldC9jb2xvLWNvbXBhcmUu
+YzogQ3JlYXRlIGV2ZW50X2JoIHdpdGgNCj4gPiA+ID4gPiB0aGUgcmlnaHQgQWlvQ29udGV4dA0K
+PiA+ID4gPiA+DQo+ID4gPiA+ID4gcWVtdV9iaF9uZXcgd2lsbCBzZXQgdGhlIGJoIHRvIGJlIGV4
+ZWN1dGVkIGluIHRoZSBtYWluIGxvb3AuDQo+ID4gPiA+ID4gVGhpcyBjYXVzZXMgcHJvYmxlbXMg
+YXMgY29sb19jb21wYXJlX2hhbmRsZV9ldmVudCBhc3N1bWVzIHRoYXQNCj4gPiA+ID4gPiBpdCBo
+YXMgZXhjbHVzaXZlIGFjY2VzcyB0aGUgcXVldWVzLCB3aGljaCBhcmUgYWxzbyBhY2Nlc3NlZCBp
+bg0KPiA+ID4gPiA+IHRoZSBpb3RocmVhZC4gSXQgYWxzbyBhc3N1bWVzIHRoYXQgaXQgcnVucyBp
+biBhIGRpZmZlcmVudCB0aHJlYWQNCj4gPiA+ID4gPiB0aGFuIHRoZSBjYWxsZXIgYW5kIHRha2Vz
+IHRoZSBhcHByb3ByaWF0ZSBsb2Nrcy4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+IENyZWF0ZSB0aGUg
+Ymggd2l0aCB0aGUgQWlvQ29udGV4dCBvZiB0aGUgaW90aHJlYWQgdG8gZnVsZmlsbA0KPiA+ID4g
+PiA+IHRoZXNlIGFzc3VtcHRpb25zLg0KPiA+ID4gPiA+DQo+ID4gPiA+DQo+ID4gPiA+IExvb2tz
+IGdvb2QgZm9yIG1lLCBJIGFzc3VtZSBpdCB3aWxsIGluY3JlYXNlIHBlcmZvcm1hbmNlLiBEbyB5
+b3UNCj4gPiA+ID4gaGF2ZQ0KPiA+ID4gcmVsYXRlZCBkYXRhPw0KPiA+ID4NCj4gPiA+IE5vLCB0
+aGlzIGZpeGVzIHNldmVyYWwgY3Jhc2hlcyBiZWNhdXNlIHRoZSBxdWV1ZXMgd2hlcmUgYWNjZXNz
+ZWQNCj4gPiA+IGNvbmN1cnJlbnRseSBmcm9tIG11bHRpcGxlIHRocmVhZHMuIFNvcnJ5IGZvciBt
+eSBiYWQgd29yZGluZy4NCj4gPg0KPiA+IENhbiB5b3UgZGVzY3JpYmUgc29tZSBkZXRhaWxzIGFi
+b3V0IHRoZSBjcmFzaD8gU3RlcCBieSBzdGVwPw0KPiA+IE1heWJlIEkgY2FuIHJlLXByb2R1Y2Ug
+YW5kIHRlc3QgaXQgZm9yIHRoaXMgcGF0Y2guDQo+IA0KPiBUaGVyZSBpcyBubyBjbGVhciB0ZXN0
+IGNhc2UuIEZvciBtZSB0aGUgY3Jhc2hlcyBoYXBwZW5lZCBhZnRlciAxLTIwaCBvZg0KPiBydW50
+aW1lIHdpdGggbG90cyBvZiBjaGVja3BvaW50cyAoODAwbXMpIGFuZCBzb21lIG5ldHdvcmsgdHJh
+ZmZpYy4gVGhlDQo+IGNvcmVkdW1wIGFsd2F5cyBzaG93ZWQgdGhhdCB0d28gdGhyZWFkcyB3aGVy
+ZSBkb2luZyBvcGVyYXRpb25zIG9uIHRoZQ0KPiBxdWV1ZXMgc2ltdWx0YW5lb3VzbHkuDQo+IFVu
+Zm9ydHVuYXRlbHksIEkgZG9uJ3QgaGF2ZSB0aGUgY29yZWR1bXBzIGFueW1vcmUuDQoNCk9LLCBB
+bHRob3VnaCBJIGhhdmUgbm90IGVuY291bnRlcmVkIHRoZSBwcm9ibGVtIHlvdSBkZXNjcmliZWQu
+DQpJIGhhdmUgdGVzdCB0aGlzIHBhdGNoLCBsb29rcyBydW5uaW5nIGZpbmUuDQoNClJldmlld2Vk
+LWJ5OiBaaGFuZyBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT4NCg0KVGhhbmtzDQpaaGFuZyBD
+aGVuDQoNCj4gDQo+IFJlZ2FyZHMsDQo+IEx1a2FzIFN0cmF1Yg0KPiANCj4gPiBUaGFua3MNCj4g
+PiBaaGFuZyBDaGVuDQo+ID4NCj4gPiA+DQo+ID4gPiBSZWdhcmRzLA0KPiA+ID4gTHVrYXMgU3Ry
+YXViDQo+ID4gPg0KPiA+ID4gPiBUaGFua3MNCj4gPiA+ID4gWmhhbmcgQ2hlbg0KPiA+ID4gPg0K
+PiA+ID4gPiA+IFNpZ25lZC1vZmYtYnk6IEx1a2FzIFN0cmF1YiA8bHVrYXNzdHJhdWIyQHdlYi5k
+ZT4NCj4gPiA+ID4gPiAtLS0NCj4gPiA+ID4gPiAgbmV0L2NvbG8tY29tcGFyZS5jIHwgMyArKy0N
+Cj4gPiA+ID4gPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigt
+KQ0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gZGlmZiAtLWdpdCBhL25ldC9jb2xvLWNvbXBhcmUuYyBi
+L25ldC9jb2xvLWNvbXBhcmUuYyBpbmRleA0KPiA+ID4gPiA+IDEwYzAyMzlmOWQuLjFkZTQyMjBm
+ZTIgMTAwNjQ0DQo+ID4gPiA+ID4gLS0tIGEvbmV0L2NvbG8tY29tcGFyZS5jDQo+ID4gPiA+ID4g
+KysrIGIvbmV0L2NvbG8tY29tcGFyZS5jDQo+ID4gPiA+ID4gQEAgLTg5MCw2ICs4OTAsNyBAQCBz
+dGF0aWMgdm9pZCBjb2xvX2NvbXBhcmVfaGFuZGxlX2V2ZW50KHZvaWQNCj4gPiA+ID4gPiAqb3Bh
+cXVlKQ0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gIHN0YXRpYyB2b2lkIGNvbG9fY29tcGFyZV9pb3Ro
+cmVhZChDb21wYXJlU3RhdGUgKnMpICB7DQo+ID4gPiA+ID4gKyAgICBBaW9Db250ZXh0ICpjdHgg
+PSBpb3RocmVhZF9nZXRfYWlvX2NvbnRleHQocy0+aW90aHJlYWQpOw0KPiA+ID4gPiA+ICAgICAg
+b2JqZWN0X3JlZihPQkpFQ1Qocy0+aW90aHJlYWQpKTsNCj4gPiA+ID4gPiAgICAgIHMtPndvcmtl
+cl9jb250ZXh0ID0NCj4gPiA+ID4gPiBpb3RocmVhZF9nZXRfZ19tYWluX2NvbnRleHQocy0+aW90
+aHJlYWQpOw0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gQEAgLTkwNiw3ICs5MDcsNyBAQCBzdGF0aWMg
+dm9pZA0KPiA+ID4gPiA+IGNvbG9fY29tcGFyZV9pb3RocmVhZChDb21wYXJlU3RhdGUNCj4gPiA+
+ICpzKQ0KPiA+ID4gPiA+ICAgICAgfQ0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gICAgICBjb2xvX2Nv
+bXBhcmVfdGltZXJfaW5pdChzKTsNCj4gPiA+ID4gPiAtICAgIHMtPmV2ZW50X2JoID0gcWVtdV9i
+aF9uZXcoY29sb19jb21wYXJlX2hhbmRsZV9ldmVudCwgcyk7DQo+ID4gPiA+ID4gKyAgICBzLT5l
+dmVudF9iaCA9IGFpb19iaF9uZXcoY3R4LCBjb2xvX2NvbXBhcmVfaGFuZGxlX2V2ZW50LA0KPiA+
+ID4gPiA+ICsgcyk7DQo+ID4gPiA+ID4gIH0NCj4gPiA+ID4gPg0KPiA+ID4gPiA+ICBzdGF0aWMg
+Y2hhciAqY29tcGFyZV9nZXRfcHJpX2luZGV2KE9iamVjdCAqb2JqLCBFcnJvciAqKmVycnApDQo+
+ID4gPiA+ID4gLS0NCj4gPiA+ID4gPiAyLjIwLjENCj4gPiA+ID4NCj4gPg0KDQo=
 
