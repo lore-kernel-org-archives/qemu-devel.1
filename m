@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AFB2C55191
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD3AC54FCB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:23:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43F7A20724
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:22:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43C2020715
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:23:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q33MOWoQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43F7A20724
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zln9NDJp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43C2020715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRiN5-0006yt-3v
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:22:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55348)
+	id 1jRiNr-0000Se-D4
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:23:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55394)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRiLr-0004Ya-9V
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:39 -0400
+ (envelope-from <philmd@redhat.com>) id 1jRiM9-00056e-2k
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRiLq-0003Nq-Q7
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35436
+ (envelope-from <philmd@redhat.com>) id 1jRiM8-0003da-BW
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44439
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRiLq-0003NW-CO
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:38 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRiM7-0003dT-W2
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587673297;
+ s=mimecast20190719; t=1587673314;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8pU1FGRWMr9wFChCxvp9YPnfOkoE9DOPVGwWc1xi51Q=;
- b=Q33MOWoQ18/7I8W2f1MoeeYEhTzGsmvkdY4RA97mnxLuivJukReZua5pjpM7IMEoDZQgBt
- N4cbFxIQMscZFglJN6N79VvyCbWLdpDgNm/8RQ3oFGqZ++F+Lhe15f7CxgnN8eEdii1aLd
- e2JM8kl0kCqA1XRSK/gb608keh9z4zA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-kYY2Cv8UPfCews5lwClptg-1; Thu, 23 Apr 2020 16:21:36 -0400
-X-MC-Unique: kYY2Cv8UPfCews5lwClptg-1
-Received: by mail-wr1-f70.google.com with SMTP id x15so3419409wrn.0
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 13:21:35 -0700 (PDT)
+ bh=aOyVErqFCmyf9pd+Nr+epVzmP7eWXaoL84ISysXFv0Q=;
+ b=Zln9NDJphptNcX3TP8SNVTX5xwA2AhSk8Z4d3viMP3xpCVfi4griM5C434x/eEHdIyrAze
+ glBMYYh6XDAdWf8pXOZZPSWXGBoG1P5UEUQCFSq/BRfYa+JH8VKY8H8vUYI73qXhswRrnQ
+ zOujGeDw+8o9RMi4R5iBmYfCbnnCDvc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-271-Jw5aTiasMhqOwhfWO5B5eA-1; Thu, 23 Apr 2020 16:21:53 -0400
+X-MC-Unique: Jw5aTiasMhqOwhfWO5B5eA-1
+Received: by mail-wr1-f72.google.com with SMTP id v9so3380384wrt.7
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 13:21:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=MAl6CeAivHgSy+VUA/NScy4gWhWpCQWoVZ2DVxmZ3RI=;
- b=sSryivdJIohko6Sm9JmxYwFw+R40GvShYwt5aSuKHqHMUnesJPWz2parZiTT/eyvIG
- y+W7oNYVpdba3LsVGMcy7KLYD++EHLZ2nSQhUXBJjVQnOqwm31tICKZvE6eGrZz5qqcw
- AHMJ6ErHkCRl6NWjf809uCEST2pwIoqbRGd86Ow6Q8ApADw7qYhWXmAFFLoAMv1yVo02
- NRF7Q/5OfF021ABThatjs6sJI1rmSHIFsZjVT9ICAFm2Jskg3qZEH0UnS1uACNgk4SJ4
- r6em8nzfGXMO2H1yWzFaHKe9clV3Cw0HsqYII7B1U6kVhIjT19wt6KLYsmliDM4/LpTw
- 7dLg==
-X-Gm-Message-State: AGi0PuaC3pkIrp7FlytD7orOprWcWRdyw9x3iyDLYmZJrp6ueQfeqUZM
- 5JxdRfoztVWj3t7RuMRhiwC5P9RkSpNUhUQblEApgbuD1Ou7ZVK5972bmXQMBxEGw7dnu8bhBzC
- 7RKILGlQMKyMBgck=
-X-Received: by 2002:adf:ee0c:: with SMTP id y12mr7508969wrn.0.1587673294669;
- Thu, 23 Apr 2020 13:21:34 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKQPnNcVHQhQ8nOPRlwicSuLfqzuDvwPh7mi8p/kAH4cmdhld0jq1TGlV9yfLAOzZvnBfVicA==
-X-Received: by 2002:adf:ee0c:: with SMTP id y12mr7508943wrn.0.1587673294395;
- Thu, 23 Apr 2020 13:21:34 -0700 (PDT)
+ bh=8gYfBqFeTywo96T3GTdB1ETByq33AuAVSUY1XmaFyaw=;
+ b=LgYPmQxL4iyho6dE3VUMLdfZYNnnu6rUQ64GGSeQCjRt1/ZRRc9Hx2tlQMd2ytGHPl
+ /mNtEwHp7hp6c1Bd2hJq8Uh3Gvl8u1yMTLvwzq5WeG+C3W/BlKU1QdF0Ep3hSx27dfPL
+ FaOGx8FSnSINrletJoIfxXavy+Zq+j0orrd8Ir5mA8JqOUkWEtVSfu4R0rh0Bx1qM2PV
+ ZS25gcRVJIOInFPJI0OQrgjl9p4tQj1+lhOr2exLb4cKo0L0WPX+sZWmY1FiqVdYoJb1
+ 4wrX+/YH+UbLHMNzOtKexRj/36s/olKWkwd+OiArOzKuQOijp7o+ir4PncJqJPYzNloa
+ EDgg==
+X-Gm-Message-State: AGi0PubdnMNwPUKed84HGtqS60SdD2YSLH5WzMvq3z9JEiPdCZBHcJ4r
+ e4fSwQoY5rpajs61IgCgrza+CMkcO7Fhn2RFbAJfWyNvTK6RltWBL91KhmyioN13FDornmfqnYJ
+ S74ZQuqYwuS8YOB0=
+X-Received: by 2002:a7b:c7d2:: with SMTP id z18mr6191719wmk.72.1587673311684; 
+ Thu, 23 Apr 2020 13:21:51 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLrHSHmXL1n+qmnOhiwmPwsBhOEScKtOKHLfqMligKeD1o9ZGj3ONDh33mP0lG3nxN3nRqrUw==
+X-Received: by 2002:a7b:c7d2:: with SMTP id z18mr6191700wmk.72.1587673311445; 
+ Thu, 23 Apr 2020 13:21:51 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id j13sm5196975wro.51.2020.04.23.13.21.33
+ by smtp.gmail.com with ESMTPSA id a67sm5423740wmc.30.2020.04.23.13.21.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Apr 2020 13:21:33 -0700 (PDT)
+ Thu, 23 Apr 2020 13:21:50 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/7] chardev: Restrict msmouse / wctablet / testdev to system
- emulation
-Date: Thu, 23 Apr 2020 22:21:08 +0200
-Message-Id: <20200423202112.644-4-philmd@redhat.com>
+Subject: [PATCH 6/7] stubs: Split machine-init-done as machine-init and
+ machine-notify
+Date: Thu, 23 Apr 2020 22:21:11 +0200
+Message-Id: <20200423202112.644-7-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200423202112.644-1-philmd@redhat.com>
 References: <20200423202112.644-1-philmd@redhat.com>
@@ -119,27 +119,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The msmouse / wctablet / testdev character devices are only
-used by system emulation. Remove them from user mode and tools.
+As the machine notify handlers are only used in system emulation,
+split the current file in two, and only build the notifier when
+system emulation is used.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- chardev/Makefile.objs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ stubs/machine-init.c                            | 4 ++++
+ stubs/{machine-init-done.c =3D> machine-notify.c} | 2 --
+ stubs/Makefile.objs                             | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+ create mode 100644 stubs/machine-init.c
+ rename stubs/{machine-init-done.c =3D> machine-notify.c} (78%)
 
-diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
-index d68e1347f9..15ee7f47da 100644
---- a/chardev/Makefile.objs
-+++ b/chardev/Makefile.objs
-@@ -17,7 +17,7 @@ chardev-obj-y +=3D char-udp.o
- chardev-obj-$(CONFIG_WIN32) +=3D char-win.o
- chardev-obj-$(CONFIG_WIN32) +=3D char-win-stdio.o
+diff --git a/stubs/machine-init.c b/stubs/machine-init.c
+new file mode 100644
+index 0000000000..7622930ee0
+--- /dev/null
++++ b/stubs/machine-init.c
+@@ -0,0 +1,4 @@
++#include "qemu/osdep.h"
++#include "sysemu/sysemu.h"
++
++bool machine_init_done =3D true;
+diff --git a/stubs/machine-init-done.c b/stubs/machine-notify.c
+similarity index 78%
+rename from stubs/machine-init-done.c
+rename to stubs/machine-notify.c
+index cd8e81392d..d164ecccb9 100644
+--- a/stubs/machine-init-done.c
++++ b/stubs/machine-notify.c
+@@ -1,8 +1,6 @@
+ #include "qemu/osdep.h"
+ #include "sysemu/sysemu.h"
 =20
--common-obj-y +=3D msmouse.o wctablet.o testdev.o
-+common-obj-$(CONFIG_SOFTMMU) +=3D msmouse.o wctablet.o testdev.o
- common-obj-$(CONFIG_BRLAPI) +=3D baum.o
- baum.o-cflags :=3D $(SDL_CFLAGS)
- baum.o-libs :=3D $(BRLAPI_LIBS)
+-bool machine_init_done =3D true;
+-
+ void qemu_add_machine_init_done_notifier(Notifier *notify)
+ {
+ }
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 45be5dc0ed..765659a3f9 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -15,7 +15,8 @@ stub-obj-y +=3D iothread-lock.o
+ stub-obj-y +=3D is-daemonized.o
+ stub-obj-$(CONFIG_LINUX_AIO) +=3D linux-aio.o
+ stub-obj-$(CONFIG_LINUX_IO_URING) +=3D io_uring.o
+-stub-obj-y +=3D machine-init-done.o
++stub-obj-y +=3D machine-init.o
++stub-obj-$(CONFIG_SOFTMMU) +=3D machine-notify.o
+ stub-obj-y +=3D migr-blocker.o
+ stub-obj-y +=3D change-state-handler.o
+ stub-obj-y +=3D monitor.o
 --=20
 2.21.1
 
