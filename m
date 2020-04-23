@@ -1,72 +1,137 @@
-Return-Path: <SRS0=gSpC=6G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA0DEC54FCB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 22:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78D84C55185
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 00:58:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CB702076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Apr 2020 22:30:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CB702076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 340992076C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 00:58:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="qWr75M1n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 340992076C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRNss-0007oQ-K5
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 18:30:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52194)
+	id 1jRQBs-0007tU-B8
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 20:58:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52386)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrzej.jakowski@intel.com>) id 1jRMbn-0001Q0-Pn
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 17:08:40 -0400
+ (envelope-from <fnuv@xilinx.com>) id 1jRQAf-0006dA-Bw
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 20:56:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <andrzej.jakowski@intel.com>) id 1jRMbm-0003wm-6O
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 17:08:39 -0400
-Received: from mga17.intel.com ([192.55.52.151]:27665)
+ (envelope-from <fnuv@xilinx.com>) id 1jRQAd-0000nC-VM
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 20:56:53 -0400
+Received: from mail-eopbgr680055.outbound.protection.outlook.com
+ ([40.107.68.55]:53525 helo=NAM04-BN3-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@intel.com>)
- id 1jRMbl-0003sW-Fx
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 17:08:37 -0400
-IronPort-SDR: xk0TsccGKGyEcgA+il11xJka10qnkFFfAifzxntLopVMVj1rZmfkzAw+OJt38D0oGH2AvjfQoR
- VKRRbUG/wbCw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Apr 2020 14:08:29 -0700
-IronPort-SDR: Ql8gjccgQx4EibkTTP+5ephPyUCu7w5Aoeamr8ssHPR2wevNX66BoG1Xxi0k3pWSLbVLPyAJoS
- DDBp1HUlPEmA==
-X-IronPort-AV: E=Sophos;i="5.73,304,1583222400"; d="scan'208";a="280164059"
-Received: from ajakowsk-mobl1.amr.corp.intel.com (HELO localhost.localdomain)
- ([10.251.238.252])
- by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Apr 2020 14:08:28 -0700
-Subject: Re: [PATCH for QEMU] hw/vfio: Add VMD Passthrough Quirk
-To: Jon Derrick <jonathan.derrick@intel.com>,
- Bjorn Helgaas <helgaas@kernel.org>, qemu-devel@nongnu.org
-References: <20200422171305.10923-1-jonathan.derrick@intel.com>
-From: Andrzej Jakowski <andrzej.jakowski@intel.com>
-Message-ID: <513cfa85-2b93-68b9-4422-aafbcba92e23@intel.com>
-Date: Wed, 22 Apr 2020 14:08:26 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <fnuv@xilinx.com>) id 1jRQAd-0000dP-Hj
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 20:56:51 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nqLUVNKGcRzRriJgJ4I9ND0jsUzjpJKRcfT9spplKpKfPpSaT3MIQAg5L/SIPEMdJHp8p1QPRGkRfto/a9g68/MJnrqlTiA1Se4xVyHoVrL4VkHT7PxogSh/cfkfooh9mCZp51PbEwIWShVDn8pVNVmHAlGCY9GEqdWxK7qozi1VjJ4g9xgS/Hcrcl3+kSycKcjUD+d1T2Y3E3mx+Kg4MsGzNluQHmKOOK5oP+gbxSq/w3jBZWz+CprppvLuC+ttXnDwh42j6vBCRgCSV8CQuXR2LYL/4BoUeidPhwEk4Uy75TLNW1pCgQ+NRqv/TsOzo4SOdnHgB6Cra12OCUiYHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=P2vfKuywKOLuQKC0B2brblPfXNbKq9T2wP1YTnQQN0g=;
+ b=OOro/NDH4V1yeUb97CMTV9GNZsfmdQQbJzN0mBczM3udeEZ56DHF2iQtOWTlu1VDdPYwMV9xHLGVQx5hkcv1OHz0jUoQnKltujnR2jDN/sZtbrd7UpPsAxcSuCdofECxAyBAQxxgVwoHnPHh1k2oIsVJHi2tFx54tpowoB5zJbPURkHC8a86xw/bm/c0ZsY17c8+RW9lD8XKJrI9DVFFEeYwg2P9IygkyeBQq14fljzGNRUzs6wa0IGlsU+jGJXBAV9aMz7Swx5f99C9v4LM2zL6jXJ5fQ8tfaMzBpZVtHdsG3yDpVyQpebnoI7M1GlHQshISnZdD94+OOfXvti1IQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=redhat.com smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=P2vfKuywKOLuQKC0B2brblPfXNbKq9T2wP1YTnQQN0g=;
+ b=qWr75M1nhGs45l52tVPCl71iY8PnYkWIgHKsm0f99Wx2FIKJHid/P8d/buas+PBP6itLbbu1D+Li8EPu4Wrv7THQq4SAtinTQO9CfgDtMYl0Pno6VORJD1A2GBVQXIqYAB0ggI58e5ADF+c1IHe3A0e+febpW6RLIpPJ2TUQvGU=
+Received: from MN2PR17CA0004.namprd17.prod.outlook.com (2603:10b6:208:15e::17)
+ by MN2PR02MB5888.namprd02.prod.outlook.com (2603:10b6:208:11b::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.29; Thu, 23 Apr
+ 2020 00:56:48 +0000
+Received: from BL2NAM02FT036.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:208:15e:cafe::e4) by MN2PR17CA0004.outlook.office365.com
+ (2603:10b6:208:15e::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend
+ Transport; Thu, 23 Apr 2020 00:56:48 +0000
+Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ BL2NAM02FT036.mail.protection.outlook.com (10.152.77.154) with Microsoft SMTP
+ Server id 15.20.2921.25 via Frontend Transport; Thu, 23 Apr 2020 00:56:47
+ +0000
+Received: from [149.199.38.66] (port=51913 helo=xsj-pvapsmtp01)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <fnu.vikram@xilinx.com>)
+ id 1jRQ9V-0004JZ-KM; Wed, 22 Apr 2020 17:55:41 -0700
+Received: from [127.0.0.1] (helo=localhost)
+ by xsj-pvapsmtp01 with smtp (Exim 4.63)
+ (envelope-from <fnu.vikram@xilinx.com>)
+ id 1jRQAZ-0007tD-3G; Wed, 22 Apr 2020 17:56:47 -0700
+Received: from xsj-pvapsmtp01 (smtp2.xilinx.com [149.199.38.66])
+ by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 03N0ufgU012615; 
+ Wed, 22 Apr 2020 17:56:41 -0700
+Received: from [172.19.2.115] (helo=xsjfnuv50.xilinx.com)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <fnu.vikram@xilinx.com>)
+ id 1jRQAT-0007oW-0q; Wed, 22 Apr 2020 17:56:41 -0700
+From: Vikram Garhwal <fnu.vikram@xilinx.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 3/4] tests/qtest: Introduce tests for Xilinx ZyqnMP CAN
+ controller
+Date: Wed, 22 Apr 2020 17:56:08 -0700
+Message-Id: <1587603369-14644-4-git-send-email-fnu.vikram@xilinx.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1587603369-14644-1-git-send-email-fnu.vikram@xilinx.com>
+References: <1587603369-14644-1-git-send-email-fnu.vikram@xilinx.com>
+X-RCIS-Action: ALLOW
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFTY:;
+ SFS:(10009020)(4636009)(136003)(346002)(396003)(376002)(39860400002)(46966005)(356005)(36756003)(478600001)(70586007)(316002)(81166007)(54906003)(82740400003)(8936002)(426003)(70206006)(9786002)(8676002)(82310400002)(81156014)(2616005)(2906002)(6916009)(47076004)(7696005)(336012)(186003)(5660300002)(30864003)(26005)(6666004)(4326008);
+ DIR:OUT; SFP:1101; 
 MIME-Version: 1.0
-In-Reply-To: <20200422171305.10923-1-jonathan.derrick@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=192.55.52.151;
- envelope-from=andrzej.jakowski@intel.com; helo=mga17.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 17:08:29
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 192.55.52.151
-X-Mailman-Approved-At: Wed, 22 Apr 2020 18:29:34 -0400
+Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e421efbd-e43d-4f1b-af4f-08d7e7213326
+X-MS-TrafficTypeDiagnostic: MN2PR02MB5888:
+X-Microsoft-Antispam-PRVS: <MN2PR02MB5888FDA0D70AE06BA85E549FBCD30@MN2PR02MB5888.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Forefront-PRVS: 03827AF76E
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ws6dDUSic7IBX7TcJoHBPj8smWmq6fGZ98GurdAtvPrCOAR6Mlr77RaVtrJHqEihXVVduyVG9aBPKyGxlSAIjdv5ZEiH3j3wMmpV/Uwm/SCdXbiuOt3oMNG6W3TgLz5zvvp5Lh5WIxKgGIPc62lmWgdcfXmQ2eDkCShe/+5kyZHV1k8uFg/XASc4rKEkWCvRzak7OF+z2G0RJchUOXZEgmDxsDOFC7Bqd+QZWdFMZQi85LGA9zd7v+CHde2Ej4/v88POwYU2nF29dzL57wyzdKoc9Fngx0K2v5A67Fonn0CpZUFaR1ogzSRtF5N5hoKTGU2PrI/4k3fB2cEt51baxT/JX7MBEz9//6YxukOGK1AcXpl7K7s/27OZpc6Ox8n9EciOmtt2IOeBBUAPOFAXilhY8yNrAACi0SIelCrmVxEbO7tQtJ9pFZPz6oxPoNvZRj/Ep5/zy8FKxSGi2scLSDq9NIFOsMFNQ7TN1i/jtKlr3yG//Xp1NskXQqzsyU9Vq/7t8pBsEt5DyYfoSnv5Gw==
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2020 00:56:47.4264 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e421efbd-e43d-4f1b-af4f-08d7e7213326
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB5888
+Received-SPF: pass client-ip=40.107.68.55; envelope-from=fnuv@xilinx.com;
+ helo=NAM04-BN3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 20:56:50
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.68.55
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,214 +143,418 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: linux-pci@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- virtualization@lists.linux-foundation.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Vikram Garhwal <fnu.vikram@xilinx.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/22/20 10:13 AM, Jon Derrick wrote:
-> The VMD endpoint provides a real PCIe domain to the guest, including
-> bridges and endpoints. The IOMMU performs Host Physical Address to Guest
-> Physical Address translation when assigning downstream endpoint BARs and
-> when translating MMIO addresses.
->
-> This translation is not desired when assigning bridge windows. When MMIO
-> goes to an endpoint after being translated to HPA, the bridge will
-> reject the HPA transaction because the bridge window has been programmed
-> with translated GPAs.
->
-> VMD device 28C0 natively supports passthrough by providing the Host
-> Physical Address in shadow registers accessible to the guest for bridge
-> window assignment. The shadow registers are valid if bit 1 is set in VMD
-> VMLOCK config register 0x70.
->
-> This quirk emulates the VMLOCK and HPA shadow registers for all VMD
-> device ids which don't natively offer this feature. The Linux VMD driver
-> is updated to match the QEMU subsystem id to enable this feature.
->
-> Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
-> ---
->  hw/vfio/pci-quirks.c | 119 +++++++++++++++++++++++++++++++++++++++++++
->  hw/vfio/pci.c        |   7 +++
->  hw/vfio/pci.h        |   2 +
->  hw/vfio/trace-events |   4 ++
->  4 files changed, 132 insertions(+)
->
-> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index 2d348f8237..2fd27cc8f6 100644
-> --- a/hw/vfio/pci-quirks.c
-> +++ b/hw/vfio/pci-quirks.c
-> @@ -1709,3 +1709,122 @@ free_exit:
->  
->      return ret;
->  }
-> +
-> +/*
-> + * The VMD endpoint provides a real PCIe domain to the guest. The IOMMU
-> + * performs Host Physical Address to Guest Physical Address translation when
-> + * assigning downstream endpoint BARs and when translating MMIO addresses.
-> + * However this translation is not desired when assigning bridge windows. When
-> + * MMIO goes to an endpoint after being translated to HPA, the bridge rejects
-> + * the transaction because the window has been programmed with translated GPAs.
-> + *
-> + * VMD uses the Host Physical Address in order to correctly program the bridge
-> + * windows in its PCIe domain. VMD device 28C0 has HPA shadow registers located
-> + * at offset 0x2000 in MEMBAR2 (BAR 4). The shadow registers are valid if bit 1
-> + * is set in the VMD VMLOCK config register 0x70.
-> + *
-> + * This quirk emulates the VMLOCK and HPA shadow registers for all VMD device
-> + * ids which don't natively offer this feature. The subsystem vendor/device
-> + * id is set to the QEMU subsystem vendor/device id, where the driver matches
-> + * the id to enable this feature.
-> + */
-> +typedef struct VFIOVMDQuirk {
-> +    VFIOPCIDevice *vdev;
-> +    uint64_t membar_phys[2];
-> +} VFIOVMDQuirk;
-> +
-> +static uint64_t vfio_vmd_quirk_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    VFIOVMDQuirk *data = opaque;
-> +    uint64_t val = 0;
-> +
-> +    memcpy(&val, (void *)data->membar_phys + addr, size);
-> +    return val;
-> +}
-> +
-> +static const MemoryRegionOps vfio_vmd_quirk = {
-> +    .read = vfio_vmd_quirk_read,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +};
-> +
-> +#define VMD_VMLOCK  0x70
-> +#define VMD_SHADOW  0x2000
-> +#define VMD_MEMBAR2 4
-> +
-> +static int vfio_vmd_emulate_shadow_registers(VFIOPCIDevice *vdev)
-> +{
-> +    VFIOQuirk *quirk;
-> +    VFIOVMDQuirk *data;
-> +    PCIDevice *pdev = &vdev->pdev;
-> +    int ret;
-> +
-> +    data = g_malloc0(sizeof(*data));
-> +    ret = pread(vdev->vbasedev.fd, data->membar_phys, 16,
-> +                vdev->config_offset + PCI_BASE_ADDRESS_2);
-> +    if (ret != 16) {
-> +        error_report("VMD %s cannot read MEMBARs (%d)",
-> +                     vdev->vbasedev.name, ret);
-> +        g_free(data);
-> +        return -EFAULT;
-> +    }
-> +
-> +    quirk = vfio_quirk_alloc(1);
-> +    quirk->data = data;
-> +    data->vdev = vdev;
-> +
-> +    /* Emulate Shadow Registers */
-> +    memory_region_init_io(quirk->mem, OBJECT(vdev), &vfio_vmd_quirk, data,
-> +                          "vfio-vmd-quirk", sizeof(data->membar_phys));
-> +    memory_region_add_subregion_overlap(vdev->bars[VMD_MEMBAR2].region.mem,
-> +                                        VMD_SHADOW, quirk->mem, 1);
-> +    memory_region_set_readonly(quirk->mem, true);
-> +    memory_region_set_enabled(quirk->mem, true);
-> +
-> +    QLIST_INSERT_HEAD(&vdev->bars[VMD_MEMBAR2].quirks, quirk, next);
-> +
-> +    trace_vfio_pci_vmd_quirk_shadow_regs(vdev->vbasedev.name,
-> +                                         data->membar_phys[0],
-> +                                         data->membar_phys[1]);
-> +
-> +    /* Advertise Shadow Register support */
-> +    pci_byte_test_and_set_mask(pdev->config + VMD_VMLOCK, 0x2);
-> +    pci_set_byte(pdev->wmask + VMD_VMLOCK, 0);
-> +    pci_set_byte(vdev->emulated_config_bits + VMD_VMLOCK, 0x2);
-> +
-> +    trace_vfio_pci_vmd_quirk_vmlock(vdev->vbasedev.name,
-> +                                    pci_get_byte(pdev->config + VMD_VMLOCK));
-> +
-> +    /* Drivers can match the subsystem vendor/device id */
-> +    pci_set_word(pdev->config + PCI_SUBSYSTEM_VENDOR_ID,
-> +                 PCI_SUBVENDOR_ID_REDHAT_QUMRANET);
-> +    pci_set_word(vdev->emulated_config_bits + PCI_SUBSYSTEM_VENDOR_ID, ~0);
-> +
-> +    pci_set_word(pdev->config + PCI_SUBSYSTEM_ID, PCI_SUBDEVICE_ID_QEMU);
-> +    pci_set_word(vdev->emulated_config_bits + PCI_SUBSYSTEM_ID, ~0);
-> +
-> +    trace_vfio_pci_vmd_quirk_subsystem(vdev->vbasedev.name,
-> +                           vdev->sub_vendor_id, vdev->sub_device_id,
-> +                           pci_get_word(pdev->config + PCI_SUBSYSTEM_VENDOR_ID),
-> +                           pci_get_word(pdev->config + PCI_SUBSYSTEM_ID));
-> +
-> +    return 0;
-> +}
-> +
-> +int vfio_pci_vmd_init(VFIOPCIDevice *vdev)
-> +{
-> +    int ret = 0;
-> +
-> +    switch (vdev->device_id) {
-> +    case 0x28C0: /* Native passthrough support */
-> +        break;
-> +    /* Emulates Native passthrough support */
-> +    case 0x201D:
-> +    case 0x467F:
-> +    case 0x4C3D:
-> +    case 0x9A0B:
-> +        ret = vfio_vmd_emulate_shadow_registers(vdev);
-> +        break;
-> +    }
-> +
-> +    return ret;
-> +}
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 5e75a95129..85425a1a6f 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -3024,6 +3024,13 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->          }
->      }
->  
-> +    if (vdev->vendor_id == PCI_VENDOR_ID_INTEL) {
-> +        ret = vfio_pci_vmd_init(vdev);
-> +        if (ret) {
-> +            error_report("Failed to setup VMD");
-> +        }
-> +    }
-> +
->      vfio_register_err_notifier(vdev);
->      vfio_register_req_notifier(vdev);
->      vfio_setup_resetfn_quirk(vdev);
-> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> index 0da7a20a7e..e8632d806b 100644
-> --- a/hw/vfio/pci.h
-> +++ b/hw/vfio/pci.h
-> @@ -217,6 +217,8 @@ int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
->  int vfio_pci_nvidia_v100_ram_init(VFIOPCIDevice *vdev, Error **errp);
->  int vfio_pci_nvlink2_init(VFIOPCIDevice *vdev, Error **errp);
->  
-> +int vfio_pci_vmd_init(VFIOPCIDevice *vdev);
-> +
->  void vfio_display_reset(VFIOPCIDevice *vdev);
->  int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
->  void vfio_display_finalize(VFIOPCIDevice *vdev);
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index b1ef55a33f..aabbd2693a 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -90,6 +90,10 @@ vfio_pci_nvidia_gpu_setup_quirk(const char *name, uint64_t tgt, uint64_t size) "
->  vfio_pci_nvlink2_setup_quirk_ssatgt(const char *name, uint64_t tgt, uint64_t size) "%s tgt=0x%"PRIx64" size=0x%"PRIx64
->  vfio_pci_nvlink2_setup_quirk_lnkspd(const char *name, uint32_t link_speed) "%s link_speed=0x%x"
->  
-> +vfio_pci_vmd_quirk_shadow_regs(const char *name, uint64_t mb1, uint64_t mb2) "%s membar1_phys=0x%"PRIx64" membar2_phys=0x%"PRIx64"
-> +vfio_pci_vmd_quirk_vmlock(const char *name, uint8_t vmlock) "%s vmlock=0x%x"
-> +vfio_pci_vmd_quirk_subsystem(const char *name, uint16_t old_svid, uint16_t old_sdid, uint16_t new_svid, uint16_t new_sdid) "%s subsystem id 0x%04x:0x%04x -> 0x%04x:0x%04x"
-> +
->  # common.c
->  vfio_region_write(const char *name, int index, uint64_t addr, uint64_t data, unsigned size) " (%s:region%d+0x%"PRIx64", 0x%"PRIx64 ", %d)"
->  vfio_region_read(char *name, int index, uint64_t addr, unsigned size, uint64_t data) " (%s:region%d+0x%"PRIx64", %d) = 0x%"PRIx64
+Qtest performs five tests on Xlnx-CAN controller:
+	It checks communication between CAN0 and CAN1 via can-bus.
+	Tests CAN in loopback, sleep and snoop mode.
+	Tests CAN filtering for incoming messages.
 
-Reviewed-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
+---
+ tests/qtest/Makefile.include |   2 +
+ tests/qtest/xlnx-can-test.c  | 367 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 369 insertions(+)
+ create mode 100644 tests/qtest/xlnx-can-test.c
+
+diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+index 9e5a51d..0996075 100644
+--- a/tests/qtest/Makefile.include
++++ b/tests/qtest/Makefile.include
+@@ -136,6 +136,7 @@ check-qtest-aarch64-$(CONFIG_TPM_TIS_SYSBUS) += tpm-tis-device-swtpm-test
+ check-qtest-aarch64-y += numa-test
+ check-qtest-aarch64-y += boot-serial-test
+ check-qtest-aarch64-y += migration-test
++check-qtest-aarch64-y += xlnx-can-test
+ 
+ # TODO: once aarch64 TCG is fixed on ARM 32 bit host, make test unconditional
+ ifneq ($(ARCH),arm)
+@@ -265,6 +266,7 @@ tests/qtest/bios-tables-test$(EXESUF): tests/qtest/bios-tables-test.o \
+ 	tests/qtest/boot-sector.o tests/qtest/acpi-utils.o $(libqos-obj-y)
+ tests/qtest/pxe-test$(EXESUF): tests/qtest/pxe-test.o tests/qtest/boot-sector.o $(libqos-obj-y)
+ tests/qtest/microbit-test$(EXESUF): tests/qtest/microbit-test.o
++tests/qtest/xlnx-can-test$(EXESUF): tests/qtest/xlnx-can-test.o
+ tests/qtest/m25p80-test$(EXESUF): tests/qtest/m25p80-test.o
+ tests/qtest/i440fx-test$(EXESUF): tests/qtest/i440fx-test.o $(libqos-pc-obj-y)
+ tests/qtest/q35-test$(EXESUF): tests/qtest/q35-test.o $(libqos-pc-obj-y)
+diff --git a/tests/qtest/xlnx-can-test.c b/tests/qtest/xlnx-can-test.c
+new file mode 100644
+index 0000000..c9e2efc
+--- /dev/null
++++ b/tests/qtest/xlnx-can-test.c
+@@ -0,0 +1,367 @@
++/*
++ *  Xilinx CAN qtest.
++ *
++ * Copyright (c) 2020 Xilinx Inc.
++ *
++ * Written-by: Vikram Garhwal<fnu.vikram@xilinx.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++
++/* Xlnx-CAN base address. */
++#define CAN0_BASE_ADDR          0xFF060000
++#define CAN1_BASE_ADDR          0xFF070000
++
++/* Register address in Xlnx-CAN. */
++#define R_SRR_OFFSET            0x00
++#define R_MSR_OFFSET            0x04
++#define R_SR_OFFSET             0x18
++#define R_ISR_OFFSET            0x1C
++#define R_ICR_OFFSET            0x24
++#define R_TXID_OFFSET           0x30
++#define R_TXDLC_OFFSET          0x34
++#define R_TXDATA1_OFFSET        0x38
++#define R_TXDATA2_OFFSET        0x3C
++#define R_RXID_OFFSET           0x50
++#define R_RXDLC_OFFSET          0x54
++#define R_RXDATA1_OFFSET        0x58
++#define R_RXDATA2_OFFSET        0x5C
++#define R_AFR                   0x60
++#define R_AFMR1                 0x64
++#define R_AFIR1                 0x68
++#define R_AFMR2                 0x6C
++#define R_AFIR2                 0x70
++#define R_AFMR3                 0x74
++#define R_AFIR3                 0x78
++#define R_AFMR4                 0x7C
++#define R_AFIR4                 0x80
++
++/* CAN modes. */
++#define CONFIG_MODE             0x00
++#define NORMAL_MODE             0x00
++#define LOOPBACK_MODE           0x02
++#define SNOOP_MODE              0x04
++#define SLEEP_MODE              0x01
++#define ENABLE_CAN              (1 << 1)
++#define STATUS_NORMAL_MODE      (1 << 3)
++#define STATUS_LOOPBACK_MODE    (1 << 1)
++#define STATUS_SNOOP_MODE       (1 << 12)
++#define STATUS_SLEEP_MODE       (1 << 2)
++#define ISR_TXOK                (1 << 1)
++#define ISR_RXOK                (1 << 4)
++
++static void match_rx_tx_data(uint32_t *buf_tx, uint32_t *buf_rx,
++                             uint8_t can_timestamp)
++{
++    uint16_t size = 0;
++    uint8_t len = 4;
++
++    while (size < len) {
++        if (R_RXID_OFFSET + 4 * size == R_RXDLC_OFFSET)  {
++            g_assert_cmpint(buf_rx[size], ==, buf_tx[size] + can_timestamp);
++        } else {
++            g_assert_cmpint(buf_rx[size], ==, buf_tx[size]);
++        }
++
++        size++;
++    }
++}
++
++static void read_data(QTestState *qts, uint64_t can_base_addr, uint32_t *buf_rx)
++{
++    uint32_t int_status;
++
++    /* Read the interrupt on CAN rx. */
++    int_status = qtest_readl(qts, can_base_addr + R_ISR_OFFSET) & ISR_RXOK;
++
++    g_assert_cmpint(int_status, ==, ISR_RXOK);
++
++    /* Read the RX register data for CAN. */
++    buf_rx[0] = qtest_readl(qts, can_base_addr + R_RXID_OFFSET);
++    buf_rx[1] = qtest_readl(qts, can_base_addr + R_RXDLC_OFFSET);
++    buf_rx[2] = qtest_readl(qts, can_base_addr + R_RXDATA1_OFFSET);
++    buf_rx[3] = qtest_readl(qts, can_base_addr + R_RXDATA2_OFFSET);
++
++    /* Clear the RX interrupt. */
++    qtest_writel(qts, CAN1_BASE_ADDR + R_ICR_OFFSET, ISR_RXOK);
++}
++
++static void send_data(QTestState *qts, uint64_t can_base_addr, uint32_t *buf_tx)
++{
++    uint32_t int_status;
++
++    /* Write the TX register data for CAN. */
++    qtest_writel(qts, can_base_addr + R_TXID_OFFSET, buf_tx[0]);
++    qtest_writel(qts, can_base_addr + R_TXDLC_OFFSET, buf_tx[1]);
++    qtest_writel(qts, can_base_addr + R_TXDATA1_OFFSET, buf_tx[2]);
++    qtest_writel(qts, can_base_addr + R_TXDATA2_OFFSET, buf_tx[3]);
++
++    /* Read the interrupt on CAN for tx. */
++    int_status = qtest_readl(qts, can_base_addr + R_ISR_OFFSET) & ISR_TXOK;
++
++    g_assert_cmpint(int_status, ==, ISR_TXOK);
++
++    /* Clear the interrupt for tx. */
++    qtest_writel(qts, CAN0_BASE_ADDR + R_ICR_OFFSET, ISR_TXOK);
++}
++
++/*
++ * This test will be transferring data from CAN0 and CAN1 through canbus. CAN0
++ * initiate the data transfer to can-bus, CAN1 receives the data. Test compares
++ * the data sent from CAN0 with received on CAN1.
++ */
++static void test_can_bus(void)
++{
++    uint32_t buf_tx[4] = {0xFF, 0x80000000, 0x12345678, 0x87654321};
++    uint32_t buf_rx[4] = {0x00, 0x00, 0x00, 0x00};
++    uint32_t status = 0;
++    uint8_t can_timestamp = 0;
++
++    QTestState *qts = qtest_init("-m 4G -machine xlnx-zcu102"
++                " -object can-bus,id=canbus0"
++                " -global driver=xlnx.zynqmp-can,property=canbus0,value=canbus0"
++                " -global driver=xlnx.zynqmp-can,property=canbus1,value=canbus0"
++                );
++
++    /* Configure the CAN0 and CAN1. */
++    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
++    qtest_writel(qts, CAN0_BASE_ADDR + R_MSR_OFFSET, NORMAL_MODE);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_MSR_OFFSET, NORMAL_MODE);
++
++    /* Check here if CAN0 and CAN1 are in normal mode. */
++    status = qtest_readl(qts, CAN0_BASE_ADDR + R_SR_OFFSET);
++    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
++
++    status = qtest_readl(qts, CAN1_BASE_ADDR + R_SR_OFFSET);
++    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
++
++    send_data(qts, CAN0_BASE_ADDR, buf_tx);
++
++    can_timestamp += 1;
++
++    read_data(qts, CAN1_BASE_ADDR, buf_rx);
++    match_rx_tx_data(buf_tx, buf_rx, can_timestamp);
++
++    qtest_quit(qts);
++}
++
++/*
++ * This test is performing loopback mode on CAN0 and CAN1. Data sent from TX of
++ * each CAN0 and CAN1 are compared with RX register data for respective CAN.
++ */
++static void test_can_loopback(void)
++{
++    uint32_t buf_tx[4] = {0xFF, 0x80000000, 0x12345678, 0x87654321};
++    uint32_t buf_rx[4] = {0x00, 0x00, 0x00, 0x00};
++    uint32_t status = 0;
++
++    QTestState *qts = qtest_init("-machine xlnx-zcu102"
++                " -object can-bus,id=canbus0"
++                " -global driver=xlnx.zynqmp-can,property=canbus0,value=canbus0"
++                " -global driver=xlnx.zynqmp-can,property=canbus1,value=canbus0"
++                );
++
++    /* Configure the CAN0 in loopback mode. */
++    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, CONFIG_MODE);
++    qtest_writel(qts, CAN0_BASE_ADDR + R_MSR_OFFSET, LOOPBACK_MODE);
++    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
++
++    /* Check here if CAN0 is set in loopback mode. */
++    status = qtest_readl(qts, CAN0_BASE_ADDR + R_SR_OFFSET);
++
++    g_assert_cmpint(status, ==, STATUS_LOOPBACK_MODE);
++
++    send_data(qts, CAN0_BASE_ADDR, buf_tx);
++    read_data(qts, CAN0_BASE_ADDR, buf_rx);
++    match_rx_tx_data(buf_tx, buf_rx, 0);
++
++    /* Configure the CAN1 in loopback mode. */
++    qtest_writel(qts, CAN1_BASE_ADDR + R_SRR_OFFSET, CONFIG_MODE);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_MSR_OFFSET, LOOPBACK_MODE);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
++
++    /* Check here if CAN1 is set in loopback mode. */
++    status = qtest_readl(qts, CAN1_BASE_ADDR + R_SR_OFFSET);
++
++    g_assert_cmpint(status, ==, STATUS_LOOPBACK_MODE);
++
++    send_data(qts, CAN1_BASE_ADDR, buf_tx);
++    read_data(qts, CAN1_BASE_ADDR, buf_rx);
++    match_rx_tx_data(buf_tx, buf_rx, 0);
++
++    qtest_quit(qts);
++}
++
++/*
++ * Enable filters for CAN1. This will filter incoming messages with ID. In this
++ * test message will pass through filter 2.
++ */
++static void test_can_filter(void)
++{
++    uint32_t buf_tx[4] = {0x14, 0x80000000, 0x12345678, 0x87654321};
++    uint32_t buf_rx[4] = {0x00, 0x00, 0x00, 0x00};
++    uint32_t status = 0;
++    uint8_t can_timestamp = 0;
++
++    QTestState *qts = qtest_init("-m 4G -machine xlnx-zcu102"
++                " -object can-bus,id=canbus0"
++                " -global driver=xlnx.zynqmp-can,property=canbus0,value=canbus0"
++                " -global driver=xlnx.zynqmp-can,property=canbus1,value=canbus0"
++                );
++
++    /* Configure the CAN0 and CAN1. */
++    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
++    qtest_writel(qts, CAN0_BASE_ADDR + R_MSR_OFFSET, NORMAL_MODE);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_MSR_OFFSET, NORMAL_MODE);
++
++    /* Check here if CAN0 and CAN1 are in normal mode. */
++    status = qtest_readl(qts, CAN0_BASE_ADDR + R_SR_OFFSET);
++    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
++
++    status = qtest_readl(qts, CAN1_BASE_ADDR + R_SR_OFFSET);
++    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
++
++    /* Set filter for CAN1 for incoming messages. */
++    qtest_writel(qts, CAN1_BASE_ADDR + R_AFR, 0x0);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_AFMR1, 0xF7);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_AFIR1, 0x121F);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_AFMR2, 0x5431);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_AFIR2, 0x14);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_AFMR3, 0x1234);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_AFIR3, 0x5431);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_AFMR4, 0xFFF);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_AFIR4, 0x1234);
++
++    qtest_writel(qts, CAN1_BASE_ADDR + R_AFR, 0xF);
++
++    send_data(qts, CAN0_BASE_ADDR, buf_tx);
++
++    can_timestamp += 1;
++
++    read_data(qts, CAN1_BASE_ADDR, buf_rx);
++    match_rx_tx_data(buf_tx, buf_rx, can_timestamp);
++
++    qtest_quit(qts);
++}
++
++/* Testing sleep mode on CAN0 while CAN1 is in normal mode. */
++static void test_can_sleepmode(void)
++{
++    uint32_t buf_tx[4] = {0x14, 0x80000000, 0x12345678, 0x87654321};
++    uint32_t buf_rx[4] = {0x00, 0x00, 0x00, 0x00};
++    uint32_t status = 0;
++    uint8_t can_timestamp = 0;
++
++    QTestState *qts = qtest_init("-m 4G -machine xlnx-zcu102"
++                " -object can-bus,id=canbus0"
++                " -global driver=xlnx.zynqmp-can,property=canbus0,value=canbus0"
++                " -global driver=xlnx.zynqmp-can,property=canbus1,value=canbus0"
++                );
++
++    /* Configure the CAN0. */
++    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, CONFIG_MODE);
++    qtest_writel(qts, CAN0_BASE_ADDR + R_MSR_OFFSET, SLEEP_MODE);
++    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
++
++    qtest_writel(qts, CAN1_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_MSR_OFFSET, NORMAL_MODE);
++
++    /* Check here if CAN0 is in SNOOP mode and CAN1 in normal mode. */
++    status = qtest_readl(qts, CAN0_BASE_ADDR + R_SR_OFFSET);
++    g_assert_cmpint(status, ==, STATUS_SLEEP_MODE);
++
++    status = qtest_readl(qts, CAN1_BASE_ADDR + R_SR_OFFSET);
++    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
++
++    send_data(qts, CAN1_BASE_ADDR, buf_tx);
++
++    /*
++     * Once CAN1 sends data on can-bus. CAN0 should exit sleep mode.
++     * Check the CAN0 status now. It should exit the sleep mode and receive the
++     * incoming data.
++     */
++    status = qtest_readl(qts, CAN0_BASE_ADDR + R_SR_OFFSET);
++    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
++
++    can_timestamp += 1;
++
++    read_data(qts, CAN0_BASE_ADDR, buf_rx);
++
++    match_rx_tx_data(buf_tx, buf_rx, can_timestamp);
++
++    qtest_quit(qts);
++}
++
++/* Testing Snoop mode on CAN0 while CAN1 is in normal mode. */
++static void test_can_snoopmode(void)
++{
++    uint32_t buf_tx[4] = {0x14, 0x80000000, 0x12345678, 0x87654321};
++    uint32_t buf_rx[4] = {0x00, 0x00, 0x00, 0x00};
++    uint32_t status = 0;
++    uint8_t can_timestamp = 0;
++
++    QTestState *qts = qtest_init("-m 4G -machine xlnx-zcu102"
++                " -object can-bus,id=canbus0"
++                " -global driver=xlnx.zynqmp-can,property=canbus0,value=canbus0"
++                " -global driver=xlnx.zynqmp-can,property=canbus1,value=canbus0"
++                );
++
++    /* Configure the CAN0. */
++    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, CONFIG_MODE);
++    qtest_writel(qts, CAN0_BASE_ADDR + R_MSR_OFFSET, SNOOP_MODE);
++    qtest_writel(qts, CAN0_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
++
++    qtest_writel(qts, CAN1_BASE_ADDR + R_SRR_OFFSET, ENABLE_CAN);
++    qtest_writel(qts, CAN1_BASE_ADDR + R_MSR_OFFSET, NORMAL_MODE);
++
++    /* Check here if CAN0 is in SNOOP mode and CAN1 in normal mode. */
++    status = qtest_readl(qts, CAN0_BASE_ADDR + R_SR_OFFSET);
++    g_assert_cmpint(status, ==, STATUS_SNOOP_MODE);
++
++    status = qtest_readl(qts, CAN1_BASE_ADDR + R_SR_OFFSET);
++    g_assert_cmpint(status, ==, STATUS_NORMAL_MODE);
++
++    send_data(qts, CAN1_BASE_ADDR, buf_tx);
++
++    can_timestamp += 1;
++
++    read_data(qts, CAN0_BASE_ADDR, buf_rx);
++
++    match_rx_tx_data(buf_tx, buf_rx, can_timestamp);
++
++    qtest_quit(qts);
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_func("/net/can/can_bus", test_can_bus);
++    qtest_add_func("/net/can/can_loopback", test_can_loopback);
++    qtest_add_func("/net/can/can_filter", test_can_filter);
++    qtest_add_func("/net/can/can_test_snoopmode", test_can_snoopmode);
++    qtest_add_func("/net/can/can_test_sleepmode", test_can_sleepmode);
++
++    return g_test_run();
++}
+-- 
+2.7.4
 
 
