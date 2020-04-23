@@ -7,87 +7,88 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 007DFC54FD0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:07:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C18C55193
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:07:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3D7B2076C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:07:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01AE520857
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:07:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fWyAbXct"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3D7B2076C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DRPoJNbC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01AE520857
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRfJk-0003FX-OE
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 13:07:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44584)
+	id 1jRfJr-0003Y5-UF
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 13:07:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44634)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jRfIc-0000we-Nh
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:06:07 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jRfIg-00013y-MI
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:06:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jRfIc-0005Sx-3A
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:06:06 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36430)
+ (envelope-from <alex.bennee@linaro.org>) id 1jRfIf-0005Ve-Rr
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:06:10 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:33411)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jRfIb-0005Rl-BF
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:06:05 -0400
-Received: by mail-wr1-x443.google.com with SMTP id d15so6099893wrx.3
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 10:06:04 -0700 (PDT)
+ id 1jRfIf-0005Uh-Az
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:06:09 -0400
+Received: by mail-wm1-x333.google.com with SMTP id v8so7927696wma.0
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 10:06:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=HvqdqtvusanP+sIzJfVgQLDOBPUMzvphXIagTaMAVCw=;
- b=fWyAbXctsyVJ/owdq+iFrtsDZe/U9mVY8Dv6UU5DXNZQo63UQ4IcfvygyjwXDjXbF6
- w98wA0bQAsq4+U2wHwU7okTRXjtFZO/g8JZ/taUUmzn3rI/kpYYFe0hniHpe02yBId5S
- 65jmc05kM1TrdZTCBJoEcrIaFOgKrOCPYWr8oV9+dQxu52EGbNeVPA/25d2/FVQfLih8
- NyuIYQZs/TeNhbK9JGkWkYWqF3qlhRcs4Rx7nCJnRMfB6u3JGegZ0agAgJSZ4as88D+z
- 7MXlawEZNuqYczn1UFwTQEIMQI/9xYD7HbCnMXWL8BeruJX8n3dnSU/vX9wkiPWHh6hT
- 4CFw==
+ bh=0Xn/wGLfgFLD46kRhQwU2daT/QhgqlaCuFRqlRFnVf8=;
+ b=DRPoJNbCfoD7YP8g55X7LdkmXphvibqng/WH+lcvTZr++fsfa7LlEL87NiZHdtHceP
+ P16Op08PVs+04nxv069zTiCW/i6g92cjHmPryOVuhZVaymEhzKS/slqeZuNfSBtNT5Mt
+ Nb8F9+lLHLdE0TvVKBzcklCs3cFgFvWQ3vgUGRVFT4emayoEYSrd/zlJvoG4PlXjhnen
+ D6SRCldiWgcCaXEKAf6Js1jwY/HTIZ99zuOWTTTRslL/VHVUnFmEITjKiL2j8UqrJX/U
+ gDUUYlpqEk0dTPv/J91iK695XdFkYNH7APz/d2yh2RHH7a6pStfzZWZoXD6s0jCty9Pq
+ F9HA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=HvqdqtvusanP+sIzJfVgQLDOBPUMzvphXIagTaMAVCw=;
- b=JDTmaFPtyrlsOXoXFjKZgwCZrIu9vGbJjyyWFy37sInQ+xIcgJKL6o/mmJ+iPqfPTM
- 9lK1n9ArI0HDsei+4nHRXMu/yzT22p6AKqF2ZI3+hBVa795IMOQZaf0DQHgzccKcxMiy
- O1QhtgtK8xQRdQOqLD1+Oo40dTrb9usmgXzq214Q0JSyM+ybt3zJAtToKHlNzQwxMnIL
- BOPBPJlHSvAegRnDCPF7A2kMM09x3xQx551rOyhngEpVT6gD+s2BqJ5HNFMvZbOC+0Ap
- TUnVsFAUq64LG9kqx/dCqu/ZT04rwQ0L3axAUqUMbzm81tIn92UP/3QWABJS/UgRLJSY
- Ot5w==
-X-Gm-Message-State: AGi0Pubrqi35EjeHd6JgHCR6ZcamBDzSD7gzVqoLViSr5AtzG3ejKX0D
- N7bxxs2/14PY/RFw0z+RDr9ufg==
-X-Google-Smtp-Source: APiQypIkvfBJFrEzg3W2AxNh+FfDpyLgdmrZD01OBWtnMNWP/2ZZipn688XO3/kU85MLU0bHScjTKg==
-X-Received: by 2002:adf:f5c4:: with SMTP id k4mr5970485wrp.294.1587661563032; 
- Thu, 23 Apr 2020 10:06:03 -0700 (PDT)
+ bh=0Xn/wGLfgFLD46kRhQwU2daT/QhgqlaCuFRqlRFnVf8=;
+ b=F3KjE2rrGLI3UCew3XlLb9viGnv0IUWAuG7+P6htVKuDR0SUGATdHHgOSEeEdvY0No
+ N4M4A++cE5VlSGorBQpcG6MEI1dKPvQbUKLPr9ubyKOrm6+3wb1tm2HPDVtgq8Matyis
+ 6S20QCl8KiyjurDof63/3Bm2xkBJnlpVV2RvRm3Uz4VqMj3OJdSFNYWToyq1CCs1krut
+ uCIeEQuEMLOBRnAdQ3wXqoWBQyT0YLSnRr/yjze4qXjNw0EjOgxWjW5cV2dw4juk3dDl
+ khTmzEc+qBYUeIElQECAq98aE43zORKZlGyiijqHK8/PFzyb8f750KWG/a1TcbA+74RB
+ Qnog==
+X-Gm-Message-State: AGi0PuYicFLjZjAGRRA9QQ2QmutLnYhbcNoHCo481Ndw8h7ZH7KYPOD7
+ Qj14KEz6MFIrThToFUvHmmLxzA==
+X-Google-Smtp-Source: APiQypLTfhET4THTUfXTrQhY9awvWcuDGyj6UjnRXZXRA1vR9OKC5Iv4eGwPQwAWdHvCwq4seh9Pmw==
+X-Received: by 2002:a05:600c:22d3:: with SMTP id
+ 19mr5348534wmg.110.1587661567859; 
+ Thu, 23 Apr 2020 10:06:07 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c10sm4231466wru.48.2020.04.23.10.05.58
+ by smtp.gmail.com with ESMTPSA id 17sm4396657wmo.2.2020.04.23.10.06.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Apr 2020 10:05:58 -0700 (PDT)
+ Thu, 23 Apr 2020 10:06:04 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8A8161FF8F;
+ by zen.linaroharston (Postfix) with ESMTP id E34F61FF93;
  Thu, 23 Apr 2020 18:05:57 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 03/14] accel/tcg: Relax va restrictions on 64-bit guests
-Date: Thu, 23 Apr 2020 18:05:46 +0100
-Message-Id: <20200423170557.31106-4-alex.bennee@linaro.org>
+Subject: [PATCH  v1 07/14] tests/tcg: better trap gdb failures
+Date: Thu, 23 Apr 2020 18:05:50 +0100
+Message-Id: <20200423170557.31106-8-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200423170557.31106-1-alex.bennee@linaro.org>
 References: <20200423170557.31106-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::333;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x333.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::333
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,140 +100,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+It seems older and non-multiarach aware GDBs might not fail gracefully
+when faced with something they don't know. For example when faced with
+a target XML for s390x the Ubuntu 18.04 gdb will generate an internal
+fault and prompt for a core dump.
 
-We cannot at present limit a 64-bit guest to a virtual address
-space smaller than the host.  It will mostly work to ignore this
-limitation, except if the guest uses high bits of the address
-space for tags.  But it will certainly work better, as presently
-we can wind up failing to allocate the guest stack.
+Work around this by invoking GDB in a more batch orientated way and
+then trying to filter out between test failures and gdb failures.
 
-Widen our user-only page tree to the host or abi pointer width.
-Remove the workaround for this problem from target/alpha.
-Always validate guest addresses vs reserved_va, as there we
-control allocation ourselves.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/exec/cpu-all.h    | 23 +++++++++++++++++++----
- target/alpha/cpu-param.h  | 15 ++-------------
- accel/tcg/translate-all.c | 15 +++++++++------
- 3 files changed, 30 insertions(+), 23 deletions(-)
+ tests/guest-debug/run-test.py               | 19 ++++++++++++++++++-
+ tests/tcg/aarch64/gdbstub/test-sve-ioctl.py |  1 -
+ tests/tcg/aarch64/gdbstub/test-sve.py       |  1 -
+ 3 files changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index b4fb5832c4..c0c2fa3cc5 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -162,12 +162,27 @@ extern unsigned long guest_base;
- extern bool have_guest_base;
- extern unsigned long reserved_va;
+diff --git a/tests/guest-debug/run-test.py b/tests/guest-debug/run-test.py
+index 8c49ee2f22..2bbb8fbaa3 100755
+--- a/tests/guest-debug/run-test.py
++++ b/tests/guest-debug/run-test.py
+@@ -50,8 +50,25 @@ if __name__ == '__main__':
+     inferior = subprocess.Popen(shlex.split(cmd))
  
--#if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
--#define GUEST_ADDR_MAX (~0ul)
-+/*
-+ * Limit the guest addresses as best we can.
-+ *
-+ * When not using -R reserved_va, we cannot really limit the guest
-+ * to less address space than the host.  For 32-bit guests, this
-+ * acts as a sanity check that we're not giving the guest an address
-+ * that it cannot even represent.  For 64-bit guests... the address
-+ * might not be what the real kernel would give, but it is at least
-+ * representable in the guest.
-+ *
-+ * TODO: Improve address allocation to avoid this problem, and to
-+ * avoid setting bits at the top of guest addresses that might need
-+ * to be used for tags.
-+ */
-+#if MIN(TARGET_VIRT_ADDR_SPACE_BITS, TARGET_ABI_BITS) <= 32
-+# define GUEST_ADDR_MAX_  UINT32_MAX
- #else
--#define GUEST_ADDR_MAX (reserved_va ? reserved_va - 1 : \
--                                    (1ul << TARGET_VIRT_ADDR_SPACE_BITS) - 1)
-+# define GUEST_ADDR_MAX_  ~0ul
- #endif
-+#define GUEST_ADDR_MAX    (reserved_va ? reserved_va - 1 : GUEST_ADDR_MAX_)
+     # Now launch gdb with our test and collect the result
+-    gdb_cmd = "%s %s -ex 'target remote localhost:1234' -x %s" % (args.gdb, args.binary, args.test)
++    gdb_cmd = "%s %s" % (args.gdb, args.binary)
++    # run quietly and ignore .gdbinit
++    gdb_cmd += " -q -n -batch"
++    # disable prompts in case of crash
++    gdb_cmd += " -ex 'set confirm off'"
++    # connect to remote
++    gdb_cmd += " -ex 'target remote localhost:1234'"
++    # finally the test script itself
++    gdb_cmd += " -x %s" % (args.test)
 +
- #else
++    print("GDB CMD: %s" % (gdb_cmd))
  
- #include "exec/hwaddr.h"
-diff --git a/target/alpha/cpu-param.h b/target/alpha/cpu-param.h
-index 692aee27ca..1153992e42 100644
---- a/target/alpha/cpu-param.h
-+++ b/target/alpha/cpu-param.h
-@@ -10,22 +10,11 @@
+     result = subprocess.call(gdb_cmd, shell=True);
  
- #define TARGET_LONG_BITS 64
- #define TARGET_PAGE_BITS 13
--#ifdef CONFIG_USER_ONLY
--/*
-- * ??? The kernel likes to give addresses in high memory.  If the host has
-- * more virtual address space than the guest, this can lead to impossible
-- * allocations.  Honor the long-standing assumption that only kernel addrs
-- * are negative, but otherwise allow allocations anywhere.  This could lead
-- * to tricky emulation problems for programs doing tagged addressing, but
-- * that's far fewer than encounter the impossible allocation problem.
-- */
--#define TARGET_PHYS_ADDR_SPACE_BITS  63
--#define TARGET_VIRT_ADDR_SPACE_BITS  63
--#else
++    # A negative result is the result of an internal gdb failure like
++    # a crash. We force a return of 0 so we don't fail the test on
++    # account of broken external tools.
++    if result < 0:
++        print("GDB crashed? SKIPPING")
++        exit(0)
 +
- /* ??? EV4 has 34 phys addr bits, EV5 has 40, EV6 has 44.  */
- #define TARGET_PHYS_ADDR_SPACE_BITS  44
- #define TARGET_VIRT_ADDR_SPACE_BITS  (30 + TARGET_PAGE_BITS)
--#endif
-+
- #define NB_MMU_MODES 3
+     exit(result)
+diff --git a/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py b/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
+index 984fbeb277..387b2fc20a 100644
+--- a/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
++++ b/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
+@@ -70,7 +70,6 @@ except (gdb.error, AttributeError):
+ try:
+     # These are not very useful in scripts
+     gdb.execute("set pagination off")
+-    gdb.execute("set confirm off")
  
- #endif
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 9924e66d1f..e4f703a7e6 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -173,8 +173,13 @@ struct page_collection {
- #define TB_FOR_EACH_JMP(head_tb, tb, n)                                 \
-     TB_FOR_EACH_TAGGED((head_tb)->jmp_list_head, tb, n, jmp_list_next)
+     # Run the actual tests
+     run_test()
+diff --git a/tests/tcg/aarch64/gdbstub/test-sve.py b/tests/tcg/aarch64/gdbstub/test-sve.py
+index dbe7f2aa93..5995689625 100644
+--- a/tests/tcg/aarch64/gdbstub/test-sve.py
++++ b/tests/tcg/aarch64/gdbstub/test-sve.py
+@@ -71,7 +71,6 @@ except (gdb.error, AttributeError):
+ try:
+     # These are not very useful in scripts
+     gdb.execute("set pagination off")
+-    gdb.execute("set confirm off")
  
--/* In system mode we want L1_MAP to be based on ram offsets,
--   while in user mode we want it to be based on virtual addresses.  */
-+/*
-+ * In system mode we want L1_MAP to be based on ram offsets,
-+ * while in user mode we want it to be based on virtual addresses.
-+ *
-+ * TODO: For user mode, see the caveat re host vs guest virtual
-+ * address spaces near GUEST_ADDR_MAX.
-+ */
- #if !defined(CONFIG_USER_ONLY)
- #if HOST_LONG_BITS < TARGET_PHYS_ADDR_SPACE_BITS
- # define L1_MAP_ADDR_SPACE_BITS  HOST_LONG_BITS
-@@ -182,7 +187,7 @@ struct page_collection {
- # define L1_MAP_ADDR_SPACE_BITS  TARGET_PHYS_ADDR_SPACE_BITS
- #endif
- #else
--# define L1_MAP_ADDR_SPACE_BITS  TARGET_VIRT_ADDR_SPACE_BITS
-+# define L1_MAP_ADDR_SPACE_BITS  MIN(HOST_LONG_BITS, TARGET_ABI_BITS)
- #endif
- 
- /* Size of the L2 (and L3, etc) page tables.  */
-@@ -2497,9 +2502,7 @@ void page_set_flags(target_ulong start, target_ulong end, int flags)
-     /* This function should never be called with addresses outside the
-        guest address space.  If this assert fires, it probably indicates
-        a missing call to h2g_valid.  */
--#if TARGET_ABI_BITS > L1_MAP_ADDR_SPACE_BITS
--    assert(end <= ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS));
--#endif
-+    assert(end - 1 <= GUEST_ADDR_MAX);
-     assert(start < end);
-     assert_memory_lock();
- 
+     # Run the actual tests
+     run_test()
 -- 
 2.20.1
 
