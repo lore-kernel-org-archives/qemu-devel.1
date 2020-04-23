@@ -2,95 +2,92 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 868B2C54FD0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:05:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 166DBC54FCB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:07:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4919D2076C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:05:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D476A2076C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:07:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EzUnXeBg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4919D2076C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tExudrxB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D476A2076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRfHz-0008UX-DN
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 13:05:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44070)
+	id 1jRfJk-0003F9-0o
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 13:07:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44570)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1jRfGv-0007ni-2f
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:04:21 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jRfIb-0000wO-RK
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:06:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1jRfGt-0003oK-HV
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:04:20 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51998
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1jRfGt-0003jF-0f
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:04:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587661456;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iNfHwH1+Ntuses6bMhYLuFNVchgVKHdXMKnAo9rwcDk=;
- b=EzUnXeBg/RKkgSS+DyL/uvD9klFam3wmPa6IEVBEo+pGdUf4kLmh5P1r8XPxgwHDWMK9mT
- nrmIrZvgmBqQpXkeAykCamwIsdFdegG4mBmT1WqtxOnLNoa/KzIv1LZtIEWW8zz61idgkb
- AEenQ8Fu+vyrr3LAZnssty7BoqkXnL8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-lWmj-__kOHOFEpmDk6xBgg-1; Thu, 23 Apr 2020 13:04:14 -0400
-X-MC-Unique: lWmj-__kOHOFEpmDk6xBgg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 969EE87308E;
- Thu, 23 Apr 2020 17:04:13 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
- (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A8BB5C1D2;
- Thu, 23 Apr 2020 17:04:13 +0000 (UTC)
-Received: from zmail17.collab.prod.int.phx2.redhat.com
- (zmail17.collab.prod.int.phx2.redhat.com [10.5.83.19])
- by colo-mx.corp.redhat.com (Postfix) with ESMTP id 513791809541;
- Thu, 23 Apr 2020 17:04:13 +0000 (UTC)
-Date: Thu, 23 Apr 2020 13:04:13 -0400 (EDT)
-From: Cleber Rosa <crosa@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <529508877.9650370.1587661453005.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAFEAcA_dcVneQ4Hj61GAkYRCUSMrA=QjwnAXccoBwjUjOE-wSQ@mail.gmail.com>
-References: <20200312193616.438922-1-crosa@redhat.com>
- <CAFEAcA8Lw94_=kY+Fv-cFW2Tk5RD62EjODjKdGf2-mLdDw7FuQ@mail.gmail.com>
- <1182067639.1655516.1584421185287.JavaMail.zimbra@redhat.com>
- <CAFEAcA-zRw7kzwzXxPmLaUqwOrQLwW9BymOJ34iJOOTCUAf=xg@mail.gmail.com>
- <20200317141257.GA5724@localhost.localdomain>
- <CAFEAcA9W4KXN6dcT0CNyD_mQ3xY5wDmJ7i0wowhaG2XPmyMYng@mail.gmail.com>
- <87sgi49uf6.fsf@dusky.pond.sub.org>
- <CAFEAcA_dcVneQ4Hj61GAkYRCUSMrA=QjwnAXccoBwjUjOE-wSQ@mail.gmail.com>
-Subject: Re: [PATCH 0/5] QEMU Gating CI
+ (envelope-from <alex.bennee@linaro.org>) id 1jRfIa-0005S5-PQ
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:06:05 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37338)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jRfIa-0005Re-CK
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:06:04 -0400
+Received: by mail-wm1-x341.google.com with SMTP id z6so7355876wml.2
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 10:06:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Rec4lCI7C2I9ftVXhw3jnhwwniJ/OyIiNlpjw4I33hQ=;
+ b=tExudrxB9vPk++NxCuVAo8EeZ109asjdxvLWGyve24NzSHb6Dg1N4A7vwp2xnIt+rI
+ +TdPFVmhFYaMtMaPlCHSYd7hh12ZtaOPp4DPr1xvchNsZT39jZ8AdNfOBsB/K9AyQQak
+ 9EfK2aRwD9wOPURWocN59R4dS5IggtEsZrPNn93cjcLnHIvp/GkHVwKt9VtDFgJYrhrA
+ iE5QaOYDiw++HdAqaLzUv10WT3gUHudZqsk9/KNUQY5jkP4wmzsVmba/olTS7r7TkYYI
+ rTztF+WTblsJieNuUDZ47gWuHpRQjyHnRmwj5zbiifqf86qMILEGt3J4dJgLEovZd+cs
+ udtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Rec4lCI7C2I9ftVXhw3jnhwwniJ/OyIiNlpjw4I33hQ=;
+ b=nlJXX1wMGOxJKDiVaK+JpLDZk92aW28FKWcY2+enUVa8U7UeewZ5sWWiIVxkbZOB5/
+ g7OdrIdcLQjha6lWQ8qzo91F7oJzrgNDmdtFUPe2XMDN4GL6wFI5ENiWhnaznH2ajO7I
+ 26smaXWbXwLbKBeeMFp1T/DxfUuyd8dzJK86MA0ZWb1UMUbLzpj9kMT78L50otfOvZ3i
+ Hr6xuNFi970SElo48umzZx7EOAN93ystVhOKNfCjVlzGBflT33O01l6OKoZwPX0q0iU5
+ 6I5/Xj75yLAbBTrgf8gUVaEdk5dlin/E4QhH2uIRvaZldWNUP3mjLA/foZllrm2LHLyx
+ /AkA==
+X-Gm-Message-State: AGi0Pubb+N4mEFvKOLSgpDGJlmPnpZfUlOfGsbJey9A2OrdkqeSLoeC7
+ nqLarha/rggdFknF1CG//Ts+ZQ==
+X-Google-Smtp-Source: APiQypIJCVINl5UI/D09wOeos0YtIIqD/mcpJQii3MCk6RXFSt3Rb6QGGnAWAJx/qBH11twcdDGFEA==
+X-Received: by 2002:a1c:9cc6:: with SMTP id f189mr5051083wme.75.1587661562041; 
+ Thu, 23 Apr 2020 10:06:02 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id y40sm4854696wrd.20.2020.04.23.10.05.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Apr 2020 10:05:58 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 737861FF8C;
+ Thu, 23 Apr 2020 18:05:57 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v1 02/14] exec/cpu-all: Use bool for have_guest_base
+Date: Thu, 23 Apr 2020 18:05:45 +0100
+Message-Id: <20200423170557.31106-3-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200423170557.31106-1-alex.bennee@linaro.org>
+References: <20200423170557.31106-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Originating-IP: [10.10.112.178, 10.4.195.26]
-Thread-Topic: QEMU Gating CI
-Thread-Index: DgfSa9udgyRTKA+gpMmc7tBfgATwNw==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=crosa@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 03:23:21
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,96 +99,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Wainer Moschetta <wmoschet@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Willian Rampazzo <wrampazz@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Richard Henderson <richard.henderson@linaro.org>
 
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ include/exec/cpu-all.h | 2 +-
+ bsd-user/main.c        | 4 ++--
+ linux-user/main.c      | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
------ Original Message -----
-> From: "Peter Maydell" <peter.maydell@linaro.org>
-> To: "Markus Armbruster" <armbru@redhat.com>
-> Cc: "Fam Zheng" <fam@euphon.net>, "Thomas Huth" <thuth@redhat.com>, "Bera=
-ldo Leal" <bleal@redhat.com>, "Erik
-> Skultety" <eskultet@redhat.com>, "Alex Benn=C3=A9e" <alex.bennee@linaro.o=
-rg>, "Wainer Moschetta" <wmoschet@redhat.com>,
-> "QEMU Developers" <qemu-devel@nongnu.org>, "Wainer dos Santos Moschetta" =
-<wainersm@redhat.com>, "Willian Rampazzo"
-> <wrampazz@redhat.com>, "Cleber Rosa" <crosa@redhat.com>, "Philippe Mathie=
-u-Daud=C3=A9" <philmd@redhat.com>, "Eduardo
-> Habkost" <ehabkost@redhat.com>
-> Sent: Tuesday, April 21, 2020 8:53:49 AM
-> Subject: Re: [PATCH 0/5] QEMU Gating CI
->=20
-> On Thu, 19 Mar 2020 at 16:33, Markus Armbruster <armbru@redhat.com> wrote=
-:
-> > Peter Maydell <peter.maydell@linaro.org> writes:
-> > > I think we should start by getting the gitlab setup working
-> > > for the basic "x86 configs" first. Then we can try adding
-> > > a runner for s390 (that one's logistically easiest because
-> > > it is a project machine, not one owned by me personally or
-> > > by Linaro) once the basic framework is working, and expand
-> > > from there.
-> >
-> > Makes sense to me.
-> >
-> > Next steps to get this off the ground:
-> >
-> > * Red Hat provides runner(s) for x86 stuff we care about.
-> >
-> > * If that doesn't cover 'basic "x86 configs" in your judgement, we
-> >   fill the gaps as described below under "Expand from there".
-> >
-> > * Add an s390 runner using the project machine you mentioned.
-> >
-> > * Expand from there: identify the remaining gaps, map them to people /
-> >   organizations interested in them, and solicit contributions from thes=
-e
-> >   guys.
-> >
-> > A note on contributions: we need both hardware and people.  By people I
-> > mean maintainers for the infrastructure, the tools and all the runners.
-> > Cleber & team are willing to serve for the infrastructure, the tools an=
-d
-> > the Red Hat runners.
->=20
-> So, with 5.0 nearly out the door it seems like a good time to check
-> in on this thread again to ask where we are progress-wise with this.
-> My impression is that this patchset provides most of the scripting
-> and config side of the first step, so what we need is for RH to provide
-> an x86 runner machine and tell the gitlab CI it exists. I appreciate
-> that the whole coronavirus and working-from-home situation will have
-> upended everybody's plans, especially when actual hardware might
-> be involved, but how's it going ?
->=20
-
-Hi Peter,
-
-You hit the nail in the head here.  We were affected indeed with our abilit=
-y
-to move some machines from one lab to another (across the country), but we'=
-re
-actively working on it.
-
-From now on, I'll give you an update every time a significant event occurs =
-on
-our side.
-
-> thanks
-> -- PMM
->=20
->=20
-
-Thanks for checking in!
-- Cleber.
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 49384bb66a..b4fb5832c4 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -159,7 +159,7 @@ static inline void tswap64s(uint64_t *s)
+  * This allows the guest address space to be offset to a convenient location.
+  */
+ extern unsigned long guest_base;
+-extern int have_guest_base;
++extern bool have_guest_base;
+ extern unsigned long reserved_va;
+ 
+ #if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index 770c2b267a..aef5531628 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -42,7 +42,7 @@
+ int singlestep;
+ unsigned long mmap_min_addr;
+ unsigned long guest_base;
+-int have_guest_base;
++bool have_guest_base;
+ unsigned long reserved_va;
+ 
+ static const char *interp_prefix = CONFIG_QEMU_INTERP_PREFIX;
+@@ -828,7 +828,7 @@ int main(int argc, char **argv)
+             }
+         } else if (!strcmp(r, "B")) {
+            guest_base = strtol(argv[optind++], NULL, 0);
+-           have_guest_base = 1;
++           have_guest_base = true;
+         } else if (!strcmp(r, "drop-ld-preload")) {
+             (void) envlist_unsetenv(envlist, "LD_PRELOAD");
+         } else if (!strcmp(r, "bsd")) {
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 1d20a83d4e..90ad365b43 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -59,7 +59,7 @@ static const char *cpu_type;
+ static const char *seed_optarg;
+ unsigned long mmap_min_addr;
+ unsigned long guest_base;
+-int have_guest_base;
++bool have_guest_base;
+ 
+ /*
+  * Used to implement backwards-compatibility for the `-strace`, and
+@@ -334,7 +334,7 @@ static void handle_arg_cpu(const char *arg)
+ static void handle_arg_guest_base(const char *arg)
+ {
+     guest_base = strtol(arg, NULL, 0);
+-    have_guest_base = 1;
++    have_guest_base = true;
+ }
+ 
+ static void handle_arg_reserved_va(const char *arg)
+-- 
+2.20.1
 
 
