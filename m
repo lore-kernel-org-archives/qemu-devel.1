@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE89C54FCB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:42:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42839C54FCB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:42:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 112D6205C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:42:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0ECAB205C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:42:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="YiqtKcBH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 112D6205C9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="UIT+lm92"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ECAB205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRgnd-0003Ps-4k
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 14:42:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32868)
+	id 1jRgns-0003mV-0s
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 14:42:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32934)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dimastep@yandex-team.ru>) id 1jRgm6-0001FF-RO
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:40:39 -0400
+ (envelope-from <dimastep@yandex-team.ru>) id 1jRgmH-0001QP-Sd
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:40:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dimastep@yandex-team.ru>) id 1jRgm6-0004KE-FK
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:40:38 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:45238)
+ (envelope-from <dimastep@yandex-team.ru>) id 1jRgmF-0004cX-RP
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:40:49 -0400
+Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:39718)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1jRgm2-00048m-TR; Thu, 23 Apr 2020 14:40:36 -0400
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
- [IPv6:2a02:6b8:0:1402::301])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 65C3C2E150C;
- Thu, 23 Apr 2020 21:40:32 +0300 (MSK)
+ id 1jRgmC-0004RL-By; Thu, 23 Apr 2020 14:40:44 -0400
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::162])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id B9EA52E14D8;
+ Thu, 23 Apr 2020 21:40:39 +0300 (MSK)
 Received: from vla5-58875c36c028.qloud-c.yandex.net
  (vla5-58875c36c028.qloud-c.yandex.net [2a02:6b8:c18:340b:0:640:5887:5c36])
- by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- GEhWYPOk17-eUQmj5PB; Thu, 23 Apr 2020 21:40:32 +0300
+ by mxbackcorp1j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ isFjwdZvjU-ebnqUoRv; Thu, 23 Apr 2020 21:40:39 +0300
 Precedence: bulk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
  s=default; 
- t=1587667232; bh=6AUSdMRun+4uomw8GjlwQJKUpFkMPJnEm3m4a1og08I=;
+ t=1587667239; bh=kUkFhpkmkerAUcEO23m978mFXGVV+mbiJpdw3pimI38=;
  h=In-Reply-To:In-Reply-To:Message-Id:References:References:Date:
  Subject:To:From:Cc;
- b=YiqtKcBHfLkbWDYhZ0Vcu+Ouj4kWCtgKHPx5Q2WwYgmVXB6mef08ag3YYDDzdlG63
- 2Z/PaAXBnSbhxgkqPrtC2hXs3Tv382XV4PAshynUzX1kbqhklJFRFCGqTWns+C6c78
- fjaBdB3LtScf2B/NeHdQHtIl7tsKD5mlb6l5gPeA=
-Authentication-Results: mxbackcorp1g.mail.yandex.net;
+ b=UIT+lm92VMZpQj/L6p8co1vHO9irvJwzojPjl5cG9z9xmmsYV7igt8q4T13iFTeMe
+ CUNJYKJfvdUVfDUD0mPXKfwZEICkPNJmE7076evfyJ/ANPXmeFajrr/XOIrztdBtMR
+ lQYWh6QNDOcOMayT4S8uxDFg9p5yeOpA6/9hcBxw=
+Authentication-Results: mxbackcorp1j.mail.yandex.net;
  dkim=pass header.i=@yandex-team.ru
 Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
  [2a02:6b8:b081:1313::1:e])
  by vla5-58875c36c028.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- 7hClKENKMK-eUXeJJgf; Thu, 23 Apr 2020 21:40:30 +0300
+ 7hClKENKMK-ebXe7FTd; Thu, 23 Apr 2020 21:40:37 +0300
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
  (Client certificate not present)
 From: Dima Stepanov <dimastep@yandex-team.ru>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v1 3/7] char-socket: initialize reconnect timer only if
- close is emitted
-Date: Thu, 23 Apr 2020 21:39:34 +0300
-Message-Id: <23b36a73ce1150cc501f436684ca558608de3322.1587667007.git.dimastep@yandex-team.ru>
+Subject: [RFC PATCH v1 5/7] vhost-user-blk: add mechanism to track the guest
+ notifiers init state
+Date: Thu, 23 Apr 2020 21:39:36 +0300
+Message-Id: <4bd32763095d015bc83f1f11a871d3a8e7b36e01.1587667007.git.dimastep@yandex-team.ru>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <cover.1587667007.git.dimastep@yandex-team.ru>
 References: <cover.1587667007.git.dimastep@yandex-team.ru>
 In-Reply-To: <cover.1587667007.git.dimastep@yandex-team.ru>
 References: <cover.1587667007.git.dimastep@yandex-team.ru>
-Received-SPF: pass client-ip=77.88.29.217;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 14:40:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 77.88.29.217
+Received-SPF: pass client-ip=2a02:6b8:0:1619::183;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a02:6b8:0:1619::183
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -95,55 +96,108 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-During vhost-user reconnect functionality testing the following assert
-was hit:
-  qemu-system-x86_64: chardev/char-socket.c:125:
-  qemu_chr_socket_restart_timer: Assertion `!s->reconnect_timer' failed.
-  Aborted (core dumped)
-This is observed only if the connection is closed by the vhost-user-blk
-daemon during the initialization routine. In this case the
-tcp_chr_disconnect_locked() routine is called twice. First time it is
-called in the tcp_chr_write() routine, after getting the SIGPIPE signal.
-Second time it is called when vhost_user_blk_connect() routine return
-error. In general it looks correct, because the initialization routine
-can return error in many cases.
-The tcp_chr_disconnect_locked() routine could be fixed. The timer will
-be restarted only if the close event is emitted.
+In case of the vhost-user devices the daemon can be killed at any
+moment. Since QEMU supports the reconnet functionality the guest
+notifiers should be reset and disabled after "disconnect" event. The
+most issues were found if the "disconnect" event happened during vhost
+device initialization step.
+The disconnect event leads to the call of the vhost_dev_cleanup()
+routine. Which memset to 0 a vhost device structure. Because of this, if
+device was not started (dev.started == false) and the connection is
+broken, then the set_guest_notifier method will produce assertion error.
+Also connection can be broken after the dev.started field is set to
+true.
+A new notifiers_set field is added to the vhost_dev structure to track
+the state of the guest notifiers during the initialization process.
 
 Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
 ---
- chardev/char-socket.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/block/vhost-user-blk.c |  8 ++++----
+ hw/virtio/vhost.c         | 11 +++++++++++
+ include/hw/virtio/vhost.h |  1 +
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index c128cca..83ca4d9 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -476,7 +476,7 @@ static void update_disconnected_filename(SocketChardev *s)
- static void tcp_chr_disconnect_locked(Chardev *chr)
- {
-     SocketChardev *s = SOCKET_CHARDEV(chr);
--    bool emit_close = s->state == TCP_CHARDEV_STATE_CONNECTED;
-+    bool was_connected = s->state == TCP_CHARDEV_STATE_CONNECTED;
- 
-     tcp_chr_free_connection(chr);
- 
-@@ -485,11 +485,11 @@ static void tcp_chr_disconnect_locked(Chardev *chr)
-                                               chr, NULL, chr->gcontext);
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index 70d7842..5a3de0f 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -175,7 +175,9 @@ static void vhost_user_blk_stop(VirtIODevice *vdev)
+         return;
      }
-     update_disconnected_filename(s);
--    if (emit_close) {
-+    if (was_connected) {
-         qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+ 
+-    vhost_dev_stop(&s->dev, vdev);
++    if (s->dev.started) {
++        vhost_dev_stop(&s->dev, vdev);
++    }
+ 
+     ret = vhost_dev_drop_guest_notifiers(&s->dev, vdev, s->dev.nvqs);
+     if (ret < 0) {
+@@ -337,9 +339,7 @@ static void vhost_user_blk_disconnect(DeviceState *dev)
+     }
+     s->connected = false;
+ 
+-    if (s->dev.started) {
+-        vhost_user_blk_stop(vdev);
 -    }
--    if (s->reconnect_time) {
--        qemu_chr_socket_restart_timer(chr);
-+        if (s->reconnect_time) {
-+            qemu_chr_socket_restart_timer(chr);
-+        }
++    vhost_user_blk_stop(vdev);
+ 
+     vhost_dev_cleanup(&s->dev);
+ }
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index fa3da9c..ddbdc53 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -1380,6 +1380,7 @@ int vhost_dev_enable_notifiers(struct vhost_dev *hdev, VirtIODevice *vdev)
+             goto fail_vq;
+         }
      }
++    hdev->notifiers_set = true;
+ 
+     return 0;
+ fail_vq:
+@@ -1407,6 +1408,10 @@ void vhost_dev_disable_notifiers(struct vhost_dev *hdev, VirtIODevice *vdev)
+     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
+     int i, r;
+ 
++    if (!hdev->notifiers_set) {
++        return;
++    }
++
+     for (i = 0; i < hdev->nvqs; ++i) {
+         r = virtio_bus_set_host_notifier(VIRTIO_BUS(qbus), hdev->vq_index + i,
+                                          false);
+@@ -1417,6 +1422,8 @@ void vhost_dev_disable_notifiers(struct vhost_dev *hdev, VirtIODevice *vdev)
+         virtio_bus_cleanup_host_notifier(VIRTIO_BUS(qbus), hdev->vq_index + i);
+     }
+     virtio_device_release_ioeventfd(vdev);
++
++    hdev->notifiers_set = false;
  }
  
+ /*
+@@ -1449,6 +1456,10 @@ int vhost_dev_drop_guest_notifiers(struct vhost_dev *hdev,
+     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+     int ret;
+ 
++    if (!hdev->notifiers_set) {
++        return 0;
++    }
++
+     ret = k->set_guest_notifiers(qbus->parent, nvqs, false);
+     if (ret < 0) {
+         error_report("Error reset guest notifier: %d", -ret);
+diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+index 4d0d2e2..e3711a7 100644
+--- a/include/hw/virtio/vhost.h
++++ b/include/hw/virtio/vhost.h
+@@ -90,6 +90,7 @@ struct vhost_dev {
+     QLIST_HEAD(, vhost_iommu) iommu_list;
+     IOMMUNotifier n;
+     const VhostDevConfigOps *config_ops;
++    bool notifiers_set;
+ };
+ 
+ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
 -- 
 2.7.4
 
