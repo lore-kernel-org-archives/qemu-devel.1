@@ -2,90 +2,81 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6475BC2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 11:05:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70BFDC55192
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 11:06:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F1392076C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 11:05:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3BA742076C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 11:06:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QqBvgc0m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F1392076C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DoooT5n1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BA742076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRZfT-000407-9y
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 07:05:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38964)
+	id 1jRZgi-0005Ag-Dk
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 07:06:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39540)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jRZdx-0003Ks-Te
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 07:03:46 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jRZg6-0004co-1b
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 07:05:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jRZdw-0001HO-6T
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 07:03:45 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58288
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jRZdv-0001Fv-N0
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 07:03:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587639822;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=z2OaMG4Jy+q5Z6CPtk92P9yVIyfGJ+gJr6XqZsxDx+0=;
- b=QqBvgc0md+M4xke+ZoY0Sed1gQTwweOfyTBM8KDeBXWalffVj1wcGbEH9rT7EOJ7SUZLQ4
- WFTclMz4rYelGpxfSSvAuaKJfclQH4kXce3hBySUqN1Xc6HLi2nt55aRpkcgRFnqk0vyYS
- 7fWwaEXrau8a1bfgwZwqcEVnrBC4Dw8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-zWtlS0ShMG6ZEusK_djbSQ-1; Thu, 23 Apr 2020 07:03:30 -0400
-X-MC-Unique: zWtlS0ShMG6ZEusK_djbSQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C752C18538BE;
- Thu, 23 Apr 2020 11:03:28 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 227D01001DC2;
- Thu, 23 Apr 2020 11:03:25 +0000 (UTC)
-Date: Thu, 23 Apr 2020 12:03:21 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: janine.schneider@fau.de
-Subject: Re: Integration of qemu-img
-Message-ID: <20200423110321.GB1077680@redhat.com>
-References: <00fc01d61256$35f849c0$a1e8dd40$@fau.de>
- <877dyfc1if.fsf@dusky.pond.sub.org>
- <20200422161813.GI47385@stefanha-x1.localdomain>
- <006e01d61958$de787120$9b695360$@fau.de>
- <CAJSP0QVeEZmSps3R8Hg+j=-BZR7_+FeOkm+m12A=gMULosP3Sg@mail.gmail.com>
- <008a01d6195d$78280570$68781050$@fau.de>
+ (envelope-from <peter.maydell@linaro.org>) id 1jRZg5-0005bh-2v
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 07:05:57 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45444)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jRZg4-0005b2-Ma
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 07:05:56 -0400
+Received: by mail-ot1-x344.google.com with SMTP id e20so5265337otk.12
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 04:05:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=EE+V4lph8j5aosFBB+StB7HloVKwTivpUyCdP1a6Nbo=;
+ b=DoooT5n11EQDRhYw1GfbwXAP2Tv6+yZ1jNMyWnN7QbTog9UWYjz5y1MAZ/p83KSRY8
+ oOmISdt2EBKZw1WKHLA9jQl0Ibo70UIDC7hoxLpiZRgCwvMv1wmOjptDQWekijQtbIJa
+ 7I3/Se+V3Ra1ow8QRpXQhf2CIjVknSNzT7lmajHHxiPrA0l5ipeNVwaxthJFSStex6qu
+ Bfwo31Wwp9pkphRB0PVqjEJ6Is+1rsKfxLSBQj8qGCBPo5l1hG8wiOHqDFkh2zoCFu0j
+ j1Slxgyy1FzZ8J774yU3F2oJY1xkd+pX9T12ecKUCyzyMzWiBk8VbZjssNDEZVCaBpHR
+ WHRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=EE+V4lph8j5aosFBB+StB7HloVKwTivpUyCdP1a6Nbo=;
+ b=LxadB5UJADXyZWXHD1qDeWaTmqWxtJ10TRinlPX7IEMWeKz6HFTKLO2Dapgj1ZzmAf
+ 7oML1kgNxZOUeFW94Y1qo1YSnH/c0MbYaMnXU41E7SRuh7o8LWQwlwJishyNur9aBLBX
+ TJrR1x8afsPmB5QNc3p0S41MW0zbDVY1UIO/HRlgRd2VDqVsoDWgvKWuVDvlEa1dC/7u
+ 96TyRES3QDD06caAVo9nq+2OnkAn5Ex+hNasEkSKlHGYCR2eZYnuY4r/ugT4TgbRUM3x
+ 0miDhaeNbWPaBxTYXnWh0tegHb2Y2SP2A9trMNsN86PszvP8BJTlF7TCLMtM0+UJk0Il
+ fY7Q==
+X-Gm-Message-State: AGi0PuYd35xsSE14s2Ybk2bNh/3sV08AI2sc3B65puWJcTq4o5/xO2S1
+ giqgMkBHxol4Pxjym0AYtQQfeQSD/2Qk1vvX2n35iw==
+X-Google-Smtp-Source: APiQypKgDsR6ExCMZZDEqbeKuqUw4RTzMOkLPWYDoANrYTzAkWX7dIyk0HE4TkCFqpip0Jmk+4THJ6BLfEcZDg7fNxA=
+X-Received: by 2002:a9d:2c08:: with SMTP id f8mr2980768otb.135.1587639954975; 
+ Thu, 23 Apr 2020 04:05:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <008a01d6195d$78280570$68781050$@fau.de>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 02:14:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200311040923.29115-1-gshan@redhat.com>
+In-Reply-To: <20200311040923.29115-1-gshan@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Apr 2020 12:05:42 +0100
+Message-ID: <CAFEAcA8jukGvWA1J8k4VvDT=pbeK2X7_GJOKX6Wy0gEy3K_+bA@mail.gmail.com>
+Subject: Re: [PATCH v3] hw/char/pl011: Enable TxFIFO and async transmission
+To: Gavin Shan <gshan@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,48 +88,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: 'Stefan Hajnoczi' <stefanha@gmail.com>,
- 'qemu-devel' <qemu-devel@nongnu.org>, 'qemu block' <qemu-block@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 23, 2020 at 12:53:48PM +0200, janine.schneider@fau.de wrote:
-> Hy again,
->=20
-> okay so now we have an easy way out just in case.
-> But I still want to build an DLL and/or a shared library for integration
-> into the tool. I want the tool to be platform independent and I was
-> already able to build qemu-img as cross build with mingw64. Does anybody
-> have experience in building a qemu library or tried it already?
+On Wed, 11 Mar 2020 at 04:09, Gavin Shan <gshan@redhat.com> wrote:
+>
+> The depth of TxFIFO can be 1 or 16 depending on LCR[4]. The TxFIFO is
+> disabled when its depth is 1. It's nice to have TxFIFO enabled if
+> possible because more characters can be piled and transmitted at once,
+> which would have less overhead. Besides, we can be blocked because of
+> qemu_chr_fe_write_all(), which isn't nice.
+>
+> This enables TxFIFO if possible. On ther other hand, the asynchronous
+> transmission is enabled if needed, as we did in hw/char/cadence_uart.c
+>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+> v3: Use PL011() to do data type conversion
+>     Return G_SOURCE_REMOVE when the backend is disconnected in pl011_xmit()
+>     Drop parenthesis in the condition validating @size in pl011_write_fifo()
+> ---
+>  hw/char/pl011.c         | 105 +++++++++++++++++++++++++++++++++++++---
+>  include/hw/char/pl011.h |   3 ++
+>  2 files changed, 102 insertions(+), 6 deletions(-)
 
-It has been discussed in the past, but general wasn't considered a
-viable, because any apps using it would have to be strictly licensed
-as GPLv2-only. This would prevent the library being used by anything
-that includes GPLv3 code, or obviously from closed source apps. This
-would seriously restrict how useful any library was.
+Thanks for this patch. I have some comments on some bits of the
+code below.
 
-I would also note that QEMU disk code is not robust against malicously
-created disk images. It is possible to create images that inflict
-a denial of service in terms of memory and CPU usage. Thus if an
-application is handling disk images obtained from untrusted users,
-it is desirable for qemu-img to be a separate process, such that
-you can put strict resource limits on it as protection against DoS.
+> diff --git a/hw/char/pl011.c b/hw/char/pl011.c
+> index 13e784f9d9..dccb8c42b0 100644
+> --- a/hw/char/pl011.c
+> +++ b/hw/char/pl011.c
+> @@ -169,6 +169,73 @@ static void pl011_set_read_trigger(PL011State *s)
+>          s->read_trigger = 1;
+>  }
+>
+> +static gboolean pl011_xmit(GIOChannel *chan, GIOCondition cond, void *opaque)
+> +{
+> +    PL011State *s = PL011(opaque);
+> +    int ret;
+> +
+> +    /* Drain FIFO if there is no backend */
+> +    if (!qemu_chr_fe_backend_connected(&s->chr)) {
+> +        s->write_count = 0;
+> +        s->flags &= ~PL011_FLAG_TXFF;
+> +        s->flags |= PL011_FLAG_TXFE;
+> +        return G_SOURCE_REMOVE;
+> +    }
 
-> The tool I want to integrate qemu in is published under GPL itself. And
-> if I am able to build qemu as library I will share it with the community
-> and everybody interested in having it.
+This "handle no backend" code isn't necessary. There was a
+period of time when it was, because some of the qemu_chr_fe_*
+functions did the wrong thing if called on a CharBackend with
+a NULL Chardev, which is why some code in the tree checks it,
+but we fixed that. If there's no backend then both
+qemu_chr_fe_write() and qemu_chr_fe_add_watch() will return 0
+without doing anything, which will make us drain the FIFO
+via the "!s->watch_tag" code path below.
 
+> +
+> +    /* Nothing to do */
+> +    if (!s->write_count) {
+> +        return FALSE;
+> +    }
+> +
+> +    ret = qemu_chr_fe_write(&s->chr, s->write_fifo, s->write_count);
+> +    if (ret > 0) {
+> +        s->write_count -= ret;
+> +        memmove(s->write_fifo, s->write_fifo + ret, s->write_count);
+> +        s->flags &= ~PL011_FLAG_TXFF;
+> +        if (!s->write_count) {
+> +            s->flags |= PL011_FLAG_TXFE;
+> +        }
+> +    }
+> +
+> +    if (s->write_count) {
+> +        s->watch_tag = qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HUP,
+> +                                             pl011_xmit, s);
+> +        if (!s->watch_tag) {
+> +            s->write_count = 0;
+> +            s->flags &= ~PL011_FLAG_TXFF;
+> +            s->flags |= PL011_FLAG_TXFE;
+> +            return FALSE;
+> +        }
+> +    }
+> +
+> +    s->int_level |= PL011_INT_TX;
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Handling of INT_TX is more complicated when the FIFO is
+enabled: the UARTIFLS.TXIFLSEL bits define at what point
+we should raise the TX interrupt as the FIFO drains
+(eg you can make it interrupt as the FIFO passes through
+the "half full" point, or when it gets <= 1/8th full, etc).
+Watch out that the definition is that the interrupt is raised
+as the FIFO fill level progresses through the trigger
+level, which is not the same as "is the FIFO fill level
+less than or equal to the trigger level now?".
 
+> +    pl011_update(s);
+> +    return FALSE;
+> +}
+> +
+> +static void pl011_write_fifo(void *opaque, const unsigned char *buf, int size)
+> +{
+> +    PL011State *s = PL011(opaque);
+> +    int depth = (s->lcr & 0x10) ? 16 : 1;
+> +
+> +    if (size >= depth - s->write_count) {
+> +        size = depth - s->write_count;
+> +    }
+> +
+> +    if (size > 0) {
+> +        memcpy(s->write_fifo + s->write_count, buf, size);
+> +        s->write_count += size;
+> +        if (s->write_count >= depth) {
+> +            s->flags |= PL011_FLAG_TXFF;
+> +        }
+> +        s->flags &= ~PL011_FLAG_TXFE;
+> +    }
+> +
+> +    if (!s->watch_tag) {
+> +        pl011_xmit(NULL, G_IO_OUT, s);
+> +    }
+> +}
+
+It looks like we only ever call pl011_write_fifo() with
+a size of 1 -- should we just make it directly take
+a single 'uint8_t ch' to write to the FIFO? It would
+simplify some of this code I think.
+
+The UARTFR.BUSY bit should be set to 1 as soon as the UART
+gets data into the tx FIFO and then cleared only when the
+data has all been transmitted. We didn't need to worry about
+that when we blocked until the data was sent (the guest could
+not execute at a point where it would see BUSY=1), but now
+we model the tx FIFO we need to update the BUSY bit (both
+in this function to set it and then in anywhere that
+empties the FIFO to clear it).
+
+> +
+>  static void pl011_write(void *opaque, hwaddr offset,
+>                          uint64_t value, unsigned size)
+>  {
+> @@ -179,13 +246,8 @@ static void pl011_write(void *opaque, hwaddr offset,
+>
+>      switch (offset >> 2) {
+>      case 0: /* UARTDR */
+> -        /* ??? Check if transmitter is enabled.  */
+
+This ??? comment is about the fact that we don't check
+UARTCR.TXE (the transmit enable bit). Your patch doesn't
+add support for that (which is fine, it's entirely separate
+from the FIFO stuff), so it shouldn't delete the comment.
+
+>          ch = value;
+> -        /* XXX this blocks entire thread. Rewrite to use
+> -         * qemu_chr_fe_write and background I/O callbacks */
+> -        qemu_chr_fe_write_all(&s->chr, &ch, 1);
+> -        s->int_level |= PL011_INT_TX;
+> -        pl011_update(s);
+> +        pl011_write_fifo(opaque, &ch, 1);
+>          break;
+>      case 1: /* UARTRSR/UARTECR */
+>          s->rsr = 0;
+> @@ -207,7 +269,16 @@ static void pl011_write(void *opaque, hwaddr offset,
+>          if ((s->lcr ^ value) & 0x10) {
+>              s->read_count = 0;
+>              s->read_pos = 0;
+> +
+> +            if (s->watch_tag) {
+> +                g_source_remove(s->watch_tag);
+> +                s->watch_tag = 0;
+> +            }
+> +            s->write_count = 0;
+> +            s->flags &= ~PL011_FLAG_TXFF;
+> +            s->flags |= PL011_FLAG_TXFE;
+>          }
+> +
+>          s->lcr = value;
+>          pl011_set_read_trigger(s);
+>          break;
+> @@ -292,6 +363,24 @@ static const MemoryRegionOps pl011_ops = {
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+>  };
+
+thanks
+-- PMM
 
