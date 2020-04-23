@@ -2,96 +2,75 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C54BC2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 10:44:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD88C2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 10:52:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 177372074F
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 10:44:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 99C3C2084D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 10:52:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F3zHFSJS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 177372074F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="IrZKYDvW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99C3C2084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRZLM-0001gx-A4
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 06:44:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35170)
+	id 1jRZSz-0005FY-P5
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 06:52:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35968)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRZKj-0001B3-4g
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:43:53 -0400
+ (envelope-from <zxq_yx_007@163.com>) id 1jRZSD-0004qE-A6
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:51:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRZKi-0004Hk-BH
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:43:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42699
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRZKh-0004FF-Rg
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:43:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587638630;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Bpp6hbr0UrVbS5RqMZ78rxToJ7J2eWO/p7gvEI7VzJc=;
- b=F3zHFSJSurKuU8AkMHbl+hEJlL+2IFYnTRzIRO26vI3h7SUdvqAvpRyKT7Ian4NSTqdbV7
- zcXQun9OURqudi/w8IAqC00dXma8MMWFW+rm+iikYdBlW9VgxQstQPO9IDrEgartPywTIb
- C8IFgHSHatJbsj/Zd6NotNSNWtlP4z4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-MLPbeMzFMxWjYynfehexDw-1; Thu, 23 Apr 2020 06:43:48 -0400
-X-MC-Unique: MLPbeMzFMxWjYynfehexDw-1
-Received: by mail-wr1-f69.google.com with SMTP id f2so2654933wrm.9
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 03:43:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=F39B6Ts+xUlpDBnNeMGvV+UtHlMajEV3NxM0wy/7W20=;
- b=i0YoNSuknLDHJtkJ9i4+dZY0kZakqnEvXFRSkNBJCJGafjSGz5O19bXebeiIJA62WA
- 9E67uT09hx0cjuVcpluZ4g677VDh4Fjwc/ixrPcm+T6c0alYZGpgS9IvpELZTnQoD0gp
- Npi7n+pZJFkzSYPV5gDWJ732Bq+o9cNcPL2HE6LDHHkXmF1EDEKzepmkD6XpsEfHhx+2
- 7uvFzH9UY7mguGfAIF8rwdVB7NfZM3ZFb4rym19/z4WHQp57BUTeEzY/9Bp+RWLR7SL8
- cvTSoLeUjCzz+iFZT4SYVGaEZ2iWykoTh3bG5+YfJ6exxT17UBvqhTPZf+xsKLJ1XJtf
- 1RFQ==
-X-Gm-Message-State: AGi0Puaasmw8yD1NQUS/EEBQc1hvNp6ARPLp5IzvjIyL1uv7XdoB0IPf
- au7heWGPUdmKRaemPQsT79Wul+KbKO/Pk0QYhUi9ffVc483HgEEsvYUQE+U1VdFImO2bf+2q2uf
- lZXYGbPaPLwxk8vw=
-X-Received: by 2002:adf:9168:: with SMTP id j95mr4040424wrj.145.1587638627052; 
- Thu, 23 Apr 2020 03:43:47 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKqwTXB0xEaJkfSGYJJALGGXeKDFeYOsXKnM28pqZDYAIUacM6QBH4017g4PLDPsPjcuZS25w==
-X-Received: by 2002:adf:9168:: with SMTP id j95mr4040403wrj.145.1587638626843; 
- Thu, 23 Apr 2020 03:43:46 -0700 (PDT)
-Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id n9sm3127249wrx.61.2020.04.23.03.43.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Apr 2020 03:43:46 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] Makefile: Let the 'help' target list the helper targets
-Date: Thu, 23 Apr 2020 12:43:45 +0200
-Message-Id: <20200423104345.5092-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
+ (envelope-from <zxq_yx_007@163.com>) id 1jRZSC-0007Ry-7J
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:51:37 -0400
+Received: from m12-13.163.com ([220.181.12.13]:47834)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <zxq_yx_007@163.com>)
+ id 1jRZSA-0007Mk-On
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:51:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=Subject:From:Message-ID:Date:MIME-Version; bh=avrKX
+ lh7r9JE42tY0xBIT4esbkUqdSAcyVXyUCssfv4=; b=IrZKYDvWXl8CyxPXKyylA
+ tXRtnbcWZg6hojgzGs98nA88p8bzGekHsBWV8F+52AUre/YXOpAXHn/Ue2CHGZfS
+ RZUm+WtpLXwsnU850a8/d+2Y5ullY8R4PoLKrfsK1LVeQHOr9CB/oMARCxjBFYK6
+ U4HorXZsMujhiRtWn8ckK4=
+Received: from [10.11.32.45] (unknown [39.155.168.46])
+ by smtp9 (Coremail) with SMTP id DcCowADn7KQvc6FepKZtBA--.6439S2;
+ Thu, 23 Apr 2020 18:51:27 +0800 (CST)
+Subject: Re: [PATCH v2] qemu-sockets: add abstract UNIX domain socket support
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20200423035640.29202-1-zxq_yx_007@163.com>
+ <20200423090006.GA1077680@redhat.com>
+From: "xiaoqiang.zhao" <zxq_yx_007@163.com>
+Message-ID: <b3f0ebc4-08f5-22e2-ead8-e8651d4b5798@163.com>
+Date: Thu, 23 Apr 2020 18:51:27 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 05:42:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+In-Reply-To: <20200423090006.GA1077680@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID: DcCowADn7KQvc6FepKZtBA--.6439S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxGFyUKrWkuryrKr45XF1rXrb_yoWrWryfpa
+ y5Ka1Dt393JF409rs5uw45GrWSya1rA3yUKwn5J3sYkws0gF1I9F1Iq3WYv347J398K3y7
+ t3yYkry7Z3Z8AwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jGMKZUUUUU=
+X-Originating-IP: [39.155.168.46]
+X-CM-SenderInfo: 520ts5t0bqili6rwjhhfrp/xtbBEAwPxlUMQlUmUgAAsv
+Received-SPF: pass client-ip=220.181.12.13; envelope-from=zxq_yx_007@163.com;
+ helo=m12-13.163.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 06:51:28
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Received-From: 220.181.12.13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,105 +82,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: armbru@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-List the name of the helper targets when calling 'make help',
-along with the tool targets:
+在 2020/4/23 下午5:00, Daniel P. Berrangé 写道:
+> Adding Eric & Markus for QAPI modelling questions
+>
+> On Thu, Apr 23, 2020 at 11:56:40AM +0800, xiaoqiang zhao wrote:
+>> unix_connect_saddr now support abstract address type
+>>
+>> By default qemu does not support abstract UNIX domain
+>> socket address. Add this ability to make qemu handy
+>> when abstract address is needed.
+> Was that a specific app you're using with QEMU that needs this ?
 
-  $ make help
-  [...]
+Thanks for your reply !
 
-  Helper targets:
-    fsdev/virtfs-proxy-helper      - Build virtfs-proxy-helper
-    scsi/qemu-pr-helper            - Build qemu-pr-helper
-    qemu-bridge-helper             - Build qemu-bridge-helper
-    vhost-user-gpu                 - Build vhost-user-gpu
-    virtiofsd                      - Build virtiofsd
+I once use qemu to connect a unix domain socket server (with abstract 
+type address written by android java code)
 
-  Tools targets:
-    qemu-ga                        - Build qemu-ga tool
-    qemu-keymap                    - Build qemu-keymap tool
-    elf2dmp                        - Build elf2dmp tool
-    ivshmem-client                 - Build ivshmem-client tool
-    ivshmem-server                 - Build ivshmem-server tool
-    qemu-nbd                       - Build qemu-nbd tool
-    qemu-storage-daemon            - Build qemu-storage-daemon tool
-    qemu-img                       - Build qemu-img tool
-    qemu-io                        - Build qemu-io tool
-    qemu-edid                      - Build qemu-edid tool
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- configure | 5 +++--
- Makefile  | 9 +++++++--
- 2 files changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/configure b/configure
-index 23b5e93752..caf880c38e 100755
---- a/configure
-+++ b/configure
-@@ -6374,7 +6374,7 @@ if test "$softmmu" =3D yes ; then
-   if test "$linux" =3D yes; then
-     if test "$virtfs" !=3D no && test "$cap_ng" =3D yes && test "$attr" =
-=3D yes ; then
-       virtfs=3Dyes
--      tools=3D"$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
-+      helpers=3D"$helpers fsdev/virtfs-proxy-helper\$(EXESUF)"
-     else
-       if test "$virtfs" =3D yes; then
-         error_exit "VirtFS requires libcap-ng devel and libattr devel"
-@@ -6389,7 +6389,7 @@ if test "$softmmu" =3D yes ; then
-       fi
-       mpath=3Dno
-     fi
--    tools=3D"$tools scsi/qemu-pr-helper\$(EXESUF)"
-+    helpers=3D"$helpers scsi/qemu-pr-helper\$(EXESUF)"
-   else
-     if test "$virtfs" =3D yes; then
-       error_exit "VirtFS is supported only on Linux"
-@@ -7630,6 +7630,7 @@ else
-   QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
- fi
-=20
-+echo "HELPERS=3D$helpers" >> $config_host_mak
- echo "TOOLS=3D$tools" >> $config_host_mak
- echo "ROMS=3D$roms" >> $config_host_mak
- echo "MAKE=3D$make" >> $config_host_mak
-diff --git a/Makefile b/Makefile
-index 8a9113e666..021a0cd491 100644
---- a/Makefile
-+++ b/Makefile
-@@ -336,9 +336,9 @@ $(call set-vpath, $(SRC_PATH))
- LIBS+=3D-lz $(LIBS_TOOLS)
-=20
- vhost-user-json-y =3D
--HELPERS-y =3D
-+HELPERS-y =3D $(HELPERS)
-=20
--HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) =3D qemu-bridge-hel=
-per$(EXESUF)
-+HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) +=3D qemu-bridge-he=
-lper$(EXESUF)
-=20
- ifeq ($(CONFIG_LINUX)$(CONFIG_VIRGL)$(CONFIG_GBM)$(CONFIG_TOOLS),yyyy)
- HELPERS-y +=3D vhost-user-gpu$(EXESUF)
-@@ -1255,6 +1255,11 @@ endif
- =09=09$(foreach t, $(TARGET_DIRS), \
- =09=09$(call print-help-run,$(t)/all,Build for $(t));) \
- =09=09echo '')
-+=09@$(if $(HELPERS-y), \
-+=09=09echo 'Helper targets:'; \
-+=09=09$(foreach t, $(HELPERS-y), \
-+=09=09$(call print-help-run,$(t),Build $(shell basename $(t)));) \
-+=09=09echo '')
- =09@$(if $(TOOLS), \
- =09=09echo 'Tools targets:'; \
- =09=09$(foreach t, $(TOOLS), \
---=20
-2.21.1
+>> Abstract address is marked by prefixing the address name with a '@'.
+> For full support of the abstract namespace we would ned to allow
+> the "sun_path" to contain an arbitrary mix of NULs and non-NULs
+> characters, and allow connect() @addrlen to be an arbitrary size.
+>
+> This patch only allows a single initial NUL, and reqiures @addrlen
+> to be the full size of sun_path, padding with trailing NULs. This
+> limitation is impossible to lift with QEMU's current approach to
+> UNIX sockets, as it relies on passing around a NULL terminated
+> string, so there's no way to have embedded NULs. Since there's
+> no explicit length, we have to chooose between forcing the full
+> sun_path size as @addrlen, or forcing the string length as the
+> @addrlen value.
+>
+> IIUC, socat makes the latter decision by default, but has a
+> flag to switch to the former.
+>
+>    [man socat]
+>    unix-tightsocklen=[0|1]
+>    On  socket  operations,  pass  a  socket  address  length that does not
+>    include the whole struct sockaddr_un record but (besides  other  compo‐
+>    nents)  only  the  relevant  part  of  the filename or abstract string.
+>    Default is 1.
+>    [/man]
+>
+> This actually is supported for both abstract and non-abstract
+> sockets, though IIUC this doesn't make a semantic difference
+> for non-abstract sockets.
+>
+> The point is we have four possible combinations
+>
+>   NON-ABSTRACT + FULL SIZE
+>   NON-ABSTRACT + MINIMAL SIZE  (default)
+>   ABSTRACT + FULL SIZE
+>   ABSTRACT + MINIMAL SIZE  (default)
+>
+> With your patch doing the latter, it means QEMU supports
+> only two combinations
+>
+>    NON+ABSTRACT + FULL SIZE
+>    ABSTRACT + MINIMAL SIZE
+>
+> and also can't use "@somerealpath" for a non-abstract
+> socket, though admittedly this is unlikely.
+>
+> Socat uses a special option to request use of abstract
+> sockets. eg ABSTRACT:somepath, and automatically adds
+> the leading NUL, so there's no need for a special "@"
+> character. This means that UNIX:@somepath still resolves
+> to a filesystem path and not a abstract socket path.
+>
+> Finally, the patch as only added support for connect()
+> not listen(). I think if QEMU wants to support abstract
+> sockets we must do both, and also have unit tests added
+> to tests/test-util-sockets.c
+Yes , I missed these parts.
+>
+>
+> The question is whether we're ok with this simple
+> approach in QEMU, or should do a full approach with
+> more explicit modelling.
+Agree,  more comments is welcome.
+>
+> ie should we change QAPI thus:
+>
+> { 'struct': 'UnixSocketAddress',
+>    'data': {
+>      'path': 'str',
+>      'tight': 'bool',
+>      'abstract': 'bool' } }
+>
+> where 'tight' is a flag indicating whether to set @addrlen
+> to the minimal string length, or the maximum sun_path length.
+> And 'abstract' indicates that we automagically add a leading
+> NUL.
+>
+> This would *not* allow for NULs in the middle of path,
+> but I'm not so bothered about that, since I can't see that
+> being widely used. If we really did need that it could be
+> added via a 'base64': 'bool' flag, to indicate that @path
+> is base64 encoded and thus may contain NULs
+>
+>  From a CLI POV, this could be mapped to QAPI thus
+>
+>   *  -chardev unix:somepath
+>
+>        @path==somepath
+>        @tight==false
+>        @abstract==false
+>
+>   *  -chardev unix:somepath,tight
+>
+>        @path==somepath
+>        @tight==true
+>        @abstract==false
+>
+>   *  -chardev unix-abstract:somepath
+>
+>        @path==somepath
+>        @tight==false
+>        @abstract==true
+>
+>   *  -chardev unix-abstract:somepath,tight
+>
+>        @path==somepath
+>        @tight==true
+>        @abstract==true
+>
+>
+>
+> Regards,
+> Daniel
 
 
