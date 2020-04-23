@@ -2,80 +2,85 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F53DC54FCB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 15:19:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11989C54FCB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 15:20:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8C38206EC
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 15:19:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8C38206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id CE2A2206EC
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 15:20:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BN7REdJU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE2A2206EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRddO-00021y-SU
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 11:19:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47160)
+	id 1jRde7-0003AQ-1Q
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 11:20:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47194)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jonathan.derrick@intel.com>) id 1jRdcG-0000mG-Dj
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:18:16 -0400
+ (envelope-from <eblake@redhat.com>) id 1jRdcN-0000w3-Ru
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:18:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <jonathan.derrick@intel.com>) id 1jRdcF-0003xr-F1
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:18:15 -0400
-Received: from mga18.intel.com ([134.134.136.126]:15939)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jonathan.derrick@intel.com>)
- id 1jRdcE-0003oI-Kp
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:18:15 -0400
-IronPort-SDR: kguTZ79BJUYgBC+dvi8yqJxGXvkBG64kPK/d9WbG6sVzrkbHw/pTSsFlSepC5GMwzA7stQQn/V
- c4tSh8yIxVlw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Apr 2020 08:18:10 -0700
-IronPort-SDR: zYEizug2f5pEgxBz0iBF5IN2GkdmOTUfaVcntlAZ2uiPCMykRTIFm63MPB9b9M9RfzEfWF0+6J
- NErz0qlayTWQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,307,1583222400"; d="scan'208";a="430357474"
-Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
- by orsmga005.jf.intel.com with ESMTP; 23 Apr 2020 08:18:10 -0700
-Received: from orsmsx111.amr.corp.intel.com (10.22.240.12) by
- ORSMSX101.amr.corp.intel.com (10.22.225.128) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 23 Apr 2020 08:18:10 -0700
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.204]) by
- ORSMSX111.amr.corp.intel.com ([169.254.12.140]) with mapi id 14.03.0439.000;
- Thu, 23 Apr 2020 08:18:10 -0700
-From: "Derrick, Jonathan" <jonathan.derrick@intel.com>
-To: "hch@infradead.org" <hch@infradead.org>
-Subject: Re: [PATCH 0/1] KVM support for VMD devices
-Thread-Topic: [PATCH 0/1] KVM support for VMD devices
-Thread-Index: AQHWGMupFPgnPdV8d0yMVvPmd3oXgKiGsTeAgACXUwA=
-Date: Thu, 23 Apr 2020 15:18:10 +0000
-Message-ID: <f58982d0d37f86c8cf4d8769d42bea284e0c2825.camel@intel.com>
-References: <20200422171444.10992-1-jonathan.derrick@intel.com>
- <20200423061631.GA12688@infradead.org>
-In-Reply-To: <20200423061631.GA12688@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.255.1.180]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2693A69249AB774DABEBE1A7DBFD60BC@intel.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <eblake@redhat.com>) id 1jRdcC-0003s1-QQ
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:18:23 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59176
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jRdcC-0003mN-Bo
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:18:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587655090;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VEHE7BuLQDAdTK6kvU9kHt3ElIKIsUSzN1sLVT7wQHQ=;
+ b=BN7REdJUwkuYpm4Y99oHnkl8mcoEULfJwy16U6x8aW4rl9zYaJ9EWoQlpnP5eDNp+6FrFi
+ cg1Fp18d5h/MZCIvmhCM/CIP/dcntx7XdVY+cvUjMCPLFWtbGx1nZwR763FFU16NyOfXhy
+ 61cKALwSbp/2mkHXnlweWUxdlopmi6c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-96-k-n0ew1lMrG1T_xc7GWCjA-1; Thu, 23 Apr 2020 11:18:04 -0400
+X-MC-Unique: k-n0ew1lMrG1T_xc7GWCjA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B87F107B7C3;
+ Thu, 23 Apr 2020 15:18:03 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 048141002381;
+ Thu, 23 Apr 2020 15:18:01 +0000 (UTC)
+Subject: Re: [PATCH v6 04/10] qcow2: Support BDRV_REQ_ZERO_WRITE for truncate
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200423150127.142609-1-kwolf@redhat.com>
+ <20200423150127.142609-5-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <b9d97ddb-b13d-637a-1848-1d93a2d44736@redhat.com>
+Date: Thu, 23 Apr 2020 10:18:00 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Received-SPF: pass client-ip=134.134.136.126;
- envelope-from=jonathan.derrick@intel.com; helo=mga18.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 11:18:11
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 134.134.136.126
+In-Reply-To: <20200423150127.142609-5-kwolf@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 03:23:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,31 +92,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "lorenzo.pieralisi@arm.com" <lorenzo.pieralisi@arm.com>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "virtualization@lists.linux-foundation.org"
- <virtualization@lists.linux-foundation.org>,
- "helgaas@kernel.org" <helgaas@kernel.org>, "Jakowski,
- Andrzej" <andrzej.jakowski@intel.com>
+Cc: vsementsov@virtuozzo.com, berto@igalia.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T24gV2VkLCAyMDIwLTA0LTIyIGF0IDIzOjE2IC0wNzAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
-ZToNCj4gT24gV2VkLCBBcHIgMjIsIDIwMjAgYXQgMDE6MTQ6NDRQTSAtMDQwMCwgSm9uIERlcnJp
-Y2sgd3JvdGU6DQo+ID4gVGhlIHR3byBwYXRjaGVzIChMaW51eCAmIFFFTVUpIGFkZCBzdXBwb3J0
-IGZvciBwYXNzdGhyb3VnaCBWTUQgZGV2aWNlcw0KPiA+IGluIFFFTVUvS1ZNLiBWTUQgZGV2aWNl
-IDI4QzAgYWxyZWFkeSBzdXBwb3J0cyBwYXNzdGhyb3VnaCBuYXRpdmVseSBieQ0KPiA+IHByb3Zp
-ZGluZyB0aGUgSG9zdCBQaHlzaWNhbCBBZGRyZXNzIGluIGEgc2hhZG93IHJlZ2lzdGVyIHRvIHRo
-ZSBndWVzdA0KPiA+IGZvciBjb3JyZWN0IGJyaWRnZSBwcm9ncmFtbWluZy4NCj4gPiANCj4gPiBU
-aGUgUUVNVSBwYXRjaCBlbXVsYXRlcyB0aGUgMjhDMCBtb2RlIGJ5IGNyZWF0aW5nIGEgc2hhZG93
-IHJlZ2lzdGVyIGFuZA0KPiA+IGFkdmVydGlzaW5nIGl0cyBzdXBwb3J0IGJ5IHVzaW5nIFFFTVUn
-cyBzdWJzeXN0ZW0gdmVuZG9yL2lkLg0KPiA+IFRoZSBMaW51eCBwYXRjaCBtYXRjaGVzIHRoZSBR
-RU1VIHN1YnN5c3RlbSB2ZW5kb3IvaWQgdG8gdXNlIHRoZSBzaGFkb3cNCj4gPiByZWdpc3Rlci4N
-Cj4gDQo+IFBsZWFzZSBwaWNrIGEgZGlmZmVyZW50IFBDSSBJRCBmb3IgUWVtdSB2cyByZWFsIGhh
-cmR3YXJlIHNvIHRoYXQgd2UNCj4gY2FuIHByb3Blcmx5IHF1aXJrIHRoZW0gaWYgdGhleSBlbmQg
-dXAgYmVoYXZpbmcgZGlmZmVyZW50bHkgZHVlIHRvDQo+IGhhcmR3YXJlIG9yIHNvZnR3YXJlIGJ1
-Z3MuDQoNClN1cmUuIFdpbGwgbG9vayBpbnRvIHRoYXQuDQpUaGFua3MgQ2hyaXN0b3BoDQoNCkpv
-bg0K
+On 4/23/20 10:01 AM, Kevin Wolf wrote:
+> If BDRV_REQ_ZERO_WRITE is set and we're extending the image, calling
+> qcow2_cluster_zeroize() with flags=0 does the right thing: It doesn't
+> undo any previous preallocation, but just adds the zero flag to all
+> relevant L2 entries. If an external data file is in use, a write_zeroes
+> request to the data file is made instead.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   block/qcow2-cluster.c |  2 +-
+>   block/qcow2.c         | 33 +++++++++++++++++++++++++++++++++
+>   2 files changed, 34 insertions(+), 1 deletion(-)
+> 
+
+> +    if ((flags & BDRV_REQ_ZERO_WRITE) && offset > old_length) {
+> +        uint64_t zero_start = QEMU_ALIGN_UP(old_length, s->cluster_size);
+> +
+> +        /*
+> +         * Use zero clusters as much as we can. qcow2_cluster_zeroize()
+> +         * requires a cluster-aligned start. The end may be unaligned if it is
+> +         * at the end of the image (which it is here).
+> +         */
+> +        ret = qcow2_cluster_zeroize(bs, zero_start, offset - zero_start, 0);
+> +        if (ret < 0) {
+> +            error_setg_errno(errp, -ret, "Failed to zero out new clusters");
+> +            goto fail;
+> +        }
+> +
+> +        /* Write explicit zeros for the unaligned head */
+> +        if (zero_start > old_length) {
+> +            uint8_t *buf = qemu_blockalign0(bs, s->cluster_size);
+> +            QEMUIOVector qiov;
+> +            qemu_iovec_init_buf(&qiov, buf, zero_start - old_length);
+> +
+> +            qemu_co_mutex_unlock(&s->lock);
+> +            ret = qcow2_co_pwritev_part(bs, old_length, qiov.size, &qiov, 0, 0);
+
+This works, but would it be any more efficient to use 
+qcow2_co_pwrite_zeroes?  If the head of the cluster is already zero, 
+then qcow2_co_pwrite_zeroes can turn into qcow2_cluster_zeroize for this 
+cluster, while qcow2_co_pwritev_part cannot.
+
+Because what you have works, and because we can use 
+qcow2_co_pwrite_zeroes as an optimization in a later patch,
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
