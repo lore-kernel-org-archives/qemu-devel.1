@@ -2,87 +2,100 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA340C54FD0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:21:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C956C54FCB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:22:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEE5D20724
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:21:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34A5420724
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:22:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZxCVaVAT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEE5D20724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iEVNq40P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34A5420724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRiM6-0004PY-Fn
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:21:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54928)
+	id 1jRiN3-0006s1-4S
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:22:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55340)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jRiKg-0002bs-JH
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:20:27 -0400
+ (envelope-from <philmd@redhat.com>) id 1jRiLq-0004Wg-EO
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jRiKW-0001ZU-IA
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:20:26 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42240)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jRiKV-0001V7-WE
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:20:16 -0400
-Received: by mail-wr1-x441.google.com with SMTP id j2so8173297wrs.9
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 13:20:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=uzNcoSaHAxnC2uxrv5wEs3MnYadshJL173MPoerjSJs=;
- b=ZxCVaVATqzDtxHkVpAKLax76QNbBsWfQpnKnJWtP+DLiZEBDJ7CgaLxI/kgGWewESr
- LJQjrBkLRqiYQkWkf+4Jc5IBiM8mMJuaNUZJXJlyZUDacgULXT83Jnkrl2Nzq/NhvjWR
- i3A648MXV2kO4aT6YxcwNGKQFi2Ouv86uOaPKO6losOWBiGK+x3s0pIlgIQldUM3GL+h
- iZDIYlynL7Yx0BYItyJW8Y0/nVXO0pkw8U7fCX0vdqL59lx2sQbm3q/UuzyoU7mPyWUX
- RC1kwZmhqLXo43zLfQwUb0xBkYkNXzcWzUsdkMEeXA2YBlWN35hllZvP4AgtwTOgYmRa
- CmrA==
+ (envelope-from <philmd@redhat.com>) id 1jRiLp-0003NY-Qv
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:38 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42270
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRiLp-0003MA-DG
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587673296;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lWM/RJA0i40F5Z53mX1T7pyIQA7QZZS8Zjo3NsXhoDY=;
+ b=iEVNq40P6wP9QoCAQQY4jjNZ1FozCfgbvN8duz8YH6uDLegBhpfIevGnlhk34dmV79/E0R
+ 4KtopLs8QXJo0KHw6HqRZ8qD2Upl0ts5sTNYI02dyvN4bjJokwXsKbZCrgY7idMd3yZHjj
+ X6LXZ369cJzwBNpIpZdLgp+ViKAzZvw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-459-fzLF-ChiMy60w7RlaDbyMQ-1; Thu, 23 Apr 2020 16:21:30 -0400
+X-MC-Unique: fzLF-ChiMy60w7RlaDbyMQ-1
+Received: by mail-wm1-f69.google.com with SMTP id l21so2678273wmh.2
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 13:21:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=uzNcoSaHAxnC2uxrv5wEs3MnYadshJL173MPoerjSJs=;
- b=eBsj8ANdf7YtdPLE9VdmbUcln9CV6Z+Z5xDY+C4xi3hQ0NCnaYTnCqLrLhdJ3puRr1
- BMPbkIulrbgepFxjFlJ3p4OtVwuvoUi0MWrYTIPGObOUId1eHLim0e5MrmnyaoZav3Qq
- 99tkO/hpgcurZ/ViZYsUB+vIXqUViElB99eGOEF41meD5vsZQ+A+tR+onOYYOiVxh0kx
- e4o2eZiz3IEIEkt2oXSjLTaGJ4jPZpwjlzB4Ufi4M/fBwdKazSubMGDnFc+1+fvamhF5
- NO/mno5vgdD6PEMr9LnH3hbEE6bU9RWY1vpvMofX1oBE5+EPueZlRXcMsktBSHQsNi7f
- GTiw==
-X-Gm-Message-State: AGi0Pubf7iXshLDoDBEdMbQBzZjTGmTBMFfmj28iNRGoaMTcA6RxwAZI
- ume42hAwSzBZTVNwa3N9Kjq6bbdW8bS1hw==
-X-Google-Smtp-Source: APiQypKZMh/f0iwH4Fxvz1muefMi8nuA1G6xiow7VLVE5+E9mVK8rDQfWDzAWUPK1yy1KWUhowNVMg==
-X-Received: by 2002:a5d:6b86:: with SMTP id n6mr6697619wrx.113.1587673213824; 
- Thu, 23 Apr 2020 13:20:13 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id u127sm5149308wme.8.2020.04.23.13.20.12
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=zlQoC138vjAdmXDl+ROR3VD/b5fkegrhyYTGSi8r/AQ=;
+ b=gB4PDBK4pHSPWgvxVDRh+cUpvgFEe8T9uRB7zfB3GBYlr9ctKW0in7WA8dZGbuqC0+
+ KlyKOrNoRB1i1m6nBy4n6gyMdmpjj1wEa9eT2I15bmETHnNs3y0/6XkxA2KdEUZr5V21
+ OeFMUlQVbn9Mllui8WqGN4CIJx3EZ0n39yajsrvuRR8PpItGL/6JWe+js1O4LDcelHNo
+ DRmsjIhbhQnbTDfioq4sfbQSd8PxdYEFJzGWGCtXvNng3LYzzzM9SrwQWOGY5s1m+WMl
+ LKxqQzfAiNLHx3cWojn3iq7YUMog0Es09EJ1WKClB0L32Ujs7JsyfuSRrusdLhK98DsR
+ 0RXw==
+X-Gm-Message-State: AGi0PuaEQRgWbrfQWH9FwIoM0liRnv1gQhsUTgwaaBy5pYtEHfDYvDnT
+ 1IqyMSJbIjHakpHJDX3q8uFVSVQ4Z8PL3Emx2dmUAzCP1UURGiAAwNse0O4GdpbuATS59k75HIM
+ Bly50GY902UFKJhY=
+X-Received: by 2002:a5d:4a4b:: with SMTP id v11mr6624662wrs.32.1587673288973; 
+ Thu, 23 Apr 2020 13:21:28 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJN1qnQfPBFb0dFeE83NkorCQvfG9XAh3cXULj8Jgig3pv5hagQ7MeOQCT1YqdPrEDkditbqw==
+X-Received: by 2002:a5d:4a4b:: with SMTP id v11mr6624640wrs.32.1587673288700; 
+ Thu, 23 Apr 2020 13:21:28 -0700 (PDT)
+Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id c190sm5335974wme.10.2020.04.23.13.21.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Apr 2020 13:20:13 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org,
-	qemu-trivial@nongnu.org
-Subject: [PATCH] elf_ops: Don't try to g_mapped_file_unref(NULL)
-Date: Thu, 23 Apr 2020 21:20:11 +0100
-Message-Id: <20200423202011.32686-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ Thu, 23 Apr 2020 13:21:28 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/7] tests/test-char: Remove unused "chardev/char-mux.h"
+ include
+Date: Thu, 23 Apr 2020 22:21:07 +0200
+Message-Id: <20200423202112.644-3-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200423202112.644-1-philmd@redhat.com>
+References: <20200423202112.644-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::441
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 02:14:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,54 +107,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Randy Yates <yates@ieee.org>
+Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+ John G Johnson <john.g.johnson@oracle.com>,
+ Jagannathan Raman <jag.raman@oracle.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Calling g_mapped_file_unref() on a NULL pointer is not valid, and
-glib will assert if you try it.
+This test never required "chardev/char-mux.h", remove it.
 
-$ qemu-system-arm -M virt -display none -device loader,file=/tmp/bad.elf
-qemu-system-arm: -device loader,file=/tmp/bad.elf: GLib: g_mapped_file_unref: assertion 'file != NULL' failed
-
-(One way to produce an ELF file that fails like this is to copy just
-the first 16 bytes of a valid ELF file; this is sufficient to fool
-the code in load_elf_ram_sym() into thinking it's an ELF file and
-calling load_elf32() or load_elf64().)
-
-The failure-exit path in load_elf can be reached from various points
-in execution, and for some of those we haven't yet called
-g_mapped_file_new_from_fd().  Add a condition to the unref call so we
-only call it if we successfully created the GMappedFile to start with.
-
-This will fix the assertion; for the specific case of the generic
-loader it will then fall back from "guess this is an ELF file" to
-"maybe it's a uImage or a hex file" and eventually to "just load as
-a raw data file".
-
-Reported-by: Randy Yates <yates@ieee.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/hw/elf_ops.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tests/test-char.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-index e0bb47bb678..398a4a2c85b 100644
---- a/include/hw/elf_ops.h
-+++ b/include/hw/elf_ops.h
-@@ -606,7 +606,9 @@ static int glue(load_elf, SZ)(const char *name, int fd,
-         *highaddr = (uint64_t)(elf_sword)high;
-     ret = total_size;
-  fail:
--    g_mapped_file_unref(mapped_file);
-+    if (mapped_file) {
-+        g_mapped_file_unref(mapped_file);
-+    }
-     g_free(phdr);
-     return ret;
- }
--- 
-2.20.1
+diff --git a/tests/test-char.c b/tests/test-char.c
+index 3afc9b1b8d..f08a39790e 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -6,7 +6,6 @@
+ #include "qemu/option.h"
+ #include "qemu/sockets.h"
+ #include "chardev/char-fe.h"
+-#include "chardev/char-mux.h"
+ #include "sysemu/sysemu.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-commands-char.h"
+--=20
+2.21.1
 
 
