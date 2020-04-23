@@ -2,70 +2,88 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C195C54FD0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:18:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 356BFC54FD0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:19:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D562F2071C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:18:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D562F2071C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 01C222071C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:19:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M5fHbaOP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01C222071C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRgQt-00035z-U4
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 14:18:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57948)
+	id 1jRgRh-0004Sj-65
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 14:19:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57984)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jRgQH-0002SZ-3V
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:18:05 -0400
+ (envelope-from <eblake@redhat.com>) id 1jRgQc-0002sc-Be
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:18:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jRgQG-0000K7-Ca
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:18:04 -0400
-Resent-Date: Thu, 23 Apr 2020 14:18:04 -0400
-Resent-Message-Id: <E1jRgQG-0000K7-Ca@eggs.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21361)
+ (envelope-from <eblake@redhat.com>) id 1jRgQa-00010h-SW
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:18:25 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28027
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jRgQF-0000Ha-SX
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:18:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1587665879; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Lfql5SGh/uyN1kNqLoUL1m00MLWjPdyqLV3Q+6bvXwSRHpFkiwApuHZvTlm63PH8qdWAdrcV046JyhRHSl5XU/n9cPrXfcvxC8VfESy/SjUIV8WK8grlFCnWR5qpf/CN5V4ZQi9QBiGMPz3UA7KKZqdLQHsXhUN4iUJpPXGlytI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1587665879;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=oIVH+EcqA3NHSuU5q/znZblSLPkM2Af01KJSiHQyQhA=; 
- b=AygppIsurjbHIPwY0M5jIqK78rykiFiDG0n2kf0/hBEziX3T1Pdw1ycfcCQPXgYz6nmrgUerAB7118CmLqidXL3N3w/Bx3EScpQJHRiJJs3/nLSP9I4eGba1yxGH+3t67OCmWIsLNxdltDGbF8L7TsxthixKDF5NUekvOLhjcx0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 158766587782240.43015617939386;
- Thu, 23 Apr 2020 11:17:57 -0700 (PDT)
-In-Reply-To: <20200423170557.31106-1-alex.bennee@linaro.org>
-Subject: Re: [PATCH for 5.1 v1 00/14] guest_base, gdbstub and Travis
-Message-ID: <158766587683.10590.2989731040751262090@39012742ff91>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jRgQa-0000xq-FA
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:18:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587665903;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+xtdrzsF04zvBFlNFveofitFAjCVODi73AWwr6171FA=;
+ b=M5fHbaOPC8T/IgW4zPUvYeJnb9DC/n01qc2ZwRYHtqvtKAyj60jqE93cVH3JHftieyrA2j
+ x/157ZqvBuFJ+mdYLFdwm3w6gS6LZjhiEAWJrBRmuKWhq1nxfl+wxwQowoYGTcipknzfUy
+ iz1UQJqb6YzVT1SynrYCmV7FsEwf5yY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-122-rW-P051YOVuxgQjDd9RoNQ-1; Thu, 23 Apr 2020 14:18:19 -0400
+X-MC-Unique: rW-P051YOVuxgQjDd9RoNQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32D15800FC7;
+ Thu, 23 Apr 2020 18:18:18 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 948776084C;
+ Thu, 23 Apr 2020 18:18:17 +0000 (UTC)
+Subject: Re: [PATCH 10/13] qapi: Clean up visitor's recovery from input with
+ invalid type
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200423160036.7048-1-armbru@redhat.com>
+ <20200423160036.7048-11-armbru@redhat.com>
+ <435f2d5d-e732-a236-bf13-991d5c3510e6@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <89636246-6a5c-476d-6016-977f39cb653c@redhat.com>
+Date: Thu, 23 Apr 2020 13:18:04 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alex.bennee@linaro.org
-Date: Thu, 23 Apr 2020 11:17:57 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 14:15:20
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 136.143.188.53
+In-Reply-To: <435f2d5d-e732-a236-bf13-991d5c3510e6@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 03:23:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,31 +95,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQyMzE3MDU1Ny4zMTEw
-Ni0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
-ZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGlu
-ZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5z
-dGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9
-MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9
-MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKQ2xlYXJlZCBkaXJlY3Rv
-cnkgJ3NsaXJwJwpTdWJtb2R1bGUgJ3NsaXJwJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2xp
-YnNsaXJwLmdpdCkgdW5yZWdpc3RlcmVkIGZvciBwYXRoICdzbGlycCcKU3VibW9kdWxlICd1aS9r
-ZXljb2RlbWFwZGInIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQva2V5Y29kZW1hcGRiLmdpdCkg
-dW5yZWdpc3RlcmVkIGZvciBwYXRoICd1aS9rZXljb2RlbWFwZGInCm1ha2VbMV06ICoqKiBbL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXJoaWc5OXNfL3NyYy9kb2NrZXItc3JjLjIwMjAtMDQt
-MjMtMTQuMTUuNTYuMTI3NzZdIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92
-YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1yaGlnOTlzXy9zcmMnCm1ha2U6ICoqKiBbZG9ja2Vy
-LXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgMm0wLjkyN3MKdXNlciAg
-ICAwbTUuMjc1cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
-b3JnL2xvZ3MvMjAyMDA0MjMxNzA1NTcuMzExMDYtMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnL3Rl
-c3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 4/23/20 1:06 PM, Eric Blake wrote:
+> On 4/23/20 11:00 AM, Markus Armbruster wrote:
+>> An alternate type's visit_type_FOO() fails when it runs into an
+>> invalid ->type.=C2=A0 If it's an input visit, we then need to free the t=
+he
+>> object we got from visit_start_alternate().=C2=A0 We do that with
+>> qapi_free_FOO(), which uses the dealloc visitor.
+>>
+>> Trouble is that object is in a bad state: its ->type is invalid.=C2=A0 S=
+o
+>> the dealloc visitor will run into the same error again, and the error
+>> recovery skips deallocating the alternate's (invalid) alternative.
+>> This is a roundabout way to g_free() the alternate.
+>>
+>> Simplify: replace the qapi_free_FOO() by g_free().
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>> =C2=A0 scripts/qapi/visit.py | 2 +-
+>> =C2=A0 1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>=20
+> Required looking at what gets generated into qapi_free_FOO() as well as=
+=20
+> when visit_start_alternate() can fail, but makes sense.
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Actually, I'm having second thoughts.  As an example, look at the generated=
+:
+
+> void visit_type_BlockDirtyBitmapMergeSource(Visitor *v, const char *name,=
+ BlockDirtyBitmapMergeSource **obj, Error **errp)
+> {
+>     Error *err =3D NULL;
+>=20
+>     visit_start_alternate(v, name, (GenericAlternate **)obj, sizeof(**obj=
+),
+>                           &err);
+>     if (err) {
+>         goto out;
+>     }
+>     if (!*obj) {
+>         goto out_obj;
+[1]
+>     }
+>     switch ((*obj)->type) {
+>     case QTYPE_QSTRING:
+>         visit_type_str(v, name, &(*obj)->u.local, &err);
+[2]
+>         break;
+>     case QTYPE_QDICT:
+>         visit_start_struct(v, name, NULL, 0, &err);
+>         if (err) {
+>             break;
+[3]
+>         }
+>         visit_type_BlockDirtyBitmap_members(v, &(*obj)->u.external, &err)=
+;
+>         if (!err) {
+>             visit_check_struct(v, &err);
+[4]
+>         }
+>         visit_end_struct(v, NULL);
+>         break;
+>     case QTYPE_NONE:
+>         abort();
+>     default:
+>         error_setg(&err, QERR_INVALID_PARAMETER_TYPE, name ? name : "null=
+",
+>                    "BlockDirtyBitmapMergeSource");
+[5]
+>     }
+> out_obj:
+>     visit_end_alternate(v, (void **)obj);
+>     if (err && visit_is_input(v)) {
+>         qapi_free_BlockDirtyBitmapMergeSource(*obj);
+
+If we got here, we must have failed at any of the points mentioned above.
+
+If [1], visit_start_alternate() failed, but *obj is NULL and both=20
+qapi_free_FOO(NULL) and g_free(NULL) are safe.
+
+If [2], visit_type_str() failed, so *obj is allocated but the embedded=20
+string (here, u.local) was left NULL.  qapi_free_FOO() then does nothing=20
+further than g_free(obj).
+
+If [3], visit_start_struct() failed, the embedded dict (here,=20
+u.external) was left NULL.  qapi_free_FOO() then does nothing further=20
+than g_free(obj).
+
+If [5], we have the wrong ->type.  As pointed out by this commit,=20
+qapi_free_FOO() does nothing further than g_free(obj).
+
+But what happens in [4]?  Here, the embedded dict was allocated, but we=20
+then failed while parsing its members.  That leaves us in a=20
+partially-allocated state, and g_free(NULL) does NOT recursively visit=20
+that partial allocation.  I think this patch is prone to a memory leak=20
+unless you _also_ patch things to free any dict branch on failure=20
+(perhaps during the QTYPE_QDICT case label, rather than here at the end).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
