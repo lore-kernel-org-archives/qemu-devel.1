@@ -2,88 +2,89 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8315BC54FCB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9FE6C54FD0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:52:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D08720736
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:42:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A62E12076C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:52:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LWQtEU8q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D08720736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r9p5K7sk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A62E12076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRfs2-00044P-E2
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 13:42:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52264)
+	id 1jRg13-0003H6-O0
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 13:52:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRfrB-0003IK-JG
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:41:50 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jRg09-00021o-3H
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:51:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRfrA-00060H-S6
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:41:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57409
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jRfrA-0005wk-FB
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:41:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587663707;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Z/cy06ZgYPwipgpfZq2y7z+/hre090Excv1poYQfl/E=;
- b=LWQtEU8qv957Rnv05JySRihOE+qMl2dH7BINy0JvqrsqlSKcMWpI0+NKTLZNQKvn0Jwmxo
- /FsG8BK+XiRzNQyIH9PcH6fAHr66biRrKoe2gh9qN3fvILCaXeL1tq2Hp+7yTmuaFhxGPY
- x3Ahmw4UoWFYnwVstVNBwxlxf2/5KqA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-E5ZUFtRMMMGae62AREvAug-1; Thu, 23 Apr 2020 13:41:44 -0400
-X-MC-Unique: E5ZUFtRMMMGae62AREvAug-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E145818FF661;
- Thu, 23 Apr 2020 17:41:43 +0000 (UTC)
-Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 41369196AE;
- Thu, 23 Apr 2020 17:41:43 +0000 (UTC)
-Subject: Re: [PATCH] qcow2: Allow resize of images with internal snapshots
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-References: <20200422205355.274706-1-eblake@redhat.com>
- <af50e0f6-3d78-ee51-5540-97fb0fc08f9b@redhat.com>
- <cee813a7-1540-aaa3-b8e1-98dbc84e90ff@redhat.com>
- <0c3d69a7-9095-9f03-f83a-c527e0751880@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <ade97dfc-a9c7-4f5d-7211-6a80f736e11d@redhat.com>
-Date: Thu, 23 Apr 2020 12:41:42 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <peter.maydell@linaro.org>) id 1jRg05-0000gy-5Y
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:51:04 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:34703)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jRg04-0000gZ-OA
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:51:00 -0400
+Received: by mail-ot1-x344.google.com with SMTP id 72so7622051otu.1
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 10:51:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=QBl/1uXw+Q2w6cFkx/zgJOnbYRA+7r+ZtVCu0o5uRxQ=;
+ b=r9p5K7skW9BshD2lRFrJfNdhPg8sR0iCp8Lb7aHME0oDOKDoZ1gAngzORYFePjsJO0
+ 3ihpaXA69VQISGLP/+YWWe9vgPq0Z9dfD9VXm1lmb8IxeQTSBxKvbjeuQUiQPUsDFH/h
+ UV4HWoem8CY1gMtba71umMU+TlDcHO/DwU4JaxvyEWUy6RF7VVIHYmyIEX0rsitkTgf2
+ QscXqb1DU3xinJ1JZ8fKn9HaVvBd1Ck6zVfeB5He8Fh+zl0XGQpVtrvhhG8nl7EGq10h
+ Hj9FdD6Gx5/yYEU/3R3wkZ9KpB/VR1y+DyJQEPbLcuX3qLfmSn4vQDOAaJ4yHfddYtVi
+ IFIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=QBl/1uXw+Q2w6cFkx/zgJOnbYRA+7r+ZtVCu0o5uRxQ=;
+ b=ZjyfA3FZ1KzYLpqeVo292QihpxcXjtQAfJht0Riwn+hByN8jZfHKh7zqCaMu3eEMbU
+ ezrHEW80W2N0AnVc5VIMTkway8DULJfmxlbQkDsNH7j813X3fV/YQKHTW8S3WmuBAggP
+ pvGLxsJAnykUAyDm4/+/3AZwo7umaLYThuLU5I20Z+a7coIW8IBDoOie5O4/SfU4JiEZ
+ aRDlviV+QScNCEdV9u7UITTCNXrgSze+OA4ULHO+FUruY1MQ6hr+P2TST8gxcdO9htr+
+ yefFYJ58+t8pwU+zYgCdhYvHUADLFARLg3kESGo+ZJzkM6gcix9Ki5ct2jsk28DFgXJS
+ SnCw==
+X-Gm-Message-State: AGi0PuY1GkDtj9kMB9B0tE2na/+E77vs1aW0BH2olqb2DZJmsmCRcOUs
+ 10suk60UoFdXBzRRwYaE2J41T7MS29XhC43/VslJUQ==
+X-Google-Smtp-Source: APiQypIXpq2bnk3+QERWRoTO0+IY5IZEA71/iVVWjk01YgDtkWbykP9veAd9kj3tNvR9SSDN4cu4mgQ317Jj+JqCuws=
+X-Received: by 2002:aca:3441:: with SMTP id b62mr2586894oia.146.1587664259273; 
+ Thu, 23 Apr 2020 10:50:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0c3d69a7-9095-9f03-f83a-c527e0751880@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 06:43:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200312193616.438922-1-crosa@redhat.com>
+ <CAFEAcA-zRw7kzwzXxPmLaUqwOrQLwW9BymOJ34iJOOTCUAf=xg@mail.gmail.com>
+ <20200317141257.GA5724@localhost.localdomain>
+ <CAFEAcA9W4KXN6dcT0CNyD_mQ3xY5wDmJ7i0wowhaG2XPmyMYng@mail.gmail.com>
+ <87sgi49uf6.fsf@dusky.pond.sub.org>
+ <CAFEAcA_dcVneQ4Hj61GAkYRCUSMrA=QjwnAXccoBwjUjOE-wSQ@mail.gmail.com>
+ <529508877.9650370.1587661453005.JavaMail.zimbra@redhat.com>
+ <20200423171322.GJ1077680@redhat.com>
+ <348064782.9653447.1587663408130.JavaMail.zimbra@redhat.com>
+In-Reply-To: <348064782.9653447.1587663408130.JavaMail.zimbra@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Apr 2020 18:50:47 +0100
+Message-ID: <CAFEAcA_mytLVYUNSOJMUZfSwWXER_x=EPvT0vd3txdTpMhwjPA@mail.gmail.com>
+Subject: Re: [PATCH 0/5] QEMU Gating CI
+To: Cleber Rosa <crosa@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,107 +96,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "open list:qcow2" <qemu-block@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Wainer Moschetta <wmoschet@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/23/20 12:21 PM, Max Reitz wrote:
+On Thu, 23 Apr 2020 at 18:37, Cleber Rosa <crosa@redhat.com> wrote:
+> We're already using the shared x86 runners, but with a different goal.  The
+> goal of the "Gating CI" is indeed to expand on non-x86 environments.  We're
+> in a "chicken and egg" kind of situation, because we'd like to prove that
+> GitLab CI will allow QEMU to expand to very different runners and jobs, while
+> not really having all that hardware setup and publicly available at this time.
 
->>> The previous comment was incorrect as well, but actually
->>> qcow2_truncate_bitmaps_check() doesn=E2=80=99t return an error when the=
-re is any
->>> bitmap, but only if there are non-active bitmaps, or active bitmaps tha=
-t
->>> cannot be modified.=C2=A0 So for non-disabled bitmaps, we generally do
->>> happily proceed.
->>
->> The comment change is collateral (only because I noticed it in the
->> diff); but I could indeed reword it slightly more accurately as:
->>
->> Check if bitmaps prevent a resize.=C2=A0 Although bitmaps can be resized=
-,
->> there are situations where we don't know whether to set or clear new
->> bits, so for now it's easiest to just prevent resize in those cases.
->=20
-> But I don=E2=80=99t know whether that explanation is actually correct.  I=
- mean,
-> that would apply for enabled active bitmaps just as well.  But we do
-> allow resizing an image with such bitmaps so it seems clear that we have
-> some idea on what to do.  (Or at least we pretend we do, for better or
-> worse).
->=20
-> (Which is that bdrv_dirty_bitmap_truncate() just calls
-> hbitmap_truncate(), which fills the new space with zeroes.)
->=20
-> The real reason we can=E2=80=99t resize with certain kinds of bitmaps pre=
-sent
-> seems more like:
-> (1) There are some bitmaps that can=E2=80=99t be written to, but we=E2=80=
-=99d have to if
-> we wanted to resize the image and they=E2=80=99re persistent,
-> (2) The second case are bitmaps that are persistent but present in
-> memory; we just haven=E2=80=99t implemented that case, I presume.
->=20
-> So it seems less like a case of =E2=80=9CWe don=E2=80=99t know what to do=
-=E2=80=9D, but more a
-> combination of =E2=80=9CWe can=E2=80=99t=E2=80=9C and =E2=80=9CWe haven=
-=E2=80=98t implemented this case, but
-> it=E2=80=99s clear what to do if we did=E2=80=9D.
+We do have the S390 machine that IBM kindly made available to
+the project -- that is not a personal or Linaro machine, so
+there are no issues with giving you a login on that so you
+can set it up as a CI runner. Drop me an email if you want
+access to it.
 
-Indeed. So definitely a reason to split this change to a separate patch=20
-(and/or fix the code to finally implement it)
-
-
->>> Speaking of the image size.=C2=A0 Is it intentional that the size is ch=
-anged
->>> to 32 MB?=C2=A0 Should amend work more like a transaction, in that we s=
-hould
->>> at least do a loose check on whether the options can be changed before
->>> we touch the image?
->>
->> Yes, the commit message tried to call it out.=C2=A0 It's a pre-existing
->> problem - during amend, we DO make changes to the disk in one step, with
->> no way to roll back those changes, even if a later step fails.
->>
->> Pre-patch, if you request an upgrade to v3 as well as a resize, but
->> resize fails, you still end up with the image being changed to v3.
->> That's no different from post-patch where if you request a resize and a
->> downgrade to v2, the resize happens but not the downgrade.=C2=A0 On the
->> bright side, our current failure scenarios at least leave the resulting
->> image viable, even if it is not the same as it was pre-attempt.
->=20
-> Yes.  OK.
-
-Okay, v2 will have a better commit message.
-
-
-> Yeah.  I don=E2=80=99t think anyone even would have realistic use for
-> transactional amends.  I suppose all users can easily split their amend
-> calls with multiple options into multiple amends in the order that would
-> be most likely reversible, if something went wrong along the way.  (And
-> that also works.  I.e., downgrading/upgrading is probably the most easy
-> to revert, but maybe you can only downgrade if your image has the
-> correct size, so you potentially need to truncate it first.  OTOH, I
-> can=E2=80=99t imagine many people actually use qemu-img amend to downgrad=
-e qcow2
-> images anyway...)
-
-Indeed - any time that you worry that an interaction of multiple changes=20
-might fail half-way through, you can always serialize those changes=20
-yourself instead of hoping the tool sequences them correctly ;)
-
-
-> I feel very much reminded of the LUKS keyslot discussion...
->=20
-> (That is to say, my thoughts on this have little to do with this
-> specific patch at this point.)
-
-Too true !
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+thanks
+-- PMM
 
