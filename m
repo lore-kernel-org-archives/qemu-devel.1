@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21428C2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 04:18:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F4EBC54FD0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 04:18:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7A842075A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 04:18:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CB362075A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 04:18:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TbroXgDz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7A842075A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sP5kH2aO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CB362075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35377 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRTJJ-0004gJ-V9
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 00:18:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49544)
+	id 1jRTJO-0004qE-5G
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 00:18:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49250)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jRTGa-0000a6-9d
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:13 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jRTG2-0007uO-Ci
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:14:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jRTGY-0007VT-13
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:12 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:54922)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jRTG0-0006LJ-Nh
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:14:37 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:54560)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jRTGX-0007PO-FF
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:09 -0400
+ id 1jRTG0-0006Fn-5J
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:14:36 -0400
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03N4DrTR064872;
- Thu, 23 Apr 2020 04:15:02 GMT
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03N4ETnc065354;
+ Thu, 23 Apr 2020 04:14:29 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2020-01-29;
- bh=dxYbdIUGdXKT2zwuEDJxPzAQcyHoUEiQaxfTDL0Km+Y=;
- b=TbroXgDz1ceW9ZFEx5kvd938yE18c2i20S/AH21O5Lr6c7j/ntwAkDduR2x5bK+wDNBH
- TbitN76hZYeGUFFYNrSOdZezNQMm09bUKt3sZFWdVQL7gVlLdqXgyrz2GFNatgMdz+GQ
- dDVw0ekRwH9X+HeKbVpC/0kDoUkMFH00hj+klaJLDFUNrHSMF1rI9N5vU0v2K0pcdsKv
- GX+aqJB+fkQMlSL2Y3TM/W8JSpMDcfzCbrvvcy1p5vPdHNi7HK4ur0VFsr1Q5L0Uekbl
- IzaaGonMj9+vNSF1gmcAYVJrd1hwM8LXqD9+4phDGBNUymIppuzSR6rEDc8AsKPvfJQI Ig== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2130.oracle.com with ESMTP id 30grpgtrt4-1
+ bh=J4QIewf9KqeLSaoTnd4LY7QKhX4e71+vNusGAW5X1Dc=;
+ b=sP5kH2aOqGZDb4ihBgN1LUAklF6S+GKs0iRy5qbA9LdmshSD40N5hXu9XOLZvohuyjMt
+ r9cTPX5/sWe6uDoCBz/DmgmaVJPnmtj4qzm/Hq5mzO/XaHjgyqbu7JiyUncH0Z3q0pIR
+ hrpIjSwZG7MKfNhaK5Lbx0g6FxClouBCAz84pc+98GJnpd94fzNjij8+BhDrRwsIKtoB
+ u5hMEj3cGDWuaP7yuaBHpC11jIABV14Md4u+s0XoiMo5Zv0DugUmFxuT1r0tpgbyCHah
+ N2vPfIjWpVHENi/uSwAxxLi6qaIBu29lQBKmwCQYdl4uD06/lzGlwD2o7J8IEn1l3raf SQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 30grpgtrs6-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 23 Apr 2020 04:15:02 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03N4CJM1089454;
- Thu, 23 Apr 2020 04:15:02 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3030.oracle.com with ESMTP id 30gb1ku83h-1
+ Thu, 23 Apr 2020 04:14:29 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03N4Dejk169001;
+ Thu, 23 Apr 2020 04:14:28 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3020.oracle.com with ESMTP id 30gb942ggp-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 23 Apr 2020 04:15:01 +0000
+ Thu, 23 Apr 2020 04:14:28 +0000
 Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03N4F0rn020828;
- Thu, 23 Apr 2020 04:15:00 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03N4ERie017639;
+ Thu, 23 Apr 2020 04:14:27 GMT
 Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 22 Apr 2020 21:14:59 -0700
+ with ESMTP ; Wed, 22 Apr 2020 21:14:27 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v6 19/36] multi-process: Connect Proxy Object with
- device in the remote process
-Date: Wed, 22 Apr 2020 21:13:54 -0700
-Message-Id: <fc69772e2a3c5269052c3f1994045a3b3689f949.1587614626.git.elena.ufimtseva@oracle.com>
+Subject: [PATCH RESEND v6 05/36] multi-process: Refactor monitor functions out
+ of vl.c
+Date: Wed, 22 Apr 2020 21:13:40 -0700
+Message-Id: <22a91b836f4105dc314f24536e96f883c0ad638c.1587614626.git.elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.25.GIT
 In-Reply-To: <cover.1587614626.git.elena.ufimtseva@oracle.com>
 References: <cover.1587614626.git.elena.ufimtseva@oracle.com>
@@ -79,16 +79,16 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9599
  signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- suspectscore=3 spamscore=0
- mlxlogscore=999 mlxscore=0 malwarescore=0 bulkscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004230027
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ adultscore=0
+ bulkscore=0 suspectscore=1 malwarescore=0 phishscore=0 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004230027
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9599
  signatures=668686
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
  mlxscore=0
- lowpriorityscore=0 adultscore=0 suspectscore=3 bulkscore=0 clxscore=1015
+ lowpriorityscore=0 adultscore=0 suspectscore=1 bulkscore=0 clxscore=1015
  malwarescore=0 phishscore=0 spamscore=0 priorityscore=1501 impostorscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004230027
@@ -120,178 +120,136 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jagannathan Raman <jag.raman@oracle.com>
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Send a message to the remote process to connect PCI device with the
-corresponding Proxy object in QEMU
+Some of the initialization helper functions w.r.t monitor
+in vl.c are also used by the remote process. Therefore, these functions
+are refactored into shared files that both QEMU & remote process
+could use.
 
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/proxy/qemu-proxy.c    | 34 +++++++++++++++++++++++++++++++
- include/io/mpqemu-link.h |  5 +++++
- io/mpqemu-link.c         |  3 +++
- remote/remote-main.c     | 43 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 85 insertions(+)
+ include/monitor/monitor.h |  3 +++
+ monitor/monitor.c         | 37 +++++++++++++++++++++++++++++++++++++
+ softmmu/vl.c              | 35 -----------------------------------
+ 3 files changed, 40 insertions(+), 35 deletions(-)
 
-diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-index 40bf56fd37..9b5e429a88 100644
---- a/hw/proxy/qemu-proxy.c
-+++ b/hw/proxy/qemu-proxy.c
-@@ -17,11 +17,45 @@
- static void proxy_set_socket(Object *obj, const char *str, Error **errp)
- {
-     PCIProxyDev *pdev = PCI_PROXY_DEV(obj);
-+    DeviceState *dev = DEVICE(obj);
-+    MPQemuMsg msg = { 0 };
-+    int wait, fd[2];
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index 1018d754a6..3803e904f2 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -48,4 +48,7 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
+ void monitor_fdset_dup_fd_remove(int dup_fd);
+ int64_t monitor_fdset_dup_fd_find(int dup_fd);
  
-     pdev->socket = atoi(str);
++int mon_init_func(void *opaque, QemuOpts *opts, Error **errp);
++void monitor_parse(const char *optarg, const char *mode, bool pretty);
++
+ #endif /* MONITOR_H */
+diff --git a/monitor/monitor.c b/monitor/monitor.c
+index 125494410a..88423b38b6 100644
+--- a/monitor/monitor.c
++++ b/monitor/monitor.c
+@@ -35,6 +35,8 @@
+ #include "sysemu/qtest.h"
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
++#include "qemu/cutils.h"
++#include "qemu/config-file.h"
  
-     mpqemu_init_channel(pdev->mpqemu_link, &pdev->mpqemu_link->com,
-                         pdev->socket);
+ /*
+  * To prevent flooding clients, events can be throttled. The
+@@ -611,6 +613,41 @@ void monitor_init_globals_core(void)
+                                    NULL);
+ }
+ 
++int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
++{
++    return monitor_init_opts(opts, errp);
++}
 +
-+    if (socketpair(AF_UNIX, SOCK_STREAM, 0, fd)) {
-+        error_setg(errp, "Failed to create socket for device channel");
-+        return;
-+    }
++void monitor_parse(const char *optarg, const char *mode, bool pretty)
++{
++    static int monitor_device_index;
++    QemuOpts *opts;
++    const char *p;
++    char label[32];
 +
-+    wait = GET_REMOTE_WAIT;
-+
-+    msg.cmd = CONNECT_DEV;
-+    msg.bytestream = 1;
-+    msg.data2 = (uint8_t *)g_strdup(dev->id);
-+    msg.size = sizeof(msg.data2);
-+    msg.num_fds = 2;
-+    msg.fds[0] = wait;
-+    msg.fds[1] = fd[1];
-+
-+    mpqemu_msg_send(&msg, pdev->mpqemu_link->com);
-+
-+    if (wait_for_remote(wait)) {
-+        error_setg(errp, "Failed to connect device to the remote");
-+        close(fd[0]);
++    if (strstart(optarg, "chardev:", &p)) {
++        snprintf(label, sizeof(label), "%s", p);
 +    } else {
-+        mpqemu_init_channel(pdev->mpqemu_link, &pdev->mpqemu_link->dev,
-+                            fd[0]);
++        snprintf(label, sizeof(label), "compat_monitor%d",
++                 monitor_device_index);
++        opts = qemu_chr_parse_compat(label, optarg, true);
++        if (!opts) {
++            error_report("parse error: %s", optarg);
++            exit(1);
++        }
 +    }
 +
-+    PUT_REMOTE_WAIT(wait);
-+
-+    close(fd[1]);
-+
-+    g_free(msg.data2);
- }
- 
- static void proxy_init(Object *obj)
-diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
-index 73cc59b874..ebae9afc45 100644
---- a/include/io/mpqemu-link.h
-+++ b/include/io/mpqemu-link.h
-@@ -38,6 +38,7 @@
- typedef enum {
-     INIT = 0,
-     SYNC_SYSMEM,
-+    CONNECT_DEV,
-     MAX,
- } mpqemu_cmd_t;
- 
-@@ -120,8 +121,12 @@ struct MPQemuLinkState {
-     GMainLoop *loop;
- 
-     MPQemuChannel *com;
-+    MPQemuChannel *dev;
- 
-     mpqemu_link_callback callback;
-+
-+    void *opaque;
-+    QemuThread thread;
- };
- 
- MPQemuLinkState *mpqemu_link_create(void);
-diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
-index 3f81cef96e..f780b65181 100644
---- a/io/mpqemu-link.c
-+++ b/io/mpqemu-link.c
-@@ -46,6 +46,9 @@ MPQemuLinkState *mpqemu_link_create(void)
-     MPQemuLinkState *link = MPQEMU_LINK(object_new(TYPE_MPQEMU_LINK));
- 
-     link->com = NULL;
-+    link->dev = NULL;
-+
-+    link->opaque = NULL;
- 
-     return link;
- }
-diff --git a/remote/remote-main.c b/remote/remote-main.c
-index dbd6ad2529..f541baae6a 100644
---- a/remote/remote-main.c
-+++ b/remote/remote-main.c
-@@ -35,6 +35,9 @@
- #include "exec/ramlist.h"
- #include "remote/remote-common.h"
- 
-+static void process_msg(GIOCondition cond, MPQemuLinkState *link,
-+                        MPQemuChannel *chan);
-+
- static MPQemuLinkState *mpqemu_link;
- 
- gchar *print_pid_exec(gchar *str)
-@@ -48,6 +51,43 @@ gchar *print_pid_exec(gchar *str)
-     return str;
- }
- 
-+#define LINK_TO_DEV(link) ((PCIDevice *)link->opaque)
-+
-+static gpointer dev_thread(gpointer data)
-+{
-+    MPQemuLinkState *link = data;
-+
-+    mpqemu_start_coms(link, link->dev);
-+
-+    return NULL;
-+}
-+
-+static void process_connect_dev_msg(MPQemuMsg *msg)
-+{
-+    char *devid = (char *)msg->data2;
-+    MPQemuLinkState *link = NULL;
-+    DeviceState *dev = NULL;
-+    int wait = msg->fds[0];
-+    int ret = 0;
-+
-+    dev = qdev_find_recursive(sysbus_get_default(), devid);
-+    if (!dev) {
-+        ret = 0xff;
-+        goto exit;
++    opts = qemu_opts_create(qemu_find_opts("mon"), label, 1, &error_fatal);
++    qemu_opt_set(opts, "mode", mode, &error_abort);
++    qemu_opt_set(opts, "chardev", label, &error_abort);
++    if (!strcmp(mode, "control")) {
++        qemu_opt_set_bool(opts, "pretty", pretty, &error_abort);
++    } else {
++        assert(pretty == false);
 +    }
-+
-+    link = mpqemu_link_create();
-+    link->opaque = (void *)PCI_DEVICE(dev);
-+
-+    mpqemu_init_channel(link, &link->dev, msg->fds[1]);
-+    mpqemu_link_set_callback(link, process_msg);
-+    qemu_thread_create(&link->thread, "dev_thread", dev_thread, link,
-+                       QEMU_THREAD_JOINABLE);
-+
-+exit:
-+    notify_proxy(wait, ret);
++    monitor_device_index++;
 +}
 +
- static void process_msg(GIOCondition cond, MPQemuLinkState *link,
-                         MPQemuChannel *chan)
+ int monitor_init(MonitorOptions *opts, bool allow_hmp, Error **errp)
  {
-@@ -72,6 +112,9 @@ static void process_msg(GIOCondition cond, MPQemuLinkState *link,
-     switch (msg->cmd) {
-     case INIT:
-         break;
-+    case CONNECT_DEV:
-+        process_connect_dev_msg(msg);
-+        break;
-     default:
-         error_setg(&err, "Unknown command in %s", print_pid_exec(pid_exec));
-         goto finalize_loop;
+     Chardev *chr;
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 6e35f3787d..abc746c1b5 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -2045,41 +2045,6 @@ static int fsdev_init_func(void *opaque, QemuOpts *opts, Error **errp)
+ }
+ #endif
+ 
+-static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
+-{
+-    return monitor_init_opts(opts, errp);
+-}
+-
+-static void monitor_parse(const char *optarg, const char *mode, bool pretty)
+-{
+-    static int monitor_device_index = 0;
+-    QemuOpts *opts;
+-    const char *p;
+-    char label[32];
+-
+-    if (strstart(optarg, "chardev:", &p)) {
+-        snprintf(label, sizeof(label), "%s", p);
+-    } else {
+-        snprintf(label, sizeof(label), "compat_monitor%d",
+-                 monitor_device_index);
+-        opts = qemu_chr_parse_compat(label, optarg, true);
+-        if (!opts) {
+-            error_report("parse error: %s", optarg);
+-            exit(1);
+-        }
+-    }
+-
+-    opts = qemu_opts_create(qemu_find_opts("mon"), label, 1, &error_fatal);
+-    qemu_opt_set(opts, "mode", mode, &error_abort);
+-    qemu_opt_set(opts, "chardev", label, &error_abort);
+-    if (!strcmp(mode, "control")) {
+-        qemu_opt_set_bool(opts, "pretty", pretty, &error_abort);
+-    } else {
+-        assert(pretty == false);
+-    }
+-    monitor_device_index++;
+-}
+-
+ struct device_config {
+     enum {
+         DEV_USB,       /* -usbdevice     */
 -- 
 2.25.GIT
 
