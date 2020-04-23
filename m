@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B1FC54FD0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12568C54FD0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:53:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 642342073A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:52:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD8C92073A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:53:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GcDO49uX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 642342073A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W4xSaQRb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD8C92073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRipU-0004bw-IP
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:52:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60032)
+	id 1jRiqP-0005mT-0d
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:53:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33928)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jRigz-0007St-KC
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:43:30 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jRipI-0004f8-89
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:52:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jRigk-0003fC-Fk
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:43:29 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:56171)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jRipG-0003vP-KF
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:52:04 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:56250)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jRigk-0003bY-11
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:43:14 -0400
-Received: by mail-wm1-x341.google.com with SMTP id e26so8093722wmk.5
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 13:43:13 -0700 (PDT)
+ id 1jRipG-0003uX-4m
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:52:02 -0400
+Received: by mail-wm1-x341.google.com with SMTP id e26so8118061wmk.5
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 13:52:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=zp4Q+x86Gu3y75i2SV75beEga6P0Ez8SPwHhkxLlBv8=;
- b=GcDO49uXByJs9niokG90uSKRL0r+CZaFXXlXJDr5NNfgy3GfyUt33/77S6JNzPnk+e
- 7A51oA0V6B1u+X46tnkd6KiC+gWIBhc35DuojWSo5GbeFv7Vzt0QEJpLpQiCAofQoAkO
- RZxE/06T+QpoDF5sWvoW90Uh36g6Px9aSit3Sk2+38LhVilf7HayAfXkZitSRFSrGqCh
- KFw6bfcmxxl0ZAHCgnjRXnHWPXzL9njFj98H9b6ei0Jv+SyyuzlBG9nKAcvPJLC57VJu
- U98UD/c6oWJEyIDUaxDUOpz1yPfkW8oP2FRlIvdhbuas9EEqs4JOxZSoBQraAQ+jVRD8
- jHOA==
+ bh=xI/7UGSbUDidCuMybls+r4oADxm2z0eT7aFVuZj77jI=;
+ b=W4xSaQRb1jl0QgtKxrzF7AZRwR2iffCAsln4yffvb/tkMnfW6bCJIk8Ql4r+jUeGGa
+ 6pCkn8Kw4ELqbaamPvpo/rJ09f+UKS9DAak8HWBZBtqmPILAFn4B+2UHy9jSfMflDbha
+ HEbmsyRe4Zjh0BVvkdDG7i2yDHYG7hqclm2fY+GHraYlgAHe8ABk8HobSC34og9+nveD
+ H+CS1KjWH1Ohlgk08DEWaCl10037ay+mAp4vbc6gcAMa9ARETdsZ3L2zu9Z21PgkHxi3
+ BJ+hzUdmP3pObvGqoTLPGyrJFpOfE65eS2aRZd2OguhErrF6TgwiUe2a5ITmRbE0LxSM
+ RwIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=zp4Q+x86Gu3y75i2SV75beEga6P0Ez8SPwHhkxLlBv8=;
- b=lSX7SfR2XIMrmr+W28rYbYvJ/YTjMPyUPSzAi9zRAQC3h/WNDTCtI4Tw0fWtThbBAT
- Wllii9HHlC2ZKkmdySG+IZBKsdXkbp3V3aMP2exMSR9FXKNr9MnSV3CUGFrAw2ehHvT5
- XhWY0DB0NwC23x+HSWvRZ3FrN7os95nj98EnUESK0C/ouZaWWx1asDO3jGuQvoyPtRoc
- P+0PN26OS9CIppalSp0Latp6kfO/A6obfB+jsXWP+pOpEwSomPv67fkhGBowgEawOMz+
- iIdQmyPHV2gTD8kgVWTp66nK4GpYGtP6p9C6tpN6kP4idyvNVtby0FXvfQ7Zz+DOTxWz
- fkwg==
-X-Gm-Message-State: AGi0PuYV4Zp3m0p34CcgvZ3Bv2r2iqRUhGSU3ZOW92Bbardmd6DAcaP1
- uZfeH+zFV76FyeUhEU8UjxEK0/tqZUwDuMRzO64=
-X-Google-Smtp-Source: APiQypIC0KZjdJ/Ni9Aon4dvkIL1aEy0Bc/tBoOpfgb1vxpvNils7IJRaVnvPTBdKDMQJ6XVXzY/AgDGQpnoNjoGejw=
-X-Received: by 2002:a1c:e284:: with SMTP id z126mr6370699wmg.32.1587674592455; 
- Thu, 23 Apr 2020 13:43:12 -0700 (PDT)
+ bh=xI/7UGSbUDidCuMybls+r4oADxm2z0eT7aFVuZj77jI=;
+ b=jYGYrxkMjPzThHMtozTmg8fFL3drvkq26hyzkhUnCXYZWpsjsb53cQS3LHJYaD1aAI
+ 0DZ73J8N287o3krd20XcSTZOyQhKlKSAyrhxEd10uR9+gM4a3JRvfhKNcQRFN/VWHErS
+ 7PfFPFYheImKp82ipwvmnLKCIYpaxFaBECe/znQOG/ioAH7Wfr1lWxNe8MfowwTw+IZ/
+ 9cUqe1wZNhTd1L9jsismXuDTObX97eLCK6l8NAWiWz94XquqNHCmtzw98f5SbyG1ZiwS
+ u3zc899C+xutjtsw5La7r9MCDDb8hAM7z4h0z4+Nx6lzfitKqa7qNmCaB4LmrQO3/ocK
+ 2LCA==
+X-Gm-Message-State: AGi0PuY5GqQ4qx6A3igNez+5G3fd3nBxxhz5szENprqVkAXNXszeq5D6
+ n22lK10Rwmyb76sh+vYPag7O9bGGpTeEZ71Dh40=
+X-Google-Smtp-Source: APiQypL93iFO65FNrvRaRIY9OtO4OY9+gRPEV3xNSp3U0yKrOc1/W9RVA5QLDAB2RNBlnlwD99JyIUYLHxeGVYjnQAg=
+X-Received: by 2002:a1c:7301:: with SMTP id d1mr6470936wmb.26.1587675118538;
+ Thu, 23 Apr 2020 13:51:58 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200423202112.644-1-philmd@redhat.com>
- <20200423202112.644-7-philmd@redhat.com>
-In-Reply-To: <20200423202112.644-7-philmd@redhat.com>
+ <20200423202112.644-4-philmd@redhat.com>
+In-Reply-To: <20200423202112.644-4-philmd@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 23 Apr 2020 22:43:00 +0200
-Message-ID: <CAJ+F1C+TkuCeSwO8Mm5k-+2JJtuph_BiPVDQFYJ2q_+DL8X37g@mail.gmail.com>
-Subject: Re: [PATCH 6/7] stubs: Split machine-init-done as machine-init and
- machine-notify
+Date: Thu, 23 Apr 2020 22:51:46 +0200
+Message-ID: <CAJ+F1CJpdU=S6zQg5J=8gYDzR1GmgbzDZqVFkaigd-vbSLbPsw@mail.gmail.com>
+Subject: Re: [PATCH 3/7] chardev: Restrict msmouse / wctablet / testdev to
+ system emulation
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -105,9 +105,8 @@ Sender: "Qemu-devel"
 On Thu, Apr 23, 2020 at 10:22 PM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
-> As the machine notify handlers are only used in system emulation,
-> split the current file in two, and only build the notifier when
-> system emulation is used.
+> The msmouse / wctablet / testdev character devices are only
+> used by system emulation. Remove them from user mode and tools.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -115,53 +114,22 @@ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  stubs/machine-init.c                            | 4 ++++
->  stubs/{machine-init-done.c =3D> machine-notify.c} | 2 --
->  stubs/Makefile.objs                             | 3 ++-
->  3 files changed, 6 insertions(+), 3 deletions(-)
->  create mode 100644 stubs/machine-init.c
->  rename stubs/{machine-init-done.c =3D> machine-notify.c} (78%)
+>  chardev/Makefile.objs | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/stubs/machine-init.c b/stubs/machine-init.c
-> new file mode 100644
-> index 0000000000..7622930ee0
-> --- /dev/null
-> +++ b/stubs/machine-init.c
-> @@ -0,0 +1,4 @@
-> +#include "qemu/osdep.h"
-> +#include "sysemu/sysemu.h"
-> +
-> +bool machine_init_done =3D true;
-> diff --git a/stubs/machine-init-done.c b/stubs/machine-notify.c
-> similarity index 78%
-> rename from stubs/machine-init-done.c
-> rename to stubs/machine-notify.c
-> index cd8e81392d..d164ecccb9 100644
-> --- a/stubs/machine-init-done.c
-> +++ b/stubs/machine-notify.c
-> @@ -1,8 +1,6 @@
->  #include "qemu/osdep.h"
->  #include "sysemu/sysemu.h"
+> diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
+> index d68e1347f9..15ee7f47da 100644
+> --- a/chardev/Makefile.objs
+> +++ b/chardev/Makefile.objs
+> @@ -17,7 +17,7 @@ chardev-obj-y +=3D char-udp.o
+>  chardev-obj-$(CONFIG_WIN32) +=3D char-win.o
+>  chardev-obj-$(CONFIG_WIN32) +=3D char-win-stdio.o
 >
-> -bool machine_init_done =3D true;
-> -
->  void qemu_add_machine_init_done_notifier(Notifier *notify)
->  {
->  }
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index 45be5dc0ed..765659a3f9 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -15,7 +15,8 @@ stub-obj-y +=3D iothread-lock.o
->  stub-obj-y +=3D is-daemonized.o
->  stub-obj-$(CONFIG_LINUX_AIO) +=3D linux-aio.o
->  stub-obj-$(CONFIG_LINUX_IO_URING) +=3D io_uring.o
-> -stub-obj-y +=3D machine-init-done.o
-> +stub-obj-y +=3D machine-init.o
-> +stub-obj-$(CONFIG_SOFTMMU) +=3D machine-notify.o
->  stub-obj-y +=3D migr-blocker.o
->  stub-obj-y +=3D change-state-handler.o
->  stub-obj-y +=3D monitor.o
+> -common-obj-y +=3D msmouse.o wctablet.o testdev.o
+> +common-obj-$(CONFIG_SOFTMMU) +=3D msmouse.o wctablet.o testdev.o
+>  common-obj-$(CONFIG_BRLAPI) +=3D baum.o
+>  baum.o-cflags :=3D $(SDL_CFLAGS)
+>  baum.o-libs :=3D $(BRLAPI_LIBS)
 > --
 > 2.21.1
 >
