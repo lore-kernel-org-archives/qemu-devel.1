@@ -2,89 +2,77 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 887EFC54FD0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E818EC55191
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:42:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D44A2071C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:34:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AFB86205C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:42:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F+jGGJ0V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D44A2071C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="x49Wa++E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFB86205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRgfx-00086Z-Lv
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 14:34:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59862)
+	id 1jRgnS-0002wE-Kh
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 14:42:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32778)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRgeB-0007Pd-OE
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:32:28 -0400
+ (envelope-from <dimastep@yandex-team.ru>) id 1jRglu-00014i-EG
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:40:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRgeA-0005nR-RB
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:32:27 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39779
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jRgeA-0005cS-4t
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:32:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587666742;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0MsDB9qQHD1BvwtKwHlT/a+a8mX4bJlU6V8Z9+dUw08=;
- b=F+jGGJ0VqyYzm1cx73ssx/oclMZuN6qlANlDxyf4H/2l3QJ/0ADnIEVmCG4sdCYiBVk9cW
- vEhsAecTqd/xHzI6s+ANOcVi0xg2I7CWh7YOa+ztfw3s27WbBgBLUk/yGIUbk14S/4S9SJ
- nfW2jcqT9TqYHHJWGNcH5qbzNnw4LJE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-95MUyD5EOKK9tMTOvo3fgg-1; Thu, 23 Apr 2020 14:32:06 -0400
-X-MC-Unique: 95MUyD5EOKK9tMTOvo3fgg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE10B87308E;
- Thu, 23 Apr 2020 18:32:04 +0000 (UTC)
-Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 51E9860300;
- Thu, 23 Apr 2020 18:32:03 +0000 (UTC)
-Subject: Re: [PATCH 12/13] qapi: Only input visitors can actually fail
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200423160036.7048-1-armbru@redhat.com>
- <20200423160036.7048-13-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <232e5c07-53e8-1157-820f-cd3d69bf23e6@redhat.com>
-Date: Thu, 23 Apr 2020 13:31:50 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200423160036.7048-13-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 02:14:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+ (envelope-from <dimastep@yandex-team.ru>) id 1jRglu-00043O-0I
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:40:26 -0400
+Received: from forwardcorp1p.mail.yandex.net
+ ([2a02:6b8:0:1472:2741:0:8b6:217]:46730)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1jRglq-0003fs-8R; Thu, 23 Apr 2020 14:40:22 -0400
+Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
+ [IPv6:2a02:6b8:0:1a2d::301])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id EC2A02E14B9;
+ Thu, 23 Apr 2020 21:40:13 +0300 (MSK)
+Received: from vla5-58875c36c028.qloud-c.yandex.net
+ (vla5-58875c36c028.qloud-c.yandex.net [2a02:6b8:c18:340b:0:640:5887:5c36])
+ by mxbackcorp1o.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ vUYIJ9wYTp-eAJKdAF1; Thu, 23 Apr 2020 21:40:13 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1587667213; bh=ZaBwB72CLvi112lt4BeCdDiyv+131Kk2SnWC3/I46hE=;
+ h=Message-Id:Date:Subject:To:From:Cc;
+ b=x49Wa++ErtAPlK60Bu428nh6nvegbwRm+CnEN7J18KIMXrhKFtKoN0ERbcfMH7+Ni
+ Ce/LvuXG7vyrfxONZmDyOqZyHcn8duvVH3FeXUrTQA1iC6Mg0al4hAEkkMVPAOYRYI
+ AvY/23UU7rspMdaE5i0Dk6Qj5JZbhjFNUNXKtWoY=
+Authentication-Results: mxbackcorp1o.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b081:1313::1:e])
+ by vla5-58875c36c028.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ 7hClKENKMK-eAXe7IkW; Thu, 23 Apr 2020 21:40:10 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+ (Client certificate not present)
+From: Dima Stepanov <dimastep@yandex-team.ru>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH v1 0/7] vhost-user reconnect issues during vhost
+ initialization
+Date: Thu, 23 Apr 2020 21:39:31 +0300
+Message-Id: <cover.1587667007.git.dimastep@yandex-team.ru>
+X-Mailer: git-send-email 2.7.4
+Received-SPF: pass client-ip=2a02:6b8:0:1472:2741:0:8b6:217;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 14:40:14
+X-ACL-Warn: Detected OS   = ???
+X-Received-From: 2a02:6b8:0:1472:2741:0:8b6:217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,32 +81,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mdroth@linux.vnet.ibm.com
+Cc: fam@euphon.net, kwolf@redhat.com, yc-core@yandex-team.ru,
+ qemu-block@nongnu.org, mst@redhat.com, jasowang@redhat.com,
+ dgilbert@redhat.com, mreitz@redhat.com, arei.gonglei@huawei.com,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ raphael.norwitz@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/23/20 11:00 AM, Markus Armbruster wrote:
-> The previous few commits have made this more obvious, and removed the
-> one exception.  Time to clarify the documentation, and drop dead error
-> checking.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
+During vhost-user reconnect functionality we hit several issues, if
+vhost-user-blk daemon is "crashed" or made disconnect during vhost
+initialization. The general scenario is as follows:
+  - vhost start routine is called
+  - vhost write failed due to SIGPIPE
+  - this call the disconnect routine and vhost_dev_cleanup routine
+    which set to 0 all the field of the vhost_dev structure
+  - return back to vhost start routine with the error
+  - on the fail path vhost start routine tries to rollback the changes
+    by using vhost_dev struct fields which were already reset
+  - sometimes this leads to SIGSEGV, sometimes to SIGABRT
+Before revising the vhost-user initialization code, we suggest adding
+the sanity checks to be aware of the possible disconnect event and that
+the vhost_dev structure can be in "uninitialized" state.
 
-I guess the only other failures an output visitor might encounter are 
-out-of-memory, or invalid contents (such as a NaN in a 'number', or 
-invalid encoding in a string...), and aborting on those errors at the 
-point they happen rather than trying to return errp makes sense.
+The vhost-user-blk daemon is updated with the additional
+"--simulate-disconnect-stage=CASENUM" argument to simulate disconnect during
+VHOST device initialization. For instance:
+  1. $ ./vhost-user-blk -s ./vhost.sock -b test-img.raw --simulate-disconnect-stage=1
+     This command will simulate disconnect in the SET_VRING_CALL handler.
+     In this case the vhost device in QEMU is not set the started field to
+     true.
+  2. $ ./vhost-user-blk -s ./vhost.sock -b test-img.raw --simulate-disconnect-stage=2
+     This command will simulate disconnect in the SET_VRING_NUM handler.
+     In this case the started field is set to true.
+These two cases test different QEMU parts. Also to trigger different code paths
+disconnect should be simulated in two ways:
+  - before any successful initialization
+  - make successful initialization once and try to simulate disconnects
+Also we catch SIGABRT on the migration start if vhost-user daemon disconnected
+during vhost-user set log commands communication.
 
-It makes for a nice conceptual result: input parsing fails on unexpected 
-input, but output visitors should never be used on invalid data.
+Dima Stepanov (7):
+  contrib/vhost-user-blk: add option to simulate disconnect on init
+  char-socket: return -1 in case of disconnect during tcp_chr_write
+  char-socket: initialize reconnect timer only if close is emitted
+  vhost: introduce wrappers to set guest notifiers for virtio device
+  vhost-user-blk: add mechanism to track the guest notifiers init state
+  vhost: check vring address before calling unmap
+  vhost: add device started check in migration set log
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+ backends/cryptodev-vhost.c              |  26 +++++---
+ backends/vhost-user.c                   |  16 ++---
+ chardev/char-socket.c                   |  18 ++---
+ contrib/libvhost-user/libvhost-user.c   |  30 +++++++++
+ contrib/libvhost-user/libvhost-user.h   |  13 ++++
+ contrib/vhost-user-blk/vhost-user-blk.c |  14 +++-
+ hw/block/vhost-user-blk.c               |  23 +++----
+ hw/net/vhost_net.c                      |  30 +++++----
+ hw/scsi/vhost-scsi-common.c             |  15 ++---
+ hw/virtio/vhost-user-fs.c               |  17 ++---
+ hw/virtio/vhost-vsock.c                 |  18 +++--
+ hw/virtio/vhost.c                       | 115 +++++++++++++++++++++++++++++---
+ hw/virtio/virtio.c                      |  13 ++++
+ include/hw/virtio/vhost.h               |   5 ++
+ include/hw/virtio/virtio.h              |   1 +
+ 15 files changed, 256 insertions(+), 98 deletions(-)
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.7.4
 
 
