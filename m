@@ -2,94 +2,100 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A080CC54FD0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AFB2C55191
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:22:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DAB720776
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:22:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43F7A20724
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:22:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hQBZg7QW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DAB720776
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q33MOWoQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43F7A20724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRiN3-0006sP-CT
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:22:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55288)
+	id 1jRiN5-0006yt-3v
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:22:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55348)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRiLf-000491-7n
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:27 -0400
+ (envelope-from <philmd@redhat.com>) id 1jRiLr-0004Ya-9V
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRiLe-00036m-59
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:26 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41033
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jRiLq-0003Nq-Q7
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35436
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRiLd-000354-Fi
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:25 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRiLq-0003NW-CO
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:21:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587673282;
+ s=mimecast20190719; t=1587673297;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=9OiKYEiXObyyvdBrn5ZU7rEjNuUJXTXkgfrEwy77Qf8=;
- b=hQBZg7QWDoFJO+tJ3XxQEtfpKLvGFc9omLcK4RiDVIs52uy1nMOpNnEoaIijFSA+N8/nza
- w/6EWMTGB8O1XLJUo1175MpB/wIsqmKfMkQhxb/ry3io+fdKYVEWWto3DkVzXgE0zrQoRX
- /t/aK9KrTS+xlOHd4FLwcaKYCWVEpoA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-NYl-vv8ENfWcWES064Hzmg-1; Thu, 23 Apr 2020 16:21:20 -0400
-X-MC-Unique: NYl-vv8ENfWcWES064Hzmg-1
-Received: by mail-wr1-f72.google.com with SMTP id e5so3364748wrs.23
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 13:21:20 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8pU1FGRWMr9wFChCxvp9YPnfOkoE9DOPVGwWc1xi51Q=;
+ b=Q33MOWoQ18/7I8W2f1MoeeYEhTzGsmvkdY4RA97mnxLuivJukReZua5pjpM7IMEoDZQgBt
+ N4cbFxIQMscZFglJN6N79VvyCbWLdpDgNm/8RQ3oFGqZ++F+Lhe15f7CxgnN8eEdii1aLd
+ e2JM8kl0kCqA1XRSK/gb608keh9z4zA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-305-kYY2Cv8UPfCews5lwClptg-1; Thu, 23 Apr 2020 16:21:36 -0400
+X-MC-Unique: kYY2Cv8UPfCews5lwClptg-1
+Received: by mail-wr1-f70.google.com with SMTP id x15so3419409wrn.0
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 13:21:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=g16r6Dl+yK2+wuLRwMGXGvj619Nq/tXVscJSs4aI4dk=;
- b=ZS88kna4ubtJqQXxFgKVuOmT/kunbcvyZhfHDYrO6WMd7rJJoE38deKHN/WVRSvbbu
- HwCSLd6whjzLmAix8b03JjCkML44KreCgxk/wRwD2zQrjZ4ypiya6SEE52Ow0A89pKDL
- y9KKG0v3p45uSWMnspLZENFMKz9Qj48HRSVO+C1Om4W7mWwjtpz7hj/5sQBQg3bU+zuG
- wlZVr09ZiI3fMWJiOIj7fodyVqquJkXbEUoGOdoLl7GE4R73rVwTvrjvnMWTkaWTYeKR
- 7ginMmOR6HsEb3sSgn+vAsnnMgdc3AUfNb/w6MdhYIx7kAp53oVNiS9hXm5eEJdW/XiK
- IAtw==
-X-Gm-Message-State: AGi0PuaoS3I7av7gnPg4FP0Y6N56ylK8B3+0bqtwqLpHSGLsdkjl3tqB
- 7poenrYuBjyJ78QDWUEG15KhMks809jET0UsYjgE0fu7Zg8BU+12nVa7eaAYkkpkNlvH9Di0CQF
- Vb9NgyaVbwhX8RfE=
-X-Received: by 2002:a1c:1bcb:: with SMTP id b194mr6218886wmb.4.1587673276548; 
- Thu, 23 Apr 2020 13:21:16 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJXIL3Yh44jjBNt18MBCNIr/1uygsc5WV3Zp1pTm/oCwcAbLjo3a0k9eTwrGK5QjeypSFckLg==
-X-Received: by 2002:a1c:1bcb:: with SMTP id b194mr6218865wmb.4.1587673276328; 
- Thu, 23 Apr 2020 13:21:16 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=MAl6CeAivHgSy+VUA/NScy4gWhWpCQWoVZ2DVxmZ3RI=;
+ b=sSryivdJIohko6Sm9JmxYwFw+R40GvShYwt5aSuKHqHMUnesJPWz2parZiTT/eyvIG
+ y+W7oNYVpdba3LsVGMcy7KLYD++EHLZ2nSQhUXBJjVQnOqwm31tICKZvE6eGrZz5qqcw
+ AHMJ6ErHkCRl6NWjf809uCEST2pwIoqbRGd86Ow6Q8ApADw7qYhWXmAFFLoAMv1yVo02
+ NRF7Q/5OfF021ABThatjs6sJI1rmSHIFsZjVT9ICAFm2Jskg3qZEH0UnS1uACNgk4SJ4
+ r6em8nzfGXMO2H1yWzFaHKe9clV3Cw0HsqYII7B1U6kVhIjT19wt6KLYsmliDM4/LpTw
+ 7dLg==
+X-Gm-Message-State: AGi0PuaC3pkIrp7FlytD7orOprWcWRdyw9x3iyDLYmZJrp6ueQfeqUZM
+ 5JxdRfoztVWj3t7RuMRhiwC5P9RkSpNUhUQblEApgbuD1Ou7ZVK5972bmXQMBxEGw7dnu8bhBzC
+ 7RKILGlQMKyMBgck=
+X-Received: by 2002:adf:ee0c:: with SMTP id y12mr7508969wrn.0.1587673294669;
+ Thu, 23 Apr 2020 13:21:34 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKQPnNcVHQhQ8nOPRlwicSuLfqzuDvwPh7mi8p/kAH4cmdhld0jq1TGlV9yfLAOzZvnBfVicA==
+X-Received: by 2002:adf:ee0c:: with SMTP id y12mr7508943wrn.0.1587673294395;
+ Thu, 23 Apr 2020 13:21:34 -0700 (PDT)
 Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id g6sm5175029wrw.34.2020.04.23.13.21.14
+ by smtp.gmail.com with ESMTPSA id j13sm5196975wro.51.2020.04.23.13.21.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Apr 2020 13:21:15 -0700 (PDT)
+ Thu, 23 Apr 2020 13:21:33 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/7] chardev: Reduce system emulation specific code
-Date: Thu, 23 Apr 2020 22:21:05 +0200
-Message-Id: <20200423202112.644-1-philmd@redhat.com>
+Subject: [PATCH 3/7] chardev: Restrict msmouse / wctablet / testdev to system
+ emulation
+Date: Thu, 23 Apr 2020 22:21:08 +0200
+Message-Id: <20200423202112.644-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200423202112.644-1-philmd@redhat.com>
+References: <20200423202112.644-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 02:14:02
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 16:21:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,44 +119,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-chardev cleanup while reviewing 'Refactor machine_init and exit
-notifiers' from the multi-process series:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg697510.html
+The msmouse / wctablet / testdev character devices are only
+used by system emulation. Remove them from user mode and tools.
 
-Elena Ufimtseva (1):
-  multi-process: Refactor machine_init and exit notifiers
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ chardev/Makefile.objs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Philippe Mathieu-Daud=C3=A9 (6):
-  monitor/misc: Remove unused "chardev/char-mux.h" include
-  tests/test-char: Remove unused "chardev/char-mux.h" include
-  chardev: Restrict msmouse / wctablet / testdev to system emulation
-  chardev: Reduce "char-mux.h" scope, rename it "chardev-internal.h"
-  chardev: Extract system emulation specific code
-  stubs: Split machine-init-done as machine-init and machine-notify
-
- Makefile.objs                                 |  1 +
- .../char-mux.h =3D> chardev/chardev-internal.h  | 10 ++-
- include/sysemu/sysemu.h                       |  2 +
- chardev/char-fe.c                             |  2 +-
- chardev/char-mux.c                            |  2 +-
- chardev/char.c                                | 37 +---------
- chardev/chardev-sysemu.c                      | 69 +++++++++++++++++++
- monitor/misc.c                                |  1 -
- softmmu/vl.c                                  | 42 -----------
- stubs/machine-init.c                          |  4 ++
- .../{machine-init-done.c =3D> machine-notify.c} |  6 +-
- tests/test-char.c                             |  1 -
- util/machine-notify.c                         | 69 +++++++++++++++++++
- MAINTAINERS                                   |  1 +
- chardev/Makefile.objs                         |  3 +-
- stubs/Makefile.objs                           |  3 +-
- 16 files changed, 165 insertions(+), 88 deletions(-)
- rename include/chardev/char-mux.h =3D> chardev/chardev-internal.h (93%)
- create mode 100644 chardev/chardev-sysemu.c
- create mode 100644 stubs/machine-init.c
- rename stubs/{machine-init-done.c =3D> machine-notify.c} (63%)
- create mode 100644 util/machine-notify.c
-
+diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
+index d68e1347f9..15ee7f47da 100644
+--- a/chardev/Makefile.objs
++++ b/chardev/Makefile.objs
+@@ -17,7 +17,7 @@ chardev-obj-y +=3D char-udp.o
+ chardev-obj-$(CONFIG_WIN32) +=3D char-win.o
+ chardev-obj-$(CONFIG_WIN32) +=3D char-win-stdio.o
+=20
+-common-obj-y +=3D msmouse.o wctablet.o testdev.o
++common-obj-$(CONFIG_SOFTMMU) +=3D msmouse.o wctablet.o testdev.o
+ common-obj-$(CONFIG_BRLAPI) +=3D baum.o
+ baum.o-cflags :=3D $(SDL_CFLAGS)
+ baum.o-libs :=3D $(BRLAPI_LIBS)
 --=20
 2.21.1
 
