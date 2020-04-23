@@ -2,83 +2,79 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB874C54FCB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 15:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7497EC54FD0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 15:54:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4E162075A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 15:37:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F187C20767
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 15:54:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gGlREDK6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4E162075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FSd9bntp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F187C20767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRduc-00026o-SX
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 11:37:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53818)
+	id 1jRe78-0000dz-3i
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 11:50:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58014)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRdtx-0001gY-6C
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:36:33 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jRe5u-0007D9-2x
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:48:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRdtw-0007Ru-7B
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:36:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58608
+ (envelope-from <kwolf@redhat.com>) id 1jRe5t-0001m0-Mu
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:48:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43551
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jRdtu-0007LQ-NS
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:36:31 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jRe5t-0001jy-2m
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:48:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587656189;
+ s=mimecast20190719; t=1587656932;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iizc3MEBI1kFVhveD5Vny+dqyQrqDqh2G/5yCYHmFVg=;
- b=gGlREDK6mVwH75PN6YlkvaslEem8hlrvA/k5VtHZtKFMcD4iJEyp/P1HtmNxFxGnV/eHS6
- vtk9sFwsW2TDlfuJfMPk85c5qLnuqVMONwFgJLBarmW8IIp1VnD2sbjMjfm4KRStMd3ILD
- d30tDzn+iXpeyeoxwyhRhsTIbtHIUQ0=
+ bh=UZyr8aq0wFC0KaPX01AX5MSXRFLmJJ3H2ULg9hbJC5g=;
+ b=FSd9bntpiaNO6QyxQWGyxYY0bwww5sVecgv2RfZRsYCfs49/6aX8q+BKkrBaMj61+JvG0B
+ ZT3O8yTvnduW03njxSW9aKfzCwVSLeTLLvvuoP/RbSGI1v3Z4RszIopjVi1nyr/h2KmmM9
+ I1apR1a2n9uybx31iLx95Vx0VnQXXkI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-N2LhN3WLM5O_FSCk2y8euQ-1; Thu, 23 Apr 2020 11:36:25 -0400
-X-MC-Unique: N2LhN3WLM5O_FSCk2y8euQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-16-SSPOay-JNEWb46_TM1tEDw-1; Thu, 23 Apr 2020 11:48:48 -0400
+X-MC-Unique: SSPOay-JNEWb46_TM1tEDw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A874460;
- Thu, 23 Apr 2020 15:36:24 +0000 (UTC)
-Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 10D885D9CC;
- Thu, 23 Apr 2020 15:36:22 +0000 (UTC)
-Subject: Re: [PATCH v6 10/10] qcow2: Forward ZERO_WRITE flag for full
- preallocation
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2220E100CC8F;
+ Thu, 23 Apr 2020 15:48:47 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-28.ams2.redhat.com [10.36.114.28])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8985F196AE;
+ Thu, 23 Apr 2020 15:48:45 +0000 (UTC)
+Date: Thu, 23 Apr 2020 17:48:44 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v6 04/10] qcow2: Support BDRV_REQ_ZERO_WRITE for truncate
+Message-ID: <20200423154844.GE23654@linux.fritz.box>
 References: <20200423150127.142609-1-kwolf@redhat.com>
- <20200423150127.142609-11-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <fca340c2-5bee-b287-e43e-28dc679ea372@redhat.com>
-Date: Thu, 23 Apr 2020 10:36:21 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ <20200423150127.142609-5-kwolf@redhat.com>
+ <b9d97ddb-b13d-637a-1848-1d93a2d44736@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200423150127.142609-11-kwolf@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <b9d97ddb-b13d-637a-1848-1d93a2d44736@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 05:42:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
@@ -95,96 +91,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: vsementsov@virtuozzo.com, berto@igalia.com, qemu-devel@nongnu.org,
- mreitz@redhat.com
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/23/20 10:01 AM, Kevin Wolf wrote:
-> The BDRV_REQ_ZERO_WRITE is currently implemented in a way that first the
-> image is possibly preallocated and then the zero flag is added to all
-> clusters. This means that a copy-on-write operation may be needed when
-> writing to these clusters, despite having used preallocation, negating
-> one of the major benefits of preallocation.
-> 
-> Instead, try to forward the BDRV_REQ_ZERO_WRITE to the protocol driver,
-> and if the protocol driver can ensure that the new area reads as zeros,
-> we can skip setting the zero flag in the qcow2 layer.
+Am 23.04.2020 um 17:18 hat Eric Blake geschrieben:
+> On 4/23/20 10:01 AM, Kevin Wolf wrote:
+> > If BDRV_REQ_ZERO_WRITE is set and we're extending the image, calling
+> > qcow2_cluster_zeroize() with flags=3D0 does the right thing: It doesn't
+> > undo any previous preallocation, but just adds the zero flag to all
+> > relevant L2 entries. If an external data file is in use, a write_zeroes
+> > request to the data file is made instead.
+> >=20
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > Reviewed-by: Max Reitz <mreitz@redhat.com>
+> > ---
+> >   block/qcow2-cluster.c |  2 +-
+> >   block/qcow2.c         | 33 +++++++++++++++++++++++++++++++++
+> >   2 files changed, 34 insertions(+), 1 deletion(-)
+> >=20
+>=20
+> > +    if ((flags & BDRV_REQ_ZERO_WRITE) && offset > old_length) {
+> > +        uint64_t zero_start =3D QEMU_ALIGN_UP(old_length, s->cluster_s=
+ize);
+> > +
+> > +        /*
+> > +         * Use zero clusters as much as we can. qcow2_cluster_zeroize(=
+)
+> > +         * requires a cluster-aligned start. The end may be unaligned =
+if it is
+> > +         * at the end of the image (which it is here).
+> > +         */
+> > +        ret =3D qcow2_cluster_zeroize(bs, zero_start, offset - zero_st=
+art, 0);
+> > +        if (ret < 0) {
+> > +            error_setg_errno(errp, -ret, "Failed to zero out new clust=
+ers");
+> > +            goto fail;
+> > +        }
+> > +
+> > +        /* Write explicit zeros for the unaligned head */
+> > +        if (zero_start > old_length) {
+> > +            uint8_t *buf =3D qemu_blockalign0(bs, s->cluster_size);
+> > +            QEMUIOVector qiov;
+> > +            qemu_iovec_init_buf(&qiov, buf, zero_start - old_length);
+> > +
+> > +            qemu_co_mutex_unlock(&s->lock);
+> > +            ret =3D qcow2_co_pwritev_part(bs, old_length, qiov.size, &=
+qiov, 0, 0);
+>=20
+> This works, but would it be any more efficient to use
+> qcow2_co_pwrite_zeroes?  If the head of the cluster is already zero, then
+> qcow2_co_pwrite_zeroes can turn into qcow2_cluster_zeroize for this clust=
+er,
+> while qcow2_co_pwritev_part cannot.
 
-Hmm.  When we get block status, it is very easy to tell that something 
-reads as zero when the qcow2 file has the zero bit set, but when the 
-qcow2 file does not have the zero bit set, we have to then query the 
-format layer whether it reads as zeros (which is expensive enough for 
-some format layers that we no longer report things as reading as zero). 
-I'm worried that optimizing this case could penalize later block status.
+The problem is that qcow2_co_pwrite_zeroes() will return -ENOTSUP if the
+request is still unaligned after this optimisation. I would have to go
+through the generic bdrv_co_pwrite_zeroes() to get the fallback, but I
+can't do that because bs->total_sectors isn't updated yet.
 
-We already can tell the difference between a cluster that has the zero 
-bit set but is not preallocated, vs. has the zero bit set and is 
-preallocated.  Are we really forcing a copy-on-write to a cluster that 
-is marked zero but preallocated?  Is the problem that we don't have a 
-way to distinguish between 'reads as zeroes, allocated, but we don't 
-know state of format layer' and 'reads as zeroes, allocated, and we know 
-format layer reads as zeroes'?
-
-> 
-> Unfortunately, the same approach doesn't work for metadata
-> preallocation, so we'll still set the zero flag there.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   block/qcow2.c              | 22 +++++++++++++++++++---
->   tests/qemu-iotests/274.out |  4 ++--
->   2 files changed, 21 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index ad621fe404..b28e588942 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -4170,9 +4170,25 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
->           /* Allocate the data area */
->           new_file_size = allocation_start +
->                           nb_new_data_clusters * s->cluster_size;
-> -        /* Image file grows, so @exact does not matter */
-> -        ret = bdrv_co_truncate(bs->file, new_file_size, false, prealloc, 0,
-> -                               errp);
-> +        /*
-> +         * Image file grows, so @exact does not matter.
-> +         *
-> +         * If we need to zero out the new area, try first whether the protocol
-> +         * driver can already take care of this.
-> +         */
-> +        if (flags & BDRV_REQ_ZERO_WRITE) {
-> +            ret = bdrv_co_truncate(bs->file, new_file_size, false, prealloc,
-> +                                   BDRV_REQ_ZERO_WRITE, errp);
-> +            if (ret >= 0) {
-> +                flags &= ~BDRV_REQ_ZERO_WRITE;
-> +            }
-
-Hmm - just noticing things: how does this series interplay with the 
-existing bdrv_has_zero_init_truncate?  Should this series automatically 
-handle BDRV_REQ_ZERO_WRITE on a bdrv_co_truncate(PREALLOC_NONE) request 
-for all drivers that report true, even if that driver does not advertise 
-support for the BDRV_REQ_ZERO_WRITE flag?
-
-> +        } else {
-> +            ret = -1;
-> +        }
-
-Here, ret == -1 does not imply whether errp is set - but annoyingly, 
-errp CAN be set if bdrv_co_truncate() failed.
-
-> +        if (ret < 0) {
-> +            ret = bdrv_co_truncate(bs->file, new_file_size, false, prealloc, 0,
-> +                                   errp);
-
-And here, you are passing a possibly-set errp back to 
-bdrv_co_truncate().  That is a bug that can abort.  You need to pass 
-NULL to the first bdrv_co_truncate() call or else clear errp prior to 
-trying a fallback to this second bdrv_co_truncate() call.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Kevin
 
 
