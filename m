@@ -4,107 +4,119 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65934C2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 10:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B17C2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 10:08:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AE1520724
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 10:06:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D810920724
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 10:08:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hoLWxrsa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AE1520724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AuMdsl+V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D810920724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRYk6-0003Va-84
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 06:06:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56532)
+	id 1jRYm0-0005Po-19
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 06:08:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56920)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jRYj7-0002P0-B5
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:05:01 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jRYkd-0004Cx-Gi
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:06:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jRYj6-0006uY-T2
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:05:01 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29961
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jRYj6-0006rx-H4
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:05:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587636299;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=8RAxOQcGQl6I8ob4sceLl/V4ekpCoViaLxszbKdqe0c=;
- b=hoLWxrsaMgh9nbbycwjS6oE5FKC8nAdgIBTxz435h/1ITsGWmXUv6P9B6hMVS+Kiv72yQ2
- wlx8uTBR8ykfSo7F4TpMCK60LQWBJ9X9QZY3XTCy0QNntvtsK5INjsTAqNlaxupVLYY+XS
- LqEh3xXPVNzuDwLOm89lEXXouka/zqo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-N_-og-7GMAeEC3NWxApuuQ-1; Thu, 23 Apr 2020 06:04:55 -0400
-X-MC-Unique: N_-og-7GMAeEC3NWxApuuQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C717B80B713;
- Thu, 23 Apr 2020 10:04:53 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-212.ams2.redhat.com
- [10.36.113.212])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B29565C1BE;
- Thu, 23 Apr 2020 10:04:51 +0000 (UTC)
-Subject: Re: [PATCH v5 2/9] block: Add flags to bdrv(_co)_truncate()
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200422152129.167074-1-kwolf@redhat.com>
- <20200422152129.167074-3-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <c2b0728d-f5cd-fc60-dbd5-08ce1674a5d9@redhat.com>
-Date: Thu, 23 Apr 2020 12:04:49 +0200
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jRYkb-0008Vk-C5
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:06:35 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39731)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jRYka-0008VO-Sy; Thu, 23 Apr 2020 06:06:33 -0400
+Received: by mail-wr1-x441.google.com with SMTP id b11so6126451wrs.6;
+ Thu, 23 Apr 2020 03:06:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=e5RvPEwI+UM9ijZWcKSbX/0IbSZr0thQvP2hbsva6TA=;
+ b=AuMdsl+VnfTe1jjNNi29XIm17OHg02WS/wqTVCHm1p+rwwZODtF7lplkjA5YoeIQpf
+ ecam5lBJ56FDTaC7EMrltKLBqcYcDOMapc5oHK+shUOinowyYFLX3SB1nImmLgLc9n1F
+ IGLAVpBCiKjPYfqwy2+PVucHmAjwyn8xwPYuQ7EgH8i9kCtsAhFwpHTKPU7gqc4N09S9
+ tPMy2U0K0mJSmFKRSi8GwEMVFtS8vJAzY3xqC82BrB9i+S2+4VeoASPOTqiLx/h79R2E
+ cMlunvNdVpWeTTuIDgHSE97jBGk4571XEMx9sVsvkRUSjTtL4h7h85AN3RmHYTXZAClK
+ YaNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=e5RvPEwI+UM9ijZWcKSbX/0IbSZr0thQvP2hbsva6TA=;
+ b=QzLOrvUFSipajdyMrWzKD4kaVHgOit6Vs/UsensVJcJBbGYAfMg2EWr3ya5+VYGWYB
+ S2NmeHjgIcLt3VY54iRnpcd2kgCwHs/5nnNHxswQX0RWkNXzwnwP1JuNH1M5CHdKOFwb
+ 576+ed6Xy6fgN3ns8aUjWU+OC1xRds7UwewHsf4qxoQ0hffFzxdZXhDthDQuQHUQHckU
+ mlEXpizuaT7CNwgzeP89DQqzbt015LgK0J01oB2JRhdqnWGcMhxB6Ys0zeZfBC/jObX5
+ R10EyN9Il2aLbCPkUGkdmKkuSy7wjpY6s0koLQDIDLaZtHkDJKTqzRV8j8KgtSaqDAfq
+ FZtA==
+X-Gm-Message-State: AGi0PuYxQWFNlhPPDm6EhCKGxYX0GtV1WNtUYPdNrkPGnDB/XnAljC7n
+ R5fE4hdMU8+lPh6oiLfIoRZtna00
+X-Google-Smtp-Source: APiQypLPmuzHqRdwFrp1m3HuXGaCgWSp1L7oPSDr1PIJa3R6Q65sf2zj0gUhAEQ0fgOhkDzlgdzL1g==
+X-Received: by 2002:a5d:4b04:: with SMTP id v4mr4256862wrq.358.1587636390479; 
+ Thu, 23 Apr 2020 03:06:30 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id l5sm2971405wrm.66.2020.04.23.03.06.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 23 Apr 2020 03:06:29 -0700 (PDT)
+Subject: Re: [PATCH QEMU v2 3/5] Add a GPIO backend using libgpiod
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+References: <20200423090118.11199-1-geert+renesas@glider.be>
+ <20200423090118.11199-4-geert+renesas@glider.be>
+ <5dbfd026-3807-b122-ce60-1339a5252fca@amsat.org>
+ <CAMuHMdWf2RfGvSizXKonmAB84kPyAPwZ3mF1PayK_mdn=wwRkw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <4ae7812b-6df5-f024-871b-903966f73b8e@amsat.org>
+Date: Thu, 23 Apr 2020 12:06:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200422152129.167074-3-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="0HeOfQio9DyrQXBmCuQINFOqvqLn1cC7I"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 03:23:21
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+In-Reply-To: <CAMuHMdWf2RfGvSizXKonmAB84kPyAPwZ3mF1PayK_mdn=wwRkw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,66 +128,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berto@igalia.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Linus Walleij <linus.walleij@linaro.org>, Magnus Damm <magnus.damm@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Alexander Graf <graf@amazon.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Bartosz Golaszewski <bartekgola@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0HeOfQio9DyrQXBmCuQINFOqvqLn1cC7I
-Content-Type: multipart/mixed; boundary="n8UTS9hkRnXmBC0l5z8O4B47c0Zkdgl8W"
+On 4/23/20 11:41 AM, Geert Uytterhoeven wrote:
+> Hi Philippe,
+> 
+> Thanks for your comments!
+> 
+> On Thu, Apr 23, 2020 at 11:28 AM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> On 4/23/20 11:01 AM, Geert Uytterhoeven wrote:
+>>> Add a GPIO controller backend, to connect virtual GPIOs on the guest to
+>>> physical GPIOs on the host.  This allows the guest to control any
+>>> external device connected to the physical GPIOs.
+>>>
+>>> Features and limitations:
+>>>   - The backend uses libgpiod on Linux,
+>>>   - For now only GPIO outputs are supported,
+>>>   - The number of GPIO lines mapped is limited to the number of GPIO
+>>>     lines available on the virtual GPIO controller.
+>>>
+>>> Future work:
+>>>   - GPIO inputs,
+>>>   - GPIO line configuration,
+>>>   - Optimizations for controlling multiple GPIO lines at once,
+>>>   - ...
+>>>
+>>> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> 
+>>> --- /dev/null
+>>> +++ b/backends/gpiodev.c
+>>> @@ -0,0 +1,94 @@
+>>> +/*
+>>> + * QEMU GPIO Backend
+>>> + *
+>>> + * Copyright (C) 2018-2020 Glider bv
+>>> + *
+>>> + * SPDX-License-Identifier: GPL-2.0-or-later
+>>> + */
+>>> +
+>>> +#include <errno.h>
+>>
+>> <errno.h> probably not needed.
+> 
+> It is indeed included by one of the other header files.
+> What is the QEMU policy w.r.t. that?
 
---n8UTS9hkRnXmBC0l5z8O4B47c0Zkdgl8W
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+See CODING_STYLE.rst:
 
-On 22.04.20 17:21, Kevin Wolf wrote:
-> Now that block drivers can support flags for .bdrv_co_truncate, expose
-> the parameter in the node level interfaces bdrv_co_truncate() and
-> bdrv_truncate().
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> ---
->  include/block/block.h       |  5 +++--
->  block/block-backend.c       |  2 +-
->  block/crypto.c              |  2 +-
->  block/io.c                  | 12 +++++++-----
->  block/parallels.c           |  6 +++---
->  block/qcow.c                |  4 ++--
->  block/qcow2-refcount.c      |  2 +-
->  block/qcow2.c               | 15 +++++++++------
->  block/raw-format.c          |  2 +-
->  block/vhdx-log.c            |  2 +-
->  block/vhdx.c                |  2 +-
->  block/vmdk.c                |  2 +-
->  tests/test-block-iothread.c |  6 +++---
->  13 files changed, 34 insertions(+), 28 deletions(-)
+Include directives
+------------------
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Order include directives as follows:
 
+.. code-block:: c
 
---n8UTS9hkRnXmBC0l5z8O4B47c0Zkdgl8W--
+    #include "qemu/osdep.h"  /* Always first... */
+    #include <...>           /* then system headers... */
+    #include "..."           /* and finally QEMU headers. */
 
---0HeOfQio9DyrQXBmCuQINFOqvqLn1cC7I
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+The "qemu/osdep.h" header contains preprocessor macros that affect the
+behavior
+of core system headers like <stdint.h>.  It must be the first include so
+that
+core system headers included by external libraries get the preprocessor
+macros
+that QEMU depends on.
 
------BEGIN PGP SIGNATURE-----
+> 
+>>
+>>> +#include <gpiod.h>
+>>
+>> Please move this one...
+>>
+>>> +
+>>> +#include "qemu/osdep.h"
+>>> +#include "qemu/config-file.h"
+>>> +#include "qemu/cutils.h"
+> 
+> I forgot to remove the two above...
+> 
+>>> +#include "qemu/error-report.h"
+>>> +#include "qemu/module.h"
+>>> +#include "qemu/option.h"
+> 
+> ... and the two above.
+> 
+>>> +#include "qapi/error.h"
+>>> +
+>>> +#include "sysemu/gpiodev.h"
+>>> +
+>>> +#include "hw/irq.h"
+>>> +#include "hw/qdev-core.h"
+>>
+>> ... here:
+>>
+>> #include <gpiod.h>
+> 
+> OK.
+> 
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -509,6 +509,7 @@ libpmem=""
+>>>  default_devices="yes"
+>>>  plugins="no"
+>>>  fuzzing="no"
+>>> +gpio=""
+>>
+>> Maybe name this feature 'libgpiod'?
+> 
+> Makes sense.
+> 
+>>>
+>>>  supported_cpu="no"
+>>>  supported_os="no"
+>>> @@ -1601,6 +1602,10 @@ for opt do
+>>>    ;;
+>>>    --gdb=*) gdb_bin="$optarg"
+>>>    ;;
+>>> +  --disable-gpio) gpio="no"
+>>> +  ;;
+>>> +  --enable-gpio) gpio="yes"
+>>
+>> Ditto: --enable-libgpiod, because else it seems rather confusing.
+> 
+> OK.
+> 
+>>> --- /dev/null
+>>> +++ b/include/sysemu/gpiodev.h
+>>> @@ -0,0 +1,12 @@
+>>> +/*
+>>> + * QEMU GPIO Backend
+>>> + *
+>>> + * Copyright (C) 2018-2020 Glider bv
+>>> + *
+>>> + * SPDX-License-Identifier: GPL-2.0-or-later
+>>> + */
+>>> +
+>>> +#include "qemu/typedefs.h"
+>>
+>> "qemu/typedefs.h" not needed in includes.
+> 
+> While removing that works, it does mean the header file is no longer
+> self-contained:
+> 
+> include/sysemu/gpiodev.h:10:23: error: unknown type name ‘DeviceState’
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6haEEACgkQ9AfbAGHV
-z0CVmAf/bP70USjSEV9GAwHv/ktN6Ds40xZTTRrvUQxWHGtbrG0ebgLUHLvinl8M
-oEcUVlWQXUfKTwbn1M9u4xXsxJMJGieZQClFBehHTpetcSZB0cvVUp6zJHwAswnn
-hx1bjFDbs6dOU3Sof7CZR+73/WfqniFsfpyjhO14e2ahgwGUh5Zn+W9CU4c3dYzO
-m0IUhSclxi1ZZr5ssk5uM4bmqhRF3j2+ZN/Bl4jj9eTwWoVRxO0kU60N+SMECYg/
-vRbRo4tbcHF/Lr5ogs79eChW3z8oTHo7NIdqx4SACLGDNiHInDKMCveGAk7BzC7v
-huDp98OPM9woqRLudWhfEJ9XFH4d/w==
-=Hrhp
------END PGP SIGNATURE-----
+Odd, because your backends/gpiodev.c already has:
 
---0HeOfQio9DyrQXBmCuQINFOqvqLn1cC7I--
+#include "hw/qdev-core.h"
 
+> 
+>>> +
+>>> +void qemu_gpiodev_add(DeviceState *dev, const char *name, unsigned int maxgpio,
+>>> +                      Error **errp);
+> 
+> Gr{oetje,eeting}s,
+> 
+>                         Geert
+> 
 
