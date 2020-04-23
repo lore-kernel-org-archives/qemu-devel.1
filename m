@@ -2,80 +2,70 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C29EBC54FCB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 22:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56DBEC54FCB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 22:29:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87ED02074F
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 22:20:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpn9eCKO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87ED02074F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 227C020724
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 22:29:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 227C020724
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRkD6-0003rL-Ko
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 18:20:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49270)
+	id 1jRkLT-0008In-RJ
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 18:29:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51168)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRkA1-0007ch-81
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 18:17:34 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jRkKR-0007dN-Gl
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 18:28:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRk9v-0006sy-Kj
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 18:17:31 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25589
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <no-reply@patchew.org>) id 1jRkKP-0002Jx-Vb
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 18:28:18 -0400
+Resent-Date: Thu, 23 Apr 2020 18:28:18 -0400
+Resent-Message-Id: <E1jRkKP-0002Jx-Vb@eggs.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21396)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jRk9u-0006nL-DJ
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 18:17:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587680241;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=75SFsu2SxUdH6Zjc5UfQGuy/xj22RvwwJ2wIvFmAVoA=;
- b=dpn9eCKOioaqPBq2sLKLgjlm3KuoGN9amyQthwGwF0FPaVOax7gmKlIieAswmoIgd/P0Pt
- We+MxD/uQyYP489Cc4TgKlRDtQhtvRU9gmh9rYvzx45/wZmgenFygQkvgmtHpYjE1G8OMe
- 8b5uQts5ebCD7CUN9I7WpVlOLp7NoqA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-jZyTgkKqMLOb88EOubjYrQ-1; Thu, 23 Apr 2020 18:17:17 -0400
-X-MC-Unique: jZyTgkKqMLOb88EOubjYrQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4C8A80B709;
- Thu, 23 Apr 2020 22:17:16 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EEBEC1C94D;
- Thu, 23 Apr 2020 22:17:15 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/3] qcow2: Allow resize of images with internal snapshots
-Date: Thu, 23 Apr 2020 17:17:06 -0500
-Message-Id: <20200423221707.477404-3-eblake@redhat.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jRkKP-00027M-Af; Thu, 23 Apr 2020 18:28:17 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1587680890; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=lyXdpUHVcwzhe8dnHES0dw0df44xCmvrFqAPCC1m5WlaVlKwQIxFvEiWxwmo2izjoASWs3s1X9BC9P1tC4ckL2OUCtYbt/kNYB0AmGCLCLAFna6/4uzvLar45v5OQ/E5+X7jFl2ljqy6EcSsAP6wObogpQIRfi4w0kHi5+7BB9o=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1587680890;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=EiLxSjIy1XkBYcLdKx9/2vS7TM6CgxCQL6g/vG+nOwc=; 
+ b=kPSLfbS3oeMGWA902IbztdvRsBuYVSaeYV78HoZXsjJHp0qcsk/sc+sKot1doXhqqDL84aIT99/wdoLW0R5+b2nKfXMuV4UlFmmGXeLg33fAxnjY8WDqXsz7Vts0ar+M8GDfd2SPlbwRjgoPv1uq5SbEmhuRQkAYhheWyYaIcRc=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1587680887576812.2974059021717;
+ Thu, 23 Apr 2020 15:28:07 -0700 (PDT)
 In-Reply-To: <20200423221707.477404-1-eblake@redhat.com>
-References: <20200423221707.477404-1-eblake@redhat.com>
+Subject: Re: [PATCH v2 0/3] qcow2: Allow resize of images with internal
+ snapshots
+Message-ID: <158768088631.10590.10570101292453550828@39012742ff91>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 16:25:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: eblake@redhat.com
+Date: Thu, 23 Apr 2020 15:28:07 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 18:28:14
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Received-From: 136.143.188.53
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,237 +77,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We originally refused to allow resize of images with internal
-snapshots because the v2 image format did not require the tracking of
-snapshot size, making it impossible to safely revert to a snapshot
-with a different size than the current view of the image.  But the
-snapshot size tracking was rectified in v3, and our recent fixes to
-qemu-img amend (see 0a85af35) guarantee that we always have a valid
-snapshot size.  Thus, we no longer need to artificially limit image
-resizes, but it does become one more thing that would prevent a
-downgrade back to v2.  And now that we support different-sized
-snapshots, it's also easy to fix reverting to a snapshot to apply the
-new size.
-
-Upgrade iotest 61 to cover this (we previously had NO coverage of
-refusal to resize while snapshots exist).  Note that the amend process
-can fail but still have effects: in particular, since we break things
-into upgrade, resize, downgrade, a failure during resize does not roll
-back changes made during upgrade, nor does failure in downgrade roll
-back a resize.  But this situation is pre-existing even without this
-patch; and without journaling, the best we could do is minimize the
-chance of partial failure by collecting all changes prior to doing any
-writes - which adds a lot of complexity but could still fail with EIO.
-On the other hand, we are careful that even if we have partial
-modification but then fail, the image is left viable (that is, we are
-careful to sequence things so that after each successful cluster
-write, there may be transient leaked clusters but no corrupt
-metadata).  And complicating the code to make it more transaction-like
-is not worth the effort: a user can always request multiple 'qemu-img
-amend' changing one thing each, if they need finer-grained control
-over detecting the first failure than what they get by letting qemu
-decide how to sequence multiple changes.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- block/qcow2-snapshot.c     | 20 ++++++++++++++++----
- block/qcow2.c              | 25 ++++++++++++++++++++++---
- tests/qemu-iotests/061     | 35 +++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/061.out | 28 ++++++++++++++++++++++++++++
- 4 files changed, 101 insertions(+), 7 deletions(-)
-
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index 82c32d4c9b08..df16424fd952 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -23,6 +23,7 @@
-  */
-
- #include "qemu/osdep.h"
-+#include "sysemu/block-backend.h"
- #include "qapi/error.h"
- #include "qcow2.h"
- #include "qemu/bswap.h"
-@@ -775,10 +776,21 @@ int qcow2_snapshot_goto(BlockDriverState *bs, const c=
-har *snapshot_id)
-     }
-
-     if (sn->disk_size !=3D bs->total_sectors * BDRV_SECTOR_SIZE) {
--        error_report("qcow2: Loading snapshots with different disk "
--            "size is not implemented");
--        ret =3D -ENOTSUP;
--        goto fail;
-+        BlockBackend *blk =3D blk_new_with_bs(bs, BLK_PERM_RESIZE, BLK_PER=
-M_ALL,
-+                                            &local_err);
-+        if (!blk) {
-+            error_report_err(local_err);
-+            ret =3D -ENOTSUP;
-+            goto fail;
-+        }
-+
-+        ret =3D blk_truncate(blk, sn->disk_size, true, PREALLOC_MODE_OFF,
-+                           &local_err);
-+        blk_unref(blk);
-+        if (ret < 0) {
-+            error_report_err(local_err);
-+            goto fail;
-+        }
-     }
-
-     /*
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 1ce72041978b..34888a793354 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3987,9 +3987,12 @@ static int coroutine_fn qcow2_co_truncate(BlockDrive=
-rState *bs, int64_t offset,
-
-     qemu_co_mutex_lock(&s->lock);
-
--    /* cannot proceed if image has snapshots */
--    if (s->nb_snapshots) {
--        error_setg(errp, "Can't resize an image which has snapshots");
-+    /*
-+     * Even though we store snapshot size for all images, it was not
-+     * required until v3, so it is not safe to proceed for v2.
-+     */
-+    if (s->nb_snapshots && s->qcow_version < 3) {
-+        error_setg(errp, "Can't resize a v2 image which has snapshots");
-         ret =3D -ENOTSUP;
-         goto fail;
-     }
-@@ -4951,6 +4954,7 @@ static int qcow2_downgrade(BlockDriverState *bs, int =
-target_version,
-     BDRVQcow2State *s =3D bs->opaque;
-     int current_version =3D s->qcow_version;
-     int ret;
-+    int i;
-
-     /* This is qcow2_downgrade(), not qcow2_upgrade() */
-     assert(target_version < current_version);
-@@ -4968,6 +4972,21 @@ static int qcow2_downgrade(BlockDriverState *bs, int=
- target_version,
-         return -ENOTSUP;
-     }
-
-+    /*
-+     * If any internal snapshot has a different size than the current
-+     * image size, or VM state size that exceeds 32 bits, downgrading
-+     * is unsafe.  Even though we would still use v3-compliant output
-+     * to preserve that data, other v2 programs might not realize
-+     * those optional fields are important.
-+     */
-+    for (i =3D 0; i < s->nb_snapshots; i++) {
-+        if (s->snapshots[i].vm_state_size > UINT32_MAX ||
-+            s->snapshots[i].disk_size !=3D bs->total_sectors * BDRV_SECTOR=
-_SIZE) {
-+            error_setg(errp, "Internal snapshots prevent downgrade of imag=
-e");
-+            return -ENOTSUP;
-+        }
-+    }
-+
-     /* clear incompatible features */
-     if (s->incompatible_features & QCOW2_INCOMPAT_DIRTY) {
-         ret =3D qcow2_mark_clean(bs);
-diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
-index ce285d308408..10eb24316461 100755
---- a/tests/qemu-iotests/061
-+++ b/tests/qemu-iotests/061
-@@ -111,6 +111,41 @@ $PYTHON qcow2.py "$TEST_IMG" dump-header
- $QEMU_IO -c "read -P 0x2a 42M 64k" "$TEST_IMG" | _filter_qemu_io
- _check_test_img
-
-+echo
-+echo "=3D=3D=3D Testing resize with snapshots =3D=3D=3D"
-+echo
-+_make_test_img -o "compat=3D0.10" 32M
-+$QEMU_IO -c "write -P 0x2a 24M 64k" "$TEST_IMG" | _filter_qemu_io
-+$QEMU_IMG snapshot -c foo "$TEST_IMG"
-+$QEMU_IMG resize "$TEST_IMG" 64M &&
-+    echo "unexpected pass"
-+$PYTHON qcow2.py "$TEST_IMG" dump-header | grep '^\(version\|size\|nb_snap=
-\)'
-+
-+$QEMU_IMG amend -o "compat=3D1.1,size=3D128M" "$TEST_IMG" ||
-+    echo "unexpected fail"
-+$PYTHON qcow2.py "$TEST_IMG" dump-header | grep '^\(version\|size\|nb_snap=
-\)'
-+
-+$QEMU_IMG snapshot -c bar "$TEST_IMG"
-+$QEMU_IMG resize --shrink "$TEST_IMG" 64M ||
-+    echo "unexpected fail"
-+$PYTHON qcow2.py "$TEST_IMG" dump-header | grep '^\(version\|size\|nb_snap=
-\)'
-+
-+$QEMU_IMG amend -o "compat=3D0.10,size=3D32M" "$TEST_IMG" &&
-+    echo "unexpected pass"
-+$PYTHON qcow2.py "$TEST_IMG" dump-header | grep '^\(version\|size\|nb_snap=
-\)'
-+
-+$QEMU_IMG snapshot -a bar "$TEST_IMG" ||
-+    echo "unexpected fail"
-+$PYTHON qcow2.py "$TEST_IMG" dump-header | grep '^\(version\|size\|nb_snap=
-\)'
-+
-+$QEMU_IMG snapshot -d bar "$TEST_IMG"
-+$QEMU_IMG amend -o "compat=3D0.10,size=3D32M" "$TEST_IMG" ||
-+    echo "unexpected fail"
-+$PYTHON qcow2.py "$TEST_IMG" dump-header | grep '^\(version\|size\|nb_snap=
-\)'
-+
-+_check_test_img
-+
-+
- echo
- echo "=3D=3D=3D Testing dirty lazy_refcounts=3Doff =3D=3D=3D"
- echo
-diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
-index 413cc4e0f4ab..5a8d36d0058a 100644
---- a/tests/qemu-iotests/061.out
-+++ b/tests/qemu-iotests/061.out
-@@ -271,6 +271,34 @@ read 65536/65536 bytes at offset 44040192
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- No errors were found on the image.
-
-+=3D=3D=3D Testing resize with snapshots =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33554432
-+wrote 65536/65536 bytes at offset 25165824
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+qemu-img: Can't resize a v2 image which has snapshots
-+version                   2
-+size                      33554432
-+nb_snapshots              1
-+version                   3
-+size                      134217728
-+nb_snapshots              1
-+Image resized.
-+version                   3
-+size                      67108864
-+nb_snapshots              2
-+qemu-img: Internal snapshots prevent downgrade of image
-+version                   3
-+size                      33554432
-+nb_snapshots              2
-+version                   3
-+size                      134217728
-+nb_snapshots              2
-+version                   2
-+size                      33554432
-+nb_snapshots              1
-+No errors were found on the image.
-+
- =3D=3D=3D Testing dirty lazy_refcounts=3Doff =3D=3D=3D
-
- Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
---=20
-2.26.2
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQyMzIyMTcwNy40Nzc0
+MDQtMS1lYmxha2VAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGFz
+YW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWly
+IG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9i
+YWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
+YmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEg
+TkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9
+eDg2XzY0LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAg
+Q0MgICAgICBibG9jay9xY293Mi1jbHVzdGVyLm8KICBDQyAgICAgIGJsb2NrL3Fjb3cyLXNuYXBz
+aG90Lm8KICBDQyAgICAgIGJsb2NrL3Fjb3cyLWNhY2hlLm8KL3RtcC9xZW11LXRlc3Qvc3JjL2Js
+b2NrL3Fjb3cuYzo4NTQ6OTogZXJyb3I6IHZhcmlhYmxlICdyZXQnIGlzIHVzZWQgdW5pbml0aWFs
+aXplZCB3aGVuZXZlciAnaWYnIGNvbmRpdGlvbiBpcyB0cnVlIFstV2Vycm9yLC1Xc29tZXRpbWVz
+LXVuaW5pdGlhbGl6ZWRdCiAgICBpZiAoIXFjb3dfYmxrKSB7CiAgICAgICAgXn5+fn5+fn5+Ci90
+bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9xY293LmM6OTMzOjEyOiBub3RlOiB1bmluaXRpYWxpemVk
+IHVzZSBvY2N1cnMgaGVyZQotLS0KICAgICAgICAgICBeCiAgICAgICAgICAgID0gMAoxIGVycm9y
+IGdlbmVyYXRlZC4KbWFrZTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBi
+bG9jay9xY293Lm9dIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9i
+cy4uLi4KL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3Fjb3cyLmM6MzQwOTo5OiBlcnJvcjogdmFy
+aWFibGUgJ3JldCcgaXMgdXNlZCB1bmluaXRpYWxpemVkIHdoZW5ldmVyICdpZicgY29uZGl0aW9u
+IGlzIHRydWUgWy1XZXJyb3IsLVdzb21ldGltZXMtdW5pbml0aWFsaXplZF0KICAgIGlmICghYmxr
+KSB7CiAgICAgICAgXn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svcWNvdzIuYzozNTc0OjEy
+OiBub3RlOiB1bmluaXRpYWxpemVkIHVzZSBvY2N1cnMgaGVyZQotLS0KICAgICAgICAgICBeCiAg
+ICAgICAgICAgID0gMAoxIGVycm9yIGdlbmVyYXRlZC4KbWFrZTogKioqIFsvdG1wL3FlbXUtdGVz
+dC9zcmMvcnVsZXMubWFrOjY5OiBibG9jay9xY293Mi5vXSBFcnJvciAxClRyYWNlYmFjayAobW9z
+dCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBs
+aW5lIDY2NCwgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBD
+YWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NF
+cnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcs
+ICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPWRkMDg3ZWY3MzUzODQ0YmNiNjA0ZGZhNDdjNmIwOTYz
+JywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywg
+Jy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9eDg2XzY0LXNvZnRtbXUnLCAnLWUnLCAnRVhUUkFf
+Q09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9
+JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScs
+ICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAv
+Y2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLV8wdWRkM252L3Ny
+Yy9kb2NrZXItc3JjLjIwMjAtMDQtMjMtMTguMjQuMDUuMTc2ODY6L3Zhci90bXAvcWVtdTp6LHJv
+JywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtZGVidWcnXScgcmV0
+dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5x
+ZW11Lmluc3RhbmNlLnV1aWQ9ZGQwODdlZjczNTM4NDRiY2I2MDRkZmE0N2M2YjA5NjMKbWFrZVsx
+XTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAv
+dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzB1ZGQzbnYvc3JjJwptYWtlOiAqKiogW2RvY2tl
+ci1ydW4tdGVzdC1kZWJ1Z0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgM201OS45MDhzCnVzZXIg
+ICAgMG04LjQ1MXMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
+Lm9yZy9sb2dzLzIwMjAwNDIzMjIxNzA3LjQ3NzQwNC0xLWVibGFrZUByZWRoYXQuY29tL3Rlc3Rp
+bmcuYXNhbi8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
