@@ -2,124 +2,74 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC724C54FD0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60AEAC54FD0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:46:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 852EF2073A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:46:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h4LfPsZH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 852EF2073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 352CC2073A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:46:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 352CC2073A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRikC-0000Ds-KJ
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:46:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60440)
+	id 1jRikM-0007s7-5J
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:46:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59564)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jRiiU-0007mL-Nc
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:45:03 -0400
+ (envelope-from <bounces@canonical.com>) id 1jRieR-0006jc-Ho
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:40:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jRiiT-00054H-IW
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:45:02 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45511)
+ (envelope-from <bounces@canonical.com>) id 1jRieQ-0001wI-ES
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:40:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41206)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jRiiT-00052p-5j
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:45:01 -0400
-Received: by mail-wr1-x442.google.com with SMTP id t14so8232132wrw.12
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 13:44:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=nw7m+QtqQ68L20g6rF5jyp/MkzoNexySjUrYPBeIGuE=;
- b=h4LfPsZHBjL26FooeyLMYHnfhYQbn/zbTUee7X3agl0r2/A4f1XhLcmINa3sspWL+T
- 5Ipg5VaSQH73EWy1FcglyR13qQUINb8QCT49TTok/9qg712FA9ejuGxQXZAMpnlyx+ru
- CNC8QGODF0hhcAxd6MUGI+YZwYUlY6V1WnAGbUsedl0deOLY35RDKOQAHLCVwY8qWqrc
- lrvuxJPNoSIEmO5agGP96Yk69YxYURMffjuS/Vn4/lupa/7Wf1YEoqjDmdaXz3Z960vw
- 2o3eeSzEiZIpc02Ex2XtiHIvrQoiZSQ1/Xv/Sak1gZYg5ewH4JWI2A1dbvqCHe44g93+
- +nRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=nw7m+QtqQ68L20g6rF5jyp/MkzoNexySjUrYPBeIGuE=;
- b=NPKUTdceSsyIdjNiOrqn7VaQH1dwCoBDh6KqNzj95t42NUlbCxwrFPrZpnRSGTJ9l8
- ACTSO56qonHGwqDpW74iXewXvugd4of3a8Yct8P2G8JOpIU+7Hq0paaPwfLiZHGhS5s8
- 7hUF49eGl1+gFgyDK/HrxCnu2LV2zRRAnSfMeaOFoqWmPy/OpvJJNISvHQxuiK7ys1XI
- kCObIhJryDAABCfkyQkSG8OXbs2QYb0KBK2mzQDq9K0StQRxuUguWHbfKCoZy5+mo9dD
- 4UJd3CdeaKI+DMiSxw3pb0O0NI4MnZEi6luPSHftU05rF3Odf3amuUcfVNwfn9o7IpGx
- ttBg==
-X-Gm-Message-State: AGi0PuaA7VNmE6jXvrXEmPXkgjcc6x5zJZ+7hZf6SYvjOvNxriUVBE/i
- hvq55umyOqtV0qEEBA/gnqG9NB28
-X-Google-Smtp-Source: APiQypLeYmXftCcszY1nYS7/ARXWgeWmHsJdPmykc0V8ak1gzgKcgMBU49pAJrHYyb0iK8+GIbBgLg==
-X-Received: by 2002:a5d:60ca:: with SMTP id x10mr6824420wrt.407.1587674698270; 
- Thu, 23 Apr 2020 13:44:58 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id l5sm4946231wmi.22.2020.04.23.13.44.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Apr 2020 13:44:57 -0700 (PDT)
-Subject: Re: Need BT support in qemu for Zephyr
-To: Dan Christian <dchristian@cardinalpeak.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <CADxL6wUGWZO0U=G7UTAebG57m6tG58hoMf_-TCC+0qReUB0G6w@mail.gmail.com>
- <20200423141112.GE1077680@redhat.com>
- <CADxL6wX-0Lt_LKT9pQMiK3Y1L0tdrF9G23dfYU=9FXgFZB-4Fw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <455cf375-fe21-f5c4-6086-4413bf710d33@amsat.org>
-Date: Thu, 23 Apr 2020 22:44:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jRieQ-0001w4-0d
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:40:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jRieO-0001fB-DZ
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 20:40:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 63D1D2E8104
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 20:40:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CADxL6wX-0Lt_LKT9pQMiK3Y1L0tdrF9G23dfYU=9FXgFZB-4Fw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::442
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 Apr 2020 20:32:01 -0000
+From: Helge Deller <deller@gmx.de>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 8-deller
+X-Launchpad-Bug-Reporter: Helge Deller (8-deller)
+X-Launchpad-Bug-Modifier: Helge Deller (8-deller)
+Message-Id: <158767392171.23001.17996085062254045820.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1874539] [NEW] tulip driver broken in v5.0.0-rc4
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="486bbbd6cb608f8eb468ed0d08689a349dfabe49";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 8b54020ba4146c3f879c256fa599d80bfe0fb688
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 16:40:48
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -128,32 +78,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Reply-To: Bug 1874539 <1874539@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/23/20 4:40 PM, Dan Christian wrote:
-> I'm new to trying to use qemu+bt (via btproxy) and haven't managed to
-> get anything working.
-> 
-> btproxy is launched first, then Zephyr launches qemu via it's west
-> tool.  The commands look like:
-> sudo tools/btproxy -u -i 0 -d # in a separate window
-> x86_64-pokysdk-linux/usr/bin/qemu-system-aarch64 -cpu cortex-a53
-> -nographic -machine virt -
-> net none -pidfile qemu.pid -chardev stdio,id=con,mux=on -serial
-> chardev:con -mon chardev=con,mode=readline -serial
-> unix:/tmp/bt-server-bredr -kernel
-> /home/dchristian/share-fb/zephyrproject/zephy
-> r/build/zephyr/zephyr.elf
-> 
-> It's failing with a device busy when btproxy tries to bind to the
-> adapter.  I don't think this is a quemu issue.
-> 
-> Zephyr packages it's own qemu:  QEMU emulator version 4.2.0 (v4.2.0-dirty)
+Public bug reported:
 
-If you just want to test/use BT, you might be luckier with an older
-version of QEMU supposed to work with BT, such QEMU v1.0. You won't have
-support for Cortex-A53 although.
+In a qemu-system-hppa system, qemu release v5.0.0-rc, the tulip nic driver =
+is broken.
+The tulip nic is detected, even getting DHCP info does work.
+But when trying to download bigger files via network, the tulip driver gets=
+ stuck.
+
+For example when trying to download a 100MB file:
+
+root@debian:~# wget https://speed.hetzner.de/100MB.bin
+--2020-04-23 20:26:43--  https://speed.hetzner.de/100MB.bin
+Resolving speed.hetzner.de (speed.hetzner.de)... 88.198.248.254, 2a01:4f8:0=
+:59ed::2
+Connecting to speed.hetzner.de (speed.hetzner.de)|88.198.248.254|:443... co=
+nnected.
+<waiting and stuck here>
+
+When reverting this commit, everything works again:
+commit 8ffb7265af64ec81748335ec8f20e7ab542c3850
+Author: Prasad J Pandit <pjp@fedoraproject.org>
+Date:   Tue Mar 24 22:57:22 2020 +0530
+PATCH: net: tulip: check frame size and r/w data length
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1874539
+
+Title:
+  tulip driver broken in v5.0.0-rc4
+
+Status in QEMU:
+  New
+
+Bug description:
+  In a qemu-system-hppa system, qemu release v5.0.0-rc, the tulip nic drive=
+r is broken.
+  The tulip nic is detected, even getting DHCP info does work.
+  But when trying to download bigger files via network, the tulip driver ge=
+ts stuck.
+
+  For example when trying to download a 100MB file:
+
+  root@debian:~# wget https://speed.hetzner.de/100MB.bin
+  --2020-04-23 20:26:43--  https://speed.hetzner.de/100MB.bin
+  Resolving speed.hetzner.de (speed.hetzner.de)... 88.198.248.254, 2a01:4f8=
+:0:59ed::2
+  Connecting to speed.hetzner.de (speed.hetzner.de)|88.198.248.254|:443... =
+connected.
+  <waiting and stuck here>
+
+  When reverting this commit, everything works again:
+  commit 8ffb7265af64ec81748335ec8f20e7ab542c3850
+  Author: Prasad J Pandit <pjp@fedoraproject.org>
+  Date:   Tue Mar 24 22:57:22 2020 +0530
+  PATCH: net: tulip: check frame size and r/w data length
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1874539/+subscriptions
 
