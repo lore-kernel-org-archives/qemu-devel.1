@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F28AC2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 04:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C346C2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 04:24:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDCC320656
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 04:23:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 640732075A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 04:24:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="zb+9yjVp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDCC320656
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="S+YgvsrF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 640732075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRTOi-0006tc-11
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 00:23:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49506)
+	id 1jRTPK-0007ct-HO
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 00:24:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49718)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jRTGX-0000ZL-7c
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:10 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jRTGq-00019O-AA
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jRTGV-0007Nh-VQ
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:08 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:41492)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jRTGp-00086E-LR
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:28 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:55140)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jRTGV-0007M8-Ei
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:07 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03N4CTwP131569;
- Thu, 23 Apr 2020 04:15:01 GMT
+ id 1jRTGp-00083w-1V
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:27 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03N4DF3K064448;
+ Thu, 23 Apr 2020 04:15:20 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2020-01-29;
- bh=b3tR5kc/fZFEBgfsLLZnsuzzLDNVQvVsWREjDfZMZ4I=;
- b=zb+9yjVp5VE1i9SELXbZLNxD1qVrCvS9OuirfeMUlVS9nYL8BLDmkdGsXpgsrZ9EJglQ
- slApFL2XCMqyOGN1DA5aoSv1bMnAML6qXCMvEWFsiq9p83I/Y5PPAR30XGqKrOACricu
- /2De8MyxuT2rySCJvKvwILxGKq/iB4Z+bhZxAzzKIlyTNvp1L5QKXPwOU87V/EUEBLyX
- TZzTlQjilTiFUu3Y5tjJ2IK5GgLyGXfSps+fp5VTkIEhrzO/j7zmAXDN27GeJ+CT5brj
- 44mDpaHirns0DZ6yOCsCZv01DGKFFDXnqKlnhPJR45UHViyB4aDMUl0JKdeSKYUClzMy bA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2120.oracle.com with ESMTP id 30jvq4s902-1
+ bh=HfeRmG6K9nkKRkIY5gOQdWsLyLw6GvbDT6AISfqUr44=;
+ b=S+YgvsrFC7sRyP4o0WmPdN38MDh4MbRVTbMr3l1+fxRhfLyfDX+BEqwBUXAFUQwKIWFb
+ s9fM6slQkrDVygTNEgwFegrdfQegdf4HKWkgxWn2Y7mm0xFtYe5Yh9yGB9caNy5a13bq
+ nsJ6UGD2QuoyxNeVRldwDhb0yz6kWoWPxFKPzpB02bQj8508hmT3E15DxHqJERDJMVgs
+ +SkuVbWRKNzZWjQLra8OYFlM4RETgn9KEhzCJClwmAcIrgAHVYLPCfAmG05YMg7r810X
+ DnG/8a4vhSOG+B3uATayIsU13C6Smp6x97E/5xOdCto3XN/5IheNmTeNtcOSmgU5Fc8N rA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 30grpgtrtx-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 23 Apr 2020 04:15:00 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03N4Bfd1093773;
- Thu, 23 Apr 2020 04:15:00 GMT
+ Thu, 23 Apr 2020 04:15:20 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03N4DWKq168843;
+ Thu, 23 Apr 2020 04:15:20 GMT
 Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3030.oracle.com with ESMTP id 30gb3ux0kw-1
+ by userp3020.oracle.com with ESMTP id 30gb942hcb-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 23 Apr 2020 04:15:00 +0000
+ Thu, 23 Apr 2020 04:15:20 +0000
 Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03N4EwrV020825;
- Thu, 23 Apr 2020 04:14:58 GMT
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03N4FHxB020966;
+ Thu, 23 Apr 2020 04:15:17 GMT
 Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 22 Apr 2020 21:14:57 -0700
+ with ESMTP ; Wed, 22 Apr 2020 21:15:17 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v6 18/36] multi-process: Initialize Proxy Object's
- communication channel
-Date: Wed, 22 Apr 2020 21:13:53 -0700
-Message-Id: <4a67a368c3ca27e393ac7646ed27b3821dd748e2.1587614626.git.elena.ufimtseva@oracle.com>
+Subject: [PATCH RESEND v6 29/36] multi-process: handle heartbeat messages in
+ remote process
+Date: Wed, 22 Apr 2020 21:14:04 -0700
+Message-Id: <5c66c9f8df2278401b7ad58ff8606ae027f1fcec.1587614626.git.elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.25.GIT
 In-Reply-To: <cover.1587614626.git.elena.ufimtseva@oracle.com>
 References: <cover.1587614626.git.elena.ufimtseva@oracle.com>
@@ -79,24 +79,24 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9599
  signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- spamscore=0 adultscore=0
- mlxlogscore=999 phishscore=0 suspectscore=1 bulkscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004230027
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ adultscore=0
+ bulkscore=0 suspectscore=1 malwarescore=0 phishscore=0 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004230027
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9599
  signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- lowpriorityscore=0 malwarescore=0
- mlxscore=0 adultscore=0 mlxlogscore=999 phishscore=0 impostorscore=0
- clxscore=1015 bulkscore=0 spamscore=0 priorityscore=1501 suspectscore=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ mlxscore=0
+ lowpriorityscore=0 adultscore=0 suspectscore=1 bulkscore=0 clxscore=1015
+ malwarescore=0 phishscore=0 spamscore=0 priorityscore=1501 impostorscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004230027
-Received-SPF: pass client-ip=141.146.126.78;
- envelope-from=elena.ufimtseva@oracle.com; helo=aserp2120.oracle.com
+Received-SPF: pass client-ip=156.151.31.86;
+ envelope-from=elena.ufimtseva@oracle.com; helo=userp2130.oracle.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 00:14:28
 X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,55 +120,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jagannathan Raman <jag.raman@oracle.com>
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Add "socket" object property which initializes the communication channel
+If the remote process is alive, it responds to proxy's heartbeat
+messages
 
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- hw/proxy/qemu-proxy.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ remote/remote-main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-index bf6c4117ef..40bf56fd37 100644
---- a/hw/proxy/qemu-proxy.c
-+++ b/hw/proxy/qemu-proxy.c
-@@ -14,6 +14,25 @@
- #include "hw/proxy/qemu-proxy.h"
- #include "hw/pci/pci.h"
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+index b37802151a..beac591fac 100644
+--- a/remote/remote-main.c
++++ b/remote/remote-main.c
+@@ -216,6 +216,7 @@ static void process_msg(GIOCondition cond, MPQemuLinkState *link,
+     g_autofree gchar *pid_exec = NULL;
  
-+static void proxy_set_socket(Object *obj, const char *str, Error **errp)
-+{
-+    PCIProxyDev *pdev = PCI_PROXY_DEV(obj);
-+
-+    pdev->socket = atoi(str);
-+
-+    mpqemu_init_channel(pdev->mpqemu_link, &pdev->mpqemu_link->com,
-+                        pdev->socket);
-+}
-+
-+static void proxy_init(Object *obj)
-+{
-+    PCIProxyDev *pdev = PCI_PROXY_DEV(obj);
-+
-+    pdev->mpqemu_link = mpqemu_link_create();
-+
-+    object_property_add_str(obj, "socket", NULL, proxy_set_socket, NULL);
-+}
-+
- static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
- {
-     PCIProxyDev *dev = PCI_PROXY_DEV(device);
-@@ -41,6 +60,7 @@ static const TypeInfo pci_proxy_dev_type_info = {
-     .instance_size = sizeof(PCIProxyDev),
-     .class_size    = sizeof(PCIProxyDevClass),
-     .class_init    = pci_proxy_dev_class_init,
-+    .instance_init = proxy_init,
-     .interfaces = (InterfaceInfo[]) {
-         { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-         { },
+     pid_exec = g_malloc(PROC_INFO_LENGTH);
++    int wait;
+ 
+     if ((cond & G_IO_HUP) || (cond & G_IO_ERR)) {
+         goto finalize_loop;
+@@ -269,6 +270,10 @@ static void process_msg(GIOCondition cond, MPQemuLinkState *link,
+     case GET_PCI_INFO:
+         process_get_pci_info_msg(link, msg);
+         break;
++    case PROXY_PING:
++        wait = msg->fds[0];
++        notify_proxy(wait, 0);
++        break;
+     default:
+         error_setg(&err, "Unknown command in %s", print_pid_exec(pid_exec));
+         goto finalize_loop;
 -- 
 2.25.GIT
 
