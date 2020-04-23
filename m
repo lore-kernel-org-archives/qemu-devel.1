@@ -2,65 +2,68 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B9F2C55185
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 01:56:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D31DEC55185
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 02:49:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CF8E2073A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 01:56:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CF8E2073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 940102075A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 02:49:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="NjtxdxF8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 940102075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRR6F-0005Br-6a
-	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 21:56:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41364)
+	id 1jRRvl-0000lW-Is
+	for qemu-devel@archiver.kernel.org; Wed, 22 Apr 2020 22:49:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jRR5O-0004fs-C1
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 21:55:30 -0400
+ (envelope-from <zxq_yx_007@163.com>) id 1jRRu0-0008Ic-MY
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 22:47:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jRR5M-0005Dk-DZ
- for qemu-devel@nongnu.org; Wed, 22 Apr 2020 21:55:29 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:44275)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jRR5L-0004YO-OM; Wed, 22 Apr 2020 21:55:28 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07659078|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_regular_dialog|0.122069-0.00291788-0.875013;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01a16384; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=9; SR=0; TI=SMTPD_---.HMAxgBk_1587606913; 
-Received: from 30.225.208.25(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HMAxgBk_1587606913)
- by smtp.aliyun-inc.com(10.147.44.118);
- Thu, 23 Apr 2020 09:55:17 +0800
-Subject: Re: [PATCH] linux-user/riscv: fix up struct target_ucontext definition
-To: Richard Henderson <richard.henderson@linaro.org>
-References: <20200412020830.607-1-zhiwei_liu@c-sky.com>
- <f6dc4fa7-fed5-28a1-5922-68e9a0510de5@c-sky.com>
- <bf6b46c3-cc39-1b4a-4ae4-9de894721f04@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <07931c1c-c7b3-510a-d3cf-5fb6bc877e87@c-sky.com>
-Date: Thu, 23 Apr 2020 09:55:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <bf6b46c3-cc39-1b4a-4ae4-9de894721f04@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 21:55:18
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+ (envelope-from <zxq_yx_007@163.com>) id 1jRRty-0000dC-SM
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 22:47:47 -0400
+Received: from m12-16.163.com ([220.181.12.16]:60045)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <zxq_yx_007@163.com>)
+ id 1jRRtw-0000M2-8t
+ for qemu-devel@nongnu.org; Wed, 22 Apr 2020 22:47:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=From:Subject:Date:Message-Id; bh=zU48EntpaAnTs1XJQf
+ aDHNhT4JTrL5bb5mDEGKr061A=; b=NjtxdxF8T1uY0r5efEoUSQG+0zLoBmgWam
+ zkHgzhd2rQn3NgE9VB9/7Xn+1SSEp0rIrxVNwoNxcdbFX5FuLMozDPvTzC0FTvz9
+ sszu7sIdJMFuFysPEANzj/pqVIbhzOwRB5DM63K8zj3oZ/kcx2AaSDkAqo+1rHTV
+ uPhCdI5BA=
+Received: from localhost.localdomain (unknown [39.155.168.46])
+ by smtp12 (Coremail) with SMTP id EMCowAC3zi4v_qBe8sKqBA--.44860S2;
+ Thu, 23 Apr 2020 10:32:17 +0800 (CST)
+From: xiaoqiang zhao <zxq_yx_007@163.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] qemu-sockets: add abstract UNIX domain socket support
+Date: Thu, 23 Apr 2020 10:32:12 +0800
+Message-Id: <20200423023212.20968-1-zxq_yx_007@163.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: EMCowAC3zi4v_qBe8sKqBA--.44860S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7ZryrXFyDGw4UGF17Xr45Awb_yoW8GF1kpF
+ W5K393GrW5Ar4rurs5JayUCr1aya1kG34UW34kJw1S9an8WF18ZFWvkr1UKryUXrWrWrW7
+ Crn0gFsIyFZ8tw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRS1vhUUUUU=
+X-Originating-IP: [39.155.168.46]
+X-CM-SenderInfo: 520ts5t0bqili6rwjhhfrp/xtbB0hEPxlUMVnudTAAAsv
+Received-SPF: pass client-ip=220.181.12.16; envelope-from=zxq_yx_007@163.com;
+ helo=m12-16.163.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/22 22:32:19
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Received-From: 220.181.12.16
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,69 +75,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu,
- wxy194768@alibaba-inc.com,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wenmeng_zhang@c-sky.com, palmer@dabbelt.com,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: xiaoqiang zhao <zxq_yx_007@163.com>, berrange@redhat.com, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+unix_connect_saddr now support abstract address type
 
+By default qemu does not support abstract UNIX domain
+socket address. Add this ability to make qemu handy
+when abstract address is needed.
+Abstract address is marked by prefixing the address name with a '@'.
 
-On 2020/4/22 12:10, Richard Henderson wrote:
-> On 4/21/20 7:34 PM, LIU Zhiwei wrote:
->> Ping.
->>
->> When I port RISU, I find this bug. I can't get the correct registers from the
->> struct ucontext_t parameter in the signal handler.
-> The RISC-V Linux ABI will need to be extended to handle RVV state.
->
-> There is room in your sigcontext structure:
->
->> struct __riscv_q_ext_state {
->>          __u64 f[64] __attribute__((aligned(16)));
->>          __u32 fcsr;
->>          /*
->>           * Reserved for expansion of sigcontext structure.  Currently zeroed
->>           * upon signal, and must be zero upon sigreturn.
->>           */
->>          __u32 reserved[3];
->> };
-> in uc->uc_mcontext.sc_fpregs.q.
->
-> That reserved field is going to have to be used in some way.
->
-> My suggestion is to use some sort of extendable record list, akin to AArch64:
->
-> struct _aarch64_ctx {
->          __u32 magic;
->          __u32 size;
-> };
->
-> One of the 3 zeros could be the total size of the extensions, so that it's easy
-> to validate the size or memcpy the lot without parsing each individual record.
->   The other two zeros could be the first header of the next record.  Which in
-> this case also allows the payload of that first record to be aligned mod 16,
-> which could come in handy.
->
-> Talk to the risc-v kernel engineers and come up with a plan that includes room
-> for the next architecture extension as well.  They may have already done so,
-> but I'm not monitoring the correct mailing list to know.
-Hi Richard,
+Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
+---
+ util/qemu-sockets.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-As far as I know, Guo Ren and Greentime are supporting RVV on Linux, 
-based on the v0.7.1 QEMU implementation.
-The main problem is that VLEN is not a  fixed number.
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index bcc06d0e01..d4f02a6b1a 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -939,6 +939,7 @@ static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
+     struct sockaddr_un un;
+     int sock, rc;
+     size_t pathlen;
++    socklen_t serverlen;
+ 
+     if (saddr->path == NULL) {
+         error_setg(errp, "unix connect: no path specified");
+@@ -963,10 +964,18 @@ static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
+     un.sun_family = AF_UNIX;
+     memcpy(un.sun_path, saddr->path, pathlen);
+ 
++    if (saddr->path[0] == '@') {
++        un.sun_path[0] = '\0';
++        serverlen = strlen(saddr->path) + offsetof(struct sockaddr_un, sun_path);
++    }
++    else {
++        serverlen = sizeof(un);
++    }
++
+     /* connect to peer */
+     do {
+         rc = 0;
+-        if (connect(sock, (struct sockaddr *) &un, sizeof(un)) < 0) {
++        if (connect(sock, (struct sockaddr *) &un, serverlen) < 0) {
+             rc = -errno;
+         }
+     } while (rc == -EINTR);
+-- 
+2.17.1
 
-Thanks for your advice. I will communicate with them.
-
-When the Linux kernel released with RVV, I will push a new sigcontext 
-structure here.
-
-Zhiwei
->
-> r~
 
 
