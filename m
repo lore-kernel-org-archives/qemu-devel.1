@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB514C55191
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 04:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69F60C54FD0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 04:22:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A65692075A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 04:21:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34FDB2075A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 04:22:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iS1BRaJZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A65692075A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Z1scR/QP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34FDB2075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRTN8-0003ZO-Pp
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 00:21:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49438)
+	id 1jRTND-0003mO-CK
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 00:22:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49486)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jRTGQ-0000RB-OH
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:03 -0400
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jRTGV-0000Yj-Mb
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1jRTGP-0007EI-PR
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:02 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:38900)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1jRTGU-0007MP-SB
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:07 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:41470)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1jRTGP-0007BJ-3x
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:01 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03N4DR95052417;
- Thu, 23 Apr 2020 04:14:54 GMT
+ id 1jRTGU-0007LQ-CY
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 00:15:06 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03N4CZbW131587;
+ Thu, 23 Apr 2020 04:14:57 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=nIk13E4+qeubC8FEj4ST8gA+voZ5HEM1QjFAcIh6j3g=;
- b=iS1BRaJZGZq5Vm1rx3svsw7rVHh0yhqil64UWnVxnDmpY0gSClFvblbkdDlpv22jFjy+
- O0EBeb5WdHJyz4JOcmB9CK4kXyTL60sH1s5DEET7lwL/eSDnX0eq5L47T5Wskfa7DAYR
- FFltYAxW2ib9VvAMxHEdu4s+wFb/XJv1dIS2ChlrTc15wzc6Tnt2M1b5gSANNiPJZeHV
- dMhGQZuhB4WHhionuVlqdUbnsqe7hWMXDHSV/ohawFZ2NKUER5qACgAsviMyTX5lrGu4
- 0nA1hH5OG+0RFS+H5/dSuOTNTWAmy51XwpDiduVjeljzDYrymDQ6zHwsoVqpa9FK1D/R JQ== 
+ bh=kvRaYlFgij7Zx+G0zUyfR0xz+W7+KI0hBo9ejXKifas=;
+ b=Z1scR/QPJSJA1SFg2jFT1buIUL8hIfz6Rm18Xl4rkOHBpCigcqbxxUtDAnTWH5kkcDH0
+ zow/Hdh5T80+a4ipqmp2B7+ty3S9GqqacPil8Zf+5GuIl5mzDaESmLSf3Ah2A5UpAuxI
+ HzoR8JKJaCTQcP1KvUfKeVpvDI9h2sYX0sKGsubblAJFi55UfMYlMgjGcXAQRgfTvsd3
+ Ivm4roLZC9+fXV/0t0xNjSFxlO0F0yvcZ1mrpGLPJdjnFNxvBDqjq81/0MnvcRVfwcSX
+ WytG78BjCLS7AfqdA9sp6LMtmYiObaEPLB6EhgTo/e5jUZKPAZps9JEwNjZ/Ff0ctkbn LQ== 
 Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 30jhyc542j-1
+ by aserp2120.oracle.com with ESMTP id 30jvq4s8yw-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 23 Apr 2020 04:14:54 +0000
+ Thu, 23 Apr 2020 04:14:57 +0000
 Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03N4BepD093655;
- Thu, 23 Apr 2020 04:14:53 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3030.oracle.com with ESMTP id 30gb3ux0h8-1
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03N4Bev4093656;
+ Thu, 23 Apr 2020 04:14:57 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 30gb3ux0jm-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 23 Apr 2020 04:14:53 +0000
+ Thu, 23 Apr 2020 04:14:57 +0000
 Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03N4EqJG017757;
- Thu, 23 Apr 2020 04:14:52 GMT
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03N4EsbX020226;
+ Thu, 23 Apr 2020 04:14:54 GMT
 Received: from flaka.hsd1.ca.comcast.net (/67.180.143.163)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 22 Apr 2020 21:14:52 -0700
+ with ESMTP ; Wed, 22 Apr 2020 21:14:54 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v6 15/36] multi-process: setup memory manager for
- remote device
-Date: Wed, 22 Apr 2020 21:13:50 -0700
-Message-Id: <c16682b1ac3a660d8b5b751b6d5f904a25d17dc4.1587614626.git.elena.ufimtseva@oracle.com>
+Subject: [PATCH RESEND v6 16/36] multi-process: remote process initialization
+Date: Wed, 22 Apr 2020 21:13:51 -0700
+Message-Id: <f80b49bb051b277c163b64551e92d5d9e8f6cb5a.1587614626.git.elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.25.GIT
 In-Reply-To: <cover.1587614626.git.elena.ufimtseva@oracle.com>
 References: <cover.1587614626.git.elena.ufimtseva@oracle.com>
@@ -82,22 +81,22 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9599
  signatures=668686
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
  spamscore=0 adultscore=0
- mlxlogscore=999 phishscore=0 suspectscore=4 bulkscore=0 mlxscore=0
+ mlxlogscore=999 phishscore=0 suspectscore=3 bulkscore=0 mlxscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004230027
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9599
  signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- spamscore=0 mlxscore=0
- clxscore=1015 suspectscore=4 phishscore=0 lowpriorityscore=0 bulkscore=0
- impostorscore=0 malwarescore=0 priorityscore=1501 adultscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ lowpriorityscore=0 malwarescore=0
+ mlxscore=0 adultscore=0 mlxlogscore=999 phishscore=0 impostorscore=0
+ clxscore=1015 bulkscore=0 spamscore=0 priorityscore=1501 suspectscore=3
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004230027
-Received-SPF: pass client-ip=156.151.31.85;
- envelope-from=elena.ufimtseva@oracle.com; helo=userp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 00:14:40
+Received-SPF: pass client-ip=141.146.126.78;
+ envelope-from=elena.ufimtseva@oracle.com; helo=aserp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 00:14:28
 X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,156 +122,41 @@ Sender: "Qemu-devel"
 
 From: Jagannathan Raman <jag.raman@oracle.com>
 
-sync_sysmem_msg_t message format is defined. It is used to send
-file descriptors of the RAM regions to remote device.
-RAM on the remote device is configured with a set of file descriptors.
-Old RAM regions are deleted and new regions, each with an fd, is
-added to the RAM.
+Adds the handler to process message from QEMU,
+Initialize remote process main loop, handles SYNC_SYSMEM
+message by updating its "system_memory" container using
+shared file descriptors received from QEMU.
 
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- MAINTAINERS              |  2 ++
- Makefile.target          |  2 ++
- exec.c                   | 17 +++++++++++
- include/exec/ram_addr.h  |  2 ++
- include/io/mpqemu-link.h | 12 ++++++++
- include/remote/memory.h  | 20 +++++++++++++
- io/mpqemu-link.c         | 13 +++++++++
- remote/memory.c          | 63 ++++++++++++++++++++++++++++++++++++++++
- 8 files changed, 131 insertions(+)
- create mode 100644 include/remote/memory.h
- create mode 100644 remote/memory.c
+ MAINTAINERS            |   1 +
+ remote/remote-common.h |  21 +++++++++
+ remote/remote-main.c   | 104 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 126 insertions(+)
+ create mode 100644 remote/remote-common.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 09764e461c..98237fff62 100644
+index 98237fff62..96f8d7ff19 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -2863,6 +2863,8 @@ F: include/remote/pcihost.h
- F: remote/pcihost.c
- F: include/remote/machine.h
- F: remote/machine.c
-+F: include/remote/memory.h
-+F: remote/memory.c
- 
- Build and test automation
- -------------------------
-diff --git a/Makefile.target b/Makefile.target
-index 70fa1eeca5..500fa07fda 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -143,6 +143,8 @@ remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/replay.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/xen-mapcache.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/audio.o
- remote-pci-tgt-obj-$(CONFIG_MPQEMU) += stubs/monitor.o
-+
-+remote-pci-tgt-obj-$(CONFIG_MPQEMU) += remote/memory.o
- endif
- 
- #########################################################
-diff --git a/exec.c b/exec.c
-index 5b1e414099..1e02e00f00 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2371,6 +2371,23 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
- 
-     return block;
- }
-+
-+void qemu_ram_init_from_fd(MemoryRegion *mr, int fd, uint64_t size,
-+                           ram_addr_t offset, Error **errp)
-+{
-+    char *name = g_strdup_printf("%d", fd);
-+
-+    memory_region_init(mr, NULL, name, size);
-+    mr->ram = true;
-+    mr->terminates = true;
-+    mr->destructor = NULL;
-+    mr->align = 0;
-+    mr->ram_block = qemu_ram_alloc_from_fd(size, mr, RAM_SHARED, fd, offset,
-+                                           errp);
-+    mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
-+
-+    g_free(name);
-+}
- #endif
- 
- static
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 1b9f489ff0..d9d7314f51 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -122,6 +122,8 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
- RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-                                  uint32_t ram_flags, int fd,
-                                  off_t offset, Error **errp);
-+void qemu_ram_init_from_fd(MemoryRegion *mr, int fd, uint64_t size,
-+                           ram_addr_t offset, Error **errp);
- 
- RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
-                                   MemoryRegion *mr, Error **errp);
-diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
-index ef95599bca..d46cb81058 100644
---- a/include/io/mpqemu-link.h
-+++ b/include/io/mpqemu-link.h
-@@ -16,6 +16,8 @@
- 
- #include "qom/object.h"
- #include "qemu/thread.h"
-+#include "exec/cpu-common.h"
-+#include "exec/hwaddr.h"
- 
- #define TYPE_MPQEMU_LINK "mpqemu-link"
- #define MPQEMU_LINK(obj) \
-@@ -27,15 +29,23 @@
- 
- /**
-  * mpqemu_cmd_t:
-+ * SYNC_SYSMEM      Shares QEMU's RAM with remote device's RAM
-  *
-  * proc_cmd_t enum type to specify the command to be executed on the remote
-  * device.
-  */
- typedef enum {
-     INIT = 0,
-+    SYNC_SYSMEM,
-     MAX,
- } mpqemu_cmd_t;
- 
-+typedef struct {
-+    hwaddr gpas[REMOTE_MAX_FDS];
-+    uint64_t sizes[REMOTE_MAX_FDS];
-+    ram_addr_t offsets[REMOTE_MAX_FDS];
-+} sync_sysmem_msg_t;
-+
- /**
-  * MPQemuMsg:
-  * @cmd: The remote command
-@@ -49,6 +59,7 @@ typedef enum {
-  * MPQemuMsg Format of the message sent to the remote device from QEMU.
-  *
-  */
-+
- typedef struct {
-     mpqemu_cmd_t cmd;
-     int bytestream;
-@@ -56,6 +67,7 @@ typedef struct {
- 
-     union {
-         uint64_t u64;
-+        sync_sysmem_msg_t sync_sysmem;
-     } data1;
- 
-     int fds[REMOTE_MAX_FDS];
-diff --git a/include/remote/memory.h b/include/remote/memory.h
+@@ -2857,6 +2857,7 @@ M: John G Johnson <john.g.johnson@oracle.com>
+ S: Maintained
+ F: remote/Makefile.objs
+ F: remote/remote-main.c
++F: remote/remote-common.h
+ F: include/io/mpqemu-link.h
+ F: io/mpqemu-link.c
+ F: include/remote/pcihost.h
+diff --git a/remote/remote-common.h b/remote/remote-common.h
 new file mode 100644
-index 0000000000..e2e479bb6f
+index 0000000000..12c8d066cf
 --- /dev/null
-+++ b/include/remote/memory.h
-@@ -0,0 +1,20 @@
++++ b/remote/remote-common.h
+@@ -0,0 +1,21 @@
 +/*
-+ * Memory manager for remote device
++ * Remote device initialization
 + *
 + * Copyright © 2018, 2020 Oracle and/or its affiliates.
 + *
@@ -280,110 +164,146 @@ index 0000000000..e2e479bb6f
 + * See the COPYING file in the top-level directory.
 + *
 + */
++#ifndef REMOTE_COMMON_H
++#define REMOTE_COMMON_H
 +
-+#ifndef REMOTE_MEMORY_H
-+#define REMOTE_MEMORY_H
++extern const char *__progname;
 +
-+#include "qemu/osdep.h"
-+#include "exec/hwaddr.h"
++#define PROC_INFO_LENGTH 1024
++gchar *print_pid_exec(gchar *str);
++
++#endif /* REMOTE_COMMON_H */
++
++
++
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+index ecf30e0cba..dbd6ad2529 100644
+--- a/remote/remote-main.c
++++ b/remote/remote-main.c
+@@ -12,6 +12,7 @@
+ #include "qemu-common.h"
+ 
+ #include <stdio.h>
++#include <unistd.h>
+ 
+ #include "qemu/module.h"
+ #include "remote/pcihost.h"
+@@ -19,12 +20,115 @@
+ #include "hw/boards.h"
+ #include "hw/qdev-core.h"
+ #include "qemu/main-loop.h"
++#include "remote/memory.h"
 +#include "io/mpqemu-link.h"
++#include "qapi/error.h"
++#include "qemu/main-loop.h"
++#include "sysemu/cpus.h"
++#include "qemu-common.h"
++#include "hw/pci/pci.h"
++#include "qemu/thread.h"
++#include "qemu/main-loop.h"
++#include "qemu/config-file.h"
++#include "sysemu/sysemu.h"
++#include "block/block.h"
++#include "exec/ramlist.h"
++#include "remote/remote-common.h"
 +
-+void remote_sysmem_reconfig(MPQemuMsg *msg, Error **errp);
++static MPQemuLinkState *mpqemu_link;
 +
-+#endif
-diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
-index cc0a7aecd4..3f81cef96e 100644
---- a/io/mpqemu-link.c
-+++ b/io/mpqemu-link.c
-@@ -368,6 +368,19 @@ bool mpqemu_msg_valid(MPQemuMsg *msg)
-             }
-         }
-     }
-+     /* Verify message specific fields. */
++gchar *print_pid_exec(gchar *str)
++{
++    if (!str) {
++        return NULL;
++    }
++    memset(str, 0, PROC_INFO_LENGTH);
++    g_snprintf(str, PROC_INFO_LENGTH, "pid %d, exec name %s ",
++                                       getpid(), __progname);
++    return str;
++}
++
++static void process_msg(GIOCondition cond, MPQemuLinkState *link,
++                        MPQemuChannel *chan)
++{
++    MPQemuMsg *msg = NULL;
++    Error *err = NULL;
++    g_autofree gchar *pid_exec = NULL;
++
++    pid_exec = g_malloc(PROC_INFO_LENGTH);
++
++    if ((cond & G_IO_HUP) || (cond & G_IO_ERR)) {
++        goto finalize_loop;
++    }
++
++    msg = g_malloc0(sizeof(MPQemuMsg));
++
++    if (mpqemu_msg_recv(msg, chan) < 0) {
++        error_setg(&err, "Failed to receive message in remote process %s",
++                   print_pid_exec(pid_exec));
++        goto finalize_loop;
++    }
++
 +    switch (msg->cmd) {
-+    case SYNC_SYSMEM:
-+        if (msg->num_fds == 0 || msg->bytestream != 0) {
-+            return false;
-+        }
-+        if (msg->size != sizeof(msg->data1)) {
-+            return false;
-+        }
++    case INIT:
 +        break;
 +    default:
-+        break;
-+    }
- 
-     return true;
- }
-diff --git a/remote/memory.c b/remote/memory.c
-new file mode 100644
-index 0000000000..2c8b7bb42f
---- /dev/null
-+++ b/remote/memory.c
-@@ -0,0 +1,63 @@
-+/*
-+ * Memory manager for remote device
-+ *
-+ * Copyright © 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include <stdint.h>
-+#include <sys/types.h>
-+
-+#include "qemu/osdep.h"
-+#include "qemu/queue.h"
-+#include "qemu-common.h"
-+#include "remote/memory.h"
-+#include "exec/memory.h"
-+#include "exec/address-spaces.h"
-+#include "cpu.h"
-+#include "exec/ram_addr.h"
-+#include "io/mpqemu-link.h"
-+#include "qemu/main-loop.h"
-+#include "qapi/error.h"
-+
-+void remote_sysmem_reconfig(MPQemuMsg *msg, Error **errp)
-+{
-+    sync_sysmem_msg_t *sysmem_info = &msg->data1.sync_sysmem;
-+    MemoryRegion *sysmem, *subregion, *next;
-+    Error *local_err = NULL;
-+    int region;
-+
-+    sysmem = get_system_memory();
-+
-+    qemu_mutex_lock_iothread();
-+
-+    memory_region_transaction_begin();
-+
-+    QTAILQ_FOREACH_SAFE(subregion, &sysmem->subregions, subregions_link, next) {
-+        if (subregion->ram) {
-+            memory_region_del_subregion(sysmem, subregion);
-+            qemu_ram_free(subregion->ram_block);
-+        }
++        error_setg(&err, "Unknown command in %s", print_pid_exec(pid_exec));
++        goto finalize_loop;
 +    }
 +
-+    for (region = 0; region < msg->num_fds; region++) {
-+        subregion = g_new(MemoryRegion, 1);
-+        qemu_ram_init_from_fd(subregion, msg->fds[region],
-+                              sysmem_info->sizes[region],
-+                              sysmem_info->offsets[region], &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            break;
-+        }
++    g_free(msg->data2);
++    g_free(msg);
 +
-+        memory_region_add_subregion(sysmem, sysmem_info->gpas[region],
-+                                    subregion);
++    return;
++
++finalize_loop:
++    if (err) {
++        error_report_err(err);
 +    }
-+
-+    memory_region_transaction_commit();
-+
-+    qemu_mutex_unlock_iothread();
++    g_free(msg);
++    mpqemu_link_finalize(mpqemu_link);
++    mpqemu_link = NULL;
 +}
+ 
+ int main(int argc, char *argv[])
+ {
++    Error *err = NULL;
++
+     module_call_init(MODULE_INIT_QOM);
+ 
++    bdrv_init_with_whitelist();
++
++    if (qemu_init_main_loop(&err)) {
++        error_report_err(err);
++        return -EBUSY;
++    }
++
++    qemu_init_cpu_loop();
++
++    page_size_init();
++
++    qemu_mutex_init(&ram_list.mutex);
++
+     current_machine = MACHINE(REMOTE_MACHINE(object_new(TYPE_REMOTE_MACHINE)));
+ 
++    mpqemu_link = mpqemu_link_create();
++    if (!mpqemu_link) {
++        printf("Could not create MPQemu link pid %d, exec_name %s",
++               getpid(), __progname);
++        return -1;
++    }
++
++    mpqemu_init_channel(mpqemu_link, &mpqemu_link->com, STDIN_FILENO);
++
++    mpqemu_link_set_callback(mpqemu_link, process_msg);
++
++    qdev_machine_creation_done();
++    qemu_mutex_lock_iothread();
++    qemu_run_machine_init_done_notifiers();
++    qemu_mutex_unlock_iothread();
++
++    mpqemu_start_coms(mpqemu_link, mpqemu_link->com);
++
+     return 0;
+ }
 -- 
 2.25.GIT
 
