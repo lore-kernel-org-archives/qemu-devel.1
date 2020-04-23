@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1685FC54FD0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 22:19:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C29EBC54FCB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 22:20:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3D092074F
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 22:19:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87ED02074F
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 22:20:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZQix6OYA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3D092074F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpn9eCKO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87ED02074F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRkBf-0001UJ-Th
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 18:19:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49230)
+	id 1jRkD6-0003rL-Ko
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 18:20:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49270)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRkA0-0007br-DW
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 18:17:33 -0400
+ (envelope-from <eblake@redhat.com>) id 1jRkA1-0007ch-81
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 18:17:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRk9v-0006sj-OM
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 18:17:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29513
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eblake@redhat.com>) id 1jRk9v-0006sy-Kj
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 18:17:31 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25589
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jRk9u-0006lU-Ci
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jRk9u-0006nL-DJ
  for qemu-devel@nongnu.org; Thu, 23 Apr 2020 18:17:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1587680241;
@@ -41,28 +41,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wECKI9TX9peXLf8DLeDr58MjRiSx0mHFD+bV5rYUJ8A=;
- b=ZQix6OYA1XoNMw5xII7Xw6yCRk5i2o1eRjnFmOSVVFKmN/dv93y0Cj6faL35vQEt9ftOBY
- FkqOOKBcTITDZ6a87WW+SuaBUAR3f/ZL0xuwq0aPVAYr+5mM3GL6naUFMErG/sl9a6Axhe
- F6LEymNsdcNDnrof9VYv4cTOWFUIo2w=
+ bh=75SFsu2SxUdH6Zjc5UfQGuy/xj22RvwwJ2wIvFmAVoA=;
+ b=dpn9eCKOioaqPBq2sLKLgjlm3KuoGN9amyQthwGwF0FPaVOax7gmKlIieAswmoIgd/P0Pt
+ We+MxD/uQyYP489Cc4TgKlRDtQhtvRU9gmh9rYvzx45/wZmgenFygQkvgmtHpYjE1G8OMe
+ 8b5uQts5ebCD7CUN9I7WpVlOLp7NoqA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-131-QIDC8n1UMqGeUIhqoLgpFA-1; Thu, 23 Apr 2020 18:17:17 -0400
-X-MC-Unique: QIDC8n1UMqGeUIhqoLgpFA-1
+ us-mta-106-jZyTgkKqMLOb88EOubjYrQ-1; Thu, 23 Apr 2020 18:17:17 -0400
+X-MC-Unique: jZyTgkKqMLOb88EOubjYrQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5EA41895910;
- Thu, 23 Apr 2020 22:17:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4C8A80B709;
+ Thu, 23 Apr 2020 22:17:16 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BB86C1C94D;
- Thu, 23 Apr 2020 22:17:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EEBEC1C94D;
+ Thu, 23 Apr 2020 22:17:15 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/3] block: Add blk_new_with_bs() helper
-Date: Thu, 23 Apr 2020 17:17:05 -0500
-Message-Id: <20200423221707.477404-2-eblake@redhat.com>
+Subject: [PATCH v2 2/3] qcow2: Allow resize of images with internal snapshots
+Date: Thu, 23 Apr 2020 17:17:06 -0500
+Message-Id: <20200423221707.477404-3-eblake@redhat.com>
 In-Reply-To: <20200423221707.477404-1-eblake@redhat.com>
 References: <20200423221707.477404-1-eblake@redhat.com>
 MIME-Version: 1.0
@@ -71,11 +71,11 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 16:21:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 16:25:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,374 +87,236 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Fam Zheng <fam@euphon.net>,
- "open list:Sheepdog" <sheepdog@lists.wpkg.org>, qemu-block@nongnu.org,
- Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
- Markus Armbruster <armbru@redhat.com>, mreitz@redhat.com,
- Stefan Hajnoczi <stefanha@redhat.com>, Liu Yuan <namei.unix@gmail.com>,
- "Denis V. Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are several callers that need to create a new block backend from
-an existing BDS; make the task slightly easier with a common helper
-routine.
+We originally refused to allow resize of images with internal
+snapshots because the v2 image format did not require the tracking of
+snapshot size, making it impossible to safely revert to a snapshot
+with a different size than the current view of the image.  But the
+snapshot size tracking was rectified in v3, and our recent fixes to
+qemu-img amend (see 0a85af35) guarantee that we always have a valid
+snapshot size.  Thus, we no longer need to artificially limit image
+resizes, but it does become one more thing that would prevent a
+downgrade back to v2.  And now that we support different-sized
+snapshots, it's also easy to fix reverting to a snapshot to apply the
+new size.
 
-Suggested-by: Max Reitz <mreitz@redhat.com>
+Upgrade iotest 61 to cover this (we previously had NO coverage of
+refusal to resize while snapshots exist).  Note that the amend process
+can fail but still have effects: in particular, since we break things
+into upgrade, resize, downgrade, a failure during resize does not roll
+back changes made during upgrade, nor does failure in downgrade roll
+back a resize.  But this situation is pre-existing even without this
+patch; and without journaling, the best we could do is minimize the
+chance of partial failure by collecting all changes prior to doing any
+writes - which adds a lot of complexity but could still fail with EIO.
+On the other hand, we are careful that even if we have partial
+modification but then fail, the image is left viable (that is, we are
+careful to sequence things so that after each successful cluster
+write, there may be transient leaked clusters but no corrupt
+metadata).  And complicating the code to make it more transaction-like
+is not worth the effort: a user can always request multiple 'qemu-img
+amend' changing one thing each, if they need finer-grained control
+over detecting the first failure than what they get by letting qemu
+decide how to sequence multiple changes.
+
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- include/sysemu/block-backend.h |  2 ++
- block/block-backend.c          | 23 +++++++++++++++++++++++
- block/crypto.c                 |  8 +++-----
- block/parallels.c              |  7 +++----
- block/qcow.c                   |  7 +++----
- block/qcow2.c                  | 15 ++++++---------
- block/qed.c                    |  7 +++----
- block/sheepdog.c               |  9 ++++-----
- block/vdi.c                    |  7 +++----
- block/vhdx.c                   |  7 +++----
- block/vmdk.c                   |  9 ++++-----
- block/vpc.c                    |  7 +++----
- blockdev.c                     |  8 +++-----
- blockjob.c                     |  7 ++-----
- 14 files changed, 65 insertions(+), 58 deletions(-)
+ block/qcow2-snapshot.c     | 20 ++++++++++++++++----
+ block/qcow2.c              | 25 ++++++++++++++++++++++---
+ tests/qemu-iotests/061     | 35 +++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/061.out | 28 ++++++++++++++++++++++++++++
+ 4 files changed, 101 insertions(+), 7 deletions(-)
 
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.=
-h
-index 9bbdbd63d743..d37c1244dd9c 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -77,6 +77,8 @@ typedef struct BlockBackendPublic {
- } BlockBackendPublic;
+diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+index 82c32d4c9b08..df16424fd952 100644
+--- a/block/qcow2-snapshot.c
++++ b/block/qcow2-snapshot.c
+@@ -23,6 +23,7 @@
+  */
 
- BlockBackend *blk_new(AioContext *ctx, uint64_t perm, uint64_t shared_perm=
-);
-+BlockBackend *blk_new_with_bs(BlockDriverState *bs, uint64_t perm,
-+                              uint64_t shared_perm, Error **errp);
- BlockBackend *blk_new_open(const char *filename, const char *reference,
-                            QDict *options, int flags, Error **errp);
- int blk_get_refcnt(BlockBackend *blk);
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 38ae41382652..1e082ce2a0f4 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -355,6 +355,29 @@ BlockBackend *blk_new(AioContext *ctx, uint64_t perm, =
-uint64_t shared_perm)
-     return blk;
- }
-
-+/*
-+ * Create a new BlockBackend connected to an existing BlockDriverState.
-+ *
-+ * @perm is a bitmasks of BLK_PERM_* constants which describes the permiss=
-ions
-+ * to request for a block driver node that is attached to this BlockBacken=
-d.
-+ * @shared_perm is a bitmask which describes which permissions may be gran=
-ted
-+ * to other users of the attached node.
-+ * Both sets of permissions can be changed later using blk_set_perm().
-+ *
-+ * Return the new BlockBackend on success, null on failure.
-+ */
-+BlockBackend *blk_new_with_bs(BlockDriverState *bs, uint64_t perm,
-+                              uint64_t shared_perm, Error **errp)
-+{
-+    BlockBackend *blk =3D blk_new(bdrv_get_aio_context(bs), perm, shared_p=
-erm);
-+
-+    if (blk_insert_bs(blk, bs, errp) < 0) {
-+        blk_unref(blk);
-+        return NULL;
-+    }
-+    return blk;
-+}
-+
- /*
-  * Creates a new BlockBackend, opens a new BlockDriverState, and connects =
-both.
-  * The new BlockBackend is in the main AioContext.
-diff --git a/block/crypto.c b/block/crypto.c
-index d577f89659fa..1cb8ae17ffde 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -261,11 +261,9 @@ static int block_crypto_co_create_generic(BlockDriverS=
-tate *bs,
-     QCryptoBlock *crypto =3D NULL;
-     struct BlockCryptoCreateData data;
-
--    blk =3D blk_new(bdrv_get_aio_context(bs),
--                  BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
--
--    ret =3D blk_insert_bs(blk, bs, errp);
--    if (ret < 0) {
-+    blk =3D blk_new_with_bs(bs, BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM=
-_ALL,
-+                          errp);
-+    if (!blk) {
-         goto cleanup;
+ #include "qemu/osdep.h"
++#include "sysemu/block-backend.h"
+ #include "qapi/error.h"
+ #include "qcow2.h"
+ #include "qemu/bswap.h"
+@@ -775,10 +776,21 @@ int qcow2_snapshot_goto(BlockDriverState *bs, const c=
+har *snapshot_id)
      }
 
-diff --git a/block/parallels.c b/block/parallels.c
-index 6d4ed77f165f..4019557ceee3 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -559,10 +559,9 @@ static int coroutine_fn parallels_co_create(BlockdevCr=
-eateOptions* opts,
-         return -EIO;
-     }
-
--    blk =3D blk_new(bdrv_get_aio_context(bs),
--                  BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
--    ret =3D blk_insert_bs(blk, bs, errp);
--    if (ret < 0) {
-+    blk =3D blk_new_with_bs(bs, BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM=
-_ALL,
-+                          errp);
-+    if (!blk) {
-         goto out;
-     }
-     blk_set_allow_write_beyond_eof(blk, true);
-diff --git a/block/qcow.c b/block/qcow.c
-index 8973e4e565a1..d9f26c515a49 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -849,10 +849,9 @@ static int coroutine_fn qcow_co_create(BlockdevCreateO=
-ptions *opts,
-         return -EIO;
-     }
-
--    qcow_blk =3D blk_new(bdrv_get_aio_context(bs),
--                       BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
--    ret =3D blk_insert_bs(qcow_blk, bs, errp);
--    if (ret < 0) {
-+    qcow_blk =3D blk_new_with_bs(bs, BLK_PERM_WRITE | BLK_PERM_RESIZE,
-+                               BLK_PERM_ALL, errp);
-+    if (!qcow_blk) {
-         goto exit;
-     }
-     blk_set_allow_write_beyond_eof(qcow_blk, true);
-diff --git a/block/qcow2.c b/block/qcow2.c
-index b524b0c53f84..1ce72041978b 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3404,10 +3404,9 @@ qcow2_co_create(BlockdevCreateOptions *create_option=
-s, Error **errp)
-     }
-
-     /* Create BlockBackend to write to the image */
--    blk =3D blk_new(bdrv_get_aio_context(bs),
--                  BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
--    ret =3D blk_insert_bs(blk, bs, errp);
--    if (ret < 0) {
-+    blk =3D blk_new_with_bs(bs, BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM=
-_ALL,
-+                          errp);
-+    if (!blk) {
-         goto out;
-     }
-     blk_set_allow_write_beyond_eof(blk, true);
-@@ -5359,11 +5358,9 @@ static int qcow2_amend_options(BlockDriverState *bs,=
- QemuOpts *opts,
-     }
-
-     if (new_size) {
--        BlockBackend *blk =3D blk_new(bdrv_get_aio_context(bs),
--                                    BLK_PERM_RESIZE, BLK_PERM_ALL);
--        ret =3D blk_insert_bs(blk, bs, errp);
--        if (ret < 0) {
--            blk_unref(blk);
+     if (sn->disk_size !=3D bs->total_sectors * BDRV_SECTOR_SIZE) {
+-        error_report("qcow2: Loading snapshots with different disk "
+-            "size is not implemented");
+-        ret =3D -ENOTSUP;
+-        goto fail;
 +        BlockBackend *blk =3D blk_new_with_bs(bs, BLK_PERM_RESIZE, BLK_PER=
 M_ALL,
-+                                            errp);
++                                            &local_err);
 +        if (!blk) {
-             return ret;
-         }
-
-diff --git a/block/qed.c b/block/qed.c
-index 1af9b3cb1db1..dd767a5c75c9 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -651,10 +651,9 @@ static int coroutine_fn bdrv_qed_co_create(BlockdevCre=
-ateOptions *opts,
-         return -EIO;
++            error_report_err(local_err);
++            ret =3D -ENOTSUP;
++            goto fail;
++        }
++
++        ret =3D blk_truncate(blk, sn->disk_size, true, PREALLOC_MODE_OFF,
++                           &local_err);
++        blk_unref(blk);
++        if (ret < 0) {
++            error_report_err(local_err);
++            goto fail;
++        }
      }
 
--    blk =3D blk_new(bdrv_get_aio_context(bs),
--                  BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
--    ret =3D blk_insert_bs(blk, bs, errp);
--    if (ret < 0) {
-+    blk =3D blk_new_with_bs(bs, BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM=
-_ALL,
-+                          errp);
-+    if (!blk) {
-         goto out;
+     /*
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 1ce72041978b..34888a793354 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3987,9 +3987,12 @@ static int coroutine_fn qcow2_co_truncate(BlockDrive=
+rState *bs, int64_t offset,
+
+     qemu_co_mutex_lock(&s->lock);
+
+-    /* cannot proceed if image has snapshots */
+-    if (s->nb_snapshots) {
+-        error_setg(errp, "Can't resize an image which has snapshots");
++    /*
++     * Even though we store snapshot size for all images, it was not
++     * required until v3, so it is not safe to proceed for v2.
++     */
++    if (s->nb_snapshots && s->qcow_version < 3) {
++        error_setg(errp, "Can't resize a v2 image which has snapshots");
+         ret =3D -ENOTSUP;
+         goto fail;
      }
-     blk_set_allow_write_beyond_eof(blk, true);
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 59f7ebb1710f..09d75ff78dd8 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -1803,12 +1803,11 @@ static int sd_prealloc(BlockDriverState *bs, int64_=
-t old_size, int64_t new_size,
-     void *buf =3D NULL;
+@@ -4951,6 +4954,7 @@ static int qcow2_downgrade(BlockDriverState *bs, int =
+target_version,
+     BDRVQcow2State *s =3D bs->opaque;
+     int current_version =3D s->qcow_version;
      int ret;
++    int i;
 
--    blk =3D blk_new(bdrv_get_aio_context(bs),
--                  BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE | BLK_PERM_RES=
-IZE,
--                  BLK_PERM_ALL);
-+    blk =3D blk_new_with_bs(bs,
-+                          BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE | BLK_=
-PERM_RESIZE,
-+                          BLK_PERM_ALL, errp);
-
--    ret =3D blk_insert_bs(blk, bs, errp);
--    if (ret < 0) {
-+    if (!blk) {
-         goto out_with_err_set;
+     /* This is qcow2_downgrade(), not qcow2_upgrade() */
+     assert(target_version < current_version);
+@@ -4968,6 +4972,21 @@ static int qcow2_downgrade(BlockDriverState *bs, int=
+ target_version,
+         return -ENOTSUP;
      }
 
-diff --git a/block/vdi.c b/block/vdi.c
-index e1a11f2aa097..d1b692741620 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -804,10 +804,9 @@ static int coroutine_fn vdi_co_do_create(BlockdevCreat=
-eOptions *create_options,
-         goto exit;
-     }
++    /*
++     * If any internal snapshot has a different size than the current
++     * image size, or VM state size that exceeds 32 bits, downgrading
++     * is unsafe.  Even though we would still use v3-compliant output
++     * to preserve that data, other v2 programs might not realize
++     * those optional fields are important.
++     */
++    for (i =3D 0; i < s->nb_snapshots; i++) {
++        if (s->snapshots[i].vm_state_size > UINT32_MAX ||
++            s->snapshots[i].disk_size !=3D bs->total_sectors * BDRV_SECTOR=
+_SIZE) {
++            error_setg(errp, "Internal snapshots prevent downgrade of imag=
+e");
++            return -ENOTSUP;
++        }
++    }
++
+     /* clear incompatible features */
+     if (s->incompatible_features & QCOW2_INCOMPAT_DIRTY) {
+         ret =3D qcow2_mark_clean(bs);
+diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
+index ce285d308408..10eb24316461 100755
+--- a/tests/qemu-iotests/061
++++ b/tests/qemu-iotests/061
+@@ -111,6 +111,41 @@ $PYTHON qcow2.py "$TEST_IMG" dump-header
+ $QEMU_IO -c "read -P 0x2a 42M 64k" "$TEST_IMG" | _filter_qemu_io
+ _check_test_img
 
--    blk =3D blk_new(bdrv_get_aio_context(bs_file),
--                  BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
--    ret =3D blk_insert_bs(blk, bs_file, errp);
--    if (ret < 0) {
-+    blk =3D blk_new_with_bs(bs_file, BLK_PERM_WRITE | BLK_PERM_RESIZE,
-+                          BLK_PERM_ALL, errp);
-+    if (!blk) {
-         goto exit;
-     }
++echo
++echo "=3D=3D=3D Testing resize with snapshots =3D=3D=3D"
++echo
++_make_test_img -o "compat=3D0.10" 32M
++$QEMU_IO -c "write -P 0x2a 24M 64k" "$TEST_IMG" | _filter_qemu_io
++$QEMU_IMG snapshot -c foo "$TEST_IMG"
++$QEMU_IMG resize "$TEST_IMG" 64M &&
++    echo "unexpected pass"
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep '^\(version\|size\|nb_snap=
+\)'
++
++$QEMU_IMG amend -o "compat=3D1.1,size=3D128M" "$TEST_IMG" ||
++    echo "unexpected fail"
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep '^\(version\|size\|nb_snap=
+\)'
++
++$QEMU_IMG snapshot -c bar "$TEST_IMG"
++$QEMU_IMG resize --shrink "$TEST_IMG" 64M ||
++    echo "unexpected fail"
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep '^\(version\|size\|nb_snap=
+\)'
++
++$QEMU_IMG amend -o "compat=3D0.10,size=3D32M" "$TEST_IMG" &&
++    echo "unexpected pass"
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep '^\(version\|size\|nb_snap=
+\)'
++
++$QEMU_IMG snapshot -a bar "$TEST_IMG" ||
++    echo "unexpected fail"
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep '^\(version\|size\|nb_snap=
+\)'
++
++$QEMU_IMG snapshot -d bar "$TEST_IMG"
++$QEMU_IMG amend -o "compat=3D0.10,size=3D32M" "$TEST_IMG" ||
++    echo "unexpected fail"
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep '^\(version\|size\|nb_snap=
+\)'
++
++_check_test_img
++
++
+ echo
+ echo "=3D=3D=3D Testing dirty lazy_refcounts=3Doff =3D=3D=3D"
+ echo
+diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
+index 413cc4e0f4ab..5a8d36d0058a 100644
+--- a/tests/qemu-iotests/061.out
++++ b/tests/qemu-iotests/061.out
+@@ -271,6 +271,34 @@ read 65536/65536 bytes at offset 44040192
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ No errors were found on the image.
 
-diff --git a/block/vhdx.c b/block/vhdx.c
-index 33e57cd6567a..4c908f226f48 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -1984,10 +1984,9 @@ static int coroutine_fn vhdx_co_create(BlockdevCreat=
-eOptions *opts,
-         return -EIO;
-     }
++=3D=3D=3D Testing resize with snapshots =3D=3D=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33554432
++wrote 65536/65536 bytes at offset 25165824
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++qemu-img: Can't resize a v2 image which has snapshots
++version                   2
++size                      33554432
++nb_snapshots              1
++version                   3
++size                      134217728
++nb_snapshots              1
++Image resized.
++version                   3
++size                      67108864
++nb_snapshots              2
++qemu-img: Internal snapshots prevent downgrade of image
++version                   3
++size                      33554432
++nb_snapshots              2
++version                   3
++size                      134217728
++nb_snapshots              2
++version                   2
++size                      33554432
++nb_snapshots              1
++No errors were found on the image.
++
+ =3D=3D=3D Testing dirty lazy_refcounts=3Doff =3D=3D=3D
 
--    blk =3D blk_new(bdrv_get_aio_context(bs),
--                  BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
--    ret =3D blk_insert_bs(blk, bs, errp);
--    if (ret < 0) {
-+    blk =3D blk_new_with_bs(bs, BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM=
-_ALL,
-+                          errp);
-+    if (!blk) {
-         goto delete_and_exit;
-     }
-     blk_set_allow_write_beyond_eof(blk, true);
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 218d9c980059..dff9bd28cc3f 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2717,11 +2717,10 @@ static BlockBackend *vmdk_co_create_cb(int64_t size=
-, int idx,
-     if (!bs) {
-         return NULL;
-     }
--    blk =3D blk_new(bdrv_get_aio_context(bs),
--                  BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE | BLK_PERM_RES=
-IZE,
--                  BLK_PERM_ALL);
--    if (blk_insert_bs(blk, bs, errp)) {
--        bdrv_unref(bs);
-+    blk =3D blk_new_with_bs(bs,
-+                          BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE | BLK_=
-PERM_RESIZE,
-+                          BLK_PERM_ALL, errp);
-+    if (!blk) {
-         return NULL;
-     }
-     blk_set_allow_write_beyond_eof(blk, true);
-diff --git a/block/vpc.c b/block/vpc.c
-index d8141b52da8b..250bb0bdad78 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -1012,10 +1012,9 @@ static int coroutine_fn vpc_co_create(BlockdevCreate=
-Options *opts,
-         return -EIO;
-     }
-
--    blk =3D blk_new(bdrv_get_aio_context(bs),
--                  BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
--    ret =3D blk_insert_bs(blk, bs, errp);
--    if (ret < 0) {
-+    blk =3D blk_new_with_bs(bs, BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM=
-_ALL,
-+                          errp);
-+    if (!blk) {
-         goto out;
-     }
-     blk_set_allow_write_beyond_eof(blk, true);
-diff --git a/blockdev.c b/blockdev.c
-index 5faddaa7052f..f43426ed5fbc 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2711,7 +2711,6 @@ void qmp_block_resize(bool has_device, const char *de=
-vice,
-     BlockBackend *blk =3D NULL;
-     BlockDriverState *bs;
-     AioContext *aio_context;
--    int ret;
-
-     bs =3D bdrv_lookup_bs(has_device ? device : NULL,
-                         has_node_name ? node_name : NULL,
-@@ -2734,14 +2733,13 @@ void qmp_block_resize(bool has_device, const char *=
-device,
-         goto out;
-     }
-
--    blk =3D blk_new(bdrv_get_aio_context(bs), BLK_PERM_RESIZE, BLK_PERM_AL=
-L);
--    ret =3D blk_insert_bs(blk, bs, errp);
--    if (ret < 0) {
-+    blk =3D blk_new_with_bs(bs, BLK_PERM_RESIZE, BLK_PERM_ALL, errp);
-+    if (!blk) {
-         goto out;
-     }
-
-     bdrv_drained_begin(bs);
--    ret =3D blk_truncate(blk, size, false, PREALLOC_MODE_OFF, errp);
-+    blk_truncate(blk, size, false, PREALLOC_MODE_OFF, errp);
-     bdrv_drained_end(bs);
-
- out:
-diff --git a/blockjob.c b/blockjob.c
-index fc850312c124..2affa1844d4f 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -397,16 +397,13 @@ void *block_job_create(const char *job_id, const Bloc=
-kJobDriver *driver,
- {
-     BlockBackend *blk;
-     BlockJob *job;
--    int ret;
-
-     if (job_id =3D=3D NULL && !(flags & JOB_INTERNAL)) {
-         job_id =3D bdrv_get_device_name(bs);
-     }
-
--    blk =3D blk_new(bdrv_get_aio_context(bs), perm, shared_perm);
--    ret =3D blk_insert_bs(blk, bs, errp);
--    if (ret < 0) {
--        blk_unref(blk);
-+    blk =3D blk_new_with_bs(bs, perm, shared_perm, errp);
-+    if (!blk) {
-         return NULL;
-     }
-
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
 --=20
 2.26.2
 
