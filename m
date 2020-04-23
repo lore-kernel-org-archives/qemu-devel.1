@@ -2,65 +2,88 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E5B5C2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:07:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 654C2C2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:07:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 503312075A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:07:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 503312075A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
+	by mail.kernel.org (Postfix) with ESMTPS id 30D5B2075A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:07:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WuAE1jef"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30D5B2075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRXp6-0008Ev-Gc
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 05:07:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36132)
+	id 1jRXpr-0000jY-Ae
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 05:07:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37744)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>) id 1jRXjr-00010h-Hm
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:01:46 -0400
+ (envelope-from <jasowang@redhat.com>) id 1jRXpF-00005o-5S
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:07:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>) id 1jRXjb-0001DS-HX
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:01:43 -0400
-Received: from xavier.telenet-ops.be ([2a02:1800:120:4::f00:14]:36680)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <geert@linux-m68k.org>)
- id 1jRXja-0001BW-2D
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:01:26 -0400
-Received: from ramsan ([IPv6:2a02:1810:ac12:ed60:89cc:efc7:85ce:4669])
- by xavier.telenet-ops.be with bizsmtp
- id W91L2200P1RvcFS0191LFD; Thu, 23 Apr 2020 11:01:21 +0200
-Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1jRXjU-0006k9-Al; Thu, 23 Apr 2020 11:01:20 +0200
-Received: from geert by rox.of.borg with local (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1jRXjU-0002vW-9V; Thu, 23 Apr 2020 11:01:20 +0200
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <bartekgola@gmail.com>,
- Magnus Damm <magnus.damm@gmail.com>
-Subject: [PATCH QEMU v2 2/5] ARM: PL061: Extract pl061_create_fdt()
-Date: Thu, 23 Apr 2020 11:01:15 +0200
-Message-Id: <20200423090118.11199-3-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200423090118.11199-1-geert+renesas@glider.be>
-References: <20200423090118.11199-1-geert+renesas@glider.be>
-Received-SPF: none client-ip=2a02:1800:120:4::f00:14;
- envelope-from=geert@linux-m68k.org; helo=xavier.telenet-ops.be
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a02:1800:120:4::f00:14
+ (envelope-from <jasowang@redhat.com>) id 1jRXpE-00054e-Is
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:07:16 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49595)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jRXpE-00054P-6E
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:07:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587632835;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TXWZjAT+oByJ2lQWekbmWmxURSiLqB0NrgFYdNz/C90=;
+ b=WuAE1jefTKQj+PpJ6pvVMheb2AzGL+fFI2+7j+WZTe6NQy6CR2p9RgUTIPJgIjAA1Mkmcm
+ eWqhoGigHRs+MbOa9FoP5zsq3+m/qRckztYfQOav+O+Zto5zH5xIlPUR4maBVkFZsnd3ax
+ HXvhYvYQOx5epUc8DMOjOrTP4A0Y658=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-14-O5pDUDYjNl6Lh02gv7MvUQ-1; Thu, 23 Apr 2020 05:07:13 -0400
+X-MC-Unique: O5pDUDYjNl6Lh02gv7MvUQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C373100CCC1;
+ Thu, 23 Apr 2020 09:07:12 +0000 (UTC)
+Received: from [10.72.13.168] (ovpn-13-168.pek2.redhat.com [10.72.13.168])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 49F0019D9E;
+ Thu, 23 Apr 2020 09:07:10 +0000 (UTC)
+Subject: Re: [PATCH 0/2] net/colo-compare.c: Expose "max_queue_size" to users
+ and clean up
+To: "Zhang, Chen" <chen.zhang@intel.com>, qemu-dev <qemu-devel@nongnu.org>
+References: <20200411033824.19389-1-chen.zhang@intel.com>
+ <716ca2bcd9e64c37a79509c468e18485@intel.com>
+ <18466058-4184-2c6e-d740-2a1479395506@redhat.com>
+ <310162af410e43ea9e0d0a22012e1929@intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <d5e9799e-49bc-82ee-4159-4a5602db015e@redhat.com>
+Date: Thu, 23 Apr 2020 17:07:09 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <310162af410e43ea9e0d0a22012e1929@intel.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 03:23:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,167 +95,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
- qemu-arm@nongnu.org, qemu-devel@nongnu.org,
- Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move the code to create the DT node for the PL061 GPIO controller from
-hw/arm/virt.c to the PL061 driver, so it can be reused.
 
-While at it, make the created node comply with the PL061 Device Tree
-bindings:
-  - Use generic node name "gpio" instead of "pl061",
-  - Add missing "#interrupt-cells" and "interrupt-controller"
-    properties.
+On 2020/4/23 =E4=B8=8B=E5=8D=884:59, Zhang, Chen wrote:
+>
+>> -----Original Message-----
+>> From: Jason Wang <jasowang@redhat.com>
+>> Sent: Thursday, April 23, 2020 4:54 PM
+>> To: Zhang, Chen <chen.zhang@intel.com>; qemu-dev <qemu-
+>> devel@nongnu.org>
+>> Cc: Zhang Chen <zhangckid@gmail.com>
+>> Subject: Re: [PATCH 0/2] net/colo-compare.c: Expose "max_queue_size" to
+>> users and clean up
+>>
+>>
+>> On 2020/4/23 =E4=B8=8B=E5=8D=883:31, Zhang, Chen wrote:
+>>> Hi Jason,
+>>>
+>>> Please review this series when you free.
+>>>
+>>> Thanks
+>>> Zhang Chen
+>>>
+>> Sure.
+>>
+>> I wonder maybe it's better e.g you can review and collect the patches th=
+at
+>> looks good and send them to me periodically?
+> OK, I will queue COLO related patch as one series to you.
+> Do I need send a pull request? or just a big patch set?
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
-v2:
-  - New.
----
- hw/arm/virt.c           | 20 +++-----------------
- hw/gpio/pl061.c         | 42 +++++++++++++++++++++++++++++++++++++++++
- include/hw/gpio/pl061.h |  7 +++++++
- 3 files changed, 52 insertions(+), 17 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 7dc96abf72cf2b9a..c88c8850fbe00bdb 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -40,6 +40,7 @@
- #include "hw/arm/primecell.h"
- #include "hw/arm/virt.h"
- #include "hw/block/flash.h"
-+#include "hw/gpio/pl061.h"
- #include "hw/vfio/vfio-calxeda-xgmac.h"
- #include "hw/vfio/vfio-amd-xgbe.h"
- #include "hw/display/ramfb.h"
-@@ -807,30 +808,16 @@ static void virt_powerdown_req(Notifier *n, void *opaque)
- 
- static void create_gpio(const VirtMachineState *vms)
- {
--    char *nodename;
-     DeviceState *pl061_dev;
-     hwaddr base = vms->memmap[VIRT_GPIO].base;
-     hwaddr size = vms->memmap[VIRT_GPIO].size;
-     int irq = vms->irqmap[VIRT_GPIO];
--    const char compat[] = "arm,pl061\0arm,primecell";
- 
-     pl061_dev = sysbus_create_simple("pl061", base,
-                                      qdev_get_gpio_in(vms->gic, irq));
- 
--    uint32_t phandle = qemu_fdt_alloc_phandle(vms->fdt);
--    nodename = g_strdup_printf("/pl061@%" PRIx64, base);
--    qemu_fdt_add_subnode(vms->fdt, nodename);
--    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
--                                 2, base, 2, size);
--    qemu_fdt_setprop(vms->fdt, nodename, "compatible", compat, sizeof(compat));
--    qemu_fdt_setprop_cell(vms->fdt, nodename, "#gpio-cells", 2);
--    qemu_fdt_setprop(vms->fdt, nodename, "gpio-controller", NULL, 0);
--    qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
--                           GIC_FDT_IRQ_TYPE_SPI, irq,
--                           GIC_FDT_IRQ_FLAGS_LEVEL_HI);
--    qemu_fdt_setprop_cell(vms->fdt, nodename, "clocks", vms->clock_phandle);
--    qemu_fdt_setprop_string(vms->fdt, nodename, "clock-names", "apb_pclk");
--    qemu_fdt_setprop_cell(vms->fdt, nodename, "phandle", phandle);
-+    uint32_t phandle = pl061_create_fdt(vms->fdt, "", 2, base, size, irq,
-+                                        vms->clock_phandle);
- 
-     gpio_key_dev = sysbus_create_simple("gpio-key", -1,
-                                         qdev_get_gpio_in(pl061_dev, 3));
-@@ -846,7 +833,6 @@ static void create_gpio(const VirtMachineState *vms)
-                           KEY_POWER);
-     qemu_fdt_setprop_cells(vms->fdt, "/gpio-keys/poweroff",
-                            "gpios", phandle, 3, 0);
--    g_free(nodename);
- }
- 
- static void create_virtio_devices(const VirtMachineState *vms)
-diff --git a/hw/gpio/pl061.c b/hw/gpio/pl061.c
-index e776c09e474216ef..74ba733a8a5e8ca5 100644
---- a/hw/gpio/pl061.c
-+++ b/hw/gpio/pl061.c
-@@ -9,12 +9,14 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "hw/arm/fdt.h"
- #include "hw/gpio/pl061.h"
- #include "hw/irq.h"
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-+#include "sysemu/device_tree.h"
- 
- //#define DEBUG_PL061 1
- 
-@@ -397,3 +399,43 @@ static void pl061_register_types(void)
- }
- 
- type_init(pl061_register_types)
-+
-+/*
-+ * pl061_create_fdt: Create a DT node for a PL061 GPIO controller
-+ * @fdt: device tree blob
-+ * @parent: name of the parent node
-+ * @n_cells: value of #address-cells and #size-cells
-+ * @base: base address of the controller's register block
-+ * @size: size of the controller's register block
-+ * @irq: interrupt number
-+ * @clock: phandle of the apb-pclk clock
-+ *
-+ * Return value: a phandle referring to the created DT node.
-+ *
-+ * See the DT Binding Documentation in the Linux kernel source tree:
-+ * Documentation/devicetree/bindings/gpio/pl061-gpio.yaml
-+ */
-+uint32_t pl061_create_fdt(void *fdt, const char *parent, unsigned int n_cells,
-+                          hwaddr base, hwaddr size, int irq, uint32_t clock)
-+{
-+    char *nodename = g_strdup_printf("%s/gpio@%" PRIx64, parent, base);
-+    static const char compat[] = "arm,pl061\0arm,primecell";
-+    uint32_t phandle = qemu_fdt_alloc_phandle(fdt);
-+
-+    qemu_fdt_add_subnode(fdt, nodename);
-+    qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", n_cells, base, n_cells,
-+                                 size);
-+    qemu_fdt_setprop(fdt, nodename, "compatible", compat, sizeof(compat));
-+    qemu_fdt_setprop_cell(fdt, nodename, "#gpio-cells", 2);
-+    qemu_fdt_setprop(fdt, nodename, "gpio-controller", NULL, 0);
-+    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells", 2);
-+    qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
-+    qemu_fdt_setprop_cells(fdt, nodename, "interrupts", GIC_FDT_IRQ_TYPE_SPI,
-+                           irq, GIC_FDT_IRQ_FLAGS_LEVEL_HI);
-+    qemu_fdt_setprop_cell(fdt, nodename, "clocks", clock);
-+    qemu_fdt_setprop_string(fdt, nodename, "clock-names", "apb_pclk");
-+    qemu_fdt_setprop_cell(fdt, nodename, "phandle", phandle);
-+    g_free(nodename);
-+
-+    return phandle;
-+}
-diff --git a/include/hw/gpio/pl061.h b/include/hw/gpio/pl061.h
-index 78cc40c52679dc4e..f98c6e24e0e68662 100644
---- a/include/hw/gpio/pl061.h
-+++ b/include/hw/gpio/pl061.h
-@@ -11,6 +11,13 @@
- #ifndef PL061_GPIO_H
- #define PL061_GPIO_H
- 
-+#include <stdint.h>
-+
-+#include "exec/hwaddr.h"
-+
- #define TYPE_PL061 "pl061"
- 
-+uint32_t pl061_create_fdt(void *fdt, const char *parent, unsigned int n_cells,
-+                          hwaddr addr, hwaddr size, int irq, uint32_t clock);
-+
- #endif /* PL061_GPIO_H */
--- 
-2.17.1
+I prefer big patch set.
+
+Thanks
+
+
+>
+> Thanks
+> Zhang Chen
+>
+>> Thanks
 
 
