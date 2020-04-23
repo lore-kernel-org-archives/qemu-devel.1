@@ -2,80 +2,103 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F5BBC54FD0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 15:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 560FFC54FCB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 15:09:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68E1D20857
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 15:09:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2174F20857
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 15:09:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KWVPZDlv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68E1D20857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="R9KG+tw7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2174F20857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRdTd-00080t-I3
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 11:09:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41174)
+	id 1jRdTz-0000Ft-B7
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 11:09:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42036)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jRdMp-0005YO-M8
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:02:20 -0400
+ (envelope-from <jag.raman@oracle.com>) id 1jRdSH-0006fI-41
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:07:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jRdMo-0006E6-V8
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:02:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52143
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jRdMo-0006DG-FY
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:02:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587654137;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Y2cqhM0E1bEKC/9lcpTQwkAhtbzAs7FyjA2Zy3RAW3s=;
- b=KWVPZDlvwAWSizvEcHxjpGd0XodkezYsg1KStB5hEFHq1woaiuhjkrqBezt2fNnX+Aomu0
- 7zwl6Z9tk9rkVfV2i/N3KDwlNDCnCfsbdinynCsxsUHF3RiYpkgx+Q042J8ws4TBFcNSpf
- tRkrWvg15+8Tm5qQ81km1mn7yPAJQ6s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-BDRbcyOIPE2N1XXN94C_Mg-1; Thu, 23 Apr 2020 11:02:15 -0400
-X-MC-Unique: BDRbcyOIPE2N1XXN94C_Mg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11F1A107ACF2;
- Thu, 23 Apr 2020 15:02:14 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-114-28.ams2.redhat.com [10.36.114.28])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4C24B610AB;
- Thu, 23 Apr 2020 15:02:06 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v6 10/10] qcow2: Forward ZERO_WRITE flag for full preallocation
-Date: Thu, 23 Apr 2020 17:01:27 +0200
-Message-Id: <20200423150127.142609-11-kwolf@redhat.com>
-In-Reply-To: <20200423150127.142609-1-kwolf@redhat.com>
-References: <20200423150127.142609-1-kwolf@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+ (envelope-from <jag.raman@oracle.com>) id 1jRdS4-0000bH-LM
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:07:56 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:57988)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
+ id 1jRdS4-0000au-5B
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 11:07:44 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03NF2kVF024083;
+ Thu, 23 Apr 2020 15:07:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2020-01-29; bh=qx0FICjMEBzVvbLvhMIZiHrVcME0HmWCXxWyCeFWI1o=;
+ b=R9KG+tw7FbTV+Y3gZyu/06H/DDnSb3izPgb/LO8s1UOKeccibNrTi6Nqbu3n4dfB36iP
+ BKHM4673NjAtz5zqg/RAFCA9NotIDc6Kz73X3pgujBRz6SQR5uSWu6MURcz5hZpan2C0
+ CKvghH28K9YONVXfJtJuW9fG2G59tR7B0K8EdUh8PrpmeHv75ZVnJCqybMymcX+F19yS
+ b36oD/a2mx3renU2UEoJZ/f2yqOP4onE3lnFK2kiQqZYF88D0adhc4k8tDvYzTDiiCRM
+ n+SOajRbvL9nWM5LjLUYcyMxxxwkJPgEoKvX17JLffel9OmXBrjH0IHIO34dBkGOi3iM VQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by aserp2120.oracle.com with ESMTP id 30jvq4v43d-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 23 Apr 2020 15:07:23 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03NF1r9D150094;
+ Thu, 23 Apr 2020 15:07:22 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3020.oracle.com with ESMTP id 30k7qv9rk6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 23 Apr 2020 15:07:22 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03NF7Kcl006942;
+ Thu, 23 Apr 2020 15:07:20 GMT
+Received: from [10.39.224.123] (/10.39.224.123)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 23 Apr 2020 08:07:19 -0700
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
+Subject: Re: [PATCH RESEND v6 06/36] monitor: destaticize HMP commands
+From: Jag Raman <jag.raman@oracle.com>
+In-Reply-To: <3cca22d6-349c-10e0-c0ff-9c75f32e56e2@redhat.com>
+Date: Thu, 23 Apr 2020 11:07:50 -0400
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 06:43:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+Message-Id: <517D1E24-5BA3-4ADB-B1A2-5B083C9201A2@oracle.com>
+References: <cover.1587614626.git.elena.ufimtseva@oracle.com>
+ <3dc3603df5b83576c7ec65589f144d44419cee52.1587614626.git.elena.ufimtseva@oracle.com>
+ <3cca22d6-349c-10e0-c0ff-9c75f32e56e2@redhat.com>
+To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+X-Mailer: Apple Mail (2.3445.9.1)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9600
+ signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ spamscore=0 mlxlogscore=999
+ adultscore=0 suspectscore=0 bulkscore=0 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004230118
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9600
+ signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ lowpriorityscore=0 malwarescore=0
+ mlxscore=0 adultscore=0 mlxlogscore=999 phishscore=0 impostorscore=0
+ clxscore=1011 bulkscore=0 spamscore=0 priorityscore=1501 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004230118
+Received-SPF: pass client-ip=141.146.126.78; envelope-from=jag.raman@oracle.com;
+ helo=aserp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 11:07:42
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,100 +110,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>, fam@euphon.net,
+ swapnil.ingle@nutanix.com, john.g.johnson@oracle.com, qemu-devel@nongnu.org,
+ kraxel@redhat.com, quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, stefanha@redhat.com, pbonzini@redhat.com,
+ rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com,
+ thanos.makatos@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The BDRV_REQ_ZERO_WRITE is currently implemented in a way that first the
-image is possibly preallocated and then the zero flag is added to all
-clusters. This means that a copy-on-write operation may be needed when
-writing to these clusters, despite having used preallocation, negating
-one of the major benefits of preallocation.
 
-Instead, try to forward the BDRV_REQ_ZERO_WRITE to the protocol driver,
-and if the protocol driver can ensure that the new area reads as zeros,
-we can skip setting the zero flag in the qcow2 layer.
 
-Unfortunately, the same approach doesn't work for metadata
-preallocation, so we'll still set the zero flag there.
+> On Apr 23, 2020, at 10:14 AM, Philippe Mathieu-Daud=C3=A9 =
+<philmd@redhat.com> wrote:
+>=20
+> Why 'destaticize HMP commands=E2=80=99?
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/qcow2.c              | 22 +++++++++++++++++++---
- tests/qemu-iotests/274.out |  4 ++--
- 2 files changed, 21 insertions(+), 5 deletions(-)
+Hi Philippe,
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index ad621fe404..b28e588942 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4170,9 +4170,25 @@ static int coroutine_fn qcow2_co_truncate(BlockDrive=
-rState *bs, int64_t offset,
-         /* Allocate the data area */
-         new_file_size =3D allocation_start +
-                         nb_new_data_clusters * s->cluster_size;
--        /* Image file grows, so @exact does not matter */
--        ret =3D bdrv_co_truncate(bs->file, new_file_size, false, prealloc,=
- 0,
--                               errp);
-+        /*
-+         * Image file grows, so @exact does not matter.
-+         *
-+         * If we need to zero out the new area, try first whether the prot=
-ocol
-+         * driver can already take care of this.
-+         */
-+        if (flags & BDRV_REQ_ZERO_WRITE) {
-+            ret =3D bdrv_co_truncate(bs->file, new_file_size, false, preal=
-loc,
-+                                   BDRV_REQ_ZERO_WRITE, errp);
-+            if (ret >=3D 0) {
-+                flags &=3D ~BDRV_REQ_ZERO_WRITE;
-+            }
-+        } else {
-+            ret =3D -1;
-+        }
-+        if (ret < 0) {
-+            ret =3D bdrv_co_truncate(bs->file, new_file_size, false, preal=
-loc, 0,
-+                                   errp);
-+        }
-         if (ret < 0) {
-             error_prepend(errp, "Failed to resize underlying file: ");
-             qcow2_free_clusters(bs, allocation_start,
-diff --git a/tests/qemu-iotests/274.out b/tests/qemu-iotests/274.out
-index 179bd7ccaf..c355b52689 100644
---- a/tests/qemu-iotests/274.out
-+++ b/tests/qemu-iotests/274.out
-@@ -179,7 +179,7 @@ read 65536/65536 bytes at offset 9437184
- 10 MiB (0xa00000) bytes     allocated at offset 5 MiB (0x500000)
-=20
- [{ "start": 0, "length": 5242880, "depth": 1, "zero": true, "data": false}=
-,
--{ "start": 5242880, "length": 10485760, "depth": 0, "zero": true, "data": =
-false, "offset": 327680}]
-+{ "start": 5242880, "length": 10485760, "depth": 0, "zero": false, "data":=
- true, "offset": 327680}]
-=20
- =3D=3D=3D preallocation=3Dfull =3D=3D=3D
- Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D16777216 cluster_size=
-=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-@@ -198,7 +198,7 @@ read 65536/65536 bytes at offset 11534336
- 4 MiB (0x400000) bytes     allocated at offset 8 MiB (0x800000)
-=20
- [{ "start": 0, "length": 8388608, "depth": 1, "zero": true, "data": false}=
-,
--{ "start": 8388608, "length": 4194304, "depth": 0, "zero": true, "data": f=
-alse, "offset": 327680}]
-+{ "start": 8388608, "length": 4194304, "depth": 0, "zero": false, "data": =
-true, "offset": 327680}]
-=20
- =3D=3D=3D preallocation=3Doff =3D=3D=3D
- Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D393216 cluster_size=3D6=
-5536 lazy_refcounts=3Doff refcount_bits=3D16
---=20
-2.25.3
+Both QEMU & the remote process links the QMP code. QEMU uses
+all of the QMP commands, whereas, the remote process only uses a
+subset of this. Therefore, the =E2=80=98static=E2=80=99 functions which =
+don=E2=80=99t have a
+reference cause build errors (like defined but not used). Therefore,
+we decided to destaticize the ones that are causing the build failure.
+
+On a different note, Dave had previously suggested destacizing only the
+HMP functions used by the remote process. However, we found out that =
+this is
+not possible because without all these functions, the build error still =
+reproduces.
+We did confirm that all the functions we have destaticized are necessary =
+to
+help with build of the remote process.
+
+Thank you very much!
+--
+Jag
+
+>=20
+> On 4/23/20 6:13 AM, elena.ufimtseva@oracle.com wrote:
+>> From: Jagannathan Raman <jag.raman@oracle.com>
+>> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+>> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+>> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> ---
+>>  hmp-commands.hx            |  4 +-
+>>  monitor/misc.c             | 76 =
++++++++++++++++++++-------------------
+>>  monitor/monitor-internal.h | 38 +++++++++++++++++++
+>>  3 files changed, 78 insertions(+), 40 deletions(-)
+>=20
 
 
