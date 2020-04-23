@@ -7,97 +7,98 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 265E5C54FD0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:27:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34F6DC54FCB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:29:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEF2920724
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:27:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1C7920736
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:29:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B0Du57E/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEF2920724
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WGOrBash"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1C7920736
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRiR4-0008E1-1z
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:27:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55870)
+	id 1jRiT1-000297-4L
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:29:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56332)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRiP8-0004QN-8w
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:25:02 -0400
+ (envelope-from <philmd@redhat.com>) id 1jRiRj-00012C-Pp
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:27:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRiP7-0006bD-GV
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:25:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23145
+ (envelope-from <philmd@redhat.com>) id 1jRiRj-0007yP-5U
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:27:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44369
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRiP7-0006ZT-14
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:25:01 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRiRi-0007y8-Ce
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:27:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587673500;
+ s=mimecast20190719; t=1587673660;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hRuWYIm0h37MXf90sUc1NyTNNDVl+nEUAxdgAji08gY=;
- b=B0Du57E/k9w6QvxpnqUxpl5lVvL+e9TN8pDDjN1NceQGuM7NYMkF1pUEUFufbHr8shL398
- g9pS5JW35gVXLA/V9/kzt/u/iPcQdfJ1kQZP0PH3jGhS2U2pOArGyEgSPM4pTdONHH3PPW
- pHt11uL9jRujdbrX+7De0QKRQlOZpF0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-76-kHv04j_rPG6Qi4Ma73BZmA-1; Thu, 23 Apr 2020 16:24:58 -0400
-X-MC-Unique: kHv04j_rPG6Qi4Ma73BZmA-1
-Received: by mail-wm1-f70.google.com with SMTP id f81so2992775wmf.2
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 13:24:58 -0700 (PDT)
+ bh=pQct0pwx3JfGqar2KIqYJDVyz6Fj01QYnz9MGugPYcc=;
+ b=WGOrBashJjI6yiziqVHqIytidPaPSbo3eMJFoVRtOrAH9o2RjC3qKfHyuf5RTndUStoorM
+ JVGCk7JNWyaLeEMLazt404mfVxpRJiib4SPuOXGw1Ob3EduNZQo56wr6g1WsqK7zNT8eXk
+ c3lpFBivrD+Xc2ZSlFgDLmsM9nhtlOQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-301-G7S2rl2cPEWcNQ-NYjBYGg-1; Thu, 23 Apr 2020 16:27:39 -0400
+X-MC-Unique: G7S2rl2cPEWcNQ-NYjBYGg-1
+Received: by mail-wr1-f72.google.com with SMTP id x15so3428006wrn.0
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 13:27:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=zV4Z3fPcHI1OYVDggGNp6FNKRP8SznCFk9VObR96orc=;
- b=bdgGnF1I08qTFW5UZF1OzCRawF+tGyf8JDaDeonEp4kNTynmZI+7t8HigIE1hIyyy4
- ggYodIjRXmipRQfesNPgRQH1jyITWNQqbVblzpGgHwCyy9V68ki5J8Be02u7QX2FSe/h
- LTFpUYQksadKi0Wjp+jpVUbqJoW7ifLTjyHEHdn+YC6BFF3XuVwpsvi4oxWiooL7bZC8
- yFUn7cHZNCfGmWi5zfcDf1NhDPztFJQqGoSGCp2HhsQ4YGX/KRRDOWN+i8dDxfDjvzy9
- ef9j77mBzqLbPzzO3hjbFvw5uUjbk31/VPBqmpVf+azU1C3H9MugtHVxjcpZU2JP51GD
- frZg==
-X-Gm-Message-State: AGi0PuZYwQ22UZa3H4VbrQbOBl3Na0t8yxLR5/lfnoSHLyyktjOFYj62
- VZHSNTnLmwaH/TLcousv7YRIBCJNJTpzZWBj5u1AnzrNOrDpHPXA0Abwwne6f5VaTaUA+emaSCe
- 0UiKItg6GeHJnIDk=
-X-Received: by 2002:a05:600c:1:: with SMTP id g1mr5896911wmc.142.1587673496046; 
- Thu, 23 Apr 2020 13:24:56 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIW4JUq7RYmK9dE4G+tWA4EQIixYMsepVbL/SlRUjKxzfgYb1cLQ7Ze4kzMPK+CSFN0qeNDDQ==
-X-Received: by 2002:a05:600c:1:: with SMTP id g1mr5896893wmc.142.1587673495788; 
- Thu, 23 Apr 2020 13:24:55 -0700 (PDT)
+ bh=Y0v4wJNHMwTtP9V72XYJxG2CitATSXoE85yjjnLIW3w=;
+ b=sdzQ5K+D2tmD5UewuUymTq0L6vWHSf2fI7xPUwiEadboXcxvjfP1LvUyssInMpDY6P
+ ihlaqrFfWVEN8Hz0+Yh+ifciQNLxndw1lcmW++LiOV4duLulVdI+WiyR8FianxI9onTa
+ 09/KqqM9BTxksvGkf/51H0PCiPU0exFflxDYfXV9RBtzYKhf9StFMQDaBpgd1+/7jAe4
+ LZgSYh3DAuKGFoC0fF+Ta4uUtSeJKKWmwFjY8pSl6h/gQjE36/Er1zQuMka6+g60dJeP
+ shlN7R3c1tOCFzoINLkk9RwftudLoThFL2iUR3V8PM3p6PnD0q3ki8fEWQj6h3hRl6mK
+ NeEg==
+X-Gm-Message-State: AGi0PuYWNO/9L7uYHxjrWavZ8tUNilFUsCyXRJV/74ZmP6yqF8jpnoxD
+ Zq3VwCg03R1iiskiLva+KbE/YqpF93QomE4B2vAbb6U07Um7nlR4Uqh5GkICxlce8RdvU71vkum
+ dRmX801+k9IuHpEM=
+X-Received: by 2002:a7b:c858:: with SMTP id c24mr6339753wml.51.1587673658000; 
+ Thu, 23 Apr 2020 13:27:38 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKfvC17Jb8r/3aZrankHxqTYcUDoeGYqGCIMzZgw22qswndHtlpAwslGaibQrEB9GAKog/3Lg==
+X-Received: by 2002:a7b:c858:: with SMTP id c24mr6339732wml.51.1587673657786; 
+ Thu, 23 Apr 2020 13:27:37 -0700 (PDT)
 Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id k184sm5159946wmf.9.2020.04.23.13.24.54
+ by smtp.gmail.com with ESMTPSA id s9sm5653186wrg.27.2020.04.23.13.27.36
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Apr 2020 13:24:55 -0700 (PDT)
-Subject: Re: [PATCH] elf_ops: Don't try to g_mapped_file_unref(NULL)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-References: <20200423202011.32686-1-peter.maydell@linaro.org>
+ Thu, 23 Apr 2020 13:27:37 -0700 (PDT)
+Subject: Re: [PATCH v1 13/14] .travis.yml: show free disk space at end of run
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200423170557.31106-1-alex.bennee@linaro.org>
+ <20200423170557.31106-14-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d9e2c1cf-30e5-a889-3e87-eed6480610ab@redhat.com>
-Date: Thu, 23 Apr 2020 22:24:54 +0200
+Message-ID: <2288595c-d747-c076-875a-7934f292fbc2@redhat.com>
+Date: Thu, 23 Apr 2020 22:27:36 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200423202011.32686-1-peter.maydell@linaro.org>
+In-Reply-To: <20200423170557.31106-14-alex.bennee@linaro.org>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 05:42:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 16:21:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,60 +110,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Randy Yates <yates@ieee.org>
+Cc: Fam Zheng <fam@euphon.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/23/20 10:20 PM, Peter Maydell wrote:
-> Calling g_mapped_file_unref() on a NULL pointer is not valid, and
-> glib will assert if you try it.
+On 4/23/20 7:05 PM, Alex Benn=C3=A9e wrote:
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>   .travis.yml | 1 +
+>   1 file changed, 1 insertion(+)
 >=20
-> $ qemu-system-arm -M virt -display none -device loader,file=3D/tmp/bad.el=
-f
-> qemu-system-arm: -device loader,file=3D/tmp/bad.elf: GLib: g_mapped_file_=
-unref: assertion 'file !=3D NULL' failed
->=20
-> (One way to produce an ELF file that fails like this is to copy just
-> the first 16 bytes of a valid ELF file; this is sufficient to fool
-> the code in load_elf_ram_sym() into thinking it's an ELF file and
-> calling load_elf32() or load_elf64().)
->=20
-> The failure-exit path in load_elf can be reached from various points
-> in execution, and for some of those we haven't yet called
-> g_mapped_file_new_from_fd().  Add a condition to the unref call so we
-> only call it if we successfully created the GMappedFile to start with.
->=20
-> This will fix the assertion; for the specific case of the generic
-> loader it will then fall back from "guess this is an ELF file" to
-> "maybe it's a uImage or a hex file" and eventually to "just load as
-> a raw data file".
->=20
-> Reported-by: Randy Yates <yates@ieee.org>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> diff --git a/.travis.yml b/.travis.yml
+> index 2fd63eceaa..a4c3c6c805 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -113,6 +113,7 @@ script:
+>           $(exit $BUILD_RC);
+>       fi
+>   after_script:
+> +  - df -h
+
+Well, I suppose it helps to realize we didn't break the runner, it was=20
+already dying...
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-> ---
->   include/hw/elf_ops.h | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-> index e0bb47bb678..398a4a2c85b 100644
-> --- a/include/hw/elf_ops.h
-> +++ b/include/hw/elf_ops.h
-> @@ -606,7 +606,9 @@ static int glue(load_elf, SZ)(const char *name, int f=
-d,
->           *highaddr =3D (uint64_t)(elf_sword)high;
->       ret =3D total_size;
->    fail:
-> -    g_mapped_file_unref(mapped_file);
-> +    if (mapped_file) {
-> +        g_mapped_file_unref(mapped_file);
-> +    }
->       g_free(phdr);
->       return ret;
->   }
+>     - if command -v ccache ; then ccache --show-stats ; fi
+>  =20
+>  =20
 >=20
 
 
