@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11235C2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:06:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E5B5C2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:07:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D97882075A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:06:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D97882075A
+	by mail.kernel.org (Postfix) with ESMTPS id 503312075A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:07:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 503312075A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRXoD-0006aF-1z
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 05:06:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36102)
+	id 1jRXp6-0008Ev-Gc
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 05:07:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36132)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>) id 1jRXjh-0000qD-46
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:01:47 -0400
+ (envelope-from <geert@linux-m68k.org>) id 1jRXjr-00010h-Hm
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:01:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>) id 1jRXjb-0001E1-HM
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:01:32 -0400
-Received: from andre.telenet-ops.be ([2a02:1800:120:4::f00:15]:34528)
+ (envelope-from <geert@linux-m68k.org>) id 1jRXjb-0001DS-HX
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:01:43 -0400
+Received: from xavier.telenet-ops.be ([2a02:1800:120:4::f00:14]:36680)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <geert@linux-m68k.org>)
- id 1jRXja-0001Bd-5S
+ id 1jRXja-0001BW-2D
  for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:01:26 -0400
 Received: from ramsan ([IPv6:2a02:1810:ac12:ed60:89cc:efc7:85ce:4669])
- by andre.telenet-ops.be with bizsmtp
- id W91L2200k1RvcFS0191LLq; Thu, 23 Apr 2020 11:01:21 +0200
+ by xavier.telenet-ops.be with bizsmtp
+ id W91L2200P1RvcFS0191LFD; Thu, 23 Apr 2020 11:01:21 +0200
 Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
  (envelope-from <geert@linux-m68k.org>)
- id 1jRXjU-0006kJ-Cn; Thu, 23 Apr 2020 11:01:20 +0200
+ id 1jRXjU-0006k9-Al; Thu, 23 Apr 2020 11:01:20 +0200
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
  (envelope-from <geert@linux-m68k.org>)
- id 1jRXjU-0002vg-BT; Thu, 23 Apr 2020 11:01:20 +0200
+ id 1jRXjU-0002vW-9V; Thu, 23 Apr 2020 11:01:20 +0200
 From: Geert Uytterhoeven <geert+renesas@glider.be>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
  Linus Walleij <linus.walleij@linaro.org>,
  Bartosz Golaszewski <bartekgola@gmail.com>,
  Magnus Damm <magnus.damm@gmail.com>
-Subject: [PATCH QEMU v2 5/5] hw/arm/virt: Add dynamic PL061 GPIO support
-Date: Thu, 23 Apr 2020 11:01:18 +0200
-Message-Id: <20200423090118.11199-6-geert+renesas@glider.be>
+Subject: [PATCH QEMU v2 2/5] ARM: PL061: Extract pl061_create_fdt()
+Date: Thu, 23 Apr 2020 11:01:15 +0200
+Message-Id: <20200423090118.11199-3-geert+renesas@glider.be>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200423090118.11199-1-geert+renesas@glider.be>
 References: <20200423090118.11199-1-geert+renesas@glider.be>
-Received-SPF: none client-ip=2a02:1800:120:4::f00:15;
- envelope-from=geert@linux-m68k.org; helo=andre.telenet-ops.be
+Received-SPF: none client-ip=2a02:1800:120:4::f00:14;
+ envelope-from=geert@linux-m68k.org; helo=xavier.telenet-ops.be
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a02:1800:120:4::f00:15
+X-Received-From: 2a02:1800:120:4::f00:14
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,73 +79,159 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add support for dynamically instantiating PL061 GPIO controller
-instances in ARM virt.  Device tree nodes are created dynamically.
+Move the code to create the DT node for the PL061 GPIO controller from
+hw/arm/virt.c to the PL061 driver, so it can be reused.
+
+While at it, make the created node comply with the PL061 Device Tree
+bindings:
+  - Use generic node name "gpio" instead of "pl061",
+  - Add missing "#interrupt-cells" and "interrupt-controller"
+    properties.
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
 v2:
   - New.
 ---
- hw/arm/sysbus-fdt.c | 18 ++++++++++++++++++
- hw/arm/virt.c       |  1 +
- 2 files changed, 19 insertions(+)
+ hw/arm/virt.c           | 20 +++-----------------
+ hw/gpio/pl061.c         | 42 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/gpio/pl061.h |  7 +++++++
+ 3 files changed, 52 insertions(+), 17 deletions(-)
 
-diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-index 6b6906f4cfc36198..493583218d176d0a 100644
---- a/hw/arm/sysbus-fdt.c
-+++ b/hw/arm/sysbus-fdt.c
-@@ -32,6 +32,7 @@
- #include "sysemu/device_tree.h"
- #include "sysemu/tpm.h"
- #include "hw/platform-bus.h"
-+#include "hw/gpio/pl061.h"
- #include "hw/vfio/vfio-platform.h"
- #include "hw/vfio/vfio-calxeda-xgmac.h"
- #include "hw/vfio/vfio-amd-xgbe.h"
-@@ -468,6 +469,22 @@ static int add_tpm_tis_fdt_node(SysBusDevice *sbdev, void *opaque)
-     return 0;
- }
- 
-+/*
-+ * add_pl061_node: Create a DT node for a PL061 GPIO controller
-+ */
-+static int add_pl061_node(SysBusDevice *sbdev, void *opaque)
-+{
-+    PlatformBusFDTData *data = opaque;
-+    PlatformBusDevice *pbus = data->pbus;
-+    void *fdt = data->fdt;
-+
-+    pl061_create_fdt(fdt, data->pbus_node_name, 1,
-+                     platform_bus_get_mmio_addr(pbus, sbdev, 0), 0x1000,
-+                     platform_bus_get_irqn(pbus, sbdev, 0) + data->irq_start,
-+                     qemu_fdt_get_phandle(fdt, "/apb-pclk"));
-+    return 0;
-+}
-+
- static int no_fdt_node(SysBusDevice *sbdev, void *opaque)
- {
-     return 0;
-@@ -489,6 +506,7 @@ static const BindingEntry bindings[] = {
-     VFIO_PLATFORM_BINDING("amd,xgbe-seattle-v1a", add_amd_xgbe_fdt_node),
- #endif
-     TYPE_BINDING(TYPE_TPM_TIS_SYSBUS, add_tpm_tis_fdt_node),
-+    TYPE_BINDING(TYPE_PL061, add_pl061_node),
-     TYPE_BINDING(TYPE_RAMFB_DEVICE, no_fdt_node),
-     TYPE_BINDING("", NULL), /* last element */
- };
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index c88c8850fbe00bdb..191594db09422d54 100644
+index 7dc96abf72cf2b9a..c88c8850fbe00bdb 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -2178,6 +2178,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_RAMFB_DEVICE);
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_PLATFORM);
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_TPM_TIS_SYSBUS);
-+    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_PL061);
-     mc->block_default_type = IF_VIRTIO;
-     mc->no_cdrom = 1;
-     mc->pci_allow_0_address = true;
+@@ -40,6 +40,7 @@
+ #include "hw/arm/primecell.h"
+ #include "hw/arm/virt.h"
+ #include "hw/block/flash.h"
++#include "hw/gpio/pl061.h"
+ #include "hw/vfio/vfio-calxeda-xgmac.h"
+ #include "hw/vfio/vfio-amd-xgbe.h"
+ #include "hw/display/ramfb.h"
+@@ -807,30 +808,16 @@ static void virt_powerdown_req(Notifier *n, void *opaque)
+ 
+ static void create_gpio(const VirtMachineState *vms)
+ {
+-    char *nodename;
+     DeviceState *pl061_dev;
+     hwaddr base = vms->memmap[VIRT_GPIO].base;
+     hwaddr size = vms->memmap[VIRT_GPIO].size;
+     int irq = vms->irqmap[VIRT_GPIO];
+-    const char compat[] = "arm,pl061\0arm,primecell";
+ 
+     pl061_dev = sysbus_create_simple("pl061", base,
+                                      qdev_get_gpio_in(vms->gic, irq));
+ 
+-    uint32_t phandle = qemu_fdt_alloc_phandle(vms->fdt);
+-    nodename = g_strdup_printf("/pl061@%" PRIx64, base);
+-    qemu_fdt_add_subnode(vms->fdt, nodename);
+-    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
+-                                 2, base, 2, size);
+-    qemu_fdt_setprop(vms->fdt, nodename, "compatible", compat, sizeof(compat));
+-    qemu_fdt_setprop_cell(vms->fdt, nodename, "#gpio-cells", 2);
+-    qemu_fdt_setprop(vms->fdt, nodename, "gpio-controller", NULL, 0);
+-    qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
+-                           GIC_FDT_IRQ_TYPE_SPI, irq,
+-                           GIC_FDT_IRQ_FLAGS_LEVEL_HI);
+-    qemu_fdt_setprop_cell(vms->fdt, nodename, "clocks", vms->clock_phandle);
+-    qemu_fdt_setprop_string(vms->fdt, nodename, "clock-names", "apb_pclk");
+-    qemu_fdt_setprop_cell(vms->fdt, nodename, "phandle", phandle);
++    uint32_t phandle = pl061_create_fdt(vms->fdt, "", 2, base, size, irq,
++                                        vms->clock_phandle);
+ 
+     gpio_key_dev = sysbus_create_simple("gpio-key", -1,
+                                         qdev_get_gpio_in(pl061_dev, 3));
+@@ -846,7 +833,6 @@ static void create_gpio(const VirtMachineState *vms)
+                           KEY_POWER);
+     qemu_fdt_setprop_cells(vms->fdt, "/gpio-keys/poweroff",
+                            "gpios", phandle, 3, 0);
+-    g_free(nodename);
+ }
+ 
+ static void create_virtio_devices(const VirtMachineState *vms)
+diff --git a/hw/gpio/pl061.c b/hw/gpio/pl061.c
+index e776c09e474216ef..74ba733a8a5e8ca5 100644
+--- a/hw/gpio/pl061.c
++++ b/hw/gpio/pl061.c
+@@ -9,12 +9,14 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "hw/arm/fdt.h"
+ #include "hw/gpio/pl061.h"
+ #include "hw/irq.h"
+ #include "hw/sysbus.h"
+ #include "migration/vmstate.h"
+ #include "qemu/log.h"
+ #include "qemu/module.h"
++#include "sysemu/device_tree.h"
+ 
+ //#define DEBUG_PL061 1
+ 
+@@ -397,3 +399,43 @@ static void pl061_register_types(void)
+ }
+ 
+ type_init(pl061_register_types)
++
++/*
++ * pl061_create_fdt: Create a DT node for a PL061 GPIO controller
++ * @fdt: device tree blob
++ * @parent: name of the parent node
++ * @n_cells: value of #address-cells and #size-cells
++ * @base: base address of the controller's register block
++ * @size: size of the controller's register block
++ * @irq: interrupt number
++ * @clock: phandle of the apb-pclk clock
++ *
++ * Return value: a phandle referring to the created DT node.
++ *
++ * See the DT Binding Documentation in the Linux kernel source tree:
++ * Documentation/devicetree/bindings/gpio/pl061-gpio.yaml
++ */
++uint32_t pl061_create_fdt(void *fdt, const char *parent, unsigned int n_cells,
++                          hwaddr base, hwaddr size, int irq, uint32_t clock)
++{
++    char *nodename = g_strdup_printf("%s/gpio@%" PRIx64, parent, base);
++    static const char compat[] = "arm,pl061\0arm,primecell";
++    uint32_t phandle = qemu_fdt_alloc_phandle(fdt);
++
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", n_cells, base, n_cells,
++                                 size);
++    qemu_fdt_setprop(fdt, nodename, "compatible", compat, sizeof(compat));
++    qemu_fdt_setprop_cell(fdt, nodename, "#gpio-cells", 2);
++    qemu_fdt_setprop(fdt, nodename, "gpio-controller", NULL, 0);
++    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells", 2);
++    qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
++    qemu_fdt_setprop_cells(fdt, nodename, "interrupts", GIC_FDT_IRQ_TYPE_SPI,
++                           irq, GIC_FDT_IRQ_FLAGS_LEVEL_HI);
++    qemu_fdt_setprop_cell(fdt, nodename, "clocks", clock);
++    qemu_fdt_setprop_string(fdt, nodename, "clock-names", "apb_pclk");
++    qemu_fdt_setprop_cell(fdt, nodename, "phandle", phandle);
++    g_free(nodename);
++
++    return phandle;
++}
+diff --git a/include/hw/gpio/pl061.h b/include/hw/gpio/pl061.h
+index 78cc40c52679dc4e..f98c6e24e0e68662 100644
+--- a/include/hw/gpio/pl061.h
++++ b/include/hw/gpio/pl061.h
+@@ -11,6 +11,13 @@
+ #ifndef PL061_GPIO_H
+ #define PL061_GPIO_H
+ 
++#include <stdint.h>
++
++#include "exec/hwaddr.h"
++
+ #define TYPE_PL061 "pl061"
+ 
++uint32_t pl061_create_fdt(void *fdt, const char *parent, unsigned int n_cells,
++                          hwaddr addr, hwaddr size, int irq, uint32_t clock);
++
+ #endif /* PL061_GPIO_H */
 -- 
 2.17.1
 
