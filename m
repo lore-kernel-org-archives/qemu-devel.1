@@ -2,84 +2,96 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70A48C55186
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 10:42:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C54BC2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 10:44:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 356A120776
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 10:42:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 177372074F
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 10:44:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IX2ILECN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 356A120776
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F3zHFSJS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 177372074F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRZJ1-0000Uz-Bd
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 06:42:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34902)
+	id 1jRZLM-0001gx-A4
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 06:44:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35170)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jRZI9-0008CO-9K
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:41:13 -0400
+ (envelope-from <philmd@redhat.com>) id 1jRZKj-0001B3-4g
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:43:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jRZI8-0003qH-BM
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:41:13 -0400
-Received: from mail-qk1-x72c.google.com ([2607:f8b0:4864:20::72c]:35846)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jRZI7-0003oo-TC; Thu, 23 Apr 2020 06:41:12 -0400
-Received: by mail-qk1-x72c.google.com with SMTP id l25so5858748qkk.3;
- Thu, 23 Apr 2020 03:41:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=so6nADBIT1YLUBLJxjJPUV9triNRdN1h5xFkMDO6eE0=;
- b=IX2ILECNpzHPfs34TzBgVig50YMTHjOsFLTC8m9eLLHyqvKygRxgS9GfCqfO8F0qv/
- dd+bNoRDRQspCSMxHYWMOigwoOJtbezm3if+lljrO6KCLV8EodUZwV3cyJRCboRAlFz9
- +tls+VVb6DyjEx7zBlcUnUCOXF2gNxwCYjCq929rTgkFiZgnV2e5lMw5/87uWqNJepik
- LNM62ZHJrD5oBuY5EGcZT10Evs319+qwNhxyYrviVEFVxF2oEIqBKPcCzlo/AebdyjEb
- U8mQ9JM8S8vnSoWEK08rVfvWtGYtd3FV9vvR44Ae6IJsgXU5zffH1ec7mYMA7aQkuDVs
- CTWA==
+ (envelope-from <philmd@redhat.com>) id 1jRZKi-0004Hk-BH
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:43:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42699
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRZKh-0004FF-Rg
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 06:43:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587638630;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Bpp6hbr0UrVbS5RqMZ78rxToJ7J2eWO/p7gvEI7VzJc=;
+ b=F3zHFSJSurKuU8AkMHbl+hEJlL+2IFYnTRzIRO26vI3h7SUdvqAvpRyKT7Ian4NSTqdbV7
+ zcXQun9OURqudi/w8IAqC00dXma8MMWFW+rm+iikYdBlW9VgxQstQPO9IDrEgartPywTIb
+ C8IFgHSHatJbsj/Zd6NotNSNWtlP4z4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-184-MLPbeMzFMxWjYynfehexDw-1; Thu, 23 Apr 2020 06:43:48 -0400
+X-MC-Unique: MLPbeMzFMxWjYynfehexDw-1
+Received: by mail-wr1-f69.google.com with SMTP id f2so2654933wrm.9
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 03:43:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=so6nADBIT1YLUBLJxjJPUV9triNRdN1h5xFkMDO6eE0=;
- b=U/fCfuCGVvHKfuk6QvS9oLQNdvRQoTaw/dPcuZaKara35/HIbsgU4D2wFmxKUDDiwx
- u640c8c/OoPtI1pnktR6iMQsB2iROCS/QqDgYQ+5fsM6AoGe6DYHu6lLhZFl1pNwIWsY
- lHwO0iGRg3wJQR7LRXqJahqpxsP7bRvKTULdfZcDN1+iFgC0nJG1Umpm6uJdTXJUr2TP
- Jb6+fmhyKmerblCxC4WZYezeXobHRqW1bKflZ0TTM5MAuwlvLbpu4zmi+o1ZO3fbp2tt
- shC7LWPWj05qXC+D9gZn7ulC+Hljf1H7HbVFEk94aAY3zHdwMH7aM3EEdfa2S+mjiWc+
- 2+Yg==
-X-Gm-Message-State: AGi0PuZdu8L2/ltWVZm1uQp5t+m0qQ3OBomK41Igak4ViOdeWsT7pHGn
- HkLUkTLXv/EAvDLWOBktuNAV8Uy+sA5QnSnIAM4=
-X-Google-Smtp-Source: APiQypJPX8lsPiNtvl7jPKhLP5n4a2PNKihUVzUl6whnI8r4dkTEj1wSrysEGWzPNaNTYo5inHYJiwwoBsVuNQl9DRg=
-X-Received: by 2002:a37:b185:: with SMTP id a127mr2715267qkf.87.1587638470542; 
- Thu, 23 Apr 2020 03:41:10 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=F39B6Ts+xUlpDBnNeMGvV+UtHlMajEV3NxM0wy/7W20=;
+ b=i0YoNSuknLDHJtkJ9i4+dZY0kZakqnEvXFRSkNBJCJGafjSGz5O19bXebeiIJA62WA
+ 9E67uT09hx0cjuVcpluZ4g677VDh4Fjwc/ixrPcm+T6c0alYZGpgS9IvpELZTnQoD0gp
+ Npi7n+pZJFkzSYPV5gDWJ732Bq+o9cNcPL2HE6LDHHkXmF1EDEKzepmkD6XpsEfHhx+2
+ 7uvFzH9UY7mguGfAIF8rwdVB7NfZM3ZFb4rym19/z4WHQp57BUTeEzY/9Bp+RWLR7SL8
+ cvTSoLeUjCzz+iFZT4SYVGaEZ2iWykoTh3bG5+YfJ6exxT17UBvqhTPZf+xsKLJ1XJtf
+ 1RFQ==
+X-Gm-Message-State: AGi0Puaasmw8yD1NQUS/EEBQc1hvNp6ARPLp5IzvjIyL1uv7XdoB0IPf
+ au7heWGPUdmKRaemPQsT79Wul+KbKO/Pk0QYhUi9ffVc483HgEEsvYUQE+U1VdFImO2bf+2q2uf
+ lZXYGbPaPLwxk8vw=
+X-Received: by 2002:adf:9168:: with SMTP id j95mr4040424wrj.145.1587638627052; 
+ Thu, 23 Apr 2020 03:43:47 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKqwTXB0xEaJkfSGYJJALGGXeKDFeYOsXKnM28pqZDYAIUacM6QBH4017g4PLDPsPjcuZS25w==
+X-Received: by 2002:adf:9168:: with SMTP id j95mr4040403wrj.145.1587638626843; 
+ Thu, 23 Apr 2020 03:43:46 -0700 (PDT)
+Received: from x1w.redhat.com (116.red-83-42-57.dynamicip.rima-tde.net.
+ [83.42.57.116])
+ by smtp.gmail.com with ESMTPSA id n9sm3127249wrx.61.2020.04.23.03.43.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Apr 2020 03:43:46 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] Makefile: Let the 'help' target list the helper targets
+Date: Thu, 23 Apr 2020 12:43:45 +0200
+Message-Id: <20200423104345.5092-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-References: <00fc01d61256$35f849c0$a1e8dd40$@fau.de>
- <877dyfc1if.fsf@dusky.pond.sub.org>
- <20200422161813.GI47385@stefanha-x1.localdomain>
- <006e01d61958$de787120$9b695360$@fau.de>
-In-Reply-To: <006e01d61958$de787120$9b695360$@fau.de>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 23 Apr 2020 11:40:58 +0100
-Message-ID: <CAJSP0QVeEZmSps3R8Hg+j=-BZR7_+FeOkm+m12A=gMULosP3Sg@mail.gmail.com>
-Subject: Re: Integration of qemu-img
-To: janine.schneider@fau.de
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::72c;
- envelope-from=stefanha@gmail.com; helo=mail-qk1-x72c.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::72c
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 05:42:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,29 +103,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 23, 2020 at 11:20 AM <janine.schneider@fau.de> wrote:
-> this requires the user of the application to install qemu first right?
-> If this is the case then this is unfortunately not an option. The user shall
-> not be bothered with installing anything else then the tool.
+List the name of the helper targets when calling 'make help',
+along with the tool targets:
 
-Hi Janine,
-Please use Reply-All to keep the email CC list in tact.  That way
-qemu-devel@nongnu.org will receive our replies and the discussion will
-stay on the mailing list.  Thanks!
+  $ make help
+  [...]
 
-It's common for applications to consist of more than a single
-executable file.  They could have shared libraries, data files, or
-other executables like qemu-img.exe.  You can distribute qemu-img.exe
-together with your application as part of a zip file or installer.
+  Helper targets:
+    fsdev/virtfs-proxy-helper      - Build virtfs-proxy-helper
+    scsi/qemu-pr-helper            - Build qemu-pr-helper
+    qemu-bridge-helper             - Build qemu-bridge-helper
+    vhost-user-gpu                 - Build vhost-user-gpu
+    virtiofsd                      - Build virtiofsd
 
-Regardless of whether you ship qemu-img.exe or build a library, please
-check QEMU's software license so that you can follow the terms of the
-GPL open source license.
+  Tools targets:
+    qemu-ga                        - Build qemu-ga tool
+    qemu-keymap                    - Build qemu-keymap tool
+    elf2dmp                        - Build elf2dmp tool
+    ivshmem-client                 - Build ivshmem-client tool
+    ivshmem-server                 - Build ivshmem-server tool
+    qemu-nbd                       - Build qemu-nbd tool
+    qemu-storage-daemon            - Build qemu-storage-daemon tool
+    qemu-img                       - Build qemu-img tool
+    qemu-io                        - Build qemu-io tool
+    qemu-edid                      - Build qemu-edid tool
 
-Stefan
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ configure | 5 +++--
+ Makefile  | 9 +++++++--
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/configure b/configure
+index 23b5e93752..caf880c38e 100755
+--- a/configure
++++ b/configure
+@@ -6374,7 +6374,7 @@ if test "$softmmu" =3D yes ; then
+   if test "$linux" =3D yes; then
+     if test "$virtfs" !=3D no && test "$cap_ng" =3D yes && test "$attr" =
+=3D yes ; then
+       virtfs=3Dyes
+-      tools=3D"$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
++      helpers=3D"$helpers fsdev/virtfs-proxy-helper\$(EXESUF)"
+     else
+       if test "$virtfs" =3D yes; then
+         error_exit "VirtFS requires libcap-ng devel and libattr devel"
+@@ -6389,7 +6389,7 @@ if test "$softmmu" =3D yes ; then
+       fi
+       mpath=3Dno
+     fi
+-    tools=3D"$tools scsi/qemu-pr-helper\$(EXESUF)"
++    helpers=3D"$helpers scsi/qemu-pr-helper\$(EXESUF)"
+   else
+     if test "$virtfs" =3D yes; then
+       error_exit "VirtFS is supported only on Linux"
+@@ -7630,6 +7630,7 @@ else
+   QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
+ fi
+=20
++echo "HELPERS=3D$helpers" >> $config_host_mak
+ echo "TOOLS=3D$tools" >> $config_host_mak
+ echo "ROMS=3D$roms" >> $config_host_mak
+ echo "MAKE=3D$make" >> $config_host_mak
+diff --git a/Makefile b/Makefile
+index 8a9113e666..021a0cd491 100644
+--- a/Makefile
++++ b/Makefile
+@@ -336,9 +336,9 @@ $(call set-vpath, $(SRC_PATH))
+ LIBS+=3D-lz $(LIBS_TOOLS)
+=20
+ vhost-user-json-y =3D
+-HELPERS-y =3D
++HELPERS-y =3D $(HELPERS)
+=20
+-HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) =3D qemu-bridge-hel=
+per$(EXESUF)
++HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) +=3D qemu-bridge-he=
+lper$(EXESUF)
+=20
+ ifeq ($(CONFIG_LINUX)$(CONFIG_VIRGL)$(CONFIG_GBM)$(CONFIG_TOOLS),yyyy)
+ HELPERS-y +=3D vhost-user-gpu$(EXESUF)
+@@ -1255,6 +1255,11 @@ endif
+ =09=09$(foreach t, $(TARGET_DIRS), \
+ =09=09$(call print-help-run,$(t)/all,Build for $(t));) \
+ =09=09echo '')
++=09@$(if $(HELPERS-y), \
++=09=09echo 'Helper targets:'; \
++=09=09$(foreach t, $(HELPERS-y), \
++=09=09$(call print-help-run,$(t),Build $(shell basename $(t)));) \
++=09=09echo '')
+ =09@$(if $(TOOLS), \
+ =09=09echo 'Tools targets:'; \
+ =09=09$(foreach t, $(TOOLS), \
+--=20
+2.21.1
+
 
