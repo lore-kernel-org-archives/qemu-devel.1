@@ -2,105 +2,103 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D24CEC2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:43:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A1CDC2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:52:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AA2620704
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:43:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1872E20776
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:52:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IBf1TREU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AA2620704
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ctrbRdPz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1872E20776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRYOk-0004if-SB
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 05:43:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50374)
+	id 1jRYX4-0007pF-AE
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 05:52:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53580)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jRYMy-000370-A2
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:42:08 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jRYVu-0007PR-PR
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:51:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jRYMw-0002Xv-RM
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:42:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47418
+ (envelope-from <pbonzini@redhat.com>) id 1jRYVt-0000Ns-L6
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:51:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56205
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jRYMw-0002VX-DT
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:42:06 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jRYVt-0000KI-42
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:51:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587634925;
+ s=mimecast20190719; t=1587635479;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=9T/MduhvMGXXSvlTCZ10Qh67DXMq8ALbcW0SRhLDJKQ=;
- b=IBf1TREUxpZTazkY2mqUyBhSa5juy1fPcsL/VoeJE2U1t9oEwtcz5lDGnnzfCfikVyhL2R
- KYHZu59gNjDu0Up+aazrZrwUTpy7wVXhsiQkD+0PcTn5DwJrnCR86Ndm500vCDRYTkthSI
- kJpsyG8Y9hSuc+xft7GIWLTg4nvQKBI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-OLS798dONbCUjV571kg7Uw-1; Thu, 23 Apr 2020 05:42:01 -0400
-X-MC-Unique: OLS798dONbCUjV571kg7Uw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82C911B18BC0;
- Thu, 23 Apr 2020 09:42:00 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-212.ams2.redhat.com
- [10.36.113.212])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 664CF19488;
- Thu, 23 Apr 2020 09:41:57 +0000 (UTC)
-Subject: Re: [PATCH v5 1/9] block: Add flags to BlockDriver.bdrv_co_truncate()
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200422152129.167074-1-kwolf@redhat.com>
- <20200422152129.167074-2-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f867217d-c202-5d5b-7fb4-ca68e6553265@redhat.com>
-Date: Thu, 23 Apr 2020 11:41:54 +0200
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cR8LvOvu2dk/FPmQGUJ+Cfx3oAaQuZ4B48zxmxKohNg=;
+ b=ctrbRdPzaVDyoOjyAv+IvlnK+nNaQSrahLIYoeS8Qp7zm4JobUqczk5P/bItAITutEV+EG
+ 3SFJ25luY2TSBOMi9buxplbXWBbVbxoJbwIbSVYQLSMlv5JzEKetlVtxSKPz3okvR0k9el
+ S6WVJ7Gue+silfiwxMTsruv5o6Ja0GA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-60-9dOeUYHeOa6WCNqO4lvCDw-1; Thu, 23 Apr 2020 05:51:18 -0400
+X-MC-Unique: 9dOeUYHeOa6WCNqO4lvCDw-1
+Received: by mail-wr1-f69.google.com with SMTP id d17so2572584wrr.17
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 02:51:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=SdDH1HFtIV0DJ19T8SqJH9OyFczODidEi2qpnXmfM20=;
+ b=m8k4f/yATD18rgw4DC6NqrEed2gJMTT8+aZAP1PozVQPW4EpazuVhmEQSHA6gxhQIj
+ n3Zq6+NS8ydnKKQUJfwtqfwz0K77d82kvgfMpPwcitlNZO56JOu4Cy4yLDOijGgTcD3Z
+ 9kBYMtwgs5XqZBjRs14WAAWfJYSHvUiavSnuSp7DlGiNC0T0BObSt/s8FGwVfJxu+Z9m
+ a+odASHflrilQddZDy9ZWvLugnPx0T7sOr3wxqYo3DzaC0jlSuY97P3MDJvwqsBziVvS
+ ENwseAhxrh4XL8fJXwTOCPQ2jjNej7mx0ia+keSPDLYjLuKtKcczWDIlPDUQknpaRrgT
+ 247Q==
+X-Gm-Message-State: AGi0Pua20lsIMwNGfWZRtCkpIkLwYW0QbJCKpOdVxvJmArbOOMe5DS1P
+ 1GZgm9VUGEhy3ecf0DToUuGLb/w24dwcUuac+/OqPylbQR4qzKGc02kv0P6d0HS6h4yqZFk9GSM
+ mBJuOCNnhH9PIGQU=
+X-Received: by 2002:a1c:8106:: with SMTP id c6mr3230589wmd.88.1587635476857;
+ Thu, 23 Apr 2020 02:51:16 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLTkxP/dxHS15yP8C0nIUHGSlxcgNeNfrW6AIFRCTsGoVH5GLMYhhXo3J5DLRMbcPnHIC/T0w==
+X-Received: by 2002:a1c:8106:: with SMTP id c6mr3230574wmd.88.1587635476668;
+ Thu, 23 Apr 2020 02:51:16 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+ by smtp.gmail.com with ESMTPSA id 91sm3105665wra.37.2020.04.23.02.51.15
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 23 Apr 2020 02:51:15 -0700 (PDT)
+Subject: Re: [PATCH 09/11] target/mips: Always enable CONFIG_SEMIHOSTING
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>
+References: <20200316120049.11225-1-philmd@redhat.com>
+ <20200316120049.11225-10-philmd@redhat.com>
+ <d07835cf-1021-7399-a28d-09a4a4c225ef@redhat.com>
+ <9a138460-9b08-a8bd-ecc9-78f6b227e972@redhat.com>
+ <5ebee88a-4ce4-7406-a668-c64e1cc5ae6c@redhat.com>
+ <766b5fe0-148e-827c-eb67-ad798a517b1a@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2b51cecc-a4d6-070c-5342-62c4f24de895@redhat.com>
+Date: Thu, 23 Apr 2020 11:51:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200422152129.167074-2-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <766b5fe0-148e-827c-eb67-ad798a517b1a@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="0rWvkoYQHXxDpHXmde3ctDsOR2WE1pWVk"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 05:42:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
@@ -116,76 +114,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berto@igalia.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0rWvkoYQHXxDpHXmde3ctDsOR2WE1pWVk
-Content-Type: multipart/mixed; boundary="T3NgBPXNOspd1AJvsWQaakERPOzl6n1kp"
-
---T3NgBPXNOspd1AJvsWQaakERPOzl6n1kp
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 22.04.20 17:21, Kevin Wolf wrote:
-> This adds a new BdrvRequestFlags parameter to the .bdrv_co_truncate()
-> driver callbacks, and a supported_truncate_flags field in
-> BlockDriverState that allows drivers to advertise support for request
-> flags in the context of truncate.
+On 23/04/20 10:43, Philippe Mathieu-Daud=C3=A9 wrote:
+>>
+>> You can add CONFIG_SEMIHOSTING=3Dy directly in the Kconfig file.
 >=20
-> For now, we always pass 0 and no drivers declare support for any flag.
+> I didn't know because it is not documented and no examples, but I the
+> code is here:
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> ---
->  include/block/block_int.h   | 10 +++++++++-
->  block/crypto.c              |  3 ++-
->  block/file-posix.c          |  2 +-
->  block/file-win32.c          |  2 +-
->  block/gluster.c             |  1 +
->  block/io.c                  |  8 +++++++-
->  block/iscsi.c               |  2 +-
->  block/nfs.c                 |  3 ++-
->  block/qcow2.c               |  2 +-
->  block/qed.c                 |  1 +
->  block/raw-format.c          |  2 +-
->  block/rbd.c                 |  1 +
->  block/sheepdog.c            |  4 ++--
->  block/ssh.c                 |  2 +-
->  tests/test-block-iothread.c |  3 ++-
->  15 files changed, 33 insertions(+), 13 deletions(-)
+> =C2=A0=C2=A0=C2=A0 # assignment_var: ID (starting with "CONFIG_")
+> =C2=A0=C2=A0=C2=A0 def parse_assignment_var(self):
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if self.tok =3D=3D TOK_ID:
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val =
+=3D self.val
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if not=
+ val.startswith("CONFIG_"):
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 raise KconfigParserError(self,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 'Expected identifier starting with
+> "CONFIG_"', TOK_NONE)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.g=
+et_token()
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return=
+ self.data.do_var(val[7:])
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else:
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 raise =
+KconfigParserError(self, 'Expected identifier')
+>=20
+> =C2=A0=C2=A0=C2=A0 # assignment: var EQUAL y_or_n
+> =C2=A0=C2=A0=C2=A0 def parse_assignment(self):
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 var =3D self.parse_assignment_=
+var()
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if self.tok !=3D TOK_EQUAL:
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 raise =
+KconfigParserError(self, 'Expected "=3D"')
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.get_token()
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.data.do_assignment(var, s=
+elf.parse_y_or_n())
+>=20
+> Thanks!
 
-(I know I haven=E2=80=99t complained before, so *shrug*, but I wonder now
-whether it actually makes sense to have the same BdrvRequestFlags for
-all request types.  Or why we have the same flags type for read, write,
-and zero-write already.)
+Well yeah, it's a bit of a hack and simply the simplest way to implement
+it.  If it turns out that there are other ways to achieve what you need,
+it's better.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---T3NgBPXNOspd1AJvsWQaakERPOzl6n1kp--
-
---0rWvkoYQHXxDpHXmde3ctDsOR2WE1pWVk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6hYuIACgkQ9AfbAGHV
-z0DAigf+OxscORVSnpGUMeAtSj59x2B4o+6NrLq4HaQ++wTn/OWxS5X7FXtZtzQe
-geTXnbbJmmSMPno2Hg8RXHMg/YX160Hzgt/2CyVBAkSH2aX6PQwVKlG0Pc0pmxRh
-FC1nTMNZC+YceuDvocBcCZ/jfrlj536impR5mJLEgP+qiRQokUf+JUuZv/dNtEKd
-YGE3A2HTLzO5vD0B8l5CjG7WbYJpC39TP6AV4CN48txxZJk2HorpsLhZut+f/K/y
-XoQOyVPVYC9Hy719u5YVJ6Ep7K/dFDkviNhO0prFSltlOgsBJnB79jTpZEG4Fv5Z
-AGkhf0BVrcIrlGdxuIDkouXpMBD/ZA==
-=VIGm
------END PGP SIGNATURE-----
-
---0rWvkoYQHXxDpHXmde3ctDsOR2WE1pWVk--
+Paolo
 
 
