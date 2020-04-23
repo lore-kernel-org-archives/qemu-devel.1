@@ -2,89 +2,82 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06E4AC54FCB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:44:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A03BC54FCB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:46:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C984C2076C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:44:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E562420704
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 18:46:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eomMk6WO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C984C2076C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="rMobuxyH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E562420704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRgpu-0007mW-Vx
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 14:44:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33040)
+	id 1jRgrt-0002IY-Qa
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 14:46:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32968)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRgmd-0002SV-8Z
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:41:11 -0400
+ (envelope-from <dimastep@yandex-team.ru>) id 1jRgmJ-0001WE-V7
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:40:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRgmc-00052e-4t
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:41:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45297
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jRgmb-00050z-N7
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:41:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587667268;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=O4EIJSuztfpcvY4tqwExUY3ZWzpUtoYZpgz41/iurrQ=;
- b=eomMk6WOR6TEJ8CGNAqvaeEFSgqyWpTmF+LR21lgT7PoTPIyJawEniDu4CHRZqabweAAAZ
- zQpYkguEGTIAnuEgWc3UcCJgcpkt+2ato/Z1ucRdK2Ho3WEpLyfC6ZrsBgj5fJxosr9GSR
- qhCvpdPw2rQjndZ6vdi6kGC/IpXC69U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-70-jrDioyWzOwCCcvp4Dlr97g-1; Thu, 23 Apr 2020 14:41:06 -0400
-X-MC-Unique: jrDioyWzOwCCcvp4Dlr97g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C769460;
- Thu, 23 Apr 2020 18:41:05 +0000 (UTC)
-Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CF9D760CD1;
- Thu, 23 Apr 2020 18:41:01 +0000 (UTC)
-Subject: Re: [PATCH 13/13] qom: Simplify object_property_get_enum()
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200423160036.7048-1-armbru@redhat.com>
- <20200423160036.7048-14-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <7be10bcd-97ba-5f01-60a0-e83c0c69ceba@redhat.com>
-Date: Thu, 23 Apr 2020 13:40:55 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200423160036.7048-14-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 05:42:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ (envelope-from <dimastep@yandex-team.ru>) id 1jRgmI-0004g3-Fm
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 14:40:51 -0400
+Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:39752)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1jRgmD-0004YU-RO; Thu, 23 Apr 2020 14:40:47 -0400
+Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
+ [IPv6:2a02:6b8:0:1a2d::301])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id ACA512E14E5;
+ Thu, 23 Apr 2020 21:40:42 +0300 (MSK)
+Received: from vla5-58875c36c028.qloud-c.yandex.net
+ (vla5-58875c36c028.qloud-c.yandex.net [2a02:6b8:c18:340b:0:640:5887:5c36])
+ by mxbackcorp1o.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ pcbgbebQ4k-efJusTgp; Thu, 23 Apr 2020 21:40:42 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1587667242; bh=5FKUZYsWXSmWGJbzPGJ+rs4aPqD/ORGDojQy3boMTtI=;
+ h=In-Reply-To:In-Reply-To:Message-Id:References:References:Date:
+ Subject:To:From:Cc;
+ b=rMobuxyHc5x4g6A2pejKni5IaV8SRrbf+O1fcjyDAZhhN4mT+0BG5n42RjHD/JB6O
+ juaZ878nkfrXoMoLW7Ov+8gpAkyd1AyVlc/gdysTZtrZWE8e51cBlTNRe0lLcowl7N
+ /KTorukp4wIxxpVLM8CqAqYt2W+D5i1zZ2/Wwp4w=
+Authentication-Results: mxbackcorp1o.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b081:1313::1:e])
+ by vla5-58875c36c028.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ 7hClKENKMK-eeXeQske; Thu, 23 Apr 2020 21:40:40 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+ (Client certificate not present)
+From: Dima Stepanov <dimastep@yandex-team.ru>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH v1 6/7] vhost: check vring address before calling unmap
+Date: Thu, 23 Apr 2020 21:39:37 +0300
+Message-Id: <696f43b4883f0ce1d3695458653da885f7693692.1587667007.git.dimastep@yandex-team.ru>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <cover.1587667007.git.dimastep@yandex-team.ru>
+References: <cover.1587667007.git.dimastep@yandex-team.ru>
+In-Reply-To: <cover.1587667007.git.dimastep@yandex-team.ru>
+References: <cover.1587667007.git.dimastep@yandex-team.ru>
+Received-SPF: pass client-ip=2a02:6b8:0:1619::183;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a02:6b8:0:1619::183
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,23 +86,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mdroth@linux.vnet.ibm.com
+Cc: fam@euphon.net, kwolf@redhat.com, yc-core@yandex-team.ru,
+ qemu-block@nongnu.org, mst@redhat.com, jasowang@redhat.com,
+ dgilbert@redhat.com, mreitz@redhat.com, arei.gonglei@huawei.com,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ raphael.norwitz@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/23/20 11:00 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   qom/object.c | 4 +---
->   1 file changed, 1 insertion(+), 3 deletions(-)
-> 
+Since disconnect can happen at any time during initialization not all
+vring buffers (for instance used vring) can be intialized successfully.
+If the buffer was not initialized then vhost_memory_unmap call will lead
+to SIGSEGV. Add checks for the vring address value before calling unmap.
+Also add assert() in the vhost_memory_unmap() routine.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+---
+ hw/virtio/vhost.c | 27 +++++++++++++++++++++------
+ 1 file changed, 21 insertions(+), 6 deletions(-)
 
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index ddbdc53..3ee50c4 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -314,6 +314,8 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
+                                hwaddr len, int is_write,
+                                hwaddr access_len)
+ {
++    assert(buffer);
++
+     if (!vhost_dev_has_iommu(dev)) {
+         cpu_physical_memory_unmap(buffer, len, is_write, access_len);
+     }
+@@ -1132,12 +1134,25 @@ static void vhost_virtqueue_stop(struct vhost_dev *dev,
+                                                 vhost_vq_index);
+     }
+ 
+-    vhost_memory_unmap(dev, vq->used, virtio_queue_get_used_size(vdev, idx),
+-                       1, virtio_queue_get_used_size(vdev, idx));
+-    vhost_memory_unmap(dev, vq->avail, virtio_queue_get_avail_size(vdev, idx),
+-                       0, virtio_queue_get_avail_size(vdev, idx));
+-    vhost_memory_unmap(dev, vq->desc, virtio_queue_get_desc_size(vdev, idx),
+-                       0, virtio_queue_get_desc_size(vdev, idx));
++    /*
++     * Since the vhost-user disconnect can happen during initialization
++     * check if vring was initialized, before making unmap.
++     */
++    if (vq->used) {
++        vhost_memory_unmap(dev, vq->used,
++                           virtio_queue_get_used_size(vdev, idx),
++                           1, virtio_queue_get_used_size(vdev, idx));
++    }
++    if (vq->avail) {
++        vhost_memory_unmap(dev, vq->avail,
++                           virtio_queue_get_avail_size(vdev, idx),
++                           0, virtio_queue_get_avail_size(vdev, idx));
++    }
++    if (vq->desc) {
++        vhost_memory_unmap(dev, vq->desc,
++                           virtio_queue_get_desc_size(vdev, idx),
++                           0, virtio_queue_get_desc_size(vdev, idx));
++    }
+ }
+ 
+ static void vhost_eventfd_add(MemoryListener *listener,
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.7.4
 
 
