@@ -2,93 +2,96 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26230C54FD0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 265E5C54FD0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:27:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3E2520724
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:26:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DEF2920724
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 20:27:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UNyTq1hm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3E2520724
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B0Du57E/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEF2920724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRiQG-0006UC-SR
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:26:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55416)
+	id 1jRiR4-0008E1-1z
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 16:27:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55870)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRiMF-0005Oi-Hj
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:22:04 -0400
+ (envelope-from <philmd@redhat.com>) id 1jRiP8-0004QN-8w
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:25:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRiME-0003gI-Nk
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:22:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29778
+ (envelope-from <philmd@redhat.com>) id 1jRiP7-0006bD-GV
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:25:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23145
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRiME-0003g9-8H
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:22:02 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRiP7-0006ZT-14
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 16:25:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587673321;
+ s=mimecast20190719; t=1587673500;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wq10tdmagP4bZ/4I285kBZFNlh6YBL1XlJbyw1tLKw8=;
- b=UNyTq1hmKiPhlS3CMetjre/NIQ5MO29MOYNfVjbUqKPHykIkRMQWsDfj9jVxCNCaK98W8K
- 5CP8yt8eqed2vdIBlku7QdW9dSAkBLH/0HK/6tVnpVR+PtQRjiQ0Iw9cW32T5xmwUXQODg
- e3UhkNr6M1qu0/D8kGXFP+WKnkBG1n4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-Q4yM1LQNNliAFdsg53b8pQ-1; Thu, 23 Apr 2020 16:21:59 -0400
-X-MC-Unique: Q4yM1LQNNliAFdsg53b8pQ-1
-Received: by mail-wr1-f71.google.com with SMTP id r11so3381938wrx.21
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 13:21:59 -0700 (PDT)
+ bh=hRuWYIm0h37MXf90sUc1NyTNNDVl+nEUAxdgAji08gY=;
+ b=B0Du57E/k9w6QvxpnqUxpl5lVvL+e9TN8pDDjN1NceQGuM7NYMkF1pUEUFufbHr8shL398
+ g9pS5JW35gVXLA/V9/kzt/u/iPcQdfJ1kQZP0PH3jGhS2U2pOArGyEgSPM4pTdONHH3PPW
+ pHt11uL9jRujdbrX+7De0QKRQlOZpF0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-76-kHv04j_rPG6Qi4Ma73BZmA-1; Thu, 23 Apr 2020 16:24:58 -0400
+X-MC-Unique: kHv04j_rPG6Qi4Ma73BZmA-1
+Received: by mail-wm1-f70.google.com with SMTP id f81so2992775wmf.2
+ for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 13:24:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Ar7WwMHZ0+CpcbAoGEZSCSPIuYugOvcLGHNI+3InVx8=;
- b=WG8apG2vb9yTobcNlK5oIZn+S/6/AcV1VgKzxWf1qOPIL2MOmVeK/+hgiIY5MGGNsr
- hy1hldMcTZ/yM094UKK7s89ufrMwoHFKZQqVDf7II50Ece0NDFlnDJX4LZ2iB7iVMuQ3
- lnyhFsK6YocjjgzNPozK9V4vlSzw8xPZsTk+LtGljYibfO+4fHGF/7EqmpUlO2Pc3tFR
- zq55VcoftG2v/mTbQf9dr4TfVeaBX/CSAIcVanrk1wWFgrMdX/uEpsLuf5ScO2F0PDUU
- x9qLRJ5ZORSHfFY1vUZ823idZ/nugbWckUUFox/hXOpm8hQMJlUTvyIskIz7bar8CFSg
- ckfg==
-X-Gm-Message-State: AGi0PuZGO5al6sbVaqkdmYGZbvgcRRL8oUT5i6BLtLejZNw0K4XAvIcj
- ILcyUSi4U/QkF7agesvnNYIYiMtMKdGTlaXBT7APwnmN+VMt2AEwQ9cUTsDNAXsc15eAiDuHbys
- AxOTX5SfPl66mwUg=
-X-Received: by 2002:adf:8284:: with SMTP id 4mr6877019wrc.6.1587673318048;
- Thu, 23 Apr 2020 13:21:58 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKH9YSaJ+JDgC9pahB+sDTq8Y4XOMtZ0jb+bccjXtPa7WsvKEEXtoqjOLwM/WnoOqI7V7U0Bg==
-X-Received: by 2002:adf:8284:: with SMTP id 4mr6876984wrc.6.1587673317711;
- Thu, 23 Apr 2020 13:21:57 -0700 (PDT)
-Received: from localhost.localdomain (116.red-83-42-57.dynamicip.rima-tde.net.
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zV4Z3fPcHI1OYVDggGNp6FNKRP8SznCFk9VObR96orc=;
+ b=bdgGnF1I08qTFW5UZF1OzCRawF+tGyf8JDaDeonEp4kNTynmZI+7t8HigIE1hIyyy4
+ ggYodIjRXmipRQfesNPgRQH1jyITWNQqbVblzpGgHwCyy9V68ki5J8Be02u7QX2FSe/h
+ LTFpUYQksadKi0Wjp+jpVUbqJoW7ifLTjyHEHdn+YC6BFF3XuVwpsvi4oxWiooL7bZC8
+ yFUn7cHZNCfGmWi5zfcDf1NhDPztFJQqGoSGCp2HhsQ4YGX/KRRDOWN+i8dDxfDjvzy9
+ ef9j77mBzqLbPzzO3hjbFvw5uUjbk31/VPBqmpVf+azU1C3H9MugtHVxjcpZU2JP51GD
+ frZg==
+X-Gm-Message-State: AGi0PuZYwQ22UZa3H4VbrQbOBl3Na0t8yxLR5/lfnoSHLyyktjOFYj62
+ VZHSNTnLmwaH/TLcousv7YRIBCJNJTpzZWBj5u1AnzrNOrDpHPXA0Abwwne6f5VaTaUA+emaSCe
+ 0UiKItg6GeHJnIDk=
+X-Received: by 2002:a05:600c:1:: with SMTP id g1mr5896911wmc.142.1587673496046; 
+ Thu, 23 Apr 2020 13:24:56 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIW4JUq7RYmK9dE4G+tWA4EQIixYMsepVbL/SlRUjKxzfgYb1cLQ7Ze4kzMPK+CSFN0qeNDDQ==
+X-Received: by 2002:a05:600c:1:: with SMTP id g1mr5896893wmc.142.1587673495788; 
+ Thu, 23 Apr 2020 13:24:55 -0700 (PDT)
+Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
  [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id c1sm5402925wrc.4.2020.04.23.13.21.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Apr 2020 13:21:57 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 7/7] multi-process: Refactor machine_init and exit notifiers
-Date: Thu, 23 Apr 2020 22:21:12 +0200
-Message-Id: <20200423202112.644-8-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200423202112.644-1-philmd@redhat.com>
-References: <20200423202112.644-1-philmd@redhat.com>
+ by smtp.gmail.com with ESMTPSA id k184sm5159946wmf.9.2020.04.23.13.24.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 23 Apr 2020 13:24:55 -0700 (PDT)
+Subject: Re: [PATCH] elf_ops: Don't try to g_mapped_file_unref(NULL)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
+References: <20200423202011.32686-1-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d9e2c1cf-30e5-a889-3e87-eed6480610ab@redhat.com>
+Date: Thu, 23 Apr 2020 22:24:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200423202011.32686-1-peter.maydell@linaro.org>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
@@ -106,246 +109,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- John G Johnson <john.g.johnson@oracle.com>,
- Jagannathan Raman <jag.raman@oracle.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Randy Yates <yates@ieee.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+On 4/23/20 10:20 PM, Peter Maydell wrote:
+> Calling g_mapped_file_unref() on a NULL pointer is not valid, and
+> glib will assert if you try it.
+>=20
+> $ qemu-system-arm -M virt -display none -device loader,file=3D/tmp/bad.el=
+f
+> qemu-system-arm: -device loader,file=3D/tmp/bad.elf: GLib: g_mapped_file_=
+unref: assertion 'file !=3D NULL' failed
+>=20
+> (One way to produce an ELF file that fails like this is to copy just
+> the first 16 bytes of a valid ELF file; this is sufficient to fool
+> the code in load_elf_ram_sym() into thinking it's an ELF file and
+> calling load_elf32() or load_elf64().)
+>=20
+> The failure-exit path in load_elf can be reached from various points
+> in execution, and for some of those we haven't yet called
+> g_mapped_file_new_from_fd().  Add a condition to the unref call so we
+> only call it if we successfully created the GMappedFile to start with.
+>=20
+> This will fix the assertion; for the specific case of the generic
+> loader it will then fall back from "guess this is an ELF file" to
+> "maybe it's a uImage or a hex file" and eventually to "just load as
+> a raw data file".
+>=20
+> Reported-by: Randy Yates <yates@ieee.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Relocate machine_int and exit notifiers into common code
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-[PMD: Removed NotifierList machine_init_done_notifiers stub]
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- Makefile.objs           |  1 +
- include/sysemu/sysemu.h |  2 ++
- softmmu/vl.c            | 42 -------------------------
- stubs/machine-notify.c  |  4 +++
- util/machine-notify.c   | 69 +++++++++++++++++++++++++++++++++++++++++
- MAINTAINERS             |  1 +
- 6 files changed, 77 insertions(+), 42 deletions(-)
- create mode 100644 util/machine-notify.c
-
-diff --git a/Makefile.objs b/Makefile.objs
-index a7c967633a..bfb9271862 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -79,6 +79,7 @@ qemu-seccomp.o-libs :=3D $(SECCOMP_LIBS)
- common-obj-$(CONFIG_FDT) +=3D device_tree.o
-=20
- common-obj-y +=3D qapi/
-+common-obj-y +=3D util/machine-notify.o
-=20
- endif # CONFIG_SOFTMMU
-=20
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index ef81302e1a..2438dd7bea 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -17,11 +17,13 @@ extern bool qemu_uuid_set;
-=20
- void qemu_add_exit_notifier(Notifier *notify);
- void qemu_remove_exit_notifier(Notifier *notify);
-+void qemu_run_exit_notifiers(void);
-=20
- extern bool machine_init_done;
-=20
- void qemu_add_machine_init_done_notifier(Notifier *notify);
- void qemu_remove_machine_init_done_notifier(Notifier *notify);
-+void qemu_run_machine_init_done_notifiers(void);
-=20
- extern int autostart;
-=20
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 32c0047889..39cbb6b50d 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -172,12 +172,6 @@ int icount_align_option;
- QemuUUID qemu_uuid;
- bool qemu_uuid_set;
-=20
--static NotifierList exit_notifiers =3D
--    NOTIFIER_LIST_INITIALIZER(exit_notifiers);
--
--static NotifierList machine_init_done_notifiers =3D
--    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
--
- bool xen_allowed;
- uint32_t xen_domid;
- enum xen_mode xen_mode =3D XEN_EMULATE;
-@@ -2325,21 +2319,6 @@ static MachineClass *machine_parse(const char *name,=
- GSList *machines)
-     return mc;
- }
-=20
--void qemu_add_exit_notifier(Notifier *notify)
--{
--    notifier_list_add(&exit_notifiers, notify);
--}
--
--void qemu_remove_exit_notifier(Notifier *notify)
--{
--    notifier_remove(notify);
--}
--
--static void qemu_run_exit_notifiers(void)
--{
--    notifier_list_notify(&exit_notifiers, NULL);
--}
--
- static const char *pid_file;
- static Notifier qemu_unlink_pidfile_notifier;
-=20
-@@ -2350,27 +2329,6 @@ static void qemu_unlink_pidfile(Notifier *n, void *d=
-ata)
-     }
- }
-=20
--bool machine_init_done;
--
--void qemu_add_machine_init_done_notifier(Notifier *notify)
--{
--    notifier_list_add(&machine_init_done_notifiers, notify);
--    if (machine_init_done) {
--        notify->notify(notify, NULL);
--    }
--}
--
--void qemu_remove_machine_init_done_notifier(Notifier *notify)
--{
--    notifier_remove(notify);
--}
--
--static void qemu_run_machine_init_done_notifiers(void)
--{
--    machine_init_done =3D true;
--    notifier_list_notify(&machine_init_done_notifiers, NULL);
--}
--
- static const QEMUOption *lookup_opt(int argc, char **argv,
-                                     const char **poptarg, int *poptind)
- {
-diff --git a/stubs/machine-notify.c b/stubs/machine-notify.c
-index d164ecccb9..71eba45b0f 100644
---- a/stubs/machine-notify.c
-+++ b/stubs/machine-notify.c
-@@ -4,3 +4,7 @@
- void qemu_add_machine_init_done_notifier(Notifier *notify)
- {
- }
-+
-+void qemu_remove_machine_init_done_notifier(Notifier *notify)
-+{
-+}
-diff --git a/util/machine-notify.c b/util/machine-notify.c
-new file mode 100644
-index 0000000000..718af79335
---- /dev/null
-+++ b/util/machine-notify.c
-@@ -0,0 +1,69 @@
-+/*
-+ * Machine notifiers.
-+ *
-+ * Copyright (c) 2003-2008 Fabrice Bellard
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a=
- copy
-+ * of this software and associated documentation files (the "Software"), t=
-o deal
-+ * in the Software without restriction, including without limitation the r=
-ights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
-ll
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included=
- in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
- OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
-,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
-HER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
- FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
-IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/notify.h"
-+#include "sysemu/sysemu.h"
-+
-+static NotifierList machine_init_done_notifiers =3D
-+    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
-+
-+static NotifierList exit_notifiers =3D
-+    NOTIFIER_LIST_INITIALIZER(exit_notifiers);
-+
-+bool machine_init_done;
-+
-+void qemu_add_machine_init_done_notifier(Notifier *notify)
-+{
-+    notifier_list_add(&machine_init_done_notifiers, notify);
-+    if (machine_init_done) {
-+        notify->notify(notify, NULL);
-+    }
-+}
-+
-+void qemu_remove_machine_init_done_notifier(Notifier *notify)
-+{
-+    notifier_remove(notify);
-+}
-+
-+void qemu_run_machine_init_done_notifiers(void)
-+{
-+    machine_init_done =3D true;
-+    notifier_list_notify(&machine_init_done_notifiers, NULL);
-+}
-+
-+void qemu_add_exit_notifier(Notifier *notify)
-+{
-+    notifier_list_add(&exit_notifiers, notify);
-+}
-+
-+void qemu_remove_exit_notifier(Notifier *notify)
-+{
-+    notifier_remove(notify);
-+}
-+
-+void qemu_run_exit_notifiers(void)
-+{
-+    notifier_list_notify(&exit_notifiers, NULL);
-+}
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8cbc1fac2b..04b19ac56c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2133,6 +2133,7 @@ F: util/qemu-timer.c
- F: softmmu/vl.c
- F: softmmu/main.c
- F: qapi/run-state.json
-+F: util/machine-notify.c
-=20
- Human Monitor (HMP)
- M: Dr. David Alan Gilbert <dgilbert@redhat.com>
---=20
-2.21.1
+> ---
+>   include/hw/elf_ops.h | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+> index e0bb47bb678..398a4a2c85b 100644
+> --- a/include/hw/elf_ops.h
+> +++ b/include/hw/elf_ops.h
+> @@ -606,7 +606,9 @@ static int glue(load_elf, SZ)(const char *name, int f=
+d,
+>           *highaddr =3D (uint64_t)(elf_sword)high;
+>       ret =3D total_size;
+>    fail:
+> -    g_mapped_file_unref(mapped_file);
+> +    if (mapped_file) {
+> +        g_mapped_file_unref(mapped_file);
+> +    }
+>       g_free(phdr);
+>       return ret;
+>   }
+>=20
 
 
