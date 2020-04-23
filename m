@@ -2,102 +2,87 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F18C55191
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 08:37:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C6FFC2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 08:55:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21AE120781
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 08:37:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D8AD2084D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 08:55:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HcraBqvA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21AE120781
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sk28YTZZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D8AD2084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRXMI-00089R-8l
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 04:37:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59300)
+	id 1jRXdj-0006XF-7y
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 04:55:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34736)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRXLa-0007eg-VD
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 04:36:39 -0400
+ (envelope-from <jasowang@redhat.com>) id 1jRXd4-0005vA-Gm
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 04:54:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRXLa-0004QQ-E7
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 04:36:38 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60145
+ (envelope-from <jasowang@redhat.com>) id 1jRXd3-0004z4-L5
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 04:54:41 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52454
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRXLa-0004Od-1W
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 04:36:38 -0400
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jRXd3-0004tR-4M
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 04:54:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587630996;
+ s=mimecast20190719; t=1587632079;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jt2SI3Ec4+DBoM95/mhaSkMRQB7x7rtS4p5XoJdtD18=;
- b=HcraBqvAmXcUzCGK3rYG5Q/kHmdwT9kUYFqmyCad/Ov63TSeC50vGiY8o/rkPBgRrYuXwX
- kk02qUatO6Ksfy+T+MaqNeUxpBmHqcwpvWyasqJFaL7EcXCaobjqvLJxeLqPgK/AgBaJuE
- glsShTOy242d7aGeIfJ/8bGhbFZ2xBQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-Lv7QcZMkOiSyIplaDd6BWQ-1; Thu, 23 Apr 2020 04:36:34 -0400
-X-MC-Unique: Lv7QcZMkOiSyIplaDd6BWQ-1
-Received: by mail-wr1-f71.google.com with SMTP id e5so2480697wrs.23
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 01:36:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=bRD8O5iG7EfvWKOKXBFAGi4rL5dnL8/PwE9Z+SSrmik=;
- b=oOLZsBUdMTQedlAywgkUo8b6fmXs9UKdZ49N0NxzJtOAl6SfEL+egNavoRZtYC4slt
- 8jnjlixA2pHf5wbxwswsNyELomtxIhivYNzeUgUC6h5E11zBz02xVwqPdLZGCqyn0ALy
- tlY97EMr9rG8JmdJhXylQ+Vqk4cFbWIz6q113lbk4V7d6xn/s0CqsKCd1xy+N+NI8ukr
- fjf4ZUw6cADQJ28xG/YuHVUz1oPCZCkVDZxv5tgMvXHY2xKVyeUEpNrnrGOyMAbqOJVY
- Wx30kadG9+0G5XMxlW50E115YpcNyNCaRe+X8kQqMU+ZMDAOgnUUL0g4zmMB8opiM1Mr
- T9oQ==
-X-Gm-Message-State: AGi0Pua8bEvYbDbYNX9plNDzJBCw69MOsZOCYiQ4482puShRcnYdQ7tV
- VuzlCBDiqFPGFcBM9eMiAb3cpAO/vc9YDcN+yUG7UVDWNpGf8rBIBNMxmgVl9dcShmaJ8NiAZIG
- g8q7DP2PxPLC0Mvc=
-X-Received: by 2002:a7b:c84f:: with SMTP id c15mr2725578wml.166.1587630991702; 
- Thu, 23 Apr 2020 01:36:31 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLsKgGadTcNDt29kt4RwW1MeBi8hDzTQTTl+RYFiTtzryLE6OQChnefkxwejcELjdlw+X5njA==
-X-Received: by 2002:a7b:c84f:: with SMTP id c15mr2725541wml.166.1587630991255; 
- Thu, 23 Apr 2020 01:36:31 -0700 (PDT)
-Received: from [192.168.1.39] (116.red-83-42-57.dynamicip.rima-tde.net.
- [83.42.57.116])
- by smtp.gmail.com with ESMTPSA id h188sm2861902wme.8.2020.04.23.01.36.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Apr 2020 01:36:30 -0700 (PDT)
-Subject: Re: [PATCH v3 10/19] target/arm: Restrict ARMv4 cpus to TCG accel
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200316160634.3386-1-philmd@redhat.com>
- <20200316160634.3386-11-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6849be34-8e45-98f8-7424-0fdb9466e9bd@redhat.com>
-Date: Thu, 23 Apr 2020 10:36:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=3obggGEhK9/La8IZUdIqOWktHXMKMTZxTBmKO/d2dMs=;
+ b=Sk28YTZZgz9MgKC28ifyuLZ/mXJxgTWN2pxA/flKkJcNahX5DyXimcCkEdfeZIWhVsZHAo
+ kb0qJYvjwTVGt4/EhNqcvou//qB5CtdxXZVEOLFh3/scDq81xAbV+RvyFt0hTNd3rNAH30
+ fYJmoaQX7N4d5aKI5WB+iatwqMQ1gtU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-374-MkWsLQC-Pd-FjBuuK5O93w-1; Thu, 23 Apr 2020 04:54:37 -0400
+X-MC-Unique: MkWsLQC-Pd-FjBuuK5O93w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEDA418B9FFA;
+ Thu, 23 Apr 2020 08:54:35 +0000 (UTC)
+Received: from [10.72.13.168] (ovpn-13-168.pek2.redhat.com [10.72.13.168])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C24BB66834;
+ Thu, 23 Apr 2020 08:54:31 +0000 (UTC)
+Subject: Re: [PATCH 0/2] net/colo-compare.c: Expose "max_queue_size" to users
+ and clean up
+To: "Zhang, Chen" <chen.zhang@intel.com>, qemu-dev <qemu-devel@nongnu.org>
+References: <20200411033824.19389-1-chen.zhang@intel.com>
+ <716ca2bcd9e64c37a79509c468e18485@intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <18466058-4184-2c6e-d740-2a1479395506@redhat.com>
+Date: Thu, 23 Apr 2020 16:54:29 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200316160634.3386-11-philmd@redhat.com>
+In-Reply-To: <716ca2bcd9e64c37a79509c468e18485@intel.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 02:14:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 03:23:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,75 +94,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- kvm@vger.kernel.org, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/16/20 5:06 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> KVM requires a cpu based on (at least) the ARMv7 architecture.
->=20
-> Only enable the following ARMv4 CPUs when TCG is available:
->=20
->    - StrongARM (SA1100/1110)
->    - OMAP1510 (TI925T)
->=20
 
-I missed to explain, the point of this Kconfig granularity is on a KVM=20
-only build, the TCG-only CPUs can't be default-selected, so most of=20
-their devices are not pulled in.
+On 2020/4/23 =E4=B8=8B=E5=8D=883:31, Zhang, Chen wrote:
+> Hi Jason,
+>
+> Please review this series when you free.
+>
+> Thanks
+> Zhang Chen
+>
 
-Instead at the end the KVM-only binary only contains the devices=20
-required to run the Cortex-A machines.
+Sure.
 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
-u.mak
-> index 8b89d8c4c0..0652396296 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -17,8 +17,6 @@ CONFIG_INTEGRATOR=3Dy
->   CONFIG_FSL_IMX31=3Dy
->   CONFIG_MUSICPAL=3Dy
->   CONFIG_MUSCA=3Dy
-> -CONFIG_CHEETAH=3Dy
-> -CONFIG_SX1=3Dy
->   CONFIG_NSERIES=3Dy
->   CONFIG_STELLARIS=3Dy
->   CONFIG_REALVIEW=3Dy
-[...]
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index e3d7e7694a..7fc0cff776 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -28,6 +28,7 @@ config ARM_VIRT
->  =20
->   config CHEETAH
->       bool
-> +    select ARM_V4
->       select OMAP
->       select TSC210X
->  =20
-> @@ -242,6 +243,7 @@ config COLLIE
->  =20
->   config SX1
->       bool
-> +    select ARM_V4
->       select OMAP
->  =20
->   config VERSATILE
-> diff --git a/target/arm/Kconfig b/target/arm/Kconfig
-> index e68c71a6ff..0d496d318a 100644
-> --- a/target/arm/Kconfig
-> +++ b/target/arm/Kconfig
-> @@ -1,2 +1,6 @@
-> +config ARM_V4
-> +    depends on TCG
-> +    bool
-> +
->   config ARM_V7M
->       bool
+I wonder maybe it's better e.g you can review and collect the patches=20
+that looks good and send them to me periodically?
+
+Thanks
 
 
