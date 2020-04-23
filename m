@@ -2,71 +2,109 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 135FEC2BA19
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D24CEC2BA19
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:43:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DADF62077D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:42:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DADF62077D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9AA2620704
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 09:43:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IBf1TREU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AA2620704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39971 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRYNV-0003Oh-1Z
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 05:42:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50182)
+	id 1jRYOk-0004if-SB
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 05:43:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50374)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert.uytterhoeven@gmail.com>) id 1jRYMb-0002Wt-A3
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:41:45 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jRYMy-000370-A2
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:42:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <geert.uytterhoeven@gmail.com>) id 1jRYMa-0001xA-Rb
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:41:45 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:43018)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <geert.uytterhoeven@gmail.com>)
- id 1jRYMY-0001ut-Vk; Thu, 23 Apr 2020 05:41:43 -0400
-Received: by mail-ot1-f65.google.com with SMTP id g14so4941147otg.10;
- Thu, 23 Apr 2020 02:41:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=0xshtJGFmIVpnTFVR1yoPS4cLrAg5tMlLKvvDBmyaBo=;
- b=F/6NkKUWHzfro7TRRrjXexMtA912l6kc60qelB2UW2Xka6XCN7JFM/RREZcJyKgobl
- F3JOSaeQ4brT3O0OV4KgMnBJikyTNZAgFgG4/j5n8pnu3BM+Gd526NBfF7AXYF46LbUS
- stFXZCq4+QfUwps3eeEJD819w7fQHS0SLoHVVWPVqjrDlsaoFIzEzF+U/uxrhVjvh3mY
- x39/Qla1IIRrt3WLFFtIGte/0CjezIuvtzA2OFZMELYIsOAGNO4BcLhhwoP6u+xpwLNZ
- /KHDd1Znr1VR5+Yy57cxG6h2FAyEClc2bkKVTDt0jxfaR6bIMn8JUmh6gZ3BawTEl3sI
- b2CA==
-X-Gm-Message-State: AGi0PuaM2qqCxjObmQA+WmuCaFigVoLQAXAqu1Rit7mFsUTLXYiJZre9
- v1H9RzEgtU+DpvNXfOq2ea82CMDRSTJceJ2r7mg=
-X-Google-Smtp-Source: APiQypKTQ38CBvNiS1ye67LjCvLSobpQz2r7lRaV8eZql0rvRTNiYFUv9xr52OJnF3F+KkW9Y9d08tEkvTKshSMobHg=
-X-Received: by 2002:aca:d50f:: with SMTP id m15mr2367854oig.54.1587634901058; 
- Thu, 23 Apr 2020 02:41:41 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1jRYMw-0002Xv-RM
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:42:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47418
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jRYMw-0002VX-DT
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 05:42:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587634925;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=9T/MduhvMGXXSvlTCZ10Qh67DXMq8ALbcW0SRhLDJKQ=;
+ b=IBf1TREUxpZTazkY2mqUyBhSa5juy1fPcsL/VoeJE2U1t9oEwtcz5lDGnnzfCfikVyhL2R
+ KYHZu59gNjDu0Up+aazrZrwUTpy7wVXhsiQkD+0PcTn5DwJrnCR86Ndm500vCDRYTkthSI
+ kJpsyG8Y9hSuc+xft7GIWLTg4nvQKBI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320-OLS798dONbCUjV571kg7Uw-1; Thu, 23 Apr 2020 05:42:01 -0400
+X-MC-Unique: OLS798dONbCUjV571kg7Uw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82C911B18BC0;
+ Thu, 23 Apr 2020 09:42:00 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-212.ams2.redhat.com
+ [10.36.113.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 664CF19488;
+ Thu, 23 Apr 2020 09:41:57 +0000 (UTC)
+Subject: Re: [PATCH v5 1/9] block: Add flags to BlockDriver.bdrv_co_truncate()
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200422152129.167074-1-kwolf@redhat.com>
+ <20200422152129.167074-2-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <f867217d-c202-5d5b-7fb4-ca68e6553265@redhat.com>
+Date: Thu, 23 Apr 2020 11:41:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200423090118.11199-1-geert+renesas@glider.be>
- <20200423090118.11199-4-geert+renesas@glider.be>
- <5dbfd026-3807-b122-ce60-1339a5252fca@amsat.org>
-In-Reply-To: <5dbfd026-3807-b122-ce60-1339a5252fca@amsat.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 23 Apr 2020 11:41:29 +0200
-Message-ID: <CAMuHMdWf2RfGvSizXKonmAB84kPyAPwZ3mF1PayK_mdn=wwRkw@mail.gmail.com>
-Subject: Re: [PATCH QEMU v2 3/5] Add a GPIO backend using libgpiod
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=209.85.210.65;
- envelope-from=geert.uytterhoeven@gmail.com; helo=mail-ot1-f65.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 05:41:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 209.85.210.65
+In-Reply-To: <20200422152129.167074-2-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="0rWvkoYQHXxDpHXmde3ctDsOR2WE1pWVk"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 05:42:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,157 +116,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Linus Walleij <linus.walleij@linaro.org>, Magnus Damm <magnus.damm@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- qemu-arm <qemu-arm@nongnu.org>, Alexander Graf <graf@amazon.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Bartosz Golaszewski <bartekgola@gmail.com>
+Cc: berto@igalia.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0rWvkoYQHXxDpHXmde3ctDsOR2WE1pWVk
+Content-Type: multipart/mixed; boundary="T3NgBPXNOspd1AJvsWQaakERPOzl6n1kp"
 
-Thanks for your comments!
+--T3NgBPXNOspd1AJvsWQaakERPOzl6n1kp
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 23, 2020 at 11:28 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> On 4/23/20 11:01 AM, Geert Uytterhoeven wrote:
-> > Add a GPIO controller backend, to connect virtual GPIOs on the guest to
-> > physical GPIOs on the host.  This allows the guest to control any
-> > external device connected to the physical GPIOs.
-> >
-> > Features and limitations:
-> >   - The backend uses libgpiod on Linux,
-> >   - For now only GPIO outputs are supported,
-> >   - The number of GPIO lines mapped is limited to the number of GPIO
-> >     lines available on the virtual GPIO controller.
-> >
-> > Future work:
-> >   - GPIO inputs,
-> >   - GPIO line configuration,
-> >   - Optimizations for controlling multiple GPIO lines at once,
-> >   - ...
-> >
-> > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+On 22.04.20 17:21, Kevin Wolf wrote:
+> This adds a new BdrvRequestFlags parameter to the .bdrv_co_truncate()
+> driver callbacks, and a supported_truncate_flags field in
+> BlockDriverState that allows drivers to advertise support for request
+> flags in the context of truncate.
+>=20
+> For now, we always pass 0 and no drivers declare support for any flag.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  include/block/block_int.h   | 10 +++++++++-
+>  block/crypto.c              |  3 ++-
+>  block/file-posix.c          |  2 +-
+>  block/file-win32.c          |  2 +-
+>  block/gluster.c             |  1 +
+>  block/io.c                  |  8 +++++++-
+>  block/iscsi.c               |  2 +-
+>  block/nfs.c                 |  3 ++-
+>  block/qcow2.c               |  2 +-
+>  block/qed.c                 |  1 +
+>  block/raw-format.c          |  2 +-
+>  block/rbd.c                 |  1 +
+>  block/sheepdog.c            |  4 ++--
+>  block/ssh.c                 |  2 +-
+>  tests/test-block-iothread.c |  3 ++-
+>  15 files changed, 33 insertions(+), 13 deletions(-)
 
-> > --- /dev/null
-> > +++ b/backends/gpiodev.c
-> > @@ -0,0 +1,94 @@
-> > +/*
-> > + * QEMU GPIO Backend
-> > + *
-> > + * Copyright (C) 2018-2020 Glider bv
-> > + *
-> > + * SPDX-License-Identifier: GPL-2.0-or-later
-> > + */
-> > +
-> > +#include <errno.h>
->
-> <errno.h> probably not needed.
+(I know I haven=E2=80=99t complained before, so *shrug*, but I wonder now
+whether it actually makes sense to have the same BdrvRequestFlags for
+all request types.  Or why we have the same flags type for read, write,
+and zero-write already.)
 
-It is indeed included by one of the other header files.
-What is the QEMU policy w.r.t. that?
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
->
-> > +#include <gpiod.h>
->
-> Please move this one...
->
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "qemu/config-file.h"
-> > +#include "qemu/cutils.h"
 
-I forgot to remove the two above...
+--T3NgBPXNOspd1AJvsWQaakERPOzl6n1kp--
 
-> > +#include "qemu/error-report.h"
-> > +#include "qemu/module.h"
-> > +#include "qemu/option.h"
+--0rWvkoYQHXxDpHXmde3ctDsOR2WE1pWVk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-... and the two above.
+-----BEGIN PGP SIGNATURE-----
 
-> > +#include "qapi/error.h"
-> > +
-> > +#include "sysemu/gpiodev.h"
-> > +
-> > +#include "hw/irq.h"
-> > +#include "hw/qdev-core.h"
->
-> ... here:
->
-> #include <gpiod.h>
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6hYuIACgkQ9AfbAGHV
+z0DAigf+OxscORVSnpGUMeAtSj59x2B4o+6NrLq4HaQ++wTn/OWxS5X7FXtZtzQe
+geTXnbbJmmSMPno2Hg8RXHMg/YX160Hzgt/2CyVBAkSH2aX6PQwVKlG0Pc0pmxRh
+FC1nTMNZC+YceuDvocBcCZ/jfrlj536impR5mJLEgP+qiRQokUf+JUuZv/dNtEKd
+YGE3A2HTLzO5vD0B8l5CjG7WbYJpC39TP6AV4CN48txxZJk2HorpsLhZut+f/K/y
+XoQOyVPVYC9Hy719u5YVJ6Ep7K/dFDkviNhO0prFSltlOgsBJnB79jTpZEG4Fv5Z
+AGkhf0BVrcIrlGdxuIDkouXpMBD/ZA==
+=VIGm
+-----END PGP SIGNATURE-----
 
-OK.
+--0rWvkoYQHXxDpHXmde3ctDsOR2WE1pWVk--
 
-> > --- a/configure
-> > +++ b/configure
-> > @@ -509,6 +509,7 @@ libpmem=3D""
-> >  default_devices=3D"yes"
-> >  plugins=3D"no"
-> >  fuzzing=3D"no"
-> > +gpio=3D""
->
-> Maybe name this feature 'libgpiod'?
-
-Makes sense.
-
-> >
-> >  supported_cpu=3D"no"
-> >  supported_os=3D"no"
-> > @@ -1601,6 +1602,10 @@ for opt do
-> >    ;;
-> >    --gdb=3D*) gdb_bin=3D"$optarg"
-> >    ;;
-> > +  --disable-gpio) gpio=3D"no"
-> > +  ;;
-> > +  --enable-gpio) gpio=3D"yes"
->
-> Ditto: --enable-libgpiod, because else it seems rather confusing.
-
-OK.
-
-> > --- /dev/null
-> > +++ b/include/sysemu/gpiodev.h
-> > @@ -0,0 +1,12 @@
-> > +/*
-> > + * QEMU GPIO Backend
-> > + *
-> > + * Copyright (C) 2018-2020 Glider bv
-> > + *
-> > + * SPDX-License-Identifier: GPL-2.0-or-later
-> > + */
-> > +
-> > +#include "qemu/typedefs.h"
->
-> "qemu/typedefs.h" not needed in includes.
-
-While removing that works, it does mean the header file is no longer
-self-contained:
-
-include/sysemu/gpiodev.h:10:23: error: unknown type name =E2=80=98DeviceSta=
-te=E2=80=99
-
-> > +
-> > +void qemu_gpiodev_add(DeviceState *dev, const char *name, unsigned int=
- maxgpio,
-> > +                      Error **errp);
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
