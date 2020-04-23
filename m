@@ -2,75 +2,90 @@ Return-Path: <SRS0=5yua=6H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53223C54FCB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:56:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 073BFC55194
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:57:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2752020663
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:56:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2752020663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id CCBA720663
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Apr 2020 17:57:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fy2JVAiY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCBA720663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRg5M-0000m3-Bs
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 13:56:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54252)
+	id 1jRg6C-0001yS-Vj
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 13:57:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54348)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jRg4h-00005D-4o
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:55:47 -0400
+ (envelope-from <eblake@redhat.com>) id 1jRg5Q-00013S-WA
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:56:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jRg4f-0005Ml-SM
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:55:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37338)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jRg4f-0005Gi-DL
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:55:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jRg4d-0002uj-9S
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 17:55:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 43D212E80E7
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 17:55:43 +0000 (UTC)
+ (envelope-from <eblake@redhat.com>) id 1jRg5P-0006xD-T9
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:56:32 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23890
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jRg5P-0006uu-DC
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 13:56:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587664590;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NliOtH3eRX+7FlzqE0XEQ1VWutMVs3I/iFICAy4XcsI=;
+ b=fy2JVAiYhGvzQvJSFyuMn8K1kNs/aGriWcwvRwVnj3HIzmhIqblYGGfNMWFhCLL9gKQGee
+ cNOmEhUeNoM2PxumUi5gsJb3m1dn2Q8myYNc1jyCTZqRTNdw+GMO3XzfhvtMqKvp7bZ0Wa
+ 89DUoBjHedcu/vKy2z/e30ZjnxMQKXw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-22-rvoYCYlWPyi7i5KvRV_JhA-1; Thu, 23 Apr 2020 13:56:20 -0400
+X-MC-Unique: rvoYCYlWPyi7i5KvRV_JhA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B3851800D51;
+ Thu, 23 Apr 2020 17:56:19 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B4ABA60CD1;
+ Thu, 23 Apr 2020 17:56:18 +0000 (UTC)
+Subject: Re: [PATCH 08/13] qapi: Assert output visitors see only valid enum
+ values
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200423160036.7048-1-armbru@redhat.com>
+ <20200423160036.7048-9-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <75ecc321-7301-3c4c-c3be-741855d13e14@redhat.com>
+Date: Thu, 23 Apr 2020 12:56:17 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Apr 2020 17:49:32 -0000
-From: Graeme Brett Houston BSc <1874504@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: sparc64 vfio
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gh975223
-X-Launchpad-Bug-Reporter: Graeme Brett Houston BSc (gh975223)
-X-Launchpad-Bug-Modifier: Graeme Brett Houston BSc (gh975223)
-Message-Id: <158766417277.8728.12362820918014730192.malonedeb@gac.canonical.com>
-Subject: [Bug 1874504] [NEW] VFIO passthrough spits out thousands of messages
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="486bbbd6cb608f8eb468ed0d08689a349dfabe49";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: df001521c1262ea774fece2c4e171990227ae949
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 12:50:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 91.189.90.7
+In-Reply-To: <20200423160036.7048-9-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 03:23:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,93 +94,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1874504 <1874504@bugs.launchpad.net>
+Cc: mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 4/23/20 11:00 AM, Markus Armbruster wrote:
+> output_type_enum() fails when *obj is not a valid value of the enum
+> type.  Should not happen.  Drop the check, along with its unit tests.
+> qapi_enum_lookup()'s assertion still guards.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   qapi/qapi-visit-core.c              |  9 -------
+>   tests/test-qobject-output-visitor.c | 39 -----------------------------
+>   tests/test-string-output-visitor.c  | 19 --------------
+>   3 files changed, 67 deletions(-)
 
-started qemu as:
-sudo qemu-system-sparc64 -device vfio-pci,host=3D0b:05.0,x-no-mmap=3Don,bus=
-=3DpciB
+Nice cleanup.
 
-messages received thousands of times:
+The commit message implies adding an assertion; but in reality, the 
+change is deleting dead code (because we already have the assertion in 
+place).  Maybe it's worth updating the subject?
 
-qemu-system-sparc64: -device vfio-pci,host=3D0b:05.0,x-no-mmap=3Don,bus=3Dp=
-ciB: iommu has granularity incompatible with target AS
-qemu-system-sparc64: -device vfio-pci,host=3D0b:05.0,x-no-mmap=3Don,bus=3Dp=
-ciB: iommu map to non memory area 4079c000
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-qemu version (think telling a lie as sure its 5.0)
-QEMU emulator version 4.2.92
-Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
+> -    /*
+> -     * TODO why is this an error, not an assertion?  If assertion:
+> -     * delete, and rely on qapi_enum_lookup()
+> -     */
+> -    if (value < 0 || value >= lookup->size) {
+> -        error_setg(errp, QERR_INVALID_PARAMETER, name ? name : "null");
+> -        return;
+> -    }
 
-pci device being passed through:
-
-0b:05.0 Display controller [0380]: 3DLabs Permedia II 2D+3D [3d3d:0009] (re=
-v 01)
-	Subsystem: Tech-Source Permedia II 2D+3D [1227:0006]
-	Flags: medium devsel, IRQ 11
-	Memory at 83000000 (32-bit, non-prefetchable) [disabled] [size=3D128K]
-	Memory at 82800000 (32-bit, non-prefetchable) [disabled] [size=3D8M]
-	Memory at 82000000 (32-bit, non-prefetchable) [disabled] [size=3D8M]
-	Expansion ROM at 83020000 [disabled] [size=3D64K]
-	Capabilities: <access denied>
-	Kernel driver in use: vfio-pci
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+The comment being deleted is what points out the assertion that already 
+exists.
 
 
-** Tags: sparc64 vfio
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-** Attachment added: "output.txt"
-   https://bugs.launchpad.net/bugs/1874504/+attachment/5358566/+files/outpu=
-t.txt
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1874504
-
-Title:
-  VFIO passthrough spits out thousands of messages
-
-Status in QEMU:
-  New
-
-Bug description:
-  started qemu as:
-  sudo qemu-system-sparc64 -device vfio-pci,host=3D0b:05.0,x-no-mmap=3Don,b=
-us=3DpciB
-
-  messages received thousands of times:
-
-  qemu-system-sparc64: -device vfio-pci,host=3D0b:05.0,x-no-mmap=3Don,bus=
-=3DpciB: iommu has granularity incompatible with target AS
-  qemu-system-sparc64: -device vfio-pci,host=3D0b:05.0,x-no-mmap=3Don,bus=
-=3DpciB: iommu map to non memory area 4079c000
-
-  qemu version (think telling a lie as sure its 5.0)
-  QEMU emulator version 4.2.92
-  Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
-
-  pci device being passed through:
-
-  0b:05.0 Display controller [0380]: 3DLabs Permedia II 2D+3D [3d3d:0009] (=
-rev 01)
-  	Subsystem: Tech-Source Permedia II 2D+3D [1227:0006]
-  	Flags: medium devsel, IRQ 11
-  	Memory at 83000000 (32-bit, non-prefetchable) [disabled] [size=3D128K]
-  	Memory at 82800000 (32-bit, non-prefetchable) [disabled] [size=3D8M]
-  	Memory at 82000000 (32-bit, non-prefetchable) [disabled] [size=3D8M]
-  	Expansion ROM at 83020000 [disabled] [size=3D64K]
-  	Capabilities: <access denied>
-  	Kernel driver in use: vfio-pci
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1874504/+subscriptions
 
