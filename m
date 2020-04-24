@@ -2,83 +2,77 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 673D3C54FCB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 14:27:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C281BC54FCB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 14:28:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EBDC20736
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 14:27:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8823620736
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 14:28:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HtRGiw0W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EBDC20736
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cMVnyDBg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8823620736
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRzJ8-0004Wc-8W
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 10:27:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58576)
+	id 1jRzJQ-0005JH-L3
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 10:28:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58884)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRzI8-0003R9-L8
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 10:27:09 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jRzIZ-0003ri-Ux
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 10:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jRzI7-00075Z-NR
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 10:26:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58360
+ (envelope-from <kwolf@redhat.com>) id 1jRzIZ-00005I-G3
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 10:27:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42019
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jRzI7-00071I-AJ
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 10:26:55 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jRzIZ-0007w9-29
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 10:27:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587738413;
+ s=mimecast20190719; t=1587738435;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lAhrcETvtbOnA/iZp39D0aOvc0h33L9z0ToMhfY/DMg=;
- b=HtRGiw0WGvCxOkyWdvx+u4HotNlPcv//wAMKUGPiqXzr3yCkDu/avMWp3xmmzBCz6M6hN1
- hoZnm1q+s6M/jXvIlVmpPY16Qsup5zu0xXU6pxlHcxTg1XlSe6Uez2MQ9VVKBS2JIHICpm
- 0qemWPDhSHOCQuNUp8YcSUB02WgRCdc=
+ bh=C4LnEPGFSo/zjI8jEGxKIjBxusRHCEQBZA/zMU3R2RI=;
+ b=cMVnyDBgodsKW6XcfQY3zYQnCvzKSmt4wzUHKDkWGjGKZ5ZKMg/ksoHd0vGkSh5/MQae+0
+ 2oPnZVfBTGIKJP+4LFNqnlhi1jCE4DgmxvEtkA8s9XAbxTcxn0FcwkpnAiyh4c67K18Liq
+ ebObCljQud6RUCHgBe4vOsdyA2JxDmk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-70-TeSzTXaXOI6yRYdsWj1aiw-1; Fri, 24 Apr 2020 10:26:50 -0400
-X-MC-Unique: TeSzTXaXOI6yRYdsWj1aiw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-456-9TghyhhrNxmFCInFRuczyg-1; Fri, 24 Apr 2020 10:27:11 -0400
+X-MC-Unique: 9TghyhhrNxmFCInFRuczyg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 477FA462;
- Fri, 24 Apr 2020 14:26:48 +0000 (UTC)
-Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BA9DF5D715;
- Fri, 24 Apr 2020 14:26:46 +0000 (UTC)
-Subject: Re: [RFC PATCH 3/3] hw/net/tulip: Set descriptor error bit when
- lenght is incorrect
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200423231644.15786-1-f4bug@amsat.org>
- <20200423231644.15786-4-f4bug@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <b1efc0fc-c8e2-10ba-31d4-db4baf73ab34@redhat.com>
-Date: Fri, 24 Apr 2020 09:26:45 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA65019057B7;
+ Fri, 24 Apr 2020 14:27:09 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-114.ams2.redhat.com
+ [10.36.114.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3D1EE60C05;
+ Fri, 24 Apr 2020 14:27:08 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v7 10/10] qcow2: Forward ZERO_WRITE flag for full preallocation
+Date: Fri, 24 Apr 2020 16:27:01 +0200
+Message-Id: <20200424142701.67053-1-kwolf@redhat.com>
+In-Reply-To: <20200424125448.63318-1-kwolf@redhat.com>
+References: <20200424125448.63318-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200423231644.15786-4-f4bug@amsat.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 03:54:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
@@ -94,26 +88,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>, Jason Wang <jasowang@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, Li Qiang <pangpei.lq@antfin.com>,
- Sven Schnelle <svens@stackframe.org>, Helge Deller <deller@gmx.de>,
- Ziming Zhang <ezrakiez@gmail.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/23/20 6:16 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> When a frame lenght is incorrect, set the RDES0 'Error Summary'
+The BDRV_REQ_ZERO_WRITE is currently implemented in a way that first the
+image is possibly preallocated and then the zero flag is added to all
+clusters. This means that a copy-on-write operation may be needed when
+writing to these clusters, despite having used preallocation, negating
+one of the major benefits of preallocation.
 
-length (here, and in the subject)
+Instead, try to forward the BDRV_REQ_ZERO_WRITE to the protocol driver,
+and if the protocol driver can ensure that the new area reads as zeros,
+we can skip setting the zero flag in the qcow2 layer.
 
-> and 'Frame too long' bits. Then stop the receive process and
-> trigger an abnormal interrupt. See [4.3.5 Receive Process].
->=20
+Unfortunately, the same approach doesn't work for metadata
+preallocation, so we'll still set the zero flag there.
 
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2.c              | 22 +++++++++++++++++++---
+ tests/qemu-iotests/274.out |  4 ++--
+ 2 files changed, 21 insertions(+), 5 deletions(-)
+
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 98065d7808..2ba0b17c39 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4170,9 +4170,25 @@ static int coroutine_fn qcow2_co_truncate(BlockDrive=
+rState *bs, int64_t offset,
+         /* Allocate the data area */
+         new_file_size =3D allocation_start +
+                         nb_new_data_clusters * s->cluster_size;
+-        /* Image file grows, so @exact does not matter */
+-        ret =3D bdrv_co_truncate(bs->file, new_file_size, false, prealloc,=
+ 0,
+-                               errp);
++        /*
++         * Image file grows, so @exact does not matter.
++         *
++         * If we need to zero out the new area, try first whether the prot=
+ocol
++         * driver can already take care of this.
++         */
++        if (flags & BDRV_REQ_ZERO_WRITE) {
++            ret =3D bdrv_co_truncate(bs->file, new_file_size, false, preal=
+loc,
++                                   BDRV_REQ_ZERO_WRITE, NULL);
++            if (ret >=3D 0) {
++                flags &=3D ~BDRV_REQ_ZERO_WRITE;
++            }
++        } else {
++            ret =3D -1;
++        }
++        if (ret < 0) {
++            ret =3D bdrv_co_truncate(bs->file, new_file_size, false, preal=
+loc, 0,
++                                   errp);
++        }
+         if (ret < 0) {
+             error_prepend(errp, "Failed to resize underlying file: ");
+             qcow2_free_clusters(bs, allocation_start,
+diff --git a/tests/qemu-iotests/274.out b/tests/qemu-iotests/274.out
+index 1a796fd07c..9d6fdeb1f7 100644
+--- a/tests/qemu-iotests/274.out
++++ b/tests/qemu-iotests/274.out
+@@ -187,7 +187,7 @@ read 65536/65536 bytes at offset 9437184
+ 10 MiB (0xa00000) bytes     allocated at offset 5 MiB (0x500000)
+=20
+ [{ "start": 0, "length": 5242880, "depth": 1, "zero": true, "data": false}=
+,
+-{ "start": 5242880, "length": 10485760, "depth": 0, "zero": true, "data": =
+false, "offset": 327680}]
++{ "start": 5242880, "length": 10485760, "depth": 0, "zero": false, "data":=
+ true, "offset": 327680}]
+=20
+ =3D=3D=3D preallocation=3Dfull =3D=3D=3D
+ Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D16777216 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+@@ -206,7 +206,7 @@ read 65536/65536 bytes at offset 11534336
+ 4 MiB (0x400000) bytes     allocated at offset 8 MiB (0x800000)
+=20
+ [{ "start": 0, "length": 8388608, "depth": 1, "zero": true, "data": false}=
+,
+-{ "start": 8388608, "length": 4194304, "depth": 0, "zero": true, "data": f=
+alse, "offset": 327680}]
++{ "start": 8388608, "length": 4194304, "depth": 0, "zero": false, "data": =
+true, "offset": 327680}]
+=20
+ =3D=3D=3D preallocation=3Doff =3D=3D=3D
+ Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D393216 cluster_size=3D6=
+5536 lazy_refcounts=3Doff refcount_bits=3D16
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.25.3
 
 
