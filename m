@@ -2,82 +2,89 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A51CC55194
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 12:24:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22A5AC54FCB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 12:36:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19BD320776
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 12:24:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E24B520700
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 12:36:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b+sJPsmo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19BD320776
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D62jLyco"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E24B520700
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRxNp-0005ve-6t
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 08:24:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46294)
+	id 1jRxZQ-0005gU-N1
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 08:36:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53944)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jRxMs-0004mA-NA
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 08:23:43 -0400
+ (envelope-from <arilou@gmail.com>) id 1jRxXs-0003WP-5K
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 08:35:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jRxMr-0006yC-VA
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 08:23:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31506
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jRxMr-0006pW-EX
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 08:23:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587731019;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=UcVsxGcgXx7A6ZhTXDf1tAfwoUEvLV3TtbJmLK5AwMI=;
- b=b+sJPsmok1YZxvZxSIg9ztiSgc7j/0HmuSGFwtYeiaJrNdVPjwNRuCrvh9xHjTrir+Ebj6
- j5c7eNt/Sz4M11QCU71eqmGxfhyE/0NcWdzYOUZJcWm+/tK3bb6C2Jepl0EavxDMjzO2+p
- TicOEUzrI8L0sqD7Fa1EPSs3z8iHjc8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-PR_3oo61N-SDlrMPkYWMEw-1; Fri, 24 Apr 2020 08:23:37 -0400
-X-MC-Unique: PR_3oo61N-SDlrMPkYWMEw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8817419057DA;
- Fri, 24 Apr 2020 12:23:35 +0000 (UTC)
-Received: from localhost (ovpn-114-136.ams2.redhat.com [10.36.114.136])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 73CE1605E0;
- Fri, 24 Apr 2020 12:23:28 +0000 (UTC)
-Date: Fri, 24 Apr 2020 13:23:27 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v2 1/3] block: Add blk_new_with_bs() helper
-Message-ID: <20200424122327.GE188259@stefanha-x1.localdomain>
-References: <20200423221707.477404-1-eblake@redhat.com>
- <20200423221707.477404-2-eblake@redhat.com>
+ (envelope-from <arilou@gmail.com>) id 1jRxXq-0003dz-HI
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 08:35:03 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40322)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1jRxXq-0003Zt-1s
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 08:35:02 -0400
+Received: by mail-wm1-x344.google.com with SMTP id u16so10511724wmc.5
+ for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 05:35:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ZGszGX7/dlFFly+wjt/H+SDs19eZmIByirBcMM+A3k0=;
+ b=D62jLycox9T9cbHAFuqYZ2dPl0qnHspWnFVq8fc6TPKi2ttn9Mv/90JXo5V5ZizFf6
+ P1rkZ2P7I3+Ie2LjRRoUtIMQXgwIa+gyhmoatUwmPBBYz4Kp9ezN+CNAHBI1TDBaOCxC
+ sDb9D/R7SnpjuvK8WB8IGQ4jw5Jgx6180MOCXWJAu35KqZDUpXtzQY1zIgz9WlqVpbUy
+ bcthAq9Ba8VSRx7xsab3IRkkm11ucFWrUloyYxNdVBA5AyFg3do7d1qZyWcks9nlnZ7h
+ 9MmKHhYDv0muIUyUFS+MrUGTPDAmizc3bU7wyRq0RlL/wmpLHhib9Rkeub6X9coIJYOs
+ GCCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ZGszGX7/dlFFly+wjt/H+SDs19eZmIByirBcMM+A3k0=;
+ b=imvgrh5CLRXjGRf8oINjCuQbqKhClC+atzlLnIhVByzp+EATLDhAW4ZzzsZSWk7pFQ
+ njlJljctU6juiCxP4WrhYZA/1CemZYXAjtt7LwiLmsKplFNB4lyTP3iF0q5KlSmTS90p
+ InIk+dxzuQEczr0zMzyBFRWUAma0gRuOLRk/rmQvYcwJsHDZuzGzGBVYnYR3+NOfPvmp
+ Njbf74EEUc/k6t9J1uB0mDWEQ4XitXqF9ddeAz8olybE4bem7yJfmyj9lGFNoPJ2BtiO
+ MeG9j9phxvNQzYd2bahEDN/bihQ2W5IED4vRdELIyuP80f1S81fZ7yGqFuUJsFZn0ow/
+ w1qw==
+X-Gm-Message-State: AGi0PuaHdLi8wmMC1ccKns1W5nhuGXgo4NfQTWZq8Qde/jq/az1c1TKg
+ mSwB/bVl57uCGX+fkv/HuAjHMh23pm5rBQ==
+X-Google-Smtp-Source: APiQypLMKTtxq71ZQJYQZgLJOi/DlFxaNthIohpZEp8GGJeuPa6EbLqlZp8vzqHcUiiFoU4wWw56BA==
+X-Received: by 2002:a1c:8106:: with SMTP id c6mr9848392wmd.88.1587731700351;
+ Fri, 24 Apr 2020 05:35:00 -0700 (PDT)
+Received: from jondnuc.lan (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
+ by smtp.gmail.com with ESMTPSA id
+ 91sm8462859wra.37.2020.04.24.05.34.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 24 Apr 2020 05:34:59 -0700 (PDT)
+From: Jon Doron <arilou@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 1/6] hyperv: expose API to determine if synic is enabled
+Date: Fri, 24 Apr 2020 15:34:39 +0300
+Message-Id: <20200424123444.3481728-2-arilou@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200424123444.3481728-1-arilou@gmail.com>
+References: <20200424123444.3481728-1-arilou@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200423221707.477404-2-eblake@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="qFgkTsE6LiHkLPZw"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 03:07:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=arilou@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,62 +96,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Fam Zheng <fam@euphon.net>,
- "open list:Sheepdog" <sheepdog@lists.wpkg.org>, qemu-block@nongnu.org,
- Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
- qemu-devel@nongnu.org, mreitz@redhat.com, Liu Yuan <namei.unix@gmail.com>,
- "Denis V. Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: mail@maciej.szmigiero.name, eyakovlev@virtuozzo.com, ehabkost@redhat.com,
+ rvkagan@gmail.com, liran.alon@oracle.com, pbonzini@redhat.com,
+ vkuznets@redhat.com, Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---qFgkTsE6LiHkLPZw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Jon Doron <arilou@gmail.com>
+---
+ hw/hyperv/hyperv.c         | 8 ++++++++
+ include/hw/hyperv/hyperv.h | 1 +
+ 2 files changed, 9 insertions(+)
 
-On Thu, Apr 23, 2020 at 05:17:05PM -0500, Eric Blake wrote:
-> There are several callers that need to create a new block backend from
-> an existing BDS; make the task slightly easier with a common helper
-> routine.
->=20
-> Suggested-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  include/sysemu/block-backend.h |  2 ++
->  block/block-backend.c          | 23 +++++++++++++++++++++++
->  block/crypto.c                 |  8 +++-----
->  block/parallels.c              |  7 +++----
->  block/qcow.c                   |  7 +++----
->  block/qcow2.c                  | 15 ++++++---------
->  block/qed.c                    |  7 +++----
->  block/sheepdog.c               |  9 ++++-----
->  block/vdi.c                    |  7 +++----
->  block/vhdx.c                   |  7 +++----
->  block/vmdk.c                   |  9 ++++-----
->  block/vpc.c                    |  7 +++----
->  blockdev.c                     |  8 +++-----
->  blockjob.c                     |  7 ++-----
->  14 files changed, 65 insertions(+), 58 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---qFgkTsE6LiHkLPZw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6i2j4ACgkQnKSrs4Gr
-c8gRIwf/QrnuU48tqV5gVDwvCAvsgYLOvYPFdA3RzGYyqLfU+awh158S9bfHIlJ2
-33tLGNXBhWWqvIX5odfBq6I4NbNDqM9hgT6pylB86dCxaQzXPwn2ZRqI9L/BOMrr
-EDEk0Mkz8CcXzHMI77s+9y1Ec5qZU/6RnyJgIiVIvaOsL6cEqRjGDgRCzm4DcThE
-ifGbmn/a2kZPkkZnWizA8HDwkVXgXLBgFpS8k0IfVxllS618YbqkNlB7UYhFnGGs
-z33dnPtgiOnorkXb9JUFGCkhUvEWW9tE1FJIpH+TZutSdpTLVI1SEgg7tQonzRoP
-+b+GTqHzy8CGsuYTV3lz2ZGl+/QCQQ==
-=4EmP
------END PGP SIGNATURE-----
-
---qFgkTsE6LiHkLPZw--
+diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
+index 8ca3706f5b..ddf4f32c60 100644
+--- a/hw/hyperv/hyperv.c
++++ b/hw/hyperv/hyperv.c
+@@ -37,6 +37,13 @@ typedef struct SynICState {
+ #define TYPE_SYNIC "hyperv-synic"
+ #define SYNIC(obj) OBJECT_CHECK(SynICState, (obj), TYPE_SYNIC)
+ 
++static bool synic_enabled;
++
++bool hyperv_is_synic_enabled(void)
++{
++    return synic_enabled;
++}
++
+ static SynICState *get_synic(CPUState *cs)
+ {
+     return SYNIC(object_resolve_path_component(OBJECT(cs), "synic"));
+@@ -133,6 +140,7 @@ void hyperv_synic_add(CPUState *cs)
+     object_property_add_child(OBJECT(cs), "synic", obj, &error_abort);
+     object_unref(obj);
+     object_property_set_bool(obj, true, "realized", &error_abort);
++    synic_enabled = true;
+ }
+ 
+ void hyperv_synic_reset(CPUState *cs)
+diff --git a/include/hw/hyperv/hyperv.h b/include/hw/hyperv/hyperv.h
+index 597381cb01..a63ee0003c 100644
+--- a/include/hw/hyperv/hyperv.h
++++ b/include/hw/hyperv/hyperv.h
+@@ -79,5 +79,6 @@ void hyperv_synic_add(CPUState *cs);
+ void hyperv_synic_reset(CPUState *cs);
+ void hyperv_synic_update(CPUState *cs, bool enable,
+                          hwaddr msg_page_addr, hwaddr event_page_addr);
++bool hyperv_is_synic_enabled(void);
+ 
+ #endif
+-- 
+2.24.1
 
 
