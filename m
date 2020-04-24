@@ -2,83 +2,78 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D40DC55186
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 08:47:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7368EC2BA1A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 08:48:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CA6220736
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 08:47:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11E7720736
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 08:48:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qy/i23R0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CA6220736
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OG4Cyzj2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11E7720736
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRtzA-0002m4-Fy
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 04:47:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36786)
+	id 1jRu14-00064y-2V
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 04:48:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36688)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jRtw5-0005jY-Bz
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 04:43:51 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jRtw3-0002Eq-Id
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 04:43:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35073
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jRtw2-00026b-2E
+ (envelope-from <armbru@redhat.com>) id 1jRtw2-0005eM-8J
  for qemu-devel@nongnu.org; Fri, 24 Apr 2020 04:43:47 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
+ (envelope-from <armbru@redhat.com>) id 1jRtw0-00025U-Rn
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 04:43:45 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31880)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jRtw0-00024G-DI
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 04:43:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587717824;
+ s=mimecast20190719; t=1587717823;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hr3YG+KjfcK59fxwDqq0zT0dktaKoHpEMtoEYHOt+0s=;
- b=Qy/i23R02kHsHiF8ujRbj9iAAX086ZTHpWMnV3sYuHRu+SCqnGv+2pdXLMvN0GMZSw1XV8
- xdCnmTRCnOILHQb2F50/fwM3F7prkzxF9LYxVJr2MRjGTBA8RTgYmUPvYRVr6hSDnCUxMI
- m73+UWWHvLh0tRVI0pp1D7CnFjgjykw=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=YzoP0f4qQghPFn1ZUI+LYJoUQ8pE8QelTZal343lE/Y=;
+ b=OG4Cyzj2AYTK/ZI2ryq9zlVTitjzSla76aIYNg+RWPLH0zIkm+m66Wqd/aZZc+F39vLe0F
+ B7aGCovgnLf6F9IdiXcBjVt1esfnylsa2j3jIJLFrxk8L9f5P6VeaqVS1Tv1ymeFksoJU4
+ JlqBgtdy7eexstuNhfx96sPleff0ks8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-138-FdfTyFVsNqmFUhW4UCogHQ-1; Fri, 24 Apr 2020 04:43:43 -0400
-X-MC-Unique: FdfTyFVsNqmFUhW4UCogHQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-5-VtisW6pYMHebS20C6ahauQ-1; Fri, 24 Apr 2020 04:43:41 -0400
+X-MC-Unique: VtisW6pYMHebS20C6ahauQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2841F107ACCD;
- Fri, 24 Apr 2020 08:43:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A14DD80B70D;
+ Fri, 24 Apr 2020 08:43:40 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EAB5699CD;
- Fri, 24 Apr 2020 08:43:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 58E4B5C1D2;
+ Fri, 24 Apr 2020 08:43:40 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id EC4CD11358C5; Fri, 24 Apr 2020 10:43:38 +0200 (CEST)
+ id CFE4211358BC; Fri, 24 Apr 2020 10:43:38 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 09/15] qapi: Assert non-input visitors see only valid
- narrow integers
-Date: Fri, 24 Apr 2020 10:43:32 +0200
-Message-Id: <20200424084338.26803-10-armbru@redhat.com>
-In-Reply-To: <20200424084338.26803-1-armbru@redhat.com>
-References: <20200424084338.26803-1-armbru@redhat.com>
+Subject: [PATCH v2 00/15] qapi: Spring cleaning
+Date: Fri, 24 Apr 2020 10:43:23 +0200
+Message-Id: <20200424084338.26803-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 03:54:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 03:11:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,56 +90,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-visit_type_intN() and visit_type_uintN() fail when the value is out of
-bounds.
+v2:
+* PATCH 10: Redone to avoid memory leak [Eric]
+* PATCH 14+15: New
 
-This is appropriate with an input visitor: the value comes from input,
-and input may be bad.
+Since PATCH 14 depends on "[PATCH 2/3] fuzz: Simplify how we compute
+available machines and types":
+Based-on: <20200424071142.3525-1-armbru@redhat.com>
 
-It should never happen with the other visitors: the value comes from
-the caller, and callers must keep it within bounds.  Assert that.
+Markus Armbruster (15):
+  qapi: Belatedly update visitor.h's big comment for QAPI modules
+  qapi: Fix the virtual walk example in visitor.h's big comment
+  qapi: Fix typo in visit_start_list()'s contract
+  qapi: Document @errp usage more thoroughly in visitor.h
+  qapi: Polish prose in visitor.h
+  qapi: Assert incomplete object occurs only in dealloc visitor
+  qapi: Fix Visitor contract for start_alternate()
+  qapi: Assert output visitors see only valid enum values
+  qapi: Assert non-input visitors see only valid narrow integers
+  qapi: Clean up visitor's recovery from input with invalid type
+  qapi: Assert non-input visitors see only valid alternate tags
+  qapi: Only input visitors can actually fail
+  qom: Simplify object_property_get_enum()
+  qapi: Disallow qmp_marshal_FOO(NULL, ...)
+  qapi: Generate simpler marshalling code when no arguments
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- qapi/qapi-visit-core.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ docs/devel/qapi-code-gen.txt        |   4 +-
+ include/qapi/visitor-impl.h         |   9 +-
+ include/qapi/visitor.h              | 192 ++++++++++++++++------------
+ block.c                             |   9 +-
+ block/sheepdog.c                    |   9 +-
+ blockdev.c                          |  16 +--
+ hw/core/machine-hmp-cmds.c          |   2 +-
+ monitor/hmp-cmds.c                  |   3 +-
+ monitor/qmp.c                       |   5 +-
+ qapi/qapi-dealloc-visitor.c         |   7 -
+ qapi/qapi-visit-core.c              |  20 +--
+ qom/object.c                        |   4 +-
+ tests/test-qobject-output-visitor.c |  39 ------
+ tests/test-string-output-visitor.c  |  19 ---
+ scripts/qapi/commands.py            |  62 ++++-----
+ scripts/qapi/visit.py               |   8 ++
+ 16 files changed, 174 insertions(+), 234 deletions(-)
 
-diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
-index 80ca83bcb9..74aa9c04bd 100644
---- a/qapi/qapi-visit-core.c
-+++ b/qapi/qapi-visit-core.c
-@@ -160,10 +160,13 @@ static void visit_type_uintN(Visitor *v, uint64_t *ob=
-j, const char *name,
-     Error *err =3D NULL;
-     uint64_t value =3D *obj;
-=20
-+    assert(v->type =3D=3D VISITOR_INPUT || value <=3D max);
-+
-     v->type_uint64(v, name, &value, &err);
-     if (err) {
-         error_propagate(errp, err);
-     } else if (value > max) {
-+        assert(v->type =3D=3D VISITOR_INPUT);
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-                    name ? name : "null", type);
-     } else {
-@@ -219,10 +222,13 @@ static void visit_type_intN(Visitor *v, int64_t *obj,=
- const char *name,
-     Error *err =3D NULL;
-     int64_t value =3D *obj;
-=20
-+    assert(v->type =3D=3D VISITOR_INPUT || (value >=3D min && value <=3D m=
-ax));
-+
-     v->type_int64(v, name, &value, &err);
-     if (err) {
-         error_propagate(errp, err);
-     } else if (value < min || value > max) {
-+        assert(v->type =3D=3D VISITOR_INPUT);
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-                    name ? name : "null", type);
-     } else {
 --=20
 2.21.1
 
