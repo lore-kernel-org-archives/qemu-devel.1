@@ -2,89 +2,81 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA218C55191
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 12:40:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EADAC54FCB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 12:49:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99DFF20736
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 12:40:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD75F20728
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 12:49:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KxuRr7jd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99DFF20736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bLywChFB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD75F20728
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRxdU-0005eD-Ov
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 08:40:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54192)
+	id 1jRxm8-0001YA-MB
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 08:49:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37226)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <arilou@gmail.com>) id 1jRxY3-0003tF-1X
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 08:35:15 -0400
+ (envelope-from <stefanha@redhat.com>) id 1jRxl4-0000yN-50
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 08:48:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <arilou@gmail.com>) id 1jRxY2-0004Ca-1s
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 08:35:14 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37505)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1jRxY1-00046L-Hn
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 08:35:13 -0400
-Received: by mail-wm1-x343.google.com with SMTP id z6so10536209wml.2
- for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 05:35:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=WU+H5+odnL+lFKgHafO2P278mQjtE3V6d/6koMgqUwg=;
- b=KxuRr7jd5tHBiypzb+xVrfEXuDyyKw3SnEmHWwcrYi7pg0cKtyUqYKXb45IdC84F9b
- EmehJmY/FICnpzqmDwrax3eHquJsV4F12JYNji65g5cns7OEF85OrEktAo+rUeZVrwsF
- EpV93MVy5I4m1ziZhwquLvFcwjYljARsEMh90X8iU6mx4YX3JtgOKBIPk8peilSBQIv2
- TUQgm4saaLrPpPoQPGVfyfwBxEBoMobs6w0EVyx1UUYrsFyzvNStv3xtwndBDf47AWPo
- BSGhUloKd4RHg0UhIU25qIkoYaLSS4SVxdmvIX3EaRLUPdZyAutdKuE88LGXQnjeDogF
- iABg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=WU+H5+odnL+lFKgHafO2P278mQjtE3V6d/6koMgqUwg=;
- b=F2mk7gMQmpJErdeAkdGvtkepvkc098pis8vhJFWsyj4hHME49RqiovEAdBdDFi/mfS
- wHL65nCzkBvD+f7h10odzhyLCzPMvxR0LTJ+vZFsSLuhYVMjoamXTYiRF4pWcdVUgz6J
- wzeD+YTybxUuAS9I5OI1RTgMNQwdFVtZ2zNx2wg78ZxmhkQnVsFHD/q7u2qE7O0xXHUp
- RVfFEiohB1O1GEXpNrs4PLcGaPTIiXqzr4jDu7tRAepd3uekYeg7kEWUUptC2gseEXRZ
- WJfMH6NtWS839l29wLEvi7diNWKZV+EneAbaw3ho0GgLHIiFu+mELLGyeRJHIbslGQiP
- wJuA==
-X-Gm-Message-State: AGi0PuZg3X/Cs6ExwRE/YshNHcgwItXyhqC83KhKEcJpX0S7mQxi1KSB
- g9Va7dunkNCd3JP3dh7Wv7bFyMYda6UYcw==
-X-Google-Smtp-Source: APiQypKGpz6JkG2RNKnSne5MgEkRpY/JXTNssrthxrX8QXIstuz18URmyCipMSZgEfw2UTv1Ru+WXQ==
-X-Received: by 2002:a1c:384:: with SMTP id 126mr10016216wmd.58.1587731708827; 
- Fri, 24 Apr 2020 05:35:08 -0700 (PDT)
-Received: from jondnuc.lan (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
- by smtp.gmail.com with ESMTPSA id
- 91sm8462859wra.37.2020.04.24.05.35.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 24 Apr 2020 05:35:08 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 6/6] vmbus: add infrastructure to save/load vmbus requests
-Date: Fri, 24 Apr 2020 15:34:44 +0300
-Message-Id: <20200424123444.3481728-7-arilou@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200424123444.3481728-1-arilou@gmail.com>
-References: <20200424123444.3481728-1-arilou@gmail.com>
+ (envelope-from <stefanha@redhat.com>) id 1jRxl2-0004SL-WF
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 08:48:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24034
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jRxl2-0004MI-G3
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 08:48:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587732519;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=IsbDPoI4pFf4k+Qgnoz7h7oaAxz+dWgBMri81x3Askc=;
+ b=bLywChFBIzo/ecqe8qDzIu2nQHxgMJR/vIRY/FLEp3Y7TklQ4BLhDuU0XSfiShthtfQW8s
+ urSdhm9ZEKppaxIbTmFWOT9WJNpx95Qb94/CLKV6So+LYA1osJQV+53L+b2eRVJp3juOxM
+ X/IqI4XRJaDBHl0Aw6vkcm3C9OeG+QE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143-DtINiFQxMBazekGSTBg4kQ-1; Fri, 24 Apr 2020 08:48:33 -0400
+X-MC-Unique: DtINiFQxMBazekGSTBg4kQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04F021005510;
+ Fri, 24 Apr 2020 12:48:31 +0000 (UTC)
+Received: from localhost (ovpn-114-136.ams2.redhat.com [10.36.114.136])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E7BDA60CD3;
+ Fri, 24 Apr 2020 12:48:24 +0000 (UTC)
+Date: Fri, 24 Apr 2020 13:48:23 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: elena.ufimtseva@oracle.com
+Subject: Re: [PATCH RESEND v6 00/36] Initial support for multi-process qemu
+Message-ID: <20200424124823.GC189569@stefanha-x1.localdomain>
+References: <cover.1587614626.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=arilou@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::343
+In-Reply-To: <cover.1587614626.git.elena.ufimtseva@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="3siQDZowHQqNOShm"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 03:07:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,149 +88,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mail@maciej.szmigiero.name, eyakovlev@virtuozzo.com, ehabkost@redhat.com,
- rvkagan@gmail.com, liran.alon@oracle.com, Roman Kagan <rkagan@virtuozzo.com>,
- pbonzini@redhat.com, vkuznets@redhat.com,
- "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
- Jon Doron <arilou@gmail.com>
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
+ felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
+ konrad.wilk@oracle.com, dgilbert@redhat.com, liran.alon@oracle.com,
+ thanos.makatos@nutanix.com, rth@twiddle.net, kwolf@redhat.com,
+ berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
+ marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This can be allow to include controller-specific data while
-saving/loading in-flight scsi requests of the vmbus scsi controller.
+--3siQDZowHQqNOShm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-Signed-off-by: Jon Doron <arilou@gmail.com>
----
- hw/hyperv/vmbus.c         | 99 +++++++++++++++++++++++++++++++++++++++
- include/hw/hyperv/vmbus.h |  3 ++
- 2 files changed, 102 insertions(+)
+On Wed, Apr 22, 2020 at 09:13:35PM -0700, elena.ufimtseva@oracle.com wrote:
+> There is an error in travis-ci build test which does not get reproduced.
+>=20
+>  TEST    iotest-qcow2: 041 [fail]
+> QEMU          -- "/home/travis/build/elena-ufimtseva/qemu-multiprocess/ou=
+t-of-tree/build/dir/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86=
+_64" -nodefaults -display none -accel qtest
+> QEMU_IMG      -- "/home/travis/build/elena-ufimtseva/qemu-multiprocess/ou=
+t-of-tree/build/dir/tests/qemu-iotests/../../qemu-img"=20
+> QEMU_IO       -- "/home/travis/build/elena-ufimtseva/qemu-multiprocess/ou=
+t-of-tree/build/dir/tests/qemu-iotests/../../qemu-io"  --cache writeback --=
+aio threads -f qcow2
+> QEMU_NBD      -- "/home/travis/build/elena-ufimtseva/qemu-multiprocess/ou=
+t-of-tree/build/dir/tests/qemu-iotests/../../qemu-nbd"=20
+> IMGFMT        -- qcow2 (compat=3D1.1)
+> IMGPROTO      -- file
+> PLATFORM      -- Linux/x86_64 travis-job-fc4e2553-b470-4a8b-812e-a4fcf8ba=
+094f 5.0.0-1031-gcp
+> TEST_DIR      -- /home/travis/build/elena-ufimtseva/qemu-multiprocess/out=
+-of-tree/build/dir/tests/qemu-iotests/scratch
+> SOCK_DIR      -- /tmp/tmp.LOmYANt5Od
+> SOCKET_SCM_HELPER -- /home/travis/build/elena-ufimtseva/qemu-multiprocess=
+/out-of-tree/build/dir/tests/qemu-iotests/socket_scm_helper
+> --- /home/travis/build/elena-ufimtseva/qemu-multiprocess/tests/qemu-iotes=
+ts/041.out=092020-04-22 00:17:23.701844698 +0000
+> +++ /home/travis/build/elena-ufimtseva/qemu-multiprocess/out-of-tree/buil=
+d/dir/tests/qemu-iotests/041.out.bad=092020-04-22 00:24:39.234343858 +0000
+> @@ -1,5 +1,29 @@
+> -........................................................................=
+......................
+> +........................FF..............................................=
+......................
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +FAIL: test_with_other_parent (__main__.TestRepairQuorum)
+> +----------------------------------------------------------------------
+> +Traceback (most recent call last):
+> +  File "041", line 1049, in test_with_other_parent
+> +    self.assert_qmp(result, 'return', {})
+> +  File "/home/travis/build/elena-ufimtseva/qemu-multiprocess/tests/qemu-=
+iotests/iotests.py", line 821, in assert_qmp
+> +    result =3D self.dictpath(d, path)
+> +  File "/home/travis/build/elena-ufimtseva/qemu-multiprocess/tests/qemu-=
+iotests/iotests.py", line 797, in dictpath
+> +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d)))
+> +AssertionError: failed path traversal for "return" in "{'error': {'class=
+': 'GenericError', 'desc': "UNIX socket path '/home/travis/build/elena-ufim=
+tseva/qemu-multiprocess/out-of-tree/build/dir/tests/qemu-iotests/scratch/nb=
+d.sock' is too long"}}"
 
-diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
-index 0df7afe0ca..ab72a59a4a 100644
---- a/hw/hyperv/vmbus.c
-+++ b/hw/hyperv/vmbus.c
-@@ -1272,6 +1272,105 @@ void vmbus_free_req(void *req)
-     g_free(req);
- }
- 
-+static const VMStateDescription vmstate_sgent = {
-+    .name = "vmbus/sgentry",
-+    .version_id = 0,
-+    .minimum_version_id = 0,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(base, ScatterGatherEntry),
-+        VMSTATE_UINT64(len, ScatterGatherEntry),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+typedef struct VMBusChanReqSave {
-+    uint16_t chan_idx;
-+    uint16_t pkt_type;
-+    uint32_t msglen;
-+    void *msg;
-+    uint64_t transaction_id;
-+    bool need_comp;
-+    uint32_t num;
-+    ScatterGatherEntry *sgl;
-+} VMBusChanReqSave;
-+
-+static const VMStateDescription vmstate_vmbus_chan_req = {
-+    .name = "vmbus/vmbus_chan_req",
-+    .version_id = 0,
-+    .minimum_version_id = 0,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT16(chan_idx, VMBusChanReqSave),
-+        VMSTATE_UINT16(pkt_type, VMBusChanReqSave),
-+        VMSTATE_UINT32(msglen, VMBusChanReqSave),
-+        VMSTATE_VBUFFER_ALLOC_UINT32(msg, VMBusChanReqSave, 0, NULL, msglen),
-+        VMSTATE_UINT64(transaction_id, VMBusChanReqSave),
-+        VMSTATE_BOOL(need_comp, VMBusChanReqSave),
-+        VMSTATE_UINT32(num, VMBusChanReqSave),
-+        VMSTATE_STRUCT_VARRAY_POINTER_UINT32(sgl, VMBusChanReqSave, num,
-+                                             vmstate_sgent, ScatterGatherEntry),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+void vmbus_save_req(QEMUFile *f, VMBusChanReq *req)
-+{
-+    VMBusChanReqSave req_save;
-+
-+    req_save.chan_idx = req->chan->subchan_idx;
-+    req_save.pkt_type = req->pkt_type;
-+    req_save.msglen = req->msglen;
-+    req_save.msg = req->msg;
-+    req_save.transaction_id = req->transaction_id;
-+    req_save.need_comp = req->need_comp;
-+    req_save.num = req->sgl.nsg;
-+    req_save.sgl = g_memdup(req->sgl.sg,
-+                            req_save.num * sizeof(ScatterGatherEntry));
-+
-+    vmstate_save_state(f, &vmstate_vmbus_chan_req, &req_save, NULL);
-+
-+    g_free(req_save.sgl);
-+}
-+
-+void *vmbus_load_req(QEMUFile *f, VMBusDevice *dev, uint32_t size)
-+{
-+    VMBusChanReqSave req_save;
-+    VMBusChanReq *req = NULL;
-+    VMBusChannel *chan = NULL;
-+    uint32_t i;
-+
-+    vmstate_load_state(f, &vmstate_vmbus_chan_req, &req_save, 0);
-+
-+    if (req_save.chan_idx >= dev->num_channels) {
-+        error_report("%s: %u(chan_idx) > %u(num_channels)", __func__,
-+                     req_save.chan_idx, dev->num_channels);
-+        goto out;
-+    }
-+    chan = &dev->channels[req_save.chan_idx];
-+
-+    if (vmbus_channel_reserve(chan, 0, req_save.msglen)) {
-+        goto out;
-+    }
-+
-+    req = vmbus_alloc_req(chan, size, req_save.pkt_type, req_save.msglen,
-+                          req_save.transaction_id, req_save.need_comp);
-+    if (req_save.msglen) {
-+        memcpy(req->msg, req_save.msg, req_save.msglen);
-+    }
-+
-+    for (i = 0; i < req_save.num; i++) {
-+        qemu_sglist_add(&req->sgl, req_save.sgl[i].base, req_save.sgl[i].len);
-+    }
-+
-+out:
-+    if (req_save.msglen) {
-+        g_free(req_save.msg);
-+    }
-+    if (req_save.num) {
-+        g_free(req_save.sgl);
-+    }
-+    return req;
-+}
-+
- static void channel_event_cb(EventNotifier *e)
- {
-     VMBusChannel *chan = container_of(e, VMBusChannel, notifier);
-diff --git a/include/hw/hyperv/vmbus.h b/include/hw/hyperv/vmbus.h
-index 63a5b807b6..9219f34d6b 100644
---- a/include/hw/hyperv/vmbus.h
-+++ b/include/hw/hyperv/vmbus.h
-@@ -224,4 +224,7 @@ int vmbus_map_sgl(VMBusChanReq *req, DMADirection dir, struct iovec *iov,
- void vmbus_unmap_sgl(VMBusChanReq *req, DMADirection dir, struct iovec *iov,
-                      unsigned iov_cnt, size_t accessed);
- 
-+void vmbus_save_req(QEMUFile *f, VMBusChanReq *req);
-+void *vmbus_load_req(QEMUFile *f, VMBusDevice *dev, uint32_t size);
-+
- #endif
--- 
-2.24.1
+UNIX Domain Socket paths have to be 108 characters or less.  The path in
+the failed test case is 110 characters long.  You could rename your
+branch to "mpqemu" to solve this failure.
+
+Stefan
+
+--3siQDZowHQqNOShm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6i4BcACgkQnKSrs4Gr
+c8jyEwf9E7WuRRQv0pc3L2lujkRpCkEzdila1lXJt0GY3rxhpOg6QaOvJk3f69X8
+bUNzqFPkyqQJ3p53iMlLhp4/SpXNGL8+3f2QrruGBCoA0RSLkgq+1WomrODr2WO1
+NuGDz5ZrFdGB9cfm0YE3yS8Jxy2nVUBlRHNzi4IqHuvEGoFW/2dTC/Mq9l5ARIoX
+nPALuJMsn2NNFek7Wq7W+Beh6A/8zCrlxLPbr+RIyawqU63z1oSpOVO2Q5EXG3Ll
+bZeKLiVO1ba9wO36OHbuXlsUUI4JiqgbHULn7m/DtSf7AvIi8qEG3IbX69sPPZWO
+3qXQ6ElXWclyZTVXzju9t0JASJGJLA==
+=YL4C
+-----END PGP SIGNATURE-----
+
+--3siQDZowHQqNOShm--
 
 
