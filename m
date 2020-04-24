@@ -2,91 +2,64 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B68C2BA19
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 01:28:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 028CBC2BA19
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 01:47:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4B3720715
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 01:28:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4B3720715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id C258B20728
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 01:47:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fSVigHNd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C258B20728
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRn8J-0000nl-Ox
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 21:27:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44300)
+	id 1jRnQx-00050h-Nq
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 21:47:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43526)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1jRn7R-0000Bb-Uv
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 21:27:12 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jRnPk-00047G-7B
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 21:46:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1jRn7O-000438-3Q
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 21:27:03 -0400
-Received: from mga11.intel.com ([192.55.52.93]:52634)
+ (envelope-from <dgibson@ozlabs.org>) id 1jRnPh-0005Dc-Uc
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 21:45:59 -0400
+Received: from ozlabs.org ([203.11.71.1]:45791)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jRn7K-0003TC-PH
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 21:26:59 -0400
-IronPort-SDR: V+Rem/O4LtZnWKdvNqO0XQHklGSZGr8VqlLb1R7Q6WylqC20BS++nARuydA5O276+nc82DoeRq
- iCZwGv1J1q9A==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
- by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Apr 2020 18:26:52 -0700
-IronPort-SDR: SRrcFVOItw1CVkRs1yFZjO7vHqwD9SDJuDxy0JdTMIt+RK86TWCOGCd1CNfqI7ai8j3XvtQUbB
- vjYHlbjdRiTQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,309,1583222400"; d="scan'208";a="259645296"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
- by orsmga006.jf.intel.com with ESMTP; 23 Apr 2020 18:26:52 -0700
-Received: from shsmsx606.ccr.corp.intel.com (10.109.6.216) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 23 Apr 2020 18:26:39 -0700
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX606.ccr.corp.intel.com (10.109.6.216) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 24 Apr 2020 09:26:37 +0800
-Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
- SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Fri, 24 Apr 2020 09:26:37 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Jason Wang <jasowang@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
-Subject: RE: [PATCH 0/2] net/colo-compare.c: Expose "max_queue_size" to users
- and clean up
-Thread-Topic: [PATCH 0/2] net/colo-compare.c: Expose "max_queue_size" to users
- and clean up
-Thread-Index: AQHWD7P+xm/8Bq9SCE2KY4WVvkZ5vqiCyuwQgAMpKICAAIZ5EP//fRGAgACHWeA=
-Date: Fri, 24 Apr 2020 01:26:37 +0000
-Message-ID: <01035db9c1ac437585c5a9f3c5ecd895@intel.com>
-References: <20200411033824.19389-1-chen.zhang@intel.com>
- <716ca2bcd9e64c37a79509c468e18485@intel.com>
- <18466058-4184-2c6e-d740-2a1479395506@redhat.com>
- <310162af410e43ea9e0d0a22012e1929@intel.com>
- <d5e9799e-49bc-82ee-4159-4a5602db015e@redhat.com>
-In-Reply-To: <d5e9799e-49bc-82ee-4159-4a5602db015e@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jRnPf-0004Rz-2M; Thu, 23 Apr 2020 21:45:56 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 497cSj4Hqcz9sSm; Fri, 24 Apr 2020 11:45:41 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1587692741;
+ bh=DwbecEN22V9apyOZL7d/4HzJ0LOORakXWNPtT03M1GA=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=fSVigHNd3hjKdtXR9ZNHB1rnpfeuXdv7wYpHZJ5sENKQg0xxSwC8VkYR4ST1w8y9g
+ 4SSvxQ64nHIbr4VBn5V0uP6L1MS2EKZpHgKIkicreu85uvoTaze8RqGRcDdohAwUMZ
+ M3EJnJrpW+VNiZOnZCXbq42KUFokRtVINdMVfNbY=
+Date: Fri, 24 Apr 2020 11:36:08 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Subject: Re: [PATCH] spapr_nvdimm.c: make 'label-size' mandatory
+Message-ID: <20200424013608.GA121306@umbus.fritz.box>
+References: <20200413203628.31636-1-danielhb413@gmail.com>
 MIME-Version: 1.0
-Received-SPF: pass client-ip=192.55.52.93; envelope-from=chen.zhang@intel.com;
- helo=mga11.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 21:26:53
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 192.55.52.93
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="gKMricLos+KVdGMg"
+Content-Disposition: inline
+In-Reply-To: <20200413203628.31636-1-danielhb413@gmail.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 21:45:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,33 +71,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyA8amFz
-b3dhbmdAcmVkaGF0LmNvbT4NCj4gU2VudDogVGh1cnNkYXksIEFwcmlsIDIzLCAyMDIwIDU6MDcg
-UE0NCj4gVG86IFpoYW5nLCBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT47IHFlbXUtZGV2IDxx
-ZW11LQ0KPiBkZXZlbEBub25nbnUub3JnPg0KPiBDYzogWmhhbmcgQ2hlbiA8emhhbmdja2lkQGdt
-YWlsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCAwLzJdIG5ldC9jb2xvLWNvbXBhcmUuYzog
-RXhwb3NlICJtYXhfcXVldWVfc2l6ZSIgdG8NCj4gdXNlcnMgYW5kIGNsZWFuIHVwDQo+IA0KPiAN
-Cj4gT24gMjAyMC80LzIzIOS4i+WNiDQ6NTksIFpoYW5nLCBDaGVuIHdyb3RlOg0KPiA+DQo+ID4+
-IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4+IEZyb206IEphc29uIFdhbmcgPGphc293
-YW5nQHJlZGhhdC5jb20+DQo+ID4+IFNlbnQ6IFRodXJzZGF5LCBBcHJpbCAyMywgMjAyMCA0OjU0
-IFBNDQo+ID4+IFRvOiBaaGFuZywgQ2hlbiA8Y2hlbi56aGFuZ0BpbnRlbC5jb20+OyBxZW11LWRl
-diA8cWVtdS0NCj4gPj4gZGV2ZWxAbm9uZ251Lm9yZz4NCj4gPj4gQ2M6IFpoYW5nIENoZW4gPHpo
-YW5nY2tpZEBnbWFpbC5jb20+DQo+ID4+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggMC8yXSBuZXQvY29s
-by1jb21wYXJlLmM6IEV4cG9zZSAibWF4X3F1ZXVlX3NpemUiDQo+ID4+IHRvIHVzZXJzIGFuZCBj
-bGVhbiB1cA0KPiA+Pg0KPiA+Pg0KPiA+PiBPbiAyMDIwLzQvMjMg5LiL5Y2IMzozMSwgWmhhbmcs
-IENoZW4gd3JvdGU6DQo+ID4+PiBIaSBKYXNvbiwNCj4gPj4+DQo+ID4+PiBQbGVhc2UgcmV2aWV3
-IHRoaXMgc2VyaWVzIHdoZW4geW91IGZyZWUuDQo+ID4+Pg0KPiA+Pj4gVGhhbmtzDQo+ID4+PiBa
-aGFuZyBDaGVuDQo+ID4+Pg0KPiA+PiBTdXJlLg0KPiA+Pg0KPiA+PiBJIHdvbmRlciBtYXliZSBp
-dCdzIGJldHRlciBlLmcgeW91IGNhbiByZXZpZXcgYW5kIGNvbGxlY3QgdGhlIHBhdGNoZXMNCj4g
-Pj4gdGhhdCBsb29rcyBnb29kIGFuZCBzZW5kIHRoZW0gdG8gbWUgcGVyaW9kaWNhbGx5Pw0KPiA+
-IE9LLCBJIHdpbGwgcXVldWUgQ09MTyByZWxhdGVkIHBhdGNoIGFzIG9uZSBzZXJpZXMgdG8geW91
-Lg0KPiA+IERvIEkgbmVlZCBzZW5kIGEgcHVsbCByZXF1ZXN0PyBvciBqdXN0IGEgYmlnIHBhdGNo
-IHNldD8NCj4gDQo+IA0KPiBJIHByZWZlciBiaWcgcGF0Y2ggc2V0Lg0KDQpPSywgSSBnb3QgaXQu
-DQoNClRoYW5rcw0KWmhhbmcgQ2hlbg0KDQo+IA0KPiBUaGFua3MNCj4gDQo+IA0KPiA+DQo+ID4g
-VGhhbmtzDQo+ID4gWmhhbmcgQ2hlbg0KPiA+DQo+ID4+IFRoYW5rcw0KDQo=
+
+--gKMricLos+KVdGMg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Apr 13, 2020 at 05:36:28PM -0300, Daniel Henrique Barboza wrote:
+> The pseries machine does not support NVDIMM modules without label.
+> Attempting to do so, even if the overall block size is aligned with
+> 256MB, will seg fault the guest kernel during NVDIMM probe. This
+> can be avoided by forcing 'label-size' to always be present for
+> sPAPR NVDIMMs.
+>=20
+> The verification was put before the alignment check because the
+> presence of label-size affects the alignment calculation, so
+> it's not optimal to warn the user about an alignment error,
+> then about the lack of label-size, then about a new alignment
+> error when the user sets a label-size.
+>=20
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+
+So, I still think it's kind of bogus that the guest side driver falls
+over so messily (more on that elswhere in the thread).
+
+However, regardless of that, it does make sense to enforce the PAPR
+restriction that all NVDIMMs have labels.  And it fixes the visible
+problem with a minimal change.
+
+So, I've applied to ppc-for-5.1.  I am going to update the error
+messages a little to make it clearer that these are PAPR specific
+restrictions.
+
+> ---
+>  hw/ppc/spapr_nvdimm.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
+> index 25be8082d7..9abcdcc26b 100644
+> --- a/hw/ppc/spapr_nvdimm.c
+> +++ b/hw/ppc/spapr_nvdimm.c
+> @@ -37,6 +37,12 @@ void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm, =
+uint64_t size,
+>      QemuUUID uuid;
+>      int ret;
+> =20
+> +    if (object_property_get_int(OBJECT(nvdimm), NVDIMM_LABEL_SIZE_PROP,
+> +                                &error_abort) =3D=3D 0) {
+> +        error_setg(errp, "NVDIMM device requires label-size to be set");
+> +        return;
+> +    }
+> +
+>      if (size % SPAPR_MINIMUM_SCM_BLOCK_SIZE) {
+>          error_setg(errp, "NVDIMM memory size excluding the label area"
+>                     " must be a multiple of %" PRIu64 "MB",
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--gKMricLos+KVdGMg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6iQoUACgkQbDjKyiDZ
+s5IVPQ//dLKeBkKtgMXNlWXTazmOQSuxQv514dcd99J3SLTbYRvhmSdAJlWCWmLG
+S3szrsKNyKZz/G7HLweg8IfucOtPhQROAmLzwqjukPoNA2aTUniwtuD1P3PcvhAs
+x8LmSYJViFQU+XEtXBFxb1VArQF76KfsXThuoSsq5xHCoPKn9VEv1skhn7dCzW9j
+h8SYAXf9/rjkSxfCCfkz30/QguJJAw4QSZJUTVk9UTTdN21raGsor/ERX/G+pN/Q
+/4DIxd/BP0JhEFS+wTMAD4P7cYgUZnK/j2TWM4t9Yq7+eVVLBCI8Zx/RqvQzzBr9
+jBy++8sV+mZGigqIujW4MKZ1/+yGTHf8CUtlGp7oubVNE/qH7jKR4FfqqEhrSx1C
+ofTfzqC15hY1Fs5hKM61xjqg9uVo36sfGmnHpttiQ9NoGi2LcvQxRswSqn6RPKEm
+OniiF5FWt7OX2Mey4jVh+p8j/aFu8TELkADtTb09zBUxWlNmJboF1G+L3n1povtf
+d3RtyTKx/LQG5/N/FuIDWKO3thjvOyB446+4ig/PzP1xVmi2p7lmk041SXiEmwzV
+QHfo96gl+w4u2X5nM7YWZigmgzEDXG11tGsaPTcOKFyu5+xVPs/S4/OUiaM7zauQ
+uGLfrFHTz3wbSjQRA8KSy1YdJ0I86lb2EqRQ2UcmKS6sF7Avjmc=
+=GZID
+-----END PGP SIGNATURE-----
+
+--gKMricLos+KVdGMg--
 
