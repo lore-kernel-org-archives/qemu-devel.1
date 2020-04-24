@@ -2,61 +2,87 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7AE2C54FCB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 15:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCE7C54FD0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 16:10:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB35A2063A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 15:53:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB35A2063A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 249182075A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 16:10:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hT2Q173r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 249182075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jS0da-0001n1-O2
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 11:53:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58478)
+	id 1jS0uP-0000n6-5p
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 12:10:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39994)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alxndr@bu.edu>) id 1jS0Tg-00030y-2a
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 11:42:56 -0400
+ (envelope-from <alexander.duyck@gmail.com>) id 1jS0tX-0000Cf-UR
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 12:09:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alxndr@bu.edu>) id 1jS0TX-0007nN-7p
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 11:42:54 -0400
-Received: from relay68.bu.edu ([128.197.228.73]:54803)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jS0TW-0007ZR-Pg
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 11:42:46 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 03OFfPji014429
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Fri, 24 Apr 2020 11:41:30 -0400
-Date: Fri, 24 Apr 2020 11:41:25 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH 2/3] fuzz: Simplify how we compute available machines and
- types
-Message-ID: <20200424154125.kxtyws52hx2ycix4@mozz.bu.edu>
-References: <20200424071142.3525-1-armbru@redhat.com>
- <20200424071142.3525-3-armbru@redhat.com>
+ (envelope-from <alexander.duyck@gmail.com>) id 1jS0tX-0007wx-FW
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 12:09:39 -0400
+Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:34205)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
+ id 1jS0tX-0007wc-1g
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 12:09:39 -0400
+Received: by mail-il1-x142.google.com with SMTP id w6so9783522ilg.1
+ for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 09:09:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=x34Cvcp8HB+wcNcEXmq5CtCFXROT6wpN0c6tiV5Xaek=;
+ b=hT2Q173r608lxtoWrm2ErJtMP40o9S3f9W7/V0ik1bRM7QMu1z30np3klCurID60RD
+ nJq6oyMwszUvpiH4m+SNe10OGIX72wA7Xn2YJ3bBdx+3tBVLZvckdIxm0A8l0i71PUKf
+ HmhnkFbXDwkB4N/u631ow92ptSdsgYlbDD8l/T4Vvs0J1RypYL5Y+ftCWIVL6md0/3SF
+ g2y2JzzjpE8tZt5l1KqgdcSKJMvu1WhP3qiLlFpFTF/+tA0rJnSzg7ix/eY86cyhjFXM
+ +f16JbdfKX0Lzc8RVCTBqNIbek0ggsAtzjOPjpIsxiO1/1oqFPH0WoDEND+qS2+uAQCF
+ GZlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=x34Cvcp8HB+wcNcEXmq5CtCFXROT6wpN0c6tiV5Xaek=;
+ b=YFZo/zA5NFSogGSZGg8cflucfKt/VKHLiUgqqedRRnXF5I2nMXNyqkC3HDXRdo/wh6
+ yEJEIM9QpT3g0PtOXnH+lg46UdqCDc7STwQ1dfoCB+RfmVLOBQqqArWBh+85oZTnc5gc
+ OD5v+q5uN3n1LR7mBMVawCKPV19cx4MGw9/9VfEP8CYsBJcdQfXdAPAI+2MF+UvILIYI
+ W+1CJo8t3GnCgxMIRtmlwB5DJi5d5XkcrqWu4glazWrx44tmfAupWBb2Mwf9o8ec8pXq
+ XzAeqtLjn08mT1Garw4rLllkJ8WrUByolAdlxKhMfWxYBFuToQ0gNDFnvVQBn1vLlZ4l
+ DdyQ==
+X-Gm-Message-State: AGi0PuYr0Uz9M+aMZCRSD/rDDjPdiM7xhvl2sYgslgMCaj2mlBPYubTu
+ BdBtgs6t8u4D6FdoNlopIh7OQorhpnp/rKdrZ0M=
+X-Google-Smtp-Source: APiQypJYUdtkiHOJXQ0XJUUP5R3bGrA9sRco/JWU+nEi3qMFRCm7/NmWWQ042UfUqTXopQtnSZExvK2LpajdpYS26Z4=
+X-Received: by 2002:a92:4b11:: with SMTP id m17mr9613499ilg.42.1587744577468; 
+ Fri, 24 Apr 2020 09:09:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200424071142.3525-3-armbru@redhat.com>
-User-Agent: NeoMutt/20180716
-Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
- helo=relay68.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 11:42:43
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Received-From: 128.197.228.73
+References: <20200422181649.12258.37077.stgit@localhost.localdomain>
+ <20200422182127.12258.26300.stgit@localhost.localdomain>
+ <a2183a2f-e10d-1e19-52d9-a9cd71fa2655@redhat.com>
+ <CAKgT0Ud1WVUV5VNCCBqJtYPSLCZTq5oXGUyvqHmXdnTQUko6qQ@mail.gmail.com>
+ <6f7f970f-9188-726e-39da-6e0954ab9fdf@redhat.com>
+In-Reply-To: <6f7f970f-9188-726e-39da-6e0954ab9fdf@redhat.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Fri, 24 Apr 2020 09:09:26 -0700
+Message-ID: <CAKgT0Ueg=oJpxXj2m9hpV8V7v75VcByhsWH3Vz1_-tRuJ3MtFQ@mail.gmail.com>
+Subject: Re: [PATCH v21 QEMU 5/5] virtio-balloon: Provide an interface for
+ free page reporting
+To: David Hildenbrand <david@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
+ envelope-from=alexander.duyck@gmail.com; helo=mail-il1-x142.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,274 +94,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org, bsd@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 200424 0911, Markus Armbruster wrote:
-> apply_to_qlist(), apply_to_node() work with QObjects.  This is
-> designed for use by tests/qtest/qos-test.c, which gets the data in
-> that form via QMP.  Goes back to commit fc281c8020 "tests: qgraph API
-> for the qtest driver framework".
-> 
-> Commit 275ab39d86 "fuzz: add support for qos-assisted fuzz targets"
-> added another user: qtest/fuzz/qos_fuzz.c.  To get the data as
-> QObjects, it uses qmp_marshal_query_machines() and
-> qmp_marshal_qom_list_types().
-> 
-> All this code is rather cumbersome.  Switch to working with generated
-> QAPI types instead:
-> 
-> * Replace apply_to_qlist() & friends by machines_apply_to_node() and
->   types_apply_to_node().
-> 
-> * Have qos_fuzz.c use qmp_query_machines() and qmp_qom_list_types()
->   instead.
-> 
-> * Have qos_test.c convert from QObject to the QAPI types.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On Fri, Apr 24, 2020 at 8:34 AM David Hildenbrand <david@redhat.com> wrote:
+>
+>
+> >> Also, I do wonder if we want to default-enable it. It can still have a
+> >> negative performance impact and some people might not want that.
+> >
+> > The negative performance impact should be minimal. At this point the
+> > hinting process ends up being very light since it only processes a
+> > small chunk of the memory before it shuts down for a couple seconds.
+> > In my original data the only time any significant performance
+> > regression was seen was with page shuffling enabled, and that was
+> > before I put limits on how many pages we could process per pass and
+> > how frequently we would make a pass through memory. My thought is that
+> > we are much better having it enabled by default rather than having it
+> > disabled by default. In the worst case scenario we have a little bit
+> > of extra thread noise from it popping up running for a few
+> > milliseconds and then sleeping for about two seconds, but the benefit
+> > side is that the VMs will do us a favor and restrict themselves to a
+> > much smaller idle footprint until such time as the memory is actually
+> > needed in the guest.
+>
+> While I agree that the impact is small, there *is* a noticeable
+> performance impact. One of the main users is memory overcommit.
+>
+> Also, imagine the following scenarios:
+> - RT workload in the guest. Just because you have a virtio-balloon
+>   device defined would mean something is suddenly active and
+>   discarding/trying to discard pages.
+> - vfio: free page reporting is completely useless right now and
+>   *only* overhead.
+> - prealloc does not expect that pages get suddenly discarded
+> - s390x, which has CMM and might not benefit at all (except when using
+>   huge pages as backing storage)
+>
+> No, I don't think it's acceptable to enable this as default. I remember
+> that it is quite common to just define a balloon device but never use it.
+>
+> E.g., "A virtual memory balloon device is added to all Xen and KVM/QEMU
+> guest virtual machines. It will be seen as <memballoon> element" [1].
+>
+> I think we should let upper layers decide (just as we do for free page
+> hinting, for example).
 
-Thank you for looking at this!
-Reviewed-by: Alexander Bulekov <alxndr@bu.edu>
+Okay. I guess there are a number of other cases I hand't thought of. I
+will switch the default to false.
 
-> ---
->  tests/qtest/libqos/qos_external.h |  8 +++-
->  tests/qtest/fuzz/qos_fuzz.c       | 34 ++++-----------
->  tests/qtest/libqos/qos_external.c | 70 +++++++++++--------------------
->  tests/qtest/qos-test.c            | 29 +++++++++----
->  4 files changed, 59 insertions(+), 82 deletions(-)
-> 
-> diff --git a/tests/qtest/libqos/qos_external.h b/tests/qtest/libqos/qos_external.h
-> index 7b44930c55..f63388cb30 100644
-> --- a/tests/qtest/libqos/qos_external.h
-> +++ b/tests/qtest/libqos/qos_external.h
-> @@ -20,8 +20,12 @@
->  #define QOS_EXTERNAL_H
->  #include "libqos/qgraph.h"
->  
-> -void apply_to_node(const char *name, bool is_machine, bool is_abstract);
-> -void apply_to_qlist(QList *list, bool is_machine);
-> +#include "libqos/malloc.h"
-> +#include "qapi/qapi-types-machine.h"
-> +#include "qapi/qapi-types-qom.h"
-> +
-> +void machines_apply_to_node(MachineInfoList *mach_info);
-> +void types_apply_to_node(ObjectTypeInfoList *type_info);
->  QGuestAllocator *get_machine_allocator(QOSGraphObject *obj);
->  void *allocate_objects(QTestState *qts, char **path, QGuestAllocator **p_alloc);
->  
-> diff --git a/tests/qtest/fuzz/qos_fuzz.c b/tests/qtest/fuzz/qos_fuzz.c
-> index af28c92866..87eadb0889 100644
-> --- a/tests/qtest/fuzz/qos_fuzz.c
-> +++ b/tests/qtest/fuzz/qos_fuzz.c
-> @@ -36,7 +36,6 @@
->  
->  #include "qapi/qapi-commands-machine.h"
->  #include "qapi/qapi-commands-qom.h"
-> -#include "qapi/qmp/qlist.h"
->  
->  
->  void *fuzz_qos_obj;
-> @@ -45,34 +44,19 @@ QGuestAllocator *fuzz_qos_alloc;
->  static const char *fuzz_target_name;
->  static char **fuzz_path_vec;
->  
-> -/*
-> - * Replaced the qmp commands with direct qmp_marshal calls.
-> - * Probably there is a better way to do this
-> - */
->  static void qos_set_machines_devices_available(void)
->  {
-> -    QDict *req = qdict_new();
-> -    QObject *response;
-> -    QDict *args = qdict_new();
-> -    QList *lst;
-> +    MachineInfoList *mach_info;
-> +    ObjectTypeInfoList *type_info;
->  
-> -    qmp_marshal_query_machines(NULL, &response, &error_abort);
-> -    lst = qobject_to(QList, response);
-> -    apply_to_qlist(lst, true);
-> +    mach_info = qmp_query_machines(&error_abort);
-> +    machines_apply_to_node(mach_info);
-> +    qapi_free_MachineInfoList(mach_info);
->  
-> -    qobject_unref(response);
-> -
-> -
-> -    qdict_put_str(req, "execute", "qom-list-types");
-> -    qdict_put_str(args, "implements", "device");
-> -    qdict_put_bool(args, "abstract", true);
-> -    qdict_put_obj(req, "arguments", (QObject *) args);
-> -
-> -    qmp_marshal_qom_list_types(args, &response, &error_abort);
-> -    lst = qobject_to(QList, response);
-> -    apply_to_qlist(lst, false);
-> -    qobject_unref(response);
-> -    qobject_unref(req);
-> +    type_info = qmp_qom_list_types(true, "device", true, true,
-> +                                   &error_abort);
-> +    types_apply_to_node(type_info);
-> +    qapi_free_ObjectTypeInfoList(type_info);
->  }
->  
->  static char **current_path;
-> diff --git a/tests/qtest/libqos/qos_external.c b/tests/qtest/libqos/qos_external.c
-> index 398556dde0..c707dac3b9 100644
-> --- a/tests/qtest/libqos/qos_external.c
-> +++ b/tests/qtest/libqos/qos_external.c
-> @@ -29,62 +29,40 @@
->  #include "libqos/qgraph_internal.h"
->  #include "libqos/qos_external.h"
->  
-> -
-> -
-> -void apply_to_node(const char *name, bool is_machine, bool is_abstract)
-> +static void machine_apply_to_node(const char *name)
->  {
-> -    char *machine_name = NULL;
-> -    if (is_machine) {
-> -        const char *arch = qtest_get_arch();
-> -        machine_name = g_strconcat(arch, "/", name, NULL);
-> -        name = machine_name;
-> +    char *machine_name = g_strconcat(qtest_get_arch(), "/", name, NULL);
-> +
-> +    qos_graph_node_set_availability(machine_name, true);
-> +    g_free(machine_name);
-> +}
-> +
-> +void machines_apply_to_node(MachineInfoList *mach_info)
-> +{
-> +    MachineInfoList *tail;
-> +
-> +    for (tail = mach_info; tail; tail = tail->next) {
-> +        machine_apply_to_node(tail->value->name);
-> +        if (tail->value->alias) {
-> +            machine_apply_to_node(tail->value->alias);
-> +        }
->      }
-> +}
-> +
-> +static void type_apply_to_node(const char *name, bool is_abstract)
-> +{
->      qos_graph_node_set_availability(name, true);
->      if (is_abstract) {
->          qos_delete_cmd_line(name);
->      }
-> -    g_free(machine_name);
->  }
->  
-> -/**
-> - * apply_to_qlist(): using QMP queries QEMU for a list of
-> - * machines and devices available, and sets the respective node
-> - * as true. If a node is found, also all its produced and contained
-> - * child are marked available.
-> - *
-> - * See qos_graph_node_set_availability() for more info
-> - */
-> -void apply_to_qlist(QList *list, bool is_machine)
-> +void types_apply_to_node(ObjectTypeInfoList *type_info)
->  {
-> -    const QListEntry *p;
-> -    const char *name;
-> -    bool abstract;
-> -    QDict *minfo;
-> -    QObject *qobj;
-> -    QString *qstr;
-> -    QBool *qbool;
-> +    ObjectTypeInfoList *tail;
->  
-> -    for (p = qlist_first(list); p; p = qlist_next(p)) {
-> -        minfo = qobject_to(QDict, qlist_entry_obj(p));
-> -        qobj = qdict_get(minfo, "name");
-> -        qstr = qobject_to(QString, qobj);
-> -        name = qstring_get_str(qstr);
-> -
-> -        qobj = qdict_get(minfo, "abstract");
-> -        if (qobj) {
-> -            qbool = qobject_to(QBool, qobj);
-> -            abstract = qbool_get_bool(qbool);
-> -        } else {
-> -            abstract = false;
-> -        }
-> -
-> -        apply_to_node(name, is_machine, abstract);
-> -        qobj = qdict_get(minfo, "alias");
-> -        if (qobj) {
-> -            qstr = qobject_to(QString, qobj);
-> -            name = qstring_get_str(qstr);
-> -            apply_to_node(name, is_machine, abstract);
-> -        }
-> +    for (tail = type_info; tail; tail = tail->next) {
-> +        type_apply_to_node(tail->value->name, tail->value->abstract);
->      }
->  }
->  
-> diff --git a/tests/qtest/qos-test.c b/tests/qtest/qos-test.c
-> index ad193f43a5..3062a13557 100644
-> --- a/tests/qtest/qos-test.c
-> +++ b/tests/qtest/qos-test.c
-> @@ -19,11 +19,12 @@
->  #include "qemu/osdep.h"
->  #include <getopt.h>
->  #include "libqtest-single.h"
-> +#include "qapi/error.h"
->  #include "qapi/qmp/qdict.h"
-> -#include "qapi/qmp/qbool.h"
-> -#include "qapi/qmp/qstring.h"
->  #include "qemu/module.h"
-> -#include "qapi/qmp/qlist.h"
-> +#include "qapi/qobject-input-visitor.h"
-> +#include "qapi/qapi-visit-machine.h"
-> +#include "qapi/qapi-visit-qom.h"
->  #include "libqos/malloc.h"
->  #include "libqos/qgraph.h"
->  #include "libqos/qgraph_internal.h"
-> @@ -51,13 +52,20 @@ static void qos_set_machines_devices_available(void)
->  {
->      QDict *response;
->      QDict *args = qdict_new();
-> -    QList *list;
-> +    QObject *ret;
-> +    Visitor *v;
-> +    MachineInfoList *mach_info;
-> +    ObjectTypeInfoList *type_info;
->  
->      qtest_start("-machine none");
->      response = qmp("{ 'execute': 'query-machines' }");
-> -    list = qdict_get_qlist(response, "return");
-> +    ret = qdict_get(response, "return");
->  
-> -    apply_to_qlist(list, true);
-> +    v = qobject_input_visitor_new(ret);
-> +    visit_type_MachineInfoList(v, NULL, &mach_info, &error_abort);
-> +    visit_free(v);
-> +    machines_apply_to_node(mach_info);
-> +    qapi_free_MachineInfoList(mach_info);
->  
->      qobject_unref(response);
->  
-> @@ -66,10 +74,13 @@ static void qos_set_machines_devices_available(void)
->  
->      response = qmp("{'execute': 'qom-list-types',"
->                     " 'arguments': %p }", args);
-> -    g_assert(qdict_haskey(response, "return"));
-> -    list = qdict_get_qlist(response, "return");
-> +    ret = qdict_get(response, "return");
->  
-> -    apply_to_qlist(list, false);
-> +    v = qobject_input_visitor_new(ret);
-> +    visit_type_ObjectTypeInfoList(v, NULL, &type_info, &error_abort);
-> +    visit_free(v);
-> +    types_apply_to_node(type_info);
-> +    qapi_free_ObjectTypeInfoList(type_info);
->  
->      qtest_end();
->      qobject_unref(response);
-> -- 
-> 2.21.1
-> 
+Thanks.
+
+- Alex
 
