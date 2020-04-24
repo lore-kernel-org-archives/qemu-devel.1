@@ -2,89 +2,125 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC1DC54FD0
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 17:46:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96FF9C55186
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 17:48:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB03E20774
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 17:46:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66B1120774
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 17:48:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gqSG9E2d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB03E20774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fjunO8wG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66B1120774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jS2Ou-0000m7-Ss
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 13:46:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50966)
+	id 1jS2RB-0002R1-DA
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 13:48:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51720)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jS2O3-0008Nc-05
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 13:45:15 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jS2Q4-0001jF-NA
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 13:47:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jS2O1-0005J9-OF
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 13:45:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38844
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jS2O1-0005H4-8v
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 13:45:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587750311;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6mTrbPjCr9EATC4yIGlUG/AhG1AcBHC93jbADmsTDXE=;
- b=gqSG9E2dSSIRZnsaDHvCI/NesZWUBc7HOLsLmEc76w/bQs9x6rUGkcu6kq11jbrTVol2PG
- bcdEo4I6OAVfhBFStoAu2TNmhqmAxkU4o8PL71N1bgAtwHUzP1oouD7aYRUaF485TMGWSo
- VHuNiBtvOZgoS0WEul2QX+XnrEgznPE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-i4_jQy2rOj-AzmvbTR5ldg-1; Fri, 24 Apr 2020 13:45:07 -0400
-X-MC-Unique: i4_jQy2rOj-AzmvbTR5ldg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 223B48018A7;
- Fri, 24 Apr 2020 17:44:37 +0000 (UTC)
-Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D028B5D9CA;
- Fri, 24 Apr 2020 17:44:34 +0000 (UTC)
-Subject: Re: [PATCH v4 24/30] qcow2: Clear the L2 bitmap when allocating a
- compressed cluster
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1584468723.git.berto@igalia.com>
- <6d596d82ed62615a8565b661691a06bfaf32237e.1584468723.git.berto@igalia.com>
- <w51r1wcn7eu.fsf@maestria.local.igalia.com>
- <1606ecb5-98ea-fefb-bb98-2ecda1d65f5c@redhat.com>
- <w51o8rgn6j6.fsf@maestria.local.igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <57ac1a2f-1632-1a00-b18d-1fc2169175b6@redhat.com>
-Date: Fri, 24 Apr 2020 12:44:33 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <w51o8rgn6j6.fsf@maestria.local.igalia.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jS2Q0-00004t-5H
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 13:47:19 -0400
+Received: from mail-eopbgr70124.outbound.protection.outlook.com
+ ([40.107.7.124]:6003 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jS2Px-0008Mu-Jn
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 13:47:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SAlTfYXSlU84dfjRJysiqY/NdRl+hTIued4wxlJSeT3k5W+dMyD9Y/4AWjREBsyuuk+xpxfK8XRFiV6S7SE0+6aW+skfPamWqZyhMEgBnwvzznOQSoKIXqkPvitE22hZ0t/KhPe5NJe+t7eUuayTWG5DCdulTmI0QuVDJv9DIg9njQVTwryM/zBO+TqkpBJDr+kpCFQ6vlecrZo+C+Blejq8PyepKIXw5c733uaIMKqNVQBt0zP4R5yysckKHBJGtmWg9HFzSQw426jg4ZAO/dW/cKqfWA6+ZamcuOXfEManhucsNBSjZ3gmhrTBroz/K0KpYkUs6ZO1aKguPvgXbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ScxtjwDEcwhyL/2ENzgb95i4th8up0CBD7Dnp+um3c4=;
+ b=ITNLCp7FP2gTe1NQMZh++/nTcuL0X/mWzQwyKLRbjviCsmAn969y4aVSUPS8ZbAXaG0GE70DtJ0HW6U+qIplpORQzHBx2qsEceL7qG4nuhpxiju6HgkG5DEcj9qGBydMJXtcHSslZ4/MCCQHS4WU9H0IeFXRBXDpHITpC1cyoF3ipMO2qosY4Ap0xMQVaabDGCDeASw5PBtnNMljzWWo/iLKaHw6HfU1qkTjxDtqzmfbqJn+uddNSFMcekSDOntS2JupvF/BnJ+VTL+lQx3EVBt+fX27kM1/O4TPRLjgVziAfuyjvYesnu8FV8xoB2lMSeNPS1hsiSD4FrOPEAh3aA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ScxtjwDEcwhyL/2ENzgb95i4th8up0CBD7Dnp+um3c4=;
+ b=fjunO8wG0Cm1ligvDXfDihUDeVguEQc94koOzkwZzoyDa6LeMsALuwHwfCZfTXLWuam0CmqmWvq3iFUPReOzWODEuSUPYFJlKYuZeSh7I1xKAnunP/W7iWjf11dcInzJrNpehspfTv19HdKSmE1yqBXQ19C6//I5TGW5f4vbE5s=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5510.eurprd08.prod.outlook.com (2603:10a6:20b:109::16)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Fri, 24 Apr
+ 2020 17:47:09 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.012; Fri, 24 Apr 2020
+ 17:47:09 +0000
+Subject: Re: [RFC patch v1 1/3] qemu-file: introduce current buffer
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
+References: <1586776334-641239-1-git-send-email-dplotnikov@virtuozzo.com>
+ <1586776334-641239-2-git-send-email-dplotnikov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200424204707763
+Message-ID: <9da701d0-09f3-bdff-fa94-cfcfc3f9d716@virtuozzo.com>
+Date: Fri, 24 Apr 2020 20:47:07 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <1586776334-641239-2-git-send-email-dplotnikov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 13:45:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+X-ClientProxiedBy: AM4PR0101CA0043.eurprd01.prod.exchangelabs.com
+ (2603:10a6:200:41::11) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.181) by
+ AM4PR0101CA0043.eurprd01.prod.exchangelabs.com (2603:10a6:200:41::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend
+ Transport; Fri, 24 Apr 2020 17:47:08 +0000
+X-Tagtoolbar-Keys: D20200424204707763
+X-Originating-IP: [185.215.60.181]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ecd77112-c034-4631-c18a-08d7e87782f3
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5510:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5510295FEC6D3C63E3C421A3C1D00@AM7PR08MB5510.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-Forefront-PRVS: 03838E948C
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(136003)(346002)(376002)(366004)(39840400004)(16526019)(31686004)(52116002)(16576012)(5660300002)(8936002)(81156014)(26005)(478600001)(316002)(36756003)(6486002)(8676002)(31696002)(2906002)(86362001)(956004)(2616005)(186003)(4744005)(66476007)(4326008)(66946007)(66556008);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xWnZ6ky5zPwCj/zTg7oDNtQsgVDOCPmmMopHn9wE2sNdfI3xZkTdtchbACEquLCbN6iqETTTRk0fsAB2xNHA+2YXzl18/VAPQxkOlMhJw0pCuCAoYUhP+g7o4HHxK9OcWfhbZCOgvGdj01Y4Dw/s+8/hw+QCXwoSX9xtEP32Zpf1NhKQNz7LETnlo2rzGzwMsSrVIO9CZO0y/YXKwVWd5RmcP2MeED1fVCbxqKBzVlQFloF6RACwrcLt6BkUEz5FMF3pUJqAuIN7enUO3iKpYwcflVD15WIF1g8ruv9wWx3eVS+isr6F9rm9VEeN+FPy2KNPMfwp9o6VzVViUbQTbs3erDi1suizp9cryDnR8BFt5+f1sIDjTmEJaVB+9MY1PkXfzSX7TVkjjb9mMUwqgtdt6p5IgDJrFzM/gQHkvqApzY/QceOLlLUAI81oFOcG
+X-MS-Exchange-AntiSpam-MessageData: 6NmvAuOVpie8Q4671QYYvWFlQ/YZHbYWL6ZIxTEhCtOX88naUhHbkiAc4hKovqIVrbup1x/BC2187IA4m5YAAXjNQw4TNZMYOpKHrurC2fdX/OeleAZI6rYO2PFOCrOEkoA3mY7Wn9NNKnComZ6VvQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ecd77112-c034-4631-c18a-08d7e87782f3
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2020 17:47:09.5086 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9Ce1YzARldi7lpiAoWLr+xarRcH36/7MhuW6zPeNzEhMpr/bzl370rcgZH6dsV9YtxPGE5WteME45risA8TLfJz7T/xRPQdzGBYslMA+eAg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5510
+Received-SPF: pass client-ip=40.107.7.124;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 13:47:10
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.7.124
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,53 +132,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: den@openvz.org, dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/24/20 12:21 PM, Alberto Garcia wrote:
-> On Fri 24 Apr 2020 07:11:08 PM CEST, Eric Blake <eblake@redhat.com> wrote:
->>> 'write -c 0 64k' followed by 'write -z 16k 16k' would not need to do any
->>> copy on write. The compressed data would remain untouched on disk but
->>> some of the subclusters would have the 'all zeroes' bit set, exactly
->>> like what happens with normal clusters.
->>
->> It's a special case that avoids COW for write zeroes, but not for
->> anything else. The moment you write any data (whether to the
->> zero-above-compressed or the regular compressed portion), the entire
->> cluster has to be rewritten.
+13.04.2020 14:12, Denis Plotnikov wrote:
+> To approach async wrtiting in the further commits, the buffer
+> allocated in QEMUFile struct is replaced with the link to the
+> current buffer. We're going to use many buffers to write the
+> qemu file stream to the unerlying storage asynchronously. The
+> current buffer points out to the buffer is currently filled
+> with data.
 > 
-> That's right but you can still write zeroes without having to rewrite
-> anything, and read back the zeroes without having to decompress the
-> data.
+> This patch doesn't add any features to qemu-file and doesn't
+> change any qemu-file behavior.
 > 
->> at the same time, I can see where you're coming from in stating that
->> if it makes management of extended L2 easier to allow zero subclusters
->> on top of a compressed cluster, then there's no reason to forbid it.
-> 
-> I'm not sure if it makes it easier. Some operations are definitely going
-> to be easier but maybe we have to add and handle _ZERO_COMPRESSED in
-> addition to _ZERO_PLAIN and _ZERO_ALLOC (the same for unallocated
-> subclusters). Or maybe replace QCow2SubclusterType with something
-> else. I need to evaluate that.
+> Signed-off-by: Denis Plotnikov<dplotnikov@virtuozzo.com>
 
-Reading the entire cluster will be interesting - you'll have to 
-decompress the entire memory, then overwrite the zeroed portions.  The 
-savings in reading occur only when your read is limited to just the 
-subclusters that are zeroed.
-
-But then again, even on a regular cluster, read has to pay attention to 
-which subclusters are zeroed, so you already have the workhorse in read 
-for detecting whether a normal read is sufficient or if you have to 
-follow up with piecing together zeroed sections.
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+Best regards,
+Vladimir
 
