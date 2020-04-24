@@ -2,88 +2,86 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB94C54FCB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 21:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2966BC54FCB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 21:14:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA44520781
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 21:12:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B68AC2098B
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 21:14:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="VN1nTHMU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA44520781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IkUN3cwj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B68AC2098B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jS5cs-0000QU-NV
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 17:12:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43860)
+	id 1jS5er-0002Aa-QX
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 17:14:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45026)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <deller@gmx.de>) id 1jS5V9-0006r7-9Y
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:04:47 -0400
+ (envelope-from <eblake@redhat.com>) id 1jS5dF-0001Ba-GQ
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <deller@gmx.de>) id 1jS5Uu-0002xP-5X
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:04:47 -0400
-Received: from mout.gmx.net ([212.227.17.20]:50179)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1jS5Ut-0002ud-Jb
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:04:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1587762263;
- bh=3rs3X4Ir6G+PDtHXU0JI9XQJTg3I84lLoA6Z50WgLz8=;
- h=X-UI-Sender-Class:Date:From:To:Subject;
- b=VN1nTHMUrsyyYMOehDKYOycQjtYuV0KxsYGZKEaSBe3eo+ZOsQKF9mJd1wUWzqW7S
- Ryt9aHG+eip9TgGXvT+Wx3fuWl7LvRUqb6fxIcbnYPLEIv3yazvrcgEDiz3TeKOURg
- wyTkaKIkharl25LcLRa+AR/WzfaUjthWwC7OY6qo=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from ls3530.fritz.box ([92.116.144.192]) by mail.gmx.com (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1N6bfq-1j8vov2pTy-0185bp; Fri, 24
- Apr 2020 23:04:23 +0200
-Date: Fri, 24 Apr 2020 23:04:22 +0200
-From: Helge Deller <deller@gmx.de>
-To: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- qemu-devel@nongnu.org
-Subject: [PATCH] linux-user: Drop unnecessary check in signalfd4 syscall
-Message-ID: <20200424210422.GB26282@ls3530.fritz.box>
+ (envelope-from <eblake@redhat.com>) id 1jS5dB-0001XG-NE
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:13:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39108
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jS5dB-0001Rd-6S
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:13:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587762783;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=npEaqXurWEGtB8NqxirVKVI3LG7velqWZrb0mGUA5ZA=;
+ b=IkUN3cwjds0/9lIzEGr0pzcExP1WbgFylVNry0e/jrMGJ8UoyERQl+gM4OW3ld91FLdx0J
+ FfTLhJgee3b0OX5oGKsUcI5INNkpHrXVqpQ/+OWqAt4J3CwWLer5Hf4jjshgfWuFIbJwIN
+ XqGIJNIQp9x6bIO7WV/kOAf4g3mizGY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-R0gSi7F_OBuRDMYwB4aa0Q-1; Fri, 24 Apr 2020 17:12:58 -0400
+X-MC-Unique: R0gSi7F_OBuRDMYwB4aa0Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B89545F;
+ Fri, 24 Apr 2020 21:12:57 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 172EA60C05;
+ Fri, 24 Apr 2020 21:12:55 +0000 (UTC)
+Subject: Re: [RFC patch v1 1/3] qemu-file: introduce current buffer
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
+References: <1586776334-641239-1-git-send-email-dplotnikov@virtuozzo.com>
+ <1586776334-641239-2-git-send-email-dplotnikov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <3bc64dd3-780c-47c1-5f35-12d4bcafc92c@redhat.com>
+Date: Fri, 24 Apr 2020 16:12:55 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Provags-ID: V03:K1:15ZIqvKIg3XIgFP/CbI9vHxcyKpVGGeF6FlNylICx3R7+Hz5OQ4
- imEF5OEbizyeyYHVyKFUsaVxeRoSBOH0HlTKJd0K5arF5klR4xtC4UvYe8AiHyq4rLUUlI6
- eCg7+FHMCvq/LOwgmm6TUu6e9rRUgvMx7nxKiq+yBp3lw8bQQ5c7Y6sXjKvOr1PVP7o4ry7
- XVKH6ZNMzPoxVQ5O5UQHQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:3titibExSQo=:FfLBx+nJKjwC/j9Il6I10R
- rFGQmqYaugt3INW9bwEfv0J42G6llq5DUgETCnY+DQWBNq28Rn6a7Ee7UbD6M6iyduNHXvJBq
- NGSVxVPekp97K09Sr9ijn8YPRfNiN8HBxqwyscDX3fx4iEKigEST2MVn1U4yHJLy3a+VnJhGv
- rfQCtJbJJyaHz/Cnb0hJdoVQfWLCT6XHyVS/iTKYf2mc55OESuc/OJG4t2uzU7m33W+KZvK+x
- gtcYGHaXPPS2l2UP8KL2d7IuvgkyLrR7fL4q3iQmOXHJiJLyKQLH1IiNjNA5Nl7EUQ0yohbwh
- 2HLbrYKbUXn0UfdnNerN9V6GFMnQYKpCpxpCGgHmbmeWWuruFkJXdhOvEuT6psRhGHSdwq+rV
- 11xrQj7+yHJc6NWzEvFPPHOG2hB9VgfMOR6Iirlz61uA6UDqR4Akfd8NZQGK0KmfEuhV3ov5M
- crXGKsU3dA8Bu2dqC0rYFYVFNfJwIDKNxqPKa+uEmiNaZ1IPsmnjz7zwSVIV0EduDv0esgWd4
- 8DF7mdvgNweAGe/vKa/e6T6duzQNevZdS+78ZdPjWZ/ktjmv/Adqs7UJFXibE5NuBrEatM4ya
- j+ypjlH3uOHnXxs7RabPeURTxl0BikLtgt9zmkQ4Ji82gttcU7XnR8jXXYKmlrAqBA9Qch9hL
- /dv+r1S4nky/F+vBRUs+mBuR3VWpGhKdyaKC1bGwu3tky2MaoA6TkYxbIyWupJe2czhi8b2VX
- ZCezlc5wHhsgRxJZxQXB9VlHwardke6vG/xQ/dg6kgtu7Bn8DNVYGW1PBXcOrWjnY5i5vQlTV
- EROvimGvEfNz7Jg7d3mNvujz/qBivDGDfs8B4zQz9P43Jo/Bcc7slwt6yDMQklSsP7swBFir6
- pVJ+xInTEhhXVAixm8wjJd5B4MI9GjzmWxr7xMW05uqmnX+3AvuQ3nIEh6o8bRIeEqUkkVDyC
- RP1TihSbW6HASKm1kBOcvDeNNh7FchmKRVCs83jpOj8UNpenIJOF7NwMjefKkfnvuG/tmkBVL
- mElBglE5rO0GQhDlPTzPS4gUR933mBsfeoX6xhW2gS3wR1IAG3LAD0WHCXqrKH8lBwdwQLnPE
- PUiKEHIfBMQ+PGIN9/8rNfLojhpefqZ6GzntUUTO/oAE3+aw2NfNcc/3wfBIN+JvPvGOA2kPV
- KSfWHXKiGDEb+/IOMM3kA3IZ++Hgi/mJ5K9qqZBLUzBKQDmcMgORDAx95ReBioF5eDO8anr8X
- Nrzd735+2i3h5CFYB
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=212.227.17.20; envelope-from=deller@gmx.de;
- helo=mout.gmx.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 17:04:29
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 212.227.17.20
+In-Reply-To: <1586776334-641239-2-git-send-email-dplotnikov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 15:11:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,29 +93,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: den@openvz.org, dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The signalfd4() syscall takes optional O_NONBLOCK and O_CLOEXEC fcntl
-flags.  If the user gave any other invalid flags, the host syscall will
-return correct error codes, so simply drop the extra check here.
+On 4/13/20 6:12 AM, Denis Plotnikov wrote:
+> To approach async wrtiting in the further commits, the buffer
 
-Signed-off-by: Helge Deller <deller@gmx.de>
+writing
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 05f03919ff..ebf0d38321 100644
-=2D-- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -7176,9 +7176,6 @@ static abi_long do_signalfd4(int fd, abi_long mask, =
-int flags)
-     sigset_t host_mask;
-     abi_long ret;
+> allocated in QEMUFile struct is replaced with the link to the
+> current buffer. We're going to use many buffers to write the
+> qemu file stream to the unerlying storage asynchronously. The
 
--    if (flags & ~(TARGET_O_NONBLOCK | TARGET_O_CLOEXEC)) {
--        return -TARGET_EINVAL;
--    }
-     if (!lock_user_struct(VERIFY_READ, target_mask, mask, 1)) {
-         return -TARGET_EFAULT;
-     }
+underlying
+
+> current buffer points out to the buffer is currently filled
+> with data.
+
+This sentence is confusing.  I'd suggest: The current_buf pointer tracks 
+which buffer is currently filled with data.
+
+> 
+> This patch doesn't add any features to qemu-file and doesn't
+> change any qemu-file behavior.
+> 
+> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> ---
+>   include/qemu/typedefs.h |   1 +
+>   migration/qemu-file.c   | 156 +++++++++++++++++++++++++++++-------------------
+>   2 files changed, 95 insertions(+), 62 deletions(-)
+> 
+> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> index 375770a..88dce54 100644
+> --- a/include/qemu/typedefs.h
+> +++ b/include/qemu/typedefs.h
+> @@ -97,6 +97,7 @@ typedef struct QDict QDict;
+>   typedef struct QEMUBH QEMUBH;
+>   typedef struct QemuConsole QemuConsole;
+>   typedef struct QEMUFile QEMUFile;
+> +typedef struct QEMUFileBuffer QEMUFileBuffer;
+>   typedef struct QemuLockable QemuLockable;
+>   typedef struct QemuMutex QemuMutex;
+>   typedef struct QemuOpt QemuOpt;
+> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+> index 1c3a358..285c6ef 100644
+> --- a/migration/qemu-file.c
+> +++ b/migration/qemu-file.c
+> @@ -33,6 +33,17 @@
+>   #define IO_BUF_SIZE 32768
+>   #define MAX_IOV_SIZE MIN(IOV_MAX, 64)
+>   
+> +QEMU_BUILD_BUG_ON(!QEMU_IS_ALIGNED(IO_BUF_SIZE, 512));
+> +
+> +struct QEMUFileBuffer {
+> +    int buf_index;
+> +    int buf_size; /* 0 when writing */
+> +    uint8_t *buf;
+> +    unsigned long *may_free;
+
+Do we really want something that compiles differently on 32- vs. 64-bit?
+/me reads ahead...
+
+> +    struct iovec *iov;
+> +    unsigned int iovcnt;
+> +};
+> +
+>   struct QEMUFile {
+>       const QEMUFileOps *ops;
+>       const QEMUFileHooks *hooks;
+> @@ -43,18 +54,12 @@ struct QEMUFile {
+>   
+>       int64_t pos; /* start of buffer when writing, end of buffer
+>                       when reading */
+> -    int buf_index;
+> -    int buf_size; /* 0 when writing */
+> -    uint8_t buf[IO_BUF_SIZE];
+> -
+> -    DECLARE_BITMAP(may_free, MAX_IOV_SIZE);
+
+...ah, you're replacing a bitmap, and our bitmap code _does_ use 'long' 
+as its core for optimum speed (which overcomes the fact that it does 
+mean annoying differences on 32- vs. 64-bit).
+
+> -    struct iovec iov[MAX_IOV_SIZE];
+> -    unsigned int iovcnt;
+> -
+>       int last_error;
+>       Error *last_error_obj;
+>       /* has the file has been shutdown */
+>       bool shutdown;
+> +    /* currently used buffer */
+> +    QEMUFileBuffer *current_buf;
+>   };
+>   
+
+Most of the patch is mechanical conversion to the rearranged struct.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
