@@ -2,123 +2,91 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E575FC2BA1A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 06:53:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 358BFC2BA1A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 06:58:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 640ED2168B
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 06:53:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F0FBA2076C
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 06:58:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="S8QZY4Oc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 640ED2168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FbCNMYdu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0FBA2076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRsDH-0000BJ-JJ
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 02:53:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48094)
+	id 1jRsIR-000298-4w
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 02:58:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jRsBN-00067R-RH
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 02:51:30 -0400
+ (envelope-from <eskultet@redhat.com>) id 1jRsHj-0001YS-AS
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 02:58:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jRsBB-00081T-Rf
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 02:51:28 -0400
-Received: from mail-vi1eur05on2097.outbound.protection.outlook.com
- ([40.107.21.97]:46401 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jRsB6-0007v3-Jr; Fri, 24 Apr 2020 02:51:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b+pwSAT7LT2q7w5tVT0KLNw0uJULXYcYOJvIHHoGPiIA7Go8jAG3UTWEZfLO27nej50c6Rzodj9mdpTJrhuW/wmPxAHcCca3BbzoGEtXXUtAoJ3tMfQ9mRMkTwT0X2Sy6TClorlQnP9CEtENurjZtWYzcN1wpoRl1ucjpdxGcOtaeoquTC3tT2J3zi1sQXkZbKgqAu7v1mEAw8OJtRlXweQjUylWqVpdvyYec4jsApfxJZ2l67x5DLP5sxIm9mL6UxNdbeqWZL0YvKt6ubCdGjjrejeEG3dv6+obXNzC3C2EcLUfcplJlqy29LFz5TG2D2vHaVWQrqm/9GlUpQJqwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Nj0rftf2Gue13RZeVzbwkpIeaidn3hRMhtjAEsWfuhQ=;
- b=cZV25LGkGV5FlTo0IN2n5zgZ6JRtJDiTnISHaBPQgtuFwQgrLZuDj0qkyfL7CcSpbNg+rYDvc7smIuWhlgJhZVsH6ZAAda0K+NKZncXjKlhD9CBLk2zFQOAoGlV01+OBkSK02cicYAjuMe8RBhD0OkwwVA4FF7WlKj2H87zQ0JRGTcQK9ZvQ1l7qOdIUkGjOglffw8Q/8cbWIUdqa4rk4ovdM9E4qV+OBxeimJqAFf53JrOphFq622kIdPawyIWTAtg1rDY7kNkFVPS7jfWqR0qUask2sxabEWMO2iYXzVdM0NhnkkLFC8/Jd329x6Eb9YDYxsM8Tele8KNisJt1ZQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Nj0rftf2Gue13RZeVzbwkpIeaidn3hRMhtjAEsWfuhQ=;
- b=S8QZY4OcbwbIVSFZbxi9OrbLPRuDuxUWJ1FKUHPLGZrwmZ3k3KB4Rr976HC2wNRmbXKjFh5aQN81KdH6F17/9wFdYYiyIK2pP8d/YPSVxiB58H49j7fOBGvXhuuX4/FDAIGEuQ0lV9Qvk8Czu/mK2C+caoGu0UMW1coNAcI8mwo=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5366.eurprd08.prod.outlook.com (2603:10a6:20b:10b::11)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2921.25; Fri, 24 Apr
- 2020 06:51:08 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.012; Fri, 24 Apr 2020
- 06:51:08 +0000
-Subject: Re: [PATCH v6 08/10] iotests: Filter testfiles out in
- filter_img_info()
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200423150127.142609-1-kwolf@redhat.com>
- <20200423150127.142609-9-kwolf@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200424095106504
-Message-ID: <b919c6c7-5b3f-3b1c-9a2b-c1366d538507@virtuozzo.com>
-Date: Fri, 24 Apr 2020 09:51:06 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200423150127.142609-9-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FRYP281CA0014.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::24)
- To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <eskultet@redhat.com>) id 1jRsHh-00006Q-MQ
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 02:58:02 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54419
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eskultet@redhat.com>)
+ id 1jRsHh-0008Um-7B
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 02:58:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587711479;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wjbDLZ6AgWIOgOTGl8FjPwsI1meFAu688o83UqZMSis=;
+ b=FbCNMYdudxoX5T1GbEus/OpLv+eTlG7qbxPZXvOJ547g4OXfsqxhnUPopVX4ru6tDv8PhL
+ ig6jI8fACAjBM3xA4uoaVNNVlFBpvMgXvzsLIhRkzEAd3/lrYZto0K6nhWg7vWr3n1LAxY
+ HLyPYF8Wtb8+FPUxtCe3UlObPPvswDE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-252-LcwZcsZLMuuq-GD3LB9stw-1; Fri, 24 Apr 2020 02:57:57 -0400
+X-MC-Unique: LcwZcsZLMuuq-GD3LB9stw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABDB4460;
+ Fri, 24 Apr 2020 06:57:56 +0000 (UTC)
+Received: from sturgeon.usersys.redhat.com (unknown [10.40.192.246])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 838251002380;
+ Fri, 24 Apr 2020 06:57:48 +0000 (UTC)
+Date: Fri, 24 Apr 2020 08:57:46 +0200
+From: Erik Skultety <eskultet@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH 0/5] QEMU Gating CI
+Message-ID: <20200424065746.GB372397@sturgeon.usersys.redhat.com>
+References: <CAFEAcA8Lw94_=kY+Fv-cFW2Tk5RD62EjODjKdGf2-mLdDw7FuQ@mail.gmail.com>
+ <1182067639.1655516.1584421185287.JavaMail.zimbra@redhat.com>
+ <CAFEAcA-zRw7kzwzXxPmLaUqwOrQLwW9BymOJ34iJOOTCUAf=xg@mail.gmail.com>
+ <20200317141257.GA5724@localhost.localdomain>
+ <CAFEAcA9W4KXN6dcT0CNyD_mQ3xY5wDmJ7i0wowhaG2XPmyMYng@mail.gmail.com>
+ <87sgi49uf6.fsf@dusky.pond.sub.org>
+ <CAFEAcA_dcVneQ4Hj61GAkYRCUSMrA=QjwnAXccoBwjUjOE-wSQ@mail.gmail.com>
+ <529508877.9650370.1587661453005.JavaMail.zimbra@redhat.com>
+ <20200423171322.GJ1077680@redhat.com>
+ <69e77a6e-8db8-f617-bfe6-1c8f39ec81b4@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.145) by
- FRYP281CA0014.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2937.13 via Frontend Transport; Fri, 24 Apr 2020 06:51:07 +0000
-X-Tagtoolbar-Keys: D20200424095106504
-X-Originating-IP: [185.215.60.145]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 47d4dc5d-b770-474f-d350-08d7e81bde0b
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5366:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB53660FCC42F4E139D4644137C1D00@AM7PR08MB5366.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-Forefront-PRVS: 03838E948C
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(10019020)(4636009)(376002)(136003)(39840400004)(346002)(366004)(396003)(478600001)(81156014)(66556008)(66946007)(26005)(66476007)(5660300002)(52116002)(36756003)(8676002)(316002)(2616005)(86362001)(186003)(16576012)(31696002)(4744005)(16526019)(2906002)(31686004)(8936002)(956004)(4326008)(6486002);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +RFDNHRif3xuXLPkwJQjY8N2Ar7UnTEg+/1QytSGYAuwsqPbA5Ls/gubxgJqR600oV4R0kBOPDoZkREHdTTxwBlU5nTuhFhz+V5zrpnCBE+vWXn5ei+OtpprTIKwv0eZomDdeGYsvrwPfhX1HNGjE+UUSZwqvPZE/vrXBFtM0tJ8+LJl8vekK0hwoO3SNP31Rf1k7Ns08YdmGcXpECyvxwzPMoWFd89VthQJXaYRBKJ+5V0I4UdEw2lNcIadjOBkEcpTwcJyi9sxRQXoFPB0gSSY3/bBS6x7bpy9EEybt4cGTzA00CpnS0i2iiXBOOdxynXHCnEd8UFII0Xz4Q9LBGzw4/VBhNBDW+qIlSQUFjtpzfmhijJv2KWCJ8fn3TQHHPmwCJraiSTLHEaSbIrUew5ZZMfg3eC42FQR2AV7og2i3xn7EE7vCbjr4f6jBMSm
-X-MS-Exchange-AntiSpam-MessageData: yofPjM8Skw6m/97nR2woU2gGDYxTo08uS62MQyLmElGksnfeePML4cDRfSeqlNfe613GC3qXTquzVOxeEYMuvKWtDQ9QiekJ0faJeljedmStmhpwC67Dy+4YX6cIl3LjHbjdgfRGzrBoVjoQIN2IfQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 47d4dc5d-b770-474f-d350-08d7e81bde0b
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2020 06:51:08.4198 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rl/tyFNiJPbx0LNSy7YU7IVJXCqqghKjZOzxNh+63T9pkt/tsqsFCWaYcxCnwEPTKk4n8E/QDthJhQWMUd2wbqL9HrrCcGyGt4DyZFpW8TI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5366
-Received-SPF: pass client-ip=40.107.21.97;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 02:51:09
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.21.97
+In-Reply-To: <69e77a6e-8db8-f617-bfe6-1c8f39ec81b4@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eskultet@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 02:57:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,25 +98,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berto@igalia.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>, Wainer Moschetta <wmoschet@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-23.04.2020 18:01, Kevin Wolf wrote:
-> We want to keep TEST_IMG for the full path of the main test image, but
-> filter_testfiles() must be called for other test images before replacing
-> other things like the image format because the test directory path could
-> contain the format as a substring.
-> 
-> Insert a filter_testfiles() call between both.
-> 
-> Signed-off-by: Kevin Wolf<kwolf@redhat.com>
-> Reviewed-by: Max Reitz<mreitz@redhat.com>
+On Thu, Apr 23, 2020 at 11:28:21PM +0200, Philippe Mathieu-Daud=C3=A9 wrote=
+:
+> On 4/23/20 7:13 PM, Daniel P. Berrang=C3=A9 wrote:
+> > On Thu, Apr 23, 2020 at 01:04:13PM -0400, Cleber Rosa wrote:
+> > > ----- Original Message -----
+> > > > From: "Peter Maydell" <peter.maydell@linaro.org>
+> > > > To: "Markus Armbruster" <armbru@redhat.com>
+> > > > Cc: "Fam Zheng" <fam@euphon.net>, "Thomas Huth" <thuth@redhat.com>,=
+ "Beraldo Leal" <bleal@redhat.com>, "Erik
+> > > > Skultety" <eskultet@redhat.com>, "Alex Benn=C3=A9e" <alex.bennee@li=
+naro.org>, "Wainer Moschetta" <wmoschet@redhat.com>,
+> > > > "QEMU Developers" <qemu-devel@nongnu.org>, "Wainer dos Santos Mosch=
+etta" <wainersm@redhat.com>, "Willian Rampazzo"
+> > > > <wrampazz@redhat.com>, "Cleber Rosa" <crosa@redhat.com>, "Philippe =
+Mathieu-Daud=C3=A9" <philmd@redhat.com>, "Eduardo
+> > > > Habkost" <ehabkost@redhat.com>
+> > > > Sent: Tuesday, April 21, 2020 8:53:49 AM
+> > > > Subject: Re: [PATCH 0/5] QEMU Gating CI
+> > > >=20
+> > > > On Thu, 19 Mar 2020 at 16:33, Markus Armbruster <armbru@redhat.com>=
+ wrote:
+> > > > > Peter Maydell <peter.maydell@linaro.org> writes:
+> > > > > > I think we should start by getting the gitlab setup working
+> > > > > > for the basic "x86 configs" first. Then we can try adding
+> > > > > > a runner for s390 (that one's logistically easiest because
+> > > > > > it is a project machine, not one owned by me personally or
+> > > > > > by Linaro) once the basic framework is working, and expand
+> > > > > > from there.
+> > > > >=20
+> > > > > Makes sense to me.
+> > > > >=20
+> > > > > Next steps to get this off the ground:
+> > > > >=20
+> > > > > * Red Hat provides runner(s) for x86 stuff we care about.
+> > > > >=20
+> > > > > * If that doesn't cover 'basic "x86 configs" in your judgement, w=
+e
+> > > > >    fill the gaps as described below under "Expand from there".
+> > > > >=20
+> > > > > * Add an s390 runner using the project machine you mentioned.
+> > > > >=20
+> > > > > * Expand from there: identify the remaining gaps, map them to peo=
+ple /
+> > > > >    organizations interested in them, and solicit contributions fr=
+om these
+> > > > >    guys.
+> > > > >=20
+> > > > > A note on contributions: we need both hardware and people.  By pe=
+ople I
+> > > > > mean maintainers for the infrastructure, the tools and all the ru=
+nners.
+> > > > > Cleber & team are willing to serve for the infrastructure, the to=
+ols and
+> > > > > the Red Hat runners.
+> > > >=20
+> > > > So, with 5.0 nearly out the door it seems like a good time to check
+> > > > in on this thread again to ask where we are progress-wise with this=
+.
+> > > > My impression is that this patchset provides most of the scripting
+> > > > and config side of the first step, so what we need is for RH to pro=
+vide
+> > > > an x86 runner machine and tell the gitlab CI it exists. I appreciat=
+e
+> > > > that the whole coronavirus and working-from-home situation will hav=
+e
+> > > > upended everybody's plans, especially when actual hardware might
+> > > > be involved, but how's it going ?
+> > > >=20
+> > >=20
+> > > Hi Peter,
+> > >=20
+> > > You hit the nail in the head here.  We were affected indeed with our =
+ability
+> > > to move some machines from one lab to another (across the country), b=
+ut we're
+> > > actively working on it.
+> >=20
+> > For x86, do we really need to be using custom runners ?
+> >=20
+> > With GitLab if someone forks the repo to their personal namespace, they
+> > cannot use any custom runners setup by the origin project. So if we use
+> > custom runners for x86, people forking won't be able to run the GitLab
+> > CI jobs.
+> >=20
+> > As a sub-system maintainer I wouldn't like this, because I ideally want
+> > to be able to run the same jobs on my staging tree, that Peter will run
+> > at merge time for the PULL request I send.
+> >=20
+> > Thus my strong preference would be to use the GitLab runners in every
+> > scenario where they are viable to use. Only use custom runners in the
+> > cases where GitLab runners are clearly inadequate for our needs.
+> >=20
+> > Based on what we've setup in GitLab for libvirt,  the shared runners
+> > they have work fine for x86. Just need the environments you are testing
+> > to be provided as Docker containers (you can actually build and cache
+> > the container images during your CI job too).  IOW, any Linux distro
+> > build and test jobs should be able to use shared runners on x86, and
+> > likewise mingw builds. Custom runners should only be needed if the
+> > jobs need todo *BSD / macOS builds, and/or have access to specific
+> > hardware devices for some reason.
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Not just ^that, you also want custom VM runners to run integration tests, e=
+.g.
+in libvirt, we'd have to put systemd and a lof of other cruft into the
+container to be able to run the tests at which point you must ask yourself,
+whyt not go with a VM instead in which case we're limited in terms of
+infrastructure...
 
--- 
-Best regards,
-Vladimir
+>=20
+> Thanks to insist with that point Daniel. I'd rather see every configurati=
+on
+> reproducible, so if we loose a hardware sponsor, we can find another one =
+and
+> start another runner.
+> Also note, if it is not easy to reproduce a runner, it will be very hard =
+to
+> debug a reported build/test error.
+
+(Thanks for bringing ^this point up Philippe)
+
+...However, what we've been actively working on in libvirt is to extend the
+lcitool we have (which can spawn local test VMs) to the point where we're a=
+ble
+to generate machines that would be the reproducible. Right now I'm playing =
+with
+cloud-init integration with lcitool (patches coming soon) that would allow =
+us
+to use the same machines locally as we'd want to have in, say, OpenStack an=
+d
+share them as compressed images, so even when updated/managed by lcitool
+locally, you'd get the same environment.
+
+Regards,
+
+--=20
+Erik Skultety
+
 
