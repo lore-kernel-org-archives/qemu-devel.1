@@ -2,77 +2,86 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A385DC54FCB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 19:23:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B430C55186
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 19:23:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70FEE20781
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 19:23:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70FEE20781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	by mail.kernel.org (Postfix) with ESMTPS id 08E9B20781
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 19:23:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PenBfbKV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08E9B20781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jS3vI-0001sm-Gq
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 15:23:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53048)
+	id 1jS3vJ-0001sz-3c
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 15:23:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52956)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jS3sZ-0003wk-Sc
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 15:20:52 -0400
+ (envelope-from <armbru@redhat.com>) id 1jS3sK-0003PX-7l
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 15:20:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jS3sY-0004F3-Uz
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 15:20:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40358)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jS3sY-0004Az-F4
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 15:20:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jS3sW-0003SS-Ay
- for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 19:20:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 50B5B2E806B
- for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 19:20:48 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Apr 2020 19:14:39 -0000
-From: Richard Henderson <rth@twiddle.net>
+ (envelope-from <armbru@redhat.com>) id 1jS3sJ-00043L-Oj
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 15:20:36 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58888
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jS3sJ-00041x-8q
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 15:20:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587756034;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Zz6PIHu4D9IJMAUYz5GlS7tUaH56am6CeocpGy7vUGA=;
+ b=PenBfbKVp8irDfpJLbvIhA1Q1Zfk/p6Scx1HEgDs2YtWbxGjU2zooaC7EU+1nTjXMer4se
+ dwG+wa9pPr7oRJp7WXdXmfRKCDO7Jb/k+SPJDiOy2D1ylunVemIEytAk0QgtO/4h/xb5By
+ OYVHC5hitIW+1WjKSHcP7LDrOrf+6og=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-470-wQXZRtGYODiiH5cS1TWTug-1; Fri, 24 Apr 2020 15:20:32 -0400
+X-MC-Unique: wQXZRtGYODiiH5cS1TWTug-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EDB11005510
+ for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 19:20:32 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BF53A605CF
+ for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 19:20:31 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 3776811358C1; Fri, 24 Apr 2020 21:20:27 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd rth
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: Richard Henderson (rth)
-References: <158772186217.18152.387783445327371928.malonedeb@wampee.canonical.com>
-Message-Id: <158775567923.17926.10729887989020372018.malone@wampee.canonical.com>
-Subject: [Bug 1874674] Re: [Feature request] acceptance test class to run
- user-mode binaries
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="486bbbd6cb608f8eb468ed0d08689a349dfabe49";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 9a42700c9f3fc554a9e4759f8231aa3266d8e2e1
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 14:50:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 91.189.90.7
+Subject: [PATCH 05/11] tests/migration: Tighten error checking
+Date: Fri, 24 Apr 2020 21:20:21 +0200
+Message-Id: <20200424192027.11404-6-armbru@redhat.com>
+In-Reply-To: <20200424192027.11404-1-armbru@redhat.com>
+References: <20200424192027.11404-1-armbru@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 02:57:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,39 +90,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1874674 <1874674@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-What user-mode testing do you think might be improved by using avocado?
+migrate_get_socket_address() neglects to check
+visit_type_SocketAddressList() failure.  This smells like a leak, but
+it actually will crash dereferencing @addrs.  Pass &error_abort to
+remove the code smell.
 
-IMO at present we have a fairly comprehensive testing infrastructure for
-user-mode that is simply underused.  With docker, we have a set of
-cross-compilers for most guest architectures, and we are able to build
-statically linked binaries that are copied out of the container for
-testing by the just-built qemu binaries on the host.  This
-infrastructure is used by check-tcg.  It's fairly easy to add new test
-cases to be run on one or all guests.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ tests/qtest/migration-test.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
--- =
+diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
+index 2568c9529c..dc3490c9fa 100644
+--- a/tests/qtest/migration-test.c
++++ b/tests/qtest/migration-test.c
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+=20
+ #include "libqtest.h"
++#include "qapi/error.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qemu/module.h"
+ #include "qemu/option.h"
+@@ -301,7 +302,6 @@ static char *migrate_get_socket_address(QTestState *who=
+, const char *parameter)
+ {
+     QDict *rsp;
+     char *result;
+-    Error *local_err =3D NULL;
+     SocketAddressList *addrs;
+     Visitor *iv =3D NULL;
+     QObject *object;
+@@ -310,7 +310,7 @@ static char *migrate_get_socket_address(QTestState *who=
+, const char *parameter)
+     object =3D qdict_get(rsp, parameter);
+=20
+     iv =3D qobject_input_visitor_new(object);
+-    visit_type_SocketAddressList(iv, NULL, &addrs, &local_err);
++    visit_type_SocketAddressList(iv, NULL, &addrs, &error_abort);
+     visit_free(iv);
+=20
+     /* we are only using a single address */
+--=20
+2.21.1
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1874674
-
-Title:
-  [Feature request] acceptance test class to run user-mode binaries
-
-Status in QEMU:
-  New
-
-Bug description:
-  Currently the acceptance test framework only target system-mode emulation.
-  It would be useful to test user-mode too.
-
-  Ref: https://www.mail-archive.com/qemu-devel@nongnu.org/msg626610.html
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1874674/+subscriptions
 
