@@ -2,101 +2,88 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DE19C2BA1A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 09:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB6DEC54FCB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 09:46:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 005BE20736
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 09:40:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9286220767
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 09:46:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PskKtfW3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 005BE20736
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="frxqOs8p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9286220767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRup0-00022a-4e
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 05:40:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51576)
+	id 1jRuuo-0004nk-Ll
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 05:46:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56616)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRuoC-0001Kk-Ms
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:39:45 -0400
+ (envelope-from <armbru@redhat.com>) id 1jRutn-0003uj-GT
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:45:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jRuo8-00066u-At
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:39:44 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41115
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1jRutl-0004Sl-Jy
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:45:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41216
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jRuo7-00065o-Tf
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:39:39 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jRutk-0004Jj-Nw
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:45:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587721178;
+ s=mimecast20190719; t=1587721527;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=65QQKAkQD69UHx96KzfXNnESVtKVthMR3jlI+VxjmZQ=;
- b=PskKtfW3dtbX00JpvKXeFvez2SvovoGvucg4gnGfqZO5tQq8p8PgAJKARXNpMJj8IPSSq7
- VHEo/ueFL4m7194xFkLrM2JQv4KrzDt874kvMzbBadcvzxCUkcNIu6rucXDDNgqr7e64bz
- w3agbthNBx++myYntl4a6wnMUzNrFAw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-gAikjl-bN1yuE4QeQ-4zdw-1; Fri, 24 Apr 2020 05:39:34 -0400
-X-MC-Unique: gAikjl-bN1yuE4QeQ-4zdw-1
-Received: by mail-wr1-f72.google.com with SMTP id u4so4499621wrm.13
- for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 02:39:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=65QQKAkQD69UHx96KzfXNnESVtKVthMR3jlI+VxjmZQ=;
- b=BO40EFDB3azcQiFWSGYH6JW3RMGOM0LAmoApD9Pq15hzEbHz/hYLNhQSXzd6RLUdtL
- lNmHX1uU031lagjdcbQ8Q1Hq8D9CN9MsGFWYP2jUy/EAG2m8h/wWHMXi47eJyCpgE3S2
- tjKOa6Q8rD7ci5BTfSpq92tGfarZ9O7ZZb3QCHEK3jm/rq/dnao5hEvv229V8G8LuY8E
- cHbVEfYlRGDSE/WUWt/n46hveKXOkzOOq80zY45qmDaHIZaoROyvvDIDBCP8fxBwLnSm
- jmYY0Lt7L84zHJp/vmfAVvJxkhcN2lIhDKCbjcYwFwzDNeSsrBrDTkJPKOCccrrFtxU9
- Lh/g==
-X-Gm-Message-State: AGi0PuZAoYKxTL+BaM4GXax64tsqpt/LgT7fKbKBn1opu52Hi/xAT5uV
- npDfQZbkHuzNuG+YB8wO0g5EbY9R/zuXe+yyRWpPdsH6ADZDwiD6H0GW3ZgwWHVSvjTvcd9RkcF
- 4mBTTZzpsuagScRSKWyILIIFfeUmEA5w=
-X-Received: by 2002:a5d:4485:: with SMTP id j5mr9466714wrq.427.1587721173715; 
- Fri, 24 Apr 2020 02:39:33 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKQTjzGWXyneF+Vecm1gldly1Y5bAXRqeg6NBC0I56yT+cFCbW8Cc47f08OGuOKqunVbbJ6ndrRIzEsLr3dXmM=
-X-Received: by 2002:a5d:4485:: with SMTP id j5mr9466677wrq.427.1587721173451; 
- Fri, 24 Apr 2020 02:39:33 -0700 (PDT)
+ bh=govfui9Xk5toF0eWPOyRdkUyeS4dUF9ZNTvHX+BmzIQ=;
+ b=frxqOs8pycSEYK1YZnF7aiTB9x2ibSIOg0SEjB7GApWRqFR4/gUVr3UobyKrV6Czqmr6oB
+ 6vEic+UJtyViLBroHboEWUtv9d+IH0FNQzVrb7DrLbQiHBCpIH2rb+2B/GV8Znmw2U4y2M
+ Uhr28/TqtmA61Vvl+kxkCV/4V1Z1LLI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-470-y8p_dEq7NuCYPdun5j2KQw-1; Fri, 24 Apr 2020 05:45:22 -0400
+X-MC-Unique: y8p_dEq7NuCYPdun5j2KQw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38CB38730A1;
+ Fri, 24 Apr 2020 09:45:21 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 864AB5D9D7;
+ Fri, 24 Apr 2020 09:45:20 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D58D311358BC; Fri, 24 Apr 2020 11:45:18 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: Re: [PATCH 2/4] smbus: Fix spd_data_generate() error API violation
+References: <20200420132826.8879-1-armbru@redhat.com>
+ <20200420132826.8879-3-armbru@redhat.com>
+ <alpine.BSF.2.22.395.2004201613040.29873@zero.eik.bme.hu>
+ <87h7xd5rvs.fsf@dusky.pond.sub.org>
+ <alpine.BSF.2.22.395.2004221502090.19234@zero.eik.bme.hu>
+Date: Fri, 24 Apr 2020 11:45:18 +0200
+In-Reply-To: <alpine.BSF.2.22.395.2004221502090.19234@zero.eik.bme.hu>
+ (BALATON Zoltan's message of "Wed, 22 Apr 2020 15:43:38 +0200 (CEST)")
+Message-ID: <87r1wdnro1.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200312193616.438922-1-crosa@redhat.com>
- <CAFEAcA-zRw7kzwzXxPmLaUqwOrQLwW9BymOJ34iJOOTCUAf=xg@mail.gmail.com>
- <20200317141257.GA5724@localhost.localdomain>
- <CAFEAcA9W4KXN6dcT0CNyD_mQ3xY5wDmJ7i0wowhaG2XPmyMYng@mail.gmail.com>
- <87sgi49uf6.fsf@dusky.pond.sub.org>
- <CAFEAcA_dcVneQ4Hj61GAkYRCUSMrA=QjwnAXccoBwjUjOE-wSQ@mail.gmail.com>
- <529508877.9650370.1587661453005.JavaMail.zimbra@redhat.com>
- <20200423171322.GJ1077680@redhat.com>
- <348064782.9653447.1587663408130.JavaMail.zimbra@redhat.com>
- <20200424093023.GD1212635@redhat.com>
-In-Reply-To: <20200424093023.GD1212635@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Fri, 24 Apr 2020 11:39:22 +0200
-Message-ID: <CAP+75-WK4gOfsHiiuhObwJb+6HPdvAJi90deaBbBM7-NG-gyiQ@mail.gmail.com>
-Subject: Re: [PATCH 0/5] QEMU Gating CI
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 03:11:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 03:54:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,144 +95,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Beraldo Leal <bleal@redhat.com>,
- Erik Skultety <eskultet@redhat.com>, Wainer Moschetta <wmoschet@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Apr 24, 2020 at 11:30 AM Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
-> > ----- Original Message -----
-> > > From: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
-> > > To: "Cleber Rosa" <crosa@redhat.com>
-[...]
-> > Hi Daniel,
-> >
-> > We're already using the shared x86 runners, but with a different goal. =
- The
-> > goal of the "Gating CI" is indeed to expand on non-x86 environments.  W=
-e're
-> > in a "chicken and egg" kind of situation, because we'd like to prove th=
-at
-> > GitLab CI will allow QEMU to expand to very different runners and jobs,=
- while
-> > not really having all that hardware setup and publicly available at thi=
-s time.
-> >
-> > My experiments were really around that point, I mean, confirming that w=
-e can grow
-> > the number of architectures/runners/jobs/configurations to provide a co=
-verage
-> > equal or greater to what Peter already does.
->
-> So IIUC, you're saying that for x86 gating, the intention is to use share=
-d
-> runners in general.
->
-> Your current work that you say is blocked on access to x86 hardware, is j=
-ust
-> about demonstrating the concept of plugging in custom runners, while we w=
-ait
-> for access to non-x86 hardware ?
->
-> > > With GitLab if someone forks the repo to their personal namespace, th=
-ey
-> > > cannot use any custom runners setup by the origin project. So if we u=
-se
-> > > custom runners for x86, people forking won't be able to run the GitLa=
-b
-> > > CI jobs.
-> > >
-> >
-> > They will continue to be able use the jobs and runners already defined =
-in
-> > the .gitlab-ci.yml file.  This work will only affect people pushing to =
-the/a
-> > "staging" branch.
-> >
-> > > As a sub-system maintainer I wouldn't like this, because I ideally wa=
-nt
-> > > to be able to run the same jobs on my staging tree, that Peter will r=
-un
-> > > at merge time for the PULL request I send.
-> > >
-> >
-> > If you're looking for symmetry between any PR and "merge time" jobs, th=
-e
-> > only solution is to allow any PR to access all the diverse set of non-s=
-hared
-> > machines we're hoping to have in the near future.  This may be somethin=
-g
-> > we'll get to, but I doubt we can tackle it in the near future now.
->
-> It occurred to me that we could do this if we grant selective access to
-> the Gitlab repos, to people who are official subsystem maintainers.
-> GitLab has a concept of "protected branches", so you can control who is
-> allowed to push changes on a per-branch granularity.
->
-> So, for example, in the main qemu.git, we could create branches for each
-> subsystem tree eg
->
->   staging-block
->   staging-qapi
->   staging-crypto
->   staging-migration
->   ....
->
-> and for each of these branches, we can grant access to relevant subsystem
-> maintainer(s).
+BALATON Zoltan <balaton@eik.bme.hu> writes:
 
-The MAINTAINERS file could help us with that, we already have scripts
-to parse its sections.
-Maintainers should keep it up-to-date, then the merge script would check, i=
-.e.:
+> On Tue, 21 Apr 2020, Markus Armbruster wrote:
+>> BALATON Zoltan <balaton@eik.bme.hu> writes:
+>>> On Mon, 20 Apr 2020, Markus Armbruster wrote:
+>>>> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
+>>>> pointer to a variable containing NULL.  Passing an argument of the
+>>>> latter kind twice without clearing it in between is wrong: if the
+>>>> first call sets an error, it no longer points to NULL for the second
+>>>> call.
+>>>>
+>>>> spd_data_generate() can pass @errp to error_setg() more than once when
+>>>> it adjusts both memory size and type.  Harmless, because no caller
+>>>> passes anything that needs adjusting.  Until the previous commit,
+>>>> sam460ex passed types that needed adjusting, but not sizes.
+>>>>
+>>>> spd_data_generate()'s contract is rather awkward:
+>>>>
+>>>>    If everything's fine, return non-null and don't set an error.
+>>>>
+>>>>    Else, if memory size or type need adjusting, return non-null and
+>>>>    set an error describing the adjustment.
+>>>>
+>>>>    Else, return null and set an error reporting why no data can be
+>>>>    generated.
+>>>>
+>>>> Its callers treat the error as a warning even when null is returned.
+>>>> They don't create the "smbus-eeprom" device then.  Suspicious.
+>>>
+>>> The idea here again is to make it work if there's a way it could work
+>>> rather than throw back an error to user and bail. This is for user
+>>> convenience in the likely case the user knows nothing about the board
+>>> or SPD data restrictions.
+>>
+>> We're in perfect agreement that the user of QEMU should not need to know
+>> anything about memory type and number of banks.  QEMU should pick a
+>> sensible configuration for any memory size it supports.
+>
+> I though it could be useful to warn the users when QEMU had to fix up
+> some values to notify them that what they get may not be what they
+> expect and can then know why.
 
-<newline> // section separator
---------------- // ignored
-Trivial patches // description ignored
-M: Michael Tokarev <mjt@tls.msk.ru>
-M: Laurent Vivier <laurent@vivier.eu> // must match commit author
-T: git git://git.corpit.ru/qemu.git trivial-patches
-T: git https://github.com/vivier/qemu.git trivial-patches // must
-match MR source
+*If* QEMU "fixed up" the user's configuration, then QEMU should indeed
+warn the user.
 
+But it doesn't fix up anything here.  This broken code is unused.
+
+>                               If the message really annoys you you can
+> remove it but I think it can be useful. I just think your real problem
+> with it is that Error can't support it so it's easier to remove the
+> warning than fixing Error or use warn_report instead.
+
+It's indeed easier to remove broken unused code than to try fixing it.
+YAGNI.
+
+>>>                           You seem to disagree with this
+>>
+>> Here's what I actually disagree with:
+>>
+>> 1. QEMU warning the user about its choice of memory type, but only
+>> sometimes.  Why warn?  There is nothing wrong, and there is nothing the
+>> user can do to avoid the condition that triggers the warning.
 >
-> When they're ready to send a pull request to Peter, they can push their
-> tree to this branch. Since the branch is in the main gitlab.com/qemu/qemu
-> project namespace, this branch can run CI using the private QEMU runners.
-> The subsystem maintainer can thus see the full set of CI results across
-> all platforms required by Gating, before Peter even gets the pull request=
-.
+> The memory size that triggers the warning is specified by the user so
+> the user can do someting about it.
+
+There is no way to trigger the warning.  If we dropped PATCH 1 instead
+of fixing it as I did in v2, then the only way to trigger the warning is
+-M sam460ex -m 64 or -m 32, and the only way to avoid it is to don't do
+that.
+
+Why would a user care whether he gets DDR or DDR2 memory?
+
+>> 2. QEMU changing the user's memory size.  Yes, I understand that's an
+>> attempt to be helpful, but I prefer my tools not to second-guess my
+>> intent.
 >
-> So when Peter then looks at merging the pull request to master, the only
-> he's likely to see are the non-deterministic bugs, or issues caused by
-> semantic conflicts with other recently merged code.
+> I agree with that and also hate Windows's habit of trying to be more
+> intelligent than the user and prefer the Unix way however the average
+> users of QEMU (from my perpective, who wants to run Amiga like OSes
+> typically on Windows and for the most part not knowing what they are
+> doing) are already intimidated by the messy QEMU command line
+> interface and will specify random values and complain or go away if it
+> does not work so making their life a little easier is not
+> useless. These users (or any CLI users) are apparently not relevant
+> from your point of view but they do exist and I think should be
+> supported better.
+
+This theoretical.  Remember, we're talking about unused code.  Proof:
+
+    $ ppc-softmmu/qemu-system-ppc -M sam460ex -m 4096
+    qemu-system-ppc: Max 1 banks of 2048 ,1024 ,512 ,256 ,128 ,64 ,32 MB DI=
+MM/bank supported
+    qemu-system-ppc: Possible valid RAM size: 2048
+
+I figure commit a0258e4afa "ppc/{ppc440_bamboo, sam460ex}: drop RAM size
+fixup" removed the only uses.  If you disagree with it, take it up with
+Igor, please.
+
+>>>                                                          and want to
+>>> remove all such logic from everywhere. Despite the title of this patch
+>>> it's not just fixing error API usage but removing those fix ups.
+>>
+>> I'm removing unused code that is also broken.  If you want to keep it,
+>> please fix it, and provide a user and/or a unit test.  Without that, it
+>> is a trap for future callers.
 >
-> It would even be possible to do the final merge into master entirely from
-> GitLab, no need to go via email. When the source branch & target branch a=
-re
-> within the same git repo, GitLab has the ability to run CI jobs against t=
-he
-> resulting merge commit in a strict gating manner, before it hits master.
-> They call this "Merge trains" in their documentation.
+> What was broken in this patch? Isn't freeing the previous warning when
+
+My commit message explains:
+
+     The Error ** argument must be NULL, &error_abort, &error_fatal, or a
+     pointer to a variable containing NULL.  Passing an argument of the
+     latter kind twice without clearing it in between is wrong: if the
+     first call sets an error, it no longer points to NULL for the second
+     call.
+
+     spd_data_generate() can pass @errp to error_setg() more than once when
+     it adjusts both memory size and type.  Harmless, because no caller
+     passes anything that needs adjusting.  Until the previous commit,
+     sam460ex passed types that needed adjusting, but not sizes.
+
+Now have a look at the code I delete:
+
+    if (size < 4) {
+        error_setg(errp, "SDRAM size is too small");
+        return NULL;
+    }
+    sz_log2 =3D 31 - clz32(size);
+    size =3D 1U << sz_log2;
+    if (ram_size > size * MiB) {
+--->    error_setg(errp, "SDRAM size 0x"RAM_ADDR_FMT" is not a power of 2, =
+"
+                   "truncating to %u MB", ram_size, size);
+    }
+    if (sz_log2 < min_log2) {
+--->    error_setg(errp,
+                   "Memory size is too small for SDRAM type, adjusting type=
+");
+        if (size >=3D 32) {
+            type =3D DDR;
+            min_log2 =3D 5;
+            max_log2 =3D 12;
+        } else {
+            type =3D SDR;
+            min_log2 =3D 2;
+            max_log2 =3D 9;
+        }
+    }
+    [...]
+    if (size > (1ULL << sz_log2) * nbanks) {
+--->    error_setg(errp, "Memory size is too big for SDRAM, truncating");
+    }
+
+If more than one of the conditions guarding these error_setg() is true,
+and @errp is neither null, &error_abort, nor &error_fatal, then it'll
+point to an Error * that is not null for the non-first error_setg()
+call.  This will trip the assertion in error_setv().
+
+> adding a new one or combining them as you say below (although I don't
+> really get what you mean) would fix it without removing fix ups? It's
+> only unused now because in previous patches you've removed all usages:
+> first broke memory fixup because of some internal QEMU API did not
+> support fixing up memory size so instead of fixing that API removed
+> what did not fit, then now removing type fix ups because it's not
+> fitting Error API.
 >
-> IOW, from Peter's POV, merging pull requests could be as simple as hittin=
-g
-> the merge button in GitLab merge request UI. Everything wrt CI would be
-> completely automated, and the subsystem maintainers would have the
-> responsibility to dealing with merge conflicts & CI failures, which is
-> more scalable for the person co-ordinating the merges into master.
+> Originally it did work well and produced usable values for whatever
+> number the user specified and it was convenient for users. (Especially
+> the sam460ex is a problematic case because of SoC and firmware limits
+> that the user should not need to know about.)
+
+I don't doubt it worked in your testing.
+
+It's still wrong.
+
+>>> If Error cannot be used for this could you change error_setg to
+>>> warn_report and keep the fix ups untouched? That fixes the problem
+>>> with error (although leaves no chance to board code to handle
+>>> errors). Maybe fix Error to be usable for what it's intended for
+>>> rather than removing cases it can't handle.
+>>
+>> Error is designed for errors, not warnings.
+>>
+>> A function either succeeds (no error) or fails (one error).
+>>
+>> It can be pressed into service for warnings (you did, although in a
+>> buggy way).  You still can return at most one Error per Error **
+>> parameter.  If you need multiple warnings, use multiple parameters
+>> (ugh!).  You could also try to squash multiple warnings into one the
+>> hints mechanism.
+>>
+>> I'd advise against combining warn_report() and Error ** in one function.
+>> A function should either take care of talking to the user completely, or
+>> leave it to its caller completely.
 >
->
-> Regards,
-> Daniel
+> I've tried to use error so the board code can decide what's an error
+> and what's a warning but if this cannot be done with this QEMU
+> facility I don't know a better way than using warn_report for
+> warnings.
+
+Is there any board that genuinely wants to decide what's an error and
+what's a warning?
+
+Here's spd_data_generate() contract again:
+
+        If everything's fine, return non-null and don't set an error.
+
+        Else, if memory size or type need adjusting, return non-null and
+        set an error describing the adjustment.
+
+        Else, return null and set an error reporting why no data can be
+        generated.
+
+It has a grand total of two users.  Both treat the second case as
+warning, and the third as error.
+
+Until you have a user that wants to handle things differently, you're
+overcomplicating things.
+
+YAGNI!
 
 
