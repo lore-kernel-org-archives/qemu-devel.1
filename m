@@ -2,79 +2,106 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B75C54FD0
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 13:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 929FEC54FCB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 13:52:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EFF620700
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 13:49:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C34F20700
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 13:52:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iP9bdHx5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EFF620700
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yqbi8ARK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C34F20700
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRyhx-0001wV-By
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 09:49:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41076)
+	id 1jRyl8-0004xv-EZ
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 09:52:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jRygg-0001GB-DC
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 09:48:14 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jRybH-0008MB-B8
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 09:42:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jRygf-0008GX-V9
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 09:48:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50636
+ (envelope-from <mreitz@redhat.com>) id 1jRybB-0000mF-Sb
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 09:42:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28341
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jRygf-0008DT-Ip
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 09:48:13 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jRybB-0000j3-F7
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 09:42:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587736092;
+ s=mimecast20190719; t=1587735751;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=siRy6QkQI4XDHW16JQqO2FyNdLsb4fS1K+Kq1bt7Av8=;
- b=iP9bdHx5qQAqBMzXm5MqbRifYDCDHtArDDxB9iOupuzimXyyJ7/RhoJGPtc/8ixNwJ8Smj
- xjsD/noR/sjtcJ5nVFYaxJrN7wPr+Kyfjcm6s88ggO9VeaGa+l7bWbgGp0hUWn6mGKpgFF
- XWaP4aBguqR7X56/wQ0EdH4vaH0aWYk=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=h6EdEaT0yTg1aFhvV5+hvZHr7Hkpw4R0DlKQgg2u/kg=;
+ b=Yqbi8ARK/v3cGGDIDbAL4CW4Q/EH5x/0BZe/JVYIHZ7Rja3Ewl0UvreK2NItKvizCtFXgk
+ TesjwvSK7iAy3Dm+Rsyo98QKDix8o83wlexG+/e7M5bDSaAr+VIOmqg0ks6oaGT92ELRE7
+ zCdzFTawFqczzdrDZXGmffYGBviFk0c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-pMokidWyPASf7GO0S5XjgQ-1; Fri, 24 Apr 2020 09:48:09 -0400
-X-MC-Unique: pMokidWyPASf7GO0S5XjgQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-403-qxjHqFLOPFujohkCasfGAQ-1; Fri, 24 Apr 2020 09:42:24 -0400
+X-MC-Unique: qxjHqFLOPFujohkCasfGAQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA078107ACF3;
- Fri, 24 Apr 2020 13:48:06 +0000 (UTC)
-Received: from localhost (ovpn-114-136.ams2.redhat.com [10.36.114.136])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 694BB610D6;
- Fri, 24 Apr 2020 13:48:00 +0000 (UTC)
-Date: Fri, 24 Apr 2020 14:47:59 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: elena.ufimtseva@oracle.com
-Subject: Re: [PATCH RESEND v6 09/36] multi-process: Add config option for
- multi-process QEMU
-Message-ID: <20200424134759.GB190507@stefanha-x1.localdomain>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1DFE8015D2;
+ Fri, 24 Apr 2020 13:42:21 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-192.ams2.redhat.com
+ [10.36.113.192])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BC70F605D1;
+ Fri, 24 Apr 2020 13:42:08 +0000 (UTC)
+Subject: Re: [PATCH RESEND v6 00/36] Initial support for multi-process qemu
+To: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ elena.ufimtseva@oracle.com
 References: <cover.1587614626.git.elena.ufimtseva@oracle.com>
- <c926e2e8a90c02c623f5ced8c1353b2dc277ec35.1587614626.git.elena.ufimtseva@oracle.com>
+ <20200424124823.GC189569@stefanha-x1.localdomain>
+ <00786792-33e1-38cc-3d4c-1cee1e786c9e@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <7bc48ca0-a2da-0e3a-3c8a-d22ec1c58c28@redhat.com>
+Date: Fri, 24 Apr 2020 15:42:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <c926e2e8a90c02c623f5ced8c1353b2dc277ec35.1587614626.git.elena.ufimtseva@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <00786792-33e1-38cc-3d4c-1cee1e786c9e@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="FkmkrVfFsRoUs1wW"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+ protocol="application/pgp-signature";
+ boundary="agck1fOs6HuWv0D4aWpYVHUsnCjxGUGP3"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 03:07:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -95,47 +122,87 @@ Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
  quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
  felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
  konrad.wilk@oracle.com, dgilbert@redhat.com, liran.alon@oracle.com,
- thanos.makatos@nutanix.com, rth@twiddle.net, kwolf@redhat.com,
- berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
- marcandre.lureau@gmail.com, pbonzini@redhat.com
+ pbonzini@redhat.com, rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com,
+ thanos.makatos@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---FkmkrVfFsRoUs1wW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--agck1fOs6HuWv0D4aWpYVHUsnCjxGUGP3
+Content-Type: multipart/mixed; boundary="jhdPvmVUDGCPnnytgj1kGpLJUBvFsxg66"
+
+--jhdPvmVUDGCPnnytgj1kGpLJUBvFsxg66
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 22, 2020 at 09:13:44PM -0700, elena.ufimtseva@oracle.com wrote:
-> From: Jagannathan Raman <jag.raman@oracle.com>
+On 24.04.20 14:53, Eric Blake wrote:
+> On 4/24/20 7:48 AM, Stefan Hajnoczi wrote:
+>> On Wed, Apr 22, 2020 at 09:13:35PM -0700, elena.ufimtseva@oracle.com
+>> wrote:
+>>> There is an error in travis-ci build test which does not get reproduced=
+.
+>>>
+>>> =A0 TEST=A0=A0=A0 iotest-qcow2: 041 [fail]
+>>> QEMU=A0=A0=A0=A0=A0=A0=A0=A0=A0 --
+>>> "/home/travis/build/elena-ufimtseva/qemu-multiprocess/out-of-tree/build=
+/dir/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64"
+>>> -nodefaults -display none -accel qtest
 >=20
-> Add a configuration option to separate multi-process code
+>>> +Traceback (most recent call last):
+>>> +=A0 File "041", line 1049, in test_with_other_parent
+>>> +=A0=A0=A0 self.assert_qmp(result, 'return', {})
+>>> +=A0 File
+>>> "/home/travis/build/elena-ufimtseva/qemu-multiprocess/tests/qemu-iotest=
+s/iotests.py",
+>>> line 821, in assert_qmp
+>>> +=A0=A0=A0 result =3D self.dictpath(d, path)
+>>> +=A0 File
+>>> "/home/travis/build/elena-ufimtseva/qemu-multiprocess/tests/qemu-iotest=
+s/iotests.py",
+>>> line 797, in dictpath
+>>> +=A0=A0=A0 self.fail('failed path traversal for "%s" in "%s"' % (path,
+>>> str(d)))
+>>> +AssertionError: failed path traversal for "return" in "{'error':
+>>> {'class': 'GenericError', 'desc': "UNIX socket path
+>>> '/home/travis/build/elena-ufimtseva/qemu-multiprocess/out-of-tree/build=
+/dir/tests/qemu-iotests/scratch/nbd.sock'
+>>> is too long"}}"
+>>
+>> UNIX Domain Socket paths have to be 108 characters or less.=A0 The path =
+in
+>> the failed test case is 110 characters long.=A0 You could rename your
+>> branch to "mpqemu" to solve this failure.
 >=20
-> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> ---
->  configure | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+> We recently fixed the iotests to prefer sticking NBD sockets under
+> $SOCK_DIR (see commits f0e24942 and friends); did we miss test 41?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Looks more like I broke it.  Oops.  Will fix.
 
---FkmkrVfFsRoUs1wW
+Max
+
+
+--jhdPvmVUDGCPnnytgj1kGpLJUBvFsxg66--
+
+--agck1fOs6HuWv0D4aWpYVHUsnCjxGUGP3
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6i7g8ACgkQnKSrs4Gr
-c8h2Cwf+N1XdtwglRe9ABvkyurMk27V6WoSY2K8hUue9rVMyr5rSlEyvRtge7wnI
-OW4KHwfV2yRHRenfWfgLpokqHJ2rIRU33fJGxZ1sYe6909NSapxneFemRE3HIlIM
-yUiIkk+UeW1IC4wT4/CV3X9EJFQPeLZ5shHpZdnqH5ZlWi9p0lolFo+aKpVoozsx
-s4CrVQT/V8t5oBrhixZUnO0Nz2PpGOYVACDyWD89tr340Y8viLyP4d/45Cen7l42
-8zg64jf8WtzuTikrDO/Y+Q3nM3SCZ3kwkykfozAqtBtabjVbbQ5dobazJzZPplHO
-UFLlwyGZ23zSYpITIun3vMz8qrX+fA==
-=2NNw
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6i7K8ACgkQ9AfbAGHV
+z0C16QgAs0ns9lS4maYkKwWuUMjxmZv+0e/GvVV8z7QkXPLZd8yoPjEnw8N2edbk
+7F2AvFtgTA3VmGRN0vNlUne7whxqxzJ1EH9frnWtVtLQuO9tQyIB+hHLAQQ569mi
+WxrxvHCRyHjaGLb+D9QMPJjzc7FGrdQyJ8/E4ZEBSblKxf/OA7GEwdGm1krn1b2a
+s0FW+mDfWzXzH/lCgUI35hUtn0NTJ37Zx9Z4Oh++MGqW6D82DT6rGoxLeyT/I4BO
+ah25Q+nNvCd/lL61zNeTRR+RurdO0q6J3mT7zhJr5dTtxMdEkEsi2v6SEMbFuD+r
+T0a4KBOC6XlSA9JvHWniRqng+UmWBg==
+=jC8y
 -----END PGP SIGNATURE-----
 
---FkmkrVfFsRoUs1wW--
+--agck1fOs6HuWv0D4aWpYVHUsnCjxGUGP3--
 
 
