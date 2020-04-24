@@ -2,150 +2,88 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45ED8C54FCB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 19:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99AE9C54FD0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 19:14:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAF7420736
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 19:13:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 52B1E20774
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 19:14:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="e0MIevSi";
-	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="KqO/4zd5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAF7420736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=fb.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cjFsDjt2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52B1E20774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jS3lr-0008AH-7S
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 15:13:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51300)
+	id 1jS3mW-0000mm-DE
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 15:14:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=13837b4cf8=coreyw7@fb.com>) id 1jS3kW-0006t1-9v
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 15:12:32 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jS3jR-0005Ja-EV
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 15:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <prvs=13837b4cf8=coreyw7@fb.com>) id 1jS3kU-0005Wb-ML
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 15:12:31 -0400
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:30074)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <prvs=13837b4cf8=coreyw7@fb.com>)
- id 1jS3kR-0005Kl-TY; Fri, 24 Apr 2020 15:12:28 -0400
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
- by mx0a-00082601.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 03OJ9Uxh003787; Fri, 24 Apr 2020 12:12:15 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com;
- h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=facebook;
- bh=h8L934ZE+mFPrZMlplNT6WJ84OfU28jEmBEHXhsDZIo=;
- b=e0MIevSiOTMagmp354lmk4mv3ufyR1dxIsmKVry1EK8AfT9sljPsVyXJFcUqhhjLmFRE
- 8JvoHe33HcofQ4wXLY1wh7w6h/OQTBOs9yXXCG6LMO22+tZ2ugi2gvYpg0ay8f02EUDv
- ngdkNlx25zPfzlCtiVEemM53BzfbpNyJ2Q4= 
-Received: from mail.thefacebook.com ([163.114.132.120])
- by mx0a-00082601.pphosted.com with ESMTP id 30kknkxhkp-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
- Fri, 24 Apr 2020 12:12:15 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (100.104.98.9) by
- o365-in.thefacebook.com (100.104.94.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1847.3; Fri, 24 Apr 2020 12:12:14 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R9my4/tTzo08cY4O5+LiEdR1wCriw66bqV3uvxeANj8aNSEJRCpSZ13u4lr3KRP2u2YkwTbrd+0F6sAtkmg3YY1im4RdTwwQNooBM6F+fm3b3QR4xKGF3jXDfbIz8h0HEnLn6k182zcE+nmRB8nZAqqWzOUuWtb1uyp4Dl6XYwETkjT9hPalrtRZ9V5OwyqMwEaifqHmPtXLWFDkXIynKH03NNZYsjm40+ue+WpkOkmwZJVSIYnLRc6Wczo9EQp/B5WrX0N5cqnIlCfcv/GGs1WKOaaDc0X500fhu2ST7Ma/JMKEW+4XXGCclDSAX2slDmTFdLaYUX+Syfxbv9CqMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h8L934ZE+mFPrZMlplNT6WJ84OfU28jEmBEHXhsDZIo=;
- b=duzCl28zGdDgWdORNnWMfmN5pJSbzHHyLhhuG27bKSwgCKI2PJhhPabvHxF/dawZPED24osP1cDWsdfdZbJXkBZCv6SzCKb5e6OeeMhprU1wP/fo2W+DtTDlwkKrTKx1W9jIfI0WfLniW8fLkYEOZmZlMkXA2D+1S2Tk2caKBZNZpopdtFoyMWZJa93+5uY6laYrUaPnqw6Ur8gRCnhxI0x1A0qAYmeLxDINmpaYMX85hQsCVP7hWPaqsN2Mxn4xHSu2S5MStGdahkH4+4knzRK0RrIhnoHcVYf7JKW453A8Ho7loAhLSL9W+YOvM6iIzs9IDn6/+rjdFYBEAtDGYA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
- header.d=fb.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
- s=selector2-fb-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h8L934ZE+mFPrZMlplNT6WJ84OfU28jEmBEHXhsDZIo=;
- b=KqO/4zd5N7cXhtvZRtxu6Ag2Nz7Rojq166l+TjXcGmVSi5meiTmPrxAnbCPVtLjeS560EPB03cqxzcSbG/MYCsHY/hA0eOyHcq9YPSzveAC3UOVzgfOI5looeQvyAGuh5CqHIfUP/aIUA3vvngKvhTjpOYQRR4LxcNSeKkqHfKQ=
-Received: from MW3PR15MB4041.namprd15.prod.outlook.com (2603:10b6:303:47::20)
- by MW3PR15MB3817.namprd15.prod.outlook.com (2603:10b6:303:4d::23)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Fri, 24 Apr
- 2020 19:12:00 +0000
-Received: from MW3PR15MB4041.namprd15.prod.outlook.com
- ([fe80::3036:d208:efd2:f6f5]) by MW3PR15MB4041.namprd15.prod.outlook.com
- ([fe80::3036:d208:efd2:f6f5%3]) with mapi id 15.20.2937.012; Fri, 24 Apr 2020
- 19:12:00 +0000
-From: Corey Wharton <coreyw7@fb.com>
-To: Alistair Francis <alistair23@gmail.com>
-CC: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "open
- list:RISC-V" <qemu-riscv@nongnu.org>, Sagar Karandikar
- <sagark@eecs.berkeley.edu>, Bastian Koppelmann
- <kbastian@mail.uni-paderborn.de>, Alistair Francis
- <alistair.francis@wdc.com>, Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng
- <bmeng.cn@gmail.com>
-Subject: RE: [PATCH v2 1/2] riscv: sifive_e: Support changing CPU type
-Thread-Topic: [PATCH v2 1/2] riscv: sifive_e: Support changing CPU type
-Thread-Index: AQHV+W6H8JK85FucOkKPYiO0hRqPjqiIsPuAgAAtHfA=
-Date: Fri, 24 Apr 2020 19:12:00 +0000
-Message-ID: <MW3PR15MB4041DC49872DE4C92E982FE993D00@MW3PR15MB4041.namprd15.prod.outlook.com>
-References: <20200313193429.8035-1-coreyw7@fb.com>
- <20200313193429.8035-2-coreyw7@fb.com>
- <CAKmqyKNGLOE_UKWVuJzrBDRkRXj74XfOace+K5ab4-5HTWg_KA@mail.gmail.com>
-In-Reply-To: <CAKmqyKNGLOE_UKWVuJzrBDRkRXj74XfOace+K5ab4-5HTWg_KA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [2601:601:c980:28be:4d1b:bc42:820d:b3a2]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b807fa57-cb7f-49d4-6a00-08d7e8835dc8
-x-ms-traffictypediagnostic: MW3PR15MB3817:
-x-microsoft-antispam-prvs: <MW3PR15MB3817A966C09ECA37BFD4468893D00@MW3PR15MB3817.namprd15.prod.outlook.com>
-x-fb-source: Internal
-x-ms-oob-tlc-oobclassifiers: OLM:473;
-x-forefront-prvs: 03838E948C
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MW3PR15MB4041.namprd15.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(136003)(366004)(376002)(396003)(346002)(39860400002)(52536014)(5660300002)(4326008)(81156014)(316002)(8676002)(8936002)(6916009)(66446008)(66556008)(64756008)(66476007)(66946007)(33656002)(86362001)(76116006)(2906002)(71200400001)(478600001)(9686003)(7696005)(6506007)(53546011)(54906003)(186003)(55016002);
- DIR:OUT; SFP:1102; 
-received-spf: None (protection.outlook.com: fb.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: b0f4Yb+mhZowmUosrE10Kho+Cso5LROcQcdI9LLFq6yi9TiH8xKp0sRrKlqZr9cng3Ok5n/B5VQicr2LgxUf0DHVLSjaxRxQk7H1uLYva9G+69c/wgamiH57ny6hHbj6eXqDAyAfTyt6s/Mv2NoVkuLC72pseYVOaoy30pXgeF9JNnMEK4k/ULP/+WdKf5QsNWtXVwXEbKL/xdvUjGx26ApN6QNbOoJnohtCgWJpY/B6J6gnBr2PAMrtNOIGnhBTA73NROr/qSFrFleih/Fp8xnr0JchOPWD1Mzg819LH+CuT345fIFPH9CaPB1KQT95T2DkIuIA+nMkVj4auHPcpygiDHZndrOesXeclNojq1rAX/YBfp2r3jCI5t6f6ndSfk4VZ4zdrpp4Bs7TtuP6qPM4k6by9bW4LUuEboam+KXQ3bBHTrG7+qkAT/JHlwHf
-x-ms-exchange-antispam-messagedata: 1s8r8YGQCqqV0J9O4vuh51xrByqqjP26tYPzM2Tp2Ad1RRegsiS6ZBeTpyIN/LNpcoCK83Kmhee/0yYp4s7t/5rwnbDy+dgfmn5LB9OPoaEfSWMDR2/szOMrsyBXOU2vk9wGPj3BdF0J4uWSa8y63sh8x/R0OBEdBtTpnfUE4yvaP5iRlVNcmBK5h4gGLsnHDqBQB5atGjL1AAOI2a+PSg==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <dgilbert@redhat.com>) id 1jS3jQ-0003H2-Al
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 15:11:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56402
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jS3jP-0003Es-Rl
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 15:11:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587755482;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=JjOS1wX2ETIang6bs9uwcXb1p1OmHUnBg9ALBvBbgS4=;
+ b=cjFsDjt2gAP+lAcGqG2t3GRdN6QBz5AXsyjmViuOQTkmOt+ANqnuwrAUkCDe+7rH5b9OPp
+ 3/1U/vm/itbYGnbpfPLwoVXB6C0qIm5bxxFXNRVvsETrVYUGoG1INAC9j5EAJv0P6yh1wf
+ OAFJNZPvaui8P5BYOn2Jb2a2d43FsBg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-406-CQCjUJiOP9yrtaTh1iTeeQ-1; Fri, 24 Apr 2020 15:11:12 -0400
+X-MC-Unique: CQCjUJiOP9yrtaTh1iTeeQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 531AB8014D9;
+ Fri, 24 Apr 2020 19:11:09 +0000 (UTC)
+Received: from work-vm (ovpn-113-179.ams2.redhat.com [10.36.113.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A63515C1D0;
+ Fri, 24 Apr 2020 19:10:51 +0000 (UTC)
+Date: Fri, 24 Apr 2020 20:10:49 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200424191049.GU3106@work-vm>
+References: <20200413055201.27053-1-yan.y.zhao@intel.com>
+ <20200417104450.2d2f2fa9.cohuck@redhat.com>
+ <20200417095202.GD16688@joy-OptiPlex-7040>
+ <20200417132457.45d91fe3.cohuck@redhat.com>
+ <20200420012457.GE16688@joy-OptiPlex-7040>
+ <20200420165600.4951ae82@w520.home>
+ <20200421023718.GA12111@joy-OptiPlex-7040>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D86DF06@SHSMSX104.ccr.corp.intel.com>
+ <20200422073628.GA12879@joy-OptiPlex-7040>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: b807fa57-cb7f-49d4-6a00-08d7e8835dc8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Apr 2020 19:12:00.5864 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6X0OcMX7E8SE2fAxppk8psP/M5af+XOK/rwfjMyFzIHptK2EZ/rBlAS477C4tAjz
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR15MB3817
-X-OriginatorOrg: fb.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-24_11:2020-04-24,
- 2020-04-24 signatures=0
-X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0
- priorityscore=1501
- lowpriorityscore=0 phishscore=0 suspectscore=0 adultscore=0 bulkscore=0
- mlxlogscore=999 impostorscore=0 malwarescore=0 clxscore=1011 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004240145
-X-FB-Internal: deliver
-Received-SPF: pass client-ip=67.231.145.42;
- envelope-from=prvs=13837b4cf8=coreyw7@fb.com; helo=mx0a-00082601.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 15:12:23
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Received-From: 67.231.145.42
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200422073628.GA12879@joy-OptiPlex-7040>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 15:11:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -157,76 +95,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Cornelia Huck <cohuck@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+ "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "Yang, Ziye" <ziye.yang@intel.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+ "Tian, Kevin" <kevin.tian@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
+ "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
+ "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "dinechin@redhat.com" <dinechin@redhat.com>,
+ "He, Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQWxpc3RhaXIgRnJhbmNp
-cyA8YWxpc3RhaXIyM0BnbWFpbC5jb20+DQo+IFNlbnQ6IEZyaWRheSwgQXByaWwgMjQsIDIwMjAg
-OTowNCBBTQ0KPiBUbzogQ29yZXkgV2hhcnRvbiA8Y29yZXl3N0BmYi5jb20+DQo+IENjOiBxZW11
-LWRldmVsQG5vbmdudS5vcmcgRGV2ZWxvcGVycyA8cWVtdS1kZXZlbEBub25nbnUub3JnPjsgb3Bl
-bg0KPiBsaXN0OlJJU0MtViA8cWVtdS1yaXNjdkBub25nbnUub3JnPjsgU2FnYXIgS2FyYW5kaWth
-cg0KPiA8c2FnYXJrQGVlY3MuYmVya2VsZXkuZWR1PjsgQmFzdGlhbiBLb3BwZWxtYW5uIDxrYmFz
-dGlhbkBtYWlsLnVuaS0NCj4gcGFkZXJib3JuLmRlPjsgQWxpc3RhaXIgRnJhbmNpcyA8YWxpc3Rh
-aXIuZnJhbmNpc0B3ZGMuY29tPjsgUGFsbWVyIERhYmJlbHQNCj4gPHBhbG1lckBkYWJiZWx0LmNv
-bT47IEJpbiBNZW5nIDxibWVuZy5jbkBnbWFpbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0gg
-djIgMS8yXSByaXNjdjogc2lmaXZlX2U6IFN1cHBvcnQgY2hhbmdpbmcgQ1BVIHR5cGUNCj4gDQo+
-IE9uIEZyaSwgTWFyIDEzLCAyMDIwIGF0IDEyOjM1IFBNIENvcmV5IFdoYXJ0b24gPGNvcmV5dzdA
-ZmIuY29tPiB3cm90ZToNCj4gPg0KPiA+IEFsbG93cyB0aGUgQ1BVIHRvIGJlIGNoYW5nZWQgZnJv
-bSB0aGUgZGVmYXVsdCB2aWEgdGhlIC1jcHUgY29tbWFuZA0KPiA+IGxpbmUgb3B0aW9uLg0KPiA+
-DQo+ID4gU2lnbmVkLW9mZi1ieTogQ29yZXkgV2hhcnRvbiA8Y29yZXl3N0BmYi5jb20+DQo+ID4g
-UmV2aWV3ZWQtYnk6IEJpbiBNZW5nIDxibWVuZy5jbkBnbWFpbC5jb20+DQo+ID4gUmV2aWV3ZWQt
-Ynk6IEFsaXN0YWlyIEZyYW5jaXMgPGFsaXN0YWlyLmZyYW5jaXNAd2RjLmNvbT4NCj4gDQo+IFRo
-YW5rcyBmb3IgdGhlIHBhdGNoLg0KPiANCj4gVW5mb3J0dW5hdGVseSB0aGlzIGZhaWxzIGBtYWtl
-IGNoZWNrYC4NCj4gDQo+IFRoZSBwcm9ibGVtIGlzIHRoYXQgdGhlIG1hY2hpbmUgaGFzIHRoZSBg
-ZGVmYXVsdF9jcHVfdHlwZWAgc2V0IGJ1dCB0aGVuIHlvdQ0KPiBzZXQgImNwdS10eXBlIiBmcm9t
-IHRoZSBTb0MuDQo+IA0KPiBUaGlzIGRpZmYgZml4ZXMgdGhlIG1ha2UgY2hlY2sgZmFpbHVyZSBm
-b3IgbWU6DQo+IA0KPiBkaWZmIC0tZ2l0IGEvaHcvcmlzY3Yvc2lmaXZlX2UuYyBiL2h3L3Jpc2N2
-L3NpZml2ZV9lLmMgaW5kZXgNCj4gMWZkMDhmMzI1Yy4uYjUzMTA5NTIxZSAxMDA2NDQNCj4gLS0t
-IGEvaHcvcmlzY3Yvc2lmaXZlX2UuYw0KPiArKysgYi9ody9yaXNjdi9zaWZpdmVfZS5jDQo+IEBA
-IC0xMjMsOCArMTIzLDYgQEAgc3RhdGljIHZvaWQgcmlzY3Zfc2lmaXZlX2Vfc29jX2luaXQoT2Jq
-ZWN0ICpvYmopDQo+ICAgICAgb2JqZWN0X2luaXRpYWxpemVfY2hpbGQob2JqLCAiY3B1cyIsICZz
-LT5jcHVzLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNpemVvZihzLT5jcHVzKSwg
-VFlQRV9SSVNDVl9IQVJUX0FSUkFZLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZl
-cnJvcl9hYm9ydCwgTlVMTCk7DQo+IC0gICAgb2JqZWN0X3Byb3BlcnR5X3NldF9zdHIoT0JKRUNU
-KCZzLT5jcHVzKSwgbXMtPmNwdV90eXBlLCAiY3B1LXR5cGUiLA0KPiAtICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICZlcnJvcl9hYm9ydCk7DQo+ICAgICAgb2JqZWN0X3Byb3BlcnR5X3NldF9p
-bnQoT0JKRUNUKCZzLT5jcHVzKSwgbXMtPnNtcC5jcHVzLCAibnVtLWhhcnRzIiwNCj4gICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAmZXJyb3JfYWJvcnQpOw0KPiAgICAgIHN5c2J1c19pbml0
-X2NoaWxkX29iaihvYmosICJyaXNjdi5zaWZpdmUuZS5ncGlvMCIsIEBAIC0xNDEsNiArMTM5LDgg
-QEANCj4gc3RhdGljIHZvaWQgcmlzY3Zfc2lmaXZlX2Vfc29jX3JlYWxpemUoRGV2aWNlU3RhdGUN
-Cj4gKmRldiwgRXJyb3IgKiplcnJwKQ0KPiAgICAgIFNpRml2ZUVTb0NTdGF0ZSAqcyA9IFJJU0NW
-X0VfU09DKGRldik7DQo+ICAgICAgTWVtb3J5UmVnaW9uICpzeXNfbWVtID0gZ2V0X3N5c3RlbV9t
-ZW1vcnkoKTsNCj4gDQo+ICsgICAgb2JqZWN0X3Byb3BlcnR5X3NldF9zdHIoT0JKRUNUKCZzLT5j
-cHVzKSwgbXMtPmNwdV90eXBlLCAiY3B1LXR5cGUiLA0KPiArICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICZlcnJvcl9hYm9ydCk7DQo+ICAgICAgb2JqZWN0X3Byb3BlcnR5X3NldF9ib29sKE9C
-SkVDVCgmcy0+Y3B1cyksIHRydWUsICJyZWFsaXplZCIsDQo+ICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgJmVycm9yX2Fib3J0KTsNCj4gDQo+IA0KPiBJJ20gaGFwcHkgdG8ganVzdCBzcXVh
-c2ggdGhhdCBpbnRvIHRoZSBwYXRjaC4gTGV0IG1lIGtub3cgaWYgeW91IGRvbid0IHdhbnQNCj4g
-bWUgdG8gZG8gdGhhdCBhbmQgSSdsbCBkcm9wIHRoZXNlIHBhdGNoZXMgYW5kIGxldCB5b3UgcmUt
-c2VuZCB0aGVtLg0KPiANCj4gQWxpc3RhaXINCj4gDQoNClRoYW5rcyBmb3IgZml4aW5nIHRoaXMg
-aXNzdWUuIEkgdGVzdGVkIHlvdXIgcGF0Y2ggYW5kIGl0IHNlZW1zIHRvIHdvcmsgYXMNCkludGVu
-ZGVkIGFuZCAgSSdtIGZpbmUgd2l0aCB5b3Ugc3F1YXNoaW5nIGl0IGludG8gdGhlIHBhdGNoLg0K
-DQpDb3JleQ0KDQo+ID4gLS0tDQo+ID4gIGh3L3Jpc2N2L3NpZml2ZV9lLmMgfCAzICsrLQ0KPiA+
-ICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+ID4NCj4g
-PiBkaWZmIC0tZ2l0IGEvaHcvcmlzY3Yvc2lmaXZlX2UuYyBiL2h3L3Jpc2N2L3NpZml2ZV9lLmMg
-aW5kZXgNCj4gPiBhMjU0Y2FkNDg5Li5iMGE2MTFhZGI5IDEwMDY0NA0KPiA+IC0tLSBhL2h3L3Jp
-c2N2L3NpZml2ZV9lLmMNCj4gPiArKysgYi9ody9yaXNjdi9zaWZpdmVfZS5jDQo+ID4gQEAgLTEy
-Myw3ICsxMjMsNyBAQCBzdGF0aWMgdm9pZCByaXNjdl9zaWZpdmVfZV9zb2NfaW5pdChPYmplY3Qg
-Km9iaikNCj4gPiAgICAgIG9iamVjdF9pbml0aWFsaXplX2NoaWxkKG9iaiwgImNwdXMiLCAmcy0+
-Y3B1cywNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNpemVvZihzLT5jcHVzKSwg
-VFlQRV9SSVNDVl9IQVJUX0FSUkFZLA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-JmVycm9yX2Fib3J0LCBOVUxMKTsNCj4gPiAtICAgIG9iamVjdF9wcm9wZXJ0eV9zZXRfc3RyKE9C
-SkVDVCgmcy0+Y3B1cyksIFNJRklWRV9FX0NQVSwgImNwdS10eXBlIiwNCj4gPiArICAgIG9iamVj
-dF9wcm9wZXJ0eV9zZXRfc3RyKE9CSkVDVCgmcy0+Y3B1cyksIG1zLT5jcHVfdHlwZSwNCj4gPiAr
-ICJjcHUtdHlwZSIsDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmZXJyb3JfYWJv
-cnQpOw0KPiA+ICAgICAgb2JqZWN0X3Byb3BlcnR5X3NldF9pbnQoT0JKRUNUKCZzLT5jcHVzKSwg
-bXMtPnNtcC5jcHVzLCAibnVtLQ0KPiBoYXJ0cyIsDQo+ID4gICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAmZXJyb3JfYWJvcnQpOyBAQCAtMjIwLDYgKzIyMCw3IEBAIHN0YXRpYw0KPiA+IHZv
-aWQgcmlzY3Zfc2lmaXZlX2VfbWFjaGluZV9pbml0KE1hY2hpbmVDbGFzcyAqbWMpDQo+ID4gICAg
-ICBtYy0+ZGVzYyA9ICJSSVNDLVYgQm9hcmQgY29tcGF0aWJsZSB3aXRoIFNpRml2ZSBFIFNESyI7
-DQo+ID4gICAgICBtYy0+aW5pdCA9IHJpc2N2X3NpZml2ZV9lX2luaXQ7DQo+ID4gICAgICBtYy0+
-bWF4X2NwdXMgPSAxOw0KPiA+ICsgICAgbWMtPmRlZmF1bHRfY3B1X3R5cGUgPSBTSUZJVkVfRV9D
-UFU7DQo+ID4gIH0NCj4gPg0KPiA+ICBERUZJTkVfTUFDSElORSgic2lmaXZlX2UiLCByaXNjdl9z
-aWZpdmVfZV9tYWNoaW5lX2luaXQpDQo+ID4gLS0NCj4gPiAyLjIxLjENCj4gPg0KPiA+DQo=
+* Yan Zhao (yan.y.zhao@intel.com) wrote:
+> On Tue, Apr 21, 2020 at 08:08:49PM +0800, Tian, Kevin wrote:
+> > > From: Yan Zhao
+> > > Sent: Tuesday, April 21, 2020 10:37 AM
+> > > 
+> > > On Tue, Apr 21, 2020 at 06:56:00AM +0800, Alex Williamson wrote:
+> > > > On Sun, 19 Apr 2020 21:24:57 -0400
+> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > >
+> > > > > On Fri, Apr 17, 2020 at 07:24:57PM +0800, Cornelia Huck wrote:
+> > > > > > On Fri, 17 Apr 2020 05:52:02 -0400
+> > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > >
+> > > > > > > On Fri, Apr 17, 2020 at 04:44:50PM +0800, Cornelia Huck wrote:
+> > > > > > > > On Mon, 13 Apr 2020 01:52:01 -0400
+> > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > > >
+> > > > > > > > > This patchset introduces a migration_version attribute under sysfs
+> > > of VFIO
+> > > > > > > > > Mediated devices.
+> > > > > > > > >
+> > > > > > > > > This migration_version attribute is used to check migration
+> > > compatibility
+> > > > > > > > > between two mdev devices.
+> > > > > > > > >
+> > > > > > > > > Currently, it has two locations:
+> > > > > > > > > (1) under mdev_type node,
+> > > > > > > > >     which can be used even before device creation, but only for
+> > > mdev
+> > > > > > > > >     devices of the same mdev type.
+> > > > > > > > > (2) under mdev device node,
+> > > > > > > > >     which can only be used after the mdev devices are created, but
+> > > the src
+> > > > > > > > >     and target mdev devices are not necessarily be of the same
+> > > mdev type
+> > > > > > > > > (The second location is newly added in v5, in order to keep
+> > > consistent
+> > > > > > > > > with the migration_version node for migratable pass-though
+> > > devices)
+> > > > > > > >
+> > > > > > > > What is the relationship between those two attributes?
+> > > > > > > >
+> > > > > > > (1) is for mdev devices specifically, and (2) is provided to keep the
+> > > same
+> > > > > > > sysfs interface as with non-mdev cases. so (2) is for both mdev
+> > > devices and
+> > > > > > > non-mdev devices.
+> > > > > > >
+> > > > > > > in future, if we enable vfio-pci vendor ops, (i.e. a non-mdev device
+> > > > > > > is binding to vfio-pci, but is able to register migration region and do
+> > > > > > > migration transactions from a vendor provided affiliate driver),
+> > > > > > > the vendor driver would export (2) directly, under device node.
+> > > > > > > It is not able to provide (1) as there're no mdev devices involved.
+> > > > > >
+> > > > > > Ok, creating an alternate attribute for non-mdev devices makes sense.
+> > > > > > However, wouldn't that rather be a case (3)? The change here only
+> > > > > > refers to mdev devices.
+> > > > > >
+> > > > > as you pointed below, (3) and (2) serve the same purpose.
+> > > > > and I think a possible usage is to migrate between a non-mdev device and
+> > > > > an mdev device. so I think it's better for them both to use (2) rather
+> > > > > than creating (3).
+> > > >
+> > > > An mdev type is meant to define a software compatible interface, so in
+> > > > the case of mdev->mdev migration, doesn't migrating to a different type
+> > > > fail the most basic of compatibility tests that we expect userspace to
+> > > > perform?  IOW, if two mdev types are migration compatible, it seems a
+> > > > prerequisite to that is that they provide the same software interface,
+> > > > which means they should be the same mdev type.
+> > > >
+> > > > In the hybrid cases of mdev->phys or phys->mdev, how does a
+> > > management
+> > > > tool begin to even guess what might be compatible?  Are we expecting
+> > > > libvirt to probe ever device with this attribute in the system?  Is
+> > > > there going to be a new class hierarchy created to enumerate all
+> > > > possible migrate-able devices?
+> > > >
+> > > yes, management tool needs to guess and test migration compatible
+> > > between two devices. But I think it's not the problem only for
+> > > mdev->phys or phys->mdev. even for mdev->mdev, management tool needs
+> > > to
+> > > first assume that the two mdevs have the same type of parent devices
+> > > (e.g.their pciids are equal). otherwise, it's still enumerating
+> > > possibilities.
+> > > 
+> > > on the other hand, for two mdevs,
+> > > mdev1 from pdev1, its mdev_type is 1/2 of pdev1;
+> > > mdev2 from pdev2, its mdev_type is 1/4 of pdev2;
+> > > if pdev2 is exactly 2 times of pdev1, why not allow migration between
+> > > mdev1 <-> mdev2.
+> > 
+> > How could the manage tool figure out that 1/2 of pdev1 is equivalent 
+> > to 1/4 of pdev2? If we really want to allow such thing happen, the best
+> > choice is to report the same mdev type on both pdev1 and pdev2.
+> I think that's exactly the value of this migration_version interface.
+> the management tool can take advantage of this interface to know if two
+> devices are migration compatible, no matter they are mdevs, non-mdevs,
+> or mix.
+> 
+> as I know, (please correct me if not right), current libvirt still
+> requires manually generating mdev devices, and it just duplicates src vm
+> configuration to the target vm.
+> for libvirt, currently it's always phys->phys and mdev->mdev (and of the
+> same mdev type).
+> But it does not justify that hybrid cases should not be allowed. otherwise,
+> why do we need to introduce this migration_version interface and leave
+> the judgement of migration compatibility to vendor driver? why not simply
+> set the criteria to something like "pciids of parent devices are equal,
+> and mdev types are equal" ?
+> 
+> 
+> > btw mdev<->phys just brings trouble to upper stack as Alex pointed out. 
+> could you help me understand why it will bring trouble to upper stack?
+> 
+> I think it just needs to read src migration_version under src dev node,
+> and test it in target migration version under target dev node. 
+> 
+> after all, through this interface we just help the upper layer
+> knowing available options through reading and testing, and they decide
+> to use it or not.
+> 
+> > Can we simplify the requirement by allowing only mdev<->mdev and 
+> > phys<->phys migration? If an customer does want to migrate between a 
+> > mdev and phys, he could wrap physical device into a wrapped mdev 
+> > instance (with the same type as the source mdev) instead of using vendor 
+> > ops. Doing so does add some burden but if mdev<->phys is not dominant 
+> > usage then such tradeoff might be worthywhile...
+> >
+> If the interfaces for phys<->phys and mdev<->mdev are consistent, it makes no
+> difference to phys<->mdev, right?
+> I think the vendor string for a mdev device is something like:
+> "Parent PCIID + mdev type + software version", and
+> that for a phys device is something like:
+> "PCIID + software version".
+> as long as we don't migrate between devices from different vendors, it's
+> easy for vendor driver to tell if a phys device is migration compatible
+> to a mdev device according it supports it or not.
+
+It surprises me that the PCIID matching is a requirement; I'd assumed
+with this clever mdev name setup that you could migrate between two
+different models in a series, or to a newer model, as long as they
+both supported the same mdev view.
+
+Dave
+
+> 
+> Thanks
+> Yan
+> > 
+> > > 
+> > > 
+> > > > I agree that there was a gap in the previous proposal for non-mdev
+> > > > devices, but I think this bring a lot of questions that we need to
+> > > > puzzle through and libvirt will need to re-evaluate how they might
+> > > > decide to pick a migration target device.  For example, I'm sure
+> > > > libvirt would reject any policy decisions regarding picking a physical
+> > > > device versus an mdev device.  Had we previously left it that only a
+> > > > layer above libvirt would select a target device and libvirt only tests
+> > > > compatibility to that target device?
+> > > I'm not sure if there's a layer above libvirt would select a target
+> > > device. but if there is such a layer (even it's human), we need to
+> > > provide an interface for them to know whether their decision is suitable
+> > > for migration. The migration_version interface provides a potential to
+> > > allow mdev->phys migration, even libvirt may currently reject it.
+> > > 
+> > > 
+> > > > We also need to consider that this expands the namespace.  If we no
+> > > > longer require matching types as the first level of comparison, then
+> > > > vendor migration strings can theoretically collide.  How do we
+> > > > coordinate that can't happen?  Thanks,
+> > > yes, it's indeed a problem.
+> > > could only allowing migration beteen devices from the same vendor be a
+> > > good
+> > > prerequisite?
+> > > 
+> > > Thanks
+> > > Yan
+> > > >
+> > > > > > > > Is existence (and compatibility) of (1) a pre-req for possible
+> > > > > > > > existence (and compatibility) of (2)?
+> > > > > > > >
+> > > > > > > no. (2) does not reply on (1).
+> > > > > >
+> > > > > > Hm. Non-existence of (1) seems to imply "this type does not support
+> > > > > > migration". If an mdev created for such a type suddenly does support
+> > > > > > migration, it feels a bit odd.
+> > > > > >
+> > > > > yes. but I think if the condition happens, it should be reported a bug
+> > > > > to vendor driver.
+> > > > > should I add a line in the doc like "vendor driver should ensure that the
+> > > > > migration compatibility from migration_version under mdev_type should
+> > > be
+> > > > > consistent with that from migration_version under device node" ?
+> > > > >
+> > > > > > (It obviously cannot be a prereq for what I called (3) above.)
+> > > > > >
+> > > > > > >
+> > > > > > > > Does userspace need to check (1) or can it completely rely on (2), if
+> > > > > > > > it so chooses?
+> > > > > > > >
+> > > > > > > I think it can completely reply on (2) if compatibility check before
+> > > > > > > mdev creation is not required.
+> > > > > > >
+> > > > > > > > If devices with a different mdev type are indeed compatible, it
+> > > seems
+> > > > > > > > userspace can only find out after the devices have actually been
+> > > > > > > > created, as (1) does not apply?
+> > > > > > > yes, I think so.
+> > > > > >
+> > > > > > How useful would it be for userspace to even look at (1) in that case?
+> > > > > > It only knows if things have a chance of working if it actually goes
+> > > > > > ahead and creates devices.
+> > > > > >
+> > > > > hmm, is it useful for userspace to test the migration_version under mdev
+> > > > > type before it knows what mdev device to generate ?
+> > > > > like when the userspace wants to migrate an mdev device in src vm,
+> > > > > but it has not created target vm and the target mdev device.
+> > > > >
+> > > > > > >
+> > > > > > > > One of my worries is that the existence of an attribute with the
+> > > same
+> > > > > > > > name in two similar locations might lead to confusion. But maybe it
+> > > > > > > > isn't a problem.
+> > > > > > > >
+> > > > > > > Yes, I have the same feeling. but as (2) is for sysfs interface
+> > > > > > > consistency, to make it transparent to userspace tools like libvirt,
+> > > > > > > I guess the same name is necessary?
+> > > > > >
+> > > > > > What do we actually need here, I wonder? (1) and (2) seem to serve
+> > > > > > slightly different purposes, while (2) and what I called (3) have the
+> > > > > > same purpose. Is it important to userspace that (1) and (2) have the
+> > > > > > same name?
+> > > > > so change (1) to migration_type_version and (2) to
+> > > > > migration_instance_version?
+> > > > > But as they are under different locations, could that location imply
+> > > > > enough information?
+> > > > >
+> > > > >
+> > > > > Thanks
+> > > > > Yan
+> > > > >
+> > > > >
+> > > >
+> > > _______________________________________________
+> > > intel-gvt-dev mailing list
+> > > intel-gvt-dev@lists.freedesktop.org
+> > > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
