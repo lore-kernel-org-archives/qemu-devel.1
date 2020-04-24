@@ -6,78 +6,79 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 992BCC55186
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 08:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EED1C55186
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 09:04:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62BEF20736
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 08:57:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE45020724
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 09:04:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="izQVrZoW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62BEF20736
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NEBqxurT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE45020724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRu9f-0002dP-HJ
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 04:57:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36918)
+	id 1jRuG5-0006Bz-VJ
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 05:04:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46976)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jRtwE-00062f-HH
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 04:43:59 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jRuFC-0005GR-BQ
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:03:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jRtw2-0002B0-9b
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 04:43:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43913
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <cohuck@redhat.com>) id 1jRuFB-0005JD-CI
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:03:34 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58161
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jRtw1-00026M-Lr
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 04:43:45 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jRuF9-0005E7-MZ
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:03:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587717824;
+ s=mimecast20190719; t=1587719008;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zgFMq8bQpgJdbXdZXsZY6rZNQAS4ggeYICAj4u3G42c=;
- b=izQVrZoWqrvKqKFgWirGAzzTBpDo9/aK6re1M9eLkHrC2gpiTEkNN1xx6wAPtkdBKPndaH
- +uQpUD8Thinmli8i0I3EddnRiOxHukB2DPdRPpBdGmyuFHMr5pO3s/a9m72VUNr1Y37PGG
- uS8DiK3JIxLt+eYqRE7M/xUCmcmEzY8=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=6U2rzUlOkf0vsj1al/PPdjPoH81uzBo5LIRE8RJ8g/0=;
+ b=NEBqxurT6YcPAMW0lvpE6CHVhlreBi2kTcuOXrgGX4dsw4nExlyGADtVu0iixxEWUn5QKj
+ qOt2JeUXLR1dXPEzZQGdN2qBcc37l3a0UtdL0bKh06tqlCcf9pOQKsyKRsITFicW5iczxc
+ l1hGH0LL6zLobv2HF6sU2iAx/5EawEU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-155-B_g4EV3rM7uM_O_2LePAhg-1; Fri, 24 Apr 2020 04:43:43 -0400
-X-MC-Unique: B_g4EV3rM7uM_O_2LePAhg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-445-5dEwdAcbPxiKXLPSWK_YYQ-1; Fri, 24 Apr 2020 05:03:24 -0400
+X-MC-Unique: 5dEwdAcbPxiKXLPSWK_YYQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A2738005B7;
- Fri, 24 Apr 2020 08:43:42 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E6DA35D70C;
- Fri, 24 Apr 2020 08:43:41 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id DF49611358C1; Fri, 24 Apr 2020 10:43:38 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 05/15] qapi: Polish prose in visitor.h
-Date: Fri, 24 Apr 2020 10:43:28 +0200
-Message-Id: <20200424084338.26803-6-armbru@redhat.com>
-In-Reply-To: <20200424084338.26803-1-armbru@redhat.com>
-References: <20200424084338.26803-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FDAD800D24;
+ Fri, 24 Apr 2020 09:03:22 +0000 (UTC)
+Received: from localhost (ovpn-112-240.ams2.redhat.com [10.36.112.240])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B53966084A;
+ Fri, 24 Apr 2020 09:03:18 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [PATCH] hw: add compat machines for 5.1
+Date: Fri, 24 Apr 2020 11:03:14 +0200
+Message-Id: <20200424090314.544-1-cohuck@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 03:07:34
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 03:11:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,187 +90,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mdroth@linux.vnet.ibm.com
+Cc: qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- include/qapi/visitor.h | 104 +++++++++++++++++++++--------------------
- 1 file changed, 54 insertions(+), 50 deletions(-)
+Add 5.1 machine types for arm/i440fx/q35/s390x/spapr.
 
-diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
-index 09df7099c6..a425ea514c 100644
---- a/include/qapi/visitor.h
-+++ b/include/qapi/visitor.h
-@@ -25,19 +25,21 @@
-  * for doing work at each node of a QAPI graph; it can also be used
-  * for a virtual walk, where there is no actual QAPI C struct.
-  *
-- * There are four kinds of visitor classes: input visitors (QObject,
-- * string, and QemuOpts) parse an external representation and build
-- * the corresponding QAPI graph, output visitors (QObject and string) take
-- * a completed QAPI graph and generate an external representation, the
-- * dealloc visitor can take a QAPI graph (possibly partially
-- * constructed) and recursively free its resources, and the clone
-- * visitor performs a deep clone of one QAPI object to another.  While
-- * the dealloc and QObject input/output visitors are general, the string,
-- * QemuOpts, and clone visitors have some implementation limitations;
-- * see the documentation for each visitor for more details on what it
-- * supports.  Also, see visitor-impl.h for the callback contracts
-- * implemented by each visitor, and docs/devel/qapi-code-gen.txt for more
-- * about the QAPI code generator.
-+ * There are four kinds of visitors: input visitors (QObject, string,
-+ * and QemuOpts) parse an external representation and build the
-+ * corresponding QAPI object, output visitors (QObject and string)
-+ * take a QAPI object and generate an external representation, the
-+ * dealloc visitor takes a QAPI object (possibly partially
-+ * constructed) and recursively frees it, and the clone visitor
-+ * performs a deep clone of a QAPI object.
-+ *
-+ * While the dealloc and QObject input/output visitors are general,
-+ * the string, QemuOpts, and clone visitors have some implementation
-+ * limitations; see the documentation for each visitor for more
-+ * details on what it supports.  Also, see visitor-impl.h for the
-+ * callback contracts implemented by each visitor, and
-+ * docs/devel/qapi-code-gen.txt for more about the QAPI code
-+ * generator.
-  *
-  * All of the visitors are created via:
-  *
-@@ -45,11 +47,15 @@
-  *
-  * A visitor should be used for exactly one top-level visit_type_FOO()
-  * or virtual walk; if that is successful, the caller can optionally
-- * call visit_complete() (for now, useful only for output visits, but
-- * safe to call on all visits).  Then, regardless of success or
-- * failure, the user should call visit_free() to clean up resources.
-- * It is okay to free the visitor without completing the visit, if
-- * some other error is detected in the meantime.
-+ * call visit_complete() (useful only for output visits, but safe to
-+ * call on all visits).  Then, regardless of success or failure, the
-+ * user should call visit_free() to clean up resources.  It is okay to
-+ * free the visitor without completing the visit, if some other error
-+ * is detected in the meantime.
-+ *
-+ * The clone and dealloc visitor should not be used directly outside
-+ * of QAPI code.  Use the qapi_free_FOO() and QAPI_CLONE() instead,
-+ * described below.
-  *
-  * All QAPI types have a corresponding function with a signature
-  * roughly compatible with this:
-@@ -68,22 +74,26 @@
-  * alternate, @name should equal the name used for visiting the
-  * alternate.
-  *
-- * The visit_type_FOO() functions expect a non-null @obj argument;
-- * they allocate *@obj during input visits, leave it unchanged on
-- * output visits, and recursively free any resources during a dealloc
-- * visit.  Each function also takes the customary @errp argument (see
-+ * The visit_type_FOO() functions take a non-null @obj argument; they
-+ * allocate *@obj during input visits, leave it unchanged during
-+ * output and clone visits, and free it (recursively) during a dealloc
-+ * visit.
-+ *
-+ * Each function also takes the customary @errp argument (see
-  * qapi/error.h for details), for reporting any errors (such as if a
-  * member @name is not present, or is present but not the specified
-  * type).
-  *
-  * If an error is detected during visit_type_FOO() with an input
-- * visitor, then *@obj will be NULL for pointer types, and left
-- * unchanged for scalar types.  Using an output or clone visitor with
-- * an incomplete object has undefined behavior (other than a special
-- * case for visit_type_str() treating NULL like ""), while the dealloc
-- * visitor safely handles incomplete objects.  Since input visitors
-- * never produce an incomplete object, such an object is possible only
-- * by manual construction.
-+ * visitor, then *@obj will be set to NULL for pointer types, and left
-+ * unchanged for scalar types.
-+ *
-+ * Using an output or clone visitor with an incomplete object has
-+ * undefined behavior (other than a special case for visit_type_str()
-+ * treating NULL like ""), while the dealloc visitor safely handles
-+ * incomplete objects.  Since input visitors never produce an
-+ * incomplete object, such an object is possible only by manual
-+ * construction.
-  *
-  * For the QAPI object types (structs, unions, and alternates), there
-  * is an additional generated function in qapi-visit-MODULE.h
-@@ -100,23 +110,20 @@
-  *
-  * void qapi_free_FOO(FOO *obj);
-  *
-- * where behaves like free() in that @obj may be NULL.  Such objects
-- * may also be used with the following macro, provided alongside the
-- * clone visitor:
-+ * Does nothing when @obj is NULL.
-+ *
-+ * Such objects may also be used with macro
-  *
-  * Type *QAPI_CLONE(Type, src);
-  *
-- * in order to perform a deep clone of @src.  Because of the generated
-- * qapi_free functions and the QAPI_CLONE() macro, the clone and
-- * dealloc visitor should not be used directly outside of QAPI code.
-+ * in order to perform a deep clone of @src.
-  *
-- * QAPI types can also inherit from a base class; when this happens, a
-- * function is generated for easily going from the derived type to the
-- * base type:
-+ * For QAPI types can that inherit from a base type, a function is
-+ * generated for going from the derived type to the base type:
-  *
-  * BASE *qapi_CHILD_base(CHILD *obj);
-  *
-- * For a real QAPI struct, typical input usage involves:
-+ * Typical input visitor usage involves:
-  *
-  * <example>
-  *  Foo *f;
-@@ -153,7 +160,7 @@
-  *  qapi_free_FooList(l);
-  * </example>
-  *
-- * Similarly, typical output usage is:
-+ * Typical output visitor usage:
-  *
-  * <example>
-  *  Foo *f =3D ...obtain populated object...
-@@ -172,17 +179,8 @@
-  *  visit_free(v);
-  * </example>
-  *
-- * When visiting a real QAPI struct, this file provides several
-- * helpers that rely on in-tree information to control the walk:
-- * visit_optional() for the 'has_member' field associated with
-- * optional 'member' in the C struct; and visit_next_list() for
-- * advancing through a FooList linked list.  Similarly, the
-- * visit_is_input() helper makes it possible to write code that is
-- * visitor-agnostic everywhere except for cleanup.  Only the generated
-- * visit_type functions need to use these helpers.
-- *
-  * It is also possible to use the visitors to do a virtual walk, where
-- * no actual QAPI struct is present.  In this situation, decisions
-+ * no actual QAPI object is present.  In this situation, decisions
-  * about what needs to be walked are made by the calling code, and
-  * structured visits are split between pairs of start and end methods
-  * (where the end method must be called if the start function
-@@ -227,6 +225,12 @@
-  * out:
-  *  visit_free(v);
-  * </example>
-+ *
-+ * This file provides helpers for use by the generated
-+ * visit_type_FOO(): visit_optional() for the 'has_member' field
-+ * associated with optional 'member' in the C struct,
-+ * visit_next_list() for advancing through a FooList linked list, and
-+ * visit_is_input() for cleaning up on failure.
-  */
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+
+Still keeping the default cpu model version on x86 at v1.
+
+I'll queue this to my s390-next branch, as I'm planning to send a pull
+req as soon as 5.0 is out; if someone else wants to queue this, we'll
+figure it out :)
+
+---
+ hw/arm/virt.c              |  9 ++++++++-
+ hw/core/machine.c          |  3 +++
+ hw/i386/pc.c               |  3 +++
+ hw/i386/pc_piix.c          | 14 +++++++++++++-
+ hw/i386/pc_q35.c           | 13 ++++++++++++-
+ hw/ppc/spapr.c             | 15 +++++++++++++--
+ hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
+ include/hw/boards.h        |  3 +++
+ include/hw/i386/pc.h       |  3 +++
+ 9 files changed, 71 insertions(+), 6 deletions(-)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 7dc96abf72cf..5e84c09402dd 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2309,15 +2309,22 @@ static void machvirt_machine_init(void)
+ }
+ type_init(machvirt_machine_init);
 =20
- /*** Useful types ***/
++static void virt_machine_5_1_options(MachineClass *mc)
++{
++}
++DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
++
+ static void virt_machine_5_0_options(MachineClass *mc)
+ {
+     static GlobalProperty compat[] =3D {
+         { TYPE_TPM_TIS_SYSBUS, "ppi", "false" },
+     };
+=20
++    virt_machine_5_1_options(mc);
++    compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+     compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+ }
+-DEFINE_VIRT_MACHINE_AS_LATEST(5, 0)
++DEFINE_VIRT_MACHINE(5, 0)
+=20
+ static void virt_machine_4_2_options(MachineClass *mc)
+ {
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index c1a444cb7558..7a50dd518f4c 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -28,6 +28,9 @@
+ #include "hw/mem/nvdimm.h"
+ #include "migration/vmstate.h"
+=20
++GlobalProperty hw_compat_5_0[] =3D {};
++const size_t hw_compat_5_0_len =3D G_N_ELEMENTS(hw_compat_5_0);
++
+ GlobalProperty hw_compat_4_2[] =3D {
+     { "virtio-blk-device", "queue-size", "128"},
+     { "virtio-scsi-device", "virtqueue_size", "128"},
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 5143c516531e..13e1d18cd758 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -94,6 +94,9 @@
+ #include "fw_cfg.h"
+ #include "trace.h"
+=20
++GlobalProperty pc_compat_5_0[] =3D {};
++const size_t pc_compat_5_0_len =3D G_N_ELEMENTS(pc_compat_5_0);
++
+ GlobalProperty pc_compat_4_2[] =3D {
+     { "mch", "smbase-smram", "off" },
+ };
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 22dee0e76c62..921caa502b85 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -419,7 +419,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
+ }
+=20
+-static void pc_i440fx_5_0_machine_options(MachineClass *m)
++static void pc_i440fx_5_1_machine_options(MachineClass *m)
+ {
+     PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+     pc_i440fx_machine_options(m);
+@@ -428,6 +428,18 @@ static void pc_i440fx_5_0_machine_options(MachineClass=
+ *m)
+     pcmc->default_cpu_version =3D 1;
+ }
+=20
++DEFINE_I440FX_MACHINE(v5_1, "pc-i440fx-5.1", NULL,
++                      pc_i440fx_5_1_machine_options);
++
++static void pc_i440fx_5_0_machine_options(MachineClass *m)
++{
++    pc_i440fx_5_1_machine_options(m);
++    m->alias =3D NULL;
++    m->is_default =3D false;
++    compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
++    compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
++}
++
+ DEFINE_I440FX_MACHINE(v5_0, "pc-i440fx-5.0", NULL,
+                       pc_i440fx_5_0_machine_options);
+=20
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index d37c425e2236..253688a9b8f3 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -349,7 +349,7 @@ static void pc_q35_machine_options(MachineClass *m)
+     m->max_cpus =3D 288;
+ }
+=20
+-static void pc_q35_5_0_machine_options(MachineClass *m)
++static void pc_q35_5_1_machine_options(MachineClass *m)
+ {
+     PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+     pc_q35_machine_options(m);
+@@ -357,6 +357,17 @@ static void pc_q35_5_0_machine_options(MachineClass *m=
+)
+     pcmc->default_cpu_version =3D 1;
+ }
+=20
++DEFINE_Q35_MACHINE(v5_1, "pc-q35-5.1", NULL,
++                   pc_q35_5_1_machine_options);
++
++static void pc_q35_5_0_machine_options(MachineClass *m)
++{
++    pc_q35_5_1_machine_options(m);
++    m->alias =3D NULL;
++    compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
++    compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
++}
++
+ DEFINE_Q35_MACHINE(v5_0, "pc-q35-5.0", NULL,
+                    pc_q35_5_0_machine_options);
+=20
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 9a2bd501aa6e..fd5bfd11a84c 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -4599,15 +4599,26 @@ static void spapr_machine_latest_class_options(Mach=
+ineClass *mc)
+     }                                                                \
+     type_init(spapr_machine_register_##suffix)
+=20
++/*
++ * pseries-5.1
++ */
++static void spapr_machine_5_1_class_options(MachineClass *mc)
++{
++    /* Defaults for the latest behaviour inherited from the base class */
++}
++
++DEFINE_SPAPR_MACHINE(5_1, "5.1", true);
++
+ /*
+  * pseries-5.0
+  */
+ static void spapr_machine_5_0_class_options(MachineClass *mc)
+ {
+-    /* Defaults for the latest behaviour inherited from the base class */
++    spapr_machine_5_1_class_options(mc);
++    compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+ }
+=20
+-DEFINE_SPAPR_MACHINE(5_0, "5.0", true);
++DEFINE_SPAPR_MACHINE(5_0, "5.0", false);
+=20
+ /*
+  * pseries-4.2
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 0fa00a9fff3d..967a6de9683b 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -672,14 +672,26 @@ bool css_migration_enabled(void)
+     }                                                                     =
+    \
+     type_init(ccw_machine_register_##suffix)
+=20
++static void ccw_machine_5_1_instance_options(MachineState *machine)
++{
++}
++
++static void ccw_machine_5_1_class_options(MachineClass *mc)
++{
++}
++DEFINE_CCW_MACHINE(5_1, "5.1", true);
++
+ static void ccw_machine_5_0_instance_options(MachineState *machine)
+ {
++    ccw_machine_5_1_instance_options(machine);
+ }
+=20
+ static void ccw_machine_5_0_class_options(MachineClass *mc)
+ {
++    ccw_machine_5_1_class_options(mc);
++    compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+ }
+-DEFINE_CCW_MACHINE(5_0, "5.0", true);
++DEFINE_CCW_MACHINE(5_0, "5.0", false);
+=20
+ static void ccw_machine_4_2_instance_options(MachineState *machine)
+ {
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index fd4d62b5010f..18815d9be24f 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -318,6 +318,9 @@ struct MachineState {
+     } \
+     type_init(machine_initfn##_register_types)
+=20
++extern GlobalProperty hw_compat_5_0[];
++extern const size_t hw_compat_5_0_len;
++
+ extern GlobalProperty hw_compat_4_2[];
+ extern const size_t hw_compat_4_2_len;
+=20
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 6ab6eda046fd..15b9294dac38 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -204,6 +204,9 @@ void pc_system_firmware_init(PCMachineState *pcms, Memo=
+ryRegion *rom_memory);
+ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+                        const CPUArchIdList *apic_ids, GArray *entry);
+=20
++extern GlobalProperty pc_compat_5_0[];
++extern const size_t pc_compat_5_0_len;
++
+ extern GlobalProperty pc_compat_4_2[];
+ extern const size_t pc_compat_4_2_len;
+=20
 --=20
 2.21.1
 
