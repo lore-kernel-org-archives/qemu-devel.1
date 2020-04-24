@@ -2,103 +2,95 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38D04C54FD0
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 13:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7513DC54FCB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 13:24:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0062220767
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 13:22:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40FCB205C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 13:24:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dpfJHXUJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0062220767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ivlctq7i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40FCB205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRyHc-0006Ac-3L
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 09:22:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53912)
+	id 1jRyJH-0007mv-F2
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 09:24:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54552)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1jRyGu-0005Zt-RA
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 09:21:37 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jRyIS-0006yu-Jw
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 09:23:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1jRyGt-0004su-SE
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 09:21:36 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:48780)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1jRyGt-0004sV-9F
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 09:21:35 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03ODId71072555;
- Fri, 24 Apr 2020 13:21:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2020-01-29; bh=XkNbRblOH6CyMFzWG+aDklpkoEO8eWM0dSjNI8/Rl7I=;
- b=dpfJHXUJCACs2w9zcTwOeMP5UBBgU3Lj0idr8R23qdI55QXHR54BmW8f+gHPaJtyK3KW
- o6H+hq9+BwKv4mVGZVu25VtGxchJAxWnxAiOKkS/Bvm8pwOyITqmLgQCaPR0l3Dh8yVE
- lcJ6dnrGbfmRIZSARMqcSgwbbwFSr/uAAnHWvVCrvje5pJ9tZAY/wBOLaUCghk7mwX+f
- Td2C42UBU/w8yDq3ViXE2/scFTK4wZPtHwRiyr194dr8/AYOLX3bdgyOzDysOc8WoT2k
- bkG3OICN2M76UJLBXTsgEPDB7zq2OcKhlzJpX+w/pbfiCybTPilg5fIaG6IDO7VwWQ8t Yg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 30jvq5120k-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 24 Apr 2020 13:21:33 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03ODGfXq182004;
- Fri, 24 Apr 2020 13:19:33 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3020.oracle.com with ESMTP id 30gbbq5ef4-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 24 Apr 2020 13:19:33 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03ODJWoQ023264;
- Fri, 24 Apr 2020 13:19:32 GMT
-Received: from dhcp-10-39-221-180.vpn.oracle.com (/10.39.221.180)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 24 Apr 2020 06:19:32 -0700
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-Subject: Re: [PATCH 5/7] chardev: Extract system emulation specific code
-From: Jag Raman <jag.raman@oracle.com>
-In-Reply-To: <20200423202112.644-6-philmd@redhat.com>
-Date: Fri, 24 Apr 2020 09:19:30 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jRyIR-0006uv-N7
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 09:23:12 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45549)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jRyIR-0006qf-1t
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 09:23:11 -0400
+Received: by mail-wr1-x442.google.com with SMTP id t14so10762081wrw.12
+ for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 06:23:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=wixBzal9tsivTqUJhXcbaIrRxfzuIbR6n5EuseLtOO0=;
+ b=ivlctq7ijYC++HGgPI5VBV4KK/aVmdUT0RXzcbqEP4JXSgODjcwWq/J95mupmosoKz
+ qniWi6T9mq3zBRcgJ/OO7kssqgCjQyqPAgCmZxpIl2AaQmjThUD/O9hzjFFO183sPRmQ
+ nZ1DFFhRXGjvFyep7+UMUKJ8K2WhoYCBzTErfYZEwNFKkGL6LLg4OKk9Qyn1+aHmIWli
+ yFtqFa84eFg5dPcFBoXMF6zsg33aGzgFWfiNgG/p/IkW6jHeprSN7Vej4dk0WS/YIHF8
+ jWkIyeSrRs/n3gPMCadydImu76Zqj20sIiq9lyNcLcNXeaBoaLIeTsPOnayd0RKldQQW
+ CPSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=wixBzal9tsivTqUJhXcbaIrRxfzuIbR6n5EuseLtOO0=;
+ b=D8iaMEORMgVt/aQ2PbR4/v7J3eFBSG1OiOJb0k9Yez3PMthOoUMXp5tOz965tv5T8b
+ ZWVKb00RyeU4VAPTj1ZPa4gQvuQUZmfc05lhDQHtIw1F4/WcwsyW6QPNBVYYXmXKnTnh
+ uGlPXNZC6L67+M6cBmxtrK1bqdLDWY1mkocah+OFTT+vMpq5jaJK9P2Ap+/+xNAnyUgZ
+ e8nyqZC1mluvPgZNyYwq1FgcAPx4GaSea/nKNvhogGSZYgtGeJzKbrcK+bNLwsIBv13b
+ s6/4nH8fTsBUklDxxm5YV5pO9OyZ4A9m10z29bVwuhVE105ditmn14efZlZyeDYvtWF8
+ 18mA==
+X-Gm-Message-State: AGi0PuZ8317F/Ei+r2lC0ScGtKPyeIss4lEVYbo8e8P7cLEzQIrwB9hT
+ 3gk+htvYCjOhw0gBqdnQNjf+qQ==
+X-Google-Smtp-Source: APiQypI/j5bo6/ivgE3U0AvPBLpA1kT6dh4GNBPvtNcjWLYOYn/Onq6E+YGKLgGEZ1v331kC2GTn6w==
+X-Received: by 2002:a5d:6b85:: with SMTP id n5mr11284855wrx.370.1587734589007; 
+ Fri, 24 Apr 2020 06:23:09 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id l9sm8266488wrq.83.2020.04.24.06.23.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 24 Apr 2020 06:23:07 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id A25D01FF7E;
+ Fri, 24 Apr 2020 14:23:06 +0100 (BST)
+References: <20200422011722.13287-1-richard.henderson@linaro.org>
+ <20200422011722.13287-14-richard.henderson@linaro.org>
+ <87ftcvb82k.fsf@linaro.org>
+ <df8292e5-5b27-31eb-1e4a-3e8f835481fc@linaro.org>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2 13/36] tcg: Use tcg_constant_{i32,i64} with tcg int
+ expanders
+In-reply-to: <df8292e5-5b27-31eb-1e4a-3e8f835481fc@linaro.org>
+Date: Fri, 24 Apr 2020 14:23:06 +0100
+Message-ID: <87d07x9fwl.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <3576CF15-BE7D-4ED4-AC3B-56806D17A2B5@oracle.com>
-References: <20200423202112.644-1-philmd@redhat.com>
- <20200423202112.644-6-philmd@redhat.com>
-To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-X-Mailer: Apple Mail (2.3445.9.1)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9600
- signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- malwarescore=0
- suspectscore=3 mlxlogscore=999 adultscore=0 mlxscore=0 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004240106
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9600
- signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- lowpriorityscore=0 malwarescore=0
- mlxscore=0 adultscore=0 mlxlogscore=999 phishscore=0 impostorscore=0
- clxscore=1011 bulkscore=0 spamscore=0 priorityscore=1501 suspectscore=3
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004240106
-Received-SPF: pass client-ip=141.146.126.78; envelope-from=jag.raman@oracle.com;
- helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 09:21:34
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,230 +102,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- John G Johnson <john.g.johnson@oracle.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-> On Apr 23, 2020, at 4:21 PM, Philippe Mathieu-Daud=C3=A9 =
-<philmd@redhat.com> wrote:
->=20
-> Split out code only used during system emulation,
-> to reduce code pulled in user emulation and tools.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> chardev/chardev-internal.h |  3 ++
-> chardev/char.c             | 35 +------------------
-> chardev/chardev-sysemu.c   | 69 ++++++++++++++++++++++++++++++++++++++
-> chardev/Makefile.objs      |  1 +
-> 4 files changed, 74 insertions(+), 34 deletions(-)
-> create mode 100644 chardev/chardev-sysemu.c
->=20
-> diff --git a/chardev/chardev-internal.h b/chardev/chardev-internal.h
-> index e0264ac349..f4d0429763 100644
-> --- a/chardev/chardev-internal.h
-> +++ b/chardev/chardev-internal.h
-> @@ -26,6 +26,7 @@
->=20
-> #include "chardev/char.h"
-> #include "chardev/char-fe.h"
-> +#include "qom/object.h"
->=20
-> #define MAX_MUX 4
-> #define MUX_BUFFER_SIZE 32 /* Must be a power of 2.  */
-> @@ -59,4 +60,6 @@ typedef struct MuxChardev {
-> void mux_set_focus(Chardev *chr, int focus);
-> void mux_chr_send_all_event(Chardev *chr, QEMUChrEvent event);
->=20
-> +Object *get_chardevs_root(void);
-> +
-> #endif /* CHAR_MUX_H */
-> diff --git a/chardev/char.c b/chardev/char.c
-> index b672a41150..555bb0448e 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -44,7 +44,7 @@
-> /***********************************************************/
-> /* character device */
->=20
-> -static Object *get_chardevs_root(void)
-> +Object *get_chardevs_root(void)
-> {
->     return container_get(object_get_root(), "/chardevs");
-> }
-> @@ -300,33 +300,6 @@ static const TypeInfo char_type_info =3D {
->     .class_init =3D char_class_init,
-> };
->=20
-> -static int chardev_machine_done_notify_one(Object *child, void =
-*opaque)
-> -{
-> -    Chardev *chr =3D (Chardev *)child;
-> -    ChardevClass *class =3D CHARDEV_GET_CLASS(chr);
-> -
-> -    if (class->chr_machine_done) {
-> -        return class->chr_machine_done(chr);
-> -    }
-> -
-> -    return 0;
-> -}
-> -
-> -static void chardev_machine_done_hook(Notifier *notifier, void =
-*unused)
-> -{
-> -    int ret =3D object_child_foreach(get_chardevs_root(),
-> -                                   chardev_machine_done_notify_one, =
-NULL);
-> -
-> -    if (ret) {
-> -        error_report("Failed to call chardev machine_done hooks");
-> -        exit(1);
-> -    }
-> -}
-> -
-> -static Notifier chardev_machine_done_notify =3D {
-> -    .notify =3D chardev_machine_done_hook,
-> -};
-> -
-> static bool qemu_chr_is_busy(Chardev *s)
-> {
->     if (CHARDEV_IS_MUX(s)) {
-> @@ -1187,12 +1160,6 @@ void qemu_chr_cleanup(void)
-> static void register_types(void)
-> {
->     type_register_static(&char_type_info);
-> -
-> -    /* this must be done after machine init, since we register FEs =
-with muxes
-> -     * as part of realize functions like serial_isa_realizefn when =
--nographic
-> -     * is specified
-> -     */
-> -    =
-qemu_add_machine_init_done_notifier(&chardev_machine_done_notify);
-> }
->=20
-> type_init(register_types);
-> diff --git a/chardev/chardev-sysemu.c b/chardev/chardev-sysemu.c
-> new file mode 100644
-> index 0000000000..eecdc615ee
-> --- /dev/null
-> +++ b/chardev/chardev-sysemu.c
-> @@ -0,0 +1,69 @@
-> +/*
-> + * QEMU System Emulator
-> + *
-> + * Copyright (c) 2003-2008 Fabrice Bellard
-> + *
-> + * Permission is hereby granted, free of charge, to any person =
-obtaining a copy
-> + * of this software and associated documentation files (the =
-"Software"), to deal
-> + * in the Software without restriction, including without limitation =
-the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, =
-and/or sell
-> + * copies of the Software, and to permit persons to whom the Software =
-is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be =
-included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, =
-EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF =
-MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT =
-SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES =
-OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, =
-ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER =
-DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "sysemu/sysemu.h"
-> +#include "chardev/char.h"
-> +#include "qemu/error-report.h"
-> +#include "chardev-internal.h"
-> +
-> +static int chardev_machine_done_notify_one(Object *child, void =
-*opaque)
-> +{
-> +    Chardev *chr =3D (Chardev *)child;
-> +    ChardevClass *class =3D CHARDEV_GET_CLASS(chr);
-> +
-> +    if (class->chr_machine_done) {
-> +        return class->chr_machine_done(chr);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static void chardev_machine_done_hook(Notifier *notifier, void =
-*unused)
-> +{
-> +    int ret =3D object_child_foreach(get_chardevs_root(),
-> +                                   chardev_machine_done_notify_one, =
-NULL);
-> +
-> +    if (ret) {
-> +        error_report("Failed to call chardev machine_done hooks");
-> +        exit(1);
-> +    }
-> +}
-> +
-> +
-> +static Notifier chardev_machine_done_notify =3D {
-> +    .notify =3D chardev_machine_done_hook,
-> +};
-> +
-> +static void register_types(void)
-> +{
-> +    /*
-> +     * This must be done after machine init, since we register FEs =
-with muxes
-> +     * as part of realize functions like serial_isa_realizefn when =
--nographic
-> +     * is specified.
-> +     */
-> +    =
-qemu_add_machine_init_done_notifier(&chardev_machine_done_notify);
-> +}
-> +
-> +type_init(register_types);
+> On 4/22/20 1:04 PM, Alex Benn=C3=A9e wrote:
+>>=20
+>> Richard Henderson <richard.henderson@linaro.org> writes:
+>>=20
+>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>>=20
+>> We have a regression. Setting up a build dir with:
+>>=20
+>>   ../../configure --disable-tools --disable-docs --target-list=3Dsparc-s=
+oftmmu,sparc64-softmmu
+>>   make -j30 && make check-acceptance
+>>=20
+>> And then running a bisect between HEAD and master:
+>>=20
+>>   git bisect run /bin/sh -c "cd builds/bisect && make -j30 && ./tests/ve=
+nv/bin/avocado run ./tests/acceptance/boot_linux_console.py:BootLinuxConsol=
+e.test_sparc_ss20"
+>>=20
+>> Fingers:
+>>=20
+>>   a4d42b76dd29818e4f393c4c3eb59601b0015b2f is the first bad commit
+>>   commit a4d42b76dd29818e4f393c4c3eb59601b0015b2f
+>>   Author: Richard Henderson <richard.henderson@linaro.org>
+>>   Date:   Tue Apr 21 18:16:59 2020 -0700
+>>=20
+>>       tcg: Use tcg_constant_{i32,i64} with tcg int expanders
+>>=20
+>>       Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>>       Message-Id: <20200422011722.13287-14-richard.henderson@linaro.org>
+>
+> Ho hum.  I can reproduce this, but after a day of debugging I'm no closer=
+ to
+> figuring out what's wrong than when I started.
+>
+> I'm going to put this whole section of TEMP_CONST to the side for now.
 
-Could you please confirm if we could use =E2=80=9Ctype_init=E2=80=9D for =
-something other
-than a class?
+From my own poking around I can say the hang occurs when you first
+introduce just:
 
-May be the chardev machine init notified could be initialized by vl.c?
+  void tcg_gen_movi_i32(TCGv_i32 ret, int32_t arg)
+  {
+      tcg_gen_mov_i32(ret, tcg_constant_i32(arg));
+  }
 
-> diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
-> index 15ee7f47da..a10acbc2b8 100644
-> --- a/chardev/Makefile.objs
-> +++ b/chardev/Makefile.objs
-> @@ -1,4 +1,5 @@
-> chardev-obj-y +=3D char.o
-> +chardev-obj-$(CONFIG_SOFTMMU) +=3D chardev-sysemu.o
-> chardev-obj-$(CONFIG_WIN32) +=3D char-console.o
-> chardev-obj-$(CONFIG_POSIX) +=3D char-fd.o
-> chardev-obj-y +=3D char-fe.o
-> --=20
-> 2.21.1
->=20
+and nothing else. Which indicates the problem has to be in the core
+plumbing itself. This is odd because all the other architectures are
+fine. I wonder if there is something special about sparc's constant
+generation?
 
+Eyeballing the numbers it does seem like sparc generates more negative
+numbers than ARM does - although ARM does generate some. I thought I'd
+just have a check to see what happens so I looked at the first
+occurrence in the sparc test:
+
+  0x00006224:  sethi  %hi(0xffdcf000), %g6
+  0x00006228:  mov  %g6, %g6      ! 0xffdcf000
+  0x0000622c:  sethi  %hi(0xffd00000), %g4
+  0x00006230:  mov  %g4, %g4      ! 0xffd00000
+  0x00006234:  sub  %g6, %g4, %g6
+  0x00006238:  sub  %g1, %g6, %g3
+  0x0000623c:  sethi  %hi(0x1000), %g5
+  0x00006240:  sub  %g3, %g5, %g3
+  0x00006244:  sub  %g3, %g5, %g3
+
+Which seems to be translated into ops ok:
+
+   ---- 00006224 00006228
+   mov_i32 g6,$0xffdcf000
+
+   ---- 00006228 0000622c
+
+   ---- 0000622c 00006230
+   mov_i32 g4,$0xffd00000
+
+   ---- 00006230 00006234
+
+   ---- 00006234 00006238
+   sub_i32 tmp0,g6,g4
+   mov_i32 g6,tmp0
+
+   ---- 00006238 0000623c
+   sub_i32 tmp0,g1,g6
+   mov_i32 g3,tmp0
+
+   ---- 0000623c 00006240
+   mov_i32 g5,$0x1000
+
+   ---- 00006240 00006244
+   sub_i32 tmp0,g3,g5
+   mov_i32 g3,tmp0
+
+   ---- 00006244 00006248
+   sub_i32 tmp0,g3,g5
+   mov_i32 g3,tmp0
+
+and looks like its doing the expected constant folding here.
+
+   ---- 00006224 00006228
+
+   ---- 00006228 0000622c
+
+   ---- 0000622c 00006230
+
+   ---- 00006230 00006234
+
+   ---- 00006234 00006238
+   movi_i32 tmp0,$0xcf000                   pref=3D0xffff
+   mov_i32 g6,tmp0                          dead: 1  pref=3D0xffff
+
+   ---- 00006238 0000623c
+   sub_i32 tmp0,g1,g6                       dead: 1 2  pref=3D0xffff
+   mov_i32 g3,tmp0                          dead: 1  pref=3D0xffff
+
+   ---- 0000623c 00006240
+   mov_i32 g5,$0x1000                       sync: 0  dead: 0  pref=3D0xffff
+
+   ---- 00006240 00006244
+   sub_i32 tmp0,g3,$0x1000                  dead: 1  pref=3D0xffff
+   mov_i32 g3,tmp0                          dead: 1  pref=3D0xffff
+
+   ---- 00006244 00006248
+   sub_i32 tmp0,g3,$0x1000                  dead: 1  pref=3D0xffff
+   mov_i32 g3,tmp0                          sync: 0  dead: 1  pref=3D0xf038
+
+
+One other data point is it is certainly in the optimisation phase that
+things go wrong because:
+
+  //#define USE_TCG_OPTIMIZATIONS
+
+means the test passes.
+
+
+>
+>
+> r~
+
+
+--=20
+Alex Benn=C3=A9e
 
