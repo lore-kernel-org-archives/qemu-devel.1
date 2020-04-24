@@ -2,105 +2,83 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA185C2BA1A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 10:42:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B6FC54FCB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 10:48:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4D272071E
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 10:42:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8064F2064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 10:48:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fX8yCnFA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4D272071E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ST+OtcgX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8064F2064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRvml-0003LA-Pb
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 06:42:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41188)
+	id 1jRvsk-0005VH-Lj
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 06:48:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43062)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jRvln-0001x6-Ct
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 06:41:19 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jRvs4-0004xb-RD
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 06:47:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jRvln-0002qB-0l
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 06:41:19 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41561)
+ (envelope-from <dgilbert@redhat.com>) id 1jRvs4-0003du-91
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 06:47:48 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38702
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jRvlm-0002iq-If
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 06:41:18 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jRvs3-0003dS-P6
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 06:47:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587724877;
+ s=mimecast20190719; t=1587725266;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=bztYjvJzjsXp4icoK49+vXwg4ZJ6fTGwDH1Z/9nmfYw=;
- b=fX8yCnFAlVkmzCWCYTNB3Is9FBlfCYC35lMEwBB3ilAXxFziY+uEvJ2764qXLmDx/5hIad
- J0zq45lMU7Oha+wjzLuX36/udEzzZkLWDJXcO0/JQEDLM+veq/QpGhB+P9mhJKpWzC3T+O
- 6pFRX7Dy9MUAS8n05+wGV9MiyoQ3/yA=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ivIfhWcXKj/Xxc39QgkuwrS8TEn+drSg3k77MfYdsN8=;
+ b=ST+OtcgXcjgpJsbZF3NGqSwarm+RY+DQoLZaZPDbiyUpYWcrxx9l8lEd+fWlWfDYmS3kab
+ aBDCnReXVEz79YlkQzbcSwlam3uJXJ7VwIvq0l+9UxEyFoygkVdZkmMl1ssNouWvj3uifI
+ CBxxyK4gnwMmvQrX9rRm6ieufuv7HvE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-ZL7RyPG9M96dE-HjpSeYfw-1; Fri, 24 Apr 2020 06:41:15 -0400
-X-MC-Unique: ZL7RyPG9M96dE-HjpSeYfw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-36-JqgLsKAsNqm77WCEge1j-A-1; Fri, 24 Apr 2020 06:47:43 -0400
+X-MC-Unique: JqgLsKAsNqm77WCEge1j-A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E21E800C78;
- Fri, 24 Apr 2020 10:41:14 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-192.ams2.redhat.com
- [10.36.113.192])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D2A6600E8;
- Fri, 24 Apr 2020 10:41:13 +0000 (UTC)
-Subject: Re: [PATCH v2 3/3] qcow2: Tweak comment about bitmaps vs. resize
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200423221707.477404-1-eblake@redhat.com>
- <20200423221707.477404-4-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <154895e4-a93a-575d-1174-42c47887988e@redhat.com>
-Date: Fri, 24 Apr 2020 12:41:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A47E7800C78;
+ Fri, 24 Apr 2020 10:47:41 +0000 (UTC)
+Received: from work-vm (ovpn-113-179.ams2.redhat.com [10.36.113.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0826C99CD;
+ Fri, 24 Apr 2020 10:47:36 +0000 (UTC)
+Date: Fri, 24 Apr 2020 11:47:34 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Subject: Re: [PATCH v1 1/2] migration/xbzrle: replace transferred xbzrle
+ bytes with encoded bytes
+Message-ID: <20200424104734.GE3106@work-vm>
+References: <1587352003-3312-1-git-send-email-wei.w.wang@intel.com>
+ <1587352003-3312-2-git-send-email-wei.w.wang@intel.com>
+ <20200421192106.GM3029@work-vm> <5E9FB148.3060906@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200423221707.477404-4-eblake@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <5E9FB148.3060906@intel.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="j3WiquyFjqu6X3G1tCT1OSQfBncRjv7TY"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 02:57:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
@@ -115,73 +93,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+Cc: kevin.tian@intel.com, quintela@redhat.com, qemu-devel@nongnu.org,
+ peterx@redhat.com, gloryxiao@tencent.com, yi.y.sun@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---j3WiquyFjqu6X3G1tCT1OSQfBncRjv7TY
-Content-Type: multipart/mixed; boundary="wIF8HJI5l1APi5luu0e8w0O6ijWOFPSou"
-
---wIF8HJI5l1APi5luu0e8w0O6ijWOFPSou
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 24.04.20 00:17, Eric Blake wrote:
-> Our comment did not actually match the code.  Rewrite the comment to
-> be less sensitive to any future changes to qcow2-bitmap.c that might
-> implement scenarios that we currently reject.
+* Wei Wang (wei.w.wang@intel.com) wrote:
+> On 04/22/2020 03:21 AM, Dr. David Alan Gilbert wrote:
+> > * Wei Wang (wei.w.wang@intel.com) wrote:
+> > > Like compressed_size which indicates how many bytes are compressed, w=
+e
+> > > need encoded_size to understand how many bytes are encoded with xbzrl=
+e
+> > > during migration.
+> > >=20
+> > > Replace the old xbzrle_counter.bytes, instead of adding a new counter=
+,
+> > > because we don't find a usage of xbzrle_counter.bytes currently, whic=
+h
+> > > includes 3 more bytes of the migration transfer protocol header (in
+> > > addition to the encoding header). The encoded_size will further be us=
+ed
+> > > to calculate the encoding rate.
+> > >=20
+> > > Signed-off-by: Yi Sun <yi.y.sun@intel.com>
+> > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > Can you explain why these 3 bytes matter?  Certainly the 2 bytes of the
+> > encoded_len are an overhead that's a cost of using XBZRLE; so if you're
+> > trying to figure out whether xbzrle is worth it, then you should includ=
+e
+> > those 2 bytes in the cost.
+> > That other byte, that holds ENCODING_FLAG_XBZRLE also seems to be pure
+> > oerhead of XBZRLE; so your cost of using XBZRLE really does include
+> > those 3 bytes.
+> >=20
+> > SO to me it makes sense to include the 3 bytes as it currently does.
+> >=20
+> > Dave
 >=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/qcow2.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Thanks Dave for sharing your thoughts.
 >=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 34888a793354..6b6d1c3fa8b9 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -3997,7 +3997,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriv=
-erState *bs, int64_t offset,
->          goto fail;
->      }
+> We hope to do a fair comparison of compression rate and xbzrle encoding
+> rate.
+> The current compression_rate doesn't include the migration flag overhead
+> (please see
+> update_compress thread_counts() ). So for xbzrle encoding rate, we wanted=
+ it
+> not include the migration
+> protocol flags as well (but the 2 bytes xbzrle encoding overhead is kept
+> there, as the compression rate
+> includes the compression header overhead).
 >=20
-> -    /* cannot proceed if image has bitmaps */
-> +    /* See qcow2-bitmap.c for which bitmap scenarios prevent a resize. *=
-/
+> Or would you think it is necessary to add the migration flag (8 bytes) fo=
+r
+> compression
+> when calculating the compression rate?
 
-Clever. ;)
+I don't think the migration flag (8 bytes) matters, because everyone has
+that; but isn't this patch about the 3 bytes (1 byte
+ENCONDING_FLAG_XBZRLE) (2 byte encoded_len) ?
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+The 2 byte encoded_len in this code, corresponds to the 4 byte blen in
+qemu_put_compression_data;  I'm not sure but I think that 4 bytes is
+included in the length update_compress_thread_counts() sees - if so
+that makes it equivalent including the length.
 
->      if (qcow2_truncate_bitmaps_check(bs, errp)) {
->          ret =3D -ENOTSUP;
->          goto fail;
+Dave
+
+
+> Best,
+> Wei
 >=20
-
-
-
---wIF8HJI5l1APi5luu0e8w0O6ijWOFPSou--
-
---j3WiquyFjqu6X3G1tCT1OSQfBncRjv7TY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6iwkcACgkQ9AfbAGHV
-z0BPMwf/YeB3wxrZXSe5VUanbzaQNbvY9oaxS0DRyIZ6LBNx2740fr7B79DxMwk8
-svQHk3jZ15fVWI1bZWspj+3gg+yHggaMKE4LxfUPynVY5Pd/VwA9utVn3sHz6sJJ
-EUD+xWrdomQNwqC5VQHYbZMzZ7CePh0zVmfUqyvYCYeNoK/cMJJqpO5SOzuqgLYG
-wJ3//1hchRXj4w1rAiemaOMaRSpIHTVRnzL1o5zv9jO5BiNwO8gxSUgAYW1gJRub
-15DIjMM1VwyJbHW7/MS+QMny2L4Z2kbrCGd6yrB3rYwQIuSQsDYZIXqsBSAVQqbi
-5gfb1VrN+BYPaD/JI0W6sto6dq0/oQ==
-=ZLmH
------END PGP SIGNATURE-----
-
---j3WiquyFjqu6X3G1tCT1OSQfBncRjv7TY--
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
