@@ -2,69 +2,69 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67F08C54FCB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 18:16:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA159C54FCB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 18:27:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38139206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 18:16:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B517C20728
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 18:27:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="tYxzY8MA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38139206A1
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="SK7qVF0b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B517C20728
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jS2rs-00006c-7z
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 14:16:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35656)
+	id 1jS32T-0003VZ-QJ
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 14:27:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38776)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jS2r3-0007oC-H8
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 14:15:13 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jS31Q-0002pf-Bx
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 14:25:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jS2r3-00020G-2l
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 14:15:13 -0400
-Received: from mail-eopbgr40098.outbound.protection.outlook.com
- ([40.107.4.98]:26630 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jS31P-00076z-Ue
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 14:25:56 -0400
+Received: from mail-vi1eur05on2091.outbound.protection.outlook.com
+ ([40.107.21.91]:55905 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jS2r0-0001nv-Ef; Fri, 24 Apr 2020 14:15:10 -0400
+ id 1jS31M-0006ts-Ar; Fri, 24 Apr 2020 14:25:52 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Y3SSJXorTWCbOLlK9QfxnR4CO0Fo389tDQSAWWzuenetKqRJdUC7VpBvLx3SDWKz+EDYzQlSDXGKXtVmud8ulHzfg8iiZFZLN4DsqhVQFLW4311aVznThwZrnS4EUVhqWlMTgIwMwApUvf19l+jqc6kSOQ+N5JqxdQH1j7wngiJw/eJeRtMvtTU6E9j0gET0RUjwyOaIZOZKL+eSHUsdnbO7MNK+bFfExEo2WcQEiArkh1avmNOJeMItzM8tAJQx0jddgaPk968R307Z13XJG/rEJCni5wu95HJhcXycLi1G72z3GlohoyUSIlEnHNjfNp3IL2U9B49R687Uv9hYag==
+ b=oG+yYneae9xBTlPSJxnA50OYuuh3zQdX3UyvIy0DaHnTJ7uDXKaGr6Thn+ViCgTOK2YsjXFcgZMrOTP+/JxDXCvnt6lfYxetGWra6Xjm8xI4FkH/c09kCZHESWOeJV1QZmqxjGjTvfydlcLhrB52PIbuy3o1E3vZ50GqCVq5R4Aut94ozAaQfKfcsL4pQIfk9wMtslEqgcJxMnRIbCFySU1F+bYQBJB5cG6mee4jNAjR70t4tYey8r98Cx5GjTTsOIbDnjE1YEoI7S5fGj3v7/xbQe1SlgKghhwLVGGAwKUTG1PgPxEOcf3NA1a9BlNFf2sdu959ertKeQrA9HkcTg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+7G3JCH4ZWjlxFUU9MCgYk5iO5GMzpL7qwz2BFlGxpk=;
- b=iv4RupChgclzRQXPl/zbsIzHJEUGFqS3UWTBrku94ILX3TJQYyGjFEKclbduZNlxj+ylqCvl5lz7KXsfJPULHfhSPUq98sHfsQv2BhKoPuSY48xxAowiNT+sDOpNq6XhVweyZT41f4lwwxEOh5MjsvPIXYYDyQl1eIP3b9fHWEvVrwMaUWYF576BppqWLIjqzx651iuarsjeqWSbUC1mlmB6uaygLWDCj8bu9HyFCOtSiQ4jG8z8E9sfLBTWvgy7C5/iaGL1gb+REli2l9lcUm9yTlns8wrfWZ0dUWR7S1kAJ8uRjXTToaePAXgoIaTcqpG0Bz0rJcQ3XwKhDfXLkg==
+ bh=Y1tNUwmb3qNw6h131hIjpQay+oKQkEpm68h4Ahtt9XA=;
+ b=h01bC7VUFIZChYwHx5mf2Ln0mLX86v+/W3diITAQglFpbTuzb3vCLPVS6ay/A3381VSdoGITEj+1rPEtpzKv21N3w76lUhSf3XgS0CNgW4iubfWC6QXrF4EtopcUp1hnpJiYYACvK7sVez8Hr/e81IvnZ/DFPzaO3P7lXquKf1CEPLIHSFYIC9rjTVcfbtTgQYJXsVZubEcgyiOAD2oj1o67F1Iz/2TWKVZrnSSS1y/A5nYkr3DsuFXLjnHD85/qPrBXdBaH7UMHml4dZ7dvJn6hRbFp+aSM03Tyd+cWqdclnxCtpFae+JdiHczRHCfIraGSvCietClc4OPQCEoDVA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+7G3JCH4ZWjlxFUU9MCgYk5iO5GMzpL7qwz2BFlGxpk=;
- b=tYxzY8MAgkcIj7qIVPDX28ZviLAIdqRyK45xcMKg0snalwBC/lKwimW3HRHzK5mXco3JCs7F4z2O+K5ZjmJs7MybSuOrDVj5RgKzpirj/qCzqa6GUqNuBecVUoYQDpc7WZqLDR46n2DwExWQW0S6Owu7snU9ezAs+JMNyZ3/V9Q=
+ bh=Y1tNUwmb3qNw6h131hIjpQay+oKQkEpm68h4Ahtt9XA=;
+ b=SK7qVF0bfoO1u88PBW954MAUAXDNrxNQsJZ+/XLUH+9UENmGK1pYYPHA7ZBr9PD6uWJPb4H2bVUKU+kkXQNkX/pjf2KYLEELHg5tR2pF99iAB4Kzop8pl6x6wZlsl4k6IVH2wiCJm6KJhs0ecV8ogtyAeVe0XG74e11QSaLtfa4=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=vsementsov@virtuozzo.com; 
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5304.eurprd08.prod.outlook.com (2603:10a6:20b:10e::21)
+ by AM7PR08MB5510.eurprd08.prod.outlook.com (2603:10a6:20b:109::16)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Fri, 24 Apr
- 2020 18:15:06 +0000
+ 2020 18:25:48 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.012; Fri, 24 Apr 2020
- 18:15:05 +0000
+ 18:25:47 +0000
 Subject: Re: [PATCH v4 24/30] qcow2: Clear the L2 bitmap when allocating a
  compressed cluster
-To: Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>,
+To: Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>,
  qemu-devel@nongnu.org
 References: <cover.1584468723.git.berto@igalia.com>
  <6d596d82ed62615a8565b661691a06bfaf32237e.1584468723.git.berto@igalia.com>
@@ -72,60 +72,61 @@ References: <cover.1584468723.git.berto@igalia.com>
  <1606ecb5-98ea-fefb-bb98-2ecda1d65f5c@redhat.com>
  <w51o8rgn6j6.fsf@maestria.local.igalia.com>
  <57ac1a2f-1632-1a00-b18d-1fc2169175b6@redhat.com>
+ <w51lfmkn4ws.fsf@maestria.local.igalia.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200424211504395
-Message-ID: <971a6e4b-ba44-4280-89fa-d454cddf12e1@virtuozzo.com>
-Date: Fri, 24 Apr 2020 21:15:04 +0300
+X-Tagtoolbar-Keys: D20200424212545716
+Message-ID: <2ed917cb-edf1-faeb-532b-ad5edb39d293@virtuozzo.com>
+Date: Fri, 24 Apr 2020 21:25:45 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
-In-Reply-To: <57ac1a2f-1632-1a00-b18d-1fc2169175b6@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <w51lfmkn4ws.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM4PR0202CA0017.eurprd02.prod.outlook.com
- (2603:10a6:200:89::27) To AM7PR08MB5494.eurprd08.prod.outlook.com
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR01CA0144.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:168::49) To AM7PR08MB5494.eurprd08.prod.outlook.com
  (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from [192.168.100.2] (185.215.60.181) by
- AM4PR0202CA0017.eurprd02.prod.outlook.com (2603:10a6:200:89::27) with
+ AM0PR01CA0144.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::49) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend
- Transport; Fri, 24 Apr 2020 18:15:05 +0000
-X-Tagtoolbar-Keys: D20200424211504395
+ Transport; Fri, 24 Apr 2020 18:25:47 +0000
+X-Tagtoolbar-Keys: D20200424212545716
 X-Originating-IP: [185.215.60.181]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 79a941fa-f743-4666-f9f0-08d7e87b6a3a
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5304:
+X-MS-Office365-Filtering-Correlation-Id: 8c1c2010-5725-455a-4e3f-08d7e87ce8c0
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5510:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB530429FDC56C293C7827B3A3C1D00@AM7PR08MB5304.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5510AB490CF46EAA0A9EA242C1D00@AM7PR08MB5510.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-Forefront-PRVS: 03838E948C
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(396003)(136003)(366004)(346002)(376002)(39840400004)(8676002)(36756003)(86362001)(81156014)(19627235002)(8936002)(2906002)(316002)(478600001)(5660300002)(54906003)(16576012)(110136005)(16526019)(6486002)(107886003)(4326008)(186003)(31686004)(66946007)(66556008)(31696002)(52116002)(53546011)(2616005)(26005)(66476007)(956004);
+ SFS:(4636009)(366004)(39840400004)(136003)(396003)(346002)(376002)(86362001)(956004)(2616005)(186003)(8676002)(2906002)(31696002)(19627235002)(6486002)(4326008)(66946007)(66556008)(66476007)(107886003)(5660300002)(16576012)(8936002)(81156014)(54906003)(16526019)(52116002)(110136005)(31686004)(36756003)(478600001)(316002)(26005);
  DIR:OUT; SFP:1102; 
 Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Fsu1wVYA9DA6yMTTEOKFxo2mE6nlz2zwCVW4ybv0ax+BFhHxCYmovi3R3qhKyN0M97pf4mcdrSqsnKXRmcigHSlb+VWuUFLEOC22+TSKmq8qMBWdXeEiTcu4GgfIoTtCheFxDO+/lww2cZWa7zs1XJqfzNx1qwCSkWT5LB1WQCKWPib5RASK4j4pYDCiTWlHtE7Vpp4Nn/8GXJC7FHnd4xCxXfA0XZ3gZP81mrHvm74lU6Xki2rwV68x+F+HRX+gY8R7RhpJQm12za1Q5YAZuJqSj02nUCmwYN8p11FVJNSvmkD7/ZvvAZzUDXJu6mBHjFqClHXPDi6Wp9VgbVEkYR0LMYptKleS+isbGXCacejEtuXJVMvSEodyEuOqrDfdz0yse0WtU2N7ZI9r3RaUGBIE+JQOU2fRDF1jNUfJWaIMZTgqd4z3vOSUpP03pINc
-X-MS-Exchange-AntiSpam-MessageData: DN5OqtgN9jjzNyKJDJAYDREnoBcwGIm5mkEvL7qI/1UaIADiZagaIRbxuRo8smAAjTJIEe3x8YXN/3sn6G6wgcEDBCW/+Dlfkh0y9DIf+IXSTC55LfqX2MBLIy+OPCljliuRmb4/rJUeaD0Mm+gvMg==
+X-Microsoft-Antispam-Message-Info: 3caOJPso+pS7ymfIlhkTOtTx++WoJHRgvV5pPl9VAPvnStkaKOvzZ90pahp8Qn1SfsWPYeXr7+gr2cKD4Q3adkFuaCJoPYEBL6fYgz11gh9DP4akNLkRSnwbVhlLCilxoRrtzqr4mSe/0skkrsU03/rttd1a1Hxb9zynQFhDoSWXgT/hwzgn/PcN+NuV76x8suWXgA8fL4HPuuNam8spoZD9OLU99jRHQrvake0paDVq1kHWAQbDNX+aqQ16VvYQsOdWUIYyGCeecndAqQQPp2VcxGWE5H1VaxLOQJWIQIzL9LM0MKB2GuucKGA5OBhLpagCkktKw5Y3rTARD45g3SK/bECM7A+MKb6HpgKa9AdJJMQXej8VFqaAfZvhh3Ax4xTo4+nrLBNbVZZVucXMCX0AhzwkmJ7+jaFmrgRIbscqvXIl4KEm0UrRcLj3OjGU
+X-MS-Exchange-AntiSpam-MessageData: 1bqgZOCu2CX0H4O75XBdVuQzRtdv1UXVHLL7FmCCw0G7MDZTYddtUecJrLJyePjR9seg1DvW1rR4kYzAnCbLyTR7vQd7eIGAFUVYOg0RXzceqjssKwAkUANkoipl3TeeIsgMUbC8mHueSNnadCpDgQ==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 79a941fa-f743-4666-f9f0-08d7e87b6a3a
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2020 18:15:05.8748 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8c1c2010-5725-455a-4e3f-08d7e87ce8c0
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2020 18:25:47.6681 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dzgPZtyo3mr4RM3sL73sEkvHUFlwr+rwaF3pMGsuGDPfOTQie9rRuH+JrvVEbPWmlO/gaz5LYRKJYLP9iJsFSCwrWtxDLKNvs98cHMmg90I=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5304
-Received-SPF: pass client-ip=40.107.4.98;
+X-MS-Exchange-CrossTenant-UserPrincipalName: aIBxk9Q6kv71J33ItBPUf5ZIZ/nxJgMpff+WgFHHV6/Il2CQIoKh+abC25mnyExgPklMHqKoSRWrs1HxdvuimkvpCE249wGn0fjWEXjBFh0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5510
+Received-SPF: pass client-ip=40.107.21.91;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR03-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 14:15:07
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 14:25:49
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.4.98
+X-Received-From: 40.107.21.91
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -144,43 +145,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-24.04.2020 20:44, Eric Blake wrote:
-> On 4/24/20 12:21 PM, Alberto Garcia wrote:
->> On Fri 24 Apr 2020 07:11:08 PM CEST, Eric Blake <eblake@redhat.com> wrote:
->>>> 'write -c 0 64k' followed by 'write -z 16k 16k' would not need to do any
->>>> copy on write. The compressed data would remain untouched on disk but
->>>> some of the subclusters would have the 'all zeroes' bit set, exactly
->>>> like what happens with normal clusters.
+24.04.2020 20:56, Alberto Garcia wrote:
+> On Fri 24 Apr 2020 07:44:33 PM CEST, Eric Blake <eblake@redhat.com> wrote:
+>>>> at the same time, I can see where you're coming from in stating that
+>>>> if it makes management of extended L2 easier to allow zero subclusters
+>>>> on top of a compressed cluster, then there's no reason to forbid it.
 >>>
->>> It's a special case that avoids COW for write zeroes, but not for
->>> anything else. The moment you write any data (whether to the
->>> zero-above-compressed or the regular compressed portion), the entire
->>> cluster has to be rewritten.
+>>> I'm not sure if it makes it easier. Some operations are definitely going
+>>> to be easier but maybe we have to add and handle _ZERO_COMPRESSED in
+>>> addition to _ZERO_PLAIN and _ZERO_ALLOC (the same for unallocated
+>>> subclusters). Or maybe replace QCow2SubclusterType with something
+>>> else. I need to evaluate that.
+
+Reviewing your series it already came in my mind, that we are doing too much with the conversion from l2e flags to "type". Does it worth it? All these ZERO_PLAIN and UNALLOCATED_ALLOC, and "case <TYPE>:" lines combined by three-four into one case, do they help, or is it an extra work? We just have to maintain two views of one model.. But I don't suggest to refactor it in these series :)
+
 >>
->> That's right but you can still write zeroes without having to rewrite
->> anything, and read back the zeroes without having to decompress the
->> data.
->>
->>> at the same time, I can see where you're coming from in stating that
->>> if it makes management of extended L2 easier to allow zero subclusters
->>> on top of a compressed cluster, then there's no reason to forbid it.
->>
->> I'm not sure if it makes it easier. Some operations are definitely going
->> to be easier but maybe we have to add and handle _ZERO_COMPRESSED in
->> addition to _ZERO_PLAIN and _ZERO_ALLOC (the same for unallocated
->> subclusters). Or maybe replace QCow2SubclusterType with something
->> else. I need to evaluate that.
+>> Reading the entire cluster will be interesting - you'll have to
+>> decompress the entire memory, then overwrite the zeroed portions.
 > 
-> Reading the entire cluster will be interesting - you'll have to decompress the entire memory, then overwrite the zeroed portions.  The savings in reading occur only when your read is limited to just the subclusters that are zeroed.
-> 
-> But then again, even on a regular cluster, read has to pay attention to which subclusters are zeroed, so you already have the workhorse in read for detecting whether a normal read is sufficient or if you have to follow up with piecing together zeroed sections.
+> I don't think so, qcow2_get_host_offset() would detect the number of
+> contiguous subclusters of the same type at the given offset. In this
+> case they would be _ZERO subclusters so there's no need to decompress
+> anything, or even read it (it works the same with uncompressed
+> clusters).
 > 
 
-AFAIK, now compressed clusters can't be used in scenarios with guest, as qcow2 driver doesn't support rewriting them. Or am I wrong? And we normally don't combine normal and compressed clusters together in one image. So, currently, the usual use-case of compressed clusters is a fully compressed image, written once.
+But if at least one of subclusters to read is not _ZERO, you'll have to decompress the whole cluster, and after decompression rewrite zero-subclusters by zeroes, as Eric says.. Or I lost the thread:)
 
-It means, that with current specification, subclusters adds nothing to this case, and no reason to create compressed image with subclusters. And even if we allow zero/unallocated subclusters, seems it adds nothing to this use-case.
-
-So, I don't see real benefits of it for now, but neither any problems with it, so agree that it's mostly about which way is simpler..
 
 -- 
 Best regards,
