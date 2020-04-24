@@ -2,85 +2,83 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A93C54FCB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 14:57:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39750C54FD0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 15:05:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A12B22071E
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 14:57:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03D402075A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 15:05:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S5A2qRPe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A12B22071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EokNCV1x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03D402075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRzls-0005OM-Ox
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 10:57:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43408)
+	id 1jRztr-00009A-4z
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 11:05:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45482)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alexander.duyck@gmail.com>) id 1jRzl7-0004nL-48
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 10:56:58 -0400
+ (envelope-from <stefanha@redhat.com>) id 1jRzsy-0007w8-IF
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 11:05:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alexander.duyck@gmail.com>) id 1jRzl6-00080R-6J
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 10:56:52 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:45788)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
- id 1jRzl5-0007ti-OF
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 10:56:51 -0400
-Received: by mail-io1-xd41.google.com with SMTP id i19so10604336ioh.12
- for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 07:56:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9/SoZXon44YJS4MOXQkeYLY8ScYnUIqZ0iKw+qG59z4=;
- b=S5A2qRPe1sgyLFSIshGBhhC3w5XxgZ4gmqWyNKjppmLwcmWDmodHKfXeSSKU2FgZIM
- R5wk8GMLzUS9wr9IlaHHs6PLQVhFtFdUpRUxz8jtaOtbip+UtdUl6+59Vr2Nj+zP/jHm
- IXd/MDoeFhv+87PT9D++bC0IguFbBKQ14K+Wcdbr33BtjApPl1rnEdmRZtvKBRJQF2yK
- X0y1U8ys6H+je9erbXaOdPX0kC3lE3M5A/9bhi+q0r/JUOYVEwRBC+Hyp1vxBhsy5O4Y
- czO8+ASHjO12/OZ/B7KEJOxHTY/f71Welj5jX0uyAnvNsWVvYn4RRG9DQ69QudGhMC6T
- 0ndQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9/SoZXon44YJS4MOXQkeYLY8ScYnUIqZ0iKw+qG59z4=;
- b=Hyo8E1Da3JDKnNSjpTgF4zwtq5jLQUCzPTcZntAH56UumRwv092jzSu68g7R2Rjyqq
- 9smrB1fP+ka6zR0K/yyWmQmllaE7agAfpAdSUw5E0uoeTkW9yGc1S2QGS4D/QfOpu6Y4
- 5w03ldrzylZwpGy+16fzijGRPRnj5/eZW62MVyu70vLVgHRsBy3Zh20bi3zSZlhhOz1o
- aRgRYE7esBwWWEGR1NyHgGnOcRQCGcuoIhz9EmN1DEaZqrvAatDm7wTQbD002xy2DtYI
- BWrcSjuA/SO9NlP+Czx6EFPALggqR3bU1bN8PCoWRnXizI6I6V7Qsh4Y19n+riJNS74g
- rm5g==
-X-Gm-Message-State: AGi0PuYNny3BNiu7n/Xh0dUwOqgOfDAsXbo6eKijL/pSPy5Yl1VzWtCt
- vzSiuYB/NivRJzkCncfpASDK3Nd1IpVi3vcCDJg=
-X-Google-Smtp-Source: APiQypLj0tF8RXhbr5/FnGmRO3hVrDmaEeowhNrJol6JADTNa+BF7Bh+gIjXlfKgChefxJpZeurPv08xhsU1hIbUuBQ=
-X-Received: by 2002:a6b:cd4a:: with SMTP id d71mr1706154iog.5.1587740210109;
- Fri, 24 Apr 2020 07:56:50 -0700 (PDT)
+ (envelope-from <stefanha@redhat.com>) id 1jRzsw-0005le-A6
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 11:05:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48706
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jRzsv-0005kC-M1
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 11:04:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587740696;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=O5pRK4htQyOtOsVl4dl3CN0QYAl6dttW6pkNYGeQ9xk=;
+ b=EokNCV1x+fO/CwkxW4Vxocm7zuxmxggIjFcjBeqM0ZXGn0bUL54G7B7G7OsM3mPGMFd3ZT
+ bqzrWbezKXZos5+ztk0hUKGuGGgTkLtIQgPHI6GtHVKQ+qAbKpOm7xdCNSW3HeOwwXDmF6
+ 8ESsdow1C2E/0Oc4HYYVgfN3iRdBnzM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-449-jcwo1RfwMvG8iwX8fhH8tg-1; Fri, 24 Apr 2020 11:04:51 -0400
+X-MC-Unique: jcwo1RfwMvG8iwX8fhH8tg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 052FA460;
+ Fri, 24 Apr 2020 15:04:23 +0000 (UTC)
+Received: from localhost (ovpn-114-136.ams2.redhat.com [10.36.114.136])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5AF261001B2C;
+ Fri, 24 Apr 2020 15:04:22 +0000 (UTC)
+Date: Fri, 24 Apr 2020 16:04:21 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: elena.ufimtseva@oracle.com
+Subject: Re: [PATCH RESEND v6 10/36] multi-process: build system for remote
+ device process
+Message-ID: <20200424150421.GC190507@stefanha-x1.localdomain>
+References: <cover.1587614626.git.elena.ufimtseva@oracle.com>
+ <622e5b5a9408c1e0bee41cd75a792ff784fc2874.1587614626.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-References: <20200422181649.12258.37077.stgit@localhost.localdomain>
- <20200422182113.12258.56556.stgit@localhost.localdomain>
- <69bf1579-78db-2a2c-6ac0-169daaa50153@redhat.com>
-In-Reply-To: <69bf1579-78db-2a2c-6ac0-169daaa50153@redhat.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Fri, 24 Apr 2020 07:56:38 -0700
-Message-ID: <CAKgT0UeZLJfZtLyDo8DcQF2KmwoNxPYnkSrx6C-j=LxU9t0ovw@mail.gmail.com>
-Subject: Re: [PATCH v21 QEMU 3/5] virtio-balloon: Replace free page hinting
- references to 'report' with 'hint'
-To: David Hildenbrand <david@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
- envelope-from=alexander.duyck@gmail.com; helo=mail-io1-xd41.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::d41
+In-Reply-To: <622e5b5a9408c1e0bee41cd75a792ff784fc2874.1587614626.git.elena.ufimtseva@oracle.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="dkEUBIird37B8yKS"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 03:07:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,293 +90,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
+ felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
+ konrad.wilk@oracle.com, dgilbert@redhat.com, liran.alon@oracle.com,
+ thanos.makatos@nutanix.com, rth@twiddle.net, kwolf@redhat.com,
+ berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
+ marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Apr 24, 2020 at 4:23 AM David Hildenbrand <david@redhat.com> wrote:
->
-> On 22.04.20 20:21, Alexander Duyck wrote:
-> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> >
-> > In an upcoming patch a feature named Free Page Reporting is about to be
-> > added. In order to avoid any confusion we should drop the use of the word
-> > 'report' when referring to Free Page Hinting. So what this patch does is go
-> > through and replace all instances of 'report' with 'hint" when we are
-> > referring to free page hinting.
-> >
-> > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > ---
-> >  hw/virtio/virtio-balloon.c         |   74 ++++++++++++++++++------------------
-> >  include/hw/virtio/virtio-balloon.h |   20 +++++-----
-> >  2 files changed, 47 insertions(+), 47 deletions(-)
-> >
-> > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> > index a4729f7fc930..a1d6fb52c876 100644
-> > --- a/hw/virtio/virtio-balloon.c
-> > +++ b/hw/virtio/virtio-balloon.c
-> > @@ -466,21 +466,21 @@ static bool get_free_page_hints(VirtIOBalloon *dev)
-> >              ret = false;
-> >              goto out;
-> >          }
-> > -        if (id == dev->free_page_report_cmd_id) {
-> > -            dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
-> > +        if (id == dev->free_page_hint_cmd_id) {
-> > +            dev->free_page_hint_status = FREE_PAGE_HINT_S_START;
-> >          } else {
-> >              /*
-> >               * Stop the optimization only when it has started. This
-> >               * avoids a stale stop sign for the previous command.
-> >               */
-> > -            if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
-> > -                dev->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-> > +            if (dev->free_page_hint_status == FREE_PAGE_HINT_S_START) {
-> > +                dev->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
-> >              }
-> >          }
-> >      }
-> >
-> >      if (elem->in_num) {
-> > -        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
-> > +        if (dev->free_page_hint_status == FREE_PAGE_HINT_S_START) {
-> >              qemu_guest_free_page_hint(elem->in_sg[0].iov_base,
-> >                                        elem->in_sg[0].iov_len);
-> >          }
-> > @@ -506,11 +506,11 @@ static void virtio_ballloon_get_free_page_hints(void *opaque)
-> >          qemu_mutex_unlock(&dev->free_page_lock);
-> >          virtio_notify(vdev, vq);
-> >        /*
-> > -       * Start to poll the vq once the reporting started. Otherwise, continue
-> > +       * Start to poll the vq once the hinting started. Otherwise, continue
-> >         * only when there are entries on the vq, which need to be given back.
-> >         */
-> >      } while (continue_to_get_hints ||
-> > -             dev->free_page_report_status == FREE_PAGE_REPORT_S_START);
-> > +             dev->free_page_hint_status == FREE_PAGE_HINT_S_START);
-> >      virtio_queue_set_notification(vq, 1);
-> >  }
-> >
-> > @@ -531,14 +531,14 @@ static void virtio_balloon_free_page_start(VirtIOBalloon *s)
-> >          return;
-> >      }
-> >
-> > -    if (s->free_page_report_cmd_id == UINT_MAX) {
-> > -        s->free_page_report_cmd_id =
-> > -                       VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
-> > +    if (s->free_page_hint_cmd_id == UINT_MAX) {
-> > +        s->free_page_hint_cmd_id =
-> > +                       VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN;
-> >      } else {
-> > -        s->free_page_report_cmd_id++;
-> > +        s->free_page_hint_cmd_id++;
-> >      }
-> >
-> > -    s->free_page_report_status = FREE_PAGE_REPORT_S_REQUESTED;
-> > +    s->free_page_hint_status = FREE_PAGE_HINT_S_REQUESTED;
-> >      virtio_notify_config(vdev);
-> >  }
-> >
-> > @@ -546,18 +546,18 @@ static void virtio_balloon_free_page_stop(VirtIOBalloon *s)
-> >  {
-> >      VirtIODevice *vdev = VIRTIO_DEVICE(s);
-> >
-> > -    if (s->free_page_report_status != FREE_PAGE_REPORT_S_STOP) {
-> > +    if (s->free_page_hint_status != FREE_PAGE_HINT_S_STOP) {
-> >          /*
-> >           * The lock also guarantees us that the
-> >           * virtio_ballloon_get_free_page_hints exits after the
-> > -         * free_page_report_status is set to S_STOP.
-> > +         * free_page_hint_status is set to S_STOP.
-> >           */
-> >          qemu_mutex_lock(&s->free_page_lock);
-> >          /*
-> >           * The guest hasn't done the reporting, so host sends a notification
-> >           * to the guest to actively stop the reporting.
-> >           */
-> > -        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-> > +        s->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
-> >          qemu_mutex_unlock(&s->free_page_lock);
-> >          virtio_notify_config(vdev);
-> >      }
-> > @@ -567,15 +567,15 @@ static void virtio_balloon_free_page_done(VirtIOBalloon *s)
-> >  {
-> >      VirtIODevice *vdev = VIRTIO_DEVICE(s);
-> >
-> > -    s->free_page_report_status = FREE_PAGE_REPORT_S_DONE;
-> > +    s->free_page_hint_status = FREE_PAGE_HINT_S_DONE;
-> >      virtio_notify_config(vdev);
-> >  }
-> >
-> >  static int
-> > -virtio_balloon_free_page_report_notify(NotifierWithReturn *n, void *data)
-> > +virtio_balloon_free_page_hint_notify(NotifierWithReturn *n, void *data)
-> >  {
-> >      VirtIOBalloon *dev = container_of(n, VirtIOBalloon,
-> > -                                      free_page_report_notify);
-> > +                                      free_page_hint_notify);
-> >      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> >      PrecopyNotifyData *pnd = data;
-> >
-> > @@ -624,7 +624,7 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
-> >      if (virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-> >          return offsetof(struct virtio_balloon_config, poison_val);
-> >      }
-> > -    return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
-> > +    return offsetof(struct virtio_balloon_config, free_page_hint_cmd_id);
-> >  }
-> >
-> >  static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
-> > @@ -635,14 +635,14 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
-> >      config.num_pages = cpu_to_le32(dev->num_pages);
-> >      config.actual = cpu_to_le32(dev->actual);
-> >
-> > -    if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
-> > -        config.free_page_report_cmd_id =
-> > -                       cpu_to_le32(dev->free_page_report_cmd_id);
-> > -    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
-> > -        config.free_page_report_cmd_id =
-> > +    if (dev->free_page_hint_status == FREE_PAGE_HINT_S_REQUESTED) {
-> > +        config.free_page_hint_cmd_id =
-> > +                       cpu_to_le32(dev->free_page_hint_cmd_id);
-> > +    } else if (dev->free_page_hint_status == FREE_PAGE_HINT_S_STOP) {
-> > +        config.free_page_hint_cmd_id =
-> >                         cpu_to_le32(VIRTIO_BALLOON_CMD_ID_STOP);
-> > -    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_DONE) {
-> > -        config.free_page_report_cmd_id =
-> > +    } else if (dev->free_page_hint_status == FREE_PAGE_HINT_S_DONE) {
-> > +        config.free_page_hint_cmd_id =
-> >                         cpu_to_le32(VIRTIO_BALLOON_CMD_ID_DONE);
-> >      }
-> >
-> > @@ -743,14 +743,14 @@ static int virtio_balloon_post_load_device(void *opaque, int version_id)
-> >      return 0;
-> >  }
-> >
-> > -static const VMStateDescription vmstate_virtio_balloon_free_page_report = {
-> > +static const VMStateDescription vmstate_virtio_balloon_free_page_hint = {
-> >      .name = "virtio-balloon-device/free-page-report",
-> >      .version_id = 1,
-> >      .minimum_version_id = 1,
-> >      .needed = virtio_balloon_free_page_support,
-> >      .fields = (VMStateField[]) {
-> > -        VMSTATE_UINT32(free_page_report_cmd_id, VirtIOBalloon),
-> > -        VMSTATE_UINT32(free_page_report_status, VirtIOBalloon),
-> > +        VMSTATE_UINT32(free_page_hint_cmd_id, VirtIOBalloon),
-> > +        VMSTATE_UINT32(free_page_hint_status, VirtIOBalloon),
-> >          VMSTATE_END_OF_LIST()
-> >      }
-> >  };
-> > @@ -766,7 +766,7 @@ static const VMStateDescription vmstate_virtio_balloon_device = {
-> >          VMSTATE_END_OF_LIST()
-> >      },
-> >      .subsections = (const VMStateDescription * []) {
-> > -        &vmstate_virtio_balloon_free_page_report,
-> > +        &vmstate_virtio_balloon_free_page_hint,
-> >          NULL
-> >      }
-> >  };
-> > @@ -797,12 +797,12 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-> >                             VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-> >          s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
-> >                                             virtio_balloon_handle_free_page_vq);
-> > -        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-> > -        s->free_page_report_cmd_id =
-> > -                           VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
-> > -        s->free_page_report_notify.notify =
-> > -                                       virtio_balloon_free_page_report_notify;
-> > -        precopy_add_notifier(&s->free_page_report_notify);
-> > +        s->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
-> > +        s->free_page_hint_cmd_id =
-> > +                           VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN;
-> > +        s->free_page_hint_notify.notify =
-> > +                                       virtio_balloon_free_page_hint_notify;
-> > +        precopy_add_notifier(&s->free_page_hint_notify);
-> >          if (s->iothread) {
-> >              object_ref(OBJECT(s->iothread));
-> >              s->free_page_bh = aio_bh_new(iothread_get_aio_context(s->iothread),
-> > @@ -827,7 +827,7 @@ static void virtio_balloon_device_unrealize(DeviceState *dev, Error **errp)
-> >      if (virtio_balloon_free_page_support(s)) {
-> >          qemu_bh_delete(s->free_page_bh);
-> >          virtio_balloon_free_page_stop(s);
-> > -        precopy_remove_notifier(&s->free_page_report_notify);
-> > +        precopy_remove_notifier(&s->free_page_hint_notify);
-> >      }
-> >      balloon_stats_destroy_timer(s);
-> >      qemu_remove_balloon_handler(s);
-> > diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-> > index d1c968d2376e..108cff97e71a 100644
-> > --- a/include/hw/virtio/virtio-balloon.h
-> > +++ b/include/hw/virtio/virtio-balloon.h
-> > @@ -23,7 +23,7 @@
-> >  #define VIRTIO_BALLOON(obj) \
-> >          OBJECT_CHECK(VirtIOBalloon, (obj), TYPE_VIRTIO_BALLOON)
-> >
-> > -#define VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN 0x80000000
-> > +#define VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN 0x80000000
-> >
-> >  typedef struct virtio_balloon_stat VirtIOBalloonStat;
-> >
-> > @@ -33,20 +33,20 @@ typedef struct virtio_balloon_stat_modern {
-> >         uint64_t val;
-> >  } VirtIOBalloonStatModern;
-> >
-> > -enum virtio_balloon_free_page_report_status {
-> > -    FREE_PAGE_REPORT_S_STOP = 0,
-> > -    FREE_PAGE_REPORT_S_REQUESTED = 1,
-> > -    FREE_PAGE_REPORT_S_START = 2,
-> > -    FREE_PAGE_REPORT_S_DONE = 3,
-> > +enum virtio_balloon_free_page_hint_status {
-> > +    FREE_PAGE_HINT_S_STOP = 0,
-> > +    FREE_PAGE_HINT_S_REQUESTED = 1,
-> > +    FREE_PAGE_HINT_S_START = 2,
-> > +    FREE_PAGE_HINT_S_DONE = 3,
-> >  };
-> >
-> >  typedef struct VirtIOBalloon {
-> >      VirtIODevice parent_obj;
-> >      VirtQueue *ivq, *dvq, *svq, *free_page_vq;
-> > -    uint32_t free_page_report_status;
-> > +    uint32_t free_page_hint_status;
-> >      uint32_t num_pages;
-> >      uint32_t actual;
-> > -    uint32_t free_page_report_cmd_id;
-> > +    uint32_t free_page_hint_cmd_id;
-> >      uint64_t stats[VIRTIO_BALLOON_S_NR];
-> >      VirtQueueElement *stats_vq_elem;
-> >      size_t stats_vq_offset;
-> > @@ -55,7 +55,7 @@ typedef struct VirtIOBalloon {
-> >      QEMUBH *free_page_bh;
-> >      /*
-> >       * Lock to synchronize threads to access the free page reporting related
-> > -     * fields (e.g. free_page_report_status).
-> > +     * fields (e.g. free_page_hint_status).
-> >       */
-> >      QemuMutex free_page_lock;
-> >      QemuCond  free_page_cond;
-> > @@ -64,7 +64,7 @@ typedef struct VirtIOBalloon {
-> >       * stopped.
-> >       */
-> >      bool block_iothread;
-> > -    NotifierWithReturn free_page_report_notify;
-> > +    NotifierWithReturn free_page_hint_notify;
-> >      int64_t stats_last_update;
-> >      int64_t stats_poll_interval;
-> >      uint32_t host_features;
-> >
->
-> Maybe split out the change to "free_page_report_cmd_id" in the uapi
-> (meaning: move that to a separate patch). So you can move forward with
-> most of this series (moving patch #1 and the free_page_report_cmd_id
-> change to the very last of this series) without depending on that change
-> to go upstream.
+--dkEUBIird37B8yKS
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Okay. I can split it if that is needed. Any specific reason for
-splitting it I should cite in the patch? From what I can tell Michael
-has already accepted the renamed and pushed it to Linus.
+On Wed, Apr 22, 2020 at 09:13:45PM -0700, elena.ufimtseva@oracle.com wrote:
+> From: Jagannathan Raman <jag.raman@oracle.com>
+>=20
+> Modify Makefile to support the building of the remote
+> device process. Implements main() function of remote
+> device process.
+>=20
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> ---
+>  MAINTAINERS             |  8 ++++++
+>  Makefile                |  2 ++
+>  Makefile.objs           | 27 ++++++++++++++++++
+>  Makefile.target         | 61 ++++++++++++++++++++++++++++++++++++++++-
+>  accel/Makefile.objs     |  2 ++
+>  backends/Makefile.objs  |  2 ++
+>  block/Makefile.objs     |  2 ++
+>  hw/Makefile.objs        |  7 +++++
+>  hw/block/Makefile.objs  |  2 ++
+>  hw/core/Makefile.objs   | 18 ++++++++++++
+>  hw/nvram/Makefile.objs  |  2 ++
+>  hw/pci/Makefile.objs    |  4 +++
+>  hw/scsi/Makefile.objs   |  2 ++
+>  migration/Makefile.objs |  2 ++
+>  qom/Makefile.objs       |  3 ++
+>  remote/Makefile.objs    |  1 +
+>  remote/remote-main.c    | 23 ++++++++++++++++
+>  stubs/replay.c          |  4 +++
+>  18 files changed, 171 insertions(+), 1 deletion(-)
+>  create mode 100644 remote/Makefile.objs
+>  create mode 100644 remote/remote-main.c
 
-Thanks.
+This approach is okay for now but will result in a lot of Makefile
+duplication in the long run.
 
-- Alex
+Each hw .o file should specify its dependencies so that qemu-system-*
+and the remote executable can link in the needed files.  The Kconfig
+system can also help with this by enabling/disabling features.
+
+Then the Makefiles don't need to duplicate *-obj-y and remote-pci-*.
+
+> diff --git a/Makefile.objs b/Makefile.objs
+> index f29c60c59d..f6654633b4 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -21,6 +21,33 @@ block-obj-$(CONFIG_REPLICATION) +=3D replication.o
+> =20
+>  block-obj-m =3D block/
+> =20
+> +#########################################################
+> +# remote-pci-obj-y is common code used by remote devices
+> +
+> +remote-pci-obj-$(CONFIG_MPQEMU) +=3D hw/
+> +remote-pci-obj-$(CONFIG_MPQEMU) +=3D qom/
+> +remote-pci-obj-$(CONFIG_MPQEMU) +=3D backends/
+> +remote-pci-obj-$(CONFIG_MPQEMU) +=3D block/
+> +remote-pci-obj-$(CONFIG_MPQEMU) +=3D migration/
+
+In the future migration can be split into the QEMU and remote parts.
+The remote executable doesn't need all the live migration code.
+
+> +remote-pci-obj-$(CONFIG_MPQEMU) +=3D remote/
+> +remote-pci-obj-$(CONFIG_MPQEMU) +=3D accel/
+
+Devices do not execute guest code so they should not need accel/.  kvm
+and tcg functions were stubbed out earlier in this patch series, so I'm
+surprised to see thing being built into the remote executable.
+
+> @@ -121,6 +131,20 @@ LIBS :=3D $(libs_cpu) $(LIBS)
+> =20
+>  obj-$(CONFIG_PLUGIN) +=3D plugins/
+> =20
+> +ifeq ($(TARGET_NAME)-$(CONFIG_MPQEMU)-$(CONFIG_USER_ONLY), x86_64-y-)
+> +remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D accel/stubs/kvm-stub.o
+> +remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D accel/stubs/tcg-stub.o
+> +remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D accel/stubs/hax-stub.o
+> +remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D accel/stubs/whpx-stub.o
+> +remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/vl-stub.o
+> +remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/net-stub.o
+> +remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/monitor.o
+> +remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/replay.o
+> +remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/xen-mapcache.o
+> +remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/audio.o
+> +remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/monitor.o
+> +endif
+
+Stubs don't need to be explicitly included, they should be linked in via
+libqemustub.a.
+
+> diff --git a/remote/remote-main.c b/remote/remote-main.c
+> new file mode 100644
+> index 0000000000..7c0764ad01
+> --- /dev/null
+> +++ b/remote/remote-main.c
+> @@ -0,0 +1,23 @@
+> +/*
+> + * Remote device initialization
+> + *
+> + * Copyright =A9 2018, 2020 Oracle and/or its affiliates.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +
+> +#include <stdio.h>
+
+This is already included by "qemu/osdep.h"
+
+> +
+> +#include "qemu/module.h"
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +    module_call_init(MODULE_INIT_QOM);
+> +
+> +    return 0;
+> +}
+> diff --git a/stubs/replay.c b/stubs/replay.c
+> index 2e3feee6a9..9b53c0cb37 100644
+> --- a/stubs/replay.c
+> +++ b/stubs/replay.c
+> @@ -102,3 +102,7 @@ int replay_get_instructions(void)
+>  void replay_account_executed_instructions(void)
+>  {
+>  }
+> +
+> +void replay_add_blocker(Error *reason)
+> +{
+> +}
+
+This can be moved to the stubs patch.
+
+--dkEUBIird37B8yKS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6i//UACgkQnKSrs4Gr
+c8i4igf/c000GJph3VsgJIXnHKWBRCFlz+3lpnezHoNj27WYUzHJDubmsd8ZHwyv
+xT8NL54ptQnULiUng160ieLc2y08okO/2tlWGTDY71Nil5I4+9D2HLHkfRZLZxOI
+sbnw545KqeD+7dDBIKTnIcQFkRFEZQ0x0pkaRQMUxHgbDvHdS81gfItGo5j3YB4r
+J+w/vMKWwTDwoJ8vmRMVttVO/i9bxewPgl38DF8t6ptdCPgrMqn2iv8rni0ZG5jk
+WECoxuxwsS8l5NCEi9J0jk7A2/1rgGiVAeKfq9zzO7NV9vMxyiEbt4xyX+LUCd9M
+5+nfPhrW8Dl4adezCGwHhIblT9MiJA==
+=8Vfp
+-----END PGP SIGNATURE-----
+
+--dkEUBIird37B8yKS--
+
 
