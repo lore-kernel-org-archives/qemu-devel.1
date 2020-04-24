@@ -2,68 +2,69 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE81C2BA1A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 09:55:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9CBCC2BA1A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 09:57:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5DC220728
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 09:55:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B370920728
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 09:57:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jBp2QZzg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5DC220728
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F99Gi2s3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B370920728
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRv32-0001bE-Td
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 05:55:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34012)
+	id 1jRv5n-00047c-Sn
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 05:57:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jRv2A-0000tL-CL
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:54:10 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jRv53-0003Lv-Ja
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:57:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jRv29-0005ux-A1
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:54:09 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33662
+ (envelope-from <mreitz@redhat.com>) id 1jRv51-0003Or-QZ
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:57:09 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28437
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jRv28-0005tW-TO
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:54:08 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jRv51-0003KH-D9
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 05:57:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587722047;
+ s=mimecast20190719; t=1587722226;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=na8Uco6vBdMIJFhRndOs9BZnbm3JxO27wGQ9kTFDxBo=;
- b=jBp2QZzg48RFaFDXJI/2kFSNTtURB9qPsqRlEw596Qcd/cyDTk5rXpxdxdXONm6Et21W54
- Yes6Y6TlR3HYogUgd/heVN4UssENX7R+HfH4FN/6RaZcl3it+dazttEyfd11tZ66m3CCgg
- itXFKN3c0Oe2/7c+nTozeusJBQK5V8s=
+ bh=1tund0S9wU5SpGCQljwTn3Cihvn7Ky7peTkk6GIDedg=;
+ b=F99Gi2s3m7KY26EZGmkC1fgm88GaCl+BgUvSDq//fOJGC6LBf2pdlx5GMtadYSbU9t0eQi
+ Zn9uaQk6igKcqZcEe3i3GdnsEIVvW1vA/HXRJWhGLaH7INYRRVH0sUri0a0mVL5Hsm1HDJ
+ uGjDluSqsKGZDo0EgjgLKRtiFoYH9r4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-jIV8A1YAO4yz0DEnc_YCWg-1; Fri, 24 Apr 2020 05:54:03 -0400
-X-MC-Unique: jIV8A1YAO4yz0DEnc_YCWg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-501-S2vHHNAIMeeYAJnxMogAJQ-1; Fri, 24 Apr 2020 05:57:02 -0400
+X-MC-Unique: S2vHHNAIMeeYAJnxMogAJQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55741100A61D;
- Fri, 24 Apr 2020 09:54:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73E7284B8A6;
+ Fri, 24 Apr 2020 09:57:00 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-113-192.ams2.redhat.com
  [10.36.113.192])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB643610EC;
- Fri, 24 Apr 2020 09:53:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 86780600F5;
+ Fri, 24 Apr 2020 09:56:57 +0000 (UTC)
 Subject: Re: [PATCH v2 1/3] block: Add blk_new_with_bs() helper
+From: Max Reitz <mreitz@redhat.com>
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 References: <20200423221707.477404-1-eblake@redhat.com>
  <20200423221707.477404-2-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
+ <307f7619-5e4a-10c1-7d49-8ee6bb8d650c@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
  /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
@@ -88,18 +89,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <307f7619-5e4a-10c1-7d49-8ee6bb8d650c@redhat.com>
-Date: Fri, 24 Apr 2020 11:53:53 +0200
+Message-ID: <f3808938-8b27-3af0-c2da-996459a5c921@redhat.com>
+Date: Fri, 24 Apr 2020 11:56:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200423221707.477404-2-eblake@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <307f7619-5e4a-10c1-7d49-8ee6bb8d650c@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="XaEhnGMv8OFo0H6qMzueRSP7oK7WM5IN6"
+ boundary="yQxxgHbTaS5rGw9xFvFNQYcyeWcDZLEq5"
 Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 03:11:53
@@ -127,92 +128,100 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XaEhnGMv8OFo0H6qMzueRSP7oK7WM5IN6
-Content-Type: multipart/mixed; boundary="jBY9NwVpLWFjDOJmUXxQvc4ACnvyJ6ZUP"
+--yQxxgHbTaS5rGw9xFvFNQYcyeWcDZLEq5
+Content-Type: multipart/mixed; boundary="LolDqW20lmxroJzyXmI30ZkgYxioRKvB3"
 
---jBY9NwVpLWFjDOJmUXxQvc4ACnvyJ6ZUP
+--LolDqW20lmxroJzyXmI30ZkgYxioRKvB3
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 24.04.20 00:17, Eric Blake wrote:
-> There are several callers that need to create a new block backend from
-> an existing BDS; make the task slightly easier with a common helper
-> routine.
+On 24.04.20 11:53, Max Reitz wrote:
+> On 24.04.20 00:17, Eric Blake wrote:
+>> There are several callers that need to create a new block backend from
+>> an existing BDS; make the task slightly easier with a common helper
+>> routine.
+>>
+>> Suggested-by: Max Reitz <mreitz@redhat.com>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>  include/sysemu/block-backend.h |  2 ++
+>>  block/block-backend.c          | 23 +++++++++++++++++++++++
+>>  block/crypto.c                 |  8 +++-----
+>>  block/parallels.c              |  7 +++----
+>>  block/qcow.c                   |  7 +++----
+>>  block/qcow2.c                  | 15 ++++++---------
+>>  block/qed.c                    |  7 +++----
+>>  block/sheepdog.c               |  9 ++++-----
+>>  block/vdi.c                    |  7 +++----
+>>  block/vhdx.c                   |  7 +++----
+>>  block/vmdk.c                   |  9 ++++-----
+>>  block/vpc.c                    |  7 +++----
+>>  blockdev.c                     |  8 +++-----
+>>  blockjob.c                     |  7 ++-----
+>>  14 files changed, 65 insertions(+), 58 deletions(-)
 >=20
-> Suggested-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  include/sysemu/block-backend.h |  2 ++
->  block/block-backend.c          | 23 +++++++++++++++++++++++
->  block/crypto.c                 |  8 +++-----
->  block/parallels.c              |  7 +++----
->  block/qcow.c                   |  7 +++----
->  block/qcow2.c                  | 15 ++++++---------
->  block/qed.c                    |  7 +++----
->  block/sheepdog.c               |  9 ++++-----
->  block/vdi.c                    |  7 +++----
->  block/vhdx.c                   |  7 +++----
->  block/vmdk.c                   |  9 ++++-----
->  block/vpc.c                    |  7 +++----
->  blockdev.c                     |  8 +++-----
->  blockjob.c                     |  7 ++-----
->  14 files changed, 65 insertions(+), 58 deletions(-)
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+(With the Patchew warning fixed, of course (i.e., we should set ret to
+-EPERM or something in qcow.c))
 
-> diff --git a/blockdev.c b/blockdev.c
-> index 5faddaa7052f..f43426ed5fbc 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-
-[...]
-
-> @@ -2734,14 +2733,13 @@ void qmp_block_resize(bool has_device, const char=
- *device,
->          goto out;
->      }
+>> diff --git a/blockdev.c b/blockdev.c
+>> index 5faddaa7052f..f43426ed5fbc 100644
+>> --- a/blockdev.c
+>> +++ b/blockdev.c
 >=20
-> -    blk =3D blk_new(bdrv_get_aio_context(bs), BLK_PERM_RESIZE, BLK_PERM_=
-ALL);
-> -    ret =3D blk_insert_bs(blk, bs, errp);
-> -    if (ret < 0) {
-> +    blk =3D blk_new_with_bs(bs, BLK_PERM_RESIZE, BLK_PERM_ALL, errp);
-> +    if (!blk) {
->          goto out;
->      }
+> [...]
 >=20
->      bdrv_drained_begin(bs);
-> -    ret =3D blk_truncate(blk, size, false, PREALLOC_MODE_OFF, errp);
-> +    blk_truncate(blk, size, false, PREALLOC_MODE_OFF, errp);
+>> @@ -2734,14 +2733,13 @@ void qmp_block_resize(bool has_device, const cha=
+r *device,
+>>          goto out;
+>>      }
+>>
+>> -    blk =3D blk_new(bdrv_get_aio_context(bs), BLK_PERM_RESIZE, BLK_PERM=
+_ALL);
+>> -    ret =3D blk_insert_bs(blk, bs, errp);
+>> -    if (ret < 0) {
+>> +    blk =3D blk_new_with_bs(bs, BLK_PERM_RESIZE, BLK_PERM_ALL, errp);
+>> +    if (!blk) {
+>>          goto out;
+>>      }
+>>
+>>      bdrv_drained_begin(bs);
+>> -    ret =3D blk_truncate(blk, size, false, PREALLOC_MODE_OFF, errp);
+>> +    blk_truncate(blk, size, false, PREALLOC_MODE_OFF, errp);
+>=20
+> This is also addressed by
+> https://lists.nongnu.org/archive/html/qemu-devel/2020-04/msg03656.html,
+> but it does make sense to fix it here, too.  Well, whichever lands first
+> lands first, I suppose (so @ret can be dropped).
 
-This is also addressed by
-https://lists.nongnu.org/archive/html/qemu-devel/2020-04/msg03656.html,
-but it does make sense to fix it here, too.  Well, whichever lands first
-lands first, I suppose (so @ret can be dropped).
+I intended to affix the =E2=80=9C(so @ret can be dropped)=E2=80=9D to the f=
+irst
+sentence, not the second one...
 
 Max
 
 
---jBY9NwVpLWFjDOJmUXxQvc4ACnvyJ6ZUP--
+--LolDqW20lmxroJzyXmI30ZkgYxioRKvB3--
 
---XaEhnGMv8OFo0H6qMzueRSP7oK7WM5IN6
+--yQxxgHbTaS5rGw9xFvFNQYcyeWcDZLEq5
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6itzEACgkQ9AfbAGHV
-z0D6EQf/dji1jPMvn98JpYCjfpx4rVD1/Qji3rvRS6PeAjcG0udu2SNRSOzY4C+S
-4+4+e1RCq7lVxIwf0at585ZutpYHbjvb+mMGKmROiJao5gpvWZnuG6rVoitKG1/D
-J+UPjjYMROaQ8OBhaGKrm+XS325rGtDO3wu3H3EupD2rwxwLQS0wHeulRTVow+2V
-MSd2syquFU3ddqBuunt1mTZHd3ZbeNFUCwMNZ7+u/zDmi+uKdGVTBXrkJj0aC7zi
-qyZxkZwWGLH9fk9WY8lFoPw6itIYG4VyAxOvkUctAoNHZ/wI7jlCIlkm9c9XMpQS
-2rNt1GzAIJpSLHxrbXsbKC0LJ699Qg==
-=lU7c
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6it+cACgkQ9AfbAGHV
+z0DgSwgAu7NmWYppBhxcsbp1MQRWTxvnw1m4KpnfOxhGfqEBm9snpDbW+nYTh94a
+rANDvlVT3oSsWNn3uUGod389kdd9HpXQivbyywSaEHVLX/MgRmhAGZTyYyPQ9c4V
+F6B4EhMI1GZUgjL/dJkylyRP7dY5cqd8TZPsB42LmIJYSqdJ1mpu4ON/zlziv5Sx
+jbDV/Z4y6jlqEig2oYu7vo483jIToUp3rks0odjoZt+yV3h5agdU/WJwBryC+Ig7
+1VAECoGYnqt0Hrfa4ppuWXpQugzwqGSnL9kr0lD/4OO8SwXPkpf9aj7dgZ+EPECP
+gAN8y4BHailk50C/LLspQ09NyS2+Pw==
+=ckWT
 -----END PGP SIGNATURE-----
 
---XaEhnGMv8OFo0H6qMzueRSP7oK7WM5IN6--
+--yQxxgHbTaS5rGw9xFvFNQYcyeWcDZLEq5--
 
 
