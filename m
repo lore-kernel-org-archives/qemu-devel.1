@@ -2,92 +2,86 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86634C55186
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 20:07:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B21C55197
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 20:09:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FA0120857
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 20:07:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F1CE20857
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 20:09:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FWwMcNG2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FA0120857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dbi1Yh9g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F1CE20857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jS4bE-0003Mo-AY
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 16:07:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34340)
+	id 1jS4dg-0005IN-FD
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 16:09:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35012)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jS4aQ-0002lo-N4
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 16:06:11 -0400
+ (envelope-from <eblake@redhat.com>) id 1jS4cq-0004kl-I1
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 16:08:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jS4aP-0005dc-E1
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 16:06:10 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:41990)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jS4aO-0005XU-Pl
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 16:06:09 -0400
-Received: by mail-pf1-x444.google.com with SMTP id f7so5310429pfa.9
- for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 13:06:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=EOai6Y7Bud3CLp0tY8BMjTTGW/H5DO96v/dRgMwf5Ho=;
- b=FWwMcNG2mL48GLdRZAxvszXkTvz42Kpj1X8BOcyuQhcmT3LbW9yWL1GedAqTtHRokh
- YvjcZZOHpcczJr3Buch0xUvUesZddJn+OShFLkUmPf9GqBZm/jYNk943YIHULc+1f39Q
- wqUN06YSD09Jh/zgw3C6Ex7GWBs+K+CoecmyN2T0mFVUtlF+zPyRi+JWMBTYFk5N2ym3
- JWzJHuA5J2TPttze3ae7GYTEyg17Nxfh4ovSmhVdiL3sjz7O+eNZ3apPhVwfKXoZE3p7
- Ykkvrc1O1Esd+yt/Ome88MNQjDY3Tsh8MNxpyhP8z/5nB0XkIq0xOHiS+0M0DArEcYKD
- 83Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EOai6Y7Bud3CLp0tY8BMjTTGW/H5DO96v/dRgMwf5Ho=;
- b=OhDXnnbHkR/skWYZK5iAjqh93pfoEKc3uT4DyHo4T20uEHqDUhLb7K9B+NUJhGWhlL
- HaOgZthfXuL9pawGNBKvifQD0CvxygLNKLAW/F5fkUKmbom4FtK69B0CkvZn4id9KkP2
- zveOQtggeWF2bzZxnUiOHg6/nyS4NSCLg3xa/FPHujcIeLYAIcMtbjCkRCgUzLNP2fjn
- IPk2iQ2boCDQq9G04Pm3H1giwsP2HTg/rCE/yt1M9urYJWTeytR0o64yrWmnAWq7RYN0
- lgEBiZSz8liCQ386sh1QYrHylZTfGfWU6OfF77WOTVWK270SSbpfCzmTcEYc7XRJgGsc
- kUzw==
-X-Gm-Message-State: AGi0PuYgEmufy7bJ37ZT3QHejBeRekewClVOIgIDCQO97Ezi+FB63X9w
- BgW+ah5XSleNHfP2FXn0HVmiUw==
-X-Google-Smtp-Source: APiQypIHekcJ2dLViEP8RNBA+yGeCDbADzNo6iXl9ycZMTzje4lZLSwZlJK3WllzCNkUmsblqhFIzA==
-X-Received: by 2002:aa7:991e:: with SMTP id z30mr11736833pff.243.1587758767114; 
- Fri, 24 Apr 2020 13:06:07 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id o21sm5240530pjr.37.2020.04.24.13.06.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 24 Apr 2020 13:06:06 -0700 (PDT)
-Subject: Re: [PATCH v2] target/arm: Implement SVE2 scatter store insns
-To: Stephen Long <steplong@quicinc.com>, qemu-devel@nongnu.org
-References: <20200422141553.8037-1-steplong@quicinc.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2fa86c71-90a3-6410-c53c-93658099fb59@linaro.org>
-Date: Fri, 24 Apr 2020 13:06:04 -0700
+ (envelope-from <eblake@redhat.com>) id 1jS4co-0006qt-Vg
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 16:08:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51836
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jS4co-0006ef-Di
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 16:08:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587758915;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=b1zy/ibFG+dLjW17C/6gpzOrBZ+TQaIHUrj8AFgYX/A=;
+ b=Dbi1Yh9gsC9BWDROwjO9qcRMWMYI40B0Ktk9zifuKovG8telRTgKcr2Xpnl4H0oFiPUvkj
+ 2/u6w1DBm5nbzRs8+l1MIr/njm14qVXXHf9EUvXZKi5FUSLTHOLzVkb54x2nsn2iNEZU9L
+ 9XurHUz+53Kq09ZU5ncVzY63Z7H1BGI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-SyZeQDUjPriuA5n-Kp07NA-1; Fri, 24 Apr 2020 16:08:31 -0400
+X-MC-Unique: SyZeQDUjPriuA5n-Kp07NA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7D96802EB1
+ for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 20:08:30 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C828196AE;
+ Fri, 24 Apr 2020 20:08:30 +0000 (UTC)
+Subject: Re: [PATCH 06/11] error: Use error_reportf_err() where appropriate
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200424192027.11404-1-armbru@redhat.com>
+ <20200424192027.11404-7-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <44cf6721-88fa-acd3-b051-43e81b37506a@redhat.com>
+Date: Fri, 24 Apr 2020 15:08:29 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200422141553.8037-1-steplong@quicinc.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200424192027.11404-7-armbru@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::444
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 13:45:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,36 +93,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, apazos@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/22/20 7:15 AM, Stephen Long wrote:
-> Add decoding logic for SVE2 64-bit/32-bit scatter non-temporal store
-> insns.
+On 4/24/20 2:20 PM, Markus Armbruster wrote:
+> Replace
 > 
-> 64-bit
-> * STNT1B (vector plus scalar)
-> * STNT1H (vector plus scalar)
-> * STNT1W (vector plus scalar)
-> * STNT1D (vector plus scalar)
+>      error_report("...: %s", ..., error_get_pretty(err));
 > 
-> 32-bit
-> * STNT1B (vector plus scalar)
-> * STNT1H (vector plus scalar)
-> * STNT1W (vector plus scalar)
+> by
 > 
-> Signed-off-by: Stephen Long <steplong@quicinc.com>
+>      error_reportf_err(err, "...: ", ...);
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 > 
-> Cool, it seemed to typedef correctly.
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  target/arm/sve.decode      | 10 ++++++++++
->  target/arm/translate-sve.c |  8 ++++++++
->  2 files changed, 18 insertions(+)
+>   chardev/char-socket.c | 5 +++--
+>   hw/sd/pxa2xx_mmci.c   | 4 ++--
+>   hw/sd/sd.c            | 4 ++--
+>   hw/usb/dev-mtp.c      | 9 +++++----
+>   qemu-nbd.c            | 7 +++----
+>   scsi/qemu-pr-helper.c | 4 ++--
+>   6 files changed, 17 insertions(+), 16 deletions(-)
 
-Applied to my SVE2 branch.  Thanks!
+Although it touches NBD, I'm happy for this to go through your tree with 
+the larger series.
 
+> +++ b/qemu-nbd.c
+> @@ -856,8 +856,7 @@ int main(int argc, char **argv)
+>           }
+>           tlscreds = nbd_get_tls_creds(tlscredsid, list, &local_err);
+>           if (local_err) {
+> -            error_report("Failed to get TLS creds %s",
+> -                         error_get_pretty(local_err));
+> +            error_reportf_err(local_err, "Failed to get TLS creds ");
 
-r~
+Odd one out for not using ':' in the message, but that's independent of 
+this patch.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
