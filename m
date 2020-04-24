@@ -2,64 +2,66 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 028CBC2BA19
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 01:47:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60759C2BA19
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 01:48:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C258B20728
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 01:47:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AA9E20728
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 01:48:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fSVigHNd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C258B20728
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="axGm8j/3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AA9E20728
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRnQx-00050h-Nq
-	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 21:47:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43526)
+	id 1jRnSF-0006DZ-9P
+	for qemu-devel@archiver.kernel.org; Thu, 23 Apr 2020 21:48:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43570)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jRnPk-00047G-7B
- for qemu-devel@nongnu.org; Thu, 23 Apr 2020 21:46:02 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jRnPk-00047K-Hq
+ for qemu-devel@nongnu.org; Thu, 23 Apr 2020 21:46:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jRnPh-0005Dc-Uc
+ (envelope-from <dgibson@ozlabs.org>) id 1jRnPi-0005El-9K
  for qemu-devel@nongnu.org; Thu, 23 Apr 2020 21:45:59 -0400
-Received: from ozlabs.org ([203.11.71.1]:45791)
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:36571 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jRnPf-0004Rz-2M; Thu, 23 Apr 2020 21:45:56 -0400
+ id 1jRnPf-0004Rw-2R; Thu, 23 Apr 2020 21:45:56 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 497cSj4Hqcz9sSm; Fri, 24 Apr 2020 11:45:41 +1000 (AEST)
+ id 497cSj5r8Zz9sSh; Fri, 24 Apr 2020 11:45:41 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1587692741;
- bh=DwbecEN22V9apyOZL7d/4HzJ0LOORakXWNPtT03M1GA=;
+ bh=fx/RvWPWW/yGqVkD0phHBQ/hvQWAEBqdQawyS11EGao=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=fSVigHNd3hjKdtXR9ZNHB1rnpfeuXdv7wYpHZJ5sENKQg0xxSwC8VkYR4ST1w8y9g
- 4SSvxQ64nHIbr4VBn5V0uP6L1MS2EKZpHgKIkicreu85uvoTaze8RqGRcDdohAwUMZ
- M3EJnJrpW+VNiZOnZCXbq42KUFokRtVINdMVfNbY=
-Date: Fri, 24 Apr 2020 11:36:08 +1000
+ b=axGm8j/3eI1ZsS8SWCLCdtelG6UgOUeG1EoeiMMOjmkD0bSqZoGozSu1y6ANBaKju
+ AZeKF0BNbGL0vvHcBuNtpWU3zVJjpmFal/AxuZA2soMe4i/JN3gSsFV6DEnLBZov2b
+ g07TRgvNZij/4ZlYNnBPelCrc7jhtQkF8lPzUPXw=
+Date: Fri, 24 Apr 2020 11:45:32 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Daniel Henrique Barboza <danielhb413@gmail.com>
 Subject: Re: [PATCH] spapr_nvdimm.c: make 'label-size' mandatory
-Message-ID: <20200424013608.GA121306@umbus.fritz.box>
+Message-ID: <20200424014532.GB121306@umbus.fritz.box>
 References: <20200413203628.31636-1-danielhb413@gmail.com>
+ <20200414020117.GB48061@umbus.fritz.box>
+ <84c6f5c7-de31-84ef-e873-58b10af14bc0@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="gKMricLos+KVdGMg"
+ protocol="application/pgp-signature"; boundary="1LKvkjL3sHcu1TtY"
 Content-Disposition: inline
-In-Reply-To: <20200413203628.31636-1-danielhb413@gmail.com>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+In-Reply-To: <84c6f5c7-de31-84ef-e873-58b10af14bc0@gmail.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/23 21:45:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,65 +73,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---gKMricLos+KVdGMg
+--1LKvkjL3sHcu1TtY
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 13, 2020 at 05:36:28PM -0300, Daniel Henrique Barboza wrote:
-> The pseries machine does not support NVDIMM modules without label.
-> Attempting to do so, even if the overall block size is aligned with
-> 256MB, will seg fault the guest kernel during NVDIMM probe. This
-> can be avoided by forcing 'label-size' to always be present for
-> sPAPR NVDIMMs.
+On Tue, Apr 14, 2020 at 08:04:29AM -0300, Daniel Henrique Barboza wrote:
 >=20
-> The verification was put before the alignment check because the
-> presence of label-size affects the alignment calculation, so
-> it's not optimal to warn the user about an alignment error,
-> then about the lack of label-size, then about a new alignment
-> error when the user sets a label-size.
 >=20
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-
-So, I still think it's kind of bogus that the guest side driver falls
-over so messily (more on that elswhere in the thread).
-
-However, regardless of that, it does make sense to enforce the PAPR
-restriction that all NVDIMMs have labels.  And it fixes the visible
-problem with a minimal change.
-
-So, I've applied to ppc-for-5.1.  I am going to update the error
-messages a little to make it clearer that these are PAPR specific
-restrictions.
-
-> ---
->  hw/ppc/spapr_nvdimm.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+> On 4/13/20 11:01 PM, David Gibson wrote:
+> > CCing Xiao, Michael and Igor for generic NVDIMM perspective.
+> >=20
+> > On Mon, Apr 13, 2020 at 05:36:28PM -0300, Daniel Henrique Barboza wrote:
+> > > The pseries machine does not support NVDIMM modules without label.
+> > > Attempting to do so, even if the overall block size is aligned with
+> > > 256MB, will seg fault the guest kernel during NVDIMM probe. This
+> > > can be avoided by forcing 'label-size' to always be present for
+> > > sPAPR NVDIMMs.
+> > >=20
+> > > The verification was put before the alignment check because the
+> > > presence of label-size affects the alignment calculation, so
+> > > it's not optimal to warn the user about an alignment error,
+> > > then about the lack of label-size, then about a new alignment
+> > > error when the user sets a label-size.
+> > >=20
+> > > Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> >=20
+> > So, this would get the job done, but it seems a bit inelegant compared
+> > to having the device default to working settings.  I'm looking at how
+> > this interacts with the generic constraints on label-size.
+> >=20
+> > The generic nvdimm code has a MIN_NAMESPACE_LABEL_SIZE of 128 kiB, and
+> > values of label-size less than that are rejected.  Except that if
+> > label-size is not set at all, it is left as 0.
+> >=20
+> > Is that intended behaviour?  Do x86 (or whatever) NVDIMMs have a label
+> > of at least 128kiB, unless they have no label at all?  Or could we
+> > make the default label-size 128kiB generically?
 >=20
-> diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
-> index 25be8082d7..9abcdcc26b 100644
-> --- a/hw/ppc/spapr_nvdimm.c
-> +++ b/hw/ppc/spapr_nvdimm.c
-> @@ -37,6 +37,12 @@ void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm, =
-uint64_t size,
->      QemuUUID uuid;
->      int ret;
-> =20
-> +    if (object_property_get_int(OBJECT(nvdimm), NVDIMM_LABEL_SIZE_PROP,
-> +                                &error_abort) =3D=3D 0) {
-> +        error_setg(errp, "NVDIMM device requires label-size to be set");
-> +        return;
-> +    }
-> +
->      if (size % SPAPR_MINIMUM_SCM_BLOCK_SIZE) {
->          error_setg(errp, "NVDIMM memory size excluding the label area"
->                     " must be a multiple of %" PRIu64 "MB",
+> My limited understanding on how NVDIMM works in x86 is that x86 NVDIMMs c=
+an
+> work with and without label, but the label has a minimum size of 128kiB.
+
+Ok.  Kinda weird, but ok.
+
+But.. the thing that bothers me about this is that the guest is
+crashing in generic code.  If the generic code can handle a label-less
+nvdimm on x86, why is it dying on power.
+
+After a bit of poking, I think the answer is that x86 is explicitly
+treating label_size=3D=3D0 as "label not supported" and returning explicit
+errors for the get_label_size/read_label/write_label low level
+operations, which the generic code is handling.  ppc, I think, is
+instead just returning bogus/meaningless values which the generic code
+is choking on.
+
+So, I really think we should have the spapr_scm driver on the guest
+side check for the zero sized label case and return similar errors,
+for robustness.
+
+But, I don't care enough to do it myself.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -137,25 +148,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---gKMricLos+KVdGMg
+--1LKvkjL3sHcu1TtY
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6iQoUACgkQbDjKyiDZ
-s5IVPQ//dLKeBkKtgMXNlWXTazmOQSuxQv514dcd99J3SLTbYRvhmSdAJlWCWmLG
-S3szrsKNyKZz/G7HLweg8IfucOtPhQROAmLzwqjukPoNA2aTUniwtuD1P3PcvhAs
-x8LmSYJViFQU+XEtXBFxb1VArQF76KfsXThuoSsq5xHCoPKn9VEv1skhn7dCzW9j
-h8SYAXf9/rjkSxfCCfkz30/QguJJAw4QSZJUTVk9UTTdN21raGsor/ERX/G+pN/Q
-/4DIxd/BP0JhEFS+wTMAD4P7cYgUZnK/j2TWM4t9Yq7+eVVLBCI8Zx/RqvQzzBr9
-jBy++8sV+mZGigqIujW4MKZ1/+yGTHf8CUtlGp7oubVNE/qH7jKR4FfqqEhrSx1C
-ofTfzqC15hY1Fs5hKM61xjqg9uVo36sfGmnHpttiQ9NoGi2LcvQxRswSqn6RPKEm
-OniiF5FWt7OX2Mey4jVh+p8j/aFu8TELkADtTb09zBUxWlNmJboF1G+L3n1povtf
-d3RtyTKx/LQG5/N/FuIDWKO3thjvOyB446+4ig/PzP1xVmi2p7lmk041SXiEmwzV
-QHfo96gl+w4u2X5nM7YWZigmgzEDXG11tGsaPTcOKFyu5+xVPs/S4/OUiaM7zauQ
-uGLfrFHTz3wbSjQRA8KSy1YdJ0I86lb2EqRQ2UcmKS6sF7Avjmc=
-=GZID
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6iRLwACgkQbDjKyiDZ
+s5JFAA//S2R96ZmwA6oYD7UYyg259Tqk2kWkeloFyGV1orR/sjvCqO9Xia1P9O5x
+LPWFdL1CkUp42qQXf/fm/gWhlB67mbupj3vHbQsyEZ5HAtsbcc+WYQ8JsMzKBScN
+ibyVHG+4H/1Mf0b0CJHeRm5A4oGigNdPshuJQTGgAiOtR52QyCGKno7hZHF1RbUG
+3UZ8bSw0Mw+xfkRQxZjYjVqwIzi3pbDA2fUIcgqGpV6n8M+uFAmEK6Q4Pc4zfBYB
+4Odqq8+ZXzbRa4X2HFPGr21SxMFoSTtaQleESIo1E5LFq0nvaPmtPvsq8Wkn4aVx
+yz4yeeQzwRlUh52QhSVU07+WKPuvnOfa8ZY8WVVcGsTaPb19+lefo2vON+ukJkIO
+bFb1dSgUJ5cU4divwupKi2hSU2QJEDUrIEbOI97vRNf+7vqOE5gDZK9FqzjMIx8y
+h1oXYXWVqmKhWHrhKGsecJMj4FTo9nu3id/HyWVuMe58S+UMzwWGqb0WKkIim2HV
+3hbP2QdNxyAtn5Ddj17qQ8Cwqey0a2PIMr791ibAl8o0wlklb27lBqzGdkhHlokq
+2gHNOZx2sr2EH05/EnoEoRd9ksThGQNzbAqsq2HyCua2lbv8Y8bRGzRpsLJaQhzy
+jn4F9WWc+jnNTuLMrfQ9uu6KpVwTMF/Q5vC1uH4w9bXXoVh5ICU=
+=tv2a
 -----END PGP SIGNATURE-----
 
---gKMricLos+KVdGMg--
+--1LKvkjL3sHcu1TtY--
 
