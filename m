@@ -2,86 +2,89 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B6FC54FCB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 10:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB03C2BA1A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 10:51:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8064F2064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 10:48:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECDB920776
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 10:51:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ST+OtcgX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8064F2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hqkIpCMw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECDB920776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRvsk-0005VH-Lj
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 06:48:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43062)
+	id 1jRvw2-0007Hi-05
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 06:51:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44530)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jRvs4-0004xb-RD
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 06:47:49 -0400
+ (envelope-from <stefanha@gmail.com>) id 1jRvuv-0006iE-HD
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 06:50:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jRvs4-0003du-91
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 06:47:48 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38702
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jRvs3-0003dS-P6
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 06:47:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587725266;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ivIfhWcXKj/Xxc39QgkuwrS8TEn+drSg3k77MfYdsN8=;
- b=ST+OtcgXcjgpJsbZF3NGqSwarm+RY+DQoLZaZPDbiyUpYWcrxx9l8lEd+fWlWfDYmS3kab
- aBDCnReXVEz79YlkQzbcSwlam3uJXJ7VwIvq0l+9UxEyFoygkVdZkmMl1ssNouWvj3uifI
- CBxxyK4gnwMmvQrX9rRm6ieufuv7HvE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-JqgLsKAsNqm77WCEge1j-A-1; Fri, 24 Apr 2020 06:47:43 -0400
-X-MC-Unique: JqgLsKAsNqm77WCEge1j-A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A47E7800C78;
- Fri, 24 Apr 2020 10:47:41 +0000 (UTC)
-Received: from work-vm (ovpn-113-179.ams2.redhat.com [10.36.113.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0826C99CD;
- Fri, 24 Apr 2020 10:47:36 +0000 (UTC)
-Date: Fri, 24 Apr 2020 11:47:34 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Wei Wang <wei.w.wang@intel.com>
-Subject: Re: [PATCH v1 1/2] migration/xbzrle: replace transferred xbzrle
- bytes with encoded bytes
-Message-ID: <20200424104734.GE3106@work-vm>
-References: <1587352003-3312-1-git-send-email-wei.w.wang@intel.com>
- <1587352003-3312-2-git-send-email-wei.w.wang@intel.com>
- <20200421192106.GM3029@work-vm> <5E9FB148.3060906@intel.com>
+ (envelope-from <stefanha@gmail.com>) id 1jRvur-0000QK-Ng
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 06:50:45 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33653)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jRvur-0000Mv-9w
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 06:50:41 -0400
+Received: by mail-wm1-x344.google.com with SMTP id v8so9696601wma.0
+ for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 03:50:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=S4xBylA9oq753w7Z75CYrLZ5MHiyjHcGivxYn9X+LLU=;
+ b=hqkIpCMwN4+4ETO4tQv00fAMkTRcjjsYgcnnAGhVryv1nYMLcVddYeGeN4O4dr3T3n
+ rtx1lCMkxzztXYAuPsDxXWQJG1pWBOyddqpfiR7DXVi3yb6r2oKPah1X1VObjXJ/MrA+
+ 7y7siQ5jJUmkb6m7BN6Jc/HpvjkntVYP3eDeDMmHUXwzzHhjkQTuBpuUX0rRF/EVosoA
+ SQAhSfEcI0wNffL839emAnLD+Y83+MpLHicMuEC7cV7HtePfC0S3YTfoP8ulcxQYAaro
+ rSoSVpDPKrOM41yexjbtwbGqv+crsKuU0SJpH3uuMFqoFuGX/1wm3mRhufvPAUPrJz1r
+ c2VQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=S4xBylA9oq753w7Z75CYrLZ5MHiyjHcGivxYn9X+LLU=;
+ b=DtrdFQU45IHmM6pq3F4IuEk6jqSkXDhGAIFeVOlixQAyXV6Hpy5CM2KlNK7oRwcgL1
+ wRuERygaHeVKMR9BKDSeP1WPOUMRBZzFbnOiCgqyf5l3KjOSjxID53si/H0bBO71XWZf
+ l1J4PQEI1AnNdbzN62F9sH1Az3/GMuU3sIHUB1jvf934CKMEk8jad7/0M1CooXjYiH1z
+ wrUEIrZc19A08Hxlo/DEZ+awc7oFt1AI5wRXBrpnlOlAWB1i6Fyx+TkpHxfy+rsFDvmD
+ Wy1pjCFB3rb0YBj9DlywH9LwVw/mKxWSHcR7Ezjm36LMGU2zRUqGBZrt+dyg9mEdT+ud
+ 3QBQ==
+X-Gm-Message-State: AGi0PuacbI+C+8M7CppUSV3F4S+wI4P7Dcu61pl6ImMr/p9GFANfQ6Ak
+ bPQWNBDSy8BavW953a1KOFw=
+X-Google-Smtp-Source: APiQypIK+5nC6yEMGjcUH3KdSVIn1lTbUmHvTDAtPn1mtFt6EVHfNpn0rvdcafJqyn11poOMTgyRFQ==
+X-Received: by 2002:a1c:f012:: with SMTP id a18mr9142222wmb.41.1587725439542; 
+ Fri, 24 Apr 2020 03:50:39 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id j4sm7531620wrm.85.2020.04.24.03.50.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 24 Apr 2020 03:50:38 -0700 (PDT)
+Date: Fri, 24 Apr 2020 11:50:37 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: dnbrdsky@gmail.com
+Subject: Re: [PATCH v5 0/2] Replaced locks with lock guard macros
+Message-ID: <20200424105037.GC174193@stefanha-x1.localdomain>
+References: <20200404042108.389635-1-dnbrdsky@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <5E9FB148.3060906@intel.com>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="oJ71EGRlYNjSvfq7"
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 02:57:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+In-Reply-To: <20200404042108.389635-1-dnbrdsky@gmail.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=stefanha@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,79 +96,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kevin.tian@intel.com, quintela@redhat.com, qemu-devel@nongnu.org,
- peterx@redhat.com, gloryxiao@tencent.com, yi.y.sun@intel.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Wei Wang (wei.w.wang@intel.com) wrote:
-> On 04/22/2020 03:21 AM, Dr. David Alan Gilbert wrote:
-> > * Wei Wang (wei.w.wang@intel.com) wrote:
-> > > Like compressed_size which indicates how many bytes are compressed, w=
-e
-> > > need encoded_size to understand how many bytes are encoded with xbzrl=
-e
-> > > during migration.
-> > >=20
-> > > Replace the old xbzrle_counter.bytes, instead of adding a new counter=
-,
-> > > because we don't find a usage of xbzrle_counter.bytes currently, whic=
-h
-> > > includes 3 more bytes of the migration transfer protocol header (in
-> > > addition to the encoding header). The encoded_size will further be us=
-ed
-> > > to calculate the encoding rate.
-> > >=20
-> > > Signed-off-by: Yi Sun <yi.y.sun@intel.com>
-> > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > Can you explain why these 3 bytes matter?  Certainly the 2 bytes of the
-> > encoded_len are an overhead that's a cost of using XBZRLE; so if you're
-> > trying to figure out whether xbzrle is worth it, then you should includ=
-e
-> > those 2 bytes in the cost.
-> > That other byte, that holds ENCODING_FLAG_XBZRLE also seems to be pure
-> > oerhead of XBZRLE; so your cost of using XBZRLE really does include
-> > those 3 bytes.
-> >=20
-> > SO to me it makes sense to include the 3 bytes as it currently does.
-> >=20
-> > Dave
+
+--oJ71EGRlYNjSvfq7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Apr 03, 2020 at 09:21:06PM -0700, dnbrdsky@gmail.com wrote:
+> From: Daniel Brodsky <dnbrdsky@gmail.com>
 >=20
-> Thanks Dave for sharing your thoughts.
+> This patch set adds:
+> - a fix for lock guard macros so they can be used multiple times in
+> the same function
+> - replacement of locks with lock guards where appropriate
 >=20
-> We hope to do a fair comparison of compression rate and xbzrle encoding
-> rate.
-> The current compression_rate doesn't include the migration flag overhead
-> (please see
-> update_compress thread_counts() ). So for xbzrle encoding rate, we wanted=
- it
-> not include the migration
-> protocol flags as well (but the 2 bytes xbzrle encoding overhead is kept
-> there, as the compression rate
-> includes the compression header overhead).
+> v4 -> v5:
+> - added G_GNUC_UNUSED to lock guard macro to supress unused var warning
 >=20
-> Or would you think it is necessary to add the migration flag (8 bytes) fo=
-r
-> compression
-> when calculating the compression rate?
-
-I don't think the migration flag (8 bytes) matters, because everyone has
-that; but isn't this patch about the 3 bytes (1 byte
-ENCONDING_FLAG_XBZRLE) (2 byte encoded_len) ?
-
-The 2 byte encoded_len in this code, corresponds to the 4 byte blen in
-qemu_put_compression_data;  I'm not sure but I think that 4 bytes is
-included in the length update_compress_thread_counts() sees - if so
-that makes it equivalent including the length.
-
-Dave
-
-
-> Best,
-> Wei
+> v3 -> v4:
+> - removed unneeded unlocks from areas where lock guards are now used
+> - dropped change to lock guard in iscsi.c as it changed old functionality
 >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> v2 -> v3:
+> - added __COUNTER__ fix for additional lock guard macro
+> - added missing include header in platform.c
+>=20
+> v1 -> v2:
+> - fixed whitespace churn
+> - added cover letter so patch set referenced correctly
+>=20
+> Daniel Brodsky (2):
+>   lockable: fix __COUNTER__ macro to be referenced properly
+>   lockable: replaced locks with lock guard macros where appropriate
+>=20
+>  block/iscsi.c           |  7 ++----
+>  block/nfs.c             | 51 +++++++++++++++++++----------------------
+>  cpus-common.c           | 14 ++++-------
+>  hw/display/qxl.c        | 43 ++++++++++++++++------------------
+>  hw/vfio/platform.c      |  5 ++--
+>  include/qemu/lockable.h |  7 +++---
+>  include/qemu/rcu.h      |  2 +-
+>  migration/migration.c   |  3 +--
+>  migration/multifd.c     |  8 +++----
+>  migration/ram.c         |  3 +--
+>  monitor/misc.c          |  4 +---
+>  ui/spice-display.c      | 14 +++++------
+>  util/log.c              |  4 ++--
+>  util/qemu-timer.c       | 17 +++++++-------
+>  util/rcu.c              |  8 +++----
+>  util/thread-pool.c      |  3 +--
+>  util/vfio-helpers.c     |  5 ++--
+>  17 files changed, 88 insertions(+), 110 deletions(-)
 
+Paolo, hope you don't mind if I use the block-next branch to merge this
+and Simran's patch that depends on it.
+
+Thanks, applied to my block-next tree:
+https://github.com/stefanha/qemu/commits/block-next
+
+Stefan
+
+--oJ71EGRlYNjSvfq7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6ixH0ACgkQnKSrs4Gr
+c8isRQf6AxigFrpXLHOrHbSSKBMUVAum5dMlnKkiuaDn+/45OB1G9XAS6r8s0INf
+cH3zXrXfr2qm5/pwazqBl+y0/oznDq7Q7qVzpB3K1PSKLAnDN1NwK4LHj7Majmjc
+anpRDjLODuAZRf6S7AMPccaK5S93vSEOfgZEZ6WKTrMMCtPzTp51oK1oQAboQPEl
+t218eJ6+6PpJ1aVxFg6Uhnqq39CPmVzz7v7Lf3VzUGZJuI0Dnj6lJ1MvUjGMazZv
+ayCyaURro4y1iZIjo7NoidLuhuOL+Y1kfK5gfUHaPD/tYFJZuHgzX1KjiBjvUoUV
+fUNjslTS4bINPsRLAKKQPKjaTiG2wQ==
+=DE/g
+-----END PGP SIGNATURE-----
+
+--oJ71EGRlYNjSvfq7--
 
