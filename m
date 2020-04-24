@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C74C54FD0
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 21:04:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB94C54FCB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 21:12:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC92E20700
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 21:04:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA44520781
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 21:12:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="NxdjAipN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC92E20700
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="VN1nTHMU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA44520781
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jS5Up-0006Eh-QV
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 17:04:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42964)
+	id 1jS5cs-0000QU-NV
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 17:12:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43860)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <deller@gmx.de>) id 1jS5Ok-0004zm-9z
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 16:58:10 -0400
+ (envelope-from <deller@gmx.de>) id 1jS5V9-0006r7-9Y
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:04:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <deller@gmx.de>) id 1jS5Oj-000844-Le
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 16:58:10 -0400
-Received: from mout.gmx.net ([212.227.15.15]:33309)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1jS5Oj-0007y8-3Z
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 16:58:09 -0400
+ (envelope-from <deller@gmx.de>) id 1jS5Uu-0002xP-5X
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:04:47 -0400
+Received: from mout.gmx.net ([212.227.17.20]:50179)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1jS5Ut-0002ud-Jb
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:04:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1587761877;
- bh=Y7M5KzT+T5sJOC2naW5SJJl9NbH4rAG+3a3/TmjMdA8=;
+ s=badeba3b8450; t=1587762263;
+ bh=3rs3X4Ir6G+PDtHXU0JI9XQJTg3I84lLoA6Z50WgLz8=;
  h=X-UI-Sender-Class:Date:From:To:Subject;
- b=NxdjAipNm5/X0NGbKXRaaF3YMPIXbnGj7UbUgsnVlrF47ll4GkxBDNx8m2amq521N
- cZtPnoplC3IZh1rrHvnYwNHXoW0HetdtqiokZRKy7JwftdlXdSo0Y1rCWQQ9fTH23S
- 0hz67TjdLbS+clqLaybw998OS5HS/4nsueItIUQA=
+ b=VN1nTHMUrsyyYMOehDKYOycQjtYuV0KxsYGZKEaSBe3eo+ZOsQKF9mJd1wUWzqW7S
+ Ryt9aHG+eip9TgGXvT+Wx3fuWl7LvRUqb6fxIcbnYPLEIv3yazvrcgEDiz3TeKOURg
+ wyTkaKIkharl25LcLRa+AR/WzfaUjthWwC7OY6qo=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from ls3530.fritz.box ([92.116.144.192]) by mail.gmx.com (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mg6Zw-1j0AUl0mzO-00hiXZ; Fri, 24
- Apr 2020 22:57:57 +0200
-Date: Fri, 24 Apr 2020 22:57:55 +0200
+Received: from ls3530.fritz.box ([92.116.144.192]) by mail.gmx.com (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1N6bfq-1j8vov2pTy-0185bp; Fri, 24
+ Apr 2020 23:04:23 +0200
+Date: Fri, 24 Apr 2020 23:04:22 +0200
 From: Helge Deller <deller@gmx.de>
 To: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
  qemu-devel@nongnu.org
-Subject: [PATCH] linux-user: Drop unnecessary check in dup3 syscall
-Message-ID: <20200424205755.GA26282@ls3530.fritz.box>
+Subject: [PATCH] linux-user: Drop unnecessary check in signalfd4 syscall
+Message-ID: <20200424210422.GB26282@ls3530.fritz.box>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Provags-ID: V03:K1:asytLhm1AYbVB71ENR2XnH6r/+ajXAPZgEy30GTIDP8LxXOvhfs
- zakPbwy1o31rcMcbex3vdkTHhNs8iwgDwKrtnmGyIQctPwn+a1ZorZtIEKArrGB7D2vRWnR
- o/za+zl1KgQeHktG2wCP2JDTwT1pIRDzCCByOpVKlmVa61/9Nc27KRzZUFSk3C5jXPlp5f5
- fDHd1969w7qMu1GFJOZAQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7JLBFDNXn+E=:3SPG7gWvGYQB37voW8dbWO
- RBMmKEgjtTH64BnH3+2XlbFT2qnOMglPXuNmBWSq2I/OnJFzIAqdlc8QX11nbWkl9ABAnHTWk
- W+G1qC3E2KyNaql9m2Miu/AsHCHUwYfY6+kvXKD8s1BuUY/qXpMqPzQPk0smIFTBYIBsupiWv
- d5NaA+IKYKDEFDboQev/Mbp2dOuf1CzuAc6T/QMEVRaXbjJjtgkOTo6XoUpaMhgBQ2tSLpfhi
- 8uftFIKC3Ci/rOxXnFuuAtavOCuQhv3zNMx1ktOhcvjGYMSOpXTYfSed3roZYaL8MR6U4068a
- Q/ye+ex7T98vwsS5qNJwxbR/qlpXM99Xi4W6LOscV2qPq9J4d4OGEQC31lu8Eu89ANYVFfk7R
- aY06cBL9iGtCEuRV2I1VO3Y3mo3Aof1MNC8BUUfyeHCzkRfGTR8UW0Me/4/pg4TevhYFgEUWm
- vE5HDUcqyqeqdfMFV9db1oWPlnOwijzQJh0fTy9V1jDgUmNrIHezEsG2bNsMZOx1sNr/AdEg0
- 6eBTRTB/AG+vgszwT5fEdtbfpbI6PVLj6CzEwfK/6oo4jHNizQwMbBv9aPj2SXERyHM2FcYgq
- oaYsepcnnWUb0iwDSbB2ekT5SdRESpZBafDH7m14E5cQeOPAv8loybwfbsMELKY28pM7Zhm5x
- DhKAGFQZ+YqoZ7eZLL9rTL06/wqclfMON4XPLZtPLVzcQWupR8aZAAo9QNi1Ra84H80JsA2MP
- KKwKsl+11ImSNhKVK8R+WBM/U8kITxZK14ilHM5u4fYRdOUlhVTf60a7l8XAipgHT90viZBqF
- axlWEDa3LS+Z63P4CQPhAAmvS6jxHasjJqsClLvNfpHBEqqcuHXPWFxE5/OCh+dziJfe/TuBn
- tu9ahFW4WV0N1PSWjop2n06NGGuP6XfsO74AY4oWIWbC2pF+NxMkouTHBvVOasYLURnqqOGR/
- a0TxoaVAtN5aP2j/WuzYS3Gxk3+K7IJiE8khTfpnXF8foRrUjpzCmJ5olk6K6xUFx9t4McAlf
- EONHGcTKNHj1U43P5561DdYSwwscNG7h++iotPwmHz0BPcdtaaCH4ynUmtgZQXlvj5/qqMsNj
- GJEkShjMezxrV/vKHTVRubJzRElGtPr8XWMjt5JXysmQvvsoRjFrHj51BegNuKHgcepncHnzA
- k/wHOXugVkn3hw8UM53R36iE/b0l5pu5zv4ac1j4jdNDo9Pm7rxxVMxr6gVDQ5l+Y6Xfil34f
- uCIkQVXI49lbWD0y9
-Received-SPF: pass client-ip=212.227.15.15; envelope-from=deller@gmx.de;
+X-Provags-ID: V03:K1:15ZIqvKIg3XIgFP/CbI9vHxcyKpVGGeF6FlNylICx3R7+Hz5OQ4
+ imEF5OEbizyeyYHVyKFUsaVxeRoSBOH0HlTKJd0K5arF5klR4xtC4UvYe8AiHyq4rLUUlI6
+ eCg7+FHMCvq/LOwgmm6TUu6e9rRUgvMx7nxKiq+yBp3lw8bQQ5c7Y6sXjKvOr1PVP7o4ry7
+ XVKH6ZNMzPoxVQ5O5UQHQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:3titibExSQo=:FfLBx+nJKjwC/j9Il6I10R
+ rFGQmqYaugt3INW9bwEfv0J42G6llq5DUgETCnY+DQWBNq28Rn6a7Ee7UbD6M6iyduNHXvJBq
+ NGSVxVPekp97K09Sr9ijn8YPRfNiN8HBxqwyscDX3fx4iEKigEST2MVn1U4yHJLy3a+VnJhGv
+ rfQCtJbJJyaHz/Cnb0hJdoVQfWLCT6XHyVS/iTKYf2mc55OESuc/OJG4t2uzU7m33W+KZvK+x
+ gtcYGHaXPPS2l2UP8KL2d7IuvgkyLrR7fL4q3iQmOXHJiJLyKQLH1IiNjNA5Nl7EUQ0yohbwh
+ 2HLbrYKbUXn0UfdnNerN9V6GFMnQYKpCpxpCGgHmbmeWWuruFkJXdhOvEuT6psRhGHSdwq+rV
+ 11xrQj7+yHJc6NWzEvFPPHOG2hB9VgfMOR6Iirlz61uA6UDqR4Akfd8NZQGK0KmfEuhV3ov5M
+ crXGKsU3dA8Bu2dqC0rYFYVFNfJwIDKNxqPKa+uEmiNaZ1IPsmnjz7zwSVIV0EduDv0esgWd4
+ 8DF7mdvgNweAGe/vKa/e6T6duzQNevZdS+78ZdPjWZ/ktjmv/Adqs7UJFXibE5NuBrEatM4ya
+ j+ypjlH3uOHnXxs7RabPeURTxl0BikLtgt9zmkQ4Ji82gttcU7XnR8jXXYKmlrAqBA9Qch9hL
+ /dv+r1S4nky/F+vBRUs+mBuR3VWpGhKdyaKC1bGwu3tky2MaoA6TkYxbIyWupJe2czhi8b2VX
+ ZCezlc5wHhsgRxJZxQXB9VlHwardke6vG/xQ/dg6kgtu7Bn8DNVYGW1PBXcOrWjnY5i5vQlTV
+ EROvimGvEfNz7Jg7d3mNvujz/qBivDGDfs8B4zQz9P43Jo/Bcc7slwt6yDMQklSsP7swBFir6
+ pVJ+xInTEhhXVAixm8wjJd5B4MI9GjzmWxr7xMW05uqmnX+3AvuQ3nIEh6o8bRIeEqUkkVDyC
+ RP1TihSbW6HASKm1kBOcvDeNNh7FchmKRVCs83jpOj8UNpenIJOF7NwMjefKkfnvuG/tmkBVL
+ mElBglE5rO0GQhDlPTzPS4gUR933mBsfeoX6xhW2gS3wR1IAG3LAD0WHCXqrKH8lBwdwQLnPE
+ PUiKEHIfBMQ+PGIN9/8rNfLojhpefqZ6GzntUUTO/oAE3+aw2NfNcc/3wfBIN+JvPvGOA2kPV
+ KSfWHXKiGDEb+/IOMM3kA3IZ++Hgi/mJ5K9qqZBLUzBKQDmcMgORDAx95ReBioF5eDO8anr8X
+ Nrzd735+2i3h5CFYB
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=212.227.17.20; envelope-from=deller@gmx.de;
  helo=mout.gmx.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 16:58:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.15.15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 17:04:29
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Received-From: 212.227.17.20
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,28 +99,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Drop the extra check in dup3() if anything other than FD_CLOEXEC (aka
-O_CLOEXEC) was given. Instead simply rely on any error codes returned by
-the host dup3() syscall.
+The signalfd4() syscall takes optional O_NONBLOCK and O_CLOEXEC fcntl
+flags.  If the user gave any other invalid flags, the host syscall will
+return correct error codes, so simply drop the extra check here.
 
 Signed-off-by: Helge Deller <deller@gmx.de>
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
 index 05f03919ff..ebf0d38321 100644
---- a/linux-user/syscall.c
+=2D-- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -8301,12 +8310,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
- #if defined(CONFIG_DUP3) && defined(TARGET_NR_dup3)
-     case TARGET_NR_dup3:
-     {
--        int host_flags;
--
--        if ((arg3 & ~TARGET_O_CLOEXEC) != 0) {
--            return -EINVAL;
--        }
--        host_flags = target_to_host_bitmask(arg3, fcntl_flags_tbl);
-+        int host_flags = target_to_host_bitmask(arg3, fcntl_flags_tbl);
-         ret = get_errno(dup3(arg1, arg2, host_flags));
-         if (ret >= 0) {
-             fd_trans_dup(arg1, arg2);
+@@ -7176,9 +7176,6 @@ static abi_long do_signalfd4(int fd, abi_long mask, =
+int flags)
+     sigset_t host_mask;
+     abi_long ret;
+
+-    if (flags & ~(TARGET_O_NONBLOCK | TARGET_O_CLOEXEC)) {
+-        return -TARGET_EINVAL;
+-    }
+     if (!lock_user_struct(VERIFY_READ, target_mask, mask, 1)) {
+         return -TARGET_EFAULT;
+     }
 
