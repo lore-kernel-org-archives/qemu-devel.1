@@ -2,95 +2,122 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EFB7C2BA1A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 04:37:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65DC9C2BA1A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 06:17:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC9F420767
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 04:37:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 318D020700
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 06:17:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qnap.com header.i=@qnap.com header.b="EUKn+ZxK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC9F420767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qnap.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="HDSlOjPY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 318D020700
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRq63-0007n8-Vk
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 00:37:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56192)
+	id 1jRre8-00042k-AA
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 02:17:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40382)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dereksu@qnap.com>) id 1jRq5E-0007Cb-Ph
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 00:37:02 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jRrdP-0003OL-A5
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 02:16:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dereksu@qnap.com>) id 1jRq5A-0003Ir-2e
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 00:37:00 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37632)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1jRq59-00035s-CQ
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 00:36:55 -0400
-Received: by mail-pl1-x642.google.com with SMTP id c21so2472776plz.4
- for <qemu-devel@nongnu.org>; Thu, 23 Apr 2020 21:36:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qnap.com; s=google;
- h=from:subject:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=P5JH0nNweQJ74BRnj82CAT20MQ5UJYwf+BQqHFLRzDU=;
- b=EUKn+ZxKbDVnU8U4ow8VnrBNidFE8O2/HURTyd3/KU8dpIgwfZ7I/GKKpXMrRMv1iJ
- iiaWuvFjlLb7qDcv8tarFabSfGXeAOVw3tM4hKzvliJKVfIGCJxp09cJ5bCX9K05ZXJY
- NC08iZSyTpwIOPYj5vMliRGzqsLxiwmTSTzbY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:subject:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=P5JH0nNweQJ74BRnj82CAT20MQ5UJYwf+BQqHFLRzDU=;
- b=SQxPgJFsr6+G/lggZjEPGoywRSK/asalfXzgYCbQbaBoS4K0GivXF5jgi1LrXEzTLL
- PNORdCRlVTQv43UmyVUmzZjptTazI3rIa+AvkQoTp/d0kVrI/FKWXl2BVRfj5PyosMYx
- ifOYuk1eJNNshz2T+k0t9e38nCu7PP3fcoJznGCM2HC2oiXM1Pd12IaZivw3J8Q5UHIj
- vhzuHczqzeGSdQMy5AsB9TOntyvEJiWY3T7hvHNd6Cko+7g7SUTQmSENgHHCSOZ4lfBU
- 6Eig1rnWWORTyKSUwnsruXgvA9NY89P3Cky8c4TrQqjwmGAZqhIE5TMIBpSmGywr1IZ4
- JS7Q==
-X-Gm-Message-State: AGi0Puaj53mX/Z1/lAhWqAD0+uwlauB6QfFF2DXVDX1XSG6wsSWnlkcn
- G7oRnriP2BweHrG/n9rHxn5vMA==
-X-Google-Smtp-Source: APiQypIcUnY/aZgn4px4BIQ1Y7STxktQuAAIH8VcigE3P7PBkcdkS7CxZDCctmM5fHlogKKXswPRVQ==
-X-Received: by 2002:a17:90a:d703:: with SMTP id
- y3mr4604915pju.75.1587703013051; 
- Thu, 23 Apr 2020 21:36:53 -0700 (PDT)
-Received: from Jing-Weide-MacBook-Pro-3.local
- (202-39-79-13.HINET-IP.hinet.net. [202.39.79.13])
- by smtp.gmail.com with ESMTPSA id o40sm3937041pjb.18.2020.04.23.21.36.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Apr 2020 21:36:52 -0700 (PDT)
-From: Derek Su <dereksu@qnap.com>
-Subject: Re: [PATCH 1/3] net/colo-compare.c: Create event_bh with the right
- AioContext
-To: "Zhang, Chen" <chen.zhang@intel.com>, Lukas Straub <lukasstraub2@web.de>
-References: <cover.1586370737.git.lukasstraub2@web.de>
- <b86f80bb47ac66b73b2afe80218c9913722c606a.1586370737.git.lukasstraub2@web.de>
- <5ab3bd6649a44354b087c31bb9fcd5a4@intel.com> <20200422104325.64659930@luklap>
- <0a075de2dc2f4e8c919478762e9a97da@intel.com> <20200422114020.3d479899@luklap>
- <8d0e2a591f1d48baa84d79e7a0f1cbb6@intel.com>
-Message-ID: <b1c85547-1a7b-b5a8-739b-e19eceffce45@qnap.com>
-Date: Fri, 24 Apr 2020 12:36:49 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <8d0e2a591f1d48baa84d79e7a0f1cbb6@intel.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jRrdN-00081k-BU
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 02:16:22 -0400
+Received: from mail-eopbgr40092.outbound.protection.outlook.com
+ ([40.107.4.92]:2115 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jRrdM-0007bQ-I5; Fri, 24 Apr 2020 02:16:20 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=m44R+/p66TqVWDsNJjnpMDz4zF/EltSDexv9lNEtw16N2EC5rwdESVfMnUlIqW/ppBqnOrB7nfbW1CA7wPD+0i1vFG54Rkh7GExjePuSHtuuZIgn0KIuWyenlqpJK7IUIW+r8fj9nH8zYR3kDpVOSDYuI3PoxhWzvzElYX11ZdbnJmeseKUNMglbDcQY70TbMA83ZKhDCRTeeD99yFaGcXhksPDpWXrTVoJqYM548A1C+zSPqCJ9FIHLDt7TI2cRDz/6FH8AXqLiILRxXgVxX8CSKRIC/2amUEYm91n5hoozj+NWp8P6dufJjqsiBV1TgNLp0EJsVxH+DkViVscfgA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=a6bMLtU4MWqmxqGZQuFRiSMpEC0yX7OVNz8UZamP8iE=;
+ b=lcWCFMDB1XGK2gVv5F85X30tfi0qjpWESsWu0V59hRhHwAhOBEiq1hL/32i4ombkFCs3Ls9ojdWeOkKiRX2EmfzeDn88Ug+uueeJajYBFPjC6iHgrFPSesI7w89hLj0dHzzZqN0dQAyOPIKwkF20x4vBWS5cGL1gCXKLz/hacjeoQG/zhwLGp9/lgFjmN+nwrA45Oy7SRLKbw0qPfstFDSDuC05BL8gWXkVPxtIyO0egleRrUvR2qbG/EhQAYQ5QdYpV2cxSpm4BOb0+d63Bp9jUufOuM8SdNDlixbspfSUY2ahLb4xR6nCIloAo9D8fP9xrx1YkMojkH9TGa+G3Ag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=a6bMLtU4MWqmxqGZQuFRiSMpEC0yX7OVNz8UZamP8iE=;
+ b=HDSlOjPYfGSEfmM0I0jk5NKqbPYpT09K7CYD7+EjGEePTxwyYzGjCPyeBaTyjtyRMWXJy/JhXwjz+RUY6vb3nWVHjdVRS2CdqbCoA+r1+D0frmpKSUsFfgrxJpNGmHw1I9wKWEfgEgwaK3sv2TzWzFslA+I6uRoH2PcDJez4g8w=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5365.eurprd08.prod.outlook.com (2603:10a6:20b:109::9)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Fri, 24 Apr
+ 2020 06:16:13 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.012; Fri, 24 Apr 2020
+ 06:16:13 +0000
+Subject: Re: [PATCH v6 04/10] qcow2: Support BDRV_REQ_ZERO_WRITE for truncate
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200423150127.142609-1-kwolf@redhat.com>
+ <20200423150127.142609-5-kwolf@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200424091611157
+Message-ID: <436f15ce-da79-7016-6478-c5ab8642ee25@virtuozzo.com>
+Date: Fri, 24 Apr 2020 09:16:11 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200423150127.142609-5-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=dereksu@qnap.com; helo=mail-pl1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::642
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FRYP281CA0008.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::18)
+ To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.145) by
+ FRYP281CA0008.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2937.13 via Frontend Transport; Fri, 24 Apr 2020 06:16:12 +0000
+X-Tagtoolbar-Keys: D20200424091611157
+X-Originating-IP: [185.215.60.145]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 06017a0e-4f6a-4c0a-7ff2-08d7e816fd2d
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5365:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5365C06EA42BD0BA51A33AA3C1D00@AM7PR08MB5365.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:238;
+X-Forefront-PRVS: 03838E948C
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(346002)(376002)(39840400004)(396003)(366004)(4326008)(66556008)(6486002)(316002)(16576012)(66946007)(478600001)(5660300002)(66476007)(36756003)(52116002)(26005)(16526019)(2616005)(8676002)(81156014)(956004)(31696002)(186003)(8936002)(31686004)(2906002)(86362001);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fKyIs+bNsl6NrSZPdBiDQKYcg21leDsBKnY9rYTqAFa3YxgHu96QGoWVSRrRFDw+pD0zLD69z9cmBzRIYu9ojnDU4eCWfk5JTjWJ1zwFQCBp2W9fgnDidCn7TbWZyO1SnshFhyEj+vih2ed2JmWh51pbnxGSJnhJZCElOKk72GNCrwYIWgUtgARMDgBsMabX86boGRnBzrCUKJJzeXaIOBO43mkepEngzi9LTocbZtNAbogFHls4rH00JQ6vh4VYhaRI5Bs0HB3HqSPxhpTk3dojsOuvpkd6Dfqc7LPas47ZcQj4NrjeK59L/9hrqLMNSYYi9VNjYTNQjAJsX3Yb5aE8a5xaWpXFWAu4MLfJTnaJSbhCFj1EJ10KeD5+6UWuYv6svNDX4T3EMiDOgB5aWsnFnmDl1G6U6ZR3uSD9ipBBfI1a9+D/IQxxJ8K+sEKr
+X-MS-Exchange-AntiSpam-MessageData: h1861I7CUKPsDMUai93SegThbdCYHSAWMfyPaPU0Prk+PxoYo8fGrmTOQeVLxr3kCeylnHpidNM50Bkk0/HOlSwaJ+E5PTH/j5g0c0mY0v4fFtS4wWFQGPLwcYvjar4TpLk5KYRQxQ21Qm5yDTBXsg==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 06017a0e-4f6a-4c0a-7ff2-08d7e816fd2d
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2020 06:16:13.6003 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5mLEcrhBMLBYG0bt3yzQ91GqrmYabcpCOecOUtO0S5h9IVtBtXOSXJ/qKsa3IhcPg3dHfGjuV4ybeBbf3fAEByyDhM9DeFImER5pqe6YME0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5365
+Received-SPF: pass client-ip=40.107.4.92;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 02:16:15
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.4.92
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,204 +129,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: berto@igalia.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020/4/23 下午3:29, Zhang, Chen wrote:
+23.04.2020 18:01, Kevin Wolf wrote:
+> If BDRV_REQ_ZERO_WRITE is set and we're extending the image, calling
+> qcow2_cluster_zeroize() with flags=0 does the right thing: It doesn't
+> undo any previous preallocation, but just adds the zero flag to all
+> relevant L2 entries. If an external data file is in use, a write_zeroes
+> request to the data file is made instead.
 > 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   block/qcow2-cluster.c |  2 +-
+>   block/qcow2.c         | 33 +++++++++++++++++++++++++++++++++
+>   2 files changed, 34 insertions(+), 1 deletion(-)
 > 
->> -----Original Message-----
->> From: Lukas Straub <lukasstraub2@web.de>
->> Sent: Wednesday, April 22, 2020 5:40 PM
->> To: Zhang, Chen <chen.zhang@intel.com>
->> Cc: qemu-devel <qemu-devel@nongnu.org>; Li Zhijian
->> <lizhijian@cn.fujitsu.com>; Jason Wang <jasowang@redhat.com>; Marc-
->> André Lureau <marcandre.lureau@redhat.com>; Paolo Bonzini
->> <pbonzini@redhat.com>
->> Subject: Re: [PATCH 1/3] net/colo-compare.c: Create event_bh with the right
->> AioContext
->>
->> On Wed, 22 Apr 2020 09:03:00 +0000
->> "Zhang, Chen" <chen.zhang@intel.com> wrote:
->>
->>>> -----Original Message-----
->>>> From: Lukas Straub <lukasstraub2@web.de>
->>>> Sent: Wednesday, April 22, 2020 4:43 PM
->>>> To: Zhang, Chen <chen.zhang@intel.com>
->>>> Cc: qemu-devel <qemu-devel@nongnu.org>; Li Zhijian
->>>> <lizhijian@cn.fujitsu.com>; Jason Wang <jasowang@redhat.com>; Marc-
->>>> André Lureau <marcandre.lureau@redhat.com>; Paolo Bonzini
->>>> <pbonzini@redhat.com>
->>>> Subject: Re: [PATCH 1/3] net/colo-compare.c: Create event_bh with
->>>> the right AioContext
->>>>
->>>> On Wed, 22 Apr 2020 08:29:39 +0000
->>>> "Zhang, Chen" <chen.zhang@intel.com> wrote:
->>>>
->>>>>> -----Original Message-----
->>>>>> From: Lukas Straub <lukasstraub2@web.de>
->>>>>> Sent: Thursday, April 9, 2020 2:34 AM
->>>>>> To: qemu-devel <qemu-devel@nongnu.org>
->>>>>> Cc: Zhang, Chen <chen.zhang@intel.com>; Li Zhijian
->>>>>> <lizhijian@cn.fujitsu.com>; Jason Wang <jasowang@redhat.com>;
->>>>>> Marc- André Lureau <marcandre.lureau@redhat.com>; Paolo Bonzini
->>>>>> <pbonzini@redhat.com>
->>>>>> Subject: [PATCH 1/3] net/colo-compare.c: Create event_bh with
->>>>>> the right AioContext
->>>>>>
->>>>>> qemu_bh_new will set the bh to be executed in the main loop.
->>>>>> This causes problems as colo_compare_handle_event assumes that
->>>>>> it has exclusive access the queues, which are also accessed in
->>>>>> the iothread. It also assumes that it runs in a different thread
->>>>>> than the caller and takes the appropriate locks.
->>>>>>
->>>>>> Create the bh with the AioContext of the iothread to fulfill
->>>>>> these assumptions.
->>>>>>
->>>>>
->>>>> Looks good for me, I assume it will increase performance. Do you
->>>>> have
->>>> related data?
->>>>
->>>> No, this fixes several crashes because the queues where accessed
->>>> concurrently from multiple threads. Sorry for my bad wording.
->>>
->>> Can you describe some details about the crash? Step by step?
->>> Maybe I can re-produce and test it for this patch.
->>
->> There is no clear test case. For me the crashes happened after 1-20h of
->> runtime with lots of checkpoints (800ms) and some network traffic. The
->> coredump always showed that two threads where doing operations on the
->> queues simultaneously.
->> Unfortunately, I don't have the coredumps anymore.
-> 
-> OK, Although I have not encountered the problem you described.
-> I have test this patch, looks running fine.
-> 
-> Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-> 
-> Thanks
-> Zhang Chen
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index 17f1363279..4b5fc8c4a7 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -1795,7 +1795,7 @@ int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
+>       /* Caller must pass aligned values, except at image end */
+>       assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
+>       assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
+> -           end_offset == bs->total_sectors << BDRV_SECTOR_BITS);
+> +           end_offset >= bs->total_sectors << BDRV_SECTOR_BITS);
+>   
+>       /* The zero flag is only supported by version 3 and newer */
+>       if (s->qcow_version < 3) {
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 9cfbdfc939..ad621fe404 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1726,6 +1726,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+>   
+>       bs->supported_zero_flags = header.version >= 3 ?
+>                                  BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK : 0;
+> +    bs->supported_truncate_flags = BDRV_REQ_ZERO_WRITE;
+>   
+>       /* Repair image if dirty */
+>       if (!(flags & (BDRV_O_CHECK | BDRV_O_INACTIVE)) && !bs->read_only &&
+> @@ -4214,6 +4215,38 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+>           g_assert_not_reached();
+>       }
+>   
+> +    if ((flags & BDRV_REQ_ZERO_WRITE) && offset > old_length) {
+> +        uint64_t zero_start = QEMU_ALIGN_UP(old_length, s->cluster_size);
+> +
+> +        /*
+> +         * Use zero clusters as much as we can. qcow2_cluster_zeroize()
+> +         * requires a cluster-aligned start. The end may be unaligned if it is
+> +         * at the end of the image (which it is here).
+> +         */
+> +        ret = qcow2_cluster_zeroize(bs, zero_start, offset - zero_start, 0);
+> +        if (ret < 0) {
+> +            error_setg_errno(errp, -ret, "Failed to zero out new clusters");
+> +            goto fail;
+> +        }
+> +
+> +        /* Write explicit zeros for the unaligned head */
+> +        if (zero_start > old_length) {
+> +            uint8_t *buf = qemu_blockalign0(bs, s->cluster_size);
 
+Why not s/s->cluster_size/zero_start - old_length/? We may save a lot of pages if cluster_size is large.
 
-Hi,
+> +            QEMUIOVector qiov;
+> +            qemu_iovec_init_buf(&qiov, buf, zero_start - old_length);
+> +
+> +            qemu_co_mutex_unlock(&s->lock);
 
-I encountered PVM crash caused by the race condition issue in v4.2.0.
-Here is the coredump for reference.
+We are in intermediate state here. Is it safe to unlock? Anything may happen, up to another truncate..
 
-```
-warning: core file may not match specified executable file.
-  Core was generated by `qemu-system-x86_64 -name source -enable-kvm 
--cpu core2duo -m 1024 -global kvm-a'.
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  #0 0x000055cb478bcd25 in qemu_hexdump (buf=0x0, fp=0x7f6e9122b680 
-<IO_2_1_stderr>, prefix=0x55cb47a388f5 "colo-compare spkt", size=1514) 
-at util/hexdump.c:34
-  34 fprintf(fp, " %02x", (unsigned char)buf[b + i]);
-  [Current thread is 1 (Thread 0x7f6da1ade700 (LWP 6119))]
-  (gdb) where
-  #0 0x000055cb478bcd25 in qemu_hexdump (buf=0x0, fp=0x7f6e9122b680 
-<IO_2_1_stderr>, prefix=0x55cb47a388f5 "colo-compare spkt", size=1514) 
-at util/hexdump.c:34
-  #1 0x000055cb476fa1b5 in colo_compare_tcp (s=0x55cb496429f0, 
-conn=0x7f6e78003e30) at net/colo-compare.c:462
-  #2 0x000055cb476fa8c1 in colo_compare_connection 
-(opaque=0x7f6e78003e30, user_data=0x55cb496429f0) at net/colo-compare.c:687
-  #3 0x000055cb476fb4ab in compare_pri_rs_finalize 
-(pri_rs=0x55cb49642b18) at net/colo-compare.c:1001
-  #4 0x000055cb476eb46f in net_fill_rstate (rs=0x55cb49642b18, 
-buf=0x7f6da1add2c8 "", size=1064) at net/net.c:1764
-  #5 0x000055cb476faafa in compare_pri_chr_in (opaque=0x55cb496429f0, 
-buf=0x7f6da1adc6f0 "`E˧V\210RT", size=4096) at net/colo-compare.c:776
-  #6 0x000055cb47815363 in qemu_chr_be_write_impl (s=0x55cb48c87ec0, 
-buf=0x7f6da1adc6f0 "`E˧V\210RT", len=4096) at chardev/char.c:177
-  #7 0x000055cb478153c7 in qemu_chr_be_write (s=0x55cb48c87ec0, 
-buf=0x7f6da1adc6f0 "`E˧V\210RT", len=4096) at chardev/char.c:189
-  #8 0x000055cb4781e002 in tcp_chr_read (chan=0x55cb48ef7690, 
-cond=G_IO_IN, opaque=0x55cb48c87ec0) at chardev/char-socket.c:525
-  #9 0x000055cb47839655 in qio_channel_fd_source_dispatch 
-(source=0x7f6e78002050, callback=0x55cb4781de53 <tcp_chr_read>, 
-user_data=0x55cb48c87ec0) at io/channel-watch.c:84
-  #10 0x00007f6e950e1285 in g_main_context_dispatch () at 
-/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-  #11 0x00007f6e950e1650 in () at /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-  #12 0x00007f6e950e1962 in g_main_loop_run () at 
-/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-  #13 0x000055cb474920ae in iothread_run (opaque=0x55cb48c67f10) at 
-iothread.c:82
-  #14 0x000055cb478a699d in qemu_thread_start (args=0x55cb498035d0) at 
-util/qemu-thread-posix.c:519
-  #15 0x00007f6e912376db in start_thread (arg=0x7f6da1ade700) at 
-pthread_create.c:463
-  #16 0x00007f6e90f6088f in clone () at 
-../sysdeps/unix/sysv/linux/x86_64/clone.S:95
-  (gdb)
-```
+> +            ret = qcow2_co_pwritev_part(bs, old_length, qiov.size, &qiov, 0, 0);
 
-COLO works well after applying this patch in my tests.
+Better not do it if this cluster is already ZERO.. But it may be a later patch to improve that.
 
-Reviewed-by: Derek Su <dereksu@qnap.com>
-Tested-by: Derek Su <dereksu@qnap.com>
-
-Regards,
-Derek
-
-
-
-
-> 
->>
->> Regards,
->> Lukas Straub
->>
->>> Thanks
->>> Zhang Chen
->>>
->>>>
->>>> Regards,
->>>> Lukas Straub
->>>>
->>>>> Thanks
->>>>> Zhang Chen
->>>>>
->>>>>> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
->>>>>> ---
->>>>>>   net/colo-compare.c | 3 ++-
->>>>>>   1 file changed, 2 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/net/colo-compare.c b/net/colo-compare.c index
->>>>>> 10c0239f9d..1de4220fe2 100644
->>>>>> --- a/net/colo-compare.c
->>>>>> +++ b/net/colo-compare.c
->>>>>> @@ -890,6 +890,7 @@ static void colo_compare_handle_event(void
->>>>>> *opaque)
->>>>>>
->>>>>>   static void colo_compare_iothread(CompareState *s)  {
->>>>>> +    AioContext *ctx = iothread_get_aio_context(s->iothread);
->>>>>>       object_ref(OBJECT(s->iothread));
->>>>>>       s->worker_context =
->>>>>> iothread_get_g_main_context(s->iothread);
->>>>>>
->>>>>> @@ -906,7 +907,7 @@ static void
->>>>>> colo_compare_iothread(CompareState
->>>> *s)
->>>>>>       }
->>>>>>
->>>>>>       colo_compare_timer_init(s);
->>>>>> -    s->event_bh = qemu_bh_new(colo_compare_handle_event, s);
->>>>>> +    s->event_bh = aio_bh_new(ctx, colo_compare_handle_event,
->>>>>> + s);
->>>>>>   }
->>>>>>
->>>>>>   static char *compare_get_pri_indev(Object *obj, Error **errp)
->>>>>> --
->>>>>> 2.20.1
->>>>>
->>>
+> +            qemu_co_mutex_lock(&s->lock);
+> +
+> +            qemu_vfree(buf);
+> +            if (ret < 0) {
+> +                error_setg_errno(errp, -ret, "Failed to zero out the new area");
+> +                goto fail;
+> +            }
+> +        }
+> +    }
+> +
+>       if (prealloc != PREALLOC_MODE_OFF) {
+>           /* Flush metadata before actually changing the image size */
+>           ret = qcow2_write_caches(bs);
 > 
 
+
+-- 
+Best regards,
+Vladimir
 
