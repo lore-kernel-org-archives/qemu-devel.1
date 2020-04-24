@@ -2,85 +2,140 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F40CC54FCB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 15:19:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 743D7C54FCB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 15:24:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECA2B206D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 15:19:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F28020700
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 15:24:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZthNqHo2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECA2B206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="zFi1gurs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F28020700
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jS071-0000wY-54
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 11:19:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49364)
+	id 1jS0CF-0002hj-DK
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 11:24:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51054)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alexander.duyck@gmail.com>) id 1jS05x-00009H-9i
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 11:18:25 -0400
+ (envelope-from <ani.sinha@nutanix.com>) id 1jS0BQ-00028n-IX
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 11:24:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alexander.duyck@gmail.com>) id 1jS05w-0003Qs-Hc
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 11:18:25 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:35361)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
- id 1jS05r-00038z-2e
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 11:18:24 -0400
-Received: by mail-io1-xd43.google.com with SMTP id y26so826934ioj.2
- for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 08:18:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BHBjQGZTiYhMmM4o670GLq7t++5l+BRKez49SYqN0kk=;
- b=ZthNqHo2y3pFbS5mZ/MtkQ3p7kk8KgrBEpa5zbeio3I5FjlwGL8KUNV4zTLtPogdc1
- J/gWji9THsTeVwL9LGSW8z0PQ10e3dsvJwCb6HX7WgH+PAcUet6WFk4u2r51F0f2wiWe
- Bhg01aU36qEqHogO+ruYKecyg0jUDY5cErZQKP+Jn8YJN0UhOPH/XTmwr3VxDSby17L6
- R+n60nPR1Z1lmGMnlXO/Zottv/Wa6nsS21Z5MgAIVNh3s7ZXR/QtFXA21HECtAbQMjCT
- /kfk3w7MAQ0yG/tn4ilXZbMGHMSOQAzsJNdN5YUblB+Ial6ufKJrz/Lk+VVDhHNu5fhz
- BTpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=BHBjQGZTiYhMmM4o670GLq7t++5l+BRKez49SYqN0kk=;
- b=jpsBNBoj/qeCS6CLYoFHvG47i+aEyNB29aI/LJPKYGf0JsteYdOBB6rGRGB1oEIFnn
- VfTLZqKnNUEJQ5AcyQCJ3jF524HE4G9YSJdryo2a8/+THlr2Tq0uatEGJs+B6NWsFO0h
- lymD+Fn1Kzl6wGkUvWBzv/s2DvENr5wkfXbVWL4xVuqJ6QFLnclNrUzZEIXABXt66jbO
- V0bDnK6f8WFR/ftB6kecs7R4Pxz7fqEEU75n/qRVCS3caSS7VrSdQSvMbjQn3v7YSry1
- pbrM4iiLsZG4eotnaUJhBlliGsTGMtO2c8QTiKaqdrKVloDFjNG80f0E45RPb6VfPZY5
- A0mQ==
-X-Gm-Message-State: AGi0PuZ/x7DsyBuYF4YxzCC0EdP50L6jM91vX40tGof3wR7jy0x4BQUJ
- 9HJVUtgMPJBC0yHvhQBK1FKRip6I2UA6ASZ8coM=
-X-Google-Smtp-Source: APiQypKdCnRWrpYrw1K6pVi7UDY3R3ggfbV7FVPasnucmtK1ohgHj4rSqwRxHbP3+3DTNZQmO32giZhC7MHLaERBgvY=
-X-Received: by 2002:a02:5249:: with SMTP id d70mr8844524jab.121.1587741496493; 
- Fri, 24 Apr 2020 08:18:16 -0700 (PDT)
+ (envelope-from <ani.sinha@nutanix.com>) id 1jS0BP-0007Jz-6P
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 11:24:03 -0400
+Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:60862)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
+ id 1jS0BO-0007BA-Iz
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 11:24:02 -0400
+Received: from pps.filterd (m0127841.ppops.net [127.0.0.1])
+ by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 03OFF9Bw009458; Fri, 24 Apr 2020 08:23:58 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=dNdetQaFW2bdQXWz2cuT5MN7pzESoas2wADiYgLIgbo=;
+ b=zFi1gursBN+XnDqmsEyJQny6d49uE264XYjdlgDoVXCIrh18IotpNJLJ/tOgHht03ug6
+ yCs1cXURN9OFMaNjKZpIVXQcedmx+YhIyp4aHdcEYuY9+Cea76oiZ4jbQ16Qithl1Lnx
+ TaObSZUtCf9bd8jQreh6BcNO9GfW83Bek8fWtHoi0Gd8ih37EmmfmUy9vwJ2ctMAJfaD
+ aRxf1IcGaKfApmW2TysWydcpczxszrykoCtH79JmB3qEN7LGTnsB3T8v65vEy1dPTUsZ
+ T6vBVj6rm1eZ1+6Bmkn8RaMGK+7U622Wf/voQQkUYBNPPjkRjLTbZEE3MnlwLIlsRLz+ QA== 
+Received: from nam10-bn7-obe.outbound.protection.outlook.com
+ (mail-bn7nam10lp2109.outbound.protection.outlook.com [104.47.70.109])
+ by mx0b-002c1b01.pphosted.com with ESMTP id 30fy3a6spn-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 24 Apr 2020 08:23:58 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=edN7wS0RvNKpuslQuBffVkXRDpfeVVkKzzNQdcCVuK7+JOcH4EUbsxhGmKR0kDo+3M8WmtCL5Pdoh8kg+icV767qyao4sqfN1T5W1w+9ZUE5+gUJsQ3u2yuNHxKhecwqfaY/chpdST1+pZ+x3Ukl7rVMp5gbnNvjiywTjnfqzf9csZtHOiQCM21VfdWjn88u4pEZBsAQX6gNYCs6EzDx9afyXBTKjPS/FhXxvzwuD4CbbhQNGfxAoCIPx6A1hwohbbbj0cJR6AYDsny6omSFQZ3xurnn049prY05cMJNVnVcYCk2vxWvpslYQsGEJuz1xImQBdApaaeSGFypp+/D8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dNdetQaFW2bdQXWz2cuT5MN7pzESoas2wADiYgLIgbo=;
+ b=lCuAdkduwfZjzVef6yXwI9Kn+D4tyM+BLP22bQ2x7qy++wMkuysoEBmRNy4BkxIcISCOfo4THFJiBOCj01TVR3tWx/5klSmVkk4kXoFSEJ1l4pNaPmpgpEKSnHkHNewM2Mi5d2zHJfBo0y5TFITV/9KuEVPgQyUXddp8YHArjuKWNBAGOye2KXju9QdUUAbqAmw4/XrwWTI+EvlMvku45E3Sx4iFgpnvCIJ56318cpNvi/tO77U5cFzQWNJzluajsH77fD8Fcf4hdXz2BaaMjLQMlRJzrNb2DJkeRyCQXVL5NQHHKyyxJFgDCuvP0LP6p7xVL3RRdijPuAKni6zpaQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MN2PR02MB5742.namprd02.prod.outlook.com (2603:10b6:208:10d::27)
+ by MN2PR02MB7085.namprd02.prod.outlook.com (2603:10b6:208:20b::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Fri, 24 Apr
+ 2020 15:23:57 +0000
+Received: from MN2PR02MB5742.namprd02.prod.outlook.com
+ ([fe80::200c:b06c:d8c6:42a]) by MN2PR02MB5742.namprd02.prod.outlook.com
+ ([fe80::200c:b06c:d8c6:42a%7]) with mapi id 15.20.2937.020; Fri, 24 Apr 2020
+ 15:23:57 +0000
+From: Ani Sinha <ani.sinha@nutanix.com>
+To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
+Subject: Re: [PATCH] Add a new PIIX option to control PCI hot unplugging of
+ devices on non-root buses
+Thread-Topic: [PATCH] Add a new PIIX option to control PCI hot unplugging of
+ devices on non-root buses
+Thread-Index: AQHWFMrLeCs/JzKNrUaCDY3Nn1YJmqh9b9kAgAACaICAAAksAIAERh2AgABeQwCAAY19AIAABL+AgAFKiACAA3KSgA==
+Date: Fri, 24 Apr 2020 15:23:56 +0000
+Message-ID: <819DA747-F897-44A4-A238-B6F20C4C8B08@nutanix.com>
+References: <1587136411-200885-1-git-send-email-ani.sinha@nutanix.com>
+ <20200417112620-mutt-send-email-mst@kernel.org>
+ <2A13ACCD-BD24-41FB-B6EA-2804F7C1FF1D@nutanix.com>
+ <20200417120732-mutt-send-email-mst@kernel.org>
+ <20200420092459.GF346737@redhat.com>
+ <20200420105936-mutt-send-email-mst@kernel.org>
+ <07BC06B8-34F6-4C46-ACCE-DD7A4CBA9BC7@nutanix.com>
+ <20200421150201.GI479771@redhat.com>
+ <A31A7DC2-E1FB-409B-9A99-324F8879E9AD@nutanix.com>
+In-Reply-To: <A31A7DC2-E1FB-409B-9A99-324F8879E9AD@nutanix.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [115.96.151.209]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3e99d1d5-fc66-4684-5c10-08d7e86381ce
+x-ms-traffictypediagnostic: MN2PR02MB7085:
+x-microsoft-antispam-prvs: <MN2PR02MB70851FC6DF72CFEF4CE7047BF1D00@MN2PR02MB7085.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 03838E948C
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MN2PR02MB5742.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(39860400002)(136003)(376002)(366004)(346002)(396003)(26005)(53546011)(6506007)(71200400001)(6916009)(54906003)(33656002)(2906002)(8676002)(81156014)(316002)(8936002)(36756003)(2616005)(6486002)(44832011)(478600001)(66946007)(186003)(5660300002)(86362001)(6512007)(66446008)(66476007)(91956017)(76116006)(64756008)(66556008)(4326008);
+ DIR:OUT; SFP:1102; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 4vjjxoIFytSIkpcfgzPfKpSr4laFOKEJnsSxx1HNeKXQdLHwZFPX4mJzwhd+ZioSiD4JLKOWAR4RVhURs2Z+vhFMhJvW6ztet99lHimNJxJDt8JTH3b3IDLW2w+0+0XV8YbJK53acvqeCcXKhbeDaG6OIKK9KP5O71EjV3ymaEX1x50ugNxjsK3reoW2IH5uv4Jrb9unGiBQpWs4+I/m9vjgzVzf3b531Sl65rPh7qVcAfBo33H95jRS2T1NPpizw6hrUPh7lyVOhcY/SjXwd172j84nARFsG1luTMCRL79yAKo/csufXOs1ba8KkY3V9uyEzE+QrNWKkFMIkFGHJ80EetFuQdkbWTzEVVAEnsuGwm0BLbyiXkKKsaugL8L0u/xWE+AwUEuf0dwZmKaLorHR8GSegKNKEGLHzQqHG5tvYNOGanLQXUW/qANDxVrE
+x-ms-exchange-antispam-messagedata: D3FoC8Rx5E3E7h0fkHC4ERCvB//mx7nuzUupttF3teVbmCDXHoxI3ZFJ33D2aOPT1z9Vi8vT7NZ7Yi2b041fRGaAqNoT4/CehqihuBY4SRldGoHWHJgL6naJlXBGQbY/pS3TmgSxHtoIWjJtyn1ROQ==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6B1868A76A4E1447812B7C7A39F6FB53@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200422181649.12258.37077.stgit@localhost.localdomain>
- <20200422182127.12258.26300.stgit@localhost.localdomain>
- <a2183a2f-e10d-1e19-52d9-a9cd71fa2655@redhat.com>
-In-Reply-To: <a2183a2f-e10d-1e19-52d9-a9cd71fa2655@redhat.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Fri, 24 Apr 2020 08:18:05 -0700
-Message-ID: <CAKgT0Ud1WVUV5VNCCBqJtYPSLCZTq5oXGUyvqHmXdnTQUko6qQ@mail.gmail.com>
-Subject: Re: [PATCH v21 QEMU 5/5] virtio-balloon: Provide an interface for
- free page reporting
-To: David Hildenbrand <david@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
- envelope-from=alexander.duyck@gmail.com; helo=mail-io1-xd43.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::d43
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3e99d1d5-fc66-4684-5c10-08d7e86381ce
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Apr 2020 15:23:57.2166 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: AM7ipLOqFVa0Lmw7DdiH4/abWh/rc99BZOPqJbJuijAocaAj2Y2Rtg/mV+RPw3Yov0X4oYWBXKeMu1F8RCoKJg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB7085
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-24_08:2020-04-24,
+ 2020-04-24 signatures=0
+X-Proofpoint-Spam-Reason: safe
+Received-SPF: pass client-ip=148.163.155.12;
+ envelope-from=ani.sinha@nutanix.com; helo=mx0b-002c1b01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 11:23:59
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Received-From: 148.163.155.12
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,186 +147,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Apr 24, 2020 at 4:20 AM David Hildenbrand <david@redhat.com> wrote:
->
-> On 22.04.20 20:21, Alexander Duyck wrote:
-> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> >
-> > Add support for free page reporting. The idea is to function very similar
-> > to how the balloon works in that we basically end up madvising the page as
-> > not being used. However we don't really need to bother with any deflate
-> > type logic since the page will be faulted back into the guest when it is
-> > read or written to.
-> >
-> > This provides a new way of letting the guest proactively report free
-> > pages to the hypervisor, so the hypervisor can reuse them. In contrast to
-> > inflate/deflate that is triggered via the hypervisor explicitly.
-> >
-> > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > ---
-> >  hw/virtio/virtio-balloon.c         |   70 ++++++++++++++++++++++++++++++++++++
-> >  include/hw/virtio/virtio-balloon.h |    2 +
-> >  2 files changed, 71 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> > index 5effc8b4653b..b473ff7f4b88 100644
-> > --- a/hw/virtio/virtio-balloon.c
-> > +++ b/hw/virtio/virtio-balloon.c
-> > @@ -321,6 +321,60 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
-> >      balloon_stats_change_timer(s, 0);
-> >  }
-> >
-> > +static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *vq)
-> > +{
-> > +    VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-> > +    VirtQueueElement *elem;
-> > +
-> > +    while ((elem = virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
-> > +        unsigned int i;
-> > +
->
-> Maybe add a comment like
->
-> /*
->  * As discarded pages will be zero when re-accessed, all pages either
->  * have the old value, or were zeroed out. In case the guest expects
->  * another value, make sure to never discard.
->  */
->
-> Whatever you think is best.
-
-Okay I will add the following comment:
-        /*
-         * When we discard the page it has the effect of removing the page
-         * from the hypervisor itself and causing it to be zeroed when it
-         * is returned to us. So we must not discard the page if it is
-         * accessible by another device or process, or if the guest is
-         * expecting it to retain a non-zero value.
-         */
-
-
-> > +        if (qemu_balloon_is_inhibited() || dev->poison_val) {
-> > +            goto skip_element;
-> > +        }
-> > +
-> > +        for (i = 0; i < elem->in_num; i++) {
-> > +            void *addr = elem->in_sg[i].iov_base;
-> > +            size_t size = elem->in_sg[i].iov_len;
-> > +            ram_addr_t ram_offset;
-> > +            RAMBlock *rb;
-> > +
-> > +            /*
-> > +             * There is no need to check the memory section to see if
-> > +             * it is ram/readonly/romd like there is for handle_output
-> > +             * below. If the region is not meant to be written to then
-> > +             * address_space_map will have allocated a bounce buffer
-> > +             * and it will be freed in address_space_unmap and trigger
-> > +             * and unassigned_mem_write before failing to copy over the
-> > +             * buffer. If more than one bad descriptor is provided it
-> > +             * will return NULL after the first bounce buffer and fail
-> > +             * to map any resources.
-> > +             */
-> > +            rb = qemu_ram_block_from_host(addr, false, &ram_offset);
-> > +            if (!rb) {
-> > +                trace_virtio_balloon_bad_addr(elem->in_addr[i]);
-> > +                continue;
-> > +            }
-> > +
-> > +            /*
-> > +             * For now we will simply ignore unaligned memory regions, or
-> > +             * regions that overrun the end of the RAMBlock.
-> > +             */
-> > +            if (!QEMU_IS_ALIGNED(ram_offset | size, qemu_ram_pagesize(rb)) ||
-> > +                (ram_offset + size) > qemu_ram_get_used_length(rb)) {
-> > +                continue;
-> > +            }
-> > +
-> > +            ram_block_discard_range(rb, ram_offset, size);
-> > +        }
-> > +
-> > +skip_element:
-> > +        virtqueue_push(vq, elem, 0);
-> > +        virtio_notify(vdev, vq);
-> > +        g_free(elem);
-> > +    }
-> > +}
-> > +
-> >  static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-> >  {
-> >      VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
-> > @@ -782,6 +836,16 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-> >      VirtIOBalloon *s = VIRTIO_BALLOON(dev);
-> >      int ret;
-> >
-> > +    /*
-> > +     * Page reporting is dependant on page poison to make sure we can
-> > +     * report a page without changing the state of the internal data.
-> > +     * We need to set the flag before we call virtio_init as it will
-> > +     * affect the config size of the vdev.
-> > +     */
-> > +    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_REPORTING)) {
-> > +        s->host_features |= 1 << VIRTIO_BALLOON_F_PAGE_POISON;
-> > +    }
-> > +
->
-> As discussed, this hunk would go away. With that, this patch is really
-> minimal, which is good :)
-
-I have already removed it. :-)
-
-> >      virtio_init(vdev, "virtio-balloon", VIRTIO_ID_BALLOON,
-> >                  virtio_balloon_config_size(s));
-> >
-> > @@ -798,6 +862,10 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-> >      s->dvq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
-> >      s->svq = virtio_add_queue(vdev, 128, virtio_balloon_receive_stats);
-> >
-> > +    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_REPORTING)) {
-> > +        s->rvq = virtio_add_queue(vdev, 32, virtio_balloon_handle_report);
-> > +    }
-> > +
-> >      if (virtio_has_feature(s->host_features,
-> >                             VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-> >          s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
-> > @@ -923,6 +991,8 @@ static Property virtio_balloon_properties[] = {
-> >                      VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
-> >      DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
-> >                      VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
-> > +    DEFINE_PROP_BIT("free-page-reporting", VirtIOBalloon, host_features,
-> > +                    VIRTIO_BALLOON_F_REPORTING, true),
->
-> I think you'll have to similarly disable it via compat machines if you
-> want to default enable. Otherwise, backward migration would be broken.
-
-Yes, I realized that after you mentioned it for poison yesterday.
-
-> Also, I do wonder if we want to default-enable it. It can still have a
-> negative performance impact and some people might not want that.
-
-The negative performance impact should be minimal. At this point the
-hinting process ends up being very light since it only processes a
-small chunk of the memory before it shuts down for a couple seconds.
-In my original data the only time any significant performance
-regression was seen was with page shuffling enabled, and that was
-before I put limits on how many pages we could process per pass and
-how frequently we would make a pass through memory. My thought is that
-we are much better having it enabled by default rather than having it
-disabled by default. In the worst case scenario we have a little bit
-of extra thread noise from it popping up running for a few
-milliseconds and then sleeping for about two seconds, but the benefit
-side is that the VMs will do us a favor and restrict themselves to a
-much smaller idle footprint until such time as the memory is actually
-needed in the guest.
-
-> Apart from that, looks good to me. Nothing else we have to migrate AFAIKs.
-
-Thanks for the review.
-
-- Alex
+DQoNCj4gT24gQXByIDIyLCAyMDIwLCBhdCA0OjE1IFBNLCBBbmkgU2luaGEgPGFuaS5zaW5oYUBu
+dXRhbml4LmNvbT4gd3JvdGU6DQo+IA0KPiANCj4gDQo+PiBPbiBBcHIgMjEsIDIwMjAsIGF0IDg6
+MzIgUE0sIERhbmllbCBQLiBCZXJyYW5nw6kgPGJlcnJhbmdlQHJlZGhhdC5jb20+IHdyb3RlOg0K
+Pj4gDQo+PiBPbiBUdWUsIEFwciAyMSwgMjAyMCBhdCAwMjo0NTowNFBNICswMDAwLCBBbmkgU2lu
+aGEgd3JvdGU6DQo+Pj4gDQo+Pj4gDQo+Pj4+IE9uIEFwciAyMCwgMjAyMCwgYXQgODozMiBQTSwg
+TWljaGFlbCBTLiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT4gd3JvdGU6DQo+Pj4+IA0KPj4+PiBC
+dXQgSSBmb3Igb25lIHdvdWxkIGxpa2UgdG8gZm9jdXMgb24ga2VlcGluZyBQSUlYIHN0YWJsZQ0K
+Pj4+PiBhbmQgZm9jdXMgZGV2ZWxvcG1lbnQgb24gcTM1LiAgTm90IGJsb2F0aW5nIFBJSVggd2l0
+aCBsb3RzIG9mIG5ldw0KPj4+PiBmZWF0dXJlcyBpcyBJTUhPIGEgZ29vZCB3YXkgdG8gZG8gdGhh
+dC4NCj4+PiANCj4+PiBEb2VzIHRoaXMgbWVhbiB0aGlzIHBhdGNoIGlzIGEgbm8tZ28gdGhlbj8g
+OigNCj4+IA0KPj4gSSdkIHN1cHBvcnQgdGhpcyBwYXRjaCwgYXMgSSBkb24ndCB0aGluayBpdCBj
+YW4gcmVhbGx5IGJlIGRlc2NyaWJlZCBhcw0KPj4gYmxvYXQgb3IgZGVzdGFiYWxpemluZy4gSXQg
+aXMganVzdCBhZGRpbmcgYSBzaW1wbGUgcHJvcGVydHkgdG8NCj4+IGNvbmRpdGlvbmFsaXplIGV4
+aXN0aW5nIGZ1bmN0aW9uYWxpdHkuICBUZWxsaW5nIHBlb3BsZSB0byBzd2l0Y2ggdG8gUTM1DQo+
+PiBpcyB1bnJlYXNvbmFibGUgYXMgaXQgaXMgbm90IGEgc2ltcGxlIDEtMSBjb252ZXJzaW9uIGZy
+b20gZXhpc3RpbmcgdXNlDQo+PiBvZiBQSUlYLiBRMzUgaGFzIG11Y2ggaGlnaGVyIGNvbXBsZXhp
+dHkgaW4gaXRzIGNvbmZpZ3VyYXRpb24sIGhhcyBoaWdoZXINCj4+IG1lbW9yeSBvdmVyaGVhZCBw
+ZXIgVk0gdG9vLCBhbmQgbGFja3MgY2VydGFpbiBmZWF0dXJlcyBvZiBQSUlYIHRvby4NCj4gDQo+
+IENvb2wuIEhvdyBkbyB3ZSBnbyBmb3J3YXJkIGZyb20gaGVyZT8NCj4gDQoNCldlIHdvdWxkIHJl
+YWxseSBhcHByZWNpYXRlIGlmIHdlIGNhbiBhZGQgdGhpcyBleHRyYSBrbm9iIGluIFFlbXUuIE1h
+eWJlIHNvbWVvbmUgZWxzZSBhbHNvIGluIHRoZSBjb21tdW5pdHkgd2lsbCBmaW5kIHRoaXMgdXNl
+ZnVsLiBXZSBkb27igJl0IHdhbnQgdG8gbWFpbnRhaW4gdGhpcyBwYXRjaCBpbnRlcm5hbGx5IGZv
+cmV2ZXIgYnV0IHJhdGhlciBwcmVmZXIgd2UgbWFpbnRhaW4gdGhpcyBhcyBhIFFlbXUgY29tbXVu
+aXR5Lg0KDQphbmkNCg0K
 
