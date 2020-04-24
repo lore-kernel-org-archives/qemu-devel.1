@@ -2,94 +2,88 @@ Return-Path: <SRS0=J7/p=6I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FBA4C54FD0
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 21:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90704C54FD0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 22:00:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 090292098B
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 21:59:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 588F820781
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 22:00:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mVqrZWpB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 090292098B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ihTPBy32"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 588F820781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jS6M0-0004x2-4I
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 17:59:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50118)
+	id 1jS6NG-0006ds-6I
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 18:00:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jS6Cp-0008F9-Uv
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:49:56 -0400
+ (envelope-from <eblake@redhat.com>) id 1jS6Gs-0002XT-LB
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:54:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jS6Co-0007M9-9o
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:49:54 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44695)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jS6Cn-0007Fl-PB
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:49:53 -0400
-Received: by mail-pg1-x544.google.com with SMTP id q18so5251185pgm.11
- for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 14:49:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=/dSm7a0eb+jHHfF9pMuOwiHXLslj0mvOfuKqqBKISPk=;
- b=mVqrZWpBvLP+Vgz7GO5RGcPi1aH8nwtt2FTjyREtyhtI6tU9w3g7lYFcJvvRv5t/ns
- KCYmZKuwijPWy+ekxAl+hAZAcjJRs/SssiQx5cMx1pnYuu+WDhWNRT5JXhuhLZIQjiDr
- SDLL2mu+HFhx8iGYzYFw24mIxQOBs5F+yytAaialRCCgR5qHqkPspUHqbFFyI5RgG+/F
- pjfsY8unxkmDpP4SOQfgfEWvs1F7X73JR0N4MheFpQZUGD5edZy0oLRGohLmwQXngD5L
- 6YKLCwyvon1XCM0rCjS46R9i4RCcR2JFl2a0eNrFK+Je+kVQuuidkiKXxJzhT36bwFhw
- EzNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=/dSm7a0eb+jHHfF9pMuOwiHXLslj0mvOfuKqqBKISPk=;
- b=Q+ttS8jYX3fALnaEQtHyaLCzFZXMrWEhBPAqDnTmaeDXyHtE03qT5leVgaQCF5qKaE
- bSY8J+4fvpSxDr8agFijity7rrJqojrQ/IxwXGWdog6i++G+stWqL/8yKynkMgIRXVuV
- Y7311P/vkfAEVmbZkyyDQ9Ja098Jjss+7rBUpDHxFFW/PXBViaTtpzSp/jGqKC7+/qxs
- gtHZdz+H5yMkLrpExIdgzrN1pklIgyagzTypyu1yIABA/denCVN67vT2KL97VSgOqGCA
- vjtfUEvm2BsppNKWZ1P6ccd3lAcglpuGypvZh2TpJF8gSEBFQJz0Chv5ohW99QrDHszz
- Fzww==
-X-Gm-Message-State: AGi0PuYJzBF6GO4fugGfXWoGN3KBO3GRXGHLub2uXlbz88cWd+hfCuBE
- XQsTsF1291zrhyUiditwokQnyPfRzVQ=
-X-Google-Smtp-Source: APiQypIW24ggZ2rmd87dB3vLfOHneNxSYjLUCanN0dseiFzRjzJv93b8AsMWBzaOXr7ZgOUlyE+rdg==
-X-Received: by 2002:a63:f46:: with SMTP id 6mr11375223pgp.367.1587764991815;
- Fri, 24 Apr 2020 14:49:51 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id c10sm5746066pgh.48.2020.04.24.14.49.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 24 Apr 2020 14:49:51 -0700 (PDT)
-Subject: Re: [PATCH] linux-user: Drop open-coded fcntl flags conversion in
- eventfd2 syscall
+ (envelope-from <eblake@redhat.com>) id 1jS6Gq-0001Hh-BB
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:54:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33863
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jS6Gp-0001Er-Qt
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 17:54:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587765241;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=v6OdSNvNHw2fW4KzCxX3OpHPBgYJpgFnmdwj8NCsYYY=;
+ b=ihTPBy32E9OOng4gHHcyXvS0Gp2cT2RrPT351VngO3D6fociLOxSJMxSghwTzHyLqB2W2k
+ DjUydxpTkKC56BsqRIRHcZLddiLg7QmKklWkqNohzr0SUm+EkGyUfLtzlzdkdxgKQGh1A2
+ NeK3CrJ+AOwzyxWnPRSmMWKdNdOHBIA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-CNKWIzBNOjqF4LaqYYNuCA-1; Fri, 24 Apr 2020 17:53:56 -0400
+X-MC-Unique: CNKWIzBNOjqF4LaqYYNuCA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFE36107ACCA;
+ Fri, 24 Apr 2020 21:53:55 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DDA4A5D70C;
+ Fri, 24 Apr 2020 21:53:54 +0000 (UTC)
+Subject: Re: [PATCH] linux-user: Drop unnecessary check in dup3 syscall
 To: Helge Deller <deller@gmx.de>, Riku Voipio <riku.voipio@iki.fi>,
  Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20200424204858.GA26164@ls3530.fritz.box>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <76c818fa-fb77-5cb8-0ae3-76aa3805166e@linaro.org>
-Date: Fri, 24 Apr 2020 14:49:48 -0700
+References: <20200424205755.GA26282@ls3530.fritz.box>
+ <56bb3ce2-9b70-7470-d4f4-563b617849d2@redhat.com>
+ <86df80e9-c747-1854-d210-5856b71e2f7b@gmx.de>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <bb774102-33a9-8d78-a0a5-779ef7eb815b@redhat.com>
+Date: Fri, 24 Apr 2020 16:53:53 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200424204858.GA26164@ls3530.fritz.box>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <86df80e9-c747-1854-d210-5856b71e2f7b@gmx.de>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::544
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 13:45:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,14 +99,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/24/20 1:48 PM, Helge Deller wrote:
-> Drop the open-coded fcntl flags conversion in the eventfd2 syscall and
-> replace it with the built-in conversion with fcntl_flags_tbl.
-> 
-> Signed-off-by: Helge Deller <deller@gmx.de>
+On 4/24/20 4:47 PM, Helge Deller wrote:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>>> -=A0=A0=A0=A0=A0=A0=A0 host_flags =3D target_to_host_bitmask(arg3, fcnt=
+l_flags_tbl);
+>>> +=A0=A0=A0=A0=A0=A0=A0 int host_flags =3D target_to_host_bitmask(arg3, =
+fcntl_flags_tbl);
+>>
+>> I don't think this is quite correct.  target_to_host_bitmask()
+>> silently ignores unknown bits, and a user that was relying on bit
+>> 0x40000000 to cause an EINVAL will not fail with this change (unless
+>> bit 0x40000000 happens to be one of the bits translated by
+>> fcntl_flags_tbl).
+>=20
+> True.
+>=20
+>> The open() syscall is notorious for ignoring unknown bits rather than
+>> failing with EINVAL, and it is has come back to haunt kernel
+>> developers; newer syscalls like dup3() learned from the mistake, and
+>> we really do want to catch unsupported bits up to make it easier for
+>> future kernels to define meanings to those bits without them being
+>> silently swallowed when run on older systems that did not know what
+>> those bits meant.
+> Ok, I wasn't aware that it's a design goal to manually find such
+> cases of wrong userspace applications. But in this case, you're right
+> that my patch shouldn't be applied.
 
+This, and several similar ones that you also posted.
 
-r~
+Maybe you could add a new int target_to_host_bitmask_strict(int src,=20
+translate_tbl, int *dst), which returns 0 when *dst is bit-for-bit=20
+translated from src, and returns -1 if src had bits not specified by=20
+translate_tbl.  In that case, the caller can then translate all usual=20
+bits and rely on the syscall() failure (as you tried here), but you can=20
+also flag -TARGET_EINVAL up front for bits not covered by the table.
+
+>=20
+> While looking at the code I just noticed another bug too, which needs
+> fixing then:
+>>> -        if ((arg3 & ~TARGET_O_CLOEXEC) !=3D 0) {
+>>> -            return -EINVAL;
+> this needs to be:
+>>> -            return -TARGET_EINVAL;
+
+Indeed.  Good catch.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
