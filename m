@@ -4,86 +4,87 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 453F3C2BA1A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 07:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7270AC5518A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 07:45:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 083E420724
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 07:32:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E61020704
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Apr 2020 07:45:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SzOZy5OJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 083E420724
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CxnSRl/S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E61020704
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jRspL-0008Bd-6F
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 03:32:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56998)
+	id 1jRt1o-0003MK-6p
+	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 03:45:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38408)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jRsoa-0007d4-9d
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 03:32:00 -0400
+ (envelope-from <armbru@redhat.com>) id 1jRt15-0002iP-71
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 03:44:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jRsoZ-0006Wy-7U
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 03:31:59 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32056
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1jRt14-0002eA-3q
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 03:44:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20610
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jRsoY-0006Nu-Oi
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 03:31:58 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jRt13-0002Yr-MU
+ for qemu-devel@nongnu.org; Fri, 24 Apr 2020 03:44:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587713516;
+ s=mimecast20190719; t=1587714292;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=F2b3ALT7FBg5h9eKv71TKr2xbansaU8IGxTPxq5D2Z0=;
- b=SzOZy5OJ2P5vkNY0Vtm3gMqmglTCuJjvyfYo87aHv/1VmCL8afhlxoGlPe01KNiwySmZxq
- OqqospIu2+SMWFHYKNFefsSbYjplR6IYnkzRMCoSlMqT8GWX8tCgPQiOJMehce+evzTRPl
- NNcrJainuNg2/xFz+0y8JcatIuI27NI=
+ bh=ppLUh3Zl8sPT7uzTTDsNRZJ8jHus4Yp+pGzZoJ3KiSA=;
+ b=CxnSRl/SfVmzTEQrczKxbeeXiWhkACTKV/Rt9Fqd/VHyw9ke83edIHXeDZ0APaa8EuVyjh
+ OoXxP4+J+YZJxGyWtW/jyFQ21Z3ywy14O6oXYqG4c7qC4tH+64Z+clHRNm2tuvlz75YtNt
+ C97LK+9+uXHkrIwY9R1PXdSaAsxB1zY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-448-G4O3gIHiMuC8FYMDl68yvA-1; Fri, 24 Apr 2020 03:31:52 -0400
-X-MC-Unique: G4O3gIHiMuC8FYMDl68yvA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-437-zaey1S39Ouuvv2ct2t4s8A-1; Fri, 24 Apr 2020 03:44:48 -0400
+X-MC-Unique: zaey1S39Ouuvv2ct2t4s8A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE01A8014D5;
- Fri, 24 Apr 2020 07:31:51 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2F551800D51;
+ Fri, 24 Apr 2020 07:44:47 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 743005D70C;
- Fri, 24 Apr 2020 07:31:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 61227600EF;
+ Fri, 24 Apr 2020 07:44:47 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id ED81511358BC; Fri, 24 Apr 2020 09:31:49 +0200 (CEST)
+ id D602911358BC; Fri, 24 Apr 2020 09:44:45 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 08/13] qapi: Assert output visitors see only valid enum
- values
+Subject: Re: [PATCH 10/13] qapi: Clean up visitor's recovery from input with
+ invalid type
 References: <20200423160036.7048-1-armbru@redhat.com>
- <20200423160036.7048-9-armbru@redhat.com>
- <75ecc321-7301-3c4c-c3be-741855d13e14@redhat.com>
-Date: Fri, 24 Apr 2020 09:31:49 +0200
-In-Reply-To: <75ecc321-7301-3c4c-c3be-741855d13e14@redhat.com> (Eric Blake's
- message of "Thu, 23 Apr 2020 12:56:17 -0500")
-Message-ID: <87h7x9pcey.fsf@dusky.pond.sub.org>
+ <20200423160036.7048-11-armbru@redhat.com>
+ <435f2d5d-e732-a236-bf13-991d5c3510e6@redhat.com>
+ <89636246-6a5c-476d-6016-977f39cb653c@redhat.com>
+Date: Fri, 24 Apr 2020 09:44:45 +0200
+In-Reply-To: <89636246-6a5c-476d-6016-977f39cb653c@redhat.com> (Eric Blake's
+ message of "Thu, 23 Apr 2020 13:18:04 -0500")
+Message-ID: <877dy5pbte.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 02:57:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/24 03:07:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,41 +103,127 @@ Sender: "Qemu-devel"
 
 Eric Blake <eblake@redhat.com> writes:
 
-> On 4/23/20 11:00 AM, Markus Armbruster wrote:
->> output_type_enum() fails when *obj is not a valid value of the enum
->> type.  Should not happen.  Drop the check, along with its unit tests.
->> qapi_enum_lookup()'s assertion still guards.
+> On 4/23/20 1:06 PM, Eric Blake wrote:
+>> On 4/23/20 11:00 AM, Markus Armbruster wrote:
+>>> An alternate type's visit_type_FOO() fails when it runs into an
+>>> invalid ->type.=C2=A0 If it's an input visit, we then need to free the =
+the
+>>> object we got from visit_start_alternate().=C2=A0 We do that with
+>>> qapi_free_FOO(), which uses the dealloc visitor.
+>>>
+>>> Trouble is that object is in a bad state: its ->type is invalid.=C2=A0 =
+So
+>>> the dealloc visitor will run into the same error again, and the error
+>>> recovery skips deallocating the alternate's (invalid) alternative.
+>>> This is a roundabout way to g_free() the alternate.
+>>>
+>>> Simplify: replace the qapi_free_FOO() by g_free().
+>>>
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>> =C2=A0 scripts/qapi/visit.py | 2 +-
+>>> =C2=A0 1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
 >>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>   qapi/qapi-visit-core.c              |  9 -------
->>   tests/test-qobject-output-visitor.c | 39 -----------------------------
->>   tests/test-string-output-visitor.c  | 19 --------------
->>   3 files changed, 67 deletions(-)
+>> Required looking at what gets generated into qapi_free_FOO() as well
+>> as when visit_start_alternate() can fail, but makes sense.
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
 >
-> Nice cleanup.
+> Actually, I'm having second thoughts.  As an example, look at the generat=
+ed:
 >
-> The commit message implies adding an assertion; but in reality, the
-> change is deleting dead code (because we already have the assertion in
-> place).  Maybe it's worth updating the subject?
+>> void visit_type_BlockDirtyBitmapMergeSource(Visitor *v, const char *name=
+, BlockDirtyBitmapMergeSource **obj, Error **errp)
+>> {
+>>     Error *err =3D NULL;
+>>
+>>     visit_start_alternate(v, name, (GenericAlternate **)obj, sizeof(**ob=
+j),
+>>                           &err);
+>>     if (err) {
+>>         goto out;
+>>     }
+>>     if (!*obj) {
+>>         goto out_obj;
+> [1]
+>>     }
+>>     switch ((*obj)->type) {
+>>     case QTYPE_QSTRING:
+>>         visit_type_str(v, name, &(*obj)->u.local, &err);
+> [2]
+>>         break;
+>>     case QTYPE_QDICT:
+>>         visit_start_struct(v, name, NULL, 0, &err);
+>>         if (err) {
+>>             break;
+> [3]
+>>         }
+>>         visit_type_BlockDirtyBitmap_members(v, &(*obj)->u.external, &err=
+);
+>>         if (!err) {
+>>             visit_check_struct(v, &err);
+> [4]
+>>         }
+>>         visit_end_struct(v, NULL);
+>>         break;
+>>     case QTYPE_NONE:
+>>         abort();
+>>     default:
+>>         error_setg(&err, QERR_INVALID_PARAMETER_TYPE, name ? name : "nul=
+l",
+>>                    "BlockDirtyBitmapMergeSource");
+> [5]
+>>     }
+>> out_obj:
+>>     visit_end_alternate(v, (void **)obj);
+>>     if (err && visit_is_input(v)) {
+>>         qapi_free_BlockDirtyBitmapMergeSource(*obj);
+>
+> If we got here, we must have failed at any of the points mentioned above.
+>
+> If [1], visit_start_alternate() failed, but *obj is NULL and both
+> qapi_free_FOO(NULL) and g_free(NULL) are safe.
+>
+> If [2], visit_type_str() failed, so *obj is allocated but the embedded
+> string (here, u.local) was left NULL.  qapi_free_FOO() then does
+> nothing further than g_free(obj).
+>
+> If [3], visit_start_struct() failed, the embedded dict (here,
+> u.external) was left NULL.  qapi_free_FOO() then does nothing further
+> than g_free(obj).
+>
+> If [5], we have the wrong ->type.  As pointed out by this commit,
+> qapi_free_FOO() does nothing further than g_free(obj).
+>
+> But what happens in [4]?  Here, the embedded dict was allocated, but
+> we then failed while parsing its members.  That leaves us in a
+> partially-allocated state, and g_free(NULL) does NOT recursively visit
+> that partial allocation.  I think this patch is prone to a memory leak
+> unless you _also_ patch things to free any dict branch on failure
+> (perhaps during the QTYPE_QDICT case label, rather than here at the
+> end).
 
-I tried to say it in the body: "qapi_enum_lookup()'s assertion still
-guards."  I could replace that by "This unmasks qapi_enum_lookup()'s
-assertion."  Okay?  Better ideas?
+You're right.
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
->> -    /*
->> -     * TODO why is this an error, not an assertion?  If assertion:
->> -     * delete, and rely on qapi_enum_lookup()
->> -     */
->> -    if (value < 0 || value >=3D lookup->size) {
->> -        error_setg(errp, QERR_INVALID_PARAMETER, name ? name : "null");
->> -        return;
->> -    }
->
-> The comment being deleted is what points out the assertion that
-> already exists.
+Let's change cleanup only for the default case, like this:
+
+       default:
+           error_setg(&err, QERR_INVALID_PARAMETER_TYPE, name ? name : "nul=
+l",
+                      "BlockDirtyBitmapMergeSource");
+ +         g_free(*obj);
+ +         *obj =3D NULL;
+       }
+   out_obj:
+       visit_end_alternate(v, (void **)obj);
+       if (err && visit_is_input(v)) {
+           qapi_free_BlockDirtyBitmapMergeSource(*obj);
+           *obj =3D NULL;
+       }
+   out:
+       error_propagate(errp, err);
+   }
 
 Thanks!
 
