@@ -2,90 +2,94 @@ Return-Path: <SRS0=p7gi=6J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31BC0C55186
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 10:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EEFCC55185
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 10:47:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE820206ED
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 10:30:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09E1420714
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 10:47:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hsTzfoCy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE820206ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZE/6JJ25"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09E1420714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSI4f-0006fX-W3
-	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 06:30:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35298)
+	id 1jSILN-00030c-38
+	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 06:47:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40618)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jSI3y-00068U-O9
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:29:35 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jSIKR-0002Tw-SM
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:46:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jSI3x-0003Av-7k
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:29:34 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47208
+ (envelope-from <pbonzini@redhat.com>) id 1jSIKR-0000wF-2q
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:46:35 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59997
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jSI3w-0003Aj-Oa
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:29:32 -0400
+ id 1jSIKQ-0000od-F2
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:46:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587810571;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:mime-version:mime-version:
- content-type:content-type: content-transfer-encoding:content-transfer-encoding;
- bh=Q/xkfiGrU7hh4/L5+3uvml1/PEXlx9XSGF3Y52m3IPs=;
- b=hsTzfoCy10r8mkCTpjdpVvkiYumfAX5Qb209EHPa2UbrUO2hZ3w379HU3CKVfL1SMxse5i
- D0wt7ncEwL/9S+a4oejcANc4Zqx/R4xjRHHu/AZsP8sOkBGqzi1UYx2A92YwDf4Ph7HdjH
- IljVJ/sw2RVtT0xnKg/aFs0/k+GZAnA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-UUEe3CmHPDWmE7drGNPStA-1; Sat, 25 Apr 2020 06:29:26 -0400
-X-MC-Unique: UUEe3CmHPDWmE7drGNPStA-1
-Received: by mail-wr1-f71.google.com with SMTP id f2so6520936wrm.9
- for <qemu-devel@nongnu.org>; Sat, 25 Apr 2020 03:29:26 -0700 (PDT)
+ s=mimecast20190719; t=1587811592;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=a4A+lrdI1dFhVegHcBQe60sNI1hR1+hKm0XsksZ6haE=;
+ b=ZE/6JJ25gF2GHZrgxAAMaPSojtqWCZtrBVNYO0Ged0bpNAgu0PfPsLPgojlzVl5xVrQbno
+ xEGNIcNItSlXst0H9RkvUuq1nMsoJCPGFTmZ2O7c/0oQsTsDMSSHpxktpMy3HQEftpJYo5
+ Ic/ru0VSbbo0WQJqiNYrtYZtyrSEgg4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-79-ctXrWRzpPbG7aWeB6Fkq7A-1; Sat, 25 Apr 2020 06:46:31 -0400
+X-MC-Unique: ctXrWRzpPbG7aWeB6Fkq7A-1
+Received: by mail-wr1-f69.google.com with SMTP id u4so6534336wrm.13
+ for <qemu-devel@nongnu.org>; Sat, 25 Apr 2020 03:46:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:to:from:reply-to:subject:message-id:date
- :user-agent:mime-version:content-language:content-transfer-encoding;
- bh=Wtc798SaiZRKd4xvI15KW6Lm5IMWQxOD5VKCV+R0GjA=;
- b=qCIFL7UkG25dk57cy67LaQDywW/lKY9s2KhMD5tmZMxUg3g6fS/+yZNaZkkj0+GDgo
- umuxqy1PXLcPuZ4AZ84NkYqoGJ3g86A7AI7RolLMZ0rjcNYYslEXsau9HeeoT1LsCcy2
- nhkcm3zUPDQZTYDh7CeBzS4uhn++5/2Q1ItqI9wSe2x7FPyL57+3YzT3XQ6r5XLgc4H/
- AENF3nLUTY7xmn61CToFxn05p08Y15hIPkCSKARB/T8TR2oh0ZC9rJCXI2EyvQIntmFf
- 8RYAELjpKyk1aXZKVKpe1sKPrK+bG+8b+a+nwkJ7IU2KDhg2XkR0q0Ro3ksq3UXeihf+
- kTdQ==
-X-Gm-Message-State: AGi0PuY8UlNkbH5j/vV1hk61m8mNbx61t6GZtwfT8wQ7X/UmDZe4gSrw
- hYSPCBDkK5/P3luZBlfLrxUytT0ECBIcbQZl8E8HP0XyQO6apquguUvucxNei65qc9BMG7ZmRzf
- XPTgN7eGnG/lZppk=
-X-Received: by 2002:a5d:6b8a:: with SMTP id n10mr16036961wrx.36.1587810565330; 
- Sat, 25 Apr 2020 03:29:25 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKrXXpKyRrBQw9KkMlM/i2jcGT9lAiH2FwZ8dFH+eCYZgK0PBopf1xo9ue/6znHXT3G3NYTtA==
-X-Received: by 2002:a5d:6b8a:: with SMTP id n10mr16036938wrx.36.1587810564943; 
- Sat, 25 Apr 2020 03:29:24 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d0a0:f143:e9e4:2926?
- ([2001:b07:6468:f312:d0a0:f143:e9e4:2926])
- by smtp.gmail.com with ESMTPSA id v1sm12516300wrv.19.2020.04.25.03.29.23
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zutJsnXkVSIqotkfhzRuC9WUfFnFfS8YcXLnqr/eb9g=;
+ b=MvVkJAiNhKa+2cxpLv4BBb9HS9fq5z6fKsVPX36NdxFgKzcwihQpXwLOTYqYw+G1m/
+ vPR9mP+r8wFHS8i4sq/x+KX4Uyr2ndNUi1y+TpcYIunrF1j6zBpc8GLdqcuaMOg1NPDf
+ fvrAgEbJEpRwM2v/ZMBaVURbyF0KojS4zokaXJvmL+LCiEBnwwwwtmm+0fbyLXTnslZW
+ LUSR/qqMwSxFmG4O8FH19Nsvel+/IgW6Skpk89XTbKM9y/c8eq0Gm3LGTJK7/K3pqHik
+ rKw+OS0cy4KmzdM/XC3OoefJTutERgfLZ6+HkBEG3OXNBON7T7qBR5bA0nBSjzKBy0/u
+ dPNw==
+X-Gm-Message-State: AGi0PubIWJ4O9lLXlZQCat6dofGAtPz0i/7nUTNR9AnWg8c9LlmkqtWP
+ CScflWCyk3VSXM50QBArdP2siF7sO1zWPa/jiG2xrVv4Dvu/wsrm1JWv9vBl6VzcyigKD7jmbAs
+ YkkMQ4FF62IqAP7E=
+X-Received: by 2002:a1c:8049:: with SMTP id b70mr15489929wmd.162.1587811589912; 
+ Sat, 25 Apr 2020 03:46:29 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJiCPU199ACMbNMeMy4dwd/mmbtcic4pJKRGyLmUyGPtsYAgvcDuntTjY0J5dKz8uovYH3qUw==
+X-Received: by 2002:a1c:8049:: with SMTP id b70mr15489915wmd.162.1587811589699; 
+ Sat, 25 Apr 2020 03:46:29 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+ by smtp.gmail.com with ESMTPSA id c190sm6789166wme.4.2020.04.25.03.46.28
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 25 Apr 2020 03:29:24 -0700 (PDT)
-To: qemu-devel <qemu-devel@nongnu.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- KVM list <kvm@vger.kernel.org>
+ Sat, 25 Apr 2020 03:46:28 -0700 (PDT)
+Subject: Re: [PATCH v2] chardev/char-socket: Properly make qio connections non
+ blocking
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+References: <1587289900-29485-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ <20200420092600.GG346737@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: CFP: KVM Forum 2020
-Message-ID: <a1d960aa-c1a0-ff95-68a8-6e471028fe1e@redhat.com>
-Date: Sat, 25 Apr 2020 12:29:22 +0200
+Message-ID: <09893acf-ce13-ce30-79fd-669eded3b7ab@redhat.com>
+Date: Sat, 25 Apr 2020 12:46:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200420092600.GG346737@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -107,176 +111,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: kvm-forum-2020-pc@redhat.com
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ edgari@xilinx.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-KVM Forum 2020: Call For Participation
-October 28-30, 2020 - Convention Centre Dublin - Dublin, Ireland
+On 20/04/20 11:26, Daniel P. Berrang=C3=A9 wrote:
+> On Sun, Apr 19, 2020 at 03:21:40PM +0530, Sai Pavan Boddu wrote:
+>> In tcp_chr_sync_read function, there is a possibility of socket
+>> disconnection during blocking read, then tcp_chr_hup function would clea=
+n up
+>> the qio channel pointers(i.e ioc, sioc).
+>>
+>> Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+>> ---
+>> Changes for V2:
+>> =09Place the guard around 'qio_channel_set_blocking' call to check conne=
+ction status
+>> =09This fix is simpler than v1 and explains better about the issue.
+>>
+>>  chardev/char-socket.c | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+>> index 185fe38..e56b2f0 100644
+>> --- a/chardev/char-socket.c
+>> +++ b/chardev/char-socket.c
+>> @@ -549,7 +549,9 @@ static int tcp_chr_sync_read(Chardev *chr, const uin=
+t8_t *buf, int len)
+>> =20
+>>      qio_channel_set_blocking(s->ioc, true, NULL);
+>>      size =3D tcp_chr_recv(chr, (void *) buf, len);
+>> -    qio_channel_set_blocking(s->ioc, false, NULL);
+>> +    if (s->state !=3D TCP_CHARDEV_STATE_DISCONNECTED) {
+>> +        qio_channel_set_blocking(s->ioc, false, NULL);
+>> +    }
+>>      if (size =3D=3D 0) {
+>>          /* connection closed */
+>>          tcp_chr_disconnect(chr);
+>=20
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>=20
+>=20
+> Regards,
+> Daniel
+>=20
 
-(All submissions must be received before June 15, 2020 at 23:59 PST)
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Queued, thanks.
 
-KVM Forum is an annual event that presents a rare opportunity for
-developers and users to meet, discuss the state of Linux virtualization
-technology, and plan for the challenges ahead. This highly technical
-conference unites the developers who drive KVM development and the users
-who depend on KVM as part of their offerings, or to power their data
-centers and clouds.
-
-Sessions include updates on the state of the KVM virtualization stack,
-planning for the future, and many opportunities for attendees to
-collaborate. After more than ten years in the mainline kernel, KVM
-continues to be a critical part of the FOSS cloud infrastructure. Come
-join us in continuing to improve the KVM ecosystem.
-
-We understand that these are uncertain times and we are continuously
-monitoring the COVID-19/Novel Coronavirus situation. Our attendees'
-safety is of the utmost importance. If we feel it is not safe to meet in
-person, we will turn the event into a virtual experience. We hope to
-announce this at the same time as the speaker notification. Speakers
-will still be expected to attend if a physical event goes ahead, but we
-understand that exceptional circumstances might arise after speakers are
-accepted and we will do our best to accommodate such circumstances.
-
-Based on these factors, we encourage you to submit and reach out to us
-should you have any questions. The program committee may be contacted as
-a group via email: kvm-forum-2020-pc@redhat.com.
-
-
-SUGGESTED TOPICS
-----------------
-
-* Scaling, latency optimizations, performance tuning
-* Hardening and security
-* New features
-* Testing
-
-KVM and the Linux Kernel:
-* Nested virtualization
-* Resource management (CPU, I/O, memory) and scheduling
-* VFIO: IOMMU, SR-IOV, virtual GPU, etc.
-* Networking: Open vSwitch, XDP, etc.
-* virtio and vhost
-* Architecture ports and new processor features
-
-QEMU:
-* Management interfaces: QOM and QMP
-* New devices, new boards, new architectures
-* New storage features
-* High availability, live migration and fault tolerance
-* Emulation and TCG
-* Firmware: ACPI, UEFI, coreboot, U-Boot, etc.
-
-Management & Infrastructure
-* Managing KVM: Libvirt, OpenStack, oVirt, KubeVirt, etc.
-* Storage: Ceph, Gluster, SPDK, etc.
-* Network Function Virtualization: DPDK, OPNFV, OVN, etc.
-* Provisioning
-
-
-SUBMITTING YOUR PROPOSAL
-------------------------
-
-Abstracts due: June 15, 2020
-
-Please submit a short abstract (~150 words) describing your presentation
-proposal. Slots vary in length up to 45 minutes.
-
-Submit your proposal here:
-https://events.linuxfoundation.org/kvm-forum/program/cfp/
-
-Please only use the categories "presentation" and "panel discussion"
-
-You will receive a notification whether or not your presentation
-proposal was accepted by August 17, 2020.
-
-Speakers will receive a complimentary pass for the event. In case your
-submission has multiple presenters, only the primary speaker for a
-proposal will receive a complimentary event pass. For panel discussions,
-all panelists will receive a complimentary event pass.
-
-
-TECHNICAL TALKS
-
-A good technical talk should not just report on what has happened over
-the last year; it should present a concrete problem and how it impacts
-the user and/or developer community. Whenever applicable, focus on work
-that needs to be done, difficulties that haven't yet been solved, and on
-decisions that other developers should be aware of. Summarizing recent
-developments is okay but it should not be more than a small portion of
-the overall talk.
-
-
-END-USER TALKS
-
-One of the big challenges as developers is to know what, where and how
-people actually use our software. We will reserve a few slots for end
-users talking about their deployment challenges and achievements.
-
-If you are using KVM in production you are encouraged submit a speaking
-proposal. Simply mark it as an end-user talk. As an end user, this is a
-unique opportunity to get your input to developers.
-
-
-PANEL DISCUSSIONS
-
-If you are proposing a panel discussion, please make sure that you list
-all of your potential panelists in your the abstract. We will request
-full biographies if a panel is accepted.
-
-
-HANDS-ON / BOF SESSIONS
-
-We will reserve some time for people to get together and discuss
-strategic decisions as well as other topics that are best solved within
-smaller groups.
-
-These sessions will be announced during the event. If you are interested
-in organizing such a session, please add it to the list at
-
-  http://www.linux-kvm.org/page/KVM_Forum_2020_BOF
-
-Let people you think who might be interested know about your BOF, and
-encourage them to add their names to the wiki page as well. Please add
-your ideas to the list before KVM Forum starts.
-
-
-HOTEL / TRAVEL
---------------
-
-This year's event will take place at the Conference Center Dublin. For
-information on hotels close to the conference, please visit
-https://events.linuxfoundation.org/kvm-forum/attend/venue-travel/.
-Information on conference hotel blocks will be available later in
-Spring 2020.
-
-
-DATES TO REMEMBER
------------------
-
-* CFP Opens: Monday, April 27, 2020
-* CFP Closes: Monday, June 15 at 11:59 PM PST
-* CFP Notifications: Monday, August 17
-* Schedule Announcement: Thursday, August 20
-* Slide Due Date: Monday, October 26
-* Event Dates: Wednesday, October 28 =E2=80=93 Friday, October 30
-
-
-
-Thank you for your interest in KVM. We're looking forward to your
-submissions and, if the conditions will permit it, to seeing you at the
-KVM Forum 2020 in October!
-
--your KVM Forum 2020 Program Committee
-
-Please contact us with any questions or comments at
-kvm-forum-2020-pc@redhat.com
+Paolo
 
 
