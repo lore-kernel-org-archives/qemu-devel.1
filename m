@@ -7,89 +7,87 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EEFCC55185
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 10:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C9F0C55186
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 10:56:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09E1420714
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 10:47:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 264EA20714
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 10:56:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZE/6JJ25"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09E1420714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NobU/7s0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 264EA20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSILN-00030c-38
-	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 06:47:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40618)
+	id 1jSIU8-00007U-5O
+	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 06:56:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42450)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jSIKR-0002Tw-SM
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:46:36 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jSITH-0007Ji-Fx
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:55:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jSIKR-0000wF-2q
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:46:35 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59997
+ (envelope-from <pbonzini@redhat.com>) id 1jSITG-0006Fp-8g
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:55:42 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44569
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jSIKQ-0000od-F2
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:46:34 -0400
+ id 1jSITF-0006CU-L1
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:55:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587811592;
+ s=mimecast20190719; t=1587812140;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=a4A+lrdI1dFhVegHcBQe60sNI1hR1+hKm0XsksZ6haE=;
- b=ZE/6JJ25gF2GHZrgxAAMaPSojtqWCZtrBVNYO0Ged0bpNAgu0PfPsLPgojlzVl5xVrQbno
- xEGNIcNItSlXst0H9RkvUuq1nMsoJCPGFTmZ2O7c/0oQsTsDMSSHpxktpMy3HQEftpJYo5
- Ic/ru0VSbbo0WQJqiNYrtYZtyrSEgg4=
+ bh=lfYKOQB4N8lkU1r8Bt/203i2dcSBDjyhT2qENujEKOQ=;
+ b=NobU/7s0YrhHlDDJ9fwtAt2N0E9cVhbChz5MNzsysVENvmSpAaLxLU/N+ToGKP+0EuWIly
+ N6L0dobQydfp/S7aEMkwWruFCUbYBtls7gLTDT04+elu4tQTVv5ekXkLaNifKqEFlyFptA
+ o/h/weha49uj7NlH/P2imk+QkrW13Sc=
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
  [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-ctXrWRzpPbG7aWeB6Fkq7A-1; Sat, 25 Apr 2020 06:46:31 -0400
-X-MC-Unique: ctXrWRzpPbG7aWeB6Fkq7A-1
-Received: by mail-wr1-f69.google.com with SMTP id u4so6534336wrm.13
- for <qemu-devel@nongnu.org>; Sat, 25 Apr 2020 03:46:30 -0700 (PDT)
+ us-mta-209-AP2OW4T_M-Gl_7EAT5og3g-1; Sat, 25 Apr 2020 06:55:36 -0400
+X-MC-Unique: AP2OW4T_M-Gl_7EAT5og3g-1
+Received: by mail-wr1-f69.google.com with SMTP id x15so6567156wrn.0
+ for <qemu-devel@nongnu.org>; Sat, 25 Apr 2020 03:55:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=zutJsnXkVSIqotkfhzRuC9WUfFnFfS8YcXLnqr/eb9g=;
- b=MvVkJAiNhKa+2cxpLv4BBb9HS9fq5z6fKsVPX36NdxFgKzcwihQpXwLOTYqYw+G1m/
- vPR9mP+r8wFHS8i4sq/x+KX4Uyr2ndNUi1y+TpcYIunrF1j6zBpc8GLdqcuaMOg1NPDf
- fvrAgEbJEpRwM2v/ZMBaVURbyF0KojS4zokaXJvmL+LCiEBnwwwwtmm+0fbyLXTnslZW
- LUSR/qqMwSxFmG4O8FH19Nsvel+/IgW6Skpk89XTbKM9y/c8eq0Gm3LGTJK7/K3pqHik
- rKw+OS0cy4KmzdM/XC3OoefJTutERgfLZ6+HkBEG3OXNBON7T7qBR5bA0nBSjzKBy0/u
- dPNw==
-X-Gm-Message-State: AGi0PubIWJ4O9lLXlZQCat6dofGAtPz0i/7nUTNR9AnWg8c9LlmkqtWP
- CScflWCyk3VSXM50QBArdP2siF7sO1zWPa/jiG2xrVv4Dvu/wsrm1JWv9vBl6VzcyigKD7jmbAs
- YkkMQ4FF62IqAP7E=
-X-Received: by 2002:a1c:8049:: with SMTP id b70mr15489929wmd.162.1587811589912; 
- Sat, 25 Apr 2020 03:46:29 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJiCPU199ACMbNMeMy4dwd/mmbtcic4pJKRGyLmUyGPtsYAgvcDuntTjY0J5dKz8uovYH3qUw==
-X-Received: by 2002:a1c:8049:: with SMTP id b70mr15489915wmd.162.1587811589699; 
- Sat, 25 Apr 2020 03:46:29 -0700 (PDT)
+ bh=UkNkwH1h9FNQTUqw8hiaZiNU6J0NADal0uC+ptQ926M=;
+ b=YEgXgEVT5XXeIQKe05atRB8oWRSOtNv7uXxIcnR15mp8pZ6VzZ/T+4PfkMcuCZzv6W
+ bl0FPtw/nJX89dNBmfplQFHJ1VUAUcaEnNamk6vV6wHSEzO+DsUJ4vcrmEe2pbvFXWGT
+ XsaEtmlzoPhKenosFP8WhcqRjdsK6ab9GanJtna4o7cizsgpduhUZs1rqd2/CQ1ANa0n
+ 7TXd831FIG0aWvMRxY53cPITsd08TTfq1S7eOyazhXrngsW1xQIl31J7AZZKaiOcIY9a
+ CgcymlZqjsXxs3cPCY5+D4IASLmJYtXpo48aLJKCgDMOwYpAsgp+mJMSrz3Zsz8ej86N
+ GEaQ==
+X-Gm-Message-State: AGi0PuYoNtHkxEXrxXDR+6JpqcwxjRvC5qrXbUknk96XfHMX8hfmFJGt
+ /ZMbOz2BoB5yykk0FdiGxLua1j2Db4Ji/+uK+MLWi/Ja5g6ZYWesNSYI5G59f4qAUW7ZUUyb/jP
+ rqUfHkToZYKzUqSw=
+X-Received: by 2002:a5d:408d:: with SMTP id o13mr17747261wrp.249.1587812135775; 
+ Sat, 25 Apr 2020 03:55:35 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKN385hJz+PY8CdCgS7+RkbP1imzLRunxAViQ0px9eGdZHOkQ6cB7eddz0X05OG0jc5X2Lm9w==
+X-Received: by 2002:a5d:408d:: with SMTP id o13mr17747245wrp.249.1587812135578; 
+ Sat, 25 Apr 2020 03:55:35 -0700 (PDT)
 Received: from [192.168.10.150] ([93.56.170.5])
- by smtp.gmail.com with ESMTPSA id c190sm6789166wme.4.2020.04.25.03.46.28
+ by smtp.gmail.com with ESMTPSA id m15sm6617897wmc.35.2020.04.25.03.55.33
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 25 Apr 2020 03:46:28 -0700 (PDT)
-Subject: Re: [PATCH v2] chardev/char-socket: Properly make qio connections non
- blocking
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-References: <1587289900-29485-1-git-send-email-sai.pavan.boddu@xilinx.com>
- <20200420092600.GG346737@redhat.com>
+ Sat, 25 Apr 2020 03:55:35 -0700 (PDT)
+Subject: Re: [PATCH v4 1/3] memory: drop guest writes to read-only ram device
+ regions
+To: Yan Zhao <yan.y.zhao@intel.com>, alex.williamson@redhat.com
+References: <20200417074437.28526-1-yan.y.zhao@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <09893acf-ce13-ce30-79fd-669eded3b7ab@redhat.com>
-Date: Sat, 25 Apr 2020 12:46:28 +0200
+Message-ID: <f96581ca-055e-ecc6-4a44-6bd26396bfc0@redhat.com>
+Date: Sat, 25 Apr 2020 12:55:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200420092600.GG346737@redhat.com>
+In-Reply-To: <20200417074437.28526-1-yan.y.zhao@intel.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -111,54 +109,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- edgari@xilinx.com, qemu-devel@nongnu.org
+Cc: xin.zeng@intel.com, philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/04/20 11:26, Daniel P. Berrang=C3=A9 wrote:
-> On Sun, Apr 19, 2020 at 03:21:40PM +0530, Sai Pavan Boddu wrote:
->> In tcp_chr_sync_read function, there is a possibility of socket
->> disconnection during blocking read, then tcp_chr_hup function would clea=
-n up
->> the qio channel pointers(i.e ioc, sioc).
->>
->> Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
->> ---
->> Changes for V2:
->> =09Place the guard around 'qio_channel_set_blocking' call to check conne=
-ction status
->> =09This fix is simpler than v1 and explains better about the issue.
->>
->>  chardev/char-socket.c | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
->> index 185fe38..e56b2f0 100644
->> --- a/chardev/char-socket.c
->> +++ b/chardev/char-socket.c
->> @@ -549,7 +549,9 @@ static int tcp_chr_sync_read(Chardev *chr, const uin=
-t8_t *buf, int len)
->> =20
->>      qio_channel_set_blocking(s->ioc, true, NULL);
->>      size =3D tcp_chr_recv(chr, (void *) buf, len);
->> -    qio_channel_set_blocking(s->ioc, false, NULL);
->> +    if (s->state !=3D TCP_CHARDEV_STATE_DISCONNECTED) {
->> +        qio_channel_set_blocking(s->ioc, false, NULL);
->> +    }
->>      if (size =3D=3D 0) {
->>          /* connection closed */
->>          tcp_chr_disconnect(chr);
+On 17/04/20 09:44, Yan Zhao wrote:
+> for ram device regions, drop guest writes if the regions is read-only.
 >=20
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
+> ---
+>  memory.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 >=20
->=20
-> Regards,
-> Daniel
->=20
+> diff --git a/memory.c b/memory.c
+> index 601b749906..9576dd6807 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -34,6 +34,7 @@
+>  #include "sysemu/accel.h"
+>  #include "hw/boards.h"
+>  #include "migration/vmstate.h"
+> +#include "qemu/log.h"
+> =20
+>  //#define DEBUG_UNASSIGNED
+> =20
+> @@ -1313,6 +1314,12 @@ static void memory_region_ram_device_write(void *o=
+paque, hwaddr addr,
+>      MemoryRegion *mr =3D opaque;
+> =20
+>      trace_memory_region_ram_device_write(get_cpu_index(), mr, addr, data=
+, size);
+> +    if (mr->readonly) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "Invalid write to read only ram device region 0x%"
+> +                       HWADDR_PRIx" size %u\n", addr, size);
+> +        return;
+> +    }
 
-Queued, thanks.
+As mentioned in the review of v1, memory_region_ram_device_write should
+be changed to a .write_with_attrs operation, so that it can return
+MEMTX_ERROR.
+
+Otherwise this looks good.
 
 Paolo
 
