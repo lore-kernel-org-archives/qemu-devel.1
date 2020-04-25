@@ -2,101 +2,105 @@ Return-Path: <SRS0=p7gi=6J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FA2C55186
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 09:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D2FEC55185
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 09:28:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 787DF2064C
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 09:13:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9C1A2074F
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 09:28:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T9mU6ZmV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 787DF2064C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ii2Q4Zvb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9C1A2074F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSGsg-0001ZQ-Lv
-	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 05:13:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54360)
+	id 1jSH6U-0005xr-SP
+	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 05:28:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56076)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jSGrv-0000xE-Nn
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 05:13:04 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jSH5E-0005E3-80
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 05:26:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jSGrt-0006gG-TA
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 05:13:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54439
+ (envelope-from <pbonzini@redhat.com>) id 1jSH4z-0006h2-4z
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 05:26:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59853
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jSGrt-0006V8-As
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 05:13:01 -0400
+ id 1jSH4y-0006fj-Kx
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 05:26:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587805979;
+ s=mimecast20190719; t=1587806790;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nPcfpOh8E/ms/mruBFQqIRs8FMvXA1tMYgNKBGfA+vU=;
- b=T9mU6ZmV0VL+84u8ck+OFAAvdnVdG23Tp4YaJu+uGb7pQxW3dJ5SdB/cSN7/xawx5KZa+7
- mnH3APhrxNoYj5ZQ3nUHMUAXuuyYu24TzkqtBUiKSg+DA91HUNp6mck50wq0No+QnxMcSI
- DBQqiq0OE8ip+Gts1vU/6x1waaOnZf0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-WlBvQmu2NLCZskPfOrriGQ-1; Sat, 25 Apr 2020 05:12:56 -0400
-X-MC-Unique: WlBvQmu2NLCZskPfOrriGQ-1
-Received: by mail-wr1-f69.google.com with SMTP id y10so6417771wrn.5
- for <qemu-devel@nongnu.org>; Sat, 25 Apr 2020 02:12:55 -0700 (PDT)
+ bh=EcIayTYvRSnN3LHp4TWg4vfwCvPsVctRGypt1w6ru+g=;
+ b=Ii2Q4ZvbwG1jR2LsrUckfTBdsSRwq4nFcjVvPUSeO7eH1yyKPIo0Ta3AUhkYzdcHEwt1pV
+ CcM6fs6cnQUd6mE2mkdYitM6L/PznjyulOIgP6r5R6Emdtn0GwRpINf57lxiKD7wjeOjb1
+ 8UEwhBz4qu6fUrzDXnRA/UI+j+CnxlA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-257-uvjJvTidM3yhvzuHZOBBVg-1; Sat, 25 Apr 2020 05:26:28 -0400
+X-MC-Unique: uvjJvTidM3yhvzuHZOBBVg-1
+Received: by mail-wr1-f72.google.com with SMTP id v9so6406507wrt.7
+ for <qemu-devel@nongnu.org>; Sat, 25 Apr 2020 02:26:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to;
- bh=VYjCd/RqaDpYqL0bPzvK6NSA5as6Z2M3Ue0UMPJvhlE=;
- b=IRIm3cJBC5GLAIAIpIFBnQDI4EqvlzrGsAyBgm0GWHqOwHqxEABLOLZC6bQt0Ra5J2
- 3tx6rqgtrL27cHTkiJvdz1o2WLCPJ2NPY+dprMs4Fvao7C9c2O6yh//bcn7U5zgMp9Cm
- BRNAPzyiOX/gkbWxV7PuUOtflcatoRZV3DP8126zy0xKV5Xy1MU28qBHhZcgAdwhUMHs
- 70XatzfB+w2uWmT/H3rU2d0G1TTBccz2xsAF8zySU6T3mnIVNfAIKxXxJyMdiGcsnbVj
- OWQDCTA+EnkOSHF34P0ZeJOy9f9K6orjCHuVNI+cM6Gz2Po7EBtceulvaLz824SXZlYQ
- /B3Q==
-X-Gm-Message-State: AGi0PubiAyHXS+yOM0Bz2fBvAKaDKp1hLYtNaB5Q0R2gaCwyPiOtr+jv
- 07/F+DErgfDovIiepZIBMEVOgZ61r5QdGkiA0dfUxpYEBCDzIJStlhGQvP8QGIqBm/KdHPdf9+y
- +RxptYBB3A9ltfUA=
-X-Received: by 2002:a5d:6acc:: with SMTP id u12mr17410456wrw.198.1587805974943; 
- Sat, 25 Apr 2020 02:12:54 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLa/+juMsh8HAw01g9WCzdEqJ8V8ERuSN0hV6an2DkcGkYQZF4WO8mcSVuaYgi1nUf1vmVsIg==
-X-Received: by 2002:a5d:6acc:: with SMTP id u12mr17410439wrw.198.1587805974674; 
- Sat, 25 Apr 2020 02:12:54 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d0a0:f143:e9e4:2926?
- ([2001:b07:6468:f312:d0a0:f143:e9e4:2926])
- by smtp.gmail.com with ESMTPSA id p6sm11833457wrt.3.2020.04.25.02.12.53
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=EcIayTYvRSnN3LHp4TWg4vfwCvPsVctRGypt1w6ru+g=;
+ b=XlobDA9216Y8y/AfAbmRoYo6CEQh/o70q1bKbxHes0f/7sIbcoensyMIity8GcXIH5
+ kDjB5DD0gysk1ekdHkmCmArQnLb81DT7VNPd2AglpY3ZvUFWlM7N4Gd43vke0otAOqtX
+ G3aSiMk6j90dDD+9RjWFYlZ/tkEgIkoVmvv0kVD+mJd6QV3lvqpHXXV/o3KNrJxJdOYG
+ y8MutDPohlDFuw2aFhqbNRpoiu0aLwG5VfFlBkLAzCDaCpTzwEqynv9WJhv0PEoVkcq5
+ 0NckPZgk2q4UDn/1GCPa6NXbaGPm9DAkS16QxkpPfoIVoJLfVUUM2M3/1VAaCStuu8T+
+ 9OiA==
+X-Gm-Message-State: AGi0PuYhJ4sKXRmVY7I/Pis1N6WADVj2iJDgvdGQ6eFax1YICO31AfAm
+ trAf+tR9OVj/ihXNNIeE5FYD0VjKGfnsOqrd8qSMGAxHPIeSU6+tJ9UblYS6fKPHUOz4RTfgFPG
+ podhh/JW0qVQ3Cqo=
+X-Received: by 2002:a5d:6148:: with SMTP id y8mr15777243wrt.236.1587806787031; 
+ Sat, 25 Apr 2020 02:26:27 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJrEPwo8PqkSy+AwbDGziqW7HxlTyJldn8EHJDzRKu+Q7IPdJOabx47EoCj6fSXW6f/LRnEmQ==
+X-Received: by 2002:a5d:6148:: with SMTP id y8mr15777218wrt.236.1587806786753; 
+ Sat, 25 Apr 2020 02:26:26 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+ by smtp.gmail.com with ESMTPSA id j13sm11628472wro.51.2020.04.25.02.26.25
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 25 Apr 2020 02:12:53 -0700 (PDT)
-Subject: Re: [PATCH v5 0/2] Replaced locks with lock guard macros
-To: Stefan Hajnoczi <stefanha@gmail.com>, dnbrdsky@gmail.com
-References: <20200404042108.389635-1-dnbrdsky@gmail.com>
- <20200424105037.GC174193@stefanha-x1.localdomain>
+ Sat, 25 Apr 2020 02:26:26 -0700 (PDT)
+Subject: Re: [PATCH v4 1/2] target/arm: kvm: Handle DABT with no valid ISS
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Andrew Jones <drjones@redhat.com>
+References: <20200323113227.3169-1-beata.michalska@linaro.org>
+ <20200323113227.3169-2-beata.michalska@linaro.org>
+ <CAFEAcA_uWS+cVRk=BKra8AhsD+B1syVzhXeCMttSKwQDdo=j3w@mail.gmail.com>
+ <20200417131032.lcyunbjwofsn2nzz@kamzik.brq.redhat.com>
+ <20200424121633.GF3106@work-vm>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f82fa018-0022-3b9f-402e-3f402115adb0@redhat.com>
-Date: Sat, 25 Apr 2020 11:12:53 +0200
+Message-ID: <d6f4b17c-1202-3aef-320a-247dc0295277@redhat.com>
+Date: Sat, 25 Apr 2020 11:24:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200424105037.GC174193@stefanha-x1.localdomain>
+In-Reply-To: <20200424121633.GF3106@work-vm>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="4wVw6fv0b3DKMcJ9l3USncQMdw2QIBrUj"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 05:12:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 05:26:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,52 +112,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Beata Michalska <beata.michalska@linaro.org>, quintela@redhat.com,
+ Christoffer Dall <Christoffer.Dall@arm.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4wVw6fv0b3DKMcJ9l3USncQMdw2QIBrUj
-Content-Type: multipart/mixed; boundary="tnbDkNGwV2KR638fZyqK7UQ7CJPVXV14v"
+On 24/04/20 14:16, Dr. David Alan Gilbert wrote:
+>>> I was trying to work out whether we need to migrate this state,
+>>> and I'm not sure. Andrew, do you know? I think this comes down
+>>> to "at what points in QEMU's kvm run loop can migration kick in",
+>>> and specifically if we get a KVM_EXIT_ARM_NISV do we definitely
+>>> go round the loop and KVM_RUN again without ever checking
+>>> to see if we should do a migration ?
+>>>
+>> I'd prefer a migration expert confirm this, so I've CC'ed David and Juan,
+>> but afaict there's no way to break out of the KVM_RUN loop after a
+>> successful (ret=0) call to kvm_arch_handle_exit() until after the next
+>> KVM_RUN ioctl. This is because even if migration kicks the vcpus between
+>> kvm_arch_handle_exit() and the next run, the signal won't do anything
+>> other than prepare the vcpu for an immediate exit.
 
---tnbDkNGwV2KR638fZyqK7UQ7CJPVXV14v
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+As far as QEMU is concerned, this should be enough for Beata's patch to
+be safe.  If the signal causes KVM to exit before KVM_EXIT_ARM_NISV,
+it's of course okay.  If you get a KVM_EXIT_ARM_NISV, however, KVM_RUN
+will exit with return code 0 and kvm_cpu_exec will:
 
-On 24/04/20 12:50, Stefan Hajnoczi wrote:
-> Paolo, hope you don't mind if I use the block-next branch to merge this
-> and Simran's patch that depends on it.
+- set env->ext_dabt_pending
 
-Absolutely not, thanks.
+- go round the loop again
+
+- notice cpu->exit_request and schedule an immediate exit
+
+- call kvm_arch_put_registers
+
+- call KVM_RUN again, which will exit with -EINTR
+
+- exit the loop and allow migration to proceed
+
+However, I'm not sure that it's a good idea to
+
++        /* Clear instantly if the call was successful */
++        env->ext_dabt_pending = 0;
+
+Rather, this should be done by the next kvm_arch_get_registers when it
+calls KVM_GET_VCPU_EVENTS.  It's also possible to add an assertion in
+kvm_get_vcpu_events that it you always get zero, to justify that the
+field is not migrated.
+
+Thanks,
 
 Paolo
-
-> Thanks, applied to my block-next tree:
-> https://github.com/stefanha/qemu/commits/block-next
-
-
-
---tnbDkNGwV2KR638fZyqK7UQ7CJPVXV14v--
-
---4wVw6fv0b3DKMcJ9l3USncQMdw2QIBrUj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl6j/xUACgkQv/vSX3jH
-roOr0AgAqf2u1EXZiNNdpCqegqWVXNG6UstNK6tBuGnCfWPg4SWRNjfzVj6jwL3P
-+9DcV93Fh2rBwjmh6ZcLwbK6lc6C9/iEMChONsmcp3vnt4zZSC2F3CWYnTVTpwEn
-SaQ9QmDfnf64PzLY8OGTU8LEDLIkLxLAxi0ZwRnyy9ql4B7prPiEcVfkMdXPcohy
-EBCcC/SJkETYksrBOEJXjNmLXBs/OPNWfKqBof5cEBy6/aT40Zv4ud3OwkotPJEh
-kmlLUQBzhvSwPtHf8+TSqffkAeT32/I9dC5n2fWvTf//fLI+bCX1PZ9GJM+YyBJ7
-tO/LIRybAbicipJ3zemtvA0yYhhnmA==
-=EIbD
------END PGP SIGNATURE-----
-
---4wVw6fv0b3DKMcJ9l3USncQMdw2QIBrUj--
 
 
