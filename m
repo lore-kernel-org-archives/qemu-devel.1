@@ -6,40 +6,39 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A7DC55186
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 08:10:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 159C2C55185
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 08:15:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C737D206B6
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 08:10:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C737D206B6
+	by mail.kernel.org (Postfix) with ESMTPS id E055E2071C
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 08:15:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E055E2071C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSFtA-0007Tu-T1
-	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 04:10:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45608)
+	id 1jSFyN-0001tA-1p
+	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 04:15:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46374)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jSFsE-0006rA-OY
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 04:09:19 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jSFxb-00019Y-Rc
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 04:14:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jSFsE-0007yz-65
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 04:09:18 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:60669)
+ (envelope-from <laurent@vivier.eu>) id 1jSFxb-0006We-9t
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 04:14:51 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:57429)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jSFsD-0007yp-K6
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 04:09:17 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jSFxa-0006Nj-Iw
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 04:14:50 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mbj7g-1ivgXk1y2g-00dIzc; Sat, 25 Apr 2020 10:09:06 +0200
-Subject: Re: [PATCH] linux-user: return target error codes for socket() and
- prctl()
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1Mt7st-1jCNrs1DNB-00tXaR; Sat, 25 Apr 2020 10:14:41 +0200
+Subject: Re: [PATCH] linux-user: Add support for /proc/cpuinfo on hppa platform
 To: Helge Deller <deller@gmx.de>, Riku Voipio <riku.voipio@iki.fi>,
  qemu-devel@nongnu.org
-References: <20200424220033.GA28140@ls3530.fritz.box>
+References: <20200424210648.GA26715@ls3530.fritz.box>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,37 +82,37 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <d98935e8-66a6-98d2-e7a8-a1bba06f0013@vivier.eu>
-Date: Sat, 25 Apr 2020 10:09:05 +0200
+Message-ID: <8c63cd8b-f5f7-a1ab-f586-6c75bcfd5f3f@vivier.eu>
+Date: Sat, 25 Apr 2020 10:14:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200424220033.GA28140@ls3530.fritz.box>
+In-Reply-To: <20200424210648.GA26715@ls3530.fritz.box>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:xh8Dte0+uucv0dD1ZAbPdpt2EUm90qAXzkDtEm+UpSmaPKaqi9f
- nwQZXb+xljjXY0nJm+bGNkkaBYHO4uSZ53xFAT/fOOu93BbxyPiqK9ExMxo/hWxtTHac+1X
- R05LHEn66/F7dkItOauAD7oF3DXJ+11omUh+4m4RFlgvfaDqd7d6TnA2BJAIgCb0zzIeQHc
- N4BWpn9JZ6/354AAuOb1A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7zIcjB+oZCM=:s3yBFIGaPvHSrA8ZefTRch
- Q5lKpzxT0gpfRQYcrBRiX0JnAosjPkvGVLGHh6hY+FX1j2YD+WYUJuYQs6oNqgk/tsMw5NtPb
- jOkqRh0A/q3eLV6TOwnsI+VkWePiV0C1gro+6L87+YAeKbuvVr6n4azSV5fiQmswuSBlezneN
- JNtLuDAALpA/Y1q2k99t7Pz6w9L58xyZpXBgC1SMyrTzfSCb7ZKlT+CZUpp1EjC7AvB4dtMaR
- OGSt022KeKtEyMCFGcoVEHu9PlGC95yBggwMVSs9d2E+xsD7/OjDPw81O6uBujb0Us8Bq2ed3
- kpCpkLY4OQVHMpvCi6k8qcE/HA0I7yADLcgz3/CeNGiPEcgt1ijfyn8zAFpiHz/dFbfTZyhBS
- NE1nrzy8pBXaGgFyUE9AcWE4lMtryYSYO5z1t+jbiib0ZVvko70k1E9460vO0XBiZwVwMvDL4
- +pmWj459x85aQ70zdIpEtbBLE8u0rSHl4jGzpAHanuIq9D889Wllx2N00ZzeoJjiJGWVM2uCi
- yTkwzOQJa1eoI8nOj3oa+0LeTPczElhTaJGx3MNTDD1Ym7YIWwJtb3v3GWiNdPxjkNA9dOjUZ
- 2e9ywnk9gDlvuMK9O/6SZ/PNIMujgeb1AIHKCJeQTBk0GffKHJ/RNt/mGXxrnf01feeTMnWEI
- Nz/HGbLTeaTnX52Z0LEQd1m3DaWkZyQaw+b5IfK3r/WVU/rBcijvVcETn+iINrXwkbg+Pp45w
- Du3uiIWpOxtTpdOAzdTPaz2mByByl15tHh617Zo6NBkS0IyvB3PCYKXV9WXSyCZhL5UKurgSn
- gsznKTKcCsOVRiI7+HJ52Z81C8a4KGUnkAerbTpoqy5Rl+7yQ1tB6KXp9h9E0evULD1hn5b
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:A2bsq1Zf7mXIcRvYqIz9YMgUFrUQ3MoYGsut9xE6/rByolncahk
+ DbM7vAtT1+s2vL2vwcuWYrx74//gA8RLS6pqeLkS2kbcVQTof/O5q2vBDcK4I/c2RkiLOlM
+ DsqGwgBusBPx6HitND3r7fwoti1x/Vt5y+eQeIWofr8kTp/YlROLpfPukStn1l58m0TlD3G
+ I/E3shuPdIdP2d5N5W/gw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:o5Du8jNP3oU=:vTIKIp9ot6B5Fp13s9nIZI
+ aPqO3XGxFnNOhbxNWUCBIQeCDxpXOXRUsQbtkVy/H+vpFh9qzKvehmnZO0pXuzmFKNghUD5le
+ h3arW/6KPFrKMPUuTFhHF7tqPwnvEyTVh3JlI1Hrb6ZMgXz6ZImkYlfrGGdkeVCoKMsAOH6+H
+ dni8SXWhU+h2lLYUjjZOaBn+qJ5p4GpozSt98w52TsiHHEL/DIpUehtk4ii5ZbhK0e4nlSCdy
+ VashjeHI9LXgUKye5Y1rdeM9+1e6KF8y7aGSMXmTCtP8BmQh6teEf47Bf7Egqobm60CTPl7Mk
+ qgr3gIAcjC066b+qg/T83kHq9Ye5fxCxns/R1aaDo5tAZrqRW1AZreh+JqULSRYU2NJiendGL
+ sWqMOhkdFuJr/pXROOvmcigsmZg848+9cVUE4umMlEaYoLOwORGLyhfdPkUZpjZoB78qBMFCz
+ cKjtzArfVp7IMwbk5WE9opwf7qxeC6aAoiZ12RXPU7i8g2mG97ctlAr4hggo6mXe6Mg73TVit
+ MpOrejeMymQWAVsMqYJ3RgGv/J+qxLYZ8L/E0aTkMWZLMQunoJq5Mm5HJwzXGdIcEo7Rgiz4W
+ A7+3mnj9aVMKnqq3cElyqKxrQ4enZmqz5vIfgbKVOp2Skn6UdaPMHP4pjVMzD86BIOF4YJS92
+ KPDaJTnwD4P9jjgWAGrOaSBVdcH5bQ0lSOUNKHJfDsea/A6MXII7BUUZCx86QzTBwCkMCruDE
+ oVG5ufuc3AOnBQ1Hm/vod7qk9arhZVrgHAxZVlXInFArwGz9xGbLZyRk7OSUk8SQLDLJJo7wU
+ aFjTKAdJ8/Bl4TD/fnE4r2JyBzivqMEpEhf0ArMcQ8YptVoHiIyK5dKYj0lAoKl6TV9bnD8
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 04:09:14
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 04:14:48
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 212.227.17.10
+X-Received-From: 217.72.192.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,33 +128,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 25/04/2020 à 00:00, Helge Deller a écrit :
-> Return target error codes instead of host error codes.
+Le 24/04/2020 à 23:06, Helge Deller a écrit :
+> Provide an own /proc/cpuinfo file for the hppa (parisc) platform.
 > 
 > Signed-off-by: Helge Deller <deller@gmx.de>
 > 
 > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 05f03919ff..655a86fa45 100644
+> index 05f03919ff..ebf0d38321 100644
 > --- a/linux-user/syscall.c
 > +++ b/linux-user/syscall.c
-> @@ -2987,7 +2987,7 @@ static abi_long do_socket(int domain, int type, int protocol)
->  #endif
->           protocol == NETLINK_KOBJECT_UEVENT ||
->           protocol == NETLINK_AUDIT)) {
-> -        return -EPFNOSUPPORT;
-> +        return -TARGET_EPFNOSUPPORT;
->      }
-> 
->      if (domain == AF_PACKET ||
-> @@ -5856,7 +5856,7 @@ static abi_long do_get_thread_area(CPUX86State *env, abi_ulong ptr)
-> 
->  abi_long do_arch_prctl(CPUX86State *env, int code, abi_ulong addr)
->  {
-> -    return -ENOSYS;
-> +    return -TARGET_ENOSYS;
+> @@ -7438,6 +7435,18 @@ static int open_cpuinfo(void *cpu_env, int fd)
 >  }
->  #else
->  abi_long do_arch_prctl(CPUX86State *env, int code, abi_ulong addr)
+>  #endif
+> 
+> +#if defined(TARGET_HPPA)
+> +static int open_cpuinfo(void *cpu_env, int fd)
+> +{
+> +    dprintf(fd, "cpu family\t: PA-RISC 1.1e\n");
+> +    dprintf(fd, "cpu\t\t: PA7300LC (PCX-L2)\n");
+> +    dprintf(fd, "capabilities\t: os32\n");
+> +    dprintf(fd, "model\t\t: 9000/778/B160L\n");
+> +    dprintf(fd, "model name\t: Merlin L2 160 QEMU (9000/778/B160L)\n");
+> +    return 0;
+> +}
+> +#endif
+> +
+>  #if defined(TARGET_M68K)
+>  static int open_hardware(void *cpu_env, int fd)
+>  {
+> @@ -7462,7 +7471,7 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname, int flags,
+>  #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+>          { "/proc/net/route", open_net_route, is_proc },
+>  #endif
+> -#if defined(TARGET_SPARC)
+> +#if defined(TARGET_SPARC) || defined(TARGET_HPPA)
+>          { "/proc/cpuinfo", open_cpuinfo, is_proc },
+>  #endif
+>  #if defined(TARGET_M68K)
 > 
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
