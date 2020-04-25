@@ -2,81 +2,85 @@ Return-Path: <SRS0=p7gi=6J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D01C54FCB
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 12:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E708C54FCB
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 13:02:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03C2320700
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 12:17:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03C2320700
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 056A120704
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 13:02:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ek+9XUZ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 056A120704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSJkQ-0004EQ-3C
-	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 08:17:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37908)
+	id 1jSKSN-0008GQ-V1
+	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 09:02:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50538)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jSJj7-0003ac-LY
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 08:16:10 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jSKRP-0007f2-PA
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 09:01:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jSJix-0001Rf-Fn
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 08:16:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33040)
+ (envelope-from <peter.maydell@linaro.org>) id 1jSKRO-0005gm-Le
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 09:01:55 -0400
+Received: from mail-oo1-xc44.google.com ([2607:f8b0:4864:20::c44]:44370)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jSJiw-00017d-Vy
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 08:15:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jSJiu-0005mE-Rs
- for <qemu-devel@nongnu.org>; Sat, 25 Apr 2020 12:15:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CF33D2E80E7
- for <qemu-devel@nongnu.org>; Sat, 25 Apr 2020 12:15:56 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jSKRO-0005a4-5K
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 09:01:54 -0400
+Received: by mail-oo1-xc44.google.com with SMTP id p67so2740569ooa.11
+ for <qemu-devel@nongnu.org>; Sat, 25 Apr 2020 06:01:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=1m3QMP7xRa7/wgAqoCxYSywfMcc7cKD5pw/BIjY7uSA=;
+ b=Ek+9XUZ41Yge2m+lkWmmFCBOrTdD5XNIf/Sx+u8jmqHyr08QHXnsB4JMyFb434+F3x
+ 6P+a/l4Ov7qmk+MicXAC0tNvT+R/4lJhME/TF93xrknRFyxJ/sTPWrwzABlxb2nqBcdf
+ +7EelrycGeLQ/b40RV4flUJXBN817DraBCreHZ9QYg8vQOUYOMcfr2I+Ra7bTOxpwydq
+ 1GzXYxlJ8ECjZlDT/bNIUznnvGVCBUckjXzcdqRWj8aUJ8wLtpHFvNO5stgWdouq85zC
+ mKRBkIh4VpsysvpDyuMTnlpC7untOt5Wxmdx+uE/7nTVZj4CIP4eYvtwr9rH4pXtQsqj
+ M88g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=1m3QMP7xRa7/wgAqoCxYSywfMcc7cKD5pw/BIjY7uSA=;
+ b=mI3sPwDB+FAepRLEaR+6iuP0cNFcOm/zP1yGpKuarYUF20mSo4fh3+P977bQcpJGMa
+ ZhOGZ6U3KDqbCVZaCPEGZJGoRzAOmAKADBX1ojk6mpTMqb3ArMkEKcJXZiixiMJFle4h
+ xPZD3YuzHTPtKU9Rrf8GmgyQQRlBttqpYAxuCVAf7/Rxmt00KCz7ctzaaLLOrlJLaFS3
+ qn8R9x2Up8IBsGJEOsejTJI8WKHrTV1RwratSWkfN0zcvpq/S0oenWFrcozqXmoYAAV2
+ GQoKRMLOy1y8ZafitlQCroCpYj96dyFN56X2XuajrLGvAP3Hs3yLQNiFrfKPZB3xWdpA
+ mGQA==
+X-Gm-Message-State: AGi0PubspsB19401UnnUEAXclM/uCQocTzQAo6t02M/4a0ixC81xGsF7
+ ndiRk8wxbuZAroakqWtQrCn5wgqo813lV1XV5YTZBA==
+X-Google-Smtp-Source: APiQypIXf1NxV1bT3Q45xcBQWY35+VOAhRJDZorouZFSMX/DXisEbhuHAb8GFhr/aSCw1yQOI+cU7qTmvyerNeala5o=
+X-Received: by 2002:a4a:8253:: with SMTP id t19mr11870988oog.69.1587819712468; 
+ Sat, 25 Apr 2020 06:01:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 25 Apr 2020 11:58:05 -0000
-From: Juerg Haefliger <1875012@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=New; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=New; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=New; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: juergh
-X-Launchpad-Bug-Reporter: Juerg Haefliger (juergh)
-X-Launchpad-Bug-Modifier: Juerg Haefliger (juergh)
-Message-Id: <158781588544.26077.10592453455728808856.malonedeb@soybean.canonical.com>
-Subject: [Bug 1875012] [NEW] KVM internal error. Suberror: 1 -- emulation
- failure
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="486bbbd6cb608f8eb468ed0d08689a349dfabe49";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ec6af8669dac22af16f8a4bdd5e7029731b17135
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 08:15:57
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 91.189.90.7
+References: <20200424205755.GA26282@ls3530.fritz.box>
+ <56bb3ce2-9b70-7470-d4f4-563b617849d2@redhat.com>
+In-Reply-To: <56bb3ce2-9b70-7470-d4f4-563b617849d2@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 25 Apr 2020 14:01:41 +0100
+Message-ID: <CAFEAcA8nNHGAaD+S50ObX2DBaN90JOQg6HDKmkBv3OZUnt9qxQ@mail.gmail.com>
+Subject: Re: [PATCH] linux-user: Drop unnecessary check in dup3 syscall
+To: Eric Blake <eblake@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c44;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc44.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::c44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,127 +89,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1875012 <1875012@bugs.launchpad.net>
+Cc: Helge Deller <deller@gmx.de>, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Fri, 24 Apr 2020 at 22:33, Eric Blake <eblake@redhat.com> wrote:
+> I don't think this is quite correct.  target_to_host_bitmask() silently
+> ignores unknown bits, and a user that was relying on bit 0x40000000 to
+> cause an EINVAL will not fail with this change (unless bit 0x40000000
+> happens to be one of the bits translated by fcntl_flags_tbl).  The
+> open() syscall is notorious for ignoring unknown bits rather than
+> failing with EINVAL, and it is has come back to haunt kernel developers;
+> newer syscalls like dup3() learned from the mistake, and we really do
+> want to catch unsupported bits up to make it easier for future kernels
+> to define meanings to those bits without them being silently swallowed
+> when run on older systems that did not know what those bits meant.
 
-Trying to boot a core20 amd64 image on an amd64 Eoan or Focal host via
-libvirt leads to:
+The other reason linux-user sometimes has this sort of manual
+check of input values is that it can affect which errno value
+is returned if a call has multiple wrong things (eg a bad
+address to a pointer parameter and a bad flags value), and some
+test suites care about the difference. I'm not sure that's the
+case here, though. I didn't write out my reasoning back in
+2017 when I made this page and don't remember it now, but my
+guess is that it's just that dup3 is only supposed
+to permit O_CLOEXEC, not any of the other flags that the
+fcntl_flags_tbl permits and translates.
 
-KVM internal error. Suberror: 1
-emulation failure
-RAX=3D0000000000000000 RBX=3D000000003bdcd5c0 RCX=3D000000003ff1d030 RDX=3D=
-00000000000019a0
-RSI=3D00000000000000ff RDI=3D000000003bd73ee0 RBP=3D000000003bd73e40 RSP=3D=
-000000003ff1d1f8
-R8 =3D000000003df52168 R9 =3D0000000000000000 R10=3Dffffffffffffffff R11=3D=
-000000003bd44c40
-R12=3D000000003bd76500 R13=3D000000003bd73e00 R14=3D0000000000020002 R15=3D=
-000000003df4b483
-RIP=3D00000000000b0000 RFL=3D00210246 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=
-=3D0 HLT=3D0
-ES =3D0030 0000000000000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-CS =3D0038 0000000000000000 ffffffff 00a09b00 DPL=3D0 CS64 [-RA]
-SS =3D0030 0000000000000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-DS =3D0030 0000000000000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-FS =3D0030 0000000000000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-GS =3D0030 0000000000000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-LDT=3D0000 0000000000000000 0000ffff 00008200 DPL=3D0 LDT
-TR =3D0000 0000000000000000 0000ffff 00008b00 DPL=3D0 TSS64-busy
-GDT=3D     000000003fbee698 00000047
-IDT=3D     000000003f2d8018 00000fff
-CR0=3D80010033 CR2=3D0000000000000000 CR3=3D000000003fc01000 CR4=3D00000668
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000 =
-
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-EFER=3D0000000000000d00
-Code=3D00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 <ff> ff =
-ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff =
-ff ff ff
-
-** Affects: qemu (Ubuntu)
-     Importance: Undecided
-         Status: New
-
-** Affects: qemu (Ubuntu Eoan)
-     Importance: Undecided
-         Status: New
-
-** Affects: qemu (Ubuntu Focal)
-     Importance: Undecided
-         Status: New
-
-** Also affects: qemu (Ubuntu)
-   Importance: Undecided
-       Status: New
-
-** No longer affects: qemu
-
-** Also affects: qemu (Ubuntu Focal)
-   Importance: Undecided
-       Status: New
-
-** Also affects: qemu (Ubuntu Eoan)
-   Importance: Undecided
-       Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1875012
-
-Title:
-  KVM internal error. Suberror: 1 -- emulation failure
-
-Status in qemu package in Ubuntu:
-  New
-Status in qemu source package in Eoan:
-  New
-Status in qemu source package in Focal:
-  New
-
-Bug description:
-  Trying to boot a core20 amd64 image on an amd64 Eoan or Focal host via
-  libvirt leads to:
-
-  KVM internal error. Suberror: 1
-  emulation failure
-  RAX=3D0000000000000000 RBX=3D000000003bdcd5c0 RCX=3D000000003ff1d030 RDX=
-=3D00000000000019a0
-  RSI=3D00000000000000ff RDI=3D000000003bd73ee0 RBP=3D000000003bd73e40 RSP=
-=3D000000003ff1d1f8
-  R8 =3D000000003df52168 R9 =3D0000000000000000 R10=3Dffffffffffffffff R11=
-=3D000000003bd44c40
-  R12=3D000000003bd76500 R13=3D000000003bd73e00 R14=3D0000000000020002 R15=
-=3D000000003df4b483
-  RIP=3D00000000000b0000 RFL=3D00210246 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-  ES =3D0030 0000000000000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-  CS =3D0038 0000000000000000 ffffffff 00a09b00 DPL=3D0 CS64 [-RA]
-  SS =3D0030 0000000000000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-  DS =3D0030 0000000000000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-  FS =3D0030 0000000000000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-  GS =3D0030 0000000000000000 ffffffff 00c09300 DPL=3D0 DS   [-WA]
-  LDT=3D0000 0000000000000000 0000ffff 00008200 DPL=3D0 LDT
-  TR =3D0000 0000000000000000 0000ffff 00008b00 DPL=3D0 TSS64-busy
-  GDT=3D     000000003fbee698 00000047
-  IDT=3D     000000003f2d8018 00000fff
-  CR0=3D80010033 CR2=3D0000000000000000 CR3=3D000000003fc01000 CR4=3D000006=
-68
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000 =
-
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  EFER=3D0000000000000d00
-  Code=3D00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 <ff> f=
-f ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff f=
-f ff ff ff
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1875012/+subscriptions
+thanks
+-- PMM
 
