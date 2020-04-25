@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE925C55186
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 08:27:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A65E1C55185
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 08:40:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4E6E2071C
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 08:27:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4E6E2071C
+	by mail.kernel.org (Postfix) with ESMTPS id 7BD2C2071E
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 08:40:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BD2C2071E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSGA7-0004nr-TN
-	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 04:27:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48288)
+	id 1jSGMV-0001qr-KP
+	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 04:40:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49618)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jSG9W-0004Fo-6G
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 04:27:10 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jSGLq-0001DN-Ln
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 04:39:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jSG9V-00076T-JY
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 04:27:09 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:53479)
+ (envelope-from <laurent@vivier.eu>) id 1jSGLq-0003ay-3K
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 04:39:54 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:50175)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jSG9V-0006vy-0O
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 04:27:09 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jSGLp-0003Gp-Ax
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 04:39:53 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MmCyE-1ik5i41Hcm-00iEQX; Sat, 25 Apr 2020 10:26:56 +0200
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MmUDf-1ijonG2aCv-00iTOH; Sat, 25 Apr 2020 10:39:43 +0200
 To: Helge Deller <deller@gmx.de>, Riku Voipio <riku.voipio@iki.fi>,
  qemu-devel@nongnu.org
-References: <20200424204858.GA26164@ls3530.fritz.box>
+References: <20200424210422.GB26282@ls3530.fritz.box>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,39 +81,38 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Subject: Re: [PATCH] linux-user: Drop open-coded fcntl flags conversion in
- eventfd2 syscall
-Message-ID: <56b61288-2c39-2b04-fca5-999fd6ab0f74@vivier.eu>
-Date: Sat, 25 Apr 2020 10:26:54 +0200
+Subject: Re: [PATCH] linux-user: Drop unnecessary check in signalfd4 syscall
+Message-ID: <c9f3644e-21c8-600b-4bf6-d55e6c52153f@vivier.eu>
+Date: Sat, 25 Apr 2020 10:39:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200424204858.GA26164@ls3530.fritz.box>
+In-Reply-To: <20200424210422.GB26282@ls3530.fritz.box>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:x3inSwoGxOYV/czEzSEgFWI/ZXlFPwWQKoq6zyLkfRDd5ZXCsEW
- ji5UUSi41hADSA78cFWVOJuHM2dszNsvFmPALfmtfn5ggbSZq63iN13jVFCetlm1qaXoYKh
- U2KdozsIaf+c2cJ6WJ8HHKH6kYs61FRDkPS0eSHv/F9rn/AcAG9o4R5oJ4foiRd446aRYLU
- ofybzuEtgpEx7SNMHujFA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:KFVdD1wGmBA=:fOvth/JqxaKDlalhtuPAo2
- 1di/7weVHTDbykPS3ASfzVSBv6KzmW70Zwp2z0og/GPXIw0xw3+KISxRxluHRXuQBr3+PvFtM
- kVTWEJM+ajKd9BBbWqxsh0XOvl0KgYVjdcUUcm833vzwVGritVjozuzgr7agDNNCgsNRL26ga
- LGNw4Cw8TQdcmI+iGntW8ChFFMK8w2xgNZIbK2V/WnTQrGT7oSBytfJxCeFwFjgwO9UjV4LBP
- 8JqE61gTR34xz1C0Igo/51s0S+yLwmhtL+CpogLtPgk1UoAFSUXrP2neCtMWbRQNHqP1zZNhn
- u09/xU0qSXa7SGzKxPSITdtpr35JRPX458z3oWCI28Ex3//HhUDbzDMdpWKNWRJX75XTIbdxz
- LwyUuTvzBPoJX4Mg02q4xiIIspPbNC/kDJ1A9ndIy760C7TsoPYKMW/oPA0LNaEMf4icn40UX
- hjiIXkOhHE+z844oGQ4XEqeQMX4FZbW/mo7k8f0ufCzBQNRayrOYcNNxuTe9euRrwS6berQei
- wR674LtQoTnbAw8UegNU+bZ9gAoUt9znKzp8fN7G3a/YPHsMjIjz15lJyqxSNG8uElUp0cazJ
- V8P1vHuF0Ej9dytaYXT/hWk6J0FyU0o22gtTLBizNqnm3/qIW++XUTd9bD6pRPeX0d8irdQ0P
- y6noWo0jhxlynuPcidBYLzYyQt8s8h6FB+ddPm8txctqXDbrCHqD4X3Uiz5HSAe35T3ePEFP2
- 4FMDxwevDz7SS44GsvLOpyJQPNcYK0JgyssItq4o0b3w8fwtHInMW2UcHwjSnIUKHlK0I9mun
- yg4ysIfp793aR8+TjBXY34AovtfHzfaV4Tw+ZYUeHgJ3PK24j+wePXtnr6QmNcBidM+fqiN
-Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:En75GcvXVsK9MXxkhHFsNyv8sBe1RQea1qaq/ROv0Oye935B3SA
+ Ivdra6FWfJ9x18hWvSwqJbli90NxDEREBopvPIPdxdCYOnTAfdUc0C5oa8uczpjIDE+vetW
+ OWEJThXo3UTuMrkbI9GGBqylKtA5bKqIAb1zq2a/y2yZ0r9WJ31P5405J/9xhX8VHwTyvMF
+ j/AXwLVPl7zKApqiV2VHg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:k4KPPU8R38E=:3Sd16Awfc8VRxFs7Kcgx5J
+ pCZaM8wNwf4zWCIBhdLWmJNw8Gy0gOwyRwEkkzrneo8MHcf8fxrNMJWFLHJtcCyfdCqhojxMV
+ aOiWK8Dwq6pLgda2EsyhqWC4dO5nPpkicYg+IgI9couwcEHDV9hMLix9TDFAcZ5P9Iri84/Vj
+ T+62iPVMwPUpR0G8/KOhig8aIMidQXee0PzAoPkPDAouO7CRu0TUEScC1NWlzst4Ud2d9A2sA
+ 20pnNgaj9aVvvA02SuLi+AhQEhmtk59oPaNjzlzHacJnF1RKHVv4+sjTzaED2kZMV3QCPwT7o
+ 5k3uxaFybA+v0in+2mHe9JU38wKDRNBUm/xsnGAl8S9Sfx7eZ72X9R6X3Yc0ZcROrvwFeArXG
+ cHSP9SnKFCZ2J1xiFu/HFuKaVOy7Z2fwEimpYszg0bfJAW8BRLExKimW4DXFCrzPf4EGNrLUd
+ 6kRgV0CEA1D6tZ9aGEQg15SSY47qc/W5Zkbqhon3BtcTwsQAomUtyIARCFG7lp9Tg1v5Qjnej
+ prhe/I21HCtp6chEHcwqWA18ixr7n8ynBRUElCOr4WYiy5L8GHk+NpwhAvUrCxsiy/652qMU4
+ hJyiotFjStIA8zPIXLbTaWrbW7IKM6v4wO/9CHTke0thaXAL6p7WtS8DL0XRFTAgvz865l3tF
+ ms9IeE1sC8zESq6o+QQhxG/H0kOjxX5DfA84/FpdnS612ZdKQUuNt919KX/d25rmHsWzb57E7
+ rmt8Y1+zUS9Kqe3ogFfmX7ROzf7gDyBn7xEJNwwvf7LX0tZdoXyC1r7mEJF8jK7rHHJ0b4K5H
+ d6Os/Ce4GIlodSy3RsZ+AnWRRyLVA4QipXraMLDNSDoYzMjcSkD4X77ajzmQZ+qv6Jkd6BE
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 04:27:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 04:14:48
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Received-From: 217.72.192.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,9 +128,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 24/04/2020 à 22:48, Helge Deller a écrit :
-> Drop the open-coded fcntl flags conversion in the eventfd2 syscall and
-> replace it with the built-in conversion with fcntl_flags_tbl.
+Le 24/04/2020 à 23:04, Helge Deller a écrit :
+> The signalfd4() syscall takes optional O_NONBLOCK and O_CLOEXEC fcntl
+> flags.  If the user gave any other invalid flags, the host syscall will
+> return correct error codes, so simply drop the extra check here.
 > 
 > Signed-off-by: Helge Deller <deller@gmx.de>
 > 
@@ -139,42 +139,26 @@ Le 24/04/2020 à 22:48, Helge Deller a écrit :
 > index 05f03919ff..ebf0d38321 100644
 > --- a/linux-user/syscall.c
 > +++ b/linux-user/syscall.c
-> @@ -11938,13 +11942,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->  #if defined(TARGET_NR_eventfd2)
->      case TARGET_NR_eventfd2:
->      {
-> -        int host_flags = arg2 & (~(TARGET_O_NONBLOCK | TARGET_O_CLOEXEC));
-> -        if (arg2 & TARGET_O_NONBLOCK) {
-> -            host_flags |= O_NONBLOCK;
-> -        }
-> -        if (arg2 & TARGET_O_CLOEXEC) {
-> -            host_flags |= O_CLOEXEC;
-> -        }
-> +        int host_flags = target_to_host_bitmask(arg2, fcntl_flags_tbl);
->          ret = get_errno(eventfd(arg1, host_flags));
->          if (ret >= 0) {
->              fd_trans_register(ret, &target_eventfd_trans);
+> @@ -7176,9 +7176,6 @@ static abi_long do_signalfd4(int fd, abi_long mask, int flags)
+>      sigset_t host_mask;
+>      abi_long ret;
+> 
+> -    if (flags & ~(TARGET_O_NONBLOCK | TARGET_O_CLOEXEC)) {
+> -        return -TARGET_EINVAL;
+> -    }
+>      if (!lock_user_struct(VERIFY_READ, target_mask, mask, 1)) {
+>          return -TARGET_EFAULT;
+>      }
 > 
 
-The problem here is eventfd2 doesn't take O_ flags but EFD_ flags.
-Most EFD_ flags are mapped to O_ flags, but one is not:
+Perhaps we want to trigger the TARGET_EINVAL before the TARGET_EFAULT if
+we have both cases?
 
-include/linux/eventfd.h:
+But I've checked the kernel, and the kernel does a copy_from_user()
+before checking the flags, but it returns EINVAL rather than EFAULT.
 
-/*
- * CAREFUL: Check include/uapi/asm-generic/fcntl.h when defining
- * new flags, since they might collide with O_* ones. We want
- * to re-use O_* flags that couldn't possibly have a meaning
- * from eventfd, in order to leave a free define-space for
- * shared O_* flags.
- */
-#define EFD_SEMAPHORE (1 << 0)
-#define EFD_CLOEXEC O_CLOEXEC
-#define EFD_NONBLOCK O_NONBLOCK
-
-So I think it's better to convert them manually
-
-Perhaps we can defined TARGET_EFD_ flags to make this clearer, I don't know.
+We can remove the flags checking but we should also change TARGET_EFAULT
+by TARGET_EINVAL.
 
 Thanks,
 Laurent
