@@ -2,119 +2,100 @@ Return-Path: <SRS0=p7gi=6J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C52E7C55185
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 10:04:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31BC0C55186
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 10:30:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9759720714
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 10:04:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9759720714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id EE820206ED
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 10:30:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hsTzfoCy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE820206ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSHg0-00085O-N8
-	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 06:04:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60350)
+	id 1jSI4f-0006fX-W3
+	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 06:30:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35298)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jSHf4-0007G5-P9
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:03:54 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jSI3y-00068U-O9
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:29:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jSHf4-000078-1i
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:03:50 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:37315)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jSHf3-0008LA-DN
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:03:49 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MOzGc-1jpSr00l6i-00PMlQ; Sat, 25 Apr 2020 12:03:46 +0200
-To: Helge Deller <deller@gmx.de>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org
-References: <20200424210422.GB26282@ls3530.fritz.box>
- <c9f3644e-21c8-600b-4bf6-d55e6c52153f@vivier.eu>
- <2703086a-d283-e780-a427-ce84ed31f852@gmx.de>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH] linux-user: Drop unnecessary check in signalfd4 syscall
-Message-ID: <67496bb6-1734-ff27-c734-aa01a7a670a4@vivier.eu>
-Date: Sat, 25 Apr 2020 12:03:44 +0200
+ (envelope-from <pbonzini@redhat.com>) id 1jSI3x-0003Av-7k
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:29:34 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47208
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jSI3w-0003Aj-Oa
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 06:29:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587810571;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:mime-version:mime-version:
+ content-type:content-type: content-transfer-encoding:content-transfer-encoding;
+ bh=Q/xkfiGrU7hh4/L5+3uvml1/PEXlx9XSGF3Y52m3IPs=;
+ b=hsTzfoCy10r8mkCTpjdpVvkiYumfAX5Qb209EHPa2UbrUO2hZ3w379HU3CKVfL1SMxse5i
+ D0wt7ncEwL/9S+a4oejcANc4Zqx/R4xjRHHu/AZsP8sOkBGqzi1UYx2A92YwDf4Ph7HdjH
+ IljVJ/sw2RVtT0xnKg/aFs0/k+GZAnA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-471-UUEe3CmHPDWmE7drGNPStA-1; Sat, 25 Apr 2020 06:29:26 -0400
+X-MC-Unique: UUEe3CmHPDWmE7drGNPStA-1
+Received: by mail-wr1-f71.google.com with SMTP id f2so6520936wrm.9
+ for <qemu-devel@nongnu.org>; Sat, 25 Apr 2020 03:29:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:to:from:reply-to:subject:message-id:date
+ :user-agent:mime-version:content-language:content-transfer-encoding;
+ bh=Wtc798SaiZRKd4xvI15KW6Lm5IMWQxOD5VKCV+R0GjA=;
+ b=qCIFL7UkG25dk57cy67LaQDywW/lKY9s2KhMD5tmZMxUg3g6fS/+yZNaZkkj0+GDgo
+ umuxqy1PXLcPuZ4AZ84NkYqoGJ3g86A7AI7RolLMZ0rjcNYYslEXsau9HeeoT1LsCcy2
+ nhkcm3zUPDQZTYDh7CeBzS4uhn++5/2Q1ItqI9wSe2x7FPyL57+3YzT3XQ6r5XLgc4H/
+ AENF3nLUTY7xmn61CToFxn05p08Y15hIPkCSKARB/T8TR2oh0ZC9rJCXI2EyvQIntmFf
+ 8RYAELjpKyk1aXZKVKpe1sKPrK+bG+8b+a+nwkJ7IU2KDhg2XkR0q0Ro3ksq3UXeihf+
+ kTdQ==
+X-Gm-Message-State: AGi0PuY8UlNkbH5j/vV1hk61m8mNbx61t6GZtwfT8wQ7X/UmDZe4gSrw
+ hYSPCBDkK5/P3luZBlfLrxUytT0ECBIcbQZl8E8HP0XyQO6apquguUvucxNei65qc9BMG7ZmRzf
+ XPTgN7eGnG/lZppk=
+X-Received: by 2002:a5d:6b8a:: with SMTP id n10mr16036961wrx.36.1587810565330; 
+ Sat, 25 Apr 2020 03:29:25 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKrXXpKyRrBQw9KkMlM/i2jcGT9lAiH2FwZ8dFH+eCYZgK0PBopf1xo9ue/6znHXT3G3NYTtA==
+X-Received: by 2002:a5d:6b8a:: with SMTP id n10mr16036938wrx.36.1587810564943; 
+ Sat, 25 Apr 2020 03:29:24 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d0a0:f143:e9e4:2926?
+ ([2001:b07:6468:f312:d0a0:f143:e9e4:2926])
+ by smtp.gmail.com with ESMTPSA id v1sm12516300wrv.19.2020.04.25.03.29.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 25 Apr 2020 03:29:24 -0700 (PDT)
+To: qemu-devel <qemu-devel@nongnu.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ KVM list <kvm@vger.kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: CFP: KVM Forum 2020
+Message-ID: <a1d960aa-c1a0-ff95-68a8-6e471028fe1e@redhat.com>
+Date: Sat, 25 Apr 2020 12:29:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <2703086a-d283-e780-a427-ce84ed31f852@gmx.de>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:gLi+2IMBQugke/IUZdY3B6e74aFb6nR+Ishv7Umu6vBeX4cPTMK
- freT6Rzr6KfBkUjNJ92/rpgJdgOnAnzjgsWIRIR2NrVeGXH0jDqqc4k5snij/6VNZDuU1Eh
- v25/N9jlcseRP0XfDo6HrZCWsVglsf/UkSAzWJM6p8ISWBzSwWGH8Fvxo1wA6yO4kX5Nz83
- Gz3KqAbgV+2ARoTFfR9JA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:oWw3X3fEd3c=:pVvHigRsdepn0E7mK35GFg
- FSKjJgkdks3qJRL/wD8XkTZfoZLBgndBXf8DuaNkJ46SjaLkOODq7R/Hvf9CbkhO6E8Y3bpWX
- UWdcD2sy8Xfvdhc3gFqBm4KW61kaVXcphoU5JeG2qfpxByRKL6vXNfncilnF+sfS6t+tRhngQ
- 2UUa+dttcCYC6nIEzwCEIXgAqPPMS7xaODTunH/IosXPwO+iTvPORyc2f4g4vbTROihwDmQRX
- 0Fipkm62IpcTQ/Vyrj4/20AfGwWoMOmoV7bzCZalqIUpPVekP81Hmkr2Xcw8raKiRjn+kq1i0
- cK8KaPVl3yvDhlPa3MFgfKt1enEHK3s3vCeGSd03Pi2sMQ+J7SWPmeAXWkAksCijrLaW9fwsq
- Qzr9JPGpUWf9sWj7xYPluNfqPZg1BCfy1+nxZiuMG+/OETq53vd1hrRHAXmeT+uWXcrlUudlv
- 94Qg/PDl+DWLwZt/N5ngw6lYCEE9LcSWGmWVAHQZZEHqZvZI/jOZO6P7nFz2Vcr7B6MbSCed5
- ixnv1FCbalz44QswOdHo+dYfvGoYJwGtmj6Q/5difp7Wbf5lKVY2k8wSM5D5IVyZiF7uHjaEv
- mSzAKy7lYj5yl7o2jImhXp8vOZgMmdwzIxucKf5A/PzC68jVXO+ni2O+FnJIotceZn7kg9GbQ
- cwgy4AhQsf2+Bx5N7ayvoFD0jJ8VBs9us/SM8YjkGys/StVqqf4CDsoCWvVZqPW67jOuEwDbp
- MHM082ZEO+b8yboEzwhfCSNcoiHkcy+sL2H573STOi5AU7OsYu537v3frBIhUXuNIUKZ32xUx
- BswBhwddUjwvKUfbxQrvtvjht8dIhTWwCn422qX9DzDkmMRLs80aYZZPPTGNk27mtgp1uri
-Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 04:27:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 06:29:31
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,63 +107,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: kvm-forum-2020-pc@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 25/04/2020 à 11:24, Helge Deller a écrit :
-> On 25.04.20 10:39, Laurent Vivier wrote:
->> Le 24/04/2020 à 23:04, Helge Deller a écrit :
->>> The signalfd4() syscall takes optional O_NONBLOCK and O_CLOEXEC fcntl
->>> flags.  If the user gave any other invalid flags, the host syscall will
->>> return correct error codes, so simply drop the extra check here.
->>>
->>> Signed-off-by: Helge Deller <deller@gmx.de>
->>>
->>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->>> index 05f03919ff..ebf0d38321 100644
->>> --- a/linux-user/syscall.c
->>> +++ b/linux-user/syscall.c
->>> @@ -7176,9 +7176,6 @@ static abi_long do_signalfd4(int fd, abi_long mask, int flags)
->>>      sigset_t host_mask;
->>>      abi_long ret;
->>>
->>> -    if (flags & ~(TARGET_O_NONBLOCK | TARGET_O_CLOEXEC)) {
->>> -        return -TARGET_EINVAL;
->>> -    }
->>>      if (!lock_user_struct(VERIFY_READ, target_mask, mask, 1)) {
->>>          return -TARGET_EFAULT;
->>>      }
->>>
->>
->> Perhaps we want to trigger the TARGET_EINVAL before the TARGET_EFAULT if
->> we have both cases?
->>
->> But I've checked the kernel, and the kernel does a copy_from_user()
->> before checking the flags, but it returns EINVAL rather than EFAULT.
-> 
-> That's not the full picture, since the kernel is not consistent here!
-> In the compat-case (32bit userspace on 64bit kernel) it returns correctly
-> EINVAL and EFAULT:
->         if (sigsetsize != sizeof(compat_sigset_t))
->                 return -EINVAL;
->         if (get_compat_sigset(&mask, user_mask))
->                 return -EFAULT;
-> while in the non-compat case it returns EINVAL only:
->         if (sizemask != sizeof(sigset_t) ||
->             copy_from_user(&mask, user_mask, sizeof(mask)))
->                 return -EINVAL;
-> 
-> I think the kernel should be fixed here...
-> 
->> We can remove the flags checking but we should also change TARGET_EFAULT
->> by TARGET_EINVAL.
-> 
-> According to the different behaviour of the kernel mentioned above
-> you won't get it correct either way.
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+KVM Forum 2020: Call For Participation
+October 28-30, 2020 - Convention Centre Dublin - Dublin, Ireland
 
-If we refer to manpage, EFAULT is not one of possible errors.
+(All submissions must be received before June 15, 2020 at 23:59 PST)
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-Thanks,
-Laurent
+KVM Forum is an annual event that presents a rare opportunity for
+developers and users to meet, discuss the state of Linux virtualization
+technology, and plan for the challenges ahead. This highly technical
+conference unites the developers who drive KVM development and the users
+who depend on KVM as part of their offerings, or to power their data
+centers and clouds.
+
+Sessions include updates on the state of the KVM virtualization stack,
+planning for the future, and many opportunities for attendees to
+collaborate. After more than ten years in the mainline kernel, KVM
+continues to be a critical part of the FOSS cloud infrastructure. Come
+join us in continuing to improve the KVM ecosystem.
+
+We understand that these are uncertain times and we are continuously
+monitoring the COVID-19/Novel Coronavirus situation. Our attendees'
+safety is of the utmost importance. If we feel it is not safe to meet in
+person, we will turn the event into a virtual experience. We hope to
+announce this at the same time as the speaker notification. Speakers
+will still be expected to attend if a physical event goes ahead, but we
+understand that exceptional circumstances might arise after speakers are
+accepted and we will do our best to accommodate such circumstances.
+
+Based on these factors, we encourage you to submit and reach out to us
+should you have any questions. The program committee may be contacted as
+a group via email: kvm-forum-2020-pc@redhat.com.
+
+
+SUGGESTED TOPICS
+----------------
+
+* Scaling, latency optimizations, performance tuning
+* Hardening and security
+* New features
+* Testing
+
+KVM and the Linux Kernel:
+* Nested virtualization
+* Resource management (CPU, I/O, memory) and scheduling
+* VFIO: IOMMU, SR-IOV, virtual GPU, etc.
+* Networking: Open vSwitch, XDP, etc.
+* virtio and vhost
+* Architecture ports and new processor features
+
+QEMU:
+* Management interfaces: QOM and QMP
+* New devices, new boards, new architectures
+* New storage features
+* High availability, live migration and fault tolerance
+* Emulation and TCG
+* Firmware: ACPI, UEFI, coreboot, U-Boot, etc.
+
+Management & Infrastructure
+* Managing KVM: Libvirt, OpenStack, oVirt, KubeVirt, etc.
+* Storage: Ceph, Gluster, SPDK, etc.
+* Network Function Virtualization: DPDK, OPNFV, OVN, etc.
+* Provisioning
+
+
+SUBMITTING YOUR PROPOSAL
+------------------------
+
+Abstracts due: June 15, 2020
+
+Please submit a short abstract (~150 words) describing your presentation
+proposal. Slots vary in length up to 45 minutes.
+
+Submit your proposal here:
+https://events.linuxfoundation.org/kvm-forum/program/cfp/
+
+Please only use the categories "presentation" and "panel discussion"
+
+You will receive a notification whether or not your presentation
+proposal was accepted by August 17, 2020.
+
+Speakers will receive a complimentary pass for the event. In case your
+submission has multiple presenters, only the primary speaker for a
+proposal will receive a complimentary event pass. For panel discussions,
+all panelists will receive a complimentary event pass.
+
+
+TECHNICAL TALKS
+
+A good technical talk should not just report on what has happened over
+the last year; it should present a concrete problem and how it impacts
+the user and/or developer community. Whenever applicable, focus on work
+that needs to be done, difficulties that haven't yet been solved, and on
+decisions that other developers should be aware of. Summarizing recent
+developments is okay but it should not be more than a small portion of
+the overall talk.
+
+
+END-USER TALKS
+
+One of the big challenges as developers is to know what, where and how
+people actually use our software. We will reserve a few slots for end
+users talking about their deployment challenges and achievements.
+
+If you are using KVM in production you are encouraged submit a speaking
+proposal. Simply mark it as an end-user talk. As an end user, this is a
+unique opportunity to get your input to developers.
+
+
+PANEL DISCUSSIONS
+
+If you are proposing a panel discussion, please make sure that you list
+all of your potential panelists in your the abstract. We will request
+full biographies if a panel is accepted.
+
+
+HANDS-ON / BOF SESSIONS
+
+We will reserve some time for people to get together and discuss
+strategic decisions as well as other topics that are best solved within
+smaller groups.
+
+These sessions will be announced during the event. If you are interested
+in organizing such a session, please add it to the list at
+
+  http://www.linux-kvm.org/page/KVM_Forum_2020_BOF
+
+Let people you think who might be interested know about your BOF, and
+encourage them to add their names to the wiki page as well. Please add
+your ideas to the list before KVM Forum starts.
+
+
+HOTEL / TRAVEL
+--------------
+
+This year's event will take place at the Conference Center Dublin. For
+information on hotels close to the conference, please visit
+https://events.linuxfoundation.org/kvm-forum/attend/venue-travel/.
+Information on conference hotel blocks will be available later in
+Spring 2020.
+
+
+DATES TO REMEMBER
+-----------------
+
+* CFP Opens: Monday, April 27, 2020
+* CFP Closes: Monday, June 15 at 11:59 PM PST
+* CFP Notifications: Monday, August 17
+* Schedule Announcement: Thursday, August 20
+* Slide Due Date: Monday, October 26
+* Event Dates: Wednesday, October 28 =E2=80=93 Friday, October 30
+
+
+
+Thank you for your interest in KVM. We're looking forward to your
+submissions and, if the conditions will permit it, to seeing you at the
+KVM Forum 2020 in October!
+
+-your KVM Forum 2020 Program Committee
+
+Please contact us with any questions or comments at
+kvm-forum-2020-pc@redhat.com
+
 
