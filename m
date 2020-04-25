@@ -2,95 +2,132 @@ Return-Path: <SRS0=p7gi=6J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CFFFC2BA1A
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 00:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A30B3C55185
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 06:39:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28F902074F
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 00:26:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65E8520728
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Apr 2020 06:39:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bu+/fQ1c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28F902074F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="FAeKXbqT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65E8520728
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jS8eB-00059S-74
-	for qemu-devel@archiver.kernel.org; Fri, 24 Apr 2020 20:26:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36394)
+	id 1jSET1-0006d8-HU
+	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 02:39:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56388)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jS8dJ-0004OY-Bd
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 20:25:25 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jSES9-0005yb-An
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 02:38:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jS8dG-0007v2-RU
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 20:25:25 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:46348)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jS8dG-0007pp-Bi
- for qemu-devel@nongnu.org; Fri, 24 Apr 2020 20:25:22 -0400
-Received: by mail-pg1-x544.google.com with SMTP id j7so5413537pgj.13
- for <qemu-devel@nongnu.org>; Fri, 24 Apr 2020 17:25:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=VIDUj/HEHDsL8OTEaiwHW8TG2vIswJFFkddCaDaTsn4=;
- b=bu+/fQ1c8wB/AlZUP/xIjWzbZfFj16xehezMmKqR4rnRN/zIu03zVZRhzU4wZTxX+x
- nfQa2+jxh8iy4oD0M6HJKXtwj3PIOGO6oR5fLSDwCP0srDhkKWs1bMHhPWlvVS1mFNn6
- ckinzoGOFdBTxYWzHkpRMd+tu0yZ8U/zvZlqtcK9blyUnjcLN1YSG0J96MvassObiw2A
- ltkH08WnJHZyv4eVMc/78gOm9ElKYMSc3qi1oCV6SkiYJpVIVucjnHKEjexNFolNPQ1t
- 9xnLYSM5y16MOlfPp1mYQwo7wvTec/hxIy9GNQwbhCRBVgTMu6+WyPX/I6MrjCRehrnO
- zD+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=VIDUj/HEHDsL8OTEaiwHW8TG2vIswJFFkddCaDaTsn4=;
- b=qUeI+T5PowS5a30+I7iP/3EwjJyf1AS72PD04dlj8m1Zed8bP0dHSovbPyCeQ9Sdcp
- pZc/MuwUKSE+B6fsLW8F8He3QCZ/anuTwbUf+SpqUZpcEAykwR68MjBd2gpZVMiN09zo
- H3CATzjz/fSw4QS7Qw7QbHldWtBfJ4KMbePSITioOopVGxP5ypPRcmHuE2OGYA4xP9zB
- oD6Q6J3x+77WV+lsH75LfhkYh3FK1wJ4jrHeifJ6SwKSL4CyMJqsPnGZFHRfiM4lA0Rz
- lEdIdq7jSivBI2+5lBCFkpreY9YeONml9wCUXu7wRPq8DTT+cn97eiPGE4lKYCdBikXf
- qI+g==
-X-Gm-Message-State: AGi0PubPh18tXh5FZSWZ2rh8lv2DD7ws4zhSWg2hVhIUSZLI7lGMxCBA
- 4XdJatdZobQAHFKUKD/2RqeipA==
-X-Google-Smtp-Source: APiQypI+MmMGGz+TYoGq8cXHaBERMTvqhSuM/sSEgMeXaJoqf3cQl02cmOTdikXOHdqMfDlBWOYS+A==
-X-Received: by 2002:a63:1415:: with SMTP id u21mr11305746pgl.452.1587774320451; 
- Fri, 24 Apr 2020 17:25:20 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id i13sm5686195pja.40.2020.04.24.17.25.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 24 Apr 2020 17:25:19 -0700 (PDT)
-Subject: Re: [PATCH RFC] target/arm: Implement SVE2 TBL, TBX
-To: Stephen Long <steplong@quicinc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20200423164236.5181-1-steplong@quicinc.com>
- <c1dc0aa8-783b-c91e-058f-52e3183f9202@linaro.org>
- <MWHPR0201MB354724516113DC31C0CFCD50C7D00@MWHPR0201MB3547.namprd02.prod.outlook.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b41a6863-d319-c437-c2a6-05c1172b3fa9@linaro.org>
-Date: Fri, 24 Apr 2020 17:25:17 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <MWHPR0201MB354724516113DC31C0CFCD50C7D00@MWHPR0201MB3547.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jSES8-000341-UG
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 02:38:17 -0400
+Received: from mail-db8eur05on2134.outbound.protection.outlook.com
+ ([40.107.20.134]:4238 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jSES6-0002re-5u; Sat, 25 Apr 2020 02:38:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Tc9jJVz+rtVSfodOuUOmgi1qKzlNBAkvkglar7FCtRPt2/G8esNoeq7NoH9IfM8h+B27UI5dKgcSt2LiNJFy2lsRtU1oNhSRu1kNqvodZ8G57dGXQu4Eyzz+DFd+XP8hjVXWgyBUJApKgQK1jzOzMAu1E4MQoLIxBfUxctzeK50myEBiqdh30xCMv4+O8SMSPE0m4Bnr1OU5T874k/+7WEyhuqGxKVGU7xNMFe1Vgyv71FT7jwZYIQxoK3Vp73py8oR9QJslIZ7psoe/olHA2hHpNOiDFBIzw2phP/9lVeH5U1agJEG3WLsO98qxXp+/soq/tiNRRpizZje/5Niawg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=b7DLpa8QqoJ8Wu+VRHkyOPjwYRXKSTKWIqM9Zt9sI30=;
+ b=lXcKuLh7+Al0yiFuPZL3feBmLlERDK7K2rcEOiLHcQv+d47l/3PKDyASRYoyknqZ/itsaozL+k4p5wLbXlMX+ducpAwx6OGLJNiBiYX/hUkO4DiAFCp3+F0fBpyo1h5mZ3Zpa9vr7HwlxV9ktkDfxvWLWGM7jDkXMGpkspsQlgNkyNhk0sVkO0cDwkX9WjcKJ8KZ0JnK7sjK87tULjiLS+uhltErhbPKVXI2aQj3kSOH8TRAWDu4wlhsT7Zir1Hw2Ejmc4fx0iVHvI+h7AKN+3W3BNKpXx4KPQhZbHwRPAnRWEg3+DGR96qXvULGYKbH93suSGZyoY7wgznwehrVfg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=b7DLpa8QqoJ8Wu+VRHkyOPjwYRXKSTKWIqM9Zt9sI30=;
+ b=FAeKXbqTPvBAKbTHyqUHGt3Bv7uEDWp06vtHOiNVV77YmuHWmGEMuQkNiyctK4zMQZcy37fs/m/WKTlGe9LIIWcmjnnnCKfTp+6OHvlxLjqLXIsdykO2edEYB4bv4FvlybRpOVIh2KdAtAFxsUqIapQRtbkT6HGHD2QoPYT8+vA=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5398.eurprd08.prod.outlook.com (2603:10a6:20b:103::16)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Sat, 25 Apr
+ 2020 06:38:08 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.012; Sat, 25 Apr 2020
+ 06:38:08 +0000
+Subject: Re: [PATCH v4 24/30] qcow2: Clear the L2 bitmap when allocating a
+ compressed cluster
+To: Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>,
+ qemu-devel@nongnu.org
+References: <cover.1584468723.git.berto@igalia.com>
+ <6d596d82ed62615a8565b661691a06bfaf32237e.1584468723.git.berto@igalia.com>
+ <w51r1wcn7eu.fsf@maestria.local.igalia.com>
+ <1606ecb5-98ea-fefb-bb98-2ecda1d65f5c@redhat.com>
+ <w51o8rgn6j6.fsf@maestria.local.igalia.com>
+ <57ac1a2f-1632-1a00-b18d-1fc2169175b6@redhat.com>
+ <971a6e4b-ba44-4280-89fa-d454cddf12e1@virtuozzo.com>
+ <w51ftcsn2uv.fsf@maestria.local.igalia.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200425093806347
+Message-ID: <c6b6cbb2-0061-2f07-369d-2caf552d35ed@virtuozzo.com>
+Date: Sat, 25 Apr 2020 09:38:06 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <w51ftcsn2uv.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::544
+X-ClientProxiedBy: AM4PR0701CA0003.eurprd07.prod.outlook.com
+ (2603:10a6:200:42::13) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.134) by
+ AM4PR0701CA0003.eurprd07.prod.outlook.com (2603:10a6:200:42::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.9 via Frontend
+ Transport; Sat, 25 Apr 2020 06:38:07 +0000
+X-Tagtoolbar-Keys: D20200425093806347
+X-Originating-IP: [185.215.60.134]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4c501673-560a-414b-ebc8-08d7e8e3373d
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5398:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB53987958B1FF497149A6AD88C1D10@AM7PR08MB5398.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 0384275935
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(376002)(366004)(136003)(6486002)(36756003)(508600001)(86362001)(8676002)(8936002)(81156014)(16526019)(31696002)(31686004)(16576012)(26005)(956004)(54906003)(110136005)(2616005)(2906002)(186003)(4326008)(66556008)(66946007)(107886003)(52116002)(66476007)(5660300002);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wmnn46KSa3p0X8FFa4pPP4Yj6j8gyMppAEJnwaztSb0IAGpuyauCT2pbS9fKQ2V9FfhLAzjMCl8S5iduif2nZVNSxhTKia/qOv+XkG+Tfb5arIaey385uZQj7ckM7ndN6EgKo/qWJmPOs6GyHSg9rLWFNmrqKZ3XsgUVWVcwtGgJ3JpjflNa8wBoumzXlb6AM2OPIFFwR1cOlAeT94k+Vp9R7Gz6mlkYQoQqXxKpxhz06haeU1BRyz12P3Z/u9WgGdXnZUWA/yqSy6v/NvB/3egv6fTpgofyhibC6Dd0lGQxKtDQ/ZnqeGyshUqIvZHBCBo7l7+G1TNy9HTTKpdUBw7kv8ymWS6UnhEmrvnWBj5pk55UekT3cIWZukeM8/Nk5jXNJNEfPJFPAxMLpr4hwTvbgyQYZqT3mVVYgD2shyRwY+Hvdgo8Vd2bWAHmot3u
+X-MS-Exchange-AntiSpam-MessageData: MK6lMSdgTWtWWw4ijVossb0o6pjCiKMZw7PxUQq2t7E0Bh1Txf/Ufzy2mOXtQA0izv2wFdH7oYNAcljHDyksD88/bNpAQkgSUqkxSnOcE6EJU3s54Ob5d5xcsv4LiJ2oG/XxG/YteUDKsuvX5KrzWoVoayRt6fYW5Oy0lW0YQO5mGyZ3LORijvnErZ0smTA2IaZOHQ9tlJspmt1r3vvoNP9yNtn7pRV5696T1I8QWICmXTSwKTXvo9TwwHqbqbSAdUiL8uOr7nr26u8QUvuS0z8s63aQ9tfaHgoYiVZPiFvFZXGjmwPhp80HltpTsPg66vBUML/J0t0UOA0kcIBhFwk2dIV2bc8Xf8OzKyWa5DrCiBcrr3B0Ni/33e3T9QuHQ8P1B7wGswJvaNKHK3jn0PSzVqGYBtaDfCtqBaY1siikKOamqJ+BP1RyiAGoglgYMPMI+NVIvlHfWe5umW5DKQHyw/baq5AevgKds0bMHt2xKTqwaflS7VptjIzLYmrTnrCni+iPMDITeU96iyaG641boG5bhZemR4+ITj+CfwjHWjcxAoHgCxEo8Qb+1ReZd1/YUBCaoHiYx9y8My4ztjUn3fHyflkVKScpsM8VZ3+ZwQsBNNMQPbbr++rjIJ53xScYoE//qCA33sR6ETW6RnbEpg730C/mppcu/pmIpK6noIHwV6sqrVd8rhnZVq7HZfYozNzKzpJJ1V8xgg1hfC14L+qfj39ORXRFt7lrpqgygHzAY19CceEuY7aWXnQvfhVeVZfWfVTKfJgeOLVL0fCbXC2Ih9qCUlb08tbjgqQ=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c501673-560a-414b-ebc8-08d7e8e3373d
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2020 06:38:08.0460 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pfJvPvuqw060b9pixSS4dmKdxaBKLHxKRVyAUwuSeJWTKvRx+ZoMG4xfrT+G1zySYi8MhblrB/ifZ+8dhj4Gob72xC95Xi1YtSXpzgFZx0c=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5398
+Received-SPF: pass client-ip=40.107.20.134;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 02:38:09
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.20.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,137 +139,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Ana Pazos <apazos@quicinc.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>,
+ Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/24/20 3:47 PM, Stephen Long wrote:
-> Oh, maybe I misread the manual description for SVE2 TBL, but I thought Zm was the indexes register and the loop compares the index from Zm with the total number of elems, table_elems.
+24.04.2020 21:41, Alberto Garcia wrote:
+> On Fri 24 Apr 2020 08:15:04 PM CEST, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+>> AFAIK, now compressed clusters can't be used in scenarios with guest,
+>> as qcow2 driver doesn't support rewriting them.
+> 
+> You can write to those images just fine, it's just not efficient because
+> you have to COW the compressed clusters.
 
-That's right.  You take the index from Zm just fine, but fail to apply that
-index properly across Zn and Zn+1.
+No, rewriting doesn't work:
+
+[root@kvm master]# ./qemu-img create -f qcow2 x 10M
+Formatting 'x', fmt=qcow2 size=10485760 cluster_size=65536 lazy_refcounts=off refcount_bits=16
+[root@kvm master]# ./qemu-io -c 'write -c 0 64K' x
+wrote 65536/65536 bytes at offset 0
+64 KiB, 1 ops; 00.23 sec (278.708 KiB/sec and 4.3548 ops/sec)
+[root@kvm master]# ./qemu-io -c 'write -c 0 64K' x
+write failed: Input/output error
 
 
-r~
+> 
+>> Or am I wrong? And we normally don't combine normal and compressed
+>> clusters together in one image.
+> 
+> As soon as you start writing to an image with compressed clusters you'll
+> have a combination of both.
+
+Ah, you mean, rewriting compressed clusters by normal.. So the use-case is just take compressed backup image and use it for the guest, instead of converting first.. It makes sense.
 
 > 
-> -----Original Message-----
-> From: Richard Henderson <richard.henderson@linaro.org>
-> Sent: Friday, April 24, 2020 2:37 PM
-> To: Stephen Long <steplong@quicinc.com>; qemu-devel@nongnu.org
-> Cc: qemu-arm@nongnu.org; Ana Pazos <apazos@quicinc.com>
-> Subject: [EXT] Re: [PATCH RFC] target/arm: Implement SVE2 TBL, TBX
+> But it's true that you don't have an image with compressed clusters if
+> what you're looking for is performance. So I wouldn't add support for
+> this if it complicates things too much.
 > 
-> On 4/23/20 9:42 AM, Stephen Long wrote:
->> Signed-off-by: Stephen Long <steplong@quicinc.com>
->>
->> These insns don't show up under any SVE2 categories in the manual. But
->> if you lookup each insn, you'll find they have SVE2 variants.
->> ---
->>  target/arm/helper-sve.h    | 10 +++++++
->>  target/arm/sve.decode      |  5 ++++
->>  target/arm/sve_helper.c    | 53 ++++++++++++++++++++++++++++++++++++++
->>  target/arm/translate-sve.c | 20 ++++++++++++++
->>  4 files changed, 88 insertions(+)
->>
->> diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h index
->> f6ae814021..54d20575e8 100644
->> --- a/target/arm/helper-sve.h
->> +++ b/target/arm/helper-sve.h
->> @@ -2687,3 +2687,13 @@ DEF_HELPER_FLAGS_5(sve2_sqrdcmlah_zzzz_s, TCG_CALL_NO_RWG,
->>                     void, ptr, ptr, ptr, ptr, i32)
->> DEF_HELPER_FLAGS_5(sve2_sqrdcmlah_zzzz_d, TCG_CALL_NO_RWG,
->>                     void, ptr, ptr, ptr, ptr, i32)
->> +
->> +DEF_HELPER_FLAGS_5(sve2_tbl_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr,
->> +ptr, i32) DEF_HELPER_FLAGS_5(sve2_tbl_h, TCG_CALL_NO_RWG, void, ptr,
->> +ptr, ptr, ptr, i32) DEF_HELPER_FLAGS_5(sve2_tbl_s, TCG_CALL_NO_RWG,
->> +void, ptr, ptr, ptr, ptr, i32) DEF_HELPER_FLAGS_5(sve2_tbl_d,
->> +TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
->> +
->> +DEF_HELPER_FLAGS_4(sve2_tbx_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr,
->> +i32) DEF_HELPER_FLAGS_4(sve2_tbx_h, TCG_CALL_NO_RWG, void, ptr, ptr,
->> +ptr, i32) DEF_HELPER_FLAGS_4(sve2_tbx_s, TCG_CALL_NO_RWG, void, ptr,
->> +ptr, ptr, i32) DEF_HELPER_FLAGS_4(sve2_tbx_d, TCG_CALL_NO_RWG, void,
->> +ptr, ptr, ptr, i32)
->> diff --git a/target/arm/sve.decode b/target/arm/sve.decode index
->> 3a2a4a7f1c..483fbf0dcc 100644
->> --- a/target/arm/sve.decode
->> +++ b/target/arm/sve.decode
->> @@ -1387,3 +1387,8 @@ UMLSLT_zzzw     01000100 .. 0 ..... 010 111 ..... .....  @rda_rn_rm
->>
->>  CMLA_zzzz       01000100 esz:2 0 rm:5 0010 rot:2 rn:5 rd:5  ra=%reg_movprfx
->>  SQRDCMLAH_zzzz  01000100 esz:2 0 rm:5 0011 rot:2 rn:5 rd:5
->> ra=%reg_movprfx
->> +
->> +### SVE2 Table Lookup (three sources)
->> +
->> +TBL_zzz         00000101 .. 1 ..... 00101 0 ..... .....  @rd_rn_rm
->> +TBX_zzz         00000101 .. 1 ..... 00101 1 ..... .....  @rd_rn_rm
->> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c index
->> 55e2c32f03..d1e91da02a 100644
->> --- a/target/arm/sve_helper.c
->> +++ b/target/arm/sve_helper.c
->> @@ -2968,6 +2968,59 @@ DO_TBL(sve_tbl_d, uint64_t, )
->>
->>  #undef TBL
->>
->> +#define DO_SVE2_TBL(NAME, TYPE, H) \
->> +void HELPER(NAME)(void *vd, void *vn1, void *vm, void *vn2, uint32_t desc)  \
->> +{                                                                           \
->> +    intptr_t i, opr_sz = simd_oprsz(desc);                                  \
->> +    uintptr_t elem = opr_sz / sizeof(TYPE);                                 \
->> +    TYPE *d = vd, *n1 = vn1, *n2 = vn2, *m = vm;                            \
->> +    ARMVectorReg tmp1, tmp2;                                                \
-> 
-> Only one temp needed.
-> 
->> +    if (unlikely(vd == vn1)) {                                              \
->> +        n1 = memcpy(&tmp1, vn1, opr_sz);                                    \
->> +    }                                                                       \
->> +    if (unlikely(vd == vn2)) {                                              \
->> +        n2 = memcpy(&tmp2, vn2, opr_sz);                                    \
->> +    }
-> 
-> Better with else if here.
-> Because vd cannot overlap both vn1 or vn2, only one of them.
->                                              \
->> +    for (i = 0; i < elem; i++) {                                            \
->> +        TYPE j = m[H(i)];                                                   \
->> +        d[H(i)] = j < (elem * 2) ? n1[H(j)] : 0;                            \
->> +                                                                            \
->> +        TYPE k = m[H(elem + i)];                                            \
->> +        d[H(elem + i)] = k < (elem * 2) ? n2[H(k)] : 0;                     \
->> +    }
-> 
-> First, the indexing is wrong.
-> 
-> Note that you're range checking vs elem * 2, but only indexing a single vector.
->  Thus you must be indexing into the next vector.
-> 
-> This should look more like
-> 
->     TYPE j = m[H(i)];
->     TYPE r = 0;
-> 
->     if (j < elem) {
->         r = n1[H(j)];
->     } else if (j < 2 * elem) {
->         r = n2[H(j - elem)];
->     }
->     d[H(i)] = r;
-> 
-> Second, this is one case where I'd prefer to share code with AArch64.  It would be worthwhile to rearrange both sve1 and advsimd to use a common set of helpers.
-> 
->> +static bool trans_TBL_zzz(DisasContext *s, arg_rrr_esz *a)
-> 
-> _zzz is not helpful here.  The SVE1 insn also operates on 3 registers, and thus could logically be _zzz too.
-> 
-> Better might be _double, after double_table = TRUE, or maybe just _2 just in case SVE3 adds a variant with more table registers.
-> 
-> 
-> r~
+> Berto
 > 
 
+
+-- 
+Best regards,
+Vladimir
 
