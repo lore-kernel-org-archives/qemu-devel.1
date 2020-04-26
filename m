@@ -2,90 +2,74 @@ Return-Path: <SRS0=j/lF=6K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E7E0C54FD0
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 11:33:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F39ADC54FCB
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 13:28:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 087652070A
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 11:33:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEEFA206DD
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 13:28:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="rHg5lZEv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 087652070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qq.com header.i=@qq.com header.b="ywcdlagM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEEFA206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSfXD-00078Q-HW
-	for qemu-devel@archiver.kernel.org; Sun, 26 Apr 2020 07:33:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53664)
+	id 1jShKs-0001wf-TJ
+	for qemu-devel@archiver.kernel.org; Sun, 26 Apr 2020 09:28:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45108)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1jSfQC-0004e9-7t
- for qemu-devel@nongnu.org; Sun, 26 Apr 2020 07:26:04 -0400
+ (envelope-from <teachk@foxmail.com>) id 1jShJm-0000qu-2V
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 09:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1jSfQA-0002EH-Q3
- for qemu-devel@nongnu.org; Sun, 26 Apr 2020 07:26:03 -0400
-Received: from mout.web.de ([212.227.17.11]:45369)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jSfQA-0002DN-4e
- for qemu-devel@nongnu.org; Sun, 26 Apr 2020 07:26:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1587900334;
- bh=v5dS5fAf/gZXYE0zPj6KcLYHvp8O8i9AacqvOW9q3rc=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=rHg5lZEv6Z9whvEluSchTjYjGEEZy0qfOQGVMeEviOexwd2KiXONvAn8f4MBSqG9k
- Xf6ZGz23sMVkf4jYVFL4O/hVhSOCYkN4AP0tLc8//+chGnXFDarThHTna7rCqT2YAo
- IGx622zq4cEcwJr6bBXq4/yyli74lByGfaHIC46o=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.95]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0Ljaei-1ivnV82Sbo-00berU; Sun, 26
- Apr 2020 13:25:34 +0200
-Date: Sun, 26 Apr 2020 13:25:23 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: Derek Su <dereksu@qnap.com>
-Subject: Re: [PATCH v5 1/1] colo-compare: Fix memory leak in packet_enqueue()
-Message-ID: <20200426132523.51992c28@luklap>
-In-Reply-To: <20200410020056.12104-2-dereksu@qnap.com>
-References: <20200410020056.12104-1-dereksu@qnap.com>
- <20200410020056.12104-2-dereksu@qnap.com>
+ (envelope-from <teachk@foxmail.com>) id 1jShJj-0000iY-IA
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 09:27:33 -0400
+Received: from out203-205-251-53.mail.qq.com ([203.205.251.53]:51993
+ helo=qq.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <teachk@foxmail.com>)
+ id 1jShJi-0000SU-1U
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 09:27:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+ t=1587907639; bh=Xk7vLMcFLYO8IlldDtMUK/Cimt/kOUdLpqq2nlxbRTc=;
+ h=From:To:Cc:Subject:Date;
+ b=ywcdlagMhAhiSCaJyZHharBexAYzs3Nq8+DBLqyOASTTok3H1HqP1tpYbo2SR7FBA
+ mNSpPcCYATWIJ2RRIgA66B3A8XKPQnSkzv36da/VnlWZkIPGN1QbSBLXXubP9Aumvs
+ MVw9gK1qesF0T/uibmHl3i1C9amqx+R5OfFdURkc=
+Received: from localhost.localdomain ([123.185.180.85])
+ by newxmesmtplogicsvrszc9.qq.com (NewEsmtp) with SMTP
+ id 67A08CDD; Sun, 26 Apr 2020 21:25:58 +0800
+X-QQ-mid: xmsmtpt1587907558tnzmcu8hn
+X-QQ-XMAILINFO: MJ821Z9Y0Tu0lHvyMuh2JxW/C43oEDp7vrdGDJO/4dzN2jOi02vXogghsWFQKA
+ pR6TFvpBiIlZzlRu7sguyaw6EKE4+nfPM1QMFjfWPTs1awPerKCvNC4dD0v2b6FZnVOHrLAGMvko
+ 63nRSlU088gnkTmfxnyYMxATMQMV13b3fMnD3r2rE3XM3ZZEgEQiW7WhQCxqnOBjLBPQRR0Vy2a/
+ tp1Z7gZtnE95RCFD5PuugZggDphiLpj3t0OmqsPi+w0b0AYzO6KTv+nw4ViDaLsinOjrE2pvrfxz
+ RqzkzaNEMhb40TK/sPFtV/AJ93ybW3zSa6yV7fO0GyMuUl9hLU0ULcpXRkvRJ32kZPRyl0JcDutg
+ ybdCMRGIHgVdDd2QDX8ND0VKYJ9Mb/i7Uq20y8W1GGRkUjR1MWv6S5tNfpEo1CtjNA0bg5nLCMDE
+ QhVtc5p/B9U/aAG/0Gu1mtuEFQkfPjMy+xZqQmzgJK13hI72dKYqygp/aO8IxB73CkK7MASmK3Fm
+ hRFveCI4p2q/GjBptGve3ivHsDb+ybAzMDG+osqsWBnoDoRBoBvXtD7Leh+FNYi4WjXoHzDqlIeu
+ WVzhAx0cLn3T1cR0GcvrnfAKzZkv1tNGsuMm4DXzNYesIhXy7xgEZqpPkynxPhvKACI9/Z42hpiq
+ X8cg==
+From: teachk <teachk@foxmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] Convert DPRINTF() to trace event
+Date: Sun, 26 Apr 2020 21:24:46 +0800
+Message-Id: <20200426132446.1187-1-teachk@foxmail.com>
+X-Mailer: git-send-email 2.22.0.windows.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/v4nm272hc.NSkbLbMtr3sGq";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:8ZtJ+DgPhsAByS+ySmirJSK4WOVxhXt32gEFeVCCeAf+2EfCM9f
- QRwFPRcFhyIhd76T1CkvT3Q0fKhhqjHJKcITjKFxnQWKYGZLFSUT/Iv/zK3RTz2DD5Aepqn
- acP80ewk4W9jJzcep0Fqqln8jBemr7xA4DENauSgJWGH1d1KNYHfi4wjRg7CsjkjEGHiYQW
- YNi4XVlKEHue60m49L48Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Yn3D+KeTotU=:sbHBvq6y6uVe86/iCcekRU
- RvWLL1DZRqjpRElJ67XsJqq10cXbBDZ4a5uuEaZoxVOMYEj8A2s+aUjYgrLNIIZw7NnNGhvlq
- tnnAarOghV76fSAJTQ92gM7gsi7Gx1TyXHw068wfVpfbNjY5pq2LWk+KzjjKprNNFNRNH4aiA
- F2WAa6ZcNGfn0ZzblnT432+o3YPxFzrYJUQQEcqRL/ZVW9znVSSasuPGvEMw8TIL3wP3E+kvO
- nMQBNrfRmiWhxO6zRJQeNtqYTTGESsqShBEIK1Xa6vKLPq1KNdPG4/dQoENUZ5jqGdyAVLWqx
- pD60FKsv3LDM+yMgKGZqj8YpUWPRJ7KiNfXzn6SWZUNKzcLFmoVwxjrCjh8w6wRW3O+36nZeD
- VKf+50cSfS6S5Yv7Jhygq7BfAjuMNuNeLuMDIJNpAlakqqZupxRJM/Gf0deF+qcgefVgdO092
- ZEkbnqeuBhVl6Op4UOnjRRilE4QNdTABMeN4qSo7hQzSefzBbPc70iHc6ab3qx/oVpFvJwyxd
- npjCPeEsGITUqa0uja1YZ3DAffjYp9ItabZtKptB4DzyP551CPqSFeOhIA6N+xB+NvZhRGzK7
- HhyU5muKFTSpEuuec5T2t1NtozluwPMpakBHnNYzrptPnaptEvIw4i2Xysx1TdR9sLm/jU9Py
- gcMoMXiESA7bDAptyDu+ZAHofW0NnZrBX9pCZDgBdMIw5EWg7NBTuzZ2TQa8nTs8ZjMhlQvGC
- exTuabBRnjf8G5YPngT6h6NlPNy3hIXFuwishrKAN6Au/2GASvG9XZm9Bcxih8eOIsiDgz3ME
- Lilo7pLTL2nI8hUd+ie8pCpPdlELVcYoMLu3Puc4vHdPqumSEBOhLTwdlS9Zr9NM2xMYkqwz8
- Vsfe3koPLkGa6lE478crb9pkBabUIM1S1r9m0NtTP+35lLu+388iUfdTFZ5KVtrtVhsEgMbFL
- Y6D+WJnd+Grjd120R4cP2wpYdB/KoNeAoDlQhwbNQX2CcwgMqzwPElcrfBuhnVaLcxQ1Fij7h
- 1/1hnpyy7Q1ikSGexn0OGeiu2vHgbN75j2hvimgcKuk3flpTEqmCG4XOOAMaV9a9TccOEKEGD
- Hpc1OK5v2OThgyFNYKl9A8bkxd8lMSdqPk5UYuujoR0SsfzhPGlm1pglOGGwV50hofp3oC0TY
- CDEDXKHLoU7O8cqltALh0chhpEoOxfcmPVd6/MYyfA4a6Gpba2haN4MbQRU0cAIyf3FO5N3Km
- 8NlRevGuwEQOOw6c7
-Received-SPF: pass client-ip=212.227.17.11; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 07:26:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.11
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=203.205.251.53; envelope-from=teachk@foxmail.com;
+ helo=qq.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 09:27:19
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Received-From: 203.205.251.53
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,131 +81,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lizhijian@cn.fujitsu.com, chyang@qnap.com, jasowang@redhat.com,
- qemu-devel@nongnu.org, ctcheng@qnap.com, chen.zhang@intel.com,
- jwsu1986@gmail.com
+Cc: arei.gonglei@huawei.com, Halloween <halloweenwx@163.com>, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/v4nm272hc.NSkbLbMtr3sGq
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+From: Halloween <halloweenwx@163.com>=0D
 
-On Fri, 10 Apr 2020 10:00:56 +0800
-Derek Su <dereksu@qnap.com> wrote:
-
-> The patch is to fix the "pkt" memory leak in packet_enqueue().
-> The allocated "pkt" needs to be freed if the colo compare
-> primary or secondary queue is too big.
->=20
-> Replace the error_report of full queue with a trace event.
->=20
-> Signed-off-by: Derek Su <dereksu@qnap.com>
-
-Looks good now and works well in my tests.
-Reviewed-by: Lukas Straub <lukasstraub2@web.de>
-Tested-by: Lukas Straub <lukasstraub2@web.de>
-
-Regards,
-Lukas Straub
-
-> ---
->  net/colo-compare.c | 23 +++++++++++++++--------
->  net/trace-events   |  1 +
->  2 files changed, 16 insertions(+), 8 deletions(-)
->=20
-> diff --git a/net/colo-compare.c b/net/colo-compare.c
-> index 10c0239f9d..035e11d4d3 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -122,6 +122,10 @@ enum {
->      SECONDARY_IN,
->  };
-> =20
-> +static const char *colo_mode[] =3D {
-> +    [PRIMARY_IN] =3D "primary",
-> +    [SECONDARY_IN] =3D "secondary",
-> +};
-> =20
->  static int compare_chr_send(CompareState *s,
->                              const uint8_t *buf,
-> @@ -217,6 +221,7 @@ static int packet_enqueue(CompareState *s, int mode, =
-Connection **con)
->      ConnectionKey key;
->      Packet *pkt =3D NULL;
->      Connection *conn;
-> +    int ret;
-> =20
->      if (mode =3D=3D PRIMARY_IN) {
->          pkt =3D packet_new(s->pri_rs.buf,
-> @@ -245,16 +250,18 @@ static int packet_enqueue(CompareState *s, int mode=
-, Connection **con)
->      }
-> =20
->      if (mode =3D=3D PRIMARY_IN) {
-> -        if (!colo_insert_packet(&conn->primary_list, pkt, &conn->pack)) {
-> -            error_report("colo compare primary queue size too big,"
-> -                         "drop packet");
-> -        }
-> +        ret =3D colo_insert_packet(&conn->primary_list, pkt, &conn->pack=
-);
->      } else {
-> -        if (!colo_insert_packet(&conn->secondary_list, pkt, &conn->sack)=
-) {
-> -            error_report("colo compare secondary queue size too big,"
-> -                         "drop packet");
-> -        }
-> +        ret =3D colo_insert_packet(&conn->secondary_list, pkt, &conn->sa=
-ck);
->      }
-> +
-> +    if (!ret) {
-> +        trace_colo_compare_drop_packet(colo_mode[mode],
-> +            "queue size too big, drop packet");
-> +        packet_destroy(pkt, NULL);
-> +        pkt =3D NULL;
-> +    }
-> +
->      *con =3D conn;
-> =20
->      return 0;
-> diff --git a/net/trace-events b/net/trace-events
-> index 02c13fd0ba..fa49c71533 100644
-> --- a/net/trace-events
-> +++ b/net/trace-events
-> @@ -12,6 +12,7 @@ colo_proxy_main(const char *chr) ": %s"
-> =20
->  # colo-compare.c
->  colo_compare_main(const char *chr) ": %s"
-> +colo_compare_drop_packet(const char *queue, const char *chr) ": %s: %s"
->  colo_compare_udp_miscompare(const char *sta, int size) ": %s =3D %d"
->  colo_compare_icmp_miscompare(const char *sta, int size) ": %s =3D %d"
->  colo_compare_ip_info(int psize, const char *sta, const char *stb, int ss=
-ize, const char *stc, const char *std) "ppkt size =3D %d, ip_src =3D %s, ip=
-_dst =3D %s, spkt size =3D %d, ip_src =3D %s, ip_dst =3D %s"
-
-
---Sig_/v4nm272hc.NSkbLbMtr3sGq
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl6lb6MACgkQNasLKJxd
-slgiUg//YyClwQCwoWfy2z1Fr6kbaFzrGLr3bcfVyTyGkW9Le/CLZRGe0zytJkvX
-kHWK/vP7bQGn22R/5Qr6SNGdfzTLhw3tanoDOy6KpGc/4+jSqn0ema8xzhXo9BBv
-r/QK3yAZpHJSR3DuLEnNyaCma8CNB8Sa6CHPB61APyPB6G97HXHS5I9fZQu8tCng
-dbMiYfIsPKoLlWolp/vt0tY/QgWUf4t7sHkau+jZ3aSFUzBsLGnY1ssHYEXeSmwH
-0rTyU4kpYfy9EWSDfV+u2VVoFsdFRXEStF9NvnOh5KLI6wjql7v2DkDlZHUTsZTs
-WPQ8J48Bqqfa2bpbzPacU2V1h71ZzGvzvimdHo/UNKJ/3wnWExr2jOCrC5559AQP
-+WluGfi4dHsYavBCpegkBOky39zbzN+AvXzRbQZFeuEvTJjnEAXCAAJ4dvv7/8AM
-2iRyQxTJov5KrM0H3euN9M1K0+2mD6RR250O9nnTj2f39qCJrYbxOYnS9vk9kzvV
-dmr7BzACnjKq01XiO3uP4y87Ul1CyoaTssyg2XBrxJWOrUv8Wv3xLEHSu+md0XJV
-1v1k7ovltzr6pJVh/VGEb5NcLVvrhvQQR5skVt9vqzKTCzjGUDTwuOqWz1B5RX4c
-tCfSHh59j2f+uwmoKzkaqqcGIF6V2LpTO6HiBqNaLjZCZ2zYfPk=
-=cOqz
------END PGP SIGNATURE-----
-
---Sig_/v4nm272hc.NSkbLbMtr3sGq--
+Signed-off-by: Halloween <halloweenwx@163.com>=0D
+---=0D
+ hw/virtio/trace-events            | 12 ++++++++++++=0D
+ hw/virtio/virtio-crypto.c         | 29 ++++++++++++++++-------------=0D
+ include/hw/virtio/virtio-crypto.h | 11 -----------=0D
+ 3 files changed, 28 insertions(+), 24 deletions(-)=0D
+=0D
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events=0D
+index e83500bee9..f7c20f211a 100644=0D
+--- a/hw/virtio/trace-events=0D
++++ b/hw/virtio/trace-events=0D
+@@ -73,3 +73,15 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc domai=
+n=3D%d"=0D
+ virtio_iommu_put_domain(uint32_t domain_id) "Free domain=3D%d"=0D
+ virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_=
+t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=3D%d"=0D
+ virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoin=
+t, uint64_t addr) "FAULT reason=3D%d flags=3D%d endpoint=3D%d address =3D0x=
+%"PRIx64=0D
++=0D
++# virtio-crypto.c=0D
++virtio_crypto_cipher_session_helper_cipher_alg_and_direction(uint32_t ciph=
+er_alg, uint8_t direction) "cipher_alg=3D%" PRIu32 ", info->direction=3D%" =
+PRIu32=0D
++virtio_crypto_cipher_session_helper_keylen(uint32_t keylen) "keylen=3D%" P=
+RIu32=0D
++virtio_crypto_create_sym_session_auth_keylen(uint32_t auth_keylen) "auth_k=
+eylen=3D%" PRIu32=0D
++virtio_crypto_create_sym_session_session_id(int64_t session_id) "create se=
+ssion_id=3D%" PRIu64 " successfully"=0D
++virtio_crypto_sym_op_helper_src_len(uint32_t src_len) "src_len=3D%" PRIu32=
+=0D
++virtio_crypto_sym_op_helper_dst_len(uint32_t dst_len) "dst_len=3D%" PRIu32=
+=0D
++virtio_crypto_sym_op_helper_hash_result_len(uint32_t hash_result_len) "has=
+h_result_len=3D%" PRIu32=0D
++virtio_crypto_handle_close_session(uint64_t session_id) "close session id =
+%" PRIu64=0D
++virtio_crypto_sym_op_helper_iv_len(uint32_t iv_len) "iv_len %" PRIu32=0D
++virtio_crypto_sym_op_helper_aad_len(uint32_t aad_len) "aad_len %" PRIu32=0D
+diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c=0D
+index 4c65114de5..f816db2fca 100644=0D
+--- a/hw/virtio/virtio-crypto.c=0D
++++ b/hw/virtio/virtio-crypto.c=0D
+@@ -25,6 +25,8 @@=0D
+ #include "standard-headers/linux/virtio_ids.h"=0D
+ #include "sysemu/cryptodev-vhost.h"=0D
+ =0D
++#include "trace.h"=0D
++=0D
+ #define VIRTIO_CRYPTO_VM_VERSION 1=0D
+ =0D
+ /*=0D
+@@ -49,8 +51,8 @@ virtio_crypto_cipher_session_helper(VirtIODevice *vdev,=0D
+     info->cipher_alg =3D ldl_le_p(&cipher_para->algo);=0D
+     info->key_len =3D ldl_le_p(&cipher_para->keylen);=0D
+     info->direction =3D ldl_le_p(&cipher_para->op);=0D
+-    DPRINTF("cipher_alg=3D%" PRIu32 ", info->direction=3D%" PRIu32 "\n",=0D
+-             info->cipher_alg, info->direction);=0D
++    trace_virtio_crypto_cipher_session_helper_cipher_alg_and_direction(\=0D
++    info->cipher_alg, info->direction);=0D
+ =0D
+     if (info->key_len > vcrypto->conf.max_cipher_key_len) {=0D
+         error_report("virtio-crypto length of cipher key is too big: %u",=
+=0D
+@@ -60,7 +62,7 @@ virtio_crypto_cipher_session_helper(VirtIODevice *vdev,=0D
+     /* Get cipher key */=0D
+     if (info->key_len > 0) {=0D
+         size_t s;=0D
+-        DPRINTF("keylen=3D%" PRIu32 "\n", info->key_len);=0D
++        trace_virtio_crypto_cipher_session_helper_keylen(info->key_len);=0D
+ =0D
+         info->cipher_key =3D g_malloc(info->key_len);=0D
+         s =3D iov_to_buf(*iov, num, 0, info->cipher_key, info->key_len);=0D
+@@ -130,7 +132,9 @@ virtio_crypto_create_sym_session(VirtIOCrypto *vcrypto,=
+=0D
+             }=0D
+             /* get auth key */=0D
+             if (info.auth_key_len > 0) {=0D
+-                DPRINTF("auth_keylen=3D%" PRIu32 "\n", info.auth_key_len);=
+=0D
++                trace_virtio_crypto_create_sym_session_auth_keylen(\=0D
++                info.auth_key_len);=0D
++=0D
+                 info.auth_key =3D g_malloc(info.auth_key_len);=0D
+                 s =3D iov_to_buf(iov, out_num, 0, info.auth_key,=0D
+                                info.auth_key_len);=0D
+@@ -165,9 +169,7 @@ virtio_crypto_create_sym_session(VirtIOCrypto *vcrypto,=
+=0D
+                                      vcrypto->cryptodev,=0D
+                                      &info, queue_index, &local_err);=0D
+     if (session_id >=3D 0) {=0D
+-        DPRINTF("create session_id=3D%" PRIu64 " successfully\n",=0D
+-                session_id);=0D
+-=0D
++        trace_virtio_crypto_create_sym_session_session_id(session_id);=0D
+         ret =3D session_id;=0D
+     } else {=0D
+         if (local_err) {=0D
+@@ -193,7 +195,7 @@ virtio_crypto_handle_close_session(VirtIOCrypto *vcrypt=
+o,=0D
+     Error *local_err =3D NULL;=0D
+ =0D
+     session_id =3D ldq_le_p(&close_sess_req->session_id);=0D
+-    DPRINTF("close session, id=3D%" PRIu64 "\n", session_id);=0D
++    trace_virtio_crypto_handle_close_session(session_id);=0D
+ =0D
+     ret =3D cryptodev_backend_sym_close_session(=0D
+               vcrypto->cryptodev, session_id, queue_id, &local_err);=0D
+@@ -474,7 +476,8 @@ virtio_crypto_sym_op_helper(VirtIODevice *vdev,=0D
+     op_info->len_to_cipher =3D len_to_cipher;=0D
+     /* Handle the initilization vector */=0D
+     if (op_info->iv_len > 0) {=0D
+-        DPRINTF("iv_len=3D%" PRIu32 "\n", op_info->iv_len);=0D
++        trace_virtio_crypto_sym_op_helper_iv_len(op_info->iv_len);=0D
++=0D
+         op_info->iv =3D op_info->data + curr_size;=0D
+ =0D
+         s =3D iov_to_buf(iov, out_num, 0, op_info->iv, op_info->iv_len);=0D
+@@ -488,7 +491,7 @@ virtio_crypto_sym_op_helper(VirtIODevice *vdev,=0D
+ =0D
+     /* Handle additional authentication data if exists */=0D
+     if (op_info->aad_len > 0) {=0D
+-        DPRINTF("aad_len=3D%" PRIu32 "\n", op_info->aad_len);=0D
++        trace_virtio_crypto_sym_op_helper_aad_len(op_info->aad_len);=0D
+         op_info->aad_data =3D op_info->data + curr_size;=0D
+ =0D
+         s =3D iov_to_buf(iov, out_num, 0, op_info->aad_data, op_info->aad_=
+len);=0D
+@@ -503,7 +506,7 @@ virtio_crypto_sym_op_helper(VirtIODevice *vdev,=0D
+ =0D
+     /* Handle the source data */=0D
+     if (op_info->src_len > 0) {=0D
+-        DPRINTF("src_len=3D%" PRIu32 "\n", op_info->src_len);=0D
++        trace_virtio_crypto_sym_op_helper_src_len(op_info->src_len);=0D
+         op_info->src =3D op_info->data + curr_size;=0D
+ =0D
+         s =3D iov_to_buf(iov, out_num, 0, op_info->src, op_info->src_len);=
+=0D
+@@ -520,11 +523,11 @@ virtio_crypto_sym_op_helper(VirtIODevice *vdev,=0D
+     op_info->dst =3D op_info->data + curr_size;=0D
+     curr_size +=3D op_info->dst_len;=0D
+ =0D
+-    DPRINTF("dst_len=3D%" PRIu32 "\n", op_info->dst_len);=0D
++    trace_virtio_crypto_sym_op_helper_dst_len(op_info->dst_len);=0D
+ =0D
+     /* Handle the hash digest result */=0D
+     if (hash_result_len > 0) {=0D
+-        DPRINTF("hash_result_len=3D%" PRIu32 "\n", hash_result_len);=0D
++        trace_virtio_crypto_sym_op_helper_hash_result_len(hash_result_len)=
+;=0D
+         op_info->digest_result =3D op_info->data + curr_size;=0D
+     }=0D
+ =0D
+diff --git a/include/hw/virtio/virtio-crypto.h b/include/hw/virtio/virtio-c=
+rypto.h=0D
+index ffe2391ece..f59f91f11e 100644=0D
+--- a/include/hw/virtio/virtio-crypto.h=0D
++++ b/include/hw/virtio/virtio-crypto.h=0D
+@@ -19,17 +19,6 @@=0D
+ #include "sysemu/iothread.h"=0D
+ #include "sysemu/cryptodev.h"=0D
+ =0D
+-=0D
+-#define DEBUG_VIRTIO_CRYPTO 0=0D
+-=0D
+-#define DPRINTF(fmt, ...) \=0D
+-do { \=0D
+-    if (DEBUG_VIRTIO_CRYPTO) { \=0D
+-        fprintf(stderr, "virtio_crypto: " fmt, ##__VA_ARGS__); \=0D
+-    } \=0D
+-} while (0)=0D
+-=0D
+-=0D
+ #define TYPE_VIRTIO_CRYPTO "virtio-crypto-device"=0D
+ #define VIRTIO_CRYPTO(obj) \=0D
+         OBJECT_CHECK(VirtIOCrypto, (obj), TYPE_VIRTIO_CRYPTO)=0D
+-- =0D
+2.17.1=0D
+=0D
 
