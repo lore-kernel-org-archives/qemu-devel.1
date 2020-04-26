@@ -2,87 +2,90 @@ Return-Path: <SRS0=j/lF=6K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB602C54FCB
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 21:27:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F817C54FCB
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 21:27:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E3DF206BF
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 21:27:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A022206BF
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 21:27:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="Dn3dtIDJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E3DF206BF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="gYBWYSW4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A022206BF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSooV-0007KU-Ht
-	for qemu-devel@archiver.kernel.org; Sun, 26 Apr 2020 17:27:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33772)
+	id 1jSooZ-0007ME-A6
+	for qemu-devel@archiver.kernel.org; Sun, 26 Apr 2020 17:27:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33784)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1jSofy-0004Cr-AQ
- for qemu-devel@nongnu.org; Sun, 26 Apr 2020 17:19:01 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1jSog6-0004Dv-EN
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 17:19:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1jSofx-0005JO-Mi
- for qemu-devel@nongnu.org; Sun, 26 Apr 2020 17:18:58 -0400
-Received: from mout.web.de ([212.227.17.11]:55101)
+ (envelope-from <lukasstraub2@web.de>) id 1jSofy-0005Lo-JR
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 17:19:06 -0400
+Received: from mout.web.de ([212.227.15.4]:40645)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jSofx-0005D7-1A
- for qemu-devel@nongnu.org; Sun, 26 Apr 2020 17:18:57 -0400
+ id 1jSofy-0005JI-0f
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 17:18:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1587935920;
- bh=ZJuhJ2Q2XeuxLAMR1BZJjm9ycQkkW/TjS8lrUoFFGK4=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
- b=Dn3dtIDJXTOR/wAVTXeDI+I+JOlt8UCcV6zJXqdHJjIPDCl87LkJpbtW1jJycb/Sf
- VbbDAnJCvox9UMluPO9YtzdRYCcQkEERGaaE1VB3BZTHSfLbabA/cOSfqgurXTDI0d
- AoLVDDOrFe+CmN7GKUErxW8ib+uShr5S4gmxNc/w=
+ s=dbaedf251592; t=1587935925;
+ bh=KlCniyLWMcP5meR1EMfh+9J/dqnOAwFcyGmWU0KJCdg=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=gYBWYSW4FDWXgautvwygWZODJtfrNr0R0Vx6CaKYyt7jdBckgm6yYjwuR5PPRG27O
+ qVThMIi3HQDGf5ukXHqtmRbedo2yBPVNhq5nmBuRKzTQ/CdEKNltoO91ix28MYCx1R
+ EpsIc6rpWutyYobkFedpl1v7wzEyKPnnR2te2lpg=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([94.134.180.69]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0LhNjo-1ip1rU1bo8-00mcAX; Sun, 26
- Apr 2020 23:18:40 +0200
-Date: Sun, 26 Apr 2020 23:18:30 +0200
+Received: from luklap ([94.134.180.69]) by smtp.web.de (mrweb003
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MTPjb-1jaguA08sp-00SOp0; Sun, 26
+ Apr 2020 23:18:45 +0200
+Date: Sun, 26 Apr 2020 23:18:43 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v3 0/6] colo-compare bugfixes
-Message-ID: <cover.1587935686.git.lukasstraub2@web.de>
+Subject: [PATCH v3 1/6] net/colo-compare.c: Create event_bh with the right
+ AioContext
+Message-ID: <dc7c5716e1e3367dc96f8496c52490ce7578a678.1587935686.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1587935686.git.lukasstraub2@web.de>
+References: <cover.1587935686.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/9ntpUWXp.kxJyJh9KqZ4VCt";
+Content-Type: multipart/signed; boundary="Sig_/6Yb3bbn4LWPpQk2bs5bYoiY";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:Jhv+erNBotfrQJoZWjoLJH3IVrNT5ZS7Lftf0oNKUNXj8P9UrZu
- lMEaKnoPqRXmuDbnPg8IGml4kEdTkLso2jt08cW3rWs58+S2k4A1+MyEVifoOB2WbfwF1Kk
- S0+qSsi7jYuOWjW/XpqZYiGYS5xsIn84ECnnrx12F0HHbGbgsP89neM2QbdMXcvb9koSmR8
- ndoEKgov9y/08eSvmvBwA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7ugBNKRbooQ=:M1BJl6W0E4Htn7PKQ2BilN
- WGCCBF1s+jkIi95MSaWtGycrUwGM8JG+Fkuds5cnREV5/Q+U63eZgdSKGx65Ae0Zxmr5cuqSd
- XFYBOwLXkDDD8q0pfAZko1djS2k4CvcBO28gyTzRknTPgRcqjKXt7bieRFAZLTXa9ttBcAE0c
- VjYNlyohXppVC//x/5EVlDdHJU4ce5Od9wCRiz/KI4Aq1wVxnPNYSfA8maRUKJPu1VvcJMjgG
- R8GURTOCB2sS2c2HvlvvEcxlhwk4yDlLDyVR8Fj8puJoAtEnCeLAkRJQl4/dxFv5JDBv/c+V9
- wHh2AvfxGoRWAUUFfZdYlkfCo85fq8QsBaD6BRT9WUjMUHlffXABtRKWc7v84FLlL6cT8fQua
- szdC/LW5hN3v81vy4NO/MK8Ai6NxzCLJWpGeRhzLFPZRIZ2fwbPhD//J13J1msT8pD2lvi7Eq
- FO86bQimzzwT2yR5Oq4PV4AI+jK+gQ03SyH+lzmO0Jb87KNwFjNAWGQGEOINxakDCUCohzJ5O
- C0C9imDSCag+vdzQCypAiu6inWH5TKCXqJMpItwQWFSmGh1RFSYhh0ZxtWX/BHzUdZxm2aSWB
- 1T1RQF/3GKTXGxrtUA4MPULzOJucggqNMqoLse4jImTQlgdLOsXWb7gTyiUZFm5DdWCNTT1cu
- 65jMUQcn6U9oAtuFhG7u6yw690bg/IhlBjafEx3D7mm0pjhmtv4UPiJ8SxYikGapXEauqhA4D
- I5K2X0GRrGEJB36cU7CPg1cKZly/QEi8TUFuTFec8p/UzqrxJxbI9yBYN+TVrgWHJWnHdU0Pr
- ED/GrBW599erEH5O3acDsliTez/EFTVQkthUBJ7MB8mopam9Zssvb5BdR90UuYvfyqW0TvzZQ
- f//DNyPQLu3j8jtblDc5O+6kOS6i+TOpMOUjLw5cynqT3yAyrvBJCEIOaytIuP/p73eOG4+xy
- bw4Z3GOjmG0ieKlogpFkV5Z8CJqgat00pFyA1tqOddTfY3RtmOOi8h6cQO8aKvm5j2eCSlOL9
- 6bn1ULtx/G6Gp/jzx2zM1pxrPbh7uQvLVxhpWUKF6tVinwnZuOwY9ah9i9wuuhzi7ZL3czj6G
- 2+uCIxVdvnieIS9BtVYtwxJJ5k9V+Wmqu7SIVCgSooMXZqDhdyFfwrZJXuxbMbklcag1enaux
- yucVpF3LcI5dXKut9MxuaIGDgno8bKsthfe+/kTxzpFwTcsg8xn4YKPDHnZFKpdY8gaIA2OBi
- x/XpUfhDYBuIT7IOr
-Received-SPF: pass client-ip=212.227.17.11; envelope-from=lukasstraub2@web.de;
+X-Provags-ID: V03:K1:Y+e1XuD7bAxwd1lKicD6/cC+P9/ujCZvW4cX1iaIzwlQeyBnK6W
+ IKBMQxWOtnu8ulz0AQDdf584Rt+MF2Stj+53kkw/3W52vo4pnyq2hWvswPNL9SZE+A8skyS
+ ohOV47+rjqHoZTSA1HS89//qqoHzWT0CwUComk5GJ3VtZVRLQgFUdaVmLAS0URtriydswMz
+ MvVYXy8Bnp7+DW4308gdg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:QSlz2Tr0d38=:Qdg/N1F122ByJ4TikGf1d6
+ 2wrnaqWPxWYZ9B8QUtTC9oJZtd/jrFcQvZMShc/mCmuBdHI1VmxJ4UVL32tPG6PZ8cTmjhr8Y
+ pnqrl3z3PhSYPZBVYuxsij8nupdhm1PxB0RxXJSdxnAKL9QhulmCwhwyKGHQXjbjcvJq7R+xj
+ nErmZ/AyWvFvmfuP/eSJQlnqxVFsNHRbgpHzCVwQ5GsqSNEigxhazbHtEYBNKjVGbPO+MwU/Z
+ uf9nEL3FGgExyJ8XkwHD+waWgyyKPbrfAnI8LUQomCQ2VJ1zBs013cjc4MbR1OGVS1M/ggaeB
+ 0TkU/an/7MrwefSjmQHWTbdXH64fEdfZqcjcNcrQH4hyD/8Jr7kWzZTIrMQR/aI6UVWTEfNEo
+ yMNNCXeSsSnIMdbqI0Gmd7loWJxglzCHdiyjDipzW31jA0XJNfMVA5kcaBitmA3hMQGzk0llo
+ AkRCvvHy1mp472id16cX0VvMYhK818U1UF5JwcN426aqYmFnISDZpK1wZHUSlYfPpREdokWUY
+ 5vULvm2HheNDYWFAN+/qVXDMoZKyngv6CysYvoUnrfUB2Dyc1Mt4lYm7VdKJKc/0Bq25oqTMW
+ IupgyUnnMHFkTUZi1Chs7YjWiCHqw4VVc/ejUvSrApZLfp7+WHidwn+s7E9fmJmCrEUQuv+I7
+ 0ffgtOyHOgDiVOykQffeGFi/oeAJUQHBTHgK7uo/8SG7pdYRwPiAxQz3qdQXNasPNbP0Bod5g
+ OWmo/QSe8GkV447anime1ltUOxcKlAK0kqIGdI+0SHp9FZgtLt4m+YesUQQ7KaEu1s8Oc7KjR
+ kxYZe42hgIxUwgOOMu1naPUBZVukpIQ71drnbhbFYJBKZtDS/U+0cfwkeE+5iv8F52ifYw8RE
+ Fsub1HCkhNUu6iuG9Tk0fq133i3tcc4pq8tCxvrLIxDGN68M7BMcYdugF5QZwoYe1dIWTqt2B
+ kvZ+tr0DMDN8OB8V3zNXN5Fxzz5TyX/QgTown4A2ZMVfuRXchupsiIpNIBXN+3XvvzgfVyLXg
+ RwDxnUQUIUv6zKumuN+tLPP5WP1MFqCo+WdWNZOqcNtL2wjGZzqRDmhmZl5tpHyrpv6HvYAc2
+ wfln/IvGhQdujWuiF3QIKFcBr7NOt9GRL3XkYmO5chEnn3DP36m5vBgDJbPhpIlJaz4jBe9r+
+ iAc37i83AFmLBODgflbzUnKu/4qj99EhPoM+BVGyBT9bR+vE1vWDsBUH0AFA1A18K2CmCYEmz
+ 08wmAp72Es6tMlGbz
+Received-SPF: pass client-ip=212.227.15.4; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 17:18:55
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 15:25:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.11
+X-Received-From: 212.227.15.4
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,75 +104,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/9ntpUWXp.kxJyJh9KqZ4VCt
+--Sig_/6Yb3bbn4LWPpQk2bs5bYoiY
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Hello Everyone,
-The performance-regression in patch 3 "net/colo-compare.c: Fix deadlock in
-compare_chr_send", has been fixed in this version by putting the packets in=
- a
-queue instead of returning error. I also found and fixed some more bugs.
+qemu_bh_new will set the bh to be executed in the main
+loop. This causes crashes as colo_compare_handle_event assumes
+that it has exclusive access the queues, which are also
+concurrently accessed in the iothread.
 
-Benchmark results:
-Client-to-server tcp:
-without patch: ~63 Mbit/s
-with patch: ~66 Mbit/s
-Server-to-client tcp:
-without patch: ~771 Kbit/s
-with patch: ~702 Kbit/s
+Create the bh with the AioContext of the iothread to fulfill
+these assumptions and fix the crashes. This is safe, because
+the bh already takes the appropriate locks.
 
-Regards,
-Lukas Straub
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+Reviewed-by: Zhang Chen <chen.zhang@intel.com>
+Reviewed-by: Derek Su <dereksu@qnap.com>
+Tested-by: Derek Su <dereksu@qnap.com>
+---
+ net/colo-compare.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Version changes:
-v3:
- -fix checkpatch.pl error
-
-v2:
- -better wording
- -fix performance-regression in patch 3 "net/colo-compare.c: Fix deadlock i=
-n compare_chr_send"
- -add more bugfixes
-
-
-Lukas Straub (6):
-  net/colo-compare.c: Create event_bh with the right AioContext
-  chardev/char.c: Use qemu_co_sleep_ns if in coroutine
-  net/colo-compare.c: Fix deadlock in compare_chr_send
-  net/colo-compare.c: Only hexdump packets if tracing is enabled
-  net/colo-compare.c, softmmu/vl.c: Check that colo-compare is active
-  net/colo-compare.c: Correct ordering in complete and finalize
-
- chardev/char.c     |   7 +-
- net/colo-compare.c | 238 +++++++++++++++++++++++++++++++++------------
- net/colo-compare.h |   1 +
- softmmu/vl.c       |   2 +
- 4 files changed, 185 insertions(+), 63 deletions(-)
-
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 10c0239f9d..1de4220fe2 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -890,6 +890,7 @@ static void colo_compare_handle_event(void *opaque)
+=20
+ static void colo_compare_iothread(CompareState *s)
+ {
++    AioContext *ctx =3D iothread_get_aio_context(s->iothread);
+     object_ref(OBJECT(s->iothread));
+     s->worker_context =3D iothread_get_g_main_context(s->iothread);
+=20
+@@ -906,7 +907,7 @@ static void colo_compare_iothread(CompareState *s)
+     }
+=20
+     colo_compare_timer_init(s);
+-    s->event_bh =3D qemu_bh_new(colo_compare_handle_event, s);
++    s->event_bh =3D aio_bh_new(ctx, colo_compare_handle_event, s);
+ }
+=20
+ static char *compare_get_pri_indev(Object *obj, Error **errp)
 --=20
 2.20.1
 
---Sig_/9ntpUWXp.kxJyJh9KqZ4VCt
+
+--Sig_/6Yb3bbn4LWPpQk2bs5bYoiY
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl6l+qYACgkQNasLKJxd
-sliVbw/+MnDCBx1o7cY3PUoEimfAUNw4cVocFvepnAvjkf/uQ6iJfbeqsCMl7KXb
-F9Vedt/kUdg99azUz5mx2ODjTKX06MP8bXVPZf02L9tYihtDtDIcYM1qMqMF/Gej
-5mwF/Q5MnUyICeZe+9jZk+ig+Ka0lsQlR607z2bdvkNy3b6EjsYQF2eC8qKOQeqx
-Aq76+abzh2yoYD7Xxz+TOx5FJJDWyyTbm01hoKlSdHGi4apq6MbC6Ph9d1laYKP9
-6m3qVVT11ytChTNtCWoJM6pOk6kOW99erkjhj+QMQ5El/OO9S6roY0M8Ic8nJk2q
-jngbVmPebKlGlTMgoIJ4BKHFm4LAThMYZKN4eoyARFejv3HeXBoI2z0TkTi1yJpk
-O8PaDWhFhPbSz2IIn1SrNmES6+bvPZsva3CwgKP0uCgwhJoUAYeqR1A3WqFyDCdD
-x2wxVB7R9Hh0MA3jnPA2/pvHFv/ClYXG4H05ykpJpeD2erEeiKBDnHLECwifMQE+
-xveyMYsmXLhviX54Ih3aNvmC1exSYlkqlr4zj4X1zrgaiatdopDVPFjoFkLympsm
-DN5YqKKi/dpk6NFdPOJc270rbVs466gu2uwXm+7qRnO1Pr8YgkFrsOPrTJIQO0TV
-o0r59KRedup9lTP3hLT9RZQD8t2hxZFp2xBOVZoZVfjrRhomKqw=
-=MqYf
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl6l+rMACgkQNasLKJxd
+sliATQ//Qi/V6wtWk/Lva94UlZTax5WxkKP6uaP0QoHMXBMZ7oTXwt84BHsy+Srh
+5oNS6G8m9MX1V+9kpZ+mZcdepjcDvwP0my6Lr2vbZzBSA7MXGRA5xmg3kxcCDn96
+zp1EysuuLNZjHRBi2cceRsZ0FuVqGrYQJsEFzOvkRzfSr0i5D1WiVB0EEwiuNdHK
+b+5tk2O2EReBUAAbShAHut5/mevrGMBHi+rMdZyYulnHwYN3exKLnyZ1JTpDUZIs
+6GRXYdC0JH0nGTRRhuUnVxLFrdZu2RTcS7WPSk+eI9gqFr5o1rTgiWLtCJ/HB/HK
+jfLCrpoVT3kfshI7oYtvCMPPbvd1FETXpDh4ucy4yjeU3PzVjevqQuQ+YyOIFqh5
+qsex+3JZZpc7AdRSt9SKonSYgTQulWgonI2RvSmv4YIiN1FYcSW//FdN3UNoEXs3
+078KbTQg0/j4d7/oz4WRhktkNrnlyBmM2WunBBUFRMV8GfizO6NJvAShILd4qT49
+W3Vqfvo9hpndYnXlgl5xSGRpHQLAxQNJjuTKPnrmsRUC4iphczCIj/dKI4w4D5pg
+VtG9hhrj4yd6l5Tx2CHetp0xO972PUGi+OsVHhrHgwFUlhH135R69CDVyz0SFsqu
+Ojqn+29NXM2DejOMaJAfenlErlGVfYlHxhLYnTeiPt83bO4dwWQ=
+=ru6O
 -----END PGP SIGNATURE-----
 
---Sig_/9ntpUWXp.kxJyJh9KqZ4VCt--
+--Sig_/6Yb3bbn4LWPpQk2bs5bYoiY--
 
