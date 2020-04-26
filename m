@@ -2,87 +2,87 @@ Return-Path: <SRS0=j/lF=6K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18F15C55185
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 02:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB5BEC2BA1A
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 06:58:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D25342071E
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 02:50:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84ADB206B6
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 06:58:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ON02naEj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D25342071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o8lMbLTO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84ADB206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSXMy-0006dJ-UW
-	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 22:50:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33866)
+	id 1jSbEy-0007Tl-J2
+	for qemu-devel@archiver.kernel.org; Sun, 26 Apr 2020 02:58:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44798)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1jSXMK-00063N-5X
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 22:49:32 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1jSbE8-0006qj-H3
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 02:57:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1jSXMI-00059M-Bw
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 22:49:31 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43905
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jSXMH-00054F-O5
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 22:49:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587869367;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wmxglyIa1WwEoM+3ixIDVgbsaok9fb8wSAkvoRkeV/k=;
- b=ON02naEjwU+1RhULFI7spBAsjdrKVkGrEKF/9ff9YV6Nb0GdYByg8QPTRvnkRHbTvasgM/
- NMb6K+fXAvFIh8ZtJ6ljYsXWMRJ3OTBk7Ysosly+9NK9brhXDCFDzNAqmQ8kB9uc02qMED
- MB2NQ+NnS0zcNbNfrs3oow2oyy1DJO8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-Ua2Zj3xsOGSFyy58LVqUog-1; Sat, 25 Apr 2020 22:49:20 -0400
-X-MC-Unique: Ua2Zj3xsOGSFyy58LVqUog-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47B068018A3;
- Sun, 26 Apr 2020 02:49:17 +0000 (UTC)
-Received: from [10.72.13.103] (ovpn-13-103.pek2.redhat.com [10.72.13.103])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2CA1360CD3;
- Sun, 26 Apr 2020 02:49:14 +0000 (UTC)
-Subject: Re: [RFC PATCH 0/3] hw/net/tulip: Fix LP#1874539
-To: Helge Deller <deller@gmx.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>
-References: <20200423231644.15786-1-f4bug@amsat.org>
- <20200424152722.GA14573@ls3530.fritz.box>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <1f04b513-eece-baa7-5556-4665afe1f637@redhat.com>
-Date: Sun, 26 Apr 2020 10:49:13 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <bmeng.cn@gmail.com>) id 1jSbE8-0005d8-1d
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 02:57:20 -0400
+Received: from mail-yb1-xb2d.google.com ([2607:f8b0:4864:20::b2d]:36270)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jSbE7-0005VX-Hf
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 02:57:19 -0400
+Received: by mail-yb1-xb2d.google.com with SMTP id v10so116266ybk.3
+ for <qemu-devel@nongnu.org>; Sat, 25 Apr 2020 23:57:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ox6qPCg4P4424MHCAdbCEmI+olCsUhyFTboTUeyShmA=;
+ b=o8lMbLTOr36pIGeuGuoYblCfnOkRVhoamIb1SQ8Wo1ewSIu/UYZd1VhxEuFWmh9vxv
+ BFXjGYSfQLGvfzsFXInFQWMq5f2NLLXnfdqAjqpFJb+MOKU3ddG+KmIvLL/AfO9+bbau
+ 2Yc289PQfV0t/ss0kW+bTKT0LJAR5QVd2apfdKrHUcrxDEBBKgigFe/EkR87E8H5IwfZ
+ M0ryMJw3CRgAG2IhxDKf88Zvs59DUeQFLtyHJqcVyMfhzO33SUE42Jr6fjK4SMv3CobJ
+ bNUOJLRc/490jF9UODQxEnUU+pMMGCedw8sPN7hDpbGBQTLnBBKvvWIAz/ABDq+16mWL
+ QgaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ox6qPCg4P4424MHCAdbCEmI+olCsUhyFTboTUeyShmA=;
+ b=aY08SHanw/kV4zfq7dAF/HPIVz7vZKeidWvng4InQSUe3bIP/oxwLGvTVHdqUzWjHl
+ stz1cnrvqLumSJmxJOucCzB3g5PWCH0DceblYcCotznztTCrWX3AXA2vfSEzioA/+vy7
+ 75c0Y6BYHPeNO+M9M0yBTMi683XWNfV66O08v/uhaELM7tpPtzZ7TGKmCCjdOOtSDoiA
+ xZ8wLudXotwCAD6/y47OAr+aHN8CWZL0QMN1ScjV9pJNwG9bc6kaTY1Wb13kwzQzggba
+ 8IglVxQ6GCLIP2QNBGZg4Wfv0vSys63nRZkoLohsdEDANkOrxxrhlyqDe5+GSlBTXY4F
+ reHA==
+X-Gm-Message-State: AGi0PuYNcxi51BSA58C9t3yefSHKgAlwx9dJqHRyYJeLvv8ik4oM/4+c
+ OT3iiZtdap1yfeGTZoSjIf8aw6dS8Y2VUH4RpOg=
+X-Google-Smtp-Source: APiQypJwyYCInHSCJZAybNwoplOzRRxYCnELXH74WgwPVfVWZEw86Li25M4BykZlm57zcsDRKPPWSQgCy1kXsSX49tI=
+X-Received: by 2002:a25:734c:: with SMTP id o73mr29844849ybc.11.1587884238050; 
+ Sat, 25 Apr 2020 23:57:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200424152722.GA14573@ls3530.fritz.box>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 22:49:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+References: <CAEUhbmUuRCDWMKZdgNNX43G4wfLvzgHcMuT=36JO_q8LnAVisg@mail.gmail.com>
+In-Reply-To: <CAEUhbmUuRCDWMKZdgNNX43G4wfLvzgHcMuT=36JO_q8LnAVisg@mail.gmail.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Sun, 26 Apr 2020 14:57:06 +0800
+Message-ID: <CAEUhbmXPXT4MRs1bZTMFUWv5Bhe20ZJcO12UUs7Pa4RQBragnA@mail.gmail.com>
+Subject: Re: hw/net/cadence_gem: TX checksum offload does not work for
+ fragmented packets
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ Jason Wang <jasowang@redhat.com>, 
+ "Peter A. G. Crosthwaite" <peter.crosthwaite@petalogix.com>,
+ John Linn <john.linn@xilinx.com>, 
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b2d;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb2d.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::b2d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,84 +94,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sven Schnelle <svens@stackframe.org>, qemu-devel@nongnu.org
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Jason,
 
-On 2020/4/24 =E4=B8=8B=E5=8D=8811:27, Helge Deller wrote:
-> * Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>:
->> Attempt to fix the launchpad bug filled by Helge:
->>
->>    In a qemu-system-hppa system, qemu release v5.0.0-rc,
->>    the tulip nic driver is broken.  The tulip nic is detected,
->>    even getting DHCP info does work.  But when trying to
->>    download bigger files via network, the tulip driver gets
->>    stuck.
->>
->> Philippe Mathieu-Daud=C3=A9 (3):
->>    hw/net/tulip: Fix 'Descriptor Error' definition
->>    hw/net/tulip: Log descriptor overflows
->>    hw/net/tulip: Set descriptor error bit when lenght is incorrect
->>
->>   hw/net/tulip.h |  2 +-
->>   hw/net/tulip.c | 32 ++++++++++++++++++++++++++++----
->>   2 files changed, 29 insertions(+), 5 deletions(-)
-> Philippe, thanks for your efforts. Sadly your patch did not fixed the
-> bug itself, but it had some nice cleanups which should be included at
-> some point.
+On Tue, Apr 21, 2020 at 10:31 PM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> Regarding the tulip hang reported by me, the patch below does fix the
-> issue.
+> Hi,
 >
-> [PATCH] Fix tulip rx hang
-> Cc: Prasad J Pandit <pjp@fedoraproject.org>
-> Fixes: 8ffb7265af ("check frame size and r/w data length")
-> Buglink: https://bugs.launchpad.net/bugs/1874539
-> Signed-off-by: Helge Deller <deller@gmx.de>
+> The cadence_gem does the TX checksum offload by:
 >
-> Commit 8ffb7265af ("check frame size and r/w data length") introduced
-> checks to prevent accesses outside of the rx/tx buffers. But the new
-> checks were plain wrong. rx_frame_len does count backwards, and the
-> surrounding code ensures that rx_frame_len will not be bigger than
-> rx_frame_size. Remove those checks again.
+>                 /* Is checksum offload enabled? */
+>                 if (s->regs[GEM_DMACFG] & GEM_DMACFG_TXCSUM_OFFL) {
+>                     net_checksum_calculate(tx_packet, total_bytes);
+>                 }
 >
-> diff --git a/hw/net/tulip.c b/hw/net/tulip.c
-> index 1295f51d07..59d21defcc 100644
-> --- a/hw/net/tulip.c
-> +++ b/hw/net/tulip.c
-> @@ -171,9 +171,6 @@ static void tulip_copy_rx_bytes(TULIPState *s, struct=
- tulip_descriptor *desc)
->               len =3D s->rx_frame_len;
->           }
+> However this will only work for non-fragmented packets. For fragmented
+> packets, it just corrupts the packets by inserting wrong checksum to
+> the fist fragment, or corrupts the data to be sent in other fragments
+> than the first one.
 >
-> -        if (s->rx_frame_len + len > sizeof(s->rx_frame)) {
-> -            return;
-> -        }
->           pci_dma_write(&s->dev, desc->buf_addr1, s->rx_frame +
->               (s->rx_frame_size - s->rx_frame_len), len);
->           s->rx_frame_len -=3D len;
-> @@ -186,9 +183,6 @@ static void tulip_copy_rx_bytes(TULIPState *s, struct=
- tulip_descriptor *desc)
->               len =3D s->rx_frame_len;
->           }
->
-> -        if (s->rx_frame_len + len > sizeof(s->rx_frame)) {
-> -            return;
-> -        }
->           pci_dma_write(&s->dev, desc->buf_addr2, s->rx_frame +
->               (s->rx_frame_size - s->rx_frame_len), len);
->           s->rx_frame_len -=3D len;
->
+> Any idea of how to solve this cleanly?
 
-Looks good to me.
+I suspect this is a common issue for all NIC models in QEMU. Could you
+please comment?
 
-Would you please send a formal patch and cc Peter.
-
-Consider we are about to release 5.0, it's better for him to apply the=20
-patch directly.
-
-Thanks
-
+Regards,
+Bin
 
