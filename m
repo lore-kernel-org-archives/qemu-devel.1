@@ -7,69 +7,68 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F39ADC54FCB
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 13:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 385A4C54FCB
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 13:29:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEEFA206DD
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 13:28:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0388E2071C
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 13:29:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qq.com header.i=@qq.com header.b="ywcdlagM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEEFA206DD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qq.com header.i=@qq.com header.b="dUSiIBg+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0388E2071C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jShKs-0001wf-TJ
-	for qemu-devel@archiver.kernel.org; Sun, 26 Apr 2020 09:28:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45108)
+	id 1jShLe-00037h-3u
+	for qemu-devel@archiver.kernel.org; Sun, 26 Apr 2020 09:29:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45402)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <teachk@foxmail.com>) id 1jShJm-0000qu-2V
- for qemu-devel@nongnu.org; Sun, 26 Apr 2020 09:27:35 -0400
+ (envelope-from <teachk@foxmail.com>) id 1jShKu-0002BO-0Z
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 09:28:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <teachk@foxmail.com>) id 1jShJj-0000iY-IA
- for qemu-devel@nongnu.org; Sun, 26 Apr 2020 09:27:33 -0400
-Received: from out203-205-251-53.mail.qq.com ([203.205.251.53]:51993
+ (envelope-from <teachk@foxmail.com>) id 1jShKs-0004uh-Ja
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 09:28:43 -0400
+Received: from out203-205-221-249.mail.qq.com ([203.205.221.249]:54726
  helo=qq.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <teachk@foxmail.com>)
- id 1jShJi-0000SU-1U
- for qemu-devel@nongnu.org; Sun, 26 Apr 2020 09:27:31 -0400
+ id 1jShKq-0004UG-Lw
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 09:28:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
- t=1587907639; bh=Xk7vLMcFLYO8IlldDtMUK/Cimt/kOUdLpqq2nlxbRTc=;
+ t=1587907715; bh=Xk7vLMcFLYO8IlldDtMUK/Cimt/kOUdLpqq2nlxbRTc=;
  h=From:To:Cc:Subject:Date;
- b=ywcdlagMhAhiSCaJyZHharBexAYzs3Nq8+DBLqyOASTTok3H1HqP1tpYbo2SR7FBA
- mNSpPcCYATWIJ2RRIgA66B3A8XKPQnSkzv36da/VnlWZkIPGN1QbSBLXXubP9Aumvs
- MVw9gK1qesF0T/uibmHl3i1C9amqx+R5OfFdURkc=
+ b=dUSiIBg+O1URlCC6sLMcIA84jowYcozy36Gjz7p3wD62iJnUImZ/ySlEsx7PVFWhZ
+ UEa5vVq/9HAZVNB0t6rtg2zdQGUVi8wzL3k1wncm/xxglaF61vnoSVfHwXOTcPtaZe
+ 0svzlDKesn1maoivV83doo8IDKZ9wy1w+CnfeCY8=
 Received: from localhost.localdomain ([123.185.180.85])
- by newxmesmtplogicsvrszc9.qq.com (NewEsmtp) with SMTP
- id 67A08CDD; Sun, 26 Apr 2020 21:25:58 +0800
-X-QQ-mid: xmsmtpt1587907558tnzmcu8hn
-X-QQ-XMAILINFO: MJ821Z9Y0Tu0lHvyMuh2JxW/C43oEDp7vrdGDJO/4dzN2jOi02vXogghsWFQKA
- pR6TFvpBiIlZzlRu7sguyaw6EKE4+nfPM1QMFjfWPTs1awPerKCvNC4dD0v2b6FZnVOHrLAGMvko
- 63nRSlU088gnkTmfxnyYMxATMQMV13b3fMnD3r2rE3XM3ZZEgEQiW7WhQCxqnOBjLBPQRR0Vy2a/
- tp1Z7gZtnE95RCFD5PuugZggDphiLpj3t0OmqsPi+w0b0AYzO6KTv+nw4ViDaLsinOjrE2pvrfxz
- RqzkzaNEMhb40TK/sPFtV/AJ93ybW3zSa6yV7fO0GyMuUl9hLU0ULcpXRkvRJ32kZPRyl0JcDutg
- ybdCMRGIHgVdDd2QDX8ND0VKYJ9Mb/i7Uq20y8W1GGRkUjR1MWv6S5tNfpEo1CtjNA0bg5nLCMDE
- QhVtc5p/B9U/aAG/0Gu1mtuEFQkfPjMy+xZqQmzgJK13hI72dKYqygp/aO8IxB73CkK7MASmK3Fm
- hRFveCI4p2q/GjBptGve3ivHsDb+ybAzMDG+osqsWBnoDoRBoBvXtD7Leh+FNYi4WjXoHzDqlIeu
- WVzhAx0cLn3T1cR0GcvrnfAKzZkv1tNGsuMm4DXzNYesIhXy7xgEZqpPkynxPhvKACI9/Z42hpiq
- X8cg==
+ by newxmesmtplogicsvrsza6.qq.com (NewEsmtp) with SMTP
+ id 4D8372F4; Sun, 26 Apr 2020 21:19:24 +0800
+X-QQ-mid: xmsmtpt1587907164tbsws7i82
+X-QQ-XMAILINFO: OFsaLwosHHDM4xrWhUebHbgTjMKTIrR7kn8jngvkvFKPjPYCJs3Frg4kXr/8rQ
+ mt940hDJQzVYaDAw9TPvIrZLSZLhy/2cqcK2VLBUmqf9bOSdf78MDUlpblbihD4RX/DY+sqJKO8y
+ VByLdwoSlxKqWAvf41MsHi61aU7qHzCFeMV50u3kA4hif7t+CpMOlxi/UOVdJSdgdInZ9DpJmcjZ
+ rx0KtURALU8poGcXYg02VM1eLwnTbk4rjYGTsjgPxF+XJXPob7cb9kysvHyUIhvrmsKjd4qfdpt9
+ FtdGmijxaFdeZXTyWGPW5gRGsKhKa2DfM6uysVdKCAZwrSw+0WE4ukQPrCTDqT0S5jbxCk8FMAvr
+ +cO5P/1Seht1Vw9pWTRSjUdfFtd1NAl+2czQ5q6mCwIuxMlLYcauUqr55FwCSlUJmVGC2uekBMa+
+ n1on/T6opJP6R0A3LU2kPSLK0vDl4Gn3Z6bNIcj/D+JbJWUg/LjPR2aAmSvwUqOI3874Tkm2uV9C
+ NdTuM88R9KqvCa3ZDKkodVE2wcbkqF+jLSGsVkzw8ncptzxJMN6ZtRHMTtJWCd0JNolKH+DYdsYv
+ 4Y936dUzVLRv7eaQ3wj7hHVtx05b1LecsXVtf50B1UPoqp+BBP5NqG/ubs
 From: teachk <teachk@foxmail.com>
 To: qemu-devel@nongnu.org
 Subject: [PATCH] Convert DPRINTF() to trace event
-Date: Sun, 26 Apr 2020 21:24:46 +0800
-Message-Id: <20200426132446.1187-1-teachk@foxmail.com>
+Date: Sun, 26 Apr 2020 21:19:09 +0800
+Message-Id: <20200426131909.1463-1-teachk@foxmail.com>
 X-Mailer: git-send-email 2.22.0.windows.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=203.205.251.53; envelope-from=teachk@foxmail.com;
+Received-SPF: pass client-ip=203.205.221.249; envelope-from=teachk@foxmail.com;
  helo=qq.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 09:27:19
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Received-From: 203.205.251.53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 09:28:35
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Received-From: 203.205.221.249
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
