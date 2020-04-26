@@ -2,70 +2,77 @@ Return-Path: <SRS0=j/lF=6K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4353CC55186
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 01:16:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD6BDC55186
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 01:47:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B06020714
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 01:16:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B06020714
+	by mail.kernel.org (Postfix) with ESMTPS id 91EBF206DD
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 01:47:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91EBF206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSVtz-0008S0-50
-	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 21:16:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47692)
+	id 1jSWNy-00055a-L3
+	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 21:47:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54602)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jSVtH-0007mU-9V
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 21:15:27 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1jSWNC-0004XO-M4
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 21:46:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jSVtG-0002oR-5U
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 21:15:26 -0400
-Received: from mga09.intel.com ([134.134.136.24]:20806)
+ (envelope-from <yan.y.zhao@intel.com>) id 1jSWNA-0001oz-ES
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 21:46:21 -0400
+Received: from mga04.intel.com ([192.55.52.120]:19520)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1jSVtF-0008T5-Je
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 21:15:25 -0400
-IronPort-SDR: YXWTSS78mMYhFTosbebuJIVAImjAfNL2crOXEKysQX0fiMP8kSyngjyW4E0XAy5wJKWCeov1R8
- 6z1V/rdTAOkA==
+ id 1jSWN9-0001gy-PN
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 21:46:20 -0400
+IronPort-SDR: HJXJg90tU3AMVJQvFBl9pCAvg2TypKjrML9AjxPJTZQBaZHUybEjCCM56WLAbhUN9MsoiWeH/q
+ gbucyNh/YvRQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 25 Apr 2020 18:14:14 -0700
-IronPort-SDR: 1l78hon6zR5/gJr//qW5r6gQGl+FzISVntKV+Bl3lJ0YCxluu3rjr+ZzlBZeImKzVmJxHSeo6S
- xNqE79Nw6cLQ==
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 25 Apr 2020 18:46:17 -0700
+IronPort-SDR: 7GmRIgK7x2Kbas227+PDDiYTBegGBzK/gXul/3TpbgOJZ9JlbqXdloRBnHw0dPc81j3kRHqRcA
+ z9zvbht08Irg==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,318,1583222400"; d="scan'208";a="281267242"
+X-IronPort-AV: E=Sophos;i="5.73,318,1583222400"; d="scan'208";a="245692941"
 Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
  ([10.239.13.16])
- by fmsmga004.fm.intel.com with ESMTP; 25 Apr 2020 18:14:13 -0700
-Date: Sat, 25 Apr 2020 21:04:31 -0400
+ by orsmga007.jf.intel.com with ESMTP; 25 Apr 2020 18:46:10 -0700
+Date: Sat, 25 Apr 2020 21:36:28 -0400
 From: Yan Zhao <yan.y.zhao@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v4 1/3] memory: drop guest writes to read-only ram device
- regions
-Message-ID: <20200426010430.GB12879@joy-OptiPlex-7040>
-References: <20200417074437.28526-1-yan.y.zhao@intel.com>
- <f96581ca-055e-ecc6-4a44-6bd26396bfc0@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200426013628.GC12879@joy-OptiPlex-7040>
+References: <20200413055201.27053-1-yan.y.zhao@intel.com>
+ <20200417104450.2d2f2fa9.cohuck@redhat.com>
+ <20200417095202.GD16688@joy-OptiPlex-7040>
+ <20200417132457.45d91fe3.cohuck@redhat.com>
+ <20200420012457.GE16688@joy-OptiPlex-7040>
+ <20200420165600.4951ae82@w520.home>
+ <20200421023718.GA12111@joy-OptiPlex-7040>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D86DF06@SHSMSX104.ccr.corp.intel.com>
+ <20200422073628.GA12879@joy-OptiPlex-7040>
+ <20200424191049.GU3106@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f96581ca-055e-ecc6-4a44-6bd26396bfc0@redhat.com>
+In-Reply-To: <20200424191049.GU3106@work-vm>
 User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=134.134.136.24; envelope-from=yan.y.zhao@intel.com;
- helo=mga09.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 21:14:15
+Received-SPF: pass client-ip=192.55.52.120; envelope-from=yan.y.zhao@intel.com;
+ helo=mga04.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 21:46:17
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 134.134.136.24
+X-Received-From: 192.55.52.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,59 +85,304 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Zeng, Xin" <xin.zeng@intel.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "philmd@redhat.com" <philmd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Cornelia Huck <cohuck@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+ "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "Yang, Ziye" <ziye.yang@intel.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+ "Tian, Kevin" <kevin.tian@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
+ "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
+ "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "dinechin@redhat.com" <dinechin@redhat.com>,
+ "He, Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Apr 25, 2020 at 06:55:33PM +0800, Paolo Bonzini wrote:
-> On 17/04/20 09:44, Yan Zhao wrote:
-> > for ram device regions, drop guest writes if the regions is read-only.
+On Sat, Apr 25, 2020 at 03:10:49AM +0800, Dr. David Alan Gilbert wrote:
+> * Yan Zhao (yan.y.zhao@intel.com) wrote:
+> > On Tue, Apr 21, 2020 at 08:08:49PM +0800, Tian, Kevin wrote:
+> > > > From: Yan Zhao
+> > > > Sent: Tuesday, April 21, 2020 10:37 AM
+> > > > 
+> > > > On Tue, Apr 21, 2020 at 06:56:00AM +0800, Alex Williamson wrote:
+> > > > > On Sun, 19 Apr 2020 21:24:57 -0400
+> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > >
+> > > > > > On Fri, Apr 17, 2020 at 07:24:57PM +0800, Cornelia Huck wrote:
+> > > > > > > On Fri, 17 Apr 2020 05:52:02 -0400
+> > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > >
+> > > > > > > > On Fri, Apr 17, 2020 at 04:44:50PM +0800, Cornelia Huck wrote:
+> > > > > > > > > On Mon, 13 Apr 2020 01:52:01 -0400
+> > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > > > >
+> > > > > > > > > > This patchset introduces a migration_version attribute under sysfs
+> > > > of VFIO
+> > > > > > > > > > Mediated devices.
+> > > > > > > > > >
+> > > > > > > > > > This migration_version attribute is used to check migration
+> > > > compatibility
+> > > > > > > > > > between two mdev devices.
+> > > > > > > > > >
+> > > > > > > > > > Currently, it has two locations:
+> > > > > > > > > > (1) under mdev_type node,
+> > > > > > > > > >     which can be used even before device creation, but only for
+> > > > mdev
+> > > > > > > > > >     devices of the same mdev type.
+> > > > > > > > > > (2) under mdev device node,
+> > > > > > > > > >     which can only be used after the mdev devices are created, but
+> > > > the src
+> > > > > > > > > >     and target mdev devices are not necessarily be of the same
+> > > > mdev type
+> > > > > > > > > > (The second location is newly added in v5, in order to keep
+> > > > consistent
+> > > > > > > > > > with the migration_version node for migratable pass-though
+> > > > devices)
+> > > > > > > > >
+> > > > > > > > > What is the relationship between those two attributes?
+> > > > > > > > >
+> > > > > > > > (1) is for mdev devices specifically, and (2) is provided to keep the
+> > > > same
+> > > > > > > > sysfs interface as with non-mdev cases. so (2) is for both mdev
+> > > > devices and
+> > > > > > > > non-mdev devices.
+> > > > > > > >
+> > > > > > > > in future, if we enable vfio-pci vendor ops, (i.e. a non-mdev device
+> > > > > > > > is binding to vfio-pci, but is able to register migration region and do
+> > > > > > > > migration transactions from a vendor provided affiliate driver),
+> > > > > > > > the vendor driver would export (2) directly, under device node.
+> > > > > > > > It is not able to provide (1) as there're no mdev devices involved.
+> > > > > > >
+> > > > > > > Ok, creating an alternate attribute for non-mdev devices makes sense.
+> > > > > > > However, wouldn't that rather be a case (3)? The change here only
+> > > > > > > refers to mdev devices.
+> > > > > > >
+> > > > > > as you pointed below, (3) and (2) serve the same purpose.
+> > > > > > and I think a possible usage is to migrate between a non-mdev device and
+> > > > > > an mdev device. so I think it's better for them both to use (2) rather
+> > > > > > than creating (3).
+> > > > >
+> > > > > An mdev type is meant to define a software compatible interface, so in
+> > > > > the case of mdev->mdev migration, doesn't migrating to a different type
+> > > > > fail the most basic of compatibility tests that we expect userspace to
+> > > > > perform?  IOW, if two mdev types are migration compatible, it seems a
+> > > > > prerequisite to that is that they provide the same software interface,
+> > > > > which means they should be the same mdev type.
+> > > > >
+> > > > > In the hybrid cases of mdev->phys or phys->mdev, how does a
+> > > > management
+> > > > > tool begin to even guess what might be compatible?  Are we expecting
+> > > > > libvirt to probe ever device with this attribute in the system?  Is
+> > > > > there going to be a new class hierarchy created to enumerate all
+> > > > > possible migrate-able devices?
+> > > > >
+> > > > yes, management tool needs to guess and test migration compatible
+> > > > between two devices. But I think it's not the problem only for
+> > > > mdev->phys or phys->mdev. even for mdev->mdev, management tool needs
+> > > > to
+> > > > first assume that the two mdevs have the same type of parent devices
+> > > > (e.g.their pciids are equal). otherwise, it's still enumerating
+> > > > possibilities.
+> > > > 
+> > > > on the other hand, for two mdevs,
+> > > > mdev1 from pdev1, its mdev_type is 1/2 of pdev1;
+> > > > mdev2 from pdev2, its mdev_type is 1/4 of pdev2;
+> > > > if pdev2 is exactly 2 times of pdev1, why not allow migration between
+> > > > mdev1 <-> mdev2.
+> > > 
+> > > How could the manage tool figure out that 1/2 of pdev1 is equivalent 
+> > > to 1/4 of pdev2? If we really want to allow such thing happen, the best
+> > > choice is to report the same mdev type on both pdev1 and pdev2.
+> > I think that's exactly the value of this migration_version interface.
+> > the management tool can take advantage of this interface to know if two
+> > devices are migration compatible, no matter they are mdevs, non-mdevs,
+> > or mix.
 > > 
-> > Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-> > ---
-> >  memory.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
+> > as I know, (please correct me if not right), current libvirt still
+> > requires manually generating mdev devices, and it just duplicates src vm
+> > configuration to the target vm.
+> > for libvirt, currently it's always phys->phys and mdev->mdev (and of the
+> > same mdev type).
+> > But it does not justify that hybrid cases should not be allowed. otherwise,
+> > why do we need to introduce this migration_version interface and leave
+> > the judgement of migration compatibility to vendor driver? why not simply
+> > set the criteria to something like "pciids of parent devices are equal,
+> > and mdev types are equal" ?
 > > 
-> > diff --git a/memory.c b/memory.c
-> > index 601b749906..9576dd6807 100644
-> > --- a/memory.c
-> > +++ b/memory.c
-> > @@ -34,6 +34,7 @@
-> >  #include "sysemu/accel.h"
-> >  #include "hw/boards.h"
-> >  #include "migration/vmstate.h"
-> > +#include "qemu/log.h"
-> >  
-> >  //#define DEBUG_UNASSIGNED
-> >  
-> > @@ -1313,6 +1314,12 @@ static void memory_region_ram_device_write(void *opaque, hwaddr addr,
-> >      MemoryRegion *mr = opaque;
-> >  
-> >      trace_memory_region_ram_device_write(get_cpu_index(), mr, addr, data, size);
-> > +    if (mr->readonly) {
-> > +        qemu_log_mask(LOG_GUEST_ERROR,
-> > +                      "Invalid write to read only ram device region 0x%"
-> > +                       HWADDR_PRIx" size %u\n", addr, size);
-> > +        return;
-> > +    }
+> > 
+> > > btw mdev<->phys just brings trouble to upper stack as Alex pointed out. 
+> > could you help me understand why it will bring trouble to upper stack?
+> > 
+> > I think it just needs to read src migration_version under src dev node,
+> > and test it in target migration version under target dev node. 
+> > 
+> > after all, through this interface we just help the upper layer
+> > knowing available options through reading and testing, and they decide
+> > to use it or not.
+> > 
+> > > Can we simplify the requirement by allowing only mdev<->mdev and 
+> > > phys<->phys migration? If an customer does want to migrate between a 
+> > > mdev and phys, he could wrap physical device into a wrapped mdev 
+> > > instance (with the same type as the source mdev) instead of using vendor 
+> > > ops. Doing so does add some burden but if mdev<->phys is not dominant 
+> > > usage then such tradeoff might be worthywhile...
+> > >
+> > If the interfaces for phys<->phys and mdev<->mdev are consistent, it makes no
+> > difference to phys<->mdev, right?
+> > I think the vendor string for a mdev device is something like:
+> > "Parent PCIID + mdev type + software version", and
+> > that for a phys device is something like:
+> > "PCIID + software version".
+> > as long as we don't migrate between devices from different vendors, it's
+> > easy for vendor driver to tell if a phys device is migration compatible
+> > to a mdev device according it supports it or not.
 > 
-> As mentioned in the review of v1, memory_region_ram_device_write should
-> be changed to a .write_with_attrs operation, so that it can return
-> MEMTX_ERROR.
+> It surprises me that the PCIID matching is a requirement; I'd assumed
+> with this clever mdev name setup that you could migrate between two
+> different models in a series, or to a newer model, as long as they
+> both supported the same mdev view.
 > 
-> Otherwise this looks good.
-> 
-hi Paolo,
-thanks for pointing it out again!
-I didn't get your meaning in v1. will update the patch!
+hi Dave
+the migration_version string is transparent to userspace, and is
+completely defined by vendor driver.
+I put it there just as an example of how vendor driver may implement it.
+e.g.
+the src migration_version string is "src PCIID + src software version", 
+then when this string is write to target migration_version node,
+the vendor driver in the target device will compare it with its own
+device info and software version.
+If different models are allowed, the write just succeeds even
+PCIIDs in src and target are different.
+
+so, it is the vendor driver to define whether two devices are able to
+migrate, no matter their PCIIDs, mdev types, software versions..., which
+provides vendor driver full flexibility.
+
+do you think it's good?
 
 Thanks
 Yan
+
+> 
+> > 
+> > Thanks
+> > Yan
+> > > 
+> > > > 
+> > > > 
+> > > > > I agree that there was a gap in the previous proposal for non-mdev
+> > > > > devices, but I think this bring a lot of questions that we need to
+> > > > > puzzle through and libvirt will need to re-evaluate how they might
+> > > > > decide to pick a migration target device.  For example, I'm sure
+> > > > > libvirt would reject any policy decisions regarding picking a physical
+> > > > > device versus an mdev device.  Had we previously left it that only a
+> > > > > layer above libvirt would select a target device and libvirt only tests
+> > > > > compatibility to that target device?
+> > > > I'm not sure if there's a layer above libvirt would select a target
+> > > > device. but if there is such a layer (even it's human), we need to
+> > > > provide an interface for them to know whether their decision is suitable
+> > > > for migration. The migration_version interface provides a potential to
+> > > > allow mdev->phys migration, even libvirt may currently reject it.
+> > > > 
+> > > > 
+> > > > > We also need to consider that this expands the namespace.  If we no
+> > > > > longer require matching types as the first level of comparison, then
+> > > > > vendor migration strings can theoretically collide.  How do we
+> > > > > coordinate that can't happen?  Thanks,
+> > > > yes, it's indeed a problem.
+> > > > could only allowing migration beteen devices from the same vendor be a
+> > > > good
+> > > > prerequisite?
+> > > > 
+> > > > Thanks
+> > > > Yan
+> > > > >
+> > > > > > > > > Is existence (and compatibility) of (1) a pre-req for possible
+> > > > > > > > > existence (and compatibility) of (2)?
+> > > > > > > > >
+> > > > > > > > no. (2) does not reply on (1).
+> > > > > > >
+> > > > > > > Hm. Non-existence of (1) seems to imply "this type does not support
+> > > > > > > migration". If an mdev created for such a type suddenly does support
+> > > > > > > migration, it feels a bit odd.
+> > > > > > >
+> > > > > > yes. but I think if the condition happens, it should be reported a bug
+> > > > > > to vendor driver.
+> > > > > > should I add a line in the doc like "vendor driver should ensure that the
+> > > > > > migration compatibility from migration_version under mdev_type should
+> > > > be
+> > > > > > consistent with that from migration_version under device node" ?
+> > > > > >
+> > > > > > > (It obviously cannot be a prereq for what I called (3) above.)
+> > > > > > >
+> > > > > > > >
+> > > > > > > > > Does userspace need to check (1) or can it completely rely on (2), if
+> > > > > > > > > it so chooses?
+> > > > > > > > >
+> > > > > > > > I think it can completely reply on (2) if compatibility check before
+> > > > > > > > mdev creation is not required.
+> > > > > > > >
+> > > > > > > > > If devices with a different mdev type are indeed compatible, it
+> > > > seems
+> > > > > > > > > userspace can only find out after the devices have actually been
+> > > > > > > > > created, as (1) does not apply?
+> > > > > > > > yes, I think so.
+> > > > > > >
+> > > > > > > How useful would it be for userspace to even look at (1) in that case?
+> > > > > > > It only knows if things have a chance of working if it actually goes
+> > > > > > > ahead and creates devices.
+> > > > > > >
+> > > > > > hmm, is it useful for userspace to test the migration_version under mdev
+> > > > > > type before it knows what mdev device to generate ?
+> > > > > > like when the userspace wants to migrate an mdev device in src vm,
+> > > > > > but it has not created target vm and the target mdev device.
+> > > > > >
+> > > > > > > >
+> > > > > > > > > One of my worries is that the existence of an attribute with the
+> > > > same
+> > > > > > > > > name in two similar locations might lead to confusion. But maybe it
+> > > > > > > > > isn't a problem.
+> > > > > > > > >
+> > > > > > > > Yes, I have the same feeling. but as (2) is for sysfs interface
+> > > > > > > > consistency, to make it transparent to userspace tools like libvirt,
+> > > > > > > > I guess the same name is necessary?
+> > > > > > >
+> > > > > > > What do we actually need here, I wonder? (1) and (2) seem to serve
+> > > > > > > slightly different purposes, while (2) and what I called (3) have the
+> > > > > > > same purpose. Is it important to userspace that (1) and (2) have the
+> > > > > > > same name?
+> > > > > > so change (1) to migration_type_version and (2) to
+> > > > > > migration_instance_version?
+> > > > > > But as they are under different locations, could that location imply
+> > > > > > enough information?
+> > > > > >
+> > > > > >
+> > > > > > Thanks
+> > > > > > Yan
+> > > > > >
+> > > > > >
+> > > > >
+> > > > _______________________________________________
+> > > > intel-gvt-dev mailing list
+> > > > intel-gvt-dev@lists.freedesktop.org
+> > > > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 > 
 
