@@ -2,77 +2,63 @@ Return-Path: <SRS0=j/lF=6K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD6BDC55186
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 01:47:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 989E2C55186
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 01:51:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91EBF206DD
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 01:47:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91EBF206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 620B3206DD
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Apr 2020 01:51:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CQ+i8pE3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 620B3206DD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSWNy-00055a-L3
-	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 21:47:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54602)
+	id 1jSWSP-00070h-II
+	for qemu-devel@archiver.kernel.org; Sat, 25 Apr 2020 21:51:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55322)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jSWNC-0004XO-M4
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 21:46:23 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jSWRh-00068m-G7
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 21:51:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jSWNA-0001oz-ES
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 21:46:21 -0400
-Received: from mga04.intel.com ([192.55.52.120]:19520)
+ (envelope-from <dgibson@ozlabs.org>) id 1jSWRg-0005So-UC
+ for qemu-devel@nongnu.org; Sat, 25 Apr 2020 21:51:01 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:45635 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1jSWN9-0001gy-PN
- for qemu-devel@nongnu.org; Sat, 25 Apr 2020 21:46:20 -0400
-IronPort-SDR: HJXJg90tU3AMVJQvFBl9pCAvg2TypKjrML9AjxPJTZQBaZHUybEjCCM56WLAbhUN9MsoiWeH/q
- gbucyNh/YvRQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
- by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 25 Apr 2020 18:46:17 -0700
-IronPort-SDR: 7GmRIgK7x2Kbas227+PDDiYTBegGBzK/gXul/3TpbgOJZ9JlbqXdloRBnHw0dPc81j3kRHqRcA
- z9zvbht08Irg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,318,1583222400"; d="scan'208";a="245692941"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by orsmga007.jf.intel.com with ESMTP; 25 Apr 2020 18:46:10 -0700
-Date: Sat, 25 Apr 2020 21:36:28 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
- VFIO live migration
-Message-ID: <20200426013628.GC12879@joy-OptiPlex-7040>
-References: <20200413055201.27053-1-yan.y.zhao@intel.com>
- <20200417104450.2d2f2fa9.cohuck@redhat.com>
- <20200417095202.GD16688@joy-OptiPlex-7040>
- <20200417132457.45d91fe3.cohuck@redhat.com>
- <20200420012457.GE16688@joy-OptiPlex-7040>
- <20200420165600.4951ae82@w520.home>
- <20200421023718.GA12111@joy-OptiPlex-7040>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D86DF06@SHSMSX104.ccr.corp.intel.com>
- <20200422073628.GA12879@joy-OptiPlex-7040>
- <20200424191049.GU3106@work-vm>
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jSWRb-0003cf-7b; Sat, 25 Apr 2020 21:50:56 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 498rTZ39NNz9sSd; Sun, 26 Apr 2020 11:50:42 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1587865842;
+ bh=jcrtSqWfwSyI1uHbyiBdio1ngK0mM82wIqUWoHCmh+g=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=CQ+i8pE38/klh/MW2DVdjeg3lCihYOI3KIhBpRzFtVsj0K29DWUJzIPURDQeOE1Dz
+ XQ9S45VehOzCVcY+e1/N9rvg3QezjQiQLM3xUhmXJNty76eccM+aqQWuTfi/2k9DPZ
+ aAH9piDh/ExIvUJdXTATNaFLAw4TThKhN34YJIfI=
+Date: Sun, 26 Apr 2020 10:59:15 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH] hw: add compat machines for 5.1
+Message-ID: <20200426005915.GA13332@umbus.fritz.box>
+References: <20200424090314.544-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="0F1p//8PRICkK4MW"
 Content-Disposition: inline
-In-Reply-To: <20200424191049.GU3106@work-vm>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=192.55.52.120; envelope-from=yan.y.zhao@intel.com;
- helo=mga04.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 21:46:17
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 192.55.52.120
+In-Reply-To: <20200424090314.544-1-cohuck@redhat.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/25 21:50:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,305 +70,291 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
- "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "Yang, Ziye" <ziye.yang@intel.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
- "Tian, Kevin" <kevin.tian@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
- "Liu, Changpeng" <changpeng.liu@intel.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "dinechin@redhat.com" <dinechin@redhat.com>,
- "He, Shaopeng" <shaopeng.he@intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Apr 25, 2020 at 03:10:49AM +0800, Dr. David Alan Gilbert wrote:
-> * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> > On Tue, Apr 21, 2020 at 08:08:49PM +0800, Tian, Kevin wrote:
-> > > > From: Yan Zhao
-> > > > Sent: Tuesday, April 21, 2020 10:37 AM
-> > > > 
-> > > > On Tue, Apr 21, 2020 at 06:56:00AM +0800, Alex Williamson wrote:
-> > > > > On Sun, 19 Apr 2020 21:24:57 -0400
-> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > >
-> > > > > > On Fri, Apr 17, 2020 at 07:24:57PM +0800, Cornelia Huck wrote:
-> > > > > > > On Fri, 17 Apr 2020 05:52:02 -0400
-> > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > > >
-> > > > > > > > On Fri, Apr 17, 2020 at 04:44:50PM +0800, Cornelia Huck wrote:
-> > > > > > > > > On Mon, 13 Apr 2020 01:52:01 -0400
-> > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > > > > >
-> > > > > > > > > > This patchset introduces a migration_version attribute under sysfs
-> > > > of VFIO
-> > > > > > > > > > Mediated devices.
-> > > > > > > > > >
-> > > > > > > > > > This migration_version attribute is used to check migration
-> > > > compatibility
-> > > > > > > > > > between two mdev devices.
-> > > > > > > > > >
-> > > > > > > > > > Currently, it has two locations:
-> > > > > > > > > > (1) under mdev_type node,
-> > > > > > > > > >     which can be used even before device creation, but only for
-> > > > mdev
-> > > > > > > > > >     devices of the same mdev type.
-> > > > > > > > > > (2) under mdev device node,
-> > > > > > > > > >     which can only be used after the mdev devices are created, but
-> > > > the src
-> > > > > > > > > >     and target mdev devices are not necessarily be of the same
-> > > > mdev type
-> > > > > > > > > > (The second location is newly added in v5, in order to keep
-> > > > consistent
-> > > > > > > > > > with the migration_version node for migratable pass-though
-> > > > devices)
-> > > > > > > > >
-> > > > > > > > > What is the relationship between those two attributes?
-> > > > > > > > >
-> > > > > > > > (1) is for mdev devices specifically, and (2) is provided to keep the
-> > > > same
-> > > > > > > > sysfs interface as with non-mdev cases. so (2) is for both mdev
-> > > > devices and
-> > > > > > > > non-mdev devices.
-> > > > > > > >
-> > > > > > > > in future, if we enable vfio-pci vendor ops, (i.e. a non-mdev device
-> > > > > > > > is binding to vfio-pci, but is able to register migration region and do
-> > > > > > > > migration transactions from a vendor provided affiliate driver),
-> > > > > > > > the vendor driver would export (2) directly, under device node.
-> > > > > > > > It is not able to provide (1) as there're no mdev devices involved.
-> > > > > > >
-> > > > > > > Ok, creating an alternate attribute for non-mdev devices makes sense.
-> > > > > > > However, wouldn't that rather be a case (3)? The change here only
-> > > > > > > refers to mdev devices.
-> > > > > > >
-> > > > > > as you pointed below, (3) and (2) serve the same purpose.
-> > > > > > and I think a possible usage is to migrate between a non-mdev device and
-> > > > > > an mdev device. so I think it's better for them both to use (2) rather
-> > > > > > than creating (3).
-> > > > >
-> > > > > An mdev type is meant to define a software compatible interface, so in
-> > > > > the case of mdev->mdev migration, doesn't migrating to a different type
-> > > > > fail the most basic of compatibility tests that we expect userspace to
-> > > > > perform?  IOW, if two mdev types are migration compatible, it seems a
-> > > > > prerequisite to that is that they provide the same software interface,
-> > > > > which means they should be the same mdev type.
-> > > > >
-> > > > > In the hybrid cases of mdev->phys or phys->mdev, how does a
-> > > > management
-> > > > > tool begin to even guess what might be compatible?  Are we expecting
-> > > > > libvirt to probe ever device with this attribute in the system?  Is
-> > > > > there going to be a new class hierarchy created to enumerate all
-> > > > > possible migrate-able devices?
-> > > > >
-> > > > yes, management tool needs to guess and test migration compatible
-> > > > between two devices. But I think it's not the problem only for
-> > > > mdev->phys or phys->mdev. even for mdev->mdev, management tool needs
-> > > > to
-> > > > first assume that the two mdevs have the same type of parent devices
-> > > > (e.g.their pciids are equal). otherwise, it's still enumerating
-> > > > possibilities.
-> > > > 
-> > > > on the other hand, for two mdevs,
-> > > > mdev1 from pdev1, its mdev_type is 1/2 of pdev1;
-> > > > mdev2 from pdev2, its mdev_type is 1/4 of pdev2;
-> > > > if pdev2 is exactly 2 times of pdev1, why not allow migration between
-> > > > mdev1 <-> mdev2.
-> > > 
-> > > How could the manage tool figure out that 1/2 of pdev1 is equivalent 
-> > > to 1/4 of pdev2? If we really want to allow such thing happen, the best
-> > > choice is to report the same mdev type on both pdev1 and pdev2.
-> > I think that's exactly the value of this migration_version interface.
-> > the management tool can take advantage of this interface to know if two
-> > devices are migration compatible, no matter they are mdevs, non-mdevs,
-> > or mix.
-> > 
-> > as I know, (please correct me if not right), current libvirt still
-> > requires manually generating mdev devices, and it just duplicates src vm
-> > configuration to the target vm.
-> > for libvirt, currently it's always phys->phys and mdev->mdev (and of the
-> > same mdev type).
-> > But it does not justify that hybrid cases should not be allowed. otherwise,
-> > why do we need to introduce this migration_version interface and leave
-> > the judgement of migration compatibility to vendor driver? why not simply
-> > set the criteria to something like "pciids of parent devices are equal,
-> > and mdev types are equal" ?
-> > 
-> > 
-> > > btw mdev<->phys just brings trouble to upper stack as Alex pointed out. 
-> > could you help me understand why it will bring trouble to upper stack?
-> > 
-> > I think it just needs to read src migration_version under src dev node,
-> > and test it in target migration version under target dev node. 
-> > 
-> > after all, through this interface we just help the upper layer
-> > knowing available options through reading and testing, and they decide
-> > to use it or not.
-> > 
-> > > Can we simplify the requirement by allowing only mdev<->mdev and 
-> > > phys<->phys migration? If an customer does want to migrate between a 
-> > > mdev and phys, he could wrap physical device into a wrapped mdev 
-> > > instance (with the same type as the source mdev) instead of using vendor 
-> > > ops. Doing so does add some burden but if mdev<->phys is not dominant 
-> > > usage then such tradeoff might be worthywhile...
-> > >
-> > If the interfaces for phys<->phys and mdev<->mdev are consistent, it makes no
-> > difference to phys<->mdev, right?
-> > I think the vendor string for a mdev device is something like:
-> > "Parent PCIID + mdev type + software version", and
-> > that for a phys device is something like:
-> > "PCIID + software version".
-> > as long as we don't migrate between devices from different vendors, it's
-> > easy for vendor driver to tell if a phys device is migration compatible
-> > to a mdev device according it supports it or not.
-> 
-> It surprises me that the PCIID matching is a requirement; I'd assumed
-> with this clever mdev name setup that you could migrate between two
-> different models in a series, or to a newer model, as long as they
-> both supported the same mdev view.
-> 
-hi Dave
-the migration_version string is transparent to userspace, and is
-completely defined by vendor driver.
-I put it there just as an example of how vendor driver may implement it.
-e.g.
-the src migration_version string is "src PCIID + src software version", 
-then when this string is write to target migration_version node,
-the vendor driver in the target device will compare it with its own
-device info and software version.
-If different models are allowed, the write just succeeds even
-PCIIDs in src and target are different.
 
-so, it is the vendor driver to define whether two devices are able to
-migrate, no matter their PCIIDs, mdev types, software versions..., which
-provides vendor driver full flexibility.
+--0F1p//8PRICkK4MW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-do you think it's good?
+On Fri, Apr 24, 2020 at 11:03:14AM +0200, Cornelia Huck wrote:
+> Add 5.1 machine types for arm/i440fx/q35/s390x/spapr.
+>=20
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
-Thanks
-Yan
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-> 
-> > 
-> > Thanks
-> > Yan
-> > > 
-> > > > 
-> > > > 
-> > > > > I agree that there was a gap in the previous proposal for non-mdev
-> > > > > devices, but I think this bring a lot of questions that we need to
-> > > > > puzzle through and libvirt will need to re-evaluate how they might
-> > > > > decide to pick a migration target device.  For example, I'm sure
-> > > > > libvirt would reject any policy decisions regarding picking a physical
-> > > > > device versus an mdev device.  Had we previously left it that only a
-> > > > > layer above libvirt would select a target device and libvirt only tests
-> > > > > compatibility to that target device?
-> > > > I'm not sure if there's a layer above libvirt would select a target
-> > > > device. but if there is such a layer (even it's human), we need to
-> > > > provide an interface for them to know whether their decision is suitable
-> > > > for migration. The migration_version interface provides a potential to
-> > > > allow mdev->phys migration, even libvirt may currently reject it.
-> > > > 
-> > > > 
-> > > > > We also need to consider that this expands the namespace.  If we no
-> > > > > longer require matching types as the first level of comparison, then
-> > > > > vendor migration strings can theoretically collide.  How do we
-> > > > > coordinate that can't happen?  Thanks,
-> > > > yes, it's indeed a problem.
-> > > > could only allowing migration beteen devices from the same vendor be a
-> > > > good
-> > > > prerequisite?
-> > > > 
-> > > > Thanks
-> > > > Yan
-> > > > >
-> > > > > > > > > Is existence (and compatibility) of (1) a pre-req for possible
-> > > > > > > > > existence (and compatibility) of (2)?
-> > > > > > > > >
-> > > > > > > > no. (2) does not reply on (1).
-> > > > > > >
-> > > > > > > Hm. Non-existence of (1) seems to imply "this type does not support
-> > > > > > > migration". If an mdev created for such a type suddenly does support
-> > > > > > > migration, it feels a bit odd.
-> > > > > > >
-> > > > > > yes. but I think if the condition happens, it should be reported a bug
-> > > > > > to vendor driver.
-> > > > > > should I add a line in the doc like "vendor driver should ensure that the
-> > > > > > migration compatibility from migration_version under mdev_type should
-> > > > be
-> > > > > > consistent with that from migration_version under device node" ?
-> > > > > >
-> > > > > > > (It obviously cannot be a prereq for what I called (3) above.)
-> > > > > > >
-> > > > > > > >
-> > > > > > > > > Does userspace need to check (1) or can it completely rely on (2), if
-> > > > > > > > > it so chooses?
-> > > > > > > > >
-> > > > > > > > I think it can completely reply on (2) if compatibility check before
-> > > > > > > > mdev creation is not required.
-> > > > > > > >
-> > > > > > > > > If devices with a different mdev type are indeed compatible, it
-> > > > seems
-> > > > > > > > > userspace can only find out after the devices have actually been
-> > > > > > > > > created, as (1) does not apply?
-> > > > > > > > yes, I think so.
-> > > > > > >
-> > > > > > > How useful would it be for userspace to even look at (1) in that case?
-> > > > > > > It only knows if things have a chance of working if it actually goes
-> > > > > > > ahead and creates devices.
-> > > > > > >
-> > > > > > hmm, is it useful for userspace to test the migration_version under mdev
-> > > > > > type before it knows what mdev device to generate ?
-> > > > > > like when the userspace wants to migrate an mdev device in src vm,
-> > > > > > but it has not created target vm and the target mdev device.
-> > > > > >
-> > > > > > > >
-> > > > > > > > > One of my worries is that the existence of an attribute with the
-> > > > same
-> > > > > > > > > name in two similar locations might lead to confusion. But maybe it
-> > > > > > > > > isn't a problem.
-> > > > > > > > >
-> > > > > > > > Yes, I have the same feeling. but as (2) is for sysfs interface
-> > > > > > > > consistency, to make it transparent to userspace tools like libvirt,
-> > > > > > > > I guess the same name is necessary?
-> > > > > > >
-> > > > > > > What do we actually need here, I wonder? (1) and (2) seem to serve
-> > > > > > > slightly different purposes, while (2) and what I called (3) have the
-> > > > > > > same purpose. Is it important to userspace that (1) and (2) have the
-> > > > > > > same name?
-> > > > > > so change (1) to migration_type_version and (2) to
-> > > > > > migration_instance_version?
-> > > > > > But as they are under different locations, could that location imply
-> > > > > > enough information?
-> > > > > >
-> > > > > >
-> > > > > > Thanks
-> > > > > > Yan
-> > > > > >
-> > > > > >
-> > > > >
-> > > > _______________________________________________
-> > > > intel-gvt-dev mailing list
-> > > > intel-gvt-dev@lists.freedesktop.org
-> > > > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+> ---
+>=20
+> Still keeping the default cpu model version on x86 at v1.
+>=20
+> I'll queue this to my s390-next branch, as I'm planning to send a pull
+> req as soon as 5.0 is out; if someone else wants to queue this, we'll
+> figure it out :)
+>=20
+> ---
+>  hw/arm/virt.c              |  9 ++++++++-
+>  hw/core/machine.c          |  3 +++
+>  hw/i386/pc.c               |  3 +++
+>  hw/i386/pc_piix.c          | 14 +++++++++++++-
+>  hw/i386/pc_q35.c           | 13 ++++++++++++-
+>  hw/ppc/spapr.c             | 15 +++++++++++++--
+>  hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
+>  include/hw/boards.h        |  3 +++
+>  include/hw/i386/pc.h       |  3 +++
+>  9 files changed, 71 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 7dc96abf72cf..5e84c09402dd 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -2309,15 +2309,22 @@ static void machvirt_machine_init(void)
+>  }
+>  type_init(machvirt_machine_init);
+> =20
+> +static void virt_machine_5_1_options(MachineClass *mc)
+> +{
+> +}
+> +DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
+> +
+>  static void virt_machine_5_0_options(MachineClass *mc)
+>  {
+>      static GlobalProperty compat[] =3D {
+>          { TYPE_TPM_TIS_SYSBUS, "ppi", "false" },
+>      };
+> =20
+> +    virt_machine_5_1_options(mc);
+> +    compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+>      compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+>  }
+> -DEFINE_VIRT_MACHINE_AS_LATEST(5, 0)
+> +DEFINE_VIRT_MACHINE(5, 0)
+> =20
+>  static void virt_machine_4_2_options(MachineClass *mc)
+>  {
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index c1a444cb7558..7a50dd518f4c 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -28,6 +28,9 @@
+>  #include "hw/mem/nvdimm.h"
+>  #include "migration/vmstate.h"
+> =20
+> +GlobalProperty hw_compat_5_0[] =3D {};
+> +const size_t hw_compat_5_0_len =3D G_N_ELEMENTS(hw_compat_5_0);
+> +
+>  GlobalProperty hw_compat_4_2[] =3D {
+>      { "virtio-blk-device", "queue-size", "128"},
+>      { "virtio-scsi-device", "virtqueue_size", "128"},
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 5143c516531e..13e1d18cd758 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -94,6 +94,9 @@
+>  #include "fw_cfg.h"
+>  #include "trace.h"
+> =20
+> +GlobalProperty pc_compat_5_0[] =3D {};
+> +const size_t pc_compat_5_0_len =3D G_N_ELEMENTS(pc_compat_5_0);
+> +
+>  GlobalProperty pc_compat_4_2[] =3D {
+>      { "mch", "smbase-smram", "off" },
+>  };
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 22dee0e76c62..921caa502b85 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -419,7 +419,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
+>      machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
+>  }
+> =20
+> -static void pc_i440fx_5_0_machine_options(MachineClass *m)
+> +static void pc_i440fx_5_1_machine_options(MachineClass *m)
+>  {
+>      PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+>      pc_i440fx_machine_options(m);
+> @@ -428,6 +428,18 @@ static void pc_i440fx_5_0_machine_options(MachineCla=
+ss *m)
+>      pcmc->default_cpu_version =3D 1;
+>  }
+> =20
+> +DEFINE_I440FX_MACHINE(v5_1, "pc-i440fx-5.1", NULL,
+> +                      pc_i440fx_5_1_machine_options);
+> +
+> +static void pc_i440fx_5_0_machine_options(MachineClass *m)
+> +{
+> +    pc_i440fx_5_1_machine_options(m);
+> +    m->alias =3D NULL;
+> +    m->is_default =3D false;
+> +    compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+> +    compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
+> +}
+> +
+>  DEFINE_I440FX_MACHINE(v5_0, "pc-i440fx-5.0", NULL,
+>                        pc_i440fx_5_0_machine_options);
+> =20
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index d37c425e2236..253688a9b8f3 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -349,7 +349,7 @@ static void pc_q35_machine_options(MachineClass *m)
+>      m->max_cpus =3D 288;
+>  }
+> =20
+> -static void pc_q35_5_0_machine_options(MachineClass *m)
+> +static void pc_q35_5_1_machine_options(MachineClass *m)
+>  {
+>      PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+>      pc_q35_machine_options(m);
+> @@ -357,6 +357,17 @@ static void pc_q35_5_0_machine_options(MachineClass =
+*m)
+>      pcmc->default_cpu_version =3D 1;
+>  }
+> =20
+> +DEFINE_Q35_MACHINE(v5_1, "pc-q35-5.1", NULL,
+> +                   pc_q35_5_1_machine_options);
+> +
+> +static void pc_q35_5_0_machine_options(MachineClass *m)
+> +{
+> +    pc_q35_5_1_machine_options(m);
+> +    m->alias =3D NULL;
+> +    compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+> +    compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
+> +}
+> +
+>  DEFINE_Q35_MACHINE(v5_0, "pc-q35-5.0", NULL,
+>                     pc_q35_5_0_machine_options);
+> =20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 9a2bd501aa6e..fd5bfd11a84c 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -4599,15 +4599,26 @@ static void spapr_machine_latest_class_options(Ma=
+chineClass *mc)
+>      }                                                                \
+>      type_init(spapr_machine_register_##suffix)
+> =20
+> +/*
+> + * pseries-5.1
+> + */
+> +static void spapr_machine_5_1_class_options(MachineClass *mc)
+> +{
+> +    /* Defaults for the latest behaviour inherited from the base class */
+> +}
+> +
+> +DEFINE_SPAPR_MACHINE(5_1, "5.1", true);
+> +
+>  /*
+>   * pseries-5.0
+>   */
+>  static void spapr_machine_5_0_class_options(MachineClass *mc)
+>  {
+> -    /* Defaults for the latest behaviour inherited from the base class */
+> +    spapr_machine_5_1_class_options(mc);
+> +    compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+>  }
+> =20
+> -DEFINE_SPAPR_MACHINE(5_0, "5.0", true);
+> +DEFINE_SPAPR_MACHINE(5_0, "5.0", false);
+> =20
+>  /*
+>   * pseries-4.2
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 0fa00a9fff3d..967a6de9683b 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -672,14 +672,26 @@ bool css_migration_enabled(void)
+>      }                                                                   =
+      \
+>      type_init(ccw_machine_register_##suffix)
+> =20
+> +static void ccw_machine_5_1_instance_options(MachineState *machine)
+> +{
+> +}
+> +
+> +static void ccw_machine_5_1_class_options(MachineClass *mc)
+> +{
+> +}
+> +DEFINE_CCW_MACHINE(5_1, "5.1", true);
+> +
+>  static void ccw_machine_5_0_instance_options(MachineState *machine)
+>  {
+> +    ccw_machine_5_1_instance_options(machine);
+>  }
+> =20
+>  static void ccw_machine_5_0_class_options(MachineClass *mc)
+>  {
+> +    ccw_machine_5_1_class_options(mc);
+> +    compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+>  }
+> -DEFINE_CCW_MACHINE(5_0, "5.0", true);
+> +DEFINE_CCW_MACHINE(5_0, "5.0", false);
+> =20
+>  static void ccw_machine_4_2_instance_options(MachineState *machine)
+>  {
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index fd4d62b5010f..18815d9be24f 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -318,6 +318,9 @@ struct MachineState {
+>      } \
+>      type_init(machine_initfn##_register_types)
+> =20
+> +extern GlobalProperty hw_compat_5_0[];
+> +extern const size_t hw_compat_5_0_len;
+> +
+>  extern GlobalProperty hw_compat_4_2[];
+>  extern const size_t hw_compat_4_2_len;
+> =20
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 6ab6eda046fd..15b9294dac38 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -204,6 +204,9 @@ void pc_system_firmware_init(PCMachineState *pcms, Me=
+moryRegion *rom_memory);
+>  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+>                         const CPUArchIdList *apic_ids, GArray *entry);
+> =20
+> +extern GlobalProperty pc_compat_5_0[];
+> +extern const size_t pc_compat_5_0_len;
+> +
+>  extern GlobalProperty pc_compat_4_2[];
+>  extern const size_t pc_compat_4_2_len;
+> =20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--0F1p//8PRICkK4MW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6k3OAACgkQbDjKyiDZ
+s5JkzBAAiqN2qujfRs00xUvk3cL2MzF5MpDJF448Dfn16FK29dhT5jU7g+OdAWZu
+6Y1ZJdA59q/RTkSkTLRR5AiMZgvIziJsJlqBz6d3lwWE069BEO6GdsJ5shJfzUQ5
+ajcukCLtKFuVRoXc6uy/6Mn+ZcgDs4AJkk+3xdBrhjBXoU74PdG9R/QHWb1IcFDa
+k0/MU2cCSn7hlelctW3ce0pchtjD6j7y77d2oaN1xSwex1faTpBmhExAMiiCt7la
+P0S6NmG20YSI8WA0qk83Y8JqVvHfTn/jZuQQWHKrKldXT6ifP7d66L7tVOtJgkHT
++ZPWSZ85FnhVrbEKqcY7qgVjNvS2d/OyP72GPSISMDXtmRu8i1MPu66GUVN2Z50O
+1suxsxCePtUbXYtOWwgnArCDC7HBmJ9YwwhwaSOgRhJblro8OlWKUgOy/20Um26/
+P9gcB3ziJuptBJBEFOZuORPDNzgMeqFrSlRNwvVg952gv916coYfuLy0gcNiCqW0
+hsGjrMr78/Cp2NolJp2/jmnhoAkWGsk47aBvUh8Djb0OAQBG1lN97aaBf489QtvX
+L6CFomeHbV8VToUrbZlmGBOwGIU67T5l7KEmVUhJkweW8kVlO54KjIcuhR1lBqM5
+NZcYmmwYiFjQBNRLFIJRU6qbHJ6LJEDj8SNu/DHvJcIVDbpm2xI=
+=YBI4
+-----END PGP SIGNATURE-----
+
+--0F1p//8PRICkK4MW--
 
