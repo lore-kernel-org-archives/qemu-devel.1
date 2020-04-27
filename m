@@ -2,69 +2,85 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A5BC54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 10:10:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 885D3C54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 10:12:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48B24206D4
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 10:10:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48B24206D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4B93C206E9
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 10:12:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XG4s+rh8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B93C206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT0ig-0003yx-Es
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 06:10:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39910)
+	id 1jT0k4-0005g5-Fu
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 06:12:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40022)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jT0hx-0002pr-3i
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:09:52 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jT0iP-0003n3-4Z
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:10:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jT0hw-00033z-Ht
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:09:48 -0400
-Resent-Date: Mon, 27 Apr 2020 06:09:48 -0400
-Resent-Message-Id: <E1jT0hw-00033z-Ht@eggs.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21343)
+ (envelope-from <cohuck@redhat.com>) id 1jT0iO-0003it-AU
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:10:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23096
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jT0hu-0002yz-GL; Mon, 27 Apr 2020 06:09:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1587982125; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=aej1LbiNSVjvJknSv39EXAs23rUceDR9KzY4XwZ6C9gqgp0vJJ6vO5+GHpatOiL075T3Rb1LOlyroAvh8IJoUJdcxxWimNXM+V6wGMRy857sZuDyuepXRklqkCqUy2oqbssP7LhZHZwrsDVDNRbIYsXE8Uih3d3TODrP24oUEGA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1587982125;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=UKucbskUtM8lp7dITO3CkRVdlOJ7T61rVZGOsyRpXLo=; 
- b=jU/Uu7zxpjy6tJsWrytUnyBspPQwC1XKnQDxJ6CVO00oHZAjPWyo6h0nlMBVxdAmxZZNd0U3QIiUoDqHrSWxWy0V5RcmCs0hhvhkncAZWGRFf2DbI8fS2gNH2xhd8zo3QQEEqF0M0m41R688hgwf7706HwXHiRTh7SCi6s+ZV3U=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1587982123452206.69111462718752;
- Mon, 27 Apr 2020 03:08:43 -0700 (PDT)
-In-Reply-To: <20200427082325.10414-1-vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v2 00/17] 64bit block-layer
-Message-ID: <158798212061.15667.17116964778178970715@39012742ff91>
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jT0iN-0003gJ-Ts
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:10:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587982214;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7jx3RoBb4hDH7vaECqM7PiML351QlBPjDB7CPVmiLY0=;
+ b=XG4s+rh83RAIRceVv8EUGem3DYOVhQM1V7TQUVkhQ9HINnH1Jnu8YT0MpJhXYpiKPVEAmh
+ eqJwVLTXPxYpHwyQrVoN2GHmxAROusIJnoZkEnPkMjQqTG0/bjvmFHRpcfGpilD5QRx/Y/
+ YA099VHAQ/TG5ruBM0Iw6HMTsiKItpo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-201-sNs4_JE4PQKPP7-061XNnQ-1; Mon, 27 Apr 2020 06:10:09 -0400
+X-MC-Unique: sNs4_JE4PQKPP7-061XNnQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 917B71005510;
+ Mon, 27 Apr 2020 10:10:07 +0000 (UTC)
+Received: from gondolin (ovpn-112-184.ams2.redhat.com [10.36.112.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 58DEE5D9DC;
+ Mon, 27 Apr 2020 10:09:58 +0000 (UTC)
+Date: Mon, 27 Apr 2020 12:09:56 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH] hw: add compat machines for 5.1
+Message-ID: <20200427120956.6c2f775c.cohuck@redhat.com>
+In-Reply-To: <4166d3fc-58e9-405d-71a1-2270ced75e7d@redhat.com>
+References: <20200424090314.544-1-cohuck@redhat.com>
+ <548cd0de-17d3-204d-7df1-4c8fdccad83c@redhat.com>
+ <20200427110609.36ecaac6.cohuck@redhat.com>
+ <4166d3fc-58e9-405d-71a1-2270ced75e7d@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: vsementsov@virtuozzo.com
-Date: Mon, 27 Apr 2020 03:08:43 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 05:31:20
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 136.143.188.53
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 02:05:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,112 +92,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, fam@euphon.net, pbonzini@redhat.com,
- integration@gluster.org, berto@igalia.com, ronniesahlberg@gmail.com,
- qemu-block@nongnu.org, sw@weilnetz.de, stefanha@redhat.com, pl@kamp.de,
- qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com,
- sheepdog@lists.wpkg.org, vsementsov@virtuozzo.com, pavel.dovgaluk@ispras.ru,
- namei.unix@gmail.com, den@openvz.org, dillaman@redhat.com, ari@tuxera.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQyNzA4MjMyNS4xMDQx
-NC0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
-dGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rp
-bmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGlu
-c3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRv
-Y2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWlu
-Z3dAZmVkb3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAg
-ICAgYmxvY2svc2hlZXBkb2cubwogIENDICAgICAgYmxvY2svYWNjb3VudGluZy5vCiAgQ0MgICAg
-ICBibG9jay9kaXJ0eS1iaXRtYXAubwovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svZmlsZS13aW4z
-Mi5jOjY0MzoyNzogZXJyb3I6IGluaXRpYWxpemF0aW9uIG9mICdCbG9ja0FJT0NCICogKCopKEJs
-b2NrRHJpdmVyU3RhdGUgKiwgaW50NjRfdCwgIGludDY0X3QsICBRRU1VSU9WZWN0b3IgKiwgaW50
-LCAgdm9pZCAoKikodm9pZCAqLCBpbnQpLCB2b2lkICopJyB7YWthICdzdHJ1Y3QgQmxvY2tBSU9D
-QiAqICgqKShzdHJ1Y3QgQmxvY2tEcml2ZXJTdGF0ZSAqLCBsb25nIGxvbmcgaW50LCAgbG9uZyBs
-b25nIGludCwgIHN0cnVjdCBRRU1VSU9WZWN0b3IgKiwgaW50LCAgdm9pZCAoKikodm9pZCAqLCBp
-bnQpLCB2b2lkICopJ30gZnJvbSBpbmNvbXBhdGlibGUgcG9pbnRlciB0eXBlICdCbG9ja0FJT0NC
-ICogKCopKEJsb2NrRHJpdmVyU3RhdGUgKiwgdWludDY0X3QsICB1aW50NjRfdCwgIFFFTVVJT1Zl
-Y3RvciAqLCBpbnQsICB2b2lkICgqKSh2b2lkICosIGludCksIHZvaWQgKiknIHtha2EgJ3N0cnVj
-dCBCbG9ja0FJT0NCICogKCopKHN0cnVjdCBCbG9ja0RyaXZlclN0YXRlICosIGxvbmcgbG9uZyB1
-bnNpZ25lZCBpbnQsICBsb25nIGxvbmcgdW5zaWduZWQgaW50LCAgc3RydWN0IFFFTVVJT1ZlY3Rv
-ciAqLCBpbnQsICB2b2lkICgqKSh2b2lkICosIGludCksIHZvaWQgKiknfSBbLVdlcnJvcj1pbmNv
-bXBhdGlibGUtcG9pbnRlci10eXBlc10KICAgICAuYmRydl9haW9fcHJlYWR2ICAgID0gcmF3X2Fp
-b19wcmVhZHYsCiAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+Ci90bXAv
-cWVtdS10ZXN0L3NyYy9ibG9jay9maWxlLXdpbjMyLmM6NjQzOjI3OiBub3RlOiAobmVhciBpbml0
-aWFsaXphdGlvbiBmb3IgJ2JkcnZfZmlsZS5iZHJ2X2Fpb19wcmVhZHYnKQovdG1wL3FlbXUtdGVz
-dC9zcmMvYmxvY2svZmlsZS13aW4zMi5jOjY0NDoyNzogZXJyb3I6IGluaXRpYWxpemF0aW9uIG9m
-ICdCbG9ja0FJT0NCICogKCopKEJsb2NrRHJpdmVyU3RhdGUgKiwgaW50NjRfdCwgIGludDY0X3Qs
-ICBRRU1VSU9WZWN0b3IgKiwgaW50LCAgdm9pZCAoKikodm9pZCAqLCBpbnQpLCB2b2lkICopJyB7
-YWthICdzdHJ1Y3QgQmxvY2tBSU9DQiAqICgqKShzdHJ1Y3QgQmxvY2tEcml2ZXJTdGF0ZSAqLCBs
-b25nIGxvbmcgaW50LCAgbG9uZyBsb25nIGludCwgIHN0cnVjdCBRRU1VSU9WZWN0b3IgKiwgaW50
-LCAgdm9pZCAoKikodm9pZCAqLCBpbnQpLCB2b2lkICopJ30gZnJvbSBpbmNvbXBhdGlibGUgcG9p
-bnRlciB0eXBlICdCbG9ja0FJT0NCICogKCopKEJsb2NrRHJpdmVyU3RhdGUgKiwgdWludDY0X3Qs
-ICB1aW50NjRfdCwgIFFFTVVJT1ZlY3RvciAqLCBpbnQsICB2b2lkICgqKSh2b2lkICosIGludCks
-IHZvaWQgKiknIHtha2EgJ3N0cnVjdCBCbG9ja0FJT0NCICogKCopKHN0cnVjdCBCbG9ja0RyaXZl
-clN0YXRlICosIGxvbmcgbG9uZyB1bnNpZ25lZCBpbnQsICBsb25nIGxvbmcgdW5zaWduZWQgaW50
-LCAgc3RydWN0IFFFTVVJT1ZlY3RvciAqLCBpbnQsICB2b2lkICgqKSh2b2lkICosIGludCksIHZv
-aWQgKiknfSBbLVdlcnJvcj1pbmNvbXBhdGlibGUtcG9pbnRlci10eXBlc10KICAgICAuYmRydl9h
-aW9fcHdyaXRldiAgID0gcmF3X2Fpb19wd3JpdGV2LAogICAgICAgICAgICAgICAgICAgICAgICAg
-ICBefn5+fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL2ZpbGUtd2luMzIuYzo2
-NDQ6Mjc6IG5vdGU6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnYmRydl9maWxlLmJkcnZfYWlv
-X3B3cml0ZXYnKQovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svZmlsZS13aW4zMi5jOjgxMjoyNzog
-ZXJyb3I6IGluaXRpYWxpemF0aW9uIG9mICdCbG9ja0FJT0NCICogKCopKEJsb2NrRHJpdmVyU3Rh
-dGUgKiwgaW50NjRfdCwgIGludDY0X3QsICBRRU1VSU9WZWN0b3IgKiwgaW50LCAgdm9pZCAoKiko
-dm9pZCAqLCBpbnQpLCB2b2lkICopJyB7YWthICdzdHJ1Y3QgQmxvY2tBSU9DQiAqICgqKShzdHJ1
-Y3QgQmxvY2tEcml2ZXJTdGF0ZSAqLCBsb25nIGxvbmcgaW50LCAgbG9uZyBsb25nIGludCwgIHN0
-cnVjdCBRRU1VSU9WZWN0b3IgKiwgaW50LCAgdm9pZCAoKikodm9pZCAqLCBpbnQpLCB2b2lkICop
-J30gZnJvbSBpbmNvbXBhdGlibGUgcG9pbnRlciB0eXBlICdCbG9ja0FJT0NCICogKCopKEJsb2Nr
-RHJpdmVyU3RhdGUgKiwgdWludDY0X3QsICB1aW50NjRfdCwgIFFFTVVJT1ZlY3RvciAqLCBpbnQs
-ICB2b2lkICgqKSh2b2lkICosIGludCksIHZvaWQgKiknIHtha2EgJ3N0cnVjdCBCbG9ja0FJT0NC
-ICogKCopKHN0cnVjdCBCbG9ja0RyaXZlclN0YXRlICosIGxvbmcgbG9uZyB1bnNpZ25lZCBpbnQs
-ICBsb25nIGxvbmcgdW5zaWduZWQgaW50LCAgc3RydWN0IFFFTVVJT1ZlY3RvciAqLCBpbnQsICB2
-b2lkICgqKSh2b2lkICosIGludCksIHZvaWQgKiknfSBbLVdlcnJvcj1pbmNvbXBhdGlibGUtcG9p
-bnRlci10eXBlc10KICAgICAuYmRydl9haW9fcHJlYWR2ICAgID0gcmF3X2Fpb19wcmVhZHYsCiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3Ny
-Yy9ibG9jay9maWxlLXdpbjMyLmM6ODEyOjI3OiBub3RlOiAobmVhciBpbml0aWFsaXphdGlvbiBm
-b3IgJ2JkcnZfaG9zdF9kZXZpY2UuYmRydl9haW9fcHJlYWR2JykKL3RtcC9xZW11LXRlc3Qvc3Jj
-L2Jsb2NrL2ZpbGUtd2luMzIuYzo4MTM6Mjc6IGVycm9yOiBpbml0aWFsaXphdGlvbiBvZiAnQmxv
-Y2tBSU9DQiAqICgqKShCbG9ja0RyaXZlclN0YXRlICosIGludDY0X3QsICBpbnQ2NF90LCAgUUVN
-VUlPVmVjdG9yICosIGludCwgIHZvaWQgKCopKHZvaWQgKiwgaW50KSwgdm9pZCAqKScge2FrYSAn
-c3RydWN0IEJsb2NrQUlPQ0IgKiAoKikoc3RydWN0IEJsb2NrRHJpdmVyU3RhdGUgKiwgbG9uZyBs
-b25nIGludCwgIGxvbmcgbG9uZyBpbnQsICBzdHJ1Y3QgUUVNVUlPVmVjdG9yICosIGludCwgIHZv
-aWQgKCopKHZvaWQgKiwgaW50KSwgdm9pZCAqKSd9IGZyb20gaW5jb21wYXRpYmxlIHBvaW50ZXIg
-dHlwZSAnQmxvY2tBSU9DQiAqICgqKShCbG9ja0RyaXZlclN0YXRlICosIHVpbnQ2NF90LCAgdWlu
-dDY0X3QsICBRRU1VSU9WZWN0b3IgKiwgaW50LCAgdm9pZCAoKikodm9pZCAqLCBpbnQpLCB2b2lk
-ICopJyB7YWthICdzdHJ1Y3QgQmxvY2tBSU9DQiAqICgqKShzdHJ1Y3QgQmxvY2tEcml2ZXJTdGF0
-ZSAqLCBsb25nIGxvbmcgdW5zaWduZWQgaW50LCAgbG9uZyBsb25nIHVuc2lnbmVkIGludCwgIHN0
-cnVjdCBRRU1VSU9WZWN0b3IgKiwgaW50LCAgdm9pZCAoKikodm9pZCAqLCBpbnQpLCB2b2lkICop
-J30gWy1XZXJyb3I9aW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgICAgLmJkcnZfYWlvX3B3
-cml0ZXYgICA9IHJhd19haW9fcHdyaXRldiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+
-fn5+fn5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9maWxlLXdpbjMyLmM6ODEzOjI3
-OiBub3RlOiAobmVhciBpbml0aWFsaXphdGlvbiBmb3IgJ2JkcnZfaG9zdF9kZXZpY2UuYmRydl9h
-aW9fcHdyaXRldicpCmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1h
-a2U6ICoqKiBbL3RtcC9xZW11LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTogYmxvY2svZmlsZS13aW4z
-Mi5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uClRy
-YWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9k
-b2NrZXIucHkiLCBsaW5lIDY2NCwgaW4gPG1vZHVsZT4KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9j
-ZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29t
-bWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVt
-dS5pbnN0YW5jZS51dWlkPWUzZmNjNTg1YTQyYjRiZmE4YWNkMTExMzBmOGQxNjVlJywgJy11Jywg
-JzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAn
-LWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScs
-ICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0nLCAn
-LWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8u
-Y2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIv
-dG1wL3BhdGNoZXctdGVzdGVyLXRtcC00aHluNWwyMC9zcmMvZG9ja2VyLXNyYy4yMDIwLTA0LTI3
-LTA2LjA0LjI4LjI2NjkxOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmZlZG9yYScsICcvdmFy
-L3RtcC9xZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3Rh
-dHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWUzZmNj
-NTg1YTQyYjRiZmE4YWNkMTExMzBmOGQxNjVlCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJy
-b3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
-dG1wLTRoeW41bDIwL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtbWluZ3dAZmVkb3Jh
-XSBFcnJvciAyCgpyZWFsICAgIDRtMTQuMTkzcwp1c2VyICAgIDBtOS4zNzZzCgoKVGhlIGZ1bGwg
-bG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDQyNzA4MjMy
-NS4xMDQxNC0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0Bm
-ZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Mon, 27 Apr 2020 11:58:28 +0200
+Auger Eric <eric.auger@redhat.com> wrote:
+
+> Hi Connie,
+> 
+> On 4/27/20 11:06 AM, Cornelia Huck wrote:
+> > On Mon, 27 Apr 2020 09:43:33 +0200
+> > Auger Eric <eric.auger@redhat.com> wrote:
+> >   
+> >> Hi Connie,
+> >>
+> >> On 4/24/20 11:03 AM, Cornelia Huck wrote:  
+> >>> Add 5.1 machine types for arm/i440fx/q35/s390x/spapr.
+> >>>
+> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >>> ---
+> >>>
+> >>> Still keeping the default cpu model version on x86 at v1.
+> >>>
+> >>> I'll queue this to my s390-next branch, as I'm planning to send a pull
+> >>> req as soon as 5.0 is out; if someone else wants to queue this, we'll
+> >>> figure it out :)
+> >>>
+> >>> ---
+> >>>  hw/arm/virt.c              |  9 ++++++++-
+> >>>  hw/core/machine.c          |  3 +++
+> >>>  hw/i386/pc.c               |  3 +++
+> >>>  hw/i386/pc_piix.c          | 14 +++++++++++++-
+> >>>  hw/i386/pc_q35.c           | 13 ++++++++++++-
+> >>>  hw/ppc/spapr.c             | 15 +++++++++++++--
+> >>>  hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
+> >>>  include/hw/boards.h        |  3 +++
+> >>>  include/hw/i386/pc.h       |  3 +++
+> >>>  9 files changed, 71 insertions(+), 6 deletions(-)
+> >>>
+> >>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> >>> index 7dc96abf72cf..5e84c09402dd 100644
+> >>> --- a/hw/arm/virt.c
+> >>> +++ b/hw/arm/virt.c
+> >>> @@ -2309,15 +2309,22 @@ static void machvirt_machine_init(void)
+> >>>  }
+> >>>  type_init(machvirt_machine_init);
+> >>>  
+> >>> +static void virt_machine_5_1_options(MachineClass *mc)
+> >>> +{
+> >>> +}
+> >>> +DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
+> >>> +
+> >>>  static void virt_machine_5_0_options(MachineClass *mc)
+> >>>  {
+> >>>      static GlobalProperty compat[] = {
+> >>>          { TYPE_TPM_TIS_SYSBUS, "ppi", "false" },
+> >>>      };
+> >>>  
+> >>> +    virt_machine_5_1_options(mc);
+> >>> +    compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
+> >>>      compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));    
+> >> As spotted by patchew we need { TYPE_TPM_TIS_SYSBUS, "ppi", "false" } to
+> >> be applied for all machine types 5_0 onwards as our tpm-tis-device does
+> >> not support PPI. So I guess we need to move compat[] declaration outside
+> >> of virt_machine_5_0_options and call
+> >> "compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));"
+> >> for each  virt_machine_5_*_options? Or is a misuse of compats?  
+> > 
+> > Ah, that was the error (I could not really make sense of it).
+> > 
+> > So, if I understand it correctly, ppi needs to be disabled for all virt
+> > machines.  
+> ppi property of tpm-tis-sysbus device needs to be disabled for all virt
+> machines whose version >= 5.0. tpm-tis-sysbus device is supported from
+> 5.0 onwards.
+
+It would probably be ok to set for all versions; if the device is not
+available, a compat entry should not hurt.
+
+> 
+> Looking again at the code, I should rather set the default value of the
+> ppi property to false in tpm_tis_sysbus_properties. Before we shared the
+> same device with x86, hence the compat but now we have a separate one. I
+> guess that should work directly without the pain of that compat :-( Let
+> me check ...
+
+Yes, that seems like a better solution.
+
+> 
+> Thanks
+> 
+> Eric
+>  I think the correct way to do this would be to add the
+> > "compat" prop in virt_machine_class_init() (even if it is not strictly
+> > compat, as it always needs to be disabled). It can be removed there and
+> > added to a compat machine should support be added in the future.
+> > 
+> > Or does anyone have a better idea?
+> > 
+> >   
+
 
