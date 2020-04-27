@@ -2,73 +2,78 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78009C54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 10:21:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F240C54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 10:25:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 483EB206B6
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 10:21:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 483EB206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1762F2064C
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 10:25:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E3hO16Af"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1762F2064C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT0sr-00056l-F8
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 06:21:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41774)
+	id 1jT0x9-00014J-Vr
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 06:25:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43072)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jT0rV-0003H8-Te
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:19:42 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jT0w6-0000EB-UU
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:24:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jT0rU-0007y7-23
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:19:40 -0400
-Received: from mga04.intel.com ([192.55.52.120]:52299)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1jT0rT-0007lJ-Gj
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:19:39 -0400
-IronPort-SDR: c0NgftxyyWR4AbJDkboz8NSspGLxP+tcVFT051L8GhRdfhv4uJRBG/onYDv8CO/gRev1OoGYpq
- Yyp/W+o//cnw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 27 Apr 2020 03:19:35 -0700
-IronPort-SDR: aTfWKO9Q/7Nf9LaCSjnUX9ITsyLjAX+qvLkZKBFptfpMqVtyyawFYeljq7DlMYUN3P1jYnveHw
- tQzlc2KusnMA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,323,1583222400"; d="scan'208";a="458319038"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by fmsmga005.fm.intel.com with ESMTP; 27 Apr 2020 03:19:34 -0700
-Date: Mon, 27 Apr 2020 06:09:52 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v4 1/3] memory: drop guest writes to read-only ram device
- regions
-Message-ID: <20200427100951.GI12879@joy-OptiPlex-7040>
-References: <20200417074437.28526-1-yan.y.zhao@intel.com>
- <f96581ca-055e-ecc6-4a44-6bd26396bfc0@redhat.com>
- <20200426010430.GB12879@joy-OptiPlex-7040>
- <20200427091545.GH12879@joy-OptiPlex-7040>
- <85cb56a3-882a-05af-5714-e51174aa995a@redhat.com>
+ (envelope-from <cohuck@redhat.com>) id 1jT0w5-0005ee-Ts
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:24:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33202
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jT0w5-0005eV-H8
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:24:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587983064;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=j6g9s5XUflybaheUo/IGc4BDyuX36qLojgvo/hs4cHE=;
+ b=E3hO16AfP9djMzjrz3PFSqiFU35OUFF1ntHMd7hD6m8ZBUNrlAJZvhAcrhuEoBPJznn1Yv
+ mxorZZpFzU1gk7T/HztYfHLCdUgHaxICI66B5g48j8uCx7d8GhGcnOorXV6it7YVQ5vhuC
+ FrS9k3Rwjp8EKUjgB5CSvuidQ2nJ0qI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-xaTwFezrOT6bAh4pz573xw-1; Mon, 27 Apr 2020 06:24:23 -0400
+X-MC-Unique: xaTwFezrOT6bAh4pz573xw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55D4F107ACF3;
+ Mon, 27 Apr 2020 10:24:22 +0000 (UTC)
+Received: from localhost (ovpn-112-184.ams2.redhat.com [10.36.112.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DCEB127CCA;
+ Mon, 27 Apr 2020 10:24:19 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH 0/3] headers update and virtio-net fixup
+Date: Mon, 27 Apr 2020 12:24:12 +0200
+Message-Id: <20200427102415.10915-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <85cb56a3-882a-05af-5714-e51174aa995a@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=192.55.52.120; envelope-from=yan.y.zhao@intel.com;
- helo=mga04.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 06:19:36
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 192.55.52.120
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 02:05:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,90 +85,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Zeng,
- Xin" <xin.zeng@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Apr 27, 2020 at 05:31:48PM +0800, Philippe Mathieu-Daudé wrote:
-> On 4/27/20 11:15 AM, Yan Zhao wrote:
-> > On Sun, Apr 26, 2020 at 09:04:31AM +0800, Yan Zhao wrote:
-> >> On Sat, Apr 25, 2020 at 06:55:33PM +0800, Paolo Bonzini wrote:
-> >>> On 17/04/20 09:44, Yan Zhao wrote:
-> >>>> for ram device regions, drop guest writes if the regions is read-only.
-> >>>>
-> >>>> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-> >>>> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> >>>> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-> >>>> ---
-> >>>>   memory.c | 7 +++++++
-> >>>>   1 file changed, 7 insertions(+)
-> >>>>
-> >>>> diff --git a/memory.c b/memory.c
-> >>>> index 601b749906..9576dd6807 100644
-> >>>> --- a/memory.c
-> >>>> +++ b/memory.c
-> >>>> @@ -34,6 +34,7 @@
-> >>>>   #include "sysemu/accel.h"
-> >>>>   #include "hw/boards.h"
-> >>>>   #include "migration/vmstate.h"
-> >>>> +#include "qemu/log.h"
-> >>>>   
-> >>>>   //#define DEBUG_UNASSIGNED
-> >>>>   
-> >>>> @@ -1313,6 +1314,12 @@ static void memory_region_ram_device_write(void *opaque, hwaddr addr,
-> >>>>       MemoryRegion *mr = opaque;
-> >>>>   
-> >>>>       trace_memory_region_ram_device_write(get_cpu_index(), mr, addr, data, size);
-> >>>> +    if (mr->readonly) {
-> >>>> +        qemu_log_mask(LOG_GUEST_ERROR,
-> >>>> +                      "Invalid write to read only ram device region 0x%"
-> >>>> +                       HWADDR_PRIx" size %u\n", addr, size);
-> >>>> +        return;
-> >>>> +    }
-> >>>
-> >>> As mentioned in the review of v1, memory_region_ram_device_write should
-> >>> be changed to a .write_with_attrs operation, so that it can return
-> >>> MEMTX_ERROR.
-> >>>
-> > hi Paolo and Alex,
-> > need I also change vfio_region_write() in patch 2 to a .write_with_attrs
-> > operation?
-> > vfio_region_read() is also possible to fail, so should I change it to a
-> > .read_with_attrs, too?
-> 
-> Yes.
-> 
-> Please submit your series as a thread, with a cover letter:
-> https://wiki.qemu.org/Contribute/SubmitAPatch#Include_a_meaningful_cover_letter
->
-hi Philippe
-thanks for pointing out this issue.
-I just realized this version of patches were sent separately, though I did send
-a cover letter. not sure what happened. maybe I just forgot to add an
--in-reply-to before sending out.
-will pay attention to it next time.
+This updates the headers to Linux 5.7-rc3. Doing so exposes
+a problem in virtio-net (the #define for compat covers too much),
+fix it.
 
-Thanks
-Yan
+Note 1: I'd like this to go through s390-next so that I can go
+        ahead with protected virtualization, which needs a headers
+        update.
 
-> > 
-> > Thanks
-> > Yan
-> > 
-> >>> Otherwise this looks good.
-> >>>
-> >> hi Paolo,
-> >> thanks for pointing it out again!
-> >> I didn't get your meaning in v1. will update the patch!
-> >>
-> >> Thanks
-> >> Yan
-> >>>
-> >>
-> > 
-> 
+Note 2: Why has the feature been merged in the first place without the
+        kernel part being upstream yet?
+
+Cornelia Huck (3):
+  virtio-net: fix rsc_ext compat handling
+  linux-headers: update against Linux 5.7-rc3
+  virtio-net: remove VIRTIO_NET_HDR_F_RSC_INFO compat handling
+
+ hw/net/virtio-net.c                           |   8 --
+ include/standard-headers/linux/ethtool.h      |  10 +-
+ .../linux/input-event-codes.h                 |   5 +-
+ include/standard-headers/linux/pci_regs.h     |   2 +
+ include/standard-headers/linux/vhost_types.h  |   8 ++
+ .../standard-headers/linux/virtio_balloon.h   |  12 ++-
+ include/standard-headers/linux/virtio_ids.h   |   1 +
+ include/standard-headers/linux/virtio_net.h   | 102 +++++++++++++++++-
+ linux-headers/COPYING                         |   2 +
+ linux-headers/asm-x86/kvm.h                   |   1 +
+ linux-headers/asm-x86/unistd_32.h             |   1 +
+ linux-headers/asm-x86/unistd_64.h             |   1 +
+ linux-headers/asm-x86/unistd_x32.h            |   1 +
+ linux-headers/linux/kvm.h                     |  47 +++++++-
+ linux-headers/linux/mman.h                    |   5 +-
+ linux-headers/linux/userfaultfd.h             |  40 +++++--
+ linux-headers/linux/vfio.h                    |  37 +++++++
+ linux-headers/linux/vhost.h                   |  24 +++++
+ 18 files changed, 280 insertions(+), 27 deletions(-)
+
+--=20
+2.21.1
+
 
