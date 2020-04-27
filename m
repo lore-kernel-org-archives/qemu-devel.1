@@ -8,85 +8,84 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9013AC55199
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA2AC55199
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:38:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D17F206B6
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:37:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1952A20661
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:38:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l9Zfalrg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D17F206B6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tff9EatI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1952A20661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT0CW-0003Gc-BM
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 05:37:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34338)
+	id 1jT0De-00057n-7N
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 05:38:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zltjiangshi@gmail.com>) id 1jT0BX-0001of-KA
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:36:20 -0400
+ (envelope-from <zltjiangshi@gmail.com>) id 1jT0C9-0003AF-Jq
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:36:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <zltjiangshi@gmail.com>) id 1jT0BW-0006bR-0R
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:36:19 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:41683)
+ (envelope-from <zltjiangshi@gmail.com>) id 1jT0C7-0006ut-QJ
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:36:57 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:32992)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1jT0BV-0006bK-Ii
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:36:17 -0400
-Received: by mail-pf1-x444.google.com with SMTP id 18so7534193pfv.8
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 02:36:17 -0700 (PDT)
+ id 1jT0C6-0006mm-SL
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:36:55 -0400
+Received: by mail-pl1-x641.google.com with SMTP id t7so875671plr.0
+ for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 02:36:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=2jQHxZ8/f0NoNfSO13UzVCQymOvG4pdt/OjX66YQQ0s=;
- b=l9ZfalrgOE4vxv1S4N4WW46K+LSFYXtbItxEyXH5FO+WcQaGq+i2o2OPAwpQJijNyw
- GRE1++9+Q5XtHo0C8Au55YtcGmNJNAyY4zDp3L6xcAbud0w29is9kPWPiFtMWUYjL5ow
- 3oE8Vaf52oC5msijG8jjh9dZxHCNjNiQUqQr/hsvg4UoNVtFQcZJRvO56q0vPHxxWfme
- 0vqwGuFwMeogHRroX+MC7fRQoNzqeJvLbIGVdXbb3Eh9T2r0/KS2LCvdUMFyNkcQM2NP
- WYqWHG1jXm0atU4cZhgAShJlp74whPUW0VtzNmUvQMVc8RtxSZcdGUh9FfvcxQJhZTY0
- RYDQ==
+ bh=Ej+gVO5kChiSjsPJGQly2wjXfc0qRhgD/tkLL8VH9Rg=;
+ b=tff9EatIEsYC7L5WaDTjjTP/cLst0BCzuBu7mx9fB/gBd63JxjJhLsrCrCcTjXMh9X
+ bB25lpjOqasPcFGQ38kZ3DvensW6Mp40s2pDWwNIu3PUGE4xDA4sRDIq3RpDapFPe6x2
+ zaZnGJUTz6aqX3QDZdv8OKT+SLIMhzR/y+fPzqUmHVs4yUe85ByJTUaJqjqE+C+HCeOo
+ eJPP9elBXZgkmUA61/6EYTZRIeTvKh3b7+Fa3cjbMjSWXaBkxistNjr5P24By75/+crD
+ 6J4awdqpvTL+bJjlKyOZMm1omCDpT1wxMlK0EWVxPwpfIPBEKICSQEAolgQHxwoYLyeX
+ DrkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=2jQHxZ8/f0NoNfSO13UzVCQymOvG4pdt/OjX66YQQ0s=;
- b=SS4v86+HDZ/oP6RL7Gp8rtEaJtoePnm24J6wmv/Ce1qxbWqfl8nywbLfOQMv0U6wMa
- 4I32YRbCNn0v97v+eI6aMvyXFKbOv5jMUyHttHnoYUjQqJifpKEstWRkIGXVcMVt40fL
- sYao0SL1IbtYFzp4lFrRddStnhraO3odNZRxvbbuUyVBiWyFXdXofk3b3WWehavqRSZT
- ZROq7dmlqmXEpFvQGzTmeQZ0juuPmhOSnb/gggjcPYwc4hL+AOSWXnreIjvMf6ioxiEr
- kdpehgitbvaL6Odhx/5bFolrZWAwFsCBYFYBK2eFi61e2eZj2J1UJCrUYdKMfYgyKYG7
- ucoQ==
-X-Gm-Message-State: AGi0PubEZA3Cp9yH9VUeQOEWmHCIzQ0xtB58Hhhyho/GdyBfoQqILSlJ
- gPfHXctl4KWIswx9bBlFlfhkvN5khFI=
-X-Google-Smtp-Source: APiQypLcOZnwo4NNFYnHuAXt1F+U4qcuDBbnuYT6KnV0etVj/g26WYjL/I9atudl/vT/oymqa0SScw==
-X-Received: by 2002:a62:32c1:: with SMTP id
- y184mr22071876pfy.306.1587980176061; 
- Mon, 27 Apr 2020 02:36:16 -0700 (PDT)
+ bh=Ej+gVO5kChiSjsPJGQly2wjXfc0qRhgD/tkLL8VH9Rg=;
+ b=sn+fcKpcoSBaaKwm6QCelH1bn7/Bw7pvK7WQVTiOVMR8jA50D+HoNziUV/z+imPvMa
+ OEUcj569okc/o21C2INoFIRQvDD4djCMuEAnGAcCMvX1Wn3yoiNkOeF9RQaEUUyD4als
+ 1Dpg6UmR7kIJOYDGZJoO08kDkFpifxSM06ZHqmtvZ4edCZ92Cb5AzmNnhmHQk2sT6QE7
+ UD59xiLPY5+4R2BG1GQPuDzf0GDuMpdqeCkD9agw9L81Fsd3rotQQS5suMzFWo/PIPl2
+ 89q4SVyJBERAbM2liD/5oUneHk57FN08S75sY3gSPJqMjy/OGblq3Wpdjqii1avEPwkY
+ K0cA==
+X-Gm-Message-State: AGi0PuYwj185yIMX0TCQ0GlqsvZtlcXyR2j55A+LHOBe3Tru3CkAxnft
+ zN7e8ENBFvUBxqzpWHSnNfE=
+X-Google-Smtp-Source: APiQypKrPrbE8txc5VwyPnK7hucUg5ekMGp1wEpS0Nnkfl6JKy1IymajTTWvYSPMCuIFlHx4YBKJsQ==
+X-Received: by 2002:a17:90a:dc01:: with SMTP id
+ i1mr21452276pjv.94.1587980212176; 
+ Mon, 27 Apr 2020 02:36:52 -0700 (PDT)
 Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
  [34.92.144.28])
- by smtp.gmail.com with ESMTPSA id u9sm11333073pfn.197.2020.04.27.02.36.13
+ by smtp.gmail.com with ESMTPSA id u9sm11333073pfn.197.2020.04.27.02.36.49
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 27 Apr 2020 02:36:15 -0700 (PDT)
+ Mon, 27 Apr 2020 02:36:51 -0700 (PDT)
 From: Huacai Chen <zltjiangshi@gmail.com>
 X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
 To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: [PATCH for-5.1 5/7] target/mips: Add more CP0 register for
- save/restore
-Date: Mon, 27 Apr 2020 17:33:13 +0800
-Message-Id: <1587979995-17717-5-git-send-email-chenhc@lemote.com>
+Subject: [PATCH for-5.1 6/7] hw/mips: Add Loongson-3 machine support (with KVM)
+Date: Mon, 27 Apr 2020 17:33:14 +0800
+Message-Id: <1587979995-17717-6-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
 References: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=zltjiangshi@gmail.com; helo=mail-pf1-x444.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pl1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,355 +103,939 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add more CP0 register for save/restore, including: EBase, XContext,
-PageGrain, PWBase, PWSize, PWField, PWCtl, Config*, KScratch1~KScratch6.
+Add Loongson-3 based machine support, it use i8259 as the interrupt
+controler and use GPEX as the pci controller. Currently it can only
+work with KVM, but we will add TCG support in future.
 
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
 Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- target/mips/kvm.c     | 212 ++++++++++++++++++++++++++++++++++++++++++++++++++
- target/mips/machine.c |   2 +
- 2 files changed, 214 insertions(+)
+ default-configs/mips64el-softmmu.mak |   1 +
+ hw/mips/Kconfig                      |  10 +
+ hw/mips/Makefile.objs                |   1 +
+ hw/mips/mips_loongson3.c             | 869 +++++++++++++++++++++++++++++++++++
+ 4 files changed, 881 insertions(+)
+ create mode 100644 hw/mips/mips_loongson3.c
 
-diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-index de3e26e..96cfa10 100644
---- a/target/mips/kvm.c
-+++ b/target/mips/kvm.c
-@@ -245,10 +245,16 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int irq, int level)
-     (KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U64 | (8 * (_R) + (_S)))
+diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips64el-softmmu.mak
+index 8b0c9b1..fc798e4 100644
+--- a/default-configs/mips64el-softmmu.mak
++++ b/default-configs/mips64el-softmmu.mak
+@@ -3,6 +3,7 @@
+ include mips-softmmu-common.mak
+ CONFIG_IDE_VIA=y
+ CONFIG_FULONG=y
++CONFIG_LOONGSON3=y
+ CONFIG_ATI_VGA=y
+ CONFIG_RTL8139_PCI=y
+ CONFIG_JAZZ=y
+diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
+index 2c2adbc..6f16b16 100644
+--- a/hw/mips/Kconfig
++++ b/hw/mips/Kconfig
+@@ -44,6 +44,16 @@ config JAZZ
+ config FULONG
+     bool
  
- #define KVM_REG_MIPS_CP0_INDEX          MIPS_CP0_32(0, 0)
-+#define KVM_REG_MIPS_CP0_RANDOM         MIPS_CP0_32(1, 0)
- #define KVM_REG_MIPS_CP0_CONTEXT        MIPS_CP0_64(4, 0)
- #define KVM_REG_MIPS_CP0_USERLOCAL      MIPS_CP0_64(4, 2)
- #define KVM_REG_MIPS_CP0_PAGEMASK       MIPS_CP0_32(5, 0)
-+#define KVM_REG_MIPS_CP0_PAGEGRAIN      MIPS_CP0_32(5, 1)
-+#define KVM_REG_MIPS_CP0_PWBASE         MIPS_CP0_64(5, 5)
-+#define KVM_REG_MIPS_CP0_PWFIELD        MIPS_CP0_64(5, 6)
-+#define KVM_REG_MIPS_CP0_PWSIZE         MIPS_CP0_64(5, 7)
- #define KVM_REG_MIPS_CP0_WIRED          MIPS_CP0_32(6, 0)
-+#define KVM_REG_MIPS_CP0_PWCTL          MIPS_CP0_32(6, 6)
- #define KVM_REG_MIPS_CP0_HWRENA         MIPS_CP0_32(7, 0)
- #define KVM_REG_MIPS_CP0_BADVADDR       MIPS_CP0_64(8, 0)
- #define KVM_REG_MIPS_CP0_COUNT          MIPS_CP0_32(9, 0)
-@@ -258,13 +264,22 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int irq, int level)
- #define KVM_REG_MIPS_CP0_CAUSE          MIPS_CP0_32(13, 0)
- #define KVM_REG_MIPS_CP0_EPC            MIPS_CP0_64(14, 0)
- #define KVM_REG_MIPS_CP0_PRID           MIPS_CP0_32(15, 0)
-+#define KVM_REG_MIPS_CP0_EBASE          MIPS_CP0_64(15, 1)
- #define KVM_REG_MIPS_CP0_CONFIG         MIPS_CP0_32(16, 0)
- #define KVM_REG_MIPS_CP0_CONFIG1        MIPS_CP0_32(16, 1)
- #define KVM_REG_MIPS_CP0_CONFIG2        MIPS_CP0_32(16, 2)
- #define KVM_REG_MIPS_CP0_CONFIG3        MIPS_CP0_32(16, 3)
- #define KVM_REG_MIPS_CP0_CONFIG4        MIPS_CP0_32(16, 4)
- #define KVM_REG_MIPS_CP0_CONFIG5        MIPS_CP0_32(16, 5)
-+#define KVM_REG_MIPS_CP0_CONFIG6        MIPS_CP0_32(16, 6)
-+#define KVM_REG_MIPS_CP0_XCONTEXT       MIPS_CP0_64(20, 0)
- #define KVM_REG_MIPS_CP0_ERROREPC       MIPS_CP0_64(30, 0)
-+#define KVM_REG_MIPS_CP0_KSCRATCH1      MIPS_CP0_64(31, 2)
-+#define KVM_REG_MIPS_CP0_KSCRATCH2      MIPS_CP0_64(31, 3)
-+#define KVM_REG_MIPS_CP0_KSCRATCH3      MIPS_CP0_64(31, 4)
-+#define KVM_REG_MIPS_CP0_KSCRATCH4      MIPS_CP0_64(31, 5)
-+#define KVM_REG_MIPS_CP0_KSCRATCH5      MIPS_CP0_64(31, 6)
-+#define KVM_REG_MIPS_CP0_KSCRATCH6      MIPS_CP0_64(31, 7)
- 
- static inline int kvm_mips_put_one_reg(CPUState *cs, uint64_t reg_id,
-                                        int32_t *addr)
-@@ -394,6 +409,29 @@ static inline int kvm_mips_get_one_ureg64(CPUState *cs, uint64_t reg_id,
-                                          (1U << CP0C5_UFE) | \
-                                          (1U << CP0C5_FRE) | \
-                                          (1U << CP0C5_UFR))
-+#define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
-+                                         (0x3fU << CP0C6_KPOS) | \
-+                                         (1U << CP0C6_KE) | \
-+                                         (1U << CP0C6_VTLBONLY) | \
-+                                         (1U << CP0C6_LASX) | \
-+                                         (1U << CP0C6_SSEN) | \
-+                                         (1U << CP0C6_DISDRTIME) | \
-+                                         (1U << CP0C6_PIXNUEN) | \
-+                                         (1U << CP0C6_SCRAND) | \
-+                                         (1U << CP0C6_LLEXCEN) | \
-+                                         (1U << CP0C6_DISVC) | \
-+                                         (1U << CP0C6_VCLRU) | \
-+                                         (1U << CP0C6_DCLRU) | \
-+                                         (1U << CP0C6_PIXUEN) | \
-+                                         (1U << CP0C6_DISBLKLYEN) | \
-+                                         (1U << CP0C6_UMEMUALEN) | \
-+                                         (1U << CP0C6_SFBEN) | \
-+                                         (1U << CP0C6_FLTINT) | \
-+                                         (1U << CP0C6_VLTINT) | \
-+                                         (1U << CP0C6_DISBTB) | \
-+                                         (3U << CP0C6_STPREFCTL) | \
-+                                         (1U << CP0C6_INSTPREF) | \
-+                                         (1U << CP0C6_DATAPREF))
- 
- static inline int kvm_mips_change_one_reg(CPUState *cs, uint64_t reg_id,
-                                           int32_t *addr, int32_t mask)
-@@ -729,6 +767,11 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, int level)
-         DPRINTF("%s: Failed to put CP0_INDEX (%d)\n", __func__, err);
-         ret = err;
-     }
-+    err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_RANDOM, &env->CP0_Random);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_RANDOM (%d)\n", __func__, err);
-+        ret = err;
++config LOONGSON3
++    bool
++    select PCKBD
++    select SERIAL
++    select ISA_BUS
++    select PCI_EXPRESS_GENERIC_BRIDGE
++    select VIRTIO_VGA
++    select QXL if SPICE
++    select MSI_NONBROKEN
++
+ config MIPS_CPS
+     bool
+     select PTIMER
+diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
+index 2f7795b..f9bc8f5 100644
+--- a/hw/mips/Makefile.objs
++++ b/hw/mips/Makefile.objs
+@@ -4,5 +4,6 @@ obj-$(CONFIG_MALTA) += gt64xxx_pci.o mips_malta.o
+ obj-$(CONFIG_MIPSSIM) += mips_mipssim.o
+ obj-$(CONFIG_JAZZ) += mips_jazz.o
+ obj-$(CONFIG_FULONG) += mips_fulong2e.o
++obj-$(CONFIG_LOONGSON3) += mips_loongson3.o
+ obj-$(CONFIG_MIPS_CPS) += cps.o
+ obj-$(CONFIG_MIPS_BOSTON) += boston.o
+diff --git a/hw/mips/mips_loongson3.c b/hw/mips/mips_loongson3.c
+new file mode 100644
+index 0000000..a45c9ec
+--- /dev/null
++++ b/hw/mips/mips_loongson3.c
+@@ -0,0 +1,869 @@
++/*
++ * Generic Loongson-3 Platform support
++ *
++ * Copyright (c) 2015-2020 Huacai Chen (chenhc@lemote.com)
++ * This code is licensed under the GNU GPL v2.
++ *
++ * Contributions are licensed under the terms of the GNU GPL,
++ * version 2 or (at your option) any later version.
++ */
++
++/*
++ * Generic PC Platform based on Loongson-3 CPU (MIPS64R2 with extensions,
++ * 800~2000MHz)
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qemu/units.h"
++#include "qapi/error.h"
++#include "cpu.h"
++#include "elf.h"
++#include "hw/boards.h"
++#include "hw/block/flash.h"
++#include "hw/char/serial.h"
++#include "hw/mips/mips.h"
++#include "hw/mips/cpudevs.h"
++#include "hw/intc/i8259.h"
++#include "hw/loader.h"
++#include "hw/ide.h"
++#include "hw/isa/superio.h"
++#include "hw/pci/msi.h"
++#include "hw/pci/pci.h"
++#include "hw/pci/pci_host.h"
++#include "hw/pci-host/gpex.h"
++#include "hw/rtc/mc146818rtc.h"
++#include "net/net.h"
++#include "exec/address-spaces.h"
++#include "sysemu/qtest.h"
++#include "sysemu/reset.h"
++#include "sysemu/runstate.h"
++#include "qemu/log.h"
++#include "qemu/error-report.h"
++
++#define INITRD_OFFSET		0x04000000
++#define BOOTPARAM_ADDR		0x8ff00000
++#define BOOTPARAM_PHYADDR	0x0ff00000
++#define CFG_ADDR 		0x0f100000
++#define FW_CONF_ADDR		0x0fff0000
++#define PM_MMIO_ADDR		0x10080000
++#define PM_MMIO_SIZE		0x100
++#define PM_CNTL_MODE		0x10
++
++#define PHYS_TO_VIRT(x) ((x) | ~(target_ulong)0x7fffffff)
++
++/* Loongson-3 has a 2MB flash rom */
++#define BIOS_SIZE               (2 * MiB)
++#define LOONGSON_MAX_VCPUS      16
++
++#define LOONGSON3_BIOSNAME "bios_loongson3.bin"
++
++#define PCIE_IRQ_BASE	   3
++
++#define VIRT_PCI_IO_BASE    0x18000000ul
++#define VIRT_PCI_IO_SIZE    0x000c0000ul
++#define VIRT_PCI_MEM_BASE   0x40000000ul
++#define VIRT_PCI_MEM_SIZE   0x40000000ul
++#define VIRT_PCI_ECAM_BASE  0x1a000000ul
++#define VIRT_PCI_ECAM_SIZE  0x02000000ul
++
++#define align(x) (((x) + 63) & ~63)
++
++struct efi_memory_map_loongson {
++    uint16_t vers;               /* version of efi_memory_map */
++    uint32_t nr_map;             /* number of memory_maps */
++    uint32_t mem_freq;           /* memory frequence */
++    struct mem_map{
++        uint32_t node_id;        /* node_id which memory attached to */
++        uint32_t mem_type;       /* system memory, pci memory, pci io, etc. */
++        uint64_t mem_start;      /* memory map start address */
++        uint32_t mem_size;       /* each memory_map size, not the total size */
++    } map[128];
++} __attribute__((packed));
++
++enum loongson_cpu_type {
++    Legacy_2E = 0x0,
++    Legacy_2F = 0x1,
++    Legacy_3A = 0x2,
++    Legacy_3B = 0x3,
++    Legacy_1A = 0x4,
++    Legacy_1B = 0x5,
++    Legacy_2G = 0x6,
++    Legacy_2H = 0x7,
++    Loongson_1A = 0x100,
++    Loongson_1B = 0x101,
++    Loongson_2E = 0x200,
++    Loongson_2F = 0x201,
++    Loongson_2G = 0x202,
++    Loongson_2H = 0x203,
++    Loongson_3A = 0x300,
++    Loongson_3B = 0x301
++};
++
++/*
++ * Capability and feature descriptor structure for MIPS CPU
++ */
++struct efi_cpuinfo_loongson {
++    uint16_t vers;               /* version of efi_cpuinfo_loongson */
++    uint32_t processor_id;       /* PRID, e.g. 6305, 6306 */
++    uint32_t cputype;            /* Loongson_3A/3B, etc. */
++    uint32_t total_node;         /* num of total numa nodes */
++    uint16_t cpu_startup_core_id;   /* Boot core id */
++    uint16_t reserved_cores_mask;
++    uint32_t cpu_clock_freq;     /* cpu_clock */
++    uint32_t nr_cpus;
++    char cpuname[64];
++} __attribute__((packed));
++
++#define MAX_UARTS 64
++struct uart_device {
++    uint32_t iotype; /* see include/linux/serial_core.h */
++    uint32_t uartclk;
++    uint32_t int_offset;
++    uint64_t uart_base;
++} __attribute__((packed));
++
++#define MAX_SENSORS 64
++#define SENSOR_TEMPER  0x00000001
++#define SENSOR_VOLTAGE 0x00000002
++#define SENSOR_FAN     0x00000004
++struct sensor_device {
++    char name[32];  /* a formal name */
++    char label[64]; /* a flexible description */
++    uint32_t type;       /* SENSOR_* */
++    uint32_t id;         /* instance id of a sensor-class */
++    uint32_t fan_policy; /* see arch/mips/include/asm/mach-loongson/loongson_hwmon.h */
++    uint32_t fan_percent;/* only for constant speed policy */
++    uint64_t base_addr;  /* base address of device registers */
++} __attribute__((packed));
++
++struct system_loongson {
++    uint16_t vers;               /* version of system_loongson */
++    uint32_t ccnuma_smp;         /* 0: no numa; 1: has numa */
++    uint32_t sing_double_channel;/* 1: single; 2: double */
++    uint32_t nr_uarts;
++    struct uart_device uarts[MAX_UARTS];
++    uint32_t nr_sensors;
++    struct sensor_device sensors[MAX_SENSORS];
++    char has_ec;
++    char ec_name[32];
++    uint64_t ec_base_addr;
++    char has_tcm;
++    char tcm_name[32];
++    uint64_t tcm_base_addr;
++    uint64_t workarounds; /* see workarounds.h */
++    uint64_t of_dtb_addr; /* NULL if not support */
++} __attribute__((packed));
++
++struct irq_source_routing_table {
++    uint16_t vers;
++    uint16_t size;
++    uint16_t rtr_bus;
++    uint16_t rtr_devfn;
++    uint32_t vendor;
++    uint32_t device;
++    uint32_t PIC_type;           /* conform use HT or PCI to route to CPU-PIC */
++    uint64_t ht_int_bit;         /* 3A: 1<<24; 3B: 1<<16 */
++    uint64_t ht_enable;          /* irqs used in this PIC */
++    uint32_t node_id;            /* node id: 0x0-0; 0x1-1; 0x10-2; 0x11-3 */
++    uint64_t pci_mem_start_addr;
++    uint64_t pci_mem_end_addr;
++    uint64_t pci_io_start_addr;
++    uint64_t pci_io_end_addr;
++    uint64_t pci_config_addr;
++    uint16_t dma_mask_bits;
++    uint16_t dma_noncoherent;
++} __attribute__((packed));
++
++struct interface_info {
++    uint16_t vers;               /* version of the specificition */
++    uint16_t size;
++    uint8_t  flag;
++    char description[64];
++} __attribute__((packed));
++
++#define MAX_RESOURCE_NUMBER 128
++struct resource_loongson {
++    uint64_t start;              /* resource start address */
++    uint64_t end;                /* resource end address */
++    char name[64];
++    uint32_t flags;
++};
++
++struct archdev_data {};          /* arch specific additions */
++
++struct board_devices {
++    char name[64];               /* hold the device name */
++    uint32_t num_resources;      /* number of device_resource */
++    /* for each device's resource */
++    struct resource_loongson resource[MAX_RESOURCE_NUMBER];
++    /* arch specific additions */
++    struct archdev_data archdata;
++};
++
++struct loongson_special_attribute {
++    uint16_t vers;               /* version of this special */
++    char special_name[64];       /* special_atribute_name */
++    uint32_t loongson_special_type; /* type of special device */
++    /* for each device's resource */
++    struct resource_loongson resource[MAX_RESOURCE_NUMBER];
++};
++
++struct loongson_params {
++    uint64_t memory_offset;      /* efi_memory_map_loongson struct offset */
++    uint64_t cpu_offset;         /* efi_cpuinfo_loongson struct offset */
++    uint64_t system_offset;      /* system_loongson struct offset */
++    uint64_t irq_offset;         /* irq_source_routing_table struct offset */
++    uint64_t interface_offset;   /* interface_info struct offset */
++    uint64_t special_offset;     /* loongson_special_attribute struct offset */
++    uint64_t boarddev_table_offset;  /* board_devices offset */
++};
++
++struct smbios_tables {
++    uint16_t vers;               /* version of smbios */
++    uint64_t vga_bios;           /* vga_bios address */
++    struct loongson_params lp;
++};
++
++struct efi_reset_system_t {
++    uint64_t ResetCold;
++    uint64_t ResetWarm;
++    uint64_t ResetType;
++    uint64_t Shutdown;
++    uint64_t DoSuspend; /* NULL if not support */
++};
++
++struct efi_loongson {
++    uint64_t mps;                /* MPS table */
++    uint64_t acpi;               /* ACPI table (IA64 ext 0.71) */
++    uint64_t acpi20;             /* ACPI table (ACPI 2.0) */
++    struct smbios_tables smbios; /* SM BIOS table */
++    uint64_t sal_systab;         /* SAL system table */
++    uint64_t boot_info;          /* boot info table */
++};
++
++struct boot_params {
++    struct efi_loongson efi;
++    struct efi_reset_system_t reset_system;
++};
++
++static struct _fw_config {
++    unsigned long ram_size;
++    unsigned int mem_freq;
++    unsigned int nr_cpus;
++    unsigned int cpu_clock_freq;
++} fw_config;
++
++static struct _loaderparams {
++    unsigned long ram_size;
++    const char *kernel_cmdline;
++    const char *kernel_filename;
++    const char *initrd_filename;
++    int64_t kernel_entry;
++    unsigned long a0, a1, a2;
++} loaderparams;
++
++static void *boot_params_p;
++static void *boot_params_buf;
++
++static unsigned int bios_boot_code[] = {
++    0x40086000,   /* mfc0    t0, CP0_STATUS                                        */
++    0x240900E2,   /* li      t1, 0x00e2       #{cu3,cu2,cu1,cu0,status_fr}<={0111} */
++    0x01094025,   /* or      t0, t0, t1                                            */
++    0x40886000,   /* mtc0    t0, CP0_STATUS                                        */
++    0x00000000,
++    0x40086000,   /* mfc0    t0, CP0_STATUS                                        */
++    0x3C090040,   /* lui     t1, 0x40         #bev                                 */
++    0x01094025,   /* or      t0, t0, t1                                            */
++    0x40886000,   /* mtc0    t0, CP0_STATUS                                        */
++    0x00000000,
++    0x40806800,   /* mtc0    zero, CP0_CAUSE                                       */
++    0x00000000,
++    0x400A7801,   /* mfc0    t2, $15, 1                                            */
++    0x314A00FF,   /* andi    t2, 0x0ff                                             */
++    0x3C089000,   /* dli     t0, 0x900000003ff01000                                */
++    0x00084438,
++    0x35083FF0,
++    0x00084438,
++    0x35081000,
++    0x314B0003,   /* andi    t3, t2, 0x3      #local cpuid                         */
++    0x000B5A00,   /* sll     t3, 8                                                 */
++    0x010B4025,   /* or      t0, t0, t3                                            */
++    0x314C000C,   /* andi    t4, t2, 0xc      #node id                             */
++    0x000C62BC,   /* dsll    t4, 42                                                */
++    0x010C4025,   /* or      t0, t0, t4                                            */
++                  /* waitforinit:                                                  */
++    0xDD020020,   /* ld      v0, FN_OFF(t0)   #FN_OFF 0x020                        */
++    0x1040FFFE,   /* beqz    v0, waitforinit                                       */
++    0x00000000,   /* nop                                                           */
++    0xDD1D0028,   /* ld      sp, SP_OFF(t0)   #FN_OFF 0x028                        */
++    0xDD1C0030,   /* ld      gp, GP_OFF(t0)   #FN_OFF 0x030                        */
++    0xDD050038,   /* ld      a1, A1_OFF(t0)   #FN_OFF 0x038                        */
++    0x00400008,   /* jr      v0               #byebye                              */
++    0x00000000,   /* nop                                                           */
++    0x1000FFFF,   /* 1:  b   1b                                                    */
++    0x00000000,   /* nop                                                           */
++
++                  /* Reset                                                         */
++    0x3C0C9000,   /* dli     t0, 0x9000000010080010                                */
++    0x358C0000,
++    0x000C6438,
++    0x358C1008,
++    0x000C6438,
++    0x358C0010,
++    0x240D0000,   /* li      t1, 0x00                                              */
++    0xA18D0000,   /* sb      t1, (t0)                                              */
++    0x1000FFFF,   /* 1:  b   1b                                                    */
++    0x00000000,   /* nop                                                           */
++
++                  /* Shutdown                                                      */
++    0x3C0C9000,   /* dli     t0, 0x9000000010080010                                */
++    0x358C0000,
++    0x000C6438,
++    0x358C1008,
++    0x000C6438,
++    0x358C0010,
++    0x240D00FF,   /* li      t1, 0xff                                              */
++    0xA18D0000,   /* sb      t1, (t0)                                              */
++    0x1000FFFF,   /* 1:  b   1b                                                    */
++    0x00000000    /* nop                                                           */
++};
++
++static uint64_t loongson3_pm_read(void *opaque, hwaddr addr, unsigned size)
++{
++    return 0;
++}
++
++static void loongson3_pm_write(void *opaque, hwaddr addr, uint64_t val,unsigned size)
++{
++    if (addr != PM_CNTL_MODE)
++        return;
++
++    switch (val) {
++    case 0x00:
++        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++        return;
++    case 0xff:
++        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
++        return;
++    default:
++        return;
 +    }
-     err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_CONTEXT,
-                                  &env->CP0_Context);
-     if (err < 0) {
-@@ -747,11 +790,40 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, int level)
-         DPRINTF("%s: Failed to put CP0_PAGEMASK (%d)\n", __func__, err);
-         ret = err;
-     }
-+    err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_PAGEGRAIN,
-+                               &env->CP0_PageGrain);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_PAGEGRAIN (%d)\n", __func__, err);
-+        ret = err;
++}
++
++static const MemoryRegionOps loongson3_pm_ops = {
++    .read  = loongson3_pm_read,
++    .write = loongson3_pm_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static struct efi_memory_map_loongson *init_memory_map(void *g_map)
++{
++    struct efi_memory_map_loongson *emap = g_map;
++
++    emap->nr_map = 2;
++    emap->mem_freq = 300000000;
++
++    emap->map[0].node_id = 0;
++    emap->map[0].mem_type = 1;
++    emap->map[0].mem_start = 0x0;
++    emap->map[0].mem_size = (loaderparams.ram_size > 0x10000000
++                            ? 256 : (loaderparams.ram_size >> 20)) - 16;
++
++    emap->map[1].node_id = 0;
++    emap->map[1].mem_type = 2;
++    emap->map[1].mem_start = 0x90000000;
++    emap->map[1].mem_size = (loaderparams.ram_size > 0x10000000
++                            ? (loaderparams.ram_size >> 20) - 256 : 0);
++
++    return emap;
++}
++
++static int get_host_cpu_freq(void)
++{
++    int fd = 0, freq = 0;
++    char buf[1024], *buf_p;
++
++    if ((fd = open("/proc/cpuinfo", O_RDONLY)) == -1) {
++        fprintf(stderr, "Failed to open /proc/cpuinfo!\n");
++        return 0;
 +    }
-+    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWBASE,
-+                               &env->CP0_PWBase);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_PWBASE (%d)\n", __func__, err);
-+        ret = err;
++
++    if (read(fd, buf, 1024) < 0) {
++        close(fd);
++        fprintf(stderr, "Failed to read /proc/cpuinfo!\n");
++        return 0;
 +    }
-+    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWFIELD,
-+                               &env->CP0_PWField);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_PWField (%d)\n", __func__, err);
-+        ret = err;
++    close(fd);
++
++    buf_p = strstr(buf, "model name");
++    while (*buf_p != '@') buf_p++;
++
++    buf_p += 2;
++    memcpy(buf, buf_p, 12);
++    buf_p = buf;
++    while ((*buf_p >= '0') && (*buf_p <= '9')) buf_p++;
++    *buf_p = '\0';
++
++    freq = atoi(buf);
++
++    return freq * 1000 * 1000;
++}
++
++static struct efi_cpuinfo_loongson *init_cpu_info(void *g_cpuinfo_loongson)
++{
++    struct efi_cpuinfo_loongson *c = g_cpuinfo_loongson;
++
++    c->cputype  = Loongson_3A;
++    c->processor_id = 0x14C000;
++    c->cpu_clock_freq = get_host_cpu_freq();
++    if (!c->cpu_clock_freq)
++        c->cpu_clock_freq = 400000000;
++
++    c->cpu_startup_core_id = 0;
++    c->nr_cpus = current_machine->smp.cpus;
++    c->total_node = (current_machine->smp.cpus + 3) / 4;
++
++    return c;
++}
++
++static struct system_loongson *init_system_loongson(void *g_system)
++{
++    struct system_loongson *s = g_system;
++
++    s->ccnuma_smp = 0;
++    s->sing_double_channel = 1;
++    s->nr_uarts = 1;
++    s->uarts[0].iotype = 2;
++    s->uarts[0].int_offset = 2;
++    s->uarts[0].uartclk = 25000000;
++    s->uarts[0].uart_base = 0x1fe001e0;
++
++    return s;
++}
++
++static struct irq_source_routing_table *init_irq_source(void *g_irq_source)
++{
++    struct irq_source_routing_table *irq_info = g_irq_source;
++
++    irq_info->node_id = 0;
++    irq_info->PIC_type = 0;
++    irq_info->dma_mask_bits = 64;
++    irq_info->pci_mem_start_addr = VIRT_PCI_MEM_BASE;
++    irq_info->pci_mem_end_addr   = VIRT_PCI_MEM_BASE + VIRT_PCI_MEM_SIZE - 1;
++    irq_info->pci_io_start_addr  = VIRT_PCI_IO_BASE;
++
++    return irq_info;
++}
++
++static struct interface_info *init_interface_info(void *g_interface)
++{
++    struct interface_info *interface = g_interface;
++
++    interface->vers = 0x01;
++    strcpy(interface->description, "UEFI_Version_v1.0");
++
++    return interface;
++}
++
++static struct board_devices *board_devices_info(void *g_board)
++{
++    struct board_devices *bd = g_board;
++
++    strcpy(bd->name, "Loongson-3A-VIRT-1w-V1.00-demo");
++
++    return bd;
++}
++
++static struct loongson_special_attribute *init_special_info(void *g_special)
++{
++    struct loongson_special_attribute *special = g_special;
++
++    strcpy(special->special_name, "2015-04-17");
++
++    return special;
++}
++
++static void init_loongson_params(struct loongson_params *lp)
++{
++    void *p = boot_params_p;
++
++    lp->memory_offset = (unsigned long long)init_memory_map(p)
++                        - (unsigned long long)lp;
++    p += align(sizeof(struct efi_memory_map_loongson));
++
++    lp->cpu_offset = (unsigned long long)init_cpu_info(p)
++                     - (unsigned long long)lp;
++    p += align(sizeof(struct efi_cpuinfo_loongson));
++
++    lp->system_offset = (unsigned long long)init_system_loongson(p)
++                        - (unsigned long long)lp;
++    p += align(sizeof(struct system_loongson));
++
++    lp->irq_offset = (unsigned long long)init_irq_source(p)
++                     - (unsigned long long)lp;
++    p += align(sizeof(struct irq_source_routing_table));
++
++    lp->interface_offset = (unsigned long long)init_interface_info(p)
++                           - (unsigned long long)lp;
++    p += align(sizeof(struct interface_info));
++
++    lp->boarddev_table_offset = (unsigned long long)board_devices_info(p)
++                                - (unsigned long long)lp;
++    p+= align(sizeof(struct board_devices));
++
++    lp->special_offset = (unsigned long long)init_special_info(p)
++                         - (unsigned long long)lp;
++    p+= align(sizeof(struct loongson_special_attribute));
++
++    boot_params_p = p;
++}
++
++static void init_smbios(struct smbios_tables *smbios)
++{
++    smbios->vers = 1;
++    init_loongson_params(&(smbios->lp));
++}
++
++static void init_efi(struct efi_loongson *efi)
++{
++    init_smbios(&(efi->smbios));
++}
++
++static void init_reset_system(struct efi_reset_system_t *reset)
++{
++    reset->Shutdown = 0xffffffffbfc000b0;
++    reset->ResetCold = 0xffffffffbfc00088;
++    reset->ResetWarm = 0xffffffffbfc00088;
++}
++
++static int init_boot_param(struct boot_params *bp)
++{
++    init_efi(&(bp->efi));
++    init_reset_system(&(bp->reset_system));
++
++    return 0;
++}
++
++static void fw_cfg_boot_set(void *opaque, const char *boot_device,
++                            Error **errp)
++{
++    fw_cfg_modify_i16(opaque, FW_CFG_BOOT_DEVICE, boot_device[0]);
++}
++
++static void fw_conf_init(unsigned long ram_size)
++{
++    FWCfgState *fw_cfg;
++
++    fw_cfg = fw_cfg_init_mem_wide(CFG_ADDR, CFG_ADDR + 8, 8, 0, NULL);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)current_machine->smp.cpus);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)current_machine->smp.max_cpus);
++    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
++    qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
++
++    fw_config.ram_size = ram_size;
++    fw_config.mem_freq = 300000000;
++    fw_config.nr_cpus = current_machine->smp.cpus;
++    fw_config.cpu_clock_freq = get_host_cpu_freq();
++}
++
++static int set_prom_bootparam(ram_addr_t initrd_offset, long initrd_size)
++{
++    long params_size;
++    char memenv[32];
++    char highmemenv[32];
++    void *params_buf;
++    unsigned int *parg_env;
++    int ret = 0;
++
++    /* Allocate params_buf for command line. */
++    params_size = 0x100000;
++    params_buf = g_malloc0(params_size);
++
++    /*
++     * Layout of params_buf looks like this:
++     * argv[0], argv[1], 0, env[0], env[1], ... env[i], 0,
++     * argv[0]'s data, argv[1]'s data, env[0]'data, ..., env[i]'s data, 0
++     */
++    parg_env = (void *)params_buf;
++
++    ret = (3 + 1) * 4;
++    *parg_env++ = (BOOTPARAM_ADDR + ret);
++    ret += (1 + snprintf(params_buf + ret, 256 - ret, "g"));
++
++    /* argv1 */
++    *parg_env++ = BOOTPARAM_ADDR + ret;
++    if (initrd_size > 0)
++        ret += (1 + snprintf(params_buf + ret, 256 - ret,
++                "rd_start=0x" TARGET_FMT_lx " rd_size=%li %s",
++                PHYS_TO_VIRT((uint32_t)initrd_offset),
++                initrd_size, loaderparams.kernel_cmdline));
++    else
++        ret += (1 + snprintf(params_buf+ret, 256 - ret, "%s",
++                loaderparams.kernel_cmdline));
++
++    /* argv2 */
++    *parg_env++ = BOOTPARAM_ADDR + 4*ret;
++
++    /* env */
++    sprintf(memenv, "%ld", loaderparams.ram_size > 0x10000000
++            ? 256 : (loaderparams.ram_size >> 20));
++    sprintf(highmemenv, "%ld", loaderparams.ram_size > 0x10000000
++            ? (loaderparams.ram_size >> 20) - 256 : 0);
++
++    setenv("memsize", memenv, 1);
++    setenv("highmemsize", highmemenv, 1);
++
++    ret = ((ret + 32) & ~31);
++
++    boot_params_buf = (void *)(params_buf + ret);
++    boot_params_p = boot_params_buf + align(sizeof(struct boot_params));
++
++    init_boot_param(boot_params_buf);
++
++    rom_add_blob_fixed("params", params_buf, params_size,
++                       BOOTPARAM_PHYADDR);
++    loaderparams.a0 = 2;
++    loaderparams.a1 = 0xffffffff80000000ULL + BOOTPARAM_PHYADDR;
++    loaderparams.a2 = 0xffffffff80000000ULL + BOOTPARAM_PHYADDR + ret;
++
++    return 0;
++}
++
++static int64_t load_kernel(CPUMIPSState *env)
++{
++    long kernel_size;
++    ram_addr_t initrd_offset;
++    int64_t kernel_entry, kernel_low, kernel_high, initrd_size;
++
++    kernel_size = load_elf(loaderparams.kernel_filename, NULL,
++                           cpu_mips_kseg0_to_phys, NULL,
++                           (uint64_t *)&kernel_entry,
++                           (uint64_t *)&kernel_low, (uint64_t *)&kernel_high,
++                           NULL, 0, EM_MIPS, 1, 0);
++    if (kernel_size < 0) {
++        error_report("could not load kernel '%s': %s",
++                     loaderparams.kernel_filename,
++                     load_elf_strerror(kernel_size));
++        exit(1);
 +    }
-+    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWSIZE,
-+                               &env->CP0_PWSize);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_PWSIZE (%d)\n", __func__, err);
-+        ret = err;
++
++    /* load initrd */
++    initrd_size = 0;
++    initrd_offset = 0;
++    if (loaderparams.initrd_filename) {
++        initrd_size = get_image_size(loaderparams.initrd_filename);
++        if (initrd_size > 0) {
++            initrd_offset = (kernel_high + ~INITRD_PAGE_MASK) &
++                            INITRD_PAGE_MASK;
++            initrd_offset = MAX(initrd_offset, INITRD_OFFSET);
++
++            if (initrd_offset + initrd_size > ram_size) {
++                error_report("memory too small for initial ram disk '%s'",
++                             loaderparams.initrd_filename);
++                exit(1);
++            }
++
++            initrd_size = load_image_targphys(loaderparams.initrd_filename,
++                                              initrd_offset,
++                                              ram_size - initrd_offset);
++        }
++
++        if (initrd_size == (target_ulong) -1) {
++            error_report("could not load initial ram disk '%s'",
++                         loaderparams.initrd_filename);
++            exit(1);
++        }
 +    }
-     err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_WIRED, &env->CP0_Wired);
-     if (err < 0) {
-         DPRINTF("%s: Failed to put CP0_WIRED (%d)\n", __func__, err);
-         ret = err;
-     }
-+    err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_PWCTL, &env->CP0_PWCtl);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_PWCTL (%d)\n", __func__, err);
-+        ret = err;
++
++    /* Setup prom parameters. */
++    set_prom_bootparam(initrd_offset, initrd_size);
++
++    return kernel_entry;
++}
++
++static void main_cpu_reset(void *opaque)
++{
++    MIPSCPU *cpu = opaque;
++    CPUMIPSState *env = &cpu->env;
++
++    cpu_reset(CPU(cpu));
++
++    /* Loongson-3 reset stuff */
++    if (loaderparams.kernel_filename) {
++        if (cpu == MIPS_CPU(first_cpu)) {
++            env->active_tc.gpr[4] = loaderparams.a0;
++            env->active_tc.gpr[5] = loaderparams.a1;
++            env->active_tc.gpr[6] = loaderparams.a2;
++            env->active_tc.PC = loaderparams.kernel_entry;
++        }
++        env->CP0_Status &= ~((1 << CP0St_BEV) | (1 << CP0St_ERL));
 +    }
-     err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_HWRENA, &env->CP0_HWREna);
-     if (err < 0) {
-         DPRINTF("%s: Failed to put CP0_HWRENA (%d)\n", __func__, err);
-@@ -799,6 +871,11 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, int level)
-         DPRINTF("%s: Failed to put CP0_PRID (%d)\n", __func__, err);
-         ret = err;
-     }
-+    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_EBASE, &env->CP0_EBase);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_EBASE (%d)\n", __func__, err);
-+        ret = err;
++}
++
++static void loongson3_isa_init(qemu_irq intc)
++{
++    qemu_irq *i8259;
++    ISABus *isa_bus;
++
++    isa_bus = isa_bus_new(NULL, get_system_memory(), get_system_io(), &error_abort);
++
++    /* Interrupt controller */
++    /* The 8259 -> IP3  */
++    i8259 = i8259_init(isa_bus, intc);
++    isa_bus_irqs(isa_bus, i8259);
++    /* init other devices */
++    isa_create_simple(isa_bus, "i8042");
++    mc146818_rtc_init(isa_bus, 2000, NULL);
++}
++
++static inline void loongson3_pcie_init(MachineState *machine, DeviceState *pic)
++{
++    int i;
++    qemu_irq irq;
++    PCIBus *pci_bus;
++    DeviceState *dev;
++    MemoryRegion *pio_alias;
++    MemoryRegion *mmio_alias, *mmio_reg;
++    MemoryRegion *ecam_alias, *ecam_reg;
++
++    dev = qdev_create(NULL, TYPE_GPEX_HOST);
++
++    qdev_init_nofail(dev);
++    pci_bus = PCI_HOST_BRIDGE(dev)->bus;
++
++    ecam_alias = g_new0(MemoryRegion, 1);
++    ecam_reg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
++    memory_region_init_alias(ecam_alias, OBJECT(dev), "pcie-ecam",
++                             ecam_reg, 0, VIRT_PCI_ECAM_SIZE);
++    memory_region_add_subregion(get_system_memory(), VIRT_PCI_ECAM_BASE, ecam_alias);
++
++    mmio_alias = g_new0(MemoryRegion, 1);
++    mmio_reg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 1);
++    memory_region_init_alias(mmio_alias, OBJECT(dev), "pcie-mmio",
++                             mmio_reg, VIRT_PCI_MEM_BASE, VIRT_PCI_MEM_SIZE);
++    memory_region_add_subregion(get_system_memory(), VIRT_PCI_MEM_BASE, mmio_alias);
++
++    pio_alias = g_new0(MemoryRegion, 1);
++    memory_region_init_alias(pio_alias, OBJECT(dev), "pcie-pio",
++                             get_system_io(), 0, VIRT_PCI_IO_SIZE);
++    memory_region_add_subregion(get_system_memory(), VIRT_PCI_IO_BASE, pio_alias);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 2, VIRT_PCI_IO_BASE);
++
++    for (i = 0; i < GPEX_NUM_IRQS; i++) {
++        irq = qdev_get_gpio_in(pic, PCIE_IRQ_BASE + i);
++        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, irq);
++        gpex_set_irq_num(GPEX_HOST(dev), i, PCIE_IRQ_BASE + i);
 +    }
-     err = kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG,
-                                   &env->CP0_Config0,
-                                   KVM_REG_MIPS_CP0_CONFIG_MASK);
-@@ -841,12 +918,61 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, int level)
-         DPRINTF("%s: Failed to change CP0_CONFIG5 (%d)\n", __func__, err);
-         ret = err;
-     }
-+    err = kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG6,
-+                                  &env->CP0_Config6,
-+                                  KVM_REG_MIPS_CP0_CONFIG6_MASK);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to change CP0_CONFIG6 (%d)\n", __func__, err);
-+        ret = err;
++
++    pci_vga_init(pci_bus);
++
++    for(i = 0; i < nb_nics; i++) {
++        NICInfo *nd = &nd_table[i];
++
++        if (!nd->model)
++            nd->model = g_strdup("virtio");
++
++        pci_nic_init_nofail(nd, pci_bus, nd->model, NULL);
 +    }
-+    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_XCONTEXT,
-+                                 &env->CP0_XContext);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_XCONTEXT (%d)\n", __func__, err);
-+        ret = err;
++}
++
++static void mips_loongson3_init(MachineState *machine)
++{
++    int i;
++    long bios_size;
++    MIPSCPU *cpu;
++    CPUMIPSState *env;
++    char *filename;
++    const char *kernel_cmdline = machine->kernel_cmdline;
++    const char *kernel_filename = machine->kernel_filename;
++    const char *initrd_filename = machine->initrd_filename;
++    ram_addr_t ram_size = machine->ram_size;
++    MemoryRegion *address_space_mem = get_system_memory();
++    MemoryRegion *ram = g_new(MemoryRegion, 1);
++    MemoryRegion *bios = g_new(MemoryRegion, 1);
++    MemoryRegion *iomem = g_new(MemoryRegion, 1);
++
++    if (ram_size < 256 * 0x100000) {
++        error_report("Loongson-3 need at least 256MB memory");
++        exit(1);
 +    }
-     err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_ERROREPC,
-                                  &env->CP0_ErrorEPC);
-     if (err < 0) {
-         DPRINTF("%s: Failed to put CP0_ERROREPC (%d)\n", __func__, err);
-         ret = err;
-     }
-+    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH1,
-+                                 &env->CP0_KScratch[0]);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_KSCRATCH1 (%d)\n", __func__, err);
-+        ret = err;
++
++    for (i = 0; i < machine->smp.cpus; i++) {
++        /* init CPUs */
++        cpu = MIPS_CPU(cpu_create(machine->cpu_type));
++
++        /* Init internal devices */
++        cpu_mips_irq_init_cpu(cpu);
++        cpu_mips_clock_init(cpu);
++        qemu_register_reset(main_cpu_reset, cpu);
 +    }
-+    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH2,
-+                                 &env->CP0_KScratch[1]);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_KSCRATCH2 (%d)\n", __func__, err);
-+        ret = err;
++    env = &MIPS_CPU(first_cpu)->env;
++
++    /* Allocate RAM/BIOS, 0x00000000~0x10000000 is alias of 0x80000000~0x90000000 */
++    memory_region_init_rom(bios, NULL, "loongson3.bios", BIOS_SIZE, &error_fatal);
++    memory_region_init_alias(ram, NULL, "loongson3.lowram", machine->ram, 0, 256 * 0x100000);
++    memory_region_init_io(iomem, NULL, &loongson3_pm_ops, NULL, "loongson3_pm", PM_MMIO_SIZE);
++
++    memory_region_add_subregion(address_space_mem, 0x00000000LL, ram);
++    memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
++    memory_region_add_subregion(address_space_mem, 0x80000000LL, machine->ram);
++    memory_region_add_subregion(address_space_mem, PM_MMIO_ADDR, iomem);
++
++    /*
++     * We do not support flash operation, just loading pmon.bin as raw BIOS.
++     * Please use -L to set the BIOS path and -bios to set bios name.
++     */
++
++    if (kernel_filename) {
++        loaderparams.ram_size = ram_size;
++        loaderparams.kernel_filename = kernel_filename;
++        loaderparams.kernel_cmdline = kernel_cmdline;
++        loaderparams.initrd_filename = initrd_filename;
++        loaderparams.kernel_entry = load_kernel(env);
++        rom_add_blob_fixed("bios", bios_boot_code, sizeof(bios_boot_code), 0x1fc00000LL);
++    } else {
++        if (bios_name == NULL) {
++                bios_name = LOONGSON3_BIOSNAME;
++        }
++        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
++        if (filename) {
++            bios_size = load_image_targphys(filename, 0x1fc00000LL,
++                                            BIOS_SIZE);
++            g_free(filename);
++        } else {
++            bios_size = -1;
++        }
++
++        if ((bios_size < 0 || bios_size > BIOS_SIZE) &&
++            !kernel_filename && !qtest_enabled()) {
++            error_report("Could not load MIPS bios '%s'", bios_name);
++            exit(1);
++        }
++
++        fw_conf_init(ram_size);
++        rom_add_blob_fixed("fw_conf", (void*)&fw_config, sizeof(fw_config), FW_CONF_ADDR);
 +    }
-+    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH3,
-+                                 &env->CP0_KScratch[2]);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_KSCRATCH3 (%d)\n", __func__, err);
-+        ret = err;
-+    }
-+    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH4,
-+                                 &env->CP0_KScratch[3]);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_KSCRATCH4 (%d)\n", __func__, err);
-+        ret = err;
-+    }
-+    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH5,
-+                                 &env->CP0_KScratch[4]);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_KSCRATCH5 (%d)\n", __func__, err);
-+        ret = err;
-+    }
-+    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH6,
-+                                 &env->CP0_KScratch[5]);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to put CP0_KSCRATCH6 (%d)\n", __func__, err);
-+        ret = err;
-+    }
- 
-     return ret;
- }
-@@ -862,6 +988,11 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
-         DPRINTF("%s: Failed to get CP0_INDEX (%d)\n", __func__, err);
-         ret = err;
-     }
-+    err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_RANDOM, &env->CP0_Random);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_RANDOM (%d)\n", __func__, err);
-+        ret = err;
-+    }
-     err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_CONTEXT,
-                                  &env->CP0_Context);
-     if (err < 0) {
-@@ -880,11 +1011,40 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
-         DPRINTF("%s: Failed to get CP0_PAGEMASK (%d)\n", __func__, err);
-         ret = err;
-     }
-+    err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_PAGEGRAIN,
-+                               &env->CP0_PageGrain);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_PAGEGRAIN (%d)\n", __func__, err);
-+        ret = err;
-+    }
-+    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWBASE,
-+                               &env->CP0_PWBase);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_PWBASE (%d)\n", __func__, err);
-+        ret = err;
-+    }
-+    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWFIELD,
-+                               &env->CP0_PWField);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_PWFIELD (%d)\n", __func__, err);
-+        ret = err;
-+    }
-+    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWSIZE,
-+                               &env->CP0_PWSize);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_PWSIZE (%d)\n", __func__, err);
-+        ret = err;
-+    }
-     err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_WIRED, &env->CP0_Wired);
-     if (err < 0) {
-         DPRINTF("%s: Failed to get CP0_WIRED (%d)\n", __func__, err);
-         ret = err;
-     }
-+    err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_PWCTL, &env->CP0_PWCtl);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_PWCtl (%d)\n", __func__, err);
-+        ret = err;
-+    }
-     err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_HWRENA, &env->CP0_HWREna);
-     if (err < 0) {
-         DPRINTF("%s: Failed to get CP0_HWRENA (%d)\n", __func__, err);
-@@ -932,6 +1092,11 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
-         DPRINTF("%s: Failed to get CP0_PRID (%d)\n", __func__, err);
-         ret = err;
-     }
-+    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_EBASE, &env->CP0_EBase);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_EBASE (%d)\n", __func__, err);
-+        ret = err;
-+    }
-     err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG, &env->CP0_Config0);
-     if (err < 0) {
-         DPRINTF("%s: Failed to get CP0_CONFIG (%d)\n", __func__, err);
-@@ -962,12 +1127,59 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
-         DPRINTF("%s: Failed to get CP0_CONFIG5 (%d)\n", __func__, err);
-         ret = err;
-     }
-+    err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG6, &env->CP0_Config6);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_CONFIG6 (%d)\n", __func__, err);
-+        ret = err;
-+    }
-+    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_XCONTEXT,
-+                                 &env->CP0_XContext);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_XCONTEXT (%d)\n", __func__, err);
-+        ret = err;
-+    }
-     err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_ERROREPC,
-                                  &env->CP0_ErrorEPC);
-     if (err < 0) {
-         DPRINTF("%s: Failed to get CP0_ERROREPC (%d)\n", __func__, err);
-         ret = err;
-     }
-+    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH1,
-+                                 &env->CP0_KScratch[0]);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_KSCRATCH1 (%d)\n", __func__, err);
-+        ret = err;
-+    }
-+    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH2,
-+                                 &env->CP0_KScratch[1]);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_KSCRATCH2 (%d)\n", __func__, err);
-+        ret = err;
-+    }
-+    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH3,
-+                                 &env->CP0_KScratch[2]);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_KSCRATCH3 (%d)\n", __func__, err);
-+        ret = err;
-+    }
-+    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH4,
-+                                 &env->CP0_KScratch[3]);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_KSCRATCH4 (%d)\n", __func__, err);
-+        ret = err;
-+    }
-+    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH5,
-+                                 &env->CP0_KScratch[4]);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_KSCRATCH5 (%d)\n", __func__, err);
-+        ret = err;
-+    }
-+    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH6,
-+                                 &env->CP0_KScratch[5]);
-+    if (err < 0) {
-+        DPRINTF("%s: Failed to get CP0_KSCRATCH6 (%d)\n", __func__, err);
-+        ret = err;
-+    }
- 
-     return ret;
- }
-diff --git a/target/mips/machine.c b/target/mips/machine.c
-index 8d5b18b..a84aefc 100644
---- a/target/mips/machine.c
-+++ b/target/mips/machine.c
-@@ -289,6 +289,8 @@ const VMStateDescription vmstate_mips_cpu = {
-         VMSTATE_INT32(env.CP0_Config1, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Config2, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Config3, MIPSCPU),
-+        VMSTATE_INT32(env.CP0_Config4, MIPSCPU),
-+        VMSTATE_INT32(env.CP0_Config5, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Config6, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Config7, MIPSCPU),
-         VMSTATE_UINT64(env.CP0_LLAddr, MIPSCPU),
++
++    msi_nonbroken = true;
++    loongson3_isa_init(env->irq[3]);
++    loongson3_pcie_init(machine, isa_pic);
++
++    if (serial_hd(0))
++        serial_mm_init(address_space_mem, 0x1fe001e0, 0, env->irq[2], 115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
++}
++
++static void mips_loongson3_machine_init(MachineClass *mc)
++{
++    mc->desc = "Generic Loongson-3 Platform";
++    mc->init = mips_loongson3_init;
++    mc->block_default_type = IF_IDE;
++    mc->max_cpus = LOONGSON_MAX_VCPUS;
++    mc->default_cpu_type = MIPS_CPU_TYPE_NAME("Loongson-3A");
++    mc->default_ram_id = "loongson3.highram";
++    mc->default_ram_size = 784 * MiB;
++    mc->kvm_type = mips_kvm_type;
++    mc->minimum_page_bits = 14;
++}
++
++DEFINE_MACHINE("loongson3", mips_loongson3_machine_init)
 -- 
 2.7.0
 
