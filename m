@@ -2,116 +2,130 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAC9DC54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 07:54:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A824C54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:03:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D2CC20728
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 07:54:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D2CC20728
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 52D4C2078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:03:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YvfYhJcv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52D4C2078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSybS-0004F7-NC
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 03:54:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41344)
+	id 1jSyjt-0007gh-FK
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 04:03:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42166)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jSyaY-0003UN-B6
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 03:54:02 -0400
+ (envelope-from <david@redhat.com>) id 1jSyif-0006t7-R1
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:02:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jSyaU-0006mt-Oc
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 03:54:02 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:54205)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jSyaU-0006mm-65
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 03:53:58 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MRBWU-1jnxNo42h2-00N928; Mon, 27 Apr 2020 09:53:49 +0200
-To: frederic.konrad@adacore.com
-References: <1587391275-12748-1-git-send-email-frederic.konrad@adacore.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH v1] target/m68k: fix gdb for m68xxx
-Message-ID: <41ff1564-36ee-1028-b377-9bf9a82de689@vivier.eu>
-Date: Mon, 27 Apr 2020 09:53:47 +0200
+ (envelope-from <david@redhat.com>) id 1jSyie-00041d-WB
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:02:25 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31421
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jSyie-00041P-CV
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:02:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587974542;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=G0UYXSlLdf99Xqgjj7u8q3PxYAWQagBhfL013+x8aho=;
+ b=YvfYhJcvUlH5Nnhfmj8U00i5+o/CImkDUw3LcK9p56oKyGkUZvn9FWxmeQbbHKHqaimvrU
+ z3MFxMwEtRE4ZshNe1OJi2mmXZUk/YZc8TQ65bamZhgZoad6EUmbZGa8bbOgLCjHdmanZE
+ TM8dLvaCxlnSmueeQkVlNT2gKYUkJuU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-442-Ksk_S8ptOUWqI1h_KsWPZg-1; Mon, 27 Apr 2020 04:02:18 -0400
+X-MC-Unique: Ksk_S8ptOUWqI1h_KsWPZg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A8B0800685
+ for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 08:02:18 +0000 (UTC)
+Received: from [10.36.114.127] (ovpn-114-127.ams2.redhat.com [10.36.114.127])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F24D660C84;
+ Mon, 27 Apr 2020 08:02:16 +0000 (UTC)
+Subject: Re: [PATCH 03/11] s390x/cpumodel: Fix harmless misuse of
+ visit_check_struct()
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200424192027.11404-1-armbru@redhat.com>
+ <20200424192027.11404-4-armbru@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <57392357-7422-180f-d965-3f7bf3e657c2@redhat.com>
+Date: Mon, 27 Apr 2020 10:02:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <1587391275-12748-1-git-send-email-frederic.konrad@adacore.com>
+In-Reply-To: <20200424192027.11404-4-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:BnOnwmftiJbtC8SZd6kilmZCjR8QoldIMTwoDRW4ZwrTX7W63q7
- P9Y1gcHV4KisjoVd1GTpfRpIzYv8OTUjWowTnfr1P95S0/qGFh7UAQXg4e2lpKp0cMBT+5D
- d5cfz1JNKlXN6/Bf5e9NvCF9HoMWrYBLL079qE6gRBY6DPlrL4AK6OlQ58m3V06BDEMos+X
- 5fkrFYed4IQC1V40kQXaQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:NhLErODbXrc=:Ufyw2KOE9vSFV5e7GSZrg6
- Z/Aa5dzNIyoU5liNV/Rvw/q0/RmRncxIRuHFrqfc2hBQufgGJUYIaht1sM5VGqz86P9AUJb0X
- J1FU9s0iUTOWofKu4WtSJu0yIThJQQiSEc2iF2A+mAF0VJN0gKHFY4dAiVpP6kZSI/cCE4ktD
- xY7MqlDk1ZCCXQdzUwys2nQ6NZu2kCDc6iN+03uBNPf1CYJCwba6zG/SNkTnoqT2t0B8zBBkW
- vc5xHoYH1SXUpAE0lucoXPaYs9PrsPtcqrRqz/S/2gSDcIM8oZZpoy7eai2qlXMRnnEljcbjX
- hlAe8h0vTsOgEiGvepRm3EnKg7IbI0x1k7K/SHVS4gYPn6GHBiIJgGgNcM+MTX0SH6D3U7q61
- DvbDK0ZqsYHYZuITFoTfLAJwO2u4yX7LTX4gghGKcqlfn1FxUH3wo4LMs4t3ytDolWGGIYBYP
- a0eghhMxCauL7+eqj31/80Z5nVxKoQ3XADK39P/1aNrimdfDxbK7fghuthd+ehfXkLNtUSxro
- pV9W6/3/q8vFWvsYpDIr8wx3x+3gYc9oRXkT+wVwsHWlrD1s/HHvtJz3DNZF5wLEXPI1nZW9W
- Lcc5/P+TUm6fMAuWnauO1SZCuZsABgS+fhdPv9hb2F+4/ikXK8e10M2p0P/8GGSqBt02OPh9C
- L8xFfown0xoOUtQTZYd9nQClrdWxnBvvJ/2s8Des1XwG8qUjS3rjVuW0dLLi6eCpx440EFHM9
- V3FEzfDhobwarAMVNWHt1dBX6ayz8u+3B5iFGoE1AbwiBFS9jeJwhKgs9uoT8ZfCY6OVf3/HU
- BZXCdb6mgFiS5UTxAQHXxMMHrfO83XSxObQUUQO+hw+Bmd2qxBghSFeqtD7NfiSgl/UdI0q
-Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 03:53:55
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 23:32:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,160 +137,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: huth@tuxfamily.org, alex.bennee@linaro.org, f4bug@amsat.org,
- qemu-devel@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- pierre@freepascal.org
+Cc: Cornelia Huck <cohuck@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 20/04/2020 à 16:01, frederic.konrad@adacore.com a écrit :
-> From: KONRAD Frederic <frederic.konrad@adacore.com>
-> 
-> Currently "cf-core.xml" is sent to GDB when using any m68k flavor.  Thing is
-> it uses the "org.gnu.gdb.coldfire.core" feature name and gdb 8.3 then expects
-> a coldfire FPU instead of the default m68881 FPU.
-> 
-> This is not OK because the m68881 floats registers are 96 bits wide so it
-> crashes GDB with the following error message:
-> 
-> (gdb) target remote localhost:7960
-> Remote debugging using localhost:7960
-> warning: Register "fp0" has an unsupported size (96 bits)
-> warning: Register "fp1" has an unsupported size (96 bits)
-> ...
-> Remote 'g' packet reply is too long (expected 148 bytes, got 180 bytes):    \
->   00000000000[...]0000
-> 
-> With this patch: qemu-system-m68k -M none -cpu m68020 -s -S
-> 
-> (gdb) tar rem :1234
-> Remote debugging using :1234
-> warning: No executable has been specified and target does not support
-> determining executable automatically.  Try using the "file" command.
-> 0x00000000 in ?? ()
-> (gdb) p $fp0
-> $1 = nan(0xffffffffffffffff)
-> 
-> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+On 24.04.20 21:20, Markus Armbruster wrote:
+> Commit e47970f51d "s390x/cpumodel: Fix query-cpu-model-FOO error API
+> violations" neglected to change visit_end_struct()'s Error ** argument
+> along with the others.  If visit_end_struct() failed, we'd take the
+
+s/visit_end_struct/visit_check_struct/ ?
+
+> success path.  Fortunately, it can't fail here:
+> qobject_input_check_struct() checks we consumed the whole dictionary,
+> and to get here, we did.  Fix it anyway.
+
+AFAIKs, if visit_check_struct() failed, we'd still do the memcopy, but
+also report the error. Not nice, not bad.
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+>=20
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  configure             |  2 +-
->  gdb-xml/m68k-core.xml | 29 +++++++++++++++++++++++++++++
->  target/m68k/cpu.c     | 30 +++++++++++++++++++++++++-----
->  3 files changed, 55 insertions(+), 6 deletions(-)
->  create mode 100644 gdb-xml/m68k-core.xml
-> 
-> diff --git a/configure b/configure
-> index 23b5e93..2b07b85 100755
-> --- a/configure
-> +++ b/configure
-> @@ -7825,7 +7825,7 @@ case "$target_name" in
->    ;;
->    m68k)
->      bflt="yes"
-> -    gdb_xml_files="cf-core.xml cf-fp.xml m68k-fp.xml"
-> +    gdb_xml_files="cf-core.xml cf-fp.xml m68k-core.xml m68k-fp.xml"
->      TARGET_SYSTBL_ABI=common
->    ;;
->    microblaze|microblazeel)
-> diff --git a/gdb-xml/m68k-core.xml b/gdb-xml/m68k-core.xml
-> new file mode 100644
-> index 0000000..5b092d2
-> --- /dev/null
-> +++ b/gdb-xml/m68k-core.xml
-> @@ -0,0 +1,29 @@
-> +<?xml version="1.0"?>
-> +<!-- Copyright (C) 2008 Free Software Foundation, Inc.
-> +
-> +     Copying and distribution of this file, with or without modification,
-> +     are permitted in any medium without royalty provided the copyright
-> +     notice and this notice are preserved.  -->
-> +<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-> +<feature name="org.gnu.gdb.m68k.core">
-> +  <reg name="d0" bitsize="32"/>
-> +  <reg name="d1" bitsize="32"/>
-> +  <reg name="d2" bitsize="32"/>
-> +  <reg name="d3" bitsize="32"/>
-> +  <reg name="d4" bitsize="32"/>
-> +  <reg name="d5" bitsize="32"/>
-> +  <reg name="d6" bitsize="32"/>
-> +  <reg name="d7" bitsize="32"/>
-> +  <reg name="a0" bitsize="32" type="data_ptr"/>
-> +  <reg name="a1" bitsize="32" type="data_ptr"/>
-> +  <reg name="a2" bitsize="32" type="data_ptr"/>
-> +  <reg name="a3" bitsize="32" type="data_ptr"/>
-> +  <reg name="a4" bitsize="32" type="data_ptr"/>
-> +  <reg name="a5" bitsize="32" type="data_ptr"/>
-> +  <reg name="fp" bitsize="32" type="data_ptr"/>
-> +  <reg name="sp" bitsize="32" type="data_ptr"/>
-> +
-> +  <reg name="ps" bitsize="32"/>
-> +  <reg name="pc" bitsize="32" type="code_ptr"/>
-> +
-> +</feature>
-> diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-> index 9445fcd..976e624 100644
-> --- a/target/m68k/cpu.c
-> +++ b/target/m68k/cpu.c
-> @@ -297,6 +297,21 @@ static void m68k_cpu_class_init(ObjectClass *c, void *data)
->      dc->vmsd = &vmstate_m68k_cpu;
->  }
->  
-> +static void m68k_cpu_class_init_m68k_core(ObjectClass *c, void *data)
-> +{
-> +    CPUClass *cc = CPU_CLASS(c);
-> +
-> +    cc->gdb_core_xml_file = "m68k-core.xml";
-> +}
+>  target/s390x/cpu_models.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index 7c32180269..87a8028ad3 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -524,7 +524,7 @@ static void cpu_model_from_info(S390CPUModel *model, =
+const CpuModelInfo *info,
+>              }
+>          }
+>          if (!err) {
+> -            visit_check_struct(visitor, errp);
+> +            visit_check_struct(visitor, &err);
+>          }
+>          visit_end_struct(visitor, NULL);
+>          visit_free(visitor);
+>=20
 
-Could you also add a m68k_cpu_class_init_cf_core() and move the
-cf-core.xml into it?
 
-> +
-> +#define DEFINE_M68K_CPU_TYPE_WITH_CLASS(cpu_model, initfn, classinit)      \
-> +    {                                                                      \
-> +        .name = M68K_CPU_TYPE_NAME(cpu_model),                             \
-> +        .instance_init = initfn,                                           \
-> +        .parent = TYPE_M68K_CPU,                                           \
-> +        .class_init = classinit,                                           \
-> +    }
-> +
-
-I would prefer to have two macros with no class parameter, something
-like DEFINE_M68K_CPU_TYPE_M68K() and DEFINE_M68K_CPU_TYPE_CF().
-
->  #define DEFINE_M68K_CPU_TYPE(cpu_model, initfn) \
->      {                                           \
->          .name = M68K_CPU_TYPE_NAME(cpu_model),  \
-> @@ -314,11 +329,16 @@ static const TypeInfo m68k_cpus_type_infos[] = {
->          .class_size = sizeof(M68kCPUClass),
->          .class_init = m68k_cpu_class_init,
->      },
-> -    DEFINE_M68K_CPU_TYPE("m68000", m68000_cpu_initfn),
-> -    DEFINE_M68K_CPU_TYPE("m68020", m68020_cpu_initfn),
-> -    DEFINE_M68K_CPU_TYPE("m68030", m68030_cpu_initfn),
-> -    DEFINE_M68K_CPU_TYPE("m68040", m68040_cpu_initfn),
-> -    DEFINE_M68K_CPU_TYPE("m68060", m68060_cpu_initfn),
-> +    DEFINE_M68K_CPU_TYPE_WITH_CLASS("m68000", m68000_cpu_initfn,
-> +                                    m68k_cpu_class_init_m68k_core),
-> +    DEFINE_M68K_CPU_TYPE_WITH_CLASS("m68020", m68020_cpu_initfn,
-> +                                    m68k_cpu_class_init_m68k_core),
-> +    DEFINE_M68K_CPU_TYPE_WITH_CLASS("m68030", m68030_cpu_initfn,
-> +                                    m68k_cpu_class_init_m68k_core),
-> +    DEFINE_M68K_CPU_TYPE_WITH_CLASS("m68040", m68040_cpu_initfn,
-> +                                    m68k_cpu_class_init_m68k_core),
-> +    DEFINE_M68K_CPU_TYPE_WITH_CLASS("m68060", m68060_cpu_initfn,
-> +                                    m68k_cpu_class_init_m68k_core),
->      DEFINE_M68K_CPU_TYPE("m5206", m5206_cpu_initfn),
->      DEFINE_M68K_CPU_TYPE("m5208", m5208_cpu_initfn),
->      DEFINE_M68K_CPU_TYPE("cfv4e", cfv4e_cpu_initfn),
-> 
-
-I think we can also have something like
-DEFINE_M68K_CPU_TYPE_M68K(m68000) or DEFINE_M68K_CPU_TYPE_CF(m5206) and
-deduce initfn function name from the macro parameter.
-
+--=20
 Thanks,
-Laurent
+
+David / dhildenb
+
 
