@@ -2,93 +2,87 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 594A0C54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C092C55199
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:39:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F22620661
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:38:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C782D206A5
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:39:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vAM+7KXP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F22620661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="jQsWlTau"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C782D206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT0E4-0006NH-8b
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 05:38:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34568)
+	id 1jT0Eq-00086S-UQ
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 05:39:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34778)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zltjiangshi@gmail.com>) id 1jT0Cy-0004ZN-1V
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:37:49 -0400
+ (envelope-from <dimastep@yandex-team.ru>) id 1jT0E5-0006ok-DF
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:38:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <zltjiangshi@gmail.com>) id 1jT0Cv-0008Fy-KL
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:37:47 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:52707)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1jT0Cv-0008Fb-86
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:37:45 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id a5so7304635pjh.2
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 02:37:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=c10wxb4q0J6s5D/OfWrl3l7rc/a1C7ATc/5TPzmK3e8=;
- b=vAM+7KXPT3SW79VWhTQ4Jwy5eyloWML726rsxvHtp5aOz+BFNWYIolpvwEHp0tAS1w
- EM2O6kaal9QwpfNQw6uAGygn2liSsZa2lLcXWePx2mna58G7aSWl1yHiYw7f62Ill5l+
- EsAhfpD2ztd26ehDXBk0o8YO2CLUaan3n4TK2Imr/aSf9Oa8M714H119b4Kn4zYkz/3Q
- g5UW6LkINeYgUEfTs9vdE7nXD07gG4g1gC8DyGyd+wVxuNernno0zkhte0KvhA6s2uju
- uxYK+7Hv8spaDHmRxjXmPjDtyqOGxM4rED7epZyj7kY49+LWaJAJM/xO3a+meYbxc835
- L9Cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=c10wxb4q0J6s5D/OfWrl3l7rc/a1C7ATc/5TPzmK3e8=;
- b=fArOmMiBstb/FN+neJQyd6uBCJy8OQE5H8M447SleMrxtFKHsQnoZt92B1TbR98AY+
- qenYB1/zmGa2yKVKGymU/8ZAKj1Z1IyPbC2zQqV2TLK6k1CvmPBBHI/yo4wbcLzESERF
- 9/Bx2Dw7rBpQyvp+jq7zn+jVWvOriXqe6he1reA9oy5DS6T/Xgpus5aGjAOzyaI2ZKkO
- e4PW81pyaqROUfQh4CpWU5wZSoTAl7L/ucyi8/wUa89XbpHIyEQU/sANNV6qt7553Eso
- vLb8DyaFaPjLG/canJUUGc6TTPo2AuC5g8CV6GGm7F0K6a8AH39KmOLbNkwd5QzrJdaD
- ZaFw==
-X-Gm-Message-State: AGi0PuZxcSJk8tGq8DDVaoR9qsKWALOo9ChtThlhpJ5Re3YQT/RxUduc
- Tj1Gk2/PL0aDq9qFtrwTav4=
-X-Google-Smtp-Source: APiQypJBw9+z+Yk8E7CLQmNtWjvsg5EYLPippm1ZNPj/nSLUbUfc5bRXGacA3yXq7ZH4ktg97B+PBg==
-X-Received: by 2002:a17:90a:aa0e:: with SMTP id
- k14mr15492021pjq.74.1587980263918; 
- Mon, 27 Apr 2020 02:37:43 -0700 (PDT)
-Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
- [34.92.144.28])
- by smtp.gmail.com with ESMTPSA id u9sm11333073pfn.197.2020.04.27.02.37.41
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 27 Apr 2020 02:37:43 -0700 (PDT)
-From: Huacai Chen <zltjiangshi@gmail.com>
-X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
-To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: [PATCH for-5.1 7/7] MAINTAINERS: Add myself as Loongson-3 maintainer
-Date: Mon, 27 Apr 2020 17:33:15 +0800
-Message-Id: <1587979995-17717-7-git-send-email-chenhc@lemote.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
-References: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=zltjiangshi@gmail.com; helo=mail-pj1-x1041.google.com
+ (envelope-from <dimastep@yandex-team.ru>) id 1jT0E4-00013Q-T1
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:38:57 -0400
+Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:49692)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1jT0Dv-0000RR-GX; Mon, 27 Apr 2020 05:38:48 -0400
+Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
+ [IPv6:2a02:6b8:0:1402::301])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id E78AD2E0DDB;
+ Mon, 27 Apr 2020 12:38:38 +0300 (MSK)
+Received: from iva4-7c3d9abce76c.qloud-c.yandex.net
+ (iva4-7c3d9abce76c.qloud-c.yandex.net [2a02:6b8:c0c:4e8e:0:640:7c3d:9abc])
+ by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ Gz0JQogBxN-cZQOlabg; Mon, 27 Apr 2020 12:38:38 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1587980318; bh=58bnVAmHqFrCWzlW/V20/mHgMY3ZzYOjLUidyQPQPvI=;
+ h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+ b=jQsWlTau2EpKeZiO3QytH1aqJUZ6PSsq2lzBUNdUCejMUup5QbSB/oDjnpS/gbfH7
+ 7K8PYV8Lh0Zr1RXIB3s2lOdhIhKmgdPRjAfhMXudYmztthNSjCZLipCxE43rswpH8F
+ wcuz8jjt6hx3lhHbGFXboYphIPQq+qBeZTXuJwcY=
+Authentication-Results: mxbackcorp1g.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-iva.dhcp.yndx.net (dynamic-iva.dhcp.yndx.net
+ [2a02:6b8:b080:9012::1:1])
+ by iva4-7c3d9abce76c.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ j4zkk2ThIK-cZWm2nLh; Mon, 27 Apr 2020 12:38:35 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Client certificate not present)
+Date: Mon, 27 Apr 2020 12:38:33 +0300
+From: Dima Stepanov <dimastep@yandex-team.ru>
+To: Li Feng <fengli@smartx.com>
+Subject: Re: [RFC PATCH v1 3/7] char-socket: initialize reconnect timer only
+ if close is emitted
+Message-ID: <20200427093824.GA8175@dimastep-nix>
+References: <cover.1587667007.git.dimastep@yandex-team.ru>
+ <23b36a73ce1150cc501f436684ca558608de3322.1587667007.git.dimastep@yandex-team.ru>
+ <CAJ+F1CJgzqSDnU==Fi4-fQ3Fh97BgEnNd_GZOg8n9i1C4xsOmw@mail.gmail.com>
+ <CAHckoCz7ZjKQu6XkFNA9DLH4RMbjGRTpZDAwyiRbUB2_Zw7+NQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHckoCz7ZjKQu6XkFNA9DLH4RMbjGRTpZDAwyiRbUB2_Zw7+NQ@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+Received-SPF: pass client-ip=2a02:6b8:0:1619::183;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::1041
+X-Received-From: 2a02:6b8:0:1619::183
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,36 +91,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
- qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ Gonglei <arei.gonglei@huawei.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
+ yc-core@yandex-team.ru, Paolo Bonzini <pbonzini@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
----
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+On Sun, Apr 26, 2020 at 03:26:58PM +0800, Li Feng wrote:
+> This patch is trying to fix the same issue with me.
+> However, our fix is different.
+> 
+> I think that check the s->reconnect_timer is better.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index aa9a057..efe840b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1080,6 +1080,12 @@ F: hw/isa/vt82c686.c
- F: hw/pci-host/bonito.c
- F: include/hw/isa/vt82c686.h
- 
-+Loongson-3
-+M: Huacai Chen <chenhc@lemote.com>
-+S: Maintained
-+F: hw/mips/mips_loongson3.c
-+F: hw/pci-host/ls7a.c
-+
- Boston
- M: Paul Burton <pburton@wavecomp.com>
- R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
--- 
-2.7.0
+I also thought about your solution:
+  - if (s->reconnect_time) {
+  + if (s->reconnect_time && !s->reconnect_timer) {
+But was afraid of possible side effects. Since Marc-André approved your
+fix, i'm also good with your approach. In this case i'll remove this
+patch from the v2 patchset.
 
+Thanks for handling it!
+
+> 
+> Thanks,
+> Feng Li
+> 
+> Marc-André Lureau <marcandre.lureau@gmail.com> 于2020年4月24日周五 上午3:16写道：
+> 
+> 
+> >
+> > Hi
+> >
+> > On Thu, Apr 23, 2020 at 8:41 PM Dima Stepanov <dimastep@yandex-team.ru> wrote:
+> > >
+> > > During vhost-user reconnect functionality testing the following assert
+> > > was hit:
+> > >   qemu-system-x86_64: chardev/char-socket.c:125:
+> > >   qemu_chr_socket_restart_timer: Assertion `!s->reconnect_timer' failed.
+> > >   Aborted (core dumped)
+> >
+> > That looks related to "[PATCH 3/4] char-socket: avoid double call
+> > tcp_chr_free_connection"
+> >
+> > > This is observed only if the connection is closed by the vhost-user-blk
+> > > daemon during the initialization routine. In this case the
+> > > tcp_chr_disconnect_locked() routine is called twice. First time it is
+> > > called in the tcp_chr_write() routine, after getting the SIGPIPE signal.
+> > > Second time it is called when vhost_user_blk_connect() routine return
+> > > error. In general it looks correct, because the initialization routine
+> > > can return error in many cases.
+> > > The tcp_chr_disconnect_locked() routine could be fixed. The timer will
+> > > be restarted only if the close event is emitted.
+> > >
+> > > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+> > > ---
+> > >  chardev/char-socket.c | 10 +++++-----
+> > >  1 file changed, 5 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> > > index c128cca..83ca4d9 100644
+> > > --- a/chardev/char-socket.c
+> > > +++ b/chardev/char-socket.c
+> > > @@ -476,7 +476,7 @@ static void update_disconnected_filename(SocketChardev *s)
+> > >  static void tcp_chr_disconnect_locked(Chardev *chr)
+> > >  {
+> > >      SocketChardev *s = SOCKET_CHARDEV(chr);
+> > > -    bool emit_close = s->state == TCP_CHARDEV_STATE_CONNECTED;
+> > > +    bool was_connected = s->state == TCP_CHARDEV_STATE_CONNECTED;
+> > >
+> > >      tcp_chr_free_connection(chr);
+> > >
+> > > @@ -485,11 +485,11 @@ static void tcp_chr_disconnect_locked(Chardev *chr)
+> > >                                                chr, NULL, chr->gcontext);
+> > >      }
+> > >      update_disconnected_filename(s);
+> > > -    if (emit_close) {
+> > > +    if (was_connected) {
+> > >          qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+> > > -    }
+> > > -    if (s->reconnect_time) {
+> > > -        qemu_chr_socket_restart_timer(chr);
+> > > +        if (s->reconnect_time) {
+> > > +            qemu_chr_socket_restart_timer(chr);
+> > > +        }
+> > >      }
+> > >  }
+> > >
+> > > --
+> > > 2.7.4
+> > >
+> > >
+> >
+> >
+> > --
+> > Marc-André Lureau
+> 
+> -- 
+> The SmartX email address is only for business purpose. Any sent message 
+> that is not related to the business is not authorized or permitted by 
+> SmartX.
+> 本邮箱为北京志凌海纳科技有限公司（SmartX）工作邮箱. 如本邮箱发出的邮件与工作无关,该邮件未得到本公司任何的明示或默示的授权.
+> 
+> 
 
