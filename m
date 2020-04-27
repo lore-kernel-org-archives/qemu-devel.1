@@ -5,78 +5,81 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA47C81CCB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 21:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2773AC81857
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 22:26:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC92D2074F
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 21:50:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBF4C2078C
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 22:26:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n6NDe53R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC92D2074F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GQoGpVWe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBF4C2078C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTBdt-000737-2a
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 17:50:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34480)
+	id 1jTCCW-0004Mr-Vq
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 18:26:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40416)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jTBd8-0006O2-LM
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 17:49:35 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jTCBW-0003UT-1I
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 18:25:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jTBd8-0007SY-3G
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 17:49:34 -0400
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:41566)
+ (envelope-from <alistair23@gmail.com>) id 1jTCBU-0001Zn-QJ
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 18:25:05 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:39388)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jTBd2-0007Rh-AD; Mon, 27 Apr 2020 17:49:29 -0400
-Received: by mail-il1-x144.google.com with SMTP id f82so18233121ilh.8;
- Mon, 27 Apr 2020 14:49:27 -0700 (PDT)
+ id 1jTCBU-0001Ze-Du; Mon, 27 Apr 2020 18:25:04 -0400
+Received: by mail-il1-x143.google.com with SMTP id r2so18368361ilo.6;
+ Mon, 27 Apr 2020 15:25:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=+KeBG7zAWzP1ss9bkDLyH8S2VP+wc99+OjPv1vvRscI=;
- b=n6NDe53RxXnIwY3vBQRpjBf83DehT0wAQL9dtqww3R7d12C4KWPCifmq19yyi32hOJ
- SConuSzLICq4/cZV0CdrbE7Gqp1wqWOSyLl2s5Da6mRJmjCtWGV/WawolnjcM9mc0eRg
- tXR46V0420NgVbHeN9rgWHsU8gd+LMsYGmwF/lggfgfcXGqH6vZmgfHTF2wOdo2v4Foh
- wVNPEMdexnSbrAl2GKMu5Uv3OHlEIjFZyhF1Qc6I2NaB/MdSBnqRVpu104cYZWsNB8T7
- MESUVT3zmGF5cIiuiimLdV1BepePAmuqipeyEG9hRQKTocRlDaO2i+bZwaB9h4ijGoTz
- Pirg==
+ :cc; bh=4d6orcMdn3i38NRXjqfckA7ZIJIuprEpeNRLSnhBce8=;
+ b=GQoGpVWewjY9XNx8Gnb9BsAKWvo36OVkwpkt4i5O+PQhCr4S4QWD7op0YjlbnNjclZ
+ HmwK/ghEdKEwrE1OeE8XCWOoXwu4tbrT7mj09Vtfg7uMYqV1psl4OXcbSkyBkvRicuLT
+ rsVV11fXlPxPjuxnYSbLhjFM35FDzUOXOKZPwRAqY3fDeUUClPJljWRoy05NQr3tZEGO
+ 6I1Li1gcKZI1ojp3MIuiG/gxlU9butuQkpH5WtW6N3VZpQCgfsfh7OiEkwzps63VtUl3
+ cMqz4yr1Gr3KLiCTrjMYPrkLvO79a6IU9+pvk7F5nKUgVUvNLHFJKca7WWsh9dWuFk9t
+ FgZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=+KeBG7zAWzP1ss9bkDLyH8S2VP+wc99+OjPv1vvRscI=;
- b=N4gC9Qf/B8s7fFtwNeMBLxeCxefRZQgVB79Lx8JG3ke6STfo7GTruG8Cil5TewRFeg
- REDdLZFFb2UvLynhPS+rD5emASiYmy0JLlZAiJbTh5/YDj+nGwGVkTeI/7h8cfSIYVol
- Db6naovHbRHAZqt+U0OC9F/uFx/Ud8RN07isL4biSKo8mDowhyZsEzpWG8gW6T5bBryY
- bf8hFyAc3450FrujNXLsviGbESFdTGVA+MA2Xk01+rsKXHqBJ0ZG/4SlU0owaApN5pzU
- UrRDqzyzvuWcCg2L0lV35gi+I1Qpff9BjEwLFlpOIyy2FCMuNdjh0RWKqC8HI85Pnx5B
- ZgIQ==
-X-Gm-Message-State: AGi0Puac+qhqg98t9LY1qnYPujhb7XxjPjrplo3arkifwiYp1OwKgjLf
- Da4QmENrdAQBRcllR+uiPjo78mtVO+zce6tp2jo=
-X-Google-Smtp-Source: APiQypLgq4Eo+NxlQ1wxrvheCGEJhhVwc2VnUGg8bDp7rfSAac4dp6PLtkIyzvfXFiACalecUF2taQnWIwH1bc/FexY=
-X-Received: by 2002:a92:aa07:: with SMTP id j7mr4118299ili.40.1588024166685;
- Mon, 27 Apr 2020 14:49:26 -0700 (PDT)
+ bh=4d6orcMdn3i38NRXjqfckA7ZIJIuprEpeNRLSnhBce8=;
+ b=FaNN5QcbwgfOiTV0Pu3SKrOK84Vtv45S+GIGLQK/Yjss3QOXTHkjgj3qlkY4qAOTpx
+ 9whkCtk3SqmssDdw0Ww4E2JmPXYY9/Qu7EAlySu7fDoooapW6QcauH8qr6021NgiYBO2
+ EI5iZwYbgZJWTttSASzlkIY+PBd2xp6P0IgTxu3S5SK2RuzGRKmZbWG2rWBfGHFerM4/
+ 0z5gH14bFCoufe3L+Q9P9TB+6W+8IZ7NNr2GDMfRrqUHH5T5/xGG3F2yxqKF2QC52UIj
+ 1X6dl4fuClpdtENO4dVnNp5+dh4CghzPrn128Ojx3CTJxMCi83gTrpk2wVtTS0VhQ67E
+ HduA==
+X-Gm-Message-State: AGi0PuY2cGUUp1W8PMhQp0fAZpnFELTvVwhcq+IvCJK8It9TPkwgCC5l
+ bUtjFsGTUuG8fDRxK1P91ucceDB50bFe02NldIU=
+X-Google-Smtp-Source: APiQypKYvod25dDv15F0NKkf3yHInNX2aCEDZyYa8FnlxM1X3niDg7dIfSy/PlQGU9EqCK9r0cQuYwnsa9qMzzjD4yk=
+X-Received: by 2002:a92:9a5c:: with SMTP id t89mr24196092ili.267.1588026302807; 
+ Mon, 27 Apr 2020 15:25:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAC41xo2O1k+cn7EO3Zu3U70qefFwGa5B1iNRNgRwLk7SGX=-Aw@mail.gmail.com>
-In-Reply-To: <CAC41xo2O1k+cn7EO3Zu3U70qefFwGa5B1iNRNgRwLk7SGX=-Aw@mail.gmail.com>
+References: <20200427181649.26851-1-edgar.iglesias@gmail.com>
+ <20200427181649.26851-5-edgar.iglesias@gmail.com>
+In-Reply-To: <20200427181649.26851-5-edgar.iglesias@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 27 Apr 2020 14:40:48 -0700
-Message-ID: <CAKmqyKPDzusVqzCFwCJ+2gY0qchguhR57zHNkE-0MTeffKs_OA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] target/riscv: fix VS interrupts forwarding to HS
-To: Jose Martins <josemartins90@gmail.com>
+Date: Mon, 27 Apr 2020 15:16:24 -0700
+Message-ID: <CAKmqyKNd55rbOCtWYk8LUJ31WhpDsp9AN+qtYqmEyh6QTKG4EA@mail.gmail.com>
+Subject: Re: [PATCH v1 04/11] hw/arm: versal: Embedd the UARTs into the SoC
+ type
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::144
+X-Received-From: 2607:f8b0:4864:20::143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,89 +91,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Apr 18, 2020 at 11:01 AM Jose Martins <josemartins90@gmail.com> wrote:
+On Mon, Apr 27, 2020 at 11:17 AM Edgar E. Iglesias
+<edgar.iglesias@gmail.com> wrote:
 >
-> When vs interrupts (2, 6, 10) are enabled, pending and not delegated
-> in hideleg, they are not always forwarded to hs mode after a return to
-> vs mode. This happens independently of the state of spie and sie on
-> the hs-level sstatus before the return. Instead, the vs-level status
-> sie state seems to be controlling if the interrupt is forward to hs or
-> not. This is both because, in riscv_cpu_local_irq_pending, vs
-> interrupts are ignored when checking for hs pending interrupts and
-> also because hs interrupts might not be considered enabled after
-> jumping to vs mode if the spie (which implicitly is copied to sie) is
-> not set when sret is executed. From what I could gather, the spec does
-> not preclude hs mode from receiving vs interrupts if they are not
-> delegated in hideleg (although this is true for m mode, but guaranteed
-> by hardwiring the corresponding bits in mideleg). Also, it clearly
-> states that: "Interrupts for higher-privilege modes, y>x, are always
-> globally enabled regardless of the setting of the global yIE bit for
-> the higher-privilege mode.", so hs_mstatus_sie must be set whenever
-> virt is enabled. After solving the previous issue, the problem remains
-> that when such interrupts are delegated in hideleg, there is still the
-> need to check it when calculating pending_hs_irq, otherwise, we're
-> still "forcing an hs except" when the interrupt should be forwarded to
-> vs. I believe the following patch will fix this issue:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 >
-> Signed-off-by: Jose Martins <josemartins90@gmail.com>
-
-Thanks for the patch!
-
-I'm a little confused, do you mind explaining some things to me below.
-
-> ---
->  target/riscv/cpu_helper.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+> Embedd the UARTs into the SoC type.
 >
-> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> index d3ba9efb02..9962ee4690 100644
-> --- a/target/riscv/cpu_helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -43,8 +43,7 @@ static int riscv_cpu_local_irq_pending(CPURISCVState *env)
->      target_ulong mstatus_sie = get_field(env->mstatus, MSTATUS_SIE);
->      target_ulong hs_mstatus_sie = get_field(env->mstatus_hs, MSTATUS_SIE);
->
-> -    target_ulong pending = env->mip & env->mie &
-> -                               ~(MIP_VSSIP | MIP_VSTIP | MIP_VSEIP);
-> +    target_ulong pending = env->mip & env->mie;
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-If the Hypervisor sets the V* interrupts why does it then want to
-receive the interrupt itself?
-
->      target_ulong vspending = (env->mip & env->mie &
->                                (MIP_VSSIP | MIP_VSTIP | MIP_VSEIP));
->
-> @@ -52,11 +51,11 @@ static int riscv_cpu_local_irq_pending(CPURISCVState *env)
->                            (env->priv == PRV_M && mstatus_mie);
->      target_ulong sie    = env->priv < PRV_S ||
->                            (env->priv == PRV_S && mstatus_sie);
-> -    target_ulong hs_sie = env->priv < PRV_S ||
-> +    target_ulong hs_sie = riscv_cpu_virt_enabled(env) || env->priv < PRV_S ||
->                            (env->priv == PRV_S && hs_mstatus_sie);
-
-Isn't hs_sie only ever accessed if riscv_cpu_virt_enabled(env)?
-Doesn't this just set hs_sie to always be 1?
-
->
->      if (riscv_cpu_virt_enabled(env)) {
-> -        target_ulong pending_hs_irq = pending & -hs_sie;
-> +        target_ulong pending_hs_irq = pending & ~env->hideleg & -hs_sie;
-
-This change looks good.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
+> ---
+>  hw/arm/xlnx-versal.c         | 12 ++++++------
+>  include/hw/arm/xlnx-versal.h |  3 ++-
+>  2 files changed, 8 insertions(+), 7 deletions(-)
 >
->          if (pending_hs_irq) {
->              riscv_cpu_set_force_hs_excep(env, FORCE_HS_EXCEP);
+> diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
+> index cc696e44c0..dbde03b7e6 100644
+> --- a/hw/arm/xlnx-versal.c
+> +++ b/hw/arm/xlnx-versal.c
+> @@ -21,7 +21,6 @@
+>  #include "kvm_arm.h"
+>  #include "hw/misc/unimp.h"
+>  #include "hw/arm/xlnx-versal.h"
+> -#include "hw/char/pl011.h"
+>
+>  #define XLNX_VERSAL_ACPU_TYPE ARM_CPU_TYPE_NAME("cortex-a72")
+>  #define GEM_REVISION        0x40070106
+> @@ -144,16 +143,17 @@ static void versal_create_uarts(Versal *s, qemu_irq *pic)
+>          DeviceState *dev;
+>          MemoryRegion *mr;
+>
+> -        dev = qdev_create(NULL, TYPE_PL011);
+> -        s->lpd.iou.uart[i] = SYS_BUS_DEVICE(dev);
+> +        sysbus_init_child_obj(OBJECT(s), name,
+> +                              &s->lpd.iou.uart[i], sizeof(s->lpd.iou.uart[i]),
+> +                              TYPE_PL011);
+> +        dev = DEVICE(&s->lpd.iou.uart[i]);
+>          qdev_prop_set_chr(dev, "chardev", serial_hd(i));
+> -        object_property_add_child(OBJECT(s), name, OBJECT(dev), &error_fatal);
+>          qdev_init_nofail(dev);
+>
+> -        mr = sysbus_mmio_get_region(s->lpd.iou.uart[i], 0);
+> +        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
+>          memory_region_add_subregion(&s->mr_ps, addrs[i], mr);
+>
+> -        sysbus_connect_irq(s->lpd.iou.uart[i], 0, pic[irqs[i]]);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[irqs[i]]);
+>          g_free(name);
+>      }
+>  }
+> diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
+> index 6c0a692b2f..a3dfd064b3 100644
+> --- a/include/hw/arm/xlnx-versal.h
+> +++ b/include/hw/arm/xlnx-versal.h
+> @@ -15,6 +15,7 @@
+>  #include "hw/sysbus.h"
+>  #include "hw/arm/boot.h"
+>  #include "hw/intc/arm_gicv3.h"
+> +#include "hw/char/pl011.h"
+>
+>  #define TYPE_XLNX_VERSAL "xlnx-versal"
+>  #define XLNX_VERSAL(obj) OBJECT_CHECK(Versal, (obj), TYPE_XLNX_VERSAL)
+> @@ -49,7 +50,7 @@ typedef struct Versal {
+>          MemoryRegion mr_ocm;
+>
+>          struct {
+> -            SysBusDevice *uart[XLNX_VERSAL_NR_UARTS];
+> +            PL011State uart[XLNX_VERSAL_NR_UARTS];
+>              SysBusDevice *gem[XLNX_VERSAL_NR_GEMS];
+>              SysBusDevice *adma[XLNX_VERSAL_NR_ADMAS];
+>          } iou;
 > --
-> 2.17.1
+> 2.20.1
+>
 >
 
