@@ -2,86 +2,88 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F01C54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 03:12:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7361C54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 03:33:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1546F221F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 03:12:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1546F221F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 89AFF206D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 03:33:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dfEJxssK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89AFF206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSuBy-0000pg-6J
-	for qemu-devel@archiver.kernel.org; Sun, 26 Apr 2020 23:12:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38796)
+	id 1jSuWI-0007c4-II
+	for qemu-devel@archiver.kernel.org; Sun, 26 Apr 2020 23:33:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41312)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1jSuBJ-00005o-A3
- for qemu-devel@nongnu.org; Sun, 26 Apr 2020 23:11:41 -0400
+ (envelope-from <jasowang@redhat.com>) id 1jSuVb-000737-7r
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 23:32:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1jSuBI-0007qC-Ek
- for qemu-devel@nongnu.org; Sun, 26 Apr 2020 23:11:41 -0400
-Received: from mga06.intel.com ([134.134.136.31]:19411)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jSuBH-0007q5-Us
- for qemu-devel@nongnu.org; Sun, 26 Apr 2020 23:11:40 -0400
-IronPort-SDR: sskHH5TyqfLDOelaMjxRaOJkD6C4GyDag0U1oL3MxjCpttczT6fU49wgZa+q/j/tZhpL4jVhbv
- zvMHsxbHektQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 26 Apr 2020 20:11:37 -0700
-IronPort-SDR: TQIH46WocEsEw2dg/iWZsFKQWVCQyyCVZVo3dszZrdVy5a2gtn7u4Fp7Rcftj4ID9gdATHW7Ua
- 3tu4dzEUqKSg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,321,1583222400"; d="scan'208";a="366999473"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
- by fmsmga001.fm.intel.com with ESMTP; 26 Apr 2020 20:11:21 -0700
-Received: from shsmsx602.ccr.corp.intel.com (10.109.6.142) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sun, 26 Apr 2020 20:11:21 -0700
-Received: from shsmsx604.ccr.corp.intel.com (10.109.6.214) by
- SHSMSX602.ccr.corp.intel.com (10.109.6.142) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Mon, 27 Apr 2020 11:11:19 +0800
-Received: from shsmsx604.ccr.corp.intel.com ([10.109.6.214]) by
- SHSMSX604.ccr.corp.intel.com ([10.109.6.214]) with mapi id 15.01.1713.004;
- Mon, 27 Apr 2020 11:11:19 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Lukas Straub <lukasstraub2@web.de>, Derek Su <dereksu@qnap.com>
-Subject: RE: [PATCH v5 1/1] colo-compare: Fix memory leak in packet_enqueue()
-Thread-Topic: [PATCH v5 1/1] colo-compare: Fix memory leak in packet_enqueue()
-Thread-Index: AQHWDtvts6Y3dTVUqUygpsUCr0Q9ZaiK1uyAgAGN10A=
-Date: Mon, 27 Apr 2020 03:11:19 +0000
-Message-ID: <99afa827c86c43a6b6049d58ca2ab155@intel.com>
-References: <20200410020056.12104-1-dereksu@qnap.com>
- <20200410020056.12104-2-dereksu@qnap.com> <20200426132523.51992c28@luklap>
-In-Reply-To: <20200426132523.51992c28@luklap>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <jasowang@redhat.com>) id 1jSuVa-00005Z-19
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 23:32:38 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32027
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jSuVZ-0008Qr-G7
+ for qemu-devel@nongnu.org; Sun, 26 Apr 2020 23:32:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587958355;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MT1H88k1QV0qWlkq+VScwZ+/zmrs60RU6iYPwkuhE+Y=;
+ b=dfEJxssKgI0cJiwOpLe2hoSN0av4JbhIS0F80Ko1oY666PPRgEJAzdydH3qQVBP/nqENmq
+ k6T0/JmjAAB5tqG+kVmMwBSQ5wICYxHa2+b0kMmbv8StAglwRzhdmcyUlDWH3w9R5HYIH/
+ vUic2hi6iJppnc2ggrSSjcIxV6VDVBo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-134-mCd2UhViMJ2FMUODFqSVDg-1; Sun, 26 Apr 2020 23:32:31 -0400
+X-MC-Unique: mCd2UhViMJ2FMUODFqSVDg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85E2945F;
+ Mon, 27 Apr 2020 03:32:30 +0000 (UTC)
+Received: from [10.72.12.205] (ovpn-12-205.pek2.redhat.com [10.72.12.205])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E41515C1D4;
+ Mon, 27 Apr 2020 03:32:26 +0000 (UTC)
+Subject: Re: [RFC PATCH 0/3] hw/net/tulip: Fix LP#1874539
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200423231644.15786-1-f4bug@amsat.org>
+ <20200424152722.GA14573@ls3530.fritz.box>
+ <1f04b513-eece-baa7-5556-4665afe1f637@redhat.com>
+ <CAFEAcA-vJXRcjNPnyB5t4UOrmH5wnUoZsx-JAwDYNavQ_L64XQ@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <24b9c9a3-a0b6-2d9b-eade-dbc43bd71ff4@redhat.com>
+Date: Mon, 27 Apr 2020 11:32:24 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Received-SPF: pass client-ip=134.134.136.31; envelope-from=chen.zhang@intel.com;
- helo=mga06.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 23:11:38
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 134.134.136.31
+In-Reply-To: <CAFEAcA-vJXRcjNPnyB5t4UOrmH5wnUoZsx-JAwDYNavQ_L64XQ@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 23:32:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,127 +95,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "lizhijian@cn.fujitsu.com" <lizhijian@cn.fujitsu.com>,
- "chyang@qnap.com" <chyang@qnap.com>,
- "jasowang@redhat.com" <jasowang@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "ctcheng@qnap.com" <ctcheng@qnap.com>,
- "jwsu1986@gmail.com" <jwsu1986@gmail.com>
+Cc: Helge Deller <deller@gmx.de>, Sven Schnelle <svens@stackframe.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+On 2020/4/26 =E4=B8=8B=E5=8D=883:57, Peter Maydell wrote:
+> On Sun, 26 Apr 2020 at 03:50, Jason Wang<jasowang@redhat.com>  wrote:
+>
+>> Looks good to me.
+>>
+>> Would you please send a formal patch and cc Peter.
+>>
+>> Consider we are about to release 5.0, it's better for him to apply the
+>> patch directly.
+> I am not applying any further patches for 5.0 unless they come
+> with an attached rock-solid justification for why we should
+> delay the release again for them.
+>
+> thanks
+> -- PMM
 
-> -----Original Message-----
-> From: Lukas Straub <lukasstraub2@web.de>
-> Sent: Sunday, April 26, 2020 7:25 PM
-> To: Derek Su <dereksu@qnap.com>
-> Cc: qemu-devel@nongnu.org; lizhijian@cn.fujitsu.com; chyang@qnap.com;
-> jasowang@redhat.com; ctcheng@qnap.com; Zhang, Chen
-> <chen.zhang@intel.com>; jwsu1986@gmail.com
-> Subject: Re: [PATCH v5 1/1] colo-compare: Fix memory leak in
-> packet_enqueue()
->=20
-> On Fri, 10 Apr 2020 10:00:56 +0800
-> Derek Su <dereksu@qnap.com> wrote:
->=20
-> > The patch is to fix the "pkt" memory leak in packet_enqueue().
-> > The allocated "pkt" needs to be freed if the colo compare primary or
-> > secondary queue is too big.
-> >
-> > Replace the error_report of full queue with a trace event.
-> >
-> > Signed-off-by: Derek Su <dereksu@qnap.com>
->=20
-> Looks good now and works well in my tests.
-> Reviewed-by: Lukas Straub <lukasstraub2@web.de>
-> Tested-by: Lukas Straub <lukasstraub2@web.de>
->=20
 
-I will queue this patch to COLO branch, then submit to Jason.
+Ok.
+
+I will queue that patch for 5.1.
 
 Thanks
-Zhang Chen
 
-> Regards,
-> Lukas Straub
->=20
-> > ---
-> >  net/colo-compare.c | 23 +++++++++++++++--------
-> >  net/trace-events   |  1 +
-> >  2 files changed, 16 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/net/colo-compare.c b/net/colo-compare.c index
-> > 10c0239f9d..035e11d4d3 100644
-> > --- a/net/colo-compare.c
-> > +++ b/net/colo-compare.c
-> > @@ -122,6 +122,10 @@ enum {
-> >      SECONDARY_IN,
-> >  };
-> >
-> > +static const char *colo_mode[] =3D {
-> > +    [PRIMARY_IN] =3D "primary",
-> > +    [SECONDARY_IN] =3D "secondary",
-> > +};
-> >
-> >  static int compare_chr_send(CompareState *s,
-> >                              const uint8_t *buf, @@ -217,6 +221,7 @@
-> > static int packet_enqueue(CompareState *s, int mode, Connection **con)
-> >      ConnectionKey key;
-> >      Packet *pkt =3D NULL;
-> >      Connection *conn;
-> > +    int ret;
-> >
-> >      if (mode =3D=3D PRIMARY_IN) {
-> >          pkt =3D packet_new(s->pri_rs.buf, @@ -245,16 +250,18 @@ static
-> > int packet_enqueue(CompareState *s, int mode, Connection **con)
-> >      }
-> >
-> >      if (mode =3D=3D PRIMARY_IN) {
-> > -        if (!colo_insert_packet(&conn->primary_list, pkt, &conn->pack)=
-) {
-> > -            error_report("colo compare primary queue size too big,"
-> > -                         "drop packet");
-> > -        }
-> > +        ret =3D colo_insert_packet(&conn->primary_list, pkt,
-> > + &conn->pack);
-> >      } else {
-> > -        if (!colo_insert_packet(&conn->secondary_list, pkt, &conn->sac=
-k)) {
-> > -            error_report("colo compare secondary queue size too big,"
-> > -                         "drop packet");
-> > -        }
-> > +        ret =3D colo_insert_packet(&conn->secondary_list, pkt,
-> > + &conn->sack);
-> >      }
-> > +
-> > +    if (!ret) {
-> > +        trace_colo_compare_drop_packet(colo_mode[mode],
-> > +            "queue size too big, drop packet");
-> > +        packet_destroy(pkt, NULL);
-> > +        pkt =3D NULL;
-> > +    }
-> > +
-> >      *con =3D conn;
-> >
-> >      return 0;
-> > diff --git a/net/trace-events b/net/trace-events index
-> > 02c13fd0ba..fa49c71533 100644
-> > --- a/net/trace-events
-> > +++ b/net/trace-events
-> > @@ -12,6 +12,7 @@ colo_proxy_main(const char *chr) ": %s"
-> >
-> >  # colo-compare.c
-> >  colo_compare_main(const char *chr) ": %s"
-> > +colo_compare_drop_packet(const char *queue, const char *chr)
-> ": %s: %s"
-> >  colo_compare_udp_miscompare(const char *sta, int size) ": %s =3D %d"
-> >  colo_compare_icmp_miscompare(const char *sta, int size) ": %s =3D %d"
-> >  colo_compare_ip_info(int psize, const char *sta, const char *stb, int =
-ssize,
-> const char *stc, const char *std) "ppkt size =3D %d, ip_src =3D %s, ip_ds=
-t =3D %s,
-> spkt size =3D %d, ip_src =3D %s, ip_dst =3D %s"
+
+>
 
 
