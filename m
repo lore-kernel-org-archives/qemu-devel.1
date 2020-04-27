@@ -2,83 +2,82 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9D6CC54FCB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 13:12:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C40CAC54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 13:13:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 972562075E
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 13:12:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E92F20575
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 13:13:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FwuQL0g3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 972562075E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RbcGVkxa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E92F20575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT3Z5-000425-Or
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 09:12:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42990)
+	id 1jT3Zo-0005Hr-N1
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 09:13:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43054)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jT3YT-0003Tb-3R
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:12:13 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jT3Z5-0004E3-EF
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:12:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jT3YS-0003HB-7p
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:12:12 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39159)
+ (envelope-from <peter.maydell@linaro.org>) id 1jT3Z4-0003XV-TT
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:12:51 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33457)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jT3YR-0003Gy-RD
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:12:11 -0400
-Received: by mail-ot1-x342.google.com with SMTP id m13so25947642otf.6
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 06:12:11 -0700 (PDT)
+ id 1jT3Z4-0003X4-GS
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:12:50 -0400
+Received: by mail-ot1-x341.google.com with SMTP id j26so25998078ots.0
+ for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 06:12:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=fe4tY7v+8FryL6AjQk0StjZNLTgG103DVMbaRRMi5T4=;
- b=FwuQL0g3PXpcHWjvNFHHWWu8C18OuGa0TT8XnsFEdotuT+ujvyIQFvQvZBKnHYQPaI
- /SZ90YsHq1L5MGaNtzfbsHotcNLelzOGvr/0nEcCt6cnEto0nKI+lmDrMYmjjC8eAPnv
- tfqk0lKDY2FIjNOIedD/F1YuLlx0tb2AEy7/J0EV6oECzki/d16pgdIBgabxeKGW1t+9
- ln3bZ6L9ejpKg52rIj2BgqlFXQ0cTTZcHG3M6Pu50SBA8QEnDPUXrBXiw3iH4i+9rKOV
- MGMWBIQs3XWxevTZxalRGoJ3BDAUxQc6e6qP+c9ttQ+KJLnLYve06R0WoMIshrgjClRI
- 7n2w==
+ :cc; bh=JkmF1I4n/URZA4JyIM+pngRW/xLN9zhqzG0w+jHOOfQ=;
+ b=RbcGVkxaecf8F+7SKPne3Y4DqIWpLL7iGncmh39y7S+nzEQfbf8QBSMNjjWwpegZ48
+ 6WAnf3MJ+PgATGxwsVzO5a30YRdjo7XYXiGanJRayKG6gztyMXk5xEEp63BX/Lrs1S2U
+ FOWjxR2N/DiKn9Qd5++e65qcOvz1CyeB344dvAohyoe82WIj72TIJ/p3Gy8661Bm+Kmb
+ Q6qzj/hLuT0yeKWsj0W/TfJfFRhIxqbJjNItvAj72p3KaK7lyG8kBtRzLScCq7jTXMzI
+ 03Da6KCICi6gr5EhBxSJ8dNRxcdJbdWUivNuV4QCW/9AGq5nCLUHjm/M6La7a2s+CB5d
+ h6ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=fe4tY7v+8FryL6AjQk0StjZNLTgG103DVMbaRRMi5T4=;
- b=fBo9jIuZpnnqmCFooy+7gp7jY/Uc62Kwamwk8pUEQZ0s4ZIYZlVmKJhqpoJHJlahg/
- cqdDptykpcva9B2y2wy5C9XwuVMtcnF019cu5il0AUCVc65/nV1d4JXKlmHYAnrrlVg3
- c7gUGKe/ehvyQKidQwizKDXPeF3pqza3iGSTZYGZNqscvO+SWMhvpql4r7Q/cZD+Njvo
- DyGtHKMuKmNTIJ9GV9ihI0iN4EhTu2MCRvxtqdFOhEXnspotFd4YI98mYfPrvwruH1Q3
- cdgQJuUW2Pi1NYYeTib4crCiwspfMbJzTGIisSvp3wi7eEaQnlejibp9W54M3aNcHlhE
- S1Jg==
-X-Gm-Message-State: AGi0PubNk5reQvtvbCbw1W1oCNZ7inIW8OO8/YXcVzIEoNo3Y9MB+AeL
- 9BXdgfBHZbrbWY5Uk8Ly5bjf+FsO5gZBkFUzOC9YIA==
-X-Google-Smtp-Source: APiQypJvq13DfZbBxyQF+JK0DKJ9gEzMi9GehRyMWodPVmzHmnnC9GAzh0Bg1z3DppZv/3RzQsf512QY9CoCPygwOGw=
-X-Received: by 2002:a9d:2c08:: with SMTP id f8mr18629606otb.135.1587993130396; 
- Mon, 27 Apr 2020 06:12:10 -0700 (PDT)
+ bh=JkmF1I4n/URZA4JyIM+pngRW/xLN9zhqzG0w+jHOOfQ=;
+ b=rwC6oOWjvCwCkBT+qzzYfhbux2pxg+7gSqPexM2T5owecpo3QfCmeVK2pTzGzbiNnc
+ HjS8d1xfTe5gwmaypWPf3sbZDnR3CcPyRgm4pyheAky/3zMKRnSMGHsV4j7ishcMKwWQ
+ fEKXSf+pb6cVSqj1uvfI5JwoPv1MPQXyyz/3ybQCiBZm7FppoOWZqEHJs3DPv0e2TXXr
+ mnrgEaD+u/pTlTIP7WZzzriIiIkqtHrwSJlpXW+2zGdh0QLs/XMK/py+KRFPYGmWDgn1
+ qfmX3JEOnnFL4WAhXDG+Fb6kvqtFJgZU1puVoWNMwQ1wP7FvHts6tmRqpYBXlc3ibO9X
+ JZUQ==
+X-Gm-Message-State: AGi0PubSJqQ/apb1ylhPeSHcLSNF2Gt2QzAOrJUumlbEy0Jh2PQevust
+ d5cIKS3X+IuoHkL8YT9VrCj5dFTVIKiEK/C79ArjKg==
+X-Google-Smtp-Source: APiQypIiNiPrqkJcRN6J6sSRnXqLT7yA065n4zbveI5YjCrUh3pBJb+nNMYc1m82xRgQeqk0xTZ+jE0P1yLHx+qmb5E=
+X-Received: by 2002:aca:c751:: with SMTP id x78mr15798887oif.163.1587993169097; 
+ Mon, 27 Apr 2020 06:12:49 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200427121823.8094-1-changbin.du@gmail.com>
-In-Reply-To: <20200427121823.8094-1-changbin.du@gmail.com>
+References: <20200423121114.4274-1-edgar.iglesias@gmail.com>
+In-Reply-To: <20200423121114.4274-1-edgar.iglesias@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Apr 2020 14:11:59 +0100
-Message-ID: <CAFEAcA8jBM5M3FLajekUpSzdqjHV-euBn+jU7GZ_ihHgjvKMjw@mail.gmail.com>
-Subject: Re: [PATCH] ui/sdl2: fix segment fault caused by null pointer
- dereference
-To: Changbin Du <changbin.du@gmail.com>
+Date: Mon, 27 Apr 2020 14:12:37 +0100
+Message-ID: <CAFEAcA-cMnC6gbhG5OTUhZX8WKSu_WKn3hkeSM=_9USmn45+rA@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] hw/arm: xlnx-zcu102: Disable unsupported FDT
+ firmware nodes
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,48 +89,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: figlesia@xilinx.com, Edgar Iglesias <edgar.iglesias@xilinx.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 27 Apr 2020 at 13:19, Changbin Du <changbin.du@gmail.com> wrote:
+On Thu, 23 Apr 2020 at 13:11, Edgar E. Iglesias
+<edgar.iglesias@gmail.com> wrote:
 >
-> I found SDL_GetWindowFromID() sometimes return NULL when I start qemu via
-> ssh forwarding even the window has been crated already. I am not sure
-> whether this is a bug of SDL, but we'd better check it carefully.
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 >
-> Signed-off-by: Changbin Du <changbin.du@gmail.com>
-> ---
->  ui/sdl2.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+> When users try direct Linux runs on the ZynqMP models without enabling
+> EL3 (and using appropriate FW) they run into trouble because the
+> upstream kernel device-tree has EL3 based firmware nodes by default.
+> PSCI firmware nodes work because we emulate the firmware in QEMU.
 >
-> diff --git a/ui/sdl2.c b/ui/sdl2.c
-> index 3c9424eb42..7c9c93b951 100644
-> --- a/ui/sdl2.c
-> +++ b/ui/sdl2.c
-> @@ -332,6 +332,9 @@ static void handle_keydown(SDL_Event *ev)
->      int gui_key_modifier_pressed = get_mod_state();
->      int gui_keysym = 0;
+> This series avoids that problem by disabling firmware nodes that the
+> machine cannot support due to lack of EL3 or EL2 support.
 >
-> +    if (!scon)
-> +        return;
-> +
->      if (!scon->ignore_hotkeys && gui_key_modifier_pressed && !ev->key.repeat) {
->          switch (ev->key.keysym.scancode) {
->          case SDL_SCANCODE_2:
-> @@ -412,6 +415,9 @@ static void handle_keyup(SDL_Event *ev)
->  {
->      struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
+> This means we can now (without manually editing DTBs) run the following
+> in a current Linux tree:
 >
-> +    if (!sconf)
-> +        return;
+> qemu-system-aarch64 -M xlnx-zcu102 -m 2G -dtb arch/arm64/boot/dts/xilinx/zynqmp-zcu102-rev1.0.dtb -serial mon:stdio -kernel arch/arm64/boot/Image -initrd zu-rootfs.cpio.gz -append rdinit=/bin/sh
+>
+> Cheers,
+> Edgar
 
-It's generally a good idea to make sure your patch at least compiles
-before sending it :-)
 
-QEMU coding style demands {} on all if statements.
 
-thanks
+Applied to target-arm.next, thanks.
+
 -- PMM
 
