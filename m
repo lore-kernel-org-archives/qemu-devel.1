@@ -2,94 +2,88 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8865CC5519A
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 16:04:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0FE4C54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 16:07:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D28A206D4
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 16:04:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A675206B8
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 16:07:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RoPw00X4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D28A206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPQ/dz4Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A675206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT6FI-00060U-E0
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 12:04:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43622)
+	id 1jT6IT-0002CP-Gh
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 12:07:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44276)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jT6BS-0008F2-8u
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 12:00:38 -0400
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jT6Fx-0007IJ-4r
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 12:05:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jT6BN-0004AO-3Y
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 12:00:36 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:39305)
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jT6Fw-0001Lw-Mu
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 12:05:16 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:35521)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jT6BM-00049H-FZ
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 12:00:32 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id e6so7609561pjt.4
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 09:00:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=F+/K3Z872EDXQDgaag5cAOSBjkaI2e3LPcXJOZLxUh8=;
- b=RoPw00X4i7H5a5Lo/cTItbCrjoFfme9323D3ozVCE5j5ukcPwMsgr8TJXerJunXfCH
- QNSHD73DpSA7E8LC6zMLyITmqpqk0VrB9MzaU0HJMn7NpLClGBjNTL2cUla12gT2p0Aw
- aci2js9N9uEk7R947/WKvmHY9on62/KLXLf6FNEs1iH8hP41y/qNKc6sn9sNe4HgvME1
- QjwI6xhjNOVXixnwYwRTno+Eom+nSqHaVkN+i2Q7d5XVUmEQEsXDArPI59x+Dkk6pEOe
- S5MvIiunujo0k5KOTCfsY43PMwwKB3NTbcCeDwSMxzOUty3RLl2KEyRU9ElloV8ynbh9
- hFDg==
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jT6Fh-0000nN-2I; Mon, 27 Apr 2020 12:05:01 -0400
+Received: by mail-lj1-x241.google.com with SMTP id g4so18197352ljl.2;
+ Mon, 27 Apr 2020 09:04:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=SFy9ImzktZE2Epy0PJlBnUaywlV+F5c+rKkog0oIig4=;
+ b=BPQ/dz4ZA7HaXSgtCd2XZ4R5nI9maR1g0q61DqeN3wmnaUVFsO4MT6Ww2Uqdosx44t
+ vqOxI3wbPYyWemwITNYpQ8IsXnpYt04flTPAPmHSq9rM2X95QRMz5wSIRXgiKcy/GDfC
+ Z57CKLaMF48V0adlcSi6tMCbCZO25fMlXSa0W3rxWYpHuX6ZnZ9uyFETjXZpVyCDdmNE
+ IrStvGDq7DX12PtdbCNEGTcJojZg7ry8h9S0vaIfxhQXypLZTF4lIrxQFXiJg6TTERfq
+ SleKOrSkHbj/nnngNIfITF5uEEwkcE58ilfXilm3OHdxXA47Zht4r7Oz/6iJ/oGYAeNl
+ X9hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=F+/K3Z872EDXQDgaag5cAOSBjkaI2e3LPcXJOZLxUh8=;
- b=n+zZKesHPcT4nuMXKWURlrzAbNIi2LMtue6g9I/jhBfdGlBZF6RnzXhN4ZLwdT5cN1
- pqiWQc8v58y25/LFE41qUm3L7ck7DHev7pWVA+LLrZ72dJDTj2khrWACm9Fob3kRHtw+
- ktgNVl0x77ryfP+3wt0sD9WtvYOgVzwA5RKndwakYyoTM698v+tWhEU2q2nbeTSLDmRz
- V7u/ThrZRY+MUFETGsq3syF5JwKh55j+LlIwr+aca7iUnHpXmbtwdiJ6yF7kZlAbmBGb
- DLqceG7OTxUty17CCaOVRIFJVxuH4XLPErsoE7Aib+rXUakS+nAUqBFEByG8ZorFACWl
- dkmw==
-X-Gm-Message-State: AGi0Pub7Qxd8lfsfI1TxtC7XFTkuAp/L8/V1jklYKpP7HHKEMC/gy/Vm
- xEuL87Pku3HF66YRoTu0gutyACzcf0g=
-X-Google-Smtp-Source: APiQypLDdrmGF+6jA166Dl44u8wAyO9JI8L00NlwhTtsKzwE6fY+Wl12Itj6y3+2dKFgG4teCm3WrQ==
-X-Received: by 2002:a17:90a:de8d:: with SMTP id
- n13mr10993010pjv.173.1588003227101; 
- Mon, 27 Apr 2020 09:00:27 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id l64sm12091347pjb.44.2020.04.27.09.00.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 27 Apr 2020 09:00:26 -0700 (PDT)
-Subject: Re: [PATCH v3 04/18] accel/tcg: Add probe_access_flags
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=SFy9ImzktZE2Epy0PJlBnUaywlV+F5c+rKkog0oIig4=;
+ b=Fre+R4FHM9eH3UFeBlCMLF+9trnuEsqrN1jehEgoEezhsseZ95yjp7XPsmvCAAiNpl
+ vTiVGBg2JgR1C2SQMwBcJa6AV1/GU7Dhm61u7yj12PygM85DkS2wnrRb1D4xs9dZMkTo
+ 9Ni6ECX8gC7br1eGl6nQXTUuXTp0Y3QSSEE/H2BDvbO+xK3YOO/kiSwY4sYHGeIkVJqh
+ Em1Szp/W00sCicM5C/Q3uzef3TFVRxuXKDeEAlXdlfRlIhIOY5ot+5tszhlk7YsZ4h/T
+ 0K/ZFD7YVrpTodvjtP900VUtM6F0MHozp4l1rOUTqSLpT6EfkYp/f+BaNDvexkzu8jGB
+ u0sg==
+X-Gm-Message-State: AGi0Pua71l2kw42L7Me+zepz2QgaYxjB2tp6DrV85ufJ00qqRiG6W62g
+ Jj+utrCxTjAffkGYYCNQnek=
+X-Google-Smtp-Source: APiQypK9GsRuEz0Q3sIR3JX9f9kyZ4D5thjlxyK70ARMdwvhzr1ugpVlzTmHl0WqDl1nyOmJ//vFsg==
+X-Received: by 2002:a2e:9e43:: with SMTP id g3mr7424743ljk.4.1588003498247;
+ Mon, 27 Apr 2020 09:04:58 -0700 (PDT)
+Received: from localhost (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id b25sm9819691ljp.105.2020.04.27.09.04.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 27 Apr 2020 09:04:57 -0700 (PDT)
+Date: Mon, 27 Apr 2020 18:04:25 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200422043309.18430-1-richard.henderson@linaro.org>
- <20200422043309.18430-5-richard.henderson@linaro.org>
- <CAFEAcA_ugvJWmN8fNbvZYJvOtyv6uPAumQ8UPtK-k9nqN=uerQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <69d6cc05-2610-d81b-df8f-0f8d723530af@linaro.org>
-Date: Mon, 27 Apr 2020 09:00:23 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Subject: Re: [PATCH 0/4] arm: Implement ARMv8.2-TTS2UXN
+Message-ID: <20200427160425.GK2669@toto>
+References: <20200330210400.11724-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_ugvJWmN8fNbvZYJvOtyv6uPAumQ8UPtK-k9nqN=uerQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200330210400.11724-1-peter.maydell@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::1044
+X-Received-From: 2a00:1450:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,64 +95,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/27/20 3:48 AM, Peter Maydell wrote:
-> probe_access() handles watchpoints. Why doesn't probe_access_flags()
-> have to do that?
-
-Because we are explicitly deferring that work to the caller.  That's a good
-fraction of the point of the new interface.
-
->> +        /* Handle clean RAM pages.  */
->> +        if (flags & TLB_NOTDIRTY) {
->> +            notdirty_write(env_cpu(env), addr, 1, iotlbentry, retaddr);
->> +        }
->> +
->> +        /* Handle watchpoints.  */
->> +        if (flags & TLB_WATCHPOINT) {
->> +            int wp_access = (access_type == MMU_DATA_STORE
->> +                             ? BP_MEM_WRITE : BP_MEM_READ);
->> +            cpu_check_watchpoint(env_cpu(env), addr, size,
->> +                                 iotlbentry->attrs, wp_access, retaddr);
->> +        }
+On Mon, Mar 30, 2020 at 10:03:56PM +0100, Peter Maydell wrote:
+> This is obviously not 5.0 material, but I figured it would be better
+> to push it out for review now rather than hang on to it and forget...
 > 
-> The old code checked for watchpoints first, and then handled notdirty-writes,
-> which seems like the more correct order. Why has the new
-> version switched them around?
-
-Not an intentional change, but I shouldn't think it would matter in the end.
-
-> The probe_access_internal() doc comment doesn't say that it
-> guarantees to set host to NULL for the TLB_MMIO/TLB_INVALID_MASK
-> cases, but we implicitly rely on it here.
-
-Eh?  probe_access_internal doesn't have a doc comment.  Call that a bug if you
-like, but you seem to be talking about something else.
-
->> +void *probe_access(CPUArchState *env, target_ulong addr, int size,
->> +                   MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
->> +{
->> +    void *host;
->> +
->> +    g_assert(-(addr | TARGET_PAGE_MASK) >= size);
->> +    probe_access_flags(env, addr, access_type, mmu_idx, false, &host, retaddr);
->> +    return host;
+> TTS2UXN is an ARMv8.2 extension which changes the 'XN' field in stage
+> 2 translation table descriptors from just bit [54] to bits [54:53],
+> allowing stage 2 to control execution permissions separately for EL0
+> and EL1.
 > 
-> The old code returned NULL for a zero size; the new version does not.
+> For QEMU this had the potential to be awkward, because it means that
+> the stage 2 translation now depends on whether it's being used
+> for an EL0 or an EL1 stage 1 access (the address doesn't change
+> but the access permissions do). Fortunately, although we allocated
+> a QEMU TLB/MMU index for Stage 2, we never actually look anything
+> up in the TLB. So patch 1 turns ARMMMUIdx_Stage2 into a 'NOTLB'
+> index (ie one without a QEMU TLB), thus avoiding the complication
+> of splitting it into separate Stage2-for-EL0 and Stage2-for-EL1
+> indexes. Once we've done that the actual implementation is pretty
+> trivial -- we just need to plumb an extra 's1_is_el0' argument
+> into get_phys_addr_lpae(), and then use it to decide what to do.
 
-Granted.
+Hi Peter,
 
-> The old code passed size into cc->tlb_fill; the new version does not.
-> The old code passed size into page_check_range(); the new version does not.
+The whole series looks good to me:
 
-This is the user-only version, and size is not used for tlb_fill.  It is only
-trivially used in page_change_range; we have just verified that addr+size does
-not cross a page boundary.
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+
+Cheers,
+Edgar
 
 
-r~
+
+> 
+> Peter Maydell (4):
+>   target/arm: Don't use a TLB for ARMMMUIdx_Stage2
+>   target/arm: Use enum constant in get_phys_addr_lpae() call
+>   target/arm: Add new 's1_is_el0' argument to get_phys_addr_lpae()
+>   target/arm: Implement ARMv8.2-TTS2UXN
+> 
+>  target/arm/cpu-param.h |   2 +-
+>  target/arm/cpu.h       |  36 ++++++--
+>  target/arm/cpu.c       |   1 +
+>  target/arm/cpu64.c     |   2 +
+>  target/arm/helper.c    | 183 ++++++++++++++++-------------------------
+>  5 files changed, 107 insertions(+), 117 deletions(-)
+> 
+> -- 
+> 2.20.1
+> 
+> 
 
