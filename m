@@ -2,119 +2,113 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6364AC54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 14:43:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45204C54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 14:46:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2591F206D4
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 14:43:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0968820661
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 14:46:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="IxS9LWvq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2591F206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GGS8hOm5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0968820661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT4yw-0006z3-St
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 10:43:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56916)
+	id 1jT51c-0002ak-4T
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 10:46:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57234)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jT4vA-0008J8-Il
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 10:39:45 -0400
+ (envelope-from <philmd@redhat.com>) id 1jT4xB-0003j7-BW
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 10:41:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jT4vA-0007nW-3p
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 10:39:44 -0400
-Received: from mail-am6eur05on2133.outbound.protection.outlook.com
- ([40.107.22.133]:24288 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jT4v6-0007iF-4f; Mon, 27 Apr 2020 10:39:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JfMZFv4rJKVixS9BlPVd0R8+vtqJpWsfr+qtfF3Y/s9cu6Ke3oPgVT/y4UWnEHiCAJXKdTxU0vhiQ6I4L2jJv2Wn4Pnar2l/aCFMOW1/XNf1qoynhB8niu4HpWLvbaAIQUd7CImwzcKTNOkAPZpFNvPBLtqmdlhj//Xmt0XBmqatAd/p4ZIOJL4i57hoGTQ8HysUQ46Opd6SQ1LNXwawwWV7j4lx2x7SgHmQfDXEOya2J5M/5L5spd1WcNse1/ifU5cyFiY9nxIjrrvj4VGD3v/zzw8SGnZ+33QljImrEACbL0DeIy2PM38rXLVW0PAhJfvdxvuUb3d4t/EIeJoJAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZWf3gkufmonKz+QtUw5YgibQn493tksGtYBwyWswqGs=;
- b=ZzShixzUpyfLPgNVubDNaNbxEQ7Wzmj8fIlAeMeV96hkFCAHulaMUPbUFA6NbpAAMylc4ZQktUR3n9geXR6Hw6irxqu9fYKYPPzYlUOBrrIDL9mwWPM31gIyk7ulpGWjxKT70nSuPV7W7s2cQ6eOhvemfCBvHUfaUXI9tsDkCx3f+xC0uPY7XdhWldCMXn7h92L5xyshdiysu3esorAqxZ5bRgLwPe4yLlofEf9Bp+vdAQpUP2+w09ejD4N88Xdj7fptj7E1WVpizYrg9S2UrDV5SQQuiMDf7lpcSiZ9vpqO5uBJwnJxL6wioLb53PKXstRsXQwywjtmLSzc+GXJ+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZWf3gkufmonKz+QtUw5YgibQn493tksGtYBwyWswqGs=;
- b=IxS9LWvqVhLrrLihDwnv1NYj6dkRH3ZGvVMRhObig6L6uHzYFgwEykx1xCB5rVM0bG61Pi0r/1f1YD20hLEXA8Pl4s1hzSxYRgZxvWpUFioXn3kYc12dDi3/TUDFS7E//vydgI4sUhSQSCnSWKuUOFUbf1+IVe7U0fw0216rmIo=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5527.eurprd08.prod.outlook.com (2603:10a6:20b:de::18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Mon, 27 Apr
- 2020 14:39:36 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.020; Mon, 27 Apr 2020
- 14:39:36 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 8/9] block/io: move bdrv_make_zero under block-status
-Date: Mon, 27 Apr 2020 17:39:06 +0300
-Message-Id: <20200427143907.5710-9-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200427143907.5710-1-vsementsov@virtuozzo.com>
-References: <20200427143907.5710-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FRYP281CA0010.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::20)
- To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <philmd@redhat.com>) id 1jT4x9-0000fb-0m
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 10:41:49 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56755
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jT4x8-0000b6-H6
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 10:41:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587998505;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5LTwE1w8j+9u5wO0DlK1I4oOJCf5xejwbfBeRhgAEjA=;
+ b=GGS8hOm52yuqO7UQBuG2m/Bd7Nj49239c0rasS5Rj5+1OXLroYpThZo+ZWmUoty7EFZeJm
+ WtoEu4zcAtXbsfHcA3Z4X2Dms2JyzXoC/hBiGT7T9icuWdNPmf3j+ghF6mAQTdZdjRSX58
+ T0Q4PApwEPH/3BD+FSbWrGtlxl9XaDM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386-mgzudmVKNpiXCUjEsIBQ1A-1; Mon, 27 Apr 2020 10:41:43 -0400
+X-MC-Unique: mgzudmVKNpiXCUjEsIBQ1A-1
+Received: by mail-wm1-f72.google.com with SMTP id 71so8759574wmb.8
+ for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 07:41:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=rUbwZ57pRsc+UZppZ0WcGMMmfi6R7DKlILXz3S0q32I=;
+ b=d6O1ebSdKZaNOX49PYC+3h9MO0CUTO7ed94KzCXzOj2QOHMl0LVguQDTFr3ZNo/0sM
+ aMVQnX+NyJ9r1WxlmanqbZMjaq44EDkCXpEUlKRglIOSAdsrjzd8csRUIL2DcnNE0mTV
+ qanLtPQnzxZeLcTXcMQdO0Yw7GFGYIyoG8A5VBsEhcaqGK2V5wDTkgBO6imEKQUb1s1f
+ KsqxvtAlv75DPCn0fNc7ZUeh+0t/3UDAXm47FQya+qimEOjxsAjkBV99lmXougPnTZ0W
+ HUXtlU3E4iK1zf0Pltq01JWdirW+nWDDXtoeaNP8Ms/DVDa4BmEm17qxy2hyDcDUmxCO
+ zBjQ==
+X-Gm-Message-State: AGi0PuamsMrw2eBJcxROTZGtHoCt2qkZD+/suiheFTI45pTLu4R4K7U3
+ trWiLkXmEHkEZ+V0gNENee9cgFK8O04Ah95PgAkmTIiPMb8KrBsCAzmkgKasCuD3qSdmU7J4Aw8
+ dDMk3iAYyuzADliI=
+X-Received: by 2002:a1c:2d02:: with SMTP id t2mr26508797wmt.98.1587998502001; 
+ Mon, 27 Apr 2020 07:41:42 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKJKjdFxoXGhDUtyhm3b+D327jFaTjFXN+a4nzlgG439n6xKcpiXfUXpFfkS57C3H0onqEi4Q==
+X-Received: by 2002:a1c:2d02:: with SMTP id t2mr26508699wmt.98.1587998500710; 
+ Mon, 27 Apr 2020 07:41:40 -0700 (PDT)
+Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.137])
+ by smtp.gmail.com with ESMTPSA id j13sm22091845wrq.24.2020.04.27.07.41.39
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 27 Apr 2020 07:41:40 -0700 (PDT)
+Subject: Re: [PATCH 0/5] QEMU Gating CI
+To: Cleber Rosa <crosa@redhat.com>
+References: <20200312193616.438922-1-crosa@redhat.com>
+ <CAFEAcA8Lw94_=kY+Fv-cFW2Tk5RD62EjODjKdGf2-mLdDw7FuQ@mail.gmail.com>
+ <1182067639.1655516.1584421185287.JavaMail.zimbra@redhat.com>
+ <CAFEAcA-zRw7kzwzXxPmLaUqwOrQLwW9BymOJ34iJOOTCUAf=xg@mail.gmail.com>
+ <20200317141257.GA5724@localhost.localdomain>
+ <CAFEAcA9W4KXN6dcT0CNyD_mQ3xY5wDmJ7i0wowhaG2XPmyMYng@mail.gmail.com>
+ <87sgi49uf6.fsf@dusky.pond.sub.org>
+ <CAFEAcA_dcVneQ4Hj61GAkYRCUSMrA=QjwnAXccoBwjUjOE-wSQ@mail.gmail.com>
+ <529508877.9650370.1587661453005.JavaMail.zimbra@redhat.com>
+ <20200423171322.GJ1077680@redhat.com>
+ <69e77a6e-8db8-f617-bfe6-1c8f39ec81b4@redhat.com>
+ <20200427011210.745db351@redhat.com>
+ <05670290-5ba0-8be0-624b-da1c95f3e820@redhat.com>
+ <20200427102835.6f625859@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <48b0d8e6-3b9d-981d-c6a3-bdee5580f701@redhat.com>
+Date: Mon, 27 Apr 2020 16:41:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (185.215.60.182) by
- FRYP281CA0010.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2937.13 via Frontend Transport; Mon, 27 Apr 2020 14:39:36 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.182]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ca1149bb-bdda-4fa0-3d38-08d7eab8cf1f
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5527:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5527B5757333BBFAB853E8B2C1AF0@AM7PR08MB5527.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-Forefront-PRVS: 0386B406AA
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39840400004)(376002)(396003)(366004)(136003)(346002)(5660300002)(107886003)(316002)(2906002)(6512007)(478600001)(6486002)(66946007)(66476007)(66556008)(69590400007)(1076003)(2616005)(956004)(81156014)(16526019)(86362001)(6506007)(52116002)(186003)(36756003)(8676002)(8936002)(6666004)(26005)(6916009)(4326008);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8pKkRoSviTLu7TvSZn4ewKAaQTtaxuxQO6IkBqeDug3KUvU8k6gxA5yqXSHpkXulLz+q4/01QlY5mzsdWMs0rvLMzwpslKCDQ+yuRbcGOPIuIMLMFqn1YFSe2eqkUm292xsVJENWoYrSWoJMCfaZyVwvXIqPx0LQDAud3/ZcUkSY0r6ucWh67sFpbksd/Vyu5h+Oj+B7gYtKzuKgrlWFSGWKvR0dTnmTDLn/JpvnDhZBbU730TE6RlWPpj5o81iAclYcv7Ht2tq0PqmMxzmf/xc5XejL287iRgtGtPC26PLHGMWprtg5S8HBOTypVOr8l8wAuwyT+pJ0td/zb4b6evsBF9VGZEU0XIEZ3H+NY7jA5qwSioAqMr19ACjq3/EndVmLQEZ+LSkDiC2Q4PvV+/hLeYYBXL68Mx6N0B14NJL0r7iWOyF7S75vqu0cCORxBYwCUKgk8JPhOUjkx3eurNUtOglLLN68Z0yk58hFDP0e/a8/rZUxQ3OV2k03jEZe
-X-MS-Exchange-AntiSpam-MessageData: 7SEJHIcN8JIWbaqbdO/faTTZ9BnIS1+Ndf9rSnhr3b9VlmfZFd1lO3NFrKDz6Naq+o9bCVBrZbC4fmCSz4Io+kXvG3Ax0WBXe54/t2ZyjpVYRpD/pSuwjMdOI8+s++uta0qfypYVXPdDo7OkdMCV3IIdzS3B+wP0smO+1rKvIupOxVfquYvqkGkkOfiGHSF7B/HSwUAO/Xysj343TDBvJYtwfmHOkE0o32lfdh3hTyNNLKYyyyzrzjoFjkGNEZqhP6KPS23J8bYPGhMlPeZZlOHS3xjVQrVwr9x1LBKWNaOxrN2QnaWRu0LF9HT7G+nQuG1lGmqnNYMW8smEvhztmHQtakj/Q1rGdngAFX6icn5WpNmdW3oHeeVrrRhqD99kFmXvPnqgq0NmgFBRuskPV9X7T8lrhiMv8l5+qLvChKFhgvIgq6SzAXaencizovNHdR+qFuxh/E6kcV7NYZG/1ikekKUwECEUm3y5GJKHelc4DwXSD8It1TfPqXqyGYbr90sarkL2CdHnVSxlwN+TT4B4oekazBf322d4GOmk8tL1FxYJol8YTOPIsj6xAvsBdqn7G7G4r7eIpvmitAH5k5RGti1ilhkmN454RjAhqrkXSAcrTRwddyp6sAzn4EvuZiUDWzfmcodAmaF7T/89odZ6ZHR4ttSJatkYZE/CeatfjR4umOlx3I8x01vXPSeYggPH2RDOVWYkmf0ey9cd/ufIsi+jf9DRJ5/r5CYefWFDK9FuzVfCDbgZ4TOzxdN6N4HK164C3JBIOHx03qoaCpIxV6q7MD8CLGR1nULobg0=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca1149bb-bdda-4fa0-3d38-08d7eab8cf1f
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 14:39:36.7710 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WPM2fMFi0XiRwEWqjl8m8lloZ224qo+VoN16COzuBuBtJ822RMHnZr8Mh4pwTXv2KOzhVJhuQv9cHxQLEt43+y7GM9jT6zcSVdW+fHbnB54=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5527
-Received-SPF: pass client-ip=40.107.22.133;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 10:39:31
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.22.133
+In-Reply-To: <20200427102835.6f625859@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 23:32:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,122 +120,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
+ Wainer Moschetta <wmoschet@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to use bdrv_co_block_status in bdrv_make_zero, so move it
-now down.
+On 4/27/20 4:28 PM, Cleber Rosa wrote:
+> On Mon, 27 Apr 2020 12:51:36 +0200
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+>=20
+>> On 4/27/20 7:12 AM, Cleber Rosa wrote:
+>>> On Thu, 23 Apr 2020 23:28:21 +0200
+>>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+>> [...]
+>>>> In some cases custom runners are acceptable. These runners won't be
+>>>> "gating" but can post informative log and status.
+>>>>
+>>>
+>>> Well, I have the feeling that some people maintaining those runners
+>>> will *not* want to have them as "informational" only.  If they
+>>> invest a good amount of time on them, I believe they'll want to
+>>> reap the benefits such as other not breaking the code they rely on.
+>>>   If their system is not gating, they lose that and may find
+>>> breakage that CI did not catch.  Again, I don't think "easily
+>>> accessible" hardware should be the only criteria for
+>>> gating/non-gating status.
+>>>
+>>> For instance, would you consider, say, a "Raspberry Pi 4 Model
+>>> B", running KVM jobs to be a reproducible runner?  Would you blame a
+>>> developer that breaks a Gating CI job on such a platform and says
+>>> that he can not reproduce it?
+>>
+>> I'm not sure I understood the problem, as I'd answer "yes" but I
+>> guess you expect me to say "no"?
+>>
+>=20
+> What I mean is: would you blame such a developer for *not* having a
+> machine himself/herself that he/she can try to reproduce the failure?
+> And would you consider a "Raspberry Pi 4 Model B" an easily available
+> hardware?
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- block/io.c | 82 +++++++++++++++++++++++++++---------------------------
- 1 file changed, 41 insertions(+), 41 deletions(-)
+My view on this is if someone merged code in mainstream QEMU and=20
+maintains it, and if it is not easy to reproduce the setup (for a bug=20
+reported by a CI script), then it is the responsibility of the=20
+maintainer to resolve it. Either by providing particular access to the=20
+hardware, or be ready to spend a long debugging session over email and=20
+multiple time zones.
 
-diff --git a/block/io.c b/block/io.c
-index e6a8ead46c..3bc0daec33 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2178,47 +2178,6 @@ int bdrv_pwrite_sync(BdrvChild *child, int64_t offset,
-     return 0;
- }
- 
--/*
-- * Completely zero out a block device with the help of bdrv_pwrite_zeroes.
-- * The operation is sped up by checking the block status and only writing
-- * zeroes to the device if they currently do not return zeroes. Optional
-- * flags are passed through to bdrv_pwrite_zeroes (e.g. BDRV_REQ_MAY_UNMAP,
-- * BDRV_REQ_FUA).
-- *
-- * Returns < 0 on error, 0 on success. For error codes see bdrv_write().
-- */
--int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
--{
--    int ret;
--    int64_t target_size, bytes, offset = 0;
--    BlockDriverState *bs = child->bs;
--
--    target_size = bdrv_getlength(bs);
--    if (target_size < 0) {
--        return target_size;
--    }
--
--    for (;;) {
--        bytes = MIN(target_size - offset, BDRV_REQUEST_MAX_BYTES);
--        if (bytes <= 0) {
--            return 0;
--        }
--        ret = bdrv_block_status(bs, offset, bytes, &bytes, NULL, NULL);
--        if (ret < 0) {
--            return ret;
--        }
--        if (ret & BDRV_BLOCK_ZERO) {
--            offset += bytes;
--            continue;
--        }
--        ret = bdrv_pwrite_zeroes(child, offset, bytes, flags);
--        if (ret < 0) {
--            return ret;
--        }
--        offset += bytes;
--    }
--}
--
- int bdrv_preadv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
- {
-     int ret;
-@@ -2773,6 +2732,47 @@ int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
-     return data.ret;
- }
- 
-+/*
-+ * Completely zero out a block device with the help of bdrv_pwrite_zeroes.
-+ * The operation is sped up by checking the block status and only writing
-+ * zeroes to the device if they currently do not return zeroes. Optional
-+ * flags are passed through to bdrv_pwrite_zeroes (e.g. BDRV_REQ_MAY_UNMAP,
-+ * BDRV_REQ_FUA).
-+ *
-+ * Returns < 0 on error, 0 on success. For error codes see bdrv_write().
-+ */
-+int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
-+{
-+    int ret;
-+    int64_t target_size, bytes, offset = 0;
-+    BlockDriverState *bs = child->bs;
-+
-+    target_size = bdrv_getlength(bs);
-+    if (target_size < 0) {
-+        return target_size;
-+    }
-+
-+    for (;;) {
-+        bytes = MIN(target_size - offset, BDRV_REQUEST_MAX_BYTES);
-+        if (bytes <= 0) {
-+            return 0;
-+        }
-+        ret = bdrv_block_status(bs, offset, bytes, &bytes, NULL, NULL);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+        if (ret & BDRV_BLOCK_ZERO) {
-+            offset += bytes;
-+            continue;
-+        }
-+        ret = bdrv_pwrite_zeroes(child, offset, bytes, flags);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+        offset += bytes;
-+    }
-+}
-+
- typedef struct BdrvVmstateCo {
-     BlockDriverState    *bs;
-     QEMUIOVector        *qiov;
--- 
-2.21.0
+If it is not possible, then this specific code/setup can not claim for=20
+gating CI, and eventually mainstream isn't the best place for it.
+
+>> [...]
 
 
