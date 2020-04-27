@@ -2,126 +2,124 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B29DAC54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 11:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE63EC54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 11:28:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BFB8205C9
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 11:27:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 76515205C9
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 11:28:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="eYmoNZZS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BFB8205C9
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="f7Uw1Jco"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76515205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT1v9-00034C-L5
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 07:27:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54292)
+	id 1jT1wJ-0004aJ-Gi
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 07:28:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54434)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jT1u4-0002DX-Tt
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 07:26:25 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jT1uX-0002cm-2Q
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 07:26:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jT1u3-0005Es-2X
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 07:26:23 -0400
-Received: from mail-eopbgr80099.outbound.protection.outlook.com
- ([40.107.8.99]:53121 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jT1uV-0006W6-Hm
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 07:26:51 -0400
+Received: from mail-eopbgr80108.outbound.protection.outlook.com
+ ([40.107.8.108]:1511 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jT1u2-0004z3-8y; Mon, 27 Apr 2020 07:26:22 -0400
+ id 1jT1uV-0006Mc-4q; Mon, 27 Apr 2020 07:26:51 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RHn4vamdqBrdkjWkLLKTNm5UX6jpRH2YVJADfCkR5An0x528y65U7JOceLo/puKpV+4zlsA5TWFB8rgwPcGljDLhNNm6NUtBlDQpb+qWU5LtPsc6T20JIi4fxsKgYtmV3nqgi3BLI0irdphRMc4NIpgXLIKFkkL+sdmKNhrI7iPsEqGIEq3dEHv2fO9XzfcPBQCQuSEzY5JvrI2Nnw0ujvreF+4Fg62pIBsygWFG11NLP+Q1to838eNDNvzNiX2EuSEselZG6dw+nNkP36gy5XKLMFZIYJCN6yGuPd1AxRa5sRA5AhURLXlJOBeaFzNJBGcxw2qbpkNWOnseQBs7PA==
+ b=Iqn2YOFHQUu0NsqqBWH/SyLShWPmVW4ldHswIFf7+awK0Hd+Axd9Yep5tFt7WPb+dOhzo99xICsb3O6ue7MV5nnHY8roSxkJCovMu0uTeENEAvO7zDyfzpWMjotfC5c4FUZPLe3vwtRLQwr99I7n5BZwa6lkfScI2gmP9VYX5sycSzacR66RMi58v7LQsT7kjhySr0zxjAB/Le5NmBJ4+0uzErjsqSMWaXdCBgwut3b57aVRZrTs675NGUnJWI3F6YLaISyK+RGa5bU1S+mKg8lmV+nNPzpxPIcveibKNlgj0SYDeFAgezYveAACwjP7HgrXbCDU2N53XdOIMq4a6Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b3LPIZAXdOMxT5zsQP7u/EPAubrLEIUsq4YuoPOlcWc=;
- b=W0uXtKeYZ/NveWJagPsu0U4hjUdpxOQWzNkaic3Cy8ZWlC+2DdN0YSBNwvYM4zM9lrIQSHF8d843h4YqMvncb2Nzuom1gpm/vnbxZVoZWQNSjXvFDvaNDdNNazne4rsPVKAvUHkfnbhHT6AtKP2xJPu6QKtRbjXLFC4xHfY1ffEY7lryHuMeZz8Uzh5J8Z0zKh0YDtmYlFmQrxyxQb4e1DEsTZ3DDxoY/WrybhBtq+a1Ud1p4kfoXSShM5s9pvTvB5/zOPeWE1uKUsi0HOMVpAGfOJXH7mtOjexJILTJGxA7XyTDkLna2ETplp8P6fhhYyNDjBNX/uRkbhXDV1J/Fw==
+ bh=+9PibjwoWUpNdYymMCF8mtNA0L7nAxa39228NTCEm88=;
+ b=Y94lB9Al8EMhYTo3+H3hV49gvRXRa8JWU1N//SyR7ma9bbk4h16lHY8z+tPqH2sWbuC7CMnqIewXHLvp366KFHo8HVJ/4YYg+SWo+73tYAhPmJaVslwmrRxl6n4wxdAIKy5Z9v8XrABo2cW+63Lt6uz8bLH1z9uUkm4cmPHeExJnr07sTdegMo65tFt+W05gQwvpghMMT3qSrCCCsrP23sDLoVl6RAZuEouP021uqi7pHf4t8ev1EmUqwHni/Mta2BuC2OGIrQwsIq4fEpt+yVQDOJHiAsFgXGPs86bBHN3DiZAORL10ltP4d8rLwenYUM/TLrYfEPcCNJjQp3lx/g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b3LPIZAXdOMxT5zsQP7u/EPAubrLEIUsq4YuoPOlcWc=;
- b=eYmoNZZSiSnMe+XZVYTbiBz001NyVwmJb+DEldUis8yLJEFQYEg7FtLM38JIYKHT8GTDuXOeX/s4ofN2g7e1lv3pC4jZ7IfN4kXrl/cF2wRNmOQF+OteZzugEnrYpvX5NIBrwbUwwpqA3EgZVxBGTAt0yfSM9HfmST62vDydN6Y=
+ bh=+9PibjwoWUpNdYymMCF8mtNA0L7nAxa39228NTCEm88=;
+ b=f7Uw1JcoiKG5A7qUNK/GoD52+jRbkBL6hbmmkqXcBeoLL3xBuL3pswaSYXw/cSZQca0/rHQ0FGMzpJS6xTSjKROlNjoqs3zP733l8ob47dCBDPlCzo7yH4JZEiwNuq8jVPWXk7SyjNTqheN5mxEshEyZO0++bRfnuh0LB3eqNMk=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=vsementsov@virtuozzo.com; 
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AM7PR08MB5350.eurprd08.prod.outlook.com (2603:10a6:20b:101::10)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Mon, 27 Apr
- 2020 11:26:17 +0000
+ 2020 11:26:48 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.020; Mon, 27 Apr 2020
- 11:26:17 +0000
+ 11:26:48 +0000
 Subject: Re: [PATCH v2 02/17] block: use int64_t as bytes type in tracked
  requests
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-block@nongnu.org
+To: qemu-block@nongnu.org
 References: <20200427082325.10414-1-vsementsov@virtuozzo.com>
  <20200427082325.10414-3-vsementsov@virtuozzo.com>
- <ab987de2-812b-7d31-ed3a-aafc7d44399b@redhat.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200427142614959
-Message-ID: <d8d3666d-427d-ec76-f58e-2e82525459d8@virtuozzo.com>
-Date: Mon, 27 Apr 2020 14:26:14 +0300
+X-Tagtoolbar-Keys: D20200427142646288
+Message-ID: <6cc80abd-47aa-db37-61cc-f4f336c29801@virtuozzo.com>
+Date: Mon, 27 Apr 2020 14:26:46 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
-In-Reply-To: <ab987de2-812b-7d31-ed3a-aafc7d44399b@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20200427082325.10414-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FRYP281CA0012.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::22)
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FRYP281CA0007.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::17)
  To AM7PR08MB5494.eurprd08.prod.outlook.com
  (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from [192.168.100.2] (185.215.60.182) by
- FRYP281CA0012.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::22) with Microsoft
+ FRYP281CA0007.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::17) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2937.13 via Frontend Transport; Mon, 27 Apr 2020 11:26:15 +0000
-X-Tagtoolbar-Keys: D20200427142614959
+ 15.20.2937.13 via Frontend Transport; Mon, 27 Apr 2020 11:26:47 +0000
+X-Tagtoolbar-Keys: D20200427142646288
 X-Originating-IP: [185.215.60.182]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: adf5b505-8bb7-4096-c691-08d7ea9dcd39
+X-MS-Office365-Filtering-Correlation-Id: e2f19acd-3120-497c-073c-08d7ea9ddfe7
 X-MS-TrafficTypeDiagnostic: AM7PR08MB5350:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB53504C6C71775E677AE81B0FC1AF0@AM7PR08MB5350.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1417;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5350D863B7BA7D40CCEB56C5C1AF0@AM7PR08MB5350.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:486;
 X-Forefront-PRVS: 0386B406AA
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(376002)(346002)(136003)(366004)(396003)(39840400004)(186003)(16576012)(6486002)(86362001)(16526019)(31696002)(26005)(2906002)(36756003)(66476007)(4326008)(7416002)(81156014)(53546011)(31686004)(66556008)(316002)(66946007)(8936002)(5660300002)(52116002)(8676002)(478600001)(956004)(2616005);
+ SFS:(4636009)(376002)(346002)(136003)(366004)(396003)(39840400004)(186003)(16576012)(6486002)(86362001)(16526019)(31696002)(26005)(107886003)(2906002)(36756003)(66476007)(4326008)(7416002)(81156014)(31686004)(66556008)(316002)(66946007)(8936002)(5660300002)(52116002)(8676002)(6916009)(478600001)(956004)(2616005);
  DIR:OUT; SFP:1102; 
 Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ss7EtYDgFS+hHFyB5cR9/WvT4Xhfbu+44bt5a7N6pCxE9kK79DdZ1xRweRYIl3CXV+ujpBKr0YoDOjNBzqxL9NthTiRkWotatC+mFI8wjBp5emivAjZO77TOgVKelGMpc8KsPLhLdktvvTOuGl5zdM6E940BsMdBDWelx/a5SPDeWPqcN7ifhM+g9FRvsgGbkptdLab4Wx2ZoZwnZDiwYhybosM1JOpCh0UeZ106iofTID1BA3UH72gnUxtwHqLWmPXHjdOx/QzxVjumvCw9D6C1vhd/OjAZpj/YyklQUk/HPpY0K4XlkbuAwBz4MI60RxYSErUlof91t0HZGDD+/I9I+y/p/N+gge+DekxInf4hSYs1yXwutb7S4oVOHq724rp2yAVsA7WJMNHeaidEiqnwdq5WpENb07ZUqZgGua9cV9gfw58MgfkQA29y4RCD
-X-MS-Exchange-AntiSpam-MessageData: IXS7XTMhdA+cgo20haffmFW7gHKHmUO3CQZ0so16GbpH6ioSA4aMhovRI1yO6OQlkjPMgHgbBUXz5GTWi5KOIOWrPVnOlDtj34VYwwhD6LNQNMM7ytQWI/ygLTsk7b43Ei9qCGpQ5E9nntqirk3fWbDQzu8yRbc7jPH/5yW25QSsgpCdseoi7juRMguCyaCcp+1aAUbARbAI50mgm/LuGNBaSYLK4XPvkFLuvfFEuJNK/JUUVmbzhGPawjBrt0BkvKKfzoQFf3zA7lOc6m7RYvGqqeaEulbF1Wo07gQrvTSoaVncTjmJgiRjk/9ntSi726UN6XVGqyAyCO2wLRBuwjc7TGLpgV8/8GC8V6o2IsxNGeZzOrP8zjZ+mUuxnQaYDbwwuXKcN/zx3vHVucw+7wJnbAoLcBwBFxud/W9nidkTKwyHHMxJ3D4Q2PMYLk2S8G3DwAJWI6rbeBdcOHnEIliad1qVYmQjr7SAdkYPDc811wiGCyjlUIMa2+uSTF3ojYXQfFonAX6UaMPcUqz4NkBRwxbvKXr7TXJCaZdMmPyNWZhmHpuGu7FpTlRnjkJB+CwkphUCgII51PYiY17nut4gHYSfjYeK1nb4Q0zmuM7FQ/0cd1nuNcc7NteifJp9JXVrSqF2qN/Hyg6/FALrkjDJpR+lvlFAvzF0wlvQGSuBkGT7m77Y0IsvNdtwHLv5Tk1V8gJxDvGZ05sT9w1xfJwZ2WvBXl5RLW0TvPqAIM18i9Oz3dAWBh/vlwFkZrXGtSJ1te095eOl//S3jJlVFCOPwW8WNuBch+MCcv6k8bM=
+X-Microsoft-Antispam-Message-Info: tmRdskM1UUyGnZXMoSXqeZXDu4xVGzFINsZofbD0xwEyT18nEpmC9DghjHyQe+wYz/5+n+aIzbkYSWjyak5oAITv4ud+30ZtHTMGlW2L0tAP+FZCGXP+BBSy03A/APRcWjI+9Nr0W80pBrXKwvzsolr4tZ/GWKEdC2k4FznzyNDOtnhIWGGuD22j9g+4e1S6YJYvqQusAsmRFRyrJilAb1Z4fr+jtuEUkzcEbbMtMnXqJJ8uEtJd/Izs9/84k7Vv7uqPujzZAEgIPJVmZ5CpxThw1j872gPq2RN/b/GkT1xd+arnAks7XhTFP0XNND3khJoYBgGOkjRzAyKOwexM9vJyOfd4FCsU7QYkcEtvshxeBuPZBJB20nM/NOwhIQ9o5GL/cxQxm71Lx8JFoptMX8WMnw+pAvilN9yoZJjH+C8Yb7oF0OFFPPJYC4tZNZdf
+X-MS-Exchange-AntiSpam-MessageData: +zc2oVrtmpWnCVk1eHxasCnwE6+fki49rkbx3lzkyjhHNl8e6OEGU+rFhoyqHRrRGRJTwLANVHOPWlvrlNUGvcH59y6sQ4eLgRp9L8CtFbMiW06hKKhw6ySvB34whIO9hgcROwBt9xyWNQWWujTdkn+4k5L6UwtnhSgE0edYTZwmuty1E6btDYPpskjY4CRucDNhGFNWZ3chBnVL3NNvPdI37wt4CVXpCjPV+0QxfHSD42BzSf07Cbx29Vl12S5fgY4Cclb9R8hnBS7ndGkqy27pZKmaef4HVoBqMmK+hpd7ICbk8+3b9tmGxvVqVlgZmlZjsOkgkvr1daRzMr+aY+tcfK9JWQbEFqvIOKUTS2phxqeNM7mAuMYcFvgvm25IUCwyEluwEN6KRvV8ZQ7ewxIyKJthXNHjUzMaMq46ZbVzBH8jZDIAA0y3nNGXauvXB5iZ3yzajWSisfFK2EZ2E/35Jq6+ykfxoL8n0enKmlRqqfEZ6hJQFZGDlGqlZW91EpgbZ7kZIFNbxs7UnQXYKA++kTScJsfPN4rp+dJhiXtCnBJqf4W2XxW6AI0UaQyyiTFY7VJ1T1WBmU+YvfI04COnYjsPDarm8/tT6sKlUREe6xVdK/zC4M4T9RoG8aHfPLVlPH+7TQzS/o1SLQotAHbcEormuLFi9eCGFo7JDvoDqniDXVobVLqlO5236lEXeGM7mZEI+Lmokm+KBH3RkuEzEq/4FHnRVZos9fom89NlGW2QYIZynWw2h0kQtcJWOme2m7+tHDdYxxmPLUaZ0UDOvMs16TB37KxR7jVv7jo=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: adf5b505-8bb7-4096-c691-08d7ea9dcd39
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 11:26:17.2693 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e2f19acd-3120-497c-073c-08d7ea9ddfe7
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 11:26:48.5211 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sTukyl47wZ8GS3nfQ6pR6Zq9VOh71QN0tTJAHikTiV5ArxkrJP6GE5/vNtqKsBCXyFIs2bEff8aqXfyr1fh1cifbMH1bN7phYe4u7gOD+7s=
+X-MS-Exchange-CrossTenant-UserPrincipalName: Fl/8uoPfM+TW0LtGrDQRZFcU0ylkO0vfPjHqlVxd1ONw19TPZ4w3NsH0ih5QGiv1+gPTRtywvVEVAQXAajOTlrG98JzIBqUUWuKMqznUPBQ=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5350
-Received-SPF: pass client-ip=40.107.8.99;
+Received-SPF: pass client-ip=40.107.8.108;
  envelope-from=vsementsov@virtuozzo.com;
  helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 07:26:18
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 07:26:49
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.8.99
+X-Received-From: 40.107.8.108
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,28 +132,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org, berto@igalia.com,
- ronniesahlberg@gmail.com, sw@weilnetz.de, stefanha@redhat.com, pl@kamp.de,
- qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com,
- sheepdog@lists.wpkg.org, pbonzini@redhat.com, pavel.dovgaluk@ispras.ru,
- namei.unix@gmail.com, den@openvz.org, dillaman@redhat.com, ari@tuxera.com
+ pavel.dovgaluk@ispras.ru, dillaman@redhat.com, qemu-devel@nongnu.org,
+ pl@kamp.de, ronniesahlberg@gmail.com, mreitz@redhat.com, den@openvz.org,
+ sheepdog@lists.wpkg.org, stefanha@redhat.com, namei.unix@gmail.com,
+ pbonzini@redhat.com, sw@weilnetz.de, jsnow@redhat.com, ari@tuxera.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-27.04.2020 13:11, Philippe Mathieu-Daudé wrote:
-> On 4/27/20 10:23 AM, Vladimir Sementsov-Ogievskiy wrote:
->> We are generally moving to int64_t for both offset and bytes parameters
->> on all io paths. Convert tracked requests now.
+27.04.2020 11:23, Vladimir Sementsov-Ogievskiy wrote:
+> We are generally moving to int64_t for both offset and bytes parameters
+> on all io paths. Convert tracked requests now.
 > 
-> This doesn't seem a strong justification... If I understand correctly this patch, it is safer to use positive signed type rather than unsigned type. OK it might make sense to better catch overflow, but it should be explained in the function prototypes, else commit message, else the series cover IMHO.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>   include/block/block_int.h |  4 ++--
+>   block/io.c                | 11 ++++++-----
+>   2 files changed, 8 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 4c3587ea19..c8daba608b 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -70,12 +70,12 @@ enum BdrvTrackedRequestType {
+>   typedef struct BdrvTrackedRequest {
+>       BlockDriverState *bs;
+>       int64_t offset;
+> -    uint64_t bytes;
+> +    int64_t bytes;
+>       enum BdrvTrackedRequestType type;
+>   
+>       bool serialising;
+>       int64_t overlap_offset;
+> -    uint64_t overlap_bytes;
+> +    int64_t overlap_bytes;
+>   
+>       QLIST_ENTRY(BdrvTrackedRequest) list;
+>       Coroutine *co; /* owner, used for deadlock detection */
+> diff --git a/block/io.c b/block/io.c
+> index aba67f66b9..7cbb80bd24 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -692,10 +692,11 @@ static void tracked_request_end(BdrvTrackedRequest *req)
+>   static void tracked_request_begin(BdrvTrackedRequest *req,
+>                                     BlockDriverState *bs,
+>                                     int64_t offset,
+> -                                  uint64_t bytes,
+> +                                  int64_t bytes,
+>                                     enum BdrvTrackedRequestType type)
+>   {
+> -    assert(bytes <= INT64_MAX && offset <= INT64_MAX - bytes);
+> +    assert(offset >= 0 && bytes >= 0 &&
+> +           bytes <= INT64_MAX && offset <= INT64_MAX - bytes);
+>   
+>       *req = (BdrvTrackedRequest){
+>           .bs = bs,
+> @@ -716,7 +717,7 @@ static void tracked_request_begin(BdrvTrackedRequest *req,
+>   }
+>   
+>   static bool tracked_request_overlaps(BdrvTrackedRequest *req,
+> -                                     int64_t offset, uint64_t bytes)
+> +                                     int64_t offset, int64_t bytes)
+>   {
+>       /*        aaaa   bbbb */
+>       if (offset >= req->overlap_offset + req->overlap_bytes) {
+> @@ -773,8 +774,8 @@ bool bdrv_mark_request_serialising(BdrvTrackedRequest *req, uint64_t align)
+>   {
+>       BlockDriverState *bs = req->bs;
+>       int64_t overlap_offset = req->offset & ~(align - 1);
+> -    uint64_t overlap_bytes = ROUND_UP(req->offset + req->bytes, align)
+> -                               - overlap_offset;
+> +    int64_t overlap_bytes =
+> +            ROUND_UP(req->offset + req->bytes, align) - overlap_offset;
 
-First time I decided to follow the tendency not to copy the whole cover-letter from previous series, but just give a link to it :) It's chosen not for safety..
+sorry, I forget to fix indentation
 
-My reason is the fact that some functions may return int64_t offset/bytes, and negative values are used to indicate an error. It seems good to use same type always, making it simple to reuse local variables for storing return value and as arguments (if it is appropriate in the context).
+>       bool waited;
+>   
+>       qemu_co_mutex_lock(&bs->reqs_lock);
+> 
 
-Eric also added (in v1 thread), that off_t is signed too.
-
-So the aim of the series is not signed type, the aim is 64bit. And for consistency, we should use same type for all io functions. And my proposal is int64_t, for these two reasons above. May be good to add them to the first commit message.
 
 -- 
 Best regards,
