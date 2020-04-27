@@ -8,71 +8,71 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 464A0C4CECD
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 18:21:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BCBCC4CECC
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 18:21:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E9B920775
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 18:21:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FB7020775
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 18:21:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ixkFq8Vg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E9B920775
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dwvxhXQO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FB7020775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT8NL-0006Xw-5q
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 14:21:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34878)
+	id 1jT8NQ-0006n2-7z
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 14:21:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34932)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jT8JP-0000CB-K0
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 14:16:59 -0400
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jT8JT-0000IM-5j
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 14:17:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jT8JP-0005HY-7n
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 14:16:59 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:39827)
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jT8JS-0005Nt-La
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 14:17:02 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:44778)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jT8JO-0005Gf-Rq; Mon, 27 Apr 2020 14:16:58 -0400
-Received: by mail-lj1-x243.google.com with SMTP id u6so18612808ljl.6;
- Mon, 27 Apr 2020 11:16:55 -0700 (PDT)
+ id 1jT8JS-0005Iw-6a; Mon, 27 Apr 2020 14:17:02 -0400
+Received: by mail-lj1-x243.google.com with SMTP id a21so15743264ljj.11;
+ Mon, 27 Apr 2020 11:17:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Yhbn5ObUlRXLSdZsWox5a/Dx90Rzfq3EfLk5bL4LODc=;
- b=ixkFq8VgmDMV3Is1MkLVmjPbXi9rK+RdNdnT1YQRZenBi4QE+5E3SzFZoMUBi7ZS1M
- bQ+LcEyu6B06ZTSmZMI07Y+BlmrC0Frwa23CdGzYVwLABSh9DHx+H5QFVAL3NAe6bx0g
- D+9+Bhh5QML+PijWjZPCn1AMgvnZdza1rW4mM7mqmVcwDITqWr6peBvvVOqdSWlQNkiO
- WhrxI281bKtfYVkTty3f0klw03JQtO+VLwLYCbV37mEChP7H6HyMg5r6ggVUF2rEzrcF
- 22XL52iBM1uCtDzPCea3VV+Rc6sTN3hb/y8qA7sfBKxcjlHZueWci2NP3By3FVULTC/6
- 2PIA==
+ bh=ppDFNV0HS5PGl+N0yG8aeZ7r5RAGOOBwmZI9oUukmYs=;
+ b=dwvxhXQOT+G38pYEQIAHeXbXYOWFA03bEal1MB0n5lJD1XIP4f73hB3MOkEmZtEKxK
+ XLqXhznW1lqlhKES2YCgz9K4QHdK89cOUjtdbQ6wCnUcHupEP/w57taV1Xy32RzkpFIl
+ bocjoWmAlvTgUlHcEl8yhClz9EHgwSd7FRbBuJgobqX9i/z7ddz4g2pHuPCX8GG/uBr6
+ A5S6u/T/EqXKbjViv5JCdqmkP1ns9QcG8HZTV+6bzoHgwmgjhx4wGSiTbQtYgCCfTXX5
+ WmsFoJ1Mspkjt17r/EkPTyCF6ubfnF2J/TOcnimQVoIdT5YlJqKF4eq/5FK2CanHCHQg
+ 543w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Yhbn5ObUlRXLSdZsWox5a/Dx90Rzfq3EfLk5bL4LODc=;
- b=WN0FWuiwsEGdR88D9fYiUBko7bmCsn7GFrgv1gasD4Oq2IxwKfDiA14SC34q6z/o+t
- Jqdoh117vAQuU4qxV1b1GUGHjrIJDPT/9JBPKbluRxr99btfdkviV2XJiijEYU690axK
- 5bOQr1aA39YxNHml1YrwQkEJHhj7+DEOyRdF38ArICN8d7BRvCYVlRjQ3oCg89WOYKxb
- fqnKDBQTKMMm2GjmZ2zJn3iwPYUIhaCCeq6udJKTwBfgjxhbaHFmd7ujmElMgtmiWWb3
- 0pzm5rWWR80zLSJVtH5E3yEVwVv9ERTBya5YMvdrXYeh4hyaYTNuipcbhrpFKHRaxLE5
- 4YhA==
-X-Gm-Message-State: AGi0PubQgKXxjDP+r+HvWRX2Rm0DCUaQTpLK/GLj3deHsyRd1k2Sofqp
- SWFA+tvg+JINu6fxCjdisnFgQEaPhiU=
-X-Google-Smtp-Source: APiQypJtr6MwhnPbz0ASElLt+tMIG/jNcMwa/RVvP7nTg+pixv1rfhOUZ4gG9xhh/qmxDiuiNqGyhA==
-X-Received: by 2002:a2e:b4a5:: with SMTP id q5mr15395300ljm.58.1588011414315; 
- Mon, 27 Apr 2020 11:16:54 -0700 (PDT)
+ bh=ppDFNV0HS5PGl+N0yG8aeZ7r5RAGOOBwmZI9oUukmYs=;
+ b=NV1ThWYTFsc6XDX5aihKiVT+4g6de5yPaDa6Gt2gGNZvlOapsY8hJUp7f0Bdvenayr
+ Oew+bhYpCFY9S6b28pnc1ING7eTReMotagIghQS4i2jXa6IAUMK1+EA21BIq/VMPJby2
+ nhWbzY+jupB0HeN40R9cXccOLpxpbd35bgY192VIa8QOMOghKBYENdbAYayXrHA81Mzz
+ gx7USYCjHmpWK21FhMCngv7TeFYMWnch+HUGBEcSEcFLd8VeOzG6b64RsB/yhjxsmn1V
+ WG2VsbIhIp4S3v68p/3J4eyQkvzSQrhUojnESrOLSsVXFgZDbRBCqAobgk1q4M608jVL
+ zqmA==
+X-Gm-Message-State: AGi0PuYkjQakbrgHotLs5ybd7IpbF6DvztyaJHrObgnz6V773R78b8Vh
+ nA+zBc4z0/xkyVOmZi4m9DBYuTFpBaY=
+X-Google-Smtp-Source: APiQypJeNSDwuZbrkgLApxqx9DKVFovq5rGjhGZtnhNkjxlZDyqpIj9Oaasv73gjDTjkIh3eNk1D3w==
+X-Received: by 2002:a2e:b17a:: with SMTP id a26mr14138623ljm.215.1588011419970; 
+ Mon, 27 Apr 2020 11:16:59 -0700 (PDT)
 Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id w29sm77771lfq.35.2020.04.27.11.16.53
+ by smtp.gmail.com with ESMTPSA id 14sm11458578lfz.8.2020.04.27.11.16.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Apr 2020 11:16:53 -0700 (PDT)
+ Mon, 27 Apr 2020 11:16:59 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 03/11] hw/arm: versal-virt: Fix typo xlnx-ve -> xlnx-versal
-Date: Mon, 27 Apr 2020 20:16:41 +0200
-Message-Id: <20200427181649.26851-4-edgar.iglesias@gmail.com>
+Subject: [PATCH v1 07/11] hw/arm: versal: Embedd the APUs into the SoC type
+Date: Mon, 27 Apr 2020 20:16:45 +0200
+Message-Id: <20200427181649.26851-8-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200427181649.26851-1-edgar.iglesias@gmail.com>
 References: <20200427181649.26851-1-edgar.iglesias@gmail.com>
@@ -106,26 +106,90 @@ Sender: "Qemu-devel"
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Fix typo xlnx-ve -> xlnx-versal.
+Embedd the APUs into the SoC type.
 
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/arm/xlnx-versal-virt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/arm/xlnx-versal-virt.c    |  4 ++--
+ hw/arm/xlnx-versal.c         | 19 +++++--------------
+ include/hw/arm/xlnx-versal.h |  2 +-
+ 3 files changed, 8 insertions(+), 17 deletions(-)
 
 diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
-index 878a275140..8a608074d1 100644
+index 8a608074d1..d7be1ad494 100644
 --- a/hw/arm/xlnx-versal-virt.c
 +++ b/hw/arm/xlnx-versal-virt.c
-@@ -440,7 +440,7 @@ static void versal_virt_init(MachineState *machine)
-         psci_conduit = QEMU_PSCI_CONDUIT_SMC;
+@@ -469,9 +469,9 @@ static void versal_virt_init(MachineState *machine)
+     s->binfo.get_dtb = versal_virt_get_dtb;
+     s->binfo.modify_dtb = versal_virt_modify_dtb;
+     if (machine->kernel_filename) {
+-        arm_load_kernel(s->soc.fpd.apu.cpu[0], machine, &s->binfo);
++        arm_load_kernel(&s->soc.fpd.apu.cpu[0], machine, &s->binfo);
+     } else {
+-        AddressSpace *as = arm_boot_address_space(s->soc.fpd.apu.cpu[0],
++        AddressSpace *as = arm_boot_address_space(&s->soc.fpd.apu.cpu[0],
+                                                   &s->binfo);
+         /* Some boot-loaders (e.g u-boot) don't like blobs at address 0 (NULL).
+          * Offset things by 4K.  */
+diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
+index ebd2dc51be..c8a296e2e0 100644
+--- a/hw/arm/xlnx-versal.c
++++ b/hw/arm/xlnx-versal.c
+@@ -31,19 +31,11 @@ static void versal_create_apu_cpus(Versal *s)
+ 
+     for (i = 0; i < ARRAY_SIZE(s->fpd.apu.cpu); i++) {
+         Object *obj;
+-        char *name;
+-
+-        obj = object_new(XLNX_VERSAL_ACPU_TYPE);
+-        if (!obj) {
+-            error_report("Unable to create apu.cpu[%d] of type %s",
+-                         i, XLNX_VERSAL_ACPU_TYPE);
+-            exit(EXIT_FAILURE);
+-        }
+-
+-        name = g_strdup_printf("apu-cpu[%d]", i);
+-        object_property_add_child(OBJECT(s), name, obj, &error_fatal);
+-        g_free(name);
+ 
++        object_initialize_child(OBJECT(s), "apu-cpu[*]",
++                                &s->fpd.apu.cpu[i], sizeof(s->fpd.apu.cpu[i]),
++                                XLNX_VERSAL_ACPU_TYPE, &error_abort, NULL);
++        obj = OBJECT(&s->fpd.apu.cpu[i]);
+         object_property_set_int(obj, s->cfg.psci_conduit,
+                                 "psci-conduit", &error_abort);
+         if (i) {
+@@ -57,7 +49,6 @@ static void versal_create_apu_cpus(Versal *s)
+         object_property_set_link(obj, OBJECT(&s->fpd.apu.mr), "memory",
+                                  &error_abort);
+         object_property_set_bool(obj, true, "realized", &error_fatal);
+-        s->fpd.apu.cpu[i] = ARM_CPU(obj);
+     }
+ }
+ 
+@@ -95,7 +86,7 @@ static void versal_create_apu_gic(Versal *s, qemu_irq *pic)
      }
  
--    sysbus_init_child_obj(OBJECT(machine), "xlnx-ve", &s->soc,
-+    sysbus_init_child_obj(OBJECT(machine), "xlnx-versal", &s->soc,
-                           sizeof(s->soc), TYPE_XLNX_VERSAL);
-     object_property_set_link(OBJECT(&s->soc), OBJECT(machine->ram),
-                              "ddr", &error_abort);
+     for (i = 0; i < nr_apu_cpus; i++) {
+-        DeviceState *cpudev = DEVICE(s->fpd.apu.cpu[i]);
++        DeviceState *cpudev = DEVICE(&s->fpd.apu.cpu[i]);
+         int ppibase = XLNX_VERSAL_NR_IRQS + i * GIC_INTERNAL + GIC_NR_SGIS;
+         qemu_irq maint_irq;
+         int ti;
+diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
+index 94b7826fd4..426b66449d 100644
+--- a/include/hw/arm/xlnx-versal.h
++++ b/include/hw/arm/xlnx-versal.h
+@@ -36,7 +36,7 @@ typedef struct Versal {
+     struct {
+         struct {
+             MemoryRegion mr;
+-            ARMCPU *cpu[XLNX_VERSAL_NR_ACPUS];
++            ARMCPU cpu[XLNX_VERSAL_NR_ACPUS];
+             GICv3State gic;
+         } apu;
+     } fpd;
 -- 
 2.20.1
 
