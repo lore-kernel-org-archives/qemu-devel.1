@@ -2,87 +2,94 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C092C55199
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:39:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD59C54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:43:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C782D206A5
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:39:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 164A1206A5
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:43:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="jQsWlTau"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C782D206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vfxAZ9n6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 164A1206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT0Eq-00086S-UQ
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 05:39:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34778)
+	id 1jT0IQ-0003fp-74
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 05:43:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35724)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dimastep@yandex-team.ru>) id 1jT0E5-0006ok-DF
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:38:57 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jT0Ho-0002zf-5X
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:42:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dimastep@yandex-team.ru>) id 1jT0E4-00013Q-T1
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:38:57 -0400
-Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:49692)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1jT0Dv-0000RR-GX; Mon, 27 Apr 2020 05:38:48 -0400
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
- [IPv6:2a02:6b8:0:1402::301])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id E78AD2E0DDB;
- Mon, 27 Apr 2020 12:38:38 +0300 (MSK)
-Received: from iva4-7c3d9abce76c.qloud-c.yandex.net
- (iva4-7c3d9abce76c.qloud-c.yandex.net [2a02:6b8:c0c:4e8e:0:640:7c3d:9abc])
- by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- Gz0JQogBxN-cZQOlabg; Mon, 27 Apr 2020 12:38:38 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1587980318; bh=58bnVAmHqFrCWzlW/V20/mHgMY3ZzYOjLUidyQPQPvI=;
- h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
- b=jQsWlTau2EpKeZiO3QytH1aqJUZ6PSsq2lzBUNdUCejMUup5QbSB/oDjnpS/gbfH7
- 7K8PYV8Lh0Zr1RXIB3s2lOdhIhKmgdPRjAfhMXudYmztthNSjCZLipCxE43rswpH8F
- wcuz8jjt6hx3lhHbGFXboYphIPQq+qBeZTXuJwcY=
-Authentication-Results: mxbackcorp1g.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-iva.dhcp.yndx.net (dynamic-iva.dhcp.yndx.net
- [2a02:6b8:b080:9012::1:1])
- by iva4-7c3d9abce76c.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- j4zkk2ThIK-cZWm2nLh; Mon, 27 Apr 2020 12:38:35 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (Client certificate not present)
-Date: Mon, 27 Apr 2020 12:38:33 +0300
-From: Dima Stepanov <dimastep@yandex-team.ru>
-To: Li Feng <fengli@smartx.com>
-Subject: Re: [RFC PATCH v1 3/7] char-socket: initialize reconnect timer only
- if close is emitted
-Message-ID: <20200427093824.GA8175@dimastep-nix>
-References: <cover.1587667007.git.dimastep@yandex-team.ru>
- <23b36a73ce1150cc501f436684ca558608de3322.1587667007.git.dimastep@yandex-team.ru>
- <CAJ+F1CJgzqSDnU==Fi4-fQ3Fh97BgEnNd_GZOg8n9i1C4xsOmw@mail.gmail.com>
- <CAHckoCz7ZjKQu6XkFNA9DLH4RMbjGRTpZDAwyiRbUB2_Zw7+NQ@mail.gmail.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1jT0Hm-0006GA-Le
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:42:47 -0400
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:55735)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jT0Hm-0005zW-7W
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:42:46 -0400
+Received: by mail-wm1-x32f.google.com with SMTP id e26so18785215wmk.5
+ for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 02:42:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=k97sNWzU0RUQ8HcGwHD7exutFNaktf7X81U7Sn1Qaz8=;
+ b=vfxAZ9n6GyCCEBlkyBb0DkFkESFNehVBODGXPz17lf6ZiXV/ZL4h3Fp1fcF5PEE8fm
+ 7avTXo5Err2S4bbUVssbTw573UoW+sOO4BVwZkNkQTYv8278o3mdNn7phm2TTwSkwcEI
+ 1uWeeoPanBmm2KJx7ZTHNZ2jgGwdodd1ImL3jH7+LY245YGLHyzOL4CitHqnP0iPcun+
+ C8+o6B/7Oarx3r/oJYnVPzNED8My2k6GpEipxLgHTAzi0062101eJEXq+IkkttcSmIUx
+ e9UzObA9ds8jVw1WMjwnS7TUTA6UJcjL06YxD15LJuDOqQOn2TeKeq9G2qZO0hhfh1Zu
+ WkNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=k97sNWzU0RUQ8HcGwHD7exutFNaktf7X81U7Sn1Qaz8=;
+ b=mK2ijGUVna4UVhCkwwpVVxTlHX+6wONXZmp4LTQjwc42P+TPr1nZBA72vK6KO7z70m
+ DqqpDYLUKT/PeNWUqZ7bQfAUlMZJB6wrZLOwJS+1941wmwEq+cJr79fd10C5soNPi3Vj
+ iLFj7F6/pV2R8CQBxj/QSwl69L9zGbMzul+ONmUuIIJlfDKzRN40ZsPak0tbCIgheS+6
+ 3c9TW1z2fx+Rtty4xAkt6ltnx0oS71MASl8LbR76XIMJ0Be8VHF8BGc+wQo3q2t9EHVJ
+ 9JZgVjCwKjlrXYSJjVL1kgLbm8/1BvmUsDV5PDdRYfxiNVMtg5HU0lbCDpQxloxqO1Lt
+ ktYg==
+X-Gm-Message-State: AGi0PubsmY4L8SkKz9WQzWrMc7Ni1BR3K2ZEzYiFanMCMhio6yuunyZp
+ ts5AsWm8SRXIARKVMsEiUerpXQ==
+X-Google-Smtp-Source: APiQypK+u4h3WJP2VO8XRM+wZU3KD5xiSZuELeC34LAH2KxauhWE4DeO+m4OjRqidi76d13xv3C6AQ==
+X-Received: by 2002:a7b:c755:: with SMTP id w21mr24619073wmk.120.1587980563697; 
+ Mon, 27 Apr 2020 02:42:43 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id h188sm16121265wme.8.2020.04.27.02.42.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 27 Apr 2020 02:42:42 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C59FC1FF7E;
+ Mon, 27 Apr 2020 10:42:41 +0100 (BST)
+References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: luoyonggang@gmail.com
+Subject: Re: About hardfloat in ppc
+In-reply-to: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
+Date: Mon, 27 Apr 2020 10:42:41 +0100
+Message-ID: <87lfmhl0xa.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHckoCz7ZjKQu6XkFNA9DLH4RMbjGRTpZDAwyiRbUB2_Zw7+NQ@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Received-SPF: pass client-ip=2a02:6b8:0:1619::183;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::32f;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32f.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a02:6b8:0:1619::183
+X-Received-From: 2a00:1450:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,114 +98,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- Gonglei <arei.gonglei@huawei.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
- yc-core@yandex-team.ru, Paolo Bonzini <pbonzini@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Apr 26, 2020 at 03:26:58PM +0800, Li Feng wrote:
-> This patch is trying to fix the same issue with me.
-> However, our fix is different.
-> 
-> I think that check the s->reconnect_timer is better.
 
-I also thought about your solution:
-  - if (s->reconnect_time) {
-  + if (s->reconnect_time && !s->reconnect_timer) {
-But was afraid of possible side effects. Since Marc-André approved your
-fix, i'm also good with your approach. In this case i'll remove this
-patch from the v2 patchset.
+=E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyonggang@gmail.com> writes:
 
-Thanks for handling it!
+> Because ppc fpu-helper are always clearing float_flag_inexact,
+> So is that possible to optimize the performance when  float_flag_inexact
+> are cleared?
 
-> 
-> Thanks,
-> Feng Li
-> 
-> Marc-André Lureau <marcandre.lureau@gmail.com> 于2020年4月24日周五 上午3:16写道：
-> 
-> 
-> >
-> > Hi
-> >
-> > On Thu, Apr 23, 2020 at 8:41 PM Dima Stepanov <dimastep@yandex-team.ru> wrote:
-> > >
-> > > During vhost-user reconnect functionality testing the following assert
-> > > was hit:
-> > >   qemu-system-x86_64: chardev/char-socket.c:125:
-> > >   qemu_chr_socket_restart_timer: Assertion `!s->reconnect_timer' failed.
-> > >   Aborted (core dumped)
-> >
-> > That looks related to "[PATCH 3/4] char-socket: avoid double call
-> > tcp_chr_free_connection"
-> >
-> > > This is observed only if the connection is closed by the vhost-user-blk
-> > > daemon during the initialization routine. In this case the
-> > > tcp_chr_disconnect_locked() routine is called twice. First time it is
-> > > called in the tcp_chr_write() routine, after getting the SIGPIPE signal.
-> > > Second time it is called when vhost_user_blk_connect() routine return
-> > > error. In general it looks correct, because the initialization routine
-> > > can return error in many cases.
-> > > The tcp_chr_disconnect_locked() routine could be fixed. The timer will
-> > > be restarted only if the close event is emitted.
-> > >
-> > > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-> > > ---
-> > >  chardev/char-socket.c | 10 +++++-----
-> > >  1 file changed, 5 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> > > index c128cca..83ca4d9 100644
-> > > --- a/chardev/char-socket.c
-> > > +++ b/chardev/char-socket.c
-> > > @@ -476,7 +476,7 @@ static void update_disconnected_filename(SocketChardev *s)
-> > >  static void tcp_chr_disconnect_locked(Chardev *chr)
-> > >  {
-> > >      SocketChardev *s = SOCKET_CHARDEV(chr);
-> > > -    bool emit_close = s->state == TCP_CHARDEV_STATE_CONNECTED;
-> > > +    bool was_connected = s->state == TCP_CHARDEV_STATE_CONNECTED;
-> > >
-> > >      tcp_chr_free_connection(chr);
-> > >
-> > > @@ -485,11 +485,11 @@ static void tcp_chr_disconnect_locked(Chardev *chr)
-> > >                                                chr, NULL, chr->gcontext);
-> > >      }
-> > >      update_disconnected_filename(s);
-> > > -    if (emit_close) {
-> > > +    if (was_connected) {
-> > >          qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-> > > -    }
-> > > -    if (s->reconnect_time) {
-> > > -        qemu_chr_socket_restart_timer(chr);
-> > > +        if (s->reconnect_time) {
-> > > +            qemu_chr_socket_restart_timer(chr);
-> > > +        }
-> > >      }
-> > >  }
-> > >
-> > > --
-> > > 2.7.4
-> > >
-> > >
-> >
-> >
-> > --
-> > Marc-André Lureau
-> 
-> -- 
-> The SmartX email address is only for business purpose. Any sent message 
-> that is not related to the business is not authorized or permitted by 
-> SmartX.
-> 本邮箱为北京志凌海纳科技有限公司（SmartX）工作邮箱. 如本邮箱发出的邮件与工作无关,该邮件未得到本公司任何的明示或默示的授权.
-> 
-> 
+There was some discussion about this in the last thread about enabling
+hardfloat for PPC. See the thread:
+
+  Subject: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+  Date: Tue, 18 Feb 2020 18:10:16 +0100
+  Message-Id: <20200218171702.979F074637D@zero.eik.bme.hu>
+
+However in short the problem is if the float_flag_inexact is clear you
+must use softfloat so you can properly calculate the inexact status. We
+can't take advantage of the inexact stickiness without loosing the
+fidelity of the calculation.
+
+--=20
+Alex Benn=C3=A9e
 
