@@ -2,93 +2,135 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA22FC54FCB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 15:22:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3004C54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 15:31:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC96E2054F
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 15:22:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 871C020656
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 15:31:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A8zWcjVA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC96E2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PgBWZPre";
+	dkim=pass (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="AbSv/OZu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 871C020656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50953 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT5aC-00028G-SU
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 11:22:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36636)
+	id 1jT5jW-00023k-Kz
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 11:31:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jT5Z8-0000a3-7V
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 11:21:05 -0400
+ (envelope-from <steplong@quicinc.com>) id 1jT5hO-0007gu-MQ
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 11:29:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jT5Z2-0003px-QT
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 11:21:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42900
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jT5Z2-0003ON-CS
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 11:20:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588000851;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9RfsftBIQkIbPtPvwLFbQ9i7OHhaqSTHoPEQ1dSEY0c=;
- b=A8zWcjVAAakeDvtIJ9dI1mBdva3Ine92qDO1EcSahmz+5NXWpRSNAuDluZJ7bm0r0JuP2b
- /FRB6RHKnokkqOYrqZxJ9gO3Wvs+hBR3IHjFMKP8XdrJKbrh1SVcfOmFFSsSY2/Y6W+VVx
- nceKz9AJlEwfNqMNj3YMesmEQVu+n0U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-OC2cYvWtMDiyU3iobR1SlA-1; Mon, 27 Apr 2020 11:20:47 -0400
-X-MC-Unique: OC2cYvWtMDiyU3iobR1SlA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D070546B;
- Mon, 27 Apr 2020 15:20:46 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.23])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B1B919C58;
- Mon, 27 Apr 2020 15:20:39 +0000 (UTC)
-Date: Mon, 27 Apr 2020 16:20:36 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 0/5] QEMU Gating CI
-Message-ID: <20200427152036.GI1244803@redhat.com>
-References: <CAFEAcA9W4KXN6dcT0CNyD_mQ3xY5wDmJ7i0wowhaG2XPmyMYng@mail.gmail.com>
- <87sgi49uf6.fsf@dusky.pond.sub.org>
- <CAFEAcA_dcVneQ4Hj61GAkYRCUSMrA=QjwnAXccoBwjUjOE-wSQ@mail.gmail.com>
- <529508877.9650370.1587661453005.JavaMail.zimbra@redhat.com>
- <20200423171322.GJ1077680@redhat.com>
- <69e77a6e-8db8-f617-bfe6-1c8f39ec81b4@redhat.com>
- <20200427011210.745db351@redhat.com>
- <05670290-5ba0-8be0-624b-da1c95f3e820@redhat.com>
- <20200427102835.6f625859@redhat.com>
- <48b0d8e6-3b9d-981d-c6a3-bdee5580f701@redhat.com>
+ (envelope-from <steplong@quicinc.com>) id 1jT5hI-0004Rp-NT
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 11:29:33 -0400
+Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:49183)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
+ id 1jT5hH-0004QT-HR; Mon, 27 Apr 2020 11:29:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1588001367; x=1619537367;
+ h=from:to:cc:subject:date:message-id:mime-version;
+ bh=ukVOBhRuoyuJdxJJZaT28IUT9HZ+mtnFzCtlL4lL88w=;
+ b=PgBWZPreroc9o/f0qqWQEzAeFAsRoJJvDK1A1rbDTTot4wLdGS0ppON2
+ VdlPMIuNrSS//PCLsy/Ub4niR+X+Xrwd68fel6/8JtseHcPwDywezh7ff
+ 8ZQUVrDJvLanc98Jw9NaqqVcLmSQqVuCQDViyfeWXCayOj4eFaUfPBZ+g 0=;
+Received: from unknown (HELO ironmsg04-sd.qualcomm.com) ([10.53.140.144])
+ by alexa-out-sd-02.qualcomm.com with ESMTP; 27 Apr 2020 08:29:21 -0700
+Received: from nasanexm01a.na.qualcomm.com ([10.85.0.81])
+ by ironmsg04-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 27 Apr 2020 08:29:21 -0700
+Received: from apsanexr02a.ap.qualcomm.com (10.85.0.26) by
+ nasanexm01a.na.qualcomm.com (10.85.0.81) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Mon, 27 Apr 2020 08:29:21 -0700
+Received: from nasanexm01a.na.qualcomm.com (10.85.0.81) by
+ apsanexr02a.ap.qualcomm.com (10.85.0.26) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Mon, 27 Apr 2020 08:29:19 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm01a.na.qualcomm.com (10.85.0.81) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2 via Frontend Transport; Mon, 27 Apr 2020 08:29:19 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=I9EboTcsqKM7RwI0jTpHNgBzwo6sW/QfPEzPD0ZndjOCifY/41f0LttxwIY83TMbQzGBlfrh7QYc8mqA2v5rNtMqr+fIXxl4lCyID2z2DuicX6fpwKhd8+mHKl6rxXkEdekFAuBCiME7wNhzXnTXIvGst8Ks+2fqnXfFhUz6UG6JThE1b3D4SQSWyG8QBq7qnN5X3Kwbtv8BdsDtDp3+WyNg8Zs+JuhKN7OmfI2BPvH3/jiSgFgY5+xa4uIbhNXsrOMXOOtiR/3ZeyapuH8hLoBkVBpK4jC5UWtducCTxqYy561J7jOeSIINIsHIUs633f1h46THg2cEnEr+GnNNOQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=03LS1Ff55y/QZyCSr8zNOLrdlDMgX6lLrnr35BoL6+g=;
+ b=j2fiK03sYYWSIOXbnBZT76GQOVxBGwkMgCv5gBhuJ3/1yncNp7Fq0g8SkrcUDZ82wCSmslM3C7WpiwJvH5tBeCfEcUqTssp2MdOJygrDIHoCSkEsVHlOUjdtHjH5qFP1neaNWC2h/Ep9jDquSS38EayzCPDrFmCrxTAFt5be2Ju958av/zbmMmFujxQTHZEYcC0rVmc5ds31qRtAXz5liuurT2aZyq/DEFyGN3kZpm25nVtq0lbiulToBjRck4fiJD3bqy7LnVdZhkHLoEVlO8u5hlEz3nkH+b7gnmedF8UGm/9Qc+Ck2tBV0LBkjs8hZ3XkFEoZmsRAbXynwfnWLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=03LS1Ff55y/QZyCSr8zNOLrdlDMgX6lLrnr35BoL6+g=;
+ b=AbSv/OZuRiC8JibhzzRbMqMxMtfDvmKpbDlpeYlWpC/UnJjnjIo+LZM0hfV4L5guSeKRUVLrwLt6p1n4/UjgYKQoLhWSq5erEGZ5XY1zYBfqTyJjHAwYSKEd8FU1DfTFTAaNaXYfh19Fz50mea6l1PW6xljaJqJz8hpU8jC7Rns=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=steplong@quicinc.com; 
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24) by MWHPR0201MB3465.namprd02.prod.outlook.com
+ (2603:10b6:301:76::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Mon, 27 Apr
+ 2020 15:29:18 +0000
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::10ad:5df5:d575:1f37]) by MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::10ad:5df5:d575:1f37%3]) with mapi id 15.20.2937.023; Mon, 27 Apr 2020
+ 15:29:18 +0000
+From: Stephen Long <steplong@quicinc.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH RFC v2 0/3] target/arm: Implement SVE2 Crypto Extensions
+Date: Mon, 27 Apr 2020 08:29:01 -0700
+Message-ID: <20200427152904.14768-1-steplong@quicinc.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR02CA0025.namprd02.prod.outlook.com
+ (2603:10b6:208:fc::38) To MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24)
 MIME-Version: 1.0
-In-Reply-To: <48b0d8e6-3b9d-981d-c6a3-bdee5580f701@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 01:12:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from STEPLONG.qualcomm.com (108.176.222.2) by
+ MN2PR02CA0025.namprd02.prod.outlook.com (2603:10b6:208:fc::38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2937.13 via Frontend Transport; Mon, 27 Apr 2020 15:29:17 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [108.176.222.2]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2dc623b4-fd00-4610-3e6a-08d7eabfc029
+X-MS-TrafficTypeDiagnostic: MWHPR0201MB3465:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <MWHPR0201MB3465A1FF511AEE5F0CD9FFC8C7AF0@MWHPR0201MB3465.namprd02.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
+X-Forefront-PRVS: 0386B406AA
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MWHPR0201MB3547.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(39860400002)(346002)(376002)(396003)(366004)(136003)(2906002)(6916009)(107886003)(6666004)(6506007)(66476007)(316002)(66946007)(26005)(8676002)(2616005)(52116002)(81156014)(4326008)(4744005)(8936002)(6486002)(478600001)(956004)(5660300002)(186003)(1076003)(36756003)(16526019)(66556008)(86362001)(6512007);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oMUqDOtrpw9kje8a7Od4mpBRG2i8erT3ikM3r/ivdw6fpxxJiyTfZJb5MerUkCs7PdAxsKyDysvsMX4mT+JMlilFoRUjD/TXSO7m93yCjWl9MSmY8FelA/sxLwxPU7RdF3hK5r7vbrFCo8QFJlPHmqZHEgzngFOYRZQeWYwMxHfAOuMhT0/CFTLodi3blEW4fA/kN1C4EQBhSnpzRtuuto9v03IcVWR9NNqSTQey98JvtBtE/ICy9V8I3FFWKFUHeyw6KDc6ZUY/M78uMitqdtUZ4T0PO3J5Y9+xK+RW27HHy2oJhN4xtJCjTR7OOmOO9gTiYNyL35VLO4QA0nQ2xt0u8QolVdfHapWIprn27dR9Ui8Qsyn7IrZBUd/N1GHTrB10iiN8O9xIlLbMOnZVeWDV2TCZqZlhA1iH7u+j7LIh6qj+nJwwL9AZCil0ZOQS
+X-MS-Exchange-AntiSpam-MessageData: GJAhHFslPlHpU7OmbJXJXGKcHzms/HBpfUlkWqD2e7mJCZyCiw29JRLmJn7xL4s5vcirQuGkcV22vfEsQhbgZ1cbM4232n3o/XmYmbflFrU+LkJbJ371nq+jXrqpjmE7b6XfzExSklRDvjOxGa9MGxMhHazf3LwtrvFeyUB13Z9Mn2S2Cw3UcajBcwbNzN57ijYCOyI++vHtw1JvV7XLcpgZef5+D9nLdYedOICU4A/BRWL4jSYQ6onKUEXQcTh20jOrPLr1StdQB3ycQQ7Jsm3AcVLfbb49me4nsYXbR1rf+b3uUW1KizgMzpATiWP/JoZlBR5FDb/PUPajiZzaYxRdHRqtyX3YuKhaWWLUQfHA0Q5zrESjtHUB5ijmjtiLXQDW+i2ptJwl9OqYqqpn4XxTjE+gyteTjzAM/MT7rtcvoWEwFkZ2PmwPeUzwBRAapAKTRcGXu9tOCMo7l2rNEPX3kZJOBWf5KEwiPC5BHTekGlNYk3MKok/C+KjKwjtHtne3kTXBfGTrXm6SqiPZm7ENwbituUdwSf29yRTNdQbHmSAXgEJMrZpmnygn8rQniHCo+os5lzo91vYftDPS6Lsi9vNV3pkAh6EjKpJLmieufrapkq8cB9MohxTA/PJqooCZuY7MV/VEifWPdm2uSeOpiOCn26Ns9aWB7TBsF8sqXFnTdyRL7qFogBt6BJhX8ATYpdC3EtpUC1KjSTI2mZaGSwBPB/v//UtudhuyP6xiPPx+IAUIiUFAq5DzNpgYjgjt3dGTW9PIG6vletVOAlJwnR1phkvXkgf3rILbgtQ=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2dc623b4-fd00-4610-3e6a-08d7eabfc029
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 15:29:18.2204 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sQQxUT5XQrx5CqN+HtQd98YEb6e2WCI/u7Hod70w0Oqmog5brFnTWMueKrnYLOhamJJq+AeVgkkcinlm+NoRyg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR0201MB3465
+X-OriginatorOrg: quicinc.com
+Received-SPF: pass client-ip=199.106.114.39; envelope-from=steplong@quicinc.com;
+ helo=alexa-out-sd-02.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 11:29:22
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Received-From: 199.106.114.39
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,136 +142,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Beraldo Leal <bleal@redhat.com>,
- Erik Skultety <eskultet@redhat.com>, Wainer Moschetta <wmoschet@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-arm@nongnu.org, richard.henderson@linaro.org, apazos@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Apr 27, 2020 at 04:41:38PM +0200, Philippe Mathieu-Daud=C3=A9 wrote=
-:
-> On 4/27/20 4:28 PM, Cleber Rosa wrote:
-> > On Mon, 27 Apr 2020 12:51:36 +0200
-> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-> >=20
-> > > On 4/27/20 7:12 AM, Cleber Rosa wrote:
-> > > > On Thu, 23 Apr 2020 23:28:21 +0200
-> > > > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-> > > [...]
-> > > > > In some cases custom runners are acceptable. These runners won't =
-be
-> > > > > "gating" but can post informative log and status.
-> > > > >=20
-> > > >=20
-> > > > Well, I have the feeling that some people maintaining those runners
-> > > > will *not* want to have them as "informational" only.  If they
-> > > > invest a good amount of time on them, I believe they'll want to
-> > > > reap the benefits such as other not breaking the code they rely on.
-> > > >   If their system is not gating, they lose that and may find
-> > > > breakage that CI did not catch.  Again, I don't think "easily
-> > > > accessible" hardware should be the only criteria for
-> > > > gating/non-gating status.
-> > > >=20
-> > > > For instance, would you consider, say, a "Raspberry Pi 4 Model
-> > > > B", running KVM jobs to be a reproducible runner?  Would you blame =
-a
-> > > > developer that breaks a Gating CI job on such a platform and says
-> > > > that he can not reproduce it?
-> > >=20
-> > > I'm not sure I understood the problem, as I'd answer "yes" but I
-> > > guess you expect me to say "no"?
-> > >=20
-> >=20
-> > What I mean is: would you blame such a developer for *not* having a
-> > machine himself/herself that he/she can try to reproduce the failure?
-> > And would you consider a "Raspberry Pi 4 Model B" an easily available
-> > hardware?
->=20
-> My view on this is if someone merged code in mainstream QEMU and maintain=
-s
-> it, and if it is not easy to reproduce the setup (for a bug reported by a=
- CI
-> script), then it is the responsibility of the maintainer to resolve it.
-> Either by providing particular access to the hardware, or be ready to spe=
-nd
-> a long debugging session over email and multiple time zones.
->=20
-> If it is not possible, then this specific code/setup can not claim for
-> gating CI, and eventually mainstream isn't the best place for it.
+Used one macro to cover the helper functions for
+SVE2 AESC, AESIMC, AESE, AESD.
 
-I'd caution to be wary about using gating CI as a big stick for hitting
-contributors with. The more rules we put in place whicih contributors
-have to follow before their work gets accepted for merge, the less likely
-someone is to have a positive experiance contributing to the project, or
-even be willing to try. This view of gating CI requirements was a negative
-aspect of contributing to the OpenStack project, which drove people away.
-There was pushback against contributing work because it lacked CI, but
-there was often no viable way for to actually provide CI in a feasible
-timeframe, especially for stuff only testable in physical hardware and
-not VMs. Even if you work for a big company, it doesn't make it easy to
-magic up money to spend on hardware & hosting to provide CI, as corporate
-beaurcracy & priorities will get in your way.
+No macro was used to implement the helper functions for
+SM4E, SM4EKEY, RAX1.
 
-I'd really encourage the more nuanced approach of thinking in terms of
-tiered support levels:
+Stephen Long (3):
+  target/arm: Implement SVE2 AESMC, AESIMC
+  target/arm: Implement SVE2 AESE, AESD, SM4E
+  target/arm: Implement SVE2 SM4EKEY, RAX1
 
-  - Tier 1: features that we have gating CI tests for. Will always work.
+ target/arm/cpu.h           |  5 +++
+ target/arm/helper-sve.h    | 10 ++++++
+ target/arm/sve.decode      | 20 ++++++++++++
+ target/arm/sve_helper.c    | 46 +++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 64 ++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 145 insertions(+)
 
-  - Tier 2: features that we have non-gating CI test for. Should work at
-            time of release, but may be broken for periods in git master.
-=09   =20
-  - Tier 3: features that we don't have CI tests for. Compile tested only,
-            relying on end user manual testing, so may or may not work
-=09    at any time or in release.
-
-Obviously tier 1 is the gold standard that we would like everything to
-achieve but we'll never achieve that reality unless we cull 90% of QEMU's
-code. I don't think that's in the best interests of our users, because
-clearly stuff in Tier 2 and Tier 3 is still useful for a large portion of
-our end users - not least because Tier 3 is the level everything is at
-right now in QEMU unless using a downstream vendor's packages.
-
-The tier levels and CI are largely around setting reasonable quality
-expectations. Right now we often have a problem that poeople want to
-re-factor code but are afraid of breaking existing functionality that
-guests rely on. This causes delays in merging code or causes people to
-not even attempt the refactoring in the first place. This harms our
-forward progress in QEMU.
-
-With gating CI, we are declaring that contributors should feel free to
-refactor anything as long as it passes gating CI. IOW, contributors only
-have to care about Tier 1 features continuing to work. It would be nice
-if refactoring does not breaks stuff in Tier 2 / 3, but if it does, then
-that is acceptable collatoral damage. We would not block the merge on
-stuff that is Tier 2 / 3.
-
-Based on what I experianced in OpenStack the other big challenge is
-deciding when something can be promoted from Tier 2 to Tier 1. They
-had the official gating CI (for Tier 1) being maintained by the core
-project infrastructure team. Any CI provided by third party companies
-was non-gating (Tier 2) (at least in the time I was involved) because
-they did not want code merge blocked on ability to communicate with
-third party companies who were often hard to contact when CI broke.
-So the only real path from Tier 2 to Tier 1 was to give the project
-direct access to the CI hardware, instead of having the providing
-company self-manage it.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+-- 
+2.17.1
 
 
