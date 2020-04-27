@@ -6,99 +6,98 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94D59C54FCB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 13:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C9E3CAB362
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 13:42:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 613AB206B6
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 13:40:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A331206D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 13:42:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iOT5jPmD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 613AB206B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PtjvHoI9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A331206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT400-0000G2-52
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 09:40:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47046)
+	id 1jT41a-0002aI-6B
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 09:42:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jT3zD-0007xQ-0C
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:39:51 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jT40h-0001Bn-NB
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jT3zB-0007bG-U6
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:39:50 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46927
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1jT40g-0000Og-Ih
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:41:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23748
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jT3zB-0007VG-Gq
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:39:49 -0400
+ id 1jT40g-0000Kh-5N
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:41:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587994787;
+ s=mimecast20190719; t=1587994881;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JO+J5uEjf57UaQTqFMGLyeM6q+KhJyhCRRYpsGhbCGw=;
- b=iOT5jPmDbHTmCJFsf8dd8oL7dpKz4cAwZjPDjlwJoepNuKbbQ53o5gGfLQ2kHJLzwQXoa1
- 4ABfOPYrcxYB0L0SpMpocXPMpxvq4Ea/QZImID1xPgSLX1H1Dx0yHfHZ9BKU3RwcmBzLbo
- PjERmr7GTpAbkaIRRsRPSfvvCUeDJP0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-XHDPR_ZBN2KGyfIk7A-Fhw-1; Mon, 27 Apr 2020 09:39:44 -0400
-X-MC-Unique: XHDPR_ZBN2KGyfIk7A-Fhw-1
-Received: by mail-wr1-f72.google.com with SMTP id 11so10535764wrc.3
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 06:39:43 -0700 (PDT)
+ bh=ow14MiYAm/g/CjsiLA/pEqWJunuyeK093MWYTll2V/Q=;
+ b=PtjvHoI9fnftGAvR1F+1hup0HdkkQK7Hpm7IlJs01r1usKkc5pstPFQ2iOPO5KUfKrEwab
+ OPkjSTqdndtKKX0lVmAo5WINaNonLKspBb6+V3mqd/zltvYd7my7jYBAfe7tdD2AmHdjXX
+ ShSnqX2r5Nnb2gVhSIzYYzTMLynwOR4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-284-8o2ioXAYPpmoCQrE-NKrpw-1; Mon, 27 Apr 2020 09:41:19 -0400
+X-MC-Unique: 8o2ioXAYPpmoCQrE-NKrpw-1
+Received: by mail-wm1-f70.google.com with SMTP id v185so8701031wmg.0
+ for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 06:41:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=JO+J5uEjf57UaQTqFMGLyeM6q+KhJyhCRRYpsGhbCGw=;
- b=q4NZ4hKFn6cnFfap5qJQHtH0qxOgYPCbmFlZx/a0+3svq5G3ASQjxHkVY0Hy20s1VP
- 6V905U1j0Hz3L3N2CUpw14ihX63I6KQ7FPqpHgtNSUzcd7Lg/USmr6E3VXLtMrN5m8lt
- /Ps4gHPnp1qi//9OZs6rSUwX2+/sSe9bHTbe/W4aCbYhvSSU+kUs0u8r0EbLBwUl7uxh
- NVi6Pf5V6IEULcT07tdfe1iqwTBBlxjssiHLbO9/uzZ7pJ7NEE2nSeEjzHfkB6mKiozK
- FkEAM3BPrvOBGgj+p6r5Emc0RFucGatJLQPS/tfxGIppxc5fNPAhFFRza61qaPmkECYE
- 3tog==
-X-Gm-Message-State: AGi0Pualr0kLDrAKc7iULONIvNym++A7OzXM/zOTOusnRJO0mDx0n2VE
- lI6oRpWzPSiTykGfeeD9dseDo3JL63qpARmfT+nQGmKZsuwP1OJ+6VwEFd3JZzcMlinqgZVHf8f
- KSzyocTqOXgTDcQ0=
-X-Received: by 2002:a5d:6acc:: with SMTP id u12mr29646365wrw.198.1587994782992; 
- Mon, 27 Apr 2020 06:39:42 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJNu4Ci21z8a5gkYOmlC8nFbHT0Q/TvIM9jnnvhSiAJ5NS6DwngcD5chW+Tjk/M4wDks0DpWw==
-X-Received: by 2002:a5d:6acc:: with SMTP id u12mr29646346wrw.198.1587994782782; 
- Mon, 27 Apr 2020 06:39:42 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ac19:d1fb:3f5f:d54f?
- ([2001:b07:6468:f312:ac19:d1fb:3f5f:d54f])
- by smtp.gmail.com with ESMTPSA id p6sm21028274wrt.3.2020.04.27.06.39.41
+ bh=ow14MiYAm/g/CjsiLA/pEqWJunuyeK093MWYTll2V/Q=;
+ b=A1hUpgccrWwZR9G+Fq6AmRoYy8bfiinXc9t+GVJ9E6CsQY6LNHEdVyI7nHXeGlDgaF
+ Qi5F6txh25WdaORn5RHKKLHx7rv9eohB4CzxfP3O/An+09J6XCkPKi/XEFOdOn7+XCr7
+ JsUL3X59yZ2O4mNORkxPaT0rX1A+CLoGo5wxkOW76IwI6OWMOPamQyVCb/CFGCyY08jO
+ +IH7wPzfWqjv1lFE7tZXd+7EFNMNJ+VH6J5p7LelIsGH4rC1QcKuwRxS7sC/DXGuZjbZ
+ yYJTssFAT2jRzKwNH6+if1duhCxrrsxzo4rLpaLjWEKP7JVCycTBkaV3z65wqp2b3XUn
+ 04MA==
+X-Gm-Message-State: AGi0PuajC7uLw4QexiHum8vJ1oKrYPG+A7eiBRj7CZa8DARU799JR8Gh
+ Mzv6Zgh0j0Zjo/PMjr0dUPDCxzA2U8JuPY3EJbtZQOQzjSjTRnFPn3yBLJ7/2yeee6NkijBPJq5
+ mFxxq04TPZ3WoaBA=
+X-Received: by 2002:a7b:cf27:: with SMTP id m7mr27815685wmg.183.1587994878053; 
+ Mon, 27 Apr 2020 06:41:18 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJgwlmdgikuipH4iv70Qpe7WsHuYkKniYlFD2lRPXqQ5pdfiweFWPPfRkU6QPxHwS5CfN3nCg==
+X-Received: by 2002:a7b:cf27:: with SMTP id m7mr27815670wmg.183.1587994877871; 
+ Mon, 27 Apr 2020 06:41:17 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+ by smtp.gmail.com with ESMTPSA id y18sm17561114wmc.45.2020.04.27.06.41.17
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 27 Apr 2020 06:39:42 -0700 (PDT)
-Subject: Re: [PATCH 4/8] run-coverity-scan: use docker.py
+ Mon, 27 Apr 2020 06:41:17 -0700 (PDT)
+Subject: Re: [PATCH 5/8] run-coverity-scan: add --no-update-tools option
 To: Peter Maydell <peter.maydell@linaro.org>
 References: <20200422172351.26583-1-pbonzini@redhat.com>
- <20200422172351.26583-5-pbonzini@redhat.com>
- <CAFEAcA_xMOJtDMJYbv+MzQYVeN0T5+q9WRcpjshkTGBrdH1Sfg@mail.gmail.com>
+ <20200422172351.26583-6-pbonzini@redhat.com>
+ <CAFEAcA_YZ+OoARe=-q6L1b_+wLcmPHG50Nz5Mzkrdo2PrpMC-g@mail.gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <eae1e876-39cc-4b5d-eb93-1e24321a1fa5@redhat.com>
-Date: Mon, 27 Apr 2020 15:38:37 +0200
+Message-ID: <dea1d9a7-c24a-8fe3-34a4-0664ef8b6ce2@redhat.com>
+Date: Mon, 27 Apr 2020 15:41:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_xMOJtDMJYbv+MzQYVeN0T5+q9WRcpjshkTGBrdH1Sfg@mail.gmail.com>
+In-Reply-To: <CAFEAcA_YZ+OoARe=-q6L1b_+wLcmPHG50Nz5Mzkrdo2PrpMC-g@mail.gmail.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 23:33:12
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 01:12:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,16 +115,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27/04/20 14:42, Peter Maydell wrote:
-> The comment at the top of the file documenting the command line
-> options needs updating.
+On 27/04/20 14:46, Peter Maydell wrote:
+>> -if [ "$UPDATE_ONLY" = yes ] && [ "$DOCKER" = yes ]; then
+>> +if [ "$UPDATE" = only ] && [ "$DOCKER" = yes ]; then
+>>      echo "Combining --docker and --update-only is not supported"
+> Pre-existing bug,but this error message should say
+> "--update-tools-only".
 > 
-> We don't accept --foo=bar for anything else: options either take
-> no argument, or take an argument as a following (ie space separated)
-> parameter. It would be more consistent with that to have
-> "--docker-engine foo" as a separate option from "--docker".
 
-Sure.
+I noticed, however by the end of the series it was easier to add the
+support...
 
 Paolo
 
