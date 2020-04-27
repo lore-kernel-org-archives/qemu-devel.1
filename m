@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B2DC54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7287DC55199
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:32:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE94B20728
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:31:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28A7320728
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:32:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="PNtYeddk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE94B20728
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="G0syHiWS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28A7320728
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSzBE-00020R-KN
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 04:31:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49118)
+	id 1jSzBT-0002VR-5n
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 04:32:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48952)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jSz41-0003X9-91
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:24:30 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jSz3j-0002qB-IF
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:24:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jSz3t-0000GA-Kr
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:24:29 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jSz3i-0007qk-Rf
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:24:11 -0400
 Received: from mail-eopbgr70099.outbound.protection.outlook.com
  ([40.107.7.99]:65188 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jSz3h-0007mE-Iz; Mon, 27 Apr 2020 04:24:09 -0400
+ id 1jSz3g-0007mE-Ht; Mon, 27 Apr 2020 04:24:08 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eaADaIIr9kUfGUkkrJNucJWzjC1TS5wLXdJYaYF61PruyXiP5TTPUlbN0Y7Z+4ZM9nAO7gQOgZYtM0Bc6THAQHxWY0rq5dQ8bB1+7VdFRG8haEjxlMyYMUPFCyBtdSrfm2RJupigLnSdazEQjRuPdDN/HtkIX42FItf1xBsLRWFflXAqVGPgLvltO6M3Wx+uKQLHyMttFoxjCne1rhufckOymKv+sVuX5Ppk2HOQnuch8Y77S6FYNqOiyNHCpJ576Vc4YqHrQhtMiEscQj6yno1Rpgj0X8ZYvRFwqkDNk02y9N0Lv80j1X9OwIcYm230wgt2+zz93VFE9t6iIZfM/w==
+ b=cNmaGsw3iGIgl/FgTgeJlRgnhBcIgYL1qX8kRN4Ug8l3ySuCYdoetS4nfZl8WrJJs6Dbjf5FI4FHc2FIPTJgVtYbCmlx5iOQEXSoL9pNWGiW9nArjRemr93yNH16ISdaUwx0VWRxsEZytPl8wx08j9n6bZ1caORfUvc8diibMNxfvgptIjAqDHI6uz3v5LNdSmX46SI0t91jjTLTthKANqfZZ89YGS3hdtkrsNixjzPKNF174zv0meaCs16x0dTk47mtPd39OAfe3Ju6Cl5LgWOQkRRPlatTZbj646XmC84j9YWZFyc15MLHoi7sVriMJT33tRG6BvYL+FKICwM9gQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5jmFQHF+mLcCi6WpqQgc+kmHUGsKoeQBvNVET0b6l+I=;
- b=drZwlzr55pYxgI0dhf8N8zVKkrYyqeGf5RZ33cdrduGAyD+Jyjy2OHyf+Q1erZpt+q+j6xX8sMUGyglIR0rjs/T7ajFPrTmZVrVQjSGXoQjJb1pEUPWr4xFjzjA11zHkGM2OEqG97mrJ/nGFu6kLnYQYpLebstNcRHHEtIQlfa7HQY1u2k9/Sozav5c4Av3Kz+9N6RDfAmrhFoQv4O8YzXqJ9vOeJ3yCE1o1aERJf1Dgo/FW0XeHcpI+foy85hXoSa3xi1029KbM6YKzjP5NU3W3Wg31HJfmafuaj/N7d3KqBy6bmd9xVk6FYWDfta6ndtH6hXoA3iK0yqDk/jsWEQ==
+ bh=H6HNUBrgvYgkrNp2weZIznabRYz6CuqDJYQUZPlLN2w=;
+ b=V/i7cVR4hD7lohPpaTjK0JN16opXsiv8+5l3W08bCg5q/iVAEwSLh3JKiYXu1vGN6CPpcJfGuovpIYwcj8uM+o2d82Jlkv1sLu6KPlISR7wy9UA3Tc2bW/9sLW7ydMpWpdedtDx15nHDHfRDqXi8hfmrAbw1uGAecYK4Td1NyrvU3Lnya+G8LP5Wi3C4QU+MhGnrmgzrCLkgK1Z37a9TBwfGBH+RyanfYvoeBMALiPGVJxHZ5uDXDc5iLrl3QYNo3+XfYIep41zb4plheSpku2DhpO5odDTYhcALZjwtQBu6m8vjf54W32cD37l4tuIjibM4w0vAZK8HPgo83t5jSg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5jmFQHF+mLcCi6WpqQgc+kmHUGsKoeQBvNVET0b6l+I=;
- b=PNtYeddkAZjXWzZgtgDrDj+5EoT0Ii1Sr2pvhT6QieQ/BOKkj5/XZNC0Rm+a4t+AHnVqGa0yI5kLTy37pKnmSfT3tgv+G2HvpPM7YV34Mq9qWDL56fvbrgC8ZmzBu4sqBPEQwY/tmwQ95tF4R9nFcYNds/+weVDR4Re675O28eo=
+ bh=H6HNUBrgvYgkrNp2weZIznabRYz6CuqDJYQUZPlLN2w=;
+ b=G0syHiWSZyQudgBBEZpo2ERsKrfyvciaz62fN5iuRlN/f4LbT39RKWOjv1Zhy/ymvyA6ZjbbtQNj7LtU7mM3vGBbjSqhXSksu/TgSU7JG1jaQ4m+/hPFcHCVvnP+6afUqADAlSD8O1ex8w9VaSIWLvPApCMa6VCDgZX05Hw1Psk=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=vsementsov@virtuozzo.com; 
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AM7PR08MB5463.eurprd08.prod.outlook.com (2603:10a6:20b:106::7)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Mon, 27 Apr
- 2020 08:24:07 +0000
+ 2020 08:24:05 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.020; Mon, 27 Apr 2020
- 08:24:07 +0000
+ 08:24:05 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 11/17] block/io: use int64_t bytes in copy_range
-Date: Mon, 27 Apr 2020 11:23:19 +0300
-Message-Id: <20200427082325.10414-12-vsementsov@virtuozzo.com>
+Subject: [PATCH v2 10/17] block/io: support int64_t bytes in read/write
+ wrappers
+Date: Mon, 27 Apr 2020 11:23:18 +0300
+Message-Id: <20200427082325.10414-11-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200427082325.10414-1-vsementsov@virtuozzo.com>
 References: <20200427082325.10414-1-vsementsov@virtuozzo.com>
@@ -80,15 +81,15 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from localhost.localdomain (185.215.60.182) by
  FR2P281CA0004.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::14) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2937.13 via Frontend Transport; Mon, 27 Apr 2020 08:24:05 +0000
+ 15.20.2937.13 via Frontend Transport; Mon, 27 Apr 2020 08:24:04 +0000
 X-Mailer: git-send-email 2.21.0
 X-Originating-IP: [185.215.60.182]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1bec70e4-fe60-4c11-05f1-08d7ea845a5c
+X-MS-Office365-Filtering-Correlation-Id: 2d683d0b-06ff-4b8c-5fed-08d7ea84598a
 X-MS-TrafficTypeDiagnostic: AM7PR08MB5463:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5463AFD32BBB0C7F9514D441C1AF0@AM7PR08MB5463.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:541;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5463DF58CE1D0F894C87A8D3C1AF0@AM7PR08MB5463.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:800;
 X-Forefront-PRVS: 0386B406AA
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
@@ -99,15 +100,15 @@ Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +VUUVn4BEePzfTqfyhVPCKGeM8YlDSXIItwO+CdKYF62L/oCwCPJiRj8GhndQVrMvUD1jiDCZmgMqY57MdCkXajV0M4QCiKIKT9MQwmG3kh0UEM0J+sfg+VoMjDN7pnVq6kurhVY/+qpUJLyGMMs2mgggaieXK1N/U6pT3I3uiNkt+p3O90BgH7R6WmL5s+PIq8FeulmxwZjYG7lAMuI9sSz8Mz18CwP5cg8VjKAYmFbxCGt62Ed1t1H1AlxniWZuOJXjn4tyYG3jpkiydMSGJyKIwQtWIMXW1E3UxIiWaHaW+if+KDnG/aZuf+M8lEBd1DMHpJFv5WY5QD2TaG6oIlDI/DG8px2+jshx5TDbgb9TFOCohqibSNX4hlge5JkbYMh/mOa9OBG791PrEkaOdxzRduzcqVWWT+TtqeSqmr+GhthWrloikJ/ADjOchv7mt94k8gHs1fgt90ehDW4hssKwTtq7zIzTNQyyIZCJDZ/o2e/wZxrZE3rptdXZ/lJ
-X-MS-Exchange-AntiSpam-MessageData: YXkcb4CAkV/NvP1dJAACF6YuXIA/XOpNw31DxqMDRJ8S9cWcBLKBjok2k8D2ZodgII1MLqolDGbCvQ+dhKbSVGQDsJ8vw06axnNRK375j0dQa0lw9OK30ov1lI5EWpg9SivqW89L3tF9YkQpqMSgIalyvThr/zwGr6EG4UaNY13RGjuyFrBCH3wPXg9hkfmrFE86c8eMQSZCwncAjOclDG7PEmtwj7ZvhvJTxa7mj4t/QSRxQ2tI3bpwbTd+6mFFCvKuL02CPrK8Us4IuIfWMxxVjeIvUS4w0C06nPkM5Q4hAN2ujmkTfQmRog5TzRiZtGMnNPgrDSQ8LHAhoMr0+7XsVzF1TFTtAatTZPpFcYFImG6wcGToN//vUF9qNb0y1temPFDmLvY7lJBO+KbqwjMTKvVe0qxZNv4AGustDeBvgSZheZxqzKTrJR87vLlsIeClYBeif0sYWv8l2xdXMHsTgmt0tYOC1Yf5ZACkENYN2GXkxg4xZDkP1yq0X6ejPzoCl1G60HbHm8mKdO4RYE8Zc6uXGso/3ZQtKlTfQgvHZ8dETVg5mLZ+Z1AIRCenVhLnOhj1d6LWg3pII+JnPfs8BumqVRnp8Tmu6OfEvFYsGm66yK80ftgKNOEdd3OeUN0UN0EadKiIc5iTuRD+KeRLhFEUsJDu8qctBtah5KiZd9XMDymIFy0cqSOyjnp0QHMzQFgaTkG9ZlygmNRUWdDYa8foFOwXZ/MbICpi7o1fHBXdv+RCnXWZTaxwvnqfxvhWmsETcr6tEnoRqofRAtQqHOFE0BvJLI8GRaQ8rFE=
+X-Microsoft-Antispam-Message-Info: THnEhTeGtSBUVtyAOcVXlVZ66Crl3X3d5jnBVcFIeVUbDqZUdqzoYQmi7UdEJtHTLnpaFT5MsVhAEFSaXmWSIlvz6AxY4I5dnCfQvKQCTOk/XkvpTEK1oCQjIvAu98BLcIQlHdqjB2uC8qHUoYG5osGsqP1TwNJig1L1ErUhx6DJA2Ada6Lz5JmN/qxJZ4HzlMtZPeqLDhIujFtbIA53ZlzViOz8HVw3bW/V0ZkGR9xnPxcQ7yOSpol0uoG8gDFKRoryzjeQynVNIguICxVcAs+is/iEpBukpTSRFm2ypIkG6bUpGCtZGga2cU+pqxy6ZOvel/F9YSulOaeZcEdxaoRAvnHtPFIFiaiNPy2kjtcnqaKLWe4kg15xRcdNxiwMLES+ZnlsHt7rhmaRFTrGwNH94XKlrWFw2pBmPPtGtEHJ50YusiHqk0DPgoMZGDixkhNCMhKbs6I4b664kzF6xOwOzFoEydJ31QrACg86dbQST3xPwQeBOyJ0ZK0ONrM6
+X-MS-Exchange-AntiSpam-MessageData: wyVQ87ufh269diAFFnguDq7vFr4jk5VR0dSjHVT0DjTnPD8prEP1kGtRI5Ud0DsufvQZEAVYZvxluCMazsxfE/Zu5O8ijR3L8W5RHEJ/wZJt/IAouL+xaO6/4pgtQElTH6zPflLONs2nfYYWyWJ83sIj5ufrwLHEw2bKzVYY57X3O5G6+98m59w9NiUv/x2h0IJY4GGdM0WRQzm6lB0HjOPXItYrzfFcmR51hcpcJ642tlzApvsRtNRfT+duaRigbBsgGY1LzdnYs0ZT/XUZHjhJduaK+FMEuMjteoLYtBOS5L3fmGzZl+HZQIfMH9YOFQj/Z3GenmJa86Pu4eHEyHie1yR/c4xbGf8Ownw0GYlQCTuMjYcqvtm1oEiGSSTnPX3TnrnwkPmhZujPQZobsW+WMmWd8vDqM5lfu0nRGnMwDX21gHaujrkeYuDJGg9kSBZXgrFQCUMPRJXE8zOvhhkPy9tIwMv4CTxuYwfztQHBugaCBfknENF905nnDthsp1SIBM3qJmCPStKl4v6zgwLMja1RmNCBeLHpHxzvlv1whQZgC2lWPTr1xVEichYB0PRPGtS2wR1ijcfT2o89RLU27uq5WBPbWvk5T9yON8VDGKeSWeC5oWykRD2akjW6dBeBUS6tPdMu14jm7Nf/9WUNV9kkBhEBZ/CwewZ4z1Jfhz3YDi486O0s9MMGf/rVBHn33QH290mKKktpRFhhmwh59g3bCdLobVua/0oAgIhvd4ON/JmlwkrSLu1b/x0Ez2FVeoy2xlL6cRHXQZjQ3FbDe3UlnKPjP8KrZEjsYaE=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1bec70e4-fe60-4c11-05f1-08d7ea845a5c
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 08:24:07.0300 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2d683d0b-06ff-4b8c-5fed-08d7ea84598a
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 08:24:05.6710 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8jksoZTmZyghj4kqUVsrDuNNirsHk3tIv8TW7d77/iSp0Rngv1rueXGk6RHaOjBIFvDSNr+61ZQ/y9+TjNJvcMZiTONC8/JWqY3fP6CNi0o=
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0exf4BRlyFvATY8lO9iVavB50cLKPROZ3XTsLKulDZLzkMNJBOgxaZjYcUjNWdS1Rj2X87NVUWfBnZqNZ1axMbx1JmXNMZOfYUUc9jSiuJY=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5463
 Received-SPF: pass client-ip=40.107.7.99;
  envelope-from=vsementsov@virtuozzo.com;
@@ -136,128 +137,169 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are generally moving to int64_t for both offset and bytes parameters
-on all io paths. Convert copy_range parameters which are already 64bit
-to signed type.
+Now, when bdrv_co_preadv_part() and bdrv_co_pwritev_part() updated,
+update all their wrappers.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/block.h     |  6 +++---
- include/block/block_int.h | 12 ++++++------
- block/io.c                | 22 +++++++++++-----------
- block/trace-events        |  4 ++--
- 4 files changed, 22 insertions(+), 22 deletions(-)
+ include/block/block.h     | 10 +++++-----
+ include/block/block_int.h |  4 ++--
+ block/blkverify.c         |  2 +-
+ block/io.c                | 17 +++++++++--------
+ block/trace-events        |  2 +-
+ 5 files changed, 18 insertions(+), 17 deletions(-)
 
 diff --git a/include/block/block.h b/include/block/block.h
-index 03abf30d1d..2eea27bc99 100644
+index b05995fe9c..03abf30d1d 100644
 --- a/include/block/block.h
 +++ b/include/block/block.h
-@@ -731,8 +731,8 @@ void bdrv_unregister_buf(BlockDriverState *bs, void *host);
-  *
-  * Returns: 0 if succeeded; negative error code if failed.
-  **/
--int coroutine_fn bdrv_co_copy_range(BdrvChild *src, uint64_t src_offset,
--                                    BdrvChild *dst, uint64_t dst_offset,
--                                    uint64_t bytes, BdrvRequestFlags read_flags,
-+int coroutine_fn bdrv_co_copy_range(BdrvChild *src, int64_t src_offset,
-+                                    BdrvChild *dst, int64_t dst_offset,
-+                                    int64_t bytes, BdrvRequestFlags read_flags,
-                                     BdrvRequestFlags write_flags);
- #endif
+@@ -318,14 +318,14 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state,
+ void bdrv_reopen_commit(BDRVReopenState *reopen_state);
+ void bdrv_reopen_abort(BDRVReopenState *reopen_state);
+ int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
+-                       int bytes, BdrvRequestFlags flags);
++                       int64_t bytes, BdrvRequestFlags flags);
+ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags);
+-int bdrv_pread(BdrvChild *child, int64_t offset, void *buf, int bytes);
++int bdrv_pread(BdrvChild *child, int64_t offset, void *buf, int64_t bytes);
+ int bdrv_preadv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov);
+-int bdrv_pwrite(BdrvChild *child, int64_t offset, const void *buf, int bytes);
++int bdrv_pwrite(BdrvChild *child, int64_t offset, const void *buf, int64_t bytes);
+ int bdrv_pwritev(BdrvChild *child, int64_t offset, QEMUIOVector *qiov);
+ int bdrv_pwrite_sync(BdrvChild *child, int64_t offset,
+-                     const void *buf, int count);
++                     const void *buf, int64_t bytes);
+ /*
+  * Efficiently zero a region of the disk image.  Note that this is a regular
+  * I/O request like read or write and should have a reasonable size.  This
+@@ -333,7 +333,7 @@ int bdrv_pwrite_sync(BdrvChild *child, int64_t offset,
+  * because it may allocate memory for the entire region.
+  */
+ int coroutine_fn bdrv_co_pwrite_zeroes(BdrvChild *child, int64_t offset,
+-                                       int bytes, BdrvRequestFlags flags);
++                                       int64_t bytes, BdrvRequestFlags flags);
+ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+     const char *backing_file);
+ void bdrv_refresh_filename(BlockDriverState *bs);
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index b4b42d0cd6..28aea2bcfd 100644
+index 3c2a1d741a..b4b42d0cd6 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -1315,14 +1315,14 @@ void bdrv_dec_in_flight(BlockDriverState *bs);
+@@ -972,13 +972,13 @@ extern BlockDriver bdrv_raw;
+ extern BlockDriver bdrv_qcow2;
  
- void blockdev_close_all_bdrv_states(void);
+ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+-    int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
++    int64_t offset, int64_t bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags);
+ int coroutine_fn bdrv_co_preadv_part(BdrvChild *child,
+     int64_t offset, int64_t bytes,
+     QEMUIOVector *qiov, size_t qiov_offset, BdrvRequestFlags flags);
+ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+-    int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
++    int64_t offset, int64_t bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags);
+ int coroutine_fn bdrv_co_pwritev_part(BdrvChild *child,
+     int64_t offset, int64_t bytes,
+diff --git a/block/blkverify.c b/block/blkverify.c
+index ba6b1853ae..667e60d832 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -31,7 +31,7 @@ typedef struct BlkverifyRequest {
+     uint64_t bytes;
+     int flags;
  
--int coroutine_fn bdrv_co_copy_range_from(BdrvChild *src, uint64_t src_offset,
--                                         BdrvChild *dst, uint64_t dst_offset,
--                                         uint64_t bytes,
-+int coroutine_fn bdrv_co_copy_range_from(BdrvChild *src, int64_t src_offset,
-+                                         BdrvChild *dst, int64_t dst_offset,
-+                                         int64_t bytes,
-                                          BdrvRequestFlags read_flags,
-                                          BdrvRequestFlags write_flags);
--int coroutine_fn bdrv_co_copy_range_to(BdrvChild *src, uint64_t src_offset,
--                                       BdrvChild *dst, uint64_t dst_offset,
--                                       uint64_t bytes,
-+int coroutine_fn bdrv_co_copy_range_to(BdrvChild *src, int64_t src_offset,
-+                                       BdrvChild *dst, int64_t dst_offset,
-+                                       int64_t bytes,
-                                        BdrvRequestFlags read_flags,
-                                        BdrvRequestFlags write_flags);
+-    int (*request_fn)(BdrvChild *, int64_t, unsigned int, QEMUIOVector *,
++    int (*request_fn)(BdrvChild *, int64_t, int64_t, QEMUIOVector *,
+                       BdrvRequestFlags);
  
+     int ret;                    /* test image result */
 diff --git a/block/io.c b/block/io.c
-index 02632eaf59..7c979eacd8 100644
+index 784eaf02f2..02632eaf59 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -3209,8 +3209,8 @@ void bdrv_unregister_buf(BlockDriverState *bs, void *host)
+@@ -946,7 +946,7 @@ static int bdrv_prwv_co(BdrvChild *child, int64_t offset,
  }
  
- static int coroutine_fn bdrv_co_copy_range_internal(
--        BdrvChild *src, uint64_t src_offset, BdrvChild *dst,
--        uint64_t dst_offset, uint64_t bytes,
-+        BdrvChild *src, int64_t src_offset, BdrvChild *dst,
-+        int64_t dst_offset, int64_t bytes,
-         BdrvRequestFlags read_flags, BdrvRequestFlags write_flags,
-         bool recurse_src)
+ int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset,
+-                       int bytes, BdrvRequestFlags flags)
++                       int64_t bytes, BdrvRequestFlags flags)
  {
-@@ -3288,9 +3288,9 @@ static int coroutine_fn bdrv_co_copy_range_internal(
-  *
-  * See the comment of bdrv_co_copy_range for the parameter and return value
-  * semantics. */
--int coroutine_fn bdrv_co_copy_range_from(BdrvChild *src, uint64_t src_offset,
--                                         BdrvChild *dst, uint64_t dst_offset,
--                                         uint64_t bytes,
-+int coroutine_fn bdrv_co_copy_range_from(BdrvChild *src, int64_t src_offset,
-+                                         BdrvChild *dst, int64_t dst_offset,
-+                                         int64_t bytes,
-                                          BdrvRequestFlags read_flags,
-                                          BdrvRequestFlags write_flags)
- {
-@@ -3304,9 +3304,9 @@ int coroutine_fn bdrv_co_copy_range_from(BdrvChild *src, uint64_t src_offset,
-  *
-  * See the comment of bdrv_co_copy_range for the parameter and return value
-  * semantics. */
--int coroutine_fn bdrv_co_copy_range_to(BdrvChild *src, uint64_t src_offset,
--                                       BdrvChild *dst, uint64_t dst_offset,
--                                       uint64_t bytes,
-+int coroutine_fn bdrv_co_copy_range_to(BdrvChild *src, int64_t src_offset,
-+                                       BdrvChild *dst, int64_t dst_offset,
-+                                       int64_t bytes,
-                                        BdrvRequestFlags read_flags,
-                                        BdrvRequestFlags write_flags)
- {
-@@ -3316,9 +3316,9 @@ int coroutine_fn bdrv_co_copy_range_to(BdrvChild *src, uint64_t src_offset,
-                                        bytes, read_flags, write_flags, false);
+     QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, NULL, bytes);
+ 
+@@ -1008,7 +1008,7 @@ int bdrv_preadv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
  }
  
--int coroutine_fn bdrv_co_copy_range(BdrvChild *src, uint64_t src_offset,
--                                    BdrvChild *dst, uint64_t dst_offset,
--                                    uint64_t bytes, BdrvRequestFlags read_flags,
-+int coroutine_fn bdrv_co_copy_range(BdrvChild *src, int64_t src_offset,
-+                                    BdrvChild *dst, int64_t dst_offset,
-+                                    int64_t bytes, BdrvRequestFlags read_flags,
-                                     BdrvRequestFlags write_flags)
+ /* See bdrv_pwrite() for the return codes */
+-int bdrv_pread(BdrvChild *child, int64_t offset, void *buf, int bytes)
++int bdrv_pread(BdrvChild *child, int64_t offset, void *buf, int64_t bytes)
  {
-     return bdrv_co_copy_range_from(src, src_offset,
+     QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
+ 
+@@ -1037,7 +1037,8 @@ int bdrv_pwritev(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
+   -EINVAL      Invalid offset or number of bytes
+   -EACCES      Trying to write a read-only device
+ */
+-int bdrv_pwrite(BdrvChild *child, int64_t offset, const void *buf, int bytes)
++int bdrv_pwrite(BdrvChild *child, int64_t offset, const void *buf,
++                int64_t bytes)
+ {
+     QEMUIOVector qiov = QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
+ 
+@@ -1055,11 +1056,11 @@ int bdrv_pwrite(BdrvChild *child, int64_t offset, const void *buf, int bytes)
+  * Returns 0 on success, -errno in error cases.
+  */
+ int bdrv_pwrite_sync(BdrvChild *child, int64_t offset,
+-                     const void *buf, int count)
++                     const void *buf, int64_t bytes)
+ {
+     int ret;
+ 
+-    ret = bdrv_pwrite(child, offset, buf, count);
++    ret = bdrv_pwrite(child, offset, buf, bytes);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -1687,7 +1688,7 @@ static bool bdrv_pad_request(BlockDriverState *bs,
+ }
+ 
+ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+-    int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
++    int64_t offset, int64_t bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags)
+ {
+     return bdrv_co_preadv_part(child, offset, bytes, qiov, 0, flags);
+@@ -2100,7 +2101,7 @@ out:
+  * Handle a write request in coroutine context
+  */
+ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+-    int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
++    int64_t offset, int64_t bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags)
+ {
+     return bdrv_co_pwritev_part(child, offset, bytes, qiov, 0, flags);
+@@ -2177,7 +2178,7 @@ out:
+ }
+ 
+ int coroutine_fn bdrv_co_pwrite_zeroes(BdrvChild *child, int64_t offset,
+-                                       int bytes, BdrvRequestFlags flags)
++                                       int64_t bytes, BdrvRequestFlags flags)
+ {
+     trace_bdrv_co_pwrite_zeroes(child->bs, offset, bytes, flags);
+ 
 diff --git a/block/trace-events b/block/trace-events
-index 13ad9af0d8..e4d68438af 100644
+index dd367a9b19..13ad9af0d8 100644
 --- a/block/trace-events
 +++ b/block/trace-events
-@@ -15,8 +15,8 @@ bdrv_co_preadv_part(void *bs, int64_t offset, int64_t bytes, int flags) "bs %p o
+@@ -13,7 +13,7 @@ blk_root_detach(void *child, void *blk, void *bs) "child %p blk %p bs %p"
+ # io.c
+ bdrv_co_preadv_part(void *bs, int64_t offset, int64_t bytes, int flags) "bs %p offset %" PRId64 " bytes %" PRId64 " flags 0x%x"
  bdrv_co_pwritev_part(void *bs, int64_t offset, int64_t bytes, int flags) "bs %p offset %" PRId64 " bytes %" PRId64 " flags 0x%x"
- bdrv_co_pwrite_zeroes(void *bs, int64_t offset, int64_t bytes, int flags) "bs %p offset %" PRId64 " bytes %" PRId64 " flags 0x%x"
+-bdrv_co_pwrite_zeroes(void *bs, int64_t offset, int count, int flags) "bs %p offset %"PRId64" count %d flags 0x%x"
++bdrv_co_pwrite_zeroes(void *bs, int64_t offset, int64_t bytes, int flags) "bs %p offset %" PRId64 " bytes %" PRId64 " flags 0x%x"
  bdrv_co_do_copy_on_readv(void *bs, int64_t offset, int64_t bytes, int64_t cluster_offset, int64_t cluster_bytes) "bs %p offset %" PRId64 " bytes %" PRId64 " cluster_offset %" PRId64 " cluster_bytes %" PRId64
--bdrv_co_copy_range_from(void *src, uint64_t src_offset, void *dst, uint64_t dst_offset, uint64_t bytes, int read_flags, int write_flags) "src %p offset %"PRIu64" dst %p offset %"PRIu64" bytes %"PRIu64" rw flags 0x%x 0x%x"
--bdrv_co_copy_range_to(void *src, uint64_t src_offset, void *dst, uint64_t dst_offset, uint64_t bytes, int read_flags, int write_flags) "src %p offset %"PRIu64" dst %p offset %"PRIu64" bytes %"PRIu64" rw flags 0x%x 0x%x"
-+bdrv_co_copy_range_from(void *src, int64_t src_offset, void *dst, int64_t dst_offset, int64_t bytes, int read_flags, int write_flags) "src %p offset %" PRId64 " dst %p offset %" PRId64 " bytes %" PRId64 " rw flags 0x%x 0x%x"
-+bdrv_co_copy_range_to(void *src, int64_t src_offset, void *dst, int64_t dst_offset, int64_t bytes, int read_flags, int write_flags) "src %p offset %" PRId64 " dst %p offset %" PRId64 " bytes %" PRId64 " rw flags 0x%x 0x%x"
- 
- # stream.c
- stream_one_iteration(void *s, int64_t offset, uint64_t bytes, int is_allocated) "s %p offset %" PRId64 " bytes %" PRIu64 " is_allocated %d"
+ bdrv_co_copy_range_from(void *src, uint64_t src_offset, void *dst, uint64_t dst_offset, uint64_t bytes, int read_flags, int write_flags) "src %p offset %"PRIu64" dst %p offset %"PRIu64" bytes %"PRIu64" rw flags 0x%x 0x%x"
+ bdrv_co_copy_range_to(void *src, uint64_t src_offset, void *dst, uint64_t dst_offset, uint64_t bytes, int read_flags, int write_flags) "src %p offset %"PRIu64" dst %p offset %"PRIu64" bytes %"PRIu64" rw flags 0x%x 0x%x"
 -- 
 2.21.0
 
