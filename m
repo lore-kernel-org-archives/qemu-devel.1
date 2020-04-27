@@ -2,93 +2,62 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FBDAC54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7129C54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:57:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DD992075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:56:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AQCDKdA4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DD992075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AC47E2075E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:57:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC47E2075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSzYm-00014T-EY
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 04:56:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55112)
+	id 1jSzZV-0002KV-Qw
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 04:57:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55358)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <abologna@redhat.com>) id 1jSzWf-0007Ez-DM
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:54:05 -0400
+ (envelope-from <wei.w.wang@intel.com>) id 1jSzYd-0001Ap-Oj
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:56:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <abologna@redhat.com>) id 1jSzWe-0007tB-Iw
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:54:05 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27832
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <abologna@redhat.com>)
- id 1jSzWe-0007oA-5H
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:54:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587977641;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7HymUgiJKDcxOukVG6M+qPC/nrztehYUbXk5QgV5gmM=;
- b=AQCDKdA47YUlyDdhB60PYAW7KHfUz0ydpLx4uB0THE3w0uiSjirYTcGCoqbq+ihHqmC8YP
- hwgwJVjZVHmI78UA/ftpFANcBC56E+V2Y3gcHtrZQlsxyv3mxETpzThCdNVLfnc/YamsKC
- 4j16QYkff4p6juAse4hvrJ3ktxRXoXs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-YcQq59p2MxWksx9t01zoJA-1; Mon, 27 Apr 2020 04:52:09 -0400
-X-MC-Unique: YcQq59p2MxWksx9t01zoJA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B55C468;
- Mon, 27 Apr 2020 08:52:08 +0000 (UTC)
-Received: from kinshicho.usersys.redhat.com (unknown [10.40.195.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0402C1001281;
- Mon, 27 Apr 2020 08:51:57 +0000 (UTC)
-Message-ID: <9a32ea035b5d327c3e31ec34a9e2a1079d88910e.camel@redhat.com>
-Subject: Re: [PATCH 0/5] QEMU Gating CI
-From: Andrea Bolognani <abologna@redhat.com>
-To: Cleber Rosa <crosa@redhat.com>, Erik Skultety <eskultet@redhat.com>
-Date: Mon, 27 Apr 2020 10:51:55 +0200
-In-Reply-To: <20200427012404.4ecf7b71@redhat.com>
-References: <CAFEAcA8Lw94_=kY+Fv-cFW2Tk5RD62EjODjKdGf2-mLdDw7FuQ@mail.gmail.com>
- <1182067639.1655516.1584421185287.JavaMail.zimbra@redhat.com>
- <CAFEAcA-zRw7kzwzXxPmLaUqwOrQLwW9BymOJ34iJOOTCUAf=xg@mail.gmail.com>
- <20200317141257.GA5724@localhost.localdomain>
- <CAFEAcA9W4KXN6dcT0CNyD_mQ3xY5wDmJ7i0wowhaG2XPmyMYng@mail.gmail.com>
- <87sgi49uf6.fsf@dusky.pond.sub.org>
- <CAFEAcA_dcVneQ4Hj61GAkYRCUSMrA=QjwnAXccoBwjUjOE-wSQ@mail.gmail.com>
- <529508877.9650370.1587661453005.JavaMail.zimbra@redhat.com>
- <20200423171322.GJ1077680@redhat.com>
- <69e77a6e-8db8-f617-bfe6-1c8f39ec81b4@redhat.com>
- <20200424065746.GB372397@sturgeon.usersys.redhat.com>
- <20200427012404.4ecf7b71@redhat.com>
-User-Agent: Evolution 3.34.4 (3.34.4-1.fc31)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=abologna@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 23:32:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ (envelope-from <wei.w.wang@intel.com>) id 1jSzYc-00051F-BL
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:56:07 -0400
+Received: from mga18.intel.com ([134.134.136.126]:26126)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <wei.w.wang@intel.com>)
+ id 1jSzYb-0004mM-QW
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:56:06 -0400
+IronPort-SDR: e0hGNsEEI4zfWmCnLV9458TQ9aiKg5my2wmP+D6QHNO7G4UCHde0NF4aSvtU5SUHlZ7hs4/yAn
+ 9Kax3pzxCLcg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 27 Apr 2020 01:56:01 -0700
+IronPort-SDR: WBq3pKZGlZPPY81xWUFmEUvUr9PlXyWM+qFeyhOzYx5M2AitzBTB6bjS1CRjyuv1KTGRreFdxz
+ xqAzIYVJZFhA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,323,1583222400"; d="scan'208";a="257172570"
+Received: from devel-ww.sh.intel.com ([10.239.48.118])
+ by orsmga003.jf.intel.com with ESMTP; 27 Apr 2020 01:55:58 -0700
+From: Wei Wang <wei.w.wang@intel.com>
+To: qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com,
+ peterx@redhat.com
+Subject: [PATCH v2] migration/xbzrle: add encoding rate
+Date: Mon, 27 Apr 2020 16:01:51 +0800
+Message-Id: <1587974511-14953-1-git-send-email-wei.w.wang@intel.com>
+X-Mailer: git-send-email 2.7.4
+Received-SPF: pass client-ip=134.134.136.126;
+ envelope-from=wei.w.wang@intel.com; helo=mga18.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 04:56:01
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Received-From: 134.134.136.126
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,67 +69,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>,
- "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
- Beraldo Leal <bleal@redhat.com>,
- Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Wainer Moschetta <wmoschet@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Willian Rampazzo <wrampazz@redhat.com>,
- Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: kevin.tian@intel.com, berrange@redhat.com, yi.y.sun@intel.com,
+ gloryxiao@tencent.com, wei.w.wang@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2020-04-27 at 01:24 -0400, Cleber Rosa wrote:
-> On Fri, 24 Apr 2020 08:57:46 +0200
-> Erik Skultety <eskultet@redhat.com> wrote:
-> > On Thu, Apr 23, 2020 at 11:28:21PM +0200, Philippe Mathieu-Daud=C3=A9
-> > wrote:
-> > > Thanks to insist with that point Daniel. I'd rather see every
-> > > configuration reproducible, so if we loose a hardware sponsor, we
-> > > can find another one and start another runner.
-> > > Also note, if it is not easy to reproduce a runner, it will be very
-> > > hard to debug a reported build/test error.
-> >=20
-> > (Thanks for bringing ^this point up Philippe)
-> >=20
-> > ...However, what we've been actively working on in libvirt is to
-> > extend the lcitool we have (which can spawn local test VMs) to the
-> > point where we're able to generate machines that would be the
-> > reproducible. Right now I'm playing with cloud-init integration with
-> > lcitool (patches coming soon) that would allow us to use the same
-> > machines locally as we'd want to have in, say, OpenStack and share
-> > them as compressed images, so even when updated/managed by lcitool
-> > locally, you'd get the same environment.
->=20
-> This is great, and it aligns with my previous point that reproducibility
-> it's not *just* about the hardware, but about diligently documenting
-> and automating the environments, be them mundane or super specialized.
-> And IMO that should score some points when it comes to being
-> promoted/demoted as a Gating machine/job.
+Users may need to check the xbzrle encoding rate to know if the guest
+memory is xbzrle encoding-friendly, and dynamically turn off the
+encoding if the encoding rate is low.
 
-I think there's room to extend and rework lcitool so that it can be
-used for QEMU CI as well, and we should definitely look into that.
+Signed-off-by: Yi Sun <yi.y.sun@intel.com>
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+---
+ migration/migration.c |  1 +
+ migration/ram.c       | 38 ++++++++++++++++++++++++++++++++++++--
+ monitor/hmp-cmds.c    |  2 ++
+ qapi/migration.json   |  5 ++++-
+ 4 files changed, 43 insertions(+), 3 deletions(-)
 
-Right now it only really covers VMs and containers, but there's
-already one situation (FreeBSD) where the expectation is that you'd
-import an existing VM image and then apply CI-related customizations
-on top, so it's not too much of a stretch to imagine doing the same
-for a bare metal machine. We use Ansible, so as long as we can
-connect to the machine via ssh we're pretty much good to go.
+ChangeLog:
+- include the 3 bytes (ENCODING_FLAG_XBZRLE flag and encoded_len) when
+  calculating the encoding rate. Similar to the compress rate
+  calculation, the 8 byte RAM_SAVE_FLAG_CONTINUE flag isn't included in
+  the calculation.
 
-Installation of VMs we already perform in an unattended fashion using
-preseed/kickstart, and it should be relatively straighforward to
-adapt those configurations to also work on real hardware. This way
-we'd both be able to rely on having a sane OS as the base, and
-relieve the administrator from the duty of manually installing the
-machines.
-
---=20
-Andrea Bolognani / Red Hat / Virtualization
+diff --git a/migration/migration.c b/migration/migration.c
+index 187ac04..e404213 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -930,6 +930,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+         info->xbzrle_cache->pages = xbzrle_counters.pages;
+         info->xbzrle_cache->cache_miss = xbzrle_counters.cache_miss;
+         info->xbzrle_cache->cache_miss_rate = xbzrle_counters.cache_miss_rate;
++        info->xbzrle_cache->encoding_rate = xbzrle_counters.encoding_rate;
+         info->xbzrle_cache->overflow = xbzrle_counters.overflow;
+     }
+ 
+diff --git a/migration/ram.c b/migration/ram.c
+index 04f13fe..f46ab96 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -327,6 +327,10 @@ struct RAMState {
+     uint64_t num_dirty_pages_period;
+     /* xbzrle misses since the beginning of the period */
+     uint64_t xbzrle_cache_miss_prev;
++    /* Amount of xbzrle pages since the beginning of the period */
++    uint64_t xbzrle_pages_prev;
++    /* Amount of xbzrle encoded bytes since the beginning of the period */
++    uint64_t xbzrle_bytes_prev;
+ 
+     /* compression statistics since the beginning of the period */
+     /* amount of count that no free thread to compress data */
+@@ -696,6 +700,18 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
+         return -1;
+     }
+ 
++    /*
++     * Reaching here means the page has hit the xbzrle cache, no matter what
++     * encoding result it is (normal encoding, overflow or skipping the page),
++     * count the page as encoded. This is used to caculate the encoding rate.
++     *
++     * Example: 2 pages (8KB) being encoded, first page encoding generates 2KB,
++     * 2nd page turns out to be skipped (i.e. no new bytes written to the
++     * page), the overall encoding rate will be 8KB / 2KB = 4, which has the
++     * skipped page included. In this way, the encoding rate can tell if the
++     * guest page is good for xbzrle encoding.
++     */
++    xbzrle_counters.pages++;
+     prev_cached_page = get_cached_data(XBZRLE.cache, current_addr);
+ 
+     /* save current buffer into memory */
+@@ -736,8 +752,12 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
+     qemu_put_be16(rs->f, encoded_len);
+     qemu_put_buffer(rs->f, XBZRLE.encoded_buf, encoded_len);
+     bytes_xbzrle += encoded_len + 1 + 2;
+-    xbzrle_counters.pages++;
+-    xbzrle_counters.bytes += bytes_xbzrle;
++    /*
++     * Like compressed_size (please see update_compress_thread_counts),
++     * the xbzrle encoded bytes don't count the 8 byte header with
++     * RAM_SAVE_FLAG_CONTINUE.
++     */
++    xbzrle_counters.bytes += bytes_xbzrle - 8;
+     ram_counters.transferred += bytes_xbzrle;
+ 
+     return 1;
+@@ -870,9 +890,23 @@ static void migration_update_rates(RAMState *rs, int64_t end_time)
+     }
+ 
+     if (migrate_use_xbzrle()) {
++        double encoded_size, unencoded_size;
++
+         xbzrle_counters.cache_miss_rate = (double)(xbzrle_counters.cache_miss -
+             rs->xbzrle_cache_miss_prev) / page_count;
+         rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
++        unencoded_size = (xbzrle_counters.pages - rs->xbzrle_pages_prev) *
++                         TARGET_PAGE_SIZE;
++        encoded_size = xbzrle_counters.bytes - rs->xbzrle_bytes_prev;
++        if (xbzrle_counters.pages == rs->xbzrle_pages_prev) {
++            xbzrle_counters.encoding_rate = 0;
++        } else if (!encoded_size) {
++            xbzrle_counters.encoding_rate = UINT64_MAX;
++        } else {
++            xbzrle_counters.encoding_rate = unencoded_size / encoded_size;
++        }
++        rs->xbzrle_pages_prev = xbzrle_counters.pages;
++        rs->xbzrle_bytes_prev = xbzrle_counters.bytes;
+     }
+ 
+     if (migrate_use_compression()) {
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 9b94e67..c2a3a66 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -303,6 +303,8 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+                        info->xbzrle_cache->cache_miss);
+         monitor_printf(mon, "xbzrle cache miss rate: %0.2f\n",
+                        info->xbzrle_cache->cache_miss_rate);
++        monitor_printf(mon, "xbzrle encoding rate: %0.2f\n",
++                       info->xbzrle_cache->encoding_rate);
+         monitor_printf(mon, "xbzrle overflow: %" PRIu64 "\n",
+                        info->xbzrle_cache->overflow);
+     }
+diff --git a/qapi/migration.json b/qapi/migration.json
+index eca2981..358e402 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -70,6 +70,8 @@
+ #
+ # @cache-miss-rate: rate of cache miss (since 2.1)
+ #
++# @encoding-rate: rate of encoded bytes (since 5.1)
++#
+ # @overflow: number of overflows
+ #
+ # Since: 1.2
+@@ -77,7 +79,7 @@
+ { 'struct': 'XBZRLECacheStats',
+   'data': {'cache-size': 'int', 'bytes': 'int', 'pages': 'int',
+            'cache-miss': 'int', 'cache-miss-rate': 'number',
+-           'overflow': 'int' } }
++           'encoding-rate': 'number', 'overflow': 'int' } }
+ 
+ ##
+ # @CompressionStats:
+@@ -337,6 +339,7 @@
+ #             "pages":2444343,
+ #             "cache-miss":2244,
+ #             "cache-miss-rate":0.123,
++#             "encoding-rate":80.1,
+ #             "overflow":34434
+ #          }
+ #       }
+-- 
+1.8.3.1
 
 
