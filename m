@@ -8,78 +8,77 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2773AC81857
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 22:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2584AC81CFF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 22:28:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBF4C2078C
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 22:26:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB1C92078C
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 22:28:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GQoGpVWe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBF4C2078C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mAo6ZVjf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB1C92078C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTCCW-0004Mr-Vq
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 18:26:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40416)
+	id 1jTCEO-0006jC-Vu
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 18:28:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40636)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jTCBW-0003UT-1I
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 18:25:06 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jTCCh-0004xS-PJ
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 18:26:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jTCBU-0001Zn-QJ
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 18:25:05 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:39388)
+ (envelope-from <alistair23@gmail.com>) id 1jTCCh-0003zE-4I
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 18:26:19 -0400
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:40080)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jTCBU-0001Ze-Du; Mon, 27 Apr 2020 18:25:04 -0400
-Received: by mail-il1-x143.google.com with SMTP id r2so18368361ilo.6;
- Mon, 27 Apr 2020 15:25:03 -0700 (PDT)
+ id 1jTCCg-0003yq-OJ; Mon, 27 Apr 2020 18:26:18 -0400
+Received: by mail-il1-x144.google.com with SMTP id e8so18352134ilm.7;
+ Mon, 27 Apr 2020 15:26:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4d6orcMdn3i38NRXjqfckA7ZIJIuprEpeNRLSnhBce8=;
- b=GQoGpVWewjY9XNx8Gnb9BsAKWvo36OVkwpkt4i5O+PQhCr4S4QWD7op0YjlbnNjclZ
- HmwK/ghEdKEwrE1OeE8XCWOoXwu4tbrT7mj09Vtfg7uMYqV1psl4OXcbSkyBkvRicuLT
- rsVV11fXlPxPjuxnYSbLhjFM35FDzUOXOKZPwRAqY3fDeUUClPJljWRoy05NQr3tZEGO
- 6I1Li1gcKZI1ojp3MIuiG/gxlU9butuQkpH5WtW6N3VZpQCgfsfh7OiEkwzps63VtUl3
- cMqz4yr1Gr3KLiCTrjMYPrkLvO79a6IU9+pvk7F5nKUgVUvNLHFJKca7WWsh9dWuFk9t
- FgZQ==
+ :cc; bh=j0AjaoVOIfBuXfuEp71fPg/spu4qN9/80erdUgjOY9k=;
+ b=mAo6ZVjfQjFNutv2KeIubrn949guSayu/LGN+VK5JKIZDkc9TouR14H++c6E6blWSC
+ ECAWGQfePeBQJDOR2//CSN68y8NV1jo3S9qdw4JEgXBd0bhB3+O+hrFb4suXVaYdH2Qw
+ BX9tqV+TnZ6vzh0iiBoc5dEbbcdUtWeNgm6MxdtfNbkMmQvra6dC6NCjL8OL1dFENatN
+ 14rzM8aROfTzgNbVZyRDtCt6ioKWr+gtsv16zw8ELYqBzXRVBP1DZjpiCxQSKb1xbl0S
+ AQcAFyFzbEuc/sa71OD9aTNYfxvM9TrmtAtcVXvrVafXBNi2VjlxSFrmwhcOj9R1sc+f
+ FYng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=4d6orcMdn3i38NRXjqfckA7ZIJIuprEpeNRLSnhBce8=;
- b=FaNN5QcbwgfOiTV0Pu3SKrOK84Vtv45S+GIGLQK/Yjss3QOXTHkjgj3qlkY4qAOTpx
- 9whkCtk3SqmssDdw0Ww4E2JmPXYY9/Qu7EAlySu7fDoooapW6QcauH8qr6021NgiYBO2
- EI5iZwYbgZJWTttSASzlkIY+PBd2xp6P0IgTxu3S5SK2RuzGRKmZbWG2rWBfGHFerM4/
- 0z5gH14bFCoufe3L+Q9P9TB+6W+8IZ7NNr2GDMfRrqUHH5T5/xGG3F2yxqKF2QC52UIj
- 1X6dl4fuClpdtENO4dVnNp5+dh4CghzPrn128Ojx3CTJxMCi83gTrpk2wVtTS0VhQ67E
- HduA==
-X-Gm-Message-State: AGi0PuY2cGUUp1W8PMhQp0fAZpnFELTvVwhcq+IvCJK8It9TPkwgCC5l
- bUtjFsGTUuG8fDRxK1P91ucceDB50bFe02NldIU=
-X-Google-Smtp-Source: APiQypKYvod25dDv15F0NKkf3yHInNX2aCEDZyYa8FnlxM1X3niDg7dIfSy/PlQGU9EqCK9r0cQuYwnsa9qMzzjD4yk=
-X-Received: by 2002:a92:9a5c:: with SMTP id t89mr24196092ili.267.1588026302807; 
- Mon, 27 Apr 2020 15:25:02 -0700 (PDT)
+ bh=j0AjaoVOIfBuXfuEp71fPg/spu4qN9/80erdUgjOY9k=;
+ b=THtspx6DaHGkItMk6xLN/VhKQIynDAjTEtPUhhXdaOeiFLSPZQm7OyT1hsJXb3fl+Q
+ /PYhn/bvxEhwzl8woz/+54FTrQKi/tyMjLum0IhWzaC6zZP2au3Of3YZpdGbTTLCWwlv
+ 0HgR0jnVahiOhkNWQnmKFt+8/CbOjMxCLIHOELQMki2uR5jiBlNngZ4mA6zvm8dBJ4xG
+ a3kE/AEudhN57j3ngAEQdXyUHVYzo9Upia6NJjFX1wF7LjdOqfH9BXn8Y6GyzrwoCtaa
+ S9cG7bHaLwVlrCcai1wSSs4muKHMOKXDdsZUp3ag36WwZySyEVrP3MAfhHhha0NFYdn5
+ K6mg==
+X-Gm-Message-State: AGi0PuZLm1MlyYBFRKzqDEoNn0WkeBjz7IwX/pR62NXx27ntvX8ym0Mt
+ Izp/aEwgNrhhsT1c9PW+vWqPzCYkbmXA6VjHCUo=
+X-Google-Smtp-Source: APiQypKtxPqdBw2VUXAcKfF9J5O68q8oG3NHqc2DO5YKfd28AwPcBOrU0B3LbHzlcPxomt/zw98kF92ufzbrE3GJeCo=
+X-Received: by 2002:a92:aa07:: with SMTP id j7mr4267679ili.40.1588026377275;
+ Mon, 27 Apr 2020 15:26:17 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200427181649.26851-1-edgar.iglesias@gmail.com>
- <20200427181649.26851-5-edgar.iglesias@gmail.com>
-In-Reply-To: <20200427181649.26851-5-edgar.iglesias@gmail.com>
+ <20200427181649.26851-6-edgar.iglesias@gmail.com>
+In-Reply-To: <20200427181649.26851-6-edgar.iglesias@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 27 Apr 2020 15:16:24 -0700
-Message-ID: <CAKmqyKNd55rbOCtWYk8LUJ31WhpDsp9AN+qtYqmEyh6QTKG4EA@mail.gmail.com>
-Subject: Re: [PATCH v1 04/11] hw/arm: versal: Embedd the UARTs into the SoC
- type
+Date: Mon, 27 Apr 2020 15:17:38 -0700
+Message-ID: <CAKmqyKPD0oMEKtoQpjwoqQYTLCaZ-JE9pYLEOo0Lnc+2ervNzA@mail.gmail.com>
+Subject: Re: [PATCH v1 05/11] hw/arm: versal: Embedd the GEMs into the SoC type
 To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::143
+X-Received-From: 2607:f8b0:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,12 +105,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Apr 27, 2020 at 11:17 AM Edgar E. Iglesias
+On Mon, Apr 27, 2020 at 11:20 AM Edgar E. Iglesias
 <edgar.iglesias@gmail.com> wrote:
 >
 > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 >
-> Embedd the UARTs into the SoC type.
+> Embedd the GEMs into the SoC type.
 >
 > Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
@@ -121,66 +120,69 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/arm/xlnx-versal.c         | 12 ++++++------
+>  hw/arm/xlnx-versal.c         | 15 ++++++++-------
 >  include/hw/arm/xlnx-versal.h |  3 ++-
->  2 files changed, 8 insertions(+), 7 deletions(-)
+>  2 files changed, 10 insertions(+), 8 deletions(-)
 >
 > diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
-> index cc696e44c0..dbde03b7e6 100644
+> index dbde03b7e6..e424aa789e 100644
 > --- a/hw/arm/xlnx-versal.c
 > +++ b/hw/arm/xlnx-versal.c
-> @@ -21,7 +21,6 @@
->  #include "kvm_arm.h"
->  #include "hw/misc/unimp.h"
->  #include "hw/arm/xlnx-versal.h"
-> -#include "hw/char/pl011.h"
->
->  #define XLNX_VERSAL_ACPU_TYPE ARM_CPU_TYPE_NAME("cortex-a72")
->  #define GEM_REVISION        0x40070106
-> @@ -144,16 +143,17 @@ static void versal_create_uarts(Versal *s, qemu_irq *pic)
+> @@ -170,25 +170,26 @@ static void versal_create_gems(Versal *s, qemu_irq *pic)
 >          DeviceState *dev;
 >          MemoryRegion *mr;
 >
-> -        dev = qdev_create(NULL, TYPE_PL011);
-> -        s->lpd.iou.uart[i] = SYS_BUS_DEVICE(dev);
-> +        sysbus_init_child_obj(OBJECT(s), name,
-> +                              &s->lpd.iou.uart[i], sizeof(s->lpd.iou.uart[i]),
-> +                              TYPE_PL011);
-> +        dev = DEVICE(&s->lpd.iou.uart[i]);
->          qdev_prop_set_chr(dev, "chardev", serial_hd(i));
+> -        dev = qdev_create(NULL, "cadence_gem");
+> -        s->lpd.iou.gem[i] = SYS_BUS_DEVICE(dev);
 > -        object_property_add_child(OBJECT(s), name, OBJECT(dev), &error_fatal);
+> +        sysbus_init_child_obj(OBJECT(s), name,
+> +                              &s->lpd.iou.gem[i], sizeof(s->lpd.iou.gem[i]),
+> +                              TYPE_CADENCE_GEM);
+> +        dev = DEVICE(&s->lpd.iou.gem[i]);
+>          if (nd->used) {
+>              qemu_check_nic_model(nd, "cadence_gem");
+>              qdev_set_nic_properties(dev, nd);
+>          }
+> -        object_property_set_int(OBJECT(s->lpd.iou.gem[i]),
+> +        object_property_set_int(OBJECT(dev),
+>                                  2, "num-priority-queues",
+>                                  &error_abort);
+> -        object_property_set_link(OBJECT(s->lpd.iou.gem[i]),
+> +        object_property_set_link(OBJECT(dev),
+>                                   OBJECT(&s->mr_ps), "dma",
+>                                   &error_abort);
 >          qdev_init_nofail(dev);
 >
-> -        mr = sysbus_mmio_get_region(s->lpd.iou.uart[i], 0);
+> -        mr = sysbus_mmio_get_region(s->lpd.iou.gem[i], 0);
 > +        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
 >          memory_region_add_subregion(&s->mr_ps, addrs[i], mr);
 >
-> -        sysbus_connect_irq(s->lpd.iou.uart[i], 0, pic[irqs[i]]);
+> -        sysbus_connect_irq(s->lpd.iou.gem[i], 0, pic[irqs[i]]);
 > +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[irqs[i]]);
 >          g_free(name);
 >      }
 >  }
 > diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
-> index 6c0a692b2f..a3dfd064b3 100644
+> index a3dfd064b3..01da736a5b 100644
 > --- a/include/hw/arm/xlnx-versal.h
 > +++ b/include/hw/arm/xlnx-versal.h
-> @@ -15,6 +15,7 @@
->  #include "hw/sysbus.h"
+> @@ -16,6 +16,7 @@
 >  #include "hw/arm/boot.h"
 >  #include "hw/intc/arm_gicv3.h"
-> +#include "hw/char/pl011.h"
+>  #include "hw/char/pl011.h"
+> +#include "hw/net/cadence_gem.h"
 >
 >  #define TYPE_XLNX_VERSAL "xlnx-versal"
 >  #define XLNX_VERSAL(obj) OBJECT_CHECK(Versal, (obj), TYPE_XLNX_VERSAL)
-> @@ -49,7 +50,7 @@ typedef struct Versal {
->          MemoryRegion mr_ocm;
+> @@ -51,7 +52,7 @@ typedef struct Versal {
 >
 >          struct {
-> -            SysBusDevice *uart[XLNX_VERSAL_NR_UARTS];
-> +            PL011State uart[XLNX_VERSAL_NR_UARTS];
->              SysBusDevice *gem[XLNX_VERSAL_NR_GEMS];
+>              PL011State uart[XLNX_VERSAL_NR_UARTS];
+> -            SysBusDevice *gem[XLNX_VERSAL_NR_GEMS];
+> +            CadenceGEMState gem[XLNX_VERSAL_NR_GEMS];
 >              SysBusDevice *adma[XLNX_VERSAL_NR_ADMAS];
 >          } iou;
+>      } lpd;
 > --
 > 2.20.1
 >
