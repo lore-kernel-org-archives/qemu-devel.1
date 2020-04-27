@@ -1,86 +1,122 @@
 Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.4 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E752C54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E574C54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:59:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18F8020663
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:54:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0167B20656
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:59:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="TcPGgRrt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18F8020663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SDC2FJL3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0167B20656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT0Sw-0004be-2v
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 05:54:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37002)
+	id 1jT0XX-0007jq-Qd
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 05:59:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37514)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jT0RN-00036e-OL
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:52:42 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jT0WX-0006v4-NY
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:58:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jT0RM-0004G4-Qv
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:52:41 -0400
-Received: from mail-yb1-xb30.google.com ([2607:f8b0:4864:20::b30]:45649)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jT0WR-0001Fm-Mv
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:58:01 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41558)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jT0RM-0004Fg-9R
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:52:40 -0400
-Received: by mail-yb1-xb30.google.com with SMTP id p7so6997915ybo.12
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 02:52:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Om/bZVryo7HNAO8clrWaNrMp9tOHsgri2oq16l2420w=;
- b=TcPGgRrtaPg/k4Js5dyCRZ/VfoZh5UOhLc8glUv/d5m3pBwXwjaUo6VLYN9IHa/AyG
- mIQ1dFQ8HBDvwkeJyZn+rysCzEHTQNfgZdP9jv8RPGFIg+lgmEpYI4FC7PyMugGSgOvY
- 9fG+OtdZmewE6Cm6zyJzwWkKttOkvIDjwDOLq8RULVttodNq32VZAaeap69BJIEjRqzo
- FLL9jPD2E7OmOT8Eq//pQJfp0g/VxNXe20NQIKjo8nc9hynZ4zqVcrm2qotSo+xLcXcO
- IcHFn6ibq/u1CXHfn3iwvgzjown7kafBT2tmbQtihoTMWcfsUaLaTEQ0UcBFZw7QcNPk
- vN7A==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jT0WR-00019t-7J
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:57:55 -0400
+Received: by mail-wr1-x444.google.com with SMTP id g13so19764235wrb.8
+ for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 02:57:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=8bBW4AyCNeDgX4H2V/mgeb7iehhCotmCOZc8OBjBmTU=;
+ b=SDC2FJL3jcA8uORXssL+F/UikY99TfmHeNaFrNkY8jwKkNXR2yMGLQ59HiBYizfOlR
+ yJIyFCFEQ3JKSWQlbd2yEivCvTugwyZ3KL7ALOiVxr99tAzuCcCRzNh2WCP0giZ29fUb
+ RcpufvI64YV+j+GyBmH5EKUFXP0uVDqt0Nqw1MQIWSmzGGooBVjSPUZPftR0Umxbx+XO
+ i/1wJ4144NkEK69NpkfEViilQnHwexfWiqGVm2cFlD39ZZO4ymS8sU93GTS/A5M5VQFj
+ sEGqJMApFRIFw76i9u5GzilG3vTvZihsRIM+ERJPGwunhNzUUPmb8BiY604SVvDa4Vuq
+ t8EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Om/bZVryo7HNAO8clrWaNrMp9tOHsgri2oq16l2420w=;
- b=WhJMbcR/R0+38SJs3zx/QPIOpbU0UQhlq5QebBY/D5WzFcDHqJWl9/dpvxXcHIZCAb
- QYVSUTwT7T4UVdEVmUC6a4DyIeKCuoAeDzzYjKVwNB4cTdaxsYvU9huWtmxKXHKvafpL
- XAx3NTezCZGTkb79dBvQgihKcNWZlLSR+tu8QuaeqPDPC0Dwjqg2WKmMF1Re4uzSchMI
- EtXzKnXk9J0jjMKzueJXb4Hl4SZdHGpmqr85y2xchrPCU7iTm72V5hnFQE+lvx1AwtW8
- fv1eJKZYNz8AtWr13e9UrTGPT1wQMVXTjbSzoGOPnZOiZ8s+jsEdKeZhl9phGGPkKk9D
- /5Sw==
-X-Gm-Message-State: AGi0PuY4EVZuWmIxtNYY9k/ShN4Svq6DmD8+ZJP/9nLDK4pNArI0/WI1
- l53lr1aepczK/KEY5fpQSOswGNN747T6M/P2dDnS6A==
-X-Google-Smtp-Source: APiQypKTeVYgLcJr+x+p9d0TzObe2SgRFPZOMqNJJhplgb70ib16gXeQW34UZ0yNejmQMvvZyz/FIj4yJoJcq+oruCM=
-X-Received: by 2002:a25:bacd:: with SMTP id a13mr36204466ybk.461.1587981157977; 
- Mon, 27 Apr 2020 02:52:37 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=8bBW4AyCNeDgX4H2V/mgeb7iehhCotmCOZc8OBjBmTU=;
+ b=ltB6uV03fRzZxC+bj4oUaq8Ei//vsf+es37v6W7ZPbCiZKgpjMrNClwJZK9H3vlYvV
+ utu8PN7SLATrsK9XKfJtCWfDtXvEYKh37IjgbcVwY6MeM/kQ9sINvyZoWlAT9Z9m6oKa
+ Zwv1VmANL+8im60zvUTpe9S9gptvTzuKXpMthJ32yFyKVtDeXa3ydPLuk8hqDftTZiov
+ UD2tooaE0eyPtiKf3dUqgBI7fecME1rxLse1necKj5IS4HxKml3g5zSw95rUB6eN1HE6
+ rvdezUXFAEpEG4FgItBO6aqs8Ln1wVUQgpS3CH019b0CaQ6fL8EH+Y7JPc+IwbuE6u2J
+ kyzg==
+X-Gm-Message-State: AGi0PubwsEtpSSingjfEbG9Iy4Dnipz+f+WxTM5EqeE8tXS0Eoq5gpT/
+ 1cFBpjI/p1KcuRt356KhJT4=
+X-Google-Smtp-Source: APiQypIZKWSYb/K8erB1TiYv0RlJpI+T3uH3nFRIltYk/HtZ/HOSPXzfvAlTpRpuJerjFqNDP01KcQ==
+X-Received: by 2002:adf:ea48:: with SMTP id j8mr26425055wrn.108.1587981473451; 
+ Mon, 27 Apr 2020 02:57:53 -0700 (PDT)
+Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.137])
+ by smtp.gmail.com with ESMTPSA id w10sm21209242wrg.52.2020.04.27.02.57.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 27 Apr 2020 02:57:52 -0700 (PDT)
+Subject: Re: [PATCH for-5.1 3/7] hw/mips: Add CPU IRQ3 delivery for KVM
+To: Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+References: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
+ <1587979995-17717-3-git-send-email-chenhc@lemote.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <5a4cc457-971c-de9b-7380-c5e81d1b378b@amsat.org>
+Date: Mon, 27 Apr 2020 11:57:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200427093345.4111acd9.cohuck@redhat.com>
- <8a559698-fb15-1f38-2fad-ee5db27f81f4@redhat.com>
- <20200427111029.703f8703.cohuck@redhat.com>
- <20200427051713-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200427051713-mutt-send-email-mst@kernel.org>
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Mon, 27 Apr 2020 12:52:26 +0300
-Message-ID: <CAOEp5OdSnxMO-BY+8NLwntjpr3CGvfh0ECHHB0w7PVAZ7OArog@mail.gmail.com>
-Subject: Re: VIRTIO_NET_HDR_F_RSC_INFO in virtio-net vs headers update
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000d4f06605a442ac12"
-Received-SPF: none client-ip=2607:f8b0:4864:20::b30;
- envelope-from=yuri.benditovich@daynix.com; helo=mail-yb1-xb30.google.com
+In-Reply-To: <1587979995-17717-3-git-send-email-chenhc@lemote.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::b30
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,142 +128,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
+ qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000d4f06605a442ac12
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 4/27/20 11:33 AM, Huacai Chen wrote:
+> Currently, KVM/MIPS only deliver I/O interrupt via IP2, this patch add
+> IP2 delivery as well, because Loongson-3 based machine use both IRQ2
+> (CPU's IP2) and IRQ3 (CPU's IP3).
+> 
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> ---
+>  hw/mips/mips_int.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
+> index 796730b..5526219 100644
+> --- a/hw/mips/mips_int.c
+> +++ b/hw/mips/mips_int.c
+> @@ -48,16 +48,14 @@ static void cpu_mips_irq_request(void *opaque, int irq, int level)
+>      if (level) {
+>          env->CP0_Cause |= 1 << (irq + CP0Ca_IP);
+>  
+> -        if (kvm_enabled() && irq == 2) {
+> +        if (kvm_enabled() && (irq == 2 || irq == 3))
 
-I'd suggest to do the single change in virtio-net.c with RSC definitions
-from updated linux headers.
-I can send respective patch if you want
+Shouldn't we check env->CP0_Config6 (or Config7) has the required
+feature first?
 
-On Mon, Apr 27, 2020 at 12:18 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-
-> On Mon, Apr 27, 2020 at 11:10:29AM +0200, Cornelia Huck wrote:
-> > On Mon, 27 Apr 2020 16:41:30 +0800
-> > Jason Wang <jasowang@redhat.com> wrote:
-> >
-> > >
-> > > On 2020/4/27 =E4=B8=8B=E5=8D=883:33, Cornelia Huck wrote:
-> > > > Hi,
-> > > >
-> > > > I'm currently trying to prepare a linux-headers update to 5.7-rc3,
-> > > > which adds the definition of VIRTIO_NET_HDR_F_RSC_INFO.
-> > > >
-> > > > Unfortunately, this breaks the build of virtio-net, because now
-> > > > virtio_net_rsc_ext_num_{packets,dupacks} are undefined (they are
-> > > > guarded by existence of VIRTIO_NET_HDR_F_RSC_INFO).
-> > > >
-> > > > What is the right way to fix this? Remove the constants that are no=
-w
-> > > > provided by the header and keep the definitions of
-> > > > virtio_net_rsc_ext_num_{packets,dupacks}?
-> > >
-> > >
-> > > We probably need to add a version of the above function when
-> > > VIRTIO_NET_HDR_F_RSC_INFO is defined as attached.
-> > >
-> > > But I fail to understand why we need a fallback when
-> > > VIRTIO_NET_HDR_F_RSC_INFO is not defined.
-> >
-> > Yes, the current code in virtio-net looks a bit odd, which is why I
-> > asked.
-> >
-> > I see two options:
-> > - do the change you proposed, do the headers update, and then rip out
-> >    the compat handling
-> > - do the above in a single step
-> >
-> > I'd prefer the second option.
->
-> Slight preference for 1st one but both are ok.
->
-> > >
-> > > Thanks
-> > >
-> > >
-> > > >
-> > > > [I'd like to queue a headers update as soon as possible, as the who=
-le
-> > > > s390 protected virt stuff depends on it...]
-> > > >
-> > > >
->
->
-
---000000000000d4f06605a442ac12
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">I&#39;d suggest to do the single change in virtio-net.c wi=
-th RSC definitions from updated linux headers.<div>I can send respective pa=
-tch if you=C2=A0want</div></div><br><div class=3D"gmail_quote"><div dir=3D"=
-ltr" class=3D"gmail_attr">On Mon, Apr 27, 2020 at 12:18 PM Michael S. Tsirk=
-in &lt;<a href=3D"mailto:mst@redhat.com">mst@redhat.com</a>&gt; wrote:<br><=
-/div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bo=
-rder-left:1px solid rgb(204,204,204);padding-left:1ex">On Mon, Apr 27, 2020=
- at 11:10:29AM +0200, Cornelia Huck wrote:<br>
-&gt; On Mon, 27 Apr 2020 16:41:30 +0800<br>
-&gt; Jason Wang &lt;<a href=3D"mailto:jasowang@redhat.com" target=3D"_blank=
-">jasowang@redhat.com</a>&gt; wrote:<br>
-&gt; <br>
-&gt; &gt; <br>
-&gt; &gt; On 2020/4/27 =E4=B8=8B=E5=8D=883:33, Cornelia Huck wrote:<br>
-&gt; &gt; &gt; Hi,<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt; I&#39;m currently trying to prepare a linux-headers update t=
-o 5.7-rc3,<br>
-&gt; &gt; &gt; which adds the definition of VIRTIO_NET_HDR_F_RSC_INFO.<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt; Unfortunately, this breaks the build of virtio-net, because =
-now<br>
-&gt; &gt; &gt; virtio_net_rsc_ext_num_{packets,dupacks} are undefined (they=
- are<br>
-&gt; &gt; &gt; guarded by existence of VIRTIO_NET_HDR_F_RSC_INFO).<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt; What is the right way to fix this? Remove the constants that=
- are now<br>
-&gt; &gt; &gt; provided by the header and keep the definitions of<br>
-&gt; &gt; &gt; virtio_net_rsc_ext_num_{packets,dupacks}?<br>
-&gt; &gt; <br>
-&gt; &gt; <br>
-&gt; &gt; We probably need to add a version of the above function when <br>
-&gt; &gt; VIRTIO_NET_HDR_F_RSC_INFO is defined as attached.<br>
-&gt; &gt; <br>
-&gt; &gt; But I fail to understand why we need a fallback when <br>
-&gt; &gt; VIRTIO_NET_HDR_F_RSC_INFO is not defined.<br>
-&gt; <br>
-&gt; Yes, the current code in virtio-net looks a bit odd, which is why I<br=
->
-&gt; asked.<br>
-&gt; <br>
-&gt; I see two options:<br>
-&gt; - do the change you proposed, do the headers update, and then rip out<=
-br>
-&gt;=C2=A0 =C2=A0 the compat handling<br>
-&gt; - do the above in a single step<br>
-&gt; <br>
-&gt; I&#39;d prefer the second option.<br>
-<br>
-Slight preference for 1st one but both are ok.<br>
-<br>
-&gt; &gt; <br>
-&gt; &gt; Thanks<br>
-&gt; &gt; <br>
-&gt; &gt; <br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt; [I&#39;d like to queue a headers update as soon as possible,=
- as the whole<br>
-&gt; &gt; &gt; s390 protected virt stuff depends on it...]<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt;<br>
-<br>
-</blockquote></div>
-
---000000000000d4f06605a442ac12--
+>              kvm_mips_set_interrupt(cpu, irq, level);
+> -        }
+>  
+>      } else {
+>          env->CP0_Cause &= ~(1 << (irq + CP0Ca_IP));
+>  
+> -        if (kvm_enabled() && irq == 2) {
+> +        if (kvm_enabled() && (irq == 2 || irq == 3))
+>              kvm_mips_set_interrupt(cpu, irq, level);
+> -        }
+>      }
+>  
+>      if (env->CP0_Cause & CP0Ca_IP_mask) {
+> 
 
