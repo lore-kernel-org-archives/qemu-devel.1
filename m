@@ -2,102 +2,120 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3020AC5519A
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:19:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69DA6C54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:21:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDD7C20656
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:19:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E18EB20656
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:21:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OCdhf+6Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDD7C20656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O+q2i8XE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E18EB20656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSzuq-0000DG-K8
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 05:19:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58958)
+	id 1jSzxP-0001pn-Rz
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 05:21:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59762)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jSzu2-0007O6-DV
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:18:14 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jSzwg-0001GA-3V
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:20:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jSzu1-0005Ge-SL
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:18:14 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32015
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jSzu1-0005GW-E9
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:18:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587979092;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Wp5GFyfKapdeIVkNjqpCH4FVWw0VYM6g5TVNuBJWjXI=;
- b=OCdhf+6Zo691Ha7TJF/gxtrtfZargMb3Z6QaWh2+1aq9/9Y0mgBIzvy5I+nSj7ZnN6pUk7
- 6WF5Xe7UerpGD0taJqmCq0eDESG3J8L+rDsBg8JXAFePJvQIz6jqS0LG7OWvdfkcUA+UHe
- 6qGbM2iLjqYhk24wddamcxFv5u/FZ8Y=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-510-vx70sLgoMJKY-jciLfWjhA-1; Mon, 27 Apr 2020 05:18:09 -0400
-X-MC-Unique: vx70sLgoMJKY-jciLfWjhA-1
-Received: by mail-wm1-f69.google.com with SMTP id 71so8413719wmb.8
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 02:18:09 -0700 (PDT)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jSzwf-0006zK-IT
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:20:57 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37445)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jSzwf-0006yd-5i
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:20:57 -0400
+Received: by mail-wr1-x441.google.com with SMTP id k1so19677257wrx.4
+ for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 02:20:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=h9gPIvg/cbjU8nzOKMB07hvh34O0JoW+0lGv6FfMUvo=;
+ b=O+q2i8XEiVvICWK52dCkVCWnht3XpOWliGwJhiSZHzt+kAJukUb2cQ9ybjvBJAr/gx
+ t0v8aWHx/zH1nSjyVA3WfQKkhhTeqUpoAS6m0eJbqigvKKFi36BZQcbeJkzBgPDGjXzu
+ codYS/MeoY1YvLiasQtleYbMjL9+zTadNw0sSwcTExTdeBGouSM6tqPNihbj+711obyS
+ DjWh2pZP/8X+IJqp2imacTGH13Q4K2LAiQjpwQL1l1pVqGRTmoEkvr53FpRaKrB4SX6c
+ WA94KBAKHM2CWA0/mchbmdhsz5hsz6TTEGs/6CMv7cpSoWE+s/TlFKQwEXyCjP/qe8YR
+ oEsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=pgHwErbHIHf8vl+AmHsB6UtYeyrd9jehT7AHaZmj9s0=;
- b=bYJn5DeXyrp+vjZeSvhQmph/J1XZP/IDmNZffoTyvScpE+GUirvPS0PETBQLSTUedO
- ONdVdQIBDaVKV0V6FAKPKuZiiywb+4Qj34Blrh+5MdC3myL5BphZBuqBcJB9GnhJHLom
- jPgO4JX+xoseNcPMWRsEtLnvOldJJLti/A6QbY6n6dGPNC7W9+coTP5fSJVJSguuJheg
- LbUTAdkTHBSC/Ni+xhR991DwmwHBTruBDhn+joSGb+0jHJMW/rLluAEugvhT+xlEf5jT
- g5Abs7MwiizbjTqjWsSj1vcBTwYGVnaJ56sz05bPDUFxxElo+godQcuqSJGj3Va8AUBi
- +rcg==
-X-Gm-Message-State: AGi0PuaZ6GUfoCvGQGe/t2bv+e7joc4/fugR8jqxVetuPesFsGNr7F7D
- jH/6M+z41+3d0TXjVrXugvmjibrsgRwtLrF1gJSInT88ApOlL+eYyJ5FgLmCYSDI2n/s0+ZuL5V
- edS+sCbUy2BvB4og=
-X-Received: by 2002:a1c:4985:: with SMTP id
- w127mr25083822wma.100.1587979088227; 
- Mon, 27 Apr 2020 02:18:08 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLg2SHOPJeRGTVNfhQsgepl5Sp8VgXuB9dVkG08gwsvOqdC4rRP2L0nUmsC59HPOkI9px0a+A==
-X-Received: by 2002:a1c:4985:: with SMTP id
- w127mr25083799wma.100.1587979087928; 
- Mon, 27 Apr 2020 02:18:07 -0700 (PDT)
-Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
- by smtp.gmail.com with ESMTPSA id
- v131sm15449866wmb.19.2020.04.27.02.18.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Apr 2020 02:18:07 -0700 (PDT)
-Date: Mon, 27 Apr 2020 05:18:05 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: VIRTIO_NET_HDR_F_RSC_INFO in virtio-net vs headers update
-Message-ID: <20200427051713-mutt-send-email-mst@kernel.org>
-References: <20200427093345.4111acd9.cohuck@redhat.com>
- <8a559698-fb15-1f38-2fad-ee5db27f81f4@redhat.com>
- <20200427111029.703f8703.cohuck@redhat.com>
+ h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=h9gPIvg/cbjU8nzOKMB07hvh34O0JoW+0lGv6FfMUvo=;
+ b=qHkk4wo/NdojAzTbXKmRwefz/iAkwVk73FCWw3iaUIwW2AuhYpJXO0kVsKfph8rx5I
+ wG2mqc/6UIA86rO5E8gEsbyETUn9HqTNmZ7HmhN0u0Q+jBZVBUQcqoqafTFpMjBKJffn
+ ncQLrpzMgbpJjVR+CZlVvSAzOXyOC/9B8NIMVCRh/oAGLyugoD37gwbLVD3EjUkBMdCK
+ SfPq/JrQ5u/kQD9hcqVdQzCpISAMjD/GNmpNaekqc6v3LNNzcmOBZchI6DRL8JF+jOlt
+ a6TEi/j24owGg7dMJsNpvrlGUi2sVB4V+h4u7R9SS8VkA2sdbxls433MwAvB5ypAezXU
+ QkCA==
+X-Gm-Message-State: AGi0PuYebSzl5fNEqDA8IRTdj5OmaPQgfQTrxNL+wchC5mj+2Na9Ps6S
+ xEi9n5DeK2vV+7Tvb8FaXoI=
+X-Google-Smtp-Source: APiQypIDKkbB7y+etZESC0cix6ghxnmD8uKL/J1HD6otKRrAbjORMmPW0rDOSb9rVS5O0xNX4Mpzmg==
+X-Received: by 2002:adf:fa03:: with SMTP id m3mr26467779wrr.68.1587979255632; 
+ Mon, 27 Apr 2020 02:20:55 -0700 (PDT)
+Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.137])
+ by smtp.gmail.com with ESMTPSA id 74sm21134765wrk.30.2020.04.27.02.20.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 27 Apr 2020 02:20:55 -0700 (PDT)
+Subject: Re: [PATCH 07/11] mips/malta: Fix create_cps() error handling
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200424192027.11404-1-armbru@redhat.com>
+ <20200424192027.11404-8-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <75dc4fbc-2b39-c8ef-8030-370672621c2f@amsat.org>
+Date: Mon, 27 Apr 2020 11:20:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200427111029.703f8703.cohuck@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200424192027.11404-8-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 23:32:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,58 +127,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yuri Benditovich <yuri.benditovich@daynix.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Apr 27, 2020 at 11:10:29AM +0200, Cornelia Huck wrote:
-> On Mon, 27 Apr 2020 16:41:30 +0800
-> Jason Wang <jasowang@redhat.com> wrote:
->=20
-> >=20
-> > On 2020/4/27 =E4=B8=8B=E5=8D=883:33, Cornelia Huck wrote:
-> > > Hi,
-> > >
-> > > I'm currently trying to prepare a linux-headers update to 5.7-rc3,
-> > > which adds the definition of VIRTIO_NET_HDR_F_RSC_INFO.
-> > >
-> > > Unfortunately, this breaks the build of virtio-net, because now
-> > > virtio_net_rsc_ext_num_{packets,dupacks} are undefined (they are
-> > > guarded by existence of VIRTIO_NET_HDR_F_RSC_INFO).
-> > >
-> > > What is the right way to fix this? Remove the constants that are now
-> > > provided by the header and keep the definitions of
-> > > virtio_net_rsc_ext_num_{packets,dupacks}?
-> >=20
-> >=20
-> > We probably need to add a version of the above function when=20
-> > VIRTIO_NET_HDR_F_RSC_INFO is defined as attached.
-> >=20
-> > But I fail to understand why we need a fallback when=20
-> > VIRTIO_NET_HDR_F_RSC_INFO is not defined.
->=20
-> Yes, the current code in virtio-net looks a bit odd, which is why I
-> asked.
->=20
-> I see two options:
-> - do the change you proposed, do the headers update, and then rip out
->    the compat handling
-> - do the above in a single step
->=20
-> I'd prefer the second option.
+On 4/24/20 9:20 PM, Markus Armbruster wrote:
+> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
+> pointer to a variable containing NULL.  Passing an argument of the
+> latter kind twice without clearing it in between is wrong: if the
+> first call sets an error, it no longer points to NULL for the second
+> 
+> create_cps() is wrong that way.  The last calls treats an error as
+> fatal.  Do that for the prior ones, too.
+> 
+> Fixes: bff384a4fbd5d0e86939092e74e766ef0f5f592c
+> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hw/mips/mips_malta.c | 15 ++++++---------
+>  1 file changed, 6 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index e4c4de1b4e..17bf41616b 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -1185,17 +1185,14 @@ static void create_cpu_without_cps(MachineState *ms,
+>  static void create_cps(MachineState *ms, MaltaState *s,
+>                         qemu_irq *cbus_irq, qemu_irq *i8259_irq)
+>  {
+> -    Error *err = NULL;
+> -
+>      sysbus_init_child_obj(OBJECT(s), "cps", OBJECT(&s->cps), sizeof(s->cps),
+>                            TYPE_MIPS_CPS);
+> -    object_property_set_str(OBJECT(&s->cps), ms->cpu_type, "cpu-type", &err);
+> -    object_property_set_int(OBJECT(&s->cps), ms->smp.cpus, "num-vp", &err);
+> -    object_property_set_bool(OBJECT(&s->cps), true, "realized", &err);
+> -    if (err != NULL) {
+> -        error_report("%s", error_get_pretty(err));
 
-Slight preference for 1st one but both are ok.
+In https://www.mail-archive.com/qemu-devel@nongnu.org/msg695645.html I
+also remove "qemu/error-report.h" which is not needed once you remove
+this call.
 
-> >=20
-> > Thanks
-> >=20
-> >=20
-> > >
-> > > [I'd like to queue a headers update as soon as possible, as the whole
-> > > s390 protected virt stuff depends on it...]
-> > >
-> > >
-
+> -        exit(1);
+> -    }
+> +    object_property_set_str(OBJECT(&s->cps), ms->cpu_type, "cpu-type",
+> +                            &error_fatal);
+> +    object_property_set_int(OBJECT(&s->cps), ms->smp.cpus, "num-vp",
+> +                            &error_fatal);
+> +    object_property_set_bool(OBJECT(&s->cps), true, "realized",
+> +                             &error_fatal);
+>  
+>      sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->cps), 0, 0, 1);
+>  
+> 
 
