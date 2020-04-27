@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C95BC5519A
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:19:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 433A3C54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:21:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 560F4214D8
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:19:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09E8E20661
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:21:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GK9v93zR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 560F4214D8
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T+JD/5ad"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09E8E20661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSyyn-0005bk-Cr
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 04:19:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46142)
+	id 1jSz1Z-0007jh-3X
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 04:21:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47940)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jSyy3-0004ui-U8
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:18:20 -0400
+ (envelope-from <david@redhat.com>) id 1jSz0p-00075u-W4
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:21:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jSyy3-00019J-7N
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:18:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54150
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1jSz0p-0003Qa-8l
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:21:11 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53540
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jSyy2-00018h-PO
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:18:18 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jSz0o-0003QO-Rs
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:21:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587975497;
+ s=mimecast20190719; t=1587975669;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=+tAA5LvevSXUteuE8fYHQEIUEudxqkCh8Ef80hQD2CI=;
- b=GK9v93zRsgcPl68ON0VOwR7fdNB+qDnHuLoPOQbViU5KK2LJLARi2cXX5pazIGJtJCacmb
- fOlHJyFg3tzGtcvR5jDYRapzDKdbVH4mU/CxR5SXiTQJuTaNapbVlAR50liN1TbFTy//rh
- 5HvCJY2ve4rSTJKH6SSC7O6ubgGcqoY=
+ bh=J7ndOchAuv8BwRiVBodGy7qHIbl98i8Jo4YQY554Awg=;
+ b=T+JD/5adVjnLwxidpE140gL5w73gnJsLn7NDBTHzCk6F7KJgXJeY0fjMgtskubzGATZHSy
+ 8MZ1SvZ8kK8eBeXbxYmzSS7BERqkVhCiQiKITg69RkiXFlIp8V2SSKJF+GqmkVs4r/sriO
+ pV4zTK1tMg7/4uxJlEMxjaLO/nHWG/8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-ElYXZE_uNQqGtzTsrqlL9A-1; Mon, 27 Apr 2020 04:18:16 -0400
-X-MC-Unique: ElYXZE_uNQqGtzTsrqlL9A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-359-BNFnpq5ONUWetzBS6gysIg-1; Mon, 27 Apr 2020 04:21:07 -0400
+X-MC-Unique: BNFnpq5ONUWetzBS6gysIg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C72B800D24;
- Mon, 27 Apr 2020 08:18:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B63C6468;
+ Mon, 27 Apr 2020 08:21:06 +0000 (UTC)
 Received: from [10.36.114.127] (ovpn-114-127.ams2.redhat.com [10.36.114.127])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8329960C84;
- Mon, 27 Apr 2020 08:18:10 +0000 (UTC)
-Subject: Re: [PATCH v22 QEMU 4/5] virtio-balloon: Implement support for page
- poison reporting feature
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2D6235D715;
+ Mon, 27 Apr 2020 08:21:01 +0000 (UTC)
+Subject: Re: [PATCH v22 QEMU 5/5] virtio-balloon: Provide an interface for
+ free page reporting
 To: Alexander Duyck <alexander.duyck@gmail.com>, mst@redhat.com
 References: <20200424164239.10723.58352.stgit@localhost.localdomain>
- <20200424165028.10723.60530.stgit@localhost.localdomain>
+ <20200424165034.10723.77728.stgit@localhost.localdomain>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -109,23 +109,23 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <042b01cf-8d46-4d47-01a5-eb09250ac435@redhat.com>
-Date: Mon, 27 Apr 2020 10:18:09 +0200
+Message-ID: <d473cfb6-0774-003c-88bd-10c5227e19a2@redhat.com>
+Date: Mon, 27 Apr 2020 10:21:01 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200424165028.10723.60530.stgit@localhost.localdomain>
+In-Reply-To: <20200424165034.10723.77728.stgit@localhost.localdomain>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 01:12:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 23:33:12
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -145,122 +145,127 @@ Sender: "Qemu-devel"
 On 24.04.20 18:50, Alexander Duyck wrote:
 > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > 
-> We need to make certain to advertise support for page poison reporting if
-> we want to actually get data on if the guest will be poisoning pages.
+> Add support for free page reporting. The idea is to function very similar
+> to how the balloon works in that we basically end up madvising the page as
+> not being used. However we don't really need to bother with any deflate
+> type logic since the page will be faulted back into the guest when it is
+> read or written to.
 > 
-> Add a value for reporting the poison value being used if page poisoning is
-> enabled in the guest. With this we can determine if we will need to skip
-> free page reporting when it is enabled in the future.
-> 
-> The value currently has no impact on existing balloon interfaces. In the
-> case of existing balloon interfaces the onus is on the guest driver to
-> reapply whatever poison is in place.
-> 
-> When we add free page reporting the poison value is used to determine if
-> we can perform in-place page reporting. The expectation is that a reported
-> page will already contain the value specified by the poison, and the
-> reporting of the page should not change that value.
+> This provides a new way of letting the guest proactively report free
+> pages to the hypervisor, so the hypervisor can reuse them. In contrast to
+> inflate/deflate that is triggered via the hypervisor explicitly.
 > 
 > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > ---
->  hw/virtio/virtio-balloon.c         |   29 +++++++++++++++++++++++++++++
->  include/hw/virtio/virtio-balloon.h |    1 +
->  2 files changed, 30 insertions(+)
+>  hw/virtio/virtio-balloon.c         |   67 ++++++++++++++++++++++++++++++++++++
+>  include/hw/virtio/virtio-balloon.h |    2 +
+>  2 files changed, 68 insertions(+), 1 deletion(-)
 > 
 > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index a1d6fb52c876..c1c76ec09c95 100644
+> index c1c76ec09c95..2ce56c6c0794 100644
 > --- a/hw/virtio/virtio-balloon.c
 > +++ b/hw/virtio/virtio-balloon.c
-> @@ -634,6 +634,7 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
->  
->      config.num_pages = cpu_to_le32(dev->num_pages);
->      config.actual = cpu_to_le32(dev->actual);
-> +    config.poison_val = cpu_to_le32(dev->poison_val);
->  
->      if (dev->free_page_hint_status == FREE_PAGE_HINT_S_REQUESTED) {
->          config.free_page_hint_cmd_id =
-> @@ -683,6 +684,14 @@ static ram_addr_t get_current_ram_size(void)
->      return size;
+> @@ -321,6 +321,67 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
+>      balloon_stats_change_timer(s, 0);
 >  }
 >  
-> +static bool virtio_balloon_page_poison_support(void *opaque)
+> +static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *vq)
 > +{
-> +    VirtIOBalloon *s = opaque;
-> +    VirtIODevice *vdev = VIRTIO_DEVICE(s);
+> +    VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
+> +    VirtQueueElement *elem;
 > +
-> +    return virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON);
+> +    while ((elem = virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
+> +        unsigned int i;
+> +
+> +        /*
+> +         * When we discard the page it has the effect of removing the page
+> +         * from the hypervisor itself and causing it to be zeroed when it
+> +         * is returned to us. So we must not discard the page if it is
+> +         * accessible by another device or process, or if the guest is
+> +         * expecting it to retain a non-zero value.
+> +         */
+> +        if (qemu_balloon_is_inhibited() || dev->poison_val) {
+> +            goto skip_element;
+> +        }
+> +
+> +        for (i = 0; i < elem->in_num; i++) {
+> +            void *addr = elem->in_sg[i].iov_base;
+> +            size_t size = elem->in_sg[i].iov_len;
+> +            ram_addr_t ram_offset;
+> +            RAMBlock *rb;
+> +
+> +            /*
+> +             * There is no need to check the memory section to see if
+> +             * it is ram/readonly/romd like there is for handle_output
+> +             * below. If the region is not meant to be written to then
+> +             * address_space_map will have allocated a bounce buffer
+> +             * and it will be freed in address_space_unmap and trigger
+> +             * and unassigned_mem_write before failing to copy over the
+> +             * buffer. If more than one bad descriptor is provided it
+> +             * will return NULL after the first bounce buffer and fail
+> +             * to map any resources.
+> +             */
+> +            rb = qemu_ram_block_from_host(addr, false, &ram_offset);
+> +            if (!rb) {
+> +                trace_virtio_balloon_bad_addr(elem->in_addr[i]);
+> +                continue;
+> +            }
+> +
+> +            /*
+> +             * For now we will simply ignore unaligned memory regions, or
+> +             * regions that overrun the end of the RAMBlock.
+> +             */
+> +            if (!QEMU_IS_ALIGNED(ram_offset | size, qemu_ram_pagesize(rb)) ||
+> +                (ram_offset + size) > qemu_ram_get_used_length(rb)) {
+> +                continue;
+> +            }
+> +
+> +            ram_block_discard_range(rb, ram_offset, size);
+> +        }
+> +
+> +skip_element:
+> +        virtqueue_push(vq, elem, 0);
+> +        virtio_notify(vdev, vq);
+> +        g_free(elem);
+> +    }
 > +}
 > +
->  static void virtio_balloon_set_config(VirtIODevice *vdev,
->                                        const uint8_t *config_data)
+>  static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
 >  {
-> @@ -697,6 +706,10 @@ static void virtio_balloon_set_config(VirtIODevice *vdev,
->          qapi_event_send_balloon_change(vm_ram_size -
->                          ((ram_addr_t) dev->actual << VIRTIO_BALLOON_PFN_SHIFT));
->      }
-> +    dev->poison_val = 0;
-> +    if (virtio_balloon_page_poison_support(dev)) {
-> +        dev->poison_val = le32_to_cpu(config.poison_val);
+>      VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
+> @@ -818,6 +879,10 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
+>      s->dvq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
+>      s->svq = virtio_add_queue(vdev, 128, virtio_balloon_receive_stats);
+>  
+> +    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_REPORTING)) {
+> +        s->rvq = virtio_add_queue(vdev, 32, virtio_balloon_handle_report);
 > +    }
->      trace_virtio_balloon_set_config(dev->actual, oldactual);
->  }
->  
-> @@ -755,6 +768,17 @@ static const VMStateDescription vmstate_virtio_balloon_free_page_hint = {
->      }
->  };
->  
-> +static const VMStateDescription vmstate_virtio_balloon_page_poison = {
-> +    .name = "vitio-balloon-device/page-poison",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = virtio_balloon_page_poison_support,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32(poison_val, VirtIOBalloon),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
 > +
->  static const VMStateDescription vmstate_virtio_balloon_device = {
->      .name = "virtio-balloon-device",
->      .version_id = 1,
-> @@ -767,6 +791,7 @@ static const VMStateDescription vmstate_virtio_balloon_device = {
->      },
->      .subsections = (const VMStateDescription * []) {
->          &vmstate_virtio_balloon_free_page_hint,
-> +        &vmstate_virtio_balloon_page_poison,
->          NULL
->      }
->  };
-> @@ -854,6 +879,8 @@ static void virtio_balloon_device_reset(VirtIODevice *vdev)
->          g_free(s->stats_vq_elem);
->          s->stats_vq_elem = NULL;
->      }
-> +
-> +    s->poison_val = 0;
->  }
->  
->  static void virtio_balloon_set_status(VirtIODevice *vdev, uint8_t status)
-> @@ -916,6 +943,8 @@ static Property virtio_balloon_properties[] = {
->                      VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
->      DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
+>      if (virtio_has_feature(s->host_features,
+>                             VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
+>          s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
+> @@ -945,6 +1010,8 @@ static Property virtio_balloon_properties[] = {
 >                      VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
-> +    DEFINE_PROP_BIT("page-poison", VirtIOBalloon, host_features,
-> +                    VIRTIO_BALLOON_F_PAGE_POISON, true),
+>      DEFINE_PROP_BIT("page-poison", VirtIOBalloon, host_features,
+>                      VIRTIO_BALLOON_F_PAGE_POISON, true),
+> +    DEFINE_PROP_BIT("free-page-reporting", VirtIOBalloon, host_features,
+> +                    VIRTIO_BALLOON_F_REPORTING, false),
 >      /* QEMU 4.0 accidentally changed the config size even when free-page-hint
 >       * is disabled, resulting in QEMU 3.1 migration incompatibility.  This
 >       * property retains this quirk for QEMU 4.1 machine types.
 > diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-> index 108cff97e71a..3ca2a78e1aca 100644
+> index 3ca2a78e1aca..ac4013d51010 100644
 > --- a/include/hw/virtio/virtio-balloon.h
 > +++ b/include/hw/virtio/virtio-balloon.h
-> @@ -70,6 +70,7 @@ typedef struct VirtIOBalloon {
->      uint32_t host_features;
+> @@ -42,7 +42,7 @@ enum virtio_balloon_free_page_hint_status {
 >  
->      bool qemu_4_0_config_size;
-> +    uint32_t poison_val;
->  } VirtIOBalloon;
->  
->  #endif
+>  typedef struct VirtIOBalloon {
+>      VirtIODevice parent_obj;
+> -    VirtQueue *ivq, *dvq, *svq, *free_page_vq;
+> +    VirtQueue *ivq, *dvq, *svq, *free_page_vq, *rvq;
+>      uint32_t free_page_hint_status;
+>      uint32_t num_pages;
+>      uint32_t actual;
 > 
 
 Acked-by: David Hildenbrand <david@redhat.com>
