@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF74C54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:16:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C95BC5519A
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:19:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34B532051A
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:16:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 560F4214D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:19:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oi2bprBb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34B532051A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GK9v93zR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 560F4214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSywO-00032V-8J
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 04:16:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44310)
+	id 1jSyyn-0005bk-Cr
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 04:19:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46142)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jSyvC-0002Go-BA
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:15:23 -0400
+ (envelope-from <david@redhat.com>) id 1jSyy3-0004ui-U8
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:18:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jSyvA-0006Ua-OZ
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:15:21 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49689
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1jSyy3-00019J-7N
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:18:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54150
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jSyvA-0006S2-6K
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:15:20 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jSyy2-00018h-PO
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:18:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587975318;
+ s=mimecast20190719; t=1587975497;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=8j0AEj4P75hr1qWy+FWzuE39iQkuJZyUcjiYEPXKXr0=;
- b=Oi2bprBbU7w7+lnqbCsuUBHabb3XkOFLwFSo6Yei7O4O9ptzVgP7M59UTxaW0uzVjtfHyK
- UtV8I/Jh6zf+E81adBu7WbIzuvghkYvghl2lLGSUmzRuqhRyTsaXBDxUdvpVH+Mz6ozNbw
- XtNocXqtGgtFaUvc8zvQEVtGSfysF+A=
+ bh=+tAA5LvevSXUteuE8fYHQEIUEudxqkCh8Ef80hQD2CI=;
+ b=GK9v93zRsgcPl68ON0VOwR7fdNB+qDnHuLoPOQbViU5KK2LJLARi2cXX5pazIGJtJCacmb
+ fOlHJyFg3tzGtcvR5jDYRapzDKdbVH4mU/CxR5SXiTQJuTaNapbVlAR50liN1TbFTy//rh
+ 5HvCJY2ve4rSTJKH6SSC7O6ubgGcqoY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-SKNuAOm0NMOnCnSFNqmJYg-1; Mon, 27 Apr 2020 04:15:15 -0400
-X-MC-Unique: SKNuAOm0NMOnCnSFNqmJYg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-402-ElYXZE_uNQqGtzTsrqlL9A-1; Mon, 27 Apr 2020 04:18:16 -0400
+X-MC-Unique: ElYXZE_uNQqGtzTsrqlL9A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EC76872FE1;
- Mon, 27 Apr 2020 08:15:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C72B800D24;
+ Mon, 27 Apr 2020 08:18:14 +0000 (UTC)
 Received: from [10.36.114.127] (ovpn-114-127.ams2.redhat.com [10.36.114.127])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3BE0319C4F;
- Mon, 27 Apr 2020 08:15:09 +0000 (UTC)
-Subject: Re: [PATCH v22 QEMU 3/5] virtio-balloon: Replace free page hinting
- references to 'report' with 'hint'
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8329960C84;
+ Mon, 27 Apr 2020 08:18:10 +0000 (UTC)
+Subject: Re: [PATCH v22 QEMU 4/5] virtio-balloon: Implement support for page
+ poison reporting feature
 To: Alexander Duyck <alexander.duyck@gmail.com>, mst@redhat.com
 References: <20200424164239.10723.58352.stgit@localhost.localdomain>
- <20200424165021.10723.14111.stgit@localhost.localdomain>
+ <20200424165028.10723.60530.stgit@localhost.localdomain>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -109,23 +109,23 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <7ce2bcde-7466-2764-7248-36f67bb9b573@redhat.com>
-Date: Mon, 27 Apr 2020 10:15:09 +0200
+Message-ID: <042b01cf-8d46-4d47-01a5-eb09250ac435@redhat.com>
+Date: Mon, 27 Apr 2020 10:18:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200424165021.10723.14111.stgit@localhost.localdomain>
+In-Reply-To: <20200424165028.10723.60530.stgit@localhost.localdomain>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 23:32:35
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 01:12:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -145,292 +145,125 @@ Sender: "Qemu-devel"
 On 24.04.20 18:50, Alexander Duyck wrote:
 > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > 
-> In an upcoming patch a feature named Free Page Reporting is about to be
-> added. In order to avoid any confusion we should drop the use of the word
-> 'report' when referring to Free Page Hinting. So what this patch does is go
-> through and replace all instances of 'report' with 'hint" when we are
-> referring to free page hinting.
+> We need to make certain to advertise support for page poison reporting if
+> we want to actually get data on if the guest will be poisoning pages.
 > 
-> Acked-by: David Hildenbrand <david@redhat.com>
+> Add a value for reporting the poison value being used if page poisoning is
+> enabled in the guest. With this we can determine if we will need to skip
+> free page reporting when it is enabled in the future.
+> 
+> The value currently has no impact on existing balloon interfaces. In the
+> case of existing balloon interfaces the onus is on the guest driver to
+> reapply whatever poison is in place.
+> 
+> When we add free page reporting the poison value is used to determine if
+> we can perform in-place page reporting. The expectation is that a reported
+> page will already contain the value specified by the poison, and the
+> reporting of the page should not change that value.
+> 
 > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > ---
->  hw/virtio/virtio-balloon.c         |   74 ++++++++++++++++++------------------
->  include/hw/virtio/virtio-balloon.h |   20 +++++-----
->  2 files changed, 47 insertions(+), 47 deletions(-)
+>  hw/virtio/virtio-balloon.c         |   29 +++++++++++++++++++++++++++++
+>  include/hw/virtio/virtio-balloon.h |    1 +
+>  2 files changed, 30 insertions(+)
 > 
 > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index a4729f7fc930..a1d6fb52c876 100644
+> index a1d6fb52c876..c1c76ec09c95 100644
 > --- a/hw/virtio/virtio-balloon.c
 > +++ b/hw/virtio/virtio-balloon.c
-> @@ -466,21 +466,21 @@ static bool get_free_page_hints(VirtIOBalloon *dev)
->              ret = false;
->              goto out;
->          }
-> -        if (id == dev->free_page_report_cmd_id) {
-> -            dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
-> +        if (id == dev->free_page_hint_cmd_id) {
-> +            dev->free_page_hint_status = FREE_PAGE_HINT_S_START;
->          } else {
->              /*
->               * Stop the optimization only when it has started. This
->               * avoids a stale stop sign for the previous command.
->               */
-> -            if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
-> -                dev->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-> +            if (dev->free_page_hint_status == FREE_PAGE_HINT_S_START) {
-> +                dev->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
->              }
->          }
->      }
+> @@ -634,6 +634,7 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
 >  
->      if (elem->in_num) {
-> -        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
-> +        if (dev->free_page_hint_status == FREE_PAGE_HINT_S_START) {
->              qemu_guest_free_page_hint(elem->in_sg[0].iov_base,
->                                        elem->in_sg[0].iov_len);
->          }
-> @@ -506,11 +506,11 @@ static void virtio_ballloon_get_free_page_hints(void *opaque)
->          qemu_mutex_unlock(&dev->free_page_lock);
->          virtio_notify(vdev, vq);
->        /*
-> -       * Start to poll the vq once the reporting started. Otherwise, continue
-> +       * Start to poll the vq once the hinting started. Otherwise, continue
->         * only when there are entries on the vq, which need to be given back.
->         */
->      } while (continue_to_get_hints ||
-> -             dev->free_page_report_status == FREE_PAGE_REPORT_S_START);
-> +             dev->free_page_hint_status == FREE_PAGE_HINT_S_START);
->      virtio_queue_set_notification(vq, 1);
->  }
->  
-> @@ -531,14 +531,14 @@ static void virtio_balloon_free_page_start(VirtIOBalloon *s)
->          return;
->      }
->  
-> -    if (s->free_page_report_cmd_id == UINT_MAX) {
-> -        s->free_page_report_cmd_id =
-> -                       VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
-> +    if (s->free_page_hint_cmd_id == UINT_MAX) {
-> +        s->free_page_hint_cmd_id =
-> +                       VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN;
->      } else {
-> -        s->free_page_report_cmd_id++;
-> +        s->free_page_hint_cmd_id++;
->      }
->  
-> -    s->free_page_report_status = FREE_PAGE_REPORT_S_REQUESTED;
-> +    s->free_page_hint_status = FREE_PAGE_HINT_S_REQUESTED;
->      virtio_notify_config(vdev);
->  }
->  
-> @@ -546,18 +546,18 @@ static void virtio_balloon_free_page_stop(VirtIOBalloon *s)
->  {
->      VirtIODevice *vdev = VIRTIO_DEVICE(s);
->  
-> -    if (s->free_page_report_status != FREE_PAGE_REPORT_S_STOP) {
-> +    if (s->free_page_hint_status != FREE_PAGE_HINT_S_STOP) {
->          /*
->           * The lock also guarantees us that the
->           * virtio_ballloon_get_free_page_hints exits after the
-> -         * free_page_report_status is set to S_STOP.
-> +         * free_page_hint_status is set to S_STOP.
->           */
->          qemu_mutex_lock(&s->free_page_lock);
->          /*
->           * The guest hasn't done the reporting, so host sends a notification
->           * to the guest to actively stop the reporting.
->           */
-> -        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-> +        s->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
->          qemu_mutex_unlock(&s->free_page_lock);
->          virtio_notify_config(vdev);
->      }
-> @@ -567,15 +567,15 @@ static void virtio_balloon_free_page_done(VirtIOBalloon *s)
->  {
->      VirtIODevice *vdev = VIRTIO_DEVICE(s);
->  
-> -    s->free_page_report_status = FREE_PAGE_REPORT_S_DONE;
-> +    s->free_page_hint_status = FREE_PAGE_HINT_S_DONE;
->      virtio_notify_config(vdev);
->  }
->  
->  static int
-> -virtio_balloon_free_page_report_notify(NotifierWithReturn *n, void *data)
-> +virtio_balloon_free_page_hint_notify(NotifierWithReturn *n, void *data)
->  {
->      VirtIOBalloon *dev = container_of(n, VirtIOBalloon,
-> -                                      free_page_report_notify);
-> +                                      free_page_hint_notify);
->      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
->      PrecopyNotifyData *pnd = data;
->  
-> @@ -624,7 +624,7 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
->      if (virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
->          return offsetof(struct virtio_balloon_config, poison_val);
->      }
-> -    return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
-> +    return offsetof(struct virtio_balloon_config, free_page_hint_cmd_id);
->  }
->  
->  static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
-> @@ -635,14 +635,14 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
 >      config.num_pages = cpu_to_le32(dev->num_pages);
 >      config.actual = cpu_to_le32(dev->actual);
+> +    config.poison_val = cpu_to_le32(dev->poison_val);
 >  
-> -    if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
-> -        config.free_page_report_cmd_id =
-> -                       cpu_to_le32(dev->free_page_report_cmd_id);
-> -    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
-> -        config.free_page_report_cmd_id =
-> +    if (dev->free_page_hint_status == FREE_PAGE_HINT_S_REQUESTED) {
-> +        config.free_page_hint_cmd_id =
-> +                       cpu_to_le32(dev->free_page_hint_cmd_id);
-> +    } else if (dev->free_page_hint_status == FREE_PAGE_HINT_S_STOP) {
-> +        config.free_page_hint_cmd_id =
->                         cpu_to_le32(VIRTIO_BALLOON_CMD_ID_STOP);
-> -    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_DONE) {
-> -        config.free_page_report_cmd_id =
-> +    } else if (dev->free_page_hint_status == FREE_PAGE_HINT_S_DONE) {
-> +        config.free_page_hint_cmd_id =
->                         cpu_to_le32(VIRTIO_BALLOON_CMD_ID_DONE);
->      }
->  
-> @@ -743,14 +743,14 @@ static int virtio_balloon_post_load_device(void *opaque, int version_id)
->      return 0;
+>      if (dev->free_page_hint_status == FREE_PAGE_HINT_S_REQUESTED) {
+>          config.free_page_hint_cmd_id =
+> @@ -683,6 +684,14 @@ static ram_addr_t get_current_ram_size(void)
+>      return size;
 >  }
 >  
-> -static const VMStateDescription vmstate_virtio_balloon_free_page_report = {
-> +static const VMStateDescription vmstate_virtio_balloon_free_page_hint = {
->      .name = "virtio-balloon-device/free-page-report",
->      .version_id = 1,
->      .minimum_version_id = 1,
->      .needed = virtio_balloon_free_page_support,
->      .fields = (VMStateField[]) {
-> -        VMSTATE_UINT32(free_page_report_cmd_id, VirtIOBalloon),
-> -        VMSTATE_UINT32(free_page_report_status, VirtIOBalloon),
-> +        VMSTATE_UINT32(free_page_hint_cmd_id, VirtIOBalloon),
-> +        VMSTATE_UINT32(free_page_hint_status, VirtIOBalloon),
->          VMSTATE_END_OF_LIST()
+> +static bool virtio_balloon_page_poison_support(void *opaque)
+> +{
+> +    VirtIOBalloon *s = opaque;
+> +    VirtIODevice *vdev = VIRTIO_DEVICE(s);
+> +
+> +    return virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON);
+> +}
+> +
+>  static void virtio_balloon_set_config(VirtIODevice *vdev,
+>                                        const uint8_t *config_data)
+>  {
+> @@ -697,6 +706,10 @@ static void virtio_balloon_set_config(VirtIODevice *vdev,
+>          qapi_event_send_balloon_change(vm_ram_size -
+>                          ((ram_addr_t) dev->actual << VIRTIO_BALLOON_PFN_SHIFT));
+>      }
+> +    dev->poison_val = 0;
+> +    if (virtio_balloon_page_poison_support(dev)) {
+> +        dev->poison_val = le32_to_cpu(config.poison_val);
+> +    }
+>      trace_virtio_balloon_set_config(dev->actual, oldactual);
+>  }
+>  
+> @@ -755,6 +768,17 @@ static const VMStateDescription vmstate_virtio_balloon_free_page_hint = {
 >      }
 >  };
-> @@ -766,7 +766,7 @@ static const VMStateDescription vmstate_virtio_balloon_device = {
->          VMSTATE_END_OF_LIST()
+>  
+> +static const VMStateDescription vmstate_virtio_balloon_page_poison = {
+> +    .name = "vitio-balloon-device/page-poison",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = virtio_balloon_page_poison_support,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32(poison_val, VirtIOBalloon),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static const VMStateDescription vmstate_virtio_balloon_device = {
+>      .name = "virtio-balloon-device",
+>      .version_id = 1,
+> @@ -767,6 +791,7 @@ static const VMStateDescription vmstate_virtio_balloon_device = {
 >      },
 >      .subsections = (const VMStateDescription * []) {
-> -        &vmstate_virtio_balloon_free_page_report,
-> +        &vmstate_virtio_balloon_free_page_hint,
+>          &vmstate_virtio_balloon_free_page_hint,
+> +        &vmstate_virtio_balloon_page_poison,
 >          NULL
 >      }
 >  };
-> @@ -797,12 +797,12 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
->                             VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
->          s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
->                                             virtio_balloon_handle_free_page_vq);
-> -        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-> -        s->free_page_report_cmd_id =
-> -                           VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
-> -        s->free_page_report_notify.notify =
-> -                                       virtio_balloon_free_page_report_notify;
-> -        precopy_add_notifier(&s->free_page_report_notify);
-> +        s->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
-> +        s->free_page_hint_cmd_id =
-> +                           VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN;
-> +        s->free_page_hint_notify.notify =
-> +                                       virtio_balloon_free_page_hint_notify;
-> +        precopy_add_notifier(&s->free_page_hint_notify);
->          if (s->iothread) {
->              object_ref(OBJECT(s->iothread));
->              s->free_page_bh = aio_bh_new(iothread_get_aio_context(s->iothread),
-> @@ -827,7 +827,7 @@ static void virtio_balloon_device_unrealize(DeviceState *dev, Error **errp)
->      if (virtio_balloon_free_page_support(s)) {
->          qemu_bh_delete(s->free_page_bh);
->          virtio_balloon_free_page_stop(s);
-> -        precopy_remove_notifier(&s->free_page_report_notify);
-> +        precopy_remove_notifier(&s->free_page_hint_notify);
+> @@ -854,6 +879,8 @@ static void virtio_balloon_device_reset(VirtIODevice *vdev)
+>          g_free(s->stats_vq_elem);
+>          s->stats_vq_elem = NULL;
 >      }
->      balloon_stats_destroy_timer(s);
->      qemu_remove_balloon_handler(s);
+> +
+> +    s->poison_val = 0;
+>  }
+>  
+>  static void virtio_balloon_set_status(VirtIODevice *vdev, uint8_t status)
+> @@ -916,6 +943,8 @@ static Property virtio_balloon_properties[] = {
+>                      VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
+>      DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
+>                      VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
+> +    DEFINE_PROP_BIT("page-poison", VirtIOBalloon, host_features,
+> +                    VIRTIO_BALLOON_F_PAGE_POISON, true),
+>      /* QEMU 4.0 accidentally changed the config size even when free-page-hint
+>       * is disabled, resulting in QEMU 3.1 migration incompatibility.  This
+>       * property retains this quirk for QEMU 4.1 machine types.
 > diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-> index d1c968d2376e..108cff97e71a 100644
+> index 108cff97e71a..3ca2a78e1aca 100644
 > --- a/include/hw/virtio/virtio-balloon.h
 > +++ b/include/hw/virtio/virtio-balloon.h
-> @@ -23,7 +23,7 @@
->  #define VIRTIO_BALLOON(obj) \
->          OBJECT_CHECK(VirtIOBalloon, (obj), TYPE_VIRTIO_BALLOON)
->  
-> -#define VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN 0x80000000
-> +#define VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN 0x80000000
->  
->  typedef struct virtio_balloon_stat VirtIOBalloonStat;
->  
-> @@ -33,20 +33,20 @@ typedef struct virtio_balloon_stat_modern {
->         uint64_t val;
->  } VirtIOBalloonStatModern;
->  
-> -enum virtio_balloon_free_page_report_status {
-> -    FREE_PAGE_REPORT_S_STOP = 0,
-> -    FREE_PAGE_REPORT_S_REQUESTED = 1,
-> -    FREE_PAGE_REPORT_S_START = 2,
-> -    FREE_PAGE_REPORT_S_DONE = 3,
-> +enum virtio_balloon_free_page_hint_status {
-> +    FREE_PAGE_HINT_S_STOP = 0,
-> +    FREE_PAGE_HINT_S_REQUESTED = 1,
-> +    FREE_PAGE_HINT_S_START = 2,
-> +    FREE_PAGE_HINT_S_DONE = 3,
->  };
->  
->  typedef struct VirtIOBalloon {
->      VirtIODevice parent_obj;
->      VirtQueue *ivq, *dvq, *svq, *free_page_vq;
-> -    uint32_t free_page_report_status;
-> +    uint32_t free_page_hint_status;
->      uint32_t num_pages;
->      uint32_t actual;
-> -    uint32_t free_page_report_cmd_id;
-> +    uint32_t free_page_hint_cmd_id;
->      uint64_t stats[VIRTIO_BALLOON_S_NR];
->      VirtQueueElement *stats_vq_elem;
->      size_t stats_vq_offset;
-> @@ -55,7 +55,7 @@ typedef struct VirtIOBalloon {
->      QEMUBH *free_page_bh;
->      /*
->       * Lock to synchronize threads to access the free page reporting related
-> -     * fields (e.g. free_page_report_status).
-> +     * fields (e.g. free_page_hint_status).
->       */
->      QemuMutex free_page_lock;
->      QemuCond  free_page_cond;
-> @@ -64,7 +64,7 @@ typedef struct VirtIOBalloon {
->       * stopped.
->       */
->      bool block_iothread;
-> -    NotifierWithReturn free_page_report_notify;
-> +    NotifierWithReturn free_page_hint_notify;
->      int64_t stats_last_update;
->      int64_t stats_poll_interval;
+> @@ -70,6 +70,7 @@ typedef struct VirtIOBalloon {
 >      uint32_t host_features;
+>  
+>      bool qemu_4_0_config_size;
+> +    uint32_t poison_val;
+>  } VirtIOBalloon;
+>  
+>  #endif
 > 
 
-There is only one wrong comment remaining I think. Something like
-
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index a1d6fb52c8..1b2127c04c 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -554,8 +554,8 @@ static void virtio_balloon_free_page_stop(VirtIOBalloon *s)
-          */
-         qemu_mutex_lock(&s->free_page_lock);
-         /*
--         * The guest hasn't done the reporting, so host sends a notification
--         * to the guest to actively stop the reporting.
-+         * The guest isn't done with hinting, so the host sends a notification
-+         * to the guest to actively stop the hinting.
-          */
-         s->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
-         qemu_mutex_unlock(&s->free_page_lock);
-
-
-
+Acked-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
