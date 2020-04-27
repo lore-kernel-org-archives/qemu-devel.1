@@ -2,129 +2,123 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CD7BC54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:22:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C7DC54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:24:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E85B820661
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:22:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC4BB20661
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:24:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZP79ERdt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E85B820661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="rmxux5BT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC4BB20661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSz2O-0000eO-3X
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 04:22:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48090)
+	id 1jSz3a-0001y5-Uv
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 04:24:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48106)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jSz1W-0007wE-Ac
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:21:54 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jSz1f-0008EU-Ho
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:22:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jSz1V-0003y9-OB
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:21:54 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30901
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jSz1V-0003x3-AL
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:21:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587975712;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=rlkmbWDJFWryPRwN+ZxevgDyYW5evqU2FgUpz7Cnrhw=;
- b=ZP79ERdtXSKdMzkT4aEhPE16mSw4WIGiKAwU2ijf/sDV3x20CitLI4sfi7hMLfiWhPlyxJ
- iFXoxpi96NYQqVspRCsLMBOE8+9vz/bOQsjK+Zu6qLE+oSqLyqfwHE6M8sa9tAbqlM/ebK
- m2lB1jDlHYaICP9NR+jmkCTWVfiWIms=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-Q23FPDOBONyoqwXuff7eLg-1; Mon, 27 Apr 2020 04:21:48 -0400
-X-MC-Unique: Q23FPDOBONyoqwXuff7eLg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D1C364AD4;
- Mon, 27 Apr 2020 08:21:47 +0000 (UTC)
-Received: from [10.36.114.127] (ovpn-114-127.ams2.redhat.com [10.36.114.127])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 91E9E6106A;
- Mon, 27 Apr 2020 08:21:43 +0000 (UTC)
-Subject: Re: [PATCH v22 QEMU 0/5] virtio-balloon: add support for page poison
- reporting and free page reporting
-To: Alexander Duyck <alexander.duyck@gmail.com>, mst@redhat.com
-References: <20200424164239.10723.58352.stgit@localhost.localdomain>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <24b5a6e2-0062-4d73-db9d-2c811c7b7751@redhat.com>
-Date: Mon, 27 Apr 2020 10:21:42 +0200
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jSz1d-0003zM-CS
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:22:02 -0400
+Received: from mail-eopbgr40125.outbound.protection.outlook.com
+ ([40.107.4.125]:56959 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jSz1c-0003yl-E5
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:22:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OHspCFaIib2zZBnn+TX2w+9RmRgsW2UP5atPxtiee4mBOKyf9pBQuvE27/vJs+emvj+BQiL0cDuoaD6Co4FUQUksDyz1TZQ5Aslnwo8BvJm1/JaBlKe0ZEoo93PP1J3PXZB+tUtUzhf9uyjBpsmTqUVlNdfbQbypphMevYaSd8VGw56cKhgqPN1D1UlF9tgcafDlobiTcCnltTYA+re6mQrwU7bZfNOHqm5zmp1ip8WYkR/A0Em9GtigQNtSX0NhzZbco9cgfF6DmDLRJPhy/UvQzhypB+jrfVKNqoaXU7TzUtDb3MkrJsszprTWCQQ/sWNqH4U1dttKjzgeayGdmg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dWkvXudNUpRRNfMH1RynLxHX8P9GraOP6zi7VaNj6PY=;
+ b=ArwsXe9DpjHRDIGg98t7RfPcHHhtMvDbF5oeUQrblwrVaXnB/ofAY/1RJMe1B4mSt32XIyHq8EfmOlkUzwjGA5TM1c65dA5httBrDOYMpzGoPSS9sw/tKdpEspD9mDWejwZ1ExG3ny8Yd/wJH2CQs25TVlkkIR5PCy6y8WdIdYamBiaXYQwvB5wzirp+dPnq/2Br0+nrHzdYK3E03ucosGx69Jhd4ZS3/IUC/ayXqmYduQvuAT+d5ehnh7fDkzJ9G9sfJrjdRuRclde6dPBQ+aMgwJ67OpPsRSrOYekcQvaiXybiwxwh28IeYWZR2xuy7NTJ8sW38XkINV8LFFOrDw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dWkvXudNUpRRNfMH1RynLxHX8P9GraOP6zi7VaNj6PY=;
+ b=rmxux5BTpg+c62Bn7dlyWGLPJdR3EY7JMLutl7yKGjxvspXUUptcE2lEhza7mbtVB0FIfwn1J3LE2hWr+68zNdGcHkiKU6sg7zxRJQX2cPpQWc4cp8tHy9fQ16DocPyN2u+GtMoxeKbi5LQs/0WBwosJy8BWrJAIcuoGwNPulWs=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=dplotnikov@virtuozzo.com; 
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (2603:10a6:208:ff::27)
+ by AM0PR08MB5090.eurprd08.prod.outlook.com (2603:10a6:208:15c::30)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Mon, 27 Apr
+ 2020 08:21:57 +0000
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::95e6:1da8:1244:d16f]) by AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::95e6:1da8:1244:d16f%4]) with mapi id 15.20.2937.023; Mon, 27 Apr 2020
+ 08:21:57 +0000
+Subject: Re: [RFC patch v1 2/3] qemu-file: add buffered mode
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <1586776334-641239-1-git-send-email-dplotnikov@virtuozzo.com>
+ <1586776334-641239-3-git-send-email-dplotnikov@virtuozzo.com>
+ <9bb27377-49e5-75de-fc7e-4846f05478e2@redhat.com>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <f7a43ea1-1db8-a047-8b35-863dc1b903c4@virtuozzo.com>
+Date: Mon, 27 Apr 2020 11:21:54 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200424164239.10723.58352.stgit@localhost.localdomain>
+ Thunderbird/68.4.1
+In-Reply-To: <9bb27377-49e5-75de-fc7e-4846f05478e2@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 23:32:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-ClientProxiedBy: FR2P281CA0017.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a::27) To AM0PR08MB3745.eurprd08.prod.outlook.com
+ (2603:10a6:208:ff::27)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.64] (94.233.240.57) by
+ FR2P281CA0017.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::27) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2937.13 via Frontend Transport; Mon, 27 Apr 2020 08:21:56 +0000
+X-Originating-IP: [94.233.240.57]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ab8a9b37-feb3-4728-03b1-08d7ea840d14
+X-MS-TrafficTypeDiagnostic: AM0PR08MB5090:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM0PR08MB5090185A8B6623883A0AB8D1CFAF0@AM0PR08MB5090.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
+X-Forefront-PRVS: 0386B406AA
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM0PR08MB3745.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(136003)(346002)(376002)(39840400004)(396003)(4326008)(31696002)(186003)(8676002)(86362001)(5660300002)(53546011)(52116002)(31686004)(6486002)(16526019)(956004)(2616005)(66476007)(66946007)(316002)(478600001)(36756003)(16576012)(66556008)(8936002)(26005)(2906002)(81156014);
+ DIR:OUT; SFP:1102; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: udGJEozZFEYDbjcRMDAtJwU0EAUGRXriVTtodimDlIL/3MhpBfdZT0JPZakpcKDxEkQJKgTpxgQtoWLerra1dFJtThEGXzvJ1Uq4b5MyYd5Ff65leH6ByT6K9BijjQ3RRGvf5prCBm30kGpP/llKojLvsYB9S7kJLIsfUCxFbwE7NWafOWPHlDm0b1RcJTsE3fFnSl8Qk5Wn3o9EF1EO6fnc752VjRjObbbDg4+Imj+Bn+Vh1i7VoXuoUnmKqIlpBtQpXKVxaPQLlSqewUHiWp+CT1lYsJVIzfnB8ee+9cj6Cl9rISTD92ctG1uIsml0AgibwF28B/L/TGd3CULz2X8yjhAX4ShpJ7qxsT5MPMF793VxUU8YzDPCBtmAH9/iR8TPGItQH0UW7kwSkXIsruWiCIYgFzRj9xKFTo+nO4Y+sSxtuR1HUJa1zevtsFiQ
+X-MS-Exchange-AntiSpam-MessageData: +K0XcQdECDw9OIhj6nbQGzCzRMGDd19Q6G6Y+3glAM5zLStfrmyoxSjVUlvBfnUZWvB7gYbK4KpMHSPbPhw8paHx+NOTAQTSXwugGSK7F9NzJatEu7aVyZ0YudA7HT8w/jDkAYZaIVyzrCY6usPsYv+i1pRy13pg6bQIQn0YBNSFUYHXmEO1dWmMMT0cDs8MX2XvwUeDitVRfoCzq9WHIdonaHaM0+Eg0g7AYfu5f21qt4KLMigtJdCus3rWEF+go4gtiIVopHXyYJ3JNpbnkX3aI0MzLJEGvN0o4meExqe6zeRCoNzorDUmv05ktlLAejNlERRA8iHzTvQoANOg7x8XIrGnaMIiRSTL+uuHDLyIp+y07OMc4fMVJNRWP0mn1GtP4eRLN4/06HzjStQTPB+19YbxZojDA/HlxiWXSXlmYLYga0H/ETGs+nFjKYXcIZ5708c4/9mpEJt4+8EW6G06NztawocLvCIHYM2A8Jf+6dPDpFbg+fbztUn5MS7XY+EFL2VlGi1MH0Pz7WQMAnmVwmM4Ftl6ZjZT3dd4vrbCInj4qLln8/drrRZ8LpP6u+xhEdinX4me6l+LI1PcKhE+bTjXL+Wd2+VOV7lrKvXZScKaNZRMO+AJ77htKCOK8Ktj6EGQtSETQaUGthxC0hO+SlcTjzNTtBx8XfeZ80fk57gs6uMVNGt79B7T0kgoqhlKdWDlxntRFl/BA0x1EoHd3IZQLLGBIcS9S12oZAkDBRupyfOKwCfJJ7YvYbuOnZAQRdVZSM5qLw6u31w3mLDNm0gD/dJh4SK7hvJmJIE=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab8a9b37-feb3-4728-03b1-08d7ea840d14
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 08:21:57.4141 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ETY1g6M5tkQ9ul/nfy71zsReMqMpqhJdqAoB9BWpubiMhk2Fa5k29SBg0ub9R7yrjeCqrEzAoJJlhy1Ffdb558RUwfms3OBBO5JkW5A/FxY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB5090
+Received-SPF: pass client-ip=40.107.4.125;
+ envelope-from=dplotnikov@virtuozzo.com;
+ helo=EUR03-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 04:21:58
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.4.125
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -136,74 +130,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: den@openvz.org, dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.04.20 18:50, Alexander Duyck wrote:
-> This series provides an asynchronous means of reporting free guest pages
-> to QEMU through virtio-balloon so that the memory associated with those
-> pages can be discarded and reused by other processes and/or guests on the
-> host. Using this it is possible to avoid unnecessary I/O to disk and
-> greatly improve performance in the case of memory overcommit on the host.
-> 
-> As a part of enabling this feature it was necessary to implement the page
-> poison reporting feature which had been added to the kernel, but was not
-> available in QEMU. This patch set adds it as a new device property
-> "page-poison" which is enabled by default, and adds support for migrating
-> the reported value.
-> 
-> I originally submitted this patch series back on February 11th 2020[1],
-> but at that time I was focused primarily on the kernel portion of this
-> patch set. However as of April 7th those patches are now included in
-> Linus's kernel tree[2] and so I am submitting the QEMU pieces for
-> inclusion.
-> 
-> [1]: https://lore.kernel.org/lkml/20200211224416.29318.44077.stgit@localhost.localdomain/
-> [2]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b0c504f154718904ae49349147e3b7e6ae91ffdc
-> 
-> Changes from v17:
-> Fixed typo in patch 1 title
-> Addressed white-space issues reported via checkpatch
-> Added braces {} for two if statements to match expected coding style
-> 
-> Changes from v18:
-> Updated patches 2 and 3 based on input from dhildenb
-> Added comment to patch 2 describing what keeps us from reporting a bad page
-> Added patch to address issue with ROM devices being directly writable
-> 
-> Changes from v19:
-> Added std-headers change to match changes pushed for linux kernel headers
-> Added patch to remove "report" from page hinting code paths
-> Updated comment to better explain why we disable hints w/ page poisoning
-> Removed code that was modifying config size for poison vs hinting
-> Dropped x-page-poison property
-> Added code to bounds check the reported region vs the RAM block
-> Dropped patch for ROM devices as that was already pulled in by Paolo
-> 
-> Changes from v20:
-> Rearranged patches to push Linux header sync patches to front
-> Removed association between free page hinting and VIRTIO_BALLOON_F_PAGE_POISON
-> Added code to enable VIRTIO_BALLOON_F_PAGE_POISON if page reporting is enabled
-> Fixed possible resource leak if poison or qemu_balloon_is_inhibited return true
-> 
-> Changes from v21:
-> Added ack for patch 3
-> Rewrote patch description for page poison reporting feature
-> Made page-poison independent property and set to enabled by default
-> Added logic to migrate poison_val
-> Added several comments in code to better explain features
-> Switched free-page-reporting property to disabled by default
-
-Except one minor nit, looks good to me. We'll have to take care of
-compat handling regarding patch #4 as soon as we have 5.0 compat
-machines in place.
 
 
--- 
-Thanks,
+On 25.04.2020 00:25, Eric Blake wrote:
+> On 4/13/20 6:12 AM, Denis Plotnikov wrote:
+>> The patch adds ability to qemu-file to write the data
+>> asynchronously to improve the performance on writing.
+>> Before, only synchronous writing was supported.
+>>
+>> Enabling of the asyncronous mode is managed by new
+>
+> asynchronous
+>
+>> "enabled_buffered" callback.
+>
+> The term "enabled_buffered" does not appear in the patch.  Did you 
+> mean...
+>
+>>
+>> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+>> ---
+>>   include/qemu/typedefs.h |   1 +
+>>   migration/qemu-file.c   | 351 
+>> +++++++++++++++++++++++++++++++++++++++++++++---
+>>   migration/qemu-file.h   |   9 ++
+>>   3 files changed, 339 insertions(+), 22 deletions(-)
+>>
+>
+>> @@ -60,6 +66,22 @@ struct QEMUFile {
+>>       bool shutdown;
+>>       /* currently used buffer */
+>>       QEMUFileBuffer *current_buf;
+>> +    /*
+>> +     * with buffered_mode enabled all the data copied to 512 byte
+>> +     * aligned buffer, including iov data. Then the buffer is passed
+>> +     * to writev_buffer callback.
+>> +     */
+>> +    bool buffered_mode;
+>
+> ..."Asynchronous mode is managed by setting the new buffered_mode 
+> flag"?  ...
+>
+>
+>> +    /* for async buffer writing */
+>> +    AioTaskPool *pool;
+>> +    /* the list of free buffers, currently used on is NOT there */
+>
+> s/on/one/
+>
+>> +    QLIST_HEAD(, QEMUFileBuffer) free_buffers;
+>> +};
+>> +
+>> +struct QEMUFileAioTask {
+>> +    AioTask task;
+>> +    QEMUFile *f;
+>> +    QEMUFileBuffer *fb;
+>>   };
+>>     /*
+>> @@ -115,10 +137,42 @@ QEMUFile *qemu_fopen_ops(void *opaque, const 
+>> QEMUFileOps *ops)
+>>       f->opaque = opaque;
+>>       f->ops = ops;
+>>   -    f->current_buf = g_new0(QEMUFileBuffer, 1);
+>> -    f->current_buf->buf = g_malloc(IO_BUF_SIZE);
+>> -    f->current_buf->iov = g_new0(struct iovec, MAX_IOV_SIZE);
+>> -    f->current_buf->may_free = bitmap_new(MAX_IOV_SIZE);
+>> +    if (f->ops->enable_buffered) {
+>> +        f->buffered_mode = f->ops->enable_buffered(f->opaque);
+>
+> ...ah, you meant 'enable_buffered'.  But still, why do we need a 
+> callback function?  Is it not sufficient to just have a bool flag?
+>
+>
+>> +static size_t get_buf_free_size(QEMUFile *f)
+>> +{
+>> +    QEMUFileBuffer *fb = f->current_buf;
+>> +    /* buf_index can't be greated than buf_size */
+>
+> greater
+>
+>> +    assert(fb->buf_size >= fb->buf_index);
+>> +    return fb->buf_size - fb->buf_index;
+>> +}
+>> +
+>
+>> +static int write_task_fn(AioTask *task)
+>> +{
+>
+>> +    /*
+>> +     * Increment file position.
+>> +     * This needs to be here before calling writev_buffer, because
+>> +     * writev_buffer is asynchronous and there could be more than one
+>> +     * writev_buffer started simultaniously. Each writev_buffer should
+>
+> simultaneously
+>
+>> +     * use its own file pos to write to. writev_buffer may write less
+>> +     * than buf_index bytes but we treat this situation as an error.
+>> +     * If error appeared, further file using is meaningless.
+>
+> s/using/use/
+>
+>> +     * We expect that, the most of the time the full buffer is written,
+>> +     * (when buf_size == buf_index). The only case when the non-full
+>> +     * buffer is written (buf_size != buf_index) is file close,
+>> +     * when we need to flush the rest of the buffer content.
+>
+> We expect that most of the time, the full buffer will be written 
+> (buf_size == buf_index), with the exception at file close where we 
+> need to flush the final partial buffer.
+>
+>> +     */
+>> +    f->pos += fb->buf_index;
+>> +
+>> +    ret = f->ops->writev_buffer(f->opaque, &v, 1, pos, &local_error);
+>> +
+>> +    /* return the just written buffer to the free list */
+>> +    QLIST_INSERT_HEAD(&f->free_buffers, fb, link);
+>> +
+>> +    /* check that we have written everything */
+>> +    if (ret != fb->buf_index) {
+>> +        qemu_file_set_error_obj(f, ret < 0 ? ret : -EIO, local_error);
+>> +    }
+>> +
+>> +    /*
+>> +     * always return 0 - don't use task error handling, relay on
+>
+> rely
+>
+>> +     * qemu file error handling
+>> +     */
+>> +    return 0;
+>> +}
+>> +
+>> +static void qemu_file_switch_current_buf(QEMUFile *f)
+>> +{
+>> +    /*
+>> +     * if the list is empty, wait until some task returns a buffer
+>> +     * to the list of free buffers.
+>> +     */
+>> +    if (QLIST_EMPTY(&f->free_buffers)) {
+>> +        aio_task_pool_wait_slot(f->pool);
+>> +    }
+>> +
+>> +    /*
+>> +     * sanity check that the list isn't empty
+>> +     * if the free list was empty, we waited for a task complition,
+>
+> completion
+>
+>> +     * and the pompleted task must return a buffer to a list of free 
+>> buffers
+>
+> completed
+>
+>> +     */
+>> +    assert(!QLIST_EMPTY(&f->free_buffers));
+>> +
+>> +    /* set the current buffer for using from the free list */
+>> +    f->current_buf = QLIST_FIRST(&f->free_buffers);
+>> +    reset_buf(f);
+>> +
+>> +    QLIST_REMOVE(f->current_buf, link);
+>> +}
+>> +
+>
+>>     /*
+>> + * Copy an external buffer to the intenal current buffer.
+>
+> internal
+>
+>> + */
+>> +static void copy_buf(QEMUFile *f, const uint8_t *buf, size_t size,
+>> +                     bool may_free)
+>> +{
+>
+>> +++ b/migration/qemu-file.h
+>> @@ -103,6 +103,14 @@ typedef QEMUFile *(QEMURetPathFunc)(void *opaque);
+>>   typedef int (QEMUFileShutdownFunc)(void *opaque, bool rd, bool wr,
+>>                                      Error **errp);
+>>   +/*
+>> + * Enables or disables the buffered mode
+>> + * Existing blocking reads/writes must be woken
+>> + * Returns true if the buffered mode has to be enabled,
+>> + * false if it has to be disabled.
+>> + */
+>> +typedef bool (QEMUFileEnableBufferedFunc)(void *opaque);
+>
+> If this never gets called outside of initial creation of the QemuFile 
+> (that is, it is not dynamic), then making it a straight flag instead 
+> of a callback function is simpler.
+Yes, I agree.
 
-David / dhildenb
+Thanks for reviewing and lots of grammar fixing!
+>
+>
+>> +
+>>   typedef struct QEMUFileOps {
+>>       QEMUFileGetBufferFunc *get_buffer;
+>>       QEMUFileCloseFunc *close;
+>> @@ -110,6 +118,7 @@ typedef struct QEMUFileOps {
+>>       QEMUFileWritevBufferFunc *writev_buffer;
+>>       QEMURetPathFunc *get_return_path;
+>>       QEMUFileShutdownFunc *shut_down;
+>> +    QEMUFileEnableBufferedFunc *enable_buffered;
+>>   } QEMUFileOps;
+>>     typedef struct QEMUFileHooks {
+>>
+>
 
 
