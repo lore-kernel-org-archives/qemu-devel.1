@@ -2,145 +2,130 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ABD0C5519A
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:10:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF74C54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:16:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7C132063A
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:10:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34B532051A
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 08:16:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="VOIvS0ej";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="arsmYjIh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7C132063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oi2bprBb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34B532051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jSyqY-0006sd-UR
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 04:10:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43270)
+	id 1jSywO-00032V-8J
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 04:16:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44310)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=379c65f89=Anup.Patel@wdc.com>)
- id 1jSynj-0002gW-5M
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:07:39 -0400
+ (envelope-from <david@redhat.com>) id 1jSyvC-0002Go-BA
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:15:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <prvs=379c65f89=Anup.Patel@wdc.com>)
- id 1jSyni-0001eF-MR
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:07:38 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:37468)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <prvs=379c65f89=Anup.Patel@wdc.com>)
- id 1jSynU-0000s1-F9; Mon, 27 Apr 2020 04:07:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1587974844; x=1619510844;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:content-transfer-encoding:mime-version;
- bh=nl3aSz2zkjAV9pCzBXTdUWqq+qb4ll+bYePGIRZ+OTE=;
- b=VOIvS0ejt4JE7qzmOED9foAai3G4mHPZIH8Fghq6RoiARfe6i7d2WbnG
- YMk6bJdrknAz/GaKAqm6XRYFFERy081azquvNsR+I1i8VSYER35GYdHeT
- r+gxZ9M2l+zWN5SleEKAelvdsks01pntwJSFqUGn6vmmFHWrmpH/7VBvO
- y9ePz5WdcL8EhN9dB6quFmxhhEvydAFya1XeBomjFDR68Bpor01Hp8uHf
- yt7JnjW8FA2Kn8saVpCdTuxOH8H2EeWrMTyIjFVpIgGK0yLSSpEzpFrXG
- 9xhpoS/tDraHJqmxaZXGIcSpxmp2ZsrE6qHV2ZR5KoyGPsc1/zcM4HwjC Q==;
-IronPort-SDR: +tW/lkyBU6kB8dY6weSvdiUtvFKF/iSeW21UQE/UIb9EQA2quqTAjDplaSIz4F9CC4rC8kk1VW
- KTDLeg4ouePDLE/19VtXuggyrZaLQX+54cHBmgN6T1lxrBWSZp8F8yJ8VdfbhatfRh5oStDTUr
- CkMntzTfSms3BFDlqOrzE/LaYyCAWc71QewE8f7jaO9EBrS+aIcMrHesgFyHUvhJnURoP9iuMZ
- Urg+lAV4cu4khj6I5B4obIhRbKIAyIKT9h6QpQVaYfxDjaiHT3tCWolUX9zMoZnbu6uAIL9bfg
- /m8=
-X-IronPort-AV: E=Sophos;i="5.73,323,1583164800"; d="scan'208";a="137668055"
-Received: from mail-bn3nam04lp2058.outbound.protection.outlook.com (HELO
- NAM04-BN3-obe.outbound.protection.outlook.com) ([104.47.46.58])
- by ob1.hgst.iphmx.com with ESMTP; 27 Apr 2020 16:07:23 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NPx98bctKF1LHwhk3QHJ0QlISea1paZPPQReQll/L2XvzBLZvFRzPD9xAjmSuQqK6Xw8AiGw4ojXTkx9MLsYZBtKl0W5AbkVDa9NXBaw6Iwn27/m6At2+CtzE3YDjKhzEzwSotAFvP0yK8ORka3u/AsSJ1tf0EGJcdLttFGs4mjhAVBctwsIybMzHYgXVcPNeV5OV/HwDqDjoalX/u/A1Oq3woaKjHOQ7JmOBqElpNQ40nosHhkMpP0I87EySlCpAibT0FVWxpJU0pkKiVy4MoVhoAAVct5ZbZUp3SWts1spYia80tE8K4Pc9Ekw5CqHFsSeYAY/b97KbG9OwPfLGw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xTyNkJJ7Dbav6Xh5HsRL5r1+SCo8qt3+2ntEswOAkAg=;
- b=CTLV5OnzchMgiOdneKntF6Qudn57n1lnNGVIauu1ExCp5yNLk4eiBZXSimup0XT9kRq40ePxS92g+JnfFJs8xTpdZcUt+p5OMMfq9aZUh1BvpAPvzVeRS+cPYoxIpnIrkV7XXfNGLwyAcKGBnjSrz1neWNOcidEEFJpbB4WW1fB31uZgL+fgEQzsC3l7R8knLSVKQ/n1RSHt1NVk3YJiTTGF3wTdfl+HeGZ5kjqDbrWJgP7aTCLTwwNUzjpd+M8Jp4o0Ti2Sot/jvVIZk7VuX2QNq99nbKtp1DJ/M4cxh+nxIHIj/2wD/VHeJSnvoTReXWeB8d0cJ5GqvPN0rN88Cw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xTyNkJJ7Dbav6Xh5HsRL5r1+SCo8qt3+2ntEswOAkAg=;
- b=arsmYjIhZNfCmIhyLyNKxKFzkOAA4270gmY0VS/HrfTc48UGBZXy4qJLSto3jq8yh09QqRFBa0rgX9qGWVYeVSk+R5GSMNoHAFi441exnNcxlUEs6Iu0+hBsamR+R/pHknoVERiMfXmuJ/wsrvpPtwu7AONuBqx8SgYEzzdO9hU=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Anup.Patel@wdc.com; 
-Received: from DM6PR04MB6201.namprd04.prod.outlook.com (20.178.225.224) by
- DM6PR04MB5241.namprd04.prod.outlook.com (20.178.27.155) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2937.22; Mon, 27 Apr 2020 08:07:21 +0000
-Received: from DM6PR04MB6201.namprd04.prod.outlook.com
- ([fe80::f8b3:c124:482b:52e0]) by DM6PR04MB6201.namprd04.prod.outlook.com
- ([fe80::f8b3:c124:482b:52e0%5]) with mapi id 15.20.2937.023; Mon, 27 Apr 2020
- 08:07:21 +0000
-From: Anup Patel <anup.patel@wdc.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>
-Subject: [PATCH v3 1/3] hw/riscv: Add optional symbol callback ptr to
- riscv_load_firmware()
-Date: Mon, 27 Apr 2020 13:36:42 +0530
-Message-Id: <20200427080644.168461-2-anup.patel@wdc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200427080644.168461-1-anup.patel@wdc.com>
-References: <20200427080644.168461-1-anup.patel@wdc.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MAXPR0101CA0062.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a00:e::24) To DM6PR04MB6201.namprd04.prod.outlook.com
- (2603:10b6:5:127::32)
+ (envelope-from <david@redhat.com>) id 1jSyvA-0006Ua-OZ
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:15:21 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49689
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jSyvA-0006S2-6K
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 04:15:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587975318;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=8j0AEj4P75hr1qWy+FWzuE39iQkuJZyUcjiYEPXKXr0=;
+ b=Oi2bprBbU7w7+lnqbCsuUBHabb3XkOFLwFSo6Yei7O4O9ptzVgP7M59UTxaW0uzVjtfHyK
+ UtV8I/Jh6zf+E81adBu7WbIzuvghkYvghl2lLGSUmzRuqhRyTsaXBDxUdvpVH+Mz6ozNbw
+ XtNocXqtGgtFaUvc8zvQEVtGSfysF+A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-SKNuAOm0NMOnCnSFNqmJYg-1; Mon, 27 Apr 2020 04:15:15 -0400
+X-MC-Unique: SKNuAOm0NMOnCnSFNqmJYg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EC76872FE1;
+ Mon, 27 Apr 2020 08:15:14 +0000 (UTC)
+Received: from [10.36.114.127] (ovpn-114-127.ams2.redhat.com [10.36.114.127])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3BE0319C4F;
+ Mon, 27 Apr 2020 08:15:09 +0000 (UTC)
+Subject: Re: [PATCH v22 QEMU 3/5] virtio-balloon: Replace free page hinting
+ references to 'report' with 'hint'
+To: Alexander Duyck <alexander.duyck@gmail.com>, mst@redhat.com
+References: <20200424164239.10723.58352.stgit@localhost.localdomain>
+ <20200424165021.10723.14111.stgit@localhost.localdomain>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <7ce2bcde-7466-2764-7248-36f67bb9b573@redhat.com>
+Date: Mon, 27 Apr 2020 10:15:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from wdc.com (106.51.31.156) by
- MAXPR0101CA0062.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:e::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend
- Transport; Mon, 27 Apr 2020 08:07:18 +0000
-X-Mailer: git-send-email 2.25.1
-X-Originating-IP: [106.51.31.156]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 2f27ed5b-65c2-4454-b501-08d7ea82030c
-X-MS-TrafficTypeDiagnostic: DM6PR04MB5241:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR04MB52417DE5B018842F34F6929B8DAF0@DM6PR04MB5241.namprd04.prod.outlook.com>
-WDCIPOUTBOUND: EOP-TRUE
-X-MS-Oob-TLC-OOBClassifiers: OLM:1417;
-X-Forefront-PRVS: 0386B406AA
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM6PR04MB6201.namprd04.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(396003)(136003)(39860400002)(366004)(346002)(55236004)(16526019)(6666004)(8676002)(1006002)(54906003)(1076003)(8936002)(81156014)(186003)(478600001)(316002)(110136005)(44832011)(86362001)(5660300002)(8886007)(4326008)(26005)(2906002)(55016002)(7696005)(52116002)(66476007)(66556008)(2616005)(36756003)(956004)(66946007);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tuIkMyTqB1ySbjeuyjQvkUTibI8/VVcArx453VRuSTketJBC8BOK6IpHQ1+IRFixaywfIveRsNmGoi4IluQx4cJYYbe36qepRfzo/pOAuMSqTLkR5besO+ygRR26KOQPsywm7eAcocbS9S0v9vKJQmp2lUNIRy8nSk36zNxZLpNBcvCQX2kQHwHTNJT2jtaw2OV3EqDsy89Boe7pS6X0T9Zkd/gt72w1Oh8omUs95YFKKTxGndsHHNn/coSg2nbcwdmWcrjFf06pQjRxC5xc/g5HqSbEXIo0UcS2mLqY1j3Ua9YceFtJqcs9NDDjNUwPT0NdGisVfPpCTLJjzDpwyeCN5qNtvDp0cw3kxkdwsbeQX6uWV9sUIC9RRCYGXakMjlybDQsWmETgr7zb3ZgaymP3Ihj5pIkn5Iag5ntLnxZU8mvsP9NmHb0rpcXnMU6q
-X-MS-Exchange-AntiSpam-MessageData: BvdeMCQM0DyOQuo30lnUQse7+lUOnL8ga/98xWwtuOoHJ3ZkRLWl1mJDhbSwBWp7FeaQxoW3BC9vIr1xF+2DkTQlm6FO5WEzN+dHMI82U73N7cmA8lWXPpBeVtWdIeYIBHCLHG5lSgBlzE1gRzRrg9JbUpcpGpplMOUPy8RgvqlRcotptLLECHdQP1+8O3N7ax0jK81oHUblmqkJ4EDzSCArlCx1wsJQNWQrmLvUnxrtTl9j7Yf0fmxKYUSQODFZBoMv/+66+7yUqe4RrQe/cEZMsimNbtJ9/TbKVP2vh2NH84V0tdsmR7CCDfz16fgV87WQLVLNqK+FDnSd325MGYaaS8zCP/w/riPoJMZOgx/KBbhgw/n4hRC7zIlPiMxRUUNTO+ChGJtimrygXWh8dw2meITnH06LAEoRvGuoxUahpFPQZ8ST1duGgvzjHBE7iefOXFSzJ8FAU7yNGvW38i4AYwVT/lAtzmbEVio9450JW4vmkwoDgTOLv2wdULlRQVQeAwoXdsyvPJTNxs81SUdo//CR2H7A6V702apt0S5NZBcGAskSdGWXANhSYUxUXcD7fBfgbXYWC7eMKBr/RWSz1NjrphyFh28toYCS3G+sEsWLZsd7JA0VB3v6HDBe1PDRpXa+JM7n7eG1D8ANH4dFoM0J1jMc0VKfNTs9cA5OPt+638/8TYLysGByUwhFOARsA2j2D8aj2LbYhf2HYYKg563XrNiWlbsTUwUxaIeKt+DWGzZ9wiKLhvgjf2yMj8VnGM0YVhIrAKNra9LwSeYk8WPpYfk8ZPdmWlGtxCo=
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f27ed5b-65c2-4454-b501-08d7ea82030c
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 08:07:21.6065 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ULJvFAVbOjxifrL3+QBxk+oQaWPHo1ZixaXnwTfQzNBN0MxdLpIkVG927zgHtGeBqzSAtMTMgR/lnZzx7zTIoQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB5241
-Received-SPF: pass client-ip=216.71.154.45;
- envelope-from=prvs=379c65f89=Anup.Patel@wdc.com; helo=esa6.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 04:07:17
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 216.71.154.45
+In-Reply-To: <20200424165021.10723.14111.stgit@localhost.localdomain>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 23:32:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -152,116 +137,304 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Atish Patra <atish.patra@wdc.com>, Anup Patel <anup.patel@wdc.com>,
- qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Anup Patel <anup@brainfault.org>
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds an optional function pointer, "sym_cb", to
-riscv_load_firmware() which provides the possibility to access
-the symbol table during kernel loading.
+On 24.04.20 18:50, Alexander Duyck wrote:
+> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> 
+> In an upcoming patch a feature named Free Page Reporting is about to be
+> added. In order to avoid any confusion we should drop the use of the word
+> 'report' when referring to Free Page Hinting. So what this patch does is go
+> through and replace all instances of 'report' with 'hint" when we are
+> referring to free page hinting.
+> 
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> ---
+>  hw/virtio/virtio-balloon.c         |   74 ++++++++++++++++++------------------
+>  include/hw/virtio/virtio-balloon.h |   20 +++++-----
+>  2 files changed, 47 insertions(+), 47 deletions(-)
+> 
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index a4729f7fc930..a1d6fb52c876 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -466,21 +466,21 @@ static bool get_free_page_hints(VirtIOBalloon *dev)
+>              ret = false;
+>              goto out;
+>          }
+> -        if (id == dev->free_page_report_cmd_id) {
+> -            dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
+> +        if (id == dev->free_page_hint_cmd_id) {
+> +            dev->free_page_hint_status = FREE_PAGE_HINT_S_START;
+>          } else {
+>              /*
+>               * Stop the optimization only when it has started. This
+>               * avoids a stale stop sign for the previous command.
+>               */
+> -            if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
+> -                dev->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
+> +            if (dev->free_page_hint_status == FREE_PAGE_HINT_S_START) {
+> +                dev->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
+>              }
+>          }
+>      }
+>  
+>      if (elem->in_num) {
+> -        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
+> +        if (dev->free_page_hint_status == FREE_PAGE_HINT_S_START) {
+>              qemu_guest_free_page_hint(elem->in_sg[0].iov_base,
+>                                        elem->in_sg[0].iov_len);
+>          }
+> @@ -506,11 +506,11 @@ static void virtio_ballloon_get_free_page_hints(void *opaque)
+>          qemu_mutex_unlock(&dev->free_page_lock);
+>          virtio_notify(vdev, vq);
+>        /*
+> -       * Start to poll the vq once the reporting started. Otherwise, continue
+> +       * Start to poll the vq once the hinting started. Otherwise, continue
+>         * only when there are entries on the vq, which need to be given back.
+>         */
+>      } while (continue_to_get_hints ||
+> -             dev->free_page_report_status == FREE_PAGE_REPORT_S_START);
+> +             dev->free_page_hint_status == FREE_PAGE_HINT_S_START);
+>      virtio_queue_set_notification(vq, 1);
+>  }
+>  
+> @@ -531,14 +531,14 @@ static void virtio_balloon_free_page_start(VirtIOBalloon *s)
+>          return;
+>      }
+>  
+> -    if (s->free_page_report_cmd_id == UINT_MAX) {
+> -        s->free_page_report_cmd_id =
+> -                       VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
+> +    if (s->free_page_hint_cmd_id == UINT_MAX) {
+> +        s->free_page_hint_cmd_id =
+> +                       VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN;
+>      } else {
+> -        s->free_page_report_cmd_id++;
+> +        s->free_page_hint_cmd_id++;
+>      }
+>  
+> -    s->free_page_report_status = FREE_PAGE_REPORT_S_REQUESTED;
+> +    s->free_page_hint_status = FREE_PAGE_HINT_S_REQUESTED;
+>      virtio_notify_config(vdev);
+>  }
+>  
+> @@ -546,18 +546,18 @@ static void virtio_balloon_free_page_stop(VirtIOBalloon *s)
+>  {
+>      VirtIODevice *vdev = VIRTIO_DEVICE(s);
+>  
+> -    if (s->free_page_report_status != FREE_PAGE_REPORT_S_STOP) {
+> +    if (s->free_page_hint_status != FREE_PAGE_HINT_S_STOP) {
+>          /*
+>           * The lock also guarantees us that the
+>           * virtio_ballloon_get_free_page_hints exits after the
+> -         * free_page_report_status is set to S_STOP.
+> +         * free_page_hint_status is set to S_STOP.
+>           */
+>          qemu_mutex_lock(&s->free_page_lock);
+>          /*
+>           * The guest hasn't done the reporting, so host sends a notification
+>           * to the guest to actively stop the reporting.
+>           */
+> -        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
+> +        s->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
+>          qemu_mutex_unlock(&s->free_page_lock);
+>          virtio_notify_config(vdev);
+>      }
+> @@ -567,15 +567,15 @@ static void virtio_balloon_free_page_done(VirtIOBalloon *s)
+>  {
+>      VirtIODevice *vdev = VIRTIO_DEVICE(s);
+>  
+> -    s->free_page_report_status = FREE_PAGE_REPORT_S_DONE;
+> +    s->free_page_hint_status = FREE_PAGE_HINT_S_DONE;
+>      virtio_notify_config(vdev);
+>  }
+>  
+>  static int
+> -virtio_balloon_free_page_report_notify(NotifierWithReturn *n, void *data)
+> +virtio_balloon_free_page_hint_notify(NotifierWithReturn *n, void *data)
+>  {
+>      VirtIOBalloon *dev = container_of(n, VirtIOBalloon,
+> -                                      free_page_report_notify);
+> +                                      free_page_hint_notify);
+>      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>      PrecopyNotifyData *pnd = data;
+>  
+> @@ -624,7 +624,7 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
+>      if (virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
+>          return offsetof(struct virtio_balloon_config, poison_val);
+>      }
+> -    return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
+> +    return offsetof(struct virtio_balloon_config, free_page_hint_cmd_id);
+>  }
+>  
+>  static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
+> @@ -635,14 +635,14 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
+>      config.num_pages = cpu_to_le32(dev->num_pages);
+>      config.actual = cpu_to_le32(dev->actual);
+>  
+> -    if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
+> -        config.free_page_report_cmd_id =
+> -                       cpu_to_le32(dev->free_page_report_cmd_id);
+> -    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
+> -        config.free_page_report_cmd_id =
+> +    if (dev->free_page_hint_status == FREE_PAGE_HINT_S_REQUESTED) {
+> +        config.free_page_hint_cmd_id =
+> +                       cpu_to_le32(dev->free_page_hint_cmd_id);
+> +    } else if (dev->free_page_hint_status == FREE_PAGE_HINT_S_STOP) {
+> +        config.free_page_hint_cmd_id =
+>                         cpu_to_le32(VIRTIO_BALLOON_CMD_ID_STOP);
+> -    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_DONE) {
+> -        config.free_page_report_cmd_id =
+> +    } else if (dev->free_page_hint_status == FREE_PAGE_HINT_S_DONE) {
+> +        config.free_page_hint_cmd_id =
+>                         cpu_to_le32(VIRTIO_BALLOON_CMD_ID_DONE);
+>      }
+>  
+> @@ -743,14 +743,14 @@ static int virtio_balloon_post_load_device(void *opaque, int version_id)
+>      return 0;
+>  }
+>  
+> -static const VMStateDescription vmstate_virtio_balloon_free_page_report = {
+> +static const VMStateDescription vmstate_virtio_balloon_free_page_hint = {
+>      .name = "virtio-balloon-device/free-page-report",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+>      .needed = virtio_balloon_free_page_support,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_UINT32(free_page_report_cmd_id, VirtIOBalloon),
+> -        VMSTATE_UINT32(free_page_report_status, VirtIOBalloon),
+> +        VMSTATE_UINT32(free_page_hint_cmd_id, VirtIOBalloon),
+> +        VMSTATE_UINT32(free_page_hint_status, VirtIOBalloon),
+>          VMSTATE_END_OF_LIST()
+>      }
+>  };
+> @@ -766,7 +766,7 @@ static const VMStateDescription vmstate_virtio_balloon_device = {
+>          VMSTATE_END_OF_LIST()
+>      },
+>      .subsections = (const VMStateDescription * []) {
+> -        &vmstate_virtio_balloon_free_page_report,
+> +        &vmstate_virtio_balloon_free_page_hint,
+>          NULL
+>      }
+>  };
+> @@ -797,12 +797,12 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
+>                             VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
+>          s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
+>                                             virtio_balloon_handle_free_page_vq);
+> -        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
+> -        s->free_page_report_cmd_id =
+> -                           VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
+> -        s->free_page_report_notify.notify =
+> -                                       virtio_balloon_free_page_report_notify;
+> -        precopy_add_notifier(&s->free_page_report_notify);
+> +        s->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
+> +        s->free_page_hint_cmd_id =
+> +                           VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN;
+> +        s->free_page_hint_notify.notify =
+> +                                       virtio_balloon_free_page_hint_notify;
+> +        precopy_add_notifier(&s->free_page_hint_notify);
+>          if (s->iothread) {
+>              object_ref(OBJECT(s->iothread));
+>              s->free_page_bh = aio_bh_new(iothread_get_aio_context(s->iothread),
+> @@ -827,7 +827,7 @@ static void virtio_balloon_device_unrealize(DeviceState *dev, Error **errp)
+>      if (virtio_balloon_free_page_support(s)) {
+>          qemu_bh_delete(s->free_page_bh);
+>          virtio_balloon_free_page_stop(s);
+> -        precopy_remove_notifier(&s->free_page_report_notify);
+> +        precopy_remove_notifier(&s->free_page_hint_notify);
+>      }
+>      balloon_stats_destroy_timer(s);
+>      qemu_remove_balloon_handler(s);
+> diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
+> index d1c968d2376e..108cff97e71a 100644
+> --- a/include/hw/virtio/virtio-balloon.h
+> +++ b/include/hw/virtio/virtio-balloon.h
+> @@ -23,7 +23,7 @@
+>  #define VIRTIO_BALLOON(obj) \
+>          OBJECT_CHECK(VirtIOBalloon, (obj), TYPE_VIRTIO_BALLOON)
+>  
+> -#define VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN 0x80000000
+> +#define VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN 0x80000000
+>  
+>  typedef struct virtio_balloon_stat VirtIOBalloonStat;
+>  
+> @@ -33,20 +33,20 @@ typedef struct virtio_balloon_stat_modern {
+>         uint64_t val;
+>  } VirtIOBalloonStatModern;
+>  
+> -enum virtio_balloon_free_page_report_status {
+> -    FREE_PAGE_REPORT_S_STOP = 0,
+> -    FREE_PAGE_REPORT_S_REQUESTED = 1,
+> -    FREE_PAGE_REPORT_S_START = 2,
+> -    FREE_PAGE_REPORT_S_DONE = 3,
+> +enum virtio_balloon_free_page_hint_status {
+> +    FREE_PAGE_HINT_S_STOP = 0,
+> +    FREE_PAGE_HINT_S_REQUESTED = 1,
+> +    FREE_PAGE_HINT_S_START = 2,
+> +    FREE_PAGE_HINT_S_DONE = 3,
+>  };
+>  
+>  typedef struct VirtIOBalloon {
+>      VirtIODevice parent_obj;
+>      VirtQueue *ivq, *dvq, *svq, *free_page_vq;
+> -    uint32_t free_page_report_status;
+> +    uint32_t free_page_hint_status;
+>      uint32_t num_pages;
+>      uint32_t actual;
+> -    uint32_t free_page_report_cmd_id;
+> +    uint32_t free_page_hint_cmd_id;
+>      uint64_t stats[VIRTIO_BALLOON_S_NR];
+>      VirtQueueElement *stats_vq_elem;
+>      size_t stats_vq_offset;
+> @@ -55,7 +55,7 @@ typedef struct VirtIOBalloon {
+>      QEMUBH *free_page_bh;
+>      /*
+>       * Lock to synchronize threads to access the free page reporting related
+> -     * fields (e.g. free_page_report_status).
+> +     * fields (e.g. free_page_hint_status).
+>       */
+>      QemuMutex free_page_lock;
+>      QemuCond  free_page_cond;
+> @@ -64,7 +64,7 @@ typedef struct VirtIOBalloon {
+>       * stopped.
+>       */
+>      bool block_iothread;
+> -    NotifierWithReturn free_page_report_notify;
+> +    NotifierWithReturn free_page_hint_notify;
+>      int64_t stats_last_update;
+>      int64_t stats_poll_interval;
+>      uint32_t host_features;
+> 
 
-The pointer is ignored, if supplied with flat (non-elf) firmware image.
+There is only one wrong comment remaining I think. Something like
 
-The Spike board requires it locate the HTIF symbols from firmware ELF
-passed via "-bios" option.
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index a1d6fb52c8..1b2127c04c 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -554,8 +554,8 @@ static void virtio_balloon_free_page_stop(VirtIOBalloon *s)
+          */
+         qemu_mutex_lock(&s->free_page_lock);
+         /*
+-         * The guest hasn't done the reporting, so host sends a notification
+-         * to the guest to actively stop the reporting.
++         * The guest isn't done with hinting, so the host sends a notification
++         * to the guest to actively stop the hinting.
+          */
+         s->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
+         qemu_mutex_unlock(&s->free_page_lock);
 
-Signed-off-by: Anup Patel <anup.patel@wdc.com>
----
- hw/riscv/boot.c         | 13 ++++++++-----
- hw/riscv/sifive_u.c     |  2 +-
- hw/riscv/virt.c         |  2 +-
- include/hw/riscv/boot.h |  6 ++++--
- 4 files changed, 14 insertions(+), 9 deletions(-)
 
-diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
-index b8e765277d..726300a171 100644
---- a/hw/riscv/boot.c
-+++ b/hw/riscv/boot.c
-@@ -36,7 +36,8 @@
- 
- void riscv_find_and_load_firmware(MachineState *machine,
-                                   const char *default_machine_firmware,
--                                  hwaddr firmware_load_addr)
-+                                  hwaddr firmware_load_addr,
-+                                  symbol_fn_t sym_cb)
- {
-     char *firmware_filename = NULL;
- 
-@@ -76,7 +77,7 @@ void riscv_find_and_load_firmware(MachineState *machine,
- 
-     if (firmware_filename) {
-         /* If not "none" load the firmware */
--        riscv_load_firmware(firmware_filename, firmware_load_addr);
-+        riscv_load_firmware(firmware_filename, firmware_load_addr, sym_cb);
-         g_free(firmware_filename);
-     }
- }
-@@ -96,12 +97,14 @@ char *riscv_find_firmware(const char *firmware_filename)
- }
- 
- target_ulong riscv_load_firmware(const char *firmware_filename,
--                                 hwaddr firmware_load_addr)
-+                                 hwaddr firmware_load_addr,
-+                                 symbol_fn_t sym_cb)
- {
-     uint64_t firmware_entry, firmware_start, firmware_end;
- 
--    if (load_elf(firmware_filename, NULL, NULL, NULL, &firmware_entry,
--                 &firmware_start, &firmware_end, NULL, 0, EM_RISCV, 1, 0) > 0) {
-+    if (load_elf_ram_sym(firmware_filename, NULL, NULL, NULL,
-+                         &firmware_entry, &firmware_start, &firmware_end, NULL,
-+                         0, EM_RISCV, 1, 0, NULL, true, sym_cb) > 0) {
-         return firmware_entry;
-     }
- 
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 56351c4faa..54bb9eb1bf 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -345,7 +345,7 @@ static void riscv_sifive_u_init(MachineState *machine)
-     create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
- 
-     riscv_find_and_load_firmware(machine, BIOS_FILENAME,
--                                 memmap[SIFIVE_U_DRAM].base);
-+                                 memmap[SIFIVE_U_DRAM].base, NULL);
- 
-     if (machine->kernel_filename) {
-         uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 85ec9e22aa..24f851e895 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -507,7 +507,7 @@ static void riscv_virt_board_init(MachineState *machine)
-                                 mask_rom);
- 
-     riscv_find_and_load_firmware(machine, BIOS_FILENAME,
--                                 memmap[VIRT_DRAM].base);
-+                                 memmap[VIRT_DRAM].base, NULL);
- 
-     if (machine->kernel_filename) {
-         uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
-diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
-index df80051fbc..474a940ad5 100644
---- a/include/hw/riscv/boot.h
-+++ b/include/hw/riscv/boot.h
-@@ -24,10 +24,12 @@
- 
- void riscv_find_and_load_firmware(MachineState *machine,
-                                   const char *default_machine_firmware,
--                                  hwaddr firmware_load_addr);
-+                                  hwaddr firmware_load_addr,
-+                                  symbol_fn_t sym_cb);
- char *riscv_find_firmware(const char *firmware_filename);
- target_ulong riscv_load_firmware(const char *firmware_filename,
--                                 hwaddr firmware_load_addr);
-+                                 hwaddr firmware_load_addr,
-+                                 symbol_fn_t sym_cb);
- target_ulong riscv_load_kernel(const char *kernel_filename,
-                                symbol_fn_t sym_cb);
- hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
+
+
 -- 
-2.25.1
+Thanks,
+
+David / dhildenb
 
 
