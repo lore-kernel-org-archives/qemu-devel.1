@@ -2,87 +2,109 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED1E7C54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 10:00:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CA05C55199
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 10:03:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5D7B20656
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 10:00:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9ABC20656
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 10:03:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f4jwC1wK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5D7B20656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bcgeqFhU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9ABC20656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT0Yn-0000z3-QB
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 06:00:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37648)
+	id 1jT0cD-0004cZ-SU
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 06:03:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jT0XO-0007ql-DS
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:58:55 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jT0Z6-0001s0-0Y
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:00:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jT0XN-0006SI-RG
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:58:54 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42127
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1jT0Z5-0002x0-9T
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:00:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38430
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jT0XN-0006Dh-Bu
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:58:53 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jT0Z4-0002ny-Qk
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 06:00:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1587981531;
+ s=mimecast20190719; t=1587981637;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kcWBuPaHBGxHMOrZqvqL266FxHOcDDC/OPS2Jo9wjKw=;
- b=f4jwC1wKOfLwzk2WD3IFEQWTDHXmEW5hmhDDfY77nXb+YgeVv9UAB5xZH9Vh41JtpQHBoe
- 9GM1yl43trLfuOvGBvg2y6RKxgqTQhfID1sWEj+wL2kVn+fbasox3pKSUbhMF6jxCb7hL2
- U+WcDBy9CvF2mYu0WB++6nNPnnc6w/I=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Y2K1egNj1eZMS0R8opccvSLZR0exQ4pvyVmp/4rOIv0=;
+ b=bcgeqFhUYZPocGVbJ3OlFnF+/aI58aC1hpuKzBkYnvW0judtrCJodom8XmjNB5DcdFnk7e
+ V4qpTKOXA55HQ7iUjiC0aqrDJpB1lsbKwoMuoW5WBudnjEn35s3DdYCFtwHbHmPszVedj7
+ VNfv6PV8BQSRUlmSUcZABklLHhY1+wk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-CQajEjsKN6GYOEPPYp85LA-1; Mon, 27 Apr 2020 05:58:46 -0400
-X-MC-Unique: CQajEjsKN6GYOEPPYp85LA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-190-9O-PSGJgP96XcR--jR28vA-1; Mon, 27 Apr 2020 06:00:34 -0400
+X-MC-Unique: 9O-PSGJgP96XcR--jR28vA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9D4787134E;
- Mon, 27 Apr 2020 09:58:43 +0000 (UTC)
-Received: from [10.36.115.95] (ovpn-115-95.ams2.redhat.com [10.36.115.95])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 050FE5C7CF;
- Mon, 27 Apr 2020 09:58:31 +0000 (UTC)
-Subject: Re: [PATCH] hw: add compat machines for 5.1
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200424090314.544-1-cohuck@redhat.com>
- <548cd0de-17d3-204d-7df1-4c8fdccad83c@redhat.com>
- <20200427110609.36ecaac6.cohuck@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <4166d3fc-58e9-405d-71a1-2270ced75e7d@redhat.com>
-Date: Mon, 27 Apr 2020 11:58:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B5F11005510;
+ Mon, 27 Apr 2020 10:00:28 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-29.ams2.redhat.com
+ [10.36.114.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E17B5C1D6;
+ Mon, 27 Apr 2020 10:00:12 +0000 (UTC)
+Subject: Re: [PATCH v3 1/3] block: Add blk_new_with_bs() helper
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200424190903.522087-1-eblake@redhat.com>
+ <20200424190903.522087-2-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <ba31b83c-538a-0f3f-9bab-7aadb2f99ea9@redhat.com>
+Date: Mon, 27 Apr 2020 12:00:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200427110609.36ecaac6.cohuck@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200424190903.522087-2-eblake@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/26 23:32:35
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="xEhqSYEW8v88T08h11wOrhpB6WnrQnVsQ"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 01:12:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,101 +116,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ "open list:Sheepdog" <sheepdog@lists.wpkg.org>, qemu-block@nongnu.org,
+ Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
+ Markus Armbruster <armbru@redhat.com>, stefanha@redhat.com,
+ Liu Yuan <namei.unix@gmail.com>, "Denis V. Lunev" <den@openvz.org>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Connie,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xEhqSYEW8v88T08h11wOrhpB6WnrQnVsQ
+Content-Type: multipart/mixed; boundary="WxyYo912wrh8eXyU9mtlMnuwoO7xchuxq"
 
-On 4/27/20 11:06 AM, Cornelia Huck wrote:
-> On Mon, 27 Apr 2020 09:43:33 +0200
-> Auger Eric <eric.auger@redhat.com> wrote:
-> 
->> Hi Connie,
->>
->> On 4/24/20 11:03 AM, Cornelia Huck wrote:
->>> Add 5.1 machine types for arm/i440fx/q35/s390x/spapr.
->>>
->>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>> ---
->>>
->>> Still keeping the default cpu model version on x86 at v1.
->>>
->>> I'll queue this to my s390-next branch, as I'm planning to send a pull
->>> req as soon as 5.0 is out; if someone else wants to queue this, we'll
->>> figure it out :)
->>>
->>> ---
->>>  hw/arm/virt.c              |  9 ++++++++-
->>>  hw/core/machine.c          |  3 +++
->>>  hw/i386/pc.c               |  3 +++
->>>  hw/i386/pc_piix.c          | 14 +++++++++++++-
->>>  hw/i386/pc_q35.c           | 13 ++++++++++++-
->>>  hw/ppc/spapr.c             | 15 +++++++++++++--
->>>  hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
->>>  include/hw/boards.h        |  3 +++
->>>  include/hw/i386/pc.h       |  3 +++
->>>  9 files changed, 71 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->>> index 7dc96abf72cf..5e84c09402dd 100644
->>> --- a/hw/arm/virt.c
->>> +++ b/hw/arm/virt.c
->>> @@ -2309,15 +2309,22 @@ static void machvirt_machine_init(void)
->>>  }
->>>  type_init(machvirt_machine_init);
->>>  
->>> +static void virt_machine_5_1_options(MachineClass *mc)
->>> +{
->>> +}
->>> +DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
->>> +
->>>  static void virt_machine_5_0_options(MachineClass *mc)
->>>  {
->>>      static GlobalProperty compat[] = {
->>>          { TYPE_TPM_TIS_SYSBUS, "ppi", "false" },
->>>      };
->>>  
->>> +    virt_machine_5_1_options(mc);
->>> +    compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
->>>      compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));  
->> As spotted by patchew we need { TYPE_TPM_TIS_SYSBUS, "ppi", "false" } to
->> be applied for all machine types 5_0 onwards as our tpm-tis-device does
->> not support PPI. So I guess we need to move compat[] declaration outside
->> of virt_machine_5_0_options and call
->> "compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));"
->> for each  virt_machine_5_*_options? Or is a misuse of compats?
-> 
-> Ah, that was the error (I could not really make sense of it).
-> 
-> So, if I understand it correctly, ppi needs to be disabled for all virt
-> machines.
-ppi property of tpm-tis-sysbus device needs to be disabled for all virt
-machines whose version >= 5.0. tpm-tis-sysbus device is supported from
-5.0 onwards.
+--WxyYo912wrh8eXyU9mtlMnuwoO7xchuxq
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Looking again at the code, I should rather set the default value of the
-ppi property to false in tpm_tis_sysbus_properties. Before we shared the
-same device with x86, hence the compat but now we have a separate one. I
-guess that should work directly without the pain of that compat :-( Let
-me check ...
+On 24.04.20 21:09, Eric Blake wrote:
+> There are several callers that need to create a new block backend from
+> an existing BDS; make the task slightly easier with a common helper
+> routine.
+>=20
+> Suggested-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  include/sysemu/block-backend.h |  2 ++
+>  block/block-backend.c          | 23 +++++++++++++++++++++++
+>  block/crypto.c                 | 10 ++++------
+>  block/parallels.c              |  8 ++++----
+>  block/qcow.c                   |  8 ++++----
+>  block/qcow2.c                  | 18 ++++++++----------
+>  block/qed.c                    |  9 ++++-----
+>  block/sheepdog.c               | 11 +++++------
+>  block/vdi.c                    |  8 ++++----
+>  block/vhdx.c                   |  9 ++++-----
+>  block/vmdk.c                   |  9 ++++-----
+>  block/vpc.c                    |  8 ++++----
+>  blockdev.c                     |  8 +++-----
+>  blockjob.c                     |  7 ++-----
+>  14 files changed, 75 insertions(+), 63 deletions(-)
 
-Thanks
+[...]
 
-Eric
- I think the correct way to do this would be to add the
-> "compat" prop in virt_machine_class_init() (even if it is not strictly
-> compat, as it always needs to be disabled). It can be removed there and
-> added to a compat machine should support be added in the future.
-> 
-> Or does anyone have a better idea?
-> 
-> 
+> diff --git a/block/crypto.c b/block/crypto.c
+> index d577f89659fa..a4d77f07fe8c 100644
+> --- a/block/crypto.c
+> +++ b/block/crypto.c
+> @@ -256,16 +256,14 @@ static int block_crypto_co_create_generic(BlockDriv=
+erState *bs,
+>                                            PreallocMode prealloc,
+>                                            Error **errp)
+>  {
+> -    int ret;
+> +    int ret =3D -EPERM;
+
+I=E2=80=99m not sure I=E2=80=99m a fan of this, because I feel like it make=
+s the code
+harder to read, due to having to look in three places (here, around the
+blk_new_with_bs() call, and under the cleanup label) instead of in two
+(not here) to verify that the error handling code is correct.
+
+There=E2=80=99s also the fact that this is not really a default return valu=
+e,
+but one very specific error code for if one very specific function call
+fails.
+
+I suppose it comes down to whether one considers LoC a complexity
+problem.  (I don=E2=80=99t, necessarily.)
+
+(Also I realize it seems rather common in the kernel to set error return
+variables before the function call, but I think the more common pattern
+in qemu is to set it in the error path.)
+
+[...]
+
+> diff --git a/block/qed.c b/block/qed.c
+> index 1af9b3cb1db1..7a31495d293b 100644
+> --- a/block/qed.c
+> +++ b/block/qed.c
+> @@ -610,7 +610,7 @@ static int coroutine_fn bdrv_qed_co_create(BlockdevCr=
+eateOptions *opts,
+>      QEDHeader le_header;
+>      uint8_t *l1_table =3D NULL;
+>      size_t l1_size;
+> -    int ret =3D 0;
+> +    int ret =3D -EPERM;
+
+(Same here; well, especially here, because there is so much other code
+between the initialization and the =E2=80=9Cgoto out=E2=80=9D this is for)
+
+[...]
+
+> diff --git a/block/sheepdog.c b/block/sheepdog.c
+> index 59f7ebb1710f..2b53cd950d20 100644
+> --- a/block/sheepdog.c
+> +++ b/block/sheepdog.c
+> @@ -1801,14 +1801,13 @@ static int sd_prealloc(BlockDriverState *bs, int6=
+4_t old_size, int64_t new_size,
+>      uint32_t idx, max_idx;
+>      uint32_t object_size;
+>      void *buf =3D NULL;
+> -    int ret;
+> +    int ret =3D -EPERM;
+
+(and here)
+
+[...]
+
+> diff --git a/block/vhdx.c b/block/vhdx.c
+> index 33e57cd6567a..bdf5d05cc018 100644
+> --- a/block/vhdx.c
+> +++ b/block/vhdx.c
+> @@ -1891,7 +1891,7 @@ static int coroutine_fn vhdx_co_create(BlockdevCrea=
+teOptions *opts,
+>      BlockBackend *blk =3D NULL;
+>      BlockDriverState *bs =3D NULL;
+>=20
+> -    int ret =3D 0;
+> +    int ret =3D -EPERM;
+
+(and again especially here)
+
+But it does look like you got all cases covered this time.
+
+Max
+
+
+--WxyYo912wrh8eXyU9mtlMnuwoO7xchuxq--
+
+--xEhqSYEW8v88T08h11wOrhpB6WnrQnVsQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6mrSoACgkQ9AfbAGHV
+z0DF0QgAlwF8q97t2YwURC5eQfzisHutYFVZpTHJJecqGVvhtW2PZAb7YF3xuTW1
+r2IzVIhTJzLtcxHVW3IkM0010eFV86c6sdLsHm5m63q81QsMq09PqV7JBCIr93RN
+7N9c1Sxx0+OxtKQNISoOgNLtBWjRQbpDcLW4HoW4JDqmjALGkBskcxp8rowcpgK6
+YFfTvD4xbUJ3vbc3yuFlhp+b8ehLNbL4ZZRBSrV09FM7f0q+lZTlSasQ//MdoUUU
+jmwWL19V38ePeTBf2ZvgDkv4QtZemWkxgih/ULiGQsNadDgC+B/DSJQQglt49Goc
+GLgkHR5KO3eLo+IsXod2ywKHE77RoA==
+=rgV6
+-----END PGP SIGNATURE-----
+
+--xEhqSYEW8v88T08h11wOrhpB6WnrQnVsQ--
 
 
