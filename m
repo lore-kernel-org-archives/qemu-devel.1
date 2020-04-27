@@ -2,93 +2,89 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4A0DC55199
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 11:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3C0FC54FD0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 11:13:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C5EB2063A
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 11:12:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCA052063A
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 11:13:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NJC9ds9o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C5EB2063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KWBGqHDW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCA052063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT1gG-00085J-I2
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 07:12:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50264)
+	id 1jT1hb-0002jX-SV
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 07:13:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50648)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jT1ev-0005uA-PO
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 07:10:54 -0400
+ (envelope-from <kraxel@redhat.com>) id 1jT1g3-0000D2-5Z
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 07:11:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jT1eu-00027P-NY
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 07:10:45 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33354)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jT1eu-00025l-5K
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 07:10:44 -0400
-Received: by mail-wm1-x343.google.com with SMTP id v8so15701746wma.0
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 04:10:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=f8b3DYniiVN97d5itQTkh4SofIBR7r1R1IctXCYJ5D8=;
- b=NJC9ds9ofb7uxD9Fw1ew5GW5m9fVQa1fUIgDIp7X89oqCiDhS9F2F9+JlyBb2gVjyd
- xJjeE21/TL4NZAR+2i5oVZ6LESOp6W4sIS4+bGSidi0ZzkvvKn3AKnunMGVUYkGQ0TTc
- V5wSTUCjlShN5DwZG3QXp5DsW/6uVWLK51ygYmmdq/8c0c6LQcKJlQI5TfvJWC1lsU8Q
- XUQDvM+xI4+GReYNaMRF5aeKR/OcHZzCWUwPPP/4foj2fNNrV6kuwcacjJxuaEulwugv
- TdasE+UG8u7iq5Qy2thCmuCv2ZW9qwRa0dThEB5IqQp205OJwekdmg1vAnWzIkDUdpMe
- R4Sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=f8b3DYniiVN97d5itQTkh4SofIBR7r1R1IctXCYJ5D8=;
- b=LKM0qo3lpQa8J0JliHHOSZPxbk0whdgpR2+KzFsMBj5oJ88HN1crLTbJHcPw4fubMf
- QYcktfE0qz9WD9I9kC2vq6GO1VmS2Bku66dOFg7rGCe3t70j6aRiKCrAlV4ODSsRvwx8
- Gy/TAX1XiT+4Gb2nF8piG3iF4GQlAIguVVPSlOlATwj5lJypragEcbA3KPL8TAwSlVu6
- QVHnQsPxalt+zlSw+cNQ/g0UoS6xgCKy6+GXlNrFcVhqr2S2ywzbU86Pxne9ILDEdVZE
- eo+lL78FLMzQdPeEdFd1N61QaFbnnrXKIvBvuJC9ZWqaEEKWlbpJCbDt/Y5JYT0WZCbh
- Rzcg==
-X-Gm-Message-State: AGi0PuYKdFQ6rzyhQVNxvl053ccpKp+o0oAXktDtfEQNgBwEKcb3IoLn
- pQO9czfkDYOTzDtEwlYQsA7Rtw==
-X-Google-Smtp-Source: APiQypKfcl62PTbSj0b1cYR+BZCIbJv+wJ5gzcgebJX8VCZOv1eSWnORXTkfXPja9aYXbKmDmo0HkA==
-X-Received: by 2002:a1c:3b09:: with SMTP id i9mr25113866wma.19.1587985842341; 
- Mon, 27 Apr 2020 04:10:42 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y18sm17001214wmc.45.2020.04.27.04.10.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Apr 2020 04:10:41 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 511AC1FF7E;
- Mon, 27 Apr 2020 12:10:40 +0100 (BST)
-References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
- <87lfmhl0xa.fsf@linaro.org>
- <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
-User-agent: mu4e 1.4.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: About hardfloat in ppc
-In-reply-to: <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
-Date: Mon, 27 Apr 2020 12:10:40 +0100
-Message-ID: <87imhlkwun.fsf@linaro.org>
+ (envelope-from <kraxel@redhat.com>) id 1jT1g2-0003Gg-3M
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 07:11:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54198
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jT1g1-0003D9-K5
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 07:11:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1587985911;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=44fC40IZNzUKfwrlo3x7vHgiSYm1evcK90FAaDkBx60=;
+ b=KWBGqHDWBWj5gRGJ/UqUjfpAZa/jExiKoFad+kbPUnYEzZZ9tJx2fVbivFxF4eeS1FkXk9
+ HvdfMmQ6dTJJdyPk7Pri8ccfuUof2JLLTU3/w6UMSE84gSK7ocrH8uRah9hpw3SXVOyLoV
+ kL3SZs+/fNXIPueI0heuS8rCthQ6Y2A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-469-nxxI4_u1OTqGDuYxcOSnFQ-1; Mon, 27 Apr 2020 07:11:49 -0400
+X-MC-Unique: nxxI4_u1OTqGDuYxcOSnFQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DB8680B722;
+ Mon, 27 Apr 2020 11:11:48 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
+ [10.36.113.193])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 33A8B605CB;
+ Mon, 27 Apr 2020 11:11:45 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 14EFC1753B; Mon, 27 Apr 2020 13:11:44 +0200 (CEST)
+Date: Mon, 27 Apr 2020 13:11:44 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: [PATCH 4/5] ramfb: add sanity checks to
+ ramfb_create_display_surface
+Message-ID: <20200427111144.iphotoyrq65yrjd7@sirius.home.kraxel.org>
+References: <20200422100211.30614-1-kraxel@redhat.com>
+ <20200422100211.30614-5-kraxel@redhat.com>
+ <b4af9628-1585-9dc5-214d-b55db4760da1@redhat.com>
+ <20200423114129.lil77p4iqy3jc5v7@sirius.home.kraxel.org>
+ <7eb38a07-a50c-2695-2ca7-822f5c1408eb@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <7eb38a07-a50c-2695-2ca7-822f5c1408eb@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::343
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 02:05:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,108 +96,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: luoyonggang@gmail.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org,
+ hqm03ster@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+> > -    size =3D (hwaddr)linesize * height;
+> > -    data =3D cpu_physical_memory_map(addr, &size, false);
+> > -    if (size !=3D (hwaddr)linesize * height) {
+> > -        cpu_physical_memory_unmap(data, size, 0, 0);
+> > +    mapsize =3D size =3D stride * (height - 1) + linesize;
+> > +    data =3D cpu_physical_memory_map(addr, &mapsize, false);
+> > +    if (size !=3D mapsize) {
+> > +        cpu_physical_memory_unmap(data, mapsize, 0, 0);
+> >          return NULL;
+> >      }
+> > =20
+> >      surface =3D qemu_create_displaysurface_from(width, height,
+> > -                                              format, linesize, data);
+> > +                                              format, stride, data);
+> >      pixman_image_set_destroy_function(surface->image,
+> >                                        ramfb_unmap_display_surface, NUL=
+L);
+> > =20
+> >=20
+>=20
+> I don't understand two things about this patch:
+>=20
+> - "stride" can still be smaller than "linesize" (scanlines can still
+> overlap). Why is that not a problem?
 
-BALATON Zoltan <balaton@eik.bme.hu> writes:
+Why it should be?  It is the guests choice.  Not a very useful one, but
+hey, if the guest prefers it that way we are at your service ...
 
-> On Mon, 27 Apr 2020, Alex Benn=C3=A9e wrote:
->> =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyonggang@gmail.com> writes:
->>> Because ppc fpu-helper are always clearing float_flag_inexact,
->>> So is that possible to optimize the performance when  float_flag_inexact
->>> are cleared?
->>
->> There was some discussion about this in the last thread about enabling
->> hardfloat for PPC. See the thread:
->>
->>  Subject: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
->>  Date: Tue, 18 Feb 2020 18:10:16 +0100
->>  Message-Id: <20200218171702.979F074637D@zero.eik.bme.hu>
->
-> I've answered this already with link to that thread here:
->
-> On Fri, 10 Apr 2020, BALATON Zoltan wrote:
-> : Date: Fri, 10 Apr 2020 20:04:53 +0200 (CEST)
-> : From: BALATON Zoltan <balaton@eik.bme.hu>
-> : To: "=E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo)" <luoyonggang@gmail.com>
-> : Cc: qemu-devel@nongnu.org, Mark Cave-Ayland, John Arbuckle, qemu-ppc@no=
-ngnu.org, Paul Clarke, Howard Spoelstra, David Gibson
-> : Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
-> :
-> : On Fri, 10 Apr 2020, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
-> :> Are this stable now? I'd like to see hard float to be landed:)
-> :
-> : If you want to see hardfloat for PPC then you should read the
-> replies to : this patch which can be found here:
-> :
-> : http://patchwork.ozlabs.org/patch/1240235/
-> :
-> : to understand what's needed then try to implement the solution with
-> FP : exceptions cached in a global that maybe could work. I won't be
-> able to : do that as said here:
-> :
-> : https://lists.nongnu.org/archive/html/qemu-ppc/2020-03/msg00006.html
-> :
-> : because I don't have time to learn all the details needed. I think :
-> others are in the same situation so unless somebody puts in the :
-> necessary effort this won't change.
->
-> Which also had a proposed solution to the problem that you could try
-> to implement, in particular see this message:
->
-> http://patchwork.ozlabs.org/project/qemu-devel/patch/20200218171702.979F0=
-74637D@zero.eik.bme.hu/#2375124
->
-> amd Richard's reply immediately below that. In short to optimise FPU
-> emulation we would either find a way to compute inexact flag quickly=20
-> without reading the FPU status (this may not be possible) or somehow
-> get status from the FPU but the obvious way of claring the flag and
-> reading them after each operation is too slow. So maybe using
-> exceptions and only clearing when actually there's a change could be
-> faster.
->
-> As to how to use exceptions see this message in above thread:
->
-> https://lists.nongnu.org/archive/html/qemu-ppc/2020-03/msg00005.html
->
-> But that's only to show how to hook in an exception handler what it
-> does needs to be implemented. Then tested and benchmarked.
->
-> I still don't know where are the extensive PPC floating point tests to
-> use for checking results though as that was never answered.
+We only must make sure our size calculations are correct.  The patch
+does that.  I think we can also outlaw stride < linesize if you are
+happier with that alternative approach.  I doubt we have any guests
+relying on this working.
 
-Specifically for PPC we don't have them. We use the softfloat test cases
-to exercise our softfloat/hardfloat code as part of "make
-check-softfloat". You can also re-build fp-bench for each guest target
-to measure raw throughput.
+> - assuming "stride > linesize" (i.e., strictly larger), we don't seem to
+> map the last complete stride, and that seems to be intentional. Is that
+> safe with regard to qemu_create_displaysurface_from()? Ultimately the
+> stride is passed to pixman_image_create_bits(), and the underlying
+> "data" may not be large enough for that. What am I missing?
 
->> However in short the problem is if the float_flag_inexact is clear you
->> must use softfloat so you can properly calculate the inexact status. We
->> can't take advantage of the inexact stickiness without loosing the
->> fidelity of the calculation.
->
-> I still don't get why can't we use hardware via exception handler to
-> detect flags for us and why do we only use hardfloat in some corner
-> cases. If reading the status is too costly then we could mirror it in
-> a global which is set by an FP exception handler. Shouldn't that be
-> faster? Is there a reason that can't work?
+Lets take a real-world example.  Wayland rounds up width and height to
+multiples of 64 (probably for tiling on modern GPUs).  So with 800x600
+you get an allocation of 832x640, like this:
 
-It would work but it would be slow. Almost every FP operation sets
-the inexact flag so it would generate an exception and exceptions take
-time to process.
+     ###########**   <- y 0
+     ###########**
+     ###########**
+     ###########**
+     ###########**   <- y 600
+     *************   <- y 640
 
-For the guests where we use hardfloat operations with inexact already
-latched is not a corner case - it is the common case which is why it
-helps.
+     ^         ^ ^----- x 832
+     |         +------- x 800
+     +----------------- x 0
 
->
-> Regards,
-> BALATON Zoltan
+where "#" is image data and "*" is unused padding space.  Pixman will
+access all "#", so we are mapping the region from the first "#" to the
+last "#", including the unused padding on each scanline, except for the
+last scanline.  Any unused scanlines at the bottom are excluded too
+(ramfb doesn't even know whenever they exist).
 
+The unused padding is only mapped because it is the easiest way to
+handle things, not because we need it.  Also the padding is typically
+*alot* smaller than PAGE_SIZE, so we couldn't exclude it from the
+mapping even if we would like to ;)
 
---=20
-Alex Benn=C3=A9e
+> Hm... bonus question: qemu_create_displaysurface_from() still accepts
+> "linesize" as a signed int. (Not sure about pixman_image_create_bits().)
+> Should we do something specific to prevent that value from being
+> negative? The guest gives us a uint32_t.
+
+Not fully sure we can do that without breaking something, might be a
+negative stride is used for upside down images (last scanline comes
+first in memory).
+
+take care,
+  Gerd
+
 
