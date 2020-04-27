@@ -2,94 +2,76 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD59C54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A853C55199
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:48:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 164A1206A5
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:43:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vfxAZ9n6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 164A1206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id DF5C020663
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 09:48:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF5C020663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT0IQ-0003fp-74
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 05:43:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35724)
+	id 1jT0Mr-0006eJ-V0
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 05:48:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36108)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jT0Ho-0002zf-5X
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:42:48 -0400
+ (envelope-from <bounces@canonical.com>) id 1jT0LA-0005LH-KP
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:46:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jT0Hm-0006GA-Le
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:42:47 -0400
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:55735)
+ (envelope-from <bounces@canonical.com>) id 1jT0L9-0000XX-CP
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:46:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56838)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jT0Hm-0005zW-7W
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:42:46 -0400
-Received: by mail-wm1-x32f.google.com with SMTP id e26so18785215wmk.5
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 02:42:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=k97sNWzU0RUQ8HcGwHD7exutFNaktf7X81U7Sn1Qaz8=;
- b=vfxAZ9n6GyCCEBlkyBb0DkFkESFNehVBODGXPz17lf6ZiXV/ZL4h3Fp1fcF5PEE8fm
- 7avTXo5Err2S4bbUVssbTw573UoW+sOO4BVwZkNkQTYv8278o3mdNn7phm2TTwSkwcEI
- 1uWeeoPanBmm2KJx7ZTHNZ2jgGwdodd1ImL3jH7+LY245YGLHyzOL4CitHqnP0iPcun+
- C8+o6B/7Oarx3r/oJYnVPzNED8My2k6GpEipxLgHTAzi0062101eJEXq+IkkttcSmIUx
- e9UzObA9ds8jVw1WMjwnS7TUTA6UJcjL06YxD15LJuDOqQOn2TeKeq9G2qZO0hhfh1Zu
- WkNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=k97sNWzU0RUQ8HcGwHD7exutFNaktf7X81U7Sn1Qaz8=;
- b=mK2ijGUVna4UVhCkwwpVVxTlHX+6wONXZmp4LTQjwc42P+TPr1nZBA72vK6KO7z70m
- DqqpDYLUKT/PeNWUqZ7bQfAUlMZJB6wrZLOwJS+1941wmwEq+cJr79fd10C5soNPi3Vj
- iLFj7F6/pV2R8CQBxj/QSwl69L9zGbMzul+ONmUuIIJlfDKzRN40ZsPak0tbCIgheS+6
- 3c9TW1z2fx+Rtty4xAkt6ltnx0oS71MASl8LbR76XIMJ0Be8VHF8BGc+wQo3q2t9EHVJ
- 9JZgVjCwKjlrXYSJjVL1kgLbm8/1BvmUsDV5PDdRYfxiNVMtg5HU0lbCDpQxloxqO1Lt
- ktYg==
-X-Gm-Message-State: AGi0PubsmY4L8SkKz9WQzWrMc7Ni1BR3K2ZEzYiFanMCMhio6yuunyZp
- ts5AsWm8SRXIARKVMsEiUerpXQ==
-X-Google-Smtp-Source: APiQypK+u4h3WJP2VO8XRM+wZU3KD5xiSZuELeC34LAH2KxauhWE4DeO+m4OjRqidi76d13xv3C6AQ==
-X-Received: by 2002:a7b:c755:: with SMTP id w21mr24619073wmk.120.1587980563697; 
- Mon, 27 Apr 2020 02:42:43 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id h188sm16121265wme.8.2020.04.27.02.42.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Apr 2020 02:42:42 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C59FC1FF7E;
- Mon, 27 Apr 2020 10:42:41 +0100 (BST)
-References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
-User-agent: mu4e 1.4.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: luoyonggang@gmail.com
-Subject: Re: About hardfloat in ppc
-In-reply-to: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
-Date: Mon, 27 Apr 2020 10:42:41 +0100
-Message-ID: <87lfmhl0xa.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jT0L8-0000XG-UA
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 05:46:15 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jT0L5-0004Lk-Nl
+ for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 09:46:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B2D4B2E8029
+ for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 09:46:11 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::32f;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32f.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::32f
+Date: Mon, 27 Apr 2020 09:32:17 -0000
+From: Daniel Berrange <1875139@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: avschie berrange
+X-Launchpad-Bug-Reporter: A van Schie (avschie)
+X-Launchpad-Bug-Modifier: Daniel Berrange (berrange)
+References: <158788589324.18152.6333525201430073299.malonedeb@wampee.canonical.com>
+Message-Id: <158797993725.17831.13213290853647082757.malone@wampee.canonical.com>
+Subject: [Bug 1875139] Re: Domain fails to start when 'readonly' device not
+ writable
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="486bbbd6cb608f8eb468ed0d08689a349dfabe49";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 36ec1156d397decc58b20bcc941db8c18f5304a7
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 05:15:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -98,30 +80,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Reply-To: Bug 1875139 <1875139@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+> This issue is introduced in QEMU 4.2.0 (4.1.0 is working fine)
 
-=E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyonggang@gmail.com> writes:
+That's not neccessarily the case - with QEMU 4.2.0, libvirt switched
+over to using the new -blockdev command line syntax. When you were
+testing with 4.1.0, it would have been using the legacy -drive syntax.
+So the change in behaviour is more likely related to the usage of
+-blockdev, than any bug introduced in QEMU.
 
-> Because ppc fpu-helper are always clearing float_flag_inexact,
-> So is that possible to optimize the performance when  float_flag_inexact
-> are cleared?
+-- =
 
-There was some discussion about this in the last thread about enabling
-hardfloat for PPC. See the thread:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1875139
 
-  Subject: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
-  Date: Tue, 18 Feb 2020 18:10:16 +0100
-  Message-Id: <20200218171702.979F074637D@zero.eik.bme.hu>
+Title:
+  Domain fails to start when 'readonly' device not writable
 
-However in short the problem is if the float_flag_inexact is clear you
-must use softfloat so you can properly calculate the inexact status. We
-can't take advantage of the inexact stickiness without loosing the
-fidelity of the calculation.
+Status in QEMU:
+  New
 
---=20
-Alex Benn=C3=A9e
+Bug description:
+  This issue is introduced in QEMU 4.2.0 (4.1.0 is working fine)
+
+  My root disk is a LVM2 volume thin snapshot that is marked as read-only
+  But when I try to start the domain (using virt-manager) I get the followi=
+ng error:
+
+  Error starting domain: internal error: process exited while connecting
+  to monitor: 2020-04-26T06:55:06.342700Z qemu-system-x86_64: -blockdev
+  {"driver":"host_device","filename":"/dev/vg/vmroot-20200425","aio":"native
+  ","node-name":"libvirt-3-storage","cache":{"direct":true,"no-
+  flush":false},"auto-read-only":true,"discard":"unmap"} The device is
+  not writable: Permission denied
+
+  Changing the lvm snapshot to writeable allows me to start the domain.
+  (Making it changes possible during domain is running)
+
+  I don't think QEMU should fail when it can't open a (block) device when t=
+he read-only option is set.
+  (why is write access needed?)
+
+  Reproduce steps:
+  * Create LVM read-only volume (I don't think any data is needed)
+  * Create domain with read-only volume as block device
+  * Try to start the domain
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1875139/+subscriptions
 
