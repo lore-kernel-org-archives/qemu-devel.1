@@ -2,78 +2,77 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB3F3C54FCB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 13:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9D6CC54FCB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 13:12:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B443D206D4
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 13:05:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 972562075E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 13:12:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AACA6q/q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B443D206D4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FwuQL0g3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 972562075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT3Rx-00015q-Oz
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 09:05:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42120)
+	id 1jT3Z5-000425-Or
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 09:12:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42990)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jT3Qn-0000NY-U6
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:04:19 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jT3YT-0003Tb-3R
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:12:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jT3Ql-0007ws-5I
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:04:17 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34652)
+ (envelope-from <peter.maydell@linaro.org>) id 1jT3YS-0003HB-7p
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:12:12 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39159)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jT3Qk-0007wc-KI
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:04:14 -0400
-Received: by mail-ot1-x342.google.com with SMTP id 72so25974509otu.1
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 06:04:14 -0700 (PDT)
+ id 1jT3YR-0003Gy-RD
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 09:12:11 -0400
+Received: by mail-ot1-x342.google.com with SMTP id m13so25947642otf.6
+ for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 06:12:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=PuRd6I5K4cYio7H8Dul4eqCBWbrS3XwjI28PCJSaHLk=;
- b=AACA6q/qcYkgadALa3zbEspFiB5o/AuHoGvdvMk6dGHRod+S+0Hv7C4/R665OWIWNY
- vBHfTPWd/6VGYgDVO08OajiHNKMGJd4nR3hvhYt2anK4Uk4PFZemsBENRtKqereGmgHU
- PLPe5V7Ioc++xKMgfXslCUFmBNn7UkBz2wr+1YFEZ8/AFhhhhdKSSbtkq+2Y+Ve987KT
- rCSeSYSKYkDBVggbXMCC0H61hf2MIfOb+wg8UlYrqMiHn2u5xTmv08uGh7e4P20Aynd6
- MO8wuI5qeNbWcbSNrKuW4XFGkpWV1LCEEHm7m/j0cyNF+5U0+owT33hyfCh1UysoUC9r
- oH9w==
+ :cc; bh=fe4tY7v+8FryL6AjQk0StjZNLTgG103DVMbaRRMi5T4=;
+ b=FwuQL0g3PXpcHWjvNFHHWWu8C18OuGa0TT8XnsFEdotuT+ujvyIQFvQvZBKnHYQPaI
+ /SZ90YsHq1L5MGaNtzfbsHotcNLelzOGvr/0nEcCt6cnEto0nKI+lmDrMYmjjC8eAPnv
+ tfqk0lKDY2FIjNOIedD/F1YuLlx0tb2AEy7/J0EV6oECzki/d16pgdIBgabxeKGW1t+9
+ ln3bZ6L9ejpKg52rIj2BgqlFXQ0cTTZcHG3M6Pu50SBA8QEnDPUXrBXiw3iH4i+9rKOV
+ MGMWBIQs3XWxevTZxalRGoJ3BDAUxQc6e6qP+c9ttQ+KJLnLYve06R0WoMIshrgjClRI
+ 7n2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=PuRd6I5K4cYio7H8Dul4eqCBWbrS3XwjI28PCJSaHLk=;
- b=QxFFFewfhXv4P8NXCg9NHWAkq18GZGKaHjirFDF+0KaqVNkcEjxgETndpF7k69yhZ+
- ryxev5wT1tjKHuh/0+XdgVHVjHoMgQdROvgJt4v1P3RUWFMMDez5uC8kQDeD978PjzUk
- jVdGZ69P6yzO9qnprGDRBycTB7zwqwXdfzZm/fvY5LmaMpEBGrUyR0usa72zt8u6NaOi
- pZPWJPNFEAU5+27rpsvPEGHBIKUNAHrcTewaesjkvV1cFjLzrjmHk6Nuv75k4ZcpSyqM
- BhRnQNf3e78x4XlS4DO82TkM3IHum1jYHysb06E5MBreK8+wfvsu+fGZFCe5L9VpUNPs
- tX2A==
-X-Gm-Message-State: AGi0PuZ6aL0j61RM4Nr5Un/cgXRmglDFxztJ2SKzEYwoFGH99DvdcroY
- PGOwYSpRxPDxXACtVFB+72zlXvvUfhCZp4U4cUuSqw==
-X-Google-Smtp-Source: APiQypLOkflUgdN1zcZU4BSrROagvQULpsMaD2oKmmnnSTCpcmb5LBkPKqOZarL7Mhq5WjYpKSwQ36AgRHW0cEA7k9Q=
-X-Received: by 2002:a05:6830:22dc:: with SMTP id
- q28mr17279263otc.221.1587992653227; 
- Mon, 27 Apr 2020 06:04:13 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=fe4tY7v+8FryL6AjQk0StjZNLTgG103DVMbaRRMi5T4=;
+ b=fBo9jIuZpnnqmCFooy+7gp7jY/Uc62Kwamwk8pUEQZ0s4ZIYZlVmKJhqpoJHJlahg/
+ cqdDptykpcva9B2y2wy5C9XwuVMtcnF019cu5il0AUCVc65/nV1d4JXKlmHYAnrrlVg3
+ c7gUGKe/ehvyQKidQwizKDXPeF3pqza3iGSTZYGZNqscvO+SWMhvpql4r7Q/cZD+Njvo
+ DyGtHKMuKmNTIJ9GV9ihI0iN4EhTu2MCRvxtqdFOhEXnspotFd4YI98mYfPrvwruH1Q3
+ cdgQJuUW2Pi1NYYeTib4crCiwspfMbJzTGIisSvp3wi7eEaQnlejibp9W54M3aNcHlhE
+ S1Jg==
+X-Gm-Message-State: AGi0PubNk5reQvtvbCbw1W1oCNZ7inIW8OO8/YXcVzIEoNo3Y9MB+AeL
+ 9BXdgfBHZbrbWY5Uk8Ly5bjf+FsO5gZBkFUzOC9YIA==
+X-Google-Smtp-Source: APiQypJvq13DfZbBxyQF+JK0DKJ9gEzMi9GehRyMWodPVmzHmnnC9GAzh0Bg1z3DppZv/3RzQsf512QY9CoCPygwOGw=
+X-Received: by 2002:a9d:2c08:: with SMTP id f8mr18629606otb.135.1587993130396; 
+ Mon, 27 Apr 2020 06:12:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200423073358.27155-1-philmd@redhat.com>
-In-Reply-To: <20200423073358.27155-1-philmd@redhat.com>
+References: <20200427121823.8094-1-changbin.du@gmail.com>
+In-Reply-To: <20200427121823.8094-1-changbin.du@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Apr 2020 14:04:01 +0100
-Message-ID: <CAFEAcA8j7y2VbM1U0Df-TEjS6Kh-iBGXA8Vg1ZrD5Ff6=WthjA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/5] target/arm: Restrict TCG cpus to TCG accel
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Mon, 27 Apr 2020 14:11:59 +0100
+Message-ID: <CAFEAcA8jBM5M3FLajekUpSzdqjHV-euBn+jU7GZ_ihHgjvKMjw@mail.gmail.com>
+Subject: Re: [PATCH] ui/sdl2: fix segment fault caused by null pointer
+ dereference
+To: Changbin Du <changbin.du@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
  envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
@@ -91,85 +90,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 Apr 2020 at 08:34, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
+On Mon, 27 Apr 2020 at 13:19, Changbin Du <changbin.du@gmail.com> wrote:
 >
-> These are the uncontroversial patches from "Support disabling
-> TCG on ARM (part 2)"
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg689168.html
+> I found SDL_GetWindowFromID() sometimes return NULL when I start qemu via
+> ssh forwarding even the window has been crated already. I am not sure
+> whether this is a bug of SDL, but we'd better check it carefully.
 >
-> The other patches are blocked by the "accel: Allow targets to
-> use Kconfig" series:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg689024.html
+> Signed-off-by: Changbin Du <changbin.du@gmail.com>
+> ---
+>  ui/sdl2.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 >
-> All patches reviewed.
+> diff --git a/ui/sdl2.c b/ui/sdl2.c
+> index 3c9424eb42..7c9c93b951 100644
+> --- a/ui/sdl2.c
+> +++ b/ui/sdl2.c
+> @@ -332,6 +332,9 @@ static void handle_keydown(SDL_Event *ev)
+>      int gui_key_modifier_pressed = get_mod_state();
+>      int gui_keysym = 0;
 >
-> Since v1:
-> - Dropped 'Make set_feature() available for other files' patch
->   which fails to build with KVM only, see:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg03843.html
+> +    if (!scon)
+> +        return;
+> +
+>      if (!scon->ignore_hotkeys && gui_key_modifier_pressed && !ev->key.repeat) {
+>          switch (ev->key.keysym.scancode) {
+>          case SDL_SCANCODE_2:
+> @@ -412,6 +415,9 @@ static void handle_keyup(SDL_Event *ev)
+>  {
+>      struct sdl2_console *scon = get_scon_from_window(ev->key.windowID);
 >
-> Many thanks to Richard Henderson for his patience!
->
-> Regards,
->
-> Phil.
->
-> Philippe Mathieu-Daud=C3=A9 (4):
->   target/arm: Restric the Address Translate write operation to TCG accel
->   target/arm/cpu: Use ARRAY_SIZE() to iterate over ARMCPUInfo[]
->   target/arm/cpu: Update coding style to make checkpatch.pl happy
->   target/arm: Restrict TCG cpus to TCG accel
->
-> Thomas Huth (1):
->   target/arm: Make cpu_register() available for other files
+> +    if (!sconf)
+> +        return;
 
+It's generally a good idea to make sure your patch at least compiles
+before sending it :-)
 
-Patch 5 doesn't compile, because it moves code out from
-cpu.c to cpu_tcg.c, where it no longer has access to the
-file-local set_feature() function:
-
-  CC      arm-softmmu/target/arm/cpu_tcg.o
-/home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/cpu_tcg.c:47:5:
-error: implicit declaration of function 'set_feature' is invalid in
-C99
-      [-Werror,-Wimplicit-function-declaration]
-    set_feature(&cpu->env, ARM_FEATURE_V5);
-    ^
-/home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/cpu_tcg.c:47:5:
-note: did you mean 'arm_feature'?
-/home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/cpu.h:1940:19:
-note: 'arm_feature' declared here
-static inline int arm_feature(CPUARMState *env, int feature)
-                  ^
-/home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/cpu_tcg.c:47:5:
-error: this function declaration is not a prototype
-[-Werror,-Wstrict-prototypes]
-    set_feature(&cpu->env, ARM_FEATURE_V5);
-    ^
-/home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/cpu_tcg.c:74:5:
-error: implicit declaration of function 'set_feature' is invalid in
-C99
-      [-Werror,-Wimplicit-function-declaration]
-    set_feature(&cpu->env, ARM_FEATURE_V5);
-    ^
-/home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/cpu_tcg.c:87:5:
-error: implicit declaration of function 'set_feature' is invalid in
-C99
-      [-Werror,-Wimplicit-function-declaration]
-    set_feature(&cpu->env, ARM_FEATURE_V5);
-    ^
-[etc]
-
-I've applied patches 1-4 to target-arm.next.
-
+QEMU coding style demands {} on all if statements.
 
 thanks
 -- PMM
