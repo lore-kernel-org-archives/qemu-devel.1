@@ -2,83 +2,131 @@ Return-Path: <SRS0=Hhxc=6L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BD83C54FD0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 15:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0915AC54FCB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 15:13:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04F0C206BF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 15:13:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C93C1206BF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 15:13:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cEIc0kzA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04F0C206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eMMp/ZCp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C93C1206BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT5RZ-0006H1-0O
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 11:13:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34948)
+	id 1jT5Rc-0006Rz-UN
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 11:13:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34872)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jT5QR-0004WI-0Q
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 11:12:06 -0400
+ (envelope-from <david@redhat.com>) id 1jT5QA-0004F8-2H
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 11:11:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jT5QQ-00033n-E8
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 11:12:02 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:38523)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jT5QO-00032g-9Y; Mon, 27 Apr 2020 11:12:00 -0400
-Received: by mail-io1-xd43.google.com with SMTP id k23so3930575ios.5;
- Mon, 27 Apr 2020 08:11:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=bQC9YrZwNZd+ktPJ54JuZ1nVS3UC6gm5Yi5AwrSK9nc=;
- b=cEIc0kzANU3cjt6QCyr+69CboKjB+/CubIU7ePIBaaGSas4MV4vBLrCZOnypXWoZ/8
- 350BgdKvHURfuz6BDaKklunqzxQ5aPE+60tM5DCa+KsgEOOnFMgHBZrH91guYrtZXFJW
- co9OoGtJHdcdc7fb7FI3lJJETyrisatzMRhNQip1NQpJD9sIANnE6qKGBuc+EXBoZ6q1
- fANl6PJwvqSGye1gzS+j4PX8ldVLhxF16Y1fu3O5m16sRZbGq1LPhdtPS3w0MfuqpVz1
- 7XHLHhX7ki1XGZLHieD0OF4OO2P2QvUTY4FGCpPtVqeXxwG8LRxoHZ8p2Ji8W/gcYsPz
- JTHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=bQC9YrZwNZd+ktPJ54JuZ1nVS3UC6gm5Yi5AwrSK9nc=;
- b=EUZNFWHxDkgC4kiTIFQSuAgmwlyRDSdky6N11mRo1L40mkJHhhuluyhq2b7wNfcp1E
- mv55ivScfmN4f0Fuj70CpfRt/xFrlEbICsAsVirpsRjZF88v0R8NK7Fh5kpuV5Lv78I2
- LlHxaxcmhbxeCvJSsC2V8Bpti4B0Bx+Z8cev/J0yMAdZ8PzJcc5nHPHS4X0vmlLfLG8H
- wEdU+wRgOs8NH8s9r5MOM4v5wngT9hVZM5mVGMMJ6zEn/i3UM0/0cmCilDNJxDxaiDgr
- 86/TMfHq/VG6F9fU/fZyd3OtUsYHqaGTADN2KRnOQys0H5L53KjTpep7KSsKQkJwfvzF
- 2B9w==
-X-Gm-Message-State: AGi0Pub4TflM1YKpSUbIAabshDO/G3C7I6HCMegSDiyorhUdjtOKo6bo
- IR0ASxF9JW7N/0A4yJPhCVcsKVaH0x24Rk454BfV/Rbt
-X-Google-Smtp-Source: APiQypIa99jfA4ePJku8625JMpF1edDWgd4m803mUOCvQjK3tpxGtvhv5tbWn2drFccRaN/UkqVdnGCXKpUUOamtmlI=
-X-Received: by 2002:a02:1a01:: with SMTP id 1mr21207977jai.26.1588000317488;
- Mon, 27 Apr 2020 08:11:57 -0700 (PDT)
+ (envelope-from <david@redhat.com>) id 1jT5Q9-0002wp-2F
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 11:11:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60941
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jT5Q8-0002wP-FT
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 11:11:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588000303;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Ua+YjmQy1rPunGWv3WzksFZ1LB2F6emevEJLKH2u3hY=;
+ b=eMMp/ZCpwBGgJMCpW/BC8LBg48LLs7GZF9i7FA1LBVJbjYE4Jc8Cw8mhXNslJ5RNEzvkrH
+ UkBUYXFKp240N442UQBXbGR0QAzbWS3LZgc42vt03tvPo7O8YYjw1fa6M01K/GkGHNXVAv
+ VkwUKTTstZXitpxQkuv4722jy/Uke1I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-323-piTPkWZINbmA5aw4XuX1Ag-1; Mon, 27 Apr 2020 11:11:41 -0400
+X-MC-Unique: piTPkWZINbmA5aw4XuX1Ag-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2A4C8B5D7B;
+ Mon, 27 Apr 2020 15:10:59 +0000 (UTC)
+Received: from [10.36.114.127] (ovpn-114-127.ams2.redhat.com [10.36.114.127])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8DD5264446;
+ Mon, 27 Apr 2020 15:10:58 +0000 (UTC)
+Subject: Re: [PATCH v22 QEMU 3/5] virtio-balloon: Replace free page hinting
+ references to 'report' with 'hint'
+To: Alexander Duyck <alexander.duyck@gmail.com>
+References: <20200424164239.10723.58352.stgit@localhost.localdomain>
+ <20200424165021.10723.14111.stgit@localhost.localdomain>
+ <7ce2bcde-7466-2764-7248-36f67bb9b573@redhat.com>
+ <CAKgT0Uckr4uN=WCvGtp5GtXRZjfR+x1BR7L5b=RvnT7CHwtsMw@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <829a7d06-d5f4-1d82-32b9-744603288d84@redhat.com>
+Date: Mon, 27 Apr 2020 17:10:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <20200427080644.168461-1-anup.patel@wdc.com>
- <20200427080644.168461-3-anup.patel@wdc.com>
-In-Reply-To: <20200427080644.168461-3-anup.patel@wdc.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 27 Apr 2020 08:03:20 -0700
-Message-ID: <CAKmqyKMPxjBheXAV_kMpyv_8d-CBfowV+3gP+uz26bQiCPhRJg@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] hw/riscv/spike: Allow loading firmware separately
- using -bios option
-To: Anup Patel <anup.patel@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd43.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::d43
+In-Reply-To: <CAKgT0Uckr4uN=WCvGtp5GtXRZjfR+x1BR7L5b=RvnT7CHwtsMw@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 02:05:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,76 +138,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Apr 27, 2020 at 1:08 AM Anup Patel <anup.patel@wdc.com> wrote:
->
-> This patch extends Spike machine support to allow loading OpenSBI
-> firmware (fw_jump.elf) separately using -bios option.
->
-> Signed-off-by: Anup Patel <anup.patel@wdc.com>
+On 27.04.20 17:08, Alexander Duyck wrote:
+> On Mon, Apr 27, 2020 at 1:15 AM David Hildenbrand <david@redhat.com> wrote:
+>>
+>> There is only one wrong comment remaining I think. Something like
+>>
+>> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+>> index a1d6fb52c8..1b2127c04c 100644
+>> --- a/hw/virtio/virtio-balloon.c
+>> +++ b/hw/virtio/virtio-balloon.c
+>> @@ -554,8 +554,8 @@ static void virtio_balloon_free_page_stop(VirtIOBalloon *s)
+>>           */
+>>          qemu_mutex_lock(&s->free_page_lock);
+>>          /*
+>> -         * The guest hasn't done the reporting, so host sends a notification
+>> -         * to the guest to actively stop the reporting.
+>> +         * The guest isn't done with hinting, so the host sends a notification
+>> +         * to the guest to actively stop the hinting.
+> 
+> I'll probably tweak it slightly and drop the "with". So the comment will read:
+>         /*
+>          * The guest isn't done hinting, so host sends a notification
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+I always feel like "so host sends" sounds wrong ("the host"). But I am
+not a native speaker.
 
-Alistair
+>          * to the guest to actively stop the hinting.
+>          */
+> 
+> There is one other spot left which is support for migration. The name
+> for the VMStateDescription is
+> "virtio-balloon-device/free-page-report". I am assuming I cannot
+> rename that. Otherwise all other references to report on the balloon
+> interface refer to reporting errors from what I can tell.
 
-> ---
->  hw/riscv/spike.c | 24 +++++++++++++++++++++++-
->  1 file changed, 23 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-> index 5053fe4590..b0395e227c 100644
-> --- a/hw/riscv/spike.c
-> +++ b/hw/riscv/spike.c
-> @@ -45,6 +45,12 @@
->
->  #include <libfdt.h>
->
-> +#if defined(TARGET_RISCV32)
-> +# define BIOS_FILENAME "opensbi-riscv32-spike-fw_jump.elf"
-> +#else
-> +# define BIOS_FILENAME "opensbi-riscv64-spike-fw_jump.elf"
-> +#endif
-> +
->  static const struct MemmapEntry {
->      hwaddr base;
->      hwaddr size;
-> @@ -183,8 +189,24 @@ static void spike_board_init(MachineState *machine)
->      memory_region_add_subregion(system_memory, memmap[SPIKE_MROM].base,
->                                  mask_rom);
->
-> +    riscv_find_and_load_firmware(machine, BIOS_FILENAME,
-> +                                 memmap[SPIKE_DRAM].base,
-> +                                 htif_symbol_callback);
-> +
->      if (machine->kernel_filename) {
-> -        riscv_load_kernel(machine->kernel_filename, htif_symbol_callback);
-> +        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
-> +                                                  htif_symbol_callback);
-> +
-> +        if (machine->initrd_filename) {
-> +            hwaddr start;
-> +            hwaddr end = riscv_load_initrd(machine->initrd_filename,
-> +                                           machine->ram_size, kernel_entry,
-> +                                           &start);
-> +            qemu_fdt_setprop_cell(s->fdt, "/chosen",
-> +                                  "linux,initrd-start", start);
-> +            qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-end",
-> +                                  end);
-> +        }
->      }
->
->      /* reset vector */
-> --
-> 2.25.1
->
->
+Yeah, that has to stay for migration to keep working.
+
+
+-- 
+Thanks,
+
+David / dhildenb
+
 
