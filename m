@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF983C4CECD
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 20:18:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C84C4CECC
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 20:19:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80F072072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 20:18:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF19B206D9
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 20:19:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nP6sCS4I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80F072072D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pNT6xcCI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF19B206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTACw-0001KJ-Hc
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 16:18:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50322)
+	id 1jTADZ-00023h-Rd
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 16:19:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50348)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jTABj-00007V-Mj
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 16:17:12 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jTAC7-0000WL-Rl
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 16:17:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jTABj-00005p-5r
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 16:17:11 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:38851)
+ (envelope-from <alistair23@gmail.com>) id 1jTAC7-0000xR-1L
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 16:17:35 -0400
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:46346)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jTABi-0008QF-NK; Mon, 27 Apr 2020 16:17:10 -0400
-Received: by mail-il1-x143.google.com with SMTP id c18so2782894ile.5;
- Mon, 27 Apr 2020 13:17:09 -0700 (PDT)
+ id 1jTAC6-0000vG-JM; Mon, 27 Apr 2020 16:17:34 -0400
+Received: by mail-il1-x144.google.com with SMTP id x2so18057115ilp.13;
+ Mon, 27 Apr 2020 13:17:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Coyf2FtT8xJGe7dQak7YvdPIn882vu160FqkJpe4Gjk=;
- b=nP6sCS4I3BtkZAwk0sA8b5sxf+o8opG0I3qIST120ewhCNoYkZdwS7M8XGBGdvNhYd
- GOlJKtJm4J2uYrIaYRa4im2zrSnksVWeZJGd8t2pzzhWRF2AaQvxCRm+nQl9ruFIlVxI
- pfSiiUlh25+LdSmGAYDuvpfZeacJM/MrdKfNBsZvHcMh2UvxBvwVHxurcldE7z1cpvGm
- PpOUOiC9z2afW+piwl6W032L1yVhvI2SBqnmIBllR8ByzCV6K2/89P9vhZbYBy4r/Ntj
- d/SaSVm2HxMiyOTNPOeaXnzBmel6f72Ub/XofWQJqXXzj6vcF8yCYCrhYcERImXj8TNZ
- K3yw==
+ :cc; bh=oAvZ5gj6xLua6e/c7b1iZR0wzMC/YFb04cZhMcsMCvw=;
+ b=pNT6xcCIi0yMLDCxlMKz9gf0akTApPAEYc0uaD7mNOlanJULQs30iODtwdWnNz8sL4
+ RdOiaI5tGxyZYpPBpF8r81WcCJjd3BQyR+CFqFlb3MH3NyhLzj7IlwECgSyV8n2okvoz
+ NRs/yEPzYkoyS1NJMDNamiNuHHhxVHi3GNicikfLCPt2NVCX2IFlSkR3fiFLx6sLVrsv
+ LSc1fuTAg+OzxEYAKbieKgEB2A7X+vMles7KYtzBRxJlB43idz0kTHSWsrb321NV644o
+ wJfP283F9BfTFVKKGtPnFzrKPaZpzIYsz1Uc94wDOKYNGYp9jCkU9MiqKZTm4oQXyP9q
+ 5A8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Coyf2FtT8xJGe7dQak7YvdPIn882vu160FqkJpe4Gjk=;
- b=mLbnevHd4aE3OEYBvczBUHbLRd9Z+9IgWKVjVYXwGyr9wk8dpWgN5UmI1QQaYiEIJp
- Ioz0IYMPu5gU9BM5EaUUrSfsQTKLYLXAoVYc7SMGaKhQfaKmfeVuowHfeELJOw/DhHn+
- 7y13hNYge7atmIgJxmicAiUy+THlBWxKTJlAWAJLbZBOQ3h7xnMyIrvGmoRex/yUJOJP
- ARyIplony6ZBxFPl0f0kLUF0LLKjeakbWvNJJt2XVrAzMiGQA+8W1CKtylE4DSNPGQXH
- /LAhiJo6dtj/Cu3xwIHNe2FhrJLUWU7WLcPrCDVp+5o9xVeh3lVQHLt+Azo0hYKqZWm3
- xikA==
-X-Gm-Message-State: AGi0PuaWBr+zRwxWj+zxTMTHfP0G3MIcVXuMwc2MHaPgQbdXpr5QXKpZ
- m67tqnMED4xKexAEE5KI8qxITLVQB1+qU1LJpwY=
-X-Google-Smtp-Source: APiQypJiQMA0nj+vve70ID5Wc7PBGptpslYR7Y1LfVsiljVtQ+efwJnhSSOzz8L0OWsuKd/a/z7Y8KjNpNJ6AHPV5pA=
-X-Received: by 2002:a92:aa07:: with SMTP id j7mr3750609ili.40.1588018628827;
- Mon, 27 Apr 2020 13:17:08 -0700 (PDT)
+ bh=oAvZ5gj6xLua6e/c7b1iZR0wzMC/YFb04cZhMcsMCvw=;
+ b=g3oE1K3QNhJ+lSFjnzdJca0E5+l+1TB+hXZgNonx7dlHB6O0jUJ9E2kaRWEbGqavFK
+ C/6GYHUrsbZwD3TcZrkFcPGgdLodaxMs2gv54swNv82O2yszWDx7JwGogMCtjtOmI6Oy
+ g1vNor+aShj29/SiKDALW6uZi4Ksqhc446V+fJvEr6V2zzW5DIgNwS0ZCKIuhEpbaokN
+ AI/aEl++G3JIw23pi2kxmnK0Tlkqrz+d+LC3oMf8agq/Vjy7tHsf+gTCG+jlVZkQnPda
+ j9tfbmjmqHZP8O9TNFB10NewqNHJH+pnBOOOHzOMuWmEmAkzvTkY2JRepuT+T+vu0DSr
+ y7kA==
+X-Gm-Message-State: AGi0PuY8SdeK7wtJWRRwcHzMSX2jJvCPH74FfcKneF9Bc1T6wxC/bAaS
+ NSNuyC4Hn4kBs5DV5/sfYLXjyE6IMKwG321sd8A=
+X-Google-Smtp-Source: APiQypJGQG5tE1j8h9DTGpLAL8bU9KoQm5jT/H+qHLotlX+Q8bhDVQtBY2KcgqMJDe/v/IbPRNztwX2TydfJs25avE0=
+X-Received: by 2002:a92:d5cf:: with SMTP id d15mr23485349ilq.131.1588018653308; 
+ Mon, 27 Apr 2020 13:17:33 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200427181649.26851-1-edgar.iglesias@gmail.com>
- <20200427181649.26851-2-edgar.iglesias@gmail.com>
-In-Reply-To: <20200427181649.26851-2-edgar.iglesias@gmail.com>
+ <20200427181649.26851-3-edgar.iglesias@gmail.com>
+In-Reply-To: <20200427181649.26851-3-edgar.iglesias@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 27 Apr 2020 13:08:30 -0700
-Message-ID: <CAKmqyKNEH6vYoRxaM1SGEYjK9Lv6hxm09zHSgGPt1da8+sRYkg@mail.gmail.com>
-Subject: Re: [PATCH v1 01/11] hw/arm: versal: Remove inclusion of
- arm_gicv3_common.h
+Date: Mon, 27 Apr 2020 13:08:55 -0700
+Message-ID: <CAKmqyKNFUL31QNh6vpOg65YuOd-=bPa334BJzdH_UO4+kHOZrw@mail.gmail.com>
+Subject: Re: [PATCH v1 02/11] hw/arm: versal: Move misplaced comment
 To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::143
+X-Received-From: 2607:f8b0:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,13 +104,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Apr 27, 2020 at 11:17 AM Edgar E. Iglesias
+On Mon, Apr 27, 2020 at 11:25 AM Edgar E. Iglesias
 <edgar.iglesias@gmail.com> wrote:
 >
 > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 >
-> Remove inclusion of arm_gicv3_common.h, this already gets
-> included via xlnx-versal.h.
+> Move misplaced comment.
 >
 > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
@@ -120,21 +118,29 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/arm/xlnx-versal.c | 1 -
->  1 file changed, 1 deletion(-)
+>  hw/arm/xlnx-versal.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
 > diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
-> index 94460f2343..c73b2fe755 100644
+> index c73b2fe755..cc696e44c0 100644
 > --- a/hw/arm/xlnx-versal.c
 > +++ b/hw/arm/xlnx-versal.c
-> @@ -20,7 +20,6 @@
->  #include "hw/arm/boot.h"
->  #include "kvm_arm.h"
->  #include "hw/misc/unimp.h"
-> -#include "hw/intc/arm_gicv3_common.h"
->  #include "hw/arm/xlnx-versal.h"
->  #include "hw/char/pl011.h"
+> @@ -36,7 +36,6 @@ static void versal_create_apu_cpus(Versal *s)
 >
+>          obj = object_new(XLNX_VERSAL_ACPU_TYPE);
+>          if (!obj) {
+> -            /* Secondary CPUs start in PSCI powered-down state */
+>              error_report("Unable to create apu.cpu[%d] of type %s",
+>                           i, XLNX_VERSAL_ACPU_TYPE);
+>              exit(EXIT_FAILURE);
+> @@ -49,6 +48,7 @@ static void versal_create_apu_cpus(Versal *s)
+>          object_property_set_int(obj, s->cfg.psci_conduit,
+>                                  "psci-conduit", &error_abort);
+>          if (i) {
+> +            /* Secondary CPUs start in PSCI powered-down state */
+>              object_property_set_bool(obj, true,
+>                                       "start-powered-off", &error_abort);
+>          }
 > --
 > 2.20.1
 >
