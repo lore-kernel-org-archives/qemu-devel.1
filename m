@@ -8,82 +8,82 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBAE0C4CECD
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 18:18:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 464A0C4CECD
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 18:21:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B8862076A
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 18:18:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E9B920775
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Apr 2020 18:21:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RmsBvv7g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B8862076A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ixkFq8Vg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E9B920775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jT8LA-00036N-NZ
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 14:18:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34888)
+	id 1jT8NL-0006Xw-5q
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 14:21:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34878)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jT8JQ-0000CO-3h
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 14:17:03 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jT8JP-0005He-AY
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jT8JP-0000CB-K0
  for qemu-devel@nongnu.org; Mon, 27 Apr 2020 14:16:59 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:46799)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jT8JP-0005HY-7n
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 14:16:59 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:39827)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jT8JO-0005Gk-SQ; Mon, 27 Apr 2020 14:16:58 -0400
-Received: by mail-lj1-x242.google.com with SMTP id f18so18631608lja.13;
- Mon, 27 Apr 2020 11:16:57 -0700 (PDT)
+ id 1jT8JO-0005Gf-Rq; Mon, 27 Apr 2020 14:16:58 -0400
+Received: by mail-lj1-x243.google.com with SMTP id u6so18612808ljl.6;
+ Mon, 27 Apr 2020 11:16:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=K2z7JThC8adf5+0uldYLYFbNNDEmc84sc30GQCEmr/s=;
- b=RmsBvv7gu93sV8OgWI9ydMYrcAl4D+U1GuR6r/mTqOVblnYKomHX7zebyF2hd4Ltfw
- hLturTp6mM6QAy7iPq9fg12rMzjLlY4gh2wdHNQt0OdcuiWilxMBJ0GUsE8tfQmr9Zrb
- l7yTYhEg68sLU/R/O6dgCzynye4I25MDoVWQCHEQW9/YDnFssiGIn8OVVEgeHoAn3aLu
- KhiMRsKRJSHikX6hqigoIcVtOdrVDQrlq36D34/tXFU1oa4y8iDAqvaU6GXv7UcEUBsh
- /F8AL1HNIErxOMT6KIEcucuvVq3byFsy1n7sl+MmADFXzcCl1UR8ea/C1M2822gsoOnz
- mwZA==
+ bh=Yhbn5ObUlRXLSdZsWox5a/Dx90Rzfq3EfLk5bL4LODc=;
+ b=ixkFq8VgmDMV3Is1MkLVmjPbXi9rK+RdNdnT1YQRZenBi4QE+5E3SzFZoMUBi7ZS1M
+ bQ+LcEyu6B06ZTSmZMI07Y+BlmrC0Frwa23CdGzYVwLABSh9DHx+H5QFVAL3NAe6bx0g
+ D+9+Bhh5QML+PijWjZPCn1AMgvnZdza1rW4mM7mqmVcwDITqWr6peBvvVOqdSWlQNkiO
+ WhrxI281bKtfYVkTty3f0klw03JQtO+VLwLYCbV37mEChP7H6HyMg5r6ggVUF2rEzrcF
+ 22XL52iBM1uCtDzPCea3VV+Rc6sTN3hb/y8qA7sfBKxcjlHZueWci2NP3By3FVULTC/6
+ 2PIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=K2z7JThC8adf5+0uldYLYFbNNDEmc84sc30GQCEmr/s=;
- b=FlNHyx2weJTDmpIUA9XsP3Ldun/SHmjNcp/TCbsJ3bi4C4PskVKnKkvVK+2mS6fnCh
- 8ryjkrIuomQGwSJj9STtVbnm7IFLogsM5HGf2A8p5mclks1JLbNmdWpuAr4wTCG6w9H8
- tuhdlxUUXs9wOi0WV8JHvuQC9R0m34p2NWgbjozPhQ2ShbsCVz+Ktv4959EMEMTWPJvx
- HQNAkNzJLn1YRc3BNCRpTcaTROpGoh0ZvViK/2liW9W+O2kY2gN5uOWCQjyeRRDrkjv5
- WJjeykYxvszJRnryjlmZr76IuTBs8URgjaAzCg5Fgn8fN7B7DCB1trg9ux7jzEtkOkVS
- 7PAg==
-X-Gm-Message-State: AGi0PuZCSKyLKslsTut5mf9E9rdMMJKtrl2uiwPn0T82InlDQK9VXDzs
- ebLxm1jV/j06ccY0/reMnjrkz1/IbF4=
-X-Google-Smtp-Source: APiQypJwvyYhNNX8OLBGenxViC29kn8S2hyVFr5xSA7VyqgRuvOukRKsG/TTv9ZRr+X6SWsGovj6SA==
-X-Received: by 2002:a2e:9a93:: with SMTP id p19mr14057349lji.77.1588011415595; 
- Mon, 27 Apr 2020 11:16:55 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id l26sm10443350ljc.49.2020.04.27.11.16.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ bh=Yhbn5ObUlRXLSdZsWox5a/Dx90Rzfq3EfLk5bL4LODc=;
+ b=WN0FWuiwsEGdR88D9fYiUBko7bmCsn7GFrgv1gasD4Oq2IxwKfDiA14SC34q6z/o+t
+ Jqdoh117vAQuU4qxV1b1GUGHjrIJDPT/9JBPKbluRxr99btfdkviV2XJiijEYU690axK
+ 5bOQr1aA39YxNHml1YrwQkEJHhj7+DEOyRdF38ArICN8d7BRvCYVlRjQ3oCg89WOYKxb
+ fqnKDBQTKMMm2GjmZ2zJn3iwPYUIhaCCeq6udJKTwBfgjxhbaHFmd7ujmElMgtmiWWb3
+ 0pzm5rWWR80zLSJVtH5E3yEVwVv9ERTBya5YMvdrXYeh4hyaYTNuipcbhrpFKHRaxLE5
+ 4YhA==
+X-Gm-Message-State: AGi0PubQgKXxjDP+r+HvWRX2Rm0DCUaQTpLK/GLj3deHsyRd1k2Sofqp
+ SWFA+tvg+JINu6fxCjdisnFgQEaPhiU=
+X-Google-Smtp-Source: APiQypJtr6MwhnPbz0ASElLt+tMIG/jNcMwa/RVvP7nTg+pixv1rfhOUZ4gG9xhh/qmxDiuiNqGyhA==
+X-Received: by 2002:a2e:b4a5:: with SMTP id q5mr15395300ljm.58.1588011414315; 
  Mon, 27 Apr 2020 11:16:54 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id w29sm77771lfq.35.2020.04.27.11.16.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 27 Apr 2020 11:16:53 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 04/11] hw/arm: versal: Embedd the UARTs into the SoC type
-Date: Mon, 27 Apr 2020 20:16:42 +0200
-Message-Id: <20200427181649.26851-5-edgar.iglesias@gmail.com>
+Subject: [PATCH v1 03/11] hw/arm: versal-virt: Fix typo xlnx-ve -> xlnx-versal
+Date: Mon, 27 Apr 2020 20:16:41 +0200
+Message-Id: <20200427181649.26851-4-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200427181649.26851-1-edgar.iglesias@gmail.com>
 References: <20200427181649.26851-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x242.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::243;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::242
+X-Received-From: 2a00:1450:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,71 +106,26 @@ Sender: "Qemu-devel"
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Embedd the UARTs into the SoC type.
+Fix typo xlnx-ve -> xlnx-versal.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/arm/xlnx-versal.c         | 12 ++++++------
- include/hw/arm/xlnx-versal.h |  3 ++-
- 2 files changed, 8 insertions(+), 7 deletions(-)
+ hw/arm/xlnx-versal-virt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
-index cc696e44c0..dbde03b7e6 100644
---- a/hw/arm/xlnx-versal.c
-+++ b/hw/arm/xlnx-versal.c
-@@ -21,7 +21,6 @@
- #include "kvm_arm.h"
- #include "hw/misc/unimp.h"
- #include "hw/arm/xlnx-versal.h"
--#include "hw/char/pl011.h"
- 
- #define XLNX_VERSAL_ACPU_TYPE ARM_CPU_TYPE_NAME("cortex-a72")
- #define GEM_REVISION        0x40070106
-@@ -144,16 +143,17 @@ static void versal_create_uarts(Versal *s, qemu_irq *pic)
-         DeviceState *dev;
-         MemoryRegion *mr;
- 
--        dev = qdev_create(NULL, TYPE_PL011);
--        s->lpd.iou.uart[i] = SYS_BUS_DEVICE(dev);
-+        sysbus_init_child_obj(OBJECT(s), name,
-+                              &s->lpd.iou.uart[i], sizeof(s->lpd.iou.uart[i]),
-+                              TYPE_PL011);
-+        dev = DEVICE(&s->lpd.iou.uart[i]);
-         qdev_prop_set_chr(dev, "chardev", serial_hd(i));
--        object_property_add_child(OBJECT(s), name, OBJECT(dev), &error_fatal);
-         qdev_init_nofail(dev);
- 
--        mr = sysbus_mmio_get_region(s->lpd.iou.uart[i], 0);
-+        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-         memory_region_add_subregion(&s->mr_ps, addrs[i], mr);
- 
--        sysbus_connect_irq(s->lpd.iou.uart[i], 0, pic[irqs[i]]);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[irqs[i]]);
-         g_free(name);
+diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
+index 878a275140..8a608074d1 100644
+--- a/hw/arm/xlnx-versal-virt.c
++++ b/hw/arm/xlnx-versal-virt.c
+@@ -440,7 +440,7 @@ static void versal_virt_init(MachineState *machine)
+         psci_conduit = QEMU_PSCI_CONDUIT_SMC;
      }
- }
-diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
-index 6c0a692b2f..a3dfd064b3 100644
---- a/include/hw/arm/xlnx-versal.h
-+++ b/include/hw/arm/xlnx-versal.h
-@@ -15,6 +15,7 @@
- #include "hw/sysbus.h"
- #include "hw/arm/boot.h"
- #include "hw/intc/arm_gicv3.h"
-+#include "hw/char/pl011.h"
  
- #define TYPE_XLNX_VERSAL "xlnx-versal"
- #define XLNX_VERSAL(obj) OBJECT_CHECK(Versal, (obj), TYPE_XLNX_VERSAL)
-@@ -49,7 +50,7 @@ typedef struct Versal {
-         MemoryRegion mr_ocm;
- 
-         struct {
--            SysBusDevice *uart[XLNX_VERSAL_NR_UARTS];
-+            PL011State uart[XLNX_VERSAL_NR_UARTS];
-             SysBusDevice *gem[XLNX_VERSAL_NR_GEMS];
-             SysBusDevice *adma[XLNX_VERSAL_NR_ADMAS];
-         } iou;
+-    sysbus_init_child_obj(OBJECT(machine), "xlnx-ve", &s->soc,
++    sysbus_init_child_obj(OBJECT(machine), "xlnx-versal", &s->soc,
+                           sizeof(s->soc), TYPE_XLNX_VERSAL);
+     object_property_set_link(OBJECT(&s->soc), OBJECT(machine->ram),
+                              "ddr", &error_abort);
 -- 
 2.20.1
 
