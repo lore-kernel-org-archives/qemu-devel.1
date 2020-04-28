@@ -2,110 +2,88 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68937C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:50:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91015C83004
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:50:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F97D206B9
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:50:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D2FF206B9
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:50:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Snyxw7Q2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F97D206B9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k6msafjk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D2FF206B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTLwU-0003Nc-RC
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 04:50:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50892)
+	id 1jTLws-0004JF-Dx
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 04:50:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51014)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTLrs-0003bO-Cj
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:46:26 -0400
+ (envelope-from <zltjiangshi@gmail.com>) id 1jTLsD-0003cd-AS
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:46:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTLmX-0006PY-3v
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:40:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20509
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTLOV-0000nG-HM
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:15:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588061705;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=vpIGwxbIqJLVqDqOkBl5NrulVEjyUrSNcpJ0mlK7HfM=;
- b=Snyxw7Q22VbW4b27qZLDEMeX4Y5f7SEZ9iBWkzkK03c8twOVB1zPz5WseGd6wfpNIb7fRu
- gTEBe2cr79mndey1hsyEi/H/rqvQHuGJYuBAQ0xfeW/dglv7wCDzHiMgqJvWq6jj5NX9LS
- LusbFKDqmQplMtneSczZK31TRqrfK6c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-xqXMcHMmNSOmmx-SuxpVQw-1; Tue, 28 Apr 2020 04:15:03 -0400
-X-MC-Unique: xqXMcHMmNSOmmx-SuxpVQw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAEAA80058A;
- Tue, 28 Apr 2020 08:15:01 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A3FB45F7FD;
- Tue, 28 Apr 2020 08:15:00 +0000 (UTC)
-Subject: Re: [PATCH v2 3/6] block/block-copy: add state pointer to
- BlockCopyTask
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200325134639.16337-1-vsementsov@virtuozzo.com>
- <20200325134639.16337-4-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <36be7fd4-a4a8-595d-eca5-b3b36351e065@redhat.com>
-Date: Tue, 28 Apr 2020 10:14:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <zltjiangshi@gmail.com>) id 1jTLlQ-0004ri-PJ
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:39:28 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:43876)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1jTLXa-0000Ie-Dp
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:24:30 -0400
+Received: by mail-lj1-x243.google.com with SMTP id l19so20505426lje.10
+ for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 01:24:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=J+vKbsSCHWeD3wg2/Qaw44d6Yuct6qNUHIzJpYXFgCU=;
+ b=k6msafjkIgWvI/J++46jdibUWvssVqESBLjs8EuYsKgMmmSL+3t3gbwuWoefdo64AK
+ q1OOzV97W1tjocLCMdMmP5qO3cUV52oJJY3gnsDbHEVrJL62KpBVkK7jJ8/v25U0zhUt
+ lAQkBLtSC8J5xKzK6i3IUiczSkbmJISI0HPt5kOLSENlkvZtxpWJ1/MQMUbVSoMvIzjy
+ 2zcmSvfkBEc/6Ytf6GHwZWXfvTnGP5zTr43tmTJpAwWNIiL+jIprzYpMFqtSHvVgVtgD
+ sPMM5xiYET6pF/A8ARlsCEb3I9sjl8JCIhIeolYhoePASSxLj00k/xmXgaBQsHivbS9s
+ 8PDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=J+vKbsSCHWeD3wg2/Qaw44d6Yuct6qNUHIzJpYXFgCU=;
+ b=QaoDWYxhFqhDcC5Ri1waMW8H3Kn4ZJuK0fB3GQ5G2/V4zkIFJS7jUPJbFTHdjpWMto
+ cwUkrrCA0tsFk49Brj7IE2DmDiDJVoWg+mLoIlGWtf+D0PEAmS6fn081GLkkRKQqkaNP
+ 2IMqWjYmzy3LWOvWPdEh5rOgDCiZPisYDT/HjtFPOTXPBrlaZ1WMjLB0ANfRaXdkyMyj
+ jdcBu3qrBn0UD65WK3sW8mL2AU9+bRdGqkgHSBBdS6o4vL3ehlZe6jLzwWHmR/g9L9qH
+ Y6SZwSuNRHAO9qrBQM7pHJX/g0+m4Z6tPTu0iTsYZbcz0r8+xOJAi8TVIhiVyXJT6jEu
+ vReg==
+X-Gm-Message-State: AGi0PuYjMo0IwcSYHAfd1+/L+5i/2EvHj7OgnxUey0wDKmsc+N1N4aoi
+ fwV8zxw5ancwHjKoXU0CNyEmVUsS7fXE1+eLBsU=
+X-Google-Smtp-Source: APiQypKGFaXP7NscPNl6/tnf9pQf+kjHxeLBuzHfzUUwM/OLk3f55ZNjhWgIerIBNWwDFPgLH2uqcok6FNcVqVOWxzk=
+X-Received: by 2002:a2e:b4e7:: with SMTP id s7mr16466243ljm.103.1588062268631; 
+ Tue, 28 Apr 2020 01:24:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200325134639.16337-4-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="otag4UyDckx51oxOI2b7iR8sDEuNwyjcX"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:15:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+References: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
+ <1587979995-17717-7-git-send-email-chenhc@lemote.com>
+ <38fe3267-3d1b-26eb-13e5-dd3ed7039e61@amsat.org>
+In-Reply-To: <38fe3267-3d1b-26eb-13e5-dd3ed7039e61@amsat.org>
+From: chen huacai <zltjiangshi@gmail.com>
+Date: Tue, 28 Apr 2020 16:31:56 +0800
+Message-ID: <CABDp7VrYJx0L7tsOh6vJ5SOAz-63YZY-UkC5zjGkUHN8a+0YwQ@mail.gmail.com>
+Subject: Re: [PATCH for-5.1 7/7] MAINTAINERS: Add myself as Loongson-3
+ maintainer
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::243;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-lj1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,51 +95,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org
+Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ qemu-level <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---otag4UyDckx51oxOI2b7iR8sDEuNwyjcX
-Content-Type: multipart/mixed; boundary="Eza7sEJWexr7MSz7qZkKUCP0AUrrBQPm1"
+Hi, Philippe,
 
---Eza7sEJWexr7MSz7qZkKUCP0AUrrBQPm1
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On Tue, Apr 28, 2020 at 2:18 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> Hi Huacai,
+>
+> On 4/27/20 11:33 AM, Huacai Chen wrote:
+> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> > ---
+> >  MAINTAINERS | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index aa9a057..efe840b 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -1080,6 +1080,12 @@ F: hw/isa/vt82c686.c
+> >  F: hw/pci-host/bonito.c
+> >  F: include/hw/isa/vt82c686.h
+> >
+> > +Loongson-3
+> > +M: Huacai Chen <chenhc@lemote.com>
+> > +S: Maintained
+> > +F: hw/mips/mips_loongson3.c
+> > +F: hw/pci-host/ls7a.c
+>
+> I still haven't received the series cover, so I'm not sure if you
+> intended to include the LS7A bridge chip here, but if so it seems you
+> forgot to include it.
+I'm sorry that I've rework the qemu patchset together with Jiaxun
+Yang. Now we have dropped LS7A bridge and use GPEX instead. This patch
+should also be updated but I forgot.
 
-On 25.03.20 14:46, Vladimir Sementsov-Ogievskiy wrote:
-> We are going to use aio-task-pool API, so we'll need state pointer in
-> BlockCopyTask anyway. Add it now and use where possible.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/block-copy.c | 30 ++++++++++++++++--------------
->  1 file changed, 16 insertions(+), 14 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+>
+> > +
+> >  Boston
+> >  M: Paul Burton <pburton@wavecomp.com>
+> >  R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+> >
 
 
---Eza7sEJWexr7MSz7qZkKUCP0AUrrBQPm1--
 
---otag4UyDckx51oxOI2b7iR8sDEuNwyjcX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6n5gMACgkQ9AfbAGHV
-z0CLyAgAtmDXmuAswTUzmFpoHYqJbu8LFvnGDNH7plmyhigerE6bZMRH5uHMoLuX
-ultcAoaXhtKslnhvV1gFe83yedAwO9Jsf5BukOlcW8lnsLRZAtam3+I8xDKw1Vct
-9e3gAFXKCnSE+ROI5EsPp+onnxPimGHTF7vk7wZOqQFgWIRLSBXHccojjSQawzDR
-vMqf1xASBt+rSqFvnpIY6SuR3YM9tostChQTyGeMJl9IdbqJQD8HSGjD01rsLmzQ
-h2MHEXotNZ1DvIaNqVKtACocU9MfCP2RirYh4AD8sGpGVWUX4E23PNOhJh85xYbW
-oQoGebSu6w2RQcdisN/wk1BZjUdKYQ==
-=4wDV
------END PGP SIGNATURE-----
-
---otag4UyDckx51oxOI2b7iR8sDEuNwyjcX--
-
+--=20
+Huacai Chen
 
