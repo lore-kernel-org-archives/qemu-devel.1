@@ -2,120 +2,95 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1E17C83004
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:53:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D5F0C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:53:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B10A206B9
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:53:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 463CE206B9
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:53:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vKZ6X9hn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B10A206B9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LCcexQMU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 463CE206B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTLz9-0001Jn-Hs
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 04:52:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51646)
+	id 1jTLzG-0001by-9h
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 04:53:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51488)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTLtk-0005C2-LT
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:48:57 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jTLsS-0004kr-Jx
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:46:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTLNd-0007wZ-GK
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:18:30 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39911)
+ (envelope-from <alex.bennee@linaro.org>) id 1jTLjO-0002pv-Aa
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:38:47 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:35974)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTKzI-0008CG-KD; Tue, 28 Apr 2020 03:49:04 -0400
-Received: by mail-wr1-x441.google.com with SMTP id b11so23425565wrs.6;
- Tue, 28 Apr 2020 00:49:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=5LMSjzOiw3vS1NL0Rg/zXUc0FJFWZ1JtR/60p0SqsUE=;
- b=vKZ6X9hnOYJJghdjbd7+OtZGMpKy+YrZiakBHcRQlJce+asDu7KQduSOAiAiTB3RLk
- I1c6U+PQwl49xldynjCgM1AG4LRHs8Vls25ScZL9Y3wtKgkFyhqFhIBCSLEaO99tjthL
- 8A1J+IahMC53DJOz/eF5/xGbIfbv/oDCs0N0XJtC65YMmkXSqPe4TY4Mq08cqsfYZ4Js
- 8omEV2lyhSTUvYo3JHkvGSFU/Gw4qFf57V77p/a2g3H5IEafOJF9vfnF/VkvQYfjf5Qh
- OZzgqzspuWheQYYLJgm5RjMd44YxilngmR8NYJifHkLavl8OZpZLSwOy3NZGOh+sm9Lx
- Q4PA==
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jTLjN-0002pJ-Mn
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:36:41 -0400
+Received: by mail-wr1-x431.google.com with SMTP id d15so21980578wrx.3
+ for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 01:36:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=aLjxcCJPbI5yIwkt1tPCq3CebYIaw+uKoJdDPOol07Q=;
+ b=LCcexQMUlFOKaAVmtkARkp1bjrxIOBDIAzYH3WZnE0TAgVS+USm1wfbu3zfp7zOSuc
+ NOJEmV3ZNYIRQLrgAQGKj0ZOPLlqUd5c26buXu9giFSLwCpTNKF5lJhZRKIXx3QSn0Oz
+ arIaDTZzK2K7eRPLTzRwlJ1bugBq0lE2EgPAjcvgwhwTZDCU6GkzDwSn/SaPLtG48NOv
+ oNRIUAdPRpVBPXMfTUZykkd2AtHN9lTjX7DeY42dwfcy/H/7FPsE1RtQIy7AMOWLeKrM
+ 9Ts3r/Pdiv/Df91JEBMndgxGCGfa6FF+j3drPdcnUEE9BfBDfpXrPMA7TqVy7zAs0/UW
+ p25Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=5LMSjzOiw3vS1NL0Rg/zXUc0FJFWZ1JtR/60p0SqsUE=;
- b=POxQTjOeLRor/x+IT8cpInp498XW+NLEwjcNDClJalVom1A8WGNA0z5t0ETIj7yisa
- /H0v6nAqdv0afq850awS2Blv28Lc3PXlfuHvF+Ztika/dNFzjvtO7hfeIUUF93NnwGAf
- tqCySdABhaZT5r7ycrhIWFB1MCu5NczwHtqkUfpqMW6HO9knes5vW8LYOfnz+mmO/5Su
- 0khR/uOjbu6kgbZ/dWWrV1QRvnkEGD907gHnMrYouqXB5UaYnOWU8FgzYszHInhY1TeR
- BouKe2uI7ZX5fTZ+Al/IkuQmmD+KYQZtqVrZeNhWKJkpeCQA2ORJpU6kdvm4ywUkNrU3
- 1g2Q==
-X-Gm-Message-State: AGi0Pub1K5N6w8Zv28Y61q7vNAHEwUGIMUQssTcJXwQuBKUBlTxNl6ou
- 6YCM02FSwuWKvKrUAiDuy5U=
-X-Google-Smtp-Source: APiQypJuJmDZ8xt88jZjIunyu4JC8xm4qWfUOz7FKWE6GqWu8LYvkbMcEAUouN6Q6mNs4vklYpsOCQ==
-X-Received: by 2002:a5d:650b:: with SMTP id x11mr31202654wru.405.1588060142969; 
- Tue, 28 Apr 2020 00:49:02 -0700 (PDT)
-Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.137])
- by smtp.gmail.com with ESMTPSA id i25sm2128824wml.43.2020.04.28.00.49.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 28 Apr 2020 00:49:02 -0700 (PDT)
-Subject: Re: [PATCH v1 06/11] hw/arm: versal: Embedd the ADMAs into the SoC
- type
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
-References: <20200427181649.26851-1-edgar.iglesias@gmail.com>
- <20200427181649.26851-7-edgar.iglesias@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <76784018-ddd2-fa05-7ae1-5b6a474a501d@amsat.org>
-Date: Tue, 28 Apr 2020 09:49:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=aLjxcCJPbI5yIwkt1tPCq3CebYIaw+uKoJdDPOol07Q=;
+ b=speScHMYNdZs2/no8FzqNDBgRN96YS/nyxndFLSc0nqK4VcwmdrF4kHQMdEDfu1+Aw
+ mbRbY4KnZyOWIUFYDPxbXoW6LQqFnn539HzwjG4FTF9JypQQur0rAqVLpbM1k0g/+K2y
+ FCiRXJYSmE+J0h9+IwfIY0AB16Rx81XcGNlT5uRliCqpZlJOf9vAi8DpPmnVjyRWwAk2
+ UNFfgsz8BAiYAD+kK/d+ssGUzxrmzyUk6NwjM+CCe5gC1ZSACTmQ6nGhlUV06/6u0GCz
+ ltZMNQkk69nFstRGgcE/EPUocgNG4UJbgPO120XNIVKlIvuwPpr7kXXQOoZ0wywDGdqL
+ L5Qg==
+X-Gm-Message-State: AGi0PuYUPN1ATJ0OPAeTWk6gSrAeH6N/tBJmt4+58HBDWeCEI6XQrc4I
+ tdQB4LkIsz9sNDCnZ9EDTquzIQ==
+X-Google-Smtp-Source: APiQypJxEd+PJmNDcyxP4QzRwt3hU18x/fN6iSWfl4tW4RIpkWcDDV0kMuY5raGRzhK6CxHZnWCF5w==
+X-Received: by 2002:adf:91e3:: with SMTP id 90mr32031468wri.206.1588062999782; 
+ Tue, 28 Apr 2020 01:36:39 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id m8sm25814928wrx.54.2020.04.28.01.36.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Apr 2020 01:36:38 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 663FF1FF7E;
+ Tue, 28 Apr 2020 09:36:37 +0100 (BST)
+References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
+ <87lfmhl0xa.fsf@linaro.org>
+ <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
+ <87imhlkwun.fsf@linaro.org>
+ <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: luoyonggang@gmail.com
+Subject: Re: About hardfloat in ppc
+In-reply-to: <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
+Date: Tue, 28 Apr 2020 09:36:37 +0100
+Message-ID: <87ftcoknvu.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200427181649.26851-7-edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x431.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::431
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,79 +102,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- frasse.iglesias@gmail.com, alistair@alistair23.me,
- richard.henderson@linaro.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
- philmd@redhat.com, luc.michel@greensocs.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/27/20 8:16 PM, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> 
-> Embedd the ADMAs into the SoC type.
-> 
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
->  hw/arm/xlnx-versal.c         | 14 +++++++-------
->  include/hw/arm/xlnx-versal.h |  3 ++-
->  2 files changed, 9 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
-> index e424aa789e..ebd2dc51be 100644
-> --- a/hw/arm/xlnx-versal.c
-> +++ b/hw/arm/xlnx-versal.c
-> @@ -203,18 +203,18 @@ static void versal_create_admas(Versal *s, qemu_irq *pic)
->          DeviceState *dev;
->          MemoryRegion *mr;
->  
-> -        dev = qdev_create(NULL, "xlnx.zdma");
-> -        s->lpd.iou.adma[i] = SYS_BUS_DEVICE(dev);
-> -        object_property_set_int(OBJECT(s->lpd.iou.adma[i]), 128, "bus-width",
-> -                                &error_abort);
-> -        object_property_add_child(OBJECT(s), name, OBJECT(dev), &error_fatal);
-> +        sysbus_init_child_obj(OBJECT(s), name,
-> +                              &s->lpd.iou.adma[i], sizeof(s->lpd.iou.adma[i]),
-> +                              TYPE_XLNX_ZDMA);
-> +        dev = DEVICE(&s->lpd.iou.adma[i]);
-> +        object_property_set_int(OBJECT(dev), 128, "bus-width", &error_abort);
->          qdev_init_nofail(dev);
->  
-> -        mr = sysbus_mmio_get_region(s->lpd.iou.adma[i], 0);
-> +        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
->          memory_region_add_subregion(&s->mr_ps,
->                                      MM_ADMA_CH0 + i * MM_ADMA_CH0_SIZE, mr);
->  
-> -        sysbus_connect_irq(s->lpd.iou.adma[i], 0, pic[VERSAL_ADMA_IRQ_0 + i]);
-> +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[VERSAL_ADMA_IRQ_0 + i]);
->          g_free(name);
->      }
->  }
-> diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
-> index 01da736a5b..94b7826fd4 100644
-> --- a/include/hw/arm/xlnx-versal.h
-> +++ b/include/hw/arm/xlnx-versal.h
-> @@ -16,6 +16,7 @@
->  #include "hw/arm/boot.h"
->  #include "hw/intc/arm_gicv3.h"
->  #include "hw/char/pl011.h"
-> +#include "hw/dma/xlnx-zdma.h"
->  #include "hw/net/cadence_gem.h"
->  
->  #define TYPE_XLNX_VERSAL "xlnx-versal"
-> @@ -53,7 +54,7 @@ typedef struct Versal {
->          struct {
->              PL011State uart[XLNX_VERSAL_NR_UARTS];
->              CadenceGEMState gem[XLNX_VERSAL_NR_GEMS];
-> -            SysBusDevice *adma[XLNX_VERSAL_NR_ADMAS];
-> +            XlnxZDMA adma[XLNX_VERSAL_NR_ADMAS];
->          } iou;
->      } lpd;
->  
-> 
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+=E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyonggang@gmail.com> writes:
+
+> I am confusing why only  inexact  are set then we can use hard-float.
+
+The inexact behaviour of the host hardware may be different from the
+guest architecture we are trying to emulate and the host hardware may
+not be configurable to emulate the guest mode.
+
+Have a look in softfloat.c and see all the places where
+float_flag_inexact is set. Can you convince yourself that the host
+hardware will do the same?
+
+> And PPC always clearing inexact  flag before calling to soft-float
+> funcitons. so we can not
+> optimize it with hard-float.
+> I need some resouces about ineact flag and why always clearing inexcat in
+> PPC FP simualtion.
+
+Because that is the behaviour of the PPC floating point unit. The
+inexact flag will represent the last operation done.
+
+> I am looking for two possible solution:
+> 1. do not clear inexact flag in PPC simulation
+> 2. even the inexact are cleared, we can still use alternative hard-float.
+>
+> But now I am the beginner, Have no clue about all the things.
+
+Well you'll need to learn about floating point because these are rather
+fundamental aspects of it's behaviour. In the old days QEMU used to use
+the host floating point processor with it's template based translation.
+However this led to lots of weird bugs because the floating point
+answers under qemu where different from the target it was trying to
+emulate. It was for this reason softfloat was introduced. The hardfloat
+optimisation can only be done when we are confident that we will get the
+exact same answer of the target we are trying to emulate - a "faster but
+incorrect" mode is just going to cause confusion as discussed in the
+previous thread. Have you read that yet?
+
+>
+> On Mon, Apr 27, 2020 at 7:10 PM Alex Benn=C3=A9e <alex.bennee@linaro.org>=
+ wrote:
+>
+>>
+>> BALATON Zoltan <balaton@eik.bme.hu> writes:
+>>
+>> > On Mon, 27 Apr 2020, Alex Benn=C3=A9e wrote:
+>> >> =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyonggang@gmail.com> wri=
+tes:
+>> >>> Because ppc fpu-helper are always clearing float_flag_inexact,
+>> >>> So is that possible to optimize the performance when
+>> float_flag_inexact
+>> >>> are cleared?
+>> >>
+>> >> There was some discussion about this in the last thread about enabling
+>> >> hardfloat for PPC. See the thread:
+>> >>
+>> >>  Subject: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+>> >>  Date: Tue, 18 Feb 2020 18:10:16 +0100
+>> >>  Message-Id: <20200218171702.979F074637D@zero.eik.bme.hu>
+>> >
+>> > I've answered this already with link to that thread here:
+>> >
+>> > On Fri, 10 Apr 2020, BALATON Zoltan wrote:
+>> > : Date: Fri, 10 Apr 2020 20:04:53 +0200 (CEST)
+>> > : From: BALATON Zoltan <balaton@eik.bme.hu>
+>> > : To: "=E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo)" <luoyonggang@gmail.c=
+om>
+>> > : Cc: qemu-devel@nongnu.org, Mark Cave-Ayland, John Arbuckle,
+>> qemu-ppc@nongnu.org, Paul Clarke, Howard Spoelstra, David Gibson
+>> > : Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+>> > :
+>> > : On Fri, 10 Apr 2020, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
+>> > :> Are this stable now? I'd like to see hard float to be landed:)
+>> > :
+>> > : If you want to see hardfloat for PPC then you should read the
+>> > replies to : this patch which can be found here:
+>> > :
+>> > : http://patchwork.ozlabs.org/patch/1240235/
+>> > :
+>> > : to understand what's needed then try to implement the solution with
+>> > FP : exceptions cached in a global that maybe could work. I won't be
+>> > able to : do that as said here:
+>> > :
+>> > : https://lists.nongnu.org/archive/html/qemu-ppc/2020-03/msg00006.html
+>> > :
+>> > : because I don't have time to learn all the details needed. I think :
+>> > others are in the same situation so unless somebody puts in the :
+>> > necessary effort this won't change.
+>> >
+>> > Which also had a proposed solution to the problem that you could try
+>> > to implement, in particular see this message:
+>> >
+>> >
+>> http://patchwork.ozlabs.org/project/qemu-devel/patch/20200218171702.979F=
+074637D@zero.eik.bme.hu/#2375124
+>> >
+>> > amd Richard's reply immediately below that. In short to optimise FPU
+>> > emulation we would either find a way to compute inexact flag quickly
+>> > without reading the FPU status (this may not be possible) or somehow
+>> > get status from the FPU but the obvious way of claring the flag and
+>> > reading them after each operation is too slow. So maybe using
+>> > exceptions and only clearing when actually there's a change could be
+>> > faster.
+>> >
+>> > As to how to use exceptions see this message in above thread:
+>> >
+>> > https://lists.nongnu.org/archive/html/qemu-ppc/2020-03/msg00005.html
+>> >
+>> > But that's only to show how to hook in an exception handler what it
+>> > does needs to be implemented. Then tested and benchmarked.
+>> >
+>> > I still don't know where are the extensive PPC floating point tests to
+>> > use for checking results though as that was never answered.
+>>
+>> Specifically for PPC we don't have them. We use the softfloat test cases
+>> to exercise our softfloat/hardfloat code as part of "make
+>> check-softfloat". You can also re-build fp-bench for each guest target
+>> to measure raw throughput.
+>>
+>> >> However in short the problem is if the float_flag_inexact is clear you
+>> >> must use softfloat so you can properly calculate the inexact status. =
+We
+>> >> can't take advantage of the inexact stickiness without loosing the
+>> >> fidelity of the calculation.
+>> >
+>> > I still don't get why can't we use hardware via exception handler to
+>> > detect flags for us and why do we only use hardfloat in some corner
+>> > cases. If reading the status is too costly then we could mirror it in
+>> > a global which is set by an FP exception handler. Shouldn't that be
+>> > faster? Is there a reason that can't work?
+>>
+>> It would work but it would be slow. Almost every FP operation sets
+>> the inexact flag so it would generate an exception and exceptions take
+>> time to process.
+>>
+>> For the guests where we use hardfloat operations with inexact already
+>> latched is not a corner case - it is the common case which is why it
+>> helps.
+>>
+>> >
+>> > Regards,
+>> > BALATON Zoltan
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+>>
+
+
+--=20
+Alex Benn=C3=A9e
 
