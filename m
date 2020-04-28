@@ -4,107 +4,119 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE08C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 06:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 441D1C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 06:41:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC9D52051A
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 06:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEECE206A5
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 06:41:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LBM1JEaH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC9D52051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZThV5EoD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEECE206A5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTJqc-0000sV-8z
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 02:36:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35670)
+	id 1jTJvR-0005bd-LA
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 02:41:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36554)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTJlq-0007kB-Tt
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:34:50 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jTJqz-0001cU-4Y
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:39:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTJi8-00079R-LE
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:31:06 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46000
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTJOF-00007v-T8
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:06:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588054002;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=JiDOZcsecwENikfXxKGF+X9kdjdbvrkflma8hf8iZpQ=;
- b=LBM1JEaHOnS2NuCK4BuMFPHZD2leWFnlauVsqaHkfOnSX09hJy256ZwusNDLIkX4iZ9D6b
- DvI+67V0vlyv47Icpi8SSsRNooUZhj2ZUYp2SUQC/5Aa4WdzamP5EssMRxus8PfnPwNuxt
- W2Jv+cbsiQNzMnhGTFUkSpg7WnFNBbQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-390-CWijeySgM3G0frGkl3KUcg-1; Tue, 28 Apr 2020 02:06:39 -0400
-X-MC-Unique: CWijeySgM3G0frGkl3KUcg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5932800D24
- for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 06:06:38 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 32BB319C4F;
- Tue, 28 Apr 2020 06:06:32 +0000 (UTC)
-Subject: Re: [PATCH] virtiofsd: Show submounts
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20200424133516.73077-1-mreitz@redhat.com>
- <20200427175902.GM2923@work-vm>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8aa9aea2-cc5d-f9b5-5cdb-b5e596ef89aa@redhat.com>
-Date: Tue, 28 Apr 2020 08:06:30 +0200
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jTJpQ-0001n9-5d
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:36:24 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40737)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jTJpP-0001mt-NU
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:34:47 -0400
+Received: by mail-wm1-x341.google.com with SMTP id u16so1459668wmc.5
+ for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 23:34:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=RjMRO79Rn0uGO75pwKgK9W0cHTRjadDSVv8aF0XV5Gw=;
+ b=ZThV5EoDf8Cou1Ioi+fvhujpFITciIIQt4RTaRQgfwsvld9Nl/x6qX+e729Qa3F2rB
+ /p5AkuaYp4aWTYmhQRhQe5GN17xZgRMJyfUVCX3kDlzfTRsZdlTJnQ3AzriGSwmaeZ2O
+ tvclDP7KM5UO4NB5N+O5APcF8WZG8HLk90tLP27kzyBnyH32IzxaGBb/WFsImgaMEmhY
+ p8HLh6/CwvKJSM4SRxknbshkSXtmdVEOBHVmGKv0THVQOVeGrol+ubO1fOzeM+dmHn1S
+ Uhvon+kywkyOxXOVC8khorWCgP04w5OuGMHUXngfNFeE/QsIP3sx6JId0uSJlC9dORGR
+ BBoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=RjMRO79Rn0uGO75pwKgK9W0cHTRjadDSVv8aF0XV5Gw=;
+ b=jflk0uc/RzMn5hkrfaHA0M4YerBfiOrK+69jZihun4WUShki84xuiMRLpGwCisjfM4
+ 8WqkMTTpnWhWa4R9JGbU0SL/CIQchylJ3C+ZKc3t8wD3cEVpqWyYihBsk9Tk+og7hU+/
+ 0k141reVDo1CzdrODl5gto7KSR3laQ9Kn36UMdVahWQ7IZKpeO9F3nvjQ3vpg8G0p7BP
+ XHxjxKIilmmyGdlR9uaxzujSotSj3g9dgisc9tl/4Lul3VS9c2LPKmqhdVJTIj8LJahw
+ t8dOSJ68OUQu+FUx3AcvWvvxuT38/z1PdL1m41PDUCGmwmXFaK7oqfWWxsbriAgjmEwk
+ 7VdA==
+X-Gm-Message-State: AGi0PuZw+bg6u/7Ztn9qf0WXDVCN8pjuOGZOpGIL9JWlOcnv2otP+SCF
+ +ZjA2pbLfenv9CraHri2tkFreark5f4=
+X-Google-Smtp-Source: APiQypLjdkvK81fTXm6+uaZz09P2tLTOkbt3GwLoSiXTXC/lxCZrON6dOOYVwN135v5k/305vyn88A==
+X-Received: by 2002:a7b:cc8e:: with SMTP id p14mr2739073wma.70.1588055686135; 
+ Mon, 27 Apr 2020 23:34:46 -0700 (PDT)
+Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.137])
+ by smtp.gmail.com with ESMTPSA id j10sm2016559wmi.18.2020.04.27.23.34.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 27 Apr 2020 23:34:45 -0700 (PDT)
+Subject: Re: [PATCH for-5.1 4/7] target/mips: Add Loongson-3 CPU definition
+To: Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+References: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
+ <1587979995-17717-4-git-send-email-chenhc@lemote.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <c1a3aec6-dc45-3484-3a70-c06449bee609@amsat.org>
+Date: Tue, 28 Apr 2020 08:34:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200427175902.GM2923@work-vm>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="zOPKgSvGA9aD5ncr3lfdc5QsGlK365KXv"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 02:06:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+In-Reply-To: <1587979995-17717-4-git-send-email-chenhc@lemote.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,117 +128,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
+ qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---zOPKgSvGA9aD5ncr3lfdc5QsGlK365KXv
-Content-Type: multipart/mixed; boundary="jx7TNYgfYlBaxII1dZA4uAvXh65J08ksL"
+Hi Huacai,
 
---jx7TNYgfYlBaxII1dZA4uAvXh65J08ksL
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On 4/27/20 11:33 AM, Huacai Chen wrote:
+> Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
+> R1/R2. Loongson-3A R4 is the newest and its ISA is almost the superset
+> of all others. To reduce complexity, we just define a "Loongson-3A" CPU
+> which is corresponding to Loongson-3A R4. Loongson-3A has CONFIG6 and
+> CONFIG7, so add their bit-fields as well.
 
-On 27.04.20 19:59, Dr. David Alan Gilbert wrote:
-> * Max Reitz (mreitz@redhat.com) wrote:
->> Currently, setup_mounts() bind-mounts the shared directory without
->> MS_REC.  This makes all submounts disappear.
->>
->> Pass MS_REC so that the guest can see submounts again.
->=20
-> Thanks!
->=20
->> Fixes: 3ca8a2b1c83eb185c232a4e87abbb65495263756
->=20
-> Should this actually be 5baa3b8e95064c2434bd9e2f312edd5e9ae275dc ?
+Is there a public datasheet for R4? (If possible in English).
 
-Well, I bisected it and landed at 3ca8a2b1.  So while the problematic
-line may have been introduced by 5baa3b8e, it wasn=E2=80=99t used until 3ca=
-8a2b1.
-
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tools/virtiofsd/passthrough_ll.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthro=
-ugh_ll.c
->> index 4c35c95b25..9d7f863e66 100644
->> --- a/tools/virtiofsd/passthrough_ll.c
->> +++ b/tools/virtiofsd/passthrough_ll.c
->> @@ -2643,7 +2643,7 @@ static void setup_mounts(const char *source)
->>      int oldroot;
->>      int newroot;
->> =20
->> -    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
->> +    if (mount(source, source, NULL, MS_BIND | MS_REC, NULL) < 0) {
->>          fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", source, =
-source);
->>          exit(1);
->>      }
->=20
-> Do we want MS_SLAVE to pick up future mounts that might happenf rom the
-> host?
-
-Hm.  So first it looks to me from the man page like one shouldn=E2=80=99t g=
-ive
-MS_SLAVE on the first mount() call but kind of only use it for remounts
-(in the list at the start, =E2=80=9CCreate a bind mount=E2=80=9D is separat=
-e from
-=E2=80=9CChange the propagation type of an existing mount=E2=80=9D, and the=
- man page
-later says =E2=80=9CThe only other flags that can be specified while changi=
-ng
-the propagation type are MS_REC (described below) and MS_SILENT (which
-is ignored).=E2=80=9D).
-
-Second, even if I do change the propagation type to MS_SLAVE in a second
-call, mounts done after qemu has been started don=E2=80=99t show up in the =
-guest
-(for me).
-
-So while it sounds correct, I can=E2=80=99t see it having an effect, actual=
-ly.
-
-> What's the interaction between this and the MS_REC|MS_SLAVE that we have
-> a few lines above for / ?
-
-Good question.  It would seem to me that there isn=E2=80=99t any.  That pre=
-vious
-mount call just sets MS_REC | MS_SLAVE for the whole mount namespace,
-and then we do a new mount here (by default from / to /) that needs its
-own flags.
-
-(More interesting is perhaps why we have that other mount() call below,
-which again sets MS_REC | MS_SLAVE for the old (not-yet-bind-mounted) /.
- I can=E2=80=99t imagine that to have any effect.)
-
-Max
-
-
---jx7TNYgfYlBaxII1dZA4uAvXh65J08ksL--
-
---zOPKgSvGA9aD5ncr3lfdc5QsGlK365KXv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6nx+YACgkQ9AfbAGHV
-z0BVWwf+O8Uh7ZUmSnV29FWnmLRugDDUamw5nwW1PD7NS/gyI4eZhFgmqqweFeDY
-pDo1/O1QZgWQix94UR4oSz1YWkKs5RTnT7oK6TTVXCoXzv7E+KSxipbeZWYmAXGE
-pPLHBJA6f7iozo4NjPMce4+EPAIEC/gl8DOhw6rzFJuioyghYBYE7F7ZfhkxGpJY
-q+gs20BDRymK0BzYt5TuZQ5q0LzQvVbBsgtnJ6dFUEPCB0FrCC3hDVmTnLPm5Pdm
-aitOlNptlgyj+TTA2Msz3w7QIK2VGO0x3/EMlS7kkNV1vm8Nkq065/PT2/k0ur6R
-coGxfV2GruNEVjsf59vEMzLrRmnMaQ==
-=Mzh7
------END PGP SIGNATURE-----
-
---zOPKgSvGA9aD5ncr3lfdc5QsGlK365KXv--
-
+> 
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> ---
+>  target/mips/cpu.h                | 28 ++++++++++++++++++++++
+>  target/mips/internal.h           |  2 ++
+>  target/mips/mips-defs.h          |  7 ++++--
+>  target/mips/translate.c          |  2 ++
+>  target/mips/translate_init.inc.c | 51 ++++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 88 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> index 94d01ea..0b3c987 100644
+> --- a/target/mips/cpu.h
+> +++ b/target/mips/cpu.h
+> @@ -940,7 +940,35 @@ struct CPUMIPSState {
+>  #define CP0C5_UFR          2
+>  #define CP0C5_NFExists     0
+>      int32_t CP0_Config6;
+> +    int32_t CP0_Config6_rw_bitmask;
+> +#define CP0C6_BPPASS          31
+> +#define CP0C6_KPOS            24
+> +#define CP0C6_KE              23
+> +#define CP0C6_VTLBONLY        22
+> +#define CP0C6_LASX            21
+> +#define CP0C6_SSEN            20
+> +#define CP0C6_DISDRTIME       19
+> +#define CP0C6_PIXNUEN         18
+> +#define CP0C6_SCRAND          17
+> +#define CP0C6_LLEXCEN         16
+> +#define CP0C6_DISVC           15
+> +#define CP0C6_VCLRU           14
+> +#define CP0C6_DCLRU           13
+> +#define CP0C6_PIXUEN          12
+> +#define CP0C6_DISBLKLYEN      11
+> +#define CP0C6_UMEMUALEN       10
+> +#define CP0C6_SFBEN           8
+> +#define CP0C6_FLTINT          7
+> +#define CP0C6_VLTINT          6
+> +#define CP0C6_DISBTB          5
+> +#define CP0C6_STPREFCTL       2
+> +#define CP0C6_INSTPREF        1
+> +#define CP0C6_DATAPREF        0
+>      int32_t CP0_Config7;
+> +    int64_t CP0_Config7_rw_bitmask;
+> +#define CP0C7_NAPCGEN       2
+> +#define CP0C7_UNIMUEN       1
+> +#define CP0C7_VFPUCGEN      0
+>      uint64_t CP0_LLAddr;
+>      uint64_t CP0_MAAR[MIPS_MAAR_MAX];
+>      int32_t CP0_MAARI;
+> diff --git a/target/mips/internal.h b/target/mips/internal.h
+> index 1bf274b..7853cb1 100644
+> --- a/target/mips/internal.h
+> +++ b/target/mips/internal.h
+> @@ -36,7 +36,9 @@ struct mips_def_t {
+>      int32_t CP0_Config5;
+>      int32_t CP0_Config5_rw_bitmask;
+>      int32_t CP0_Config6;
+> +    int32_t CP0_Config6_rw_bitmask;
+>      int32_t CP0_Config7;
+> +    int32_t CP0_Config7_rw_bitmask;
+>      target_ulong CP0_LLAddr_rw_bitmask;
+>      int CP0_LLAddr_shift;
+>      int32_t SYNCI_Step;
+> diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+> index a831bb4..c2c96db 100644
+> --- a/target/mips/mips-defs.h
+> +++ b/target/mips/mips-defs.h
+> @@ -51,8 +51,9 @@
+>   */
+>  #define INSN_LOONGSON2E   0x0001000000000000ULL
+>  #define INSN_LOONGSON2F   0x0002000000000000ULL
+> -#define INSN_VR54XX       0x0004000000000000ULL
+> -#define INSN_R5900        0x0008000000000000ULL
+> +#define INSN_LOONGSON3A   0x0004000000000000ULL
+> +#define INSN_VR54XX       0x0008000000000000ULL
+> +#define INSN_R5900        0x0010000000000000ULL
+>  /*
+>   *   bits 56-63: vendor-specific ASEs
+>   */
+> @@ -94,6 +95,8 @@
+>  /* Wave Computing: "nanoMIPS" */
+>  #define CPU_NANOMIPS32  (CPU_MIPS32R6 | ISA_NANOMIPS32)
+>  
+> +#define CPU_LOONGSON3A  (CPU_MIPS64R2 | INSN_LOONGSON3A)
+> +
+>  /*
+>   * Strictly follow the architecture standard:
+>   * - Disallow "special" instruction handling for PMON/SPIM.
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 25b595a..2caf4cb 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -31206,7 +31206,9 @@ void cpu_state_reset(CPUMIPSState *env)
+>      env->CP0_Config5 = env->cpu_model->CP0_Config5;
+>      env->CP0_Config5_rw_bitmask = env->cpu_model->CP0_Config5_rw_bitmask;
+>      env->CP0_Config6 = env->cpu_model->CP0_Config6;
+> +    env->CP0_Config6_rw_bitmask = env->cpu_model->CP0_Config6_rw_bitmask;
+>      env->CP0_Config7 = env->cpu_model->CP0_Config7;
+> +    env->CP0_Config7_rw_bitmask = env->cpu_model->CP0_Config7_rw_bitmask;
+>      env->CP0_LLAddr_rw_bitmask = env->cpu_model->CP0_LLAddr_rw_bitmask
+>                                   << env->cpu_model->CP0_LLAddr_shift;
+>      env->CP0_LLAddr_shift = env->cpu_model->CP0_LLAddr_shift;
+> diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
+> index 6d145a9..a32412d 100644
+> --- a/target/mips/translate_init.inc.c
+> +++ b/target/mips/translate_init.inc.c
+> @@ -802,6 +802,57 @@ const mips_def_t mips_defs[] =
+>          .mmu_type = MMU_TYPE_R4000,
+>      },
+>      {
+> +        .name = "Loongson-3A",
+> +        .CP0_PRid = 0x14C000,
+> +        /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
+> +        .CP0_Config0 = MIPS_CONFIG0 | (0x1 << CP0C0_AR) | (0x2 << CP0C0_AT) |
+> +                       (MMU_TYPE_R4000 << CP0C0_MT),
+> +        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << CP0C1_MMU) |
+> +                       (2 << CP0C1_IS) | (4 << CP0C1_IL) | (3 << CP0C1_IA) |
+> +                       (2 << CP0C1_DS) | (4 << CP0C1_DL) | (3 << CP0C1_DA) |
+> +                       (1 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << CP0C1_EP),
+> +        .CP0_Config2 = MIPS_CONFIG2,
+> +        .CP0_Config3 = MIPS_CONFIG3 | (1U << CP0C3_M) | (1 << CP0C3_MSAP) |
+> +                       (1 << CP0C3_BP) | (1 << CP0C3_BI) | (1 << CP0C3_ULRI) |
+> +                       (1 << CP0C3_RXI) | (1 << CP0C3_LPA) | (1 << CP0C3_VInt),
+> +        .CP0_Config4 = MIPS_CONFIG4 | (1U << CP0C4_M) | (2 << CP0C4_IE) |
+> +                       (1 << CP0C4_AE) | (0x1c << CP0C4_KScrExist),
+> +        .CP0_Config4_rw_bitmask = 0,
+> +        .CP0_Config5 = MIPS_CONFIG5 | (1 << CP0C5_NFExists) | (1 << 18),
+> +        .CP0_Config5_rw_bitmask = (1 << CP0C5_K) | (1 << CP0C5_CV) |
+> +                                  (1 << CP0C5_MSAEn) | (1 << CP0C5_UFE) |
+> +                                  (1 << CP0C5_FRE) | (1 << CP0C5_SBRI),
+> +        .CP0_Config6 = (1 << CP0C6_VCLRU) | (1 << CP0C6_DCLRU) | (1 << CP0C6_SFBEN) |
+> +                       (1 << CP0C6_FLTINT) | (1 << CP0C6_INSTPREF) | (1 << CP0C6_DATAPREF),
+> +        .CP0_Config6_rw_bitmask = (1 << CP0C6_BPPASS) | (0x3f << CP0C6_KPOS) |
+> +                                  (1 << CP0C6_KE) | (1 << CP0C6_VTLBONLY) | (1 << CP0C6_LASX) |
+> +                                  (1 << CP0C6_SSEN) | (1 << CP0C6_DISDRTIME) |
+> +                                  (1 << CP0C6_PIXNUEN) | (1 << CP0C6_SCRAND) |
+> +                                  (1 << CP0C6_LLEXCEN) | (1 << CP0C6_DISVC) |
+> +                                  (1 << CP0C6_VCLRU) | (1 << CP0C6_DCLRU) |
+> +                                  (1 << CP0C6_PIXUEN) | (1 << CP0C6_DISBLKLYEN) |
+> +                                  (1 << CP0C6_UMEMUALEN) | (1 << CP0C6_SFBEN) |
+> +                                  (1 << CP0C6_FLTINT) | (1 << CP0C6_VLTINT) |
+> +                                  (1 << CP0C6_DISBTB) | (3 << CP0C6_STPREFCTL) |
+> +                                  (1 << CP0C6_INSTPREF) | (1 << CP0C6_DATAPREF),
+> +        .CP0_Config7 = 0,
+> +        .CP0_Config7_rw_bitmask = (1 << CP0C7_NAPCGEN) | (1 << CP0C7_UNIMUEN) | \
+> +                                  (1 << CP0C7_VFPUCGEN),
+> +        .CP0_LLAddr_rw_bitmask = 1,
+> +        .SYNCI_Step = 16,
+> +        .CCRes = 2,
+> +        .CP0_Status_rw_bitmask = 0x7DDBFFFF,
+> +        .CP0_PageGrain_rw_bitmask = (1U << CP0PG_RIE) | (1 << CP0PG_XIE) |
+> +                    (1 << CP0PG_ELPA) | (1 << CP0PG_IEC),
+> +        .CP1_fcr0 = (0x5 << FCR0_PRID) | (0x1 << FCR0_REV) | (0x1 << FCR0_F64),
+> +        .CP1_fcr31 = 0,
+> +        .CP1_fcr31_rw_bitmask = 0xFF83FFFF,
+> +        .SEGBITS = 48,
+> +        .PABITS = 48,
+> +        .insn_flags = CPU_LOONGSON3A,
+> +        .mmu_type = MMU_TYPE_R4000,
+> +    },
+> +    {
+>          /* A generic CPU providing MIPS64 DSP R2 ASE features.
+>             FIXME: Eventually this should be replaced by a real CPU model. */
+>          .name = "mips64dspr2",
+> 
 
