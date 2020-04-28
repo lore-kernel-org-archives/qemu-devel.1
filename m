@@ -2,119 +2,86 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8491CC83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:45:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B58B2C83007
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 10:01:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 394B7206A1
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:45:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F11D20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 10:01:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="FUYOdJ/7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 394B7206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NmT4pDfz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F11D20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTMnr-0007oT-BC
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 05:45:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33554)
+	id 1jTN3b-0007j0-FB
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 06:01:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39488)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTMXG-0005DO-LP
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:30:04 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jTN28-0006Cy-DE
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:00:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTMU6-0005wO-WC
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:28:13 -0400
-Received: from mail-vi1eur05on2133.outbound.protection.outlook.com
- ([40.107.21.133]:40320 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jTM1o-0008Vv-02; Tue, 28 Apr 2020 04:55:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bWIDCSDFj2RAjtHtv2B8vXC81IE+vwYb52kI6Q9+TVngDZRg/amndpApsGJKhQYybwXhuWhoF+SdAyTPIwuWOcAuj34sAbU5NXhjDY6C7DQtI7MYJLTi+LG3yrD0IohCoazmpf+/sKeTv5SPZI6CVj7DYh9cDq+EDjcgVYE3oZOVGK0F3ZB4uhnjsuv7fMAtaz5KCjJ7PbIacFFqjamudv0KCHn3sEtgnYx4j2TcMNdef2SIQDkunDoQyC095IWTUyL7fjOpLZMAxdf5iYuPnw+QV/5j/ZEONNGFYKXAGkN8AfVoOhbSUyT1IJGXu6os4WPxjvICnhRY/gSMgROChg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RXROdLAE+ybEt/RjCV1QzqpD37vS3gYZWuvhowhXe5s=;
- b=Zo6PbU4VAiu7xB0LZ0iFFJ6YEiKqFNt9nfprGyBPdIJuIAF5e8CsDQJEPJNiXMdobF0Rk27FnnxniMSC+8EYMyfCDMSa6Ip83AMg6g1cdEiuEAzkM8ulTG8FZmzeymxpgM8TfbUDoeeKkPCgaC0qCfObvEuKwH9CIRtjpsE/A/bthugntEOxLoHrWRfuzLJz65GjoO+IY8DTwIdi8hPrBCy98DC6EPmNjXdz390reglxOMU742OPFkFSyYhCQsnGwY1FKzphUK+Y4CzWd2MEgTg7VYAdn4TNSVdGoG/OErg05WYHh2u0NNWMYMLvGD5Es+copMdojDCAzUZT/i1lyQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RXROdLAE+ybEt/RjCV1QzqpD37vS3gYZWuvhowhXe5s=;
- b=FUYOdJ/7s1UKDNqQG87NINNUCpF7pleg5cpzD9ebRxM3fsEQKr4erjw4EvuOvPxyeWYFDYaKATeDGLpq3MJtZqOpsqWQ3JjaqJbZXHh1jgQCap9M7Bj/P4EgOeokSIfLAeeaNp0IyWq//M1lAVuCTGnW1fCrOGmBmMnKbm5gIkQ=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5304.eurprd08.prod.outlook.com (2603:10a6:20b:10e::21)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Tue, 28 Apr
- 2020 08:55:37 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.023; Tue, 28 Apr 2020
- 08:55:37 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: backing chain & block status & filters
-To: qemu block <qemu-block@nongnu.org>
-X-Tagtoolbar-Keys: D20200428115535240
-Message-ID: <a1c1b734-34dc-f8d3-b6a0-43b136e237e2@virtuozzo.com>
-Date: Tue, 28 Apr 2020 11:55:35 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM3PR04CA0128.eurprd04.prod.outlook.com (2603:10a6:207::12)
- To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <dgilbert@redhat.com>) id 1jTN1p-0001rW-8i
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:00:07 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35713
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jTN1o-0001qs-Q2
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:59:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588067986;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZcyZtfU/zatDdmCUBHIPNfLtscTtuJvfT8GvQbFjUoQ=;
+ b=NmT4pDfzSYYZJuy9CVXq5PKgV354AkHxOpZrWRCoxZrV8rWE8Z4/0x8Dzt4MrertGfkUpN
+ fT2aT/YXcVHF3EqCddWFYGbtQb3iUesLdSK8Zdr3U9leWxpd2RZfdUw2Po5nXqHcIH0DME
+ MyPVjzc/IfKJ7J3BEZh9S1hx1QWbeGE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-aWe9txyCNY2avmgeis0yKA-1; Tue, 28 Apr 2020 05:59:45 -0400
+X-MC-Unique: aWe9txyCNY2avmgeis0yKA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31A771895A34
+ for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 09:59:44 +0000 (UTC)
+Received: from work-vm (ovpn-113-77.ams2.redhat.com [10.36.113.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EEA4460C87;
+ Tue, 28 Apr 2020 09:59:37 +0000 (UTC)
+Date: Tue, 28 Apr 2020 10:59:35 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [PATCH] virtiofsd: Show submounts
+Message-ID: <20200428095935.GA2794@work-vm>
+References: <20200424133516.73077-1-mreitz@redhat.com>
+ <20200427175902.GM2923@work-vm>
+ <8aa9aea2-cc5d-f9b5-5cdb-b5e596ef89aa@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.155) by
- AM3PR04CA0128.eurprd04.prod.outlook.com (2603:10a6:207::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2937.13 via Frontend Transport; Tue, 28 Apr 2020 08:55:36 +0000
-X-Tagtoolbar-Keys: D20200428115535240
-X-Originating-IP: [185.215.60.155]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 71d2267b-cb63-4394-b2c8-08d7eb51eb1b
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5304:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5304916873197B4D41F2BE0EC1AC0@AM7PR08MB5304.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-Forefront-PRVS: 0387D64A71
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(346002)(136003)(366004)(396003)(39850400004)(66946007)(5660300002)(66476007)(66556008)(31686004)(36756003)(86362001)(31696002)(52116002)(478600001)(16526019)(4326008)(81156014)(2906002)(6916009)(8936002)(8676002)(107886003)(26005)(54906003)(956004)(2616005)(186003)(6486002)(316002)(16576012);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cCxlCjSOdHdUpfo3+FmLVhQpyf53t2MTE8Qe6rIFXK4yUSvY0bAcvAwYQKMLB0UySFJrWLRKfrb2B/6/kIVw4efUTh/kbvE0B1LzIjMnIpBa0t4u9gS1/6YczPVzEwshKX1ErEV9A9iXbHZbBIca5vB2VaclWC45xVJpE9SsNuKx9WzIxK6GBtDh9AFzr5vzlIKgsaXXWgixigFSrv3fQZMuRtDFE9CvC5HFPzhMu1G9wiewcaUEX6imbCb5eSaiLLQwYqRT9fWdbWOx1vJRsRT9HKqpbNh8JetsPtfRWC9CYzFuRckNzDgX5U8BBlTVWR7EEBTYjA6H4uURbB7ZZPog7ckg6vhnVGQImbQJWz1HazQkkDOQk6Bd5vq2IHXKsdE+ZPMfA/KQ2GpV9nX7Kj77LMl3nUsR36jECa8q31sMc6p4S1MOMvhkikz8QDJh
-X-MS-Exchange-AntiSpam-MessageData: Ko3ga3dAM+nxVcBVnPS1puY96CWPZYNW9/omOtbUoq7mXpuWhTuOW5dF6O9mS9Goa4CRiH74qutnndeh8gjC3Gf80d0UctMpLKcGBmwGBdoIf1sr/KltilQOeBPTT6BzsWNurYK3otYfhMMrGGg11QqYXveupNPdQHPNOL8MqqlK4bRwJdzgsSij9SMCyMiZJlTnIRbs5YQFHgCImNsT17+9ZvO5ZfMUIMmJmrBA6BgaMxYCw91/ghyKDDQ6IoxBiWPscJQdML+UtiGZsQLt9q8sNBqawocpsIeIqp+gHA6oGVRzMVdj9z9B4uI20V4Ln5qsHx7srL+NvGnzUrGDZHV/tXMPhnVJvsR1sPB1qTpJtPfUoOXY0g+3BmEvz6/36MVmb0lLJSftj/7+51hlzGzSyz5OOVEwz2fkLQbtrvwtSiCnUf7l7XxWNUIb9VqKq1+j1WEoeU+oHdOUgHUgOQvIyRJgfaxdqCyWM3Udcdr+4nmSsk3uNn9tZz8HYYYIrUPhgjCVqN4Qpf2V2Ot91CrIw1tKkqS/Yqr348191wRSX5Fmc2zzjJiZegGpvtdUbsUF9Nk4a7M4K8+xdigo7YvdJbK0IRul+HVh1EtQuG1alrIukH3qU+d5j6Fiai6544yKU5hvDq5O4mcF7mN0z41dwLc3ciOGveanw4U7RT/auDdu2K/Aqw567zInWZyi8GByDt21zZrY4GKvsplauhYEOadhi8a+cZQR5RiURn0y9U27xpyXIw1dRgTgSmFy/BWtfRa3psPZZQMqNLFcXG1eZinouaASiJfx4PGRNkY=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 71d2267b-cb63-4394-b2c8-08d7eb51eb1b
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2020 08:55:37.4554 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: olZ5GpFW/ltvwvAQMwCcriGCy2hFf9N0Fa4TgjcVRKIdriuZizN7VfA85MH4q9EpxdJTpB6DdXrsg1fUhijQ3ZYL9gsk0wgNmJmQAGgGO8A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5304
-Received-SPF: pass client-ip=40.107.21.133;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:55:40
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.21.133
+In-Reply-To: <8aa9aea2-cc5d-f9b5-5cdb-b5e596ef89aa@redhat.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 02:06:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,71 +93,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi!
+* Max Reitz (mreitz@redhat.com) wrote:
+> On 27.04.20 19:59, Dr. David Alan Gilbert wrote:
+> > * Max Reitz (mreitz@redhat.com) wrote:
+> >> Currently, setup_mounts() bind-mounts the shared directory without
+> >> MS_REC.  This makes all submounts disappear.
+> >>
+> >> Pass MS_REC so that the guest can see submounts again.
+> >=20
+> > Thanks!
+> >=20
+> >> Fixes: 3ca8a2b1c83eb185c232a4e87abbb65495263756
+> >=20
+> > Should this actually be 5baa3b8e95064c2434bd9e2f312edd5e9ae275dc ?
+>=20
+> Well, I bisected it and landed at 3ca8a2b1.  So while the problematic
+> line may have been introduced by 5baa3b8e, it wasn=E2=80=99t used until 3=
+ca8a2b1.
 
-I wanted to resend my "[PATCH 0/4] fix & merge block_status_above and is_allocated_above", and returned to all the inconsistencies about block-status. I keep in mind Max's series about child-access functions, and Andrey's work about using COR filter in block-stream, which depends on Max's series (because, without them COR fitler with file child breaks backing chains).. And, it seems that it's better to discuss some questions before resending.
+OK, I'd rather stick with the Fixes: for the patch that was actually
+wrong.
 
-First, problems about block-status:
+> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >> ---
+> >>  tools/virtiofsd/passthrough_ll.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passth=
+rough_ll.c
+> >> index 4c35c95b25..9d7f863e66 100644
+> >> --- a/tools/virtiofsd/passthrough_ll.c
+> >> +++ b/tools/virtiofsd/passthrough_ll.c
+> >> @@ -2643,7 +2643,7 @@ static void setup_mounts(const char *source)
+> >>      int oldroot;
+> >>      int newroot;
+> >> =20
+> >> -    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
+> >> +    if (mount(source, source, NULL, MS_BIND | MS_REC, NULL) < 0) {
+> >>          fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", source=
+, source);
+> >>          exit(1);
+> >>      }
+> >=20
+> > Do we want MS_SLAVE to pick up future mounts that might happenf rom the
+> > host?
+>=20
+> Hm.  So first it looks to me from the man page like one shouldn=E2=80=99t=
+ give
+> MS_SLAVE on the first mount() call but kind of only use it for remounts
+> (in the list at the start, =E2=80=9CCreate a bind mount=E2=80=9D is separ=
+ate from
+> =E2=80=9CChange the propagation type of an existing mount=E2=80=9D, and t=
+he man page
+> later says =E2=80=9CThe only other flags that can be specified while chan=
+ging
+> the propagation type are MS_REC (described below) and MS_SILENT (which
+> is ignored).=E2=80=9D).
+>=20
+> Second, even if I do change the propagation type to MS_SLAVE in a second
+> call, mounts done after qemu has been started don=E2=80=99t show up in th=
+e guest
+> (for me).
+>=20
+> So while it sounds correct, I can=E2=80=99t see it having an effect, actu=
+ally.
 
-1. We consider ALLOCATED = ZERO | DATA, and documented as follows:
+That's unfortunate; but I guess we can debug that separately
 
-    * BDRV_BLOCK_DATA: allocation for data at offset is tied to this layer
-    * BDRV_BLOCK_ZERO: offset reads as zero
-    * BDRV_BLOCK_OFFSET_VALID: an associated offset exists for accessing raw data
-    * BDRV_BLOCK_ALLOCATED: the content of the block is determined by this
-    *                       layer rather than any backing, set by block layer
+> > What's the interaction between this and the MS_REC|MS_SLAVE that we hav=
+e
+> > a few lines above for / ?
+>=20
+> Good question.  It would seem to me that there isn=E2=80=99t any.  That p=
+revious
+> mount call just sets MS_REC | MS_SLAVE for the whole mount namespace,
+> and then we do a new mount here (by default from / to /) that needs its
+> own flags.
+>=20
+> (More interesting is perhaps why we have that other mount() call below,
+> which again sets MS_REC | MS_SLAVE for the old (not-yet-bind-mounted) /.
+>  I can=E2=80=99t imagine that to have any effect.)
 
-This actually means, that we should always have BDRV_BLOCK_ALLOCATED for formats which doesn't support backing. So, all such format drivers must return ZERO or DATA (or both?), yes?. Seems file-posix does so, but, for example, iscsi - doesn't.
+Is that just trying to be careful before the umount2 so it doesn't try
+to unmount something useful?
 
-2. ZERO. The meaning differs a bit for generic block_status and for drivers.. I think, we at least should document it like this:
+Dave
 
-BDRV_BLOCK_DATA: allocation for data at offset is tied to this layer
-BDRV_BLOCK_ZERO: if driver return ZERO, than the region is allocated at this layer and read as ZERO. If generic block_status returns ZERO, it only mean that it reads as zero, but the region may be allocated on underlying level.
+> Max
+>=20
 
-3. bdi.unallocated_blocks_are_zero
 
-I think it's very bad, that we have formats, that supports backing, but doesn't report bdi.unallocated_blocks_are_zero as true. It means that UNALLOCATED region reads as zero if we have short backing file, and not as zero if we remove this short backing file. I can live with it but this is weird logic. These bad drivers are qcow (not qcow2), parallels and vmdk. I hope, they actually just forget to set unallocated_blocks_are_zero to true.
 
-Next. But what about drivers which doesn't support backing? As we considered above, they should always return ZERO or DATA, as everything is allocated in this backing-chain level (last level, of course).. So again unallocated_blocks_are_zero is meaningless. So, I think, that driver which doesn't support backings, should be fixed to return always ZERO or DATA, than we don't need this unallocated_blocks_are_zero at all.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-3. Short backing files in allocated_above: we must consider space after EOF as ALLOCATED, if short backing file is inside requested backing-chain part, as it produced exactly because of this short file (and we never go to backing). (current realization of allocated_above is buggy, see my outdated series "[PATCH 0/4] fix & merge block_status_above and is_allocated_above")
-
-4. Long ago we've discussed problems about BDRV_BLOCK_RAW, when we have a backing chain of non-backing child.. I just remember that we didn't reach the consensus.
-
-5. Filters.. OK we have two functions for them: bdrv_co_block_status_from_file and bdrv_co_block_status_from_backing. I think both are wrong:
-
-bdrv_co_block_status_from_file leads to problem [4], when we can report UNALLOCATED, which refers not to the current backing chain, but to sub backing chain of file child, which is inconsistent with block_status_above and is_allocated_above iteration.
-
-bdrv_co_block_status_from_backing is also is not consistent with block_status_above iteration.. At least at leads to querying the same node twice.
-
-=================
-
-So, about filters and backing chains. Keeping (OK, just, trying to keep) all these things in mind, I think that it's better to keep backing chains exactly *backing* chains, so that "backing" child is the only "not own" child of the node. So, its close to current behavior and we don't need child-access functions. Then how filters should work:
-
-Filter with backing child, should always return UNALLOCATED (i.e. no DATA, no ZERO), it is honest: everything is on the other level of backing chain.
-
-Filter with file child should always return BDRV_BLOCK_DATA | BDRV_BLOCK_RECURSE, to show that:
-1. everything is allocated in *this* level of backing chain
-2. filter is too lazy to dig in it's file child (and, maybe the whole sub-tree of it) and asks generic layer to do it by itself, if it wants zeroes.
-
-Then, of course, if we want some filter to be inside backing chain, it should have not "file" child but "backing". For this, we may support in current public filter both variants: backing or file, as user prefer. I.e., filter is opened either with file option or with backing and operate correspondingly. And newer filters (like backup-top) may support only backing variants.
-
-=================
-
-So, I propose to complicate a bit code of old file-based filters, to support backing child (which may be done on demand, when needed. For example, Virtuozzo now need only COR filter (and only to satisfy iotests, actually)), and keep generic code about block-status and handling backing-chains simpler (and simpler to document).
-
-Another benefit is that block-graph is already visible through QAPI, and it would be good to keep backing link meaning, not adding the thing that for filters "file" link behaves as "backing".
-
-So again, I'm for limiting backing-behavior to bs->backing child only (as it currently behaves). What do you think?
-
--- 
-Best regards,
-Vladimir
 
