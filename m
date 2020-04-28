@@ -7,77 +7,75 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A4EAC83007
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 167CEC83000
 	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 07:58:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 134C7206A5
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 07:58:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE7AB2053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 07:58:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPWfLkgA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 134C7206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ij1xZWAo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE7AB2053B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTL8c-0007fc-6W
+	id 1jTL8b-0007eP-VV
 	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 03:58:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45750)
+Received: from eggs.gnu.org ([209.51.188.92]:45744)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTL5d-0006AA-IE
+ id 1jTL5d-0006A8-5f
  for qemu-devel@nongnu.org; Tue, 28 Apr 2020 03:57:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTL1c-0002Qr-FB
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 03:55:37 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41392)
+ id 1jTL1a-0002Ku-6w
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 03:55:36 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36147)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTKwp-0007gK-8F; Tue, 28 Apr 2020 03:46:31 -0400
-Received: by mail-wr1-x442.google.com with SMTP id g13so23418833wrb.8;
- Tue, 28 Apr 2020 00:46:30 -0700 (PDT)
+ id 1jTKwb-0007e7-I2; Tue, 28 Apr 2020 03:46:17 -0400
+Received: by mail-wr1-x443.google.com with SMTP id d15so21803105wrx.3;
+ Tue, 28 Apr 2020 00:46:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=q7g9YFbPCEBfb2q6ljExc4tNJelo4z+8tGtUokQsLSk=;
- b=BPWfLkgAoNPJ5NXyJyGsTemFCNhiyYQSXGgR6V0zw0+uhHW7NidduMUOJzlbLMLyPs
- FlilpxipEa4rGFOaK5yNbnsBGXKgXN0hWj8yXqqUzgv7gu60PMkX9I2Yhf1MvfWsIEfz
- Bag0zq0r3QvTAgSj8vqxcgjmimcsupmor/76T/hId/pnLDu88RATWHaeYMNqhYapconr
- iZHNDxgmMJ0fqWgUvOaBNptUs4XwbEWt0ypEcue8bjS+dnjnNGy7JwLCRNyCGjfr9IxD
- 6YR8jrO2pDyXrlUzylt6AQ2Fca975DBJOd/1T8esyCnfdnf0zbXy851PSgJiMm8F/Z5R
- kNhg==
+ bh=IiCmi3gnLXnh9qqh5SktG6taFgc0wMvCmCpUJaLx16Q=;
+ b=ij1xZWAoThDbPF82cYrzoVl2fWa1BCrpruAPyHehHVau+19zxuC7890n77NUx2OAfV
+ c9ZVY7wVT5MHljQIAQ6ymi1jjRiklJ2WBKqTc0K467AQLmHl40+B1z07p01dwcqfMUbt
+ nVgIhbbbrDldObkGX5wfVCqpoEIfht7ATF4zPtin3X3g7cuOz2eB2L3IvZCxLy93hdrP
+ s20abzu3OCAFx+ZtwuXPVpneX7HTBSugORfxk6DHcKIaHfOMd53Zi7WuApjlAbVzIJ0a
+ fPYX32paKHq0TNoDMS+LUdFxU5mdm4QKjPBBoFIbVvp+QNUwAXAKDcbe/2tqy5tQBfig
+ /y0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=q7g9YFbPCEBfb2q6ljExc4tNJelo4z+8tGtUokQsLSk=;
- b=j0OxeJ4/KMz9gk2snjOFJjxXV/TMkDpcImDCqiKMj7ZqBSCu4g6SmGeFvHJPJT7UpE
- jlskBcQiIn//8tX/AsSy94UPeLePexIImDUJEHtoQaDYcNstXkzbrbp9mMSlnz17dwZ7
- AK+GrFwzArBIbJnD+++1/jLbxFj5byor0OHw7YvWnhSh7TjHPWaQpXlsJ+mVOrty2f/J
- S+hGxArvzl2+KqPItF8WBA5Lvi7cfMkTnm62VNTKdOQvqBr/20IlnepXFMKgeopIET9H
- KCdZzxFGneZyOFIYn/O7CoTvAMitYcq7o7J6E2lZuEqIw/Z5id8Zmeuzs9smnQzltEdK
- QR8w==
-X-Gm-Message-State: AGi0Puahon8VmhF/SxPFFU0WwMftifJxB2Q+DIhlAnWIqnynYbKerKmV
- nJED7EXcq3Q7gyvAdPT8GKQ=
-X-Google-Smtp-Source: APiQypJawROjiHEARpfp0kXiF82Rb/NCApJzgCOS5fB/R2IsMFMc+LjH7Lnnc/Gian8Z8dwuGq69Ug==
-X-Received: by 2002:a05:6000:10c4:: with SMTP id
- b4mr32394075wrx.203.1588059989671; 
- Tue, 28 Apr 2020 00:46:29 -0700 (PDT)
+ bh=IiCmi3gnLXnh9qqh5SktG6taFgc0wMvCmCpUJaLx16Q=;
+ b=am61547DW4OywH+NuFS5mN79MlJu/olhS9344Ihd1kpSWKOz7DlqE2CCNPKhjhfnpu
+ APIwtFiKON63vRArwPfggg/RuBnxu2BTcMfYmd+H6wEewhfdWtN7U08b7mv0cFxSVsWw
+ gGjgPkkTODgPc26L0LiZ9rqmjWBsQw7/k6JkLF8zaLC09fg+VE/OftWFMxp3yRJqdSev
+ fmBDfpJMcEX7cJ0v68np7MFCPrQIhyp1eK7sxP8nH+rseXtI29nj64qLNRHS+rxGLdiP
+ cX6lI3XZG13orjsuJi5aZ2uNvCADezCatKz4sFk1uVXh+ibNXeYXCctDjQV/aKv2Mqsi
+ 4IMw==
+X-Gm-Message-State: AGi0Pua7WWqIE9nqdNZoNUXwABDtQv5MgqKlTVNRm7Bi2AmdV1kU9yJE
+ yMIr/shFH1GXtIRmjY0Kvxg=
+X-Google-Smtp-Source: APiQypJapOMYClJ2UWMZtR/iiZfUOWzUZ/0TLevhro7UmG/lZFF04wLQve1R8rHLGiOMS0RIxquczQ==
+X-Received: by 2002:adf:f884:: with SMTP id u4mr31105349wrp.171.1588059975401; 
+ Tue, 28 Apr 2020 00:46:15 -0700 (PDT)
 Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.137])
- by smtp.gmail.com with ESMTPSA id z1sm2196255wmf.15.2020.04.28.00.46.27
+ by smtp.gmail.com with ESMTPSA id f8sm24315068wrm.14.2020.04.28.00.46.13
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 28 Apr 2020 00:46:29 -0700 (PDT)
-Subject: Re: [PATCH v1 03/11] hw/arm: versal-virt: Fix typo xlnx-ve ->
- xlnx-versal
+ Tue, 28 Apr 2020 00:46:14 -0700 (PDT)
+Subject: Re: [PATCH v1 02/11] hw/arm: versal: Move misplaced comment
 To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
 References: <20200427181649.26851-1-edgar.iglesias@gmail.com>
- <20200427181649.26851-4-edgar.iglesias@gmail.com>
+ <20200427181649.26851-3-edgar.iglesias@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Autocrypt: addr=f4bug@amsat.org; keydata=
  mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
@@ -102,21 +100,21 @@ Autocrypt: addr=f4bug@amsat.org; keydata=
  K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
  n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
  CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <524b9d39-930e-6596-87de-bc36321ffe6c@amsat.org>
-Date: Tue, 28 Apr 2020 09:46:27 +0200
+Message-ID: <96c06a2f-bda9-b74b-5f2b-818f32e2a790@amsat.org>
+Date: Tue, 28 Apr 2020 09:46:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200427181649.26851-4-edgar.iglesias@gmail.com>
+In-Reply-To: <20200427181649.26851-3-edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -140,26 +138,33 @@ Sender: "Qemu-devel"
 On 4/27/20 8:16 PM, Edgar E. Iglesias wrote:
 > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 > 
-> Fix typo xlnx-ve -> xlnx-versal.
+> Move misplaced comment.
 > 
 > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 > ---
->  hw/arm/xlnx-versal-virt.c | 2 +-
+>  hw/arm/xlnx-versal.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
-> index 878a275140..8a608074d1 100644
-> --- a/hw/arm/xlnx-versal-virt.c
-> +++ b/hw/arm/xlnx-versal-virt.c
-> @@ -440,7 +440,7 @@ static void versal_virt_init(MachineState *machine)
->          psci_conduit = QEMU_PSCI_CONDUIT_SMC;
->      }
+> diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
+> index c73b2fe755..cc696e44c0 100644
+> --- a/hw/arm/xlnx-versal.c
+> +++ b/hw/arm/xlnx-versal.c
+> @@ -36,7 +36,6 @@ static void versal_create_apu_cpus(Versal *s)
 >  
-> -    sysbus_init_child_obj(OBJECT(machine), "xlnx-ve", &s->soc,
-> +    sysbus_init_child_obj(OBJECT(machine), "xlnx-versal", &s->soc,
->                            sizeof(s->soc), TYPE_XLNX_VERSAL);
->      object_property_set_link(OBJECT(&s->soc), OBJECT(machine->ram),
->                               "ddr", &error_abort);
+>          obj = object_new(XLNX_VERSAL_ACPU_TYPE);
+>          if (!obj) {
+> -            /* Secondary CPUs start in PSCI powered-down state */
+>              error_report("Unable to create apu.cpu[%d] of type %s",
+>                           i, XLNX_VERSAL_ACPU_TYPE);
+>              exit(EXIT_FAILURE);
+> @@ -49,6 +48,7 @@ static void versal_create_apu_cpus(Versal *s)
+>          object_property_set_int(obj, s->cfg.psci_conduit,
+>                                  "psci-conduit", &error_abort);
+>          if (i) {
+> +            /* Secondary CPUs start in PSCI powered-down state */
+>              object_property_set_bool(obj, true,
+>                                       "start-powered-off", &error_abort);
+>          }
 > 
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
