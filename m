@@ -2,87 +2,120 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6009EC83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:55:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C2CC83008
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:56:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E231206B9
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:55:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0942206D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:56:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I3wN164U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E231206B9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g2zQh373"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0942206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTM1A-00069D-0e
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 04:55:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51578)
+	id 1jTM2h-0000U1-S8
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 04:56:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53190)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zltjiangshi@gmail.com>) id 1jTLsj-0004wJ-W3
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:47:07 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jTLw3-00032U-OS
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:51:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <zltjiangshi@gmail.com>) id 1jTLrm-0002Ek-Ca
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:46:21 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:45985)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jTLvF-0004YM-PJ
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:49:47 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33671)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1jTLZZ-0002DB-IW
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:26:33 -0400
-Received: by mail-lf1-x141.google.com with SMTP id f8so16176052lfe.12
- for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 01:26:33 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jTKyh-0008AR-40; Tue, 28 Apr 2020 03:48:27 -0400
+Received: by mail-wm1-x343.google.com with SMTP id v8so1650816wma.0;
+ Tue, 28 Apr 2020 00:48:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=/pxSPH3uzHb6jb5WZ5jbgxdZGc5cFMsWzvcqeAua4jA=;
- b=I3wN164UGKYFtOjGkFs4OQQyrF17c826wLfQofQDG62Dnf8PY4LfgeN3+L2nHByz4a
- LXsbFNn6THJbGcbKz3ReFrTWu1SI3u+sa/svoqzc5bh6nMgdaLr/mRy0jtsB1sUnqnLs
- iO7pv3PueGvCsmUpAWbZho/Tyr+1K8DXU0VtIRQtvzkN/RtNkCwTkraCuanY6ipdZGtp
- ukz+UlPULYtTfbj9jdh9clsP6adb7dENRvRwxCO8VLQouKSPSN/a+kpzZ954SD4XrvAb
- xjaefIqEw8x2DQPy3MwJdykKXCRgAlDY/BKtdkBFRMZAKgbYT3vzjtYYWtlEvTeNzEsl
- tZ2Q==
+ h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=tXtUX+4HU5O6O3aW9+EvxcIT8n5DFd6Hbo5TC8dBG3E=;
+ b=g2zQh373DvieWOQ5YWPC0pMzFCObYUlUBY5Wia0nmrY0WRUM2TziUVu5Ku3/1sk8ss
+ Gidwo2b+zTN90On1DQekxW+DQijEY/yErAync9ZIRBRAxS6Gn170XeB/J3jUSsRnEpX9
+ uEY6fCmJXk4KAq6qOp1rkZQp46r+Xw/th8RQdJ13WMBG4grjJldhCe/85yHxkDcP3I/l
+ iiq0O7/SkWbb2reH5QKvr/5p8FYruV20KzKEa9q2gaHYzf7Gml4k7O8RipmkIcIp6EC/
+ 1nAnAc5mRC/4egmhRG9MzE6jJoN/LFp7UNGotGim7exsI0gharsULUi7J0E+yl61xGL2
+ xMjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=/pxSPH3uzHb6jb5WZ5jbgxdZGc5cFMsWzvcqeAua4jA=;
- b=O6Lm3VNYlb6iCPn/SqBhdIPPXa1jPjvnlNPrk/a2RmASolrqLjTX91N7MmK08s+MzY
- YZkgiIL+y3ya2LfqE75M2EXHK6/uvM3xgabjLolnp79hXwS3KfhLfQ/M/nGY5H2s1XEw
- VmxBikokjm/9pua9nLUSmIj9CLFCy5go7ZIFUA1A3TBfmviExkFiYRt/w4dhKawzbdbZ
- mBpqIk4vj/kvCSmJfVxf6EqX5VXhqKqNic7AM1xU+uGodLeOEr+VcOOzEyGMyxhRofXx
- il+9j8d2U8E9K0iBjRZa/TAZynAlGgr+rTqOOz+UU+6F5sCYPFeHP0xqX1X4yXBuE9qU
- +f+A==
-X-Gm-Message-State: AGi0PuZQmXJ/tefUrmM5y4L7QFPjZ/bX22KCakw0kVEY1NcGxmGylcqh
- G13ARr+l9/PHgDupFyVVKknx8Z7DMFsjvw1QuWE=
-X-Google-Smtp-Source: APiQypJalbv40M7p2g3OzASYHJvPPMdZYk9bWuE+27giz1/B7T/hX4PWAf87wUSdknVPxKKEtsmhat36aewbtEaioc4=
-X-Received: by 2002:a19:dcc:: with SMTP id 195mr18393552lfn.193.1588062391180; 
- Tue, 28 Apr 2020 01:26:31 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=tXtUX+4HU5O6O3aW9+EvxcIT8n5DFd6Hbo5TC8dBG3E=;
+ b=f5BlIv7/Lkr/p6VKpbyy5huJhCDiqFOI/rXFi2ldlQ0ol0N6zNe8QrWqk1mv1Zf4kA
+ 543O1WyA5BigEOcGOoHLpF6tjsO6DOknzcy9C4JMIQFWpT4dwPFrFbVguo8aR69zIkUa
+ TI2t+1o6ThqO+jm+P7DXcBYVluEVoE4tE3O7md17iXVWPNsTQ0rg0pDGjoDc/Mc6gSBr
+ R7EFrvPY7TzOQDP2pZoCHT55xi/7QxCryySqlO3sOIL54likECabq/g2Jx2Ivvwrpg7e
+ 7Q2zHyFlx7pCXZ8EeXmqNNg52chjI2Tm8sUHXPmlljNExbJHQFGJ7Mur7KU7HBaYxU/w
+ Xelw==
+X-Gm-Message-State: AGi0PuaXcQ6aeOOWQq9aQ9QFgpnPhqNsnacRENy7d57qUTAiDmdYJ32i
+ rv1dUGTtV8LGlC2v6ftVkQE=
+X-Google-Smtp-Source: APiQypJW6w24MZ8IN9rkO9EB2LG9xbMmUvuzQGaYbROoagN4Gl78xCMqZGJJy2AFB3vyTPwtOVTRhg==
+X-Received: by 2002:a05:600c:2341:: with SMTP id
+ 1mr2924988wmq.153.1588060105311; 
+ Tue, 28 Apr 2020 00:48:25 -0700 (PDT)
+Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.137])
+ by smtp.gmail.com with ESMTPSA id 60sm25128908wrr.7.2020.04.28.00.48.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 28 Apr 2020 00:48:23 -0700 (PDT)
+Subject: Re: [PATCH v1 05/11] hw/arm: versal: Embedd the GEMs into the SoC type
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
+References: <20200427181649.26851-1-edgar.iglesias@gmail.com>
+ <20200427181649.26851-6-edgar.iglesias@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <690a9a61-0385-b804-1370-64268384d7ef@amsat.org>
+Date: Tue, 28 Apr 2020 09:48:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
- <1587979995-17717-4-git-send-email-chenhc@lemote.com>
- <c1a3aec6-dc45-3484-3a70-c06449bee609@amsat.org>
-In-Reply-To: <c1a3aec6-dc45-3484-3a70-c06449bee609@amsat.org>
-From: chen huacai <zltjiangshi@gmail.com>
-Date: Tue, 28 Apr 2020 16:34:00 +0800
-Message-ID: <CABDp7Vq-YX0LWU3iM=oygpcKzoS8cmXG6mvTQ5Gm_PbQsQMAgw@mail.gmail.com>
-Subject: Re: [PATCH for-5.1 4/7] target/mips: Add Loongson-3 CPU definition
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::141;
- envelope-from=zltjiangshi@gmail.com; helo=mail-lf1-x141.google.com
+In-Reply-To: <20200427181649.26851-6-edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::141
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,237 +127,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- qemu-level <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
+ frasse.iglesias@gmail.com, alistair@alistair23.me,
+ richard.henderson@linaro.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
+ philmd@redhat.com, luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Philippe,
+On 4/27/20 8:16 PM, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> 
+> Embedd the GEMs into the SoC type.
+> 
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
+>  hw/arm/xlnx-versal.c         | 15 ++++++++-------
+>  include/hw/arm/xlnx-versal.h |  3 ++-
+>  2 files changed, 10 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
+> index dbde03b7e6..e424aa789e 100644
+> --- a/hw/arm/xlnx-versal.c
+> +++ b/hw/arm/xlnx-versal.c
+> @@ -170,25 +170,26 @@ static void versal_create_gems(Versal *s, qemu_irq *pic)
+>          DeviceState *dev;
+>          MemoryRegion *mr;
+>  
+> -        dev = qdev_create(NULL, "cadence_gem");
+> -        s->lpd.iou.gem[i] = SYS_BUS_DEVICE(dev);
+> -        object_property_add_child(OBJECT(s), name, OBJECT(dev), &error_fatal);
+> +        sysbus_init_child_obj(OBJECT(s), name,
+> +                              &s->lpd.iou.gem[i], sizeof(s->lpd.iou.gem[i]),
+> +                              TYPE_CADENCE_GEM);
+> +        dev = DEVICE(&s->lpd.iou.gem[i]);
+>          if (nd->used) {
+>              qemu_check_nic_model(nd, "cadence_gem");
+>              qdev_set_nic_properties(dev, nd);
+>          }
+> -        object_property_set_int(OBJECT(s->lpd.iou.gem[i]),
+> +        object_property_set_int(OBJECT(dev),
+>                                  2, "num-priority-queues",
+>                                  &error_abort);
+> -        object_property_set_link(OBJECT(s->lpd.iou.gem[i]),
+> +        object_property_set_link(OBJECT(dev),
+>                                   OBJECT(&s->mr_ps), "dma",
+>                                   &error_abort);
+>          qdev_init_nofail(dev);
+>  
+> -        mr = sysbus_mmio_get_region(s->lpd.iou.gem[i], 0);
+> +        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
+>          memory_region_add_subregion(&s->mr_ps, addrs[i], mr);
+>  
+> -        sysbus_connect_irq(s->lpd.iou.gem[i], 0, pic[irqs[i]]);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[irqs[i]]);
+>          g_free(name);
+>      }
+>  }
+> diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
+> index a3dfd064b3..01da736a5b 100644
+> --- a/include/hw/arm/xlnx-versal.h
+> +++ b/include/hw/arm/xlnx-versal.h
+> @@ -16,6 +16,7 @@
+>  #include "hw/arm/boot.h"
+>  #include "hw/intc/arm_gicv3.h"
+>  #include "hw/char/pl011.h"
+> +#include "hw/net/cadence_gem.h"
+>  
+>  #define TYPE_XLNX_VERSAL "xlnx-versal"
+>  #define XLNX_VERSAL(obj) OBJECT_CHECK(Versal, (obj), TYPE_XLNX_VERSAL)
+> @@ -51,7 +52,7 @@ typedef struct Versal {
+>  
+>          struct {
+>              PL011State uart[XLNX_VERSAL_NR_UARTS];
+> -            SysBusDevice *gem[XLNX_VERSAL_NR_GEMS];
+> +            CadenceGEMState gem[XLNX_VERSAL_NR_GEMS];
+>              SysBusDevice *adma[XLNX_VERSAL_NR_ADMAS];
+>          } iou;
+>      } lpd;
+> 
 
-On Tue, Apr 28, 2020 at 2:34 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
->
-> Hi Huacai,
->
-> On 4/27/20 11:33 AM, Huacai Chen wrote:
-> > Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
-> > R1/R2. Loongson-3A R4 is the newest and its ISA is almost the superset
-> > of all others. To reduce complexity, we just define a "Loongson-3A" CPU
-> > which is corresponding to Loongson-3A R4. Loongson-3A has CONFIG6 and
-> > CONFIG7, so add their bit-fields as well.
->
-> Is there a public datasheet for R4? (If possible in English).
-I'm sorry that we only have Chinese datasheet in www.loongson.cn.
-
->
-> >
-> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > ---
-> >  target/mips/cpu.h                | 28 ++++++++++++++++++++++
-> >  target/mips/internal.h           |  2 ++
-> >  target/mips/mips-defs.h          |  7 ++++--
-> >  target/mips/translate.c          |  2 ++
-> >  target/mips/translate_init.inc.c | 51 ++++++++++++++++++++++++++++++++=
-++++++++
-> >  5 files changed, 88 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> > index 94d01ea..0b3c987 100644
-> > --- a/target/mips/cpu.h
-> > +++ b/target/mips/cpu.h
-> > @@ -940,7 +940,35 @@ struct CPUMIPSState {
-> >  #define CP0C5_UFR          2
-> >  #define CP0C5_NFExists     0
-> >      int32_t CP0_Config6;
-> > +    int32_t CP0_Config6_rw_bitmask;
-> > +#define CP0C6_BPPASS          31
-> > +#define CP0C6_KPOS            24
-> > +#define CP0C6_KE              23
-> > +#define CP0C6_VTLBONLY        22
-> > +#define CP0C6_LASX            21
-> > +#define CP0C6_SSEN            20
-> > +#define CP0C6_DISDRTIME       19
-> > +#define CP0C6_PIXNUEN         18
-> > +#define CP0C6_SCRAND          17
-> > +#define CP0C6_LLEXCEN         16
-> > +#define CP0C6_DISVC           15
-> > +#define CP0C6_VCLRU           14
-> > +#define CP0C6_DCLRU           13
-> > +#define CP0C6_PIXUEN          12
-> > +#define CP0C6_DISBLKLYEN      11
-> > +#define CP0C6_UMEMUALEN       10
-> > +#define CP0C6_SFBEN           8
-> > +#define CP0C6_FLTINT          7
-> > +#define CP0C6_VLTINT          6
-> > +#define CP0C6_DISBTB          5
-> > +#define CP0C6_STPREFCTL       2
-> > +#define CP0C6_INSTPREF        1
-> > +#define CP0C6_DATAPREF        0
-> >      int32_t CP0_Config7;
-> > +    int64_t CP0_Config7_rw_bitmask;
-> > +#define CP0C7_NAPCGEN       2
-> > +#define CP0C7_UNIMUEN       1
-> > +#define CP0C7_VFPUCGEN      0
-> >      uint64_t CP0_LLAddr;
-> >      uint64_t CP0_MAAR[MIPS_MAAR_MAX];
-> >      int32_t CP0_MAARI;
-> > diff --git a/target/mips/internal.h b/target/mips/internal.h
-> > index 1bf274b..7853cb1 100644
-> > --- a/target/mips/internal.h
-> > +++ b/target/mips/internal.h
-> > @@ -36,7 +36,9 @@ struct mips_def_t {
-> >      int32_t CP0_Config5;
-> >      int32_t CP0_Config5_rw_bitmask;
-> >      int32_t CP0_Config6;
-> > +    int32_t CP0_Config6_rw_bitmask;
-> >      int32_t CP0_Config7;
-> > +    int32_t CP0_Config7_rw_bitmask;
-> >      target_ulong CP0_LLAddr_rw_bitmask;
-> >      int CP0_LLAddr_shift;
-> >      int32_t SYNCI_Step;
-> > diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-> > index a831bb4..c2c96db 100644
-> > --- a/target/mips/mips-defs.h
-> > +++ b/target/mips/mips-defs.h
-> > @@ -51,8 +51,9 @@
-> >   */
-> >  #define INSN_LOONGSON2E   0x0001000000000000ULL
-> >  #define INSN_LOONGSON2F   0x0002000000000000ULL
-> > -#define INSN_VR54XX       0x0004000000000000ULL
-> > -#define INSN_R5900        0x0008000000000000ULL
-> > +#define INSN_LOONGSON3A   0x0004000000000000ULL
-> > +#define INSN_VR54XX       0x0008000000000000ULL
-> > +#define INSN_R5900        0x0010000000000000ULL
-> >  /*
-> >   *   bits 56-63: vendor-specific ASEs
-> >   */
-> > @@ -94,6 +95,8 @@
-> >  /* Wave Computing: "nanoMIPS" */
-> >  #define CPU_NANOMIPS32  (CPU_MIPS32R6 | ISA_NANOMIPS32)
-> >
-> > +#define CPU_LOONGSON3A  (CPU_MIPS64R2 | INSN_LOONGSON3A)
-> > +
-> >  /*
-> >   * Strictly follow the architecture standard:
-> >   * - Disallow "special" instruction handling for PMON/SPIM.
-> > diff --git a/target/mips/translate.c b/target/mips/translate.c
-> > index 25b595a..2caf4cb 100644
-> > --- a/target/mips/translate.c
-> > +++ b/target/mips/translate.c
-> > @@ -31206,7 +31206,9 @@ void cpu_state_reset(CPUMIPSState *env)
-> >      env->CP0_Config5 =3D env->cpu_model->CP0_Config5;
-> >      env->CP0_Config5_rw_bitmask =3D env->cpu_model->CP0_Config5_rw_bit=
-mask;
-> >      env->CP0_Config6 =3D env->cpu_model->CP0_Config6;
-> > +    env->CP0_Config6_rw_bitmask =3D env->cpu_model->CP0_Config6_rw_bit=
-mask;
-> >      env->CP0_Config7 =3D env->cpu_model->CP0_Config7;
-> > +    env->CP0_Config7_rw_bitmask =3D env->cpu_model->CP0_Config7_rw_bit=
-mask;
-> >      env->CP0_LLAddr_rw_bitmask =3D env->cpu_model->CP0_LLAddr_rw_bitma=
-sk
-> >                                   << env->cpu_model->CP0_LLAddr_shift;
-> >      env->CP0_LLAddr_shift =3D env->cpu_model->CP0_LLAddr_shift;
-> > diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_i=
-nit.inc.c
-> > index 6d145a9..a32412d 100644
-> > --- a/target/mips/translate_init.inc.c
-> > +++ b/target/mips/translate_init.inc.c
-> > @@ -802,6 +802,57 @@ const mips_def_t mips_defs[] =3D
-> >          .mmu_type =3D MMU_TYPE_R4000,
-> >      },
-> >      {
-> > +        .name =3D "Loongson-3A",
-> > +        .CP0_PRid =3D 0x14C000,
-> > +        /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size=
-.  */
-> > +        .CP0_Config0 =3D MIPS_CONFIG0 | (0x1 << CP0C0_AR) | (0x2 << CP=
-0C0_AT) |
-> > +                       (MMU_TYPE_R4000 << CP0C0_MT),
-> > +        .CP0_Config1 =3D MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << CP0C1=
-_MMU) |
-> > +                       (2 << CP0C1_IS) | (4 << CP0C1_IL) | (3 << CP0C1=
-_IA) |
-> > +                       (2 << CP0C1_DS) | (4 << CP0C1_DL) | (3 << CP0C1=
-_DA) |
-> > +                       (1 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << CP0C1=
-_EP),
-> > +        .CP0_Config2 =3D MIPS_CONFIG2,
-> > +        .CP0_Config3 =3D MIPS_CONFIG3 | (1U << CP0C3_M) | (1 << CP0C3_=
-MSAP) |
-> > +                       (1 << CP0C3_BP) | (1 << CP0C3_BI) | (1 << CP0C3=
-_ULRI) |
-> > +                       (1 << CP0C3_RXI) | (1 << CP0C3_LPA) | (1 << CP0=
-C3_VInt),
-> > +        .CP0_Config4 =3D MIPS_CONFIG4 | (1U << CP0C4_M) | (2 << CP0C4_=
-IE) |
-> > +                       (1 << CP0C4_AE) | (0x1c << CP0C4_KScrExist),
-> > +        .CP0_Config4_rw_bitmask =3D 0,
-> > +        .CP0_Config5 =3D MIPS_CONFIG5 | (1 << CP0C5_NFExists) | (1 << =
-18),
-> > +        .CP0_Config5_rw_bitmask =3D (1 << CP0C5_K) | (1 << CP0C5_CV) |
-> > +                                  (1 << CP0C5_MSAEn) | (1 << CP0C5_UFE=
-) |
-> > +                                  (1 << CP0C5_FRE) | (1 << CP0C5_SBRI)=
-,
-> > +        .CP0_Config6 =3D (1 << CP0C6_VCLRU) | (1 << CP0C6_DCLRU) | (1 =
-<< CP0C6_SFBEN) |
-> > +                       (1 << CP0C6_FLTINT) | (1 << CP0C6_INSTPREF) | (=
-1 << CP0C6_DATAPREF),
-> > +        .CP0_Config6_rw_bitmask =3D (1 << CP0C6_BPPASS) | (0x3f << CP0=
-C6_KPOS) |
-> > +                                  (1 << CP0C6_KE) | (1 << CP0C6_VTLBON=
-LY) | (1 << CP0C6_LASX) |
-> > +                                  (1 << CP0C6_SSEN) | (1 << CP0C6_DISD=
-RTIME) |
-> > +                                  (1 << CP0C6_PIXNUEN) | (1 << CP0C6_S=
-CRAND) |
-> > +                                  (1 << CP0C6_LLEXCEN) | (1 << CP0C6_D=
-ISVC) |
-> > +                                  (1 << CP0C6_VCLRU) | (1 << CP0C6_DCL=
-RU) |
-> > +                                  (1 << CP0C6_PIXUEN) | (1 << CP0C6_DI=
-SBLKLYEN) |
-> > +                                  (1 << CP0C6_UMEMUALEN) | (1 << CP0C6=
-_SFBEN) |
-> > +                                  (1 << CP0C6_FLTINT) | (1 << CP0C6_VL=
-TINT) |
-> > +                                  (1 << CP0C6_DISBTB) | (3 << CP0C6_ST=
-PREFCTL) |
-> > +                                  (1 << CP0C6_INSTPREF) | (1 << CP0C6_=
-DATAPREF),
-> > +        .CP0_Config7 =3D 0,
-> > +        .CP0_Config7_rw_bitmask =3D (1 << CP0C7_NAPCGEN) | (1 << CP0C7=
-_UNIMUEN) | \
-> > +                                  (1 << CP0C7_VFPUCGEN),
-> > +        .CP0_LLAddr_rw_bitmask =3D 1,
-> > +        .SYNCI_Step =3D 16,
-> > +        .CCRes =3D 2,
-> > +        .CP0_Status_rw_bitmask =3D 0x7DDBFFFF,
-> > +        .CP0_PageGrain_rw_bitmask =3D (1U << CP0PG_RIE) | (1 << CP0PG_=
-XIE) |
-> > +                    (1 << CP0PG_ELPA) | (1 << CP0PG_IEC),
-> > +        .CP1_fcr0 =3D (0x5 << FCR0_PRID) | (0x1 << FCR0_REV) | (0x1 <<=
- FCR0_F64),
-> > +        .CP1_fcr31 =3D 0,
-> > +        .CP1_fcr31_rw_bitmask =3D 0xFF83FFFF,
-> > +        .SEGBITS =3D 48,
-> > +        .PABITS =3D 48,
-> > +        .insn_flags =3D CPU_LOONGSON3A,
-> > +        .mmu_type =3D MMU_TYPE_R4000,
-> > +    },
-> > +    {
-> >          /* A generic CPU providing MIPS64 DSP R2 ASE features.
-> >             FIXME: Eventually this should be replaced by a real CPU mod=
-el. */
-> >          .name =3D "mips64dspr2",
-> >
-
-
-
---=20
-Huacai Chen
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
