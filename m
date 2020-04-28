@@ -2,87 +2,70 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 975FEC83002
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 02:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8469C83002
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 02:45:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35A2320728
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 02:27:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tmzHm6B6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35A2320728
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id AB33C206D9
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 02:45:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB33C206D9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTFyT-0003rG-7O
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 22:27:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41238)
+	id 1jTGFB-0002Az-Nz
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 22:45:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43210)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pauldzim@gmail.com>) id 1jTFv8-0005DH-Ch
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 22:24:26 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jTGEQ-0001A7-Mu
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 22:44:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <pauldzim@gmail.com>) id 1jTFv7-0002jP-RK
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 22:24:26 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:39752)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
- id 1jTFv7-0002j4-E2
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 22:24:25 -0400
-Received: by mail-pl1-x641.google.com with SMTP id k18so7740913pll.6
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 19:24:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=PXKXjtVVrrXV5MvzLqoNhi8atJWdX4WMW2e8oHa6A4c=;
- b=tmzHm6B6bu19y7fviz5MyUZd9robGhK6Et5kJLPLgjbLYAOsEkd1qoG5zU6xIdptzX
- N+Gp1/fklAOuv5gX7bc/603W2VzqNBQTRW8xV7CtMwwqv5DThUoPNIzJXfIKbc2WXv4L
- ElgQ+9L5bz5ZpcAdfuKRQXOo16GWIt0PaQfMfgKdBIfLWDdDv2SURtYbF61fXFD/7a3W
- BbWQtmn/BC0YglMu8s0/8u/voVApO1FxuAkDHjn3Zzj3RisUJk7SbijMiaWt1hMv5Z1I
- xA3Hk0OkbsLZxxgdiSNxwXzN0nEyVmVkeeIAAoUgV1EKmMZ56hd1QEaC8+NotKBspWCp
- SHtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=PXKXjtVVrrXV5MvzLqoNhi8atJWdX4WMW2e8oHa6A4c=;
- b=K41pQSY8MH7ZhCl0aLHKL4IsTg/yP+ShyrHN/Gc6H5fmHOUD3ZMyMJaTldudAY2BLd
- Ol5VgSdQv3xO/mwTZNhUcWq8LIYl0vbt0kMXGBwaeM56m633IBd9jjkJldIK3Kga5F29
- obthK8/seuUAoy5Q1VvCIudC/anE88XTtmknqYAxn51OKOE4ycpqLrkOPZx47Q3hokUf
- hnWHU9756ULY9wnjMUBygV/NRD2WHveGdswLnaHGVF2k/1vsfcodlBfiw7rnwkRh27lw
- BvFxQfWKJamHGOuG5hp/I9IznnYiX8tMkRZXJjkq+ByandOF9GK01jp0OD0YdX3KDnD/
- xhpg==
-X-Gm-Message-State: AGi0PuZGXpOzR5/PMc/E1y72mQhz64WEejoXF2AxjD+5UI/6/bPj1TS3
- K8e/4g3Og7xUgP+ZLIl1c4TOge5BahCSAQ==
-X-Google-Smtp-Source: APiQypKBTc5meP5268YW5i33ZMYPxRBQRoUcxn7ioNeVWkMD/j2TTqrMlrVKqkdMCYe7vgEXO19koQ==
-X-Received: by 2002:a17:902:b088:: with SMTP id
- p8mr14227334plr.244.1588040664032; 
- Mon, 27 Apr 2020 19:24:24 -0700 (PDT)
-Received: from localhost.localdomain ([75.167.104.59])
- by smtp.gmail.com with ESMTPSA id z190sm11695649pgz.73.2020.04.27.19.24.23
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Apr 2020 19:24:23 -0700 (PDT)
-From: Paul Zimmerman <pauldzim@gmail.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH v4 5/7] usb: add short-packet handling to usb-storage driver
-Date: Mon, 27 Apr 2020 19:22:30 -0700
-Message-Id: <20200428022232.18875-6-pauldzim@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200428022232.18875-1-pauldzim@gmail.com>
-References: <20200428022232.18875-1-pauldzim@gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=pauldzim@gmail.com; helo=mail-pl1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::641
+ (envelope-from <no-reply@patchew.org>) id 1jTGEO-0001LM-SG
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 22:44:22 -0400
+Resent-Date: Mon, 27 Apr 2020 22:44:22 -0400
+Resent-Message-Id: <E1jTGEO-0001LM-SG@eggs.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21759)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jTGEO-0001K2-BR
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 22:44:20 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1588041846; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=D5+fzEACtXDIjDppu+XR0lwCkXzoFU53XHRdn0LtNJFe97Q+IKKGeJjALAKfRoBGAYKssijGb9OIfcce31xFxH9ET+Uq8gSlRA6Rt+araSHPGCaOPrlc3Su6hAaQcbp9ZAB2K7jH/+WX7CaWrtOI2X0xcCBHHAjW2pYDcoj9H3w=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1588041846;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=BgdtSM1xUe7TeJeMPUG2X2q7hWY+sIyyDZNOZ+enlG0=; 
+ b=fz9sfLIbXzu/auvQPdQKsW7QnFZi30sG1SPH/3QzYnxVUm8i6CrWGgZ9vrrjGktgz8hKd7NK9if0kN2+X6c8/1FFo95cqYiMrtbfu1af9BZCf4LqfjJmd24/exCiteWILoHj68cyua/gSYmp4pEYWsZiHdXADcsUvaMW12O/gpA=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1588041844030980.3880504533834;
+ Mon, 27 Apr 2020 19:44:04 -0700 (PDT)
+In-Reply-To: <20200428012810.10877-1-vishal.l.verma@intel.com>
+Subject: Re: [PATCH 0/3] account for NVDIMM nodes during SRAT generation
+Message-ID: <158804184249.15667.634657454454879088@39012742ff91>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: vishal.l.verma@intel.com
+Date: Mon, 27 Apr 2020 19:44:04 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 22:44:18
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Received-From: 136.143.188.57
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,81 +77,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Paul Zimmerman <pauldzim@gmail.com>, John Snow <jsnow@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, jingqi.liu@intel.com, dave.hansen@linux.intel.com,
+ qemu-devel@nongnu.org, vishal.l.verma@intel.com, dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The dwc-hsotg (dwc2) USB host depends on a short packet to
-indicate the end of an IN transfer. The usb-storage driver
-currently doesn't provide this, so fix it.
-
-I have tested this change rather extensively using a PC
-emulation with xhci, ehci, and uhci controllers, and have
-not observed any regressions.
-
-Signed-off-by: Paul Zimmerman <pauldzim@gmail.com>
----
- hw/usb/dev-storage.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index 5c4b57b06b..ae3c550042 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -229,6 +229,9 @@ static void usb_msd_copy_data(MSDState *s, USBPacket *p)
-     usb_packet_copy(p, scsi_req_get_buf(s->req) + s->scsi_off, len);
-     s->scsi_len -= len;
-     s->scsi_off += len;
-+    if (len > s->data_len) {
-+        len = s->data_len;
-+    }
-     s->data_len -= len;
-     if (s->scsi_len == 0 || s->data_len == 0) {
-         scsi_req_continue(s->req);
-@@ -303,6 +306,9 @@ static void usb_msd_command_complete(SCSIRequest *req, uint32_t status, size_t r
-             if (s->data_len) {
-                 int len = (p->iov.size - p->actual_length);
-                 usb_packet_skip(p, len);
-+                if (len > s->data_len) {
-+                    len = s->data_len;
-+                }
-                 s->data_len -= len;
-             }
-             if (s->data_len == 0) {
-@@ -469,6 +475,9 @@ static void usb_msd_handle_data(USBDevice *dev, USBPacket *p)
-                 int len = p->iov.size - p->actual_length;
-                 if (len) {
-                     usb_packet_skip(p, len);
-+                    if (len > s->data_len) {
-+                        len = s->data_len;
-+                    }
-                     s->data_len -= len;
-                     if (s->data_len == 0) {
-                         s->mode = USB_MSDM_CSW;
-@@ -528,13 +537,17 @@ static void usb_msd_handle_data(USBDevice *dev, USBPacket *p)
-                 int len = p->iov.size - p->actual_length;
-                 if (len) {
-                     usb_packet_skip(p, len);
-+                    if (len > s->data_len) {
-+                        len = s->data_len;
-+                    }
-                     s->data_len -= len;
-                     if (s->data_len == 0) {
-                         s->mode = USB_MSDM_CSW;
-                     }
-                 }
-             }
--            if (p->actual_length < p->iov.size) {
-+            if (p->actual_length < p->iov.size && (p->short_not_ok ||
-+                    s->scsi_len >= p->ep->max_packet_size)) {
-                 DPRINTF("Deferring packet %p [wait data-in]\n", p);
-                 s->packet = p;
-                 p->status = USB_RET_ASYNC;
--- 
-2.17.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQyODAxMjgxMC4xMDg3
+Ny0xLXZpc2hhbC5sLnZlcm1hQGludGVsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIDAvM10gYWNjb3VudCBmb3IgTlZESU1N
+IG5vZGVzIGR1cmluZyBTUkFUIGdlbmVyYXRpb24KTWVzc2FnZS1pZDogMjAyMDA0MjgwMTI4MTAu
+MTA4NzctMS12aXNoYWwubC52ZXJtYUBpbnRlbC5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVs
+bCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
+b3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2Uu
+Lgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
+JwozNGM1OWQzIHRlc3RzL2FjcGk6IHVwZGF0ZSBleHBlY3RlZCBTUkFUIGZpbGVzCmRjYzk2ZWIg
+aHcvYWNwaS1idWlsZDogYWNjb3VudCBmb3IgTlZESU1NIG51bWEgbm9kZXMgaW4gU1JBVAowOGI3
+ZWU1IGRpZmZzLWFsbG93ZWQ6IGFkZCB0aGUgU1JBVCBBTUwgdG8gZGlmZnMtYWxsb3dlZAoKPT09
+IE9VVFBVVCBCRUdJTiA9PT0KMS8zIENoZWNraW5nIGNvbW1pdCAwOGI3ZWU1ZTdkZGYgKGRpZmZz
+LWFsbG93ZWQ6IGFkZCB0aGUgU1JBVCBBTUwgdG8gZGlmZnMtYWxsb3dlZCkKMi8zIENoZWNraW5n
+IGNvbW1pdCBkY2M5NmViOTdkNDYgKGh3L2FjcGktYnVpbGQ6IGFjY291bnQgZm9yIE5WRElNTSBu
+dW1hIG5vZGVzIGluIFNSQVQpCkVSUk9SOiBEbyBub3QgYWRkIGV4cGVjdGVkIGZpbGVzIHRvZ2V0
+aGVyIHdpdGggdGVzdHMsIGZvbGxvdyBpbnN0cnVjdGlvbnMgaW4gdGVzdHMvcXRlc3QvYmlvcy10
+YWJsZXMtdGVzdC5jOiBib3RoIHRlc3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QtYWxsb3dlZC1k
+aWZmLmggYW5kIGh3L2kzODYvYWNwaS1idWlsZC5jIGZvdW5kCgpFUlJPUjogRG8gbm90IGFkZCBl
+eHBlY3RlZCBmaWxlcyB0b2dldGhlciB3aXRoIHRlc3RzLCBmb2xsb3cgaW5zdHJ1Y3Rpb25zIGlu
+IHRlc3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QuYzogYm90aCB0ZXN0cy9xdGVzdC9iaW9zLXRh
+Ymxlcy10ZXN0LWFsbG93ZWQtZGlmZi5oIGFuZCBody9pMzg2L2FjcGktYnVpbGQuYyBmb3VuZAoK
+dG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMiBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzMg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjMvMyBDaGVja2luZyBjb21taXQgMzRjNTlkM2Ew
+MjMyICh0ZXN0cy9hY3BpOiB1cGRhdGUgZXhwZWN0ZWQgU1JBVCBmaWxlcykKRVJST1I6IERvIG5v
+dCBhZGQgZXhwZWN0ZWQgZmlsZXMgdG9nZXRoZXIgd2l0aCB0ZXN0cywgZm9sbG93IGluc3RydWN0
+aW9ucyBpbiB0ZXN0cy9xdGVzdC9iaW9zLXRhYmxlcy10ZXN0LmM6IGJvdGggdGVzdHMvZGF0YS9h
+Y3BpL3BjL1NSQVQuZGltbXB4bSBhbmQgaHcvaTM4Ni9hY3BpLWJ1aWxkLmMgZm91bmQKCkVSUk9S
+OiBEbyBub3QgYWRkIGV4cGVjdGVkIGZpbGVzIHRvZ2V0aGVyIHdpdGggdGVzdHMsIGZvbGxvdyBp
+bnN0cnVjdGlvbnMgaW4gdGVzdHMvcXRlc3QvYmlvcy10YWJsZXMtdGVzdC5jOiBib3RoIHRlc3Rz
+L2RhdGEvYWNwaS9xMzUvU1JBVC5kaW1tcHhtIGFuZCBody9pMzg2L2FjcGktYnVpbGQuYyBmb3Vu
+ZAoKRVJST1I6IERvIG5vdCBhZGQgZXhwZWN0ZWQgZmlsZXMgdG9nZXRoZXIgd2l0aCB0ZXN0cywg
+Zm9sbG93IGluc3RydWN0aW9ucyBpbiB0ZXN0cy9xdGVzdC9iaW9zLXRhYmxlcy10ZXN0LmM6IGJv
+dGggdGVzdHMvcXRlc3QvYmlvcy10YWJsZXMtdGVzdC1hbGxvd2VkLWRpZmYuaCBhbmQgaHcvaTM4
+Ni9hY3BpLWJ1aWxkLmMgZm91bmQKCkVSUk9SOiBEbyBub3QgYWRkIGV4cGVjdGVkIGZpbGVzIHRv
+Z2V0aGVyIHdpdGggdGVzdHMsIGZvbGxvdyBpbnN0cnVjdGlvbnMgaW4gdGVzdHMvcXRlc3QvYmlv
+cy10YWJsZXMtdGVzdC5jOiBib3RoIHRlc3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QtYWxsb3dl
+ZC1kaWZmLmggYW5kIGh3L2kzODYvYWNwaS1idWlsZC5jIGZvdW5kCgp0b3RhbDogNCBlcnJvcnMs
+IDAgd2FybmluZ3MsIDEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy8zIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
+b2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcv
+bG9ncy8yMDIwMDQyODAxMjgxMC4xMDg3Ny0xLXZpc2hhbC5sLnZlcm1hQGludGVsLmNvbS90ZXN0
+aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
+aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
