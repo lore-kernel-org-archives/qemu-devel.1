@@ -2,91 +2,87 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C255C83004
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 19:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88724C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 19:25:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6D3220730
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 19:22:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 347462070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 19:25:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="et664txF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6D3220730
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JyINQSaH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 347462070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTVoa-0004af-Pn
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 15:22:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57896)
+	id 1jTVqs-0008D6-Bb
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 15:25:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frasse.iglesias@gmail.com>) id 1jTVm7-0001dF-LX
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 15:20:16 -0400
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jTVpg-0006Wx-PU
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 15:23:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <frasse.iglesias@gmail.com>) id 1jTVm4-0007Ve-1U
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 15:20:11 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:43408)
+ (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jTVpe-0007kt-4Y
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 15:23:52 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:35712)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frasse.iglesias@gmail.com>)
- id 1jTVm3-0007Ab-E0; Tue, 28 Apr 2020 15:20:07 -0400
-Received: by mail-lj1-x244.google.com with SMTP id l19so22710042lje.10;
- Tue, 28 Apr 2020 12:20:06 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jTVpd-0007ke-Kt
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 15:23:49 -0400
+Received: by mail-wr1-x432.google.com with SMTP id x18so26044393wrq.2
+ for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 12:23:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=2VHHYl362ANMdbfnHSBXZWQ4eRLbKzKZSfARZITH0S4=;
- b=et664txFnd7GBR7qeSq9/UgZbPCdjFEGTN4UxuIs9yfJNs4iSTxjAGkx37O+vyvzlG
- U93UFdnpxcLZCcaRJzodY46eOMzw0vcW79sScbvwN8QkHXtWizxxo/AjVtQv1DQ77t0G
- M0QN+EEC3mZKmzb8LX4xgptlM3u8l270JHcgSMdjtW4+AkL95BwyhKz57OxGS0mFk86u
- TqvPhVS+hJt20HWZURZW3kpNe13e3oGhmMKJGGo8+hUfdFpNcpAF7BC1sDB4fPSG3WDe
- XJhzbVI4Sq5w5yTGTw+Su8RHiFYY9mA3rAGj8zx5BGnO6B8AQjqykFjuUwpAta6ON3Zs
- uSEg==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=j9jD2CweGe2K/fEoLA9TLGIO9tTL+IhltSwVHDqmI/E=;
+ b=JyINQSaHQ2jJUEDcFrX0yiQStmUWyvqA/EmXovSqnDGAnn4SwL2LuOBSpYc5ItNtLt
+ GXBse58+HVzGCwvXFbLAt45dxZORuOcyXEDRkCIXEl6wwUFLlct1vgjQnRWJamRmy1bp
+ WItQHsTy1MIMDhHHNFS0WvYDolAQGjptJKxjYYq1aON9bvANXOsMdBFv3cQbtx0MbMZY
+ Zo7dmq3+8c9bt+vZMoKu5vFddqqGDZjPwmxj9YVfCnRBeCcoCI/qXqUp2pzxE76e+c4c
+ gHXhqQBZc3RmpfwaiCltWz7D4AJiXpWVMpesuGHnLp889t/GA+L52GcQI9RLvrVRkYOf
+ u2sA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=2VHHYl362ANMdbfnHSBXZWQ4eRLbKzKZSfARZITH0S4=;
- b=pph6m7XxU9N3mskHUIeXfqCohrcXsmAJZTL5p4ZSZOGGJJ5jMZWFnSehqpl+kAk794
- p7L/987lP6C4pp1HCttEHWoBMxzMz7OqU+qN/tcO4yfHdvfnGCOSp39kRb3Ya7cp/vqh
- zf2lXJTNGdMmrH7/389Om/VC+NJPUh6OK7iZ8Vl20ZWgdB4nK6GRUuCez58ko7+jKIYo
- Zzt7sHzqsbyJUuppK6KWfdFMYPN1ji/fpYBzdfxZFbrdPKRLH9bn2hEr4H5Owy2A/Ww0
- xUGob2hXaDM45W7qpjacHBZTMncOEXmuRTujMaajrpJzgeafytL5gnG0Y2bBO46p+SJl
- h6/w==
-X-Gm-Message-State: AGi0PuZL6+uEr738JBcEZGz/TSJXuTzmmsGCw3LBMIMPLWH2Z4o0fr6w
- NuS0Y1ZzSy8HvVvrUqQcjD8=
-X-Google-Smtp-Source: APiQypK7ZTt8WRPWWGmtPdSjUUn1dIFBnXkK9bnWXeV6lbXI/eD1lsoTsdvv5w76U3CwO03ANpt9Pw==
-X-Received: by 2002:a2e:7d0f:: with SMTP id y15mr5027059ljc.91.1588101603862; 
- Tue, 28 Apr 2020 12:20:03 -0700 (PDT)
-Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
- by smtp.gmail.com with ESMTPSA id
- u3sm166908lff.26.2020.04.28.12.20.02
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 28 Apr 2020 12:20:03 -0700 (PDT)
-Date: Tue, 28 Apr 2020 21:20:01 +0200
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
-To: Vikram Garhwal <fnu.vikram@xilinx.com>
-Subject: Re: [PATCH v3 1/4] hw/net/can: Introduce Xilinx ZynqMP CAN controller
-Message-ID: <20200428191959.gcazma62xnygshd7@fralle-msi>
-References: <1587603369-14644-1-git-send-email-fnu.vikram@xilinx.com>
- <1587603369-14644-2-git-send-email-fnu.vikram@xilinx.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=j9jD2CweGe2K/fEoLA9TLGIO9tTL+IhltSwVHDqmI/E=;
+ b=oTxqAW9hXKuQ+84svhan1s+HzEekQ9pQBF1DQP46/RtPTxb2AHdcDemT6YfvFsIfi1
+ Yx/QuUedN1duqsobdAUgowwKa1BpCqStXjYfY+WnDQBoWYBNgSo5/UJgDXAfTsWLpM5y
+ C6toHZ/8MIjYftre+pWxLmDYiyQLb1ZjOxJT12BmHFiOU2wRXX2ganOosIWKd3psVebo
+ 2POlT54FwRScRyzssbfcqeDg+84OtU3hXSVxpvyhuw/VrqHBeBaIl2e0YPqXW753MxyH
+ 9J3rgPC3W7hs4peNvzcyUwTHgV5ECEnGMtak7/CWHmiqFV/7ipGiGq3AKWCpYeyqtklg
+ 7xVw==
+X-Gm-Message-State: AGi0PuahTeOPoNiMLo1kO+r0wLsreBJ/fyFukobPquzP1ye3e1AF1geV
+ dwWStHuJA7E3pyW4XUgXw3z1cL+y3r23P5HQz2U=
+X-Google-Smtp-Source: APiQypKvTGg5cS7aRILXRjDf5gpAxmUq/HKS1oX1KUWM0YsDwRXYp9dk8D06GGPBk5UseeR4QLy8EtgoIE6WGH15f04=
+X-Received: by 2002:adf:dc50:: with SMTP id m16mr27943563wrj.329.1588101827863; 
+ Tue, 28 Apr 2020 12:23:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1587603369-14644-2-git-send-email-fnu.vikram@xilinx.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
-Received-SPF: pass client-ip=2a00:1450:4864:20::244;
- envelope-from=frasse.iglesias@gmail.com; helo=mail-lj1-x244.google.com
+References: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
+ <1587979995-17717-6-git-send-email-chenhc@lemote.com>
+In-Reply-To: <1587979995-17717-6-git-send-email-chenhc@lemote.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Tue, 28 Apr 2020 21:23:35 +0200
+Message-ID: <CAHiYmc4utajVS0KiP0PSrvKMLVqLU7__-sEWmrmfJ_fjYfLj7w@mail.gmail.com>
+Subject: Re: [PATCH for-5.1 6/7] hw/mips: Add Loongson-3 machine support (with
+ KVM)
+To: Huacai Chen <zltjiangshi@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::432;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x432.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::244
+X-Received-From: 2a00:1450:4864:20::432
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,1262 +94,1050 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- "open list:Xilinx ZynqMP" <qemu-arm@nongnu.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Vikram,
+Hi. Huacei.
 
-A couple of more comments here also.
+Please expand commit message with the description of the machine
+internal organization (several paragraphs).
 
-On [2020 Apr 22] Wed 17:56:06, Vikram Garhwal wrote:
-> XlnxCAN is developed based on SocketCAN, QEMU CAN bus implementation.
-> Bus connection and socketCAN connection for each CAN module can be set
-> through command lines.
-> 
-> Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
+Also, please include command line for starting the machine. More than
+one example is better than only one.
+
+Specifically, can you explicitly say what is your KVM setup, so that
+anyone could repro it?
+
+Good health to people from China!
+
+Yours,
+Aleksandar
+
+=D0=BF=D0=BE=D0=BD, 27. =D0=B0=D0=BF=D1=80 2020. =D1=83 11:36 Huacai Chen <=
+zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
+=BE/=D0=BB=D0=B0:
+>
+> Add Loongson-3 based machine support, it use i8259 as the interrupt
+> controler and use GPEX as the pci controller. Currently it can only
+> work with KVM, but we will add TCG support in future.
+>
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 > ---
->  hw/net/can/Makefile.objs         |    1 +
->  hw/net/can/xlnx-zynqmp-can.c     | 1113 ++++++++++++++++++++++++++++++++++++++
->  include/hw/net/xlnx-zynqmp-can.h |   76 +++
->  3 files changed, 1190 insertions(+)
->  create mode 100644 hw/net/can/xlnx-zynqmp-can.c
->  create mode 100644 include/hw/net/xlnx-zynqmp-can.h
-> 
-> diff --git a/hw/net/can/Makefile.objs b/hw/net/can/Makefile.objs
-> index 9f0c4ee..0fe87dd 100644
-> --- a/hw/net/can/Makefile.objs
-> +++ b/hw/net/can/Makefile.objs
-> @@ -2,3 +2,4 @@ common-obj-$(CONFIG_CAN_SJA1000) += can_sja1000.o
->  common-obj-$(CONFIG_CAN_PCI) += can_kvaser_pci.o
->  common-obj-$(CONFIG_CAN_PCI) += can_pcm3680_pci.o
->  common-obj-$(CONFIG_CAN_PCI) += can_mioe3680_pci.o
-> +common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-can.o
-> diff --git a/hw/net/can/xlnx-zynqmp-can.c b/hw/net/can/xlnx-zynqmp-can.c
+>  default-configs/mips64el-softmmu.mak |   1 +
+>  hw/mips/Kconfig                      |  10 +
+>  hw/mips/Makefile.objs                |   1 +
+>  hw/mips/mips_loongson3.c             | 869 +++++++++++++++++++++++++++++=
+++++++
+>  4 files changed, 881 insertions(+)
+>  create mode 100644 hw/mips/mips_loongson3.c
+>
+> diff --git a/default-configs/mips64el-softmmu.mak b/default-configs/mips6=
+4el-softmmu.mak
+> index 8b0c9b1..fc798e4 100644
+> --- a/default-configs/mips64el-softmmu.mak
+> +++ b/default-configs/mips64el-softmmu.mak
+> @@ -3,6 +3,7 @@
+>  include mips-softmmu-common.mak
+>  CONFIG_IDE_VIA=3Dy
+>  CONFIG_FULONG=3Dy
+> +CONFIG_LOONGSON3=3Dy
+>  CONFIG_ATI_VGA=3Dy
+>  CONFIG_RTL8139_PCI=3Dy
+>  CONFIG_JAZZ=3Dy
+> diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
+> index 2c2adbc..6f16b16 100644
+> --- a/hw/mips/Kconfig
+> +++ b/hw/mips/Kconfig
+> @@ -44,6 +44,16 @@ config JAZZ
+>  config FULONG
+>      bool
+>
+> +config LOONGSON3
+> +    bool
+> +    select PCKBD
+> +    select SERIAL
+> +    select ISA_BUS
+> +    select PCI_EXPRESS_GENERIC_BRIDGE
+> +    select VIRTIO_VGA
+> +    select QXL if SPICE
+> +    select MSI_NONBROKEN
+> +
+>  config MIPS_CPS
+>      bool
+>      select PTIMER
+> diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
+> index 2f7795b..f9bc8f5 100644
+> --- a/hw/mips/Makefile.objs
+> +++ b/hw/mips/Makefile.objs
+> @@ -4,5 +4,6 @@ obj-$(CONFIG_MALTA) +=3D gt64xxx_pci.o mips_malta.o
+>  obj-$(CONFIG_MIPSSIM) +=3D mips_mipssim.o
+>  obj-$(CONFIG_JAZZ) +=3D mips_jazz.o
+>  obj-$(CONFIG_FULONG) +=3D mips_fulong2e.o
+> +obj-$(CONFIG_LOONGSON3) +=3D mips_loongson3.o
+>  obj-$(CONFIG_MIPS_CPS) +=3D cps.o
+>  obj-$(CONFIG_MIPS_BOSTON) +=3D boston.o
+> diff --git a/hw/mips/mips_loongson3.c b/hw/mips/mips_loongson3.c
 > new file mode 100644
-> index 0000000..31799c0
+> index 0000000..a45c9ec
 > --- /dev/null
-> +++ b/hw/net/can/xlnx-zynqmp-can.c
-> @@ -0,0 +1,1113 @@
+> +++ b/hw/mips/mips_loongson3.c
+> @@ -0,0 +1,869 @@
 > +/*
-> + * QEMU model of the Xilinx CAN device.
+> + * Generic Loongson-3 Platform support
 > + *
-> + * Copyright (c) 2020 Xilinx Inc.
+> + * Copyright (c) 2015-2020 Huacai Chen (chenhc@lemote.com)
+> + * This code is licensed under the GNU GPL v2.
 > + *
-> + * Written-by: Vikram Garhwal<fnu.vikram@xilinx.com>
-> + *
-> + * Based on QEMU CAN Device emulation implemented by Jin Yang, Deniz Eren and
-> + * Pavel Pisa
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
+> + * Contributions are licensed under the terms of the GNU GPL,
+> + * version 2 or (at your option) any later version.
+> + */
+> +
+> +/*
+> + * Generic PC Platform based on Loongson-3 CPU (MIPS64R2 with extensions=
+,
+> + * 800~2000MHz)
 > + */
 > +
 > +#include "qemu/osdep.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/register.h"
-> +#include "hw/irq.h"
+> +#include "qemu-common.h"
+> +#include "qemu/units.h"
 > +#include "qapi/error.h"
-> +#include "qemu/bitops.h"
+> +#include "cpu.h"
+> +#include "elf.h"
+> +#include "hw/boards.h"
+> +#include "hw/block/flash.h"
+> +#include "hw/char/serial.h"
+> +#include "hw/mips/mips.h"
+> +#include "hw/mips/cpudevs.h"
+> +#include "hw/intc/i8259.h"
+> +#include "hw/loader.h"
+> +#include "hw/ide.h"
+> +#include "hw/isa/superio.h"
+> +#include "hw/pci/msi.h"
+> +#include "hw/pci/pci.h"
+> +#include "hw/pci/pci_host.h"
+> +#include "hw/pci-host/gpex.h"
+> +#include "hw/rtc/mc146818rtc.h"
+> +#include "net/net.h"
+> +#include "exec/address-spaces.h"
+> +#include "sysemu/qtest.h"
+> +#include "sysemu/reset.h"
+> +#include "sysemu/runstate.h"
 > +#include "qemu/log.h"
-> +#include "qemu/cutils.h"
-> +#include "sysemu/sysemu.h"
-> +#include "migration/vmstate.h"
-> +#include "hw/qdev-properties.h"
-> +#include "net/can_emu.h"
-> +#include "net/can_host.h"
-> +#include "qemu/event_notifier.h"
-> +#include "qom/object_interfaces.h"
-> +#include "hw/net/xlnx-zynqmp-can.h"
+> +#include "qemu/error-report.h"
 > +
-> +#ifndef XLNX_ZYNQMP_CAN_ERR_DEBUG
-> +#define XLNX_ZYNQMP_CAN_ERR_DEBUG 0
-> +#endif
+> +#define INITRD_OFFSET          0x04000000
+> +#define BOOTPARAM_ADDR         0x8ff00000
+> +#define BOOTPARAM_PHYADDR      0x0ff00000
+> +#define CFG_ADDR               0x0f100000
+> +#define FW_CONF_ADDR           0x0fff0000
+> +#define PM_MMIO_ADDR           0x10080000
+> +#define PM_MMIO_SIZE           0x100
+> +#define PM_CNTL_MODE           0x10
 > +
-> +#define DB_PRINT(...) do { \
-> +    if (XLNX_ZYNQMP_CAN_ERR_DEBUG) { \
-> +        qemu_log(__VA_ARGS__); \
-> +    } \
-> +} while (0)
+> +#define PHYS_TO_VIRT(x) ((x) | ~(target_ulong)0x7fffffff)
 > +
-> +#define MAX_DLC            8
-> +#undef ERROR
+> +/* Loongson-3 has a 2MB flash rom */
+> +#define BIOS_SIZE               (2 * MiB)
+> +#define LOONGSON_MAX_VCPUS      16
 > +
-> +REG32(SOFTWARE_RESET_REGISTER, 0x0)
-> +    FIELD(SOFTWARE_RESET_REGISTER, CEN, 1, 1)
-> +    FIELD(SOFTWARE_RESET_REGISTER, SRST, 0, 1)
-> +REG32(MODE_SELECT_REGISTER, 0x4)
-> +    FIELD(MODE_SELECT_REGISTER, SNOOP, 2, 1)
-> +    FIELD(MODE_SELECT_REGISTER, LBACK, 1, 1)
-> +    FIELD(MODE_SELECT_REGISTER, SLEEP, 0, 1)
-> +REG32(ARBITRATION_PHASE_BAUD_RATE_PRESCALER_REGISTER, 0x8)
-> +    FIELD(ARBITRATION_PHASE_BAUD_RATE_PRESCALER_REGISTER, BRP, 0, 8)
-> +REG32(ARBITRATION_PHASE_BIT_TIMING_REGISTER, 0xc)
-> +    FIELD(ARBITRATION_PHASE_BIT_TIMING_REGISTER, SJW, 7, 2)
-> +    FIELD(ARBITRATION_PHASE_BIT_TIMING_REGISTER, TS2, 4, 3)
-> +    FIELD(ARBITRATION_PHASE_BIT_TIMING_REGISTER, TS1, 0, 4)
-> +REG32(ERROR_COUNTER_REGISTER, 0x10)
-> +    FIELD(ERROR_COUNTER_REGISTER, REC, 8, 8)
-> +    FIELD(ERROR_COUNTER_REGISTER, TEC, 0, 8)
-> +REG32(ERROR_STATUS_REGISTER, 0x14)
-> +    FIELD(ERROR_STATUS_REGISTER, ACKER, 4, 1)
-> +    FIELD(ERROR_STATUS_REGISTER, BERR, 3, 1)
-> +    FIELD(ERROR_STATUS_REGISTER, STER, 2, 1)
-> +    FIELD(ERROR_STATUS_REGISTER, FMER, 1, 1)
-> +    FIELD(ERROR_STATUS_REGISTER, CRCER, 0, 1)
-> +REG32(STATUS_REGISTER, 0x18)
-> +    FIELD(STATUS_REGISTER, SNOOP, 12, 1)
-> +    FIELD(STATUS_REGISTER, ACFBSY, 11, 1)
-> +    FIELD(STATUS_REGISTER, TXFLL, 10, 1)
-> +    FIELD(STATUS_REGISTER, TXBFLL, 9, 1)
-> +    FIELD(STATUS_REGISTER, ESTAT, 7, 2)
-> +    FIELD(STATUS_REGISTER, ERRWRN, 6, 1)
-> +    FIELD(STATUS_REGISTER, BBSY, 5, 1)
-> +    FIELD(STATUS_REGISTER, BIDLE, 4, 1)
-> +    FIELD(STATUS_REGISTER, NORMAL, 3, 1)
-> +    FIELD(STATUS_REGISTER, SLEEP, 2, 1)
-> +    FIELD(STATUS_REGISTER, LBACK, 1, 1)
-> +    FIELD(STATUS_REGISTER, CONFIG, 0, 1)
-> +REG32(INTERRUPT_STATUS_REGISTER, 0x1c)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, TXFEMP, 14, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, TXFWMEMP, 13, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, RXFWMFLL, 12, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, WKUP, 11, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, SLP, 10, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, BSOFF, 9, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, ERROR, 8, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, RXNEMP, 7, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, RXOFLW, 6, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, RXUFLW, 5, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, RXOK, 4, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, TXBFLL, 3, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, TXFLL, 2, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, TXOK, 1, 1)
-> +    FIELD(INTERRUPT_STATUS_REGISTER, ARBLST, 0, 1)
-> +REG32(INTERRUPT_ENABLE_REGISTER, 0x20)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, ETXFEMP, 14, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, ETXFWMEMP, 13, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, ERXFWMFLL, 12, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, EWKUP, 11, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, ESLP, 10, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, EBSOFF, 9, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, EERROR, 8, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, ERXNEMP, 7, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, ERXOFLW, 6, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, ERXUFLW, 5, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, ERXOK, 4, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, ETXBFLL, 3, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, ETXFLL, 2, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, ETXOK, 1, 1)
-> +    FIELD(INTERRUPT_ENABLE_REGISTER, EARBLST, 0, 1)
-> +REG32(INTERRUPT_CLEAR_REGISTER, 0x24)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CTXFEMP, 14, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CTXFWMEMP, 13, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CRXFWMFLL, 12, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CWKUP, 11, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CSLP, 10, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CBSOFF, 9, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CERROR, 8, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CRXNEMP, 7, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CRXOFLW, 6, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CRXUFLW, 5, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CRXOK, 4, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CTXBFLL, 3, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CTXFLL, 2, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CTXOK, 1, 1)
-> +    FIELD(INTERRUPT_CLEAR_REGISTER, CARBLST, 0, 1)
-> +REG32(TIMESTAMP_REGISTER, 0x28)
-> +    FIELD(TIMESTAMP_REGISTER, CTS, 0, 1)
-> +REG32(WIR, 0x2c)
-> +    FIELD(WIR, EW, 8, 8)
-> +    FIELD(WIR, FW, 0, 8)
-> +REG32(TXFIFO_ID, 0x30)
-> +    FIELD(TXFIFO_ID, IDH, 21, 11)
-> +    FIELD(TXFIFO_ID, SRRRTR, 20, 1)
-> +    FIELD(TXFIFO_ID, IDE, 19, 1)
-> +    FIELD(TXFIFO_ID, IDL, 1, 18)
-> +    FIELD(TXFIFO_ID, RTR, 0, 1)
-> +REG32(TXFIFO_DLC, 0x34)
-> +    FIELD(TXFIFO_DLC, DLC, 28, 4)
-> +REG32(TXFIFO_DATA1, 0x38)
-> +    FIELD(TXFIFO_DATA1, DB0, 24, 8)
-> +    FIELD(TXFIFO_DATA1, DB1, 16, 8)
-> +    FIELD(TXFIFO_DATA1, DB2, 8, 8)
-> +    FIELD(TXFIFO_DATA1, DB3, 0, 8)
-> +REG32(TXFIFO_DATA2, 0x3c)
-> +    FIELD(TXFIFO_DATA2, DB4, 24, 8)
-> +    FIELD(TXFIFO_DATA2, DB5, 16, 8)
-> +    FIELD(TXFIFO_DATA2, DB6, 8, 8)
-> +    FIELD(TXFIFO_DATA2, DB7, 0, 8)
-> +REG32(TXHPB_ID, 0x40)
-> +    FIELD(TXHPB_ID, IDH, 21, 11)
-> +    FIELD(TXHPB_ID, SRRRTR, 20, 1)
-> +    FIELD(TXHPB_ID, IDE, 19, 1)
-> +    FIELD(TXHPB_ID, IDL, 1, 18)
-> +    FIELD(TXHPB_ID, RTR, 0, 1)
-> +REG32(TXHPB_DLC, 0x44)
-> +    FIELD(TXHPB_DLC, DLC, 28, 4)
-> +REG32(TXHPB_DATA1, 0x48)
-> +    FIELD(TXHPB_DATA1, DB0, 24, 8)
-> +    FIELD(TXHPB_DATA1, DB1, 16, 8)
-> +    FIELD(TXHPB_DATA1, DB2, 8, 8)
-> +    FIELD(TXHPB_DATA1, DB3, 0, 8)
-> +REG32(TXHPB_DATA2, 0x4c)
-> +    FIELD(TXHPB_DATA2, DB4, 24, 8)
-> +    FIELD(TXHPB_DATA2, DB5, 16, 8)
-> +    FIELD(TXHPB_DATA2, DB6, 8, 8)
-> +    FIELD(TXHPB_DATA2, DB7, 0, 8)
-> +REG32(RXFIFO_ID, 0x50)
-> +    FIELD(RXFIFO_ID, IDH, 21, 11)
-> +    FIELD(RXFIFO_ID, SRRRTR, 20, 1)
-> +    FIELD(RXFIFO_ID, IDE, 19, 1)
-> +    FIELD(RXFIFO_ID, IDL, 1, 18)
-> +    FIELD(RXFIFO_ID, RTR, 0, 1)
-> +REG32(RXFIFO_DLC, 0x54)
-> +    FIELD(RXFIFO_DLC, DLC, 28, 4)
-> +    FIELD(RXFIFO_DLC, RXT, 0, 16)
-> +REG32(RXFIFO_DATA1, 0x58)
-> +    FIELD(RXFIFO_DATA1, DB0, 24, 8)
-> +    FIELD(RXFIFO_DATA1, DB1, 16, 8)
-> +    FIELD(RXFIFO_DATA1, DB2, 8, 8)
-> +    FIELD(RXFIFO_DATA1, DB3, 0, 8)
-> +REG32(RXFIFO_DATA2, 0x5c)
-> +    FIELD(RXFIFO_DATA2, DB4, 24, 8)
-> +    FIELD(RXFIFO_DATA2, DB5, 16, 8)
-> +    FIELD(RXFIFO_DATA2, DB6, 8, 8)
-> +    FIELD(RXFIFO_DATA2, DB7, 0, 8)
-> +REG32(AFR, 0x60)
-> +    FIELD(AFR, UAF4, 3, 1)
-> +    FIELD(AFR, UAF3, 2, 1)
-> +    FIELD(AFR, UAF2, 1, 1)
-> +    FIELD(AFR, UAF1, 0, 1)
-> +REG32(AFMR1, 0x64)
-> +    FIELD(AFMR1, AMIDH, 21, 11)
-> +    FIELD(AFMR1, AMSRR, 20, 1)
-> +    FIELD(AFMR1, AMIDE, 19, 1)
-> +    FIELD(AFMR1, AMIDL, 1, 18)
-> +    FIELD(AFMR1, AMRTR, 0, 1)
-> +REG32(AFIR1, 0x68)
-> +    FIELD(AFIR1, AIIDH, 21, 11)
-> +    FIELD(AFIR1, AISRR, 20, 1)
-> +    FIELD(AFIR1, AIIDE, 19, 1)
-> +    FIELD(AFIR1, AIIDL, 1, 18)
-> +    FIELD(AFIR1, AIRTR, 0, 1)
-> +REG32(AFMR2, 0x6c)
-> +    FIELD(AFMR2, AMIDH, 21, 11)
-> +    FIELD(AFMR2, AMSRR, 20, 1)
-> +    FIELD(AFMR2, AMIDE, 19, 1)
-> +    FIELD(AFMR2, AMIDL, 1, 18)
-> +    FIELD(AFMR2, AMRTR, 0, 1)
-> +REG32(AFIR2, 0x70)
-> +    FIELD(AFIR2, AIIDH, 21, 11)
-> +    FIELD(AFIR2, AISRR, 20, 1)
-> +    FIELD(AFIR2, AIIDE, 19, 1)
-> +    FIELD(AFIR2, AIIDL, 1, 18)
-> +    FIELD(AFIR2, AIRTR, 0, 1)
-> +REG32(AFMR3, 0x74)
-> +    FIELD(AFMR3, AMIDH, 21, 11)
-> +    FIELD(AFMR3, AMSRR, 20, 1)
-> +    FIELD(AFMR3, AMIDE, 19, 1)
-> +    FIELD(AFMR3, AMIDL, 1, 18)
-> +    FIELD(AFMR3, AMRTR, 0, 1)
-> +REG32(AFIR3, 0x78)
-> +    FIELD(AFIR3, AIIDH, 21, 11)
-> +    FIELD(AFIR3, AISRR, 20, 1)
-> +    FIELD(AFIR3, AIIDE, 19, 1)
-> +    FIELD(AFIR3, AIIDL, 1, 18)
-> +    FIELD(AFIR3, AIRTR, 0, 1)
-> +REG32(AFMR4, 0x7c)
-> +    FIELD(AFMR4, AMIDH, 21, 11)
-> +    FIELD(AFMR4, AMSRR, 20, 1)
-> +    FIELD(AFMR4, AMIDE, 19, 1)
-> +    FIELD(AFMR4, AMIDL, 1, 18)
-> +    FIELD(AFMR4, AMRTR, 0, 1)
-> +REG32(AFIR4, 0x80)
-> +    FIELD(AFIR4, AIIDH, 21, 11)
-> +    FIELD(AFIR4, AISRR, 20, 1)
-> +    FIELD(AFIR4, AIIDE, 19, 1)
-> +    FIELD(AFIR4, AIIDL, 1, 18)
-> +    FIELD(AFIR4, AIRTR, 0, 1)
+> +#define LOONGSON3_BIOSNAME "bios_loongson3.bin"
 > +
-> +static void can_update_irq(XlnxZynqMPCANState *s)
+> +#define PCIE_IRQ_BASE     3
+> +
+> +#define VIRT_PCI_IO_BASE    0x18000000ul
+> +#define VIRT_PCI_IO_SIZE    0x000c0000ul
+> +#define VIRT_PCI_MEM_BASE   0x40000000ul
+> +#define VIRT_PCI_MEM_SIZE   0x40000000ul
+> +#define VIRT_PCI_ECAM_BASE  0x1a000000ul
+> +#define VIRT_PCI_ECAM_SIZE  0x02000000ul
+> +
+> +#define align(x) (((x) + 63) & ~63)
+> +
+> +struct efi_memory_map_loongson {
+> +    uint16_t vers;               /* version of efi_memory_map */
+> +    uint32_t nr_map;             /* number of memory_maps */
+> +    uint32_t mem_freq;           /* memory frequence */
+> +    struct mem_map{
+> +        uint32_t node_id;        /* node_id which memory attached to */
+> +        uint32_t mem_type;       /* system memory, pci memory, pci io, e=
+tc. */
+> +        uint64_t mem_start;      /* memory map start address */
+> +        uint32_t mem_size;       /* each memory_map size, not the total =
+size */
+> +    } map[128];
+> +} __attribute__((packed));
+> +
+> +enum loongson_cpu_type {
+> +    Legacy_2E =3D 0x0,
+> +    Legacy_2F =3D 0x1,
+> +    Legacy_3A =3D 0x2,
+> +    Legacy_3B =3D 0x3,
+> +    Legacy_1A =3D 0x4,
+> +    Legacy_1B =3D 0x5,
+> +    Legacy_2G =3D 0x6,
+> +    Legacy_2H =3D 0x7,
+> +    Loongson_1A =3D 0x100,
+> +    Loongson_1B =3D 0x101,
+> +    Loongson_2E =3D 0x200,
+> +    Loongson_2F =3D 0x201,
+> +    Loongson_2G =3D 0x202,
+> +    Loongson_2H =3D 0x203,
+> +    Loongson_3A =3D 0x300,
+> +    Loongson_3B =3D 0x301
+> +};
+> +
+> +/*
+> + * Capability and feature descriptor structure for MIPS CPU
+> + */
+> +struct efi_cpuinfo_loongson {
+> +    uint16_t vers;               /* version of efi_cpuinfo_loongson */
+> +    uint32_t processor_id;       /* PRID, e.g. 6305, 6306 */
+> +    uint32_t cputype;            /* Loongson_3A/3B, etc. */
+> +    uint32_t total_node;         /* num of total numa nodes */
+> +    uint16_t cpu_startup_core_id;   /* Boot core id */
+> +    uint16_t reserved_cores_mask;
+> +    uint32_t cpu_clock_freq;     /* cpu_clock */
+> +    uint32_t nr_cpus;
+> +    char cpuname[64];
+> +} __attribute__((packed));
+> +
+> +#define MAX_UARTS 64
+> +struct uart_device {
+> +    uint32_t iotype; /* see include/linux/serial_core.h */
+> +    uint32_t uartclk;
+> +    uint32_t int_offset;
+> +    uint64_t uart_base;
+> +} __attribute__((packed));
+> +
+> +#define MAX_SENSORS 64
+> +#define SENSOR_TEMPER  0x00000001
+> +#define SENSOR_VOLTAGE 0x00000002
+> +#define SENSOR_FAN     0x00000004
+> +struct sensor_device {
+> +    char name[32];  /* a formal name */
+> +    char label[64]; /* a flexible description */
+> +    uint32_t type;       /* SENSOR_* */
+> +    uint32_t id;         /* instance id of a sensor-class */
+> +    uint32_t fan_policy; /* see arch/mips/include/asm/mach-loongson/loon=
+gson_hwmon.h */
+> +    uint32_t fan_percent;/* only for constant speed policy */
+> +    uint64_t base_addr;  /* base address of device registers */
+> +} __attribute__((packed));
+> +
+> +struct system_loongson {
+> +    uint16_t vers;               /* version of system_loongson */
+> +    uint32_t ccnuma_smp;         /* 0: no numa; 1: has numa */
+> +    uint32_t sing_double_channel;/* 1: single; 2: double */
+> +    uint32_t nr_uarts;
+> +    struct uart_device uarts[MAX_UARTS];
+> +    uint32_t nr_sensors;
+> +    struct sensor_device sensors[MAX_SENSORS];
+> +    char has_ec;
+> +    char ec_name[32];
+> +    uint64_t ec_base_addr;
+> +    char has_tcm;
+> +    char tcm_name[32];
+> +    uint64_t tcm_base_addr;
+> +    uint64_t workarounds; /* see workarounds.h */
+> +    uint64_t of_dtb_addr; /* NULL if not support */
+> +} __attribute__((packed));
+> +
+> +struct irq_source_routing_table {
+> +    uint16_t vers;
+> +    uint16_t size;
+> +    uint16_t rtr_bus;
+> +    uint16_t rtr_devfn;
+> +    uint32_t vendor;
+> +    uint32_t device;
+> +    uint32_t PIC_type;           /* conform use HT or PCI to route to CP=
+U-PIC */
+> +    uint64_t ht_int_bit;         /* 3A: 1<<24; 3B: 1<<16 */
+> +    uint64_t ht_enable;          /* irqs used in this PIC */
+> +    uint32_t node_id;            /* node id: 0x0-0; 0x1-1; 0x10-2; 0x11-=
+3 */
+> +    uint64_t pci_mem_start_addr;
+> +    uint64_t pci_mem_end_addr;
+> +    uint64_t pci_io_start_addr;
+> +    uint64_t pci_io_end_addr;
+> +    uint64_t pci_config_addr;
+> +    uint16_t dma_mask_bits;
+> +    uint16_t dma_noncoherent;
+> +} __attribute__((packed));
+> +
+> +struct interface_info {
+> +    uint16_t vers;               /* version of the specificition */
+> +    uint16_t size;
+> +    uint8_t  flag;
+> +    char description[64];
+> +} __attribute__((packed));
+> +
+> +#define MAX_RESOURCE_NUMBER 128
+> +struct resource_loongson {
+> +    uint64_t start;              /* resource start address */
+> +    uint64_t end;                /* resource end address */
+> +    char name[64];
+> +    uint32_t flags;
+> +};
+> +
+> +struct archdev_data {};          /* arch specific additions */
+> +
+> +struct board_devices {
+> +    char name[64];               /* hold the device name */
+> +    uint32_t num_resources;      /* number of device_resource */
+> +    /* for each device's resource */
+> +    struct resource_loongson resource[MAX_RESOURCE_NUMBER];
+> +    /* arch specific additions */
+> +    struct archdev_data archdata;
+> +};
+> +
+> +struct loongson_special_attribute {
+> +    uint16_t vers;               /* version of this special */
+> +    char special_name[64];       /* special_atribute_name */
+> +    uint32_t loongson_special_type; /* type of special device */
+> +    /* for each device's resource */
+> +    struct resource_loongson resource[MAX_RESOURCE_NUMBER];
+> +};
+> +
+> +struct loongson_params {
+> +    uint64_t memory_offset;      /* efi_memory_map_loongson struct offse=
+t */
+> +    uint64_t cpu_offset;         /* efi_cpuinfo_loongson struct offset *=
+/
+> +    uint64_t system_offset;      /* system_loongson struct offset */
+> +    uint64_t irq_offset;         /* irq_source_routing_table struct offs=
+et */
+> +    uint64_t interface_offset;   /* interface_info struct offset */
+> +    uint64_t special_offset;     /* loongson_special_attribute struct of=
+fset */
+> +    uint64_t boarddev_table_offset;  /* board_devices offset */
+> +};
+> +
+> +struct smbios_tables {
+> +    uint16_t vers;               /* version of smbios */
+> +    uint64_t vga_bios;           /* vga_bios address */
+> +    struct loongson_params lp;
+> +};
+> +
+> +struct efi_reset_system_t {
+> +    uint64_t ResetCold;
+> +    uint64_t ResetWarm;
+> +    uint64_t ResetType;
+> +    uint64_t Shutdown;
+> +    uint64_t DoSuspend; /* NULL if not support */
+> +};
+> +
+> +struct efi_loongson {
+> +    uint64_t mps;                /* MPS table */
+> +    uint64_t acpi;               /* ACPI table (IA64 ext 0.71) */
+> +    uint64_t acpi20;             /* ACPI table (ACPI 2.0) */
+> +    struct smbios_tables smbios; /* SM BIOS table */
+> +    uint64_t sal_systab;         /* SAL system table */
+> +    uint64_t boot_info;          /* boot info table */
+> +};
+> +
+> +struct boot_params {
+> +    struct efi_loongson efi;
+> +    struct efi_reset_system_t reset_system;
+> +};
+> +
+> +static struct _fw_config {
+> +    unsigned long ram_size;
+> +    unsigned int mem_freq;
+> +    unsigned int nr_cpus;
+> +    unsigned int cpu_clock_freq;
+> +} fw_config;
+> +
+> +static struct _loaderparams {
+> +    unsigned long ram_size;
+> +    const char *kernel_cmdline;
+> +    const char *kernel_filename;
+> +    const char *initrd_filename;
+> +    int64_t kernel_entry;
+> +    unsigned long a0, a1, a2;
+> +} loaderparams;
+> +
+> +static void *boot_params_p;
+> +static void *boot_params_buf;
+> +
+> +static unsigned int bios_boot_code[] =3D {
+> +    0x40086000,   /* mfc0    t0, CP0_STATUS                             =
+           */
+> +    0x240900E2,   /* li      t1, 0x00e2       #{cu3,cu2,cu1,cu0,status_f=
+r}<=3D{0111} */
+> +    0x01094025,   /* or      t0, t0, t1                                 =
+           */
+> +    0x40886000,   /* mtc0    t0, CP0_STATUS                             =
+           */
+> +    0x00000000,
+> +    0x40086000,   /* mfc0    t0, CP0_STATUS                             =
+           */
+> +    0x3C090040,   /* lui     t1, 0x40         #bev                      =
+           */
+> +    0x01094025,   /* or      t0, t0, t1                                 =
+           */
+> +    0x40886000,   /* mtc0    t0, CP0_STATUS                             =
+           */
+> +    0x00000000,
+> +    0x40806800,   /* mtc0    zero, CP0_CAUSE                            =
+           */
+> +    0x00000000,
+> +    0x400A7801,   /* mfc0    t2, $15, 1                                 =
+           */
+> +    0x314A00FF,   /* andi    t2, 0x0ff                                  =
+           */
+> +    0x3C089000,   /* dli     t0, 0x900000003ff01000                     =
+           */
+> +    0x00084438,
+> +    0x35083FF0,
+> +    0x00084438,
+> +    0x35081000,
+> +    0x314B0003,   /* andi    t3, t2, 0x3      #local cpuid              =
+           */
+> +    0x000B5A00,   /* sll     t3, 8                                      =
+           */
+> +    0x010B4025,   /* or      t0, t0, t3                                 =
+           */
+> +    0x314C000C,   /* andi    t4, t2, 0xc      #node id                  =
+           */
+> +    0x000C62BC,   /* dsll    t4, 42                                     =
+           */
+> +    0x010C4025,   /* or      t0, t0, t4                                 =
+           */
+> +                  /* waitforinit:                                       =
+           */
+> +    0xDD020020,   /* ld      v0, FN_OFF(t0)   #FN_OFF 0x020             =
+           */
+> +    0x1040FFFE,   /* beqz    v0, waitforinit                            =
+           */
+> +    0x00000000,   /* nop                                                =
+           */
+> +    0xDD1D0028,   /* ld      sp, SP_OFF(t0)   #FN_OFF 0x028             =
+           */
+> +    0xDD1C0030,   /* ld      gp, GP_OFF(t0)   #FN_OFF 0x030             =
+           */
+> +    0xDD050038,   /* ld      a1, A1_OFF(t0)   #FN_OFF 0x038             =
+           */
+> +    0x00400008,   /* jr      v0               #byebye                   =
+           */
+> +    0x00000000,   /* nop                                                =
+           */
+> +    0x1000FFFF,   /* 1:  b   1b                                         =
+           */
+> +    0x00000000,   /* nop                                                =
+           */
+> +
+> +                  /* Reset                                              =
+           */
+> +    0x3C0C9000,   /* dli     t0, 0x9000000010080010                     =
+           */
+> +    0x358C0000,
+> +    0x000C6438,
+> +    0x358C1008,
+> +    0x000C6438,
+> +    0x358C0010,
+> +    0x240D0000,   /* li      t1, 0x00                                   =
+           */
+> +    0xA18D0000,   /* sb      t1, (t0)                                   =
+           */
+> +    0x1000FFFF,   /* 1:  b   1b                                         =
+           */
+> +    0x00000000,   /* nop                                                =
+           */
+> +
+> +                  /* Shutdown                                           =
+           */
+> +    0x3C0C9000,   /* dli     t0, 0x9000000010080010                     =
+           */
+> +    0x358C0000,
+> +    0x000C6438,
+> +    0x358C1008,
+> +    0x000C6438,
+> +    0x358C0010,
+> +    0x240D00FF,   /* li      t1, 0xff                                   =
+           */
+> +    0xA18D0000,   /* sb      t1, (t0)                                   =
+           */
+> +    0x1000FFFF,   /* 1:  b   1b                                         =
+           */
+> +    0x00000000    /* nop                                                =
+           */
+> +};
+> +
+> +static uint64_t loongson3_pm_read(void *opaque, hwaddr addr, unsigned si=
+ze)
 > +{
-> +    unsigned int irq;
-> +
-> +    /* Watermark register interrupts. */
-> +    if ((fifo32_num_free(&s->tx_fifo) / CAN_FRAME_SIZE) >
-> +            ARRAY_FIELD_EX32(s->regs, WIR, EW)) {
-> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, TXFWMEMP, 1);
-> +    }
-> +
-> +    if ((fifo32_num_used(&s->rx_fifo) / CAN_FRAME_SIZE) >
-> +            ARRAY_FIELD_EX32(s->regs, WIR, FW)) {
-> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXFWMFLL, 1);
-> +    }
-> +
-> +    /* RX Interrupts. */
-> +    if (fifo32_num_used(&s->rx_fifo) >= CAN_FRAME_SIZE) {
-> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXNEMP, 1);
-> +    }
-> +
-> +    /* TX interrupts. */
-> +    if (fifo32_is_empty(&s->tx_fifo)) {
-> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, TXFEMP, 1);
-> +    }
-> +
-> +    if (fifo32_is_full(&s->tx_fifo)) {
-> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, TXFLL, 1);
-> +    }
-> +
-> +    if (fifo32_is_full(&s->txhpb_fifo)) {
-> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, TXBFLL, 1);
-> +    }
-> +
-> +    irq = s->regs[R_INTERRUPT_STATUS_REGISTER];
-> +    irq &= s->regs[R_INTERRUPT_ENABLE_REGISTER];
-> +
-> +    qemu_set_irq(s->irq, irq);
-> +}
-> +
-> +static void can_ier_post_write(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
-> +
-> +    can_update_irq(s);
-> +}
-> +
-> +static uint64_t can_icr_pre_write(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
-> +    uint32_t val = val64;
-> +
-> +    s->regs[R_INTERRUPT_STATUS_REGISTER] &= ~val;
-> +    can_update_irq(s);
-> +
 > +    return 0;
 > +}
 > +
-> +static void can_config_reset(XlnxZynqMPCANState *s)
+> +static void loongson3_pm_write(void *opaque, hwaddr addr, uint64_t val,u=
+nsigned size)
 > +{
-> +    /* Reset all the configuration registers. */
-> +    register_reset(&s->reg_info[R_SOFTWARE_RESET_REGISTER]);
-> +    register_reset(&s->reg_info[R_MODE_SELECT_REGISTER]);
-> +    register_reset(
-> +              &s->reg_info[R_ARBITRATION_PHASE_BAUD_RATE_PRESCALER_REGISTER]);
-> +    register_reset(&s->reg_info[R_ARBITRATION_PHASE_BIT_TIMING_REGISTER]);
-> +    register_reset(&s->reg_info[R_STATUS_REGISTER]);
-> +    register_reset(&s->reg_info[R_INTERRUPT_STATUS_REGISTER]);
-> +    register_reset(&s->reg_info[R_INTERRUPT_ENABLE_REGISTER]);
-> +    register_reset(&s->reg_info[R_INTERRUPT_CLEAR_REGISTER]);
-> +    register_reset(&s->reg_info[R_WIR]);
-> +}
-> +
-> +static void can_config_mode(XlnxZynqMPCANState *s)
-> +{
-> +    register_reset(&s->reg_info[R_ERROR_COUNTER_REGISTER]);
-> +    register_reset(&s->reg_info[R_ERROR_STATUS_REGISTER]);
-> +
-> +    /* Put XlnxZynqMPCANState in configuration mode. */
-> +    ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, CONFIG, 1);
-> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, WKUP, 0);
-> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, SLP, 0);
-> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, BSOFF, 0);
-> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, ERROR, 0);
-> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXOFLW, 0);
-> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXOK, 0);
-> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, TXOK, 0);
-> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, ARBLST, 0);
-> +
-> +    can_update_irq(s);
-> +}
-> +
-> +static void update_status_register_mode_bits(XlnxZynqMPCANState *s)
-> +{
-> +    /* Wake up interrupt bit. */
-> +    bool wakeup_irq_val = (ARRAY_FIELD_EX32(s->regs, MODE_SELECT_REGISTER,
-> +                            SLEEP) == 0) && ARRAY_FIELD_EX32(s->regs,
-> +                            STATUS_REGISTER, SLEEP);
-> +
-> +    /* Sleep interrupt bit. */
-> +    bool sleep_irq_val = (ARRAY_FIELD_EX32(s->regs, MODE_SELECT_REGISTER,
-> +                            SLEEP) && (ARRAY_FIELD_EX32(s->regs,
-> +                            STATUS_REGISTER, SLEEP) == 0));
-> +
-> +    /* Clear previous core mode status bits. */
-> +    ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, LBACK, 0);
-> +    ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, SLEEP, 0);
-> +    ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, SNOOP, 0);
-> +    ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, NORMAL, 0);
-> +
-> +    /* set current mode bit and generate irqs accordingly. */
-> +    if (ARRAY_FIELD_EX32(s->regs, MODE_SELECT_REGISTER, LBACK)) {
-> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, LBACK, 1);
-> +    } else if (ARRAY_FIELD_EX32(s->regs, MODE_SELECT_REGISTER, SLEEP)) {
-> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, SLEEP, 1);
-> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, SLP,
-> +                            sleep_irq_val);
-> +    } else if (ARRAY_FIELD_EX32(s->regs, MODE_SELECT_REGISTER, SNOOP)) {
-> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, SNOOP, 1);
-> +    } else {
-> +        /*
-> +         * If all bits are zero then XlnxZynqMPCANState is set in normal mode.
-> +         */
-> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, NORMAL, 1);
-> +        /* Set wakeup interrupt bit. */
-> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, WKUP,
-> +                            wakeup_irq_val);
-> +    }
-> +
-> +    can_update_irq(s);
-> +}
-> +
-> +static void can_exit_sleep_mode(XlnxZynqMPCANState *s)
-> +{
-> +    ARRAY_FIELD_DP32(s->regs, MODE_SELECT_REGISTER, SLEEP, 0);
-> +    update_status_register_mode_bits(s);
-> +}
-> +
-> +static void generate_frame(qemu_can_frame *frame, uint32_t *data)
-> +{
-> +    frame->can_id = data[0];
-> +    frame->can_dlc = FIELD_EX32(data[1], TXFIFO_DLC, DLC);
-> +
-> +    frame->data[0] = FIELD_EX32(data[2], TXFIFO_DATA1, DB3);
-> +    frame->data[1] = FIELD_EX32(data[2], TXFIFO_DATA1, DB2);
-> +    frame->data[2] = FIELD_EX32(data[2], TXFIFO_DATA1, DB1);
-> +    frame->data[3] = FIELD_EX32(data[2], TXFIFO_DATA1, DB0);
-> +
-> +    frame->data[4] = FIELD_EX32(data[3], TXFIFO_DATA2, DB7);
-> +    frame->data[5] = FIELD_EX32(data[3], TXFIFO_DATA2, DB6);
-> +    frame->data[6] = FIELD_EX32(data[3], TXFIFO_DATA2, DB5);
-> +    frame->data[7] = FIELD_EX32(data[3], TXFIFO_DATA2, DB4);
-> +}
-> +
-> +static bool tx_ready_check(XlnxZynqMPCANState *s)
-> +{
-> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, SRST)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Attempting to transfer data while"
-> +                      " XlnxZynqMPCANState%d is in reset mode\n",
-> +                      s->cfg.ctrl_idx);
-> +        return false;
-> +    }
-> +
-> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN) == 0) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Attempting to transfer data while"
-> +                      " XlnxZynqMPCANState%d is in configuration mode.Reset the"
-> +                      " core so operations can start fresh\n",
-> +                      s->cfg.ctrl_idx);
-> +        return false;
-> +    }
-> +
-> +    if (ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, SNOOP)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Attempting to transfer data while"
-> +                        " XlnxZynqMPCANState%d is in SNOOP MODE\n",
-> +                         s->cfg.ctrl_idx);
-> +        return false;
-> +    }
-> +
-> +    return true;
-> +}
-> +
-> +static void transfer_fifo(XlnxZynqMPCANState *s, Fifo32 *fifo)
-> +{
-> +    qemu_can_frame frame;
-> +    uint32_t data[CAN_FRAME_SIZE];
-> +    int i;
-> +    bool can_tx = tx_ready_check(s);
-> +
-> +    if (can_tx) {
-> +        while (!fifo32_is_empty(fifo)) {
-> +            for (i = 0; i < CAN_FRAME_SIZE; i++) {
-> +                data[i] = fifo32_pop(fifo);
-> +            }
-> +
-> +            if (ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, LBACK)) {
-> +                /*
-> +                 * Controller is in loopback. In Loopback mode, the CAN core
-> +                 * transmits a recessive bitstream on to the XlnxZynqMPCANState
-> +                 * Bus. Any message transmitted is looped back to the RX line
-> +                 * and acknowledged. The XlnxZynqMPCANState core receives any
-> +                 * message that it transmits.
-> +                 */
-> +                if (fifo32_is_full(&s->rx_fifo)) {
-> +                    DB_PRINT("Loopback: RX FIFO is full."
-> +                             "TX FIFO will be flushed.\n");
-> +
-> +                    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER,
-> +                                      RXOFLW, 1);
-> +                } else {
-> +                    for (i = 0; i < CAN_FRAME_SIZE; i++) {
-> +                        fifo32_push(&s->rx_fifo, data[i]);
-> +                    }
-> +
-> +                    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER,
-> +                                      RXOK, 1);
-> +                }
-> +            } else {
-> +                /* Normal mode Tx. */
-> +                generate_frame(&frame, data);
-> +
-> +                can_bus_client_send(&s->bus_client, &frame, 1);
-> +            }
-> +        }
-> +
-> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, TXOK, 1);
-> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, TXBFLL, 0);
-> +
-> +        if (ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, SLEEP)) {
-> +            can_exit_sleep_mode(s);
-> +        }
-> +    } else {
-> +        DB_PRINT("CAN is not enabled for data transfer.\n");
-> +    }
-> +
-> +    can_update_irq(s);
-> +}
-> +
-> +static uint64_t can_srr_pre_write(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
-> +    uint32_t val = val64;
-> +
-> +    ARRAY_FIELD_DP32(s->regs, SOFTWARE_RESET_REGISTER, CEN,
-> +                        FIELD_EX32(val, SOFTWARE_RESET_REGISTER, CEN));
-> +
-> +    if (FIELD_EX32(val, SOFTWARE_RESET_REGISTER, SRST)) {
-> +        DB_PRINT("Resetting XlnxZynqMPCANState%d\n", s->cfg.ctrl_idx);
-> +
-> +        /* First, core will do software reset then will enter in config mode. */
-> +        can_config_reset(s);
-> +    }
-> +
-> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN) == 0) {
-> +        can_config_mode(s);
-> +
-> +    } else {
-> +        /*
-> +         * Leave config mode. Now XlnxZynqMPCANState core will enter Normal,
-> +         * Sleep, snoop or Loopback mode depending upon LBACK, SLEEP, SNOOP
-> +         * register states.
-> +         */
-> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, CONFIG, 0);
-> +
-> +        /* XlnxZynqMP CAN is out of config mode. it will send pending data. */
-> +        transfer_fifo(s, &s->txhpb_fifo);
-> +        transfer_fifo(s, &s->tx_fifo);
-> +    }
-> +
-> +    update_status_register_mode_bits(s);
-> +
-> +    return s->regs[R_SOFTWARE_RESET_REGISTER];
-> +}
-> +
-> +static uint64_t can_msr_pre_write(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
-> +    uint32_t val = val64;
-> +    uint8_t multi_mode = 0;
-
-The 0 init can be removed (since the variable is always set below): 
-
-uint8_t multi_mode;
-
-
-> +
-> +    /*
-> +     * Multiple mode set check. This is done to make sure user doesn't set
-> +     * multiple modes.
-> +     */
-> +    multi_mode = FIELD_EX32(val, MODE_SELECT_REGISTER, LBACK) +
-> +                 FIELD_EX32(val, MODE_SELECT_REGISTER, SLEEP) +
-> +                 FIELD_EX32(val, MODE_SELECT_REGISTER, SNOOP);
-> +
-> +    if (multi_mode > 1) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Attempting to configure several modes "
-> +                     "simultaneously. One mode will be selected according to "
-> +                     "their priority: LBACK > SLEEP > SNOOP.\n ");
-> +    }
-> +
-> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN) == 0) {
-> +        /* We are in configuration mode, any mode can be selected. */
-> +        s->regs[R_MODE_SELECT_REGISTER] = val;
-> +    } else {
-> +        bool sleep_mode_bit = FIELD_EX32(val, MODE_SELECT_REGISTER, SLEEP);
-> +
-> +        ARRAY_FIELD_DP32(s->regs, MODE_SELECT_REGISTER, SLEEP, sleep_mode_bit);
-> +
-> +        if (FIELD_EX32(val, MODE_SELECT_REGISTER, LBACK)) {
-> +            qemu_log_mask(LOG_GUEST_ERROR, "Attempting to set LBACK mode "
-> +                          "without setting CEN bit as 0\n");
-> +        } else if (FIELD_EX32(val, MODE_SELECT_REGISTER, SNOOP)) {
-> +            qemu_log_mask(LOG_GUEST_ERROR, "Attempting to set SNOOP mode "
-> +                              "without setting CEN bit as 0\n");
-> +        }
-> +
-> +        update_status_register_mode_bits(s);
-> +    }
-> +    return s->regs[R_MODE_SELECT_REGISTER];
-> +}
-> +
-> +static uint64_t can_brpr_pre_write(RegisterInfo  *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
-> +    uint32_t val = val64;
-> +
-> +    /* Only allow writes when in config mode. */
-> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN)) {
-> +        val = s->regs[R_ARBITRATION_PHASE_BAUD_RATE_PRESCALER_REGISTER];
-> +    }
-> +
-> +    return val;
-> +}
-> +
-> +static uint64_t can_btr_pre_write(RegisterInfo  *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
-> +    uint32_t val = val64;
-> +
-> +    /* Only allow writes when in config mode. */
-> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN)) {
-> +        val = s->regs[R_ARBITRATION_PHASE_BIT_TIMING_REGISTER];
-> +    }
-> +
-> +    return val;
-> +}
-> +
-> +static uint64_t can_tcr_pre_write(RegisterInfo  *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
-> +    uint32_t val = val64;
-> +
-> +    if (FIELD_EX32(val, TIMESTAMP_REGISTER, CTS)) {
-> +        s->rx_time_stamp = 0;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static void update_rx_fifo(XlnxZynqMPCANState *s, const qemu_can_frame *frame)
-> +{
-> +    uint32_t filter_pass = 0;
-
-We could consider a bool here (but above is ok for me also).
-
-bool filter_pass = false;
-
-
-> +
-> +    /* If no filter is enabled. Message will be stored in FIFO. */
-> +    if (!((ARRAY_FIELD_EX32(s->regs, AFR, UAF1)) |
-> +       (ARRAY_FIELD_EX32(s->regs, AFR, UAF2)) |
-> +       (ARRAY_FIELD_EX32(s->regs, AFR, UAF3)) |
-> +       (ARRAY_FIELD_EX32(s->regs, AFR, UAF4)))) {
-> +        filter_pass = 1;
-> +    }
-> +
-> +    /*
-> +     * Messages that pass any of the acceptance filters will be stored in
-> +     * the RX FIFO.
-> +     */
-> +    if (ARRAY_FIELD_EX32(s->regs, AFR, UAF1)) {
-> +        uint32_t id_masked = s->regs[R_AFMR1] & frame->can_id;
-> +        uint32_t filter_id_masked = s->regs[R_AFMR1] & s->regs[R_AFIR1];
-> +
-> +        if (filter_id_masked == id_masked) {
-> +            filter_pass = 1;
-> +        }
-> +    }
-> +
-> +    if (ARRAY_FIELD_EX32(s->regs, AFR, UAF2)) {
-> +        uint32_t id_masked = s->regs[R_AFMR2] & frame->can_id;
-> +        uint32_t filter_id_masked = s->regs[R_AFMR2] & s->regs[R_AFIR2];
-> +
-> +        if (filter_id_masked == id_masked) {
-> +            filter_pass = 1;
-> +        }
-> +    }
-> +
-> +    if (ARRAY_FIELD_EX32(s->regs, AFR, UAF3)) {
-> +        uint32_t id_masked = s->regs[R_AFMR3] & frame->can_id;
-> +        uint32_t filter_id_masked = s->regs[R_AFMR3] & s->regs[R_AFIR3];
-> +
-> +        if (filter_id_masked == id_masked) {
-> +            filter_pass = 1;
-> +        }
-> +    }
-> +
-> +    if (ARRAY_FIELD_EX32(s->regs, AFR, UAF4)) {
-> +        uint32_t id_masked = s->regs[R_AFMR4] & frame->can_id;
-> +        uint32_t filter_id_masked = s->regs[R_AFMR4] & s->regs[R_AFIR4];
-> +
-> +        if (filter_id_masked == id_masked) {
-> +            filter_pass = 1;
-> +        }
-> +    }
-> +
-> +    /* Store the message in fifo if it passed through any of the filters. */
-> +    if (filter_pass && frame->can_dlc <= MAX_DLC) {
-> +
-> +        if (fifo32_is_full(&s->rx_fifo)) {
-> +            DB_PRINT("RX FIFO is full.\n");
-> +
-> +            ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXOFLW, 1);
-> +        } else {
-> +            s->rx_time_stamp += 1;
-> +
-> +            fifo32_push(&s->rx_fifo, frame->can_id);
-> +
-> +            fifo32_push(&s->rx_fifo, (deposit32(0, R_RXFIFO_DLC_DLC_SHIFT,
-> +                                                R_RXFIFO_DLC_DLC_LENGTH,
-> +                                                frame->can_dlc) |
-> +                                      deposit32(0, R_RXFIFO_DLC_RXT_SHIFT,
-> +                                                R_RXFIFO_DLC_RXT_LENGTH,
-> +                                                s->rx_time_stamp)));
-> +
-> +            /* First 32 bit of the data. */
-> +            fifo32_push(&s->rx_fifo, (deposit32(0, R_TXFIFO_DATA1_DB3_SHIFT,
-> +                                        R_TXFIFO_DATA1_DB3_LENGTH,
-> +                                        frame->data[0]) |
-> +                                      deposit32(0, R_TXFIFO_DATA1_DB2_SHIFT,
-> +                                        R_TXFIFO_DATA1_DB2_LENGTH,
-> +                                        frame->data[1]) |
-> +                                      deposit32(0, R_TXFIFO_DATA1_DB1_SHIFT,
-> +                                        R_TXFIFO_DATA1_DB1_LENGTH,
-> +                                        frame->data[2]) |
-> +                                      deposit32(0, R_TXFIFO_DATA1_DB0_SHIFT,
-> +                                        R_TXFIFO_DATA1_DB0_LENGTH,
-> +                                        frame->data[3])));
-> +            /* Last 32 bit of the data. */
-> +            fifo32_push(&s->rx_fifo, (deposit32(0, R_TXFIFO_DATA2_DB7_SHIFT,
-> +                                         R_TXFIFO_DATA2_DB7_LENGTH,
-> +                                         frame->data[4]) |
-> +                                      deposit32(0, R_TXFIFO_DATA2_DB6_SHIFT,
-> +                                         R_TXFIFO_DATA2_DB6_LENGTH,
-> +                                         frame->data[5]) |
-> +                                      deposit32(0, R_TXFIFO_DATA2_DB5_SHIFT,
-> +                                         R_TXFIFO_DATA2_DB5_LENGTH,
-> +                                         frame->data[6]) |
-> +                                      deposit32(0, R_TXFIFO_DATA2_DB4_SHIFT,
-> +                                          R_TXFIFO_DATA2_DB4_LENGTH,
-> +                                          frame->data[7])));
-> +
-> +            ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXOK, 1);
-> +        }
-> +
-> +        can_update_irq(s);
-> +
-> +    } else {
-> +        DB_PRINT("Message didn't pass through any filter"
-> +                  "or dlc is not in range\n");
-> +    }
-> +}
-> +
-> +static uint64_t can_rxfifo_pre_read(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
-> +    uint32_t r = 0;
-> +
-> +    if (!fifo32_is_empty(&s->rx_fifo)) {
-> +        r = fifo32_pop(&s->rx_fifo);
-> +    } else {
-> +        DB_PRINT("No message in RXFIFO\n");
-> +
-> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXUFLW, 1);
-> +    }
-> +
-> +    can_update_irq(s);
-> +    return r;
-> +}
-> +
-> +static void can_filter_enable_post_write(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
-> +
-> +    if (ARRAY_FIELD_EX32(s->regs, AFR, UAF1) &&
-> +        ARRAY_FIELD_EX32(s->regs, AFR, UAF2) &&
-> +        ARRAY_FIELD_EX32(s->regs, AFR, UAF3) &&
-> +        ARRAY_FIELD_EX32(s->regs, AFR, UAF4)) {
-> +
-> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, ACFBSY, 1);
-> +
-> +    } else {
-> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, ACFBSY, 0);
-> +    }
-> +}
-> +
-> +static uint64_t can_filter_mask_pre_write(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
-> +    uint32_t reg_idx = (reg->access->addr) / 4;
-> +    uint32_t val = val64;
-> +    uint32_t filter_number = (reg_idx - R_AFMR1) / 2;
-> +
-> +    /* modify an acceptance filter, the corresponding UAF bit should be '0.' */
-> +    if (!(s->regs[R_AFR] & (1 << filter_number))) {
-> +        s->regs[reg_idx] = val;
-> +    } else {
-> +        DB_PRINT("Acceptance filter %d mask is not set as it's corresponding "
-> +                 "UAF bit is not set to 0\n", filter_number + 1);
-> +    }
-> +
-> +    return s->regs[reg_idx];
-> +}
-> +
-> +static uint64_t can_filter_id_pre_write(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
-> +    uint32_t reg_idx = (reg->access->addr) / 4;
-> +    uint32_t val = val64;
-> +    uint32_t filter_number = (reg_idx - R_AFIR1) / 2;
-> +
-> +    if (!(s->regs[R_AFR] & (1 << filter_number))) {
-> +        s->regs[reg_idx] = val;
-> +    } else {
-> +        DB_PRINT("Acceptance filter %d id is not set as it's corresponding "
-> +                 "UAF bit is not set to 0\n", filter_number + 1);
-> +    }
-> +
-> +    return s->regs[reg_idx];
-> +}
-> +
-> +static void can_tx_post_write(RegisterInfo *reg, uint64_t val64)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
-> +    uint32_t val = val64;
-> +
-> +    bool is_txhpb = reg->access->addr > A_TXFIFO_DATA2;
-> +
-> +    bool initiate_transfer = (reg->access->addr == A_TXFIFO_DATA2) ||
-> +                             (reg->access->addr == A_TXHPB_DATA2);
-> +
-> +    Fifo32 *f = is_txhpb ? &s->txhpb_fifo : &s->tx_fifo;
-> +
-> +    DB_PRINT("TX FIFO write for CAN%d\n", s->cfg.ctrl_idx);
-> +
-> +    if (!fifo32_is_full(f)) {
-> +        fifo32_push(f, val);
-> +    } else {
-> +        DB_PRINT("TX FIFO is full.\n");
-> +    }
-> +
-> +    /* Initiate the message send if TX register is written. */
-> +    if (initiate_transfer &&
-> +            ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN)) {
-> +        transfer_fifo(s, f);
-> +    }
-> +
-> +    can_update_irq(s);
-> +}
-> +
-> +static const RegisterAccessInfo can_regs_info[] = {
-> +    {   .name = "SOFTWARE_RESET_REGISTER",
-> +        .addr = A_SOFTWARE_RESET_REGISTER,
-> +        .rsvd = 0xfffffffc,
-> +        .pre_write = can_srr_pre_write,
-> +    },{ .name = "MODE_SELECT_REGISTER",
-> +        .addr = A_MODE_SELECT_REGISTER,
-> +        .rsvd = 0xfffffff8,
-> +        .pre_write = can_msr_pre_write,
-> +    },{ .name = "ARBITRATION_PHASE_BAUD_RATE_PRESCALER_REGISTER",
-> +        .addr = A_ARBITRATION_PHASE_BAUD_RATE_PRESCALER_REGISTER,
-> +        .rsvd = 0xffffff00,
-> +        .pre_write = can_brpr_pre_write,
-> +    },{ .name = "ARBITRATION_PHASE_BIT_TIMING_REGISTER",
-> +        .addr = A_ARBITRATION_PHASE_BIT_TIMING_REGISTER,
-> +        .rsvd = 0xfffffe00,
-> +        .pre_write = can_btr_pre_write,
-> +    },{ .name = "ERROR_COUNTER_REGISTER",
-> +        .addr = A_ERROR_COUNTER_REGISTER,
-> +        .rsvd = 0xffff0000,
-> +        .ro = 0xffffffff,
-> +    },{ .name = "ERROR_STATUS_REGISTER",
-> +        .addr = A_ERROR_STATUS_REGISTER,
-> +        .rsvd = 0xffffffe0,
-> +        .w1c = 0x1f,
-> +    },{ .name = "STATUS_REGISTER",  .addr = A_STATUS_REGISTER,
-> +        .reset = 0x1,
-> +        .rsvd = 0xffffe000,
-> +        .ro = 0x1fff,
-> +    },{ .name = "INTERRUPT_STATUS_REGISTER",
-> +        .addr = A_INTERRUPT_STATUS_REGISTER,
-> +        .reset = 0x6000,
-> +        .rsvd = 0xffff8000,
-> +        .ro = 0x7fff,
-> +    },{ .name = "INTERRUPT_ENABLE_REGISTER",
-> +        .addr = A_INTERRUPT_ENABLE_REGISTER,
-> +        .rsvd = 0xffff8000,
-> +        .post_write = can_ier_post_write,
-> +    },{ .name = "INTERRUPT_CLEAR_REGISTER",
-> +        .addr = A_INTERRUPT_CLEAR_REGISTER,
-> +        .rsvd = 0xffff8000,
-> +        .pre_write = can_icr_pre_write,
-> +    },{ .name = "TIMESTAMP_REGISTER",
-> +        .addr = A_TIMESTAMP_REGISTER,
-> +        .rsvd = 0xfffffffe,
-> +        .pre_write = can_tcr_pre_write,
-> +    },{ .name = "WIR",  .addr = A_WIR,
-> +        .reset = 0x3f3f,
-> +        .rsvd = 0xffff0000,
-> +    },{ .name = "TXFIFO_ID",  .addr = A_TXFIFO_ID,
-> +        .post_write = can_tx_post_write,
-> +    },{ .name = "TXFIFO_DLC",  .addr = A_TXFIFO_DLC,
-> +        .rsvd = 0xfffffff,
-> +        .post_write = can_tx_post_write,
-> +    },{ .name = "TXFIFO_DATA1",  .addr = A_TXFIFO_DATA1,
-> +        .post_write = can_tx_post_write,
-> +    },{ .name = "TXFIFO_DATA2",  .addr = A_TXFIFO_DATA2,
-> +        .post_write = can_tx_post_write,
-> +    },{ .name = "TXHPB_ID",  .addr = A_TXHPB_ID,
-> +        .post_write = can_tx_post_write,
-> +    },{ .name = "TXHPB_DLC",  .addr = A_TXHPB_DLC,
-> +        .rsvd = 0xfffffff,
-> +        .post_write = can_tx_post_write,
-> +    },{ .name = "TXHPB_DATA1",  .addr = A_TXHPB_DATA1,
-> +        .post_write = can_tx_post_write,
-> +    },{ .name = "TXHPB_DATA2",  .addr = A_TXHPB_DATA2,
-> +        .post_write = can_tx_post_write,
-> +    },{ .name = "RXFIFO_ID",  .addr = A_RXFIFO_ID,
-> +        .ro = 0xffffffff,
-> +        .post_read = can_rxfifo_pre_read,
-> +    },{ .name = "RXFIFO_DLC",  .addr = A_RXFIFO_DLC,
-> +        .rsvd = 0xfff0000,
-> +        .post_read = can_rxfifo_pre_read,
-> +    },{ .name = "RXFIFO_DATA1",  .addr = A_RXFIFO_DATA1,
-> +        .post_read = can_rxfifo_pre_read,
-> +    },{ .name = "RXFIFO_DATA2",  .addr = A_RXFIFO_DATA2,
-> +        .post_read = can_rxfifo_pre_read,
-> +    },{ .name = "AFR",  .addr = A_AFR,
-> +        .rsvd = 0xfffffff0,
-> +        .post_write = can_filter_enable_post_write,
-> +    },{ .name = "AFMR1",  .addr = A_AFMR1,
-> +        .pre_write = can_filter_mask_pre_write,
-> +    },{ .name = "AFIR1",  .addr = A_AFIR1,
-> +        .pre_write = can_filter_id_pre_write,
-> +    },{ .name = "AFMR2",  .addr = A_AFMR2,
-> +        .pre_write = can_filter_mask_pre_write,
-> +    },{ .name = "AFIR2",  .addr = A_AFIR2,
-> +        .pre_write = can_filter_id_pre_write,
-> +    },{ .name = "AFMR3",  .addr = A_AFMR3,
-> +        .pre_write = can_filter_mask_pre_write,
-> +    },{ .name = "AFIR3",  .addr = A_AFIR3,
-> +        .pre_write = can_filter_id_pre_write,
-> +    },{ .name = "AFMR4",  .addr = A_AFMR4,
-> +        .pre_write = can_filter_mask_pre_write,
-> +    },{ .name = "AFIR4",  .addr = A_AFIR4,
-> +        .pre_write = can_filter_id_pre_write,
-> +    }
-> +};
-> +
-> +static const MemoryRegionOps can_ops = {
-> +    .read = register_read_memory,
-> +    .write = register_write_memory,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +    },
-> +};
-> +
-> +static void xlnx_zynqmp_can_reset(DeviceState *dev)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(dev);
-> +    unsigned int i;
-> +
-> +    for (i = 0; i < ARRAY_SIZE(s->reg_info); ++i) {
-> +        register_reset(&s->reg_info[i]);
-> +    }
-> +
-> +    /*
-> +     * Reset FIFOs when CAN model is reset. This will clear the fifo writes
-> +     * done by post_write which gets called from register_reset function,
-> +     * post_write handle will not be able to trigger tx because CAN will be
-> +     * disabled when software_reset_register is cleared first.
-> +     */
-> +    fifo32_reset(&s->rx_fifo);
-> +    fifo32_reset(&s->tx_fifo);
-> +    fifo32_reset(&s->txhpb_fifo);
-> +}
-> +
-> +static bool xlnx_zynqmp_can_can_receive(CanBusClientState *client)
-> +{
-> +    XlnxZynqMPCANState *s = container_of(client, XlnxZynqMPCANState,
-> +                                         bus_client);
-> +
-> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, SRST)) {
-> +        DB_PRINT("XlnxZynqMPCANState%d Controller is reset\n", s->cfg.ctrl_idx);
-> +        return false;
-> +    } else if ((ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN)) == 0) {
-> +        DB_PRINT("XlnxZynqMPCANState%d is disabled. Incoming messages will be"
-> +                 "discarded\n", s->cfg.ctrl_idx);
-> +        return false;
-> +    } else {
-> +        return true;
-> +    }
-> +}
-> +
-> +static ssize_t xlnx_zynqmp_can_receive(CanBusClientState *client,
-> +                               const qemu_can_frame *buf, size_t buf_size) {
-> +    XlnxZynqMPCANState *s = container_of(client, XlnxZynqMPCANState,
-> +                                        bus_client);
-> +    const qemu_can_frame *frame = buf;
-> +
-> +    DB_PRINT("Incoming data for CAN%d\n", s->cfg.ctrl_idx);
-> +
-> +    if (buf_size <= 0) {
-> +        DB_PRINT("junk data received on XlnxZynqMPCANState bus\n");
-> +        return 0;
-> +    }
-> +    if (ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, LBACK)) {
-> +        /*
-> +         * XlnxZynqMPCANState will not participate in normal bus communication
-> +         *  and does not receive any messages transmitted by other CAN nodes.
-> +         */
-> +        DB_PRINT("XlnxZynqMPCANState is in loopback mode."
-> +                 " It will not receive data.\n");
-> +
-> +    } else if (ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, SNOOP)) {
-> +        /* Snoop Mode: Just keep the data. no response back. */
-> +        update_rx_fifo(s, frame);
-> +    } else if ((ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, SLEEP))) {
-> +        /*
-> +         * XlnxZynqMPCANState is in sleep mode. Any data on bus will bring it
-> +         * to wake up state.
-> +         */
-> +        can_exit_sleep_mode(s);
-> +        update_rx_fifo(s, frame);
-> +    } else if ((ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, SLEEP)) == 0) {
-> +        update_rx_fifo(s, frame);
-> +    } else {
-> +        DB_PRINT("Can't receive data as XlnxZynqMPCANState is not configured"
-> +                  " correctly.\n");
-> +    }
-> +
-> +    return 1;
-> +}
-> +
-> +static CanBusClientInfo can_xilinx_bus_client_info = {
-> +    .can_receive = xlnx_zynqmp_can_can_receive,
-> +    .receive = xlnx_zynqmp_can_receive,
-> +};
-> +
-> +static int xlnx_zynqmp_can_connect_to_bus(XlnxZynqMPCANState *s,
-> +                                          CanBusState *bus)
-> +{
-> +    s->bus_client.info = &can_xilinx_bus_client_info;
-> +
-> +    if (can_bus_insert_client(bus, &s->bus_client) < 0) {
-> +        return -1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static void xlnx_zynqmp_can_realize(DeviceState *dev, Error **errp)
-> +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(dev);
-> +
-> +    if (s->cfg.ctrl_idx > MAX_CAN_CTRLS) {
-> +        error_setg(errp, "ctrl-idx: %d exceeds max XlnxZynqMPCANState"
-> +                   " controller index", s->cfg.ctrl_idx);
+> +    if (addr !=3D PM_CNTL_MODE)
+> +        return;
+> +
+> +    switch (val) {
+> +    case 0x00:
+> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> +        return;
+> +    case 0xff:
+> +        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+> +        return;
+> +    default:
 > +        return;
 > +    }
+> +}
 > +
-> +    if (s->canbus[s->cfg.ctrl_idx]) {
-> +        if (xlnx_zynqmp_can_connect_to_bus(s, s->canbus[s->cfg.ctrl_idx]) < 0) {
-> +            error_setg(errp, "xlnx_zynqmp_can_connect_to_bus failed");
-
-Add a 'return' here (as above).
-
-Best regards,
-Francisco Iglesias
-
+> +static const MemoryRegionOps loongson3_pm_ops =3D {
+> +    .read  =3D loongson3_pm_read,
+> +    .write =3D loongson3_pm_write,
+> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> +};
+> +
+> +static struct efi_memory_map_loongson *init_memory_map(void *g_map)
+> +{
+> +    struct efi_memory_map_loongson *emap =3D g_map;
+> +
+> +    emap->nr_map =3D 2;
+> +    emap->mem_freq =3D 300000000;
+> +
+> +    emap->map[0].node_id =3D 0;
+> +    emap->map[0].mem_type =3D 1;
+> +    emap->map[0].mem_start =3D 0x0;
+> +    emap->map[0].mem_size =3D (loaderparams.ram_size > 0x10000000
+> +                            ? 256 : (loaderparams.ram_size >> 20)) - 16;
+> +
+> +    emap->map[1].node_id =3D 0;
+> +    emap->map[1].mem_type =3D 2;
+> +    emap->map[1].mem_start =3D 0x90000000;
+> +    emap->map[1].mem_size =3D (loaderparams.ram_size > 0x10000000
+> +                            ? (loaderparams.ram_size >> 20) - 256 : 0);
+> +
+> +    return emap;
+> +}
+> +
+> +static int get_host_cpu_freq(void)
+> +{
+> +    int fd =3D 0, freq =3D 0;
+> +    char buf[1024], *buf_p;
+> +
+> +    if ((fd =3D open("/proc/cpuinfo", O_RDONLY)) =3D=3D -1) {
+> +        fprintf(stderr, "Failed to open /proc/cpuinfo!\n");
+> +        return 0;
+> +    }
+> +
+> +    if (read(fd, buf, 1024) < 0) {
+> +        close(fd);
+> +        fprintf(stderr, "Failed to read /proc/cpuinfo!\n");
+> +        return 0;
+> +    }
+> +    close(fd);
+> +
+> +    buf_p =3D strstr(buf, "model name");
+> +    while (*buf_p !=3D '@') buf_p++;
+> +
+> +    buf_p +=3D 2;
+> +    memcpy(buf, buf_p, 12);
+> +    buf_p =3D buf;
+> +    while ((*buf_p >=3D '0') && (*buf_p <=3D '9')) buf_p++;
+> +    *buf_p =3D '\0';
+> +
+> +    freq =3D atoi(buf);
+> +
+> +    return freq * 1000 * 1000;
+> +}
+> +
+> +static struct efi_cpuinfo_loongson *init_cpu_info(void *g_cpuinfo_loongs=
+on)
+> +{
+> +    struct efi_cpuinfo_loongson *c =3D g_cpuinfo_loongson;
+> +
+> +    c->cputype  =3D Loongson_3A;
+> +    c->processor_id =3D 0x14C000;
+> +    c->cpu_clock_freq =3D get_host_cpu_freq();
+> +    if (!c->cpu_clock_freq)
+> +        c->cpu_clock_freq =3D 400000000;
+> +
+> +    c->cpu_startup_core_id =3D 0;
+> +    c->nr_cpus =3D current_machine->smp.cpus;
+> +    c->total_node =3D (current_machine->smp.cpus + 3) / 4;
+> +
+> +    return c;
+> +}
+> +
+> +static struct system_loongson *init_system_loongson(void *g_system)
+> +{
+> +    struct system_loongson *s =3D g_system;
+> +
+> +    s->ccnuma_smp =3D 0;
+> +    s->sing_double_channel =3D 1;
+> +    s->nr_uarts =3D 1;
+> +    s->uarts[0].iotype =3D 2;
+> +    s->uarts[0].int_offset =3D 2;
+> +    s->uarts[0].uartclk =3D 25000000;
+> +    s->uarts[0].uart_base =3D 0x1fe001e0;
+> +
+> +    return s;
+> +}
+> +
+> +static struct irq_source_routing_table *init_irq_source(void *g_irq_sour=
+ce)
+> +{
+> +    struct irq_source_routing_table *irq_info =3D g_irq_source;
+> +
+> +    irq_info->node_id =3D 0;
+> +    irq_info->PIC_type =3D 0;
+> +    irq_info->dma_mask_bits =3D 64;
+> +    irq_info->pci_mem_start_addr =3D VIRT_PCI_MEM_BASE;
+> +    irq_info->pci_mem_end_addr   =3D VIRT_PCI_MEM_BASE + VIRT_PCI_MEM_SI=
+ZE - 1;
+> +    irq_info->pci_io_start_addr  =3D VIRT_PCI_IO_BASE;
+> +
+> +    return irq_info;
+> +}
+> +
+> +static struct interface_info *init_interface_info(void *g_interface)
+> +{
+> +    struct interface_info *interface =3D g_interface;
+> +
+> +    interface->vers =3D 0x01;
+> +    strcpy(interface->description, "UEFI_Version_v1.0");
+> +
+> +    return interface;
+> +}
+> +
+> +static struct board_devices *board_devices_info(void *g_board)
+> +{
+> +    struct board_devices *bd =3D g_board;
+> +
+> +    strcpy(bd->name, "Loongson-3A-VIRT-1w-V1.00-demo");
+> +
+> +    return bd;
+> +}
+> +
+> +static struct loongson_special_attribute *init_special_info(void *g_spec=
+ial)
+> +{
+> +    struct loongson_special_attribute *special =3D g_special;
+> +
+> +    strcpy(special->special_name, "2015-04-17");
+> +
+> +    return special;
+> +}
+> +
+> +static void init_loongson_params(struct loongson_params *lp)
+> +{
+> +    void *p =3D boot_params_p;
+> +
+> +    lp->memory_offset =3D (unsigned long long)init_memory_map(p)
+> +                        - (unsigned long long)lp;
+> +    p +=3D align(sizeof(struct efi_memory_map_loongson));
+> +
+> +    lp->cpu_offset =3D (unsigned long long)init_cpu_info(p)
+> +                     - (unsigned long long)lp;
+> +    p +=3D align(sizeof(struct efi_cpuinfo_loongson));
+> +
+> +    lp->system_offset =3D (unsigned long long)init_system_loongson(p)
+> +                        - (unsigned long long)lp;
+> +    p +=3D align(sizeof(struct system_loongson));
+> +
+> +    lp->irq_offset =3D (unsigned long long)init_irq_source(p)
+> +                     - (unsigned long long)lp;
+> +    p +=3D align(sizeof(struct irq_source_routing_table));
+> +
+> +    lp->interface_offset =3D (unsigned long long)init_interface_info(p)
+> +                           - (unsigned long long)lp;
+> +    p +=3D align(sizeof(struct interface_info));
+> +
+> +    lp->boarddev_table_offset =3D (unsigned long long)board_devices_info=
+(p)
+> +                                - (unsigned long long)lp;
+> +    p+=3D align(sizeof(struct board_devices));
+> +
+> +    lp->special_offset =3D (unsigned long long)init_special_info(p)
+> +                         - (unsigned long long)lp;
+> +    p+=3D align(sizeof(struct loongson_special_attribute));
+> +
+> +    boot_params_p =3D p;
+> +}
+> +
+> +static void init_smbios(struct smbios_tables *smbios)
+> +{
+> +    smbios->vers =3D 1;
+> +    init_loongson_params(&(smbios->lp));
+> +}
+> +
+> +static void init_efi(struct efi_loongson *efi)
+> +{
+> +    init_smbios(&(efi->smbios));
+> +}
+> +
+> +static void init_reset_system(struct efi_reset_system_t *reset)
+> +{
+> +    reset->Shutdown =3D 0xffffffffbfc000b0;
+> +    reset->ResetCold =3D 0xffffffffbfc00088;
+> +    reset->ResetWarm =3D 0xffffffffbfc00088;
+> +}
+> +
+> +static int init_boot_param(struct boot_params *bp)
+> +{
+> +    init_efi(&(bp->efi));
+> +    init_reset_system(&(bp->reset_system));
+> +
+> +    return 0;
+> +}
+> +
+> +static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+> +                            Error **errp)
+> +{
+> +    fw_cfg_modify_i16(opaque, FW_CFG_BOOT_DEVICE, boot_device[0]);
+> +}
+> +
+> +static void fw_conf_init(unsigned long ram_size)
+> +{
+> +    FWCfgState *fw_cfg;
+> +
+> +    fw_cfg =3D fw_cfg_init_mem_wide(CFG_ADDR, CFG_ADDR + 8, 8, 0, NULL);
+> +    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)current_machine->sm=
+p.cpus);
+> +    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)current_machine->s=
+mp.max_cpus);
+> +    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
+> +    qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
+> +
+> +    fw_config.ram_size =3D ram_size;
+> +    fw_config.mem_freq =3D 300000000;
+> +    fw_config.nr_cpus =3D current_machine->smp.cpus;
+> +    fw_config.cpu_clock_freq =3D get_host_cpu_freq();
+> +}
+> +
+> +static int set_prom_bootparam(ram_addr_t initrd_offset, long initrd_size=
+)
+> +{
+> +    long params_size;
+> +    char memenv[32];
+> +    char highmemenv[32];
+> +    void *params_buf;
+> +    unsigned int *parg_env;
+> +    int ret =3D 0;
+> +
+> +    /* Allocate params_buf for command line. */
+> +    params_size =3D 0x100000;
+> +    params_buf =3D g_malloc0(params_size);
+> +
+> +    /*
+> +     * Layout of params_buf looks like this:
+> +     * argv[0], argv[1], 0, env[0], env[1], ... env[i], 0,
+> +     * argv[0]'s data, argv[1]'s data, env[0]'data, ..., env[i]'s data, =
+0
+> +     */
+> +    parg_env =3D (void *)params_buf;
+> +
+> +    ret =3D (3 + 1) * 4;
+> +    *parg_env++ =3D (BOOTPARAM_ADDR + ret);
+> +    ret +=3D (1 + snprintf(params_buf + ret, 256 - ret, "g"));
+> +
+> +    /* argv1 */
+> +    *parg_env++ =3D BOOTPARAM_ADDR + ret;
+> +    if (initrd_size > 0)
+> +        ret +=3D (1 + snprintf(params_buf + ret, 256 - ret,
+> +                "rd_start=3D0x" TARGET_FMT_lx " rd_size=3D%li %s",
+> +                PHYS_TO_VIRT((uint32_t)initrd_offset),
+> +                initrd_size, loaderparams.kernel_cmdline));
+> +    else
+> +        ret +=3D (1 + snprintf(params_buf+ret, 256 - ret, "%s",
+> +                loaderparams.kernel_cmdline));
+> +
+> +    /* argv2 */
+> +    *parg_env++ =3D BOOTPARAM_ADDR + 4*ret;
+> +
+> +    /* env */
+> +    sprintf(memenv, "%ld", loaderparams.ram_size > 0x10000000
+> +            ? 256 : (loaderparams.ram_size >> 20));
+> +    sprintf(highmemenv, "%ld", loaderparams.ram_size > 0x10000000
+> +            ? (loaderparams.ram_size >> 20) - 256 : 0);
+> +
+> +    setenv("memsize", memenv, 1);
+> +    setenv("highmemsize", highmemenv, 1);
+> +
+> +    ret =3D ((ret + 32) & ~31);
+> +
+> +    boot_params_buf =3D (void *)(params_buf + ret);
+> +    boot_params_p =3D boot_params_buf + align(sizeof(struct boot_params)=
+);
+> +
+> +    init_boot_param(boot_params_buf);
+> +
+> +    rom_add_blob_fixed("params", params_buf, params_size,
+> +                       BOOTPARAM_PHYADDR);
+> +    loaderparams.a0 =3D 2;
+> +    loaderparams.a1 =3D 0xffffffff80000000ULL + BOOTPARAM_PHYADDR;
+> +    loaderparams.a2 =3D 0xffffffff80000000ULL + BOOTPARAM_PHYADDR + ret;
+> +
+> +    return 0;
+> +}
+> +
+> +static int64_t load_kernel(CPUMIPSState *env)
+> +{
+> +    long kernel_size;
+> +    ram_addr_t initrd_offset;
+> +    int64_t kernel_entry, kernel_low, kernel_high, initrd_size;
+> +
+> +    kernel_size =3D load_elf(loaderparams.kernel_filename, NULL,
+> +                           cpu_mips_kseg0_to_phys, NULL,
+> +                           (uint64_t *)&kernel_entry,
+> +                           (uint64_t *)&kernel_low, (uint64_t *)&kernel_=
+high,
+> +                           NULL, 0, EM_MIPS, 1, 0);
+> +    if (kernel_size < 0) {
+> +        error_report("could not load kernel '%s': %s",
+> +                     loaderparams.kernel_filename,
+> +                     load_elf_strerror(kernel_size));
+> +        exit(1);
+> +    }
+> +
+> +    /* load initrd */
+> +    initrd_size =3D 0;
+> +    initrd_offset =3D 0;
+> +    if (loaderparams.initrd_filename) {
+> +        initrd_size =3D get_image_size(loaderparams.initrd_filename);
+> +        if (initrd_size > 0) {
+> +            initrd_offset =3D (kernel_high + ~INITRD_PAGE_MASK) &
+> +                            INITRD_PAGE_MASK;
+> +            initrd_offset =3D MAX(initrd_offset, INITRD_OFFSET);
+> +
+> +            if (initrd_offset + initrd_size > ram_size) {
+> +                error_report("memory too small for initial ram disk '%s'=
+",
+> +                             loaderparams.initrd_filename);
+> +                exit(1);
+> +            }
+> +
+> +            initrd_size =3D load_image_targphys(loaderparams.initrd_file=
+name,
+> +                                              initrd_offset,
+> +                                              ram_size - initrd_offset);
 > +        }
 > +
+> +        if (initrd_size =3D=3D (target_ulong) -1) {
+> +            error_report("could not load initial ram disk '%s'",
+> +                         loaderparams.initrd_filename);
+> +            exit(1);
+> +        }
+> +    }
+> +
+> +    /* Setup prom parameters. */
+> +    set_prom_bootparam(initrd_offset, initrd_size);
+> +
+> +    return kernel_entry;
+> +}
+> +
+> +static void main_cpu_reset(void *opaque)
+> +{
+> +    MIPSCPU *cpu =3D opaque;
+> +    CPUMIPSState *env =3D &cpu->env;
+> +
+> +    cpu_reset(CPU(cpu));
+> +
+> +    /* Loongson-3 reset stuff */
+> +    if (loaderparams.kernel_filename) {
+> +        if (cpu =3D=3D MIPS_CPU(first_cpu)) {
+> +            env->active_tc.gpr[4] =3D loaderparams.a0;
+> +            env->active_tc.gpr[5] =3D loaderparams.a1;
+> +            env->active_tc.gpr[6] =3D loaderparams.a2;
+> +            env->active_tc.PC =3D loaderparams.kernel_entry;
+> +        }
+> +        env->CP0_Status &=3D ~((1 << CP0St_BEV) | (1 << CP0St_ERL));
+> +    }
+> +}
+> +
+> +static void loongson3_isa_init(qemu_irq intc)
+> +{
+> +    qemu_irq *i8259;
+> +    ISABus *isa_bus;
+> +
+> +    isa_bus =3D isa_bus_new(NULL, get_system_memory(), get_system_io(), =
+&error_abort);
+> +
+> +    /* Interrupt controller */
+> +    /* The 8259 -> IP3  */
+> +    i8259 =3D i8259_init(isa_bus, intc);
+> +    isa_bus_irqs(isa_bus, i8259);
+> +    /* init other devices */
+> +    isa_create_simple(isa_bus, "i8042");
+> +    mc146818_rtc_init(isa_bus, 2000, NULL);
+> +}
+> +
+> +static inline void loongson3_pcie_init(MachineState *machine, DeviceStat=
+e *pic)
+> +{
+> +    int i;
+> +    qemu_irq irq;
+> +    PCIBus *pci_bus;
+> +    DeviceState *dev;
+> +    MemoryRegion *pio_alias;
+> +    MemoryRegion *mmio_alias, *mmio_reg;
+> +    MemoryRegion *ecam_alias, *ecam_reg;
+> +
+> +    dev =3D qdev_create(NULL, TYPE_GPEX_HOST);
+> +
+> +    qdev_init_nofail(dev);
+> +    pci_bus =3D PCI_HOST_BRIDGE(dev)->bus;
+> +
+> +    ecam_alias =3D g_new0(MemoryRegion, 1);
+> +    ecam_reg =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
+> +    memory_region_init_alias(ecam_alias, OBJECT(dev), "pcie-ecam",
+> +                             ecam_reg, 0, VIRT_PCI_ECAM_SIZE);
+> +    memory_region_add_subregion(get_system_memory(), VIRT_PCI_ECAM_BASE,=
+ ecam_alias);
+> +
+> +    mmio_alias =3D g_new0(MemoryRegion, 1);
+> +    mmio_reg =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 1);
+> +    memory_region_init_alias(mmio_alias, OBJECT(dev), "pcie-mmio",
+> +                             mmio_reg, VIRT_PCI_MEM_BASE, VIRT_PCI_MEM_S=
+IZE);
+> +    memory_region_add_subregion(get_system_memory(), VIRT_PCI_MEM_BASE, =
+mmio_alias);
+> +
+> +    pio_alias =3D g_new0(MemoryRegion, 1);
+> +    memory_region_init_alias(pio_alias, OBJECT(dev), "pcie-pio",
+> +                             get_system_io(), 0, VIRT_PCI_IO_SIZE);
+> +    memory_region_add_subregion(get_system_memory(), VIRT_PCI_IO_BASE, p=
+io_alias);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 2, VIRT_PCI_IO_BASE);
+> +
+> +    for (i =3D 0; i < GPEX_NUM_IRQS; i++) {
+> +        irq =3D qdev_get_gpio_in(pic, PCIE_IRQ_BASE + i);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, irq);
+> +        gpex_set_irq_num(GPEX_HOST(dev), i, PCIE_IRQ_BASE + i);
+> +    }
+> +
+> +    pci_vga_init(pci_bus);
+> +
+> +    for(i =3D 0; i < nb_nics; i++) {
+> +        NICInfo *nd =3D &nd_table[i];
+> +
+> +        if (!nd->model)
+> +            nd->model =3D g_strdup("virtio");
+> +
+> +        pci_nic_init_nofail(nd, pci_bus, nd->model, NULL);
+> +    }
+> +}
+> +
+> +static void mips_loongson3_init(MachineState *machine)
+> +{
+> +    int i;
+> +    long bios_size;
+> +    MIPSCPU *cpu;
+> +    CPUMIPSState *env;
+> +    char *filename;
+> +    const char *kernel_cmdline =3D machine->kernel_cmdline;
+> +    const char *kernel_filename =3D machine->kernel_filename;
+> +    const char *initrd_filename =3D machine->initrd_filename;
+> +    ram_addr_t ram_size =3D machine->ram_size;
+> +    MemoryRegion *address_space_mem =3D get_system_memory();
+> +    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+> +    MemoryRegion *bios =3D g_new(MemoryRegion, 1);
+> +    MemoryRegion *iomem =3D g_new(MemoryRegion, 1);
+> +
+> +    if (ram_size < 256 * 0x100000) {
+> +        error_report("Loongson-3 need at least 256MB memory");
+> +        exit(1);
+> +    }
+> +
+> +    for (i =3D 0; i < machine->smp.cpus; i++) {
+> +        /* init CPUs */
+> +        cpu =3D MIPS_CPU(cpu_create(machine->cpu_type));
+> +
+> +        /* Init internal devices */
+> +        cpu_mips_irq_init_cpu(cpu);
+> +        cpu_mips_clock_init(cpu);
+> +        qemu_register_reset(main_cpu_reset, cpu);
+> +    }
+> +    env =3D &MIPS_CPU(first_cpu)->env;
+> +
+> +    /* Allocate RAM/BIOS, 0x00000000~0x10000000 is alias of 0x80000000~0=
+x90000000 */
+> +    memory_region_init_rom(bios, NULL, "loongson3.bios", BIOS_SIZE, &err=
+or_fatal);
+> +    memory_region_init_alias(ram, NULL, "loongson3.lowram", machine->ram=
+, 0, 256 * 0x100000);
+> +    memory_region_init_io(iomem, NULL, &loongson3_pm_ops, NULL, "loongso=
+n3_pm", PM_MMIO_SIZE);
+> +
+> +    memory_region_add_subregion(address_space_mem, 0x00000000LL, ram);
+> +    memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
+> +    memory_region_add_subregion(address_space_mem, 0x80000000LL, machine=
+->ram);
+> +    memory_region_add_subregion(address_space_mem, PM_MMIO_ADDR, iomem);
+> +
+> +    /*
+> +     * We do not support flash operation, just loading pmon.bin as raw B=
+IOS.
+> +     * Please use -L to set the BIOS path and -bios to set bios name.
+> +     */
+> +
+> +    if (kernel_filename) {
+> +        loaderparams.ram_size =3D ram_size;
+> +        loaderparams.kernel_filename =3D kernel_filename;
+> +        loaderparams.kernel_cmdline =3D kernel_cmdline;
+> +        loaderparams.initrd_filename =3D initrd_filename;
+> +        loaderparams.kernel_entry =3D load_kernel(env);
+> +        rom_add_blob_fixed("bios", bios_boot_code, sizeof(bios_boot_code=
+), 0x1fc00000LL);
 > +    } else {
-> +        /* If no bus is set. */
-> +        DB_PRINT("Canbus%d property is not set for xlnxCAN%d\n",
-> +                 s->cfg.ctrl_idx, s->cfg.ctrl_idx);
+> +        if (bios_name =3D=3D NULL) {
+> +                bios_name =3D LOONGSON3_BIOSNAME;
+> +        }
+> +        filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+> +        if (filename) {
+> +            bios_size =3D load_image_targphys(filename, 0x1fc00000LL,
+> +                                            BIOS_SIZE);
+> +            g_free(filename);
+> +        } else {
+> +            bios_size =3D -1;
+> +        }
+> +
+> +        if ((bios_size < 0 || bios_size > BIOS_SIZE) &&
+> +            !kernel_filename && !qtest_enabled()) {
+> +            error_report("Could not load MIPS bios '%s'", bios_name);
+> +            exit(1);
+> +        }
+> +
+> +        fw_conf_init(ram_size);
+> +        rom_add_blob_fixed("fw_conf", (void*)&fw_config, sizeof(fw_confi=
+g), FW_CONF_ADDR);
 > +    }
 > +
-> +    /* Create RX FIFO, TXFIFO, TXHPB storage. */
-> +    fifo32_create(&s->rx_fifo, RXFIFO_SIZE);
-> +    fifo32_create(&s->tx_fifo, RXFIFO_SIZE);
-> +    fifo32_create(&s->txhpb_fifo, CAN_FRAME_SIZE);
+> +    msi_nonbroken =3D true;
+> +    loongson3_isa_init(env->irq[3]);
+> +    loongson3_pcie_init(machine, isa_pic);
+> +
+> +    if (serial_hd(0))
+> +        serial_mm_init(address_space_mem, 0x1fe001e0, 0, env->irq[2], 11=
+5200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
 > +}
 > +
-> +static void xlnx_zynqmp_can_init(Object *obj)
+> +static void mips_loongson3_machine_init(MachineClass *mc)
 > +{
-> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(obj);
-> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-> +
-> +    RegisterInfoArray *reg_array;
-> +
-> +    memory_region_init(&s->iomem, obj, TYPE_XLNX_ZYNQMP_CAN,
-> +                        XLNX_ZYNQMP_CAN_R_MAX * 4);
-> +    reg_array = register_init_block32(DEVICE(obj), can_regs_info,
-> +                               ARRAY_SIZE(can_regs_info),
-> +                               s->reg_info, s->regs,
-> +                               &can_ops,
-> +                               XLNX_ZYNQMP_CAN_ERR_DEBUG,
-> +                               XLNX_ZYNQMP_CAN_R_MAX * 4);
-> +
-> +    memory_region_add_subregion(&s->iomem, 0x00, &reg_array->mem);
-> +    sysbus_init_mmio(sbd, &s->iomem);
-> +    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
-> +
-> +    object_property_add_link(obj, "canbus0", TYPE_CAN_BUS,
-> +                             (Object **)&s->canbus[0],
-> +                             qdev_prop_allow_set_link_before_realize,
-> +                             0, &error_abort);
-> +
-> +    object_property_add_link(obj, "canbus1", TYPE_CAN_BUS,
-> +                             (Object **)&s->canbus[1],
-> +                             qdev_prop_allow_set_link_before_realize,
-> +                             0, &error_abort);
+> +    mc->desc =3D "Generic Loongson-3 Platform";
+> +    mc->init =3D mips_loongson3_init;
+> +    mc->block_default_type =3D IF_IDE;
+> +    mc->max_cpus =3D LOONGSON_MAX_VCPUS;
+> +    mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("Loongson-3A");
+> +    mc->default_ram_id =3D "loongson3.highram";
+> +    mc->default_ram_size =3D 784 * MiB;
+> +    mc->kvm_type =3D mips_kvm_type;
+> +    mc->minimum_page_bits =3D 14;
 > +}
 > +
-> +static const VMStateDescription vmstate_can = {
-> +    .name = TYPE_XLNX_ZYNQMP_CAN,
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_FIFO32(rx_fifo, XlnxZynqMPCANState),
-> +        VMSTATE_UINT32_ARRAY(regs, XlnxZynqMPCANState, XLNX_ZYNQMP_CAN_R_MAX),
-> +        VMSTATE_UINT8(cfg.ctrl_idx, XlnxZynqMPCANState),
-> +        VMSTATE_END_OF_LIST(),
-> +    }
-> +};
-> +
-> +static Property xlnx_zynqmp_can_properties[] = {
-> +    DEFINE_PROP_UINT8("ctrl-idx", XlnxZynqMPCANState, cfg.ctrl_idx, 0),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void xlnx_zynqmp_can_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +    dc->reset = xlnx_zynqmp_can_reset;
-> +    dc->realize = xlnx_zynqmp_can_realize;
-> +    device_class_set_props(dc, xlnx_zynqmp_can_properties);
-> +    dc->vmsd = &vmstate_can;
-> +}
-> +
-> +static const TypeInfo can_info = {
-> +    .name          = TYPE_XLNX_ZYNQMP_CAN,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(XlnxZynqMPCANState),
-> +    .class_init    = xlnx_zynqmp_can_class_init,
-> +    .instance_init = xlnx_zynqmp_can_init,
-> +};
-> +
-> +static void can_register_types(void)
-> +{
-> +    type_register_static(&can_info);
-> +}
-> +
-> +type_init(can_register_types)
-> diff --git a/include/hw/net/xlnx-zynqmp-can.h b/include/hw/net/xlnx-zynqmp-can.h
-> new file mode 100644
-> index 0000000..3038542
-> --- /dev/null
-> +++ b/include/hw/net/xlnx-zynqmp-can.h
-> @@ -0,0 +1,76 @@
-> +/*
-> + * QEMU model of the Xilinx CAN device.
-> + *
-> + * Copyright (c) 2020 Xilinx Inc.
-> + *
-> + * Written-by: Vikram Garhwal<fnu.vikram@xilinx.com>
-> + *
-> + * Based on QEMU CAN Device emulation implemented by Jin Yang, Deniz Eren and
-> + * Pavel Pisa.
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#ifndef HW_CAN_XILINX_H
-> +#define HW_CAN_XILINX_H
-> +
-> +#include "hw/register.h"
-> +#include "net/can_emu.h"
-> +#include "net/can_host.h"
-> +#include "qemu/fifo32.h"
-> +
-> +#define TYPE_XLNX_ZYNQMP_CAN "xlnx.zynqmp-can"
-> +
-> +#define XLNX_ZYNQMP_CAN(obj) \
-> +     OBJECT_CHECK(XlnxZynqMPCANState, (obj), TYPE_XLNX_ZYNQMP_CAN)
-> +
-> +#define MAX_CAN_CTRLS      2
-> +#define XLNX_ZYNQMP_CAN_R_MAX     (0x84 / 4)
-> +#define MAILBOX_CAPACITY   64
-> +
-> +/* Each CAN_FRAME will have 4 * 32bit size. */
-> +#define CAN_FRAME_SIZE     4
-> +#define RXFIFO_SIZE        (MAILBOX_CAPACITY * CAN_FRAME_SIZE)
-> +
-> +
-> +typedef struct XlnxZynqMPCANState {
-> +    SysBusDevice        parent_obj;
-> +    MemoryRegion        iomem;
-> +
-> +    qemu_irq            irq;
-> +
-> +    CanBusClientState   bus_client;
-> +    CanBusState         *canbus[MAX_CAN_CTRLS];
-> +
-> +    struct {
-> +        uint8_t         ctrl_idx;
-> +   } cfg;
-> +
-> +    RegisterInfo        reg_info[XLNX_ZYNQMP_CAN_R_MAX];
-> +    uint32_t            regs[XLNX_ZYNQMP_CAN_R_MAX];
-> +
-> +    uint16_t            rx_time_stamp;
-> +
-> +    Fifo32                rx_fifo;
-> +    Fifo32                tx_fifo;
-> +    Fifo32                txhpb_fifo;
-> +
-> +} XlnxZynqMPCANState;
-> +
-> +#endif
-> -- 
-> 2.7.4
-> 
-> 
+> +DEFINE_MACHINE("loongson3", mips_loongson3_machine_init)
+> --
+> 2.7.0
+>
 
