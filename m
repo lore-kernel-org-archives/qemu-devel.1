@@ -7,79 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 528B3C8300A
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 20:12:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F54C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 20:14:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FCC120B80
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 20:12:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC3E0206D6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 20:14:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N+9ntDsB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FCC120B80
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N2QzmBcZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC3E0206D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTWaq-0001mv-4J
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 16:12:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36934)
+	id 1jTWd2-0004pw-RI
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 16:14:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36944)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jTWXU-0007yl-CA
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:11:09 -0400
+ (envelope-from <peterx@redhat.com>) id 1jTWXW-0007yu-MM
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:11:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jTWTy-0004C3-Nu
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:09:08 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41313
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <peterx@redhat.com>) id 1jTWU0-0004Em-6e
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:09:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57413
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jTWTy-00046w-9C
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:05:30 -0400
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jTWTz-0004CQ-NE
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:05:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588104328;
+ s=mimecast20190719; t=1588104330;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VrE5LZkr68jWjuEjIcgWLcaBl9XGx69+ktzvmgweIdw=;
- b=N+9ntDsBJdLBDaod6rQwGMJp/Kt5U7bkuSzkoGr32ZlNa68ScnNJ9gk5x98CMTlJ/MfYWt
- WO8zmAJiBcLF9fJLOWyFS2VWyN+0gUQyKkutPlqw47rUxwUa+HPLATx3YEGTH0y3LMTz8W
- LGfLZDkL6qf29EAE2DvqReQuifmsL7I=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-315-t_x3v2IwNGSll4tcCNDmyQ-1; Tue, 28 Apr 2020 16:05:26 -0400
-X-MC-Unique: t_x3v2IwNGSll4tcCNDmyQ-1
-Received: by mail-qv1-f71.google.com with SMTP id dh14so23961701qvb.4
- for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 13:05:26 -0700 (PDT)
+ bh=V7cZKxuteEXSYDoI49xeS5MTvgBO9o2UUzrB1670/T4=;
+ b=N2QzmBcZ5JhQLTlbWlrzzf9FYnibzsUNOfN+4foXj53hKiOknAVo5BFG/Nm6HGEEAFP+uF
+ ZsBW4DrjgKfJ85t6QaVLj+zAAacUO6r3dcfgTBSA/7TEC9BOjAzJNwa2g7sah+68jTUgXu
+ vmWhnOJ3aPNSVhfPXwxxJvE7orUlx+E=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-1gZVTwsTP56R6_PNZJ-7Dw-1; Tue, 28 Apr 2020 16:05:29 -0400
+X-MC-Unique: 1gZVTwsTP56R6_PNZJ-7Dw-1
+Received: by mail-qt1-f200.google.com with SMTP id v18so25812313qtq.22
+ for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 13:05:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=kqF+l5qd3CVbIOa0BR+c6tRuUFlT6yEu/7alzCqAkbE=;
- b=fGWlSNhz8P7FdlEUh3H7UVvlYB4dQWz3GhiplTrMV/jxX4aK7SxJnRZH2/CN7Pq32G
- HlcEtqQCscuAJofp4BLz2hFBfMNRm1jMzg/w8PQ5aKdSHpTKqkCkN1FmB0FSDgJhu499
- uha9IS8J35iA64JM4f/vQlKjgnvO5pokXEBWkpODvbUj0vxGd2UPQ2WWF52DHYhPX48C
- jmhbNhDVgTvJXV/7veA6HmEtIwwkw3/Z9zCRn2I/nzCq53Ks1jFyMkA08qy5JrVzfBqm
- fLJyPVtLOw0qqQ6YJWjeX44gOItxdcd3TXaWwcdMxJxO8ol5116Od+pfmIUA5C14Ub6i
- hPEQ==
-X-Gm-Message-State: AGi0PuY3N8/P69B5W06qMFaeLEqDOYDL8devBAl9MIx22uO0hz0SczxY
- 5RixHCvXJSV/2+bUrwxnbr+dhLqTpeIAuxG2wxmeuv/bQEJYtag6PSwBxgHPZRhhjN/GpjjoyS7
- O1ZbElr1nDZzhf/k=
-X-Received: by 2002:ac8:33fd:: with SMTP id d58mr27867698qtb.213.1588104325813; 
- Tue, 28 Apr 2020 13:05:25 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKgjpwYk5ZShWA9IJUKXNtOM+JDNyUlXcb+z1W4hN8Zz8V5LQDU8ceHEltdk2JHiZ0APYmZDQ==
-X-Received: by 2002:ac8:33fd:: with SMTP id d58mr27867675qtb.213.1588104325468; 
- Tue, 28 Apr 2020 13:05:25 -0700 (PDT)
+ bh=fS4jWDgrSptjjyOMhj/BjINMgbDQWDJYgx5SYZkfOPA=;
+ b=MYKGa5P8SenzLt9x94OT/mNhsgPYgjGMyfofnPBjfRzU7iGHKmOIOkc7psK9nI96n9
+ jhmFBe9yrWAN2YjBjJrM/Dn2oLIcWgX6inw7go6bQx3/tnFn7TdRodqn95SqxgQSUw4B
+ YPWOmoDSakmtizVv3tMoRsmnuqd4YUmTgkWrIAOy8JJPwsso/27cUCbYirgsl0o89D1q
+ UknJlCJGM7ZHFWCtqo5IxONBXz1ovCQyKIoapv49oWL8Y+PdNpTAW9ZIs99vCdh5jGxE
+ acO9EF5jn8iphLknrTqFh5zzT1HUq8/vFJC7ZnVWopuh1eVu2EZS/ewxzy+dJGMrtSUY
+ WnRA==
+X-Gm-Message-State: AGi0PubJKTHGIjjnD4g1j2WMhGGK9bICAZVUmpriVXI6+m4ZNGKXsJyj
+ ryUV3eGn8BBs/u4eBAs5og3IuUoAVwz/B+L2gKBtXr2yLMlI138sUFJHDslyK4OqoUW3aMXrE64
+ QvLXf5vHnaGb0Ois=
+X-Received: by 2002:a37:a0d5:: with SMTP id
+ j204mr28938604qke.112.1588104327809; 
+ Tue, 28 Apr 2020 13:05:27 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJdkuV+Q1GelkdNKVrlzRd60hPhhQMlKsEH1BXxVtp545bSQiMeHkYXMVueq61LcbAks0bgWg==
+X-Received: by 2002:a37:a0d5:: with SMTP id
+ j204mr28938561qke.112.1588104327211; 
+ Tue, 28 Apr 2020 13:05:27 -0700 (PDT)
 Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id k127sm14106585qkb.35.2020.04.28.13.05.24
+ by smtp.gmail.com with ESMTPSA id k127sm14106585qkb.35.2020.04.28.13.05.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Apr 2020 13:05:24 -0700 (PDT)
+ Tue, 28 Apr 2020 13:05:26 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RFC v2 8/9] KVM: Add dirty-gfn-count property
-Date: Tue, 28 Apr 2020 16:05:08 -0400
-Message-Id: <20200428200509.13150-6-peterx@redhat.com>
+Subject: [PATCH RFC v2 9/9] KVM: Dirty ring support
+Date: Tue, 28 Apr 2020 16:05:09 -0400
+Message-Id: <20200428200509.13150-7-peterx@redhat.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200428195707.11980-1-peterx@redhat.com>
 References: <20200428195707.11980-1-peterx@redhat.com>
@@ -88,11 +90,11 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:11:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=peterx@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 02:16:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,166 +111,532 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a parameter for dirty gfn count for dirty rings.  If zero, dirty ring i=
-s
-disabled.  Otherwise dirty ring will be enabled with the per-vcpu gfn count=
- as
-specified.  If dirty ring cannot be enabled due to unsupported kernel or
-illegal parameter, it'll fallback to dirty logging.
+KVM dirty ring is a new interface to pass over dirty bits from kernel to th=
+e
+userspace.  Instead of using a bitmap for each memory region, the dirty rin=
+g
+contains an array of dirtied GPAs to fetch (in the form of offset in slots)=
+.
+For each vcpu there will be one dirty ring that binds to it.
 
-By default, dirty ring is not enabled (dirty-gfn-count default to 0).
+kvm_dirty_ring_reap() is the major function to collect dirty rings.  It can=
+ be
+called either by a standalone reaper thread that runs in the background,
+collecting dirty pages for the whole VM.  It can also be called directly by=
+ any
+thread that has BQL taken.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- accel/kvm/kvm-all.c | 72 +++++++++++++++++++++++++++++++++++++++++++++
- qemu-options.hx     |  5 ++++
- 2 files changed, 77 insertions(+)
+ accel/kvm/kvm-all.c    | 341 ++++++++++++++++++++++++++++++++++++++++-
+ accel/kvm/trace-events |   7 +
+ include/hw/core/cpu.h  |   8 +
+ 3 files changed, 353 insertions(+), 3 deletions(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 2d581013cc..fbb0a3b1e9 100644
+index fbb0a3b1e9..236dbcd536 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -127,6 +127,9 @@ struct KVMState
+@@ -15,6 +15,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include <sys/ioctl.h>
++#include <poll.h>
+=20
+ #include <linux/kvm.h>
+=20
+@@ -75,6 +76,25 @@ struct KVMParkedVcpu {
+     QLIST_ENTRY(KVMParkedVcpu) node;
+ };
+=20
++enum KVMDirtyRingReaperState {
++    KVM_DIRTY_RING_REAPER_NONE =3D 0,
++    /* The reaper is sleeping */
++    KVM_DIRTY_RING_REAPER_WAIT,
++    /* The reaper is reaping for dirty pages */
++    KVM_DIRTY_RING_REAPER_REAPING,
++};
++
++/*
++ * KVM reaper instance, responsible for collecting the KVM dirty bits
++ * via the dirty ring.
++ */
++struct KVMDirtyRingReaper {
++    /* The reaper thread */
++    QemuThread reaper_thr;
++    volatile uint64_t reaper_iteration; /* iteration number of reaper thr =
+*/
++    volatile enum KVMDirtyRingReaperState reaper_state; /* reap thr state =
+*/
++};
++
+ struct KVMState
+ {
+     AccelState parent_obj;
+@@ -121,7 +141,6 @@ struct KVMState
+     void *memcrypt_handle;
+     int (*memcrypt_encrypt_data)(void *handle, uint8_t *ptr, uint64_t len)=
+;
+=20
+-    /* For "info mtree -f" to tell if an MR is registered in KVM */
+     int nr_as;
+     struct KVMAs {
          KVMMemoryListener *ml;
-         AddressSpace *as;
-     } *as;
-+    bool kvm_dirty_ring_enabled;    /* Whether KVM dirty ring is enabled *=
+@@ -130,6 +149,7 @@ struct KVMState
+     bool kvm_dirty_ring_enabled;    /* Whether KVM dirty ring is enabled *=
 /
-+    uint64_t kvm_dirty_ring_size;   /* Size of the per-vcpu dirty ring */
-+    uint32_t kvm_dirty_gfn_count;   /* Number of dirty GFNs per ring */
+     uint64_t kvm_dirty_ring_size;   /* Size of the per-vcpu dirty ring */
+     uint32_t kvm_dirty_gfn_count;   /* Number of dirty GFNs per ring */
++    struct KVMDirtyRingReaper reaper;
  };
 =20
  KVMState *kvm_state;
-@@ -2087,6 +2090,40 @@ static int kvm_init(MachineState *ms)
-     s->memory_listener.listener.coalesced_io_add =3D kvm_coalesce_mmio_reg=
-ion;
-     s->memory_listener.listener.coalesced_io_del =3D kvm_uncoalesce_mmio_r=
-egion;
+@@ -359,6 +379,13 @@ int kvm_destroy_vcpu(CPUState *cpu)
+         goto err;
+     }
 =20
-+    /*
-+     * Enable KVM dirty ring if supported, otherwise fall back to
-+     * dirty logging mode
-+     */
-+    if (s->kvm_dirty_gfn_count > 0) {
-+        uint64_t ring_size;
-+
-+        ring_size =3D s->kvm_dirty_gfn_count * sizeof(struct kvm_dirty_gfn=
-);
-+
-+        /* Read the max supported pages */
-+        ret =3D kvm_vm_check_extension(kvm_state, KVM_CAP_DIRTY_LOG_RING);
-+        if (ret > 0) {
-+            if (ring_size > ret) {
-+                error_report("KVM dirty GFN count %" PRIu32 " too big "
-+                             "(maximum is %ld).  Please use a smaller valu=
-e.",
-+                             s->kvm_dirty_gfn_count,
-+                             ret / sizeof(struct kvm_dirty_gfn));
-+                ret =3D -EINVAL;
-+                goto err;
-+            }
-+
-+            ret =3D kvm_vm_enable_cap(s, KVM_CAP_DIRTY_LOG_RING, 0, ring_s=
-ize);
-+            if (ret) {
-+                error_report("Enabling of KVM dirty ring failed: %d. "
-+                             "Suggested mininum value is 1024. "
-+                             "Please also make sure it's a power of two.",=
- ret);
-+                goto err;
-+            }
-+
-+            s->kvm_dirty_ring_size =3D ring_size;
-+            s->kvm_dirty_ring_enabled =3D true;
++    if (cpu->kvm_dirty_gfns) {
++        ret =3D munmap(cpu->kvm_dirty_gfns, s->kvm_dirty_ring_size);
++        if (ret < 0) {
++            goto err;
 +        }
 +    }
 +
-     kvm_memory_listener_register(s, &s->memory_listener,
-                                  &address_space_memory, 0);
-     memory_listener_register(&kvm_io_listener,
-@@ -3047,6 +3084,33 @@ bool kvm_kernel_irqchip_split(void)
-     return kvm_state->kernel_irqchip_split =3D=3D ON_OFF_AUTO_ON;
+     vcpu =3D g_malloc0(sizeof(*vcpu));
+     vcpu->vcpu_id =3D kvm_arch_vcpu_id(cpu);
+     vcpu->kvm_fd =3D cpu->kvm_fd;
+@@ -423,6 +450,19 @@ int kvm_init_vcpu(CPUState *cpu)
+             (void *)cpu->kvm_run + s->coalesced_mmio * PAGE_SIZE;
+     }
+=20
++    if (s->kvm_dirty_ring_enabled) {
++        /* Use MAP_SHARED to share pages with the kernel */
++        cpu->kvm_dirty_gfns =3D mmap(NULL, s->kvm_dirty_ring_size,
++                                   PROT_READ | PROT_WRITE, MAP_SHARED,
++                                   cpu->kvm_fd,
++                                   PAGE_SIZE * KVM_DIRTY_LOG_PAGE_OFFSET);
++        if (cpu->kvm_dirty_gfns =3D=3D MAP_FAILED) {
++            ret =3D -errno;
++            DPRINTF("mmap'ing vcpu dirty gfns failed: %d\n", ret);
++            goto err;
++        }
++    }
++
+     ret =3D kvm_arch_init_vcpu(cpu);
+ err:
+     return ret;
+@@ -536,6 +576,11 @@ static void kvm_slot_sync_dirty_pages(KVMSlot *slot)
+     cpu_physical_memory_set_dirty_lebitmap(slot->dirty_bmap, start, pages)=
+;
  }
 =20
-+static void kvm_get_dirty_gfn_count(Object *obj, Visitor *v,
-+                                    const char *name, void *opaque,
-+                                    Error **errp)
++static void kvm_slot_reset_dirty_pages(KVMSlot *slot)
 +{
-+    KVMState *s =3D KVM_STATE(obj);
-+    uint32_t value =3D s->kvm_dirty_gfn_count;
-+
-+    visit_type_uint32(v, name, &value, errp);
++    memset(slot->dirty_bmap, 0, slot->dirty_bmap_size);
 +}
 +
-+static void kvm_set_dirty_gfn_count(Object *obj, Visitor *v,
-+                                    const char *name, void *opaque,
-+                                    Error **errp)
+ #define ALIGN(x, y)  (((x)+(y)-1) & ~((y)-1))
+=20
+ /* Allocate the dirty bitmap for a slot  */
+@@ -579,6 +624,198 @@ static void kvm_slot_get_dirty_log(KVMState *s, KVMSl=
+ot *slot)
+     }
+ }
+=20
++/* Should be with all slots_lock held for the address spaces. */
++static void kvm_dirty_ring_mark_page(KVMState *s, uint32_t as_id,
++                                     uint32_t slot_id, uint64_t offset)
 +{
-+    KVMState *s =3D KVM_STATE(obj);
-+    Error *error =3D NULL;
-+    uint32_t value;
++    KVMMemoryListener *kml;
++    KVMSlot *mem;
 +
-+    visit_type_uint32(v, name, &value, &error);
-+    if (error) {
-+        error_propagate(errp, error);
++    if (as_id >=3D s->nr_as) {
 +        return;
 +    }
 +
-+    s->kvm_dirty_gfn_count =3D value;
++    kml =3D s->as[as_id].ml;
++    mem =3D &kml->slots[slot_id];
++
++    if (!mem->memory_size || offset >=3D (mem->memory_size / TARGET_PAGE_S=
+IZE)) {
++        return;
++    }
++
++    set_bit(offset, mem->dirty_bmap);
 +}
 +
- static void kvm_accel_instance_init(Object *obj)
++static bool dirty_gfn_is_dirtied(struct kvm_dirty_gfn *gfn)
++{
++    return gfn->flags =3D=3D KVM_DIRTY_GFN_F_DIRTY;
++}
++
++static void dirty_gfn_set_collected(struct kvm_dirty_gfn *gfn)
++{
++    gfn->flags =3D KVM_DIRTY_GFN_F_RESET;
++}
++
++/*
++ * Should be with all slots_lock held for the address spaces.  It returns =
+the
++ * dirty page we've collected on this dirty ring.
++ */
++static uint32_t kvm_dirty_ring_reap_one(KVMState *s, CPUState *cpu)
++{
++    struct kvm_dirty_gfn *dirty_gfns =3D cpu->kvm_dirty_gfns, *cur;
++    uint32_t gfn_count =3D s->kvm_dirty_gfn_count;
++    uint32_t count =3D 0, fetch =3D cpu->kvm_fetch_index;
++
++    assert(dirty_gfns && gfn_count);
++    trace_kvm_dirty_ring_reap_vcpu(cpu->cpu_index);
++
++    while (true) {
++        cur =3D &dirty_gfns[fetch % gfn_count];
++        if (!dirty_gfn_is_dirtied(cur)) {
++            break;
++        }
++        kvm_dirty_ring_mark_page(s, cur->slot >> 16, cur->slot & 0xffff,
++                                 cur->offset);
++        dirty_gfn_set_collected(cur);
++        trace_kvm_dirty_ring_page(cpu->cpu_index, fetch, cur->offset);
++        fetch++;
++        count++;
++    }
++    cpu->kvm_fetch_index =3D fetch;
++
++    return count;
++}
++
++/*
++ * Currently for simplicity, we must hold BQL before calling this.  We can
++ * consider to drop the BQL if we're clear with all the race conditions.
++ */
++static uint64_t kvm_dirty_ring_reap(KVMState *s)
++{
++    KVMMemoryListener *kml;
++    int ret, i, locked_count =3D s->nr_as;
++    CPUState *cpu;
++    uint64_t total =3D 0;
++    int64_t stamp;
++
++    /*
++     * We need to lock all kvm slots for all address spaces here,
++     * because:
++     *
++     * (1) We need to mark dirty for dirty bitmaps in multiple slots
++     *     and for tons of pages, so it's better to take the lock here
++     *     once rather than once per page.  And more importantly,
++     *
++     * (2) We must _NOT_ publish dirty bits to the other threads
++     *     (e.g., the migration thread) via the kvm memory slot dirty
++     *     bitmaps before correctly re-protect those dirtied pages.
++     *     Otherwise we can have potential risk of data corruption if
++     *     the page data is read in the other thread before we do
++     *     reset below.
++     */
++    for (i =3D 0; i < s->nr_as; i++) {
++        kml =3D s->as[i].ml;
++        if (!kml) {
++            /*
++             * This is tricky - we grow s->as[] dynamically now.  Take
++             * care of that case.  We also assumed the as[] will fill
++             * one by one starting from zero.  Without this, we race
++             * with register_smram_listener.
++             *
++             * TODO: make all these prettier...
++             */
++            locked_count =3D i;
++            break;
++        }
++        kvm_slots_lock(kml);
++    }
++
++    stamp =3D get_clock();
++
++    CPU_FOREACH(cpu) {
++        total +=3D kvm_dirty_ring_reap_one(s, cpu);
++    }
++
++    if (total) {
++        ret =3D kvm_vm_ioctl(s, KVM_RESET_DIRTY_RINGS);
++        assert(ret =3D=3D total);
++    }
++
++    stamp =3D get_clock() - stamp;
++
++    if (total) {
++        trace_kvm_dirty_ring_reap(total, stamp / 1000);
++    }
++
++    /* Unlock whatever locks that we have locked */
++    for (i =3D 0; i < locked_count; i++) {
++        kvm_slots_unlock(s->as[i].ml);
++    }
++
++    return total;
++}
++
++static void do_kvm_cpu_synchronize_kick(CPUState *cpu, run_on_cpu_data arg=
+)
++{
++    /* No need to do anything */
++}
++
++/*
++ * Kick all vcpus out in a synchronized way.  When returned, we
++ * guarantee that every vcpu has been kicked and at least returned to
++ * userspace once.
++ */
++static void kvm_cpu_synchronize_kick_all(void)
++{
++    CPUState *cpu;
++
++    CPU_FOREACH(cpu) {
++        run_on_cpu(cpu, do_kvm_cpu_synchronize_kick, RUN_ON_CPU_NULL);
++    }
++}
++
++/*
++ * Flush all the existing dirty pages to the KVM slot buffers.  When
++ * this call returns, we guarantee that all the touched dirty pages
++ * before calling this function have been put into the per-kvmslot
++ * dirty bitmap.
++ *
++ * To achieve this, we need to:
++ *
++ * (1) Kick all vcpus out, this will make sure that we flush all the
++ *     dirty buffers that potentially in the hardware (PML) into the
++ *     dirty rings, after that,
++ *
++ * (2) Kick the reaper thread and make sure it reaps all the dirty
++ *     page that is in the dirty rings.
++ *
++ * This function must be called with BQL held.
++ */
++static void kvm_dirty_ring_flush(struct KVMDirtyRingReaper *r)
++{
++    trace_kvm_dirty_ring_flush(0);
++
++    /*
++     * The function needs to be serialized.  Since this function
++     * should always be with BQL held, serialization is guaranteed.
++     * However, let's be sure of it.
++     */
++    assert(qemu_mutex_iothread_locked());
++
++    /*
++     * First make sure to flush the hardware buffers by kicking all
++     * vcpus out in a synchronous way.
++     */
++    kvm_cpu_synchronize_kick_all();
++
++    /*
++     * Recycle the dirty bits outside the reaper thread.  We're safe becau=
+se
++     * kvm_dirty_ring_reap() is internally protected by a mutex.
++     */
++    kvm_dirty_ring_reap(kvm_state);
++
++    trace_kvm_dirty_ring_flush(1);
++}
++
+ /**
+  * kvm_physical_sync_dirty_bitmap - Sync dirty bitmap from kernel space
+  *
+@@ -1111,6 +1348,51 @@ out:
+     kvm_slots_unlock(kml);
+ }
+=20
++static void *kvm_dirty_ring_reaper_thread(void *data)
++{
++    KVMState *s =3D data;
++    struct KVMDirtyRingReaper *r =3D &s->reaper;
++
++    rcu_register_thread();
++
++    trace_kvm_dirty_ring_reaper("init");
++
++    while (true) {
++        r->reaper_state =3D KVM_DIRTY_RING_REAPER_WAIT;
++        trace_kvm_dirty_ring_reaper("wait");
++        /*
++         * TODO: provide a smarter timeout rather than a constant?
++         */
++        sleep(1);
++
++        trace_kvm_dirty_ring_reaper("wakeup");
++        r->reaper_state =3D KVM_DIRTY_RING_REAPER_REAPING;
++
++        qemu_mutex_lock_iothread();
++        kvm_dirty_ring_reap(s);
++        qemu_mutex_unlock_iothread();
++
++        r->reaper_iteration++;
++    }
++
++    trace_kvm_dirty_ring_reaper("exit");
++
++    rcu_unregister_thread();
++
++    return NULL;
++}
++
++static int kvm_dirty_ring_reaper_init(KVMState *s)
++{
++    struct KVMDirtyRingReaper *r =3D &s->reaper;
++
++    qemu_thread_create(&r->reaper_thr, "kvm-reaper",
++                       kvm_dirty_ring_reaper_thread,
++                       s, QEMU_THREAD_JOINABLE);
++
++    return 0;
++}
++
+ static void kvm_region_add(MemoryListener *listener,
+                            MemoryRegionSection *section)
  {
-     KVMState *s =3D KVM_STATE(obj);
-@@ -3054,6 +3118,8 @@ static void kvm_accel_instance_init(Object *obj)
-     s->kvm_shadow_mem =3D -1;
-     s->kernel_irqchip_allowed =3D true;
-     s->kernel_irqchip_split =3D ON_OFF_AUTO_AUTO;
-+    /* KVM dirty ring is by default off */
-+    s->kvm_dirty_gfn_count =3D 0;
+@@ -1139,6 +1421,36 @@ static void kvm_log_sync(MemoryListener *listener,
+     kvm_slots_unlock(kml);
  }
 =20
- static void kvm_accel_class_init(ObjectClass *oc, void *data)
-@@ -3075,6 +3141,12 @@ static void kvm_accel_class_init(ObjectClass *oc, vo=
-id *data)
-         NULL, NULL, &error_abort);
-     object_class_property_set_description(oc, "kvm-shadow-mem",
-         "KVM shadow MMU size", &error_abort);
++static void kvm_log_sync_global(MemoryListener *l)
++{
++    KVMMemoryListener *kml =3D container_of(l, KVMMemoryListener, listener=
+);
++    KVMState *s =3D kvm_state;
++    KVMSlot *mem;
++    int i;
 +
-+    object_class_property_add(oc, "dirty-gfn-count", "uint32",
-+        kvm_get_dirty_gfn_count, kvm_set_dirty_gfn_count,
-+        NULL, NULL, &error_abort);
-+    object_class_property_set_description(oc, "dirty-gfn-count",
-+        "KVM dirty GFN count (=3D0 to disable dirty ring)", &error_abort);
- }
++    /* Flush all kernel dirty addresses into KVMSlot dirty bitmap */
++    kvm_dirty_ring_flush(&s->reaper);
++
++    /*
++     * TODO: make this faster when nr_slots is big while there are
++     * only a few used slots (small VMs).
++     */
++    kvm_slots_lock(kml);
++    for (i =3D 0; i < s->nr_slots; i++) {
++        mem =3D &kml->slots[i];
++        if (mem->memory_size && mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
++            kvm_slot_sync_dirty_pages(mem);
++            /*
++             * This is not needed by KVM_GET_DIRTY_LOG because the
++             * ioctl will unconditionally overwrite the whole region.
++             * However kvm dirty ring has no such side effect.
++             */
++            kvm_slot_reset_dirty_pages(mem);
++        }
++    }
++    kvm_slots_unlock(kml);
++}
++
+ static void kvm_log_clear(MemoryListener *listener,
+                           MemoryRegionSection *section)
+ {
+@@ -1245,10 +1557,15 @@ void kvm_memory_listener_register(KVMState *s, KVMM=
+emoryListener *kml,
+     kml->listener.region_del =3D kvm_region_del;
+     kml->listener.log_start =3D kvm_log_start;
+     kml->listener.log_stop =3D kvm_log_stop;
+-    kml->listener.log_sync =3D kvm_log_sync;
+-    kml->listener.log_clear =3D kvm_log_clear;
+     kml->listener.priority =3D 10;
 =20
- static const TypeInfo kvm_accel_type =3D {
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 292d4e7c0c..62e88f012c 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -124,6 +124,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
-     "                kernel-irqchip=3Don|off|split controls accelerated ir=
-qchip support (default=3Don)\n"
-     "                kvm-shadow-mem=3Dsize of KVM shadow MMU in bytes\n"
-     "                tb-size=3Dn (TCG translation block cache size)\n"
-+    "                dirty-gfn-count=3Dn (KVM dirty ring GFN count, defaul=
-t 0)\n"
-     "                thread=3Dsingle|multi (enable multi-threaded TCG)\n",=
- QEMU_ARCH_ALL)
- SRST
- ``-accel name[,prop=3Dvalue[,...]]``
-@@ -158,6 +159,10 @@ SRST
-         where both the back-end and front-ends support it and no
-         incompatible TCG features have been enabled (e.g.
-         icount/replay).
++    if (s->kvm_dirty_ring_enabled) {
++        kml->listener.log_sync_global =3D kvm_log_sync_global;
++    } else {
++        kml->listener.log_sync =3D kvm_log_sync;
++        kml->listener.log_clear =3D kvm_log_clear;
++    }
 +
-+    ``dirty-gfn-count=3Dn``
-+        Controls the per-vcpu KVM dirty ring GFN count (=3D0 to disable).
-+
- ERST
+     memory_listener_register(&kml->listener, as);
 =20
- DEF("smp", HAS_ARG, QEMU_OPTION_smp,
+     for (i =3D 0; i < s->nr_as; ++i) {
+@@ -2138,6 +2455,13 @@ static int kvm_init(MachineState *ms)
+         qemu_balloon_inhibit(true);
+     }
+=20
++    if (s->kvm_dirty_ring_enabled) {
++        ret =3D kvm_dirty_ring_reaper_init(s);
++        if (ret) {
++            goto err;
++        }
++    }
++
+     return 0;
+=20
+ err:
+@@ -2445,6 +2769,17 @@ int kvm_cpu_exec(CPUState *cpu)
+         case KVM_EXIT_INTERNAL_ERROR:
+             ret =3D kvm_handle_internal_error(cpu, run);
+             break;
++        case KVM_EXIT_DIRTY_RING_FULL:
++            /*
++             * We shouldn't continue if the dirty ring of this vcpu is
++             * still full.  Got kicked by KVM_RESET_DIRTY_RINGS.
++             */
++            trace_kvm_dirty_ring_full(cpu->cpu_index);
++            qemu_mutex_lock_iothread();
++            kvm_dirty_ring_reap(kvm_state);
++            qemu_mutex_unlock_iothread();
++            ret =3D 0;
++            break;
+         case KVM_EXIT_SYSTEM_EVENT:
+             switch (run->system_event.type) {
+             case KVM_SYSTEM_EVENT_SHUTDOWN:
+diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
+index 4fb6e59d19..89ef99569f 100644
+--- a/accel/kvm/trace-events
++++ b/accel/kvm/trace-events
+@@ -16,4 +16,11 @@ kvm_set_ioeventfd_mmio(int fd, uint64_t addr, uint32_t v=
+al, bool assign, uint32_
+ kvm_set_ioeventfd_pio(int fd, uint16_t addr, uint32_t val, bool assign, ui=
+nt32_t size, bool datamatch) "fd: %d @0x%x val=3D0x%x assign: %d size: %d m=
+atch: %d"
+ kvm_set_user_memory(uint32_t slot, uint32_t flags, uint64_t guest_phys_add=
+r, uint64_t memory_size, uint64_t userspace_addr, int ret) "Slot#%d flags=
+=3D0x%x gpa=3D0x%"PRIx64 " size=3D0x%"PRIx64 " ua=3D0x%"PRIx64 " ret=3D%d"
+ kvm_clear_dirty_log(uint32_t slot, uint64_t start, uint32_t size) "slot#%"=
+PRId32" start 0x%"PRIx64" size 0x%"PRIx32
++kvm_dirty_ring_full(int id) "vcpu %d"
++kvm_dirty_ring_reap_vcpu(int id) "vcpu %d"
++kvm_dirty_ring_page(int vcpu, uint32_t slot, uint64_t offset) "vcpu %d fet=
+ch %"PRIu32" offset 0x%"PRIx64
++kvm_dirty_ring_reaper(const char *s) "%s"
++kvm_dirty_ring_reap(uint64_t count, int64_t t) "reaped %"PRIu64" pages (to=
+ok %"PRIi64" us)"
++kvm_dirty_ring_reaper_kick(const char *reason) "%s"
++kvm_dirty_ring_flush(int finished) "%d"
+=20
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index b26fdb5ab8..2d2bf61629 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -340,6 +340,11 @@ struct qemu_work_item;
+  * @ignore_memory_transaction_failures: Cached copy of the MachineState
+  *    flag of the same name: allows the board to suppress calling of the
+  *    CPU do_transaction_failed hook function.
++ * @kvm_dirty_ring_full:
++ *   Whether the kvm dirty ring of this vcpu is soft-full.
++ * @kvm_dirty_ring_avail:
++ *   Semaphore to be posted when the kvm dirty ring of the vcpu is
++ *   available again.
+  *
+  * State of one CPU core or thread.
+  */
+@@ -407,9 +412,12 @@ struct CPUState {
+      */
+     uintptr_t mem_io_pc;
+=20
++    /* Only used in KVM */
+     int kvm_fd;
+     struct KVMState *kvm_state;
+     struct kvm_run *kvm_run;
++    struct kvm_dirty_gfn *kvm_dirty_gfns;
++    uint32_t kvm_fetch_index;
+=20
+     /* Used for events with 'vcpu' and *without* the 'disabled' properties=
+ */
+     DECLARE_BITMAP(trace_dstate_delayed, CPU_TRACE_DSTATE_MAX_EVENTS);
 --=20
 2.24.1
 
