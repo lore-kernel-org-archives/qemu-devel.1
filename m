@@ -2,91 +2,96 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 123E3C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 17:28:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EDBDC83009
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 17:29:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0A112082E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 17:28:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 701EE2137B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 17:29:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kzkdl6Zo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0A112082E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sjUkOCFV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 701EE2137B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTU2G-0004jm-UV
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 13:28:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41410)
+	id 1jTU3E-00065M-KF
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 13:29:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTU0y-00036E-8T
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 13:27:43 -0400
+ id 1jTU25-0004lK-I5
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 13:28:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTU0F-0006ve-Fv
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 13:27:24 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41365)
+ id 1jTU1N-0007eV-94
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 13:28:33 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52074)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTU0F-0006vK-3Q; Tue, 28 Apr 2020 13:26:39 -0400
-Received: by mail-wr1-x443.google.com with SMTP id g13so25618199wrb.8;
- Tue, 28 Apr 2020 10:26:38 -0700 (PDT)
+ id 1jTU0n-00071g-Lv; Tue, 28 Apr 2020 13:27:13 -0400
+Received: by mail-wm1-x341.google.com with SMTP id x4so3735388wmj.1;
+ Tue, 28 Apr 2020 10:27:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=xj9mbELBxmDJv8s9rOOYS9YWnqmysEZNeFuMvyIIlyA=;
- b=Kzkdl6ZotuJuQRi9dX0Gl+v1Qt0Rrwc/vwPNM7kYUWRImgpXPnYJW7Jrw87F+YYr1J
- c68jfMCbFNtTJ/1hsZv0drxDIyjrxQ014XUg7ipvyaKgWB7Vuxo3cJyKdpAguzRZP9E+
- 9wRKj24gb2AyvHGkBlj0vdbZvthc41UhN1gIst9GnUrQagUNqZkHNcZtiRAJX3j5WEj3
- Pr0b2x3HT1TFmAKTFqqEBFwQNLaNHyxau23MTPaU9WvEx+88E6sNdvqoZceAjh5vMZ7b
- Fq3PX6q1jJabTzHHWM+Jo1gcY4avryYTOQRTg9gC4qNAhkZkaAUMPSrK4U0nJCYb1BCo
- 4ygQ==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=pqKrXOEtrxnP496YhTxf3HJMjQqHOadMZsTWVWntBL0=;
+ b=sjUkOCFVSKo/9ZEDfLABxfTfnh/Y084rvTB8qqqnBVGrtZMrreiTVKbJJF2TAnW2L1
+ D3HJEgtEg3wqrMh+0ww12LoM63XSj2JkQ5J8Obf/cFmljgSNP6zDFVbTUy2ka3IBcWgl
+ AT7Ijanp3yvFZL+ZB2m0hSGP77PhOXdKEO31mttp/g/MHNsuc900hlGJ6dJT3eRDoOia
+ b4KHFcwqbRx1GgRPDCG12JXqLIKW3IEbZlA7zxYYvf87ifFX5bMZr0Z9voexQiijPPIx
+ KaShqpBJsodjPnNvkXPZLu+w8+oy4fbRMCqn44JoOeXjlidxCdBEF/tL43PpCt3Jt5sg
+ pIzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=xj9mbELBxmDJv8s9rOOYS9YWnqmysEZNeFuMvyIIlyA=;
- b=ITPzEspDVtPcuaOcNhcMd0f3nAWDDUNj+9muNz8PlZwzL81iFLqWLWWhYa/qi0jFwD
- TrF8jMrm3kJcGg92MeFPd1McZ2G8xwQ8sEtjBiGhcplXpAJUyxqoZeGimh2i6xFgo2Kh
- Swli3BvPtwsDXpD5IN6uTahSF+A39iSNKpstboweuSEZ0t+H817wxYUcFXcxRsKc3XU9
- ymygH+3HQU1k9Ar7QJhikXaSUAIWmLv+9fhVcIfWwqYC2r785ue0jHODHGRPL6HU/rB/
- MeiFh2a6BiQL/WqyEy3FdXDvBMmY6cJp3rUT0+5yQU6sFci2B/ERzRiOFsI3O3fyyr8i
- zFGw==
-X-Gm-Message-State: AGi0PubY8uUAv3hynISh5Edg9xzIq10xHf8rTORd3W/zYwW1y6f+JhOY
- BmwwEmCA5B3Gx0Ms4gm9wx9GDFO9WFw=
-X-Google-Smtp-Source: APiQypL47sLmxJRilvt7J9SQ036wwpQ0Wh7mkdbsCW45ZpWGBbrNTFllZpiG1bY0BIjdP+QeNzOvRg==
-X-Received: by 2002:adf:f1c6:: with SMTP id z6mr27383600wro.361.1588094796438; 
- Tue, 28 Apr 2020 10:26:36 -0700 (PDT)
-Received: from x1w.redhat.com (137.red-88-21-205.staticip.rima-tde.net.
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pqKrXOEtrxnP496YhTxf3HJMjQqHOadMZsTWVWntBL0=;
+ b=lEuyxfoWygnYVTBkmL66YLPKnLtxrzay8X3Sl4W5Qw81u3MtyaHe8K9ecQBmVhoHo4
+ 3SLHeb7NMeC/9mJV3YxrgeriGoeZJIpEOoeNcCBNEVm+1hH9wsPDhUkwN/AC0VbAeUXF
+ Y4o+hBIQfTk1xtqCGXwjItKDrImNfMhFeEd5YWhvLTf21dnEkRcR5+Cw2qnW8CtNT6Qw
+ g9HB9rHx2Uamk+ZO7qLnoADNUXJWJTaqZFdfLZrKUpPz5bqn5oOLwHQpqVC+EWnsQLFd
+ FWwwyqvFuLQlgGWf4TuaCpTK1GKNOJLoQNqgJoO9dMiuWCzoVgPXH5V6trIagKkzA7sh
+ oc3w==
+X-Gm-Message-State: AGi0Pub/SGeleFLSJOJyD1ew0eu+FuiZo+WWkWqbbGIySpxHSHXtP00+
+ oMYwXLHRpOceAC8BLriZxwjdN9KKAr4=
+X-Google-Smtp-Source: APiQypJwAZ/OilwvL3caTUHo5t7XYxsT6n/WJZQCEoQLLcpA8pzTRVN8pX6KcPZkmh17f1H8cG4EUg==
+X-Received: by 2002:a1c:7ed7:: with SMTP id z206mr5308336wmc.64.1588094831609; 
+ Tue, 28 Apr 2020 10:27:11 -0700 (PDT)
+Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.137])
- by smtp.gmail.com with ESMTPSA id w6sm27132286wrm.86.2020.04.28.10.26.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Apr 2020 10:26:35 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3] target/arm: Use correct variable for setting 'max' cpu's
- MIDR_EL1
-Date: Tue, 28 Apr 2020 19:26:34 +0200
-Message-Id: <20200428172634.29707-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.1
+ by smtp.gmail.com with ESMTPSA id g6sm26515968wrw.34.2020.04.28.10.27.10
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 28 Apr 2020 10:27:10 -0700 (PDT)
+Subject: Re: [PATCH 11/17] hw/arm/bcm2835: Drop futile attempts at
+ QOM-adopting memory
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200428163419.4483-1-armbru@redhat.com>
+ <20200428163419.4483-12-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <518e7614-f783-65c5-0b00-e0fca429a820@amsat.org>
+Date: Tue, 28 Apr 2020 19:27:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200428163419.4483-12-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,60 +103,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Desnogues <laurent.desnogues@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, berrange@redhat.com,
+ ehabkost@redhat.com, Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ qemu-arm@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MIDR_EL1 a 64-bit system register with the top 32-bit being RES0.
+On 4/28/20 6:34 PM, Markus Armbruster wrote:
+> The "bcm2835-peripherals" device's .instance_init() method
+> bcm2835_peripherals_init() attempts to make two memory regions QOM
+> children of the device.  This is futile, because memory_region_init()
+> already did.  The errors are ignored (a later commit will change
+> that).  Drop the useless calls.
+> 
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>
+> Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
+> Cc: qemu-arm@nongnu.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   hw/arm/bcm2835_peripherals.c | 2 --
+>   1 file changed, 2 deletions(-)
+> 
+> diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+> index edcaa4916d..8b399d67ff 100644
+> --- a/hw/arm/bcm2835_peripherals.c
+> +++ b/hw/arm/bcm2835_peripherals.c
+> @@ -43,12 +43,10 @@ static void bcm2835_peripherals_init(Object *obj)
+>   
+>       /* Memory region for peripheral devices, which we export to our parent */
+>       memory_region_init(&s->peri_mr, obj,"bcm2835-peripherals", 0x1000000);
+> -    object_property_add_child(obj, "peripheral-io", OBJECT(&s->peri_mr), NULL);
+>       sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->peri_mr);
+>   
+>       /* Internal memory region for peripheral bus addresses (not exported) */
+>       memory_region_init(&s->gpu_bus_mr, obj, "bcm2835-gpu", (uint64_t)1 << 32);
+> -    object_property_add_child(obj, "gpu-bus", OBJECT(&s->gpu_bus_mr), NULL);
+>   
+>       /* Internal memory region for request/response communication with
+>        * mailbox-addressable peripherals (not exported)
+> 
 
-This fixes when compiling with -Werror=conversion:
-
-  target/arm/cpu64.c: In function ‘aarch64_max_initfn’:
-  target/arm/cpu64.c:628:21: error: conversion from ‘uint64_t’ {aka ‘long unsigned int’} to ‘uint32_t’ {aka ‘unsigned int’} may change value [-Werror=conversion]
-    628 |         cpu->midr = t;
-        |                     ^
-
-Suggested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-Since v2: Do not use RESERVED bits.
-Since v1: Follow Laurent and Peter suggestion.
----
- target/arm/cpu.h | 2 +-
- target/arm/cpu.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 8b9f2961ba..592fb217d6 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -894,7 +894,7 @@ struct ARMCPU {
-         uint64_t id_aa64dfr0;
-         uint64_t id_aa64dfr1;
-     } isar;
--    uint32_t midr;
-+    uint64_t midr;
-     uint32_t revidr;
-     uint32_t reset_fpsid;
-     uint32_t ctr;
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index a79f233b17..7ff80894b6 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -2757,7 +2757,7 @@ static const ARMCPUInfo arm_cpus[] = {
- static Property arm_cpu_properties[] = {
-     DEFINE_PROP_BOOL("start-powered-off", ARMCPU, start_powered_off, false),
-     DEFINE_PROP_UINT32("psci-conduit", ARMCPU, psci_conduit, 0),
--    DEFINE_PROP_UINT32("midr", ARMCPU, midr, 0),
-+    DEFINE_PROP_UINT64("midr", ARMCPU, midr, 0),
-     DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
-                         mp_affinity, ARM64_AFFINITY_INVALID),
-     DEFINE_PROP_INT32("node-id", ARMCPU, node_id, CPU_UNSET_NUMA_NODE_ID),
--- 
-2.21.1
-
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
