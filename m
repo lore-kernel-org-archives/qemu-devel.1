@@ -2,130 +2,90 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7443C83001
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 17:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFCDEC83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 17:17:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3A0F20730
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 17:14:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 763E02082E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 17:17:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i+Qwjmpz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3A0F20730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fRc9Kp4B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 763E02082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTToI-00082M-Pt
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 13:14:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39870)
+	id 1jTTrd-0001wb-KU
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 13:17:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39990)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jTTnZ-0007I2-0q
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 13:13:33 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jTTqp-0001LW-SE
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 13:16:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jTTnX-0001SQ-3X
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 13:13:32 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60214
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jTTnW-0001LE-K1
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 13:13:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588094008;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ZMRrKf54dW6kXbmMEMIBgiZUtqbBLDYfeZWZclkQv/U=;
- b=i+Qwjmpzcu1cJSGs+mO4AK4HGyyd+ExO5xw8qy6YUwdFMo4PhcaY8cmRkCKDp+ZJ6fITCh
- HIxpXZ2nYAXWAgOzbslIOWBeB/jK2iUJ4ClQj+pCEXge2Ec2fSQRRc27CfKlbqDF9IIGpU
- OFE0d2vtRMD9SIQWaSOPDIxo/q18xuE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-4Knlp4pZPpSxqJU2lzHPjA-1; Tue, 28 Apr 2020 13:13:26 -0400
-X-MC-Unique: 4Knlp4pZPpSxqJU2lzHPjA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89E63800C78;
- Tue, 28 Apr 2020 17:13:25 +0000 (UTC)
-Received: from [10.36.112.101] (ovpn-112-101.ams2.redhat.com [10.36.112.101])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5361860300;
- Tue, 28 Apr 2020 17:13:23 +0000 (UTC)
-Subject: Re: [PATCH 08/17] s390x/cpumodel: Fix UI to CPU features
- pcc-cmac-{aes,eaes}-256
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200428163419.4483-1-armbru@redhat.com>
- <20200428163419.4483-9-armbru@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <7ed42e2f-e437-3d06-e46b-5416e4d2a6d3@redhat.com>
-Date: Tue, 28 Apr 2020 19:13:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <alex.bennee@linaro.org>) id 1jTTqg-0002tb-JP
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 13:16:55 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:33896)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jTTqg-0002t5-1c
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 13:16:46 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id j1so25604261wrt.1
+ for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 10:16:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=1pq1lHLSOmmH7N125+R4HUhPyCkUqHE2ejEQyvBBBJ0=;
+ b=fRc9Kp4BL4wukY/0nQJpg2aiHYkkTUFAPptu/gIqTYe94FEU1PBi8G7Cax89hS+5cU
+ X0lfZk1Llx9L7tsRFaLQlRhe8AZhR56VQZvnvu+wac1C5HTtIYMbLNr4ip9ljjanEg7c
+ rjpj2AzwCzvRQ7qPbopfxM3T5K1v3q2fFQa44rV8sZCmP8IBt1qa1TkmmcydckbvoJsF
+ NkpvzpWO/0uegOV+IHmVJvtwBs7GVTMSEjtV28DLjFPvy7y5cuDS9wju7ELTHvRyDJ/I
+ 6mCU295luYqZGOoVhugRiDWgkgaZGtlSGCrEd1d9VI1bJBoPYK5p6J/ms/RU+hOKlU6B
+ mqYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=1pq1lHLSOmmH7N125+R4HUhPyCkUqHE2ejEQyvBBBJ0=;
+ b=MAPd0NlQi7NvpLTZXd2JSYAaM11eGfhS98M2Y1n0vRS34CeBb/VADDwIP1ONODhS2S
+ gYiT2/PEJFuUEdNpM2zrFD24hsiNwNSqjg+yNcD0DtldikhGvk2J0bjAzGeT/Lk4bztn
+ 5WEEJEmnbP/vmLNAaawPG80NxIBaMiKQwAybD1y69RHVIajIWUawUdccCWzTYyl1oXHG
+ lv7463PBmKdycnW0jiQVChZW01cXa8z+W6it1SmnvCmCMnXYoVvJlR7KPI4f6Vmx6N3/
+ kIlCN4kGZtXyD1Hgkm0anKyqmwEBm7GXJmpM6SZ4VfYhIz28V/WaTEmZyyz26CZDr/3Q
+ Zy3w==
+X-Gm-Message-State: AGi0Pubkr2ThaL7EtBrh3qz0CgGfAjniw3BpXlwEGFMYMh+Yv2FbsokM
+ w6iyHanan3bgP0riXQiJWYiyBQ==
+X-Google-Smtp-Source: APiQypLveZJoKkg8Z/+93IyggNTiYpAxrmImkFgS39j9RPIs3/35ZsTrsKYoGYVj3gryAyPQv1cjqg==
+X-Received: by 2002:adf:e5c8:: with SMTP id a8mr37306195wrn.56.1588094203607; 
+ Tue, 28 Apr 2020 10:16:43 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id r2sm4199028wmg.2.2020.04.28.10.16.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Apr 2020 10:16:42 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 59C091FF7E;
+ Tue, 28 Apr 2020 18:16:41 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH] plugins: new lockstep plugin for debugging TCG changes
+Date: Tue, 28 Apr 2020 18:16:33 +0100
+Message-Id: <20200428171633.17487-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200428163419.4483-9-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:11:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42a.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::42a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,104 +97,295 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28.04.20 18:34, Markus Armbruster wrote:
-> Both s390_features[S390_FEAT_PCC_CMAC_AES_256].name and
-> s390_features[S390_FEAT_PCC_CMAC_EAES_256].name is
-> "pcc-cmac-eaes-256".  The former is obviously a pasto.
->=20
-> Impact:
->=20
-> * s390_feat_bitmap_to_ascii() misidentifies S390_FEAT_PCC_CMAC_AES_256
->   as "pcc-cmac-eaes-256".  Affects QMP commands query-cpu-definitions,
->   query-cpu-model-expansion, query-cpu-model-baseline,
->   query-cpu-model-comparison, and the error message when
->   s390_realize_cpu_model() fails in check_compatibility().
->=20
-> * s390_realize_cpu_model() misidentifies it in check_consistency()
->   warnings.
->=20
-> * s390_cpu_list() likewise.  Affects -cpu help.
->=20
-> * s390_cpu_model_register_props() creates CPU property
->   "pcc-cmac-eaes-256" twice.  The second one fails, but the error is
->   ignored (a later commit will change that).  Results in a single
->   property "pcc-cmac-eaes-256" with the description for
->   S390_FEAT_PCC_CMAC_AES_256, and no property for
->   S390_FEAT_PCC_CMAC_EAES_256.  CPU properties are visible in CLI -cpu
->   and -device, QMP & HMP device_add, QMP device-list-properties, and
->   QOM introspection.
->=20
-> Fix by deleting the wayward 'e'.
+When we make changes to the TCG we sometimes cause regressions that
+are deep into the execution cycle of the guest. Debugging this often
+requires comparing large volumes of trace information to figure out
+where behaviour has diverged.
 
-Very nice catch - thanks!
+The lockstep plugin utilises a shared socket so two QEMU's running
+with the plugin will write their current execution position and wait
+to receive the position of their partner process. When execution
+diverges the plugins output where they were and the previous few
+blocks before unloading themselves and letting execution continue.
 
-While this sounds very bad, it's luckily not that bad in practice
-(currently).
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ tests/plugin/lockstep.c | 244 ++++++++++++++++++++++++++++++++++++++++
+ tests/plugin/Makefile   |   1 +
+ 2 files changed, 245 insertions(+)
+ create mode 100644 tests/plugin/lockstep.c
 
-The feature (or rather, both features) is part of the feature group
-"msa4". As long as we have all sub-features part of that group (which is
-usually the case), we will always indicate "msa4" to the user, instead
-of all the separate sub-features. So, expansion, baseline, comparison
-will usually only work with "msa4".
-
-(in addition, current KVM is not capable of actually masking off these
-sub-features, so it will still, always see the feature, even if not
-explicitly specified via "-cpu X,pcc-cmac-aes-256=3Don)
-
-I think we should do stable backports.
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
->=20
-> Fixes: 782417446279717aa85320191a519b51f6d5dd31
-> Cc: Halil Pasic <pasic@linux.ibm.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: David Hildenbrand <david@redhat.com>
-> Cc: qemu-s390x@nongnu.org
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  target/s390x/cpu_features_def.inc.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_featu=
-res_def.inc.h
-> index 31dff0d84e..a8d562d688 100644
-> --- a/target/s390x/cpu_features_def.inc.h
-> +++ b/target/s390x/cpu_features_def.inc.h
-> @@ -310,7 +310,7 @@ DEF_FEAT(PCC_CMAC_ETDEA_192, "pcc-cmac-etdea-128", PC=
-C, 10, "PCC Compute-Last-Bl
->  DEF_FEAT(PCC_CMAC_TDEA, "pcc-cmac-etdea-192", PCC, 11, "PCC Compute-Last=
--Block-CMAC-Using-EncryptedTDEA-192")
->  DEF_FEAT(PCC_CMAC_AES_128, "pcc-cmac-aes-128", PCC, 18, "PCC Compute-Las=
-t-Block-CMAC-Using-AES-128")
->  DEF_FEAT(PCC_CMAC_AES_192, "pcc-cmac-aes-192", PCC, 19, "PCC Compute-Las=
-t-Block-CMAC-Using-AES-192")
-> -DEF_FEAT(PCC_CMAC_AES_256, "pcc-cmac-eaes-256", PCC, 20, "PCC Compute-La=
-st-Block-CMAC-Using-AES-256")
-> +DEF_FEAT(PCC_CMAC_AES_256, "pcc-cmac-aes-256", PCC, 20, "PCC Compute-Las=
-t-Block-CMAC-Using-AES-256")
->  DEF_FEAT(PCC_CMAC_EAES_128, "pcc-cmac-eaes-128", PCC, 26, "PCC Compute-L=
-ast-Block-CMAC-Using-Encrypted-AES-128")
->  DEF_FEAT(PCC_CMAC_EAES_192, "pcc-cmac-eaes-192", PCC, 27, "PCC Compute-L=
-ast-Block-CMAC-Using-Encrypted-AES-192")
->  DEF_FEAT(PCC_CMAC_EAES_256, "pcc-cmac-eaes-256", PCC, 28, "PCC Compute-L=
-ast-Block-CMAC-Using-Encrypted-AES-256")
->=20
-
-
---=20
-Thanks,
-
-David / dhildenb
+diff --git a/tests/plugin/lockstep.c b/tests/plugin/lockstep.c
+new file mode 100644
+index 0000000000..2c386d2b83
+--- /dev/null
++++ b/tests/plugin/lockstep.c
+@@ -0,0 +1,244 @@
++/*
++ * Lockstep Execution Plugin
++ *
++ * Allows you to execute two QEMU instances in lockstep and report
++ * when their execution diverges. This is mainly useful for developers
++ * who want to see where a change to TCG code generation has
++ * introduced a subtle and hard to find bug.
++ *
++ * Caveats:
++ *   - single-threaded linux-user apps only with non-deterministic syscalls
++ *   - icount based system emulation (no MTTCG)
++ *
++ * This code is not thread safe!
++ *
++ * Copyright (c) 2020 Linaro Ltd
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include <glib.h>
++#include <inttypes.h>
++#include <unistd.h>
++#include <sys/socket.h>
++#include <sys/un.h>
++#include <stdio.h>
++#include <errno.h>
++
++#include <qemu-plugin.h>
++
++QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
++
++/* saved so we can uninstall later */
++static qemu_plugin_id_t our_id;
++
++static unsigned long bb_count;
++static unsigned long insn_count;
++
++typedef struct {
++    uint64_t pc;
++    uint64_t insns_in_block;
++    uint64_t insns_executed;
++} BlockInfo;
++
++static GSList *log;
++
++static int socket_fd;
++static char *path_to_unlink;
++
++
++static void plugin_cleanup(qemu_plugin_id_t id)
++{
++
++    /* Free our block data */
++    g_slist_free_full(log, &g_free);
++
++    close(socket_fd);
++    if (path_to_unlink) {
++        unlink(path_to_unlink);
++    }
++}
++
++static void plugin_exit(qemu_plugin_id_t id, void *p)
++{
++    g_autoptr(GString) out = g_string_new("No divergence :-)\n");
++    g_string_append_printf(out, "Executed %ld/%d blocks\n",
++                           bb_count, g_slist_length(log));
++    g_string_append_printf(out, "Executed ~%ld instructions\n", insn_count);
++    qemu_plugin_outs(out->str);
++
++    plugin_cleanup(id);
++}
++
++static void report_divergance(BlockInfo *us, BlockInfo *them)
++{
++    int i;
++    GSList *entry = log;
++    g_autoptr(GString) out = g_string_new("I feel a divergence in the force\n");
++    g_string_append_printf(out, "Us @ %#016lx (%ld)\n",
++                           us->pc, us->insns_executed);
++    g_string_append_printf(out, "Them @ %#016lx (%ld)\n",
++                           them->pc, them->insns_executed);
++    for (i = 0; i < 5; i++) {
++        BlockInfo *prev = (BlockInfo *) entry->data;
++        g_string_append_printf(out, "  previously @ %#016lx\n", prev->pc);
++        entry = g_slist_next(entry);
++    }
++
++    qemu_plugin_outs(out->str);
++
++    /* we can't do anything else now so uninstall ourselves */
++    qemu_plugin_uninstall(our_id, plugin_cleanup);
++}
++
++static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
++{
++    BlockInfo *bi = (BlockInfo *) udata;
++    BlockInfo remote;
++    ssize_t bytes;
++
++    bi->insns_executed = insn_count;
++
++    /* write our execution state */
++    bytes = write(socket_fd, bi, sizeof(BlockInfo));
++    if (bytes < sizeof(BlockInfo)) {
++        if (bytes < 0) {
++            qemu_plugin_outs("problem writing to socket");
++            abort();
++        }
++        qemu_plugin_outs("wrote less than expected");
++    }
++    /* read where our peer has reached */
++    bytes = read(socket_fd, &remote, sizeof(BlockInfo));
++    if (bytes < sizeof(BlockInfo)) {
++        if (bytes < 0) {
++            qemu_plugin_outs("problem reading from socket");
++            abort();
++        }
++        qemu_plugin_outs("read less than expected");
++        abort();
++    }
++
++    // compare and bail
++    if ((bi->pc != remote.pc) ||
++        (bi->insns_executed != remote.insns_executed)) {
++        report_divergance(bi, &remote);
++    }
++
++    // mark the execution as complete
++    log = g_slist_prepend(log, bi);
++    insn_count += bi->insns_in_block;
++    bb_count++;
++}
++
++static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
++{
++    BlockInfo *bi = g_new0(BlockInfo, 1);
++    bi->pc = qemu_plugin_tb_vaddr(tb);
++    bi->insns_in_block = qemu_plugin_tb_n_insns(tb);
++
++    qemu_plugin_register_vcpu_tb_exec_cb(tb, vcpu_tb_exec,
++                                         QEMU_PLUGIN_CB_NO_REGS, (void *)bi);
++}
++
++
++/*
++ * Instead of encoding master/slave status into what is essentially
++ * two peers we shall just take the simple approach of checking for
++ * the existence of the pipe and assuming if it's not there we are the
++ * first process.
++ */
++static bool setup_socket(const char *path)
++{
++    struct sockaddr_un sockaddr;
++    int fd;
++
++    fd = socket(AF_UNIX, SOCK_STREAM, 0);
++    if (fd < 0) {
++        perror("create socket");
++        return false;
++    }
++
++    sockaddr.sun_family = AF_UNIX;
++    g_strlcpy(sockaddr.sun_path, path, sizeof(sockaddr.sun_path)-1);
++    if (bind(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {
++        perror("bind socket");
++        close(fd);
++        return false;
++    }
++
++    /* remember to clean-up */
++    path_to_unlink = g_strdup(path);
++
++    if (listen(fd, 1) < 0) {
++        perror("listen socket");
++        close(fd);
++        return false;
++    }
++
++    socket_fd = accept(fd, NULL, NULL);
++    if (socket_fd < 0 && errno != EINTR) {
++        perror("accept socket");
++        return false;
++    }
++
++    qemu_plugin_outs("setup_socket::ready\n");
++
++    return true;
++}
++
++static bool connect_socket(const char *path)
++{
++    int fd;
++    struct sockaddr_un sockaddr;
++
++    fd = socket(AF_UNIX, SOCK_STREAM, 0);
++    if (fd < 0) {
++        perror("create socket");
++        return false;
++    }
++
++    sockaddr.sun_family = AF_UNIX;
++    g_strlcpy(sockaddr.sun_path, path, sizeof(sockaddr.sun_path)-1);
++
++    if (connect(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {
++        perror("failed to connect");
++        return false;
++    }
++
++    qemu_plugin_outs("connect_socket::ready\n");
++
++    socket_fd = fd;
++    return true;
++}
++
++static bool setup_unix_socket(const char *path)
++{
++    if (g_file_test(path, G_FILE_TEST_EXISTS)) {
++        return connect_socket(path);
++    } else {
++        return setup_socket(path);
++    }
++}
++
++
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
++                                           const qemu_info_t *info,
++                                           int argc, char **argv)
++{
++    if (!argc || !argv[0]) {
++        qemu_plugin_outs("Need a socket path to talk to other instance.");
++        return -1;
++    }
++
++    if (!setup_unix_socket(argv[0])) {
++        qemu_plugin_outs("Failed to setup socket for communications.");
++        return -1;
++    }
++
++    our_id = id;
++
++    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
++    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
++    return 0;
++}
+diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
+index 75467b6db8..b3250e2504 100644
+--- a/tests/plugin/Makefile
++++ b/tests/plugin/Makefile
+@@ -13,6 +13,7 @@ NAMES += mem
+ NAMES += hotblocks
+ NAMES += howvec
+ NAMES += hotpages
++NAMES += lockstep
+ 
+ SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
+ 
+-- 
+2.20.1
 
 
