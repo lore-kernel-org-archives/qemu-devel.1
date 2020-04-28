@@ -2,85 +2,77 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5CC2C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 21:34:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3247C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 21:40:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89E7420730
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 21:34:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6CCD520730
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 21:40:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HKGSEzEV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89E7420730
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hHOa4shr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CCD520730
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTXsL-00006X-Jl
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 17:34:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49626)
+	id 1jTXxh-0002h3-Jb
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 17:40:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50076)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jTXra-0007bX-JR
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 17:33:58 -0400
+ (envelope-from <eblake@redhat.com>) id 1jTXwm-0001K4-1Y
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 17:39:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jTXra-0005Li-2K
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 17:33:58 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42228
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eblake@redhat.com>) id 1jTXvo-0008BS-Li
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 17:39:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51911
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jTXrZ-0005Ji-JQ
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 17:33:57 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jTXvo-0008BH-8V
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 17:38:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588109636;
+ s=mimecast20190719; t=1588109899;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mJh9HOEISVycXwu8QaXKgH8h3u5a9ua9YR5RfUw0UnU=;
- b=HKGSEzEVIDkus2WZNXzM109vgDxx1jlL3watfsdTcpyx0kc3XJYERGciBqg57nOKQtTN15
- BP4pbKCX8pP2PHaUDUnqqJCH1lJ2S3mLiaZ6HZ9D0c0+mxInvCEob0NdKhTDQsQO4sat3l
- a7fBpN9PkU1v2bxLIzwvlFTBSLbBW7M=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=LK75nYSRtRRZuMEp++Qb+RXUesvk1OVJFMBt4OC3ZfQ=;
+ b=hHOa4shrT7PrYrVRu0RtLX1Ik8+Eb+qVTDzARGt49kkiaDEbZwuvO1HRTZAKjzER1mj4O4
+ McNfhjgD/aSFIkKrnnhHq2o3W336H644MZFOOLGl8FM3GboCdLwKftLDjsv0vvhnVWpmpU
+ y9WNahmNEyQrFegN0rsLKJLaqx20h+Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-A9a1L1KPPzapw5e6Pd89qg-1; Tue, 28 Apr 2020 17:33:48 -0400
-X-MC-Unique: A9a1L1KPPzapw5e6Pd89qg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-198-T8V2cAIEOOefrCaFyz1-2Q-1; Tue, 28 Apr 2020 17:38:17 -0400
+X-MC-Unique: T8V2cAIEOOefrCaFyz1-2Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F5E1462;
- Tue, 28 Apr 2020 21:33:46 +0000 (UTC)
-Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D35D819C4F;
- Tue, 28 Apr 2020 21:33:37 +0000 (UTC)
-Subject: Re: [PATCH v2 00/17] 64bit block-layer
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200427082325.10414-1-vsementsov@virtuozzo.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A24F118FF663;
+ Tue, 28 Apr 2020 21:38:16 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9216B1002388;
+ Tue, 28 Apr 2020 21:38:09 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <4bb8e5d2-8ac5-bee2-7128-8c7cccf8f653@redhat.com>
-Date: Tue, 28 Apr 2020 16:33:36 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+To: qemu-devel@nongnu.org
+Subject: [PATCH] block: Comment cleanups
+Date: Tue, 28 Apr 2020 16:38:07 -0500
+Message-Id: <20200428213807.776655-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200427082325.10414-1-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 02:06:42
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 02:16:38
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,36 +84,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org, berto@igalia.com,
- pavel.dovgaluk@ispras.ru, qemu-devel@nongnu.org, dillaman@redhat.com,
- pl@kamp.de, ronniesahlberg@gmail.com, mreitz@redhat.com, den@openvz.org,
- sheepdog@lists.wpkg.org, stefanha@redhat.com, namei.unix@gmail.com,
- pbonzini@redhat.com, sw@weilnetz.de, jsnow@redhat.com, ari@tuxera.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>, berto@igalia.com,
+ "open list:Block I/O path" <qemu-block@nongnu.org>, qemu-trivial@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/27/20 3:23 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all!
-> 
-> v1 was "[RFC 0/3] 64bit block-layer part I", please refer to initial
-> cover-letter
->   https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg08723.html
-> for motivation.
-> 
-> v2:
-> patch 02 is unchanged, add Stefan's r-b. Everything other is changed a
-> lot. What's new:
-> 
+It's been a while since we got rid of the sector-based bdrv_read and
+bdrv_write (commit 2e11d756); let's finish the job on a few remaining
+comments.
 
-You'll also want to check my (now-abandoned?) posting from a while back:
-https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg02769.html
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
 
-to see what (if anything) from that attempt can be salvaged.
+Hmm - I started this in Nov 2018, and just barely noticed that it has
+been sitting in a stale tree on my disk for a while now...
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+ block/io.c             |  3 ++-
+ block/qcow2-refcount.c |  2 +-
+ block/vvfat.c          | 10 +++++-----
+ tests/qemu-iotests/001 |  2 +-
+ tests/qemu-iotests/052 |  2 +-
+ tests/qemu-iotests/134 |  2 +-
+ tests/qemu-iotests/188 |  2 +-
+ 7 files changed, 12 insertions(+), 11 deletions(-)
+
+diff --git a/block/io.c b/block/io.c
+index a4f971423093..7d30e61edc6c 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -960,7 +960,7 @@ int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset=
+,
+  * flags are passed through to bdrv_pwrite_zeroes (e.g. BDRV_REQ_MAY_UNMAP=
+,
+  * BDRV_REQ_FUA).
+  *
+- * Returns < 0 on error, 0 on success. For error codes see bdrv_write().
++ * Returns < 0 on error, 0 on success. For error codes see bdrv_pwrite().
+  */
+ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
+ {
+@@ -994,6 +994,7 @@ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags f=
+lags)
+     }
+ }
+
++/* return < 0 if error. See bdrv_pwrite() for the return codes */
+ int bdrv_preadv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
+ {
+     int ret;
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index d9650b9b6c50..0457a6060d11 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2660,7 +2660,7 @@ fail:
+  * - 0 if writing to this offset will not affect the mentioned metadata
+  * - a positive QCow2MetadataOverlap value indicating one overlapping sect=
+ion
+  * - a negative value (-errno) indicating an error while performing a chec=
+k,
+- *   e.g. when bdrv_read failed on QCOW2_OL_INACTIVE_L2
++ *   e.g. when bdrv_pread failed on QCOW2_OL_INACTIVE_L2
+  */
+ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t of=
+fset,
+                                  int64_t size)
+diff --git a/block/vvfat.c b/block/vvfat.c
+index ab800c4887a2..6d5c090dec4d 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -2148,7 +2148,7 @@ DLOG(checkpoint());
+      * - get modified FAT
+      * - compare the two FATs (TODO)
+      * - get buffer for marking used clusters
+-     * - recurse direntries from root (using bs->bdrv_read to make
++     * - recurse direntries from root (using bs->bdrv_pread to make
+      *    sure to get the new data)
+      *   - check that the FAT agrees with the size
+      *   - count the number of clusters occupied by this directory and
+@@ -2913,9 +2913,9 @@ static int handle_deletes(BDRVVVFATState* s)
+ /*
+  * synchronize mapping with new state:
+  *
+- * - copy FAT (with bdrv_read)
++ * - copy FAT (with bdrv_pread)
+  * - mark all filenames corresponding to mappings as deleted
+- * - recurse direntries from root (using bs->bdrv_read)
++ * - recurse direntries from root (using bs->bdrv_pread)
+  * - delete files corresponding to mappings marked as deleted
+  */
+ static int do_commit(BDRVVVFATState* s)
+@@ -2935,10 +2935,10 @@ static int do_commit(BDRVVVFATState* s)
+         return ret;
+     }
+
+-    /* copy FAT (with bdrv_read) */
++    /* copy FAT (with bdrv_pread) */
+     memcpy(s->fat.pointer, s->fat2, 0x200 * s->sectors_per_fat);
+
+-    /* recurse direntries from root (using bs->bdrv_read) */
++    /* recurse direntries from root (using bs->bdrv_pread) */
+     ret =3D commit_direntries(s, 0, -1);
+     if (ret) {
+         fprintf(stderr, "Fatal: error while committing (%d)\n", ret);
+diff --git a/tests/qemu-iotests/001 b/tests/qemu-iotests/001
+index d87a535c3391..696726e45f56 100755
+--- a/tests/qemu-iotests/001
++++ b/tests/qemu-iotests/001
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env bash
+ #
+-# Test simple read/write using plain bdrv_read/bdrv_write
++# Test simple read/write using plain bdrv_pread/bdrv_pwrite
+ #
+ # Copyright (C) 2009 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/052 b/tests/qemu-iotests/052
+index 45a140910da1..8d5c10601fe9 100755
+--- a/tests/qemu-iotests/052
++++ b/tests/qemu-iotests/052
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env bash
+ #
+-# Test bdrv_read/bdrv_write using BDRV_O_SNAPSHOT
++# Test bdrv_pread/bdrv_pwrite using BDRV_O_SNAPSHOT
+ #
+ # Copyright (C) 2013 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/134 b/tests/qemu-iotests/134
+index 5f0fb86211e3..5162d2166248 100755
+--- a/tests/qemu-iotests/134
++++ b/tests/qemu-iotests/134
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env bash
+ #
+-# Test encrypted read/write using plain bdrv_read/bdrv_write
++# Test encrypted read/write using plain bdrv_pread/bdrv_pwrite
+ #
+ # Copyright (C) 2015 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/188 b/tests/qemu-iotests/188
+index afca44df5427..09b9b6083ab3 100755
+--- a/tests/qemu-iotests/188
++++ b/tests/qemu-iotests/188
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env bash
+ #
+-# Test encrypted read/write using plain bdrv_read/bdrv_write
++# Test encrypted read/write using plain bdrv_pread/bdrv_pwrite
+ #
+ # Copyright (C) 2017 Red Hat, Inc.
+ #
+--=20
+2.26.2
 
 
