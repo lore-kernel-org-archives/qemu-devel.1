@@ -2,122 +2,86 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30BB5C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:25:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A917DC83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:27:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E256820663
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:24:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C8B320663
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:27:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="pi/UiPgr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E256820663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XSeA+ncc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C8B320663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTMU7-0000LI-0h
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 05:24:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59924)
+	id 1jTMWd-00044X-2d
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 05:27:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59988)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTMPq-0002AJ-G9
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:22:00 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jTMQ4-0002C8-FS
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:22:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTMMf-0000su-MK
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:20:33 -0400
-Received: from mail-eopbgr140098.outbound.protection.outlook.com
- ([40.107.14.98]:22631 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jTMMe-0000sY-RY; Tue, 28 Apr 2020 05:17:17 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LC12H12A5G55UnlzHgrncPlM6bagFyWwya5EyO+p46tl5OI/SB9LkYZxV3fCVxh0NfhlEm6L+XNIinEujAxvrWqQ+jpvKq62CVUdfAL/HWqgMrhFLX14GYevV6EsHyiRCS6Lfk9CvLCb06sUUSfZQaWQGk8Pp+I4lK75IpBZOuyC2yXFxVR3Roy2MvX3Cn/xblcFgqWd4/iuhKyngnYQZLbpwmOfqzFwgrxyjjBLIBo9Dn+nOyEttIl+r2OmKdvKeI69LZTRdG9DHkRJ3D5NuBfPmPyDl9B2IPhDocRSE5qc06ndeNViK9Mr9ptFXciCSOO67SHPeT5R3wexzEpgqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RfUNAOL9NY2v1Bdc94tU+oCTjE5Bdziivmy39UMaI+E=;
- b=TJ0HYwf+U2sfV5wHzgzdAdairJmRBcA853cPUW9LQsr5bfpnoJhDJNQxwvuz2/LkfBcLOyGqhwmKdxooTFk4fhX7J/5/9RyHKIk2fcwIX8pXuAkSPRSX/ynIiJa/Ga/Do7ndxAxEPr2rhTcHhh67B36JnUefIXlUNMw2CzaC8BJM37vF0GLVrcCu50YJrux+MKAsixYRSo0LJdflT+zeZ25pp574QwX14gHREWOMcSbXw8bRGG/ChDQupOwb6gh5hjftIZeLons+/6WXcY8uU3IPHFXMP1pSOS2aPVgt/EmQqYqDV040fLTz6bfCAYpreT+puDOZwVrpVSAlq6S2fg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RfUNAOL9NY2v1Bdc94tU+oCTjE5Bdziivmy39UMaI+E=;
- b=pi/UiPgrHKbZvzp8JQIZEKme8bR7AhI24bQgtrB3PMrDIBu11f2EiQTuwT/rDShHPeh5l19sZu2Y3aWkPUZwLDI8LAoKQ9pFkLcMMkJhFgRycJUUDoaLvLAi1c7uo3JF+LeiY2prFfwxPdUW9OcYSqdAAnKr1epAVG4bBJ4GooQ=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5381.eurprd08.prod.outlook.com (2603:10a6:20b:105::23)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Tue, 28 Apr
- 2020 09:17:11 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.023; Tue, 28 Apr 2020
- 09:17:11 +0000
-Subject: Re: [PATCH v2 5/6] block/block-copy: move block_copy_task_create down
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200325134639.16337-1-vsementsov@virtuozzo.com>
- <20200325134639.16337-6-vsementsov@virtuozzo.com>
- <ae040bc6-7c0e-4b55-0723-c5e892570fb9@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200428121709825
-Message-ID: <9fd7f07e-d297-15a5-1bd1-355e8c8b013e@virtuozzo.com>
-Date: Tue, 28 Apr 2020 12:17:09 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <ae040bc6-7c0e-4b55-0723-c5e892570fb9@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ZR0P278CA0017.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:16::27) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <cohuck@redhat.com>) id 1jTMNY-0000xN-R0
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:20:47 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55467
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jTMNY-0000ww-DC
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:18:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588065491;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=skT+eEQ8GSD2a4gia8wU7vGSyJ6xvinMLrKAReaBG4I=;
+ b=XSeA+nccs3a19dht6rjpacS6+3qr41c57daARw0rl6Zyh+bsRuIdTwfCs+6nsIPbGEgMsW
+ p+LI9PPhmbd4K7hWYXnQmLB4rX3ydnknAgb0sO9bVmd7FcSvC7yNPOPxaXevIsENLzojdC
+ fj784u8FvzdmBiUNKHcHAivsU7qsLcU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-378-_HLvFpv9PnC-GvNHmrzl7w-1; Tue, 28 Apr 2020 05:18:09 -0400
+X-MC-Unique: _HLvFpv9PnC-GvNHmrzl7w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A42A6107B271;
+ Tue, 28 Apr 2020 09:18:08 +0000 (UTC)
+Received: from gondolin (ovpn-112-178.ams2.redhat.com [10.36.112.178])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7876160D37;
+ Tue, 28 Apr 2020 09:18:04 +0000 (UTC)
+Date: Tue, 28 Apr 2020 11:18:01 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH 3/3] virtio-net: remove VIRTIO_NET_HDR_F_RSC_INFO compat
+ handling
+Message-ID: <20200428111801.7422d95a.cohuck@redhat.com>
+In-Reply-To: <85367d20-e4f5-6869-319e-2f60d2510130@redhat.com>
+References: <20200427102415.10915-1-cohuck@redhat.com>
+ <20200427102415.10915-4-cohuck@redhat.com>
+ <7f703bea-2cae-dcdc-71bd-9623c7db33ac@redhat.com>
+ <20200428103407.12612838.cohuck@redhat.com>
+ <85367d20-e4f5-6869-319e-2f60d2510130@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.155) by
- ZR0P278CA0017.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:16::27) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2937.13 via Frontend Transport; Tue, 28 Apr 2020 09:17:11 +0000
-X-Tagtoolbar-Keys: D20200428121709825
-X-Originating-IP: [185.215.60.155]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1c425c00-30fc-4210-87da-08d7eb54ef1d
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5381:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB53814FC05594BF3CFB30DE68C1AC0@AM7PR08MB5381.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-Forefront-PRVS: 0387D64A71
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(396003)(136003)(346002)(376002)(39840400004)(2906002)(4326008)(5660300002)(107886003)(6486002)(36756003)(478600001)(16576012)(66476007)(66556008)(956004)(31686004)(2616005)(186003)(316002)(4744005)(26005)(81156014)(16526019)(31696002)(8676002)(8936002)(52116002)(86362001)(66946007)(53546011);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BmSDVW0nEGqSlJaNS/yEs5yPtoOLIEunNWLvi8IliCOwYmmFfe61yhkWfk2y7lkgFD/esuNuLtLPtrM22kobg1nnpXI7NYw2cTvmB0h2e5lSOYakypLfr+tFNikVroR6PMEuO3MiBcS7FHdHgon56OifG+magESMdRNjhn73rnSJjbLkaqvN7y2SKPw3OjugruBAtAAgjvipfKti8LZNhEBT+/B7OeEYp91hTuDX7m7WRBmQsVUG4vj6PxXFJjt1RnbySfmCeMf0G9oYQlizZL7xOQhHeEeRCqEeT0wgvKDVs+KI/t43Tadw820hRPb4NkVUbSsJALbUh7VpZFmi69AzGvsnWjdw7sc0Gfm69W2uhz2R/uknQlvMbmRolBU3TmthrwUopEGKM6sS1/+LsGB0WkjHrDxcU+M+DVCJqfucclFGMD+1nnXby0tMvNkE
-X-MS-Exchange-AntiSpam-MessageData: GHX8BdzSKkxqtRt35EPXWDzivSmob5OpgDFVbax15SNZNrPCLQ3kAM4OG03ESjm4SomsIvdxZtLv1I6oAYBhU6C7f3CLDDihdksN8hEO9R9YecbxUfT4noUpvEswGccPDuT2bnmMgI7LMMBXihx9d9C7Xx1aiNDgntdHGJG/MnWhFPJhyg5RJ8x7G6nEy7/E6/3fGN39QWMht4NaKVEo+aYIjDba9xcYlZzp1rLtNJaI7L7xJTG+FjrXNwtxysESZL4JjuzOF9QnwVCns074XATQXogkT9k4qPz/p5Eh5a5nn+C56mzZP3toQQSnSniKOYLtSic00czyMoqQ7X9WK4xYfdrirDCLaFcQsGPdXQmqYz6ejhsLqAwQBLsBebytuh1JzWAKAejot2J3vc/93Z0bg3PXyfUJIfF6BKIrbbsWc730b3TMfYkFwkvK5vO5fKxuT+O2J9uQgk2+2t+FRLt1sf1p256LHzamf+iETgDDxGvk3HoYaSTfhVkggCduUrrQ0wpmXE9GpDWLSJJYIkVEoeh+WwgVdgxx1E2oDVdJcyGRJBnGndTZ/lwVUDMJyglkwhOoRe8fJ3fSx5RPCEAURhXrsvXiqA7CzySCVBe7IQGXFto38BY/Dt7Eglw3rht9934Ghzbdww6AMn3CMvyYMzYpJcTQkNG+yLYZ3N1gRPIolVVXb3eBjNAzNFEzdiSQcg/9VGdnWO/PKjmyxqQiqDl6UVK7EtEHatRN97TRy91Wv8XV7EbzpUU63CTdSj+42WrHLglnflkoppxFJ3a2wMkfqq1KO7d40OktDVU=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1c425c00-30fc-4210-87da-08d7eb54ef1d
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2020 09:17:11.8481 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wLS4h0FPO+nVwUCdqhqkTvnI1jzVdfqnbWs5880LH5aZrUM7IcabufHCRQCNTMuba2ogvzIWVDq0Y4e3BTVykyYtG+yGecoDELejLSA0FMc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5381
-Received-SPF: pass client-ip=40.107.14.98;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR01-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 05:17:12
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.14.98
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 02:06:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,34 +93,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Yuri Benditovich <yuri.benditovich@daynix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-28.04.2020 12:06, Max Reitz wrote:
-> On 25.03.20 14:46, Vladimir Sementsov-Ogievskiy wrote:
->> Simple movement without any change. It's needed for the following
->> patch, as this function will need to use some staff which is currently
-> 
-> *stuff
-> 
->> below it.
-> 
-> Wouldn’t it be simpler to just declare block_copy_task_entry()?
-> 
+On Tue, 28 Apr 2020 16:58:44 +0800
+Jason Wang <jasowang@redhat.com> wrote:
 
-I just think, that it's good to keep native order of functions and avoid extra declarations. Still, may be I care too much. No actual difference, if you prefer declaration, I can drop this patch.
+> On 2020/4/28 =E4=B8=8B=E5=8D=884:34, Cornelia Huck wrote:
+> > On Tue, 28 Apr 2020 16:19:15 +0800
+> > Jason Wang <jasowang@redhat.com> wrote:
+> > =20
+> >> On 2020/4/27 =E4=B8=8B=E5=8D=886:24, Cornelia Huck wrote: =20
+> >>> VIRTIO_NET_HDR_F_RSC_INFO is available in the headers now.
+> >>>
+> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >>> ---
+> >>>    hw/net/virtio-net.c | 8 --------
+> >>>    1 file changed, 8 deletions(-)
+> >>>
+> >>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> >>> index e85d902588b3..7449570c7123 100644
+> >>> --- a/hw/net/virtio-net.c
+> >>> +++ b/hw/net/virtio-net.c
+> >>> @@ -77,14 +77,6 @@
+> >>>       tso/gso/gro 'off'. */
+> >>>    #define VIRTIO_NET_RSC_DEFAULT_INTERVAL 300000
+> >>>   =20
+> >>> -/* temporary until standard header include it */
+> >>> -#if !defined(VIRTIO_NET_HDR_F_RSC_INFO)
+> >>> -
+> >>> -#define VIRTIO_NET_HDR_F_RSC_INFO  4 /* rsc_ext data in csum_ fields=
+ */
+> >>> -#define VIRTIO_NET_F_RSC_EXT       61
+> >>> -
+> >>> -#endif
+> >>> -
+> >>>    static inline __virtio16 *virtio_net_rsc_ext_num_packets(
+> >>>        struct virtio_net_hdr *hdr)
+> >>>    { =20
+> >>
+> >> I think we should not keep the those tricky num_packets/dup_acks. =20
+> > No real opinion here, patch 3 is only a cleanup.
+> >
+> > The important one is patch 1, because without it I cannot do a headers
+> > update. =20
+>=20
+>=20
+> Yes, at least we should dereference segments/dup_acks instead of=20
+> csum_start/csum_offsets since the header has been synced.
 
-> 
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block/block-copy.c | 66 +++++++++++++++++++++++-----------------------
->>   1 file changed, 33 insertions(+), 33 deletions(-)
-> 
+So what about:
 
+- I merge patch 1 and the header sync now (because I have a bunch of
+  patches that depend on it...)
+- We change virtio-net to handle that properly on top (probably best
+  done by someone familiar with the code base ;)
 
--- 
-Best regards,
-Vladimir
 
