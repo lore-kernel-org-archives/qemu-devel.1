@@ -2,92 +2,77 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16E03C83001
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 00:59:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7AC3C83001
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 01:06:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1EE5206E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 00:59:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ott5Zfcf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1EE5206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7D899206D6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 01:06:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D899206D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTEaj-0006rL-0W
-	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 20:59:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58984)
+	id 1jTEhG-0001Ho-IJ
+	for qemu-devel@archiver.kernel.org; Mon, 27 Apr 2020 21:06:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60976)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alexander.duyck@gmail.com>) id 1jTEVq-0007w1-Hx
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 20:54:14 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1jTEfk-0000UF-Sp
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 21:04:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alexander.duyck@gmail.com>) id 1jTEVp-0007t2-Sg
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 20:54:14 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:45390)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
- id 1jTEVp-0007ra-FJ
- for qemu-devel@nongnu.org; Mon, 27 Apr 2020 20:54:13 -0400
-Received: by mail-pl1-x641.google.com with SMTP id t4so7641404plq.12
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 17:54:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:from:to:cc:date:message-id:in-reply-to:references
- :user-agent:mime-version:content-transfer-encoding;
- bh=f60PjaQ32uAPz31QIwCr3FQCyG63xWUpLWuGVvAuWxg=;
- b=ott5ZfcfjsX8twq3aMk83UeYAo9pX8WJJxHY6YdkeYFfBJGRxsxYZZA7v7EDhpGhKb
- o3PLPkMKlrJ6VZU4rIylsZLL9yoQh9tgeKUDkJYZNG3WjaZsm80DpmNNHaTU1pRd8+eX
- QT6oHgoIbz4xgVY48EkqikxACeJrdSGKoAJomSzwLDsqiARh5HIw/OP0UFmjY+GeScpH
- oXSN0ToZeTGGutXg7YzIJT1EP9HSBWZfh+vJ9jTblhq2+UX5qihpSOrFq5XN2ocDc2IP
- FEDCRdQWSmiIqI5/wpjAvGgNkzcuJpFjGWhIwjhjgwk98zDa6ZOmgawH9FTffN/W9xEP
- 8sBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
- :references:user-agent:mime-version:content-transfer-encoding;
- bh=f60PjaQ32uAPz31QIwCr3FQCyG63xWUpLWuGVvAuWxg=;
- b=Xn5UDkX/uINv8z1Uo5cnGUI1p7GRAbGAlILKH0WE4t47FcBGGcUQyNA2nn1tSbIo/y
- Z+n+XXJgOF8B8fx/A1zX9iJPok1nfeOFIRGHRqDmbhs+mRdVZGqOrzqytOsH0tvzBx28
- Y8cYVz/9e1NV4/lWco1/4Z+oMViTmbXiqRS73js/T0vdKuDcsyDe2isP5CcDMo/mOGVw
- YsBJe61PqRXRDruukc8PGIkIbG0o8d9NzpdFtQg1iS+FJ+TrQzkdPbjiVlYltvNLSe1B
- smnV5h36hbPEGXzHg0unhAAgC4R0kDqd6Uzv5Ye2Fna/XXiLXvHtnR524W9cP08duaLp
- U8MQ==
-X-Gm-Message-State: AGi0PuZXlDe0TBFQvUIKM2RvXV7/LGX2MBFf6FRaMLwFj3XD5YXHDk1b
- aeedaJSAlXj+W8w9Cj6IKcE=
-X-Google-Smtp-Source: APiQypKM/UeoJ04DIuB1fMPrOKtfTjcu0VeAbgnUH8nfuNpNf3i8qI3e9mdrAZsIXqT5X4CvWWS+DA==
-X-Received: by 2002:a17:90a:25cb:: with SMTP id
- k69mr1665193pje.93.1588035252024; 
- Mon, 27 Apr 2020 17:54:12 -0700 (PDT)
-Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
- by smtp.gmail.com with ESMTPSA id 67sm3945151pfx.108.2020.04.27.17.54.11
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 27 Apr 2020 17:54:11 -0700 (PDT)
-Subject: [PATCH v23 QEMU 5/5] virtio-balloon: Provide an interface for free
- page reporting
-From: Alexander Duyck <alexander.duyck@gmail.com>
-To: david@redhat.com, mst@redhat.com
-Date: Mon, 27 Apr 2020 17:54:10 -0700
-Message-ID: <20200428005410.6158.56128.stgit@localhost.localdomain>
-In-Reply-To: <20200428005134.6158.88521.stgit@localhost.localdomain>
-References: <20200428005134.6158.88521.stgit@localhost.localdomain>
-User-Agent: StGit/0.17.1-dirty
+ (envelope-from <yan.y.zhao@intel.com>) id 1jTEfh-00056x-FV
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 21:04:27 -0400
+Received: from mga01.intel.com ([192.55.52.88]:31447)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jTEfg-00050t-8T
+ for qemu-devel@nongnu.org; Mon, 27 Apr 2020 21:04:25 -0400
+IronPort-SDR: gKGH0h3/yny0UidnOWXVhD0N/hP+k7PVVAQ9Wa3AAEWE5P9VmWRXQ1WPujm2qEYYc4HLJrqZVO
+ 0HFx2F0K0iyQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 27 Apr 2020 18:04:20 -0700
+IronPort-SDR: /OgPjKQLqGW0dazR7C5+g5qKwUQ9gEtbYMc94xEtbrMextw6H04uF6g4BJIQtESaIAoBC9Pz0h
+ ospD7fj3JFAg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,325,1583222400"; d="scan'208";a="246339926"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by orsmga007.jf.intel.com with ESMTP; 27 Apr 2020 18:04:12 -0700
+Date: Mon, 27 Apr 2020 20:54:29 -0400
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200428005429.GJ12879@joy-OptiPlex-7040>
+References: <20200417095202.GD16688@joy-OptiPlex-7040>
+ <20200417132457.45d91fe3.cohuck@redhat.com>
+ <20200420012457.GE16688@joy-OptiPlex-7040>
+ <20200420165600.4951ae82@w520.home>
+ <20200421023718.GA12111@joy-OptiPlex-7040>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D86DF06@SHSMSX104.ccr.corp.intel.com>
+ <20200422073628.GA12879@joy-OptiPlex-7040>
+ <20200424191049.GU3106@work-vm>
+ <20200426013628.GC12879@joy-OptiPlex-7040>
+ <20200427153743.GK2923@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=alexander.duyck@gmail.com; helo=mail-pl1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::641
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200427153743.GK2923@work-vm>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=192.55.52.88; envelope-from=yan.y.zhao@intel.com;
+ helo=mga01.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/27 21:04:21
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Received-From: 192.55.52.88
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,136 +84,325 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+ "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "Yang, Ziye" <ziye.yang@intel.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+ "Tian, Kevin" <kevin.tian@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
+ "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
+ "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "dinechin@redhat.com" <dinechin@redhat.com>,
+ "He, Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+On Mon, Apr 27, 2020 at 11:37:43PM +0800, Dr. David Alan Gilbert wrote:
+> * Yan Zhao (yan.y.zhao@intel.com) wrote:
+> > On Sat, Apr 25, 2020 at 03:10:49AM +0800, Dr. David Alan Gilbert wrote:
+> > > * Yan Zhao (yan.y.zhao@intel.com) wrote:
+> > > > On Tue, Apr 21, 2020 at 08:08:49PM +0800, Tian, Kevin wrote:
+> > > > > > From: Yan Zhao
+> > > > > > Sent: Tuesday, April 21, 2020 10:37 AM
+> > > > > > 
+> > > > > > On Tue, Apr 21, 2020 at 06:56:00AM +0800, Alex Williamson wrote:
+> > > > > > > On Sun, 19 Apr 2020 21:24:57 -0400
+> > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > >
+> > > > > > > > On Fri, Apr 17, 2020 at 07:24:57PM +0800, Cornelia Huck wrote:
+> > > > > > > > > On Fri, 17 Apr 2020 05:52:02 -0400
+> > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > > > >
+> > > > > > > > > > On Fri, Apr 17, 2020 at 04:44:50PM +0800, Cornelia Huck wrote:
+> > > > > > > > > > > On Mon, 13 Apr 2020 01:52:01 -0400
+> > > > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > > > > > >
+> > > > > > > > > > > > This patchset introduces a migration_version attribute under sysfs
+> > > > > > of VFIO
+> > > > > > > > > > > > Mediated devices.
+> > > > > > > > > > > >
+> > > > > > > > > > > > This migration_version attribute is used to check migration
+> > > > > > compatibility
+> > > > > > > > > > > > between two mdev devices.
+> > > > > > > > > > > >
+> > > > > > > > > > > > Currently, it has two locations:
+> > > > > > > > > > > > (1) under mdev_type node,
+> > > > > > > > > > > >     which can be used even before device creation, but only for
+> > > > > > mdev
+> > > > > > > > > > > >     devices of the same mdev type.
+> > > > > > > > > > > > (2) under mdev device node,
+> > > > > > > > > > > >     which can only be used after the mdev devices are created, but
+> > > > > > the src
+> > > > > > > > > > > >     and target mdev devices are not necessarily be of the same
+> > > > > > mdev type
+> > > > > > > > > > > > (The second location is newly added in v5, in order to keep
+> > > > > > consistent
+> > > > > > > > > > > > with the migration_version node for migratable pass-though
+> > > > > > devices)
+> > > > > > > > > > >
+> > > > > > > > > > > What is the relationship between those two attributes?
+> > > > > > > > > > >
+> > > > > > > > > > (1) is for mdev devices specifically, and (2) is provided to keep the
+> > > > > > same
+> > > > > > > > > > sysfs interface as with non-mdev cases. so (2) is for both mdev
+> > > > > > devices and
+> > > > > > > > > > non-mdev devices.
+> > > > > > > > > >
+> > > > > > > > > > in future, if we enable vfio-pci vendor ops, (i.e. a non-mdev device
+> > > > > > > > > > is binding to vfio-pci, but is able to register migration region and do
+> > > > > > > > > > migration transactions from a vendor provided affiliate driver),
+> > > > > > > > > > the vendor driver would export (2) directly, under device node.
+> > > > > > > > > > It is not able to provide (1) as there're no mdev devices involved.
+> > > > > > > > >
+> > > > > > > > > Ok, creating an alternate attribute for non-mdev devices makes sense.
+> > > > > > > > > However, wouldn't that rather be a case (3)? The change here only
+> > > > > > > > > refers to mdev devices.
+> > > > > > > > >
+> > > > > > > > as you pointed below, (3) and (2) serve the same purpose.
+> > > > > > > > and I think a possible usage is to migrate between a non-mdev device and
+> > > > > > > > an mdev device. so I think it's better for them both to use (2) rather
+> > > > > > > > than creating (3).
+> > > > > > >
+> > > > > > > An mdev type is meant to define a software compatible interface, so in
+> > > > > > > the case of mdev->mdev migration, doesn't migrating to a different type
+> > > > > > > fail the most basic of compatibility tests that we expect userspace to
+> > > > > > > perform?  IOW, if two mdev types are migration compatible, it seems a
+> > > > > > > prerequisite to that is that they provide the same software interface,
+> > > > > > > which means they should be the same mdev type.
+> > > > > > >
+> > > > > > > In the hybrid cases of mdev->phys or phys->mdev, how does a
+> > > > > > management
+> > > > > > > tool begin to even guess what might be compatible?  Are we expecting
+> > > > > > > libvirt to probe ever device with this attribute in the system?  Is
+> > > > > > > there going to be a new class hierarchy created to enumerate all
+> > > > > > > possible migrate-able devices?
+> > > > > > >
+> > > > > > yes, management tool needs to guess and test migration compatible
+> > > > > > between two devices. But I think it's not the problem only for
+> > > > > > mdev->phys or phys->mdev. even for mdev->mdev, management tool needs
+> > > > > > to
+> > > > > > first assume that the two mdevs have the same type of parent devices
+> > > > > > (e.g.their pciids are equal). otherwise, it's still enumerating
+> > > > > > possibilities.
+> > > > > > 
+> > > > > > on the other hand, for two mdevs,
+> > > > > > mdev1 from pdev1, its mdev_type is 1/2 of pdev1;
+> > > > > > mdev2 from pdev2, its mdev_type is 1/4 of pdev2;
+> > > > > > if pdev2 is exactly 2 times of pdev1, why not allow migration between
+> > > > > > mdev1 <-> mdev2.
+> > > > > 
+> > > > > How could the manage tool figure out that 1/2 of pdev1 is equivalent 
+> > > > > to 1/4 of pdev2? If we really want to allow such thing happen, the best
+> > > > > choice is to report the same mdev type on both pdev1 and pdev2.
+> > > > I think that's exactly the value of this migration_version interface.
+> > > > the management tool can take advantage of this interface to know if two
+> > > > devices are migration compatible, no matter they are mdevs, non-mdevs,
+> > > > or mix.
+> > > > 
+> > > > as I know, (please correct me if not right), current libvirt still
+> > > > requires manually generating mdev devices, and it just duplicates src vm
+> > > > configuration to the target vm.
+> > > > for libvirt, currently it's always phys->phys and mdev->mdev (and of the
+> > > > same mdev type).
+> > > > But it does not justify that hybrid cases should not be allowed. otherwise,
+> > > > why do we need to introduce this migration_version interface and leave
+> > > > the judgement of migration compatibility to vendor driver? why not simply
+> > > > set the criteria to something like "pciids of parent devices are equal,
+> > > > and mdev types are equal" ?
+> > > > 
+> > > > 
+> > > > > btw mdev<->phys just brings trouble to upper stack as Alex pointed out. 
+> > > > could you help me understand why it will bring trouble to upper stack?
+> > > > 
+> > > > I think it just needs to read src migration_version under src dev node,
+> > > > and test it in target migration version under target dev node. 
+> > > > 
+> > > > after all, through this interface we just help the upper layer
+> > > > knowing available options through reading and testing, and they decide
+> > > > to use it or not.
+> > > > 
+> > > > > Can we simplify the requirement by allowing only mdev<->mdev and 
+> > > > > phys<->phys migration? If an customer does want to migrate between a 
+> > > > > mdev and phys, he could wrap physical device into a wrapped mdev 
+> > > > > instance (with the same type as the source mdev) instead of using vendor 
+> > > > > ops. Doing so does add some burden but if mdev<->phys is not dominant 
+> > > > > usage then such tradeoff might be worthywhile...
+> > > > >
+> > > > If the interfaces for phys<->phys and mdev<->mdev are consistent, it makes no
+> > > > difference to phys<->mdev, right?
+> > > > I think the vendor string for a mdev device is something like:
+> > > > "Parent PCIID + mdev type + software version", and
+> > > > that for a phys device is something like:
+> > > > "PCIID + software version".
+> > > > as long as we don't migrate between devices from different vendors, it's
+> > > > easy for vendor driver to tell if a phys device is migration compatible
+> > > > to a mdev device according it supports it or not.
+> > > 
+> > > It surprises me that the PCIID matching is a requirement; I'd assumed
+> > > with this clever mdev name setup that you could migrate between two
+> > > different models in a series, or to a newer model, as long as they
+> > > both supported the same mdev view.
+> > > 
+> > hi Dave
+> > the migration_version string is transparent to userspace, and is
+> > completely defined by vendor driver.
+> > I put it there just as an example of how vendor driver may implement it.
+> > e.g.
+> > the src migration_version string is "src PCIID + src software version", 
+> > then when this string is write to target migration_version node,
+> > the vendor driver in the target device will compare it with its own
+> > device info and software version.
+> > If different models are allowed, the write just succeeds even
+> > PCIIDs in src and target are different.
+> > 
+> > so, it is the vendor driver to define whether two devices are able to
+> > migrate, no matter their PCIIDs, mdev types, software versions..., which
+> > provides vendor driver full flexibility.
+> > 
+> > do you think it's good?
+> 
+> Yeh that's OK; I guess it's going to need to have a big table in their
+> with all the PCIIDs in.
+> The alternative would be to abstract it a little; e.g. to say it's
+> an Intel-gpu-core-v4  and then it would be less worried about the exact
+> clock speed etc - but yes you might be right htat PCIIDs might be best
+> for checking for quirks.
+>
+glad that you are agreed with it:)
+I think the vendor driver still can choose a way to abstract a little
+(e.g. Intel-gpu-core-v4...) if they think it's better. In that case, the
+migration_string would be something like "Intel-gpu-core-v4 + instance
+number + software version".
+IOW, they can choose anything they think appropriate to identify migration
+compatibility of a device.
+But Alex is right, we have to prevent namespace overlapping. So I think
+we need to ensure src and target devices are from the same vendors.
+or, any other ideas?
 
-Add support for free page reporting. The idea is to function very similar
-to how the balloon works in that we basically end up madvising the page as
-not being used. However we don't really need to bother with any deflate
-type logic since the page will be faulted back into the guest when it is
-read or written to.
+Thanks
+Yan
 
-This provides a new way of letting the guest proactively report free
-pages to the hypervisor, so the hypervisor can reuse them. In contrast to
-inflate/deflate that is triggered via the hypervisor explicitly.
 
-Acked-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
----
- hw/virtio/virtio-balloon.c         |   69 ++++++++++++++++++++++++++++++++++++
- include/hw/virtio/virtio-balloon.h |    2 +
- 2 files changed, 70 insertions(+), 1 deletion(-)
-
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 1666132a24c1..53abba290274 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -321,6 +321,67 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
-     balloon_stats_change_timer(s, 0);
- }
- 
-+static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+    VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-+    VirtQueueElement *elem;
-+
-+    while ((elem = virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
-+        unsigned int i;
-+
-+        /*
-+         * When we discard the page it has the effect of removing the page
-+         * from the hypervisor itself and causing it to be zeroed when it
-+         * is returned to us. So we must not discard the page if it is
-+         * accessible by another device or process, or if the guest is
-+         * expecting it to retain a non-zero value.
-+         */
-+        if (qemu_balloon_is_inhibited() || dev->poison_val) {
-+            goto skip_element;
-+        }
-+
-+        for (i = 0; i < elem->in_num; i++) {
-+            void *addr = elem->in_sg[i].iov_base;
-+            size_t size = elem->in_sg[i].iov_len;
-+            ram_addr_t ram_offset;
-+            RAMBlock *rb;
-+
-+            /*
-+             * There is no need to check the memory section to see if
-+             * it is ram/readonly/romd like there is for handle_output
-+             * below. If the region is not meant to be written to then
-+             * address_space_map will have allocated a bounce buffer
-+             * and it will be freed in address_space_unmap and trigger
-+             * and unassigned_mem_write before failing to copy over the
-+             * buffer. If more than one bad descriptor is provided it
-+             * will return NULL after the first bounce buffer and fail
-+             * to map any resources.
-+             */
-+            rb = qemu_ram_block_from_host(addr, false, &ram_offset);
-+            if (!rb) {
-+                trace_virtio_balloon_bad_addr(elem->in_addr[i]);
-+                continue;
-+            }
-+
-+            /*
-+             * For now we will simply ignore unaligned memory regions, or
-+             * regions that overrun the end of the RAMBlock.
-+             */
-+            if (!QEMU_IS_ALIGNED(ram_offset | size, qemu_ram_pagesize(rb)) ||
-+                (ram_offset + size) > qemu_ram_get_used_length(rb)) {
-+                continue;
-+            }
-+
-+            ram_block_discard_range(rb, ram_offset, size);
-+        }
-+
-+skip_element:
-+        virtqueue_push(vq, elem, 0);
-+        virtio_notify(vdev, vq);
-+        g_free(elem);
-+    }
-+}
-+
- static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
-@@ -841,6 +902,12 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-             virtio_error(vdev, "iothread is missing");
-         }
-     }
-+
-+    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_REPORTING)) {
-+        s->reporting_vq = virtio_add_queue(vdev, 32,
-+                                           virtio_balloon_handle_report);
-+    }
-+
-     reset_stats(s);
- }
- 
-@@ -945,6 +1012,8 @@ static Property virtio_balloon_properties[] = {
-                     VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
-     DEFINE_PROP_BIT("page-poison", VirtIOBalloon, host_features,
-                     VIRTIO_BALLOON_F_PAGE_POISON, true),
-+    DEFINE_PROP_BIT("free-page-reporting", VirtIOBalloon, host_features,
-+                    VIRTIO_BALLOON_F_REPORTING, false),
-     /* QEMU 4.0 accidentally changed the config size even when free-page-hint
-      * is disabled, resulting in QEMU 3.1 migration incompatibility.  This
-      * property retains this quirk for QEMU 4.1 machine types.
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-index 3ca2a78e1aca..28fd2b396087 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -42,7 +42,7 @@ enum virtio_balloon_free_page_hint_status {
- 
- typedef struct VirtIOBalloon {
-     VirtIODevice parent_obj;
--    VirtQueue *ivq, *dvq, *svq, *free_page_vq;
-+    VirtQueue *ivq, *dvq, *svq, *free_page_vq, *reporting_vq;
-     uint32_t free_page_hint_status;
-     uint32_t num_pages;
-     uint32_t actual;
-
+> > > > > > 
+> > > > > > 
+> > > > > > > I agree that there was a gap in the previous proposal for non-mdev
+> > > > > > > devices, but I think this bring a lot of questions that we need to
+> > > > > > > puzzle through and libvirt will need to re-evaluate how they might
+> > > > > > > decide to pick a migration target device.  For example, I'm sure
+> > > > > > > libvirt would reject any policy decisions regarding picking a physical
+> > > > > > > device versus an mdev device.  Had we previously left it that only a
+> > > > > > > layer above libvirt would select a target device and libvirt only tests
+> > > > > > > compatibility to that target device?
+> > > > > > I'm not sure if there's a layer above libvirt would select a target
+> > > > > > device. but if there is such a layer (even it's human), we need to
+> > > > > > provide an interface for them to know whether their decision is suitable
+> > > > > > for migration. The migration_version interface provides a potential to
+> > > > > > allow mdev->phys migration, even libvirt may currently reject it.
+> > > > > > 
+> > > > > > 
+> > > > > > > We also need to consider that this expands the namespace.  If we no
+> > > > > > > longer require matching types as the first level of comparison, then
+> > > > > > > vendor migration strings can theoretically collide.  How do we
+> > > > > > > coordinate that can't happen?  Thanks,
+> > > > > > yes, it's indeed a problem.
+> > > > > > could only allowing migration beteen devices from the same vendor be a
+> > > > > > good
+> > > > > > prerequisite?
+> > > > > > 
+> > > > > > Thanks
+> > > > > > Yan
+> > > > > > >
+> > > > > > > > > > > Is existence (and compatibility) of (1) a pre-req for possible
+> > > > > > > > > > > existence (and compatibility) of (2)?
+> > > > > > > > > > >
+> > > > > > > > > > no. (2) does not reply on (1).
+> > > > > > > > >
+> > > > > > > > > Hm. Non-existence of (1) seems to imply "this type does not support
+> > > > > > > > > migration". If an mdev created for such a type suddenly does support
+> > > > > > > > > migration, it feels a bit odd.
+> > > > > > > > >
+> > > > > > > > yes. but I think if the condition happens, it should be reported a bug
+> > > > > > > > to vendor driver.
+> > > > > > > > should I add a line in the doc like "vendor driver should ensure that the
+> > > > > > > > migration compatibility from migration_version under mdev_type should
+> > > > > > be
+> > > > > > > > consistent with that from migration_version under device node" ?
+> > > > > > > >
+> > > > > > > > > (It obviously cannot be a prereq for what I called (3) above.)
+> > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > > Does userspace need to check (1) or can it completely rely on (2), if
+> > > > > > > > > > > it so chooses?
+> > > > > > > > > > >
+> > > > > > > > > > I think it can completely reply on (2) if compatibility check before
+> > > > > > > > > > mdev creation is not required.
+> > > > > > > > > >
+> > > > > > > > > > > If devices with a different mdev type are indeed compatible, it
+> > > > > > seems
+> > > > > > > > > > > userspace can only find out after the devices have actually been
+> > > > > > > > > > > created, as (1) does not apply?
+> > > > > > > > > > yes, I think so.
+> > > > > > > > >
+> > > > > > > > > How useful would it be for userspace to even look at (1) in that case?
+> > > > > > > > > It only knows if things have a chance of working if it actually goes
+> > > > > > > > > ahead and creates devices.
+> > > > > > > > >
+> > > > > > > > hmm, is it useful for userspace to test the migration_version under mdev
+> > > > > > > > type before it knows what mdev device to generate ?
+> > > > > > > > like when the userspace wants to migrate an mdev device in src vm,
+> > > > > > > > but it has not created target vm and the target mdev device.
+> > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > > One of my worries is that the existence of an attribute with the
+> > > > > > same
+> > > > > > > > > > > name in two similar locations might lead to confusion. But maybe it
+> > > > > > > > > > > isn't a problem.
+> > > > > > > > > > >
+> > > > > > > > > > Yes, I have the same feeling. but as (2) is for sysfs interface
+> > > > > > > > > > consistency, to make it transparent to userspace tools like libvirt,
+> > > > > > > > > > I guess the same name is necessary?
+> > > > > > > > >
+> > > > > > > > > What do we actually need here, I wonder? (1) and (2) seem to serve
+> > > > > > > > > slightly different purposes, while (2) and what I called (3) have the
+> > > > > > > > > same purpose. Is it important to userspace that (1) and (2) have the
+> > > > > > > > > same name?
+> > > > > > > > so change (1) to migration_type_version and (2) to
+> > > > > > > > migration_instance_version?
+> > > > > > > > But as they are under different locations, could that location imply
+> > > > > > > > enough information?
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > Thanks
+> > > > > > > > Yan
+> > > > > > > >
+> > > > > > > >
+> > > > > > >
+> > > > > > _______________________________________________
+> > > > > > intel-gvt-dev mailing list
+> > > > > > intel-gvt-dev@lists.freedesktop.org
+> > > > > > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+> > > > 
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > > 
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 
