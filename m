@@ -2,88 +2,106 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29E0EC83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 18:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3454DC83004
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 18:59:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA60820575
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 18:59:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1E4220575
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 18:59:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DCBpkNe6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA60820575
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="uOaQIMEo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1E4220575
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45515 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTVSE-0003Zk-4n
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 14:59:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54656)
+	id 1jTVSG-0003ay-9S
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 14:59:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54646)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jTVRK-0002Q6-Hq
+ (envelope-from <jag.raman@oracle.com>) id 1jTVRJ-0002Op-K9
  for qemu-devel@nongnu.org; Tue, 28 Apr 2020 14:58:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <aleksandar.qemu.devel@gmail.com>) id 1jTVRH-0008Rv-VE
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 14:58:42 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51962)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jTVRH-0008Rg-JK
+ (envelope-from <jag.raman@oracle.com>) id 1jTVRH-0008Rm-HG
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 14:58:41 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:48882)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
+ id 1jTVRG-0008RN-UX
  for qemu-devel@nongnu.org; Tue, 28 Apr 2020 14:58:39 -0400
-Received: by mail-wm1-x341.google.com with SMTP id x4so4054970wmj.1
- for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 11:58:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Dq51KaSYQwvgRi06Sw6vX1BCpzIodik5YZab6lt1lW0=;
- b=DCBpkNe6UBOqxTV1YBRhzUPWvZEibS4Qnx2yIPk4p7JT4cmKgWg3JLZCbhhpZpX01y
- yrc16wf3x2YbAEpE5eJ+w69PjFTbe0g7U10sjvBREIsUSRh+kFO6u5muqo1HePTJKfGq
- Ov6m8yLjcTDngEtYhqaiU/4kL1M/xQtNuVLOXxeywouLuKsf6oy8Kd/JzLZAYpH13Tzd
- 6fySfbXeDmxJ9UMlVWIPh6XKrTZ3Qra1ISyX/MjQYoe1gJLhIlop+RvXIiw4BdhtJCqu
- wMCV21B7mTGkM5/KnAm5y4eiluG5W6YyhW5f7AWpQVqwU9eZJgA4ByyV4eWqFPSm/DrZ
- e+Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Dq51KaSYQwvgRi06Sw6vX1BCpzIodik5YZab6lt1lW0=;
- b=dlZZ0oL0WEkSmtId1eaMDCSEOme4AFiNVVbdiNF9nK+i7EGnPgFe6/1CpEVB46eduv
- ZVntCxTKBcWE6A/UAly1NkSeeWLL7alY049oS7c6qX38N56Re1h/tSisorb/NwHtRXOH
- KzmTXQQwMGFuHUO3+rOPTVoj0ko4CVpw2iKxIg8Yka7xrqMtBhCXtMqz5XzZ1RCpLP1Z
- Yj53acH0v/lU7lo825euUcAR/vNJTLi/JTtmvjKLfgmgd6mKuuAlUNMhv7hRO3eX2bxs
- g67Qv3j688hPKAjBuEKx60V0FRjnIwDGb9W5u5rL/aLn6PmONpsnodgcvcZxcUYbwk9b
- Ky/g==
-X-Gm-Message-State: AGi0Puaa2z7Ih9PUjWMOUFTnCSdt+N4cc3DHqgQ5nLQSmjEGbJVggskp
- nC4/3NNOz1Q87dd1aXxS6ZoqeApVKVaf47Nu3Lw=
-X-Google-Smtp-Source: APiQypJ9tjvyqItdKyBp8mJaSpv/MS6CJ9whOaWP9fEpEG0xuileUxI+kP1Cz3l8Ae6bDD5YU2N9YhmUg27Ons3MTiI=
-X-Received: by 2002:a7b:c190:: with SMTP id y16mr6453250wmi.50.1588100317753; 
- Tue, 28 Apr 2020 11:58:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
- <1587979995-17717-3-git-send-email-chenhc@lemote.com>
- <5a4cc457-971c-de9b-7380-c5e81d1b378b@amsat.org>
- <CABDp7Voe_WJwa6J9W-rQdSRHMx+u=46tfd9ufEdAkE36e59_FQ@mail.gmail.com>
-In-Reply-To: <CABDp7Voe_WJwa6J9W-rQdSRHMx+u=46tfd9ufEdAkE36e59_FQ@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Tue, 28 Apr 2020 20:58:25 +0200
-Message-ID: <CAHiYmc5R8icimeJ3i=E-8_uUWpRMUUH67xZKFk04CrjgXKHgcQ@mail.gmail.com>
-Subject: Re: [PATCH for-5.1 3/7] hw/mips: Add CPU IRQ3 delivery for KVM
-To: chen huacai <zltjiangshi@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03SItQZY087917;
+ Tue, 28 Apr 2020 18:58:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2020-01-29; bh=Np6cJns2fxd64mDpT7hXl77uKHuZ04a3jiK7qrjMnWw=;
+ b=uOaQIMEoPKmhOZFAZRnTHU9o8RcXC8cupV5Q+LGt/ZDo1GtUCD3wyqM4zAt/xP6PS5YY
+ bS5UqO3TI/QjbIK30jdx+BKBf8GHAH1FpJu3Vs6MlJMvuPOZEgtav4RiEjxMwqiZGiy8
+ c+i8SJOXw03CCT+D/17cBOceCquIumsQV4b8rusDf3qlHYjgPKuAOchW4hz3uQyck8Dq
+ R+RY4kD68AXInOR1zM+onWfdfPFtNEJfXrZyCIT4QIvbWtS7Us3s82knhO/JqaxhpzwC
+ +NFM2k8KPVlSL+BontasCC9CpwFB1dftBnaOYz6Wp7My7O+KyRV3HQowjWajPdayZA6Q JQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 30p2p077d5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 28 Apr 2020 18:58:27 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03SIuft5157866;
+ Tue, 28 Apr 2020 18:58:27 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3030.oracle.com with ESMTP id 30mxpgqq61-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 28 Apr 2020 18:58:27 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03SIwOvf030456;
+ Tue, 28 Apr 2020 18:58:24 GMT
+Received: from dhcp-10-39-193-143.vpn.oracle.com (/10.39.193.143)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 28 Apr 2020 11:58:23 -0700
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
+Subject: Re: [PATCH RESEND v6 08/36] multi-process: Add stub functions to
+ facilitate build of multi-process
+From: Jag Raman <jag.raman@oracle.com>
+In-Reply-To: <20200428162916.GC109767@stefanha-x1.localdomain>
+Date: Tue, 28 Apr 2020 14:58:21 -0400
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::341
+Message-Id: <DDBFBA4D-9922-4D60-B761-A8199F09CC90@oracle.com>
+References: <cover.1587614626.git.elena.ufimtseva@oracle.com>
+ <647fa5bf70dbea7d2b4e47d2084dea3a66385433.1587614626.git.elena.ufimtseva@oracle.com>
+ <20200424131230.GA190507@stefanha-x1.localdomain>
+ <A0E83A03-3B01-4863-949A-F5DDC328A387@oracle.com>
+ <20200428162916.GC109767@stefanha-x1.localdomain>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+X-Mailer: Apple Mail (2.3445.9.1)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9605
+ signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ malwarescore=0
+ mlxscore=0 bulkscore=0 adultscore=0 phishscore=0 suspectscore=4
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004280150
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9605
+ signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ phishscore=0 clxscore=1015
+ bulkscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0 malwarescore=0
+ mlxscore=0 suspectscore=4 mlxlogscore=999 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004280149
+Received-SPF: pass client-ip=156.151.31.85; envelope-from=jag.raman@oracle.com;
+ helo=userp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 12:23:09
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,76 +113,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Aurelien Jarno <aurelien@aurel32.net>, qemu-level <qemu-devel@nongnu.org>
+Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>, fam@euphon.net,
+ Swapnil Ingle <swapnil.ingle@nutanix.com>,
+ John G Johnson <john.g.johnson@oracle.com>, qemu-devel@nongnu.org,
+ kraxel@redhat.com, quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, thanos.makatos@nutanix.com, rth@twiddle.net,
+ kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D1=83=D1=82=D0=BE, 28. =D0=B0=D0=BF=D1=80 2020. =D1=83 10:21 chen huacai <=
-zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
-=BE/=D0=BB=D0=B0:
->
-> Hi, Philippe,
->
-> On Mon, Apr 27, 2020 at 5:57 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
-org> wrote:
-> >
-> > On 4/27/20 11:33 AM, Huacai Chen wrote:
-> > > Currently, KVM/MIPS only deliver I/O interrupt via IP2, this patch ad=
-d
-> > > IP2 delivery as well, because Loongson-3 based machine use both IRQ2
-> > > (CPU's IP2) and IRQ3 (CPU's IP3).
-> > >
-> > > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > > ---
-> > >  hw/mips/mips_int.c | 6 ++----
-> > >  1 file changed, 2 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
-> > > index 796730b..5526219 100644
-> > > --- a/hw/mips/mips_int.c
-> > > +++ b/hw/mips/mips_int.c
-> > > @@ -48,16 +48,14 @@ static void cpu_mips_irq_request(void *opaque, in=
-t irq, int level)
-> > >      if (level) {
-> > >          env->CP0_Cause |=3D 1 << (irq + CP0Ca_IP);
-> > >
-> > > -        if (kvm_enabled() && irq =3D=3D 2) {
-> > > +        if (kvm_enabled() && (irq =3D=3D 2 || irq =3D=3D 3))
-> >
-> > Shouldn't we check env->CP0_Config6 (or Config7) has the required
-> > feature first?
-> I'm sorry that I can't understand IRQ delivery has something to do
-> with Config6/Config7, to identify Loongson-3?
->
-
-Obviously, yes.
-
-Thanks,
-Aleksandar
 
 
-> >
-> > >              kvm_mips_set_interrupt(cpu, irq, level);
-> > > -        }
-> > >
-> > >      } else {
-> > >          env->CP0_Cause &=3D ~(1 << (irq + CP0Ca_IP));
-> > >
-> > > -        if (kvm_enabled() && irq =3D=3D 2) {
-> > > +        if (kvm_enabled() && (irq =3D=3D 2 || irq =3D=3D 3))
-> > >              kvm_mips_set_interrupt(cpu, irq, level);
-> > > -        }
-> > >      }
-> > >
-> > >      if (env->CP0_Cause & CP0Ca_IP_mask) {
-> > >
->
->
->
-> --
-> Huacai Chen
+> On Apr 28, 2020, at 12:29 PM, Stefan Hajnoczi <stefanha@redhat.com> =
+wrote:
+>=20
+> On Fri, Apr 24, 2020 at 09:47:56AM -0400, Jag Raman wrote:
+>>> On Apr 24, 2020, at 9:12 AM, Stefan Hajnoczi <stefanha@redhat.com> =
+wrote:
+>>> On Wed, Apr 22, 2020 at 09:13:43PM -0700, elena.ufimtseva@oracle.com =
+wrote:
+>>>> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+>>>> index f884bb6180..f74c7e927b 100644
+>>>> --- a/stubs/Makefile.objs
+>>>> +++ b/stubs/Makefile.objs
+>>>> @@ -20,6 +20,7 @@ stub-obj-y +=3D migr-blocker.o
+>>>> stub-obj-y +=3D change-state-handler.o
+>>>> stub-obj-y +=3D monitor.o
+>>>> stub-obj-y +=3D monitor-core.o
+>>>> +stub-obj-y +=3D get-fd.o
+>>>> stub-obj-y +=3D notify-event.o
+>>>> stub-obj-y +=3D qtest.o
+>>>> stub-obj-y +=3D replay.o
+>>>=20
+>>> audio.c, vl-stub.c, and xen-mapcache.c are added by this patch but =
+not
+>>> added to Makefile.objs?  Can they be removed?
+>>=20
+>> Hey Stefan,
+>>=20
+>> Sorry it=E2=80=99s not clear. but these files are referenced in =
+Makefile.target.
+>=20
+> Why is the Makefile.target change not in this patch?
+>=20
+> Please structure patch series as logical changes that can be reviewed
+> sequentially.  Not only is it hard for reviewers to understand what is
+> going on but it probably also breaks bisectability if patches contain
+> incomplete changes.
+
+Hi Stefan,
+
+We grouped all the stubs into a separate patch for ease of review. If =
+you=E2=80=99re finding
+it hard to review this way, we=E2=80=99ll modify to ensure that the =
+Makefile changes go along
+with the stubs.
+
+--
+Jag
+
+>=20
+>>>=20
+>>> This entire patch requires justification.  Stubs exist so that =
+common
+>>> code can be linked without optional features.
+>>>=20
+>>> For example, common code may call into kvm but that callback isn't
+>>> relevant when building with kvm accelerator support (e.g. say =
+qemu-nbd).
+>>> That's where the stub function comes in.  It fulfills the dependency
+>>> without dragging in the actual kvm accelerator code.
+>>>=20
+>>> Adding lots of stubs suggests you are building QEMU in a new way =
+that
+>>> wasn't done before (this is true and expected for this patch =
+series).  I
+>>> would like to understand the reason for these stubs though.  For
+>>> example, why do you need to stub audio?
+>>=20
+>> These stub functions are only used by the remote process, and not by
+>> QEMU itself.
+>>=20
+>> Our goal is to ensure that the remote process is building the =
+smallest
+>> set of files necessary and these stub functions are necessary to meet
+>> that goal.
+>>=20
+>> For example, the remote process needs to build some of the functions
+>> defined in =E2=80=9Chw/core/qdev-properties-system.c=E2=80=9D. =
+However, this file
+>> depends on audio.c (references audio_state_by_name()), which is not
+>> needed for the remote process. The alternative to stub functions =
+would
+>> be to compile audio.c into the remote process, but that was not =
+necessary
+>> in our judgement. When the project started out, we spent a lot of =
+time
+>> figuring out which functions/files are necessary for the remote =
+process, and
+>> we stubbed out the ones which are needed to resolve dependency during
+>> compilation, but not needed for functionality.
+>>=20
+>> audio.c is just an example of tens of other places where we needed to
+>> make similar judgements.
+>>=20
+>> Would you prefer if we moved these stub functions into a separate
+>> library (instead of stub-obj-y) which is only linked by the remote =
+process?
+>=20
+> It's too bad that none of these judgements were documented.  As a
+> reviewer I have no idea what the justification for each individual =
+stub
+> was.
+>=20
+> Some stubs are unavoidable but they also indicate that the code is
+> tightly coupled where maybe it can be split up.  The
+> qdev-properties-system.c example you mentioned sounds like something
+> that should be broken up into multiple files.  Then stubs wouldn't be
+> necessary.
+>=20
+> That said, adding stubs doesn't place a great burden on anyone and I
+> think they can be merged.
+
 
