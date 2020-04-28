@@ -6,76 +6,76 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6BB5C83008
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 13:27:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4516EC83006
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 13:27:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A244C206E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 13:27:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C569206F0
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 13:27:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fD8dYbEU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A244C206E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XTyj37/a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C569206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTQH0-0005GQ-Nk
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 09:27:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35160)
+	id 1jTQH7-0005OA-6x
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 09:27:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35176)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTQFz-0003A6-BF
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 09:26:41 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jTQG1-0003BV-6e
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 09:26:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTQFy-0001n0-0A
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 09:26:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30219
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1jTQFz-0001nI-1t
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 09:26:40 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27022
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTQFx-0001mZ-Fm
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 09:26:37 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTQFy-0001mt-LY
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 09:26:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588080395;
+ s=mimecast20190719; t=1588080397;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3OWL5LjDCx7y5IeGJUkDregA90v3xX3dRAsB1yU3tXA=;
- b=fD8dYbEUCyktAWsQhlNc7zKaJPS8PlXo2XY6GmSXJp3S7r9f5DyuheIHRvbEM5vwX1B9ro
- lLuGlrPmAVTUwtjAKD1NYe4FuX5rPVL8DqpPsDtkgWVeEYPz/byEMRbfM+k11YInZOdLsh
- 4NFAbO+HAmFJjWR8/VfVIXrwX1adoQk=
+ bh=cZLAHpoF0nFbu2Hs47YYpAqe/b62f83BB8uxlXC1y4A=;
+ b=XTyj37/alB5vXrPuIlgx7/drnr5+OVT0joBuv2wEDwCk+fC4Soi3QIaeW/6z8kfFsX5yUh
+ kcoUwU5rp/qxHDLJnEm80d19KqLrvRz4ymnRgUWbmEi3pOeMs6RbCOPpbluM/pBPtkxBG2
+ qeB/spnBFr2aD5leagrKyYQlKcG5QaQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-MlxHMeRQOlO4P4rBVSfP8Q-1; Tue, 28 Apr 2020 09:26:34 -0400
-X-MC-Unique: MlxHMeRQOlO4P4rBVSfP8Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-350-wSI-PD4IOpuqWo5doSgm0w-1; Tue, 28 Apr 2020 09:26:36 -0400
+X-MC-Unique: wSI-PD4IOpuqWo5doSgm0w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D410462;
- Tue, 28 Apr 2020 13:26:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D352835B41;
+ Tue, 28 Apr 2020 13:26:35 +0000 (UTC)
 Received: from localhost (ovpn-112-143.ams2.redhat.com [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AC6E460C81;
- Tue, 28 Apr 2020 13:26:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D0BA9579A9;
+ Tue, 28 Apr 2020 13:26:34 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 1/4] block: Add bdrv_make_empty()
-Date: Tue, 28 Apr 2020 15:26:26 +0200
-Message-Id: <20200428132629.796753-2-mreitz@redhat.com>
+Subject: [PATCH 2/4] block: Use bdrv_make_empty() where possible
+Date: Tue, 28 Apr 2020 15:26:27 +0200
+Message-Id: <20200428132629.796753-3-mreitz@redhat.com>
 In-Reply-To: <20200428132629.796753-1-mreitz@redhat.com>
 References: <20200428132629.796753-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:15:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 02:06:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,63 +93,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Right now, all users of bdrv_make_empty() call the BlockDriver method
-directly.  That is not only bad style, it is also wrong, unless the
-caller has a BdrvChild with a WRITE permission.
-
-Introduce bdrv_make_empty() that verifies that it does.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block.h |  1 +
- block.c               | 23 +++++++++++++++++++++++
- 2 files changed, 24 insertions(+)
+ block/replication.c | 6 ++----
+ block/vvfat.c       | 4 +---
+ 2 files changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index b05995fe9c..d947fb4080 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -351,6 +351,7 @@ BlockMeasureInfo *bdrv_measure(BlockDriver *drv, QemuOp=
-ts *opts,
- void bdrv_get_geometry(BlockDriverState *bs, uint64_t *nb_sectors_ptr);
- void bdrv_refresh_limits(BlockDriverState *bs, Error **errp);
- int bdrv_commit(BlockDriverState *bs);
-+int bdrv_make_empty(BdrvChild *c, Error **errp);
- int bdrv_change_backing_file(BlockDriverState *bs,
-     const char *backing_file, const char *backing_fmt);
- void bdrv_register(BlockDriver *bdrv);
-diff --git a/block.c b/block.c
-index 2e3905c99e..b0d5b98617 100644
---- a/block.c
-+++ b/block.c
-@@ -6791,3 +6791,26 @@ void bdrv_del_child(BlockDriverState *parent_bs, Bdr=
-vChild *child, Error **errp)
+diff --git a/block/replication.c b/block/replication.c
+index da013c2041..cc6a40d577 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -331,9 +331,8 @@ static void secondary_do_checkpoint(BDRVReplicationStat=
+e *s, Error **errp)
+         return;
+     }
 =20
-     parent_bs->drv->bdrv_del_child(parent_bs, child, errp);
+-    ret =3D s->active_disk->bs->drv->bdrv_make_empty(s->active_disk->bs);
++    ret =3D bdrv_make_empty(s->active_disk, errp);
+     if (ret < 0) {
+-        error_setg(errp, "Cannot make active disk empty");
+         return;
+     }
+=20
+@@ -343,9 +342,8 @@ static void secondary_do_checkpoint(BDRVReplicationStat=
+e *s, Error **errp)
+         return;
+     }
+=20
+-    ret =3D s->hidden_disk->bs->drv->bdrv_make_empty(s->hidden_disk->bs);
++    ret =3D bdrv_make_empty(s->hidden_disk, errp);
+     if (ret < 0) {
+-        error_setg(errp, "Cannot make hidden disk empty");
+         return;
+     }
  }
-+
-+int bdrv_make_empty(BdrvChild *c, Error **errp)
-+{
-+    BlockDriver *drv =3D c->bs->drv;
-+    int ret;
-+
-+    assert(c->perm & BLK_PERM_WRITE);
-+
-+    if (!drv->bdrv_make_empty) {
-+        error_setg(errp, "%s does not support emptying nodes",
-+                   drv->format_name);
-+        return -ENOTSUP;
-+    }
-+
-+    ret =3D drv->bdrv_make_empty(c->bs);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "Failed to empty %s",
-+                         c->bs->filename);
-+        return ret;
-+    }
-+
-+    return 0;
-+}
+diff --git a/block/vvfat.c b/block/vvfat.c
+index ab800c4887..e3020b65c8 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -2960,9 +2960,7 @@ static int do_commit(BDRVVVFATState* s)
+         return ret;
+     }
+=20
+-    if (s->qcow->bs->drv && s->qcow->bs->drv->bdrv_make_empty) {
+-        s->qcow->bs->drv->bdrv_make_empty(s->qcow->bs);
+-    }
++    bdrv_make_empty(s->qcow, NULL);
+=20
+     memset(s->used_clusters, 0, sector2cluster(s, s->sector_count));
+=20
 --=20
 2.25.4
 
