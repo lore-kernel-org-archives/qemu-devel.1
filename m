@@ -2,87 +2,99 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F48FC83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 14:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF38C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 15:06:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5852E206D8
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 14:59:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AFEF4205C9
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 15:06:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QPdVa3YQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5852E206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SNGb0Vyu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFEF4205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTRhp-00032A-Ds
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 10:59:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48972)
+	id 1jTRoP-0006lf-Dc
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 11:06:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49458)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jTRgu-0001p5-Th
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 10:58:34 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jTRmP-0005l9-Sn
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 11:05:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jTRgt-0005Is-EL
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 10:58:32 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29124
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jTRgs-0005Ik-RK
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 10:58:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588085909;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+f5oekzb/cpxr4kyQF3ubQavvanfiue50uBnql4okS8=;
- b=QPdVa3YQ7uXtEiOJR0dGI1DUKD2j9uPZ9FuX5KiXrrLKmRhvP9qVjnnXr24p64y7SNg6aJ
- iIirK/8cCleGYFPG+J2JMrqWy1YvYscotOJVXrFZOgR2FfWuFnpLP/dPvNv4C9tsO2nBeY
- s0oC1LJ72XwmInZq2xWGNoKSDvq5/AI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-yqHBbrGRNYCHQQwqgxG8_Q-1; Tue, 28 Apr 2020 10:58:21 -0400
-X-MC-Unique: yqHBbrGRNYCHQQwqgxG8_Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEA231895A29
- for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 14:58:20 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E7F05C220;
- Tue, 28 Apr 2020 14:58:07 +0000 (UTC)
-Date: Tue, 28 Apr 2020 15:58:04 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH] virtiofsd: Show submounts
-Message-ID: <20200428145804.GC1374620@redhat.com>
-References: <20200424133516.73077-1-mreitz@redhat.com>
- <20200427175902.GM2923@work-vm>
- <20200428145143.GB107541@stefanha-x1.localdomain>
+ (envelope-from <richard.henderson@linaro.org>) id 1jTRkN-0007D1-52
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 11:04:13 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39967)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jTRkM-0007Bg-LP
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 11:02:06 -0400
+Received: by mail-pl1-x643.google.com with SMTP id t16so8465301plo.7
+ for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 08:02:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=51pRypiGFKSGI4pYYYy/oWUaBflFIbs/RrLf++hBG20=;
+ b=SNGb0VyuRnRh3WVgHha7whyhblwGUKS5Ilsatd6ThWGikhGmviLo1J0B6KbcRSfvXs
+ caT2RF2ykTsjZS0CMMnwpYNONjvAIlouYmJkwuWNfg9THyPDPyC9JlzmDFiMLSTkIfBG
+ loIhFtwnuxK8CRfkxYfRvzZfFPCCARAAQzvxW05Efhv/FK6q4g3klXI1JVMhTIwO7uSC
+ bllBRnCQQCOm2kmP5ql6svaV1njZbjaAm+D91fvxOIC8FeSF1YyQ0vwVHwaerLKip3DB
+ cEqAs290R1eNKStR05RQYO4gTo6BsUKDLioazCXtlcCksr0/kbsbp97P3fhyKbkS/mFl
+ lovw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=51pRypiGFKSGI4pYYYy/oWUaBflFIbs/RrLf++hBG20=;
+ b=b7CupncQ2sj0bFjutewS9oKhl2QnDKQ0o36OrQwjIKiWiFaaJ4TzahumsrvYjggB8q
+ KN5u7gblkjuR6xsgsRS9sC6Csr2mWfKnalWMRJ01lLRFKz8FrYCjOSjh5iD2j6jsmpCS
+ t9l01jTn9Vftxjwt/ASy44To+HiRdjWPpdB5BZnqjCyAZOz98EgJqa2/b9FzzDw1hWRw
+ xZH8/Bd/FAMXOOkNxWgpAJnEVQnYKZNwhq2uDKBClcoQWPc8SUUmsePX9ia9jROM01l1
+ JzvH2OGHQKdEr88swoChQ/dRR8EpXFNaV5sxsFQr4tA0QiDrtwQBnZ8bK6VxdPf647fJ
+ rKDg==
+X-Gm-Message-State: AGi0PuZ/uDMFHjA5qPzfQ1q7bhlP+7M5AYeB+o77AHFKO2B6Lse9WPeO
+ led96pG+ZSHfWMekf/pohl44Lw==
+X-Google-Smtp-Source: APiQypIEdxLMy5vPcIjOv6L4SuwKYa+3vtDteaMNS3VEpC2eRbNDzxlV5lVDpBTNWZ4FeNsF2OiHQA==
+X-Received: by 2002:a17:902:5a03:: with SMTP id
+ q3mr11264040pli.45.1588086124325; 
+ Tue, 28 Apr 2020 08:02:04 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id w66sm15307675pfw.50.2020.04.28.08.02.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 28 Apr 2020 08:02:03 -0700 (PDT)
+Subject: Re: [PATCH v3 13/18] target/arm: Update contiguous first-fault and
+ no-fault loads
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200422043309.18430-1-richard.henderson@linaro.org>
+ <20200422043309.18430-14-richard.henderson@linaro.org>
+ <CAFEAcA8oWP9XGzD+pb_VhDth8zx8j1Gz4vwiK+dArpw8x1BmqA@mail.gmail.com>
+ <22c1fd55-7cd3-6320-1f90-40d1bd2cc883@linaro.org>
+ <CAFEAcA-iqrEi_wQ+mBN1NtrEKq3uDYPoDunqW5e9KV6ivz3-SQ@mail.gmail.com>
+ <d148806b-c7f1-fefc-bfb4-fcefb81ab509@linaro.org>
+ <CAFEAcA-iJWqPQ-SwukaBcxgNFppAmeZNUR2doz6sgV6RduC32A@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <df19b271-55ad-9071-2790-d0d4991fe831@linaro.org>
+Date: Tue, 28 Apr 2020 08:02:01 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200428145143.GB107541@stefanha-x1.localdomain>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <CAFEAcA-iJWqPQ-SwukaBcxgNFppAmeZNUR2doz6sgV6RduC32A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:11:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,76 +106,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: virtio-fs@redhat.com, Max Reitz <mreitz@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Apr 28, 2020 at 03:51:43PM +0100, Stefan Hajnoczi wrote:
-> On Mon, Apr 27, 2020 at 06:59:02PM +0100, Dr. David Alan Gilbert wrote:
-> > * Max Reitz (mreitz@redhat.com) wrote:
-> > > Currently, setup_mounts() bind-mounts the shared directory without
-> > > MS_REC.  This makes all submounts disappear.
-> > >=20
-> > > Pass MS_REC so that the guest can see submounts again.
-> >=20
-> > Thanks!
-> >=20
-> > > Fixes: 3ca8a2b1c83eb185c232a4e87abbb65495263756
-> >=20
-> > Should this actually be 5baa3b8e95064c2434bd9e2f312edd5e9ae275dc ?
-> >=20
-> > > Signed-off-by: Max Reitz <mreitz@redhat.com>
-> > > ---
-> > >  tools/virtiofsd/passthrough_ll.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passt=
-hrough_ll.c
-> > > index 4c35c95b25..9d7f863e66 100644
-> > > --- a/tools/virtiofsd/passthrough_ll.c
-> > > +++ b/tools/virtiofsd/passthrough_ll.c
-> > > @@ -2643,7 +2643,7 @@ static void setup_mounts(const char *source)
-> > >      int oldroot;
-> > >      int newroot;
-> > > =20
-> > > -    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
-> > > +    if (mount(source, source, NULL, MS_BIND | MS_REC, NULL) < 0) {
-> > >          fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", sourc=
-e, source);
-> > >          exit(1);
-> > >      }
-> >=20
-> > Do we want MS_SLAVE to pick up future mounts that might happenf rom the
-> > host?
->=20
-> There are two separate concepts:
->=20
-> 1. Mount namespaces.  The virtiofsd process is sandboxed and lives in
->    its own mount namespace.  Therefore it does not share the mounts that
->    the rest of the host system sees.
->=20
-> 2. Propagation type.  This is related to bind mounts so that mount
->    operations that happen in one bind-mounted location can also appear
->    in other bind-mounted locations.
->=20
-> Since virtiofsd is in a separate mount namespace, does the propagation
-> type even have any effect?
+On 4/27/20 11:38 AM, Peter Maydell wrote:
+> I would suggest something like:
+> 
+> +     * From this point on, all memory operations are MemSingleNF.
+> +     *
+> +     * Per the MemSingleNF pseudocode, a no-fault load from Device memory
+> +     * must not actually hit the bus -- it returns (UNKNOWN, FAULT) instead.
+> +     *
+> +     * Unfortuately we do not have access to the memory attributes from the PTE
+> +     * to tell Device memory from Normal memory. So we make a mostly
+> +     * correct check, and indicate (UNKNOWN, FAULT) for any MMIO.
+> +     * This gives the right answer for the common cases of "Normal memory,
+> +     * backed by host RAM" and "Device memory, backed by MMIO".
+> +     * The architecture allows us to suppress an NF load and return
+> +     * (UNKNOWN, FAULT) for any reason), so our behaviour (indicate
+> +     * fault) for the corner case of "Normal memory, backed by MMIO" is
+> +     * permitted. The case we get wrong is "Device memory, backed by
+> +     * host RAM", which we should return (UNKNOWN, FAULT) for but do not.
+> +     *
+> +     * Similarly, CPU_BP breakpoints would raise exceptions, and so
+> +     * return (UNKNOWN, FAULT).  For simplicity, we consider gdb and
+> +     * architectural breakpoints the same.
+> 
+> assuming my understanding is correct...
 
-Yes, propagation should work across mount namespaces if you get the mount
-flags right.  You can try it out using  unshare + mount commands
-to debug different scenarios.
+Yep, thanks.  I'll merge this text.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
 
+r~
 
