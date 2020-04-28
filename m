@@ -2,91 +2,110 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91842C83004
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 07:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AFA3C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 07:51:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E885206A5
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 07:50:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15CF6206D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 07:51:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LFE04p88"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E885206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="emK1Z+mZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15CF6206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTL0E-0006Qj-DH
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 03:50:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35862)
+	id 1jTL1x-0001b5-3v
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 03:51:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44394)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gorbak25@gmail.com>) id 1jTJpH-000068-MH
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:36:10 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jTKx6-0002wO-5g
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 03:50:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <gorbak25@gmail.com>) id 1jTJkm-00080U-RR
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:34:39 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50872)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <gorbak25@gmail.com>)
- id 1jTJkm-00080L-Cd
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:30:00 -0400
-Received: by mail-wm1-x342.google.com with SMTP id x25so1379256wmc.0
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 23:30:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=/xdW9TlF14cno7Dox1YULYIivWRvz4pvd3kbVi7j+L4=;
- b=LFE04p88MpHoPldLuBL/ef/Ua1bNp9e+y/AioN8MiM9U5SHhMHb2oaOuIHdrgUrfvp
- OwWz5i3q1Tu4LjPp1sZH+uewJSXti8ttRSe8d4o4Yu9774I62ekPt4PWwGGhSWeKwURe
- Ujhqmqn4J7uo8NwSOeHNm7zB07nEI89ZLHKzkvQ6aAibNYyiRGvStPM8fWwvmlIgeLf0
- kL5lPAGouNRIDqC54gdYhcUeIT8+TvQlmoaylTU7gdf5GOflOAULoHvyg0STXeW1JqD2
- b3Wb8+3KZ0w1uJGCNf8Yoy4RhiJJW0ZhIBUJTUGabjsPKXlvUQHvXTzw9rBHXagIZJky
- 8iiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=/xdW9TlF14cno7Dox1YULYIivWRvz4pvd3kbVi7j+L4=;
- b=T0NIEnU58BPuCNyTwlByHJz0mKHNIGghHtrkcLt9KwA0dkQQ2XPX1cxqR8PQYl+rkp
- 8F6FH06TDqauLZwMlQoErevsnash0HNfVtQgPyo6gK19uD+BpNqI7Tny2zqs8UaEJtP+
- sJy+3ngu0pJyizWdlUI0zm5UsuASowdnk9QDu03liy+ehfOtqTy7xPpeey7QIM8Ff6Jb
- AElxlWGrmh0LcWQKZsVUjPmxqS0Rb9rKnQmskDh6Ge58Z/iipz2FATAPKL9pRTRaLADr
- arVylC+QPQkDYZCpJBg7qJ/b8/2//6EMRdik8CU1kuio2TrCCV0KKobCQdtwnsR1Q8cB
- ltXA==
-X-Gm-Message-State: AGi0PuYu2jTFNzAxEizlTdUI6nL/WrxPKIPfacLlVV7YmQeK2t8N/qoV
- Yx065TfC2+JwjxZfh6mwG8CtQRwdbcJ2PA==
-X-Google-Smtp-Source: APiQypJjAWImZKi6yyETe7bMvdVFmRMyX+Q/xhJCHdWzOGMOtz5pIllYGMr6MRFpzeCK7ibGxixnWw==
-X-Received: by 2002:a1c:8106:: with SMTP id c6mr2746244wmd.88.1588055398259;
- Mon, 27 Apr 2020 23:29:58 -0700 (PDT)
-Received: from localhost.localdomain (public-gprs351065.centertel.pl.
- [37.47.2.154])
- by smtp.gmail.com with ESMTPSA id a205sm2030564wmh.29.2020.04.27.23.29.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Apr 2020 23:29:57 -0700 (PDT)
-From: Grzegorz Uriasz <gorbak25@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] Fix undefined behaviour
-Date: Tue, 28 Apr 2020 06:28:46 +0000
-Message-Id: <20200428062847.7764-2-gorbak25@gmail.com>
-X-Mailer: git-send-email 2.26.1
-In-Reply-To: <20200428062847.7764-1-gorbak25@gmail.com>
-References: <20200428062847.7764-1-gorbak25@gmail.com>
+ (envelope-from <mreitz@redhat.com>) id 1jTKvQ-0006g1-Qj
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 03:46:47 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36372
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTKvQ-0006fn-E5
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 03:45:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588059902;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=WrB3QrPatswRMjn/X1rm7oWpfp567+VjIJVs1RtSgGA=;
+ b=emK1Z+mZbRPAVbsEdimHOUXMREPXP/9siFd9TEvum/ocDK0MA/Hc6IUs+HCSOYDxJAyGh6
+ +0uQ0yqP+IFJWZ/qze4q9l4Mt66ite2QF37eTDNrwPPf7bHjVm89M5hvEvhTU+z1gYQSD4
+ W4OSsThpcgAFuzmnWhC5NX9ghUboU9o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-462-ROARzGIxO2Spo2el1u_BPg-1; Tue, 28 Apr 2020 03:45:00 -0400
+X-MC-Unique: ROARzGIxO2Spo2el1u_BPg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CB60100CCC8;
+ Tue, 28 Apr 2020 07:44:59 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 11B805C1D4;
+ Tue, 28 Apr 2020 07:44:57 +0000 (UTC)
+Subject: Re: [PATCH v2 2/6] block/block-copy: alloc task on each iteration
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200325134639.16337-1-vsementsov@virtuozzo.com>
+ <20200325134639.16337-3-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <b5572d89-941a-e0d4-ea79-26828459eb6f@redhat.com>
+Date: Tue, 28 Apr 2020 09:44:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=gorbak25@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::342
-X-Mailman-Approved-At: Tue, 28 Apr 2020 03:48:48 -0400
+In-Reply-To: <20200325134639.16337-3-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="MRKmxYMrlkxNQdSMsljytt7gHUwp5A0ZS"
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 02:06:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,54 +117,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: artur@puzio.waw.pl, Stefano Stabellini <sstabellini@kernel.org>,
- Paul Durrant <paul@xen.org>, jakub@bartmin.ski,
- marmarek@invisiblethingslab.com, Grzegorz Uriasz <gorbak25@gmail.com>,
- Anthony Perard <anthony.perard@citrix.com>, j.nowak26@student.uw.edu.pl,
- xen-devel@lists.xenproject.org
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Grzegorz Uriasz <gorbak25@gmail.com>
----
- hw/xen/xen_pt_load_rom.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MRKmxYMrlkxNQdSMsljytt7gHUwp5A0ZS
+Content-Type: multipart/mixed; boundary="i2KvQlq6xMjChkmLPmyVUWRURC8ShrmBo"
 
-diff --git a/hw/xen/xen_pt_load_rom.c b/hw/xen/xen_pt_load_rom.c
-index a50a80837e..9f100dc159 100644
---- a/hw/xen/xen_pt_load_rom.c
-+++ b/hw/xen/xen_pt_load_rom.c
-@@ -38,12 +38,12 @@ void *pci_assign_dev_load_option_rom(PCIDevice *dev,
-     fp = fopen(rom_file, "r+");
-     if (fp == NULL) {
-         if (errno != ENOENT) {
--            error_report("pci-assign: Cannot open %s: %s", rom_file, strerror(errno));
-+            warn_report("pci-assign: Cannot open %s: %s", rom_file, strerror(errno));
-         }
-         return NULL;
-     }
-     if (fstat(fileno(fp), &st) == -1) {
--        error_report("pci-assign: Cannot stat %s: %s", rom_file, strerror(errno));
-+        warn_report("pci-assign: Cannot stat %s: %s", rom_file, strerror(errno));
-         goto close_rom;
-     }
- 
-@@ -59,10 +59,9 @@ void *pci_assign_dev_load_option_rom(PCIDevice *dev,
-     memset(ptr, 0xff, st.st_size);
- 
-     if (!fread(ptr, 1, st.st_size, fp)) {
--        error_report("pci-assign: Cannot read from host %s", rom_file);
--        error_printf("Device option ROM contents are probably invalid "
--                     "(check dmesg).\nSkip option ROM probe with rombar=0, "
--                     "or load from file with romfile=\n");
-+        warn_report("pci-assign: Cannot read from host %s", rom_file);
-+        memory_region_unref(&dev->rom);
-+        ptr = NULL;
-         goto close_rom;
-     }
- 
--- 
-2.26.1
+--i2KvQlq6xMjChkmLPmyVUWRURC8ShrmBo
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 25.03.20 14:46, Vladimir Sementsov-Ogievskiy wrote:
+> We are going to use aio-task-pool API, so tasks will be handled in
+> parallel. We need therefore separate allocated task on each iteration.
+> Introduce this logic now.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/block-copy.c | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--i2KvQlq6xMjChkmLPmyVUWRURC8ShrmBo--
+
+--MRKmxYMrlkxNQdSMsljytt7gHUwp5A0ZS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6n3vgACgkQ9AfbAGHV
+z0C42wf+Kyd7wuV2JrloHeh12PJy4ChzUx+m0UEyqV2DIeswYvakp5Q3NIxmOStr
+t89X4ZBIax0v9HxuRYfzPD2Xk4uBM/Jrc9AupAhsTy9ON2TsVkp4F7IXLNRCUXsV
+dhajw8T66THTlYTu3IqIoRvsKqOv4pj4AuM4hJIxGKLe0i3jRcZryxL/31sz1EfV
+O7LfQ8yEnuE/jj8xtXWWlKw7P2F7AVhU8JjPhqF2ZmC0ENw5126WBVyuBVz0Ba2b
+Rlxh9l98vzaGKO7g11HQpyo9Suq1fUGxKODTuB1HFVOEOYWCaKVuC5+xQcRlAwUR
+DVmqPgL0XX2SUv8qqm6MlukFkW61eg==
+=ikBF
+-----END PGP SIGNATURE-----
+
+--MRKmxYMrlkxNQdSMsljytt7gHUwp5A0ZS--
 
 
