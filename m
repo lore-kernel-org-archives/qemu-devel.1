@@ -2,111 +2,119 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27970C83007
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:44:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8491CC83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:45:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8A71206D7
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:44:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 394B7206A1
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:45:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UC2zDv9M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8A71206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="FUYOdJ/7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 394B7206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTMmW-0006CK-7X
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 05:44:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60630)
+	id 1jTMnr-0007oT-BC
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 05:45:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33554)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTMT9-0005yj-Db
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:24:35 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jTMXG-0005DO-LP
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:30:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTLz8-0007XY-3A
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:57:54 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33007
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTLz7-0007XJ-Gk
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:52:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588063976;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=cjdUEQHGZb0sfVpEwg7oXdqDO3o9GpcB0Vz3zhKTjAU=;
- b=UC2zDv9MQDNc9jiETAKYxsw8ObKTQg4n/kx5ELWHgIW5eR73ezEjKYsEeRrpY4QhewA0OI
- YPoBo43vOK10CgM6jAXyITYGKMs6qPSVo2XtEkNUjGWQl4ABprPFflBooCHGbN6RDwDLxH
- ZjArL6cJ7MIcPkr7Bhsb2qGwKIp0Akk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-dxStsTvXMfeZ4aPFnVq6wA-1; Tue, 28 Apr 2020 04:52:53 -0400
-X-MC-Unique: dxStsTvXMfeZ4aPFnVq6wA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6549D1899521;
- Tue, 28 Apr 2020 08:52:52 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 01C3F1002388;
- Tue, 28 Apr 2020 08:52:50 +0000 (UTC)
-Subject: Re: [PATCH v2 4/6] block/block-copy: move task size initial
- calculation to _task_create
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200325134639.16337-1-vsementsov@virtuozzo.com>
- <20200325134639.16337-5-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <630a5655-7b00-3ee4-943d-e4b5ad52db57@redhat.com>
-Date: Tue, 28 Apr 2020 10:52:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jTMU6-0005wO-WC
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:28:13 -0400
+Received: from mail-vi1eur05on2133.outbound.protection.outlook.com
+ ([40.107.21.133]:40320 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jTM1o-0008Vv-02; Tue, 28 Apr 2020 04:55:44 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bWIDCSDFj2RAjtHtv2B8vXC81IE+vwYb52kI6Q9+TVngDZRg/amndpApsGJKhQYybwXhuWhoF+SdAyTPIwuWOcAuj34sAbU5NXhjDY6C7DQtI7MYJLTi+LG3yrD0IohCoazmpf+/sKeTv5SPZI6CVj7DYh9cDq+EDjcgVYE3oZOVGK0F3ZB4uhnjsuv7fMAtaz5KCjJ7PbIacFFqjamudv0KCHn3sEtgnYx4j2TcMNdef2SIQDkunDoQyC095IWTUyL7fjOpLZMAxdf5iYuPnw+QV/5j/ZEONNGFYKXAGkN8AfVoOhbSUyT1IJGXu6os4WPxjvICnhRY/gSMgROChg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RXROdLAE+ybEt/RjCV1QzqpD37vS3gYZWuvhowhXe5s=;
+ b=Zo6PbU4VAiu7xB0LZ0iFFJ6YEiKqFNt9nfprGyBPdIJuIAF5e8CsDQJEPJNiXMdobF0Rk27FnnxniMSC+8EYMyfCDMSa6Ip83AMg6g1cdEiuEAzkM8ulTG8FZmzeymxpgM8TfbUDoeeKkPCgaC0qCfObvEuKwH9CIRtjpsE/A/bthugntEOxLoHrWRfuzLJz65GjoO+IY8DTwIdi8hPrBCy98DC6EPmNjXdz390reglxOMU742OPFkFSyYhCQsnGwY1FKzphUK+Y4CzWd2MEgTg7VYAdn4TNSVdGoG/OErg05WYHh2u0NNWMYMLvGD5Es+copMdojDCAzUZT/i1lyQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RXROdLAE+ybEt/RjCV1QzqpD37vS3gYZWuvhowhXe5s=;
+ b=FUYOdJ/7s1UKDNqQG87NINNUCpF7pleg5cpzD9ebRxM3fsEQKr4erjw4EvuOvPxyeWYFDYaKATeDGLpq3MJtZqOpsqWQ3JjaqJbZXHh1jgQCap9M7Bj/P4EgOeokSIfLAeeaNp0IyWq//M1lAVuCTGnW1fCrOGmBmMnKbm5gIkQ=
+Authentication-Results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none
+ header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5304.eurprd08.prod.outlook.com (2603:10a6:20b:10e::21)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Tue, 28 Apr
+ 2020 08:55:37 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.023; Tue, 28 Apr 2020
+ 08:55:37 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: backing chain & block status & filters
+To: qemu block <qemu-block@nongnu.org>
+X-Tagtoolbar-Keys: D20200428115535240
+Message-ID: <a1c1b734-34dc-f8d3-b6a0-43b136e237e2@virtuozzo.com>
+Date: Tue, 28 Apr 2020 11:55:35 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM3PR04CA0128.eurprd04.prod.outlook.com (2603:10a6:207::12)
+ To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <20200325134639.16337-5-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="KFVOL47rrfni8ryVIhgHL7balCRG4fnPb"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:11:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.155) by
+ AM3PR04CA0128.eurprd04.prod.outlook.com (2603:10a6:207::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2937.13 via Frontend Transport; Tue, 28 Apr 2020 08:55:36 +0000
+X-Tagtoolbar-Keys: D20200428115535240
+X-Originating-IP: [185.215.60.155]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 71d2267b-cb63-4394-b2c8-08d7eb51eb1b
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5304:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5304916873197B4D41F2BE0EC1AC0@AM7PR08MB5304.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 0387D64A71
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(376002)(346002)(136003)(366004)(396003)(39850400004)(66946007)(5660300002)(66476007)(66556008)(31686004)(36756003)(86362001)(31696002)(52116002)(478600001)(16526019)(4326008)(81156014)(2906002)(6916009)(8936002)(8676002)(107886003)(26005)(54906003)(956004)(2616005)(186003)(6486002)(316002)(16576012);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: cCxlCjSOdHdUpfo3+FmLVhQpyf53t2MTE8Qe6rIFXK4yUSvY0bAcvAwYQKMLB0UySFJrWLRKfrb2B/6/kIVw4efUTh/kbvE0B1LzIjMnIpBa0t4u9gS1/6YczPVzEwshKX1ErEV9A9iXbHZbBIca5vB2VaclWC45xVJpE9SsNuKx9WzIxK6GBtDh9AFzr5vzlIKgsaXXWgixigFSrv3fQZMuRtDFE9CvC5HFPzhMu1G9wiewcaUEX6imbCb5eSaiLLQwYqRT9fWdbWOx1vJRsRT9HKqpbNh8JetsPtfRWC9CYzFuRckNzDgX5U8BBlTVWR7EEBTYjA6H4uURbB7ZZPog7ckg6vhnVGQImbQJWz1HazQkkDOQk6Bd5vq2IHXKsdE+ZPMfA/KQ2GpV9nX7Kj77LMl3nUsR36jECa8q31sMc6p4S1MOMvhkikz8QDJh
+X-MS-Exchange-AntiSpam-MessageData: Ko3ga3dAM+nxVcBVnPS1puY96CWPZYNW9/omOtbUoq7mXpuWhTuOW5dF6O9mS9Goa4CRiH74qutnndeh8gjC3Gf80d0UctMpLKcGBmwGBdoIf1sr/KltilQOeBPTT6BzsWNurYK3otYfhMMrGGg11QqYXveupNPdQHPNOL8MqqlK4bRwJdzgsSij9SMCyMiZJlTnIRbs5YQFHgCImNsT17+9ZvO5ZfMUIMmJmrBA6BgaMxYCw91/ghyKDDQ6IoxBiWPscJQdML+UtiGZsQLt9q8sNBqawocpsIeIqp+gHA6oGVRzMVdj9z9B4uI20V4Ln5qsHx7srL+NvGnzUrGDZHV/tXMPhnVJvsR1sPB1qTpJtPfUoOXY0g+3BmEvz6/36MVmb0lLJSftj/7+51hlzGzSyz5OOVEwz2fkLQbtrvwtSiCnUf7l7XxWNUIb9VqKq1+j1WEoeU+oHdOUgHUgOQvIyRJgfaxdqCyWM3Udcdr+4nmSsk3uNn9tZz8HYYYIrUPhgjCVqN4Qpf2V2Ot91CrIw1tKkqS/Yqr348191wRSX5Fmc2zzjJiZegGpvtdUbsUF9Nk4a7M4K8+xdigo7YvdJbK0IRul+HVh1EtQuG1alrIukH3qU+d5j6Fiai6544yKU5hvDq5O4mcF7mN0z41dwLc3ciOGveanw4U7RT/auDdu2K/Aqw567zInWZyi8GByDt21zZrY4GKvsplauhYEOadhi8a+cZQR5RiURn0y9U27xpyXIw1dRgTgSmFy/BWtfRa3psPZZQMqNLFcXG1eZinouaASiJfx4PGRNkY=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71d2267b-cb63-4394-b2c8-08d7eb51eb1b
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2020 08:55:37.4554 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: olZ5GpFW/ltvwvAQMwCcriGCy2hFf9N0Fa4TgjcVRKIdriuZizN7VfA85MH4q9EpxdJTpB6DdXrsg1fUhijQ3ZYL9gsk0wgNmJmQAGgGO8A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5304
+Received-SPF: pass client-ip=40.107.21.133;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:55:40
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.21.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,116 +126,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KFVOL47rrfni8ryVIhgHL7balCRG4fnPb
-Content-Type: multipart/mixed; boundary="4hKalja2jVV1Lpf1R7NlLRQBhDvYNzKpA"
+Hi!
 
---4hKalja2jVV1Lpf1R7NlLRQBhDvYNzKpA
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+I wanted to resend my "[PATCH 0/4] fix & merge block_status_above and is_allocated_above", and returned to all the inconsistencies about block-status. I keep in mind Max's series about child-access functions, and Andrey's work about using COR filter in block-stream, which depends on Max's series (because, without them COR fitler with file child breaks backing chains).. And, it seems that it's better to discuss some questions before resending.
 
-On 25.03.20 14:46, Vladimir Sementsov-Ogievskiy wrote:
-> Comment "Called only on full-dirty region" without corresponding
-> assertion is a very unsafe thing.
+First, problems about block-status:
 
-Not sure whether it=92s that unsafe for a static function with a single
-caller, but, well.
+1. We consider ALLOCATED = ZERO | DATA, and documented as follows:
 
-> Adding assertion means call
-> bdrv_dirty_bitmap_next_zero twice. Instead, let's move
-> bdrv_dirty_bitmap_next_zero call to block_copy_task_create. It also
-> allows to drop cur_bytes variable which partly duplicate task->bytes.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/block-copy.c | 47 ++++++++++++++++++++++++----------------------
->  1 file changed, 25 insertions(+), 22 deletions(-)
->=20
-> diff --git a/block/block-copy.c b/block/block-copy.c
-> index 63d8468b27..dd406eb4bb 100644
-> --- a/block/block-copy.c
-> +++ b/block/block-copy.c
-> @@ -106,12 +106,23 @@ static bool coroutine_fn block_copy_wait_one(BlockC=
-opyState *s, int64_t offset,
->      return true;
->  }
-> =20
-> -/* Called only on full-dirty region */
->  static BlockCopyTask *block_copy_task_create(BlockCopyState *s,
->                                               int64_t offset, int64_t byt=
-es)
+    * BDRV_BLOCK_DATA: allocation for data at offset is tied to this layer
+    * BDRV_BLOCK_ZERO: offset reads as zero
+    * BDRV_BLOCK_OFFSET_VALID: an associated offset exists for accessing raw data
+    * BDRV_BLOCK_ALLOCATED: the content of the block is determined by this
+    *                       layer rather than any backing, set by block layer
 
-A bit of documentation on the new interface might be nice.  For one
-thing, that @offset must be dirty, although there is an assertion that,
-well, checks it.  (An assertion doesn=92t really check anything, it rather
-verifies a contract.  And violation is fatal.)
+This actually means, that we should always have BDRV_BLOCK_ALLOCATED for formats which doesn't support backing. So, all such format drivers must return ZERO or DATA (or both?), yes?. Seems file-posix does so, but, for example, iscsi - doesn't.
 
-For another, what the range [offset, offset + bytes) is; namely
-basically the whole range of data that we might potentially copy, only
-that the head must be dirty, but the tail may be clean.
+2. ZERO. The meaning differs a bit for generic block_status and for drivers.. I think, we at least should document it like this:
 
-Which makes me think that the interface is maybe less than intuitive.
-It would make more sense if we could just call this function on the
-whole region and it would figure out whether @offset is dirty by itself
-(and return NULL if it isn=92t).
+BDRV_BLOCK_DATA: allocation for data at offset is tied to this layer
+BDRV_BLOCK_ZERO: if driver return ZERO, than the region is allocated at this layer and read as ZERO. If generic block_status returns ZERO, it only mean that it reads as zero, but the region may be allocated on underlying level.
 
-OTOH I suppose the interface how it is here is more useful for
-task-ification.  But maybe that should be documented.
+3. bdi.unallocated_blocks_are_zero
 
->  {
-> +    int64_t next_zero;
->      BlockCopyTask *task =3D g_new(BlockCopyTask, 1);
-> =20
-> +    assert(bdrv_dirty_bitmap_get(s->copy_bitmap, offset));
-> +
-> +    bytes =3D MIN(bytes, s->copy_size);
-> +    next_zero =3D bdrv_dirty_bitmap_next_zero(s->copy_bitmap, offset, by=
-tes);
-> +    if (next_zero >=3D 0) {
-> +        assert(next_zero > offset); /* offset is dirty */
-> +        assert(next_zero < offset + bytes); /* no need to do MIN() */
-> +        bytes =3D next_zero - offset;
-> +    }
-> +
-> +    /* region is dirty, so no existent tasks possible in it */
+I think it's very bad, that we have formats, that supports backing, but doesn't report bdi.unallocated_blocks_are_zero as true. It means that UNALLOCATED region reads as zero if we have short backing file, and not as zero if we remove this short backing file. I can live with it but this is weird logic. These bad drivers are qcow (not qcow2), parallels and vmdk. I hope, they actually just forget to set unallocated_blocks_are_zero to true.
 
-s/existent/existing/?
+Next. But what about drivers which doesn't support backing? As we considered above, they should always return ZERO or DATA, as everything is allocated in this backing-chain level (last level, of course).. So again unallocated_blocks_are_zero is meaningless. So, I think, that driver which doesn't support backings, should be fixed to return always ZERO or DATA, than we don't need this unallocated_blocks_are_zero at all.
 
-(The code movement and how you replaced cur_bytes by task->bytes looks
-good.)
+3. Short backing files in allocated_above: we must consider space after EOF as ALLOCATED, if short backing file is inside requested backing-chain part, as it produced exactly because of this short file (and we never go to backing). (current realization of allocated_above is buggy, see my outdated series "[PATCH 0/4] fix & merge block_status_above and is_allocated_above")
 
-Max
+4. Long ago we've discussed problems about BDRV_BLOCK_RAW, when we have a backing chain of non-backing child.. I just remember that we didn't reach the consensus.
 
->      assert(!find_conflicting_task(s, offset, bytes));
-> =20
->      bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
+5. Filters.. OK we have two functions for them: bdrv_co_block_status_from_file and bdrv_co_block_status_from_backing. I think both are wrong:
 
+bdrv_co_block_status_from_file leads to problem [4], when we can report UNALLOCATED, which refers not to the current backing chain, but to sub backing chain of file child, which is inconsistent with block_status_above and is_allocated_above iteration.
 
---4hKalja2jVV1Lpf1R7NlLRQBhDvYNzKpA--
+bdrv_co_block_status_from_backing is also is not consistent with block_status_above iteration.. At least at leads to querying the same node twice.
 
---KFVOL47rrfni8ryVIhgHL7balCRG4fnPb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+=================
 
------BEGIN PGP SIGNATURE-----
+So, about filters and backing chains. Keeping (OK, just, trying to keep) all these things in mind, I think that it's better to keep backing chains exactly *backing* chains, so that "backing" child is the only "not own" child of the node. So, its close to current behavior and we don't need child-access functions. Then how filters should work:
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6n7uEACgkQ9AfbAGHV
-z0CzWggAvwt2QGFcPWkETOOvrxjtRynLvO/RQAGJydwG/7qxDcO5BZxdnO7a3teD
-Znp19KAqe0ehbgJrdSNuxRfu4a4Dvgg0WshrTaZ0se7A7qy+/XpEIjh6dIUTEnN4
-3kAB4C+Zl4kktY4mjQJsjTwMOUIOL+feiYlCgy0ARM7zRXjr0r4WM7/V88+nEc8a
-2Z/k/94miJc6Bx+9+92RaTpSR+Q/jUBtVPg6iUobZWVzYdQHOFHTlutVl0CO67xQ
-McuP7FppaNOgcQnL8l5jHOF/O/xRWRigwM0MXU2DQJFcRPrpkasg24kZ0ccBp+K4
-8z9UtEjPFywTOLciHL3SXJHIbKpElw==
-=AJgQ
------END PGP SIGNATURE-----
+Filter with backing child, should always return UNALLOCATED (i.e. no DATA, no ZERO), it is honest: everything is on the other level of backing chain.
 
---KFVOL47rrfni8ryVIhgHL7balCRG4fnPb--
+Filter with file child should always return BDRV_BLOCK_DATA | BDRV_BLOCK_RECURSE, to show that:
+1. everything is allocated in *this* level of backing chain
+2. filter is too lazy to dig in it's file child (and, maybe the whole sub-tree of it) and asks generic layer to do it by itself, if it wants zeroes.
 
+Then, of course, if we want some filter to be inside backing chain, it should have not "file" child but "backing". For this, we may support in current public filter both variants: backing or file, as user prefer. I.e., filter is opened either with file option or with backing and operate correspondingly. And newer filters (like backup-top) may support only backing variants.
+
+=================
+
+So, I propose to complicate a bit code of old file-based filters, to support backing child (which may be done on demand, when needed. For example, Virtuozzo now need only COR filter (and only to satisfy iotests, actually)), and keep generic code about block-status and handling backing-chains simpler (and simpler to document).
+
+Another benefit is that block-graph is already visible through QAPI, and it would be good to keep backing link meaning, not adding the thing that for filters "file" link behaves as "backing".
+
+So again, I'm for limiting backing-behavior to bs->backing child only (as it currently behaves). What do you think?
+
+-- 
+Best regards,
+Vladimir
 
