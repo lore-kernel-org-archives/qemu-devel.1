@@ -2,124 +2,111 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A07B0C83004
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 05:42:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 189CDC83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 06:25:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6649B206B8
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 05:42:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4F45206B8
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 06:25:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="QcQY51Y9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6649B206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XadVhWQ/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4F45206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTJ1G-0005Uz-EC
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 01:42:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59528)
+	id 1jTJgm-0002Ki-Ry
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 02:25:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35112)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTIxE-0002pd-CC
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 01:41:58 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jTJbg-0000Ac-Eq
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:24:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTIfB-000066-19
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 01:23:35 -0400
-Received: from mail-eopbgr70138.outbound.protection.outlook.com
- ([40.107.7.138]:56526 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jTIfA-00005n-9G
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 01:20:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PNUtAQ60Hcer2wBnZBdmG/I4/BP8lgSPBiRoKlsV0cw2GugKeP1WDbBcgU/ujf8LiYz6hkN0OhF3CY5t/q4www3Kl3DONuIFHs2USWaegT6+zOWmJKRTUrOs/yviN1hi8C6PgYSKW+fswUMd6yC/I3GztYoz4zO2I+/k3tD5GtrlR9mK300/cs0mVcY0jukJ9vHxQ1uhe3KDWIJ/Z1YVYvp6cIjnZo8E5bJFC7J13UwS64XnUKc5XVi+oT/QNs0HFzZoDx0bS0Vu1tJOM537p1giJc+quzP5UfN/Gr1NN2E/zu0EJbLyoU5uvx6EwpxCYbmz/ZELIuygOLrpAEAwow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6Z+mitY1eBx3nzvo3oqkbyUsMnOqZ79y23GIN/dACpU=;
- b=OBzZvB3+zlkTrNLIyWe/3VO48RMyMnvNJrAtozDP4oHuyA1Ikdu5rLyy5kkyVt+WGSErtsor4CssEB2CZay0mcKc6uLeG2vhfZijbOxmJd4gdm8LvsYVlfConFcV9KkrIZdjUMJKGgstk0WhippNLV3aakJWF0Cq4jKa1cEhEkJJq8Akz1qiCftLR6c3YTGy1iSUh9F+G5ThdzmxvJIgbF+TdswwCdn5modtd3FU/+oUD8ImQ5HeGKa7CRQDqFpPCEQ0ZoRQxYgeS/lZbREt/qJNVS/iHKCvJLgv2NQRBsFTksfwmcUjK8ZF5RpKEFCVXfgP4JVFoMnDH2ypXpZEQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6Z+mitY1eBx3nzvo3oqkbyUsMnOqZ79y23GIN/dACpU=;
- b=QcQY51Y99A5zVCw0DgRPvSb1rEUkLLBQtTv/k3J1xI5BgqxJeILu9jlpJ05dbC2EnD3yXJCMVUTIZWfqAooSqRZE6WUd3WRX+BYGS8Mn5SZxj5BC7k1OemfgOLKaq5179S1yZ5BsuEwF74lKJ4N6vcenEH0wtaZ6ywRYToVxcV4=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5479.eurprd08.prod.outlook.com (2603:10a6:20b:104::12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Tue, 28 Apr
- 2020 05:20:04 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.023; Tue, 28 Apr 2020
- 05:20:04 +0000
-Subject: Re: Questionable aspects of QEMU Error's design
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <87o8sblgto.fsf@dusky.pond.sub.org>
- <87blo7heag.fsf@dusky.pond.sub.org> <87blndey9c.fsf@dusky.pond.sub.org>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200428082002459
-Message-ID: <3b9d53fd-bdd0-c15b-292c-c4952fa24dfd@virtuozzo.com>
-Date: Tue, 28 Apr 2020 08:20:02 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <87blndey9c.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM4PR0202CA0003.eurprd02.prod.outlook.com
- (2603:10a6:200:89::13) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <mreitz@redhat.com>) id 1jTJXv-0000sI-Jg
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:20:36 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32726
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTJXv-0000NW-3j
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:16:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588054600;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=D7E9KLrH6SV5MOsRQjm1HPcBP4RYz2Z2qFWQkFe34Oc=;
+ b=XadVhWQ/IuFHFVo/4eishGytU/83mxll9XByS7ugTueXWb1FFpIlHQi71Jycvll4JN3KE6
+ nPgxK6uqjo3z0ZzJw7Afwy12bTp9HB+4+lHh4I1myGN1zRyhWepewIJfd0o8+tm/KZVG1T
+ 8SMdkOa8xL74My+QGu5xBFJYvO7TkOg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-444-B5AEZhlfPhCTLska99K46w-1; Tue, 28 Apr 2020 02:16:34 -0400
+X-MC-Unique: B5AEZhlfPhCTLska99K46w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8C031005510;
+ Tue, 28 Apr 2020 06:16:31 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A6C55D715;
+ Tue, 28 Apr 2020 06:16:29 +0000 (UTC)
+Subject: Re: [PATCH v20 3/4] qcow2: add zstd cluster compression
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
+References: <20200421081117.7595-1-dplotnikov@virtuozzo.com>
+ <20200421081117.7595-4-dplotnikov@virtuozzo.com>
+ <f8b52ed6-9532-ff65-5c18-0b5142c3b550@redhat.com>
+ <f34a5b59-a323-4d63-e4c6-2fcd505b58b1@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <6f9049f9-4b2a-796d-d3f7-dbd9dbe720cc@redhat.com>
+Date: Tue, 28 Apr 2020 08:16:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.155) by
- AM4PR0202CA0003.eurprd02.prod.outlook.com (2603:10a6:200:89::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend
- Transport; Tue, 28 Apr 2020 05:20:03 +0000
-X-Tagtoolbar-Keys: D20200428082002459
-X-Originating-IP: [185.215.60.155]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 641643dc-5219-418a-9923-08d7eb33ceb6
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5479:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5479C42EB3DDAE3BC185C996C1AC0@AM7PR08MB5479.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 0387D64A71
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(396003)(366004)(136003)(39850400004)(376002)(16526019)(54906003)(316002)(4326008)(36756003)(16576012)(8936002)(26005)(81156014)(52116002)(5660300002)(6486002)(478600001)(2906002)(31686004)(86362001)(186003)(8676002)(66946007)(956004)(31696002)(2616005)(66556008)(66476007);
- DIR:OUT; SFP:1102; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1IWmI3+rj3wJBcEtak90pdUOtzDmP69FyKWB3XX6UKdC/DZydlSuJHZon3vYITbegBX4n/gAvc+9bBDglkGctl3HXwYnLlOsNHpj2OYKFYFZ295GhVHG36/2qzguVGcgjF8AKD4o4fzDGOuwTvHxiWkOHvgPK5s9BcMRWiTm1EVOQLHyT1Zc0HWFHeCQgSmUG8rszGvWVi1mhSjE7j83MJRhSh6d/IGtu8iZ2O4Oc++fKPeXkAz5TuY1IWw58FOhIyLx3SsPFAMzI5+cF51y+EYPwwvgk7McyeINjcbuO+xPWNYTcOxy7owlT0wcB2SIthnUamP/E/34Y99KGLG89tz5TDhSXc28YZ5Pq3Ot9oaq1dUBKtmazYmF1uiLd2DHnlkknCewh2PKr+lBbCZJprDL4Vp5s6wBFtUg1pjrp59jFFb4dy8Bc6gpo5guRqQO
-X-MS-Exchange-AntiSpam-MessageData: hNtDaZS1knA51x+5IqKAHYff0lbt4O+YhJsk89W/ahJGrmapW7O6ymYoW032pWA65csFmy6S2XWrutZAKGKLzOwm1wL/6KFAeti6hp8x/rgzg45vDfGddTarfNHIrRiR2xmzga6yHOoDXu3USu3wetnbTXzhqnZGZ9Gc3eJGcYUaRJVNU9+2WcKvpcplJUjvwSbekWhoZCRKtBVmyOrEh6tJddaPwrOTFsCmN4chnx2dfALyethGk4croTIAi9bKnHs9eawtC1AEL803YO4gx6JTj5qnn0SR6E5IjhxiZcNvoKrI41dKS8GwBuk/OiWefzjLZXKwl82AZIMuZe59+VZs/ZgOsoAdRNONXnD0bD810wZ++G53Q8ALhXOIuZZueKOmq44KU9qag5Y1SdCH+dDRXegYBlE4tEoiAgUHEJK/0iq8lv+cwDN0hg6qGeFh67MqHLpTxJ+q5HLwcRQjuXAXzhLOqp0JMmnk35HF9CybvvkPG2wm2CAEqGygn3T3yWMmhjYm6XGrsjdxQQokVEQTMUnqoTmvmht13V5dvU//mz2kMvEr5teqNi7kWYg/triddF+mshA3UFt5bLNy12ht4ErQJzSpqrGNmWRB6Us4TR84XiBDItvFCppr3Fuh0ZJLwrspgQKiHMHGTHJo69pNne21jQ5gh6HI2eDmw6SKul0MAVYUBnXWQR6gQqwNgasQBjt0CPekyL0lrVzREUlfw8PZu2uQKFcZ0S3EIpAhjlBDUcaWt9PxwJ8itY5zrmOrWP7+EqTkEG8TqEhWkU+DHoHD6HWj664b7rzWDIk=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 641643dc-5219-418a-9923-08d7eb33ceb6
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2020 05:20:04.4358 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: s6EenoCbnioaA5p1UM4SuqISm7vvfj4jSRFYyLcWsosDMaMPgHpg+rE5Z5DMYLtts/URKDEsQCA5SR071AAeNksej3Oj7pz9BxdziEfPRXA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5479
-Received-SPF: pass client-ip=40.107.7.138;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 01:20:05
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.7.138
+In-Reply-To: <f34a5b59-a323-4d63-e4c6-2fcd505b58b1@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="jQS9u8r28eRviwDeKkH9nz0SiW06A5AzN"
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 02:06:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,117 +118,280 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ qemu-block@nongnu.org, armbru@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-27.04.2020 18:36, Markus Armbruster wrote:
-> Markus Armbruster <armbru@redhat.com> writes:
-> 
->> Markus Armbruster <armbru@redhat.com> writes:
->>
->>> QEMU's Error was patterned after GLib's GError.  Differences include:
->> [...]
->>> * Return value conventions
->>>
->>>    Common: non-void functions return a distinct error value on failure
->>>    when such a value can be defined.  Patterns:
->>>
->>>    - Functions returning non-null pointers on success return null pointer
->>>      on failure.
->>>
->>>    - Functions returning non-negative integers on success return a
->>>      negative error code on failure.
->>>
->>>    Different: GLib discourages void functions, because these lead to
->>>    awkward error checking code.  We have tons of them, and tons of
->>>    awkward error checking code:
->>>
->>>      Error *err = NULL;
->>>      frobnicate(arg, &err);
->>>      if (err) {
->>>          ... recover ...
->>>          error_propagate(errp, err);
->>>      }
->>>
->>>    instead of
->>>
->>>      if (!frobnicate(arg, errp))
->>>          ... recover ...
->>>      }
->>>
->>>    Can also lead to pointless creation of Error objects.
->>>
->>>    I consider this a design mistake.  Can we still fix it?  We have more
->>>    than 2000 void functions taking an Error ** parameter...
->>>
->>>    Transforming code that receives and checks for errors with Coccinelle
->>>    shouldn't be hard.  Transforming code that returns errors seems more
->>>    difficult.  We need to transform explicit and implicit return to
->>>    either return true or return false, depending on what we did to the
->>>    @errp parameter on the way to the return.  Hmm.
->> [...]
->>
->> To figure out what functions with an Error ** parameter return, I used
->> Coccinelle to find such function definitions and print the return types.
->> Summary of results:
->>
->>     2155 void
->>      873 signed integer
->>      494 pointer
->>      153 bool
->>       33 unsigned integer
->>        6 enum
->>     ---------------------
->>     3714 total
->>
->> I then used Coccinelle to find checked calls of void functions (passing
->> &error_fatal or &error_abort is not considered "checking" here).  These
->> calls become simpler if we make the functions return a useful value.  I
->> found a bit under 600 direct calls, and some 50 indirect calls.
->>
->> Most frequent direct calls:
->>
->>      127 object_property_set_bool
->>       27 qemu_opts_absorb_qdict
->>       16 visit_type_str
->>       14 visit_type_int
->>       10 visit_type_uint32
->>
->> Let's have a closer look at object_property_set() & friends.  Out of
->> almost 1000 calls, some 150 are checked.  While I'm sure many of the
->> unchecked calls can't actually fail, I am concerned some unchecked calls
->> can.
->>
->> If we adopt the convention to return a value that indicates success /
->> failure, we should consider converting object.h to it sooner rather than
->> later.
->>
->> Please understand these are rough numbers from quick & dirty scripts.
-> 
-> FYI, I'm working on converting QemuOpts, QAPI visitors and QOM.  I keep
-> running into bugs.  So far:
-> 
->      [PATCH v2 for-5.1 0/9] qemu-option: Fix corner cases and clean up
->      [PATCH for-5.1 0/5] qobject: Minor spring cleaning
->      [PATCH v2 00/14] Miscellaneous error handling fixes
->      [PATCH 0/4] Subject: [PATCH 0/4] smbus: SPD fixes
->      [PATCH 0/3] fuzz: Probably there is a better way to do this
->      [PATCH v2 00/15] qapi: Spring cleaning
->      [PATCH 00/11] More miscellaneous error handling fixes
-> 
-> I got another one coming for QOM and qdev before I can post the
-> conversion.
-> 
-> Vladimir, since the conversion will mess with error_propagate(), I'd
-> like to get it in before your auto-propagation work.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jQS9u8r28eRviwDeKkH9nz0SiW06A5AzN
+Content-Type: multipart/mixed; boundary="RWSaHtZ1SFSlQmsOj2j78bH06XYk13aL0"
 
-OK, just let me know when to regenerate the series, it's not hard.
+--RWSaHtZ1SFSlQmsOj2j78bH06XYk13aL0
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Best regards,
-Vladimir
+On 27.04.20 21:26, Denis Plotnikov wrote:
+>=20
+>=20
+> On 27.04.2020 15:35, Max Reitz wrote:
+>> On 21.04.20 10:11, Denis Plotnikov wrote:
+>>> zstd significantly reduces cluster compression time.
+>>> It provides better compression performance maintaining
+>>> the same level of the compression ratio in comparison with
+>>> zlib, which, at the moment, is the only compression
+>>> method available.
+>>>
+>>> The performance test results:
+>>> Test compresses and decompresses qemu qcow2 image with just
+>>> installed rhel-7.6 guest.
+>>> Image cluster size: 64K. Image on disk size: 2.2G
+>>>
+>>> The test was conducted with brd disk to reduce the influence
+>>> of disk subsystem to the test results.
+>>> The results is given in seconds.
+>>>
+>>> compress cmd:
+>>> =A0=A0 time ./qemu-img convert -O qcow2 -c -o compression_type=3D[zlib|=
+zstd]
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 src.img [zlib|zs=
+td]_compressed.img
+>>> decompress cmd
+>>> =A0=A0 time ./qemu-img convert -O qcow2
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 [zlib|zstd]_comp=
+ressed.img uncompressed.img
+>>>
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 compression=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0 decompression
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 zlib=A0=A0=A0=A0=A0=A0 zstd=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0 zlib=A0=A0=A0=A0=A0=A0=A0=A0 zstd
+>>> ------------------------------------------------------------
+>>> real=A0=A0=A0=A0 65.5=A0=A0=A0=A0=A0=A0 16.3 (-75 %)=A0=A0=A0 1.9=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0 1.6 (-16 %)
+>>> user=A0=A0=A0=A0 65.0=A0=A0=A0=A0=A0=A0 15.8=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0 5.3=A0=A0=A0=A0=A0=A0=A0=A0=A0 2.5
+>>> sys=A0=A0=A0=A0=A0=A0 3.3=A0=A0=A0=A0=A0=A0=A0 0.2=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0 2.0=A0=A0=A0=A0=A0=A0=A0=A0=A0 2.0
+>>>
+>>> Both ZLIB and ZSTD gave the same compression ratio: 1.57
+>>> compressed image size in both cases: 1.4G
+>>>
+>>> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+>>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>>> QAPI part:
+>>> Acked-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>> =A0 docs/interop/qcow2.txt |=A0=A0 1 +
+>>> =A0 configure=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0=A0 2 +-
+>>> =A0 qapi/block-core.json=A0=A0 |=A0=A0 3 +-
+>>> =A0 block/qcow2-threads.c=A0 | 157 ++++++++++++++++++++++++++++++++++++=
++++++
+>>> =A0 block/qcow2.c=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0=A0 7 ++
+>>> =A0 5 files changed, 168 insertions(+), 2 deletions(-)
+>> [...]
+>>
+>>> diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+>>> index 7dbaf53489..0525718704 100644
+>>> --- a/block/qcow2-threads.c
+>>> +++ b/block/qcow2-threads.c
+>>> @@ -28,6 +28,11 @@
+>>> =A0 #define ZLIB_CONST
+>>> =A0 #include <zlib.h>
+>>> =A0 +#ifdef CONFIG_ZSTD
+>>> +#include <zstd.h>
+>>> +#include <zstd_errors.h>
+>>> +#endif
+>>> +
+>>> =A0 #include "qcow2.h"
+>>> =A0 #include "block/thread-pool.h"
+>>> =A0 #include "crypto.h"
+>>> @@ -166,6 +171,148 @@ static ssize_t qcow2_zlib_decompress(void
+>>> *dest, size_t dest_size,
+>>> =A0=A0=A0=A0=A0 return ret;
+>>> =A0 }
+>>> =A0 +#ifdef CONFIG_ZSTD
+>>> +
+>>> +/*
+>>> + * qcow2_zstd_compress()
+>>> + *
+>>> + * Compress @src_size bytes of data using zstd compression method
+>>> + *
+>>> + * @dest - destination buffer, @dest_size bytes
+>>> + * @src - source buffer, @src_size bytes
+>>> + *
+>>> + * Returns: compressed size on success
+>>> + *=A0=A0=A0=A0=A0=A0=A0=A0=A0 -ENOMEM destination buffer is not enough=
+ to store
+>>> compressed data
+>>> + *=A0=A0=A0=A0=A0=A0=A0=A0=A0 -EIO=A0=A0=A0 on any other error
+>>> + */
+>>> +static ssize_t qcow2_zstd_compress(void *dest, size_t dest_size,
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 const void *src, size_t src_size)
+>>> +{
+>>> +=A0=A0=A0 ssize_t ret;
+>>> +=A0=A0=A0 ZSTD_outBuffer output =3D { dest, dest_size, 0 };
+>>> +=A0=A0=A0 ZSTD_inBuffer input =3D { src, src_size, 0 };
+>> Minor style note: I think it=92d be nicer to use designated initializers
+>> here.
+>>
+>>> +=A0=A0=A0 ZSTD_CCtx *cctx =3D ZSTD_createCCtx();
+>>> +
+>>> +=A0=A0=A0 if (!cctx) {
+>>> +=A0=A0=A0=A0=A0=A0=A0 return -EIO;
+>>> +=A0=A0=A0 }
+>>> +=A0=A0=A0 /*
+>>> +=A0=A0=A0=A0 * Use the zstd streamed interface for symmetry with decom=
+pression,
+>>> +=A0=A0=A0=A0 * where streaming is essential since we don't record the =
+exact
+>>> +=A0=A0=A0=A0 * compressed size.
+>>> +=A0=A0=A0=A0 *
+>>> +=A0=A0=A0=A0 * In the loop, we try to compress all the data into one z=
+std
+>>> frame.
+>>> +=A0=A0=A0=A0 * ZSTD_compressStream2 potentially can finish a frame ear=
+lier
+>>> +=A0=A0=A0=A0 * than the full input data is consumed. That's why we are=
+ looping
+>>> +=A0=A0=A0=A0 * until all the input data is consumed.
+>>> +=A0=A0=A0=A0 */
+>>> +=A0=A0=A0 while (input.pos < input.size) {
+>>> +=A0=A0=A0=A0=A0=A0=A0 size_t zstd_ret;
+>>> +=A0=A0=A0=A0=A0=A0=A0 /*
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0 * ZSTD spec: "You must continue calling ZSTD_=
+compressStream2()
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0 * with ZSTD_e_end until it returns 0, at whic=
+h point you are
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0 * free to start a new frame". We assume that =
+"start a new
+>>> frame"
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0 * means call ZSTD_compressStream2 in the very=
+ beginning or
+>>> when
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0 * ZSTD_compressStream2 has returned with 0.
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0 */
+>>> +=A0=A0=A0=A0=A0=A0=A0 do {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 zstd_ret =3D ZSTD_compressStream2(cc=
+tx, &output, &input,
+>>> ZSTD_e_end);
+>> The spec makes it sound to me like ZSTD_e_end will always complete in a
+>> single call if there=92s enough space in the output buffer.=A0 So the on=
+ly
+>> team we have to loop would be when there isn=92t enough space anyway:
+>>
+>> It says this about ZSTD_e_end:
+>>> flush operation is the same, and follows same rules as calling
+>>> ZSTD_compressStream2() with ZSTD_e_flush.
+>> Those rules being:
+>>> Note that, if `output->size` is too small, a single invocation with
+>>> ZSTD_e_flush might not be enough (return code > 0).
+>> So it seems like it will only return a value > 0 if the output buffer is
+>> definitely too small.
+>>
+>> The spec also notes that the return value is greater than 0 if:
+>>>> 0 if some data still present within internal buffer (the value is
+>>> minimal estimation of remaining size),
+>> So it=92s a minimum estimate.=A0 That=92s another point that heavily imp=
+lies
+>> to me that if the return value were less than what=92s left in the buffe=
+r,
+>> the function wouldn=92t return but still try to write it out, until it
+>> realizes that there isn=92t enough space in the output buffer, and then
+>> return a value that exceeds the remaining output buffer size.
+>>
+>> (Because if the function just played it safe, I would expect it to
+>> return a maximum estimate.)
+>>
+>>
+>> OTOH, if it were actually possible for ZSTD_e_end to finish a frame
+>> earlier than the end of the input, I think it would make more sense to
+>> use ZSTD_e_continue until the input is done and then finish with
+>> ZSTD_e_end, like the spec seems to propose.=A0 That way, we=92d always e=
+nd
+>> up with a single frame to make decompression simpler (and I think it
+>> would also make more sense overall).
+>>
+>>
+>> But anyway.=A0 From how I understand the spec, this code simply always
+>> ends up creating a single frame or erroring out, without looping ever.
+>> So it isn=92t exactly wrong, it just seems overly complicated.=A0 (Again=
+,
+>> assuming I understand the spec correctly.=A0 Which seems like a tough
+>> thing to assume, because the spec is not exactly obvious to read...)
+>>
+>> (Running some quick tests by converting some images with zstd
+>> compression seems to confirm that whenever ZSTD_compressStream2()
+>> returns, either zstd_ret > output.size - output.pos, or zstd_ret =3D=3D =
+0
+>> and input.pos =3D=3D input.size.=A0 So none of the loops ever loop.)
+>>
+>> Max
+>=20
+> So, what should we do?
+>=20
+> 1. Rely on the test that there's no need for the loop:
+> =A0=A0 * make one ZSTD_compressStream2() call
+> =A0=A0 * make sure it returned with zstd_ret =3D=3D 0 and
+> =A0=A0=A0=A0 input.pos =3D=3D input.size.
+> =A0=A0=A0=A0 if so, return with the size
+> =A0=A0 * if not, check that zstd_ret > output.size - output.pos
+> =A0=A0=A0=A0 if so, return with -ENOMEM
+> =A0=A0 * if none above return with -EIO
+>=20
+> =A0=A0 This should cover the majority of the compressing cases
+
+According to how I interpret the spec, =93none of the above=94 should never
+happen except for ZSTD_isError(zstd_ret), so this should cover all
+compressing cases, actually.
+
+> 2. Leave the loop as is, because of the documentation:
+> =A0=A0 "You *must* continue calling ZSTD_compressStream2() with ZSTD_e_en=
+d
+> until it returns 0,
+> =A0=A0=A0 at which point you are free to start a new frame."
+
+As far as I can see, the return value is always 0 or greater than the
+remaining buffer space, so this will always be satisfied even without a
+loop.  (We will always have one of three cases: (1) Success and all
+input has been consumed, (2) ZSTD_isError(zstd_ret), so we return -EIO,
+(3) zstd_ret > output.size - output.pos, so we return -ENOMEM.
+
+I interpret the =93You *must* continue until it returns 0=94 as =93If there=
+ is
+no sufficient space in the output buffer, this function will return a
+value greater than 0 indicating how much space is at least still
+required.  The caller is free to supply a greater output buffer for the
+next call (by supplying a different ZSTD_outBuffer structure), and then
+we=92ll try again.=94
+(I.e., retrying with the same ZSTD_outBuffer will make the function
+return immediately because it knows that it=92s insufficient.)
+
+Max
+
+
+--RWSaHtZ1SFSlQmsOj2j78bH06XYk13aL0--
+
+--jQS9u8r28eRviwDeKkH9nz0SiW06A5AzN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6nyjsACgkQ9AfbAGHV
+z0DHSAgArCoj6W0ZDZ7nwrgTTrGtJbJtyD3eIebXlQRttZNHPWOIgQKnPWOAkFWT
+NnZt5aa0Iv7DxNkgZLPFRyJOZzE5NLn2chOcKmbLLebSm9NiwN0xqv82h9Z7fsud
+o9rmBv7Ba6Pr2Psy5My5fYeiSjzFJJ++4XsqkNPcd85nn2TVmd0A2bj5H0AOVnMV
+sQIdBKRhGPOfg82yF0f1Uk4yhwUyaBjoWCb519nNU1xh2UpVrv7C812ejuw6yzbw
+HNUoiK6NEY8dxojmdESGx3uaNOTH20LzMhYxWdUouaWUm7kGpQyOw8N60fpygddI
+qpecjq5QdP7qLe5gNRpENxGYrZRXcA==
+=6wNP
+-----END PGP SIGNATURE-----
+
+--jQS9u8r28eRviwDeKkH9nz0SiW06A5AzN--
+
 
