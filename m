@@ -2,68 +2,69 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F354C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 10:03:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0852C83004
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 10:08:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48ECD20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 10:03:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADAFB206B9
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 10:08:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iUJoocvC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48ECD20663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JmaObxwo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADAFB206B9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTN53-0001CJ-3i
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 06:03:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40286)
+	id 1jTNAI-0003lC-R0
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 06:08:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40960)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTN3w-0008MF-8o
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:02:07 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jTN90-0002kR-T4
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:07:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTN3v-0004tK-Lo
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:02:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47153
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1jTN7s-0006Wa-Ui
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:07:14 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30094
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTN3t-0004sQ-UV
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:01:59 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTN7s-0006WH-HZ
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:06:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588068116;
+ s=mimecast20190719; t=1588068363;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=7YA+EDsTA2SbA8jfQxXao+GeV0jdLm9+5/1pvLocc/Y=;
- b=iUJoocvC8eKfIp7SDrJ4NwrtrWyo2bazlG92OJyMiE04IWP4yZsHRiIsVahkWpoHC4ZzUk
- Vwcy2+KUomxwu16qmVoNsBEZ2OVzwow9NqPHM0BpICT2AxgikeUxDcVup9nf/iul5WMIiZ
- 2R7NOgNbn+AEHkSwMiuq7dO0eqZtbr8=
+ bh=qSoHt9KiI8SHmBws6qFdKSsmZu+aZqUUzhVEQycr+zc=;
+ b=JmaObxwoOIWJ/u1CRyPSdhq/ncYKAqmpjUHHVq2L6AzPZRy5LTC2mG3/rNEHOCYU8pfr/U
+ C767rNoehhHp1VQWIgoXgaYpN/VANyA/dhzrWSF+vvgMFvjd8yzOChn1lzd/Wg2gTFOgjQ
+ mII3tPQdpLUu+Aj98pz4HLHTGbJPPgc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-L84GgLUkN2CQDChdBVgtOA-1; Tue, 28 Apr 2020 06:01:49 -0400
-X-MC-Unique: L84GgLUkN2CQDChdBVgtOA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-253-7nA6vnTYP6i3oDs5r2CVbg-1; Tue, 28 Apr 2020 06:06:01 -0400
+X-MC-Unique: 7nA6vnTYP6i3oDs5r2CVbg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52C858463A2;
- Tue, 28 Apr 2020 10:01:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25A41107ACF4;
+ Tue, 28 Apr 2020 10:06:00 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B06D360C87;
- Tue, 28 Apr 2020 10:01:46 +0000 (UTC)
-Subject: Re: [PATCH v2 6/6] block/block-copy: use aio-task-pool API
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F2F475D9E5;
+ Tue, 28 Apr 2020 10:05:58 +0000 (UTC)
+Subject: Re: [PATCH v2 5/6] block/block-copy: move block_copy_task_create down
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 References: <20200325134639.16337-1-vsementsov@virtuozzo.com>
- <20200325134639.16337-7-vsementsov@virtuozzo.com>
+ <20200325134639.16337-6-vsementsov@virtuozzo.com>
+ <ae040bc6-7c0e-4b55-0723-c5e892570fb9@redhat.com>
+ <9fd7f07e-d297-15a5-1bd1-355e8c8b013e@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -89,23 +90,23 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <74a7f4e6-6c6b-a484-95c6-838f34fb9f22@redhat.com>
-Date: Tue, 28 Apr 2020 12:01:44 +0200
+Message-ID: <4fa175ee-8308-013c-dd44-e2eacdfce241@redhat.com>
+Date: Tue, 28 Apr 2020 12:05:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200325134639.16337-7-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <9fd7f07e-d297-15a5-1bd1-355e8c8b013e@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="y2f7OFPTU9MAsqfE6MtMwm7tyKXmO8MH7"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:15:05
+ boundary="OBffgBWlYqKBOhyNjqz81CbFsBkhhArMK"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:11:46
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,122 +124,61 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---y2f7OFPTU9MAsqfE6MtMwm7tyKXmO8MH7
-Content-Type: multipart/mixed; boundary="zoWntt0cxuQ33CEPW8bQClpgrUqRmfrqt"
+--OBffgBWlYqKBOhyNjqz81CbFsBkhhArMK
+Content-Type: multipart/mixed; boundary="H2N3Q4PnDbZYGcnk2tOkHAofmVnx1zdyr"
 
---zoWntt0cxuQ33CEPW8bQClpgrUqRmfrqt
+--H2N3Q4PnDbZYGcnk2tOkHAofmVnx1zdyr
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 25.03.20 14:46, Vladimir Sementsov-Ogievskiy wrote:
-> Run block_copy iterations in parallel in aio tasks.
+On 28.04.20 11:17, Vladimir Sementsov-Ogievskiy wrote:
+> 28.04.2020 12:06, Max Reitz wrote:
+>> On 25.03.20 14:46, Vladimir Sementsov-Ogievskiy wrote:
+>>> Simple movement without any change. It's needed for the following
+>>> patch, as this function will need to use some staff which is currently
+>>
+>> *stuff
+>>
+>>> below it.
+>>
+>> Wouldn=92t it be simpler to just declare block_copy_task_entry()?
+>>
 >=20
-> Changes:
->   - BlockCopyTask becomes aio task structure. Add zeroes field to pass
->     it to block_copy_do_copy
->   - add call state - it's a state of one call of block_copy(), shared
->     between parallel tasks. For now used only to keep information about
->     first error: is it read or not.
->   - convert block_copy_dirty_clusters to aio-task loop.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/block-copy.c | 104 +++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 91 insertions(+), 13 deletions(-)
+> I just think, that it's good to keep native order of functions and avoid
+> extra declarations. Still, may be I care too much. No actual difference,
+> if you prefer declaration, I can drop this patch.
 
-Looks good, just some nits:
+Personally, the native order doesn=92t do me any good (cscope doesn=92t
+really care where the definition is), and also having functions in order
+seems just like a C artifact.
 
-> diff --git a/block/block-copy.c b/block/block-copy.c
-> index 910947cb43..9994598eb7 100644
-> --- a/block/block-copy.c
-> +++ b/block/block-copy.c
-
-[...]
-
-> @@ -225,6 +237,30 @@ void block_copy_set_progress_meter(BlockCopyState *s=
-, ProgressMeter *pm)
->      s->progress =3D pm;
->  }
-> =20
-> +/* Takes ownership on @task */
-
-*of
-
-> +static coroutine_fn int block_copy_task_run(AioTaskPool *pool,
-> +                                            BlockCopyTask *task)
-> +{
-> +    if (!pool) {
-> +        int ret =3D task->task.func(&task->task);
-> +
-> +        g_free(task);
-> +        return ret;
-> +    }
-> +
-> +    aio_task_pool_wait_slot(pool);
-> +    if (aio_task_pool_status(pool) < 0) {
-> +        co_put_to_shres(task->s->mem, task->bytes);
-> +        block_copy_task_end(task, -EAGAIN);
-
-Hm, I think -ECANCELED might be better.  Not that it really matters...
-
-> +        g_free(task);
-> +        return aio_task_pool_status(pool);
-
-Here, too.  (Here, there=92s also the fact that this task doesn=92t really
-fail because of the same reason that the other task failed, so we should
-have our own error code here.)
-
-> +    }
-> +
-> +    aio_task_pool_start_task(pool, &task->task);
-> +
-> +    return 0;
-> +}
-> +
->  /*
->   * block_copy_do_copy
->   *
-
-[...]
-
-> @@ -519,25 +584,38 @@ static int coroutine_fn block_copy_dirty_clusters(B=
-lockCopyState *s,
-
-[...]
-
-> +out:
-> +    if (aio) {
-> +        aio_task_pool_wait_all(aio);
-> +        if (ret =3D=3D 0) {
-> +            ret =3D aio_task_pool_status(aio);
-> +        }
-> +        g_free(aio);
-
-aio_task_pool_free()?
+I just prefer declarations because otherwise we end up moving functions
+all the time with no real benefit.  Furthermore, moving functions has
+the drawback of polluting git blame.
 
 Max
 
 
---zoWntt0cxuQ33CEPW8bQClpgrUqRmfrqt--
+--H2N3Q4PnDbZYGcnk2tOkHAofmVnx1zdyr--
 
---y2f7OFPTU9MAsqfE6MtMwm7tyKXmO8MH7
+--OBffgBWlYqKBOhyNjqz81CbFsBkhhArMK
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6n/wkACgkQ9AfbAGHV
-z0DKEQf9GPFmP86bXLqa0Gr1PUuIdkYgGvNb6VPOq/XOR9hvHWY4LAOJBNXiynO+
-hFTlAOMkkcGHAZdGIkBDrFBdLxiY2YHPTNl6+xeiP4y/+rVDCjFfSciFEXLzbmDV
-ZI+LTopFEKaBERBgsM0JLBxJ1S3q/mML5jVLLA/YpgS18F+AESbXgW3Ul33L5zHk
-6cwbbAjOFY5OCMH+QTvZw6yuA69aJJtLCl2l8QWWj+2F4VViUsGvSWvYqWtsjl8h
-S96bRVtAFMcBHslxQkPGvhzcJTYkFeETUWm4c5qmONI2vL2DmlznHeVA/8C4u6CY
-rm2V1d1RQNjcBmvw1gfWCfVfAGYtVQ==
-=Glk1
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6oAAUACgkQ9AfbAGHV
+z0BXOgf/QNJZViDIjcs2am8NihYSMz3uwnTkdzHSPL1UfYTH0+uIBlGaEPGhNW1u
+YY0am+ZpD6WFYAN88BSGdcBBN9vjsHvDzUFMc1jpDlABd0OCdEhbaHQCWT68d81z
+ToWTKJZz5dlJORayFV+IXgn4GqI4XlLv2oeDtK2SQeblWUPZu2qsy5oEtp3KXJgS
+q7SjMel/CR/HErTrZoyoy77MUNFiH+CTn3br95dMN+j/t92GA7j2VFDaZQ3hDU/q
+kLdG4p/aFcbQQd15hb5ugPNo8Q8vH+XF8eTO8kvSR8e7UW3RV1GatfiaCnkSvlna
+rHe9A1l/Txdb7BGDi91rQVZME6ye+A==
+=BOKx
 -----END PGP SIGNATURE-----
 
---y2f7OFPTU9MAsqfE6MtMwm7tyKXmO8MH7--
+--OBffgBWlYqKBOhyNjqz81CbFsBkhhArMK--
 
 
