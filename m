@@ -4,119 +4,109 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 441D1C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 06:41:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00448C83008
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 06:41:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEECE206A5
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 06:41:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C01A2206A5
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 06:41:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZThV5EoD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEECE206A5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ObusQYDS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C01A2206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTJvR-0005bd-LA
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 02:41:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36554)
+	id 1jTJwH-0007Jw-O5
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 02:41:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36648)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTJqz-0001cU-4Y
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:39:58 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jTJrS-0002C4-5e
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:40:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTJpQ-0001n9-5d
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:36:24 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40737)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTJpP-0001mt-NU
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:34:47 -0400
-Received: by mail-wm1-x341.google.com with SMTP id u16so1459668wmc.5
- for <qemu-devel@nongnu.org>; Mon, 27 Apr 2020 23:34:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=RjMRO79Rn0uGO75pwKgK9W0cHTRjadDSVv8aF0XV5Gw=;
- b=ZThV5EoDf8Cou1Ioi+fvhujpFITciIIQt4RTaRQgfwsvld9Nl/x6qX+e729Qa3F2rB
- /p5AkuaYp4aWTYmhQRhQe5GN17xZgRMJyfUVCX3kDlzfTRsZdlTJnQ3AzriGSwmaeZ2O
- tvclDP7KM5UO4NB5N+O5APcF8WZG8HLk90tLP27kzyBnyH32IzxaGBb/WFsImgaMEmhY
- p8HLh6/CwvKJSM4SRxknbshkSXtmdVEOBHVmGKv0THVQOVeGrol+ubO1fOzeM+dmHn1S
- Uhvon+kywkyOxXOVC8khorWCgP04w5OuGMHUXngfNFeE/QsIP3sx6JId0uSJlC9dORGR
- BBoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=RjMRO79Rn0uGO75pwKgK9W0cHTRjadDSVv8aF0XV5Gw=;
- b=jflk0uc/RzMn5hkrfaHA0M4YerBfiOrK+69jZihun4WUShki84xuiMRLpGwCisjfM4
- 8WqkMTTpnWhWa4R9JGbU0SL/CIQchylJ3C+ZKc3t8wD3cEVpqWyYihBsk9Tk+og7hU+/
- 0k141reVDo1CzdrODl5gto7KSR3laQ9Kn36UMdVahWQ7IZKpeO9F3nvjQ3vpg8G0p7BP
- XHxjxKIilmmyGdlR9uaxzujSotSj3g9dgisc9tl/4Lul3VS9c2LPKmqhdVJTIj8LJahw
- t8dOSJ68OUQu+FUx3AcvWvvxuT38/z1PdL1m41PDUCGmwmXFaK7oqfWWxsbriAgjmEwk
- 7VdA==
-X-Gm-Message-State: AGi0PuZw+bg6u/7Ztn9qf0WXDVCN8pjuOGZOpGIL9JWlOcnv2otP+SCF
- +ZjA2pbLfenv9CraHri2tkFreark5f4=
-X-Google-Smtp-Source: APiQypLjdkvK81fTXm6+uaZz09P2tLTOkbt3GwLoSiXTXC/lxCZrON6dOOYVwN135v5k/305vyn88A==
-X-Received: by 2002:a7b:cc8e:: with SMTP id p14mr2739073wma.70.1588055686135; 
- Mon, 27 Apr 2020 23:34:46 -0700 (PDT)
-Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.137])
- by smtp.gmail.com with ESMTPSA id j10sm2016559wmi.18.2020.04.27.23.34.44
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 27 Apr 2020 23:34:45 -0700 (PDT)
-Subject: Re: [PATCH for-5.1 4/7] target/mips: Add Loongson-3 CPU definition
-To: Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-References: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
- <1587979995-17717-4-git-send-email-chenhc@lemote.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <c1a3aec6-dc45-3484-3a70-c06449bee609@amsat.org>
-Date: Tue, 28 Apr 2020 08:34:44 +0200
+ (envelope-from <mreitz@redhat.com>) id 1jTJpl-0001qb-Mm
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:36:53 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22240
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTJpl-0001pW-0x
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 02:35:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588055706;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=+nSQbbskV7DNFupQmBuY2FhjMyAlKMppJSzD23Xl+1Q=;
+ b=ObusQYDSSqhryvDBmNNK/7eo3Ge9hXGycIKi/yVGQnd3Qu3zKHFi4Dt1fmP4MVQtshKmg4
+ X34nHJswwwqnue0VMZwcmAWGdg9/WvPLc3ThqJ2HxWh8My0cw2fTKpr3fl54ZgHwUI5JMZ
+ 9xUjoLkHDKevTOK6+rQ/9xs/vB6Cm74=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-nn2KIq0NMpWN600KKwgwMA-1; Tue, 28 Apr 2020 02:35:02 -0400
+X-MC-Unique: nn2KIq0NMpWN600KKwgwMA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD6F11009442;
+ Tue, 28 Apr 2020 06:35:00 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 910EB5F7FD;
+ Tue, 28 Apr 2020 06:34:52 +0000 (UTC)
+Subject: Re: [PATCH v3 1/3] block: Add blk_new_with_bs() helper
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200424190903.522087-1-eblake@redhat.com>
+ <20200424190903.522087-2-eblake@redhat.com>
+ <ba31b83c-538a-0f3f-9bab-7aadb2f99ea9@redhat.com>
+ <5d70074f-ef06-31f6-f694-ef4c4517472c@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <59352c54-2d9c-5bde-9f5b-541f2ae5cccc@redhat.com>
+Date: Tue, 28 Apr 2020 08:34:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <1587979995-17717-4-git-send-email-chenhc@lemote.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::341
+In-Reply-To: <5d70074f-ef06-31f6-f694-ef4c4517472c@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="iGMFusVHO0deybt4uKnqZqHEZ19EDMb1z"
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 02:06:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,188 +118,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
- qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ "open list:Sheepdog" <sheepdog@lists.wpkg.org>, qemu-block@nongnu.org,
+ Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
+ Markus Armbruster <armbru@redhat.com>, stefanha@redhat.com,
+ Liu Yuan <namei.unix@gmail.com>, "Denis V. Lunev" <den@openvz.org>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Huacai,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iGMFusVHO0deybt4uKnqZqHEZ19EDMb1z
+Content-Type: multipart/mixed; boundary="XnA8rzA95pnCFTs5Dp7Tiuw0EEyTFfSCg"
 
-On 4/27/20 11:33 AM, Huacai Chen wrote:
-> Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
-> R1/R2. Loongson-3A R4 is the newest and its ISA is almost the superset
-> of all others. To reduce complexity, we just define a "Loongson-3A" CPU
-> which is corresponding to Loongson-3A R4. Loongson-3A has CONFIG6 and
-> CONFIG7, so add their bit-fields as well.
+--XnA8rzA95pnCFTs5Dp7Tiuw0EEyTFfSCg
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Is there a public datasheet for R4? (If possible in English).
+On 27.04.20 16:03, Eric Blake wrote:
+> On 4/27/20 5:00 AM, Max Reitz wrote:
+>> On 24.04.20 21:09, Eric Blake wrote:
+>>> There are several callers that need to create a new block backend from
+>>> an existing BDS; make the task slightly easier with a common helper
+>>> routine.
+>>>
+>>> Suggested-by: Max Reitz <mreitz@redhat.com>
+>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>> ---
+>=20
+>>> +++ b/block/crypto.c
+>>> @@ -256,16 +256,14 @@ static int
+>>> block_crypto_co_create_generic(BlockDriverState *bs,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PreallocMode prealloc,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error **errp)
+>>> =C2=A0 {
+>>> -=C2=A0=C2=A0=C2=A0 int ret;
+>>> +=C2=A0=C2=A0=C2=A0 int ret =3D -EPERM;
+>>
+>> I=E2=80=99m not sure I=E2=80=99m a fan of this, because I feel like it m=
+akes the code
+>> harder to read, due to having to look in three places (here, around the
+>> blk_new_with_bs() call, and under the cleanup label) instead of in two
+>> (not here) to verify that the error handling code is correct.
+>>
+>> There=E2=80=99s also the fact that this is not really a default return v=
+alue,
+>> but one very specific error code for if one very specific function call
+>> fails.
+>>
+>> I suppose it comes down to whether one considers LoC a complexity
+>> problem.=C2=A0 (I don=E2=80=99t, necessarily.)
+>>
+>> (Also I realize it seems rather common in the kernel to set error return
+>> variables before the function call, but I think the more common pattern
+>> in qemu is to set it in the error path.)
+>=20
+> I'm fine with either style.=C2=A0 Setting it up front is handy if that
+> particular error makes a good default, but in many of the functions I
+> touched, we were returning a variety of errors (-EIO, -EINVAL, -EPERM,
+> etc) such that there was no good default, and thus no reason to set a
+> default up front.=C2=A0 Is this something that would go through your tree=
+,
+> and if so, are you okay making that tweak, or do I need to send v4?
 
-> 
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> ---
->  target/mips/cpu.h                | 28 ++++++++++++++++++++++
->  target/mips/internal.h           |  2 ++
->  target/mips/mips-defs.h          |  7 ++++--
->  target/mips/translate.c          |  2 ++
->  target/mips/translate_init.inc.c | 51 ++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 88 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> index 94d01ea..0b3c987 100644
-> --- a/target/mips/cpu.h
-> +++ b/target/mips/cpu.h
-> @@ -940,7 +940,35 @@ struct CPUMIPSState {
->  #define CP0C5_UFR          2
->  #define CP0C5_NFExists     0
->      int32_t CP0_Config6;
-> +    int32_t CP0_Config6_rw_bitmask;
-> +#define CP0C6_BPPASS          31
-> +#define CP0C6_KPOS            24
-> +#define CP0C6_KE              23
-> +#define CP0C6_VTLBONLY        22
-> +#define CP0C6_LASX            21
-> +#define CP0C6_SSEN            20
-> +#define CP0C6_DISDRTIME       19
-> +#define CP0C6_PIXNUEN         18
-> +#define CP0C6_SCRAND          17
-> +#define CP0C6_LLEXCEN         16
-> +#define CP0C6_DISVC           15
-> +#define CP0C6_VCLRU           14
-> +#define CP0C6_DCLRU           13
-> +#define CP0C6_PIXUEN          12
-> +#define CP0C6_DISBLKLYEN      11
-> +#define CP0C6_UMEMUALEN       10
-> +#define CP0C6_SFBEN           8
-> +#define CP0C6_FLTINT          7
-> +#define CP0C6_VLTINT          6
-> +#define CP0C6_DISBTB          5
-> +#define CP0C6_STPREFCTL       2
-> +#define CP0C6_INSTPREF        1
-> +#define CP0C6_DATAPREF        0
->      int32_t CP0_Config7;
-> +    int64_t CP0_Config7_rw_bitmask;
-> +#define CP0C7_NAPCGEN       2
-> +#define CP0C7_UNIMUEN       1
-> +#define CP0C7_VFPUCGEN      0
->      uint64_t CP0_LLAddr;
->      uint64_t CP0_MAAR[MIPS_MAAR_MAX];
->      int32_t CP0_MAARI;
-> diff --git a/target/mips/internal.h b/target/mips/internal.h
-> index 1bf274b..7853cb1 100644
-> --- a/target/mips/internal.h
-> +++ b/target/mips/internal.h
-> @@ -36,7 +36,9 @@ struct mips_def_t {
->      int32_t CP0_Config5;
->      int32_t CP0_Config5_rw_bitmask;
->      int32_t CP0_Config6;
-> +    int32_t CP0_Config6_rw_bitmask;
->      int32_t CP0_Config7;
-> +    int32_t CP0_Config7_rw_bitmask;
->      target_ulong CP0_LLAddr_rw_bitmask;
->      int CP0_LLAddr_shift;
->      int32_t SYNCI_Step;
-> diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-> index a831bb4..c2c96db 100644
-> --- a/target/mips/mips-defs.h
-> +++ b/target/mips/mips-defs.h
-> @@ -51,8 +51,9 @@
->   */
->  #define INSN_LOONGSON2E   0x0001000000000000ULL
->  #define INSN_LOONGSON2F   0x0002000000000000ULL
-> -#define INSN_VR54XX       0x0004000000000000ULL
-> -#define INSN_R5900        0x0008000000000000ULL
-> +#define INSN_LOONGSON3A   0x0004000000000000ULL
-> +#define INSN_VR54XX       0x0008000000000000ULL
-> +#define INSN_R5900        0x0010000000000000ULL
->  /*
->   *   bits 56-63: vendor-specific ASEs
->   */
-> @@ -94,6 +95,8 @@
->  /* Wave Computing: "nanoMIPS" */
->  #define CPU_NANOMIPS32  (CPU_MIPS32R6 | ISA_NANOMIPS32)
->  
-> +#define CPU_LOONGSON3A  (CPU_MIPS64R2 | INSN_LOONGSON3A)
-> +
->  /*
->   * Strictly follow the architecture standard:
->   * - Disallow "special" instruction handling for PMON/SPIM.
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 25b595a..2caf4cb 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -31206,7 +31206,9 @@ void cpu_state_reset(CPUMIPSState *env)
->      env->CP0_Config5 = env->cpu_model->CP0_Config5;
->      env->CP0_Config5_rw_bitmask = env->cpu_model->CP0_Config5_rw_bitmask;
->      env->CP0_Config6 = env->cpu_model->CP0_Config6;
-> +    env->CP0_Config6_rw_bitmask = env->cpu_model->CP0_Config6_rw_bitmask;
->      env->CP0_Config7 = env->cpu_model->CP0_Config7;
-> +    env->CP0_Config7_rw_bitmask = env->cpu_model->CP0_Config7_rw_bitmask;
->      env->CP0_LLAddr_rw_bitmask = env->cpu_model->CP0_LLAddr_rw_bitmask
->                                   << env->cpu_model->CP0_LLAddr_shift;
->      env->CP0_LLAddr_shift = env->cpu_model->CP0_LLAddr_shift;
-> diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
-> index 6d145a9..a32412d 100644
-> --- a/target/mips/translate_init.inc.c
-> +++ b/target/mips/translate_init.inc.c
-> @@ -802,6 +802,57 @@ const mips_def_t mips_defs[] =
->          .mmu_type = MMU_TYPE_R4000,
->      },
->      {
-> +        .name = "Loongson-3A",
-> +        .CP0_PRid = 0x14C000,
-> +        /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
-> +        .CP0_Config0 = MIPS_CONFIG0 | (0x1 << CP0C0_AR) | (0x2 << CP0C0_AT) |
-> +                       (MMU_TYPE_R4000 << CP0C0_MT),
-> +        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << CP0C1_MMU) |
-> +                       (2 << CP0C1_IS) | (4 << CP0C1_IL) | (3 << CP0C1_IA) |
-> +                       (2 << CP0C1_DS) | (4 << CP0C1_DL) | (3 << CP0C1_DA) |
-> +                       (1 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << CP0C1_EP),
-> +        .CP0_Config2 = MIPS_CONFIG2,
-> +        .CP0_Config3 = MIPS_CONFIG3 | (1U << CP0C3_M) | (1 << CP0C3_MSAP) |
-> +                       (1 << CP0C3_BP) | (1 << CP0C3_BI) | (1 << CP0C3_ULRI) |
-> +                       (1 << CP0C3_RXI) | (1 << CP0C3_LPA) | (1 << CP0C3_VInt),
-> +        .CP0_Config4 = MIPS_CONFIG4 | (1U << CP0C4_M) | (2 << CP0C4_IE) |
-> +                       (1 << CP0C4_AE) | (0x1c << CP0C4_KScrExist),
-> +        .CP0_Config4_rw_bitmask = 0,
-> +        .CP0_Config5 = MIPS_CONFIG5 | (1 << CP0C5_NFExists) | (1 << 18),
-> +        .CP0_Config5_rw_bitmask = (1 << CP0C5_K) | (1 << CP0C5_CV) |
-> +                                  (1 << CP0C5_MSAEn) | (1 << CP0C5_UFE) |
-> +                                  (1 << CP0C5_FRE) | (1 << CP0C5_SBRI),
-> +        .CP0_Config6 = (1 << CP0C6_VCLRU) | (1 << CP0C6_DCLRU) | (1 << CP0C6_SFBEN) |
-> +                       (1 << CP0C6_FLTINT) | (1 << CP0C6_INSTPREF) | (1 << CP0C6_DATAPREF),
-> +        .CP0_Config6_rw_bitmask = (1 << CP0C6_BPPASS) | (0x3f << CP0C6_KPOS) |
-> +                                  (1 << CP0C6_KE) | (1 << CP0C6_VTLBONLY) | (1 << CP0C6_LASX) |
-> +                                  (1 << CP0C6_SSEN) | (1 << CP0C6_DISDRTIME) |
-> +                                  (1 << CP0C6_PIXNUEN) | (1 << CP0C6_SCRAND) |
-> +                                  (1 << CP0C6_LLEXCEN) | (1 << CP0C6_DISVC) |
-> +                                  (1 << CP0C6_VCLRU) | (1 << CP0C6_DCLRU) |
-> +                                  (1 << CP0C6_PIXUEN) | (1 << CP0C6_DISBLKLYEN) |
-> +                                  (1 << CP0C6_UMEMUALEN) | (1 << CP0C6_SFBEN) |
-> +                                  (1 << CP0C6_FLTINT) | (1 << CP0C6_VLTINT) |
-> +                                  (1 << CP0C6_DISBTB) | (3 << CP0C6_STPREFCTL) |
-> +                                  (1 << CP0C6_INSTPREF) | (1 << CP0C6_DATAPREF),
-> +        .CP0_Config7 = 0,
-> +        .CP0_Config7_rw_bitmask = (1 << CP0C7_NAPCGEN) | (1 << CP0C7_UNIMUEN) | \
-> +                                  (1 << CP0C7_VFPUCGEN),
-> +        .CP0_LLAddr_rw_bitmask = 1,
-> +        .SYNCI_Step = 16,
-> +        .CCRes = 2,
-> +        .CP0_Status_rw_bitmask = 0x7DDBFFFF,
-> +        .CP0_PageGrain_rw_bitmask = (1U << CP0PG_RIE) | (1 << CP0PG_XIE) |
-> +                    (1 << CP0PG_ELPA) | (1 << CP0PG_IEC),
-> +        .CP1_fcr0 = (0x5 << FCR0_PRID) | (0x1 << FCR0_REV) | (0x1 << FCR0_F64),
-> +        .CP1_fcr31 = 0,
-> +        .CP1_fcr31_rw_bitmask = 0xFF83FFFF,
-> +        .SEGBITS = 48,
-> +        .PABITS = 48,
-> +        .insn_flags = CPU_LOONGSON3A,
-> +        .mmu_type = MMU_TYPE_R4000,
-> +    },
-> +    {
->          /* A generic CPU providing MIPS64 DSP R2 ASE features.
->             FIXME: Eventually this should be replaced by a real CPU model. */
->          .name = "mips64dspr2",
-> 
+I suppose I can do that, this is what I=E2=80=99d squash in, OK?
+
+Max
+
+diff --git a/block/crypto.c b/block/crypto.c
+index a4d77f07fe..d09b364134 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -256,7 +256,7 @@ static int
+block_crypto_co_create_generic(BlockDriverState *bs,
+                                           PreallocMode prealloc,
+                                           Error **errp)
+ {
+-    int ret =3D -EPERM;
++    int ret;
+     BlockBackend *blk;
+     QCryptoBlock *crypto =3D NULL;
+     struct BlockCryptoCreateData data;
+@@ -264,6 +264,7 @@ static int
+block_crypto_co_create_generic(BlockDriverState *bs,
+     blk =3D blk_new_with_bs(bs, BLK_PERM_WRITE | BLK_PERM_RESIZE,
+BLK_PERM_ALL,
+                           errp);
+     if (!blk) {
++        ret =3D -EPERM;
+         goto cleanup;
+     }
+
+diff --git a/block/qed.c b/block/qed.c
+index 7a31495d29..671742511e 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -610,7 +610,7 @@ static int coroutine_fn
+bdrv_qed_co_create(BlockdevCreateOptions *opts,
+     QEDHeader le_header;
+     uint8_t *l1_table =3D NULL;
+     size_t l1_size;
+-    int ret =3D -EPERM;
++    int ret =3D 0;
+
+     assert(opts->driver =3D=3D BLOCKDEV_DRIVER_QED);
+     qed_opts =3D &opts->u.qed;
+@@ -654,6 +654,7 @@ static int coroutine_fn
+bdrv_qed_co_create(BlockdevCreateOptions *opts,
+     blk =3D blk_new_with_bs(bs, BLK_PERM_WRITE | BLK_PERM_RESIZE,
+BLK_PERM_ALL,
+                           errp);
+     if (!blk) {
++        ret =3D -EPERM;
+         goto out;
+     }
+     blk_set_allow_write_beyond_eof(blk, true);
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 2b53cd950d..8baf9e66bb 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -1801,13 +1801,14 @@ static int sd_prealloc(BlockDriverState *bs,
+int64_t old_size, int64_t new_size,
+     uint32_t idx, max_idx;
+     uint32_t object_size;
+     void *buf =3D NULL;
+-    int ret =3D -EPERM;
++    int ret;
+
+     blk =3D blk_new_with_bs(bs,
+                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE |
+BLK_PERM_RESIZE,
+                           BLK_PERM_ALL, errp);
+
+     if (!blk) {
++        ret =3D -EPERM;
+         goto out_with_err_set;
+     }
+
+diff --git a/block/vhdx.c b/block/vhdx.c
+index bdf5d05cc0..8ca6976b59 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -1891,7 +1891,7 @@ static int coroutine_fn
+vhdx_co_create(BlockdevCreateOptions *opts,
+     BlockBackend *blk =3D NULL;
+     BlockDriverState *bs =3D NULL;
+
+-    int ret =3D -EPERM;
++    int ret =3D 0;
+     uint64_t image_size;
+     uint32_t log_size;
+     uint32_t block_size;
+@@ -1987,6 +1987,7 @@ static int coroutine_fn
+vhdx_co_create(BlockdevCreateOptions *opts,
+     blk =3D blk_new_with_bs(bs, BLK_PERM_WRITE | BLK_PERM_RESIZE,
+BLK_PERM_ALL,
+                           errp);
+     if (!blk) {
++        ret =3D -EPERM;
+         goto delete_and_exit;
+     }
+     blk_set_allow_write_beyond_eof(blk, true);
+
+
+--XnA8rzA95pnCFTs5Dp7Tiuw0EEyTFfSCg--
+
+--iGMFusVHO0deybt4uKnqZqHEZ19EDMb1z
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6nzosACgkQ9AfbAGHV
+z0B4Swf9H3jAThDKf044xz+rand/xkJ6VUavMi4ACTRtBD4EzhFfMlQT+1a6I0j1
+j1+ieNOoro2Q4V9yGqH/9kOF3Lh7e6XrMxzh2EjT5ZdDJBIFohrqm7pu6BoReEPX
+hm6xt8BaPiHjBt/AT0T3yTAAp6lPr/mCssHzgo+sc0nMPRJYWWHsnuV0HLb+zRkq
+Z066sGQpXYQIpA1lFFEbN6oXqIOyRQnm842ojv479wgrFNvns7X4IBpwKEaIYiNO
++9ZFG0GlTI9IM4XjcEvVqH4lJOqH5e5ibRTkHGNqLvPud4Qterz/1I4IT+oWMQ91
+Zv/2ZZSJKf9Sn3ZxtKOC3qQXgMpxbQ==
+=04l/
+-----END PGP SIGNATURE-----
+
+--iGMFusVHO0deybt4uKnqZqHEZ19EDMb1z--
+
 
