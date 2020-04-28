@@ -2,80 +2,85 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D6A2C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 16:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55479C83008
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 16:12:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EF3D206E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 16:11:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EF3D206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 23A80206E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 16:12:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j0mWZZYF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23A80206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTSpy-0006r9-Cd
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 12:11:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58022)
+	id 1jTSq3-0006vv-5e
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 12:12:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58110)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vishal.l.verma@intel.com>) id 1jTSkG-0000ng-5w
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:10:02 -0400
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jTSkV-0001Ld-3t
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:10:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vishal.l.verma@intel.com>) id 1jTSh7-0003GW-4P
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:06:03 -0400
-Received: from mga14.intel.com ([192.55.52.115]:50074)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vishal.l.verma@intel.com>)
- id 1jTSh5-00039U-Ul
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:02:48 -0400
-IronPort-SDR: zwkNwWpFLrvtjGu3TgbRCdZRlNf7chbY5EnnVDXP2iNoFGMNLKOXZL18R0clHqQroF+6OMj4Ds
- ubOLV1QhoBBw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 28 Apr 2020 09:02:44 -0700
-IronPort-SDR: /eZuulpYd3j+4daqGFUMK4nitTM663T7mjHb2eIjO+NXfES7dcoZxiUf5v1GYBQsTM4K+v2L5R
- lUCkJLpGVjhA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,328,1583222400"; d="scan'208";a="367538602"
-Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
- by fmsmga001.fm.intel.com with ESMTP; 28 Apr 2020 09:02:41 -0700
-Received: from orsmsx151.amr.corp.intel.com (10.22.226.38) by
- ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 28 Apr 2020 09:02:40 -0700
-Received: from orsmsx121.amr.corp.intel.com ([169.254.10.248]) by
- ORSMSX151.amr.corp.intel.com ([169.254.7.25]) with mapi id 14.03.0439.000;
- Tue, 28 Apr 2020 09:02:40 -0700
-From: "Verma, Vishal L" <vishal.l.verma@intel.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: Re: [PATCH 0/3] account for NVDIMM nodes during SRAT generation
-Thread-Topic: [PATCH 0/3] account for NVDIMM nodes during SRAT generation
-Thread-Index: AQHWHPxhIv/dZlNKYkaQJpWbPC6PXaiOSSIAgADfH4A=
-Date: Tue, 28 Apr 2020 16:02:40 +0000
-Message-ID: <abf42131fec08836004e4b3642d36cc0ce9abca4.camel@intel.com>
-References: <158804184249.15667.634657454454879088@39012742ff91>
-In-Reply-To: <158804184249.15667.634657454454879088@39012742ff91>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.32.5 (3.32.5-1.fc30) 
-x-originating-ip: [10.18.116.7]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3D9FAC84B4F3C24AB20FCF3E707DD793@intel.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jTSiB-0004gB-4B
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:06:18 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:36470)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jTSiA-0004aX-HS; Tue, 28 Apr 2020 12:03:54 -0400
+Received: by mail-lf1-x144.google.com with SMTP id w145so17363542lff.3;
+ Tue, 28 Apr 2020 09:03:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=yArlMeJLEqclMBk/jDgf3oGNxTygsUNwmienflwMm3k=;
+ b=j0mWZZYFnSxj3FZOvyV8jT/ElcHRTsSkFi9e9vfxEedeYPKf3WmKh1wLrg2WXr7Gsz
+ pxJNO0LzXHE0H038NF88DlJdrJ9vVONRPsShOgBd3kazspxf8AGr0HqlXmNEKz9MPXAT
+ lExW3MMLqxGmfugQkmRtwX7auUGlz+5RZUoXd7FEAEdGUP/GXb7Y0ZXDQG8Qy8IzNtyr
+ F0UKCHlJXerP1am8gi8nDmV/DzEWOchrYpD4JvGC4pZ6336MvcAJmmKPsPtHK0mgiHQ+
+ Rz3ww2dWWJOPl3iEWgjmgy4Q2o2nKmqSNWmiMfVKrEnrUi2FeK4mVgnewx2xkVXtciCJ
+ MsYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=yArlMeJLEqclMBk/jDgf3oGNxTygsUNwmienflwMm3k=;
+ b=A/OOpr+4irl6YBVbutvz8sWwTRd2NKbL7rDRllZoLON8nClr0/TkSoTbBNssJTmz5Q
+ rBbGfHQ6MC2e0dqhASlbnHdd05dOHFh3MmpwU0qEenN+EmN5Cc4pZg3TsgFgmgUXkrXw
+ baSOegRmgTRsIkR+vbPMFvMv6ZTylfsDPzEppRndltFcqbTeTf7fhpvHbKWucgm5ZpYt
+ Ld8yvTeLU3hcXvtTRV+jNTKOQlw8teR15yqwayN5EJKftm3jieJT96mwSOMAH8momys7
+ 6YufsZmXyPLXrfffSkZg+uPzXE0Thk3/bWAaATBfB5kAxWJT3E/86KG/2p9oTVmBHXNf
+ LfMQ==
+X-Gm-Message-State: AGi0PuYb2UkE84TeoxjqnnKaxSnDfhN8mkqO43v8tS/prCzfZz6P307a
+ xtWGt7IQQenfVIYKv5alIIkYWdXb7lg=
+X-Google-Smtp-Source: APiQypJI+cZsh16+K0O7tePSvwjHaQqCteAvJfdFe11U6G4DwlIeeSXKjK4+r3dCvd3d0JwcfQ4AUQ==
+X-Received: by 2002:a19:42c3:: with SMTP id p186mr1473618lfa.194.1588089831760; 
+ Tue, 28 Apr 2020 09:03:51 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id q125sm13024013ljb.34.2020.04.28.09.03.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Apr 2020 09:03:50 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 0/1] target/arm: Remove access_el3_aa32ns()
+Date: Tue, 28 Apr 2020 18:03:49 +0200
+Message-Id: <20200428160350.10030-1-edgar.iglesias@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Received-SPF: pass client-ip=192.55.52.115;
- envelope-from=vishal.l.verma@intel.com; helo=mga14.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 12:02:44
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 192.55.52.115
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::144;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x144.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,57 +92,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Liu, Jingqi" <jingqi.liu@intel.com>, "Williams,
- Dan J" <dan.j.williams@intel.com>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "mst@redhat.com" <mst@redhat.com>
+Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ richard.henderson@linaro.org, edgar.iglesias@xilinx.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T24gTW9uLCAyMDIwLTA0LTI3IGF0IDE5OjQ0IC0wNzAwLCBuby1yZXBseUBwYXRjaGV3Lm9yZyB3
-cm90ZToNCj4gUGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQyODAx
-MjgxMC4xMDg3Ny0xLXZpc2hhbC5sLnZlcm1hQGludGVsLmNvbS8NClsuLl0NCj4gDQo+ID09PSBP
-VVRQVVQgQkVHSU4gPT09DQo+IDEvMyBDaGVja2luZyBjb21taXQgMDhiN2VlNWU3ZGRmIChkaWZm
-cy1hbGxvd2VkOiBhZGQgdGhlIFNSQVQgQU1MIHRvDQo+IGRpZmZzLWFsbG93ZWQpDQo+IDIvMyBD
-aGVja2luZyBjb21taXQgZGNjOTZlYjk3ZDQ2IChody9hY3BpLWJ1aWxkOiBhY2NvdW50IGZvciBO
-VkRJTU0NCj4gbnVtYSBub2RlcyBpbiBTUkFUKQ0KPiBFUlJPUjogRG8gbm90IGFkZCBleHBlY3Rl
-ZCBmaWxlcyB0b2dldGhlciB3aXRoIHRlc3RzLCBmb2xsb3cNCj4gaW5zdHJ1Y3Rpb25zIGluIHRl
-c3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QuYzogYm90aCB0ZXN0cy9xdGVzdC9iaW9zLQ0KPiB0
-YWJsZXMtdGVzdC1hbGxvd2VkLWRpZmYuaCBhbmQgaHcvaTM4Ni9hY3BpLWJ1aWxkLmMgZm91bmQN
-Cj4gDQo+IEVSUk9SOiBEbyBub3QgYWRkIGV4cGVjdGVkIGZpbGVzIHRvZ2V0aGVyIHdpdGggdGVz
-dHMsIGZvbGxvdw0KPiBpbnN0cnVjdGlvbnMgaW4gdGVzdHMvcXRlc3QvYmlvcy10YWJsZXMtdGVz
-dC5jOiBib3RoIHRlc3RzL3F0ZXN0L2Jpb3MtDQo+IHRhYmxlcy10ZXN0LWFsbG93ZWQtZGlmZi5o
-IGFuZCBody9pMzg2L2FjcGktYnVpbGQuYyBmb3VuZA0KDQpJJ20gbm90IHN1cmUgSSBmb2xsb3cg
-dGhlc2UgZXJyb3JzIC0gSSB0aGluayBJIGZvbGxvd2VkIHRoZSBpbnN0cnVjdGlvbnMNCmluIGJp
-b3MtdGFibGVzLXRlc3QuYyBleGFjdGx5Li4gRGlkIEkgbWlzcyBzb21ldGhpbmc/DQoNCj4gDQo+
-IHRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMzIgbGluZXMgY2hlY2tlZA0KPiANCj4gUGF0
-Y2ggMi8zIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMNCj4gYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlDQo+IENIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuDQo+IA0KPiAzLzMgQ2hlY2tp
-bmcgY29tbWl0IDM0YzU5ZDNhMDIzMiAodGVzdHMvYWNwaTogdXBkYXRlIGV4cGVjdGVkIFNSQVQN
-Cj4gZmlsZXMpDQo+IEVSUk9SOiBEbyBub3QgYWRkIGV4cGVjdGVkIGZpbGVzIHRvZ2V0aGVyIHdp
-dGggdGVzdHMsIGZvbGxvdw0KPiBpbnN0cnVjdGlvbnMgaW4gdGVzdHMvcXRlc3QvYmlvcy10YWJs
-ZXMtdGVzdC5jOiBib3RoDQo+IHRlc3RzL2RhdGEvYWNwaS9wYy9TUkFULmRpbW1weG0gYW5kIGh3
-L2kzODYvYWNwaS1idWlsZC5jIGZvdW5kDQo+IA0KPiBFUlJPUjogRG8gbm90IGFkZCBleHBlY3Rl
-ZCBmaWxlcyB0b2dldGhlciB3aXRoIHRlc3RzLCBmb2xsb3cNCj4gaW5zdHJ1Y3Rpb25zIGluIHRl
-c3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QuYzogYm90aA0KPiB0ZXN0cy9kYXRhL2FjcGkvcTM1
-L1NSQVQuZGltbXB4bSBhbmQgaHcvaTM4Ni9hY3BpLWJ1aWxkLmMgZm91bmQNCj4gDQo+IEVSUk9S
-OiBEbyBub3QgYWRkIGV4cGVjdGVkIGZpbGVzIHRvZ2V0aGVyIHdpdGggdGVzdHMsIGZvbGxvdw0K
-PiBpbnN0cnVjdGlvbnMgaW4gdGVzdHMvcXRlc3QvYmlvcy10YWJsZXMtdGVzdC5jOiBib3RoIHRl
-c3RzL3F0ZXN0L2Jpb3MtDQo+IHRhYmxlcy10ZXN0LWFsbG93ZWQtZGlmZi5oIGFuZCBody9pMzg2
-L2FjcGktYnVpbGQuYyBmb3VuZA0KPiANCj4gRVJST1I6IERvIG5vdCBhZGQgZXhwZWN0ZWQgZmls
-ZXMgdG9nZXRoZXIgd2l0aCB0ZXN0cywgZm9sbG93DQo+IGluc3RydWN0aW9ucyBpbiB0ZXN0cy9x
-dGVzdC9iaW9zLXRhYmxlcy10ZXN0LmM6IGJvdGggdGVzdHMvcXRlc3QvYmlvcy0NCj4gdGFibGVz
-LXRlc3QtYWxsb3dlZC1kaWZmLmggYW5kIGh3L2kzODYvYWNwaS1idWlsZC5jIGZvdW5kDQo+IA0K
-PiB0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDEgbGluZXMgY2hlY2tlZA0KPiANCj4gUGF0
-Y2ggMy8zIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMNCj4gYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlDQo+IENIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuDQo+IA0KPiA9PT0gT1VUUFVU
-IEVORCA9PT0NCj4gDQo+IFRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxDQo+IA0KPiAN
-Cj4gVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdA0KPiBodHRwOi8vcGF0Y2hldy5vcmcvbG9n
-cy8yMDIwMDQyODAxMjgxMC4xMDg3Ny0xLXZpc2hhbC5sLnZlcm1hQGludGVsLmNvbS90ZXN0aW5n
-LmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4NCj4gLS0tDQo+IEVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4NCj4gUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20NCg==
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+
+Hi,
+
+Laurent reported hitting the assert in access_el3_aa32ns()
+when accessing 32-bit versions of some of the virtualization
+regs when EL3 is 64-bit.
+
+I think we got this wrong back then and it seems to me like
+we should remove direct usage of access_el3_aa32ns() and
+always call access_el3_aa32ns_aa64_any() to handle both
+the aa32-only cases and the mixed aa32/aa64.
+
+Cheers,
+Edgar
+
+Edgar E. Iglesias (1):
+  target/arm: Drop access_el3_aa32ns()
+
+ target/arm/helper.c | 34 ++++++++++------------------------
+ 1 file changed, 10 insertions(+), 24 deletions(-)
+
+-- 
+2.20.1
+
 
