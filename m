@@ -2,82 +2,89 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C77C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 10:46:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B2E3C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 10:56:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88CA0206E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 10:46:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25828206D6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 10:56:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="duQMVv00"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88CA0206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="x1F2cIVP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25828206D6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTNka-0002x3-NE
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 06:46:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45536)
+	id 1jTNv7-00077Y-7A
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 06:56:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46722)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jTNh4-0007yY-0m
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:43:36 -0400
+ (envelope-from <yuri.benditovich@daynix.com>) id 1jTNuL-0006Az-OX
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:56:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jTNdd-0004Yw-1a
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:42:25 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49709
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jTNdc-0004Yi-KG
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:38:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588070331;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/7NAWnNaoUlS7P4lX/0IlMVjObOSLq35HG7C8D10PDI=;
- b=duQMVv00Z2jACVbViMo0qXZwkunrEZZX31CZr0cFOmx1Qsj6mgvJa6UtfbPf4y3ShEFFTC
- 0KrZIEq7OwL7CBQhb0SyCtyCxB0zAB0OkZuCqtH7qxZCvXW5yFNSxAGqBjSZG0kqWBDksG
- AmtsrPm/QilWoYz5CxLXJHcTgijk8+Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-9jAzkI02P-WUWyIWSwXQLw-1; Tue, 28 Apr 2020 06:38:50 -0400
-X-MC-Unique: 9jAzkI02P-WUWyIWSwXQLw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74A8280058A;
- Tue, 28 Apr 2020 10:38:48 +0000 (UTC)
-Received: from gondolin (ovpn-112-178.ams2.redhat.com [10.36.112.178])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A982E600D2;
- Tue, 28 Apr 2020 10:38:43 +0000 (UTC)
-Date: Tue, 28 Apr 2020 12:38:26 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH 0/2] virt: Set tpm-tis-device ppi property to off by
- default
-Message-ID: <20200428123826.1ec68e6c.cohuck@redhat.com>
-In-Reply-To: <20200427143145.16251-1-eric.auger@redhat.com>
-References: <20200427143145.16251-1-eric.auger@redhat.com>
-Organization: Red Hat GmbH
+ (envelope-from <yuri.benditovich@daynix.com>) id 1jTNuL-0003ap-4f
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:56:09 -0400
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:45551)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
+ id 1jTNuK-0003ab-J5
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 06:56:08 -0400
+Received: by mail-yb1-xb44.google.com with SMTP id p7so9024076ybo.12
+ for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 03:56:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=CaOcP7p1a+xI1BBpOHxIXH9Xc4VV47t0hEDc9rL9zvc=;
+ b=x1F2cIVPuH+iofsoqekVb6NnIwSGOifH7qPMX0BTYsMlQYg9A8TDEnmZU7wmz5gsYj
+ DO3VbVGy4XkHEU2zGlPP0tIkOAtHagv3zFcYj2uCNClCs3yF1q3jZonBtWFRJxps8ssK
+ PrE+4anKqO5ZzuOjx1hGOZqDA0hQ+qaugSCzLvijVADC/4KmaOzwiv3DFwnk1rFxqQIl
+ VeL/9IXDt4dlUrZnZUwIfw+CXD6/CWR+4FnKhIZPH2rpzrFem3pYdyn1La4Pr7bbLk+C
+ QnULsTfVaRQ+cFA5fzH/KxktbhU3csLmYZHhgNPgKjgaKzipHmSS84t6oYbg6jZVuGPm
+ npzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=CaOcP7p1a+xI1BBpOHxIXH9Xc4VV47t0hEDc9rL9zvc=;
+ b=hvTKo/9kspXEQzN7qQsx8Modxe17rsvZPQTwSf2gHduMftLCwKGMESmxxKbiJpjtxJ
+ ruebnjH/vY33revvSy3xiIBJ7wLSL6ZOmNxpjxmdvI/ET3rX4LzhyAts6C1pelOJSnCn
+ 6TAZFMDfeWkCMa8oQCetnGqQgRgpZsmv4Q5PV1D39UpBoLPRFA1jst7ParPOjFHVTyu5
+ 7gbtI+zpoUGQQwoKoZ/0Bmgbex9OLNMtWeOLXKWKRBjOk/MZJFRLT3hb3i1W4p32t4BX
+ Mlysx89e+Pcs8dHMIuK7b3V0smVSn+jdlVAOloJPRVGmZNbFukVSutRNBqHOfYxAdZaG
+ xlgA==
+X-Gm-Message-State: AGi0Pubix76QTjimtYfWa3sCjLpRUpS4BiWQ/wzlCusGAerVastcZF+x
+ EUno9GB3n6JkooBFTWsetdg1XK73rjnAxkVhq7hiWQ==
+X-Google-Smtp-Source: APiQypJ1rwUwtJf+JId+pciz05Fn8Box1ddHZU39Z/RFiZXycWuUj03/cktC0P/NeW6rgQYqWLK6/2L9pv6g+mcVzow=
+X-Received: by 2002:a25:bacd:: with SMTP id a13mr45614802ybk.461.1588071367136; 
+ Tue, 28 Apr 2020 03:56:07 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:11:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200427102415.10915-1-cohuck@redhat.com>
+ <20200427102415.10915-4-cohuck@redhat.com>
+ <7f703bea-2cae-dcdc-71bd-9623c7db33ac@redhat.com>
+ <20200428103407.12612838.cohuck@redhat.com>
+ <85367d20-e4f5-6869-319e-2f60d2510130@redhat.com>
+ <20200428111801.7422d95a.cohuck@redhat.com>
+In-Reply-To: <20200428111801.7422d95a.cohuck@redhat.com>
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
+Date: Tue, 28 Apr 2020 13:55:55 +0300
+Message-ID: <CAOEp5OcgjWQzU=pRwc+2ftwGnX97wVR+vO-7HkV4=yNnsjcdhg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] virtio-net: remove VIRTIO_NET_HDR_F_RSC_INFO compat
+ handling
+To: Cornelia Huck <cohuck@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000b771a605a457addb"
+Received-SPF: none client-ip=2607:f8b0:4864:20::b44;
+ envelope-from=yuri.benditovich@daynix.com; helo=mail-yb1-xb44.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::b44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,37 +96,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, eric.auger.pro@gmail.com, stefanb@linux.ibm.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 27 Apr 2020 16:31:43 +0200
-Eric Auger <eric.auger@redhat.com> wrote:
+--000000000000b771a605a457addb
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Instead of using a compat in the mach-virt machine to force
-> PPI off for all virt machines (PPI not supported by the
-> tpm-tis-device device), let's simply change the default value
-> in the sysbus device.
-> 
-> Best Regards
-> 
-> Eric
-> 
-> Eric Auger (2):
->   tpm: tpm-tis-device: set PPI to false by default
->   hw/arm/virt: Remove the compat forcing tpm-tis-device PPI to off
-> 
->  hw/arm/virt.c           | 5 -----
->  hw/tpm/tpm_tis_sysbus.c | 2 +-
->  2 files changed, 1 insertion(+), 6 deletions(-)
-> 
+On Tue, Apr 28, 2020 at 12:18 PM Cornelia Huck <cohuck@redhat.com> wrote:
 
-I think we can apply the compat machines patch on top of these two
-patches.
+> On Tue, 28 Apr 2020 16:58:44 +0800
+> Jason Wang <jasowang@redhat.com> wrote:
+>
+> > On 2020/4/28 =E4=B8=8B=E5=8D=884:34, Cornelia Huck wrote:
+> > > On Tue, 28 Apr 2020 16:19:15 +0800
+> > > Jason Wang <jasowang@redhat.com> wrote:
+> > >
+> > >> On 2020/4/27 =E4=B8=8B=E5=8D=886:24, Cornelia Huck wrote:
+> > >>> VIRTIO_NET_HDR_F_RSC_INFO is available in the headers now.
+> > >>>
+> > >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > >>> ---
+> > >>>    hw/net/virtio-net.c | 8 --------
+> > >>>    1 file changed, 8 deletions(-)
+> > >>>
+> > >>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> > >>> index e85d902588b3..7449570c7123 100644
+> > >>> --- a/hw/net/virtio-net.c
+> > >>> +++ b/hw/net/virtio-net.c
+> > >>> @@ -77,14 +77,6 @@
+> > >>>       tso/gso/gro 'off'. */
+> > >>>    #define VIRTIO_NET_RSC_DEFAULT_INTERVAL 300000
+> > >>>
+> > >>> -/* temporary until standard header include it */
+> > >>> -#if !defined(VIRTIO_NET_HDR_F_RSC_INFO)
+> > >>> -
+> > >>> -#define VIRTIO_NET_HDR_F_RSC_INFO  4 /* rsc_ext data in csum_
+> fields */
+> > >>> -#define VIRTIO_NET_F_RSC_EXT       61
+> > >>> -
+> > >>> -#endif
+> > >>> -
+> > >>>    static inline __virtio16 *virtio_net_rsc_ext_num_packets(
+> > >>>        struct virtio_net_hdr *hdr)
+> > >>>    {
+> > >>
+> > >> I think we should not keep the those tricky num_packets/dup_acks.
+> > > No real opinion here, patch 3 is only a cleanup.
+> > >
+> > > The important one is patch 1, because without it I cannot do a header=
+s
+> > > update.
+> >
+> >
+> > Yes, at least we should dereference segments/dup_acks instead of
+> > csum_start/csum_offsets since the header has been synced.
+>
+> So what about:
+>
+> - I merge patch 1 and the header sync now (because I have a bunch of
+>   patches that depend on it...)
+> - We change virtio-net to handle that properly on top (probably best
+>   done by someone familiar with the code base ;)
+>
+>
+Jason,
+This series just solves the conflict caused by the update of Linux headers.
+After this series is applied I can submit further patch to use actual RSC
+definitions from linux headers.
 
-Q: Who will queue this and the machine types patch? It feels a bit
-weird taking arm patches through the s390 tree :)
+Thanks,
+Yuri
 
+--000000000000b771a605a457addb
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"></div><br><div class=3D"gmail_quote"><div=
+ dir=3D"ltr" class=3D"gmail_attr">On Tue, Apr 28, 2020 at 12:18 PM Cornelia=
+ Huck &lt;<a href=3D"mailto:cohuck@redhat.com">cohuck@redhat.com</a>&gt; wr=
+ote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px=
+ 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On Tue, 28 =
+Apr 2020 16:58:44 +0800<br>
+Jason Wang &lt;<a href=3D"mailto:jasowang@redhat.com" target=3D"_blank">jas=
+owang@redhat.com</a>&gt; wrote:<br>
+<br>
+&gt; On 2020/4/28 =E4=B8=8B=E5=8D=884:34, Cornelia Huck wrote:<br>
+&gt; &gt; On Tue, 28 Apr 2020 16:19:15 +0800<br>
+&gt; &gt; Jason Wang &lt;<a href=3D"mailto:jasowang@redhat.com" target=3D"_=
+blank">jasowang@redhat.com</a>&gt; wrote:<br>
+&gt; &gt;=C2=A0 <br>
+&gt; &gt;&gt; On 2020/4/27 =E4=B8=8B=E5=8D=886:24, Cornelia Huck wrote:=C2=
+=A0 <br>
+&gt; &gt;&gt;&gt; VIRTIO_NET_HDR_F_RSC_INFO is available in the headers now=
+.<br>
+&gt; &gt;&gt;&gt;<br>
+&gt; &gt;&gt;&gt; Signed-off-by: Cornelia Huck &lt;<a href=3D"mailto:cohuck=
+@redhat.com" target=3D"_blank">cohuck@redhat.com</a>&gt;<br>
+&gt; &gt;&gt;&gt; ---<br>
+&gt; &gt;&gt;&gt;=C2=A0 =C2=A0 hw/net/virtio-net.c | 8 --------<br>
+&gt; &gt;&gt;&gt;=C2=A0 =C2=A0 1 file changed, 8 deletions(-)<br>
+&gt; &gt;&gt;&gt;<br>
+&gt; &gt;&gt;&gt; diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c<br=
+>
+&gt; &gt;&gt;&gt; index e85d902588b3..7449570c7123 100644<br>
+&gt; &gt;&gt;&gt; --- a/hw/net/virtio-net.c<br>
+&gt; &gt;&gt;&gt; +++ b/hw/net/virtio-net.c<br>
+&gt; &gt;&gt;&gt; @@ -77,14 +77,6 @@<br>
+&gt; &gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0tso/gso/gro &#39;off&#39;. */<b=
+r>
+&gt; &gt;&gt;&gt;=C2=A0 =C2=A0 #define VIRTIO_NET_RSC_DEFAULT_INTERVAL 3000=
+00<br>
+&gt; &gt;&gt;&gt;=C2=A0 =C2=A0 <br>
+&gt; &gt;&gt;&gt; -/* temporary until standard header include it */<br>
+&gt; &gt;&gt;&gt; -#if !defined(VIRTIO_NET_HDR_F_RSC_INFO)<br>
+&gt; &gt;&gt;&gt; -<br>
+&gt; &gt;&gt;&gt; -#define VIRTIO_NET_HDR_F_RSC_INFO=C2=A0 4 /* rsc_ext dat=
+a in csum_ fields */<br>
+&gt; &gt;&gt;&gt; -#define VIRTIO_NET_F_RSC_EXT=C2=A0 =C2=A0 =C2=A0 =C2=A06=
+1<br>
+&gt; &gt;&gt;&gt; -<br>
+&gt; &gt;&gt;&gt; -#endif<br>
+&gt; &gt;&gt;&gt; -<br>
+&gt; &gt;&gt;&gt;=C2=A0 =C2=A0 static inline __virtio16 *virtio_net_rsc_ext=
+_num_packets(<br>
+&gt; &gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct virtio_net_hdr *hdr)<br=
+>
+&gt; &gt;&gt;&gt;=C2=A0 =C2=A0 {=C2=A0 <br>
+&gt; &gt;&gt;<br>
+&gt; &gt;&gt; I think we should not keep the those tricky num_packets/dup_a=
+cks.=C2=A0 <br>
+&gt; &gt; No real opinion here, patch 3 is only a cleanup.<br>
+&gt; &gt;<br>
+&gt; &gt; The important one is patch 1, because without it I cannot do a he=
+aders<br>
+&gt; &gt; update.=C2=A0 <br>
+&gt; <br>
+&gt; <br>
+&gt; Yes, at least we should dereference segments/dup_acks instead of <br>
+&gt; csum_start/csum_offsets since the header has been synced.<br>
+<br>
+So what about:<br>
+<br>
+- I merge patch 1 and the header sync now (because I have a bunch of<br>
+=C2=A0 patches that depend on it...)<br>
+- We change virtio-net to handle that properly on top (probably best<br>
+=C2=A0 done by someone familiar with the code base ;)<br>
+<br></blockquote><div><br></div><div>Jason,</div><div>This series just solv=
+es the conflict caused by the update of Linux headers.=C2=A0</div><div>
+
+After this series is applied I can submit further patch to use actual RSC d=
+efinitions from linux headers.=C2=A0</div><div><br></div><div>Thanks,</div>=
+<div>Yuri</div></div></div>
+
+--000000000000b771a605a457addb--
 
