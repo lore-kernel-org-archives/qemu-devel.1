@@ -2,51 +2,98 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B42C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 20:06:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71F05C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 20:12:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22EF72070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 20:06:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22EF72070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3B3AC206D9
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 20:12:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GBZ6hjpB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B3AC206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTWUW-0004de-1C
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 16:06:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35956)
+	id 1jTWaj-0001Zn-7f
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 16:12:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36898)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jTWPa-0006Y5-1R
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:01:20 -0400
+ (envelope-from <peterx@redhat.com>) id 1jTWXO-0007yM-Jj
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:11:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jTWPC-00028l-4d
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:00:57 -0400
-Received: from relay.sw.ru ([185.231.240.75]:39190)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jTWPB-00022M-E6; Tue, 28 Apr 2020 16:00:33 -0400
-Received: from dptest2.qa.sw.ru ([10.94.4.71])
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jTWOx-0000u3-O0; Tue, 28 Apr 2020 23:00:19 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+ (envelope-from <peterx@redhat.com>) id 1jTWTl-0003UG-0T
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:09:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34248
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jTWTk-0003Kb-Be
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:05:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588104314;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6Eo4r6u5SYM1WZ9PfvYPN2Ms1+i0Op+LVgOGKasP7MU=;
+ b=GBZ6hjpBBd6mh/LuFmv9/RuAVLh/2lDsva762lVhKFJIeoNj3JuvZ3UgrPwxO4fT9BznAy
+ 2uhscJV8T3QlNVG+aUGFzL0fEfbhfPHi/hoEaFRSAOM8AM5xUDiI956t86b/dJzvnHVVoz
+ UuXsj8SfpGCyPlfYjvXQaVwO/prcX5Q=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-402-1cQA5VYKOqKgQwAqQnA9sg-1; Tue, 28 Apr 2020 16:05:13 -0400
+X-MC-Unique: 1cQA5VYKOqKgQwAqQnA9sg-1
+Received: by mail-qv1-f69.google.com with SMTP id c89so23127772qva.2
+ for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 13:05:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=wCJFXyhmyRTeYnNgNSFP3nGZV6uKvSfUmf8nDeG988w=;
+ b=Gzx6LwGXe+UN8EBmfIzTPCGkALrS5ZkKOmJ+EApmu9HFN8PGGhPjb3/IUSZD429Eh4
+ xB7hNubkm13iQvpUIf858MQjoQKHkgtfSJ+iKLwrHAmHI6HHlRs7JgBDY3ePor+tUf7k
+ 0kr7MHyG4Cf3OL6CIW0Vx77fvXbmTOPcMe/gAkEYKTnFq9EwpBH90hcTKKtaFIgjKTS1
+ ob/Hi8ImxRuczXHVNbVeuI7WOmtzAyDtK3Qpamm/QoI7y0bZn29JZAo/lM+OzYscnl7g
+ f9Su7UApdxqVWvgFjikeialgfs9JfduorYeDISwajs1hcG9PodG9IN0kv4O71kj4kjCe
+ Btpg==
+X-Gm-Message-State: AGi0PuYa7g1gtAXu+rs0A/dTnh6D1Q3xLPBsZL5jl7Oi+6o7HFMTRWsO
+ rf52SHjkWemWrFccJ0DjKyhXO2ePr8q1cn27/fOruhB2x5BBPJXkhgxK5bEOsJ+deHr3R5tedid
+ SMMdWBL2L5xjYKgM=
+X-Received: by 2002:ac8:3844:: with SMTP id r4mr29502507qtb.32.1588104312201; 
+ Tue, 28 Apr 2020 13:05:12 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKIM2aZOSVuI2kcKN1DseMpwgNmpU391VOAikAbuGAb5n1d6rmkgC6htMuARMNPfMcrEult0g==
+X-Received: by 2002:ac8:3844:: with SMTP id r4mr29502436qtb.32.1588104311486; 
+ Tue, 28 Apr 2020 13:05:11 -0700 (PDT)
+Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id k127sm14106585qkb.35.2020.04.28.13.05.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Apr 2020 13:05:10 -0700 (PDT)
+From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v22 0/4]  implement zstd cluster compression method
-Date: Tue, 28 Apr 2020 23:00:09 +0300
-Message-Id: <20200428200013.24474-1-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-Received-SPF: pass client-ip=185.231.240.75;
- envelope-from=dplotnikov@virtuozzo.com; helo=relay.sw.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 16:00:30
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Received-From: 185.231.240.75
+Subject: [PATCH RFC v2 3/9] memory: Introduce log_sync_global() to memory
+ listener
+Date: Tue, 28 Apr 2020 16:05:03 -0400
+Message-Id: <20200428200509.13150-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200428195707.11980-1-peterx@redhat.com>
+References: <20200428195707.11980-1-peterx@redhat.com>
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=peterx@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 02:16:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -58,172 +105,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: pbonzini@redhat.com, dgilbert@redhat.com, Peter Xu <peterx@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v22:
-   03: remove assignemnt in if condition
+Some of the memory listener may want to do log synchronization without
+being able to specify a range of memory to sync but always globally.
+Such a memory listener should provide this new method instead of the
+log_sync() method.
 
-v21:
-   03:
-       * remove the loop on compression [Max]
-       * use designated initializers [Max]
-   04:
-       * don't erase user's options [Max]
-       * use _rm_test_img [Max]
-       * add unsupported qcow2 options [Max]
+Obviously we can also achieve similar thing when we put the global
+sync logic into a log_sync() handler. However that's not efficient
+enough because otherwise memory_global_dirty_log_sync() may do the
+global sync N times, where N is the number of flat ranges in the
+address space.
 
-v20:
-   04: fix a number of flaws [Vladimir]
-       * don't use $RAND_FILE passing to qemu-io,
-         so check $TEST_DIR is redundant
-       * re-arrage $RAND_FILE writing
-       * fix a typo
+Make this new method be exclusive to log_sync().
 
-v19:
-   04: fix a number of flaws [Eric]
-       * remove rudundant test case descriptions
-       * fix stdout redirect
-       * don't use (())
-       * use peek_file_be instead of od
-       * check $TEST_DIR for spaces and other before using
-       * use $RAND_FILE safer
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ include/exec/memory.h | 12 ++++++++++++
+ memory.c              | 33 +++++++++++++++++++++++----------
+ 2 files changed, 35 insertions(+), 10 deletions(-)
 
-v18:
-   * 04: add quotes to all file name variables [Vladimir] 
-   * 04: add Vladimir's comment according to "qemu-io write -s"
-         option issue.
-
-v17:
-   * 03: remove incorrect comment in zstd decompress [Vladimir]
-   * 03: remove "paraniod" and rewrite the comment on decompress [Vladimir]
-   * 03: fix dead assignment [Vladimir]
-   * 04: add and remove quotes [Vladimir]
-   * 04: replace long offset form with the short one [Vladimir]
-
-v16:
-   * 03: ssize_t for ret, size_t for zstd_ret [Vladimir]
-   * 04: small fixes according to the comments [Vladimir] 
-
-v15:
-   * 01: aiming qemu 5.1 [Eric]
-   * 03: change zstd_res definition place [Vladimir]
-   * 04: add two new test cases [Eric]
-         1. test adjacent cluster compression with zstd
-         2. test incompressible cluster processing
-   * 03, 04: many rewording and gramma fixing [Eric]
-
-v14:
-   * fix bug on compression - looping until compress == 0 [Me]
-   * apply reworked Vladimir's suggestions:
-      1. not mixing ssize_t with size_t
-      2. safe check for ENOMEM in compression part - avoid overflow
-      3. tolerate sanity check allow zstd to make progress only
-         on one of the buffers
-v13:
-   * 03: add progress sanity check to decompression loop [Vladimir]
-     03: add successful decompression check [Me]
-
-v12:
-   * 03: again, rework compression and decompression loops
-         to make them more correct [Vladimir]
-     03: move assert in compression to more appropriate place
-             [Vladimir]
-v11:
-   * 03: the loops don't need "do{}while" form anymore and
-         the they were buggy (missed "do" in the beginning)
-         replace them with usual "while(){}" loops [Vladimir]
-v10:
-   * 03: fix zstd (de)compressed loops for multi-frame
-         cases [Vladimir]
-v9:
-   * 01: fix error checking and reporting in qcow2_amend compression type part [Vladimir]
-   * 03: replace asserts with -EIO in qcow2_zstd_decompression [Vladimir, Alberto]
-   * 03: reword/amend/add comments, fix typos [Vladimir]
-
-v8:
-   * 03: switch zstd API from simple to stream [Eric]
-         No need to state a special cluster layout for zstd
-         compressed clusters.
-v7:
-   * use qapi_enum_parse instead of the open-coding [Eric]
-   * fix wording, typos and spelling [Eric]
-
-v6:
-   * "block/qcow2-threads: fix qcow2_decompress" is removed from the series
-      since it has been accepted by Max already
-   * add compile time checking for Qcow2Header to be a multiple of 8 [Max, Alberto]
-   * report error on qcow2 amending when the compression type is actually chnged [Max]
-   * remove the extra space and the extra new line [Max]
-   * re-arrange acks and signed-off-s [Vladimir]
-
-v5:
-   * replace -ENOTSUP with abort in qcow2_co_decompress [Vladimir]
-   * set cluster size for all test cases in the beginning of the 287 test
-
-v4:
-   * the series is rebased on top of 01 "block/qcow2-threads: fix qcow2_decompress"
-   * 01 is just a no-change resend to avoid extra dependencies. Still, it may be merged in separate
-
-v3:
-   * remove redundant max compression type value check [Vladimir, Eric]
-     (the switch below checks everything)
-   * prevent compression type changing on "qemu-img amend" [Vladimir]
-   * remove zstd config setting, since it has been added already by
-     "migration" patches [Vladimir]
-   * change the compression type error message [Vladimir] 
-   * fix alignment and 80-chars exceeding [Vladimir]
-
-v2:
-   * rework compression type setting [Vladimir]
-   * squash iotest changes to the compression type introduction patch [Vladimir, Eric]
-   * fix zstd availability checking in zstd iotest [Vladimir]
-   * remove unnecessry casting [Eric]
-   * remove rudundant checks [Eric]
-   * fix compressed cluster layout in qcow2 spec [Vladimir]
-   * fix wording [Eric, Vladimir]
-   * fix compression type filtering in iotests [Eric]
-
-v1:
-   the initial series
-
-Denis Plotnikov (4):
-  qcow2: introduce compression type feature
-  qcow2: rework the cluster compression routine
-  qcow2: add zstd cluster compression
-  iotests: 287: add qcow2 compression type test
-
- docs/interop/qcow2.txt           |   1 +
- configure                        |   2 +-
- qapi/block-core.json             |  23 ++-
- block/qcow2.h                    |  20 ++-
- include/block/block_int.h        |   1 +
- block/qcow2-threads.c            | 240 +++++++++++++++++++++++++++++--
- block/qcow2.c                    | 120 ++++++++++++++++
- slirp                            |   2 +-
- tests/qemu-iotests/031.out       |  14 +-
- tests/qemu-iotests/036.out       |   4 +-
- tests/qemu-iotests/049.out       | 102 ++++++-------
- tests/qemu-iotests/060.out       |   1 +
- tests/qemu-iotests/061.out       |  34 +++--
- tests/qemu-iotests/065           |  28 ++--
- tests/qemu-iotests/080           |   2 +-
- tests/qemu-iotests/144.out       |   4 +-
- tests/qemu-iotests/182.out       |   2 +-
- tests/qemu-iotests/242.out       |   5 +
- tests/qemu-iotests/255.out       |   8 +-
- tests/qemu-iotests/287           | 152 ++++++++++++++++++++
- tests/qemu-iotests/287.out       |  67 +++++++++
- tests/qemu-iotests/common.filter |   3 +-
- tests/qemu-iotests/group         |   1 +
- 23 files changed, 727 insertions(+), 109 deletions(-)
- create mode 100755 tests/qemu-iotests/287
- create mode 100644 tests/qemu-iotests/287.out
-
--- 
-2.17.0
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index e000bd2f97..c0c6155ca0 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -533,6 +533,18 @@ struct MemoryListener {
+      */
+     void (*log_sync)(MemoryListener *listener, MemoryRegionSection *sectio=
+n);
+=20
++    /**
++     * @log_sync_global:
++     *
++     * This is the global version of @log_sync when the listener does
++     * not have a way to synchronize the log with finer granularity.
++     * When the listener registers with @log_sync_global defined, then
++     * its @log_sync must be NULL.  Vice versa.
++     *
++     * @listener: The #MemoryListener.
++     */
++    void (*log_sync_global)(MemoryListener *listener);
++
+     /**
+      * @log_clear:
+      *
+diff --git a/memory.c b/memory.c
+index 357f7276ee..2a704996c2 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2047,6 +2047,10 @@ void memory_region_set_dirty(MemoryRegion *mr, hwadd=
+r addr,
+                                         memory_region_get_dirty_log_mask(m=
+r));
+ }
+=20
++/*
++ * If memory region `mr' is NULL, do global sync.  Otherwise, sync
++ * dirty bitmap for the specified memory region.
++ */
+ static void memory_region_sync_dirty_bitmap(MemoryRegion *mr)
+ {
+     MemoryListener *listener;
+@@ -2060,18 +2064,24 @@ static void memory_region_sync_dirty_bitmap(MemoryR=
+egion *mr)
+      * address space once.
+      */
+     QTAILQ_FOREACH(listener, &memory_listeners, link) {
+-        if (!listener->log_sync) {
+-            continue;
+-        }
+-        as =3D listener->address_space;
+-        view =3D address_space_get_flatview(as);
+-        FOR_EACH_FLAT_RANGE(fr, view) {
+-            if (fr->dirty_log_mask && (!mr || fr->mr =3D=3D mr)) {
+-                MemoryRegionSection mrs =3D section_from_flat_range(fr, vi=
+ew);
+-                listener->log_sync(listener, &mrs);
++        if (listener->log_sync) {
++            as =3D listener->address_space;
++            view =3D address_space_get_flatview(as);
++            FOR_EACH_FLAT_RANGE(fr, view) {
++                if (fr->dirty_log_mask && (!mr || fr->mr =3D=3D mr)) {
++                    MemoryRegionSection mrs =3D section_from_flat_range(fr=
+, view);
++                    listener->log_sync(listener, &mrs);
++                }
+             }
++            flatview_unref(view);
++        } else if (listener->log_sync_global) {
++            /*
++             * No matter whether MR is specified, what we can do here
++             * is to do a global sync, because we are not capable to
++             * sync in a finer granularity.
++             */
++            listener->log_sync_global(listener);
+         }
+-        flatview_unref(view);
+     }
+ }
+=20
+@@ -2758,6 +2768,9 @@ void memory_listener_register(MemoryListener *listene=
+r, AddressSpace *as)
+ {
+     MemoryListener *other =3D NULL;
+=20
++    /* Only one of them can be defined for a listener */
++    assert(!(listener->log_sync && listener->log_sync_global));
++
+     listener->address_space =3D as;
+     if (QTAILQ_EMPTY(&memory_listeners)
+         || listener->priority >=3D QTAILQ_LAST(&memory_listeners)->priorit=
+y) {
+--=20
+2.24.1
 
 
