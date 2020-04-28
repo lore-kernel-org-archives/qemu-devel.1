@@ -2,124 +2,70 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67E03C83001
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 13:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC15C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 13:44:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37311206D6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 13:37:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="UrPLIhvV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37311206D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 912E3206B9
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 13:44:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 912E3206B9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTQQg-0002Gw-9W
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 09:37:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36370)
+	id 1jTQX8-000827-LA
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 09:44:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37466)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jTQO6-0005af-D0
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 09:35:03 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jTQWT-0007Kr-8J
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 09:43:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jTQO5-0007Ki-7t
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 09:35:02 -0400
-Received: from mail-eopbgr140123.outbound.protection.outlook.com
- ([40.107.14.123]:55975 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jTQNy-0007Id-Fl; Tue, 28 Apr 2020 09:34:54 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kFNDDb/ybPliNVDjjiixcJigYYkkkwgicDm3g6BR5AufbJ8G0BPKepNmmMhlsLEW6BVQj9g41ZsoL2vQLR2fW3iTs9+ih6wggMwg6YhCvPP5OigArzOAyGb7Jqo/iQ3HBLyxQU3vQJv6nRQSu3lmv5BRZXo+Lxmx8jYbwDqHvFMoPlU06fI3L4nBXalWO/Nwb3nlee0qhF6XDsSS5aPQQs1lXjenorPNh00p9YfA0vYLRXdWQBXZvN6bnapenh8oUzvuXfv2doy/Wq8jUTpvNYo7jTwsEgqfDmyN9UnIgeqeAuM3vgNJwxEl3TOhrBU4Tq25a+pXSOSyw6zUP7aXOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J7IEGIQMUhEfSfEOitrtYLbFGW7gkyhYrHtBkMl7oU4=;
- b=AUtLlGcHpzq03yyph4BoPi5yu1iV4IYuhFZodaxAMdEgdatupWBRET5Rp1R55OnSMAluroRzDtgvai4D4iAJIuocJbgyOUmBgDyOFa0NICxLSRxG2ryYgNSzEZVZOrd1DEsqjrkMUvhE4kwS57Q0mTVj7VWZbpQUBN9mwlyNz+ob6QzCD4XOfxkLgu2mZzoG4QoDbO7SQ8/LPNqsqpj2i/KlpXbS4XzYJsVjQL9xH1k74WkvsRx+lvbfBF5V8LarCAXGxRWKxcUHMWW0mN1940u90Rq2Tn2phHiNTaLdyFKIoT07/b1o4WpSgKWHyz+R7H7MpkQS2uWctZba8rBa7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J7IEGIQMUhEfSfEOitrtYLbFGW7gkyhYrHtBkMl7oU4=;
- b=UrPLIhvVX1RCB0PVC9vkU4HV+R0rUsm+1f7LCKjlf0kWATYcPIQoUoobRSMZ2O8jGc4RQlFtsXtWn1nSolfWBfK85ysQ00y5V3aimBlpT2oXTdpI75cPDo6xly4Arr2D7HhX3Ab+ykDrVjjDwH8HepmZEhj7WmkS1+G3xPrOeoE=
-Authentication-Results: igalia.com; dkim=none (message not signed)
- header.d=none;igalia.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (2603:10a6:208:ff::27)
- by AM0PR08MB4227.eurprd08.prod.outlook.com (2603:10a6:208:13d::14)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19; Tue, 28 Apr
- 2020 13:34:51 +0000
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::95e6:1da8:1244:d16f]) by AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::95e6:1da8:1244:d16f%4]) with mapi id 15.20.2937.023; Tue, 28 Apr 2020
- 13:34:50 +0000
-Subject: Re: [PATCH v20 4/4] iotests: 287: add qcow2 compression type test
-To: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200421081117.7595-1-dplotnikov@virtuozzo.com>
- <20200421081117.7595-5-dplotnikov@virtuozzo.com>
- <c0fdc097-dabd-4661-fce9-a63a24a8d792@redhat.com>
- <64471c60-6bdd-fc7a-2dec-ff480137fec8@virtuozzo.com>
- <f96f8020-2c39-3676-3bff-d35038f6e3df@redhat.com>
- <639fc953-3e01-6ff8-460e-5f571ffca48f@redhat.com>
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <ddd2c369-af24-e6c4-14a1-4d7beb294c82@virtuozzo.com>
-Date: Tue, 28 Apr 2020 16:34:47 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <639fc953-3e01-6ff8-460e-5f571ffca48f@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: AM3PR05CA0117.eurprd05.prod.outlook.com
- (2603:10a6:207:2::19) To AM0PR08MB3745.eurprd08.prod.outlook.com
- (2603:10a6:208:ff::27)
+ (envelope-from <no-reply@patchew.org>) id 1jTQWD-0003Z3-OY
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 09:43:40 -0400
+Resent-Date: Tue, 28 Apr 2020 09:43:39 -0400
+Resent-Message-Id: <E1jTQWD-0003Z3-OY@eggs.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21742)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jTQS0-0001xN-2L; Tue, 28 Apr 2020 09:39:04 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1588081135; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=b0Y9ix4pLM4Qq86v0T3mDtLfYYpSq+W6a16hG+6kPh00kumaQZSEs2xwxfVKi0kn6i50RpBHDUB4t+vvy26yIJTBD4hexfJvQQAr1j2Hr2PdGoox0hXC9aJdJDibQuNbhEWzgq6lmoj2iIsYFgX7i7jo6+JSo2PoXGyVB5U8c7Q=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1588081135;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=IBEesiWM82fp4fHIKGUafdJ5DlWpgK1kIMSkDG/Oy6Y=; 
+ b=fSOc1PyRA6Xb3XjJnF39dR5Q8OsZGDIGB0Qs/rIri8yP3hkDZDH/zFw7rTHTg7j261aEaeEHYBeNzLFq30WuUF9JN9rv2BHaacT7dHb8kfYjxVC0S+1N98QRt1nfxKUfuuQjXc53GgT7Adui4hUjlzqjJhBEAzxopNMNhmNFvOA=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 158808113454551.6063730957992;
+ Tue, 28 Apr 2020 06:38:54 -0700 (PDT)
+In-Reply-To: <20200428132629.796753-1-mreitz@redhat.com>
+Subject: Re: [PATCH 0/4] block: Do not call BlockDriver.bdrv_make_empty()
+ directly
+Message-ID: <158808113321.30407.2614862410102124566@39012742ff91>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.64] (178.34.151.204) by
- AM3PR05CA0117.eurprd05.prod.outlook.com (2603:10a6:207:2::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2937.13 via Frontend Transport; Tue, 28 Apr 2020 13:34:49 +0000
-X-Originating-IP: [178.34.151.204]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d6df4b13-8e77-47b9-90b8-08d7eb78ed46
-X-MS-TrafficTypeDiagnostic: AM0PR08MB4227:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM0PR08MB4227C47A98D2BB71DA8653DDCFAC0@AM0PR08MB4227.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3383;
-X-Forefront-PRVS: 0387D64A71
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM0PR08MB3745.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(346002)(366004)(39840400004)(396003)(136003)(5660300002)(16576012)(110136005)(66946007)(66556008)(4744005)(31686004)(316002)(66476007)(2616005)(956004)(2906002)(31696002)(6486002)(52116002)(26005)(36756003)(8676002)(186003)(8936002)(16526019)(4326008)(81156014)(86362001)(53546011)(478600001);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 47/EDQQqk8BdyHo4ZZIn6Xd9lDtaDg9HRRsKtSZGF1kFBKiwp5Mg2+l1VUN0DrE06+0BxJiiSPFj4JzKlNknV04OWOCD5hlBgi2PP3DW1FQJjxHMXZRnHl0tnG9uBJPQHPNQXKdZAcLhPCsc4RFJ8G1OO2fdc5umiGM7TnLVRxPlYDY34Hw8ilUw8CrFjDk9F5f3Objh8XdZ2J+Pvpe4z7RygmRxekmEPbVjHNhBqnvxD2XGLaRW2evbRM/25TO2WI+R53HgAZa0SFfHwbNb2qK4s3CXbctNrVgzCv0NBTPVb4JXfDc9FgtZLoB6EZYKX6wWD/YEz0iEAqmInThRS4DMkIJILUaNV0xSnR816FtoRVjuxWOiDBpzhDtsiRf/v2ob4vpCmnrJmUxNT6Yq4g+8Q5RU/7pwcabhQVezxEbpdtCCH3CBFGeh2ASdTRev
-X-MS-Exchange-AntiSpam-MessageData: 0s4bsxvWVLM5Bdm5LvtqMyu4yWSfo6LslFr28+52SGz6IE3sb82bOkRZQXNVvh9yuRGAGO2Ar4Dwf1nBJ8toWGFtbpzx5BHQeQmFn52uhcbevMvvzC9V57CV41ncLu3Ix/Q1USUrMacoN0aOBtlqkH7fkauYQTo4ueCPEkV3Dmsmn+I0ZXDCESicIKbuWMxo/DHeFxJV//Q/Me/6M2GxSIj7qlbUC9Tn3OHUJiVgS4vcJQFix2MZHdsNv+00Z6ypFImV3lHir8fJoPRixMWtascZhWsDVUl2TeB7W2N15wJIueRiEF5UJ3zT1gAWR/mO6nly0ChRe5b+QLF/doAybsm/1sejdw/s02OWgoLrEkJ4BncFz96cY8OCObCL4ah4ipyCeCcqF+pS7XA+TgjF9wM2X3ePTaWWKyZwVnkDT59/VWFAEVHQ87ZUHVBDPSkwiA0Q8vNITmiUgxEY1/dBBWSGcmQj6N7PzCNhcyCZ3SAZwTAPF+vjMe4TEWBbmUompUxd3cJ56uCyjQRnPAFqQ3n9oZr3dGdRuBj1dyJsVhMyvjwh6UmEORBrXY7aD2uyQ+550y6Qc1REps7Rtxt8o+Ox4rNHDGg4iI1wQ/qEJdC4sdq6V9m6tVzKOkN0UOzKHPWL2kCcb3hGsiZf/gygQ6pPsMsBS3DHlSXkZ4/5UY+vuwVqgPygl+UTbSupfdBKzfn6kn8iCE2dBLyEuXSE+zaU6RbtcHJwaIZNFbSNl4Ff3GmOZ2k1IzQdrac9kxFWku0COgeva6xIZRV9UZbBKljHwcLOrmCOcEHJ9Oo+lUs=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d6df4b13-8e77-47b9-90b8-08d7eb78ed46
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2020 13:34:50.7740 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: J5G5DrYBHYgYbK9f9bGZCj3npxr+LibLpqByQOKdUN+LID2UJqPt/4cgyELkjmEUZw2Z/+XRUz/ErtZ+3/fL2MfWpTS5tHkYaTf1+WYZIew=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4227
-Received-SPF: pass client-ip=40.107.14.123;
- envelope-from=dplotnikov@virtuozzo.com;
- helo=EUR01-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 09:34:52
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.14.123
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mreitz@redhat.com
+Date: Tue, 28 Apr 2020 06:38:54 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 09:39:01
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Received-From: 136.143.188.57
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,41 +77,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-block@nongnu.org, armbru@redhat.com, den@openvz.org
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 28.04.2020 16:01, Eric Blake wrote:
-> On 4/28/20 7:55 AM, Max Reitz wrote:
->
->>>>> +# This tests qocw2-specific low-level functionality
->>>>> +_supported_fmt qcow2
->>>>> +_supported_proto file
->>>>> +_supported_os Linux
->>>> This test doesn’t work with compat=0.10 (because we can’t store a
->>>> non-default compression type there) or data_file (because those don’t
->>>> support compression), so those options should be marked as 
->>>> unsupported.
->>>>
->>>> (It does seem to work with any refcount_bits, though.)
->>>
->>> Could I ask how to achieve that?
->>> I can't find any _supported_* related.
->>
->>
->> It’s _unsupported_imgopts.
->
-> Test 036 is an example of this.
-Max, Eric
-
-Thanks!
-
-Denis
->
->
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQyODEzMjYyOS43OTY3
+NTMtMS1tcmVpdHpAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGFz
+YW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWly
+IG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9i
+YWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
+YmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEg
+TkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9
+eDg2XzY0LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAg
+U0lHTiAgICBwYy1iaW9zL29wdGlvbnJvbS9rdm12YXBpYy5iaW4KICBCVUlMRCAgIHBjLWJpb3Mv
+b3B0aW9ucm9tL3B2aC5yYXcKICBTSUdOICAgIHBjLWJpb3Mvb3B0aW9ucm9tL3B2aC5iaW4KL3Rt
+cC9xZW11LXRlc3Qvc3JjL3FlbXUtaW1nLmM6MTA3MToyNzogZXJyb3I6IGltcGxpY2l0IGRlY2xh
+cmF0aW9uIG9mIGZ1bmN0aW9uICdibGtfbmV3X3dpdGhfYnMnIGlzIGludmFsaWQgaW4gQzk5IFst
+V2Vycm9yLC1XaW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAgICAgICAgb2xkX2JhY2tp
+bmdfYmxrID0gYmxrX25ld193aXRoX2JzKGJzLCBCTEtfUEVSTV9XUklURSwgQkxLX1BFUk1fQUxM
+LAogICAgICAgICAgICAgICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3FlbXUtaW1n
+LmM6MTA3MToyNzogZXJyb3I6IHRoaXMgZnVuY3Rpb24gZGVjbGFyYXRpb24gaXMgbm90IGEgcHJv
+dG90eXBlIFstV2Vycm9yLC1Xc3RyaWN0LXByb3RvdHlwZXNdCi90bXAvcWVtdS10ZXN0L3NyYy9x
+ZW11LWltZy5jOjEwNzE6MjU6IGVycm9yOiBpbmNvbXBhdGlibGUgaW50ZWdlciB0byBwb2ludGVy
+IGNvbnZlcnNpb24gYXNzaWduaW5nIHRvICdCbG9ja0JhY2tlbmQgKicgKGFrYSAnc3RydWN0IEJs
+b2NrQmFja2VuZCAqJykgZnJvbSAnaW50JyBbLVdlcnJvciwtV2ludC1jb252ZXJzaW9uXQogICAg
+ICAgIG9sZF9iYWNraW5nX2JsayA9IGJsa19uZXdfd2l0aF9icyhicywgQkxLX1BFUk1fV1JJVEUs
+IEJMS19QRVJNX0FMTCwKICAgICAgICAgICAgICAgICAgICAgICAgXiB+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CjMgZXJyb3JzIGdlbmVyYXRlZC4KbWFr
+ZTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBxZW11LWltZy5vXSBFcnJv
+ciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uClRyYWNlYmFjayAo
+bW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHki
+LCBsaW5lIDY2NCwgaW4gPG1vZHVsZT4KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3Io
+cmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydz
+dWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5j
+ZS51dWlkPTE4OTZkMmIxZjEwNDQwOTFiODMyYmUzMTNkNjZhYzZlJywgJy11JywgJzEwMDMnLCAn
+LS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFS
+R0VUX0xJU1Q9eDg2XzY0LXNvZnRtbXUnLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9Jywg
+Jy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5W
+PScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRj
+aGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12Jywg
+Jy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1mcWw5dGk1aC9zcmMvZG9ja2VyLXNyYy4yMDIw
+LTA0LTI4LTA5LjM0LjAwLjUzMzI6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywg
+Jy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtZGVidWcnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhp
+dCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9
+MTg5NmQyYjFmMTA0NDA5MWI4MzJiZTMxM2Q2NmFjNmUKbWFrZVsxXTogKioqIFtkb2NrZXItcnVu
+XSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRl
+c3Rlci10bXAtZnFsOXRpNWgvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1kZWJ1Z0Bm
+ZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgNG00NC4xOTRzCnVzZXIgICAgMG04LjA4NHMKCgpUaGUg
+ZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNDI4
+MTMyNjI5Ljc5Njc1My0xLW1yZWl0ekByZWRoYXQuY29tL3Rlc3RpbmcuYXNhbi8/dHlwZT1tZXNz
+YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAcmVkaGF0LmNvbQ==
 
