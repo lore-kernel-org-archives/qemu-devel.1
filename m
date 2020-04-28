@@ -2,78 +2,73 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA683C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 16:48:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B18C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 16:48:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E41F2063A
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 16:48:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1753B2063A
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 16:48:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N+yhruKv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E41F2063A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JgTr+kqR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1753B2063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTTOs-0006m1-AN
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 12:48:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34372)
+	id 1jTTP0-00077d-38
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 12:48:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34338)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jTTFD-0006gl-HX
+ (envelope-from <armbru@redhat.com>) id 1jTTF9-0006Xa-0H
  for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:38:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jTTBm-0000sp-QN
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:38:03 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57353
+ (envelope-from <armbru@redhat.com>) id 1jTTBl-0000s5-Fc
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:37:58 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34551
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jTTBm-0000sA-5b
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:34:30 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jTTBl-0000rh-01
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:34:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588091669;
+ s=mimecast20190719; t=1588091668;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=g7Z8Bpz+o6QBfvAeZB0OddicG3+uz1QIygnr8RDeDGo=;
- b=N+yhruKvqjZ8bm9w7Akz6tqCapsfzZTW7xeTaTY3yVPjS8t+Wuwzw+aHwvAtWa+MlOfV8m
- UL9nPsp/M/hrTl41msZbSQQtj06hJ47ks57XgLlUe/ZCkIYHngl5fi8KFWpIi1wE8JfaQA
- gRNcFTlOXQivpZDxkR27AB8zuvYpHts=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=l5gCU16OjuE/K0Y1j6H/vrc4tbSr6SVVVljlpxRPzgk=;
+ b=JgTr+kqRZ614BlHk0+GSvY2zOc2G+JYe1pmZwZsyIk4ThwbSNUTJJbaB0IVvglAJi8e4R0
+ Q8NkPrF+mjs89F+FCp+85B3BKckC9Qnztu4klHV3VwIkmqw8cJvlHg/j/Hg9I98X5feKix
+ J1gt7/ywDg5h0mRHiWryo41UgjGQH34=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-446-XVAYkOi_Nkyo_1m3SOWCvA-1; Tue, 28 Apr 2020 12:34:27 -0400
-X-MC-Unique: XVAYkOi_Nkyo_1m3SOWCvA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-244-wQessxZSMqWX4JS9h1mlkQ-1; Tue, 28 Apr 2020 12:34:26 -0400
+X-MC-Unique: wQessxZSMqWX4JS9h1mlkQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFE881895944
- for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 16:34:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 202E9107B7C8
+ for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 16:34:25 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A87B66083;
- Tue, 28 Apr 2020 16:34:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 904A828564;
+ Tue, 28 Apr 2020 16:34:21 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0DDD911358C1; Tue, 28 Apr 2020 18:34:20 +0200 (CEST)
+ id F1CD611358BC; Tue, 28 Apr 2020 18:34:19 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 05/17] qom: Make all the object_property_add_FOO() return the
- property
-Date: Tue, 28 Apr 2020 18:34:07 +0200
-Message-Id: <20200428163419.4483-6-armbru@redhat.com>
-In-Reply-To: <20200428163419.4483-1-armbru@redhat.com>
-References: <20200428163419.4483-1-armbru@redhat.com>
+Subject: [PATCH 00/17] qom: Spring cleaning
+Date: Tue, 28 Apr 2020 18:34:02 +0200
+Message-Id: <20200428163419.4483-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
@@ -96,667 +91,317 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some object_property_add_FOO() return the newly added property, some
-don't.  Clean that up.
+Includes one actual bug fix for s390x.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- include/qom/object.h |  50 ++++++---
- qom/object.c         | 250 ++++++++++++++++++++++---------------------
- 2 files changed, 164 insertions(+), 136 deletions(-)
+Markus Armbruster (17):
+  qom: Clearer reference counting in object_initialize_childv()
+  qom: Clean up inconsistent use of gchar * vs. char *
+  qom: Drop object_property_del_child()'s unused parameter @errp
+  qom: Change object_property_get_uint16List() to match its doc
+  qom: Make all the object_property_add_FOO() return the property
+  qom: Drop object_property_set_description() parameter @errp
+  tests/check-qom-proplist: Improve iterator coverage
+  s390x/cpumodel: Fix UI to CPU features pcc-cmac-{aes,eaes}-256
+  hw/isa/superio: Make the components QOM children
+  e1000: Don't run e1000_instance_init() twice
+  hw/arm/bcm2835: Drop futile attempts at QOM-adopting memory
+  qdev: Clean up qdev_connect_gpio_out_named()
+  qom: Drop parameter @errp of object_property_add() & friends
+  Drop more @errp parameters after previous commit
+  qdev: Unrealize must not fail
+  spapr_pci: Drop some dead error handling
+  qom: Drop @errp parameter of object_property_del()
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 5d1ed672c3..26e9f13a17 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -1505,9 +1505,11 @@ Object *object_resolve_path_component(Object *parent=
-, const char *part);
-  * The value of a child property as a C string will be the child object's
-  * canonical path. It can be retrieved using object_property_get_str().
-  * The child object itself can be retrieved using object_property_get_link=
-().
-+ *
-+ * Returns: The newly added property on success, or %NULL on failure.
-  */
--void object_property_add_child(Object *obj, const char *name,
--                               Object *child, Error **errp);
-+ObjectProperty *object_property_add_child(Object *obj, const char *name,
-+                                          Object *child, Error **errp);
-=20
- typedef enum {
-     /* Unref the link pointer when the property is deleted */
-@@ -1556,8 +1558,10 @@ void object_property_allow_set_link(const Object *, =
-const char *,
-  * <code>@flags</code> <code>OBJ_PROP_LINK_STRONG</code> bit is set,
-  * the reference count is decremented when the property is deleted or
-  * modified.
-+ *
-+ * Returns: The newly added property on success, or %NULL on failure.
-  */
--void object_property_add_link(Object *obj, const char *name,
-+ObjectProperty *object_property_add_link(Object *obj, const char *name,
-                               const char *type, Object **targetp,
-                               void (*check)(const Object *obj, const char =
-*name,
-                                             Object *val, Error **errp),
-@@ -1583,8 +1587,10 @@ ObjectProperty *object_class_property_add_link(Objec=
-tClass *oc,
-  *
-  * Add a string property using getters/setters.  This function will add a
-  * property of type 'string'.
-+ *
-+ * Returns: The newly added property on success, or %NULL on failure.
-  */
--void object_property_add_str(Object *obj, const char *name,
-+ObjectProperty *object_property_add_str(Object *obj, const char *name,
-                              char *(*get)(Object *, Error **),
-                              void (*set)(Object *, const char *, Error **)=
-,
-                              Error **errp);
-@@ -1606,8 +1612,10 @@ ObjectProperty *object_class_property_add_str(Object=
-Class *klass,
-  *
-  * Add a bool property using getters/setters.  This function will add a
-  * property of type 'bool'.
-+ *
-+ * Returns: The newly added property on success, or %NULL on failure.
-  */
--void object_property_add_bool(Object *obj, const char *name,
-+ObjectProperty *object_property_add_bool(Object *obj, const char *name,
-                               bool (*get)(Object *, Error **),
-                               void (*set)(Object *, bool, Error **),
-                               Error **errp);
-@@ -1629,8 +1637,10 @@ ObjectProperty *object_class_property_add_bool(Objec=
-tClass *klass,
-  *
-  * Add an enum property using getters/setters.  This function will add a
-  * property of type '@typename'.
-+ *
-+ * Returns: The newly added property on success, or %NULL on failure.
-  */
--void object_property_add_enum(Object *obj, const char *name,
-+ObjectProperty *object_property_add_enum(Object *obj, const char *name,
-                               const char *typename,
-                               const QEnumLookup *lookup,
-                               int (*get)(Object *, Error **),
-@@ -1654,8 +1664,10 @@ ObjectProperty *object_class_property_add_enum(Objec=
-tClass *klass,
-  *
-  * Add a read-only struct tm valued property using a getter function.
-  * This function will add a property of type 'struct tm'.
-+ *
-+ * Returns: The newly added property on success, or %NULL on failure.
-  */
--void object_property_add_tm(Object *obj, const char *name,
-+ObjectProperty *object_property_add_tm(Object *obj, const char *name,
-                             void (*get)(Object *, struct tm *, Error **),
-                             Error **errp);
-=20
-@@ -1683,8 +1695,10 @@ typedef enum {
-  *
-  * Add an integer property in memory.  This function will add a
-  * property of type 'uint8'.
-+ *
-+ * Returns: The newly added property on success, or %NULL on failure.
-  */
--void object_property_add_uint8_ptr(Object *obj, const char *name,
-+ObjectProperty *object_property_add_uint8_ptr(Object *obj, const char *nam=
-e,
-                                    const uint8_t *v, ObjectPropertyFlags f=
-lags,
-                                    Error **errp);
-=20
-@@ -1704,8 +1718,10 @@ ObjectProperty *object_class_property_add_uint8_ptr(=
-ObjectClass *klass,
-  *
-  * Add an integer property in memory.  This function will add a
-  * property of type 'uint16'.
-+ *
-+ * Returns: The newly added property on success, or %NULL on failure.
-  */
--void object_property_add_uint16_ptr(Object *obj, const char *name,
-+ObjectProperty *object_property_add_uint16_ptr(Object *obj, const char *na=
-me,
-                                     const uint16_t *v,
-                                     ObjectPropertyFlags flags,
-                                     Error **errp);
-@@ -1726,8 +1742,10 @@ ObjectProperty *object_class_property_add_uint16_ptr=
-(ObjectClass *klass,
-  *
-  * Add an integer property in memory.  This function will add a
-  * property of type 'uint32'.
-+ *
-+ * Returns: The newly added property on success, or %NULL on failure.
-  */
--void object_property_add_uint32_ptr(Object *obj, const char *name,
-+ObjectProperty *object_property_add_uint32_ptr(Object *obj, const char *na=
-me,
-                                     const uint32_t *v,
-                                     ObjectPropertyFlags flags,
-                                     Error **errp);
-@@ -1748,8 +1766,10 @@ ObjectProperty *object_class_property_add_uint32_ptr=
-(ObjectClass *klass,
-  *
-  * Add an integer property in memory.  This function will add a
-  * property of type 'uint64'.
-+ *
-+ * Returns: The newly added property on success, or %NULL on failure.
-  */
--void object_property_add_uint64_ptr(Object *obj, const char *name,
-+ObjectProperty *object_property_add_uint64_ptr(Object *obj, const char *na=
-me,
-                                     const uint64_t *v,
-                                     ObjectPropertyFlags flags,
-                                     Error **Errp);
-@@ -1775,8 +1795,10 @@ ObjectProperty *object_class_property_add_uint64_ptr=
-(ObjectClass *klass,
-  * this property exists.  In the case of a child object or an alias on the=
- same
-  * object this will be the case.  For aliases to other objects the caller =
-is
-  * responsible for taking a reference.
-+ *
-+ * Returns: The newly added property on success, or %NULL on failure.
-  */
--void object_property_add_alias(Object *obj, const char *name,
-+ObjectProperty *object_property_add_alias(Object *obj, const char *name,
-                                Object *target_obj, const char *target_name=
-,
-                                Error **errp);
-=20
-@@ -1794,8 +1816,10 @@ void object_property_add_alias(Object *obj, const ch=
-ar *name,
-  * this property exists.  In the case @target is a child of @obj,
-  * this will be the case.  Otherwise, the caller is responsible for
-  * taking a reference.
-+ *
-+ * Returns: The newly added property on success, or %NULL on failure.
-  */
--void object_property_add_const_link(Object *obj, const char *name,
-+ObjectProperty *object_property_add_const_link(Object *obj, const char *na=
-me,
-                                     Object *target, Error **errp);
-=20
- /**
-diff --git a/qom/object.c b/qom/object.c
-index ddb021db21..067bb3186d 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1679,33 +1679,30 @@ static void object_finalize_child_property(Object *=
-obj, const char *name,
-     object_unref(child);
- }
-=20
--void object_property_add_child(Object *obj, const char *name,
--                               Object *child, Error **errp)
-+ObjectProperty *
-+object_property_add_child(Object *obj, const char *name,
-+                          Object *child, Error **errp)
- {
--    Error *local_err =3D NULL;
--    char *type;
-+    g_autofree char *type =3D NULL;
-     ObjectProperty *op;
-=20
-     if (child->parent !=3D NULL) {
-         error_setg(errp, "child object is already parented");
--        return;
-+        return NULL;
-     }
-=20
-     type =3D g_strdup_printf("child<%s>", object_get_typename(OBJECT(child=
-)));
-=20
-     op =3D object_property_add(obj, name, type, object_get_child_property,=
- NULL,
--                             object_finalize_child_property, child, &local=
-_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        goto out;
-+                             object_finalize_child_property, child, errp);
-+    if (!op) {
-+        return NULL;
-     }
-=20
-     op->resolve =3D object_resolve_child_property;
-     object_ref(child);
-     child->parent =3D obj;
--
--out:
--    g_free(type);
-+    return op;
- }
-=20
- void object_property_allow_set_link(const Object *obj, const char *name,
-@@ -1852,16 +1849,16 @@ static void object_release_link_property(Object *ob=
-j, const char *name,
-     }
- }
-=20
--static void object_add_link_prop(Object *obj, const char *name,
--                                 const char *type, void *ptr,
--                                 void (*check)(const Object *, const char =
-*,
--                                               Object *, Error **),
--                                 ObjectPropertyLinkFlags flags,
--                                 Error **errp)
-+static ObjectProperty *
-+object_add_link_prop(Object *obj, const char *name,
-+                     const char *type, void *ptr,
-+                     void (*check)(const Object *, const char *,
-+                                   Object *, Error **),
-+                     ObjectPropertyLinkFlags flags,
-+                     Error **errp)
- {
--    Error *local_err =3D NULL;
-     LinkProperty *prop =3D g_malloc(sizeof(*prop));
--    char *full_type;
-+    g_autofree char *full_type =3D NULL;
-     ObjectProperty *op;
-=20
-     if (flags & OBJ_PROP_LINK_DIRECT) {
-@@ -1879,27 +1876,26 @@ static void object_add_link_prop(Object *obj, const=
- char *name,
-                              check ? object_set_link_property : NULL,
-                              object_release_link_property,
-                              prop,
--                             &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+                             errp);
-+    if (!op) {
-         g_free(prop);
--        goto out;
-+        return NULL;
-     }
-=20
-     op->resolve =3D object_resolve_link_property;
--
--out:
--    g_free(full_type);
-+    return op;
- }
-=20
--void object_property_add_link(Object *obj, const char *name,
--                              const char *type, Object **targetp,
--                              void (*check)(const Object *, const char *,
--                                            Object *, Error **),
--                              ObjectPropertyLinkFlags flags,
--                              Error **errp)
-+ObjectProperty *
-+object_property_add_link(Object *obj, const char *name,
-+                         const char *type, Object **targetp,
-+                         void (*check)(const Object *, const char *,
-+                                       Object *, Error **),
-+                         ObjectPropertyLinkFlags flags,
-+                         Error **errp)
- {
--    object_add_link_prop(obj, name, type, targetp, check, flags, errp);
-+    return object_add_link_prop(obj, name, type, targetp, check, flags,
-+                                errp);
- }
-=20
- ObjectProperty *
-@@ -1941,11 +1937,13 @@ out:
-     return op;
- }
-=20
--void object_property_add_const_link(Object *obj, const char *name,
--                                    Object *target, Error **errp)
-+ObjectProperty *
-+object_property_add_const_link(Object *obj, const char *name,
-+                               Object *target, Error **errp)
- {
--    object_add_link_prop(obj, name, object_get_typename(target), target,
--                         NULL, OBJ_PROP_LINK_DIRECT, errp);
-+    return object_add_link_prop(obj, name,
-+                                object_get_typename(target), target,
-+                                NULL, OBJ_PROP_LINK_DIRECT, errp);
- }
-=20
- char *object_get_canonical_path_component(Object *obj)
-@@ -2154,26 +2152,27 @@ static void property_release_str(Object *obj, const=
- char *name,
-     g_free(prop);
- }
-=20
--void object_property_add_str(Object *obj, const char *name,
--                           char *(*get)(Object *, Error **),
--                           void (*set)(Object *, const char *, Error **),
--                           Error **errp)
-+ObjectProperty *
-+object_property_add_str(Object *obj, const char *name,
-+                        char *(*get)(Object *, Error **),
-+                        void (*set)(Object *, const char *, Error **),
-+                        Error **errp)
- {
--    Error *local_err =3D NULL;
-     StringProperty *prop =3D g_malloc0(sizeof(*prop));
-+    ObjectProperty *op;
-=20
-     prop->get =3D get;
-     prop->set =3D set;
-=20
--    object_property_add(obj, name, "string",
--                        get ? property_get_str : NULL,
--                        set ? property_set_str : NULL,
--                        property_release_str,
--                        prop, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    op =3D object_property_add(obj, name, "string",
-+                             get ? property_get_str : NULL,
-+                             set ? property_set_str : NULL,
-+                             property_release_str,
-+                             prop, errp);
-+    if (!op) {
-         g_free(prop);
-     }
-+    return op;
- }
-=20
- ObjectProperty *
-@@ -2248,26 +2247,27 @@ static void property_release_bool(Object *obj, cons=
-t char *name,
-     g_free(prop);
- }
-=20
--void object_property_add_bool(Object *obj, const char *name,
--                              bool (*get)(Object *, Error **),
--                              void (*set)(Object *, bool, Error **),
--                              Error **errp)
-+ObjectProperty *
-+object_property_add_bool(Object *obj, const char *name,
-+                         bool (*get)(Object *, Error **),
-+                         void (*set)(Object *, bool, Error **),
-+                         Error **errp)
- {
--    Error *local_err =3D NULL;
-     BoolProperty *prop =3D g_malloc0(sizeof(*prop));
-+    ObjectProperty *op;
-=20
-     prop->get =3D get;
-     prop->set =3D set;
-=20
--    object_property_add(obj, name, "bool",
--                        get ? property_get_bool : NULL,
--                        set ? property_set_bool : NULL,
--                        property_release_bool,
--                        prop, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    op =3D object_property_add(obj, name, "bool",
-+                             get ? property_get_bool : NULL,
-+                             set ? property_set_bool : NULL,
-+                             property_release_bool,
-+                             prop, errp);
-+    if (!op) {
-         g_free(prop);
-     }
-+    return op;
- }
-=20
- ObjectProperty *
-@@ -2334,29 +2334,30 @@ static void property_release_enum(Object *obj, cons=
-t char *name,
-     g_free(prop);
- }
-=20
--void object_property_add_enum(Object *obj, const char *name,
--                              const char *typename,
--                              const QEnumLookup *lookup,
--                              int (*get)(Object *, Error **),
--                              void (*set)(Object *, int, Error **),
--                              Error **errp)
-+ObjectProperty *
-+object_property_add_enum(Object *obj, const char *name,
-+                         const char *typename,
-+                         const QEnumLookup *lookup,
-+                         int (*get)(Object *, Error **),
-+                         void (*set)(Object *, int, Error **),
-+                         Error **errp)
- {
--    Error *local_err =3D NULL;
-     EnumProperty *prop =3D g_malloc(sizeof(*prop));
-+    ObjectProperty *op;
-=20
-     prop->lookup =3D lookup;
-     prop->get =3D get;
-     prop->set =3D set;
-=20
--    object_property_add(obj, name, typename,
--                        get ? property_get_enum : NULL,
--                        set ? property_set_enum : NULL,
--                        property_release_enum,
--                        prop, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    op =3D object_property_add(obj, name, typename,
-+                             get ? property_get_enum : NULL,
-+                             set ? property_set_enum : NULL,
-+                             property_release_enum,
-+                             prop, errp);
-+    if (!op) {
-         g_free(prop);
-     }
-+    return op;
- }
-=20
- ObjectProperty *
-@@ -2447,23 +2448,24 @@ static void property_release_tm(Object *obj, const =
-char *name,
-     g_free(prop);
- }
-=20
--void object_property_add_tm(Object *obj, const char *name,
--                            void (*get)(Object *, struct tm *, Error **),
--                            Error **errp)
-+ObjectProperty *
-+object_property_add_tm(Object *obj, const char *name,
-+                       void (*get)(Object *, struct tm *, Error **),
-+                       Error **errp)
- {
--    Error *local_err =3D NULL;
-     TMProperty *prop =3D g_malloc0(sizeof(*prop));
-+    ObjectProperty *op;
-=20
-     prop->get =3D get;
-=20
--    object_property_add(obj, name, "struct tm",
--                        get ? property_get_tm : NULL, NULL,
--                        property_release_tm,
--                        prop, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    op =3D object_property_add(obj, name, "struct tm",
-+                             get ? property_get_tm : NULL, NULL,
-+                             property_release_tm,
-+                             prop, errp);
-+    if (!op) {
-         g_free(prop);
-     }
-+    return op;
- }
-=20
- ObjectProperty *
-@@ -2586,10 +2588,11 @@ static void property_set_uint64_ptr(Object *obj, Vi=
-sitor *v, const char *name,
-     *field =3D value;
- }
-=20
--void object_property_add_uint8_ptr(Object *obj, const char *name,
--                                   const uint8_t *v,
--                                   ObjectPropertyFlags flags,
--                                   Error **errp)
-+ObjectProperty *
-+object_property_add_uint8_ptr(Object *obj, const char *name,
-+                              const uint8_t *v,
-+                              ObjectPropertyFlags flags,
-+                              Error **errp)
- {
-     ObjectPropertyAccessor *getter =3D NULL;
-     ObjectPropertyAccessor *setter =3D NULL;
-@@ -2602,8 +2605,8 @@ void object_property_add_uint8_ptr(Object *obj, const=
- char *name,
-         setter =3D property_set_uint8_ptr;
-     }
-=20
--    object_property_add(obj, name, "uint8",
--                        getter, setter, NULL, (void *)v, errp);
-+    return object_property_add(obj, name, "uint8",
-+                               getter, setter, NULL, (void *)v, errp);
- }
-=20
- ObjectProperty *
-@@ -2627,10 +2630,11 @@ object_class_property_add_uint8_ptr(ObjectClass *kl=
-ass, const char *name,
-                                      getter, setter, NULL, (void *)v, errp=
-);
- }
-=20
--void object_property_add_uint16_ptr(Object *obj, const char *name,
--                                    const uint16_t *v,
--                                    ObjectPropertyFlags flags,
--                                    Error **errp)
-+ObjectProperty *
-+object_property_add_uint16_ptr(Object *obj, const char *name,
-+                               const uint16_t *v,
-+                               ObjectPropertyFlags flags,
-+                               Error **errp)
- {
-     ObjectPropertyAccessor *getter =3D NULL;
-     ObjectPropertyAccessor *setter =3D NULL;
-@@ -2643,8 +2647,8 @@ void object_property_add_uint16_ptr(Object *obj, cons=
-t char *name,
-         setter =3D property_set_uint16_ptr;
-     }
-=20
--    object_property_add(obj, name, "uint16",
--                        getter, setter, NULL, (void *)v, errp);
-+    return object_property_add(obj, name, "uint16",
-+                               getter, setter, NULL, (void *)v, errp);
- }
-=20
- ObjectProperty *
-@@ -2668,10 +2672,11 @@ object_class_property_add_uint16_ptr(ObjectClass *k=
-lass, const char *name,
-                                      getter, setter, NULL, (void *)v, errp=
-);
- }
-=20
--void object_property_add_uint32_ptr(Object *obj, const char *name,
--                                    const uint32_t *v,
--                                    ObjectPropertyFlags flags,
--                                    Error **errp)
-+ObjectProperty *
-+object_property_add_uint32_ptr(Object *obj, const char *name,
-+                               const uint32_t *v,
-+                               ObjectPropertyFlags flags,
-+                               Error **errp)
- {
-     ObjectPropertyAccessor *getter =3D NULL;
-     ObjectPropertyAccessor *setter =3D NULL;
-@@ -2684,8 +2689,8 @@ void object_property_add_uint32_ptr(Object *obj, cons=
-t char *name,
-         setter =3D property_set_uint32_ptr;
-     }
-=20
--    object_property_add(obj, name, "uint32",
--                        getter, setter, NULL, (void *)v, errp);
-+    return object_property_add(obj, name, "uint32",
-+                               getter, setter, NULL, (void *)v, errp);
- }
-=20
- ObjectProperty *
-@@ -2709,10 +2714,11 @@ object_class_property_add_uint32_ptr(ObjectClass *k=
-lass, const char *name,
-                                      getter, setter, NULL, (void *)v, errp=
-);
- }
-=20
--void object_property_add_uint64_ptr(Object *obj, const char *name,
--                                    const uint64_t *v,
--                                    ObjectPropertyFlags flags,
--                                    Error **errp)
-+ObjectProperty *
-+object_property_add_uint64_ptr(Object *obj, const char *name,
-+                               const uint64_t *v,
-+                               ObjectPropertyFlags flags,
-+                               Error **errp)
- {
-     ObjectPropertyAccessor *getter =3D NULL;
-     ObjectPropertyAccessor *setter =3D NULL;
-@@ -2725,8 +2731,8 @@ void object_property_add_uint64_ptr(Object *obj, cons=
-t char *name,
-         setter =3D property_set_uint64_ptr;
-     }
-=20
--    object_property_add(obj, name, "uint64",
--                        getter, setter, NULL, (void *)v, errp);
-+    return object_property_add(obj, name, "uint64",
-+                               getter, setter, NULL, (void *)v, errp);
- }
-=20
- ObjectProperty *
-@@ -2787,19 +2793,19 @@ static void property_release_alias(Object *obj, con=
-st char *name, void *opaque)
-     g_free(prop);
- }
-=20
--void object_property_add_alias(Object *obj, const char *name,
--                               Object *target_obj, const char *target_name=
-,
--                               Error **errp)
-+ObjectProperty *
-+object_property_add_alias(Object *obj, const char *name,
-+                          Object *target_obj, const char *target_name,
-+                          Error **errp)
- {
-     AliasProperty *prop;
-     ObjectProperty *op;
-     ObjectProperty *target_prop;
--    char *prop_type;
--    Error *local_err =3D NULL;
-+    g_autofree char *prop_type =3D NULL;
-=20
-     target_prop =3D object_property_find(target_obj, target_name, errp);
-     if (!target_prop) {
--        return;
-+        return NULL;
-     }
-=20
-     if (object_property_is_child(target_prop)) {
-@@ -2817,12 +2823,12 @@ void object_property_add_alias(Object *obj, const c=
-har *name,
-                              property_get_alias,
-                              property_set_alias,
-                              property_release_alias,
--                             prop, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+                             prop, errp);
-+    if (!op) {
-         g_free(prop);
--        goto out;
-+        return NULL;
-     }
-+
-     op->resolve =3D property_resolve_alias;
-     if (target_prop->defval) {
-         op->defval =3D qobject_ref(target_prop->defval);
-@@ -2831,9 +2837,7 @@ void object_property_add_alias(Object *obj, const cha=
-r *name,
-     object_property_set_description(obj, op->name,
-                                     target_prop->description,
-                                     &error_abort);
--
--out:
--    g_free(prop_type);
-+    return op;
- }
-=20
- void object_property_set_description(Object *obj, const char *name,
+ hw/9pfs/9p.h                        |   2 +-
+ hw/s390x/virtio-ccw.h               |   2 +-
+ hw/sd/sdhci-internal.h              |   2 +-
+ hw/usb/ccid.h                       |   2 +-
+ hw/usb/hcd-ehci.h                   |   2 +-
+ include/hw/acpi/ich9.h              |   2 +-
+ include/hw/ppc/spapr.h              |   2 +-
+ include/hw/qdev-core.h              |   6 +-
+ include/hw/s390x/s390-ccw.h         |   2 +-
+ include/hw/scsi/scsi.h              |   2 +-
+ include/hw/usb.h                    |   2 +-
+ include/hw/xen/xen-block.h          |   2 +-
+ include/hw/xen/xen-bus.h            |   2 +-
+ include/qom/object.h                | 153 ++++-----
+ include/sysemu/sysemu.h             |   2 +-
+ monitor/monitor-internal.h          |   2 +-
+ target/ppc/cpu.h                    |   3 +-
+ target/s390x/cpu_features_def.inc.h |   2 +-
+ accel/kvm/kvm-all.c                 |   8 +-
+ accel/tcg/tcg-all.c                 |   7 +-
+ authz/list.c                        |   5 +-
+ authz/listfile.c                    |   6 +-
+ authz/pamacct.c                     |   3 +-
+ authz/simple.c                      |   3 +-
+ backends/cryptodev-vhost-user.c     |   3 +-
+ backends/cryptodev.c                |   2 +-
+ backends/dbus-vmstate.c             |   6 +-
+ backends/hostmem-file.c             |  11 +-
+ backends/hostmem-memfd.c            |  17 +-
+ backends/hostmem.c                  |  35 +-
+ backends/rng-egd.c                  |   3 +-
+ backends/rng-random.c               |   3 +-
+ backends/rng.c                      |   3 +-
+ backends/vhost-user.c               |   2 +-
+ block/throttle-groups.c             |   6 +-
+ bootdevice.c                        |  10 +-
+ chardev/char-socket.c               |   4 +-
+ chardev/char.c                      |   7 +-
+ crypto/secret.c                     |  18 +-
+ crypto/tlscreds.c                   |  12 +-
+ crypto/tlscredsanon.c               |   3 +-
+ crypto/tlscredspsk.c                |   6 +-
+ crypto/tlscredsx509.c               |   9 +-
+ hw/9pfs/9p.c                        |   4 +-
+ hw/9pfs/virtio-9p-device.c          |   4 +-
+ hw/acpi/ich9.c                      |  25 +-
+ hw/acpi/pcihp.c                     |   9 +-
+ hw/acpi/piix4.c                     |  15 +-
+ hw/arm/allwinner-a10.c              |   2 +-
+ hw/arm/allwinner-h3.c               |  12 +-
+ hw/arm/armv7m.c                     |   2 +-
+ hw/arm/aspeed.c                     |   4 +-
+ hw/arm/aspeed_ast2600.c             |  13 +-
+ hw/arm/aspeed_soc.c                 |  13 +-
+ hw/arm/bcm2835_peripherals.c        |  28 +-
+ hw/arm/bcm2836.c                    |  16 +-
+ hw/arm/cubieboard.c                 |   3 +-
+ hw/arm/mcimx6ul-evk.c               |   2 +-
+ hw/arm/mcimx7d-sabre.c              |   2 +-
+ hw/arm/msf2-soc.c                   |   3 +-
+ hw/arm/nrf51_soc.c                  |   3 +-
+ hw/arm/orangepi.c                   |   3 +-
+ hw/arm/raspi.c                      |   3 +-
+ hw/arm/sabrelite.c                  |   2 +-
+ hw/arm/sbsa-ref.c                   |   5 +-
+ hw/arm/vexpress.c                   |  10 +-
+ hw/arm/virt.c                       |  39 +--
+ hw/arm/xlnx-versal-virt.c           |   3 +-
+ hw/arm/xlnx-versal.c                |  10 +-
+ hw/arm/xlnx-zcu102.c                |  10 +-
+ hw/arm/xlnx-zynqmp.c                |   9 +-
+ hw/audio/intel-hda.c                |   2 +-
+ hw/audio/marvell_88w8618.c          |   2 +-
+ hw/audio/pcspk.c                    |   2 +-
+ hw/block/fdc.c                      |   4 +-
+ hw/block/nvme.c                     |   2 +-
+ hw/block/pflash_cfi02.c             |   2 +-
+ hw/block/vhost-user-blk.c           |   4 +-
+ hw/block/virtio-blk.c               |   4 +-
+ hw/block/xen-block.c                |   8 +-
+ hw/char/serial-pci-multi.c          |   2 +-
+ hw/char/serial-pci.c                |   2 +-
+ hw/char/serial.c                    |   2 +-
+ hw/char/virtio-console.c            |   2 +-
+ hw/char/virtio-serial-bus.c         |   8 +-
+ hw/core/bus.c                       |  24 +-
+ hw/core/cpu.c                       |   2 +-
+ hw/core/generic-loader.c            |   2 +-
+ hw/core/machine-qmp-cmds.c          |   6 +-
+ hw/core/machine.c                   |  87 +++--
+ hw/core/qdev-properties.c           |  11 +-
+ hw/core/qdev.c                      |  74 ++---
+ hw/cpu/core.c                       |   4 +-
+ hw/display/bochs-display.c          |   3 +-
+ hw/display/sm501.c                  |   2 +-
+ hw/display/vga-pci.c                |   4 +-
+ hw/display/vhost-user-gpu-pci.c     |   3 +-
+ hw/display/vhost-user-gpu.c         |   2 +-
+ hw/display/vhost-user-vga.c         |   3 +-
+ hw/display/virtio-gpu-base.c        |   2 +-
+ hw/display/xlnx_dp.c                |   7 +-
+ hw/dma/rc4030.c                     |   2 +-
+ hw/dma/sparc32_dma.c                |  10 +-
+ hw/dma/xilinx_axidma.c              |   9 +-
+ hw/dma/xlnx-zdma.c                  |   7 +-
+ hw/gpio/aspeed_gpio.c               |   2 +-
+ hw/hyperv/hyperv.c                  |   2 +-
+ hw/i386/kvm/apic.c                  |   2 +-
+ hw/i386/microvm.c                   |  29 +-
+ hw/i386/pc.c                        |  18 +-
+ hw/i386/pc_piix.c                   |   2 +-
+ hw/i386/pc_q35.c                    |   4 +-
+ hw/i386/pc_sysfw.c                  |   7 +-
+ hw/i386/x86.c                       |  14 +-
+ hw/ide/macio.c                      |   2 +-
+ hw/ide/qdev.c                       |   6 +-
+ hw/input/vhost-user-input.c         |   2 +-
+ hw/input/virtio-input-hid.c         |   2 +-
+ hw/input/virtio-input-host.c        |   2 +-
+ hw/input/virtio-input.c             |   9 +-
+ hw/intc/apic.c                      |   2 +-
+ hw/intc/apic_common.c               |   6 +-
+ hw/intc/ioapic.c                    |   2 +-
+ hw/intc/s390_flic.c                 |   4 +-
+ hw/intc/xics.c                      |   4 +-
+ hw/intc/xive.c                      |   2 +-
+ hw/ipack/ipack.c                    |   6 +-
+ hw/ipmi/ipmi.c                      |   3 +-
+ hw/isa/isa-superio.c                |  13 +-
+ hw/isa/lpc_ich9.c                   |   8 +-
+ hw/mem/nvdimm.c                     |   4 +-
+ hw/mem/pc-dimm.c                    |   4 +-
+ hw/microblaze/petalogix_ml605_mmu.c |   6 +-
+ hw/misc/aspeed_sdmc.c               |   2 +-
+ hw/misc/edu.c                       |   3 +-
+ hw/misc/mac_via.c                   |   4 +-
+ hw/misc/macio/gpio.c                |   2 +-
+ hw/misc/macio/macio.c               |   4 +-
+ hw/misc/macio/pmu.c                 |   2 +-
+ hw/misc/pca9552.c                   |   2 +-
+ hw/misc/tmp105.c                    |   2 +-
+ hw/misc/tmp421.c                    |   8 +-
+ hw/net/cadence_gem.c                |   3 +-
+ hw/net/can/can_kvaser_pci.c         |   2 +-
+ hw/net/can/can_mioe3680_pci.c       |   4 +-
+ hw/net/can/can_pcm3680_pci.c        |   4 +-
+ hw/net/e1000.c                      |   3 +-
+ hw/net/e1000e.c                     |   2 +-
+ hw/net/eepro100.c                   |   2 +-
+ hw/net/lance.c                      |   2 +-
+ hw/net/lasi_i82596.c                |   2 +-
+ hw/net/ne2000-isa.c                 |   2 +-
+ hw/net/ne2000-pci.c                 |   2 +-
+ hw/net/pcnet-pci.c                  |   2 +-
+ hw/net/rtl8139.c                    |   2 +-
+ hw/net/spapr_llan.c                 |   2 +-
+ hw/net/sungem.c                     |   2 +-
+ hw/net/sunhme.c                     |   2 +-
+ hw/net/tulip.c                      |   2 +-
+ hw/net/virtio-net.c                 |   6 +-
+ hw/net/vmxnet3.c                    |   2 +-
+ hw/net/xilinx_axienet.c             |   9 +-
+ hw/nios2/10m50_devboard.c           |   3 +-
+ hw/nvram/fw_cfg.c                   |   4 +-
+ hw/nvram/mac_nvram.c                |   2 +-
+ hw/pci-host/grackle.c               |   2 +-
+ hw/pci-host/i440fx.c                |  12 +-
+ hw/pci-host/pnv_phb3_msi.c          |   3 +-
+ hw/pci-host/pnv_phb3_pbcq.c         |   3 +-
+ hw/pci-host/q35.c                   |  20 +-
+ hw/pci-host/sabre.c                 |   2 +-
+ hw/pci-host/uninorth.c              |   8 +-
+ hw/pci/pci.c                        |  14 +-
+ hw/pci/pcie.c                       |   2 +-
+ hw/pci/shpc.c                       |   2 +-
+ hw/pcmcia/pxa2xx.c                  |   2 +-
+ hw/ppc/e500.c                       |   8 +-
+ hw/ppc/mac_newworld.c               |   7 +-
+ hw/ppc/mac_oldworld.c               |   2 +-
+ hw/ppc/pnv.c                        |  16 +-
+ hw/ppc/pnv_bmc.c                    |   5 +-
+ hw/ppc/pnv_core.c                   |   4 +-
+ hw/ppc/pnv_psi.c                    |   2 +-
+ hw/ppc/prep.c                       |   6 +-
+ hw/ppc/spapr.c                      |  59 ++--
+ hw/ppc/spapr_caps.c                 |  16 +-
+ hw/ppc/spapr_cpu_core.c             |   7 +-
+ hw/ppc/spapr_drc.c                  |  36 +-
+ hw/ppc/spapr_iommu.c                |   4 +-
+ hw/ppc/spapr_irq.c                  |   2 +-
+ hw/ppc/spapr_pci.c                  |  98 ++----
+ hw/ppc/spapr_rng.c                  |   3 +-
+ hw/ppc/spapr_rtc.c                  |   2 +-
+ hw/ppc/spapr_tpm_proxy.c            |   2 +-
+ hw/riscv/sifive_u.c                 |   7 +-
+ hw/riscv/virt.c                     |   5 +-
+ hw/rtc/mc146818rtc.c                |   4 +-
+ hw/s390x/ap-bridge.c                |   2 +-
+ hw/s390x/css-bridge.c               |   9 +-
+ hw/s390x/event-facility.c           |   6 +-
+ hw/s390x/s390-ccw.c                 |   4 +-
+ hw/s390x/s390-pci-bus.c             |   4 +-
+ hw/s390x/s390-skeys.c               |   4 +-
+ hw/s390x/s390-stattrib.c            |   4 +-
+ hw/s390x/s390-virtio-ccw.c          |  19 +-
+ hw/s390x/sclp.c                     |   5 +-
+ hw/s390x/tod.c                      |   2 +-
+ hw/s390x/virtio-ccw-balloon.c       |   4 +-
+ hw/s390x/virtio-ccw-blk.c           |   2 +-
+ hw/s390x/virtio-ccw-net.c           |   2 +-
+ hw/s390x/virtio-ccw.c               |   8 +-
+ hw/scsi/lsi53c895a.c                |   2 +-
+ hw/scsi/scsi-bus.c                  |  17 +-
+ hw/scsi/scsi-disk.c                 |   2 +-
+ hw/scsi/vhost-scsi.c                |   4 +-
+ hw/scsi/vhost-user-scsi.c           |   4 +-
+ hw/scsi/virtio-scsi.c               |   2 +-
+ hw/sd/sdhci-pci.c                   |   2 +-
+ hw/sd/sdhci.c                       |   6 +-
+ hw/sparc/sun4m.c                    |   7 +-
+ hw/sparc64/sun4u.c                  |   2 +-
+ hw/ssi/xilinx_spips.c               |   3 +-
+ hw/usb/bus.c                        |  18 +-
+ hw/usb/ccid-card-emulated.c         |   2 +-
+ hw/usb/dev-audio.c                  |   2 +-
+ hw/usb/dev-hid.c                    |   2 +-
+ hw/usb/dev-hub.c                    |   2 +-
+ hw/usb/dev-network.c                |   4 +-
+ hw/usb/dev-smartcard-reader.c       |  11 +-
+ hw/usb/dev-storage.c                |   2 +-
+ hw/usb/dev-uas.c                    |   2 +-
+ hw/usb/dev-wacom.c                  |   2 +-
+ hw/usb/hcd-ehci-pci.c               |   2 +-
+ hw/usb/hcd-ehci.c                   |   2 +-
+ hw/usb/host-libusb.c                |   4 +-
+ hw/usb/redirect.c                   |   4 +-
+ hw/vfio/ap.c                        |   2 +-
+ hw/vfio/ccw.c                       |   6 +-
+ hw/vfio/pci-quirks.c                |   6 +-
+ hw/vfio/pci.c                       |   2 +-
+ hw/virtio/vhost-scsi-pci.c          |   2 +-
+ hw/virtio/vhost-user-blk-pci.c      |   2 +-
+ hw/virtio/vhost-user-fs.c           |   2 +-
+ hw/virtio/vhost-user-input-pci.c    |   3 +-
+ hw/virtio/vhost-user-scsi-pci.c     |   2 +-
+ hw/virtio/vhost-vsock.c             |   2 +-
+ hw/virtio/virtio-balloon-pci.c      |   4 +-
+ hw/virtio/virtio-balloon.c          |   6 +-
+ hw/virtio/virtio-blk-pci.c          |   2 +-
+ hw/virtio/virtio-crypto.c           |   2 +-
+ hw/virtio/virtio-iommu.c            |   2 +-
+ hw/virtio/virtio-net-pci.c          |   2 +-
+ hw/virtio/virtio-pmem.c             |   2 +-
+ hw/virtio/virtio-rng.c              |   4 +-
+ hw/virtio/virtio.c                  |  11 +-
+ hw/watchdog/wdt_diag288.c           |   2 +-
+ hw/xen/xen-bus.c                    |  12 +-
+ hw/xen/xen-common.c                 |   5 +-
+ iothread.c                          |   6 +-
+ memory.c                            |  14 +-
+ net/can/can_host.c                  |   3 +-
+ net/can/can_socketcan.c             |   3 +-
+ net/colo-compare.c                  |  20 +-
+ net/dump.c                          |   4 +-
+ net/filter-buffer.c                 |   2 +-
+ net/filter-mirror.c                 |  10 +-
+ net/filter-rewriter.c               |   2 +-
+ net/filter.c                        |  15 +-
+ qdev-monitor.c                      |   4 +-
+ qom/container.c                     |   4 +-
+ qom/object.c                        | 499 +++++++++++-----------------
+ qom/object_interfaces.c             |   8 +-
+ scsi/pr-manager-helper.c            |   3 +-
+ softmmu/vl.c                        |   7 +-
+ target/arm/cpu.c                    |  11 +-
+ target/arm/cpu64.c                  |  11 +-
+ target/arm/kvm.c                    |   4 +-
+ target/i386/cpu.c                   |  92 +++--
+ target/i386/sev.c                   |  23 +-
+ target/ppc/compat.c                 |  14 +-
+ target/ppc/translate_init.inc.c     |   9 +-
+ target/s390x/cpu.c                  |   2 +-
+ target/s390x/cpu_models.c           |  15 +-
+ tests/check-qom-proplist.c          |  70 ++--
+ tests/test-qdev-global-props.c      |   4 +-
+ ui/console.c                        |   7 +-
+ ui/input-barrier.c                  |  14 +-
+ ui/input-linux.c                    |   8 +-
+ 288 files changed, 1127 insertions(+), 1604 deletions(-)
+
 --=20
 2.21.1
 
