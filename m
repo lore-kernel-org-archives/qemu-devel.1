@@ -2,106 +2,120 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E81C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8312C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:47:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFF44206B9
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:47:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80C60206B9
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 08:47:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fs6rfIvT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFF44206B9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mQ4iGMFq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80C60206B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTLtT-0005gC-Mp
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 04:47:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50892)
+	id 1jTLtu-0006Sy-H1
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 04:47:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50988)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jTLqM-0003bO-Hv
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:45:27 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jTLqy-0003cY-BV
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:45:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jTLm1-0005bC-Ug
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:40:21 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38317
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jTLLH-0007Ki-KC
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:11:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588061506;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=V2WSghkShCxIWYjkzOczpfaiRkm/PcShyED4aIyEyoY=;
- b=Fs6rfIvTzfnk5ZQz6Jc+tVlt4DVCApgXm3L6y8nIh6ymAAvm+VH7XFnPsT7grvN75yP8Vi
- T9sD1Z2HqvMQLY1Pf8NHFAz/s2Y2VZA4Ldfk6dkmQqMBugbZ8CZuYNsd79qwJdNZqGlJuW
- SW0T55IbmWKCO4mNUALUHovx6vrTpSk=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-505-cksdQLPiMqWNQzCABarZGQ-1; Tue, 28 Apr 2020 04:11:42 -0400
-X-MC-Unique: cksdQLPiMqWNQzCABarZGQ-1
-Received: by mail-ej1-f72.google.com with SMTP id q25so12531058ejz.21
- for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 01:11:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jTLnf-0000Gv-IG
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:44:31 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44571)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jTKxh-0007zF-8E; Tue, 28 Apr 2020 03:47:25 -0400
+Received: by mail-wr1-x443.google.com with SMTP id d17so23440785wrg.11;
+ Tue, 28 Apr 2020 00:47:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=QvoQ9kzrgNjLHac1nVVG5bQDC/ypENCAVc25EKXxS04=;
- b=Kom3q1cOpD7BCKFrv8ywMdBsbBt6x/ZnGBRrp7+iYiwqVyku8vJR4WufSFgp7fHvXy
- pJLjeJD+UDHEV7KjYT5R4Y69H+mxa5zGjcr/8Y/dsYEHGVRBaX6YzFPAsaSkxDvhpaV6
- MP2gKJBD3OXBmU/EZpwhuoDi7D6fEiQG3exGj3jXo//UX73+8c9X0VP/IsLzhHrIk1ve
- XY+dsCQSRQQP+Z5ow0R+Kmt+EkGJD0q7b4dPrduMGSGPaHPthUchqPfU82acjd026i6D
- u2Q+6/Sli/qgDfQ3P8DFiLAoH8zxClOL27DQm6K15feDfwKIMiYg9ww63388L0HjQq3q
- xx7g==
-X-Gm-Message-State: AGi0PuZKUc1nAGNr7aTGGnioW66KCGQz/gxekZYl/a43syCXMaRTiS9q
- tJ7oSsW4LQagisZcZHySOAZp4eLJct7o4TrgsYrm/ZYeKhoRlxkLTI2bjoX06d6QLZbOIYS/K0j
- MhQKN+zijmvS0I+4=
-X-Received: by 2002:a17:906:7e5a:: with SMTP id
- z26mr24334169ejr.168.1588061501285; 
- Tue, 28 Apr 2020 01:11:41 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLUt9EByc1fI8snnCHvWmtDHt5d+/cXGv7+S+RsBIweKmNhlnLPNl/DMpBzmIOUhM9YN78hVQ==
-X-Received: by 2002:a17:906:7e5a:: with SMTP id
- z26mr24334148ejr.168.1588061500994; 
- Tue, 28 Apr 2020 01:11:40 -0700 (PDT)
+ bh=KFOfqikoEDaFU0QanQWnrZou41WM3WSERbHHJspAm2M=;
+ b=mQ4iGMFqRpf1dFbbTaw6HYEPsFHrAkWlWZMjxn7TasqR83QPJ9XL+6AiwMUXU+PmbQ
+ 8wq4JoP/YcIRy4M7bWJF9G3PjCDQT2PfPSUXXKeXvek4boUkFhGidEj3/0inJbCfqWF6
+ XS3ZmRa053StDOuPOk4DWD5MP1bmmUM9VaGcOo5SXkYw6+lNwZmvl329NWf1JvAOlWmv
+ Re4CSkDXrSGL07pgUvrbwGDuXzPle7CV4tqchPp00V6gzQTTgzVvzui9a9Skv/42aS15
+ QsDcEHDzR8Nkvf6XeeGV1QNaomEaR5y4m9XYlc6T+egBWJpIMckBa4YFPA3FMfr5/oHV
+ 2WRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=KFOfqikoEDaFU0QanQWnrZou41WM3WSERbHHJspAm2M=;
+ b=Fd2VSXy0o+xw/GFNxBB9h1C3ENgDgUQyrr7s9muOIR8L1hLQIGq66mOM/eYgIIKumH
+ 5M2auaQp6DoTnS3nQ5uU2FO9Fu+jMf3eZbMD2DYZ9Jr0Qu/1qgcLpYlK2HB9d5mEKmpU
+ qF3Sx97yFUcjTGkS3kS3GeeMOep2NUA0lB+DyW/KoS9W/T7tKS2I1Cv4OHmdmjHVxpJ/
+ ER0LnKe9JGx8d7Iq173xRJkf7+UtmOEsI3sTrwebl8TX6TXuSOk777c2Yx4sIciPwobG
+ VxXCl/aewMbbtZgBV/BNcEn0y/Kd5kPMhO0OmaUUiXfcg96lVQdLBpgRrxfUV4Cp+i+t
+ dohA==
+X-Gm-Message-State: AGi0PuYmgydJWcRhBTeZeArCcJF8YrRAPGaseLh2OOV7O2PF1IBTh6jA
+ Dy6NtdlSYgd3v6H9Cpf2YN4=
+X-Google-Smtp-Source: APiQypLqtdMSt8lbBETVC7spIhei0voQf8SGUw8OvHRj+K9KFbIZgl34lZXwv+UGii+hnzdFoWzBdg==
+X-Received: by 2002:adf:d091:: with SMTP id y17mr30819861wrh.418.1588060042776; 
+ Tue, 28 Apr 2020 00:47:22 -0700 (PDT)
 Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.137])
- by smtp.gmail.com with ESMTPSA id e16sm390193eja.58.2020.04.28.01.11.39
+ by smtp.gmail.com with ESMTPSA id m8sm25643628wrx.54.2020.04.28.00.47.21
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 28 Apr 2020 01:11:40 -0700 (PDT)
-Subject: Re: [PATCH v2] [Qemu-devel] target/i386: HAX: Enable ROM/ROM device
- memory region support
-To: Colin Xu <colin.xu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>
-References: <1585538712-28300-1-git-send-email-hang.yuan@linux.intel.com>
- <54b6f6c0-6419-2bc2-c915-9c7a83ab8dea@intel.com>
- <alpine.LNX.2.22.419.2004281043520.5289@coxu-arch-shz>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <74454205-5a9b-29af-5b7f-44a3d22fc4e9@redhat.com>
-Date: Tue, 28 Apr 2020 10:11:38 +0200
+ Tue, 28 Apr 2020 00:47:22 -0700 (PDT)
+Subject: Re: [PATCH v1 04/11] hw/arm: versal: Embedd the UARTs into the SoC
+ type
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
+References: <20200427181649.26851-1-edgar.iglesias@gmail.com>
+ <20200427181649.26851-5-edgar.iglesias@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <2f5ece4e-2a11-fe91-9b18-d9fbcbed79dc@amsat.org>
+Date: Tue, 28 Apr 2020 09:47:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <alpine.LNX.2.22.419.2004281043520.5289@coxu-arch-shz>
+In-Reply-To: <20200427181649.26851-5-edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:11:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,102 +127,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "hang.yuan@linux.intel.com" <hang.yuan@linux.intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wang,
- Wenchao" <wenchao.wang@intel.com>
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
+ frasse.iglesias@gmail.com, alistair@alistair23.me,
+ richard.henderson@linaro.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
+ philmd@redhat.com, luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/28/20 4:45 AM, Colin Xu wrote:
->=20
-> Hi Paolo,
->=20
-> Would you please queue this one?
-> --=20
-> Best Regards,
-> Colin Xu
->=20
-> On Mon, 30 Mar 2020, Colin Xu wrote:
->=20
->> Looks good to me.
->>
->> Reviewed-by: Colin Xu <colin.xu@intel.com>
->>
->> On 2020-03-30 11:25, hang.yuan@linux.intel.com wrote:
->>> From: Hang Yuan <hang.yuan@linux.intel.com>
->>>
->>> Add ROM and ROM device memory region support in HAX. Their memory=20
->>> region is
->>> read only and write access will generate EPT violation. The violation=
-=20
->>> will be
->>> handled in the HAX kernel with the following patch.
+On 4/27/20 8:16 PM, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> 
+> Embedd the UARTs into the SoC type.
+> 
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
+>  hw/arm/xlnx-versal.c         | 12 ++++++------
+>  include/hw/arm/xlnx-versal.h |  3 ++-
+>  2 files changed, 8 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
+> index cc696e44c0..dbde03b7e6 100644
+> --- a/hw/arm/xlnx-versal.c
+> +++ b/hw/arm/xlnx-versal.c
+> @@ -21,7 +21,6 @@
+>  #include "kvm_arm.h"
+>  #include "hw/misc/unimp.h"
+>  #include "hw/arm/xlnx-versal.h"
+> -#include "hw/char/pl011.h"
+>  
+>  #define XLNX_VERSAL_ACPU_TYPE ARM_CPU_TYPE_NAME("cortex-a72")
+>  #define GEM_REVISION        0x40070106
+> @@ -144,16 +143,17 @@ static void versal_create_uarts(Versal *s, qemu_irq *pic)
+>          DeviceState *dev;
+>          MemoryRegion *mr;
+>  
+> -        dev = qdev_create(NULL, TYPE_PL011);
+> -        s->lpd.iou.uart[i] = SYS_BUS_DEVICE(dev);
+> +        sysbus_init_child_obj(OBJECT(s), name,
+> +                              &s->lpd.iou.uart[i], sizeof(s->lpd.iou.uart[i]),
+> +                              TYPE_PL011);
+> +        dev = DEVICE(&s->lpd.iou.uart[i]);
+>          qdev_prop_set_chr(dev, "chardev", serial_hd(i));
+> -        object_property_add_child(OBJECT(s), name, OBJECT(dev), &error_fatal);
+>          qdev_init_nofail(dev);
+>  
+> -        mr = sysbus_mmio_get_region(s->lpd.iou.uart[i], 0);
+> +        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
+>          memory_region_add_subregion(&s->mr_ps, addrs[i], mr);
+>  
+> -        sysbus_connect_irq(s->lpd.iou.uart[i], 0, pic[irqs[i]]);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[irqs[i]]);
 
-"will be"? This patch is 10 months old.
+Cleaner :)
 
->>>
->>> https://github.com/intel/haxm/commit/33ceea09a1655fca12c47f1e112b1d2693=
-57ff28=20
->>>
->>>
->>> v2: fix coding style problems
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-^ This line goes ...
-
->>>
->>> Signed-off-by: Hang Yuan <hang.yuan@linux.intel.com>
->>> ---
-
-... here after the '---'.
-
->>> =A0 target/i386/hax-mem.c | 11 ++++-------
->>> =A0 1 file changed, 4 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/target/i386/hax-mem.c b/target/i386/hax-mem.c
->>> index 6bb5a24917..a8bfd37977 100644
->>> --- a/target/i386/hax-mem.c
->>> +++ b/target/i386/hax-mem.c
->>> @@ -175,13 +175,10 @@ static void=20
->>> hax_process_section(MemoryRegionSection *section, uint8_t flags)
->>> =A0=A0=A0=A0=A0 uint64_t host_va;
->>> =A0=A0=A0=A0=A0 uint32_t max_mapping_size;
->>>
->>> -=A0=A0=A0 /* We only care about RAM and ROM regions */
->>> -=A0=A0=A0 if (!memory_region_is_ram(mr)) {
->>> -=A0=A0=A0=A0=A0=A0=A0 if (memory_region_is_romd(mr)) {
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* HAXM kernel module does not suppo=
-rt ROMD yet=A0 */
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 warn_report("Ignoring ROMD region 0x=
-%016" PRIx64=20
->>> "->0x%016" PRIx64,
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 =
-start_pa, start_pa + size);
-
-Don't you need to check for some kmod version before removing this check?
-
->>> -=A0=A0=A0=A0=A0=A0=A0 }
->>> +=A0=A0=A0 /* We only care about RAM/ROM regions and ROM device */
->>> +=A0=A0=A0 if (memory_region_is_rom(mr) || (memory_region_is_romd(mr)))=
- {
-
-Redundant parenthesis.
-
->>> +=A0=A0=A0=A0=A0=A0=A0 flags |=3D HAX_RAM_INFO_ROM;
->>> +=A0=A0=A0 } else if (!memory_region_is_ram(mr)) {
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return;
->>> =A0=A0=A0=A0=A0 }
-
-If you move the 'if (RAM) return' first, the code becomes easier to review.
-
->>>
->>
->> --=20
->> Best Regards,
->> Colin Xu
->>
->>
->>
->=20
-
+>          g_free(name);
+>      }
+>  }
+> diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
+> index 6c0a692b2f..a3dfd064b3 100644
+> --- a/include/hw/arm/xlnx-versal.h
+> +++ b/include/hw/arm/xlnx-versal.h
+> @@ -15,6 +15,7 @@
+>  #include "hw/sysbus.h"
+>  #include "hw/arm/boot.h"
+>  #include "hw/intc/arm_gicv3.h"
+> +#include "hw/char/pl011.h"
+>  
+>  #define TYPE_XLNX_VERSAL "xlnx-versal"
+>  #define XLNX_VERSAL(obj) OBJECT_CHECK(Versal, (obj), TYPE_XLNX_VERSAL)
+> @@ -49,7 +50,7 @@ typedef struct Versal {
+>          MemoryRegion mr_ocm;
+>  
+>          struct {
+> -            SysBusDevice *uart[XLNX_VERSAL_NR_UARTS];
+> +            PL011State uart[XLNX_VERSAL_NR_UARTS];
+>              SysBusDevice *gem[XLNX_VERSAL_NR_GEMS];
+>              SysBusDevice *adma[XLNX_VERSAL_NR_ADMAS];
+>          } iou;
+> 
 
