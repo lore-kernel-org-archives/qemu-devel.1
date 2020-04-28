@@ -2,107 +2,61 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D15BC83004
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 11:51:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB071C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 12:15:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF688206D7
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 11:51:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JKubXDq/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF688206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7FA44206D6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 12:15:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FA44206D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bitdefender.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTOm2-00049D-3g
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 07:51:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52048)
+	id 1jTP8q-0007RY-HC
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 08:15:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55306)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTOjM-0000Mo-Qp
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 07:49:15 -0400
+ (envelope-from <alazar@bitdefender.com>) id 1jTP8E-0006sz-A2
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 08:14:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTOgr-0007gU-6Y
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 07:48:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31023
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTOgq-0007gC-LO
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 07:46:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588074375;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ybfEM1J+dcH0zE4QDaM2UHzAtfwnLcZfPyIOmG6zFJE=;
- b=JKubXDq/F+Kk1MMF6dEeXHaXcqULBLx3yXJUw404FHw23FUKKwPllcIyuxFQVGEAjyK1aS
- P6M+Gbsl043D+Lm6mQnu0D+2k3805/IU3z1ywyl6GUPCjKtwWB/OS+bx0rXK0q/f/zmKFE
- 5cFV8+SOsQxVZyJjKCTC8zFSVhIqUmc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-Aqk2Dd97Nk2D32zvV-c57A-1; Tue, 28 Apr 2020 07:46:09 -0400
-X-MC-Unique: Aqk2Dd97Nk2D32zvV-c57A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26278800688;
- Tue, 28 Apr 2020 11:46:08 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1051C600DB;
- Tue, 28 Apr 2020 11:46:03 +0000 (UTC)
-Subject: Re: [PATCH v10 00/14] iotests: use python logging
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20200331000014.11581-1-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <a63ac7e2-51fd-7d02-3e7d-be14912bd103@redhat.com>
-Date: Tue, 28 Apr 2020 13:46:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <alazar@bitdefender.com>) id 1jTP8C-0004BN-Ql
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 08:14:33 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:55408)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alazar@bitdefender.com>)
+ id 1jTP8C-0004B7-4z
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 08:14:32 -0400
+Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
+ by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id
+ AFAA030747BF; Tue, 28 Apr 2020 15:14:27 +0300 (EEST)
+Received: from localhost (unknown [91.199.104.50])
+ by smtp.bitdefender.com (Postfix) with ESMTPSA id 909AF303A3E5;
+ Tue, 28 Apr 2020 15:14:27 +0300 (EEST)
+From: Adalbert =?iso-8859-2?b?TGF643I=?= <alazar@bitdefender.com>
+Subject: Re: [RFC PATCH v1 20/26] kvm: vmi: intercept live migration
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+In-Reply-To: <20200427190855.GN2923@work-vm>
+References: <20200415005938.23895-1-alazar@bitdefender.com>
+ <20200415005938.23895-21-alazar@bitdefender.com>
+ <20200427190855.GN2923@work-vm>
+Date: Tue, 28 Apr 2020 15:14:54 +0300
+Message-ID: <15880760940.91F7391B.25850@host>
+User-agent: void
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 MIME-Version: 1.0
-In-Reply-To: <20200331000014.11581-1-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="rqTtjEMIlI2DCjZ44JL4aamXIxuYNehpX"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 02:16:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Received-SPF: pass client-ip=91.199.104.161;
+ envelope-from=alazar@bitdefender.com; helo=mx01.bbu.dsd.mx.bitdefender.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 08:14:28
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Received-From: 91.199.104.161
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,61 +68,272 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
- philmd@redhat.com, armbru@redhat.com
+Cc: Marian Rotariu <marian.c.rotariu@gmail.com>, qemu-devel@nongnu.org,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rqTtjEMIlI2DCjZ44JL4aamXIxuYNehpX
-Content-Type: multipart/mixed; boundary="7inEjrTcfmal2ctKx3qx6SiFfs6hTIUkT"
+On Mon, 27 Apr 2020 20:08:55 +0100, "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Adalbert Lazăr (alazar@bitdefender.com) wrote:
+> > From: Marian Rotariu <marian.c.rotariu@gmail.com>
+> > 
+> > It is possible that the introspection tool has made some changes inside
+> > the introspected VM which can make the guest crash if the introspection
+> > connection is suddenly closed.
+> > 
+> > When the live migration starts, for now, the introspection tool is
+> > signaled to remove its hooks from the introspected VM.
+> > 
+> > CC: Juan Quintela <quintela@redhat.com>
+> > CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > Signed-off-by: Marian Rotariu <marian.c.rotariu@gmail.com>
+> > Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
+> 
+> OK, so this isn't too intrusive to the migration code; and other than
+> renaming 'start_live_migration_thread' to
+> 'start_outgoing_migration_thread' I think I'd be OK with this,
+> 
+> but it might depend what your overall aim is.
+> 
+> For example, you might be better intercepting each migration_state
+> change in your notifier, that's much finer grain than just the start of
+> migration.
 
---7inEjrTcfmal2ctKx3qx6SiFfs6hTIUkT
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Thank you, Dave.
 
-On 31.03.20 02:00, John Snow wrote:
-> This series uses python logging to enable output conditionally on
-> iotests.log(). We unify an initialization call (which also enables
-> debugging output for those tests with -d) and then make the switch
-> inside of iotests.
->=20
-> It will help alleviate the need to create logged/unlogged versions
-> of all the various helpers we have made.
->=20
-> Also, I got lost and accidentally delinted iotests while I was here.
-> Sorry about that. By version 9, it's now the overwhelming focus of
-> this series. No good deed, etc.
+We want to intercept the live migration and 'block' it while the guest
+is running (some changes made to the guest by the introspection app has
+to be undone while the vCPUs are in certain states).
 
-Seems like nobody else wants it, so I thank you and let you know that
-I=E2=80=99ve applied this series to my block-next branch:
+I'm not sure what is the best way to block these kind of events
+(including the pause/shutdown commands). If calling main_loop_wait()
+is enough (patch [22/26] kvm: vmi: add 'async_unhook' property [1])
+then we can drop a lot of code.
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block-next
+The use of a notifier will be nice, but from what I understand, we can't
+block the migration from a notification callback.
 
-Max
+> The other thing I worry about is that there doesn't seem to be much
+> guard against odd orderings of things - for example, what happens
+> if the introspection client was to issue the  INTERCEPT_MIGRATE command
+> twice while a migration was already running?  Or before an actual
+> incoming channel connetion had happened?
+> 
+> Dave
 
+Sorry that I haven't described the interception. When we intercept
+an action that we want to 'block', we set a static variable first,
+regardless if the introspection channel is connected or not, and :
 
---7inEjrTcfmal2ctKx3qx6SiFfs6hTIUkT--
+   - if the introspection channel is not connected we don't block the
+   action, but this (variable) will prevent the activation of this
+   channel until the action (ie. migrate) is completed (a). I assume
+   that there could be only one migrate (or suspend/pause) user command
+   at any given time (b).
 
---rqTtjEMIlI2DCjZ44JL4aamXIxuYNehpX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+   - if the introspection channel is connected, the introspection app
+   is signaled to start its unhook/undo process. We let the code flow
+   continue, but the action (migrate/suspend/pause) is delayed until
+   the introspection channel is closed. Meanwhile, any other intercepted
+   action will not be blocked/delayed (c), but the fact that these actions
+   are in progress is saved to static variables and the introspecton
+   channel won't be reactivated.
 
------BEGIN PGP SIGNATURE-----
+Indeed, there are cases that are not handled well:
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6oF3oACgkQ9AfbAGHV
-z0Awqgf+OFAS2BUgAgVXPCg4iWq4Y5bvqUq7vXgzjbW2vy9WKm7MVpWdIgUZI/pc
-8Ahfnb3j0kczMFbXMPta1AGWHukdfhQ9xv6DwrHs+mSzJTx1Mk2vPgbLvLH1ET88
-3LvYpDhNCBH94K0f8PmC2TaTlOPXNqhXf81CUdo0QGKM6MsK9IepilBlKrq3g8Ua
-81OQ2YwAk4wxSkkFIx15rYzMCTtaKaFxuGdEdFquxC5pl6k45ZL7KY1iFkrPLJ3v
-8d+ukjHi8j+Dtz4ZYxPctN40ljXxgcJako2a4+NsdLYc6YTpl3tXKOIc4jl3m/aZ
-e1FoZnYtCFtK+HRYS+QCrTZ/Uc6Cbg==
-=7LfW
------END PGP SIGNATURE-----
+  a) if the migration is started and canceled before the introspection
+  object is created (through QMP), the introspection channel will be
+  disabled until the next migration starts and finishes.
 
---rqTtjEMIlI2DCjZ44JL4aamXIxuYNehpX--
+  b) if a migration command has been delayed, a following migrate command
+  (if this is possible) won't be delayed and we will have two migration
+  threads started.
 
+  c) if a migration command has been delayed, a following suspend/pause
+  command won't be delayed and the introspection app might not have
+  enough time to finish its unhook/undo process.
+
+[1]: https://lore.kernel.org/qemu-devel/20200415005938.23895-23-alazar@bitdefender.com/
+
+> > ---
+> >  accel/kvm/vmi.c                | 31 +++++++++++++++++++++++++++----
+> >  include/sysemu/vmi-intercept.h |  1 +
+> >  migration/migration.c          | 18 +++++++++++++++---
+> >  migration/migration.h          |  2 ++
+> >  4 files changed, 45 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/accel/kvm/vmi.c b/accel/kvm/vmi.c
+> > index 90906478b4..ea7191e48d 100644
+> > --- a/accel/kvm/vmi.c
+> > +++ b/accel/kvm/vmi.c
+> > @@ -21,6 +21,8 @@
+> >  #include "chardev/char.h"
+> >  #include "chardev/char-fe.h"
+> >  #include "migration/vmstate.h"
+> > +#include "migration/migration.h"
+> > +#include "migration/misc.h"
+> >  
+> >  #include "sysemu/vmi-intercept.h"
+> >  #include "sysemu/vmi-handshake.h"
+> > @@ -58,6 +60,7 @@ typedef struct VMIntrospection {
+> >      int64_t vm_start_time;
+> >  
+> >      Notifier machine_ready;
+> > +    Notifier migration_state_change;
+> >      bool created_from_command_line;
+> >  
+> >      bool kvmi_hooked;
+> > @@ -74,9 +77,11 @@ static const char *action_string[] = {
+> >      "suspend",
+> >      "resume",
+> >      "force-reset",
+> > +    "migrate",
+> >  };
+> >  
+> >  static bool suspend_pending;
+> > +static bool migrate_pending;
+> >  
+> >  #define TYPE_VM_INTROSPECTION "introspection"
+> >  
+> > @@ -88,6 +93,15 @@ static bool suspend_pending;
+> >  static Error *vm_introspection_init(VMIntrospection *i);
+> >  static void vm_introspection_reset(void *opaque);
+> >  
+> > +static void migration_state_notifier(Notifier *notifier, void *data)
+> > +{
+> > +    MigrationState *s = data;
+> > +
+> > +    if (migration_has_failed(s)) {
+> > +        migrate_pending = false;
+> > +    }
+> > +}
+> > +
+> >  static void machine_ready(Notifier *notifier, void *data)
+> >  {
+> >      VMIntrospection *i = container_of(notifier, VMIntrospection, machine_ready);
+> > @@ -144,6 +158,9 @@ static void complete(UserCreatable *uc, Error **errp)
+> >  
+> >      ic->uniq = i;
+> >  
+> > +    i->migration_state_change.notify = migration_state_notifier;
+> > +    add_migration_state_change_notifier(&i->migration_state_change);
+> > +
+> >      qemu_register_reset(vm_introspection_reset, i);
+> >  }
+> >  
+> > @@ -478,6 +495,9 @@ static void continue_with_the_intercepted_action(VMIntrospection *i)
+> >      case VMI_INTERCEPT_SUSPEND:
+> >          vm_stop(RUN_STATE_PAUSED);
+> >          break;
+> > +    case VMI_INTERCEPT_MIGRATE:
+> > +        start_live_migration_thread(migrate_get_current());
+> > +        break;
+> >      default:
+> >          error_report("VMI: %s: unexpected action %d",
+> >                       __func__, i->intercepted_action);
+> > @@ -571,9 +591,9 @@ static void chr_event_open(VMIntrospection *i)
+> >  {
+> >      Error *local_err = NULL;
+> >  
+> > -    if (suspend_pending) {
+> > -        info_report("VMI: %s: too soon (suspend=%d)",
+> > -                    __func__, suspend_pending);
+> > +    if (suspend_pending || migrate_pending) {
+> > +        info_report("VMI: %s: too soon (suspend=%d, migrate=%d)",
+> > +                    __func__, suspend_pending, migrate_pending);
+> >          maybe_disable_socket_reconnect(i);
+> >          qemu_chr_fe_disconnect(&i->sock);
+> >          return;
+> > @@ -608,7 +628,7 @@ static void chr_event_close(VMIntrospection *i)
+> >      cancel_unhook_timer(i);
+> >      cancel_handshake_timer(i);
+> >  
+> > -    if (suspend_pending) {
+> > +    if (suspend_pending || migrate_pending) {
+> >          maybe_disable_socket_reconnect(i);
+> >  
+> >          if (i->intercepted_action != VMI_INTERCEPT_NONE) {
+> > @@ -680,6 +700,9 @@ static bool record_intercept_action(VMI_intercept_command action)
+> >          break;
+> >      case VMI_INTERCEPT_FORCE_RESET:
+> >          break;
+> > +    case VMI_INTERCEPT_MIGRATE:
+> > +        migrate_pending = true;
+> > +        break;
+> >      default:
+> >          return false;
+> >      }
+> > diff --git a/include/sysemu/vmi-intercept.h b/include/sysemu/vmi-intercept.h
+> > index ef591b49e7..b4a9a3faa7 100644
+> > --- a/include/sysemu/vmi-intercept.h
+> > +++ b/include/sysemu/vmi-intercept.h
+> > @@ -15,6 +15,7 @@ typedef enum {
+> >      VMI_INTERCEPT_SUSPEND,
+> >      VMI_INTERCEPT_RESUME,
+> >      VMI_INTERCEPT_FORCE_RESET,
+> > +    VMI_INTERCEPT_MIGRATE,
+> >  } VMI_intercept_command;
+> >  
+> >  bool vm_introspection_intercept(VMI_intercept_command ic, Error **errp);
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 187ac0410c..222037d739 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -55,6 +55,8 @@
+> >  #include "qemu/queue.h"
+> >  #include "multifd.h"
+> >  
+> > +#include "sysemu/vmi-intercept.h"
+> > +
+> >  #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
+> >  
+> >  /* Amount of time to allocate to each "chunk" of bandwidth-throttled
+> > @@ -3471,6 +3473,13 @@ static void *migration_thread(void *opaque)
+> >      return NULL;
+> >  }
+> >  
+> > +void start_live_migration_thread(MigrationState *s)
+> > +{
+> > +    qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
+> > +                    QEMU_THREAD_JOINABLE);
+> > +    s->migration_thread_running = true;
+> > +}
+> > +
+> >  void migrate_fd_connect(MigrationState *s, Error *error_in)
+> >  {
+> >      Error *local_err = NULL;
+> > @@ -3534,9 +3543,12 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
+> >          migrate_fd_cleanup(s);
+> >          return;
+> >      }
+> > -    qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
+> > -                       QEMU_THREAD_JOINABLE);
+> > -    s->migration_thread_running = true;
+> > +
+> > +    if (vm_introspection_intercept(VMI_INTERCEPT_MIGRATE, &error_in)) {
+> > +        return;
+> > +    }
+> > +
+> > +    start_live_migration_thread(s);
+> >  }
+> >  
+> >  void migration_global_dump(Monitor *mon)
+> > diff --git a/migration/migration.h b/migration/migration.h
+> > index 507284e563..eb5668e1f2 100644
+> > --- a/migration/migration.h
+> > +++ b/migration/migration.h
+> > @@ -263,6 +263,8 @@ struct MigrationState
+> >      uint8_t clear_bitmap_shift;
+> >  };
+> >  
+> > +void start_live_migration_thread(MigrationState *s);
+> > +
+> >  void migrate_set_state(int *state, int old_state, int new_state);
+> >  
+> >  void migration_fd_process_incoming(QEMUFile *f, Error **errp);
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 
