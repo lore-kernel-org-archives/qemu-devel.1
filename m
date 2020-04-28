@@ -2,104 +2,97 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFBA6C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 20:23:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDD56C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 20:24:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEA8D206D6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 20:23:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEA8D206D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 95A6D206D6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 20:24:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W2mQrtf2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95A6D206D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTWlP-0008O3-Qo
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 16:23:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38540)
+	id 1jTWlx-0001Ec-Pn
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 16:24:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38646)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1jTWjR-00059V-SW
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:21:52 -0400
+ (envelope-from <peterx@redhat.com>) id 1jTWje-0005Y5-Q6
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:21:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1jTWgB-0002gx-DY
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:21:29 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3336
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jTWbM-0005mW-V5; Tue, 28 Apr 2020 16:13:09 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 03SK1i9K019614; Tue, 28 Apr 2020 16:13:07 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30pjxvafpy-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 28 Apr 2020 16:13:07 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03SK1ppZ020518;
- Tue, 28 Apr 2020 16:13:06 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.27])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30pjxvafpp-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 28 Apr 2020 16:13:06 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
- by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03SJtil0024666;
- Tue, 28 Apr 2020 20:13:06 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
- [9.57.198.25]) by ppma05wdc.us.ibm.com with ESMTP id 30mcu6ewdb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 28 Apr 2020 20:13:06 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
- [9.57.199.109])
- by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 03SKD5id41681370
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 28 Apr 2020 20:13:05 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 883ED112062;
- Tue, 28 Apr 2020 20:13:05 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 71568112061;
- Tue, 28 Apr 2020 20:13:05 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue, 28 Apr 2020 20:13:05 +0000 (GMT)
-Subject: Re: [PATCH 0/2] virt: Set tpm-tis-device ppi property to off by
- default
-To: Cornelia Huck <cohuck@redhat.com>, Eric Auger <eric.auger@redhat.com>
-References: <20200427143145.16251-1-eric.auger@redhat.com>
- <20200428123826.1ec68e6c.cohuck@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <0257ca1e-2323-e437-4e19-d8a4dfa6d792@linux.ibm.com>
-Date: Tue, 28 Apr 2020 16:13:05 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <peterx@redhat.com>) id 1jTWiq-0005iZ-8D
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:21:42 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55582
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jTWip-0005iQ-Qb
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 16:20:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588105250;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dhEWpyo+Q0EUz3VV8U/FNddmyz/kRxcBk51oAgaeNwo=;
+ b=W2mQrtf2P/OebdEbyQNOv4F3GZ+HjoS3Vt9CQio28H+0akp7NFBshMAi1Etskomso7ezIs
+ QfKGkC/FgQTros/NbobTVO4SJHlV35J9aVhE16N7tkOiDgf6v/JFQBxGwjkUZ03483DjlZ
+ +aMvSZefahZ/aDFZBweUcJ7yxXn/0UQ=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-179-BbCo-acROmKGTb0oasXQZg-1; Tue, 28 Apr 2020 16:20:48 -0400
+X-MC-Unique: BbCo-acROmKGTb0oasXQZg-1
+Received: by mail-qk1-f197.google.com with SMTP id l19so24681080qki.14
+ for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 13:20:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=pr75bz5CF/LtKMO69yDpgBPILn3PrEjdTGM0+okmUQM=;
+ b=A/MbZCEgLURhPMgKYDeI9rlxb8zOE7/speeECVIGMmqzgT2l5dWU0yEELUjMKP+KKV
+ ZWen5b0lVAIg3zy5KA80wjCg0CkdpJU8dWVjGWuARQeFfZwfpxVrmRP4N30NppbVTdPn
+ dKCGy8baN8NZCvIA+/rqdTZqC24XofbpRae6AZR1CAdAbLLOv3kuW6HeJCERr4Q6euJ8
+ jnhtupi7rh721kWBwoHq91fJHyUy1rEYRFPCyGEbV/tk4wqxJ1JmW4/detq1anYAdlG7
+ YsDdbelTDzzjG/8YPk+PCnd0Nc/8QzNVg0q8CHoP/LbTBPR2ycsEh1qjtiWkcUXWQPti
+ Oiiw==
+X-Gm-Message-State: AGi0PuY0Ic1SfyOFn0uxGGfjRdp/mnFxU6/f0KyBCEHrXU/9ze7Qb+sV
+ 5yjrJuxDIAbUgyab6wOIVhkzj+57Uwcug8/XN4KsVrjU7KW+JdFGd2Z3Ywr1DmEplO4ENSWDCcS
+ U65dInWJhxr987vE=
+X-Received: by 2002:ac8:6c6:: with SMTP id j6mr30634772qth.194.1588105243260; 
+ Tue, 28 Apr 2020 13:20:43 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIeRzoKSB0gO3ZL3lCw15W2Rf4LXDAiJ4IZ3C4BAsi/p3gfx10CfBepjKpH20ztL/7XjpsH5w==
+X-Received: by 2002:ac8:6c6:: with SMTP id j6mr30634754qth.194.1588105242987; 
+ Tue, 28 Apr 2020 13:20:42 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id k58sm15000518qtf.40.2020.04.28.13.20.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Apr 2020 13:20:42 -0700 (PDT)
+Date: Tue, 28 Apr 2020 16:20:41 -0400
+From: Peter Xu <peterx@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH RFC v2 9/9] KVM: Dirty ring support
+Message-ID: <20200428202041.GA4280@xz-x1>
+References: <20200428195707.11980-1-peterx@redhat.com>
+ <20200428200509.13150-7-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200428123826.1ec68e6c.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-28_12:2020-04-28,
- 2020-04-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0
- priorityscore=1501 phishscore=0 adultscore=0 malwarescore=0
- impostorscore=0 mlxlogscore=999 bulkscore=0 lowpriorityscore=0 mlxscore=0
- suspectscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2003020000 definitions=main-2004280153
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 16:13:07
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+In-Reply-To: <20200428200509.13150-7-peterx@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:11:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,40 +104,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, eric.auger.pro@gmail.com
+Cc: pbonzini@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/28/20 6:38 AM, Cornelia Huck wrote:
-> On Mon, 27 Apr 2020 16:31:43 +0200
-> Eric Auger <eric.auger@redhat.com> wrote:
->
->> Instead of using a compat in the mach-virt machine to force
->> PPI off for all virt machines (PPI not supported by the
->> tpm-tis-device device), let's simply change the default value
->> in the sysbus device.
->>
->> Best Regards
->>
->> Eric
->>
->> Eric Auger (2):
->>    tpm: tpm-tis-device: set PPI to false by default
->>    hw/arm/virt: Remove the compat forcing tpm-tis-device PPI to off
->>
->>   hw/arm/virt.c           | 5 -----
->>   hw/tpm/tpm_tis_sysbus.c | 2 +-
->>   2 files changed, 1 insertion(+), 6 deletions(-)
->>
-> I think we can apply the compat machines patch on top of these two
-> patches.
->
-> Q: Who will queue this and the machine types patch? It feels a bit
-> weird taking arm patches through the s390 tree :)
->
-I can queue them and would send the PR soon. I am also fine with someone 
-else doing it.
+On Tue, Apr 28, 2020 at 04:05:09PM -0400, Peter Xu wrote:
+> +/*
+> + * Flush all the existing dirty pages to the KVM slot buffers.  When
+> + * this call returns, we guarantee that all the touched dirty pages
+> + * before calling this function have been put into the per-kvmslot
+> + * dirty bitmap.
+> + *
+> + * To achieve this, we need to:
+> + *
+> + * (1) Kick all vcpus out, this will make sure that we flush all the
+> + *     dirty buffers that potentially in the hardware (PML) into the
+> + *     dirty rings, after that,
+> + *
+> + * (2) Kick the reaper thread and make sure it reaps all the dirty
+> + *     page that is in the dirty rings.
+
+Please note that some of the comments might be outdated, like this one...
+
+(I think I'll remove these two paragraph in the next post)
+
+> + *
+> + * This function must be called with BQL held.
+> + */
+> +static void kvm_dirty_ring_flush(struct KVMDirtyRingReaper *r)
+> +{
+> +    trace_kvm_dirty_ring_flush(0);
+> +
+> +    /*
+> +     * The function needs to be serialized.  Since this function
+> +     * should always be with BQL held, serialization is guaranteed.
+> +     * However, let's be sure of it.
+> +     */
+> +    assert(qemu_mutex_iothread_locked());
+> +
+> +    /*
+> +     * First make sure to flush the hardware buffers by kicking all
+> +     * vcpus out in a synchronous way.
+> +     */
+> +    kvm_cpu_synchronize_kick_all();
+> +
+> +    /*
+> +     * Recycle the dirty bits outside the reaper thread.  We're safe bec=
+ause
+> +     * kvm_dirty_ring_reap() is internally protected by a mutex.
+
+Same here; the comment is obsolete.  There used to be a mutex after v1 and
+before v2, but I removed the mutex because now we simply always take the BQ=
+L so
+that mutex is not needed any more.
+
+I'm not sure whether there's still obsolete comments here and there (since =
+the
+code does changed quite a bit).  Anyway please stick to the code if there's
+conflicts, and I'll try to fix the comments up.
+
+> +     */
+> +    kvm_dirty_ring_reap(kvm_state);
+> +
+> +    trace_kvm_dirty_ring_flush(1);
+> +}
+
+--=20
+Peter Xu
 
 
