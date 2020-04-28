@@ -6,65 +6,59 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15F12C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 14:44:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFBF3C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 14:45:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2670206C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 14:44:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2670206C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 86497206D9
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 14:45:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86497206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bitdefender.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTRTG-0007ll-VL
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 10:44:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46448)
+	id 1jTRUc-0001NZ-Kv
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 10:45:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46614)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jTROc-0005Q4-Rv
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 10:43:32 -0400
+ (envelope-from <alazar@bitdefender.com>) id 1jTRPZ-0005mx-Mv
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 10:44:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jTRKf-0000Kr-0e
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 10:39:38 -0400
-Resent-Date: Tue, 28 Apr 2020 10:39:38 -0400
-Resent-Message-Id: <E1jTRKf-0000Kr-0e@eggs.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21782)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jTRKe-0008WN-86; Tue, 28 Apr 2020 10:35:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1588084493; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=lojSe8YMbdqCaqkvcGY1y511kuX7n6n6WnbIS5/0PYxSMPqtpmr3jyVy2JmxNLH5tpWmXs7AI0qRNSggZR3fnWqTuHnxngPfndej78baDR4ZcEORFuczM1rQd+2EV+PiSQ5sZGFdBZchcWiLwV9XOFLV41puh44EnBc3HbB0Mak=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1588084493;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=vnLqFN1UM+NnULpysaYDE7c4KKj/o4Wylu4C0io3U68=; 
- b=G481YwwOss7M5R/ZPLoqDTrsYKi4W1DJqWuoBWm6EP2eNhiS88dTByoKITM5dmdhNV+A+8JtVB/0PbL/l+6ijeM4ghXo0izpuICZPcgmsuzcKwlBRjZz1qYNqS1n5Nk8M0N38a928wf+X/cDFSt86o5LrSRU/BT67gxAaCvTWmQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1588084488913399.7635687250114;
- Tue, 28 Apr 2020 07:34:48 -0700 (PDT)
-In-Reply-To: <20200428133407.10657-1-dplotnikov@virtuozzo.com>
-Subject: Re: [PATCH v21 0/4] implement zstd cluster compression method
-Message-ID: <158808448742.30407.15546256250575826186@39012742ff91>
+ (envelope-from <alazar@bitdefender.com>) id 1jTRNJ-0005oy-0q
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 10:40:36 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:59150)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alazar@bitdefender.com>)
+ id 1jTRNI-0005oY-GH
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 10:38:16 -0400
+Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
+ by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id
+ D9BDD306E47C; Tue, 28 Apr 2020 17:38:13 +0300 (EEST)
+Received: from localhost (unknown [91.199.104.50])
+ by smtp.bitdefender.com (Postfix) with ESMTPSA id BBC163000E5A;
+ Tue, 28 Apr 2020 17:38:13 +0300 (EEST)
+From: Adalbert =?iso-8859-2?b?TGF643I=?= <alazar@bitdefender.com>
+Subject: Re: [RFC PATCH v1 20/26] kvm: vmi: intercept live migration
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+In-Reply-To: <20200428134320.GE2794@work-vm>
+References: <20200415005938.23895-1-alazar@bitdefender.com>
+ <20200415005938.23895-21-alazar@bitdefender.com>
+ <20200427190855.GN2923@work-vm> <15880760940.91F7391B.25850@host>
+ <20200428122439.GD2794@work-vm> <15880797910.d6Bf.5687@host>
+ <20200428134320.GE2794@work-vm>
+Date: Tue, 28 Apr 2020 17:38:40 +0300
+Message-ID: <15880847200.C32EdC.20466@host>
+User-agent: void
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: dplotnikov@virtuozzo.com
-Date: Tue, 28 Apr 2020 07:34:48 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 09:39:01
+Received-SPF: pass client-ip=91.199.104.161;
+ envelope-from=alazar@bitdefender.com; helo=mx01.bbu.dsd.mx.bitdefender.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 08:14:28
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 136.143.188.57
+X-Received-From: 91.199.104.161
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,50 +70,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com,
- den@openvz.org, mreitz@redhat.com
+Cc: Marian Rotariu <marian.c.rotariu@gmail.com>, qemu-devel@nongnu.org,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQyODEzMzQwNy4xMDY1
-Ny0xLWRwbG90bmlrb3ZAdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYyMSAwLzRdIGltcGxlbWVudCB6c3Rk
-IGNsdXN0ZXIgY29tcHJlc3Npb24gbWV0aG9kCk1lc3NhZ2UtaWQ6IDIwMjAwNDI4MTMzNDA3LjEw
-NjU3LTEtZHBsb3RuaWtvdkB2aXJ0dW96em8uY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwg
-fHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
-aXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4K
-PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-MTQ2ZmYyYSBpb3Rlc3RzOiAyODc6IGFkZCBxY293MiBjb21wcmVzc2lvbiB0eXBlIHRlc3QKNjk0
-YmJjNyBxY293MjogYWRkIHpzdGQgY2x1c3RlciBjb21wcmVzc2lvbgo5NTRhYzBkIHFjb3cyOiBy
-ZXdvcmsgdGhlIGNsdXN0ZXIgY29tcHJlc3Npb24gcm91dGluZQozMjk0YzIxIHFjb3cyOiBpbnRy
-b2R1Y2UgY29tcHJlc3Npb24gdHlwZSBmZWF0dXJlCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzQg
-Q2hlY2tpbmcgY29tbWl0IDMyOTRjMjFmOGE2NiAocWNvdzI6IGludHJvZHVjZSBjb21wcmVzc2lv
-biB0eXBlIGZlYXR1cmUpCjIvNCBDaGVja2luZyBjb21taXQgOTU0YWMwZDBhNTQxIChxY293Mjog
-cmV3b3JrIHRoZSBjbHVzdGVyIGNvbXByZXNzaW9uIHJvdXRpbmUpCjMvNCBDaGVja2luZyBjb21t
-aXQgNjk0YmJjN2JmMDBmIChxY293MjogYWRkIHpzdGQgY2x1c3RlciBjb21wcmVzc2lvbikKRVJS
-T1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzExNTogRklMRTogYmxv
-Y2svcWNvdzItdGhyZWFkcy5jOjIyNToKKyAgICBpZiAoKHpzdGRfcmV0ID0gWlNURF9jb21wcmVz
-c1N0cmVhbTIoY2N0eCwgJm91dHB1dCwgJmlucHV0LCBaU1REX2VfZW5kKSkpIHsKCnRvdGFsOiAx
-IGVycm9ycywgMCB3YXJuaW5ncywgMjM4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvNCBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoKNC80IENoZWNraW5nIGNvbW1pdCAxNDZmZjJhMDc4YTkgKGlv
-dGVzdHM6IDI4NzogYWRkIHFjb3cyIGNvbXByZXNzaW9uIHR5cGUgdGVzdCkKV0FSTklORzogYWRk
-ZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0
-aW5nPwojMjM6IApuZXcgZmlsZSBtb2RlIDEwMDc1NQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5p
-bmdzLCAyMjggbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC80IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
-CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIw
-MjAwNDI4MTMzNDA3LjEwNjU3LTEtZHBsb3RuaWtvdkB2aXJ0dW96em8uY29tL3Rlc3RpbmcuY2hl
-Y2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Tue, 28 Apr 2020 14:43:20 +0100, "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Adalbert Lazăr (alazar@bitdefender.com) wrote:
+> > One use case is to do VM introspection all the time the guest is running.
+> > From the user perspective, the pause/suspend/shutdown/snapshot/migrate
+> > commands should work regardless if the VM is currently introspected
+> > or not. Our first option was to delay these commands for a couple of
+> > seconds when the VM is introspected, while the introspection app reverts
+> > its changes, without blocking the vCPUs.
+> 
+> Ah OK, so it's not really about blocking it completely; just delaying it
+> a bit; in that case add_blocker is the wrong thing.
+> 
+> > I'll see if we can mix the migrate notifier with migrate_add_blocker(),
+> > or add a new migration state. To block the migration (with an error)
+> > is our second option, because the user doing this might not be allowed
+> > to stop the VM introspection.
+> 
+> Maybe the right thing is to do something just like
+> MIGRATION_STATUS_WAIT_UNPLUG, it's right near the start of the thread.
+> Again it's job is just to make the migration wait while it does some
+> stuff before it can let migration continue.
+> 
+
+This is it! Thank you, Dave.
+
+We already register a VMStateDescription structure to save the VM start time
+([18/26] kvm: vmi: store/restore 'vm_start_time' on migrate/snapshot [1]).
+All we have to do is setup the dev_unplug_pending callback and
+return true when the introspection channel is still active.
+
+[1]: https://lore.kernel.org/qemu-devel/20200415005938.23895-19-alazar@bitdefender.com/
 
