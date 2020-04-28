@@ -2,89 +2,111 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C8E6C83004
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:39:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27970C83007
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:44:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C71AA206C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:39:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8A71206D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 09:44:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20150623.gappssmtp.com header.i=@smartx-com.20150623.gappssmtp.com header.b="LzsWTNS6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C71AA206C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UC2zDv9M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8A71206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTMhp-0001WT-UG
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 05:39:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33992)
+	id 1jTMmW-0006CK-7X
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 05:44:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60630)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fengli@smartx.com>) id 1jTMYy-0007Em-F5
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:31:30 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jTMT9-0005yj-Db
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:24:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <fengli@smartx.com>) id 1jTMXB-0008PT-Ii
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 05:29:59 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37780)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1jTLxv-0007Iv-Q9
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:51:44 -0400
-Received: by mail-pf1-x443.google.com with SMTP id d184so10367709pfd.4
- for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 01:51:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=smartx-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=YVaXGPGd8Q2+faJKdiZOSxUYLEVCJh2RPvbe2ldUqVs=;
- b=LzsWTNS6enY0henXY+D+4tLpPLoCZfSR90wWPbRIRQa+87NMUqkvfLVNAz8YdhOvto
- 4c2gmCYVbLKUNyPIYvA6wdfAtSBYsabEJ9g+Fzjk71nmEpQcz9iqYGgJP2DkJieSEcGD
- ZXe4qLfnCzV/HtbIkCW+I84efOl3ID2xm4vtFCgm/n9Us2S6XSvoXwz4M11iiHjNkPP/
- MIw060wLn+G6q7jrrcxH79MBPNDMuwbswnAb0K03XEGCHJOYltxJnHgm6YXu9qJ3aCco
- nI0WjXoIN51E++Dl+nAdo6p4sYPIcraS/unbV7dApDPce1JJuZ3b6hY+/tjjTX/q2U+M
- B5fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=YVaXGPGd8Q2+faJKdiZOSxUYLEVCJh2RPvbe2ldUqVs=;
- b=h6ySa+xipM9TQSxm8C+Iaorw02HEcvyKX1qbw/q62rxDeQ3fS6bIWEb7DO6/zDN3ZE
- 7gg1fKhyt0j1n66BUas5YUgWk0/YguCyz2CwfqwjbohMYZRcDHx9iyKze+pcTrp3oZOV
- 81YAGpYDUuAbSIj1MRDYyHu/0qsrw6i0HsEOs+TZqH2xCISCx8ee81wvfoI3CuJipQc1
- QA5o14LiNsWqMG8TAyT6Pn52dzOTjDUnE3WMiXaOijHfiVy7bL30mSWV4OZ6aLRp/7Dn
- 9C3nt/SZINNZrEKN355SH3HoUfoP/orHPQqQ420JE0kYTkiGk5NNfn/S4gSjyp3o0Fvu
- UVWw==
-X-Gm-Message-State: AGi0Pua3KiHRoDxLUkpjNrUrdwJINgYUTCGFq5SI/clVd5GSH22ROcti
- IJpFWdcC7nbQWHLrk+KKs9Oigw==
-X-Google-Smtp-Source: APiQypL4pFfltLhkobmFcVCNvVENvE3oA9Jl4Cf0/t648eXukIjHwoC93pk6DjTZlXZbVTMW7ffqdw==
-X-Received: by 2002:a62:1c97:: with SMTP id c145mr30019101pfc.68.1588063901508; 
- Tue, 28 Apr 2020 01:51:41 -0700 (PDT)
-Received: from 31_216.localdomain ([47.75.194.237])
- by smtp.gmail.com with ESMTPSA id k4sm10502932pgg.88.2020.04.28.01.51.38
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 28 Apr 2020 01:51:40 -0700 (PDT)
-From: Li Feng <fengli@smartx.com>
-To: kyle@smartx.com, lifeng1519@gmail.com, dimastep@yandex-team.ru,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org (open list:All patches CC here)
-Subject: [PATCH v2] char-socket: initialize reconnect timer only when the
- timer doesn't start
-Date: Tue, 28 Apr 2020 16:51:21 +0800
-Message-Id: <20200428085122.1621-1-fengli@smartx.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20200415032826.16701-4-fengli@smartx.com>
-References: <20200415032826.16701-4-fengli@smartx.com>
-Received-SPF: none client-ip=2607:f8b0:4864:20::443;
- envelope-from=fengli@smartx.com; helo=mail-pf1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::443
+ (envelope-from <mreitz@redhat.com>) id 1jTLz8-0007XY-3A
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:57:54 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33007
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTLz7-0007XJ-Gk
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 04:52:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588063976;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=cjdUEQHGZb0sfVpEwg7oXdqDO3o9GpcB0Vz3zhKTjAU=;
+ b=UC2zDv9MQDNc9jiETAKYxsw8ObKTQg4n/kx5ELWHgIW5eR73ezEjKYsEeRrpY4QhewA0OI
+ YPoBo43vOK10CgM6jAXyITYGKMs6qPSVo2XtEkNUjGWQl4ABprPFflBooCHGbN6RDwDLxH
+ ZjArL6cJ7MIcPkr7Bhsb2qGwKIp0Akk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-187-dxStsTvXMfeZ4aPFnVq6wA-1; Tue, 28 Apr 2020 04:52:53 -0400
+X-MC-Unique: dxStsTvXMfeZ4aPFnVq6wA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6549D1899521;
+ Tue, 28 Apr 2020 08:52:52 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 01C3F1002388;
+ Tue, 28 Apr 2020 08:52:50 +0000 (UTC)
+Subject: Re: [PATCH v2 4/6] block/block-copy: move task size initial
+ calculation to _task_create
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200325134639.16337-1-vsementsov@virtuozzo.com>
+ <20200325134639.16337-5-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <630a5655-7b00-3ee4-943d-e4b5ad52db57@redhat.com>
+Date: Tue, 28 Apr 2020 10:52:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
+MIME-Version: 1.0
+In-Reply-To: <20200325134639.16337-5-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="KFVOL47rrfni8ryVIhgHL7balCRG4fnPb"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:11:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,194 +118,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Feng <fengli@smartx.com>
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When the disconnect event is triggered in the connecting stage,
-the tcp_chr_disconnect_locked may be called twice.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KFVOL47rrfni8ryVIhgHL7balCRG4fnPb
+Content-Type: multipart/mixed; boundary="4hKalja2jVV1Lpf1R7NlLRQBhDvYNzKpA"
 
-The first call:
-    #0  qemu_chr_socket_restart_timer (chr=0x55555582ee90) at chardev/char-socket.c:120
-    #1  0x000055555558e38c in tcp_chr_disconnect_locked (chr=<optimized out>) at chardev/char-socket.c:490
-    #2  0x000055555558e3cd in tcp_chr_disconnect (chr=0x55555582ee90) at chardev/char-socket.c:497
-    #3  0x000055555558ea32 in tcp_chr_new_client (chr=chr@entry=0x55555582ee90, sioc=sioc@entry=0x55555582f0b0) at chardev/char-socket.c:892
-    #4  0x000055555558eeb8 in qemu_chr_socket_connected (task=0x55555582f300, opaque=<optimized out>) at chardev/char-socket.c:1090
-    #5  0x0000555555574352 in qio_task_complete (task=task@entry=0x55555582f300) at io/task.c:196
-    #6  0x00005555555745f4 in qio_task_thread_result (opaque=0x55555582f300) at io/task.c:111
-    #7  qio_task_wait_thread (task=0x55555582f300) at io/task.c:190
-    #8  0x000055555558f17e in tcp_chr_wait_connected (chr=0x55555582ee90, errp=0x555555802a08 <error_abort>) at chardev/char-socket.c:1013
-    #9  0x0000555555567cbd in char_socket_client_reconnect_test (opaque=0x5555557fe020 <client8unix>) at tests/test-char.c:1152
-The second call:
-    #0  0x00007ffff5ac3277 in raise () from /lib64/libc.so.6
-    #1  0x00007ffff5ac4968 in abort () from /lib64/libc.so.6
-    #2  0x00007ffff5abc096 in __assert_fail_base () from /lib64/libc.so.6
-    #3  0x00007ffff5abc142 in __assert_fail () from /lib64/libc.so.6
-    #4  0x000055555558d10a in qemu_chr_socket_restart_timer (chr=0x55555582ee90) at chardev/char-socket.c:125
-    #5  0x000055555558df0c in tcp_chr_disconnect_locked (chr=<optimized out>) at chardev/char-socket.c:490
-    #6  0x000055555558df4d in tcp_chr_disconnect (chr=0x55555582ee90) at chardev/char-socket.c:497
-    #7  0x000055555558e5b2 in tcp_chr_new_client (chr=chr@entry=0x55555582ee90, sioc=sioc@entry=0x55555582f0b0) at chardev/char-socket.c:892
-    #8  0x000055555558e93a in tcp_chr_connect_client_sync (chr=chr@entry=0x55555582ee90, errp=errp@entry=0x7fffffffd178) at chardev/char-socket.c:944
-    #9  0x000055555558ec78 in tcp_chr_wait_connected (chr=0x55555582ee90, errp=0x555555802a08 <error_abort>) at chardev/char-socket.c:1035
-    #10 0x000055555556804b in char_socket_client_test (opaque=0x5555557fe020 <client8unix>) at tests/test-char.c:1023
+--4hKalja2jVV1Lpf1R7NlLRQBhDvYNzKpA
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Run test/test-char to reproduce this issue.
+On 25.03.20 14:46, Vladimir Sementsov-Ogievskiy wrote:
+> Comment "Called only on full-dirty region" without corresponding
+> assertion is a very unsafe thing.
 
-test-char: chardev/char-socket.c:125: qemu_chr_socket_restart_timer: Assertion `!s->reconnect_timer' failed.
+Not sure whether it=92s that unsafe for a static function with a single
+caller, but, well.
 
-Signed-off-by: Li Feng <fengli@smartx.com>
----
-v2:
-- Rewrite the solution.
-- Add test to reproduce this issue.
+> Adding assertion means call
+> bdrv_dirty_bitmap_next_zero twice. Instead, let's move
+> bdrv_dirty_bitmap_next_zero call to block_copy_task_create. It also
+> allows to drop cur_bytes variable which partly duplicate task->bytes.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/block-copy.c | 47 ++++++++++++++++++++++++----------------------
+>  1 file changed, 25 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/block/block-copy.c b/block/block-copy.c
+> index 63d8468b27..dd406eb4bb 100644
+> --- a/block/block-copy.c
+> +++ b/block/block-copy.c
+> @@ -106,12 +106,23 @@ static bool coroutine_fn block_copy_wait_one(BlockC=
+opyState *s, int64_t offset,
+>      return true;
+>  }
+> =20
+> -/* Called only on full-dirty region */
+>  static BlockCopyTask *block_copy_task_create(BlockCopyState *s,
+>                                               int64_t offset, int64_t byt=
+es)
 
- chardev/char-socket.c |  2 +-
- tests/test-char.c     | 48 ++++++++++++++++++++++++++++++++++++++----------
- 2 files changed, 39 insertions(+), 11 deletions(-)
+A bit of documentation on the new interface might be nice.  For one
+thing, that @offset must be dirty, although there is an assertion that,
+well, checks it.  (An assertion doesn=92t really check anything, it rather
+verifies a contract.  And violation is fatal.)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 1f14c2c7c8..d84330b3c9 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -486,7 +486,7 @@ static void tcp_chr_disconnect_locked(Chardev *chr)
-     if (emit_close) {
-         qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-     }
--    if (s->reconnect_time) {
-+    if (s->reconnect_time && !s->reconnect_timer) {
-         qemu_chr_socket_restart_timer(chr);
-     }
- }
-diff --git a/tests/test-char.c b/tests/test-char.c
-index 8d39bdc9fa..13dbbfe2a3 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -625,12 +625,14 @@ static void char_udp_test(void)
- typedef struct {
-     int event;
-     bool got_pong;
-+    CharBackend *be;
- } CharSocketTestData;
- 
- 
- #define SOCKET_PING "Hello"
- #define SOCKET_PONG "World"
- 
-+typedef void (*char_socket_cb)(void *opaque, QEMUChrEvent event);
- 
- static void
- char_socket_event(void *opaque, QEMUChrEvent event)
-@@ -639,6 +641,23 @@ char_socket_event(void *opaque, QEMUChrEvent event)
-     data->event = event;
- }
- 
-+static void
-+char_socket_event_with_error(void *opaque, QEMUChrEvent event)
-+{
-+    CharSocketTestData *data = opaque;
-+    CharBackend *be = data->be;
-+    data->event = event;
-+    switch (event) {
-+    case CHR_EVENT_OPENED:
-+        qemu_chr_fe_disconnect(be);
-+        return;
-+    case CHR_EVENT_CLOSED:
-+        return;
-+    default:
-+        return;
-+    }
-+}
-+
- 
- static void
- char_socket_read(void *opaque, const uint8_t *buf, int size)
-@@ -783,6 +802,7 @@ static void char_socket_server_test(gconstpointer opaque)
- 
-  reconnect:
-     data.event = -1;
-+    data.be = &be;
-     qemu_chr_fe_set_handlers(&be, NULL, NULL,
-                              char_socket_event, NULL,
-                              &data, NULL, true);
-@@ -869,6 +889,7 @@ typedef struct {
-     const char *reconnect;
-     bool wait_connected;
-     bool fd_pass;
-+    char_socket_cb event_cb;
- } CharSocketClientTestConfig;
- 
- static void char_socket_client_dupid_test(gconstpointer opaque)
-@@ -920,6 +941,7 @@ static void char_socket_client_dupid_test(gconstpointer opaque)
- static void char_socket_client_test(gconstpointer opaque)
- {
-     const CharSocketClientTestConfig *config = opaque;
-+    const char_socket_cb event_cb = config->event_cb;
-     QIOChannelSocket *ioc;
-     char *optstr;
-     Chardev *chr;
-@@ -983,8 +1005,9 @@ static void char_socket_client_test(gconstpointer opaque)
- 
-  reconnect:
-     data.event = -1;
-+    data.be = &be;
-     qemu_chr_fe_set_handlers(&be, NULL, NULL,
--                             char_socket_event, NULL,
-+                             event_cb, NULL,
-                              &data, NULL, true);
-     if (config->reconnect) {
-         g_assert(data.event == -1);
-@@ -1022,7 +1045,7 @@ static void char_socket_client_test(gconstpointer opaque)
-     /* Setup a callback to receive the reply to our greeting */
-     qemu_chr_fe_set_handlers(&be, char_socket_can_read,
-                              char_socket_read,
--                             char_socket_event, NULL,
-+                             event_cb, NULL,
-                              &data, NULL, true);
-     g_assert(data.event == CHR_EVENT_OPENED);
-     data.event = -1;
-@@ -1467,19 +1490,22 @@ int main(int argc, char **argv)
- 
- #define SOCKET_CLIENT_TEST(name, addr)                                  \
-     static CharSocketClientTestConfig client1 ## name =                 \
--        { addr, NULL, false, false };                                   \
-+        { addr, NULL, false, false, char_socket_event};                 \
-     static CharSocketClientTestConfig client2 ## name =                 \
--        { addr, NULL, true, false };                                    \
-+        { addr, NULL, true, false, char_socket_event };                 \
-     static CharSocketClientTestConfig client3 ## name =                 \
--        { addr, ",reconnect=1", false };                                \
-+        { addr, ",reconnect=1", false, false, char_socket_event };      \
-     static CharSocketClientTestConfig client4 ## name =                 \
--        { addr, ",reconnect=1", true };                                 \
-+        { addr, ",reconnect=1", true, false, char_socket_event };       \
-     static CharSocketClientTestConfig client5 ## name =                 \
--        { addr, NULL, false, true };                                    \
-+        { addr, NULL, false, true, char_socket_event };                 \
-     static CharSocketClientTestConfig client6 ## name =                 \
--        { addr, NULL, true, true };                                     \
-+        { addr, NULL, true, true, char_socket_event };                  \
-     static CharSocketClientTestConfig client7 ## name =                 \
--        { addr, ",reconnect=1", false, false };                         \
-+        { addr, ",reconnect=1", false, false, char_socket_event };      \
-+    static CharSocketClientTestConfig client8 ## name =                 \
-+        { addr, ",reconnect=1", true, false,                            \
-+            char_socket_event_with_error };                             \
-     g_test_add_data_func("/char/socket/client/mainloop/" # name,        \
-                          &client1 ##name, char_socket_client_test);     \
-     g_test_add_data_func("/char/socket/client/wait-conn/" # name,       \
-@@ -1493,7 +1519,9 @@ int main(int argc, char **argv)
-     g_test_add_data_func("/char/socket/client/wait-conn-fdpass/" # name, \
-                          &client6 ##name, char_socket_client_test);     \
-     g_test_add_data_func("/char/socket/client/dupid-reconnect/" # name, \
--                         &client7 ##name, char_socket_client_dupid_test)
-+                         &client7 ##name, char_socket_client_dupid_test);\
-+    g_test_add_data_func("/char/socket/client/reconnect-error/" # name, \
-+                         &client8 ##name, char_socket_client_test)
- 
-     if (has_ipv4) {
-         SOCKET_SERVER_TEST(tcp, &tcpaddr);
--- 
-2.11.0
+For another, what the range [offset, offset + bytes) is; namely
+basically the whole range of data that we might potentially copy, only
+that the head must be dirty, but the tail may be clean.
+
+Which makes me think that the interface is maybe less than intuitive.
+It would make more sense if we could just call this function on the
+whole region and it would figure out whether @offset is dirty by itself
+(and return NULL if it isn=92t).
+
+OTOH I suppose the interface how it is here is more useful for
+task-ification.  But maybe that should be documented.
+
+>  {
+> +    int64_t next_zero;
+>      BlockCopyTask *task =3D g_new(BlockCopyTask, 1);
+> =20
+> +    assert(bdrv_dirty_bitmap_get(s->copy_bitmap, offset));
+> +
+> +    bytes =3D MIN(bytes, s->copy_size);
+> +    next_zero =3D bdrv_dirty_bitmap_next_zero(s->copy_bitmap, offset, by=
+tes);
+> +    if (next_zero >=3D 0) {
+> +        assert(next_zero > offset); /* offset is dirty */
+> +        assert(next_zero < offset + bytes); /* no need to do MIN() */
+> +        bytes =3D next_zero - offset;
+> +    }
+> +
+> +    /* region is dirty, so no existent tasks possible in it */
+
+s/existent/existing/?
+
+(The code movement and how you replaced cur_bytes by task->bytes looks
+good.)
+
+Max
+
+>      assert(!find_conflicting_task(s, offset, bytes));
+> =20
+>      bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
+
+
+--4hKalja2jVV1Lpf1R7NlLRQBhDvYNzKpA--
+
+--KFVOL47rrfni8ryVIhgHL7balCRG4fnPb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6n7uEACgkQ9AfbAGHV
+z0CzWggAvwt2QGFcPWkETOOvrxjtRynLvO/RQAGJydwG/7qxDcO5BZxdnO7a3teD
+Znp19KAqe0ehbgJrdSNuxRfu4a4Dvgg0WshrTaZ0se7A7qy+/XpEIjh6dIUTEnN4
+3kAB4C+Zl4kktY4mjQJsjTwMOUIOL+feiYlCgy0ARM7zRXjr0r4WM7/V88+nEc8a
+2Z/k/94miJc6Bx+9+92RaTpSR+Q/jUBtVPg6iUobZWVzYdQHOFHTlutVl0CO67xQ
+McuP7FppaNOgcQnL8l5jHOF/O/xRWRigwM0MXU2DQJFcRPrpkasg24kZ0ccBp+K4
+8z9UtEjPFywTOLciHL3SXJHIbKpElw==
+=AJgQ
+-----END PGP SIGNATURE-----
+
+--KFVOL47rrfni8ryVIhgHL7balCRG4fnPb--
 
 
