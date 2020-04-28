@@ -2,99 +2,82 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF38C83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 15:06:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5221C83000
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 15:07:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFEF4205C9
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 15:06:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A034C205C9
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 15:07:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SNGb0Vyu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFEF4205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TI7jD3lW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A034C205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTRoP-0006lf-Dc
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 11:06:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49458)
+	id 1jTRpH-0008J2-PS
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 11:07:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49536)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jTRmP-0005l9-Sn
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 11:05:12 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jTRmY-0005lS-Oh
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 11:06:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jTRkN-0007D1-52
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 11:04:13 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39967)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jTRkM-0007Bg-LP
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 11:02:06 -0400
-Received: by mail-pl1-x643.google.com with SMTP id t16so8465301plo.7
- for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 08:02:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=51pRypiGFKSGI4pYYYy/oWUaBflFIbs/RrLf++hBG20=;
- b=SNGb0VyuRnRh3WVgHha7whyhblwGUKS5Ilsatd6ThWGikhGmviLo1J0B6KbcRSfvXs
- caT2RF2ykTsjZS0CMMnwpYNONjvAIlouYmJkwuWNfg9THyPDPyC9JlzmDFiMLSTkIfBG
- loIhFtwnuxK8CRfkxYfRvzZfFPCCARAAQzvxW05Efhv/FK6q4g3klXI1JVMhTIwO7uSC
- bllBRnCQQCOm2kmP5ql6svaV1njZbjaAm+D91fvxOIC8FeSF1YyQ0vwVHwaerLKip3DB
- cEqAs290R1eNKStR05RQYO4gTo6BsUKDLioazCXtlcCksr0/kbsbp97P3fhyKbkS/mFl
- lovw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=51pRypiGFKSGI4pYYYy/oWUaBflFIbs/RrLf++hBG20=;
- b=b7CupncQ2sj0bFjutewS9oKhl2QnDKQ0o36OrQwjIKiWiFaaJ4TzahumsrvYjggB8q
- KN5u7gblkjuR6xsgsRS9sC6Csr2mWfKnalWMRJ01lLRFKz8FrYCjOSjh5iD2j6jsmpCS
- t9l01jTn9Vftxjwt/ASy44To+HiRdjWPpdB5BZnqjCyAZOz98EgJqa2/b9FzzDw1hWRw
- xZH8/Bd/FAMXOOkNxWgpAJnEVQnYKZNwhq2uDKBClcoQWPc8SUUmsePX9ia9jROM01l1
- JzvH2OGHQKdEr88swoChQ/dRR8EpXFNaV5sxsFQr4tA0QiDrtwQBnZ8bK6VxdPf647fJ
- rKDg==
-X-Gm-Message-State: AGi0PuZ/uDMFHjA5qPzfQ1q7bhlP+7M5AYeB+o77AHFKO2B6Lse9WPeO
- led96pG+ZSHfWMekf/pohl44Lw==
-X-Google-Smtp-Source: APiQypIEdxLMy5vPcIjOv6L4SuwKYa+3vtDteaMNS3VEpC2eRbNDzxlV5lVDpBTNWZ4FeNsF2OiHQA==
-X-Received: by 2002:a17:902:5a03:: with SMTP id
- q3mr11264040pli.45.1588086124325; 
- Tue, 28 Apr 2020 08:02:04 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id w66sm15307675pfw.50.2020.04.28.08.02.03
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 28 Apr 2020 08:02:03 -0700 (PDT)
-Subject: Re: [PATCH v3 13/18] target/arm: Update contiguous first-fault and
- no-fault loads
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200422043309.18430-1-richard.henderson@linaro.org>
- <20200422043309.18430-14-richard.henderson@linaro.org>
- <CAFEAcA8oWP9XGzD+pb_VhDth8zx8j1Gz4vwiK+dArpw8x1BmqA@mail.gmail.com>
- <22c1fd55-7cd3-6320-1f90-40d1bd2cc883@linaro.org>
- <CAFEAcA-iqrEi_wQ+mBN1NtrEKq3uDYPoDunqW5e9KV6ivz3-SQ@mail.gmail.com>
- <d148806b-c7f1-fefc-bfb4-fcefb81ab509@linaro.org>
- <CAFEAcA-iJWqPQ-SwukaBcxgNFppAmeZNUR2doz6sgV6RduC32A@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <df19b271-55ad-9071-2790-d0d4991fe831@linaro.org>
-Date: Tue, 28 Apr 2020 08:02:01 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <kwolf@redhat.com>) id 1jTRlX-0007nm-Eh
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 11:04:22 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59935
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jTRlV-0007nJ-B2
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 11:03:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588086196;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=yAqwhX3+AnzKdJLw0RQWKD4jv3O+DvVGr5w9/stfNX8=;
+ b=TI7jD3lWUqrein5g+3+XesII8+D5QkTeaRFsGuyEqhCO9jlJnCDWqbVYmbvWcboBJvFZ6i
+ k2sYCqq59LfBiJvSFBcZmy88xzEHi3BChfrEA2dZrmyeoQA2woSf7u0azvJ+nsvnGZNspp
+ 6Tzj6am3yXfyKuRfaFinxRp4b8GDpDo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-353-uLiyU3s6NQSkdpqxWbYXGg-1; Tue, 28 Apr 2020 11:03:14 -0400
+X-MC-Unique: uLiyU3s6NQSkdpqxWbYXGg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F338800685;
+ Tue, 28 Apr 2020 15:03:13 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-37.ams2.redhat.com [10.36.114.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C6175600D2;
+ Tue, 28 Apr 2020 15:03:12 +0000 (UTC)
+Date: Tue, 28 Apr 2020 17:03:11 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [PATCH 4/4] block: Use blk_make_empty() after commits
+Message-ID: <20200428150311.GK5789@linux.fritz.box>
+References: <20200428132629.796753-1-mreitz@redhat.com>
+ <20200428132629.796753-5-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-iJWqPQ-SwukaBcxgNFppAmeZNUR2doz6sgV6RduC32A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::643
+In-Reply-To: <20200428132629.796753-5-mreitz@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:11:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,38 +89,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/27/20 11:38 AM, Peter Maydell wrote:
-> I would suggest something like:
-> 
-> +     * From this point on, all memory operations are MemSingleNF.
-> +     *
-> +     * Per the MemSingleNF pseudocode, a no-fault load from Device memory
-> +     * must not actually hit the bus -- it returns (UNKNOWN, FAULT) instead.
-> +     *
-> +     * Unfortuately we do not have access to the memory attributes from the PTE
-> +     * to tell Device memory from Normal memory. So we make a mostly
-> +     * correct check, and indicate (UNKNOWN, FAULT) for any MMIO.
-> +     * This gives the right answer for the common cases of "Normal memory,
-> +     * backed by host RAM" and "Device memory, backed by MMIO".
-> +     * The architecture allows us to suppress an NF load and return
-> +     * (UNKNOWN, FAULT) for any reason), so our behaviour (indicate
-> +     * fault) for the corner case of "Normal memory, backed by MMIO" is
-> +     * permitted. The case we get wrong is "Device memory, backed by
-> +     * host RAM", which we should return (UNKNOWN, FAULT) for but do not.
-> +     *
-> +     * Similarly, CPU_BP breakpoints would raise exceptions, and so
-> +     * return (UNKNOWN, FAULT).  For simplicity, we consider gdb and
-> +     * architectural breakpoints the same.
-> 
-> assuming my understanding is correct...
+Am 28.04.2020 um 15:26 hat Max Reitz geschrieben:
+> bdrv_commit() already has a BlockBackend pointing to the BDS that we
+> want to empty, it just has the wrong permissions.
+>=20
+> qemu-img commit has no BlockBackend pointing to the old backing file
+> yet, but introducing one is simple.
+>=20
+> After this commit, bdrv_make_empty() is the only remaining caller of
+> BlockDriver.bdrv_make_empty().
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/commit.c |  8 +++++++-
+>  qemu-img.c     | 19 ++++++++++++++-----
+>  2 files changed, 21 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/block/commit.c b/block/commit.c
+> index 8e672799af..24720ba67d 100644
+> --- a/block/commit.c
+> +++ b/block/commit.c
+> @@ -493,10 +493,16 @@ int bdrv_commit(BlockDriverState *bs)
+>      }
+> =20
+>      if (drv->bdrv_make_empty) {
+> -        ret =3D drv->bdrv_make_empty(bs);
+> +        ret =3D blk_set_perm(src, BLK_PERM_WRITE, BLK_PERM_ALL, NULL);
 
-Yep, thanks.  I'll merge this text.
+This is very likely to fail because the common case is that the source
+node is attached to a guest device that doesn't share writes.
+(qemu-iotests 131 and 274 catch this.)
 
+So I think after my theoretical comment in patch 1, this is the
+practical reason why we need WRITE_UNCHANGED rather than WRITE.
 
-r~
+Also, why don't you take this permission from the start so that we would
+error out right away rather than failing after waiting for the all the
+data to be copied?
+
+>          if (ret < 0) {
+>              goto ro_cleanup;
+>          }
+> +
+> +        ret =3D blk_make_empty(src, NULL);
+> +        if (ret < 0) {
+> +            goto ro_cleanup;
+> +        }
+> +
+>          blk_flush(src);
+>      }
+> =20
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 821cbf610e..a5e8659867 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -1065,11 +1065,20 @@ static int img_commit(int argc, char **argv)
+>          goto unref_backing;
+>      }
+> =20
+> -    if (!drop && bs->drv->bdrv_make_empty) {
+> -        ret =3D bs->drv->bdrv_make_empty(bs);
+> -        if (ret) {
+> -            error_setg_errno(&local_err, -ret, "Could not empty %s",
+> -                             filename);
+> +    if (!drop) {
+> +        BlockBackend *old_backing_blk;
+> +
+> +        old_backing_blk =3D blk_new_with_bs(bs, BLK_PERM_WRITE, BLK_PERM=
+_ALL,
+> +                                          &local_err);
+
+Oh, you actually depend on another series that you didn't mention in
+the cover letter.
+
+> +        if (!old_backing_blk) {
+> +            goto unref_backing;
+> +        }
+> +        ret =3D blk_make_empty(old_backing_blk, &local_err);
+> +        blk_unref(old_backing_blk);
+> +        if (ret =3D=3D -ENOTSUP) {
+> +            error_free(local_err);
+> +            local_err =3D NULL;
+> +        } else if (ret < 0) {
+>              goto unref_backing;
+>          }
+>      }
+
+Kevin
+
 
