@@ -2,86 +2,91 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2BCFC83004
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 18:52:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E0DEC83004
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 18:57:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A201720575
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 18:52:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6A3E20B80
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 18:57:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YuzH9VUK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A201720575
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PS5mzIT9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6A3E20B80
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTVKp-0005TQ-N8
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 14:51:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53662)
+	id 1jTVQU-0000Lu-SS
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 14:57:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54356)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jTVJq-0004bp-I6
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 14:50:58 -0400
+ (envelope-from <frasse.iglesias@gmail.com>) id 1jTVPT-0007vJ-Or
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 14:56:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jTVJp-0002tA-D2
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 14:50:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47689
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jTVJo-0002sm-Pa
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 14:50:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588099855;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=67gahdHtJfVQl5pSWcO/99XcqqkIJhB7HW5ibQI7LKM=;
- b=YuzH9VUKi2bzSuNgUydZemfaEiHEx7go8KaG9qMR8YLeE8axglJ1M6KH9iUxGgrxCTOakQ
- zh2dMQf5y1vSFZm7FBCwIRxOz04ERJ+/xJuBineWHd8aleFt9oZP97XOUH6GeUlAvx4Jte
- 9tr4wJOO9fiIdLyPBqrMiwd0XmQS0R8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-hCBidi6JN92OSNyeKqOnBQ-1; Tue, 28 Apr 2020 14:50:53 -0400
-X-MC-Unique: hCBidi6JN92OSNyeKqOnBQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45E44108BD09
- for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 18:50:52 +0000 (UTC)
-Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5694C60D37;
- Tue, 28 Apr 2020 18:50:51 +0000 (UTC)
-Subject: Re: [PATCH 17/17] qom: Drop @errp parameter of object_property_del()
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200428163419.4483-1-armbru@redhat.com>
- <20200428163419.4483-18-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <c695d53c-1126-f121-b452-1931b84cb25d@redhat.com>
-Date: Tue, 28 Apr 2020 13:50:50 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <frasse.iglesias@gmail.com>) id 1jTVP0-0007iY-46
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 14:56:47 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:35968)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <frasse.iglesias@gmail.com>)
+ id 1jTVOz-0007h2-Mr; Tue, 28 Apr 2020 14:56:17 -0400
+Received: by mail-lj1-x244.google.com with SMTP id u15so22642382ljd.3;
+ Tue, 28 Apr 2020 11:56:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=3WQb39qb3qFPRCFp9//hGfhfcbKualdj6DWguugT4sM=;
+ b=PS5mzIT9W6+NMGb46exgifnv5s6PWmaslFSwUXObkx7oNYuse7FIovkhjf7woJ4PxV
+ wKog6MpJfvaVFuJqbf/wdqtmJs8SY9j73H2qsGikzPMEVlpNRJEuSrzHpGxKvAXCa1fb
+ UTLD8GHgiJUeBFA14sEOPHN+F9ph1iDZoCKAN8K0sGrRUe2JmC9FVYhatwgU2BReMr21
+ ouz5VSEL2WGEYCrGCMj3PFYzFHPzmpeBsf5Fnu1bJAdi+XVQGRlSVrhAbfmnV0SE7XiJ
+ nbGNIeaO0Z7O5IM8CtHbq5vWhnw++kovMRR36dR507RnF1Fu0BwG4dihpG2a693wUltg
+ B3zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=3WQb39qb3qFPRCFp9//hGfhfcbKualdj6DWguugT4sM=;
+ b=mLX2EJWV96DbHMsbbVvp6GDR+LeiQWngpEW9uuTV+uIDrwFpMlgitxhnWshPAwrd9N
+ 5EXWGURh5NPymcgal3FIZwlZmnCUU5zt56bYY0rBo0p9tKn3+gQHdPUgikW93MEFCmjt
+ 2Tq+eFJs3VDaNPtNEjAObTGkx6wyjlQ7HRTnRbe3OCWs12SQY1NXnZpnFmPI4XsQQsb+
+ 2kRyx2/pYQJ2JEFuL6RUcg4rPofPzmT/oUB788dzTQA89AmFQZyvmww5PPulqZrWSJuE
+ HVu0j03QqrpS7Ns7dyHwrax5v8IFaghmrwryS13wPOLhn/C+rlvFZcAhaODVPKyW7plr
+ UvNg==
+X-Gm-Message-State: AGi0PuZEq6PFK7PTcY/OyaX/Y2zBh9lJykiUCX1h+q5fl4wa9UHWQWIp
+ oB56hUGgM84JMJvvgSPGGV0=
+X-Google-Smtp-Source: APiQypLjU9FWBw0yIoL+8MYsOiEH/p3XvOwKJeJL4GGlAnVPlh3DSR5WB4PTc06IczbFzaFh6VhgQw==
+X-Received: by 2002:a2e:90c9:: with SMTP id o9mr16614941ljg.187.1588100175013; 
+ Tue, 28 Apr 2020 11:56:15 -0700 (PDT)
+Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
+ by smtp.gmail.com with ESMTPSA id
+ j22sm77869lfg.96.2020.04.28.11.56.13
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Tue, 28 Apr 2020 11:56:14 -0700 (PDT)
+Date: Tue, 28 Apr 2020 20:56:12 +0200
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
+To: Vikram Garhwal <fnu.vikram@xilinx.com>
+Subject: Re: [PATCH v3 2/4] xlnx-zynqmp: Connect Xilinx ZynqMP CAN controller
+Message-ID: <20200428185611.qn4nolfq2zklahxm@fralle-msi>
+References: <1587603369-14644-1-git-send-email-fnu.vikram@xilinx.com>
+ <1587603369-14644-3-git-send-email-fnu.vikram@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <20200428163419.4483-18-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 02:16:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1587603369-14644-3-git-send-email-fnu.vikram@xilinx.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
+Received-SPF: pass client-ip=2a00:1450:4864:20::244;
+ envelope-from=frasse.iglesias@gmail.com; helo=mail-lj1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,59 +98,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ "open list:Xilinx ZynqMP" <qemu-arm@nongnu.org>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair@alistair23.me>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/28/20 11:34 AM, Markus Armbruster wrote:
-> Same story as for object_property_add(): the only way
-> object_property_del() can fail is when the property with this name
-> does not exist.  Since our property names are all hardcoded, failure
-> is a programming error, and the appropriate way to handle it is
-> passing &error_abort.  Most callers do that, the commit before
-> previous fixed one that didn't (and got the error handling wrong), and
-> the two remaining exceptions ignore errors.
+Hi Vikram,
+
+A couple of more comments:
+
+On the git summary:
+s/controller/controllers/
+
+On [2020 Apr 22] Wed 17:56:07, Vikram Garhwal wrote:
+> Connect CAN0 and CAN1 to ZCU102 board.
+
+Perhaps also:
+s/to ZCU102 board/on the ZynqMP/
+
+(even though zcu102 is the only board using it at the moment).
+
+Best regards,
+Francisco
+
 > 
-> Drop the @errp parameter and assert the precondition instead.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
 > ---
-
-I skipped review of 15/17 (it's less mechanical, and although the commit 
-message was good, verifying that the patch matches the commit message is 
-a bigger task).  But assuming it is right, then this one indeed makes sense.
-
-
-> +++ b/qom/object.c
-> @@ -1280,15 +1280,10 @@ ObjectProperty *object_class_property_find(ObjectClass *klass, const char *name,
->       return prop;
->   }
->   
-> -void object_property_del(Object *obj, const char *name, Error **errp)
-> +void object_property_del(Object *obj, const char *name)
->   {
->       ObjectProperty *prop = g_hash_table_lookup(obj->properties, name);
->   
-> -    if (!prop) {
-> -        error_setg(errp, "Property '.%s' not found", name);
-> -        return;
-> -    }
-> -
->       if (prop->release) {
->           prop->release(obj, name, prop->opaque);
->       }
-
-However, the commit message says you assert the precondition, whereas 
-the code SEGVs rather than asserts if the precondition is not met.  In 
-practice, both will flag the programmer error, so I don't care which you 
-do, but it's worth making the commit match the intent: Did you mean to 
-add an assert()?
-
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+>  hw/arm/xlnx-zynqmp.c         | 26 ++++++++++++++++++++++++++
+>  include/hw/arm/xlnx-zynqmp.h |  3 +++
+>  2 files changed, 29 insertions(+)
+> 
+> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+> index b84d153..e5f0d9f 100644
+> --- a/hw/arm/xlnx-zynqmp.c
+> +++ b/hw/arm/xlnx-zynqmp.c
+> @@ -81,6 +81,14 @@ static const int uart_intr[XLNX_ZYNQMP_NUM_UARTS] = {
+>      21, 22,
+>  };
+>  
+> +static const uint64_t can_addr[XLNX_ZYNQMP_NUM_CAN] = {
+> +    0xFF060000, 0xFF070000,
+> +};
+> +
+> +static const int can_intr[XLNX_ZYNQMP_NUM_CAN] = {
+> +    23, 24,
+> +};
+> +
+>  static const uint64_t sdhci_addr[XLNX_ZYNQMP_NUM_SDHCI] = {
+>      0xFF160000, 0xFF170000,
+>  };
+> @@ -254,6 +262,11 @@ static void xlnx_zynqmp_init(Object *obj)
+>                                TYPE_CADENCE_UART);
+>      }
+>  
+> +    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
+> +        sysbus_init_child_obj(obj, "can[*]", &s->can[i], sizeof(s->can[i]),
+> +                              TYPE_XLNX_ZYNQMP_CAN);
+> +    }
+> +
+>      sysbus_init_child_obj(obj, "sata", &s->sata, sizeof(s->sata),
+>                            TYPE_SYSBUS_AHCI);
+>  
+> @@ -508,6 +521,19 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+>                             gic_spi[uart_intr[i]]);
+>      }
+>  
+> +    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
+> +        object_property_set_int(OBJECT(&s->can[i]), i, "ctrl-idx",
+> +                                &error_abort);
+> +        object_property_set_bool(OBJECT(&s->can[i]), true, "realized", &err);
+> +        if (err) {
+> +            error_propagate(errp, err);
+> +            return;
+> +        }
+> +        sysbus_mmio_map(SYS_BUS_DEVICE(&s->can[i]), 0, can_addr[i]);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->can[i]), 0,
+> +                           gic_spi[can_intr[i]]);
+> +    }
+> +
+>      object_property_set_int(OBJECT(&s->sata), SATA_NUM_PORTS, "num-ports",
+>                              &error_abort);
+>      object_property_set_bool(OBJECT(&s->sata), true, "realized", &err);
+> diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+> index 53076fa..2be0ff9 100644
+> --- a/include/hw/arm/xlnx-zynqmp.h
+> +++ b/include/hw/arm/xlnx-zynqmp.h
+> @@ -22,6 +22,7 @@
+>  #include "hw/intc/arm_gic.h"
+>  #include "hw/net/cadence_gem.h"
+>  #include "hw/char/cadence_uart.h"
+> +#include "hw/net/xlnx-zynqmp-can.h"
+>  #include "hw/ide/ahci.h"
+>  #include "hw/sd/sdhci.h"
+>  #include "hw/ssi/xilinx_spips.h"
+> @@ -41,6 +42,7 @@
+>  #define XLNX_ZYNQMP_NUM_RPU_CPUS 2
+>  #define XLNX_ZYNQMP_NUM_GEMS 4
+>  #define XLNX_ZYNQMP_NUM_UARTS 2
+> +#define XLNX_ZYNQMP_NUM_CAN 2
+>  #define XLNX_ZYNQMP_NUM_SDHCI 2
+>  #define XLNX_ZYNQMP_NUM_SPIS 2
+>  #define XLNX_ZYNQMP_NUM_GDMA_CH 8
+> @@ -92,6 +94,7 @@ typedef struct XlnxZynqMPState {
+>  
+>      CadenceGEMState gem[XLNX_ZYNQMP_NUM_GEMS];
+>      CadenceUARTState uart[XLNX_ZYNQMP_NUM_UARTS];
+> +    XlnxZynqMPCANState    can[XLNX_ZYNQMP_NUM_CAN];
+>      SysbusAHCIState sata;
+>      SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
+>      XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
+> -- 
+> 2.7.4
+> 
+> 
 
