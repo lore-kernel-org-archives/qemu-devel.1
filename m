@@ -2,87 +2,103 @@ Return-Path: <SRS0=buBk=6M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D538AC83000
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 16:31:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76D98C83001
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 16:31:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EF2620746
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 16:31:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42E8B20746
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Apr 2020 16:31:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BV1CqI82"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EF2620746
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YPo96fxg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42E8B20746
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTT8g-0004RT-Oh
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 12:31:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33226)
+	id 1jTT8j-0004VL-Av
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 12:31:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33190)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jTT5S-0007hr-6G
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:28:24 -0400
+ (envelope-from <joao.m.martins@oracle.com>) id 1jTT5O-0007hg-CW
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:28:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jTT3R-0003xq-Ve
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:27:57 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36635
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jTT3R-0003wW-Hs
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:25:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588091152;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tekVEtqqrpJSUhiUvVPpRLzpvComuinsn8PrnIcqN2Y=;
- b=BV1CqI824bM17MqiGzDcegqT4wWgqEBmlGhKla5PDpVCcflHBda5tLeI+XmRMBAVYjdwoh
- yXjtCLmHYHWxIBUbDX27U9JGnWsMFkAZJyBPTOH7Dlk126tjQJsh26Pkg2AljmoXpWWkNX
- yP7Gd4ttaeFI9oEKuTOrgdQPYnatYQI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-BdxohwE3PiS-MBc-V3HigQ-1; Tue, 28 Apr 2020 12:25:50 -0400
-X-MC-Unique: BdxohwE3PiS-MBc-V3HigQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BD291902EA0;
- Tue, 28 Apr 2020 16:25:49 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CB97B5C1D4;
- Tue, 28 Apr 2020 16:25:46 +0000 (UTC)
-Date: Tue, 28 Apr 2020 17:25:43 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v2 11/14] block/core: add generic infrastructure for
- x-blockdev-amend qmp command
-Message-ID: <20200428162543.GI1467943@redhat.com>
-References: <20200308151903.25941-1-mlevitsk@redhat.com>
- <20200308151903.25941-12-mlevitsk@redhat.com>
+ (envelope-from <joao.m.martins@oracle.com>) id 1jTT2W-0003hC-Tp
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:27:54 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:39756)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <joao.m.martins@oracle.com>)
+ id 1jTT2W-0003h4-Ay
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 12:24:56 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03SGNRxl087258;
+ Tue, 28 Apr 2020 16:24:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=ia2Wy9rUcK3VbudgTV66PLeEy8zQ0qRl4VzYWkTP4DQ=;
+ b=YPo96fxg5lCnjOk4m8vdFdk4xFRKeVrjnwFuxOmqF4aEMRHhDt4tCae6EXvC4zWgz8cx
+ nJ03QVPpfDbHn4kv2aojQLSITm2qC21RJSZs5u/WuB221hpVL3wvbF9CpLJk9zt8Z7NT
+ 4JX6pQpkJXoKpnH71PKoaJ1LVbZxDoItSzxnhjB921de0AiTWoD967YoRSidH2Ce0Ob1
+ TvmmHKkkJ0OqTTIi79GlaOZeuJNeo3+YntQpZUFZI2ZU/Qa8V6pOv3UJFOnpATCEhCaR
+ nBg3ELTtVtMEsZYmthaoJSkS33AzvNrPm7fcMFlhUAlgy9dxOOaMDGK/TJeLat8zrfE0 iQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 30p01nqj6h-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 28 Apr 2020 16:24:52 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03SGLuIW110996;
+ Tue, 28 Apr 2020 16:22:51 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3020.oracle.com with ESMTP id 30mxx05x1s-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 28 Apr 2020 16:22:51 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03SGMo2Z026920;
+ Tue, 28 Apr 2020 16:22:50 GMT
+Received: from [10.175.178.2] (/10.175.178.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 28 Apr 2020 09:22:50 -0700
+Subject: Re: [PATCH v2 1/3] exec: fetch the alignment of Linux devdax pmem
+ character device nodes
+To: Jingqi Liu <jingqi.liu@intel.com>
+References: <20200415033538.43329-1-jingqi.liu@intel.com>
+ <20200415033538.43329-2-jingqi.liu@intel.com>
+From: Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <e2dd8b7d-5342-0739-6724-410994a96cd6@oracle.com>
+Date: Tue, 28 Apr 2020 17:22:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <20200308151903.25941-12-mlevitsk@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200415033538.43329-2-jingqi.liu@intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 04:11:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9605
+ signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ spamscore=0 bulkscore=0
+ suspectscore=1 mlxlogscore=999 phishscore=0 malwarescore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004280128
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9605
+ signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ spamscore=0 clxscore=1015
+ phishscore=0 mlxlogscore=999 adultscore=0 priorityscore=1501 mlxscore=0
+ suspectscore=1 malwarescore=0 lowpriorityscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004280128
+Received-SPF: pass client-ip=156.151.31.86;
+ envelope-from=joao.m.martins@oracle.com; helo=userp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/28 11:32:26
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,61 +110,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Mar 08, 2020 at 05:19:00PM +0200, Maxim Levitsky wrote:
-> blockdev-amend will be used similiar to blockdev-create
-> to allow on the fly changes of the structure of the format based block de=
-vices.
->=20
-> Current plan is to first support encryption keyslot management for luks
-> based formats (raw and embedded in qcow2)
->=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+On 4/15/20 4:35 AM, Jingqi Liu wrote:
+> If the backend file is devdax pmem character device, the alignment
+> specified by the option 'align=NUM' in the '-object memory-backend-file'
+> needs to match the alignment requirement of the devdax pmem character device.
+> 
+> This patch uses the interfaces of libdaxctl to fetch the devdax pmem file
+> 'align', so that we can compare it with the NUM of 'align=NUM'.
+> The NUM needs to be larger than or equal to the devdax pmem file 'align'.
+> 
+> It also fixes the problem that mmap() returns failure in qemu_ram_mmap()
+> when the NUM of 'align=NUM' is less than the devdax pmem file 'align'.
+> 
+> Suggested-by: Dan Williams <dan.j.williams@intel.com>
+> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+
+  Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+
+I also no longer see the previous problem we talked in v1 wrt to ABI differences
+between dax_pmem_compat (your case) vs dax_pmem|dax_hmem (my case). The @align
+validation also occurs as expected.
+
 > ---
->  block/Makefile.objs       |   2 +-
->  block/amend.c             | 108 ++++++++++++++++++++++++++++++++++++++
->  include/block/block_int.h |  21 +++++---
->  qapi/block-core.json      |  42 +++++++++++++++
->  qapi/job.json             |   4 +-
->  5 files changed, 169 insertions(+), 8 deletions(-)
->  create mode 100644 block/amend.c
-
-> diff --git a/block/amend.c b/block/amend.c
-> new file mode 100644
-> index 0000000000..2db7b1eafc
-> --- /dev/null
-> +++ b/block/amend.c
-> @@ -0,0 +1,108 @@
-> +/*
-> + * Block layer code related to image options amend
-> + *
-> + * Copyright (c) 2018 Kevin Wolf <kwolf@redhat.com>
-> + * Copyright (c) 2019 Maxim Levitsky <mlevitsk@redhat.com>
-
-I would have expected these to be  "Copyright (C) 2019 Red Hat, Inc"
-since employees usually have to assign copyright, unless they were
-done outside of work context.
-
-Aside from that=20
-
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+>  exec.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 53 insertions(+), 1 deletion(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index de9d949902..2c3444e47e 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -77,6 +77,10 @@
+>  
+>  #include "monitor/monitor.h"
+>  
+> +#ifdef CONFIG_LIBDAXCTL
+> +#include <daxctl/libdaxctl.h>
+> +#endif
+> +
+>  //#define DEBUG_SUBPAGE
+>  
+>  #if !defined(CONFIG_USER_ONLY)
+> @@ -1736,6 +1740,46 @@ static int64_t get_file_size(int fd)
+>      return size;
+>  }
+>  
+> +static int64_t get_file_align(int fd)
+> +{
+> +    int64_t align = -1;
+> +#if defined(__linux__) && defined(CONFIG_LIBDAXCTL)
+> +    struct stat st;
+> +
+> +    if (fstat(fd, &st) < 0) {
+> +        return -errno;
+> +    }
+> +
+> +    /* Special handling for devdax character devices */
+> +    if (S_ISCHR(st.st_mode)) {
+> +        g_autofree char *path = NULL;
+> +        g_autofree char *rpath = NULL;
+> +        struct daxctl_ctx *ctx;
+> +        struct daxctl_region *region;
+> +        int rc = 0;
+> +
+> +        path = g_strdup_printf("/sys/dev/char/%d:%d",
+> +                    major(st.st_rdev), minor(st.st_rdev));
+> +        rpath = realpath(path, NULL);
+> +
+> +        rc = daxctl_new(&ctx);
+> +        if (rc) {
+> +            return -1;
+> +        }
+> +
+> +        daxctl_region_foreach(ctx, region) {
+> +            if (strstr(rpath, daxctl_region_get_path(region))) {
+> +                align = daxctl_region_get_align(region);
+> +                break;
+> +            }
+> +        }
+> +        daxctl_unref(ctx);
+> +    }
+> +#endif /* defined(__linux__) && defined(CONFIG_LIBDAXCTL) */
+> +
+> +    return align;
+> +}
+> +
+>  static int file_ram_open(const char *path,
+>                           const char *region_name,
+>                           bool *created,
+> @@ -2275,7 +2319,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+>  {
+>      RAMBlock *new_block;
+>      Error *local_err = NULL;
+> -    int64_t file_size;
+> +    int64_t file_size, file_align;
+>  
+>      /* Just support these ram flags by now. */
+>      assert((ram_flags & ~(RAM_SHARED | RAM_PMEM)) == 0);
+> @@ -2311,6 +2355,14 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+>          return NULL;
+>      }
+>  
+> +    file_align = get_file_align(fd);
+> +    if (file_align > 0 && mr && file_align > mr->align) {
+> +        error_setg(errp, "backing store align 0x%" PRIx64
+> +                   " is larger than 'align' option 0x" RAM_ADDR_FMT,
+> +                   file_align, mr->align);
+> +        return NULL;
+> +    }
+> +
+>      new_block = g_malloc0(sizeof(*new_block));
+>      new_block->mr = mr;
+>      new_block->used_length = size;
+> 
 
