@@ -2,123 +2,144 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBE5C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:12:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16931C83007
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:12:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBA53208FE
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:12:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="DvYNQKGG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBA53208FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id DA3FF2173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:12:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA3FF2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTlZV-0007oe-3s
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 08:12:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53432)
+	id 1jTlZg-00085v-34
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 08:12:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53456)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTlYh-00073d-Pz
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:11:24 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jTlYt-0007Fr-Au
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:11:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTlYh-0000UK-2c
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:11:23 -0400
-Received: from mail-eopbgr40094.outbound.protection.outlook.com
- ([40.107.4.94]:46663 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ (envelope-from <frankja@linux.ibm.com>) id 1jTlYs-0000Wi-3c
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:11:35 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51984)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jTlYg-0000Or-56; Wed, 29 Apr 2020 08:11:22 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CrAIM00kOmtKyo6m+cg2Mw4KEi65/Fv9J+A5bQrIwDq5eBvOvNxSXEwMY6vfKcSQ1bMSdIloV+R4kWZ5m+kASbvD/sLJaSnNeKwAdgdXzu22uNJoqj2wPpCPW9GV2LWolPsO7i+ZhrW6QjjIHCPcewC6abt6OOQi0XyS0oao+leYwNQ6yn7HIxLHuOL0jz6fcuDUEh2m1sC2QTHw8syv17ck9eoNIuV+vY3ba99G1TvKFp7e6UruvT3wREajtPT8LaB1T8Hbw0BQUnsDpxF7N7vElGDv8ErqUT8R5fYBPoTZPBvui4NV/IOXWwPW71iXTrLT62qAN81Z2fBLxR3NSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dC+LxIXoBnqmGvIeyKY1seNAjrwdC63Rnly+d0q5l0s=;
- b=MiLIaXmhIxIMxnp8USpId9k4SuUSV44l78lt+vjDzFr9AWgmGwGDdi7tggvOI5kqztxI5QHps+yTM887r6ZvjCFmiagCjVSpX7oCPiKz6g6uG6lSwQ6Nb2tnpBHyfjLUE3d3dm6my5z8LcQpssg9xnkSQDPIXH9y+pZkA90uUNmEUpPxO/yBaekZ6lX+uHJJRNkNKS9YXAqg6tB6RmxWa/crBzI7VuCgiyRoRnufdM2YVVMG4ubJFuJpT4uTjrbmjgZ3GW1Da7QKdzOpR8gdlemzSCv36IDNkwCLzMHWcxo+65rU2Cg90A9rWpidajfs3ttTyt2Ud8A20uIhRU1Mhg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dC+LxIXoBnqmGvIeyKY1seNAjrwdC63Rnly+d0q5l0s=;
- b=DvYNQKGGI/8pCN6RBTPt2oeYKT5ktlzdv8o21tWyzvw+Ww4ZIPY2UJ8VF2o7dC8lCqWb74K2DBB0bhJdTizJGifLD+1DEu49tCpp2gF2rXCRRT4BVUmH8uSSWLz+BiaHPO03yWkF1r75Sfa20Um+UIzjCTZ2I7gZYK4Za01wPc0=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5478.eurprd08.prod.outlook.com (2603:10a6:20b:107::14)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Wed, 29 Apr
- 2020 12:11:19 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.023; Wed, 29 Apr 2020
- 12:11:19 +0000
-Subject: Re: [PATCH v3 5/5] block/block-copy: use aio-task-pool API
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200429061039.12687-1-vsementsov@virtuozzo.com>
- <20200429061039.12687-6-vsementsov@virtuozzo.com>
- <1abe2617-4cc6-85c5-8c81-e2fa1fe4b5dc@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200429151117799
-Message-ID: <6379bdc2-a256-418f-c550-26222554d4f8@virtuozzo.com>
-Date: Wed, 29 Apr 2020 15:11:17 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <1abe2617-4cc6-85c5-8c81-e2fa1fe4b5dc@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM4PR0101CA0067.eurprd01.prod.exchangelabs.com
- (2603:10a6:200:41::35) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1jTlYr-0000WT-CR; Wed, 29 Apr 2020 08:11:33 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 03TC3tVZ037367; Wed, 29 Apr 2020 08:11:29 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 30mfhfcr92-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 29 Apr 2020 08:11:29 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03TC4Bgb038997;
+ Wed, 29 Apr 2020 08:11:29 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.70])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 30mfhfcr84-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 29 Apr 2020 08:11:29 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+ by ppma01fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03TCAnQ1016441;
+ Wed, 29 Apr 2020 12:11:26 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com
+ (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+ by ppma01fra.de.ibm.com with ESMTP id 30mcu8dscx-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 29 Apr 2020 12:11:26 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 03TCBO0n60293538
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 29 Apr 2020 12:11:24 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5A5D24C04E;
+ Wed, 29 Apr 2020 12:11:24 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0E0124C058;
+ Wed, 29 Apr 2020 12:11:24 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.84.78])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 29 Apr 2020 12:11:23 +0000 (GMT)
+Subject: Re: [PATCH 0/8] pc-bios: s390x: Cleanup part 1
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+References: <20200324150847.10476-1-frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <6d7af967-7567-5e0b-e73a-a4eecc5ad7bf@linux.ibm.com>
+Date: Wed, 29 Apr 2020 14:11:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.184) by
- AM4PR0101CA0067.eurprd01.prod.exchangelabs.com (2603:10a6:200:41::35) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20 via Frontend
- Transport; Wed, 29 Apr 2020 12:11:18 +0000
-X-Tagtoolbar-Keys: D20200429151117799
-X-Originating-IP: [185.215.60.184]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ea3b0af2-7822-4fcc-963c-08d7ec366ca4
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5478:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5478A8D2D7A08F4FE7E1E536C1AD0@AM7PR08MB5478.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:580;
-X-Forefront-PRVS: 03883BD916
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(136003)(39840400004)(366004)(376002)(346002)(396003)(36756003)(4326008)(52116002)(956004)(2906002)(26005)(53546011)(2616005)(107886003)(5660300002)(31686004)(8676002)(186003)(16526019)(16576012)(6486002)(66556008)(66946007)(66476007)(86362001)(31696002)(478600001)(316002)(8936002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KCZLJhYoRgDiJ3t6ug9fLQmFzRq1TWOhiZMdTR4oaHmx/YTU7tx9aBC4PaEqwFfp/RHHfOslTkClPnNiyXIP0YpjrG8Tp83v0GfZBFHq2LczwUYCJJjoh3NhgNyu/AIlJrDAM5MGeDZS64yNsG+UI9HdnVC3QlvVpzF+2M660Hj+iA6j0JTYUaKuy49yBx48PDNJw/WjVf32CP/UIYXk3aGlNUVVGYTUI2ACCKFEFHyyrli/62TF/kcozz6vNtb5B5yRv4MY1qlnTzAVVsxgRn/Rz0wZlkksHAQSWiGM6c2vRURHEspOPyi1ARhDS7TTgZyF3vlGXqLc9xaz6JhnfXtfPdoYsJvLlxPLt0mwa1Sjl3xaSf45neiygA40x58fGSKD1W49odyTXKPXfG9zjoNL+K4iWtROe2VPgTymXytMFpttio0xZ+tFNypIWb+B
-X-MS-Exchange-AntiSpam-MessageData: VQehLpm4zigZq5zVTy/lRucvdA38RebwZJXteOavRnQgYdeAWquoqXISgObDDN/IU08ZEf+sfUANyjI1hHEYE3NNxLtZIRFyciNcibMZFNdqEFHtOholraxl8rWmp0a350/l+/1XdooFJ6HBclR1UlAhgZqFfHInWataP3x6r7phN1q5armkRS0gK7uJiMAGi6y7gutjvf1GLcloIpAnY9sDtl6IKBkM17FQmvZxSYdQsPQZAV4Qcq2gvbQwnweJeh1X1MaqHWE5poyc2QJaxaC/cJZgMqdQpoAKzjVoSe7yZ5TaO/oHJ6j2+fOQ6jS9t8zyXODUaQtSfn1mHClkD42UWMB2sixu7/8EUD1bEkAVMZHCr0pF0Bd7eawP/0hZuopFJVPLNMlnt0wIpjltQ4YGfOUVt/jYoPFlJby+E8d3RwV+PdO5hPDyoeDKUR1NcgonbrHYVHh4sMzgw82XjSflhjeGoA9C2/gFGUZqcShyLFDjlIWxg8jwJQfx2F8JjmXkZle5oswX3hmFVvnZHdFxWJT8yXfUK3x6PC9srMNyJCQ/W2P7Th74RUpWkERkTRkiyttvkvG8wFXcRu46oIk8acyvA9/7hE65CKc/WcR/mbR9jieOJ3MKEzHorDLyomGHDrjXiD+tuNy5UwO3jD0U9NFN29q/HnFxRp6U5xW+H+gue3jRKnO3wIZOtTj7kRi3lyUcH/9cqm6YklKJkbQz3+XIA2tufNia/5qXsp02Ho8aArTW+Lc5ye2KMQBf8zb5mk3RFs5IohLDy4fFPakeYNni5wwNw77uSK1VsTU=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea3b0af2-7822-4fcc-963c-08d7ec366ca4
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2020 12:11:19.2763 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Vy/+TsuIZpKdAqYtjsaEjXAp4YTt0AcSh0DME5ORx5JiSEPEvB0NVVCed9IARaRWTuxLBmDbkhXyWgOuTZrSeOyb2DPdq8eLwcM/UvXWl8U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5478
-Received-SPF: pass client-ip=40.107.4.94;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR03-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 08:11:20
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.4.94
+In-Reply-To: <20200324150847.10476-1-frankja@linux.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="D1aSspkyvYBjJdyaKehWr3K7Uh6NPM32z"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-29_04:2020-04-29,
+ 2020-04-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 suspectscore=0
+ phishscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 mlxlogscore=833
+ malwarescore=0 impostorscore=0 clxscore=1011 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004290098
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=frankja@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 08:11:30
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,110 +151,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-29.04.2020 14:55, Max Reitz wrote:
-> On 29.04.20 08:10, Vladimir Sementsov-Ogievskiy wrote:
->> Run block_copy iterations in parallel in aio tasks.
->>
->> Changes:
->>    - BlockCopyTask becomes aio task structure. Add zeroes field to pass
->>      it to block_copy_do_copy
->>    - add call state - it's a state of one call of block_copy(), shared
->>      between parallel tasks. For now used only to keep information about
->>      first error: is it read or not.
->>    - convert block_copy_dirty_clusters to aio-task loop.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block/block-copy.c | 104 +++++++++++++++++++++++++++++++++++++++------
->>   1 file changed, 91 insertions(+), 13 deletions(-)
->>
->> diff --git a/block/block-copy.c b/block/block-copy.c
->> index 5cf032c4d8..f5ef91f292 100644
->> --- a/block/block-copy.c
->> +++ b/block/block-copy.c
-> 
-> [...]
-> 
->> @@ -261,6 +278,30 @@ void block_copy_set_progress_meter(BlockCopyState *s, ProgressMeter *pm)
->>       s->progress = pm;
->>   }
->>   
->> +/* Takes ownership on @task */
-> 
-> Still *of
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--D1aSspkyvYBjJdyaKehWr3K7Uh6NPM32z
+Content-Type: multipart/mixed; boundary="LthCg88Cct1U4MOlDdBNMXk6GRCAGtJWs"
 
-Ohhh, very sorry for it, I really forget to update the patch :(
+--LthCg88Cct1U4MOlDdBNMXk6GRCAGtJWs
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> 
->> +static coroutine_fn int block_copy_task_run(AioTaskPool *pool,
->> +                                            BlockCopyTask *task)
->> +{
->> +    if (!pool) {
->> +        int ret = task->task.func(&task->task);
->> +
->> +        g_free(task);
->> +        return ret;
->> +    }
->> +
->> +    aio_task_pool_wait_slot(pool);
->> +    if (aio_task_pool_status(pool) < 0) {
->> +        co_put_to_shres(task->s->mem, task->bytes);
->> +        block_copy_task_end(task, -EAGAIN);
-> 
-> It looks like you may have missed my nit picks on v2 regarding this
-> patch, so I’m going to ask again whether -ECANCELED might be better here
-> (even though it still doesn’t really matter).
+On 3/24/20 4:08 PM, Janosch Frank wrote:
+> The bios is in dire need for a cleanup as there are still a lot of
+> magic constants being used throughout as well as duplicated code.
+>=20
+> In the first part of this series we consolidate constants and
+> functions, as well as doing some minor cleanups and fixes.
+>=20
+> The patches are based on my protvirt branch and are available here:
+> https://github.com/frankjaa/qemu/pull/new/cleanup_bios
 
-Hmm yes, sounds better in the context. And I don't see any specific usage of it, and don't remember why I've chosen EAGAIN :) Let's use ECANCELED.
+Ping
+It's not urgent, but I don't want it to get buried and forgotten.
 
-> 
->> +        g_free(task);
->> +        return aio_task_pool_status(pool);
-> 
-> And whether it may be better to return a constant like -ECANCELED here,
-> because how a previous task failed shouldn’t really concern this task
-> (or its error code).
+>=20
+> Janosch Frank (8):
+>   pc-bios: s390x: Consolidate timing functions into time.h
+>   pc-bios: s390x: Get rid of magic offsets into the lowcore
+>   pc-bios: s390x: Rename and use PSW_MASK_ZMODE constant
+>   pc-bios: s390x: Use PSW masks where possible
+>   pc-bios: s390x: Move panic() into header and add infinite loop
+>   pc-bios: s390x: Use ebcdic2ascii table
+>   pc-bios: s390x: Replace 0x00 with 0x0 or 0
+>   pc-bios: s390x: Make u32 ptr check explicit
+>=20
+>  pc-bios/s390-ccw/bootmap.c     |  4 +---
+>  pc-bios/s390-ccw/cio.h         | 17 +++++++++------
+>  pc-bios/s390-ccw/dasd-ipl.c    | 17 +++++++--------
+>  pc-bios/s390-ccw/helper.h      |  2 +-
+>  pc-bios/s390-ccw/jump2ipl.c    | 10 ++++-----
+>  pc-bios/s390-ccw/main.c        | 15 +++----------
+>  pc-bios/s390-ccw/menu.c        |  1 +
+>  pc-bios/s390-ccw/netmain.c     | 23 +++-----------------
+>  pc-bios/s390-ccw/s390-arch.h   |  4 +++-
+>  pc-bios/s390-ccw/s390-ccw.h    | 25 ++++++----------------
+>  pc-bios/s390-ccw/start.S       |  5 +++--
+>  pc-bios/s390-ccw/time.h        | 39 ++++++++++++++++++++++++++++++++++=
 
-Looks correct, will change.
-
-> 
->> +    }
->> +
->> +    aio_task_pool_start_task(pool, &task->task);
->> +
->> +    return 0;
->> +}
->> +
->>   /*
->>    * block_copy_do_copy
->>    *
-> 
-> [...]
-> 
->> @@ -525,25 +590,38 @@ static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
-> 
-> [...]
-> 
->> +out:
->> +    if (aio) {
->> +        aio_task_pool_wait_all(aio);
->> +        if (ret == 0) {
->> +            ret = aio_task_pool_status(aio);
->> +        }
->> +        g_free(aio);
-> 
-> I’d still prefer aio_task_pool_free().
-> 
-
-a thousand apologies :(
+>  pc-bios/s390-ccw/virtio-net.c  |  1 +
+>  pc-bios/s390-ccw/virtio-scsi.c |  1 +
+>  pc-bios/s390-ccw/virtio.c      | 18 +++-------------
+>  15 files changed, 88 insertions(+), 94 deletions(-)
+>  create mode 100644 pc-bios/s390-ccw/time.h
+>=20
 
 
--- 
-Best regards,
-Vladimir
+
+--LthCg88Cct1U4MOlDdBNMXk6GRCAGtJWs--
+
+--D1aSspkyvYBjJdyaKehWr3K7Uh6NPM32z
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6pbusACgkQ41TmuOI4
+ufgvvA/+PKgvb/ToMi9orCLnrDjcZKCF2jZr1x7y0FICGKJ8sgdXCMwKJ+1x87RD
+swJk353Wq98+WklGF6nanx513Kv8Y6fg7dXrVwWnCgIPLdDIQ+NSZGfqaPSLwMNJ
+4eQSOs8lV8goStegfuGUWqvEQTdCG6BfrVcxh92anFGV9ROAEJ+IjGrGiWHgDaWX
+yy+CSSFV4vk4UPwOLttsSQmdd+vPP7NKpptYW8vWUNxEGHsWHaOWwAmlo/096D8j
+s2PNvtbSG7/U5QNwjHzT0kOVEigjzw4m7N77w0I6684pkpwKxdr02/rPrc8lySYK
+wdYtPVUVwseQaarmE675B6DJHk4KO2+QCkDzVWij30ho8yDrnoJdGEz7xxL3nzvx
+5zozKxw8bLX3RnMwNX+OBirYf+zo1mtmUGFKRrgHKJggS6DNvFBPPVhG9eAK6sn/
+wWLWbThNQUdAWmIZQujxYoH6/ThMSGK2NraRT0TGhgjjz/QQXTFcHXd6xYDRgRmJ
+LaDNTyOzjh9gGIb/dG+jFO/9RVLeCSwF69QetkIUYGT8CWCKr55VWo2OD2jt0Odu
+9b2U9gpmOwAfqmP1yX7clgZtX7zW6SYtfOkeYMzLjooSbIZT9ByxpXpSHiC7R3tu
+DLMkOx9jgzZQscUY1kJc4/eNWhzyP02jI5m6ZODZo20gnlEWTAk=
+=fYvy
+-----END PGP SIGNATURE-----
+
+--D1aSspkyvYBjJdyaKehWr3K7Uh6NPM32z--
+
 
