@@ -2,87 +2,83 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CABEC83004
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:41:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E1BDC83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:41:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29C972073E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:41:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 660CD2073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:41:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="fTFgwSqe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29C972073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L0qOlvY9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 660CD2073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jThLb-0006Jv-5i
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:41:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46776)
+	id 1jThLx-0007tm-K6
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:41:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46256)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <luc.michel@greensocs.com>) id 1jTh6O-0007vG-Js
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:26:03 -0400
+ (envelope-from <armbru@redhat.com>) id 1jTh27-0007uJ-Pd
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:22:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <luc.michel@greensocs.com>) id 1jTh6H-00072K-Km
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:25:52 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:57170)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
- id 1jTh4Q-0005bj-O7; Wed, 29 Apr 2020 03:23:50 -0400
-Received: from [172.17.10.6] (unknown [172.17.10.6])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 9AE0C96EF2;
- Wed, 29 Apr 2020 07:23:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1588145029;
+ (envelope-from <armbru@redhat.com>) id 1jTh1j-0003zZ-05
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:21:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34005
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jTh1h-0003uW-KD
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:21:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588144856;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RgZxt7m47Azwf4GwDjyuYY/Lnebn+TdybSEDtuCUIfg=;
- b=fTFgwSqe+rKtbFJbLmR/pNdiQxlB8PRXQCbNH30DPrdIaqL7j21l4eMAa1qfcK8R6hsqVz
- qhRuQTBwYJtXCJnvcuNYJ+pxYJtPtNF8HfskZfwqKoW6Ll/x8XMnv0mq+EJG68WKPflj2/
- 711ZDaFZueSCkCVeDnsTsNh0ea2CuPs=
-Subject: Re: [PATCH v1 02/11] hw/arm: versal: Move misplaced comment
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
-References: <20200427181649.26851-1-edgar.iglesias@gmail.com>
- <20200427181649.26851-3-edgar.iglesias@gmail.com>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <43668463-c08d-533c-d296-5e5c1c877483@greensocs.com>
-Date: Wed, 29 Apr 2020 09:23:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ bh=/7bpX1iXJErQuyCFTBQ9FX3q8b7UtGzaD9CWLu+A9OI=;
+ b=L0qOlvY9K1Qg52INXkYpab4P2I5pOTNfh/vGeby96fCIsRev9JvKsEeARnEWI39bzKE3aS
+ J3nyPx3RENiv/MqgabAW+qqRjnOck/sXlqOB9wVHCgvwJsUWC0iAMcilp2JU/BiYKyR4rV
+ VkPrYreciCYzAvLjcAXHBJrKUULUfUg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-417-cQx5e_4rOpOVt9j_fDD6zA-1; Wed, 29 Apr 2020 03:20:54 -0400
+X-MC-Unique: cQx5e_4rOpOVt9j_fDD6zA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B0E21895A2C
+ for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 07:20:53 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 697BB5D9F3;
+ Wed, 29 Apr 2020 07:20:53 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 1CBE311358CB; Wed, 29 Apr 2020 09:20:49 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 14/32] cpus: Proper range-checking for -icount shift=N
+Date: Wed, 29 Apr 2020 09:20:30 +0200
+Message-Id: <20200429072048.29963-15-armbru@redhat.com>
+In-Reply-To: <20200429072048.29963-1-armbru@redhat.com>
+References: <20200429072048.29963-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200427181649.26851-3-edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1588145029;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RgZxt7m47Azwf4GwDjyuYY/Lnebn+TdybSEDtuCUIfg=;
- b=YHbqWQlJBnDfX8Fs6ygxa1hNozDh5+/pMYI52KB0QZU8wuA9L5F/k6fjIpMWF4f1VfJL73
- luQtvbfiXR3t5kWl9Le6JcBMWfSa602HEVqq/OdE6j8BpBHQ8DUc/2gMx1R/GKzCVoHMpo
- ioxOw4bv/u84sGcRwkDmn7Sl3KejLjs=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1588145029; a=rsa-sha256; cv=none;
- b=tQvGiAIrn3B9B9rHfjskBY7s0ZELb+VSNPwyJeaqlpz9aiOyfZhBMxI7XuVeiNsEz9MRFp
- e4juZ8T3sZ9vsm2sp05SaDMoLo6pI5AoZgoGpUHgSfD6eZ/PCv3oZBdNhEKYxUHopQ2ccr
- riO0dcGPS04yJmT6L3V0B7wUfBIQUJI=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=luc smtp.mailfrom=luc.michel@greensocs.com
-Received-SPF: pass client-ip=5.135.226.135;
- envelope-from=luc.michel@greensocs.com; helo=beetle.greensocs.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 03:23:35
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 5.135.226.135
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:18:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,47 +90,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- frasse.iglesias@gmail.com, alistair@alistair23.me,
- richard.henderson@linaro.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
- philmd@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/27/20 8:16 PM, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> 
-> Move misplaced comment.
-> 
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+timers_state.icount_time_shift must be in [0,63] to avoid undefined
+behavior when shifting by it, e.g. in cpu_icount_to_ns().
+icount_adjust() clamps it to [0,MAX_ICOUNT_SHIFT], with
+MAX_ICOUNT_SHIFT =3D 10.  configure_icount() doesn't.  Fix that.
 
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+Fixes: a8bfac37085c3372366d722f131a7e18d664ee4d
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20200422130719.28225-5-armbru@redhat.com>
+---
+ cpus.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-> ---
->  hw/arm/xlnx-versal.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
-> index c73b2fe755..cc696e44c0 100644
-> --- a/hw/arm/xlnx-versal.c
-> +++ b/hw/arm/xlnx-versal.c
-> @@ -36,7 +36,6 @@ static void versal_create_apu_cpus(Versal *s)
->  
->          obj = object_new(XLNX_VERSAL_ACPU_TYPE);
->          if (!obj) {
-> -            /* Secondary CPUs start in PSCI powered-down state */
->              error_report("Unable to create apu.cpu[%d] of type %s",
->                           i, XLNX_VERSAL_ACPU_TYPE);
->              exit(EXIT_FAILURE);
-> @@ -49,6 +48,7 @@ static void versal_create_apu_cpus(Versal *s)
->          object_property_set_int(obj, s->cfg.psci_conduit,
->                                  "psci-conduit", &error_abort);
->          if (i) {
-> +            /* Secondary CPUs start in PSCI powered-down state */
->              object_property_set_bool(obj, true,
->                                       "start-powered-off", &error_abort);
->          }
-> 
+diff --git a/cpus.c b/cpus.c
+index 1b542b37f9..5670c96bcf 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -25,6 +25,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qemu/config-file.h"
++#include "qemu/cutils.h"
+ #include "migration/vmstate.h"
+ #include "monitor/monitor.h"
+ #include "qapi/error.h"
+@@ -801,7 +802,6 @@ void configure_icount(QemuOpts *opts, Error **errp)
+     bool sleep =3D qemu_opt_get_bool(opts, "sleep", true);
+     bool align =3D qemu_opt_get_bool(opts, "align", false);
+     long time_shift =3D -1;
+-    char *rem_str =3D NULL;
+=20
+     if (!option && qemu_opt_get(opts, "align")) {
+         error_setg(errp, "Please specify shift option when using align");
+@@ -814,9 +814,8 @@ void configure_icount(QemuOpts *opts, Error **errp)
+     }
+=20
+     if (strcmp(option, "auto") !=3D 0) {
+-        errno =3D 0;
+-        time_shift =3D strtol(option, &rem_str, 0);
+-        if (errno !=3D 0 || *rem_str !=3D '\0' || !strlen(option)) {
++        if (qemu_strtol(option, NULL, 0, &time_shift) < 0
++            || time_shift < 0 || time_shift > MAX_ICOUNT_SHIFT) {
+             error_setg(errp, "icount: Invalid shift value");
+             return;
+         }
+--=20
+2.21.1
+
 
