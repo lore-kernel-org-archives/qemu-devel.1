@@ -6,79 +6,79 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EE63C83003
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4418DC83007
 	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 11:53:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05B582073E
+	by mail.kernel.org (Postfix) with ESMTPS id 1094A20B80
 	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 11:53:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YT2fGNda"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05B582073E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IECl3l+y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1094A20B80
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTlHg-0007YG-2V
+	id 1jTlHg-0007YV-3v
 	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 07:53:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50884)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50882)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTlGj-0005sV-4w
+ (envelope-from <kraxel@redhat.com>) id 1jTlGj-0005sU-5F
  for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:52:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTlGh-0001zQ-Vw
+ (envelope-from <kraxel@redhat.com>) id 1jTlGi-0001zF-0A
  for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:52:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45109
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43834
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jTlGh-0001yk-I4
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jTlGh-0001yd-Fe
  for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:52:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1588161166;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8HzfMaz5xTJAgTkcw7l/JDpnlBvQ2/56TeX1FDlCG+s=;
- b=YT2fGNdaIB+df7Y1xQ3PM95Cdbq7QdxALDOT7Y5xyB7hmCl4tUe9Dt3VvKzM2yPyGwtOT1
- C6ECz+exu0+OctWRHmGn4Qjsf3EKpt/vYyciZ7OJ4HAvtHihL96/GYX56r4j8CtGgpaVLb
- oosgM62YXnhwrYpK4x/kD6YpWZQqJ1M=
+ bh=lDXYPiQCE75Oc34pPrtAqolaDeqROJMdOx2Dqa0OP4M=;
+ b=IECl3l+yYEswS7EeHJBj3T1LVL5Pm+VdKTBvfsOVKa6v9aaA/PrFNdrMF6nAvDbc6rZX93
+ aFUNqZ2vhcyNbBL/rXzVXu2e2u/DkgHMo8jHiUL2wU3mg+o60KAvqvZI6qiOGvQfYxZdUA
+ 3wszY4NrsIkvXRuqOBJFKctBVahmpdA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-SD4R5NGEPS2NeZI-Q0u2Ww-1; Wed, 29 Apr 2020 07:52:44 -0400
-X-MC-Unique: SD4R5NGEPS2NeZI-Q0u2Ww-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-382-wwAqqk_tPU6NeR9BfSapkw-1; Wed, 29 Apr 2020 07:52:44 -0400
+X-MC-Unique: wwAqqk_tPU6NeR9BfSapkw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 531A1835B49;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1D21108BD0A;
  Wed, 29 Apr 2020 11:52:43 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
  [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C30F15D9C9;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C59C160BF4;
  Wed, 29 Apr 2020 11:52:37 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 109749D9C; Wed, 29 Apr 2020 13:52:37 +0200 (CEST)
+ id 07FF89D9B; Wed, 29 Apr 2020 13:52:37 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/6] ramfb: drop leftover debug message
-Date: Wed, 29 Apr 2020 13:52:33 +0200
-Message-Id: <20200429115236.28709-4-kraxel@redhat.com>
+Subject: [PATCH v2 2/6] Revert "hw/display/ramfb: lock guest resolution after
+ it's set"
+Date: Wed, 29 Apr 2020 13:52:32 +0200
+Message-Id: <20200429115236.28709-3-kraxel@redhat.com>
 In-Reply-To: <20200429115236.28709-1-kraxel@redhat.com>
 References: <20200429115236.28709-1-kraxel@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 00:53:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,26 +97,91 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This reverts commit a9e0cb67b7f4c485755659f9b764c38b5f970de4.
+
+This breaks OVMF.  Reproducer: Just hit 'ESC' at early boot to enter
+firmware setup.  OVMF wants switch from (default) 800x600 to 640x480 for
+that, and this patch blocks it.
+
+Cc: Hou Qiming <hqm03ster@gmail.com>
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 ---
- hw/display/ramfb.c | 2 --
- 1 file changed, 2 deletions(-)
+ hw/display/ramfb.c | 26 ++++----------------------
+ 1 file changed, 4 insertions(+), 22 deletions(-)
 
 diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
-index 9d41c2ad2868..228defee5683 100644
+index bd4746dc1768..9d41c2ad2868 100644
 --- a/hw/display/ramfb.c
 +++ b/hw/display/ramfb.c
-@@ -81,8 +81,6 @@ static void ramfb_fw_cfg_write(void *dev, off_t offset, s=
-ize_t len)
+@@ -31,7 +31,6 @@ struct RAMFBState {
+     DisplaySurface *ds;
+     uint32_t width, height;
+     struct RAMFBCfg cfg;
+-    bool locked;
+ };
+=20
+ static void ramfb_unmap_display_surface(pixman_image_t *image, void *unuse=
+d)
+@@ -72,25 +71,18 @@ static DisplaySurface *ramfb_create_display_surface(int=
+ width, int height,
+ static void ramfb_fw_cfg_write(void *dev, off_t offset, size_t len)
+ {
+     RAMFBState *s =3D dev;
+-    uint32_t fourcc, format, width, height;
++    uint32_t fourcc, format;
+     hwaddr stride, addr;
+=20
+-    width     =3D be32_to_cpu(s->cfg.width);
+-    height    =3D be32_to_cpu(s->cfg.height);
++    s->width  =3D be32_to_cpu(s->cfg.width);
++    s->height =3D be32_to_cpu(s->cfg.height);
+     stride    =3D be32_to_cpu(s->cfg.stride);
+     fourcc    =3D be32_to_cpu(s->cfg.fourcc);
      addr      =3D be64_to_cpu(s->cfg.addr);
      format    =3D qemu_drm_format_to_pixman(fourcc);
 =20
--    fprintf(stderr, "%s: %dx%d @ 0x%" PRIx64 "\n", __func__,
--            s->width, s->height, addr);
+     fprintf(stderr, "%s: %dx%d @ 0x%" PRIx64 "\n", __func__,
+-            width, height, addr);
+-    if (s->locked) {
+-        fprintf(stderr, "%s: resolution locked, change rejected\n", __func=
+__);
+-        return;
+-    }
+-    s->locked =3D true;
+-    s->width =3D width;
+-    s->height =3D height;
++            s->width, s->height, addr);
      s->ds =3D ramfb_create_display_surface(s->width, s->height,
                                           format, stride, addr);
+ }
+@@ -110,13 +102,6 @@ void ramfb_display_update(QemuConsole *con, RAMFBState=
+ *s)
+     dpy_gfx_update_full(con);
+ }
+=20
+-static void ramfb_reset(void *opaque)
+-{
+-    RAMFBState *s =3D (RAMFBState *)opaque;
+-    s->locked =3D false;
+-    memset(&s->cfg, 0, sizeof(s->cfg));
+-}
+-
+ RAMFBState *ramfb_setup(Error **errp)
+ {
+     FWCfgState *fw_cfg =3D fw_cfg_find();
+@@ -129,12 +114,9 @@ RAMFBState *ramfb_setup(Error **errp)
+=20
+     s =3D g_new0(RAMFBState, 1);
+=20
+-    s->locked =3D false;
+-
+     rom_add_vga("vgabios-ramfb.bin");
+     fw_cfg_add_file_callback(fw_cfg, "etc/ramfb",
+                              NULL, ramfb_fw_cfg_write, s,
+                              &s->cfg, sizeof(s->cfg), false);
+-    qemu_register_reset(ramfb_reset, s);
+     return s;
  }
 --=20
 2.18.2
