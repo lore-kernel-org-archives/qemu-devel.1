@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7899C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:09:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D07BC83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:09:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B35620787
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:09:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6605220787
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:09:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dG86bvoE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B35620787
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BGyeaJrF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6605220787
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jThmD-0006Ln-LR
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:09:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51028)
+	id 1jThmS-000726-J8
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:09:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48152)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jThho-0007cT-EP
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:08:04 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jThKA-0005Su-Hz
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:40:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jThf7-0004ou-OL
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:04:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59256
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1jThK9-0005Gt-T0
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:40:06 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34709
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jThf7-0004oW-9M
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:01:45 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jThK9-0005Gb-E4
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:40:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588147304;
+ s=mimecast20190719; t=1588146004;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=bpboKJQELJcm8CZ2jZTejb6iBD4DWfIg8BnXkkD+ZFg=;
- b=dG86bvoElKxShKphSRCFxApLaRS3B8DJZGhrGWb2sXkw1RRXcmgbyPusm/iQaFVj42e3kX
- 2b71t8hVglIeQTkwW/h5OlhmZbo6j7D4LAwRO9Dms0gWB+61+4mDfDXBgwUmETRMgJu6Cv
- DCTzIF40H0777zfq7yVKbc1XxpzPo6o=
+ bh=YZ8FxVQVSl8F88J2XJzVow3pfa6GEkGlomKrB0SiCqE=;
+ b=BGyeaJrFvWjITbFiD68wWeea/LovComPeGV6rgyzMJU4hmfXeZgRdTXsCs+tla++vKiS4z
+ iu5gcdTNJWdlFaWQM2NPDAG2SaoKhg7SLJci7RJBRdlNicSqnyKNuinbwxqiPMRQiGAqk+
+ ZYb8RKIKIiZav/nc6+qv2eUQQdt0zrU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-1C7u_MQxNaKcmrao7uI31Q-1; Wed, 29 Apr 2020 04:01:42 -0400
-X-MC-Unique: 1C7u_MQxNaKcmrao7uI31Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-421-HxcaW993OAqIkR9irSQnig-1; Wed, 29 Apr 2020 03:40:02 -0400
+X-MC-Unique: HxcaW993OAqIkR9irSQnig-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31B4D80B71F;
- Wed, 29 Apr 2020 08:01:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93733107ACF5;
+ Wed, 29 Apr 2020 07:40:01 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-113-19.ams2.redhat.com
  [10.36.113.19])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4781A60BEC;
- Wed, 29 Apr 2020 08:01:40 +0000 (UTC)
-Subject: Re: [PATCH 4/4] block: Use blk_make_empty() after commits
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C74E1002397;
+ Wed, 29 Apr 2020 07:40:00 +0000 (UTC)
+Subject: Re: [PATCH 3/4] block: Add blk_make_empty()
 To: Kevin Wolf <kwolf@redhat.com>
 References: <20200428132629.796753-1-mreitz@redhat.com>
- <20200428132629.796753-5-mreitz@redhat.com>
- <20200428150311.GK5789@linux.fritz.box>
+ <20200428132629.796753-4-mreitz@redhat.com>
+ <20200428144706.GJ5789@linux.fritz.box>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -89,23 +89,23 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <dc7f8c0f-cb5c-8c23-ea7a-cdd4a5ac9698@redhat.com>
-Date: Wed, 29 Apr 2020 10:01:38 +0200
+Message-ID: <af3006f0-a01f-e866-a9f4-91db823d5348@redhat.com>
+Date: Wed, 29 Apr 2020 09:39:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200428150311.GK5789@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200428144706.GJ5789@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="FDPssQ5QjHaxlKLtzuK1aAluHKhSuGXDs"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ boundary="kqt85QI73IH3PrOUJXzfLGdGldnpGRnig"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:28:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,123 +123,80 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FDPssQ5QjHaxlKLtzuK1aAluHKhSuGXDs
-Content-Type: multipart/mixed; boundary="2qiUkxfNXlwQxCbycLfYCR1ydz37Pe1Md"
+--kqt85QI73IH3PrOUJXzfLGdGldnpGRnig
+Content-Type: multipart/mixed; boundary="lZsCFyW4sn7Gh4T6FBYXqst00VBAGMCJI"
 
---2qiUkxfNXlwQxCbycLfYCR1ydz37Pe1Md
+--lZsCFyW4sn7Gh4T6FBYXqst00VBAGMCJI
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 28.04.20 17:03, Kevin Wolf wrote:
+On 28.04.20 16:47, Kevin Wolf wrote:
 > Am 28.04.2020 um 15:26 hat Max Reitz geschrieben:
->> bdrv_commit() already has a BlockBackend pointing to the BDS that we
->> want to empty, it just has the wrong permissions.
->>
->> qemu-img commit has no BlockBackend pointing to the old backing file
->> yet, but introducing one is simple.
->>
->> After this commit, bdrv_make_empty() is the only remaining caller of
->> BlockDriver.bdrv_make_empty().
+>> Two callers of BlockDriver.bdrv_make_empty() remain that should not call
+>> this method directly.  Both do not have access to a BdrvChild, but they
+>> can use a BlockBackend, so we add this function that lets them use it.
 >>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>  block/commit.c |  8 +++++++-
->>  qemu-img.c     | 19 ++++++++++++++-----
->>  2 files changed, 21 insertions(+), 6 deletions(-)
+>>  include/sysemu/block-backend.h | 2 ++
+>>  block/block-backend.c          | 5 +++++
+>>  2 files changed, 7 insertions(+)
 >>
->> diff --git a/block/commit.c b/block/commit.c
->> index 8e672799af..24720ba67d 100644
->> --- a/block/commit.c
->> +++ b/block/commit.c
->> @@ -493,10 +493,16 @@ int bdrv_commit(BlockDriverState *bs)
->>      }
+>> diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backe=
+nd.h
+>> index d37c1244dd..14338b76dc 100644
+>> --- a/include/sysemu/block-backend.h
+>> +++ b/include/sysemu/block-backend.h
+>> @@ -266,4 +266,6 @@ int coroutine_fn blk_co_copy_range(BlockBackend *blk=
+_in, int64_t off_in,
 >> =20
->>      if (drv->bdrv_make_empty) {
->> -        ret =3D drv->bdrv_make_empty(bs);
->> +        ret =3D blk_set_perm(src, BLK_PERM_WRITE, BLK_PERM_ALL, NULL);
->=20
-> This is very likely to fail because the common case is that the source
-> node is attached to a guest device that doesn't share writes.
-> (qemu-iotests 131 and 274 catch this.)
->=20
-> So I think after my theoretical comment in patch 1, this is the
-> practical reason why we need WRITE_UNCHANGED rather than WRITE.
->=20
-> Also, why don't you take this permission from the start so that we would
-> error out right away rather than failing after waiting for the all the
-> data to be copied?
-
-Because we only need to take it when the BlockDriver actually supports
-bdrv_make_empty(), so I thought I=E2=80=99d put it here where we have the c=
-heck
-anyway.
-
-However, yes, when we take WRITE_UNCHANGED, we might as well take it
-unconditionally from the start.  (And then call blk_make_empty()
-unconditionally here, too, and let it figure out -ENOTSUP, like Eric noted.=
-)
-
->>          if (ret < 0) {
->>              goto ro_cleanup;
->>          }
->> +
->> +        ret =3D blk_make_empty(src, NULL);
->> +        if (ret < 0) {
->> +            goto ro_cleanup;
->> +        }
->> +
->>          blk_flush(src);
->>      }
+>>  const BdrvChild *blk_root(BlockBackend *blk);
 >> =20
->> diff --git a/qemu-img.c b/qemu-img.c
->> index 821cbf610e..a5e8659867 100644
->> --- a/qemu-img.c
->> +++ b/qemu-img.c
->> @@ -1065,11 +1065,20 @@ static int img_commit(int argc, char **argv)
->>          goto unref_backing;
->>      }
->> =20
->> -    if (!drop && bs->drv->bdrv_make_empty) {
->> -        ret =3D bs->drv->bdrv_make_empty(bs);
->> -        if (ret) {
->> -            error_setg_errno(&local_err, -ret, "Could not empty %s",
->> -                             filename);
->> +    if (!drop) {
->> +        BlockBackend *old_backing_blk;
+>> +int blk_make_empty(BlockBackend *blk, Error **errp);
 >> +
->> +        old_backing_blk =3D blk_new_with_bs(bs, BLK_PERM_WRITE, BLK_PER=
-M_ALL,
->> +                                          &local_err);
+>>  #endif
+>> diff --git a/block/block-backend.c b/block/block-backend.c
+>> index 3592066b42..5d36efd32f 100644
+>> --- a/block/block-backend.c
+>> +++ b/block/block-backend.c
+>> @@ -2402,3 +2402,8 @@ const BdrvChild *blk_root(BlockBackend *blk)
+>>  {
+>>      return blk->root;
+>>  }
+>> +
+>> +int blk_make_empty(BlockBackend *blk, Error **errp)
+>> +{
+>> +    return bdrv_make_empty(blk->root, errp);
+>> +}
 >=20
-> Oh, you actually depend on another series that you didn't mention in
-> the cover letter.
+> Should we check that blk->root !=3D NULL? Most other functions do that
+> through blk_is_available().
 
-Well, yes.  I didn=E2=80=99t really realize because I just based it on my
-block-next...
+Why not.
 
 Max
 
 
---2qiUkxfNXlwQxCbycLfYCR1ydz37Pe1Md--
+--lZsCFyW4sn7Gh4T6FBYXqst00VBAGMCJI--
 
---FDPssQ5QjHaxlKLtzuK1aAluHKhSuGXDs
+--kqt85QI73IH3PrOUJXzfLGdGldnpGRnig
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6pNGIACgkQ9AfbAGHV
-z0AT1gf/bqRykFw8IRuIZPA7VzaTGV61KscNPWx6kDMmUoT4d+O66w88vKi2+BZj
-EmU+iXK6t+VINcbY5i0/vQbROrrxl0bJGr7IaVkJfCDCZ48BskH/AbJXIdeYLPDJ
-ph3xGGMkqR2XOEMQmksVF/mXSdzNKKzLuDLT7PLmHiuoFJ9OCG7mXqschB29zX/l
-JbWdAli0w5qm9oGwkBguKYZgUpUGK53yFvfg0dwB2t4u3QiKxYG3UgUof/x2/GEw
-FniixzJHFFeBnGHQ8tO6SVg7ET0UpPYp4pfG4BtGxy4mDepg6OTz8x18UaS3tl+o
-RMekcqMu9RN5HT/3cpLPEQ9dflmX8A==
-=D9i3
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6pL08ACgkQ9AfbAGHV
+z0AtNwgArtaMzKI7/5AkWRqWST4Z5hISU/YRUpRMN3au+t3Btj9jzS0hvkSYl1zb
+7H/I9DcGCAaI7uR6Eni8k91RtciHN8QKjwLfXq5MAcA45fhQoROKBZoFF6d62Hdw
+uJhNo2FECZurxohDU/rV6pp6J3FDno60mtDXjvZ1nDIt6/cJTUFacX/Q00SCBlTF
+5ALR5QRCEWoGdY9cuHPGhFSlSCCe/Hd6mRWDnOKPq9klnZzWM3jeFLH7y9Ogvznd
+i2SiBjdqZ6tSKPjp0zh0ZFoRKDCY41uT1tiG73AJ4WsxQaScp95lnCyiMWt16CLz
+VLWN5KHqhpmZFOSNebmildosMvVoUw==
+=AXPL
 -----END PGP SIGNATURE-----
 
---FDPssQ5QjHaxlKLtzuK1aAluHKhSuGXDs--
+--kqt85QI73IH3PrOUJXzfLGdGldnpGRnig--
 
 
