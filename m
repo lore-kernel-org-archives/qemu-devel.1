@@ -2,106 +2,112 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB9EC83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 11:58:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B98FC83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:00:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5D2B206F0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 11:58:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5D2B206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1FD662083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:00:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NXq/7ZID"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FD662083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTlMd-0008EN-R9
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 07:58:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51008)
+	id 1jTlOB-00015t-8M
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 08:00:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51480)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1jTlHR-0007VY-6F
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:53:33 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jTlKh-0005HB-CQ
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:56:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1jTlHQ-00026G-NS
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:53:32 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16816
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jTlHO-00024e-FP; Wed, 29 Apr 2020 07:53:30 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 03TBVGKg168157; Wed, 29 Apr 2020 07:53:26 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30q80pj2g7-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 29 Apr 2020 07:53:26 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03TBdMDu189276;
- Wed, 29 Apr 2020 07:53:26 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30q80pj2fy-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 29 Apr 2020 07:53:25 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03TBj2qW011051;
- Wed, 29 Apr 2020 11:53:25 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
- [9.57.198.23]) by ppma02dal.us.ibm.com with ESMTP id 30mcu6wjh6-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 29 Apr 2020 11:53:25 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
- [9.57.199.110])
- by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 03TBrOKj19071432
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 29 Apr 2020 11:53:24 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 842FEAE05F;
- Wed, 29 Apr 2020 11:53:24 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6AA08AE05C;
- Wed, 29 Apr 2020 11:53:24 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed, 29 Apr 2020 11:53:24 +0000 (GMT)
-Subject: Re: [PATCH 0/2] virt: Set tpm-tis-device ppi property to off by
- default
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200427143145.16251-1-eric.auger@redhat.com>
- <20200428123826.1ec68e6c.cohuck@redhat.com>
- <0257ca1e-2323-e437-4e19-d8a4dfa6d792@linux.ibm.com>
- <20200429081129.18e9760a.cohuck@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <b109541b-36cf-03b3-eac7-910f1caafa55@linux.ibm.com>
-Date: Wed, 29 Apr 2020 07:53:24 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jTlKg-0004FK-NB
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:56:55 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33451
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTlKg-0004FD-9E
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:56:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588161413;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=il7bRSL0ZmjCLl39OJc1FAVf8D8/TFCXIYTbJI3H3HU=;
+ b=NXq/7ZIDLDp+TNpqG9GEHeO8FZyWbQwhSnMfEdJiJCZnaahj6Xee2uj3C2YUblEQCKCgkz
+ PThXpLvh8AT/NpZBujqE71a1LFg/C3ZkdGbVcT1YFq8l6zrjLvVnYUAm3YRE+BCpa6kmqI
+ Sdx4xlWN49tUoY/lMZmT9DH8pMt3djE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-351-LS8Z3fboPOGq65eAu1ZrAA-1; Wed, 29 Apr 2020 07:56:51 -0400
+X-MC-Unique: LS8Z3fboPOGq65eAu1ZrAA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15FDC18957EA;
+ Wed, 29 Apr 2020 11:56:50 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-19.ams2.redhat.com
+ [10.36.113.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CEA3F5D9C9;
+ Wed, 29 Apr 2020 11:56:48 +0000 (UTC)
+Subject: Re: [PATCH v3 4/5] block/block-copy: refactor task creation
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200429061039.12687-1-vsementsov@virtuozzo.com>
+ <20200429061039.12687-5-vsementsov@virtuozzo.com>
+ <affc8770-2b70-c3e4-af1b-ca620119c2d5@redhat.com>
+ <92dd552d-b181-5b39-c796-e228c4d33379@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <0f14b02d-884a-9581-f1c7-7133e6d36557@redhat.com>
+Date: Wed, 29 Apr 2020 13:56:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200429081129.18e9760a.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-29_04:2020-04-29,
- 2020-04-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- priorityscore=1501 mlxscore=0 clxscore=1015 impostorscore=0 phishscore=0
- bulkscore=0 spamscore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004290093
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 07:53:27
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+In-Reply-To: <92dd552d-b181-5b39-c796-e228c4d33379@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ppfvitIFueypwC7zjHFrG9q2WiSCMP3Az"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:28:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,66 +119,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, qemu-devel@nongnu.org,
- Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
- eric.auger.pro@gmail.com
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/29/20 2:11 AM, Cornelia Huck wrote:
-> On Tue, 28 Apr 2020 16:13:05 -0400
-> Stefan Berger <stefanb@linux.ibm.com> wrote:
->
->> On 4/28/20 6:38 AM, Cornelia Huck wrote:
->>> On Mon, 27 Apr 2020 16:31:43 +0200
->>> Eric Auger <eric.auger@redhat.com> wrote:
->>>   
->>>> Instead of using a compat in the mach-virt machine to force
->>>> PPI off for all virt machines (PPI not supported by the
->>>> tpm-tis-device device), let's simply change the default value
->>>> in the sysbus device.
->>>>
->>>> Best Regards
->>>>
->>>> Eric
->>>>
->>>> Eric Auger (2):
->>>>     tpm: tpm-tis-device: set PPI to false by default
->>>>     hw/arm/virt: Remove the compat forcing tpm-tis-device PPI to off
->>>>
->>>>    hw/arm/virt.c           | 5 -----
->>>>    hw/tpm/tpm_tis_sysbus.c | 2 +-
->>>>    2 files changed, 1 insertion(+), 6 deletions(-)
->>>>   
->>> I think we can apply the compat machines patch on top of these two
->>> patches.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ppfvitIFueypwC7zjHFrG9q2WiSCMP3Az
+Content-Type: multipart/mixed; boundary="lmiUEGV7HGegee5zpI1GHaB4U3ZOs4ErJ"
+
+--lmiUEGV7HGegee5zpI1GHaB4U3ZOs4ErJ
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 29.04.20 13:54, Vladimir Sementsov-Ogievskiy wrote:
+> 29.04.2020 14:38, Max Reitz wrote:
+>> On 29.04.20 08:10, Vladimir Sementsov-Ogievskiy wrote:
+>>> Instead of just relying on the comment "Called only on full-dirty
+>>> region" in block_copy_task_create() let's move initial dirty area
+>>> search directly to block_copy_task_create(). Let's also use effective
+>>> bdrv_dirty_bitmap_next_dirty_area instead of looping through all
+>>> non-dirty clusters.
 >>>
->>> Q: Who will queue this and the machine types patch? It feels a bit
->>> weird taking arm patches through the s390 tree :)
->>>   
->> I can queue them and would send the PR soon. I am also fine with someone
->> else doing it.
-> Would be great if you could queue these together with
-> https://patchew.org/QEMU/20200424090314.544-1-cohuck@redhat.com/
-> (hopefully should still apply cleanly, let me know if a respin is
-> needed).
->
-It's probably better to respin:
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>> =A0 block/block-copy.c | 78 ++++++++++++++++++++++++++-----------------=
+---
+>>> =A0 1 file changed, 44 insertions(+), 34 deletions(-)
+>>>
+>>> diff --git a/block/block-copy.c b/block/block-copy.c
+>>> index 35ff9cc3ef..5cf032c4d8 100644
+>>> --- a/block/block-copy.c
+>>> +++ b/block/block-copy.c
+>>
+>> [...]
+>>
+>>> @@ -106,17 +111,27 @@ static bool coroutine_fn
+>>> block_copy_wait_one(BlockCopyState *s, int64_t offset,
+>>> =A0=A0=A0=A0=A0 return true;
+>>> =A0 }
+>>> =A0 -/* Called only on full-dirty region */
+>>> +/*
+>>> + * Search for the first dirty area in offset/bytes range and create
+>>> task at
+>>> + * the beginning of it.
+>>
+>> Oh, that=92s even better.
+>>
+>>> + */
+>>> =A0 static BlockCopyTask *block_copy_task_create(BlockCopyState *s,
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int64=
+_t offset,
+>>> int64_t bytes)
+>>> =A0 {
+>>> -=A0=A0=A0 BlockCopyTask *task =3D g_new(BlockCopyTask, 1);
+>>> +=A0=A0=A0 if (!bdrv_dirty_bitmap_next_dirty_area(s->copy_bitmap,
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 offset, offset + =
+bytes,
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 s->copy_size, &of=
+fset,
+>>> &bytes))
+>>> +=A0=A0=A0 {
+>>> +=A0=A0=A0=A0=A0=A0=A0 return NULL;
+>>> +=A0=A0=A0 }
+>>> =A0 +=A0=A0=A0 /* region is dirty, so no existent tasks possible in it =
+*/
+>>> =A0=A0=A0=A0=A0 assert(!find_conflicting_task(s, offset, bytes));
+>>> =A0 =A0=A0=A0=A0=A0 bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, byt=
+es);
+>>> =A0=A0=A0=A0=A0 s->in_flight_bytes +=3D bytes;
+>>> =A0 +=A0=A0=A0 BlockCopyTask *task =3D g_new(BlockCopyTask, 1);
+>>
+>> This should be declared at the top of the function.
+>>
+>=20
+> I just thought, why not to try another style? Are you against?
+> Requirement to declare variables at start of block is obsolete, isn't it?
 
- > patches apply id:20200424090314.544-1-cohuck@redhat.com
-Applying: hw: add compat machines for 5.1
-Using index info to reconstruct a base tree...
-M    hw/arm/virt.c
-Falling back to patching base and 3-way merge...
-Auto-merging hw/arm/virt.c
-CONFLICT (content): Merge conflict in hw/arm/virt.c
-error: Failed to merge in the changes.
-hint: Use 'git am --show-current-patch' to see the failed patch
-Patch failed at 0001 hw: add compat machines for 5.1
-When you have resolved this problem, run "git am --continue".
-If you prefer to skip this patch, run "git am --skip" instead.
-To restore the original branch and stop patching, run "git am --abort".
+Oh, it absolutely is and personally I=92m absolutely not against it, but
+CODING_STYLE says:
 
+> Mixed declarations (interleaving statements and declarations within
+> blocks) are generally not allowed; declarations should be at the beginnin=
+g                                                                          =
+                                                                           =
+             =20
+> of blocks.
+
+Max
+
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>
+>>> =A0=A0=A0=A0=A0 *task =3D (BlockCopyTask) {
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 .s =3D s,
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 .offset =3D offset,
+>>
+>=20
+>=20
+
+
+
+--lmiUEGV7HGegee5zpI1GHaB4U3ZOs4ErJ--
+
+--ppfvitIFueypwC7zjHFrG9q2WiSCMP3Az
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6pa38ACgkQ9AfbAGHV
+z0BSaAf+LeR893RGiZRPy1fJ6kKDf1jMHnZLwfqfWUtrcWAt7DULq7li4XzC2f7q
+chEVcR+QglrF3ra3UwDufIIb5I/5LfWsownK2qYwxwd1FPhsO/Ngm210QoX4HBEX
+gE3UK3KtbpLv2+NdXnUXXRZ/m5OyYIF/zTYO5JD/PSgBuD2mtLNipvy1Ev93WtBM
+aj4A7eAgJFCygdESrUSKFrPdWfSl+cpPlkb2C65KFrz8TBGWvUIemsIyNDB4Hx3h
+dHsOwCRomA0DepmBgxoFR+2I9wgKZRC4/iZpr5L5zvvhSadaSXsHmQicxmsIFaJj
+KewvABE9km+xJb3rgj2q1omkETVhZw==
+=RwEF
+-----END PGP SIGNATURE-----
+
+--ppfvitIFueypwC7zjHFrG9q2WiSCMP3Az--
 
 
