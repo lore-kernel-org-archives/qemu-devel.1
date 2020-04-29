@@ -2,90 +2,89 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F535C83001
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 03:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0769EC83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 03:44:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2D2020731
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 03:10:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B164220731
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 03:44:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ml9H7kdF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2D2020731
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vHFHcjyL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B164220731
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTd6x-0004mO-0Z
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 23:10:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52020)
+	id 1jTde8-0001LP-R4
+	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 23:44:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56494)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gorbak25@gmail.com>) id 1jTd4T-0001yO-3i
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 23:07:57 -0400
+ (envelope-from <chenhuacai@gmail.com>) id 1jTddW-0000vz-8H
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 23:43:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <gorbak25@gmail.com>) id 1jTd1f-0006b3-0H
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 23:07:36 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51887)
+ (envelope-from <chenhuacai@gmail.com>) id 1jTddK-0000vU-7Q
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 23:43:49 -0400
+Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:38752)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <gorbak25@gmail.com>)
- id 1jTd1e-0006av-Ke
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 23:04:42 -0400
-Received: by mail-wm1-x341.google.com with SMTP id x4so306654wmj.1
- for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 20:04:42 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
+ id 1jTddJ-0000vH-Oo
+ for qemu-devel@nongnu.org; Tue, 28 Apr 2020 23:43:37 -0400
+Received: by mail-il1-x142.google.com with SMTP id c18so1100633ile.5
+ for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 20:43:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=MFxxzEsM5GfOkfgyaKw8Kz24FnJBi9lLjF7uh1T3+yM=;
- b=Ml9H7kdFfKHLrPPnYLICG9djXTuB/GA+1a6LqrTQxGGNkNJxCNdRS2clqs+BPiSaDo
- SyDSYfAFPEVvMLZE53vt6LjJUGrWhyg2uP48+5Sp8JH/PFYvzj47b4hIdShvxZBnCvzt
- d/MHprmO+6eDewWi8n5QAuvcyvODR4vbkp3lFjbCmAr5WpDkeuyk8frileoa4IteY9nl
- 63aJmdKg+mGax5YgJy6sQ5P8fsduxB/TCCu0sSM5W6EAyEP9+wr5mzYCYLTrFRWlaPgN
- vegKSMP7+zwJX5Dsx86WJlzPqx2lM0Ue6tru7DS1zb1UpztfuArjUPSTwPkXfGEVRaoA
- Jfnw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ATB2/TxwBQ4MRvujsi7t+js5C6MFt3QCWs8/JL/RSIo=;
+ b=vHFHcjyLgf6L6pAGPFvObwuSlXoTcCvAmpaB5BVqmH6N1JCWUogLyJo6xDGpHPaFzL
+ cDoBCc9+197Gy29appurQ+voefmefXhdeYQHV3OC1BjF/NVhDL80DE/nZMPXmRh5VaOI
+ RDHMeLGc6VGQ7mNzYHurBZrfNAtAGurwFJilr/pJj/GO/F3sWlJlYLOVzwBu0RwAxzyo
+ 8bC3CF+Qk9aVMp1Kep4lhwbqnug7/haTkjwtOQDQFVTjJFtkChPC8Z9IJTWM9iCnOeIq
+ Yp8br4Qsmoxpz7uyDAfihYLMvO+8StvilJwdO5tIbhO4nAGZaXE0HimNUgiAHk6zUm2P
+ 9DsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=MFxxzEsM5GfOkfgyaKw8Kz24FnJBi9lLjF7uh1T3+yM=;
- b=Qc8vhArOIcg9bKe6MupO3ikZrEDdlegVjxNHUmGyL2gM64mkJ00LUyMn6pAIBUaOO4
- ql7gCgfZHbGos/yoW13S2Q+MmFM17InQJWx0mPabnlbofnhl6XTlpy6pM7NPrpsj/pdb
- ormiQONXg+qJljX+RwSH0uEqP9YizsRR6SBJLtVoKs7VOmpoFFjBTAoGMYV46CW1FvE7
- lt8CItV1TDC2dVr0GYrOhR1mOTX9LMLX3G/AFlg+amr7bdvgEgKFW8K0OGDwtpO3d8zj
- hRrPlHduRt6QXisXxjy7j+12uBH01yZwKMlaf14fgb/x1JEt/a85TCP5CUMSinLtkMt4
- ZQrQ==
-X-Gm-Message-State: AGi0PuarpcNJYL9Kz+9yq7xUPuTn5As2zCSZlvUSfyeg2V6Yrtw7mPiq
- IUP3PCuvTW4dKi16bgpC0iIFo/iSXxHKcA==
-X-Google-Smtp-Source: APiQypJ7i6XB4Z4DtGjW0thFBqIHvxddUzWj5q8KwPgw4tknkPlZoRrX8MoglxKZaemp9rCnP0Ki8A==
-X-Received: by 2002:a1c:cc1a:: with SMTP id h26mr525239wmb.127.1588129480910; 
- Tue, 28 Apr 2020 20:04:40 -0700 (PDT)
-Received: from localhost.localdomain (public-gprs636909.centertel.pl.
- [5.184.31.46])
- by smtp.gmail.com with ESMTPSA id o6sm19713725wrw.63.2020.04.28.20.04.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Apr 2020 20:04:40 -0700 (PDT)
-From: Grzegorz Uriasz <gorbak25@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/2] Improve legacy vbios handling
-Date: Wed, 29 Apr 2020 03:04:09 +0000
-Message-Id: <20200429030409.9406-3-gorbak25@gmail.com>
-X-Mailer: git-send-email 2.26.1
-In-Reply-To: <20200429030409.9406-1-gorbak25@gmail.com>
-References: <20200429030409.9406-1-gorbak25@gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ATB2/TxwBQ4MRvujsi7t+js5C6MFt3QCWs8/JL/RSIo=;
+ b=LQQcUdSvDemEugHa1DAcJbbje/aLXMLFQcMPHCAyNQImT2WVlabrB8Kw6Xxt4Q2syz
+ SrPiq6xzo6Z07RvBGlZY95q5xsiKyLayLcGtVDugePR8odCdt1tlqZtaq7uizwNy0+Gm
+ rOFFYzrhBmRrGlo8bKoCaBqS0Qb3metk494BuPQBdzl9bGK87E5VzB0+DnRJJTmxSbg8
+ k25EgO/a9DMA9w3PpwGR+avZDnNOuMsQoqPj7yYQD+BbAVhXVk4edoOAc/AfIT95L8cx
+ Ar8zGfpi2g2xH3cdWl0jh2Pi0pjXyoN+oy2ss9PtyiqQONBQVxEcgMjZqZ/IjITy7Cs6
+ Q5Cw==
+X-Gm-Message-State: AGi0Pub3ugVRIbIc9USi44z2o/SkZc4SY8BYJO0kKFtek2KnN0L4eUQu
+ +3XU3JYwpDb/Lsrexm1IbJ5MSmaGTmSA/VLI3V0=
+X-Google-Smtp-Source: APiQypLtWGwSOwDychBLd4VL0WpzINOr/FKDwASJNtJ8nPit1LnY0p9wljAYFuugy2Lnk+R0roA5hCn1Cky+i2tY8Yk=
+X-Received: by 2002:a92:5d0f:: with SMTP id r15mr19711162ilb.251.1588131816402; 
+ Tue, 28 Apr 2020 20:43:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=gorbak25@gmail.com; helo=mail-wm1-x341.google.com
+References: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
+ <1587979995-17717-4-git-send-email-chenhc@lemote.com>
+ <c1a3aec6-dc45-3484-3a70-c06449bee609@amsat.org>
+ <CABDp7Vq-YX0LWU3iM=oygpcKzoS8cmXG6mvTQ5Gm_PbQsQMAgw@mail.gmail.com>
+ <CAHiYmc6zFjBtgXRv=8+dqnbDtZqKqiwSDwEi0wKqJmJnys_y0g@mail.gmail.com>
+In-Reply-To: <CAHiYmc6zFjBtgXRv=8+dqnbDtZqKqiwSDwEi0wKqJmJnys_y0g@mail.gmail.com>
+From: Huacai Chen <chenhuacai@gmail.com>
+Date: Wed, 29 Apr 2020 11:51:06 +0800
+Message-ID: <CAAhV-H6NFV7hbaOp8BwPck3FWm5ZHBpuoA9FDmN6tby5LcoTeg@mail.gmail.com>
+Subject: Re: [PATCH for-5.1 4/7] target/mips: Add Loongson-3 CPU definition
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
+ envelope-from=chenhuacai@gmail.com; helo=mail-il1-x142.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,160 +96,299 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: artur@puzio.waw.pl, Stefano Stabellini <sstabellini@kernel.org>,
- Paul Durrant <paul@xen.org>, jakub@bartmin.ski,
- marmarek@invisiblethingslab.com, Grzegorz Uriasz <gorbak25@gmail.com>,
- Anthony Perard <anthony.perard@citrix.com>, j.nowak26@student.uw.edu.pl,
- xen-devel@lists.xenproject.org
+Cc: chen huacai <zltjiangshi@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, qemu-level <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The current method of getting the vbios is broken - it just isn't working on any device I've tested - the reason
-for this is explained in the previous patch. The vbios is polymorphic and getting a proper unmodified copy is
-often not possible without reverse engineering the firmware. We don't need an unmodified copy for most purposes -
-an unmodified copy is only needed for initializing the bios framebuffer and providing the bios with a corrupted
-copy of the rom won't do any damage as the bios will just ignore the rom.
+Hi, Aleksandar,
 
-After the i915 driver takes over the vbios is only needed for reading some metadata/configuration stuff etc...
-I've tested that not having any kind of vbios in the guest actually works fine but on older generations of IGD
-there are some slight hiccups. To maximize compatibility the best approach is to just copy the results of the vbios
-execution directly to the guest. It turns out the vbios is always present on an hardcoded memory range in a reserved
-memory range from real mode - all we need to do is to memcpy it into the guest.
+I've tried translate.google.com, and documents are available here:
+Loongson-3A R1 (Loongson-3A1000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A1000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A1000_processor_user_manual_P1.pdf
+(Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A1000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A1000_processor_user_manual_P2.pdf
+(Chinese Version)
 
-The following patch does 2 things:
-1) When pci_assign_dev_load_option_rom fails to read the vbios from sysfs(this works only when the igd is not the
-boot gpu - this is unlikely to happen) it falls back to using /dev/mem to copy the vbios directly to the guest.
-Using /dev/mem should be fine as there is more xen specific pci code which also relies on /dev/mem.
-2) When dealing with IGD in the more generic code we skip the allocation of the rom resource - the reason for this is to prevent
-a malicious guest from modifying the vbios in the host -> this is needed as someone might try to pwn the i915 driver in the host by doing so
-(attach igd to guest, guest modifies vbios, the guest is terminated and the idg is reattached to the host, i915 driver in the host uses data from the modified vbios).
-This is also needed to not overwrite the proper shadow copy made before.
+Loongson-3A R2 (Loongson-3A2000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A2000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A2000_user1.pdf (Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A2000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A2000_user2.pdf (Chinese Version)
 
-I've tested this patch and it works fine - the guest isn't complaining about the missing vbios tables and the pci config
-space in the guest looks fine.
+Loongson-3A R3 (Loongson-3A3000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A3000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A3000_3B3000usermanual1.pdf
+(Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A3000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A3000_3B3000usermanual2.pdf
+(Chinese Version)
 
-Signed-off-by: Grzegorz Uriasz <gorbak25@gmail.com>
----
- hw/xen/xen_pt.c          |  8 +++++--
- hw/xen/xen_pt_graphics.c | 48 +++++++++++++++++++++++++++++++++++++---
- hw/xen/xen_pt_load_rom.c |  2 +-
- 3 files changed, 52 insertions(+), 6 deletions(-)
+Loongson-3A R4 (Loongson-3A4000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A4000_p1.pdf
+http://ftp.godson.ac.cn/lemote/3A4000user.pdf (Chinese Version)
+User Manual Part 2:
+I'm sorry that it is unavailable now.
 
-diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
-index b91082cb8b..ffc3559dd4 100644
---- a/hw/xen/xen_pt.c
-+++ b/hw/xen/xen_pt.c
-@@ -483,8 +483,12 @@ static int xen_pt_register_regions(XenPCIPassthroughState *s, uint16_t *cmd)
-                    i, r->size, r->base_addr, type);
-     }
- 
--    /* Register expansion ROM address */
--    if (d->rom.base_addr && d->rom.size) {
-+    /*
-+     * Register expansion ROM address. If we are dealing with a ROM
-+     * shadow copy for legacy vga devices then don't bother to map it
-+     * as previous code creates a proper shadow copy
-+     */
-+    if (d->rom.base_addr && d->rom.size && !(is_igd_vga_passthrough(d))) {
-         uint32_t bar_data = 0;
- 
-         /* Re-set BAR reported by OS, otherwise ROM can't be read. */
-diff --git a/hw/xen/xen_pt_graphics.c b/hw/xen/xen_pt_graphics.c
-index a3bc7e3921..fe0ef2685c 100644
---- a/hw/xen/xen_pt_graphics.c
-+++ b/hw/xen/xen_pt_graphics.c
-@@ -129,7 +129,7 @@ int xen_pt_unregister_vga_regions(XenHostPCIDevice *dev)
-     return 0;
- }
- 
--static void *get_vgabios(XenPCIPassthroughState *s, int *size,
-+static void *get_sysfs_vgabios(XenPCIPassthroughState *s, int *size,
-                        XenHostPCIDevice *dev)
- {
-     return pci_assign_dev_load_option_rom(&s->dev, size,
-@@ -137,6 +137,45 @@ static void *get_vgabios(XenPCIPassthroughState *s, int *size,
-                                           dev->dev, dev->func);
- }
- 
-+static void xen_pt_direct_vbios_copy(XenPCIPassthroughState *s, Error **errp)
-+{
-+    int fd = -1;
-+    void *guest_bios = NULL;
-+    void *host_vbios = NULL;
-+    /* This is always 32 pages in the real mode reserved region */
-+    int bios_size = 32 << XC_PAGE_SHIFT;
-+    int vbios_addr = 0xc0000;
-+
-+    fd = open("/dev/mem", O_RDONLY);
-+    if (fd == -1) {
-+        error_setg(errp, "Can't open /dev/mem: %s", strerror(errno));
-+        return;
-+    }
-+    host_vbios = mmap(NULL, bios_size,
-+            PROT_READ, MAP_ANONYMOUS | MAP_PRIVATE, fd, vbios_addr);
-+    close(fd);
-+
-+    if (host_vbios == MAP_FAILED) {
-+        error_setg(errp, "Failed to mmap host vbios: %s", strerror(errno));
-+        return;
-+    }
-+
-+    memory_region_init_ram(&s->dev.rom, OBJECT(&s->dev),
-+            "legacy_vbios.rom", bios_size, &error_abort);
-+    guest_bios = memory_region_get_ram_ptr(&s->dev.rom);
-+    memcpy(guest_bios, host_vbios, bios_size);
-+
-+    if (munmap(host_vbios, bios_size) == -1) {
-+        XEN_PT_LOG(&s->dev, "Failed to unmap host vbios: %s\n", strerror(errno));
-+    }
-+
-+    cpu_physical_memory_write(vbios_addr, guest_bios, bios_size);
-+    memory_region_set_address(&s->dev.rom, vbios_addr);
-+    pci_register_bar(&s->dev, PCI_ROM_SLOT, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->dev.rom);
-+    s->dev.has_rom = true;
-+    XEN_PT_LOG(&s->dev, "Legacy VBIOS registered\n");
-+}
-+
- /* Refer to Seabios. */
- struct rom_header {
-     uint16_t signature;
-@@ -179,9 +218,11 @@ void xen_pt_setup_vga(XenPCIPassthroughState *s, XenHostPCIDevice *dev,
-         return;
-     }
- 
--    bios = get_vgabios(s, &bios_size, dev);
-+    bios = get_sysfs_vgabios(s, &bios_size, dev);
-     if (!bios) {
--        error_setg(errp, "VGA: Can't get VBIOS");
-+        XEN_PT_LOG(&s->dev, "Unable to get host VBIOS from sysfs - "
-+                            "falling back to a direct copy of memory ranges\n");
-+        xen_pt_direct_vbios_copy(s, errp);
-         return;
-     }
- 
-@@ -223,6 +264,7 @@ void xen_pt_setup_vga(XenPCIPassthroughState *s, XenHostPCIDevice *dev,
- 
-     /* Currently we fixed this address as a primary for legacy BIOS. */
-     cpu_physical_memory_write(0xc0000, bios, bios_size);
-+    XEN_PT_LOG(&s->dev, "Legacy VBIOS registered\n");
- }
- 
- uint32_t igd_read_opregion(XenPCIPassthroughState *s)
-diff --git a/hw/xen/xen_pt_load_rom.c b/hw/xen/xen_pt_load_rom.c
-index 9f100dc159..8cd9aa84dc 100644
---- a/hw/xen/xen_pt_load_rom.c
-+++ b/hw/xen/xen_pt_load_rom.c
-@@ -65,7 +65,7 @@ void *pci_assign_dev_load_option_rom(PCIDevice *dev,
-         goto close_rom;
-     }
- 
--    pci_register_bar(dev, PCI_ROM_SLOT, 0, &dev->rom);
-+    pci_register_bar(dev, PCI_ROM_SLOT, PCI_BASE_ADDRESS_SPACE_MEMORY, &dev->rom);
-     dev->has_rom = true;
-     *size = st.st_size;
- close_rom:
--- 
-2.26.1
-
+On Wed, Apr 29, 2020 at 2:37 AM Aleksandar Markovic
+<aleksandar.qemu.devel@gmail.com> wrote:
+>
+> Huacai,
+>
+> Can you please do machine translation of the document?
+>
+> It can be done via translate.google.com (it accepts pdf files, but
+> does not have download feature, and workaround is to "print to pdf"...
+>
+> Thanks in advance!
+> Aleksandar
+>
+> =D1=83=D1=82=D0=BE, 28. =D0=B0=D0=BF=D1=80 2020. =D1=83 10:26 chen huacai=
+ <zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=
+=D0=BE/=D0=BB=D0=B0:
+> >
+> > Hi, Philippe,
+> >
+> > On Tue, Apr 28, 2020 at 2:34 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsa=
+t.org> wrote:
+> > >
+> > > Hi Huacai,
+> > >
+> > > On 4/27/20 11:33 AM, Huacai Chen wrote:
+> > > > Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-=
+3B
+> > > > R1/R2. Loongson-3A R4 is the newest and its ISA is almost the super=
+set
+> > > > of all others. To reduce complexity, we just define a "Loongson-3A"=
+ CPU
+> > > > which is corresponding to Loongson-3A R4. Loongson-3A has CONFIG6 a=
+nd
+> > > > CONFIG7, so add their bit-fields as well.
+> > >
+> > > Is there a public datasheet for R4? (If possible in English).
+> > I'm sorry that we only have Chinese datasheet in www.loongson.cn.
+> >
+> > >
+> > > >
+> > > > Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> > > > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> > > > ---
+> > > >  target/mips/cpu.h                | 28 ++++++++++++++++++++++
+> > > >  target/mips/internal.h           |  2 ++
+> > > >  target/mips/mips-defs.h          |  7 ++++--
+> > > >  target/mips/translate.c          |  2 ++
+> > > >  target/mips/translate_init.inc.c | 51 ++++++++++++++++++++++++++++=
+++++++++++++
+> > > >  5 files changed, 88 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> > > > index 94d01ea..0b3c987 100644
+> > > > --- a/target/mips/cpu.h
+> > > > +++ b/target/mips/cpu.h
+> > > > @@ -940,7 +940,35 @@ struct CPUMIPSState {
+> > > >  #define CP0C5_UFR          2
+> > > >  #define CP0C5_NFExists     0
+> > > >      int32_t CP0_Config6;
+> > > > +    int32_t CP0_Config6_rw_bitmask;
+> > > > +#define CP0C6_BPPASS          31
+> > > > +#define CP0C6_KPOS            24
+> > > > +#define CP0C6_KE              23
+> > > > +#define CP0C6_VTLBONLY        22
+> > > > +#define CP0C6_LASX            21
+> > > > +#define CP0C6_SSEN            20
+> > > > +#define CP0C6_DISDRTIME       19
+> > > > +#define CP0C6_PIXNUEN         18
+> > > > +#define CP0C6_SCRAND          17
+> > > > +#define CP0C6_LLEXCEN         16
+> > > > +#define CP0C6_DISVC           15
+> > > > +#define CP0C6_VCLRU           14
+> > > > +#define CP0C6_DCLRU           13
+> > > > +#define CP0C6_PIXUEN          12
+> > > > +#define CP0C6_DISBLKLYEN      11
+> > > > +#define CP0C6_UMEMUALEN       10
+> > > > +#define CP0C6_SFBEN           8
+> > > > +#define CP0C6_FLTINT          7
+> > > > +#define CP0C6_VLTINT          6
+> > > > +#define CP0C6_DISBTB          5
+> > > > +#define CP0C6_STPREFCTL       2
+> > > > +#define CP0C6_INSTPREF        1
+> > > > +#define CP0C6_DATAPREF        0
+> > > >      int32_t CP0_Config7;
+> > > > +    int64_t CP0_Config7_rw_bitmask;
+> > > > +#define CP0C7_NAPCGEN       2
+> > > > +#define CP0C7_UNIMUEN       1
+> > > > +#define CP0C7_VFPUCGEN      0
+> > > >      uint64_t CP0_LLAddr;
+> > > >      uint64_t CP0_MAAR[MIPS_MAAR_MAX];
+> > > >      int32_t CP0_MAARI;
+> > > > diff --git a/target/mips/internal.h b/target/mips/internal.h
+> > > > index 1bf274b..7853cb1 100644
+> > > > --- a/target/mips/internal.h
+> > > > +++ b/target/mips/internal.h
+> > > > @@ -36,7 +36,9 @@ struct mips_def_t {
+> > > >      int32_t CP0_Config5;
+> > > >      int32_t CP0_Config5_rw_bitmask;
+> > > >      int32_t CP0_Config6;
+> > > > +    int32_t CP0_Config6_rw_bitmask;
+> > > >      int32_t CP0_Config7;
+> > > > +    int32_t CP0_Config7_rw_bitmask;
+> > > >      target_ulong CP0_LLAddr_rw_bitmask;
+> > > >      int CP0_LLAddr_shift;
+> > > >      int32_t SYNCI_Step;
+> > > > diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+> > > > index a831bb4..c2c96db 100644
+> > > > --- a/target/mips/mips-defs.h
+> > > > +++ b/target/mips/mips-defs.h
+> > > > @@ -51,8 +51,9 @@
+> > > >   */
+> > > >  #define INSN_LOONGSON2E   0x0001000000000000ULL
+> > > >  #define INSN_LOONGSON2F   0x0002000000000000ULL
+> > > > -#define INSN_VR54XX       0x0004000000000000ULL
+> > > > -#define INSN_R5900        0x0008000000000000ULL
+> > > > +#define INSN_LOONGSON3A   0x0004000000000000ULL
+> > > > +#define INSN_VR54XX       0x0008000000000000ULL
+> > > > +#define INSN_R5900        0x0010000000000000ULL
+> > > >  /*
+> > > >   *   bits 56-63: vendor-specific ASEs
+> > > >   */
+> > > > @@ -94,6 +95,8 @@
+> > > >  /* Wave Computing: "nanoMIPS" */
+> > > >  #define CPU_NANOMIPS32  (CPU_MIPS32R6 | ISA_NANOMIPS32)
+> > > >
+> > > > +#define CPU_LOONGSON3A  (CPU_MIPS64R2 | INSN_LOONGSON3A)
+> > > > +
+> > > >  /*
+> > > >   * Strictly follow the architecture standard:
+> > > >   * - Disallow "special" instruction handling for PMON/SPIM.
+> > > > diff --git a/target/mips/translate.c b/target/mips/translate.c
+> > > > index 25b595a..2caf4cb 100644
+> > > > --- a/target/mips/translate.c
+> > > > +++ b/target/mips/translate.c
+> > > > @@ -31206,7 +31206,9 @@ void cpu_state_reset(CPUMIPSState *env)
+> > > >      env->CP0_Config5 =3D env->cpu_model->CP0_Config5;
+> > > >      env->CP0_Config5_rw_bitmask =3D env->cpu_model->CP0_Config5_rw=
+_bitmask;
+> > > >      env->CP0_Config6 =3D env->cpu_model->CP0_Config6;
+> > > > +    env->CP0_Config6_rw_bitmask =3D env->cpu_model->CP0_Config6_rw=
+_bitmask;
+> > > >      env->CP0_Config7 =3D env->cpu_model->CP0_Config7;
+> > > > +    env->CP0_Config7_rw_bitmask =3D env->cpu_model->CP0_Config7_rw=
+_bitmask;
+> > > >      env->CP0_LLAddr_rw_bitmask =3D env->cpu_model->CP0_LLAddr_rw_b=
+itmask
+> > > >                                   << env->cpu_model->CP0_LLAddr_shi=
+ft;
+> > > >      env->CP0_LLAddr_shift =3D env->cpu_model->CP0_LLAddr_shift;
+> > > > diff --git a/target/mips/translate_init.inc.c b/target/mips/transla=
+te_init.inc.c
+> > > > index 6d145a9..a32412d 100644
+> > > > --- a/target/mips/translate_init.inc.c
+> > > > +++ b/target/mips/translate_init.inc.c
+> > > > @@ -802,6 +802,57 @@ const mips_def_t mips_defs[] =3D
+> > > >          .mmu_type =3D MMU_TYPE_R4000,
+> > > >      },
+> > > >      {
+> > > > +        .name =3D "Loongson-3A",
+> > > > +        .CP0_PRid =3D 0x14C000,
+> > > > +        /* 64KB I-cache and d-cache. 4 way with 32 bit cache line =
+size.  */
+> > > > +        .CP0_Config0 =3D MIPS_CONFIG0 | (0x1 << CP0C0_AR) | (0x2 <=
+< CP0C0_AT) |
+> > > > +                       (MMU_TYPE_R4000 << CP0C0_MT),
+> > > > +        .CP0_Config1 =3D MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << C=
+P0C1_MMU) |
+> > > > +                       (2 << CP0C1_IS) | (4 << CP0C1_IL) | (3 << C=
+P0C1_IA) |
+> > > > +                       (2 << CP0C1_DS) | (4 << CP0C1_DL) | (3 << C=
+P0C1_DA) |
+> > > > +                       (1 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << C=
+P0C1_EP),
+> > > > +        .CP0_Config2 =3D MIPS_CONFIG2,
+> > > > +        .CP0_Config3 =3D MIPS_CONFIG3 | (1U << CP0C3_M) | (1 << CP=
+0C3_MSAP) |
+> > > > +                       (1 << CP0C3_BP) | (1 << CP0C3_BI) | (1 << C=
+P0C3_ULRI) |
+> > > > +                       (1 << CP0C3_RXI) | (1 << CP0C3_LPA) | (1 <<=
+ CP0C3_VInt),
+> > > > +        .CP0_Config4 =3D MIPS_CONFIG4 | (1U << CP0C4_M) | (2 << CP=
+0C4_IE) |
+> > > > +                       (1 << CP0C4_AE) | (0x1c << CP0C4_KScrExist)=
+,
+> > > > +        .CP0_Config4_rw_bitmask =3D 0,
+> > > > +        .CP0_Config5 =3D MIPS_CONFIG5 | (1 << CP0C5_NFExists) | (1=
+ << 18),
+> > > > +        .CP0_Config5_rw_bitmask =3D (1 << CP0C5_K) | (1 << CP0C5_C=
+V) |
+> > > > +                                  (1 << CP0C5_MSAEn) | (1 << CP0C5=
+_UFE) |
+> > > > +                                  (1 << CP0C5_FRE) | (1 << CP0C5_S=
+BRI),
+> > > > +        .CP0_Config6 =3D (1 << CP0C6_VCLRU) | (1 << CP0C6_DCLRU) |=
+ (1 << CP0C6_SFBEN) |
+> > > > +                       (1 << CP0C6_FLTINT) | (1 << CP0C6_INSTPREF)=
+ | (1 << CP0C6_DATAPREF),
+> > > > +        .CP0_Config6_rw_bitmask =3D (1 << CP0C6_BPPASS) | (0x3f <<=
+ CP0C6_KPOS) |
+> > > > +                                  (1 << CP0C6_KE) | (1 << CP0C6_VT=
+LBONLY) | (1 << CP0C6_LASX) |
+> > > > +                                  (1 << CP0C6_SSEN) | (1 << CP0C6_=
+DISDRTIME) |
+> > > > +                                  (1 << CP0C6_PIXNUEN) | (1 << CP0=
+C6_SCRAND) |
+> > > > +                                  (1 << CP0C6_LLEXCEN) | (1 << CP0=
+C6_DISVC) |
+> > > > +                                  (1 << CP0C6_VCLRU) | (1 << CP0C6=
+_DCLRU) |
+> > > > +                                  (1 << CP0C6_PIXUEN) | (1 << CP0C=
+6_DISBLKLYEN) |
+> > > > +                                  (1 << CP0C6_UMEMUALEN) | (1 << C=
+P0C6_SFBEN) |
+> > > > +                                  (1 << CP0C6_FLTINT) | (1 << CP0C=
+6_VLTINT) |
+> > > > +                                  (1 << CP0C6_DISBTB) | (3 << CP0C=
+6_STPREFCTL) |
+> > > > +                                  (1 << CP0C6_INSTPREF) | (1 << CP=
+0C6_DATAPREF),
+> > > > +        .CP0_Config7 =3D 0,
+> > > > +        .CP0_Config7_rw_bitmask =3D (1 << CP0C7_NAPCGEN) | (1 << C=
+P0C7_UNIMUEN) | \
+> > > > +                                  (1 << CP0C7_VFPUCGEN),
+> > > > +        .CP0_LLAddr_rw_bitmask =3D 1,
+> > > > +        .SYNCI_Step =3D 16,
+> > > > +        .CCRes =3D 2,
+> > > > +        .CP0_Status_rw_bitmask =3D 0x7DDBFFFF,
+> > > > +        .CP0_PageGrain_rw_bitmask =3D (1U << CP0PG_RIE) | (1 << CP=
+0PG_XIE) |
+> > > > +                    (1 << CP0PG_ELPA) | (1 << CP0PG_IEC),
+> > > > +        .CP1_fcr0 =3D (0x5 << FCR0_PRID) | (0x1 << FCR0_REV) | (0x=
+1 << FCR0_F64),
+> > > > +        .CP1_fcr31 =3D 0,
+> > > > +        .CP1_fcr31_rw_bitmask =3D 0xFF83FFFF,
+> > > > +        .SEGBITS =3D 48,
+> > > > +        .PABITS =3D 48,
+> > > > +        .insn_flags =3D CPU_LOONGSON3A,
+> > > > +        .mmu_type =3D MMU_TYPE_R4000,
+> > > > +    },
+> > > > +    {
+> > > >          /* A generic CPU providing MIPS64 DSP R2 ASE features.
+> > > >             FIXME: Eventually this should be replaced by a real CPU=
+ model. */
+> > > >          .name =3D "mips64dspr2",
+> > > >
+> >
+> >
+> >
+> > --
+> > Huacai Chen
 
