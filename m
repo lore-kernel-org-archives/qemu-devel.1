@@ -6,79 +6,150 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D94B1C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 13:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2650C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 13:31:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A09BE2087E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 13:27:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6DE562085B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 13:31:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J9NyaUV+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A09BE2087E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WTW0gpqB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DE562085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTmke-0004Lr-PN
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 09:27:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36962)
+	id 1jTmnw-0006ko-EO
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 09:31:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37566)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jTmjt-0003tp-AD
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 09:27:09 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jTmmp-0005bF-Uu
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 09:30:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jTmjJ-0005T4-Vm
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 09:27:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47211
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <jsnow@redhat.com>) id 1jTmmo-00052q-PO
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 09:30:03 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37329
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jTmjJ-0005DP-Eh
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 09:26:25 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jTmmo-000519-61
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 09:30:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588166783;
+ s=mimecast20190719; t=1588167000;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rlzG3nw1xjRFpaj3z9ilKoW5qYC50883EMouLQRjr5s=;
- b=J9NyaUV+Ofb5KHKXYkZaOpaSgluNbrt2mgJA9b8KkwlsREOEWKTiYWSbtGmFlbTaGt8YCg
- kutM/YS00Aueothm95j9jQgJ75Ba7pT2g+JgB3kL7i0zt8qfc6ZIxi1F3RyKpUl+fi4uP0
- QQIrHColJ3aLaemMvaI5J47zVoO0zY8=
+ content-transfer-encoding:content-transfer-encoding:autocrypt:autocrypt;
+ bh=BuZFn4nQvzZI9TZVvclXvBzPKsyMPKCrBsNyaKlCzos=;
+ b=WTW0gpqBp7yYmQ+NozUSrN66aERyEB+kCmFAMTvKpP+72u3IFxpF7F5yqVw9Ngmznvt8Od
+ ldl1xwAnD+8JQuj54iO+zOyXEacEiGqCZLw8EFNGk/4kloE6onmjXKH0e/jKp2W2anlDBu
+ KwT8ARjMXjZxrrohzwLQAY58qcuDFb4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-V1UZGjMoPEORCPc4r1jgJw-1; Wed, 29 Apr 2020 09:26:20 -0400
-X-MC-Unique: V1UZGjMoPEORCPc4r1jgJw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-215-0JAO21gBPK-A6HZyZ4KdQw-1; Wed, 29 Apr 2020 09:29:58 -0400
+X-MC-Unique: 0JAO21gBPK-A6HZyZ4KdQw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDAA88AB388;
- Wed, 29 Apr 2020 13:26:19 +0000 (UTC)
-Received: from work-vm (ovpn-114-192.ams2.redhat.com [10.36.114.192])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A0FE5D70B;
- Wed, 29 Apr 2020 13:26:10 +0000 (UTC)
-Date: Wed, 29 Apr 2020 14:26:07 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH RFC 0/4] vl: Sync dirty bitmap when system resets
-Message-ID: <20200429132607.GJ2834@work-vm>
-References: <20200428194219.10963-1-peterx@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6E958AB381;
+ Wed, 29 Apr 2020 13:29:57 +0000 (UTC)
+Received: from [10.10.117.103] (ovpn-117-103.rdu2.redhat.com [10.10.117.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3EB221002388;
+ Wed, 29 Apr 2020 13:29:55 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Subject: dirty bitmap migration refactor
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <2e939379-b770-43f7-2cad-90f765141d70@redhat.com>
+Date: Wed, 29 Apr 2020 09:29:55 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200428194219.10963-1-peterx@redhat.com>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:28:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,98 +161,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Tian Kevin <kevin.tian@intel.com>,
- qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+Cc: Peter Krempa <pkrempa@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> This RFC series starts from the fact that we will sync dirty bitmap when
-> removing a memslot for KVM.  IIUC that was majorly to maintain the dirty =
-bitmap
-> even across a system reboot.
->=20
-> This series wants to move that sync from kvm memslot removal to system re=
-set.
->=20
-> (I still don't know why the reset system will still need to keep the RAM =
-status
->  before the reset.  I thought things like kdump might use this to retriev=
-e info
->  from previous kernel panic, however IIUC that's not what kdump is doing =
-now.
->  Anyway, I'd be more than glad if anyone knows the real scenario behind
->  this...)
+Hi all,
 
-Aren't there pages written by the BIOS that are read by the system as it
-comes up through reset - so you need those pages intact?
-(But I don't think that slot gets removed? Or does it - the bios has
-some weird aliasing)
+as you are probably aware I haven't been paying attention to dirty
+bitmap work very much for the past month.
 
-> The current solution (sync at kvm memslot removal) works in most cases, b=
-ut:
->=20
->   - it will be merely impossible to work for dirty ring, and,
+Around KVM Forum, we had a giant thread dedicated to discussing the
+problems with dirty bitmap migration, which in a nutshell, are that it
+migrates using the node name with no option for re-routing or re-naming
+nodes.
 
-Why doesn't that work with dirty ring?
+IIRC, there was a patchset to fix this quickly sent by Virtuozzo, but
+the series stalled because it was quite close to a release and was
+deemed too risky.
 
->   - it has an existing flaw on race condition. [1]
->=20
-> So if system reset is the only thing we care here, I'm thinking whether w=
-e can
-> move this sync explicitly to system reset so we do a global sync there in=
-stead
-> of sync every time when memory layout changed and caused memory removals.=
-  I
-> think it can be more explict to sync during system reset, and also with t=
-hat
-> context it will be far easier for kvm dirty ring to provide the same logi=
-c.
->=20
-> This is totally RFC because I'm still trying to find whether there will b=
-e
-> other cases besides system reset that we want to keep the dirty bits for =
-a
-> to-be-removed memslot (real memory removals like unplugging memory should=
-n't
-> matter, because we won't care about the dirty bits if it's never going to=
- be
-> there anymore, not to mention we won't allow such things during a migrati=
-on).
-> So far I don't see any.
+What is the status of those patches, if any? Do we need to start from
+scratch to implement the functionality that libvirt wants here?
 
-I'm still unusure when slot removal happens for real; but if it's
-happening for RAM on PCI devices, then that would make sense as
-something you might want to keep.
-
-Dave
-
-> I've run some tests either using the old dirty log or dirty ring, with ei=
-ther
-> some memory load or reboots on the source, and I see no issues so far.
->=20
-> Comments greatly welcomed.  Thanks.
->=20
-> [1] https://lore.kernel.org/qemu-devel/20200327150425.GJ422390@xz-x1/
->=20
-> Peter Xu (4):
->   migration: Export migration_bitmap_sync_precopy()
->   migration: Introduce migrate_is_precopy()
->   vl: Sync dirty bits for system resets during precopy
->   kvm: No need to sync dirty bitmap before memslot removal any more
->=20
->  accel/kvm/kvm-all.c      |  3 ---
->  include/migration/misc.h |  2 ++
->  migration/migration.c    |  7 +++++++
->  migration/ram.c          | 10 +++++-----
->  softmmu/vl.c             | 16 ++++++++++++++++
->  5 files changed, 30 insertions(+), 8 deletions(-)
->=20
-> --=20
-> 2.24.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--js
 
 
