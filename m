@@ -2,87 +2,84 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A613CC83000
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46204C8300A
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 21:09:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65DC12076B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:54:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65DC12076B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=physnet.uni-hamburg.de
+	by mail.kernel.org (Postfix) with ESMTPS id 10D2520BED
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 21:09:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uwmyTiJc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10D2520BED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTtin-0007Ec-HP
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:54:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41836)
+	id 1jTtxS-0007Rh-8P
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 17:09:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57774)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mhohmann@physnet.uni-hamburg.de>) id 1jTs5k-00071r-D7
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 15:09:57 -0400
+ (envelope-from <josemartins90@gmail.com>) id 1jTtwQ-0006aL-Lw
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 17:08:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mhohmann@physnet.uni-hamburg.de>) id 1jTs55-00045Q-FX
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 15:09:56 -0400
-Received: from mail.physnet.uni-hamburg.de ([134.100.106.230]:46056)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mhohmann@physnet.uni-hamburg.de>)
- id 1jTs54-00044m-Q5
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 15:09:15 -0400
-Received: from 227-98-191-90.dyn.estpak.ee ([90.191.98.227]
- helo=[192.168.1.129]) by mail.physnet.uni-hamburg.de with esmtpsa
- (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16) (Exim 4.72)
- (envelope-from <mhohmann@physnet.uni-hamburg.de>)
- id 1jTs4t-0002rh-Ib; Wed, 29 Apr 2020 21:09:04 +0200
-To: qemu-devel@nongnu.org
-From: Manuel Hohmann <mhohmann@physnet.uni-hamburg.de>
-Subject: Error "cannot bind memory to host NUMA nodes: Operation not
- permitted" running inside docker
-Autocrypt: addr=mhohmann@physnet.uni-hamburg.de; prefer-encrypt=mutual;
- keydata=
- mQENBEzzkJ0BCACoFEyKwRypWgc6Bbl/t5CRmCq+wnrLqGTji2iB9gHhP/dFisO3bdPjX2bT
- bZSG48rR7Q999M5NjCX7juQbAKQm5vv3NDBNqq35Q7nSALsEEazy1awbx56EBXPn/5VbH4JT
- c3sZiQR/MZY81WcWANPxZr3XWOl71netiVNzO5OBZSTxRV7dnB2meYBlhgD7dDzZTfJ8tpqu
- XlzlaZ+H2QDDt2TH0LYm6rhK2OXDqTCs09BiZi48Ev6YI/DC/RpLNGlVtACV1RB1i+GAKIZJ
- /E+E1A5wQTG+/wHblFq9PcFJKTJOQvMh3kV/4S4GuQbXoAMVn+6FGIF7mat4Oo+mNjchABEB
- AAG0ME1hbnVlbCBIb2htYW5uIDxtaG9obWFubkBwaHlzbmV0LnVuaS1oYW1idXJnLmRlPokB
- OAQTAQIAIgUCTPOQnQIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQ+9/1Gux6RLIN
- fgf+MHuA2VcJxo/xAvTjfrvmDFgTsepHFlWPKkEdEQY2FSG1dqhAHtEIlEJ0M/6Y0r5cSn+L
- E8yqW8OWP0aCsd0BTcp+h1t8lIZhx33ZGmOFDxLVcnIq/zyEloRbVZPG05yvKgmc3N3opaw4
- 8WrdnQ7Q6+iQhY9v+S+BcRyJNDL6cWXZF2uLOvXDAq2Y1lihZSwBXvcQOgQ7nfgJYAveA140
- fqRmg5e7usL2xq1kaWDvRrxBk/D6kWqLBkvYQrxxflTfsbM4IJP4lmCIfyr0BxY0VOzjZ8Wu
- SYl9ETJcHSc4zR+s94PnDAlFsZbZHGoXK6YxD6SlyaisT00bqvZXmY8gHbkBDQRM85CdAQgA
- l90YtA7ak5BUEHw4WPY9AIpfP0IWSI3lQbudSdTcJ2GPx5fE01dd/W1V+7K7VBiDw7m1CjT7
- qnv5ZPFWIhGCBzxGhi/81NXhnEsHoElJEzea0XY64/7hf+CeM4rrx7CaXjByHDbVfFPQqUEZ
- yhZhxYChmpCi/5CAvs5sJKFNqTqF6AXFCNdam0iWu1pT2MVhl2RqYQq0rUNVDhlh/v/fPKsM
- tUqyfXbiXVaG9zcozC7AS6U+0jly9oMsGrz9eCE6uDc3YceTnhUqRvuBzj3wB6hFNXj82T/+
- 4r60s9zAc2VMi3F0jKBr0+7b+5JOjeraPlvNB0ftCfnFNDGeC0pZAQARAQABiQEfBBgBAgAJ
- BQJM85CdAhsMAAoJEPvf9RrsekSyMAMH/2gVwokA0EEeF00AO6K9uTukidAflrXYFS+KLKC2
- oa8uAb2Or6y2OOZeaLmYhbOdRapFCElqjGSMYlBHPFmu10KDUYzNuaVmSULw84e0KzNPCeJG
- zOF4bGvLY9bv4cp2tMeUNDIvQHsmZ0PE+O9i9cVtuITEjsXxa/62SE1TSnLg3QUUZEvTIIKN
- ZEoxKIHrxiLVsa5Rd21YDVyShLjK4sa4Tc0PUPpe5yWkET6hVBIw2g15hAO8+qkShbRYg9CH
- pZQlUIv2wMJqzXV4UaHYzRJcgZZ0YEvNHE/Vstl7GLHk/QtaCxqva6novYYXWK/rMGrK19gw
- 3dYtCkCgf6rLwTE=
-Organization: University of Tartu
-Message-ID: <187fffac-d7b9-5a1c-11c2-72dba9c21347@physnet.uni-hamburg.de>
-Date: Wed, 29 Apr 2020 22:09:01 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <josemartins90@gmail.com>) id 1jTtwQ-0002dl-Cn
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 17:08:26 -0400
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:46334)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <josemartins90@gmail.com>)
+ id 1jTtwP-0002dR-26; Wed, 29 Apr 2020 17:08:25 -0400
+Received: by mail-il1-x144.google.com with SMTP id x2so3845586ilp.13;
+ Wed, 29 Apr 2020 14:08:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ZKmOmQWNchllpHFerOMahyJhCu0arGhsHrYxlR6EX4c=;
+ b=uwmyTiJcU07ADDWwjp3rkygnprTqrHo+V3T/o+ElES3JaY0y62+OhMc3e9cEqbdrR7
+ tjoJwBoDiIaafma6vu73/oGlvM3o1pG4ZAXieDbkKhB3cb6YQZrag0wt9creGZOycVMA
+ hxa9vrPJwTITT2aLNX7oLWV1QKl34D+PeHawaWsB42kNcNuIGUeLb0uw8izQ1f3u47Dh
+ 2pVz+Msvcgn2jeBr2mvBXCG5/4QK9jPGOCnbbzqxK5UXAfY0CZ6OVDhFVyiHvaHW/cfr
+ WUV3Pxc+hoRjqbV4/0fBdNWV9uwhxNCeGTH7vngtr9bpYENFe728dBX3SF92NogqROQB
+ Ak8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ZKmOmQWNchllpHFerOMahyJhCu0arGhsHrYxlR6EX4c=;
+ b=A954ULbnfnc7kaM2wdrOti0YQmR7k0AP62QmJjkK41AzgqTcFYU+5KF6dJ0HzyEWZ5
+ 6ifCNc/LzqwzV/3EaQDqgvUXXIOOKgqJvBuA07OmuhC//GZs32bGwK37vRuc2Zqjrex9
+ wNdCyx+Ir1zVADqnjgoLCOkYcqHHwTg1cYG6MbbidT8JVh2EfTdBHzfcjH/L+aAG1S16
+ D1oat6jIM3SLc2m0pBnCNqknqn5anS83SSjIIjfehgGvUqDBA8g0sXZfiJBgw8vD9is0
+ 4vs0uemdlvJbW4lBRFKfCQuU2kDlLm3is+56JcTJwfvYvY64w+y17yMIy0i8Pe+aZnO7
+ dk6Q==
+X-Gm-Message-State: AGi0PuYqX7dnLEqkkbo+7AuakOTHrmA9I98kBcjGeHyiqdD4cqQbo10Q
+ BCyocTy/MwxbYLqu/lwwy7aGuxiMSm7DMHXAl2k=
+X-Google-Smtp-Source: APiQypJtddMFTCos2prusOH04+xx+NYH48XpL4J4Uc0d+4ED1CxEwAmBGgjDBGCss6MeaU4NAc097PRJjX4WDUE1fj4=
+X-Received: by 2002:a92:5b90:: with SMTP id c16mr293446ilg.276.1588194503547; 
+ Wed, 29 Apr 2020 14:08:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="upfXptObL2Kf69Mj6B3uUxQWG7a2yp2uz"
-Received-SPF: none client-ip=134.100.106.230;
- envelope-from=mhohmann@physnet.uni-hamburg.de;
- helo=mail.physnet.uni-hamburg.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 15:09:05
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Received-From: 134.100.106.230
-X-Mailman-Approved-At: Wed, 29 Apr 2020 16:49:14 -0400
+References: <CAC41xo2O1k+cn7EO3Zu3U70qefFwGa5B1iNRNgRwLk7SGX=-Aw@mail.gmail.com>
+ <CAKmqyKPDzusVqzCFwCJ+2gY0qchguhR57zHNkE-0MTeffKs_OA@mail.gmail.com>
+ <CAC41xo3qeQZ+i8XoQq3j80_JDEoL2yMA__arpmE+GXyjX4c1sg@mail.gmail.com>
+ <CAKmqyKPJ6QqUULrDj9NX_bLdnjsjzPOGcCBH5q23fG=ScT_NzA@mail.gmail.com>
+In-Reply-To: <CAKmqyKPJ6QqUULrDj9NX_bLdnjsjzPOGcCBH5q23fG=ScT_NzA@mail.gmail.com>
+From: Jose Martins <josemartins90@gmail.com>
+Date: Wed, 29 Apr 2020 22:08:12 +0100
+Message-ID: <CAC41xo32aWNZteKP-95AtFXQo3w_Ey-7MA0-dL_uJmEMScAuhg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] target/riscv: fix VS interrupts forwarding to HS
+To: Alistair Francis <alistair23@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
+ envelope-from=josemartins90@gmail.com; helo=mail-il1-x144.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,87 +91,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: imammedo@redhat.com
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---upfXptObL2Kf69Mj6B3uUxQWG7a2yp2uz
-Content-Type: multipart/mixed; boundary="b7KHyhShTlMP1BgB9gZa2kyrKusnhv8uK"
+> Your change just made it true for whenever virtulisation is enabled
+> (in which case we don't need it).
 
---b7KHyhShTlMP1BgB9gZa2kyrKusnhv8uK
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-Hi,
-
-I encountered the following error on the QEMU 5.0.0 release, compiled and=
- run inside a docker image:
-
-"cannot bind memory to host NUMA nodes: Operation not permitted"
-
-The QEMU command line to reproduce this behavior:
-
-qemu-system-i386 -m 64 -M pc -smp 1 -display none -monitor stdio -drive f=
-ile=3Dmp-acpi/NOS.iso,media=3Dcdrom,id=3Dd -boot order=3Dd -d cpu_reset
-
-The docker image which shows the error is available here:
-
-https://hub.docker.com/repository/docker/xenos1984/test-qemu
-
-Built on Ubuntu 20.04, and including NUMA support with libnuma-dev packag=
-e installed, from the following sources:
-
-https://github.com/xenos1984/cross-toolchain/tree/master/tools-qemu
-https://github.com/xenos1984/cross-toolchain/tree/master/test-qemu
-
-The iso image used can be obtained here, but should not be relevant:
-
-https://github.com/xenos1984/NOS/releases/download/latest/nos-i686.iso.bz=
-2
-
-The command fails when the image is used in a CI environment:
-
-https://circleci.com/gh/xenos1984/NOS/953
-
-On recommendation by @imammedo I tried the following:
-
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -384,3 +384,3 @@
-          if (mbind(ptr, sz, backend->policy,
--                  maxnode ? backend->host_nodes : NULL, maxnode + 1, fla=
-gs)) {
-+                  maxnode ? backend->host_nodes : NULL, 0, flags)) {
-              if (backend->policy !=3D MPOL_DEFAULT || errno !=3D ENOSYS)=
- {
-
-But no success, the same error occurs.
-
-Best regards,
-xenos1984 / Manuel Hohmann
-
-
---b7KHyhShTlMP1BgB9gZa2kyrKusnhv8uK--
-
---upfXptObL2Kf69Mj6B3uUxQWG7a2yp2uz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEGQ1wnDd/ca3CjRdj+9/1Gux6RLIFAl6p0M0ACgkQ+9/1Gux6
-RLIkzwgAoixoo70Q2P611ID0BqvmfFjwGFcMuL5HDvxmPCpZlKQ5niwPoMVfz3P/
-EhKqs/TPzWD7tPZ1R0oipKNQcpuFwqGDuoxkLB66SMPCMMVC6eeoccK4oY2qAyNQ
-SkQUhu0NmD+QQlo/4Hw32Jj1Xk/JHEf4UJ+bj9FZuNuORKmvj92aVjvsLpS49pwf
-p+V0qITTTQgm8dXHAyrmk8y46qSORVjVjnqfJqqVIzE8H97HR8a9TOs+PTGcz85B
-WzUS9Fis7uYCTkdSgjkLg+jZdRFyNB8abQ0kCLe/IDQr9lu5rUCeuas0AxUUh8pw
-yPy/xE2cpchPXpLoklnMdoXjdgjSVQ==
-=lpVD
------END PGP SIGNATURE-----
-
---upfXptObL2Kf69Mj6B3uUxQWG7a2yp2uz--
+This is exactly my point. As I said in the commit message, the spec
+clearly tells us that "Interrupts for higher-privilege modes, y>x, are
+always globally enabled regardless of the setting of the global yIE
+bit for the higher-privilege mode.". HS is clearly a higher-privilege
+mode than either VS or VU. So, if virtualization is enabled, HS level
+interrupts must be considered enabled independently of the state of
+the actual sie bit in mstatus_hs.
 
