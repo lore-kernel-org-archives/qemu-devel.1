@@ -6,78 +6,78 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F19DFC83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 11:13:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B964C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 11:14:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF4652073E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 11:13:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4612C20775
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 11:14:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CTZe1vXN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF4652073E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jJ3JssG9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4612C20775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTkes-0002ZW-VH
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 07:13:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44840)
+	id 1jTkfz-0003a0-GQ
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 07:14:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44846)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTkUx-0005Bq-Dl
+ (envelope-from <kraxel@redhat.com>) id 1jTkUy-0005C9-Tr
  for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:03:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTkU0-00042X-BI
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:03:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42696
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kraxel@redhat.com>) id 1jTkU0-00044J-NX
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:03:28 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41802
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jTkTz-0003vx-7R
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:02:27 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jTkTz-0003wm-OB
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:02:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1588158145;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=U8KXLBcIqzMr231ku/aiAX86UiTP/JSBvfezgXhyRiE=;
- b=CTZe1vXNFi0OV2+W154WTlV7N74CCZ1DZAt7QVVblPmX1hmULlKIc0UwB3xMKxzxFCdpgy
- 1M8WPXV58zXG8K87pzqyv4SyNfCLz/85MeIGegh6erIngdpy6OwgW/O94yueg85tGMAO2q
- ARw1smRK6Vk7e5EIk5PGYKIDdTlv+eo=
+ bh=aUJCupT6IYh2WAx1L3nT6pq2CVSmwuP3AoQsjaYSYSs=;
+ b=jJ3JssG9tdsOLWAAtZIve64eq5a2qm7BLVVi40y/HVk4bpkmoYEokQ690OuabNzuavbk5f
+ fqVNSv2gFJvBlNbkdT47QuGAf90Df6PN3+aAFjVgK23qz9onDLiU7SAMhuaCv15bWOIt65
+ WW7I/PrL9QV8L6NFgB0kBbz1hHH9Q5w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-sUZtw12dNCusBwB2szLHXA-1; Wed, 29 Apr 2020 07:02:23 -0400
-X-MC-Unique: sUZtw12dNCusBwB2szLHXA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-249--H-v5AYmNi6uwaLrclFEfA-1; Wed, 29 Apr 2020 07:02:23 -0400
+X-MC-Unique: -H-v5AYmNi6uwaLrclFEfA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D56E71005510
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF1DF835B41
  for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 11:02:22 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
  [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D69E8648C8;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DA17C60BF4;
  Wed, 29 Apr 2020 11:02:19 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 601209DA4; Wed, 29 Apr 2020 13:02:15 +0200 (CEST)
+ id 689AE9DA6; Wed, 29 Apr 2020 13:02:15 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 10/12] audio: deprecate -soundhw hda
-Date: Wed, 29 Apr 2020 13:02:12 +0200
-Message-Id: <20200429110214.29037-11-kraxel@redhat.com>
+Subject: [PATCH 11/12] audio: deprecate -soundhw pcspk
+Date: Wed, 29 Apr 2020 13:02:13 +0200
+Message-Id: <20200429110214.29037-12-kraxel@redhat.com>
 In-Reply-To: <20200429110214.29037-1-kraxel@redhat.com>
 References: <20200429110214.29037-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:18:10
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:28:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,33 +98,79 @@ Sender: "Qemu-devel"
 
 Add deprecation message to the audio init function.
 
+Factor out audio initialization and call that from
+both audio init and realize, so setting audiodev via
+-global is enough to properly initialize pcspk.
+
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/audio/intel-hda.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/audio/pcspk.c | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
 
-diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
-index e8d18b7c5887..df4f13157d44 100644
---- a/hw/audio/intel-hda.c
-+++ b/hw/audio/intel-hda.c
-@@ -25,6 +25,7 @@
- #include "qemu/bitops.h"
- #include "qemu/log.h"
+diff --git a/hw/audio/pcspk.c b/hw/audio/pcspk.c
+index 29dc00bf8dc7..72e7234d5f65 100644
+--- a/hw/audio/pcspk.c
++++ b/hw/audio/pcspk.c
+@@ -28,6 +28,7 @@
+ #include "audio/audio.h"
  #include "qemu/module.h"
+ #include "qemu/timer.h"
 +#include "qemu/error-report.h"
- #include "hw/audio/soundhw.h"
- #include "intel-hda.h"
+ #include "hw/timer/i8254.h"
  #include "migration/vmstate.h"
-@@ -1307,6 +1308,8 @@ static int intel_hda_and_codec_init(PCIBus *bus)
-     BusState *hdabus;
-     DeviceState *codec;
+ #include "hw/audio/pcspk.h"
+@@ -112,11 +113,15 @@ static void pcspk_callback(void *opaque, int free)
+     }
+ }
 =20
-+    warn_report("'-soundhw hda' is deprecated, "
-+                "please use '-device intel-hda -device hda-duplex' instead=
-");
-     controller =3D DEVICE(pci_create_simple(bus, -1, "intel-hda"));
-     hdabus =3D QLIST_FIRST(&controller->child_bus);
-     codec =3D qdev_create(hdabus, "hda-duplex");
+-static int pcspk_audio_init(ISABus *bus)
++static int pcspk_audio_init(PCSpkState *s)
+ {
+-    PCSpkState *s =3D pcspk_state;
+     struct audsettings as =3D {PCSPK_SAMPLE_RATE, 1, AUDIO_FORMAT_U8, 0};
+=20
++    if (s->voice) {
++        /* already initialized */
++        return 0;
++    }
++
+     AUD_register_card(s_spk, &s->card);
+=20
+     s->voice =3D AUD_open_out(&s->card, s->voice, s_spk, s, pcspk_callback=
+, &as);
+@@ -185,6 +190,10 @@ static void pcspk_realizefn(DeviceState *dev, Error **=
+errp)
+=20
+     isa_register_ioport(isadev, &s->ioport, s->iobase);
+=20
++    if (s->card.state) {
++        pcspk_audio_init(s);
++    }
++
+     pcspk_state =3D s;
+ }
+=20
+@@ -236,9 +245,18 @@ static const TypeInfo pcspk_info =3D {
+     .class_init     =3D pcspk_class_initfn,
+ };
+=20
++static int pcspk_audio_init_soundhw(ISABus *bus)
++{
++    PCSpkState *s =3D pcspk_state;
++
++    warn_report("'-soundhw pcspk' is deprecated, "
++                "please set a backend using '-global isa-pcspk.audiodev=3D=
+<name>' instead");
++    return pcspk_audio_init(s);
++}
++
+ static void pcspk_register(void)
+ {
+     type_register_static(&pcspk_info);
+-    isa_register_soundhw("pcspk", "PC speaker", pcspk_audio_init);
++    isa_register_soundhw("pcspk", "PC speaker", pcspk_audio_init_soundhw);
+ }
+ type_init(pcspk_register)
 --=20
 2.18.2
 
