@@ -2,89 +2,98 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D9B8C83007
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:24:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C759C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:24:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0A992085B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:24:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB351206D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:24:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HMZu2WWS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0A992085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X/ifDRcs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB351206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTi0s-0007iv-VP
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:24:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53766)
+	id 1jTi1F-00006m-4e
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:24:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53654)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jThzl-0006LH-ML
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:23:11 -0400
+ (envelope-from <xadimgnik@gmail.com>) id 1jThzc-0006Kv-OP
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:23:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jThzB-0007JY-8J
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:23:04 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34493
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jThzA-0007JL-Mz
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:22:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588148547;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=wQzVbQbptXQzuvUCEwqy7vYmczNt9NyS3EKM4ZqoKs8=;
- b=HMZu2WWSGCymqzTdzaor79V5J55PgGkzTHjKrRdiF/7aa61nhVIS9yG3E59tENALmu3/2k
- ZT4pyPUhHM/e5mbNFpO1v4dbukpaMSkO7iCK0dlQaOcSeMkoX4fMIqJemPpSITgE8D6ygz
- T8pH8daMVINklWoMDqmNHk8WX7OdiaY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-280-JZjBrfiXNBCUHdA-AX-81Q-1; Wed, 29 Apr 2020 04:22:22 -0400
-X-MC-Unique: JZjBrfiXNBCUHdA-AX-81Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 103C4462;
- Wed, 29 Apr 2020 08:22:19 +0000 (UTC)
-Received: from work-vm (ovpn-114-192.ams2.redhat.com [10.36.114.192])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 545095D9E5;
- Wed, 29 Apr 2020 08:22:04 +0000 (UTC)
-Date: Wed, 29 Apr 2020 09:22:01 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
- VFIO live migration
-Message-ID: <20200429082201.GA2834@work-vm>
-References: <20200420165600.4951ae82@w520.home>
- <20200421023718.GA12111@joy-OptiPlex-7040>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D86DF06@SHSMSX104.ccr.corp.intel.com>
- <20200422073628.GA12879@joy-OptiPlex-7040>
- <20200424191049.GU3106@work-vm>
- <20200426013628.GC12879@joy-OptiPlex-7040>
- <20200427153743.GK2923@work-vm>
- <20200428005429.GJ12879@joy-OptiPlex-7040>
- <20200428141437.GG2794@work-vm>
- <20200429072616.GL12879@joy-OptiPlex-7040>
+ (envelope-from <xadimgnik@gmail.com>) id 1jThxp-0006ko-CA
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:22:56 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35735)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
+ id 1jThxo-0006kJ-4G
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:21:04 -0400
+Received: by mail-wr1-x444.google.com with SMTP id x18so1399941wrq.2
+ for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 01:21:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:reply-to:to:cc:references:in-reply-to:subject:date:message-id
+ :mime-version:content-transfer-encoding:thread-index
+ :content-language;
+ bh=bYaqg9ydbwBt0js6txP6ki/prPNP0trtCyBSqQbrobQ=;
+ b=X/ifDRcsX//oWfrKOCF95UTlM8nTjbfEN2YNN8a3lxS7/WXdwJIVECtAdjJMtF6dnl
+ 9rKyYKthAh8vSUTJq/7CwI8XjEKKjH0tImI32k7XRHe/9ygtRgrOD8FwtbVCKB2pDgR1
+ w9AwHePJ19NNJ3vz6Hgu1fGmjs8D/PP+R0nQOycHVYgIobXh02Z7Ey74T7Eue9qJWSW6
+ ozgwk+VYqqDqjXVCw7Utot5okJA9LYrZs9SOb5PKO8DE70sY6pMdQL+Cjw2BhERZnzAg
+ qQXjCHzVgi3oY7+Lxgev+Bb/e24I90hkUId50P5i4nOUY0TD0km9L2Vz7HAbA3AB0IaL
+ 5Z9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:reply-to:to:cc:references:in-reply-to
+ :subject:date:message-id:mime-version:content-transfer-encoding
+ :thread-index:content-language;
+ bh=bYaqg9ydbwBt0js6txP6ki/prPNP0trtCyBSqQbrobQ=;
+ b=a/0xfgsomQoNlvU48HSR34XRtE8P48IzEKqGHoEIoRlqHLtm2GvQ2nJ1XtOStt0lNj
+ fXDoQdcyb4ncAR/kcZEBqVzqFJsi/1wFS3XjEzUCIDKbujXkXwQW0p/Du+FE6/qg43Yo
+ hykHJe+N363AQu+FV4Idlw3rKBkBbYgpOGPaVxPrVskL6FUqMxcaKespeJlmWYaRAr2d
+ /ZIqqzoa1nuBULhW6mDqvl1Orw4yynu2w0hfBVhuZMjkJsnMnzy/MNlBB/jlSMl9o7Wq
+ +4BYp9v9LlRxAc7RPZjOd5FGe6vskxIO2wsNfxCgr41ahvaYoVkO3rxBFhQrHbIFD6C/
+ T9JA==
+X-Gm-Message-State: AGi0PubONmjU9mm6t7di4YhScF+h/nmFtcKM7Uahhn80OLJ22XFyKf8+
+ SBxYHOqW+Cy37x7WbOi3aZ0=
+X-Google-Smtp-Source: APiQypIdTB9pj3s5+HsG0ipZxTuN6qEj6czRhMIH2sYciiFQV+4evNyC5gWUJUJvyUxzDBEnb/V7wA==
+X-Received: by 2002:a5d:4b43:: with SMTP id w3mr38262885wrs.208.1588148460211; 
+ Wed, 29 Apr 2020 01:21:00 -0700 (PDT)
+Received: from CBGR90WXYV0 ([54.239.6.186])
+ by smtp.gmail.com with ESMTPSA id i25sm6530739wml.43.2020.04.29.01.20.58
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 29 Apr 2020 01:20:59 -0700 (PDT)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: "Paul Durrant" <paul@xen.org>
+To: "'Grzegorz Uriasz'" <gorbak25@gmail.com>,
+	<qemu-devel@nongnu.org>
+References: <20200429030409.9406-1-gorbak25@gmail.com>
+ <20200429030409.9406-3-gorbak25@gmail.com>
+In-Reply-To: <20200429030409.9406-3-gorbak25@gmail.com>
+Subject: RE: [PATCH v2 2/2] Improve legacy vbios handling
+Date: Wed, 29 Apr 2020 09:20:58 +0100
+Message-ID: <000101d61dff$1d0f5b60$572e1220$@xen.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200429072616.GL12879@joy-OptiPlex-7040>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 00:53:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQFtlR//ELGf2l/FYLvu2IzrckebEAI2wQ0TqU8dnlA=
+Content-Language: en-gb
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=xadimgnik@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,359 +105,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
- "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "Yang, Ziye" <ziye.yang@intel.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
- "Tian, Kevin" <kevin.tian@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
- "Liu, Changpeng" <changpeng.liu@intel.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "dinechin@redhat.com" <dinechin@redhat.com>,
- "He, Shaopeng" <shaopeng.he@intel.com>
+Reply-To: paul@xen.org
+Cc: artur@puzio.waw.pl, 'Stefano Stabellini' <sstabellini@kernel.org>,
+ jakub@bartmin.ski, marmarek@invisiblethingslab.com,
+ 'Anthony Perard' <anthony.perard@citrix.com>, j.nowak26@student.uw.edu.pl,
+ xen-devel@lists.xenproject.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Yan Zhao (yan.y.zhao@intel.com) wrote:
-> On Tue, Apr 28, 2020 at 10:14:37PM +0800, Dr. David Alan Gilbert wrote:
-> > * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> > > On Mon, Apr 27, 2020 at 11:37:43PM +0800, Dr. David Alan Gilbert wrote:
-> > > > * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> > > > > On Sat, Apr 25, 2020 at 03:10:49AM +0800, Dr. David Alan Gilbert wrote:
-> > > > > > * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> > > > > > > On Tue, Apr 21, 2020 at 08:08:49PM +0800, Tian, Kevin wrote:
-> > > > > > > > > From: Yan Zhao
-> > > > > > > > > Sent: Tuesday, April 21, 2020 10:37 AM
-> > > > > > > > > 
-> > > > > > > > > On Tue, Apr 21, 2020 at 06:56:00AM +0800, Alex Williamson wrote:
-> > > > > > > > > > On Sun, 19 Apr 2020 21:24:57 -0400
-> > > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > > > > > >
-> > > > > > > > > > > On Fri, Apr 17, 2020 at 07:24:57PM +0800, Cornelia Huck wrote:
-> > > > > > > > > > > > On Fri, 17 Apr 2020 05:52:02 -0400
-> > > > > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > > > > > > > >
-> > > > > > > > > > > > > On Fri, Apr 17, 2020 at 04:44:50PM +0800, Cornelia Huck wrote:
-> > > > > > > > > > > > > > On Mon, 13 Apr 2020 01:52:01 -0400
-> > > > > > > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > This patchset introduces a migration_version attribute under sysfs
-> > > > > > > > > of VFIO
-> > > > > > > > > > > > > > > Mediated devices.
-> > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > This migration_version attribute is used to check migration
-> > > > > > > > > compatibility
-> > > > > > > > > > > > > > > between two mdev devices.
-> > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > Currently, it has two locations:
-> > > > > > > > > > > > > > > (1) under mdev_type node,
-> > > > > > > > > > > > > > >     which can be used even before device creation, but only for
-> > > > > > > > > mdev
-> > > > > > > > > > > > > > >     devices of the same mdev type.
-> > > > > > > > > > > > > > > (2) under mdev device node,
-> > > > > > > > > > > > > > >     which can only be used after the mdev devices are created, but
-> > > > > > > > > the src
-> > > > > > > > > > > > > > >     and target mdev devices are not necessarily be of the same
-> > > > > > > > > mdev type
-> > > > > > > > > > > > > > > (The second location is newly added in v5, in order to keep
-> > > > > > > > > consistent
-> > > > > > > > > > > > > > > with the migration_version node for migratable pass-though
-> > > > > > > > > devices)
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > What is the relationship between those two attributes?
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > (1) is for mdev devices specifically, and (2) is provided to keep the
-> > > > > > > > > same
-> > > > > > > > > > > > > sysfs interface as with non-mdev cases. so (2) is for both mdev
-> > > > > > > > > devices and
-> > > > > > > > > > > > > non-mdev devices.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > in future, if we enable vfio-pci vendor ops, (i.e. a non-mdev device
-> > > > > > > > > > > > > is binding to vfio-pci, but is able to register migration region and do
-> > > > > > > > > > > > > migration transactions from a vendor provided affiliate driver),
-> > > > > > > > > > > > > the vendor driver would export (2) directly, under device node.
-> > > > > > > > > > > > > It is not able to provide (1) as there're no mdev devices involved.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Ok, creating an alternate attribute for non-mdev devices makes sense.
-> > > > > > > > > > > > However, wouldn't that rather be a case (3)? The change here only
-> > > > > > > > > > > > refers to mdev devices.
-> > > > > > > > > > > >
-> > > > > > > > > > > as you pointed below, (3) and (2) serve the same purpose.
-> > > > > > > > > > > and I think a possible usage is to migrate between a non-mdev device and
-> > > > > > > > > > > an mdev device. so I think it's better for them both to use (2) rather
-> > > > > > > > > > > than creating (3).
-> > > > > > > > > >
-> > > > > > > > > > An mdev type is meant to define a software compatible interface, so in
-> > > > > > > > > > the case of mdev->mdev migration, doesn't migrating to a different type
-> > > > > > > > > > fail the most basic of compatibility tests that we expect userspace to
-> > > > > > > > > > perform?  IOW, if two mdev types are migration compatible, it seems a
-> > > > > > > > > > prerequisite to that is that they provide the same software interface,
-> > > > > > > > > > which means they should be the same mdev type.
-> > > > > > > > > >
-> > > > > > > > > > In the hybrid cases of mdev->phys or phys->mdev, how does a
-> > > > > > > > > management
-> > > > > > > > > > tool begin to even guess what might be compatible?  Are we expecting
-> > > > > > > > > > libvirt to probe ever device with this attribute in the system?  Is
-> > > > > > > > > > there going to be a new class hierarchy created to enumerate all
-> > > > > > > > > > possible migrate-able devices?
-> > > > > > > > > >
-> > > > > > > > > yes, management tool needs to guess and test migration compatible
-> > > > > > > > > between two devices. But I think it's not the problem only for
-> > > > > > > > > mdev->phys or phys->mdev. even for mdev->mdev, management tool needs
-> > > > > > > > > to
-> > > > > > > > > first assume that the two mdevs have the same type of parent devices
-> > > > > > > > > (e.g.their pciids are equal). otherwise, it's still enumerating
-> > > > > > > > > possibilities.
-> > > > > > > > > 
-> > > > > > > > > on the other hand, for two mdevs,
-> > > > > > > > > mdev1 from pdev1, its mdev_type is 1/2 of pdev1;
-> > > > > > > > > mdev2 from pdev2, its mdev_type is 1/4 of pdev2;
-> > > > > > > > > if pdev2 is exactly 2 times of pdev1, why not allow migration between
-> > > > > > > > > mdev1 <-> mdev2.
-> > > > > > > > 
-> > > > > > > > How could the manage tool figure out that 1/2 of pdev1 is equivalent 
-> > > > > > > > to 1/4 of pdev2? If we really want to allow such thing happen, the best
-> > > > > > > > choice is to report the same mdev type on both pdev1 and pdev2.
-> > > > > > > I think that's exactly the value of this migration_version interface.
-> > > > > > > the management tool can take advantage of this interface to know if two
-> > > > > > > devices are migration compatible, no matter they are mdevs, non-mdevs,
-> > > > > > > or mix.
-> > > > > > > 
-> > > > > > > as I know, (please correct me if not right), current libvirt still
-> > > > > > > requires manually generating mdev devices, and it just duplicates src vm
-> > > > > > > configuration to the target vm.
-> > > > > > > for libvirt, currently it's always phys->phys and mdev->mdev (and of the
-> > > > > > > same mdev type).
-> > > > > > > But it does not justify that hybrid cases should not be allowed. otherwise,
-> > > > > > > why do we need to introduce this migration_version interface and leave
-> > > > > > > the judgement of migration compatibility to vendor driver? why not simply
-> > > > > > > set the criteria to something like "pciids of parent devices are equal,
-> > > > > > > and mdev types are equal" ?
-> > > > > > > 
-> > > > > > > 
-> > > > > > > > btw mdev<->phys just brings trouble to upper stack as Alex pointed out. 
-> > > > > > > could you help me understand why it will bring trouble to upper stack?
-> > > > > > > 
-> > > > > > > I think it just needs to read src migration_version under src dev node,
-> > > > > > > and test it in target migration version under target dev node. 
-> > > > > > > 
-> > > > > > > after all, through this interface we just help the upper layer
-> > > > > > > knowing available options through reading and testing, and they decide
-> > > > > > > to use it or not.
-> > > > > > > 
-> > > > > > > > Can we simplify the requirement by allowing only mdev<->mdev and 
-> > > > > > > > phys<->phys migration? If an customer does want to migrate between a 
-> > > > > > > > mdev and phys, he could wrap physical device into a wrapped mdev 
-> > > > > > > > instance (with the same type as the source mdev) instead of using vendor 
-> > > > > > > > ops. Doing so does add some burden but if mdev<->phys is not dominant 
-> > > > > > > > usage then such tradeoff might be worthywhile...
-> > > > > > > >
-> > > > > > > If the interfaces for phys<->phys and mdev<->mdev are consistent, it makes no
-> > > > > > > difference to phys<->mdev, right?
-> > > > > > > I think the vendor string for a mdev device is something like:
-> > > > > > > "Parent PCIID + mdev type + software version", and
-> > > > > > > that for a phys device is something like:
-> > > > > > > "PCIID + software version".
-> > > > > > > as long as we don't migrate between devices from different vendors, it's
-> > > > > > > easy for vendor driver to tell if a phys device is migration compatible
-> > > > > > > to a mdev device according it supports it or not.
-> > > > > > 
-> > > > > > It surprises me that the PCIID matching is a requirement; I'd assumed
-> > > > > > with this clever mdev name setup that you could migrate between two
-> > > > > > different models in a series, or to a newer model, as long as they
-> > > > > > both supported the same mdev view.
-> > > > > > 
-> > > > > hi Dave
-> > > > > the migration_version string is transparent to userspace, and is
-> > > > > completely defined by vendor driver.
-> > > > > I put it there just as an example of how vendor driver may implement it.
-> > > > > e.g.
-> > > > > the src migration_version string is "src PCIID + src software version", 
-> > > > > then when this string is write to target migration_version node,
-> > > > > the vendor driver in the target device will compare it with its own
-> > > > > device info and software version.
-> > > > > If different models are allowed, the write just succeeds even
-> > > > > PCIIDs in src and target are different.
-> > > > > 
-> > > > > so, it is the vendor driver to define whether two devices are able to
-> > > > > migrate, no matter their PCIIDs, mdev types, software versions..., which
-> > > > > provides vendor driver full flexibility.
-> > > > > 
-> > > > > do you think it's good?
-> > > > 
-> > > > Yeh that's OK; I guess it's going to need to have a big table in their
-> > > > with all the PCIIDs in.
-> > > > The alternative would be to abstract it a little; e.g. to say it's
-> > > > an Intel-gpu-core-v4  and then it would be less worried about the exact
-> > > > clock speed etc - but yes you might be right htat PCIIDs might be best
-> > > > for checking for quirks.
-> > > >
-> > > glad that you are agreed with it:)
-> > > I think the vendor driver still can choose a way to abstract a little
-> > > (e.g. Intel-gpu-core-v4...) if they think it's better. In that case, the
-> > > migration_string would be something like "Intel-gpu-core-v4 + instance
-> > > number + software version".
-> > > IOW, they can choose anything they think appropriate to identify migration
-> > > compatibility of a device.
-> > > But Alex is right, we have to prevent namespace overlapping. So I think
-> > > we need to ensure src and target devices are from the same vendors.
-> > > or, any other ideas?
-> > 
-> > That's why I kept the 'Intel' in that example; or PCI vendor ID; I was
-> Yes, it's a good idea!
-> could we add a line in the doc saying that
-> it is the vendor driver to add a unique string to avoid namespace
-> collision?
-
-So why don't we split the difference; lets say that it should start with
-the hex PCI Vendor ID.
-
-> > only really trying to say that within one vendors range there are often
-> > a lot of PCI-IDs that have really minor variations.
-> Yes. I also prefer to include PCI-IDs.
-> BTW, sometimes even the same PCI-ID does not guarantee two devices are of no
-> difference or are migration compatible. for example, two local NVMe
-> devices may have the same PCI-ID but are configured to two different remote NVMe
-> devices. the vendor driver needs to add extra info besides PCI-IDs then.
-
-Ah, yes that's an interesting example.
-
-Dave
-
-> Thanks
-> Yan
+> -----Original Message-----
+> From: Grzegorz Uriasz <gorbak25@gmail.com>
+> Sent: 29 April 2020 04:04
+> To: qemu-devel@nongnu.org
+> Cc: Grzegorz Uriasz <gorbak25@gmail.com>; marmarek@invisiblethingslab.com; artur@puzio.waw.pl;
+> jakub@bartmin.ski; j.nowak26@student.uw.edu.pl; Stefano Stabellini <sstabellini@kernel.org>; Anthony
+> Perard <anthony.perard@citrix.com>; Paul Durrant <paul@xen.org>; xen-devel@lists.xenproject.org
+> Subject: [PATCH v2 2/2] Improve legacy vbios handling
 > 
-> > 
-> > 
-> > > 
-> > > 
-> > > > > > > > > 
-> > > > > > > > > 
-> > > > > > > > > > I agree that there was a gap in the previous proposal for non-mdev
-> > > > > > > > > > devices, but I think this bring a lot of questions that we need to
-> > > > > > > > > > puzzle through and libvirt will need to re-evaluate how they might
-> > > > > > > > > > decide to pick a migration target device.  For example, I'm sure
-> > > > > > > > > > libvirt would reject any policy decisions regarding picking a physical
-> > > > > > > > > > device versus an mdev device.  Had we previously left it that only a
-> > > > > > > > > > layer above libvirt would select a target device and libvirt only tests
-> > > > > > > > > > compatibility to that target device?
-> > > > > > > > > I'm not sure if there's a layer above libvirt would select a target
-> > > > > > > > > device. but if there is such a layer (even it's human), we need to
-> > > > > > > > > provide an interface for them to know whether their decision is suitable
-> > > > > > > > > for migration. The migration_version interface provides a potential to
-> > > > > > > > > allow mdev->phys migration, even libvirt may currently reject it.
-> > > > > > > > > 
-> > > > > > > > > 
-> > > > > > > > > > We also need to consider that this expands the namespace.  If we no
-> > > > > > > > > > longer require matching types as the first level of comparison, then
-> > > > > > > > > > vendor migration strings can theoretically collide.  How do we
-> > > > > > > > > > coordinate that can't happen?  Thanks,
-> > > > > > > > > yes, it's indeed a problem.
-> > > > > > > > > could only allowing migration beteen devices from the same vendor be a
-> > > > > > > > > good
-> > > > > > > > > prerequisite?
-> > > > > > > > > 
-> > > > > > > > > Thanks
-> > > > > > > > > Yan
-> > > > > > > > > >
-> > > > > > > > > > > > > > Is existence (and compatibility) of (1) a pre-req for possible
-> > > > > > > > > > > > > > existence (and compatibility) of (2)?
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > no. (2) does not reply on (1).
-> > > > > > > > > > > >
-> > > > > > > > > > > > Hm. Non-existence of (1) seems to imply "this type does not support
-> > > > > > > > > > > > migration". If an mdev created for such a type suddenly does support
-> > > > > > > > > > > > migration, it feels a bit odd.
-> > > > > > > > > > > >
-> > > > > > > > > > > yes. but I think if the condition happens, it should be reported a bug
-> > > > > > > > > > > to vendor driver.
-> > > > > > > > > > > should I add a line in the doc like "vendor driver should ensure that the
-> > > > > > > > > > > migration compatibility from migration_version under mdev_type should
-> > > > > > > > > be
-> > > > > > > > > > > consistent with that from migration_version under device node" ?
-> > > > > > > > > > >
-> > > > > > > > > > > > (It obviously cannot be a prereq for what I called (3) above.)
-> > > > > > > > > > > >
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > > Does userspace need to check (1) or can it completely rely on (2), if
-> > > > > > > > > > > > > > it so chooses?
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > I think it can completely reply on (2) if compatibility check before
-> > > > > > > > > > > > > mdev creation is not required.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > > If devices with a different mdev type are indeed compatible, it
-> > > > > > > > > seems
-> > > > > > > > > > > > > > userspace can only find out after the devices have actually been
-> > > > > > > > > > > > > > created, as (1) does not apply?
-> > > > > > > > > > > > > yes, I think so.
-> > > > > > > > > > > >
-> > > > > > > > > > > > How useful would it be for userspace to even look at (1) in that case?
-> > > > > > > > > > > > It only knows if things have a chance of working if it actually goes
-> > > > > > > > > > > > ahead and creates devices.
-> > > > > > > > > > > >
-> > > > > > > > > > > hmm, is it useful for userspace to test the migration_version under mdev
-> > > > > > > > > > > type before it knows what mdev device to generate ?
-> > > > > > > > > > > like when the userspace wants to migrate an mdev device in src vm,
-> > > > > > > > > > > but it has not created target vm and the target mdev device.
-> > > > > > > > > > >
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > > One of my worries is that the existence of an attribute with the
-> > > > > > > > > same
-> > > > > > > > > > > > > > name in two similar locations might lead to confusion. But maybe it
-> > > > > > > > > > > > > > isn't a problem.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > Yes, I have the same feeling. but as (2) is for sysfs interface
-> > > > > > > > > > > > > consistency, to make it transparent to userspace tools like libvirt,
-> > > > > > > > > > > > > I guess the same name is necessary?
-> > > > > > > > > > > >
-> > > > > > > > > > > > What do we actually need here, I wonder? (1) and (2) seem to serve
-> > > > > > > > > > > > slightly different purposes, while (2) and what I called (3) have the
-> > > > > > > > > > > > same purpose. Is it important to userspace that (1) and (2) have the
-> > > > > > > > > > > > same name?
-> > > > > > > > > > > so change (1) to migration_type_version and (2) to
-> > > > > > > > > > > migration_instance_version?
-> > > > > > > > > > > But as they are under different locations, could that location imply
-> > > > > > > > > > > enough information?
-> > > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > > > > Thanks
-> > > > > > > > > > > Yan
-> > > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > _______________________________________________
-> > > > > > > > > intel-gvt-dev mailing list
-> > > > > > > > > intel-gvt-dev@lists.freedesktop.org
-> > > > > > > > > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
-> > > > > > > 
-> > > > > > --
-> > > > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > > > > 
-> > > > > 
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > > 
-> > > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
+> The current method of getting the vbios is broken - it just isn't working on any device I've tested -
+> the reason
+> for this is explained in the previous patch. The vbios is polymorphic and getting a proper unmodified
+> copy is
+> often not possible without reverse engineering the firmware. We don't need an unmodified copy for most
+> purposes -
+> an unmodified copy is only needed for initializing the bios framebuffer and providing the bios with a
+> corrupted
+> copy of the rom won't do any damage as the bios will just ignore the rom.
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> After the i915 driver takes over the vbios is only needed for reading some metadata/configuration
+> stuff etc...
+> I've tested that not having any kind of vbios in the guest actually works fine but on older
+> generations of IGD
+> there are some slight hiccups. To maximize compatibility the best approach is to just copy the results
+> of the vbios
+> execution directly to the guest. It turns out the vbios is always present on an hardcoded memory range
+> in a reserved
+> memory range from real mode - all we need to do is to memcpy it into the guest.
+> 
+> The following patch does 2 things:
+> 1) When pci_assign_dev_load_option_rom fails to read the vbios from sysfs(this works only when the igd
+> is not the
+> boot gpu - this is unlikely to happen) it falls back to using /dev/mem to copy the vbios directly to
+> the guest.
+
+Why bother with sysfs if it is unlikely to work?
+
+> Using /dev/mem should be fine as there is more xen specific pci code which also relies on /dev/mem.
+> 2) When dealing with IGD in the more generic code we skip the allocation of the rom resource - the
+> reason for this is to prevent
+> a malicious guest from modifying the vbios in the host -> this is needed as someone might try to pwn
+> the i915 driver in the host by doing so
+> (attach igd to guest, guest modifies vbios, the guest is terminated and the idg is reattached to the
+> host, i915 driver in the host uses data from the modified vbios).
+> This is also needed to not overwrite the proper shadow copy made before.
+> 
+> I've tested this patch and it works fine - the guest isn't complaining about the missing vbios tables
+> and the pci config
+> space in the guest looks fine.
+> 
+> Signed-off-by: Grzegorz Uriasz <gorbak25@gmail.com>
+> ---
+>  hw/xen/xen_pt.c          |  8 +++++--
+>  hw/xen/xen_pt_graphics.c | 48 +++++++++++++++++++++++++++++++++++++---
+>  hw/xen/xen_pt_load_rom.c |  2 +-
+>  3 files changed, 52 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
+> index b91082cb8b..ffc3559dd4 100644
+> --- a/hw/xen/xen_pt.c
+> +++ b/hw/xen/xen_pt.c
+> @@ -483,8 +483,12 @@ static int xen_pt_register_regions(XenPCIPassthroughState *s, uint16_t *cmd)
+>                     i, r->size, r->base_addr, type);
+>      }
+> 
+> -    /* Register expansion ROM address */
+> -    if (d->rom.base_addr && d->rom.size) {
+> +    /*
+> +     * Register expansion ROM address. If we are dealing with a ROM
+> +     * shadow copy for legacy vga devices then don't bother to map it
+> +     * as previous code creates a proper shadow copy
+> +     */
+> +    if (d->rom.base_addr && d->rom.size && !(is_igd_vga_passthrough(d))) {
+
+You don't need brackets around the function call.
+
+  Paul
+
+>          uint32_t bar_data = 0;
+> 
+>          /* Re-set BAR reported by OS, otherwise ROM can't be read. */
+> diff --git a/hw/xen/xen_pt_graphics.c b/hw/xen/xen_pt_graphics.c
+> index a3bc7e3921..fe0ef2685c 100644
+> --- a/hw/xen/xen_pt_graphics.c
+> +++ b/hw/xen/xen_pt_graphics.c
+> @@ -129,7 +129,7 @@ int xen_pt_unregister_vga_regions(XenHostPCIDevice *dev)
+>      return 0;
+>  }
+> 
+> -static void *get_vgabios(XenPCIPassthroughState *s, int *size,
+> +static void *get_sysfs_vgabios(XenPCIPassthroughState *s, int *size,
+>                         XenHostPCIDevice *dev)
+>  {
+>      return pci_assign_dev_load_option_rom(&s->dev, size,
+> @@ -137,6 +137,45 @@ static void *get_vgabios(XenPCIPassthroughState *s, int *size,
+>                                            dev->dev, dev->func);
+>  }
+> 
+> +static void xen_pt_direct_vbios_copy(XenPCIPassthroughState *s, Error **errp)
+> +{
+> +    int fd = -1;
+> +    void *guest_bios = NULL;
+> +    void *host_vbios = NULL;
+> +    /* This is always 32 pages in the real mode reserved region */
+> +    int bios_size = 32 << XC_PAGE_SHIFT;
+> +    int vbios_addr = 0xc0000;
+> +
+> +    fd = open("/dev/mem", O_RDONLY);
+> +    if (fd == -1) {
+> +        error_setg(errp, "Can't open /dev/mem: %s", strerror(errno));
+> +        return;
+> +    }
+> +    host_vbios = mmap(NULL, bios_size,
+> +            PROT_READ, MAP_ANONYMOUS | MAP_PRIVATE, fd, vbios_addr);
+> +    close(fd);
+> +
+> +    if (host_vbios == MAP_FAILED) {
+> +        error_setg(errp, "Failed to mmap host vbios: %s", strerror(errno));
+> +        return;
+> +    }
+> +
+> +    memory_region_init_ram(&s->dev.rom, OBJECT(&s->dev),
+> +            "legacy_vbios.rom", bios_size, &error_abort);
+> +    guest_bios = memory_region_get_ram_ptr(&s->dev.rom);
+> +    memcpy(guest_bios, host_vbios, bios_size);
+> +
+> +    if (munmap(host_vbios, bios_size) == -1) {
+> +        XEN_PT_LOG(&s->dev, "Failed to unmap host vbios: %s\n", strerror(errno));
+> +    }
+> +
+> +    cpu_physical_memory_write(vbios_addr, guest_bios, bios_size);
+> +    memory_region_set_address(&s->dev.rom, vbios_addr);
+> +    pci_register_bar(&s->dev, PCI_ROM_SLOT, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->dev.rom);
+> +    s->dev.has_rom = true;
+> +    XEN_PT_LOG(&s->dev, "Legacy VBIOS registered\n");
+> +}
+> +
+>  /* Refer to Seabios. */
+>  struct rom_header {
+>      uint16_t signature;
+> @@ -179,9 +218,11 @@ void xen_pt_setup_vga(XenPCIPassthroughState *s, XenHostPCIDevice *dev,
+>          return;
+>      }
+> 
+> -    bios = get_vgabios(s, &bios_size, dev);
+> +    bios = get_sysfs_vgabios(s, &bios_size, dev);
+>      if (!bios) {
+> -        error_setg(errp, "VGA: Can't get VBIOS");
+> +        XEN_PT_LOG(&s->dev, "Unable to get host VBIOS from sysfs - "
+> +                            "falling back to a direct copy of memory ranges\n");
+> +        xen_pt_direct_vbios_copy(s, errp);
+>          return;
+>      }
+> 
+> @@ -223,6 +264,7 @@ void xen_pt_setup_vga(XenPCIPassthroughState *s, XenHostPCIDevice *dev,
+> 
+>      /* Currently we fixed this address as a primary for legacy BIOS. */
+>      cpu_physical_memory_write(0xc0000, bios, bios_size);
+> +    XEN_PT_LOG(&s->dev, "Legacy VBIOS registered\n");
+>  }
+> 
+>  uint32_t igd_read_opregion(XenPCIPassthroughState *s)
+> diff --git a/hw/xen/xen_pt_load_rom.c b/hw/xen/xen_pt_load_rom.c
+> index 9f100dc159..8cd9aa84dc 100644
+> --- a/hw/xen/xen_pt_load_rom.c
+> +++ b/hw/xen/xen_pt_load_rom.c
+> @@ -65,7 +65,7 @@ void *pci_assign_dev_load_option_rom(PCIDevice *dev,
+>          goto close_rom;
+>      }
+> 
+> -    pci_register_bar(dev, PCI_ROM_SLOT, 0, &dev->rom);
+> +    pci_register_bar(dev, PCI_ROM_SLOT, PCI_BASE_ADDRESS_SPACE_MEMORY, &dev->rom);
+>      dev->has_rom = true;
+>      *size = st.st_size;
+>  close_rom:
+> --
+> 2.26.1
+
 
 
