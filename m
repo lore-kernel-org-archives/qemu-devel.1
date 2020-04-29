@@ -7,120 +7,118 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E3EFC83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:08:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBE5C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:12:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42BB02087E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:08:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBA53208FE
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:12:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="UvTqhoOF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42BB02087E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="DvYNQKGG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBA53208FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTlVn-0005X5-8k
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 08:08:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52696)
+	id 1jTlZV-0007oe-3s
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 08:12:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53432)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTlSZ-00047x-Fd
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:07:21 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jTlYh-00073d-Pz
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:11:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTlRy-0006RV-68
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:05:03 -0400
-Received: from mail-eopbgr50109.outbound.protection.outlook.com
- ([40.107.5.109]:52812 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jTlYh-0000UK-2c
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:11:23 -0400
+Received: from mail-eopbgr40094.outbound.protection.outlook.com
+ ([40.107.4.94]:46663 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jTlRx-0006Fb-NA; Wed, 29 Apr 2020 08:04:25 -0400
+ id 1jTlYg-0000Or-56; Wed, 29 Apr 2020 08:11:22 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E+CXU0ivpgxMd8LYu4A6NuHt3K56jsgi5IEQSKiCl0QZfv9t0J16Cw8uksY8/9VN3VhZoh/ExzmlHs9ldG5HId2Xr/XkOh6Xo4bzjewaT0EeDF4D8c0GboFQFXghqNrrT4j2XfKfCbcUwnoej2bPrtzIDCie8lhEdInJqaje884fC14mIwJnQvkbG8c5gpm9g/MrjsOWjmr+5girJ5XdcqstAYXnWYUQZc34ujrh/J/yGr+8mB5iZdlso1+POR+1Znl/D0bJFCvb8loqEI7yGjBvjQcemdugqWpSby108roOQEG2Xd1G3ot9atGwOrZLiGWXpP+Zu0OdViz/X5YN0g==
+ b=CrAIM00kOmtKyo6m+cg2Mw4KEi65/Fv9J+A5bQrIwDq5eBvOvNxSXEwMY6vfKcSQ1bMSdIloV+R4kWZ5m+kASbvD/sLJaSnNeKwAdgdXzu22uNJoqj2wPpCPW9GV2LWolPsO7i+ZhrW6QjjIHCPcewC6abt6OOQi0XyS0oao+leYwNQ6yn7HIxLHuOL0jz6fcuDUEh2m1sC2QTHw8syv17ck9eoNIuV+vY3ba99G1TvKFp7e6UruvT3wREajtPT8LaB1T8Hbw0BQUnsDpxF7N7vElGDv8ErqUT8R5fYBPoTZPBvui4NV/IOXWwPW71iXTrLT62qAN81Z2fBLxR3NSA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hRiOL2ngvQfwSXlkBrf2FKjdcsvhZWqRhBx9lMquJTc=;
- b=AejzFqr11gPqfZvNa9lZTgBw8LdXgG8l/xs0uYypir2PR9C83ShCePXiau+047EnI30wMiMP/hSQ1JiFtkg7JsxjyonYXuOQvDo1eFomZmu33ebSHfhObmqMa7yGptxAcaW+sst6D9N0oH8IZzrapMfTDqQX8FwTSffPhuci5WKP5ROXnK7ktDTGeWxJ95FcHyPaJnzZYxzCO9vBi9tfQq3fAGI0Oc0JDmjdbza8+7HJYuK8gkqthxvR4GGNpW6eHJWNxs2ceT7wy1fAwjGwgWeFc8o4q0QppmpaQ4jRHsSPw/OxZtrq9hdUepAqDUL0qtQMuFJoazTQVryYT+YbAg==
+ bh=dC+LxIXoBnqmGvIeyKY1seNAjrwdC63Rnly+d0q5l0s=;
+ b=MiLIaXmhIxIMxnp8USpId9k4SuUSV44l78lt+vjDzFr9AWgmGwGDdi7tggvOI5kqztxI5QHps+yTM887r6ZvjCFmiagCjVSpX7oCPiKz6g6uG6lSwQ6Nb2tnpBHyfjLUE3d3dm6my5z8LcQpssg9xnkSQDPIXH9y+pZkA90uUNmEUpPxO/yBaekZ6lX+uHJJRNkNKS9YXAqg6tB6RmxWa/crBzI7VuCgiyRoRnufdM2YVVMG4ubJFuJpT4uTjrbmjgZ3GW1Da7QKdzOpR8gdlemzSCv36IDNkwCLzMHWcxo+65rU2Cg90A9rWpidajfs3ttTyt2Ud8A20uIhRU1Mhg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hRiOL2ngvQfwSXlkBrf2FKjdcsvhZWqRhBx9lMquJTc=;
- b=UvTqhoOFsGkvCIN+MgoPw2Skb6p8vI5HlYKgvrySUXLxH0nf73JqNN2MT6mVKn9dsr8ASDjwOAWQt7Pm5+dihEA3bSCHZob4M5DBBdpl+Cr/xwjry7iv5x4f0bVj3NrLVLLThux/hhzGdgF/XKaI/zFVq7QBepDEaHBt/l2WNZs=
+ bh=dC+LxIXoBnqmGvIeyKY1seNAjrwdC63Rnly+d0q5l0s=;
+ b=DvYNQKGGI/8pCN6RBTPt2oeYKT5ktlzdv8o21tWyzvw+Ww4ZIPY2UJ8VF2o7dC8lCqWb74K2DBB0bhJdTizJGifLD+1DEu49tCpp2gF2rXCRRT4BVUmH8uSSWLz+BiaHPO03yWkF1r75Sfa20Um+UIzjCTZ2I7gZYK4Za01wPc0=
 Authentication-Results: openvz.org; dkim=none (message not signed)
  header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5478.eurprd08.prod.outlook.com (2603:10a6:20b:107::14)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Wed, 29 Apr
- 2020 12:04:22 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Wed, 29 Apr
+ 2020 12:11:19 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.023; Wed, 29 Apr 2020
- 12:04:22 +0000
-Subject: Re: [PATCH v3 4/5] block/block-copy: refactor task creation
+ 12:11:19 +0000
+Subject: Re: [PATCH v3 5/5] block/block-copy: use aio-task-pool API
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20200429061039.12687-1-vsementsov@virtuozzo.com>
- <20200429061039.12687-5-vsementsov@virtuozzo.com>
- <affc8770-2b70-c3e4-af1b-ca620119c2d5@redhat.com>
- <92dd552d-b181-5b39-c796-e228c4d33379@virtuozzo.com>
- <0f14b02d-884a-9581-f1c7-7133e6d36557@redhat.com>
+ <20200429061039.12687-6-vsementsov@virtuozzo.com>
+ <1abe2617-4cc6-85c5-8c81-e2fa1fe4b5dc@redhat.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200429150420718
-Message-ID: <3117b258-aecc-d588-68a9-1b32ee8acff9@virtuozzo.com>
-Date: Wed, 29 Apr 2020 15:04:20 +0300
+X-Tagtoolbar-Keys: D20200429151117799
+Message-ID: <6379bdc2-a256-418f-c550-26222554d4f8@virtuozzo.com>
+Date: Wed, 29 Apr 2020 15:11:17 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
-In-Reply-To: <0f14b02d-884a-9581-f1c7-7133e6d36557@redhat.com>
+In-Reply-To: <1abe2617-4cc6-85c5-8c81-e2fa1fe4b5dc@redhat.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR02CA0080.eurprd02.prod.outlook.com
- (2603:10a6:208:154::21) To AM7PR08MB5494.eurprd08.prod.outlook.com
+X-ClientProxiedBy: AM4PR0101CA0067.eurprd01.prod.exchangelabs.com
+ (2603:10a6:200:41::35) To AM7PR08MB5494.eurprd08.prod.outlook.com
  (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from [192.168.100.2] (185.215.60.184) by
- AM0PR02CA0080.eurprd02.prod.outlook.com (2603:10a6:208:154::21) with
+ AM4PR0101CA0067.eurprd01.prod.exchangelabs.com (2603:10a6:200:41::35) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19 via Frontend
- Transport; Wed, 29 Apr 2020 12:04:21 +0000
-X-Tagtoolbar-Keys: D20200429150420718
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20 via Frontend
+ Transport; Wed, 29 Apr 2020 12:11:18 +0000
+X-Tagtoolbar-Keys: D20200429151117799
 X-Originating-IP: [185.215.60.184]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 26c8bb3a-f1c7-4eec-d9a6-08d7ec357421
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5494:
+X-MS-Office365-Filtering-Correlation-Id: ea3b0af2-7822-4fcc-963c-08d7ec366ca4
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5478:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5494F634C5E65072C9FF810AC1AD0@AM7PR08MB5494.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:525;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5478A8D2D7A08F4FE7E1E536C1AD0@AM7PR08MB5478.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:580;
 X-Forefront-PRVS: 03883BD916
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(136003)(376002)(346002)(396003)(39840400004)(366004)(2906002)(478600001)(5660300002)(31696002)(86362001)(6486002)(4326008)(107886003)(66556008)(186003)(2616005)(956004)(66476007)(16526019)(66946007)(16576012)(316002)(52116002)(8936002)(8676002)(36756003)(31686004)(26005)(53546011);
+ SFS:(4636009)(136003)(39840400004)(366004)(376002)(346002)(396003)(36756003)(4326008)(52116002)(956004)(2906002)(26005)(53546011)(2616005)(107886003)(5660300002)(31686004)(8676002)(186003)(16526019)(16576012)(6486002)(66556008)(66946007)(66476007)(86362001)(31696002)(478600001)(316002)(8936002);
  DIR:OUT; SFP:1102; 
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0K0w/l+1BKQKz81hm7RAwiAIb0D769MA6ljJSdgijSlEVmv5Cl4ZceLHOf9VDhaJIVA+JE6+zpPEPATKeNdOAHUCTa/+qPIOeVKSLzMg3GcXqNQXzs1KX3ZmatMwyubRu8jzbrBwh6CFw5rU+zAQYEj5/02x6VZLDTvUybpfJHGD9hi+zAPbEzXQfAjrzyj+HauFfasYaKMMbFgTpDPdF3wrPwv7ACENIMAitohGzLuskZoTkvgdXCmF/i6KoTmBAi7OyEopgen4ER7w4E4DrqCS8HHp3/CxJ5LuuRgPf8SGa53L2ki0+WHVj26/rN3MHPkqpfm2vKuNUlk4EAaJd85xXQHy4jPUUUnFDfDWLeaQ6+mbA6OksYDlvAJb37DMrfTr0E6cwmle8B7hlAppv3JvZy68kWofgRk41dqfgkGFFjvaV7AFAMHyaO/Ceb8l
-X-MS-Exchange-AntiSpam-MessageData: wmq2hQSJH2Pzv5m3LrGSQE7laWJ3f+1IwVYQmfyS668i5vOYB61IQ7mYSCTXks+d7Sdsd7/k/KmDu9OwuX8eXucdlagljhvxim/4wS5zGO9Yrqg3xKhc4XEW3Lr2RvCusVITA8NZsfBo+dcuLtdAVY5pIMETR3SlNWjGWh4djFW8dBMMox8LhHmeTWtuH5NHliWpSeZ8BN1X+TTKSijlUAlCwt5KvsSFKqRppfqymIPLre5O19P82PL77WFr6ICzm7AqEhaNkhyeDAj2Zu1/tkFgR0hOgon969MLXL8CFwgAOkkuSzES3t0O34WSDJI/ob8nFcYnZpnd5cPmEvTKmpp+fxphcnPtaOmyM5fyt7H6p550inJzoYkk7y4NgRZjL9zyluPyGdq6ZXh5HeQy4CUT5FFzXYv6VZ3t1ITQ8A5Krk5mhnuw9pvsrl0P3z0hmc2XQkvihllkx3SEqYygDaoYF2rplyQvZ25a5orh44Y+Ee1kigmzdCkk5O6H4UbMr4t2oq3KArgJHiZpJRdJ2Dn+VpTWFVFRYQXxfveyxzoWorlgjOA8jt+ZE9ZR6nQoE0Yw3eQFR84Ba3JtC7cY/NkR/VJiDCZmhGiHY0/izSK/xCThDbPD81nEjyz7ivVMiyu42ht90zyETAZkTX0BksdXaF6h0JmfWgm2C7ZgCrhJ5sqxRbhEMbesj1LPPjRsHyn5W21ZWbuo1f3RqWs3Ufav7WFcEfuKNbg3xnZCYinXepi0+dw6rryp4rxFcCSQykGqOfPk5GU7vp9ScWs8czMN0vledhuO0NO8J0+nXgs=
+X-Microsoft-Antispam-Message-Info: KCZLJhYoRgDiJ3t6ug9fLQmFzRq1TWOhiZMdTR4oaHmx/YTU7tx9aBC4PaEqwFfp/RHHfOslTkClPnNiyXIP0YpjrG8Tp83v0GfZBFHq2LczwUYCJJjoh3NhgNyu/AIlJrDAM5MGeDZS64yNsG+UI9HdnVC3QlvVpzF+2M660Hj+iA6j0JTYUaKuy49yBx48PDNJw/WjVf32CP/UIYXk3aGlNUVVGYTUI2ACCKFEFHyyrli/62TF/kcozz6vNtb5B5yRv4MY1qlnTzAVVsxgRn/Rz0wZlkksHAQSWiGM6c2vRURHEspOPyi1ARhDS7TTgZyF3vlGXqLc9xaz6JhnfXtfPdoYsJvLlxPLt0mwa1Sjl3xaSf45neiygA40x58fGSKD1W49odyTXKPXfG9zjoNL+K4iWtROe2VPgTymXytMFpttio0xZ+tFNypIWb+B
+X-MS-Exchange-AntiSpam-MessageData: VQehLpm4zigZq5zVTy/lRucvdA38RebwZJXteOavRnQgYdeAWquoqXISgObDDN/IU08ZEf+sfUANyjI1hHEYE3NNxLtZIRFyciNcibMZFNdqEFHtOholraxl8rWmp0a350/l+/1XdooFJ6HBclR1UlAhgZqFfHInWataP3x6r7phN1q5armkRS0gK7uJiMAGi6y7gutjvf1GLcloIpAnY9sDtl6IKBkM17FQmvZxSYdQsPQZAV4Qcq2gvbQwnweJeh1X1MaqHWE5poyc2QJaxaC/cJZgMqdQpoAKzjVoSe7yZ5TaO/oHJ6j2+fOQ6jS9t8zyXODUaQtSfn1mHClkD42UWMB2sixu7/8EUD1bEkAVMZHCr0pF0Bd7eawP/0hZuopFJVPLNMlnt0wIpjltQ4YGfOUVt/jYoPFlJby+E8d3RwV+PdO5hPDyoeDKUR1NcgonbrHYVHh4sMzgw82XjSflhjeGoA9C2/gFGUZqcShyLFDjlIWxg8jwJQfx2F8JjmXkZle5oswX3hmFVvnZHdFxWJT8yXfUK3x6PC9srMNyJCQ/W2P7Th74RUpWkERkTRkiyttvkvG8wFXcRu46oIk8acyvA9/7hE65CKc/WcR/mbR9jieOJ3MKEzHorDLyomGHDrjXiD+tuNy5UwO3jD0U9NFN29q/HnFxRp6U5xW+H+gue3jRKnO3wIZOtTj7kRi3lyUcH/9cqm6YklKJkbQz3+XIA2tufNia/5qXsp02Ho8aArTW+Lc5ye2KMQBf8zb5mk3RFs5IohLDy4fFPakeYNni5wwNw77uSK1VsTU=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 26c8bb3a-f1c7-4eec-d9a6-08d7ec357421
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2020 12:04:22.3156 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea3b0af2-7822-4fcc-963c-08d7ec366ca4
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2020 12:11:19.2763 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mf/1C5A+01weL+4MhQO46ZjBzZUBqx/y8fpRlOru/q1hyuGV980Ggw+bbo2iOreNLvLrvzzNXtJXHKuJFDp7f5JMxTA5Gw6y9wMvgzPepfU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5494
-Received-SPF: pass client-ip=40.107.5.109;
+X-MS-Exchange-CrossTenant-UserPrincipalName: Vy/+TsuIZpKdAqYtjsaEjXAp4YTt0AcSh0DME5ORx5JiSEPEvB0NVVCed9IARaRWTuxLBmDbkhXyWgOuTZrSeOyb2DPdq8eLwcM/UvXWl8U=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5478
+Received-SPF: pass client-ip=40.107.4.94;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR03-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 08:04:23
+ helo=EUR03-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 08:11:20
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.5.109
+X-Received-From: 40.107.4.94
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,75 +135,102 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-29.04.2020 14:56, Max Reitz wrote:
-> On 29.04.20 13:54, Vladimir Sementsov-Ogievskiy wrote:
->> 29.04.2020 14:38, Max Reitz wrote:
->>> On 29.04.20 08:10, Vladimir Sementsov-Ogievskiy wrote:
->>>> Instead of just relying on the comment "Called only on full-dirty
->>>> region" in block_copy_task_create() let's move initial dirty area
->>>> search directly to block_copy_task_create(). Let's also use effective
->>>> bdrv_dirty_bitmap_next_dirty_area instead of looping through all
->>>> non-dirty clusters.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>>    block/block-copy.c | 78 ++++++++++++++++++++++++++--------------------
->>>>    1 file changed, 44 insertions(+), 34 deletions(-)
->>>>
->>>> diff --git a/block/block-copy.c b/block/block-copy.c
->>>> index 35ff9cc3ef..5cf032c4d8 100644
->>>> --- a/block/block-copy.c
->>>> +++ b/block/block-copy.c
->>>
->>> [...]
->>>
->>>> @@ -106,17 +111,27 @@ static bool coroutine_fn
->>>> block_copy_wait_one(BlockCopyState *s, int64_t offset,
->>>>        return true;
->>>>    }
->>>>    -/* Called only on full-dirty region */
->>>> +/*
->>>> + * Search for the first dirty area in offset/bytes range and create
->>>> task at
->>>> + * the beginning of it.
->>>
->>> Oh, that’s even better.
->>>
->>>> + */
->>>>    static BlockCopyTask *block_copy_task_create(BlockCopyState *s,
->>>>                                                 int64_t offset,
->>>> int64_t bytes)
->>>>    {
->>>> -    BlockCopyTask *task = g_new(BlockCopyTask, 1);
->>>> +    if (!bdrv_dirty_bitmap_next_dirty_area(s->copy_bitmap,
->>>> +                                           offset, offset + bytes,
->>>> +                                           s->copy_size, &offset,
->>>> &bytes))
->>>> +    {
->>>> +        return NULL;
->>>> +    }
->>>>    +    /* region is dirty, so no existent tasks possible in it */
->>>>        assert(!find_conflicting_task(s, offset, bytes));
->>>>          bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
->>>>        s->in_flight_bytes += bytes;
->>>>    +    BlockCopyTask *task = g_new(BlockCopyTask, 1);
->>>
->>> This should be declared at the top of the function.
->>>
+29.04.2020 14:55, Max Reitz wrote:
+> On 29.04.20 08:10, Vladimir Sementsov-Ogievskiy wrote:
+>> Run block_copy iterations in parallel in aio tasks.
 >>
->> I just thought, why not to try another style? Are you against?
->> Requirement to declare variables at start of block is obsolete, isn't it?
+>> Changes:
+>>    - BlockCopyTask becomes aio task structure. Add zeroes field to pass
+>>      it to block_copy_do_copy
+>>    - add call state - it's a state of one call of block_copy(), shared
+>>      between parallel tasks. For now used only to keep information about
+>>      first error: is it read or not.
+>>    - convert block_copy_dirty_clusters to aio-task loop.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/block-copy.c | 104 +++++++++++++++++++++++++++++++++++++++------
+>>   1 file changed, 91 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/block/block-copy.c b/block/block-copy.c
+>> index 5cf032c4d8..f5ef91f292 100644
+>> --- a/block/block-copy.c
+>> +++ b/block/block-copy.c
 > 
-> Oh, it absolutely is and personally I’m absolutely not against it, but
-> CODING_STYLE says:
+> [...]
 > 
->> Mixed declarations (interleaving statements and declarations within
->> blocks) are generally not allowed; declarations should be at the beginning
->> of blocks.
+>> @@ -261,6 +278,30 @@ void block_copy_set_progress_meter(BlockCopyState *s, ProgressMeter *pm)
+>>       s->progress = pm;
+>>   }
+>>   
+>> +/* Takes ownership on @task */
+> 
+> Still *of
+
+Ohhh, very sorry for it, I really forget to update the patch :(
+
+> 
+>> +static coroutine_fn int block_copy_task_run(AioTaskPool *pool,
+>> +                                            BlockCopyTask *task)
+>> +{
+>> +    if (!pool) {
+>> +        int ret = task->task.func(&task->task);
+>> +
+>> +        g_free(task);
+>> +        return ret;
+>> +    }
+>> +
+>> +    aio_task_pool_wait_slot(pool);
+>> +    if (aio_task_pool_status(pool) < 0) {
+>> +        co_put_to_shres(task->s->mem, task->bytes);
+>> +        block_copy_task_end(task, -EAGAIN);
+> 
+> It looks like you may have missed my nit picks on v2 regarding this
+> patch, so I’m going to ask again whether -ECANCELED might be better here
+> (even though it still doesn’t really matter).
+
+Hmm yes, sounds better in the context. And I don't see any specific usage of it, and don't remember why I've chosen EAGAIN :) Let's use ECANCELED.
+
+> 
+>> +        g_free(task);
+>> +        return aio_task_pool_status(pool);
+> 
+> And whether it may be better to return a constant like -ECANCELED here,
+> because how a previous task failed shouldn’t really concern this task
+> (or its error code).
+
+Looks correct, will change.
+
+> 
+>> +    }
+>> +
+>> +    aio_task_pool_start_task(pool, &task->task);
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>   /*
+>>    * block_copy_do_copy
+>>    *
+> 
+> [...]
+> 
+>> @@ -525,25 +590,38 @@ static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
+> 
+> [...]
+> 
+>> +out:
+>> +    if (aio) {
+>> +        aio_task_pool_wait_all(aio);
+>> +        if (ret == 0) {
+>> +            ret = aio_task_pool_status(aio);
+>> +        }
+>> +        g_free(aio);
+> 
+> I’d still prefer aio_task_pool_free().
 > 
 
-Oh, missed (or forget). Let's fix it? :) Not in these series, of course. OK, I'll fix the patch.
-
+a thousand apologies :(
 
 
 -- 
