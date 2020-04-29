@@ -2,86 +2,96 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DBA5C83000
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:48:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17991C83000
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:53:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C33920BED
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:48:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C33920BED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=physnet.uni-hamburg.de
+	by mail.kernel.org (Postfix) with ESMTPS id D4DAF2076B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:53:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X1Yi8fYl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4DAF2076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTtd9-0001CE-6F
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:48:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54518)
+	id 1jTtiA-0006dD-St
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:53:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55750)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mhohmann@physnet.uni-hamburg.de>) id 1jTtVX-0007tN-3V
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:40:39 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jTtfo-0003mv-O2
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:51:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mhohmann@physnet.uni-hamburg.de>) id 1jTtVV-0004td-RD
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:40:38 -0400
-Received: from mail.physnet.uni-hamburg.de ([134.100.106.230]:48368)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mhohmann@physnet.uni-hamburg.de>)
- id 1jTtVV-0004tD-3p
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:40:37 -0400
-Received: from 227-98-191-90.dyn.estpak.ee ([90.191.98.227]
- helo=[192.168.1.129]) by mail.physnet.uni-hamburg.de with esmtpsa
- (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16) (Exim 4.72)
- (envelope-from <mhohmann@physnet.uni-hamburg.de>)
- id 1jTtVR-0004A4-Ka; Wed, 29 Apr 2020 22:40:34 +0200
-From: Manuel Hohmann <mhohmann@physnet.uni-hamburg.de>
-Subject: Error "cannot bind memory to host NUMA nodes: Operation not
- permitted" running inside docker
-To: qemu-devel@nongnu.org
-Autocrypt: addr=mhohmann@physnet.uni-hamburg.de; prefer-encrypt=mutual;
- keydata=
- mQENBEzzkJ0BCACoFEyKwRypWgc6Bbl/t5CRmCq+wnrLqGTji2iB9gHhP/dFisO3bdPjX2bT
- bZSG48rR7Q999M5NjCX7juQbAKQm5vv3NDBNqq35Q7nSALsEEazy1awbx56EBXPn/5VbH4JT
- c3sZiQR/MZY81WcWANPxZr3XWOl71netiVNzO5OBZSTxRV7dnB2meYBlhgD7dDzZTfJ8tpqu
- XlzlaZ+H2QDDt2TH0LYm6rhK2OXDqTCs09BiZi48Ev6YI/DC/RpLNGlVtACV1RB1i+GAKIZJ
- /E+E1A5wQTG+/wHblFq9PcFJKTJOQvMh3kV/4S4GuQbXoAMVn+6FGIF7mat4Oo+mNjchABEB
- AAG0ME1hbnVlbCBIb2htYW5uIDxtaG9obWFubkBwaHlzbmV0LnVuaS1oYW1idXJnLmRlPokB
- OAQTAQIAIgUCTPOQnQIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQ+9/1Gux6RLIN
- fgf+MHuA2VcJxo/xAvTjfrvmDFgTsepHFlWPKkEdEQY2FSG1dqhAHtEIlEJ0M/6Y0r5cSn+L
- E8yqW8OWP0aCsd0BTcp+h1t8lIZhx33ZGmOFDxLVcnIq/zyEloRbVZPG05yvKgmc3N3opaw4
- 8WrdnQ7Q6+iQhY9v+S+BcRyJNDL6cWXZF2uLOvXDAq2Y1lihZSwBXvcQOgQ7nfgJYAveA140
- fqRmg5e7usL2xq1kaWDvRrxBk/D6kWqLBkvYQrxxflTfsbM4IJP4lmCIfyr0BxY0VOzjZ8Wu
- SYl9ETJcHSc4zR+s94PnDAlFsZbZHGoXK6YxD6SlyaisT00bqvZXmY8gHbkBDQRM85CdAQgA
- l90YtA7ak5BUEHw4WPY9AIpfP0IWSI3lQbudSdTcJ2GPx5fE01dd/W1V+7K7VBiDw7m1CjT7
- qnv5ZPFWIhGCBzxGhi/81NXhnEsHoElJEzea0XY64/7hf+CeM4rrx7CaXjByHDbVfFPQqUEZ
- yhZhxYChmpCi/5CAvs5sJKFNqTqF6AXFCNdam0iWu1pT2MVhl2RqYQq0rUNVDhlh/v/fPKsM
- tUqyfXbiXVaG9zcozC7AS6U+0jly9oMsGrz9eCE6uDc3YceTnhUqRvuBzj3wB6hFNXj82T/+
- 4r60s9zAc2VMi3F0jKBr0+7b+5JOjeraPlvNB0ftCfnFNDGeC0pZAQARAQABiQEfBBgBAgAJ
- BQJM85CdAhsMAAoJEPvf9RrsekSyMAMH/2gVwokA0EEeF00AO6K9uTukidAflrXYFS+KLKC2
- oa8uAb2Or6y2OOZeaLmYhbOdRapFCElqjGSMYlBHPFmu10KDUYzNuaVmSULw84e0KzNPCeJG
- zOF4bGvLY9bv4cp2tMeUNDIvQHsmZ0PE+O9i9cVtuITEjsXxa/62SE1TSnLg3QUUZEvTIIKN
- ZEoxKIHrxiLVsa5Rd21YDVyShLjK4sa4Tc0PUPpe5yWkET6hVBIw2g15hAO8+qkShbRYg9CH
- pZQlUIv2wMJqzXV4UaHYzRJcgZZ0YEvNHE/Vstl7GLHk/QtaCxqva6novYYXWK/rMGrK19gw
- 3dYtCkCgf6rLwTE=
-Organization: University of Tartu
-Message-ID: <76d8eb61-e89e-0465-974b-6901a5fb848e@physnet.uni-hamburg.de>
-Date: Wed, 29 Apr 2020 23:40:32 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <alex.bennee@linaro.org>) id 1jTtfn-00005e-Iy
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:51:16 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38121)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jTtfn-000055-41
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:51:15 -0400
+Received: by mail-wr1-x444.google.com with SMTP id x17so4211242wrt.5
+ for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 13:51:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=lLc+w8h+0tcUssa/ZZ0mD/6b560cq3kMauYmicGKZD8=;
+ b=X1Yi8fYlStto6hLwsN9agHHwwRBZCTkiii+yPLHbLJnnt8qIFQk7iO0KIhFJsKKKCK
+ VpSbs8oHXwsSqIRUU9apQqxPTNhoTe0peL6HO27Q6gkCIORYUi0stlMbR64p40uPnP5r
+ Y3PDDV7stzM7zwgIT5d5MHDqwuICttfaEIftTVYJGExsSk1Ozy6T6PpswvlY2ekN2yWU
+ /OfjUGC/+NAqqmuDIzXgOJHyjUr6sIj7FcUCa89++U9MrpqFBnCYLc1LcBEgfmtpAARk
+ SldjmPtC17L+GfQF0gx0Ib+A7l1PRGNt1YsfARkuzga4g/Kfkwt2qY0aErdsjtiYup79
+ dqHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=lLc+w8h+0tcUssa/ZZ0mD/6b560cq3kMauYmicGKZD8=;
+ b=P9KOawtopCe7bqoevMASHO1bNZfaFCwuJ1W8uEDcNpI+pERE80wjvBmDmS/X/yXT0s
+ XUgc8uda+2+pCxlX7kRtiz4MPeRYAovjuVZCOS4tWf2wiOLzveFGCU03R+urMGIpoDRq
+ DtmqFRimvGwdpj913OzRX+FeJ64GIOe2+bv48VU5xYAIQNxZfiFbUKefyKbIvY123ads
+ dWgvmKdZhN+bOpYCW10aOJlWP32rL8gSx/nrEG4GJVQH8gxnZxSdN27dJ63ug3TZO0P9
+ XptpAZ04po+FMdyxLaiSUxG3M4ATd6KvP3ABFMjhbEP8jZDVpREH+Q72fOd/OJc5iLWn
+ nafg==
+X-Gm-Message-State: AGi0PuaNV3hNhxRHfkUycuHu+jMHxEBDcy5G1B+7fN1kOGhpbwxIXTXI
+ AsUyMFPdSRkpNsH6lFECF0h6Iw==
+X-Google-Smtp-Source: APiQypJaCZlFqFVeI786JT3o47pqv5jWApe5Jy500rtXoVl/zL9j5uBYAcBsvZnXJgJxl2Fd2VEhzA==
+X-Received: by 2002:adf:8162:: with SMTP id 89mr39873372wrm.387.1588193473253; 
+ Wed, 29 Apr 2020 13:51:13 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f2sm712760wro.59.2020.04.29.13.51.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Apr 2020 13:51:12 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9B38B1FF7E;
+ Wed, 29 Apr 2020 21:51:05 +0100 (BST)
+References: <1588094279-17913-1-git-send-email-frederic.konrad@adacore.com>
+ <1588094279-17913-2-git-send-email-frederic.konrad@adacore.com>
+ <87d07rlac5.fsf@linaro.org>
+ <9f6c1efc-a195-0f5d-8c34-4dfb45d910f8@vivier.eu>
+ <87a72ulk1z.fsf@linaro.org>
+ <1a78341c-b481-c9f2-f8fd-f50ab3bf197f@vivier.eu>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Subject: Re: [PATCH 1/2] softfloat: m68k: infinity is a valid encoding
+In-reply-to: <1a78341c-b481-c9f2-f8fd-f50ab3bf197f@vivier.eu>
+Date: Wed, 29 Apr 2020 21:51:05 +0100
+Message-ID: <87pnbqj9s6.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="RrhljUiMlyS4X1jzI31plhmllHXQsXwpu"
-Received-SPF: none client-ip=134.100.106.230;
- envelope-from=mhohmann@physnet.uni-hamburg.de;
- helo=mail.physnet.uni-hamburg.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 15:09:05
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Received-From: 134.100.106.230
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,94 +103,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: imammedo@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, philmd@redhat.com,
+ qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RrhljUiMlyS4X1jzI31plhmllHXQsXwpu
-Content-Type: multipart/mixed; boundary="hZAyTGUnQLJgEcA3MQ4FXxSoPiOLBJfa6"
 
---hZAyTGUnQLJgEcA3MQ4FXxSoPiOLBJfa6
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Laurent Vivier <laurent@vivier.eu> writes:
 
-Hi,
+> Le 29/04/2020 =C3=A0 11:26, Alex Benn=C3=A9e a =C3=A9crit :
+>>=20
+>> Laurent Vivier <laurent@vivier.eu> writes:
+>>=20
+>>> Le 28/04/2020 =C3=A0 20:43, Alex Benn=C3=A9e a =C3=A9crit :
+>>>>
+>>>> KONRAD Frederic <frederic.konrad@adacore.com> writes:
+>>>>
+>>>>> The MC68881 say about infinities (3.2.4):
+>>>>>
+>>>>> "*For the extended precision format, the most significant bit of the
+>>>>> mantissa (the integer bit) is a don't care."
+>>>>>
+>>>>> https://www.nxp.com/docs/en/reference-manual/MC68881UM.pdf
+>>>>>
+>>>>> The m68k extended format is implemented with the floatx80 and
+>>>>> floatx80_invalid_encoding currently treats 0x7fff00000000000000000000=
+ as
+>>>>> an invalid encoding.  This patch fixes floatx80_invalid_encoding so it
+>>>>> accepts that the most significant bit of the mantissa can be 0.
+>>>>>
+>>>>> This bug can be revealed with the following code which pushes extended
+>>>>> infinity on the stack as a double and then reloads it as a double.  It
+>>>>> should normally be converted and read back as infinity and is current=
+ly
+>>>>> read back as nan:
+>>>>
+>>>> Do you have any real HW on which you could record some .ref files for
+>>>> the various multiarch float tests we have (float_convs/float_madds)?
+>>>> Does this different of invalid encoding show up when you add them?
+>>>
+>>> On my side, in the past when I started to implement m68k FPU, I used
+>>> TestFloat and SoftFloat I have ported to m68k and I compare the result
+>>> in QEMU and in a Quadra 800.
+>>=20
+>> Surely TestFloat and SoftFloat is all emulation though?
+>>=20
+>> Anyway if you have a Quadra 800 running Linux could you generate some
+>> .ref files for the float_convs and float_madds test cases. The binaries
+>> are static so you should just be able to copy them and run.
+>>=20
+>>
+>
+> Here are the files I have generated on Q800.
 
-I encountered the following error message on the QEMU 5.0.0 release, comp=
-iled and run inside a docker image:
+So running those with:
 
-"cannot bind memory to host NUMA nodes: Operation not permitted"
+  run-float_convs: QEMU_OPTS +=3D -cpu m68040
+  run-float_madds: QEMU_OPTS +=3D -cpu m68040
 
-The QEMU command line to reproduce this behavior (it happens also on -x86=
-_64, -arm, -aarch64 with similar command line):
+We see the m68k float needs a fair bit of work from the get go:
 
-qemu-system-i386 -m 64 -M pc -smp 1 -display none -monitor stdio -drive f=
-ile=3Dmp-acpi/NOS.iso,media=3Dcdrom,id=3Dd -boot order=3Dd -d cpu_reset
+      Reference                                            qemu-m68k -cou m=
+68040
 
-The docker image which shows the error is available here:
+  ### Rounding to nearest						### Rounding to nearest
+                                                                >	from sing=
+le: f32(-nan:0xffbfffff)
+                                                                >	  to doub=
+le: f64(-nan:0x00fff7ffffe0000000) (OK)
+                                                                >	   to int=
+32: 2147483647 (OK)
+                                                                >	   to int=
+64: 9223372034707292159 (OK)
+                                                                >	  to uint=
+32: 2147483647 (OK)
+                                                                >	  to uint=
+64: 9223372034707292159 (OK)
+  from single: f32(-nan:0xffffffff)				from single: f32(-nan:0xffffffff)
+    to double: f64(-nan:0x00ffffffffe0000000) (OK)		  to double: f64(-nan:0=
+x00ffffffffe0000000) (OK)
+     to int32: 2147483392 (INVALID)			      |	   to int32: 2147483647 (OK)
+     to int64: 9223370939490631424 (INVALID)		      |	   to int64: 92233720=
+34707292159 (OK)
+    to uint32: 2147483392 (INVALID)			      |	  to uint32: 2147483647 (OK)
+    to uint64: 9223370939490631424 (INVALID)		      |	  to uint64: 92233720=
+34707292159 (OK)
+  from single: f32(-nan:0xffffffff)			      |	from single: f32(nan:0x7fffff=
+ff)
+    to double: f64(-nan:0x00ffffffffe0000000) (OK)	      |	  to double: f64=
+(nan:0x007fffffffe0000000) (OK)
+     to int32: 2147483392 (INVALID)			      |	   to int32: 2147483647 (OK)
+     to int64: 9223370939490631424 (INVALID)		      |	   to int64: 92233720=
+34707292159 (OK)
+    to uint32: 2147483392 (INVALID)			      |	  to uint32: 2147483647 (OK)
+    to uint64: 9223370939490631424 (INVALID)		      |	  to uint64: 92233720=
+34707292159 (OK)
+  from single: f32(-inf:0xff800000)			      <
+    to double: f64(-inf:0x00fff0000000000000) (OK)	      <
+     to int32: -2147483648 (INVALID)			      <
+     to int64: 1 (INVALID)				      <
+    to uint32: -2147483648 (INVALID)			      <
+    to uint64: -9223372034707292160 (INVALID)		      <
+  from single: f32(-0x1.fffffe00000000000000p+127:0xff7fffff)	from single: =
+f32(-0x1.fffffe00000000000000p+127:0xff7fffff)
+    to double: f64(-0x1.fffffe00000000000000p+127:0x00c7efffffe	  to double=
+: f64(-0x1.fffffe00000000000000p+127:0x00c7efffffe
+     to int32: -2147483648 (INVALID)			      |	   to int32: -2147483648 (OK)
+     to int64: 1 (INVALID)				      |	   to int64: 1 (OK)
+    to uint32: -2147483648 (INVALID)			      |	  to uint32: -2147483648 (OK)
+    to uint64: -9223372034707292160 (INVALID)		      |	  to uint64: -922337=
+2034707292160 (OK)
 
-https://hub.docker.com/repository/docker/xenos1984/test-qemu
+snipped a bunch more.
 
-Built on Ubuntu 20.04, and including NUMA support with libnuma-dev packag=
-e installed, from the following sources:
-
-https://github.com/xenos1984/cross-toolchain/tree/master/tools-qemu
-https://github.com/xenos1984/cross-toolchain/tree/master/test-qemu
-
-The iso image used can be obtained here, but should not be relevant:
-
-https://github.com/xenos1984/NOS/releases/download/latest/nos-i686.iso.bz=
-2
-
-The command fails when the image is used in a CI environment:
-
-https://circleci.com/gh/xenos1984/NOS/953
-
-On recommendation by @imammedo I post the issue to qemu-devel, and also t=
-ried the following patch:
-
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -384,3 +384,3 @@
-           if (mbind(ptr, sz, backend->policy,
--                  maxnode ? backend->host_nodes : NULL, maxnode + 1, fla=
-gs)) {
-+                  maxnode ? backend->host_nodes : NULL, 0, flags)) {
-               if (backend->policy !=3D MPOL_DEFAULT || errno !=3D ENOSYS=
-) {
-
-But no success, the same error occurs. It happens only within docker - th=
-e same command runs fine on my desktop (also Ubuntu 20.04) system.
-
-Best regards,
-xenos1984 / Manuel Hohmann
-
-PS: I apologize if this mail is sent / received more than once; there was=
- a problem with my outgoing mails.
-
-
-
---hZAyTGUnQLJgEcA3MQ4FXxSoPiOLBJfa6--
-
---RrhljUiMlyS4X1jzI31plhmllHXQsXwpu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEGQ1wnDd/ca3CjRdj+9/1Gux6RLIFAl6p5kAACgkQ+9/1Gux6
-RLIfsAf7B6PtDG/huDf+EfyFs2et2sc+CzHMK85o7bhKKNBrh04cHZ6dA8hWrwCG
-5ySQuko5eIZduKQ20k0NmrcfAQd6E2yO7gLt+f8c//vsVjFU8a1Oi2rPqx92R89G
-z5O41Gs0v8afXWlqb7WadIVFBmDtIOEectVC51asZCN8f7spINw38yAJX+XUmiuG
-3wETeXaTOjwljUBLfCQ44NiAhItEe3DQPTwtkfw5jWg67Ztm8yc5nAo7ECVegLqa
-U6HV6RANdAVAnpr15TipWc4emMKH5h1oahL6prfUfzOrBFuDQA7PLFAFyyoT7315
-RcZ7IEKp7xQFeOfqa8uJD8apZbli+g==
-=R7Zx
------END PGP SIGNATURE-----
-
---RrhljUiMlyS4X1jzI31plhmllHXQsXwpu--
+--=20
+Alex Benn=C3=A9e
 
