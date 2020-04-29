@@ -2,91 +2,83 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E2CC83000
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:44:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64527C83007
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:44:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B6542076B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:44:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E9FB2076B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:44:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="JjIEpN7Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B6542076B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MqS9Oo3o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E9FB2076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTtZg-0005IK-5K
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:44:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53862)
+	id 1jTtZh-0005K4-BI
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:44:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54096)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTtOo-00080n-BO
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:37:24 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jTtS9-00017a-Ae
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTtOA-0006uy-H9
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:33:42 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:7550)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTtKL-000664-KS; Wed, 29 Apr 2020 16:29:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1588192145; x=1619728145;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=xAP1D28Ruxk2F1O9NmhqCbS55wsbO5b1VBkOLwbfPLU=;
- b=JjIEpN7ZBklAbwCmFpFRLZc6xcUJThs78MvQBpnL7AEEt9LlbkxQu57L
- ehqzAtg/ZE+9eXJpOk4mSGvwW6FaPF66+VQX4hWbZDQqPmUCJRyKbflvW
- cvfsfhVJsRK9acKFyF9qlKUSNUGuK/DdgCXiakqrU4YW6Yw2260pbffc7
- tdBx0kFA5pe1FTnjbE31TUrWrJ0yxkdL4ml98eFWgQMc0wrrssXovpOkw
- z9dtfM1n58i55QrTkmT1xV3SgopskDeRslZ4/LWacLMFWIllS7eV3eXZV
- bom+2lNhsmSW30D5O0MgYdYTwfCNo7H7uGoy4Qm/h75Js7sVs9rQyKES+ A==;
-IronPort-SDR: W8JB2oCLHF8ie++1c2zNajwibdbxkmR9eCbsXmrJ2DgsnJJaQwUIskbvcvmkZqbOGy4EJkIFge
- RxUyAMPqzxEs4cEpfCjXkINxaFLlBM0SCDttha6Q4MjtvpKXgH+VD/CLo4FkeGAQnAx/GVS618
- jqpJ3pMCx8I8C2qREayUaUoaUN5w7H1qw8mAAN8E4XmumFRu7DEuH8GGhfxNXXg8mumMnvsGuq
- 1zPO29vnYeCgfOMfiVTScK6YXKRTPrHmsk4TxIxP0ReLQiM0BiHqLLkgcUsr5jNLO4N07N73+p
- H+8=
-X-IronPort-AV: E=Sophos;i="5.73,333,1583164800"; d="scan'208";a="136507040"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 04:28:40 +0800
-IronPort-SDR: N70QnSowggVf2ICZKldPqi7af4tyi0wNsXinJgAoA2uzBcAHIiu32FIegL/CX8a0DE0bgqsEPo
- 1BgvBewJBd8c5b9aVI5rJ4ssc0ByaYlFU=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Apr 2020 13:18:44 -0700
-IronPort-SDR: 6TrPTPWZm4S7BSG7QiwNQacwj7H7TT7rt85hHsHk4AX1fnRigjE6PXWWyI7jQKRJlQE18JrkY/
- jtWvcq+7D+kA==
-WDCIronportException: Internal
-Received: from usa004631.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.56.145])
- by uls-op-cesaip01.wdc.com with ESMTP; 29 Apr 2020 13:28:40 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: peter.maydell@linaro.org
-Subject: [PULL v2 10/14] linux-user/riscv: fix up struct target_ucontext
- definition
-Date: Wed, 29 Apr 2020 13:20:02 -0700
-Message-Id: <20200429202006.775322-11-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200429202006.775322-1-alistair.francis@wdc.com>
-References: <20200429202006.775322-1-alistair.francis@wdc.com>
+ (envelope-from <alistair23@gmail.com>) id 1jTtOD-000701-3d
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:37:09 -0400
+Received: from mail-il1-x12c.google.com ([2607:f8b0:4864:20::12c]:45573)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jTtLJ-00075J-Mz; Wed, 29 Apr 2020 16:30:05 -0400
+Received: by mail-il1-x12c.google.com with SMTP id i16so3748211ils.12;
+ Wed, 29 Apr 2020 13:30:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=JD309+QP5aFGYpEOtu8FSUsMrucDubhseVn8EEOeRlg=;
+ b=MqS9Oo3oWvMBiggMraC8eBDe8LYgBImF8SovpaFkfIJHY8U+1xsrRZZ4k8NBiabP7A
+ 7BxVPK4wURf7U53RnJdmZxaz9AeqsJ2XBWAV6E4DJm94BLL2VCbKT3vXY4q6LKBCpI8X
+ uUS9oGwuZRt0hEQq+GyepFDjQEqPipeLVg2x4W8zuIi/PbhvEV8sJUj+7lsZVP2+Fbgh
+ 0AjvjHf2xOAEQ/Y7VUzInehaTXY5qGRqaDmNA5rz0FYK/pq4MZx/C3rKVx6KGOwik8hg
+ AHocB/5D63LQ2/RqPLjfec4M3tB1kSklS2HaIwaTIYg7xd/t60G5Fv5LMyzH8eTDxWqB
+ xyrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=JD309+QP5aFGYpEOtu8FSUsMrucDubhseVn8EEOeRlg=;
+ b=SsDIP92Rbdg3x4/X662/nBVvKB58FjNuc7iQ6md/wTb4Fw0AHt0ejF4KjIqxWT6Y8M
+ Ll3oPSXdiRrH9/Wtc5Qajhe+DNiq8+lYth732hUah1V/C2lX4whhztDIdCQpu04NDZMj
+ Z/D+q80ZVoNcTxg3f6bnEb9WUFncYvLSE4Vod5AUS/eZjTYHLAN4IgHVpwiNBcPYcVJZ
+ BjbVXGtasHDOaJs5onZhoSVmXO0S3xy8siaU1VM/h35YgCCI52aZnB6YF8lElXIV47jV
+ juF9VrHecg00fVhXUgGPy1sOiikhxMoblj5wYK8xhE0HtJO3ARE1MPkFkdbU3QvXQWWp
+ 2g9Q==
+X-Gm-Message-State: AGi0Puba3BgshJpAj1tNFLqVKKutcjqpI2ly1VKRG6PPRedgqIz8562e
+ 7V0fS7pSta6hHIPzhmE7ZBpw9Anq8yRMrdOCB2E=
+X-Google-Smtp-Source: APiQypLlut6ezUjrJJ253PgGbs0C5jdBSO7pBqScUr3PZjo/8K5CMDOqoBl6HlMMEmONFYO+RiWUoZQoN91OJbzrtHg=
+X-Received: by 2002:a92:d0c6:: with SMTP id y6mr131493ila.227.1588192204100;
+ Wed, 29 Apr 2020 13:30:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.154.42;
- envelope-from=prvs=381fbd49e=alistair.francis@wdc.com;
- helo=esa4.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 16:28:37
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 216.71.154.42
+References: <20200429182856.2588202-1-alistair.francis@wdc.com>
+ <CAFEAcA-ZqDFo=D3YZgqLpvhzW+Jq8h-JNynDS05E2bSa6FOLEg@mail.gmail.com>
+In-Reply-To: <CAFEAcA-ZqDFo=D3YZgqLpvhzW+Jq8h-JNynDS05E2bSa6FOLEg@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 29 Apr 2020 13:21:30 -0700
+Message-ID: <CAKmqyKOwRrZZ+z1n_e=avxLs62TfN-Js4ounWWcd0p-gzR4nDw@mail.gmail.com>
+Subject: Re: [PULL 00/14] RISC-V Patch Queue for 5.1
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::12c;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x12c.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::12c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,43 +90,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>, palmerdabbelt@google.com,
- qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+On Wed, Apr 29, 2020 at 1:04 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Wed, 29 Apr 2020 at 19:37, Alistair Francis <alistair.francis@wdc.com> wrote:
+> >
+> > The following changes since commit a7922a3c81f34f45b1ebc9670a7769edc4c42a43:
+> >
+> >   Open 5.1 development tree (2020-04-29 15:07:10 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   git@github.com:alistair23/qemu.git tags/pull-riscv-to-apply-20200429-1
+> >
+> > for you to fetch changes up to 23766b6a35d5b1664ab782c02624bf2435c4ed5d:
+> >
+> >   hw/riscv/spike: Allow more than one CPUs (2020-04-29 11:23:44 -0700)
+> >
+> > ----------------------------------------------------------------
+> > RISC-V pull request for 5.1
+> >
+> > This is the first pull request for the 5.1 development period. It
+> > contains all of the patches that were sent during the 5.0 timeframe.
+> >
+> > This is an assortment of fixes for RISC-V, including fixes for the
+> > Hypervisor extension, the Spike machine and an update to OpenSBI.
+> >
+> > --------------------------------------------------------------
+>
+> Hi; this doesn't apply to current master. The conflict looks like
+> it's probably pretty easy to fix up, but could you fix it and resend,
+> please?
 
-As struct target_ucontext will be transfered to signal handler, it
-must keep pace with struct ucontext_t defined in Linux kernel.
+Done!
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20200412020830.607-1-zhiwei_liu@c-sky.com
-Message-Id: <20200412020830.607-1-zhiwei_liu@c-sky.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- linux-user/riscv/signal.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+There was a conflict with the other PR that went in after I sent the
+PR. Should be good to go now.
 
-diff --git a/linux-user/riscv/signal.c b/linux-user/riscv/signal.c
-index 83ecc6f799..67a95dbc7b 100644
---- a/linux-user/riscv/signal.c
-+++ b/linux-user/riscv/signal.c
-@@ -40,8 +40,9 @@ struct target_ucontext {
-     unsigned long uc_flags;
-     struct target_ucontext *uc_link;
-     target_stack_t uc_stack;
--    struct target_sigcontext uc_mcontext;
-     target_sigset_t uc_sigmask;
-+    uint8_t   __unused[1024 / 8 - sizeof(target_sigset_t)];
-+    struct target_sigcontext uc_mcontext QEMU_ALIGNED(16);
- };
- 
- struct target_rt_sigframe {
--- 
-2.26.2
+Alistair
 
+>
+> thanks
+> -- PMM
+>
 
