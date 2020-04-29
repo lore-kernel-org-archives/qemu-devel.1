@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA868C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 11:11:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 447D8C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 11:12:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92E53206B8
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 11:11:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E55A2073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 11:12:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fDh1FjvZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92E53206B8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AsZaS9o+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E55A2073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTkcX-0008N7-MR
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 07:11:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44822)
+	id 1jTkdd-0001Ci-6C
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 07:12:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTkUv-0005BS-8r
+ (envelope-from <kraxel@redhat.com>) id 1jTkUv-0005BZ-Rj
  for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:03:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTkTw-0003sG-KO
+ (envelope-from <kraxel@redhat.com>) id 1jTkTy-0003wK-En
  for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:03:25 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32584
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57994
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jTkTw-0003nc-5X
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:02:24 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jTkTx-0003qQ-0Z
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 07:02:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1588158143;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eWhEbL+FaYUiHQWlH6+AXjDfQ3NVOtqgxWbSXhQ9H2Q=;
- b=fDh1FjvZ1/DJgElvLF96BJTaykzoyYPDYq/c6bJAZV3lz0D8Zv5nQ7xT5U7eOKI4TtOAVe
- sIGq9p00xgmpo/Ar2cb64jTcB89z7pENnqw9xJ8hsFC+HwO6rvN0OPZHlhekMG9zTCGqJp
- vz77iJCFcPZzThcHA+NvLoVSZfE9QGE=
+ bh=PvDLqvzBI0CfTZenu/nOV53MsSThnMnnkIRJz4NuciA=;
+ b=AsZaS9o+7X2B/iZWCES2kDIO3F2v+BlehawIZedqFBSEQqWmgFhclen/H/xEKDNesiVkNs
+ izz+jRTA7YvzQHmjKUDlz2e/V4UwP1C3wmPlqy05b/u1QsBEmLtisokqKCKYBG2OtWgzVD
+ cRTAsHDqPP84L93Iwq9gL1eGxbS1CAE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-XTPl2tNWMRqR99-ulFeJIA-1; Wed, 29 Apr 2020 07:02:20 -0400
-X-MC-Unique: XTPl2tNWMRqR99-ulFeJIA-1
+ us-mta-266-jG6iz1dxMl2wxN3VjVRSKw-1; Wed, 29 Apr 2020 07:02:21 -0400
+X-MC-Unique: jG6iz1dxMl2wxN3VjVRSKw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EF858015CF
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33D5E107ACF9
  for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 11:02:20 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
  [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B88ED27CC4;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D3C39282C8;
  Wed, 29 Apr 2020 11:02:19 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 4F09E9DA1; Wed, 29 Apr 2020 13:02:15 +0200 (CEST)
+ id 579139DA2; Wed, 29 Apr 2020 13:02:15 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 08/12] audio: deprecate -soundhw gus
-Date: Wed, 29 Apr 2020 13:02:10 +0200
-Message-Id: <20200429110214.29037-9-kraxel@redhat.com>
+Subject: [PATCH 09/12] audio: deprecate -soundhw sb16
+Date: Wed, 29 Apr 2020 13:02:11 +0200
+Message-Id: <20200429110214.29037-10-kraxel@redhat.com>
 In-Reply-To: <20200429110214.29037-1-kraxel@redhat.com>
 References: <20200429110214.29037-1-kraxel@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
@@ -73,11 +73,11 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 00:53:13
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,37 +101,37 @@ Remove the now obsolete init function.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/audio/gus.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ hw/audio/sb16.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/hw/audio/gus.c b/hw/audio/gus.c
-index eb4a803fb53b..61d16fad9ffb 100644
---- a/hw/audio/gus.c
-+++ b/hw/audio/gus.c
-@@ -292,12 +292,6 @@ static void gus_realizefn (DeviceState *dev, Error **e=
-rrp)
-     AUD_set_active_out (s->voice, 1);
+diff --git a/hw/audio/sb16.c b/hw/audio/sb16.c
+index df6f755a37f8..2d9e50f99b5d 100644
+--- a/hw/audio/sb16.c
++++ b/hw/audio/sb16.c
+@@ -1415,12 +1415,6 @@ static void sb16_realizefn (DeviceState *dev, Error =
+**errp)
+     AUD_register_card ("sb16", &s->card);
  }
 =20
--static int GUS_init (ISABus *bus)
+-static int SB16_init (ISABus *bus)
 -{
--    isa_create_simple (bus, TYPE_GUS);
+-    isa_create_simple (bus, TYPE_SB16);
 -    return 0;
 -}
 -
- static Property gus_properties[] =3D {
-     DEFINE_AUDIO_PROPERTIES(GUSState, card),
-     DEFINE_PROP_UINT32 ("freq",    GUSState, freq,        44100),
-@@ -328,7 +322,7 @@ static const TypeInfo gus_info =3D {
- static void gus_register_types (void)
+ static Property sb16_properties[] =3D {
+     DEFINE_AUDIO_PROPERTIES(SB16State, card),
+     DEFINE_PROP_UINT32 ("version", SB16State, ver,  0x0405), /* 4.5 */
+@@ -1453,7 +1447,8 @@ static const TypeInfo sb16_info =3D {
+ static void sb16_register_types (void)
  {
-     type_register_static (&gus_info);
--    isa_register_soundhw("gus", "Gravis Ultrasound GF1", GUS_init);
-+    deprecated_register_soundhw("gus", "Gravis Ultrasound GF1", 1, TYPE_GU=
-S);
+     type_register_static (&sb16_info);
+-    isa_register_soundhw("sb16", "Creative Sound Blaster 16", SB16_init);
++    deprecated_register_soundhw("sb16", "Creative Sound Blaster 16",
++                                1, TYPE_SB16);
  }
 =20
- type_init (gus_register_types)
+ type_init (sb16_register_types)
 --=20
 2.18.2
 
