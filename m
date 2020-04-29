@@ -2,89 +2,162 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0769EC83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 03:44:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3827EC8300B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 04:18:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B164220731
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 03:44:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vHFHcjyL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B164220731
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id ECE1E2073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 04:18:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE1E2073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTde8-0001LP-R4
-	for qemu-devel@archiver.kernel.org; Tue, 28 Apr 2020 23:44:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56494)
+	id 1jTeAi-0005gp-4s
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 00:18:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59600)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chenhuacai@gmail.com>) id 1jTddW-0000vz-8H
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 23:43:51 -0400
+ (envelope-from <LYan@suse.com>) id 1jTeA3-00052x-Ls
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 00:17:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <chenhuacai@gmail.com>) id 1jTddK-0000vU-7Q
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 23:43:49 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:38752)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1jTddJ-0000vH-Oo
- for qemu-devel@nongnu.org; Tue, 28 Apr 2020 23:43:37 -0400
-Received: by mail-il1-x142.google.com with SMTP id c18so1100633ile.5
- for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 20:43:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=ATB2/TxwBQ4MRvujsi7t+js5C6MFt3QCWs8/JL/RSIo=;
- b=vHFHcjyLgf6L6pAGPFvObwuSlXoTcCvAmpaB5BVqmH6N1JCWUogLyJo6xDGpHPaFzL
- cDoBCc9+197Gy29appurQ+voefmefXhdeYQHV3OC1BjF/NVhDL80DE/nZMPXmRh5VaOI
- RDHMeLGc6VGQ7mNzYHurBZrfNAtAGurwFJilr/pJj/GO/F3sWlJlYLOVzwBu0RwAxzyo
- 8bC3CF+Qk9aVMp1Kep4lhwbqnug7/haTkjwtOQDQFVTjJFtkChPC8Z9IJTWM9iCnOeIq
- Yp8br4Qsmoxpz7uyDAfihYLMvO+8StvilJwdO5tIbhO4nAGZaXE0HimNUgiAHk6zUm2P
- 9DsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=ATB2/TxwBQ4MRvujsi7t+js5C6MFt3QCWs8/JL/RSIo=;
- b=LQQcUdSvDemEugHa1DAcJbbje/aLXMLFQcMPHCAyNQImT2WVlabrB8Kw6Xxt4Q2syz
- SrPiq6xzo6Z07RvBGlZY95q5xsiKyLayLcGtVDugePR8odCdt1tlqZtaq7uizwNy0+Gm
- rOFFYzrhBmRrGlo8bKoCaBqS0Qb3metk494BuPQBdzl9bGK87E5VzB0+DnRJJTmxSbg8
- k25EgO/a9DMA9w3PpwGR+avZDnNOuMsQoqPj7yYQD+BbAVhXVk4edoOAc/AfIT95L8cx
- Ar8zGfpi2g2xH3cdWl0jh2Pi0pjXyoN+oy2ss9PtyiqQONBQVxEcgMjZqZ/IjITy7Cs6
- Q5Cw==
-X-Gm-Message-State: AGi0Pub3ugVRIbIc9USi44z2o/SkZc4SY8BYJO0kKFtek2KnN0L4eUQu
- +3XU3JYwpDb/Lsrexm1IbJ5MSmaGTmSA/VLI3V0=
-X-Google-Smtp-Source: APiQypLtWGwSOwDychBLd4VL0WpzINOr/FKDwASJNtJ8nPit1LnY0p9wljAYFuugy2Lnk+R0roA5hCn1Cky+i2tY8Yk=
-X-Received: by 2002:a92:5d0f:: with SMTP id r15mr19711162ilb.251.1588131816402; 
- Tue, 28 Apr 2020 20:43:36 -0700 (PDT)
-MIME-Version: 1.0
-References: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
- <1587979995-17717-4-git-send-email-chenhc@lemote.com>
- <c1a3aec6-dc45-3484-3a70-c06449bee609@amsat.org>
- <CABDp7Vq-YX0LWU3iM=oygpcKzoS8cmXG6mvTQ5Gm_PbQsQMAgw@mail.gmail.com>
- <CAHiYmc6zFjBtgXRv=8+dqnbDtZqKqiwSDwEi0wKqJmJnys_y0g@mail.gmail.com>
-In-Reply-To: <CAHiYmc6zFjBtgXRv=8+dqnbDtZqKqiwSDwEi0wKqJmJnys_y0g@mail.gmail.com>
-From: Huacai Chen <chenhuacai@gmail.com>
-Date: Wed, 29 Apr 2020 11:51:06 +0800
-Message-ID: <CAAhV-H6NFV7hbaOp8BwPck3FWm5ZHBpuoA9FDmN6tby5LcoTeg@mail.gmail.com>
-Subject: Re: [PATCH for-5.1 4/7] target/mips: Add Loongson-3 CPU definition
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+ (envelope-from <LYan@suse.com>) id 1jTeA1-0007Vz-Ky
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 00:17:26 -0400
+Received: from m9a0013g.houston.softwaregrp.com ([15.124.64.91]:49345)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <LYan@suse.com>) id 1jTeA1-0007IF-3C
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 00:17:25 -0400
+Received: FROM m9a0013g.houston.softwaregrp.com (15.121.0.191) BY
+ m9a0013g.houston.softwaregrp.com WITH ESMTP; 
+ Wed, 29 Apr 2020 04:16:35 +0000
+Received: from M9W0068.microfocus.com (2002:f79:bf::f79:bf) by
+ M9W0068.microfocus.com (2002:f79:bf::f79:bf) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1591.10; Wed, 29 Apr 2020 04:15:05 +0000
+Received: from NAM02-CY1-obe.outbound.protection.outlook.com (15.124.72.13) by
+ M9W0068.microfocus.com (15.121.0.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1591.10 via Frontend Transport; Wed, 29 Apr 2020 04:15:05 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=e39rLoP6bfVOywP319I6qDSwLoWOKnKD3qGnJ9GqdtfMpy0HQgR55ccDl8oK++hxp2RG6OVDLkFLj3bnLCqqdXOGSCHYhlqtJUUSNHkrzPw6VHbv+w4iuQFOmenMkzo+ciDQCgEaw4Ln9INP2zvAlvQmjbPCOlxP72HAmwDtSRIoBABrtNpshYeZ5Jl2verVUIcLr7jlcpICw/X+w+XJ1+q4JMQrf17zMoLmszja6SUzC08BQxbYqw0ri6bM6coygKwe9979bEVR9zOhMxeyN+fL1SkvlPNR7/VWvqzKMg5scRtpx/3Ugy3ph9MZeSn+yLRsLAzWxAzU9IAh5LOm9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=O4jDUeRmR57Z9uP+5LH5Ii+/NenpmlpZ8r+y+zXcBdk=;
+ b=davt6lA0+2cGdVbR17YqXg0sFeRwkayTIpjB3xL942jOejJ4O/Wqxu0eGUjaXmaneUfhRi3nmMudELL/JR4+o4c6tHzxy07ft4VvOYXc8r1zzkG4AtHjlPxMMCWt33P9rmsq8IPxx5A7I5O1467/IcuJp5wloBP+9A4yNMi4cB6Vqega2AWaRNTL/GSg9F1emwe1mfNUlB0xLtAC2TsYXoR2K7i2n87vNTTrmMDZkCRts2gMcB242nudNHTHnfO5Yj/kdcXedX9wkNWxoBjDmoTZ0J5cRzinMW3DAma4krHy25vQGxtQWdqS39Y/+iiqsXKTwZIW1+7O3B7Y4tSN9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: googlegroups.com; dkim=none (message not signed)
+ header.d=none;googlegroups.com; dmarc=none action=none header.from=suse.com;
+Received: from BYAPR18MB3047.namprd18.prod.outlook.com (2603:10b6:a03:105::32)
+ by BYAPR18MB2373.namprd18.prod.outlook.com (2603:10b6:a03:12e::28)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Wed, 29 Apr
+ 2020 04:15:03 +0000
+Received: from BYAPR18MB3047.namprd18.prod.outlook.com
+ ([fe80::2d27:6a4b:3a2f:1ca1]) by BYAPR18MB3047.namprd18.prod.outlook.com
+ ([fe80::2d27:6a4b:3a2f:1ca1%4]) with mapi id 15.20.2937.026; Wed, 29 Apr 2020
+ 04:15:03 +0000
+Subject: Re: [RFC][PATCH v2 0/3] IVSHMEM version 2 device for QEMU
+To: Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel <qemu-devel@nongnu.org>
+References: <cover.1578407802.git.jan.kiszka@siemens.com>
+From: Liang Yan <lyan@suse.com>
+Autocrypt: addr=lyan@suse.com; prefer-encrypt=mutual; keydata=
+ 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
+ yMQQ+LPXfanS4w==
+Message-ID: <04fc6cb7-b02d-d8c1-1fdf-6b3c8c211284@suse.com>
+Date: Wed, 29 Apr 2020 00:15:00 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
+In-Reply-To: <cover.1578407802.git.jan.kiszka@siemens.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
- envelope-from=chenhuacai@gmail.com; helo=mail-il1-x142.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::142
+X-ClientProxiedBy: MN2PR05CA0027.namprd05.prod.outlook.com
+ (2603:10b6:208:c0::40) To BYAPR18MB3047.namprd18.prod.outlook.com
+ (2603:10b6:a03:105::32)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [IPv6:2605:a000:160e:228::ab4] (2605:a000:160e:228::ab4) by
+ MN2PR05CA0027.namprd05.prod.outlook.com (2603:10b6:208:c0::40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2958.12 via Frontend Transport; Wed, 29 Apr 2020 04:15:02 +0000
+X-Originating-IP: [2605:a000:160e:228::ab4]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 02335703-a2a4-4249-9385-08d7ebf3e438
+X-MS-TrafficTypeDiagnostic: BYAPR18MB2373:
+X-Microsoft-Antispam-PRVS: <BYAPR18MB2373BBA79E8D27B677200698BFAD0@BYAPR18MB2373.namprd18.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Forefront-PRVS: 03883BD916
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BYAPR18MB3047.namprd18.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(39860400002)(346002)(136003)(376002)(396003)(53546011)(5660300002)(4326008)(186003)(2616005)(31686004)(6486002)(52116002)(16526019)(54906003)(110136005)(2906002)(8936002)(66946007)(66476007)(36756003)(316002)(966005)(66556008)(86362001)(478600001)(8676002)(31696002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: uNEJ2hBtj0cRrHLIPQaeWSEXlus5QKgPfvFcQyKfULaPxt1RZE+ixxjdfK86YYdR8P11uB42oxy3npmo38C2WJ0xGcTbGByW+McgvZnw/pe8EQNcrWsZj4Q690SEW3BPVCrweSgmFkitudbobXGFdPQDAz/Fn8KC8J0L/PP6RPCNhXQfwCS/+mpj+3ocPbG8DS2rwuibrp7ij5kybn1jiQthofYmWC1vuSQCrCVG0OXtaJ5r5egAgswAYrXyJER1bikJdGn+x+K1kTfp8mlSWKPCh+kwTncaP5+Vus+S23k+WONfOtzKnsQNq0GSafMW/dCqsOMsNe37kU6zMtFrK7PpQv48R43QHQsW9FJaEcJ/ko+K57dbqmqhFXfj/MKgTuIfxX8yU7hE2Pnxffoj2E68bn6pNEcVPH0Hi7FRQaNzKIRNd4IEwW7Nsx56c7mNUHE9iLDwFQCVsJ5nKItCV7qY3lnKaMd9OI2LFc9TZMH94Z4qjbA+Yz8+U+O+Kl/ksao7E31v835CaB4J4OMknA==
+X-MS-Exchange-AntiSpam-MessageData: mnjmy5i4+FFPyciBrJGFMZY8+wwXL4QF1Jv91tmypoVw8PXnGYpYzv65SHhE4IoNaOtg5UyUGGfOeyJt8t1gKjWxXeMC3Z5LRRXjicHYcwzxsIyw/th1p/Sw4eyQ7Zd6AdMMPrU5rfEhjKETALaEzsCMFj51O+e5CPTqGu9+RB3u5bQfx5Ak896tm3GrfsTDrwXadde5rdW4a3iyz75U7QtgbYL4KbL45uW8irWSSYvc+Ebj4oWZHERaXOtwOrfaapPvJ23hnB7V/TeTDM+u27tGSQapeY+IyrnewJovpMLFSR1Uihywdw8hhntc4pLEvjaKcP5KVAlDu3DD6LxKDA/Quo7GnUjPIXricm0ATtHpx/sDM/Q4rCWZJK7vLy+fMOpo/beP1xnMGGm2blSyohss7jHWG246B9cs6WNsD5gT+X+3KGxgiMDeuFrsz8qeUeqogaxc+01+yHitl/rmCND7MvvS5LECD3M6vMiVrfDmOi4z/EwWhad5DJz2NECP1/dNmxiqTnLA+7EbJCm6be+AJJPCZ8873W+SNP5lgSdez9t61o+UiaFDSAg3hx0XMMJ/pedHcnvGi6zK7QrTfwyMRazSkdXThYQLpwG80+0pE6Pt4HxNlt5JtzKWGFwHLm9eanwUkXtJ7yP7n22tlIdeP3MGBxFv1O7KNe3h2d1VU/5yk4dY/5+0ag7bFaXJXeJ77nIgaOjefd9AhJvDl4M2JyAYd+x63Em7T/KMwUEWeb1TpxFCNfpWbXU6be7qnF4FWG8B7ir0+RTxdvOF10mcLTBFebpdBpuLQxbzGZoWct1NaQ5rOpUWsKn9njBRW+e4pJLPUITmJGtqK76Abg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 02335703-a2a4-4249-9385-08d7ebf3e438
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2020 04:15:03.6996 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 856b813c-16e5-49a5-85ec-6f081e13b527
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kP2h7HBV6lrbkVh8n29KVq7arvnWuBDNY1tJ+cCIuPyjD0TA54LzxSejVTw+m6xt
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR18MB2373
+X-OriginatorOrg: suse.com
+Received-SPF: pass client-ip=15.124.64.91; envelope-from=LYan@suse.com;
+ helo=m9a0013g.houston.softwaregrp.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 00:17:15
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Received-From: 15.124.64.91
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,299 +169,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: chen huacai <zltjiangshi@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Aurelien Jarno <aurelien@aurel32.net>, qemu-level <qemu-devel@nongnu.org>
+Cc: Jailhouse <jailhouse-dev@googlegroups.com>,
+ Claudio Fontana <claudio.fontana@gmail.com>, "Michael
+ S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Hannes Reinecke <hare@suse.de>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Aleksandar,
+Hi, All,
 
-I've tried translate.google.com, and documents are available here:
-Loongson-3A R1 (Loongson-3A1000)
-User Manual Part 1:
-http://ftp.godson.ac.cn/lemote/3A1000_p1.pdf
-http://ftp.godson.ac.cn/lemote/Loongson3A1000_processor_user_manual_P1.pdf
-(Chinese Version)
-User Manual Part 2:
-http://ftp.godson.ac.cn/lemote/3A1000_p2.pdf
-http://ftp.godson.ac.cn/lemote/Loongson3A1000_processor_user_manual_P2.pdf
-(Chinese Version)
+Did a test for these patches, all looked fine.
 
-Loongson-3A R2 (Loongson-3A2000)
-User Manual Part 1:
-http://ftp.godson.ac.cn/lemote/3A2000_p1.pdf
-http://ftp.godson.ac.cn/lemote/Loongson3A2000_user1.pdf (Chinese Version)
-User Manual Part 2:
-http://ftp.godson.ac.cn/lemote/3A2000_p2.pdf
-http://ftp.godson.ac.cn/lemote/Loongson3A2000_user2.pdf (Chinese Version)
+Test environment:
+Host: opensuse tumbleweed + latest upstream qemu  + these three patches
+Guest: opensuse tumbleweed root fs + custom kernel(5.5) + related
+uio-ivshmem driver + ivshmem-console/ivshmem-block tools
 
-Loongson-3A R3 (Loongson-3A3000)
-User Manual Part 1:
-http://ftp.godson.ac.cn/lemote/3A3000_p1.pdf
-http://ftp.godson.ac.cn/lemote/Loongson3A3000_3B3000usermanual1.pdf
-(Chinese Version)
-User Manual Part 2:
-http://ftp.godson.ac.cn/lemote/3A3000_p2.pdf
-http://ftp.godson.ac.cn/lemote/Loongson3A3000_3B3000usermanual2.pdf
-(Chinese Version)
 
-Loongson-3A R4 (Loongson-3A4000)
-User Manual Part 1:
-http://ftp.godson.ac.cn/lemote/3A4000_p1.pdf
-http://ftp.godson.ac.cn/lemote/3A4000user.pdf (Chinese Version)
-User Manual Part 2:
-I'm sorry that it is unavailable now.
+1. lspci show
 
-On Wed, Apr 29, 2020 at 2:37 AM Aleksandar Markovic
-<aleksandar.qemu.devel@gmail.com> wrote:
->
-> Huacai,
->
-> Can you please do machine translation of the document?
->
-> It can be done via translate.google.com (it accepts pdf files, but
-> does not have download feature, and workaround is to "print to pdf"...
->
-> Thanks in advance!
-> Aleksandar
->
-> =D1=83=D1=82=D0=BE, 28. =D0=B0=D0=BF=D1=80 2020. =D1=83 10:26 chen huacai=
- <zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=
-=D0=BE/=D0=BB=D0=B0:
-> >
-> > Hi, Philippe,
-> >
-> > On Tue, Apr 28, 2020 at 2:34 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsa=
-t.org> wrote:
-> > >
-> > > Hi Huacai,
-> > >
-> > > On 4/27/20 11:33 AM, Huacai Chen wrote:
-> > > > Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-=
-3B
-> > > > R1/R2. Loongson-3A R4 is the newest and its ISA is almost the super=
-set
-> > > > of all others. To reduce complexity, we just define a "Loongson-3A"=
- CPU
-> > > > which is corresponding to Loongson-3A R4. Loongson-3A has CONFIG6 a=
-nd
-> > > > CONFIG7, so add their bit-fields as well.
-> > >
-> > > Is there a public datasheet for R4? (If possible in English).
-> > I'm sorry that we only have Chinese datasheet in www.loongson.cn.
-> >
-> > >
-> > > >
-> > > > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > > > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > > > ---
-> > > >  target/mips/cpu.h                | 28 ++++++++++++++++++++++
-> > > >  target/mips/internal.h           |  2 ++
-> > > >  target/mips/mips-defs.h          |  7 ++++--
-> > > >  target/mips/translate.c          |  2 ++
-> > > >  target/mips/translate_init.inc.c | 51 ++++++++++++++++++++++++++++=
-++++++++++++
-> > > >  5 files changed, 88 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> > > > index 94d01ea..0b3c987 100644
-> > > > --- a/target/mips/cpu.h
-> > > > +++ b/target/mips/cpu.h
-> > > > @@ -940,7 +940,35 @@ struct CPUMIPSState {
-> > > >  #define CP0C5_UFR          2
-> > > >  #define CP0C5_NFExists     0
-> > > >      int32_t CP0_Config6;
-> > > > +    int32_t CP0_Config6_rw_bitmask;
-> > > > +#define CP0C6_BPPASS          31
-> > > > +#define CP0C6_KPOS            24
-> > > > +#define CP0C6_KE              23
-> > > > +#define CP0C6_VTLBONLY        22
-> > > > +#define CP0C6_LASX            21
-> > > > +#define CP0C6_SSEN            20
-> > > > +#define CP0C6_DISDRTIME       19
-> > > > +#define CP0C6_PIXNUEN         18
-> > > > +#define CP0C6_SCRAND          17
-> > > > +#define CP0C6_LLEXCEN         16
-> > > > +#define CP0C6_DISVC           15
-> > > > +#define CP0C6_VCLRU           14
-> > > > +#define CP0C6_DCLRU           13
-> > > > +#define CP0C6_PIXUEN          12
-> > > > +#define CP0C6_DISBLKLYEN      11
-> > > > +#define CP0C6_UMEMUALEN       10
-> > > > +#define CP0C6_SFBEN           8
-> > > > +#define CP0C6_FLTINT          7
-> > > > +#define CP0C6_VLTINT          6
-> > > > +#define CP0C6_DISBTB          5
-> > > > +#define CP0C6_STPREFCTL       2
-> > > > +#define CP0C6_INSTPREF        1
-> > > > +#define CP0C6_DATAPREF        0
-> > > >      int32_t CP0_Config7;
-> > > > +    int64_t CP0_Config7_rw_bitmask;
-> > > > +#define CP0C7_NAPCGEN       2
-> > > > +#define CP0C7_UNIMUEN       1
-> > > > +#define CP0C7_VFPUCGEN      0
-> > > >      uint64_t CP0_LLAddr;
-> > > >      uint64_t CP0_MAAR[MIPS_MAAR_MAX];
-> > > >      int32_t CP0_MAARI;
-> > > > diff --git a/target/mips/internal.h b/target/mips/internal.h
-> > > > index 1bf274b..7853cb1 100644
-> > > > --- a/target/mips/internal.h
-> > > > +++ b/target/mips/internal.h
-> > > > @@ -36,7 +36,9 @@ struct mips_def_t {
-> > > >      int32_t CP0_Config5;
-> > > >      int32_t CP0_Config5_rw_bitmask;
-> > > >      int32_t CP0_Config6;
-> > > > +    int32_t CP0_Config6_rw_bitmask;
-> > > >      int32_t CP0_Config7;
-> > > > +    int32_t CP0_Config7_rw_bitmask;
-> > > >      target_ulong CP0_LLAddr_rw_bitmask;
-> > > >      int CP0_LLAddr_shift;
-> > > >      int32_t SYNCI_Step;
-> > > > diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-> > > > index a831bb4..c2c96db 100644
-> > > > --- a/target/mips/mips-defs.h
-> > > > +++ b/target/mips/mips-defs.h
-> > > > @@ -51,8 +51,9 @@
-> > > >   */
-> > > >  #define INSN_LOONGSON2E   0x0001000000000000ULL
-> > > >  #define INSN_LOONGSON2F   0x0002000000000000ULL
-> > > > -#define INSN_VR54XX       0x0004000000000000ULL
-> > > > -#define INSN_R5900        0x0008000000000000ULL
-> > > > +#define INSN_LOONGSON3A   0x0004000000000000ULL
-> > > > +#define INSN_VR54XX       0x0008000000000000ULL
-> > > > +#define INSN_R5900        0x0010000000000000ULL
-> > > >  /*
-> > > >   *   bits 56-63: vendor-specific ASEs
-> > > >   */
-> > > > @@ -94,6 +95,8 @@
-> > > >  /* Wave Computing: "nanoMIPS" */
-> > > >  #define CPU_NANOMIPS32  (CPU_MIPS32R6 | ISA_NANOMIPS32)
-> > > >
-> > > > +#define CPU_LOONGSON3A  (CPU_MIPS64R2 | INSN_LOONGSON3A)
-> > > > +
-> > > >  /*
-> > > >   * Strictly follow the architecture standard:
-> > > >   * - Disallow "special" instruction handling for PMON/SPIM.
-> > > > diff --git a/target/mips/translate.c b/target/mips/translate.c
-> > > > index 25b595a..2caf4cb 100644
-> > > > --- a/target/mips/translate.c
-> > > > +++ b/target/mips/translate.c
-> > > > @@ -31206,7 +31206,9 @@ void cpu_state_reset(CPUMIPSState *env)
-> > > >      env->CP0_Config5 =3D env->cpu_model->CP0_Config5;
-> > > >      env->CP0_Config5_rw_bitmask =3D env->cpu_model->CP0_Config5_rw=
-_bitmask;
-> > > >      env->CP0_Config6 =3D env->cpu_model->CP0_Config6;
-> > > > +    env->CP0_Config6_rw_bitmask =3D env->cpu_model->CP0_Config6_rw=
-_bitmask;
-> > > >      env->CP0_Config7 =3D env->cpu_model->CP0_Config7;
-> > > > +    env->CP0_Config7_rw_bitmask =3D env->cpu_model->CP0_Config7_rw=
-_bitmask;
-> > > >      env->CP0_LLAddr_rw_bitmask =3D env->cpu_model->CP0_LLAddr_rw_b=
-itmask
-> > > >                                   << env->cpu_model->CP0_LLAddr_shi=
-ft;
-> > > >      env->CP0_LLAddr_shift =3D env->cpu_model->CP0_LLAddr_shift;
-> > > > diff --git a/target/mips/translate_init.inc.c b/target/mips/transla=
-te_init.inc.c
-> > > > index 6d145a9..a32412d 100644
-> > > > --- a/target/mips/translate_init.inc.c
-> > > > +++ b/target/mips/translate_init.inc.c
-> > > > @@ -802,6 +802,57 @@ const mips_def_t mips_defs[] =3D
-> > > >          .mmu_type =3D MMU_TYPE_R4000,
-> > > >      },
-> > > >      {
-> > > > +        .name =3D "Loongson-3A",
-> > > > +        .CP0_PRid =3D 0x14C000,
-> > > > +        /* 64KB I-cache and d-cache. 4 way with 32 bit cache line =
-size.  */
-> > > > +        .CP0_Config0 =3D MIPS_CONFIG0 | (0x1 << CP0C0_AR) | (0x2 <=
-< CP0C0_AT) |
-> > > > +                       (MMU_TYPE_R4000 << CP0C0_MT),
-> > > > +        .CP0_Config1 =3D MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << C=
-P0C1_MMU) |
-> > > > +                       (2 << CP0C1_IS) | (4 << CP0C1_IL) | (3 << C=
-P0C1_IA) |
-> > > > +                       (2 << CP0C1_DS) | (4 << CP0C1_DL) | (3 << C=
-P0C1_DA) |
-> > > > +                       (1 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << C=
-P0C1_EP),
-> > > > +        .CP0_Config2 =3D MIPS_CONFIG2,
-> > > > +        .CP0_Config3 =3D MIPS_CONFIG3 | (1U << CP0C3_M) | (1 << CP=
-0C3_MSAP) |
-> > > > +                       (1 << CP0C3_BP) | (1 << CP0C3_BI) | (1 << C=
-P0C3_ULRI) |
-> > > > +                       (1 << CP0C3_RXI) | (1 << CP0C3_LPA) | (1 <<=
- CP0C3_VInt),
-> > > > +        .CP0_Config4 =3D MIPS_CONFIG4 | (1U << CP0C4_M) | (2 << CP=
-0C4_IE) |
-> > > > +                       (1 << CP0C4_AE) | (0x1c << CP0C4_KScrExist)=
-,
-> > > > +        .CP0_Config4_rw_bitmask =3D 0,
-> > > > +        .CP0_Config5 =3D MIPS_CONFIG5 | (1 << CP0C5_NFExists) | (1=
- << 18),
-> > > > +        .CP0_Config5_rw_bitmask =3D (1 << CP0C5_K) | (1 << CP0C5_C=
-V) |
-> > > > +                                  (1 << CP0C5_MSAEn) | (1 << CP0C5=
-_UFE) |
-> > > > +                                  (1 << CP0C5_FRE) | (1 << CP0C5_S=
-BRI),
-> > > > +        .CP0_Config6 =3D (1 << CP0C6_VCLRU) | (1 << CP0C6_DCLRU) |=
- (1 << CP0C6_SFBEN) |
-> > > > +                       (1 << CP0C6_FLTINT) | (1 << CP0C6_INSTPREF)=
- | (1 << CP0C6_DATAPREF),
-> > > > +        .CP0_Config6_rw_bitmask =3D (1 << CP0C6_BPPASS) | (0x3f <<=
- CP0C6_KPOS) |
-> > > > +                                  (1 << CP0C6_KE) | (1 << CP0C6_VT=
-LBONLY) | (1 << CP0C6_LASX) |
-> > > > +                                  (1 << CP0C6_SSEN) | (1 << CP0C6_=
-DISDRTIME) |
-> > > > +                                  (1 << CP0C6_PIXNUEN) | (1 << CP0=
-C6_SCRAND) |
-> > > > +                                  (1 << CP0C6_LLEXCEN) | (1 << CP0=
-C6_DISVC) |
-> > > > +                                  (1 << CP0C6_VCLRU) | (1 << CP0C6=
-_DCLRU) |
-> > > > +                                  (1 << CP0C6_PIXUEN) | (1 << CP0C=
-6_DISBLKLYEN) |
-> > > > +                                  (1 << CP0C6_UMEMUALEN) | (1 << C=
-P0C6_SFBEN) |
-> > > > +                                  (1 << CP0C6_FLTINT) | (1 << CP0C=
-6_VLTINT) |
-> > > > +                                  (1 << CP0C6_DISBTB) | (3 << CP0C=
-6_STPREFCTL) |
-> > > > +                                  (1 << CP0C6_INSTPREF) | (1 << CP=
-0C6_DATAPREF),
-> > > > +        .CP0_Config7 =3D 0,
-> > > > +        .CP0_Config7_rw_bitmask =3D (1 << CP0C7_NAPCGEN) | (1 << C=
-P0C7_UNIMUEN) | \
-> > > > +                                  (1 << CP0C7_VFPUCGEN),
-> > > > +        .CP0_LLAddr_rw_bitmask =3D 1,
-> > > > +        .SYNCI_Step =3D 16,
-> > > > +        .CCRes =3D 2,
-> > > > +        .CP0_Status_rw_bitmask =3D 0x7DDBFFFF,
-> > > > +        .CP0_PageGrain_rw_bitmask =3D (1U << CP0PG_RIE) | (1 << CP=
-0PG_XIE) |
-> > > > +                    (1 << CP0PG_ELPA) | (1 << CP0PG_IEC),
-> > > > +        .CP1_fcr0 =3D (0x5 << FCR0_PRID) | (0x1 << FCR0_REV) | (0x=
-1 << FCR0_F64),
-> > > > +        .CP1_fcr31 =3D 0,
-> > > > +        .CP1_fcr31_rw_bitmask =3D 0xFF83FFFF,
-> > > > +        .SEGBITS =3D 48,
-> > > > +        .PABITS =3D 48,
-> > > > +        .insn_flags =3D CPU_LOONGSON3A,
-> > > > +        .mmu_type =3D MMU_TYPE_R4000,
-> > > > +    },
-> > > > +    {
-> > > >          /* A generic CPU providing MIPS64 DSP R2 ASE features.
-> > > >             FIXME: Eventually this should be replaced by a real CPU=
- model. */
-> > > >          .name =3D "mips64dspr2",
-> > > >
-> >
-> >
-> >
-> > --
-> > Huacai Chen
+00:04.0 Unassigned class [ff80]: Siemens AG Device 4106 (prog-if 02)
+Subsystem: Red Hat, Inc. Device 1100
+Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr-
+Stepping- SERR+ FastB2B- DisINTx+
+Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=3Dfast >TAbort- <TAbort-
+<MAbort- >SERR- <PERR- INTx-
+Latency: 0
+Region 0: Memory at fea56000 (32-bit, non-prefetchable) [size=3D4K]
+Region 1: Memory at fea57000 (32-bit, non-prefetchable) [size=3D4K]
+Region 2: Memory at fd800000 (64-bit, prefetchable) [size=3D1M]
+Capabilities: [4c] Vendor Specific Information: Len=3D18 <?>
+Capabilities: [40] MSI-X: Enable+ Count=3D2 Masked-
+Vector table: BAR=3D1 offset=3D00000000
+PBA: BAR=3D1 offset=3D00000800
+Kernel driver in use: virtio-ivshmem
+
+
+2. virtio-ivshmem-console test
+2.1 ivshmem2-server(host)
+
+airey:~/ivshmem/qemu/:[0]# ./ivshmem2-server -F -l 64K -n 2 -V 3 -P 0x8003
+*** Example code, do not use in production ***
+
+2.2 guest vm backend(test-01)
+localhost:~ # echo "110a 4106 1af4 1100 ffc003 ffffff" >
+/sys/bus/pci/drivers/uio_ivshmem/new_id
+[  185.831277] uio_ivshmem 0000:00:04.0: state_table at
+0x00000000fd800000, size 0x0000000000001000
+[  185.835129] uio_ivshmem 0000:00:04.0: rw_section at
+0x00000000fd801000, size 0x0000000000007000
+
+localhost:~ # virtio/virtio-ivshmem-console /dev/uio0
+Waiting for peer to be ready...
+
+2.3 guest vm frontend(test-02)
+need to boot or reboot after backend is done
+
+2.4 backend will serial output of frontend
+
+localhost:~ # virtio/virtio-ivshmem-console /dev/uio0
+Waiting for peer to be ready...
+
+localhost:~/virtio # ./virtio-ivshmem-console /dev/uio0
+Waiting for peer to be ready...
+Starting virtio device
+device_status: 0x0
+device_status: 0x1
+device_status: 0x3
+device_features_sel: 1
+device_features_sel: 0
+driver_features_sel: 1
+driver_features[1]: 0x13
+driver_features_sel: 0
+driver_features[0]: 0x1
+device_status: 0xb
+queue_sel: 0
+queue size: 8
+queue driver vector: 1
+queue desc: 0x200
+queue driver: 0x280
+queue device: 0x2c0
+queue enable: 1
+queue_sel: 1
+queue size: 8
+queue driver vector: 2
+queue desc: 0x400
+queue driver: 0x480
+queue device: 0x4c0
+queue enable: 1
+device_status: 0xf
+
+Welcome to openSUSE Tumbleweed 20200326 - Kernel 5.5.0-rc5-1-default+
+(hvc0).
+
+enp0s3:
+
+
+localhost login:
+
+2.5 close backend and frontend will show
+localhost:~ # [  185.685041] virtio-ivshmem 0000:00:04.0: backend failed!
+
+3. virtio-ivshmem-block test
+
+3.1 ivshmem2-server(host)
+airey:~/ivshmem/qemu/:[0]# ./ivshmem2-server -F -l 1M -n 2 -V 2 -P 0x8002
+*** Example code, do not use in production ***
+
+3.2 guest vm backend(test-01)
+
+localhost:~ # echo "110a 4106 1af4 1100 ffc002 ffffff" >
+/sys/bus/pci/drivers/uio_ivshmem/new_id
+[   77.701462] uio_ivshmem 0000:00:04.0: state_table at
+0x00000000fd800000, size 0x0000000000001000
+[   77.705231] uio_ivshmem 0000:00:04.0: rw_section at
+0x00000000fd801000, size 0x00000000000ff000
+
+localhost:~ # virtio/virtio-ivshmem-block /dev/uio0 /root/disk.img
+Waiting for peer to be ready...
+
+3.3 guest vm frontend(test-02)
+need to boot or reboot after backend is done
+
+3.4 guest vm backend(test-01)
+localhost:~ # virtio/virtio-ivshmem-block /dev/uio0 /root/disk.img
+Waiting for peer to be ready...
+Starting virtio device
+device_status: 0x0
+device_status: 0x1
+device_status: 0x3
+device_features_sel: 1
+device_features_sel: 0
+driver_features_sel: 1
+driver_features[1]: 0x13
+driver_features_sel: 0
+driver_features[0]: 0x206
+device_status: 0xb
+queue_sel: 0
+queue size: 8
+queue driver vector: 1
+queue desc: 0x200
+queue driver: 0x280
+queue device: 0x2c0
+queue enable: 1
+device_status: 0xf
+
+3.5 guest vm frontend(test-02), a new disk is attached:
+
+fdisk /dev/vdb
+
+Disk /dev/vdb: 192 KiB, 196608 bytes, 384 sectors
+Units: sectors of 1 * 512 =3D 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+3.6 close backend and frontend will show
+localhost:~ # [ 1312.284301] virtio-ivshmem 0000:00:04.0: backend failed!
+
+
+
+Tested-by: Liang Yan <lyan@suse.com>
+
+On 1/7/20 9:36 AM, Jan Kiszka wrote:
+> Overdue update of the ivshmem 2.0 device model as presented at [1].
+>=20
+> Changes in v2:
+>  - changed PCI device ID to Siemens-granted one,
+>    adjusted PCI device revision to 0
+>  - removed unused feature register from device
+>  - addressed feedback on specification document
+>  - rebased over master
+>=20
+> This version is now fully in sync with the implementation for Jailhouse
+> that is currently under review [2][3], UIO and virtio-ivshmem drivers
+> are shared. Jailhouse will very likely pick up this revision of the
+> device in order to move forward with stressing it.
+>=20
+> More details on the usage with QEMU were in the original cover letter
+> (with adjustements to the new device ID):
+>=20
+> If you want to play with this, the basic setup of the shared memory
+> device is described in patch 1 and 3. UIO driver and also the
+> virtio-ivshmem prototype can be found at
+>=20
+>     http://git.kiszka.org/?p=3Dlinux.git;a=3Dshortlog;h=3Drefs/heads/queu=
+es/ivshmem2
+>=20
+> Accessing the device via UIO is trivial enough. If you want to use it
+> for virtio, this is additionally to the description in patch 3 needed on
+> the virtio console backend side:
+>=20
+>     modprobe uio_ivshmem
+>     echo "110a 4106 1af4 1100 ffc003 ffffff" > /sys/bus/pci/drivers/uio_i=
+vshmem/new_id
+>     linux/tools/virtio/virtio-ivshmem-console /dev/uio0
+>=20
+> And for virtio block:
+>=20
+>     echo "110a 4106 1af4 1100 ffc002 ffffff" > /sys/bus/pci/drivers/uio_i=
+vshmem/new_id
+>     linux/tools/virtio/virtio-ivshmem-console /dev/uio0 /path/to/disk.img
+>=20
+> After that, you can start the QEMU frontend instance with the
+> virtio-ivshmem driver installed which can use the new /dev/hvc* or
+> /dev/vda* as usual.
+>=20
+> Any feedback welcome!
+>=20
+> Jan
+>=20
+> PS: Let me know if I missed someone potentially interested in this topic
+> on CC - or if you would like to be dropped from the list.
+>=20
+> [1] https://kvmforum2019.sched.com/event/TmxI
+> [2] https://groups.google.com/forum/#!topic/jailhouse-dev/ffnCcRh8LOs
+> [3] https://groups.google.com/forum/#!topic/jailhouse-dev/HX-0AGF1cjg
+>=20
+> Jan Kiszka (3):
+>   hw/misc: Add implementation of ivshmem revision 2 device
+>   docs/specs: Add specification of ivshmem device revision 2
+>   contrib: Add server for ivshmem revision 2
+>=20
+>  Makefile                                  |    3 +
+>  Makefile.objs                             |    1 +
+>  configure                                 |    1 +
+>  contrib/ivshmem2-server/Makefile.objs     |    1 +
+>  contrib/ivshmem2-server/ivshmem2-server.c |  462 ++++++++++++
+>  contrib/ivshmem2-server/ivshmem2-server.h |  158 +++++
+>  contrib/ivshmem2-server/main.c            |  313 +++++++++
+>  docs/specs/ivshmem-2-device-spec.md       |  376 ++++++++++
+>  hw/misc/Makefile.objs                     |    2 +-
+>  hw/misc/ivshmem2.c                        | 1085 +++++++++++++++++++++++=
+++++++
+>  include/hw/misc/ivshmem2.h                |   48 ++
+>  include/hw/pci/pci_ids.h                  |    2 +
+>  12 files changed, 2451 insertions(+), 1 deletion(-)
+>  create mode 100644 contrib/ivshmem2-server/Makefile.objs
+>  create mode 100644 contrib/ivshmem2-server/ivshmem2-server.c
+>  create mode 100644 contrib/ivshmem2-server/ivshmem2-server.h
+>  create mode 100644 contrib/ivshmem2-server/main.c
+>  create mode 100644 docs/specs/ivshmem-2-device-spec.md
+>  create mode 100644 hw/misc/ivshmem2.c
+>  create mode 100644 include/hw/misc/ivshmem2.h
+>=20
 
