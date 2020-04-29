@@ -2,88 +2,139 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51EB4C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 06:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FCBDC83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 06:01:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F756206D6
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 06:00:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 083DB206D6
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 06:01:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y3rDCjzj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F756206D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="Fp9SmWge"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 083DB206D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTfll-00087E-83
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 02:00:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38450)
+	id 1jTfmf-00013z-7R
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 02:01:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38538)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jTfkp-0007by-CK
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 01:59:31 -0400
+ (envelope-from <ani.sinha@nutanix.com>) id 1jTfld-0008Gj-H1
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 02:00:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jTfkn-0003f3-9M
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 01:59:31 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55599
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jTfkm-0003Tk-SO
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 01:59:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588139967;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kFQ7QRi3nFYNRl/LD1ZeFgvqOAO12pmBe0ANKHN40ZE=;
- b=Y3rDCjzjZkC7wgcVmIFZ5LFDmd0uohgEcl0/4QrsYM3tsQr+8IkscRnlT4Jqj/no4h33b3
- BOdJhehYyIUCj5efSSexw5Lo9tBV1NynrQqCLAZ05P7V/5dFqRCyXTJx31ASoEjStfXAg/
- z8sTT09WSmHzLM5Z2ubdqZkKXePB3bg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-505-TNV_N5UIOC27umId6u_n-Q-1; Wed, 29 Apr 2020 01:59:23 -0400
-X-MC-Unique: TNV_N5UIOC27umId6u_n-Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 050E780058A;
- Wed, 29 Apr 2020 05:59:22 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B3A05EDE0;
- Wed, 29 Apr 2020 05:59:21 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0865411358BC; Wed, 29 Apr 2020 07:59:20 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 07/11] mips/malta: Fix create_cps() error handling
-References: <20200424192027.11404-1-armbru@redhat.com>
- <20200424192027.11404-8-armbru@redhat.com>
- <75dc4fbc-2b39-c8ef-8030-370672621c2f@amsat.org>
-Date: Wed, 29 Apr 2020 07:59:19 +0200
-In-Reply-To: <75dc4fbc-2b39-c8ef-8030-370672621c2f@amsat.org> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 27 Apr 2020 11:20:53
- +0200")
-Message-ID: <871ro6x26g.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <ani.sinha@nutanix.com>) id 1jTflc-0007Ud-CW
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 02:00:21 -0400
+Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:13436)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
+ id 1jTflb-0007JV-MB
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 02:00:20 -0400
+Received: from pps.filterd (m0127837.ppops.net [127.0.0.1])
+ by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 03T5w1SL017590; Tue, 28 Apr 2020 23:00:02 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=Vp4/WjGwt0SIJavZveBE8GLr0nMFwIBmGTmPkahIPbc=;
+ b=Fp9SmWgey0SXGCtbRQ6l79126+GQq7Paq3sIL/YopGLyqQzJM6jQP36rwErTZi/PA8Bw
+ HksTZuayYedOXSs5emBUxVz5Bb3pL9gl7+EIVT4bLzwwskJjocRM4JcNEpMGeHFyVKAC
+ B0A91Me5lYJMnmX7VqAdiEkBKLBBb9FuBvlLxCn1DZHpZRoLs3GQkThR/8BddibycHVS
+ ZTp3ALabNY86W30t7rQKz5RB+R3kPC/FfUcWkShXwuwT3ah6CHwPQsHqjWtTz1f5NuE4
+ w3FB/NVTljSbnDuKQul+ABpKkq8V3jGUcpATapFzgNJalCJ/LbbKrxLrOb+GNN8jZsW8 Vw== 
+Received: from nam10-mw2-obe.outbound.protection.outlook.com
+ (mail-mw2nam10lp2100.outbound.protection.outlook.com [104.47.55.100])
+ by mx0a-002c1b01.pphosted.com with ESMTP id 30nhn9nuew-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 28 Apr 2020 23:00:02 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KwON5aj8lI5YSSPyUOj5w80fleXmVwFiFJwcION0F12nMrl5L0YNBi3qQZqJPm14Tfnhcmzx28LSy+yaappKriON3BX+qkRMIOpVlSAd7bODRWTXGJJgcyaITpyBKefnYf5nbO7j6d/i1Jcbl38PCIn0i3gqWTyP0N/imVzcupPHJhV65UVdayZUFs+4iTYbeTFesAg1XO78P/xZWKdQtAwqb/v0P0vUbYYoTgxaOHC9n2a2+DfTRescppSFi4ZuNgkQfCGGfoqacX+B7VpfNcknIhN6M5T3GM7LPra+Rk8+Kxk+vh2sWmWpgSoQUDhpzP8t1mZ1QWh8QO7hciQqYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Vp4/WjGwt0SIJavZveBE8GLr0nMFwIBmGTmPkahIPbc=;
+ b=OI5+hOZgaX9kTq5q5m5qYjt0u0Aywl1uuaBOBC55SKvnqVjGwR2icxd9FSCKxZbAftqHW4EL86l08vJl2wGL/5tcQc4pFFFOLeni//Op5FtA1tO524vBLt78iPD5Mwr7Ep3pD4X+bg3yfT0ojlsMe+aUfyWA71khNk8GTxRsa516x8rFzQRVPKdMw94QIfDNfm3Cf0cCkarewvINeqyoj4i4hh7W+SDmfROnL4fCglzb1Z5iP3/VdKIsTEwnqzEvql8KEY8a3gLCfkODHBucfjFD9RfGjDS1v/8l/I2ykjLZnb/39hdEO0N+otTE+/MFCij+Fpvdidj4hTvCWxYQAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MN2PR02MB5742.namprd02.prod.outlook.com (2603:10b6:208:10d::27)
+ by MN2PR02MB6365.namprd02.prod.outlook.com (2603:10b6:208:1bf::25)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19; Wed, 29 Apr
+ 2020 06:00:00 +0000
+Received: from MN2PR02MB5742.namprd02.prod.outlook.com
+ ([fe80::200c:b06c:d8c6:42a]) by MN2PR02MB5742.namprd02.prod.outlook.com
+ ([fe80::200c:b06c:d8c6:42a%7]) with mapi id 15.20.2937.028; Wed, 29 Apr 2020
+ 05:59:59 +0000
+From: Ani Sinha <ani.sinha@nutanix.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH V2] Add a new PIIX option to control PCI hot unplugging of
+ devices on non-root buses
+Thread-Topic: [PATCH V2] Add a new PIIX option to control PCI hot unplugging
+ of devices on non-root buses
+Thread-Index: AQHWHUYvMyDNYIpa20C9378Nh0w8t6iOszWAgAAA+QCAAANNgIAABV8AgABEbYCAAEbYAIAASz+AgAAI5YA=
+Date: Wed, 29 Apr 2020 05:59:59 +0000
+Message-ID: <5AD9B19D-EACA-4111-BB5B-78F8378AE93D@nutanix.com>
+References: <1588069012-211196-1-git-send-email-ani.sinha@nutanix.com>
+ <20200428120426-mutt-send-email-mst@kernel.org>
+ <67e481a5-de04-4e01-b9ec-70932194d69f@Spark>
+ <20200428121837-mutt-send-email-mst@kernel.org>
+ <CAARzgwwTo+r9xFge_XL_eu8-nsRFBFXEaQmTOhT1YHJifzfCJA@mail.gmail.com>
+ <20200428164428-mutt-send-email-mst@kernel.org>
+ <CAARzgwznhCPhGmwOxUBf_6bnFX7-Za7TxFMd999CARM+hDm8bA@mail.gmail.com>
+ <20200429011228-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200429011228-mutt-send-email-mst@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nutanix.com;
+x-originating-ip: [192.146.154.3]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: aa3bdc85-7e93-4fa9-e1fb-08d7ec028d39
+x-ms-traffictypediagnostic: MN2PR02MB6365:
+x-microsoft-antispam-prvs: <MN2PR02MB636598A5D35AA0F28ABCBC18F1AD0@MN2PR02MB6365.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:466;
+x-forefront-prvs: 03883BD916
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 1T77ZrywZq0jidUEUf1fr2LgFIruBnvnbJFAPbGMU5nvqUKFKRO2mcmpPijYFAo+iU7oaoixm9ITA0HBpghj3CZOnCppFlf6O4iXZxTUiybQ5mNudzRsn9vr0hO02RHo8mcB4KqlAKNAazxbFqW3wV03GZ9DGlXxVIA1wdT+NmRG8iKpAY82x+9GB4/alH1/gzgazgCElzu2RUtG0duGKxQLUfkNa7YY9T30ylFgkTWGYhb69Ea6x3bJCCQYMwxhbTc1Af0ohAkRaQVGJ78bvEXE8VmehcAZ6TU515z0lv1Hp8x/8GDVsaDFsgfv1r1EVFEmRZq/Lk6MAoDiMeKImyMYf7jsmufSn3MreceUbbKGcO7ihKc6NzQVJpFydWJV6XKKedQL31/BnSHv8IJtpJP05H70rQSof9db2HFX5Nk8/1e/tdlc8a+aSX5Ohjo4
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MN2PR02MB5742.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(39840400004)(396003)(376002)(136003)(366004)(346002)(76116006)(8936002)(91956017)(66946007)(5660300002)(36756003)(6916009)(2906002)(478600001)(8676002)(33656002)(86362001)(6512007)(6486002)(7416002)(4326008)(71200400001)(186003)(26005)(53546011)(6506007)(44832011)(66446008)(316002)(64756008)(54906003)(2616005)(66556008)(66476007);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: 4rMmzbEGF1JwrmlvqHv6c4i30YofPP2LV6ncqQFUn/rxlC1DZEL8T+RUPXFISTgS6FdpWpO9mKg0ZzdKR+lTof5N1yND8hM+Jv5/QC9i+3196acLfaFb3eOJUU1ysdwdW5UkHpeM6wYciZhZ+fOrXliLBXDmUmT6UQufAmZ7cH5E2X9UBEXu8puHcbx9SWiXjgNsPSoJt2mnsZ1i5PqSuUS+uLEH5BwW7fTZZvKspdGNgQBsl7ymJmibU0Mb2+OwFtwMBkBibQK/MRcEZ76tcqEQ0cTfBSe+o+aVidWCVZFiJIQUjy8V7MpV4XAzPrl1fjb+BKZZafQXxbx5rgUjTd9wG/ZYOgunMF+uDOXuaMWAJCc6HPceyKL8WCs/NhYeGJTQpZJxqnkcO22M6fBroDvArsaZbQy7Cmk+8GqrwVdB6cWDIvxl4IoTM4bKXiOXXzn3vylkOuFWBLSxgEhi8L5p08ttNrzf7GkOY6vsW2sGvtFEKGI/OM+Ybn/wqggE5NIFKLczlQ/mtAYNRkdKNyL415QBPPWBbADjtzA+qDW9jhHykQx9GhPeL9CNnhGzfSK5Ec1qju9n+ISN+YARvPBvdccARFKVM2pugk4/tcKKFQXGC2a4+njagNvvsIVUgUMtnmFJdq2e0s3yC/qHuw5ZFfDk0d59BOJT/BUYKf8YTEWqisCqprLGd/85+Uv1aQtisu1hesfuyPSSs/KtxcWI7yGRjOejhDh9UwqPthYPcNwF0JQWXsZTx622vO5I72y6TLBhNDhdO5yqRMH51+TKFafzt3Vwb0N0kWA2ms8=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <B0EB26D19D2D6647A37B3EB0944EC978@namprd02.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:28:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa3bdc85-7e93-4fa9-e1fb-08d7ec028d39
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2020 05:59:59.8835 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: YR+vrX8OpoYIEVaTr+JXcAYiRrggud7do2o/n8y869OX462o6TRQw0+NZpbyofANNriBRWvPngHbT0i25C3/aA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB6365
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-29_01:2020-04-28,
+ 2020-04-29 signatures=0
+X-Proofpoint-Spam-Reason: safe
+Received-SPF: pass client-ip=148.163.151.68;
+ envelope-from=ani.sinha@nutanix.com; helo=mx0a-002c1b01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 02:00:18
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Received-From: 148.163.151.68
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,76 +146,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-> On 4/24/20 9:20 PM, Markus Armbruster wrote:
->> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
->> pointer to a variable containing NULL.  Passing an argument of the
->> latter kind twice without clearing it in between is wrong: if the
->> first call sets an error, it no longer points to NULL for the second
->>=20
->> create_cps() is wrong that way.  The last calls treats an error as
->> fatal.  Do that for the prior ones, too.
->>=20
->> Fixes: bff384a4fbd5d0e86939092e74e766ef0f5f592c
->> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->> Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
->> Cc: Aurelien Jarno <aurelien@aurel32.net>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  hw/mips/mips_malta.c | 15 ++++++---------
->>  1 file changed, 6 insertions(+), 9 deletions(-)
->>=20
->> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
->> index e4c4de1b4e..17bf41616b 100644
->> --- a/hw/mips/mips_malta.c
->> +++ b/hw/mips/mips_malta.c
->> @@ -1185,17 +1185,14 @@ static void create_cpu_without_cps(MachineState =
-*ms,
->>  static void create_cps(MachineState *ms, MaltaState *s,
->>                         qemu_irq *cbus_irq, qemu_irq *i8259_irq)
->>  {
->> -    Error *err =3D NULL;
->> -
->>      sysbus_init_child_obj(OBJECT(s), "cps", OBJECT(&s->cps), sizeof(s->=
-cps),
->>                            TYPE_MIPS_CPS);
->> -    object_property_set_str(OBJECT(&s->cps), ms->cpu_type, "cpu-type", =
-&err);
->> -    object_property_set_int(OBJECT(&s->cps), ms->smp.cpus, "num-vp", &e=
-rr);
->> -    object_property_set_bool(OBJECT(&s->cps), true, "realized", &err);
->> -    if (err !=3D NULL) {
->> -        error_report("%s", error_get_pretty(err));
->
-> In https://www.mail-archive.com/qemu-devel@nongnu.org/msg695645.html I
-> also remove "qemu/error-report.h" which is not needed once you remove
-> this call.
 
-Missed it, sorry.  I only reviewed the Coccinelle scripts [PATCH 1+3/7].
+> On Apr 29, 2020, at 10:58 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
+>=20
+> For example, how about hot-plugging a bridge which doesn't
+> support hotplug itself?
 
-I'd replace my patch by yours to give you proper credit, but your commit
-message mentions "the coccinelle script", presumably the one from PATCH
-1/7, and that patch isn't quite ready in my opinion.
+So now for every device we want to hot plug, we will add a new bridge? Soun=
+ds not a scalable and elegant idea.
 
->> -        exit(1);
->> -    }
->> +    object_property_set_str(OBJECT(&s->cps), ms->cpu_type, "cpu-type",
->> +                            &error_fatal);
->> +    object_property_set_int(OBJECT(&s->cps), ms->smp.cpus, "num-vp",
->> +                            &error_fatal);
->> +    object_property_set_bool(OBJECT(&s->cps), true, "realized",
->> +                             &error_fatal);
->> =20
->>      sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->cps), 0, 0, 1);
->> =20
->>=20
+> Would that happen to make windows
+> do what you want, for both PCI and PCIE? We don't support
+> hotplugging bridges with devices behind them ATM, but
+> that sounds like a useful option.
+>=20
+>=20
+> Also, pcie root ports recently gained ability to disable hotplug, see
+> 	commit 530a0963184e57e71a5b538e9161f115df533e96
+> 	Author: Julia Suvorova <jusual@redhat.com>
+> 	Date:   Wed Feb 26 18:46:07 2020 +0100
+>=20
+> 	    pcie_root_port: Add hotplug disabling option
+>=20
+> adding this to pci and pcie bridges sounds very reasonable.
+
+This patch uses PCIE native hot plug capability to turn on or turn off per =
+slot hot plug option. This does not enable hot unplugging while allowing de=
+vices to be hot plugged on a PCIE port. Besides, PCI-PCI bridges already ha=
+ve an option to disable hot plug capability for all the slots of that bridg=
+e. My patch follows that approach.
 
 
