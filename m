@@ -2,72 +2,64 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E654C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:06:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61071C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:07:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60B3A2073E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:06:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60B3A2073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 35E7F2073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:07:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35E7F2073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTgnY-0006iU-JI
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:06:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44588)
+	id 1jTgoV-0007hP-E1
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:07:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44646)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jingqi.liu@intel.com>) id 1jTgks-0004Iw-DJ
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:03:41 -0400
+ (envelope-from <groug@kaod.org>) id 1jTglH-0004bv-Tm
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:04:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <jingqi.liu@intel.com>) id 1jTgkq-0007q9-2N
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:03:37 -0400
-Received: from mga07.intel.com ([134.134.136.100]:42697)
+ (envelope-from <groug@kaod.org>) id 1jTglG-0008EG-So
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:04:03 -0400
+Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:42434)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jingqi.liu@intel.com>)
- id 1jTgkp-0007pF-09
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:03:35 -0400
-IronPort-SDR: evUs7uKx15m0zHgUj1m33jzKMzgWJ16+6KDwFOPkSbFV5jvCITXtprCLEDIMwDegSXkPsUmtSK
- 9qDPnBSUtbfg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Apr 2020 00:03:31 -0700
-IronPort-SDR: KJp3imhaCeAYkfJwwuznSt7R7NYZhyxrmKGxfsdwqcsOYx43rYsAONXCPJtJBcop9ftoo5rPMt
- q+VMhQWCrnPg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,330,1583222400"; 
- d="scan'208,217";a="459492266"
-Received: from jingqili-mobl.ccr.corp.intel.com (HELO [10.238.4.212])
- ([10.238.4.212])
- by fmsmga006.fm.intel.com with ESMTP; 29 Apr 2020 00:03:28 -0700
-Subject: Re: [PATCH v2 3/3] configure: add libdaxctl support
-To: Joao Martins <joao.m.martins@oracle.com>
-References: <20200415033538.43329-1-jingqi.liu@intel.com>
- <20200415033538.43329-4-jingqi.liu@intel.com>
- <7b6a53cb-7591-26dd-2bdc-8d6a0bbb0338@oracle.com>
-From: "Liu, Jingqi" <jingqi.liu@intel.com>
-Message-ID: <9fca45c6-ab11-4263-eb99-c0c993f11987@intel.com>
-Date: Wed, 29 Apr 2020 15:03:28 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jTglG-0007u9-BF
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:04:02 -0400
+Received: from player696.ha.ovh.net (unknown [10.108.35.131])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id EE6BA1D2348
+ for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 09:03:52 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player696.ha.ovh.net (Postfix) with ESMTPSA id 3CBE611E799BB;
+ Wed, 29 Apr 2020 07:03:45 +0000 (UTC)
+Date: Wed, 29 Apr 2020 09:03:42 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH 16/17] spapr_pci: Drop some dead error handling
+Message-ID: <20200429090342.68fdedf8@bahia.lan>
+In-Reply-To: <20200428163419.4483-17-armbru@redhat.com>
+References: <20200428163419.4483-1-armbru@redhat.com>
+ <20200428163419.4483-17-armbru@redhat.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <7b6a53cb-7591-26dd-2bdc-8d6a0bbb0338@oracle.com>
-Content-Type: multipart/alternative;
- boundary="------------4264F1F39D4D5103731A4369"
-Received-SPF: pass client-ip=134.134.136.100;
- envelope-from=jingqi.liu@intel.com; helo=mga07.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 03:03:31
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 134.134.136.100
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 2798987169230199182
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedriedvgdduudduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=87.98.172.75; envelope-from=groug@kaod.org;
+ helo=4.mo2.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 03:03:53
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Received-From: 87.98.172.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,227 +71,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: berrange@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, pbonzini@redhat.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------4264F1F39D4D5103731A4369
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+On Tue, 28 Apr 2020 18:34:18 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
-On 4/29/2020 12:23 AM, Joao Martins wrote:
-> On 4/15/20 4:35 AM, Jingqi Liu wrote:
->> Add a pair of configure options --{enable,disable}-libdaxctl to control
->> whether QEMU is compiled with libdaxctl [1]. Libdaxctl is a utility
->> library for managing the device dax subsystem.
->>
->> QEMU uses mmap(2) to maps vNVDIMM backends and aligns the mapping
->> address to the page size (getpagesize(2)) by default. However, some
->> types of backends may require an alignment different than the page
->> size. The 'align' option is provided to memory-backend-file to allow
->> users to specify the proper alignment.
->>
->> For device dax (e.g., /dev/dax0.0), the 'align' option needs to match
->> the alignment requirement of the device dax, which can be fetched
->> through the libdaxctl APIs.
->>
->> [1] Libdaxctl is a part of ndctl project.
->> The project's repository is: https://github.com/pmem/ndctl
->>
->> For more information about libdaxctl APIs, you can refer to the
->> comments in source code of: pmem/ndctl/daxctl/lib/libdaxctl.c.
->>
->> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
->> ---
->>   configure | 30 ++++++++++++++++++++++++++++++
->>   1 file changed, 30 insertions(+)
->>
->> diff --git a/configure b/configure
->> index e225a1e3ff..df1752cf08 100755
->> --- a/configure
->> +++ b/configure
->> @@ -509,6 +509,7 @@ libpmem=""
->>   default_devices="yes"
->>   plugins="no"
->>   fuzzing="no"
->> +libdaxctl=""
->>   
->>   supported_cpu="no"
->>   supported_os="no"
->> @@ -1601,6 +1602,10 @@ for opt do
->>     ;;
->>     --gdb=*) gdb_bin="$optarg"
->>     ;;
->> +  --enable-libdaxctl) libdaxctl=yes
->> +  ;;
->> +  --disable-libdaxctl) libdaxctl=no
->> +  ;;
->>     *)
->>         echo "ERROR: unknown option $opt"
->>         echo "Try '$0 --help' for more information"
->> @@ -1894,6 +1899,7 @@ disabled with --disable-FEATURE, default is enabled if available:
->>     debug-mutex     mutex debugging support
->>     libpmem         libpmem support
->>     xkbcommon       xkbcommon support
->> +  libdaxctl       libdaxctl support
->>   
->>   NOTE: The object files are built at the place where configure is launched
->>   EOF
->> @@ -6190,6 +6196,25 @@ if test "$libpmem" != "no"; then
->>   	fi
->>   fi
->>   
->> +##########################################
->> +# check for libdaxctl
->> +
->> +if test "$libdaxctl" != "no"; then
->> +	if $pkg_config --exists "libdaxctl"; then
->> +		libdaxctl="yes"
->> +		libdaxctl_libs=$($pkg_config --libs libdaxctl)
->> +		libdaxctl_cflags=$($pkg_config --cflags libdaxctl)
->> +		libs_softmmu="$libs_softmmu $libdaxctl_libs"
->> +		QEMU_CFLAGS="$QEMU_CFLAGS $libdaxctl_cflags"
->> +	else
->> +		if test "$libdaxctl" = "yes" ; then
->> +			feature_not_found "libdaxctl" "Install libdaxctl"
->> +		fi
-> Region iteration APIs, align and path getter routines are only available since
-> libdaxctl v56/v57 (the latest is v68).
->
-> Not sure how likely this happens in today's distros but if we care about systems
-> with < v57 we should probably check that
-> daxctl_region_foreach/daxctl_region_get_align/daxctl_region_get_path symbols
-> exist? Or alternatively requiring v57 or up which serves as a bandage, but more
-> long term ... any usage of newer daxctl APIs will require the former.
+> chassis_from_bus() uses object_property_get_uint() to get property
+> "chassis_nr" of the bridge device.  Failure would be a programming
+> error.  Pass &error_abort, and simplify its callers.
+> 
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: qemu-ppc@nongnu.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-Thanks for your suggestion.
-Better to require v57 or up.
-How about adding the following check:
-+       if $pkg_config --atleast-version=57 "libdaxctl"; then
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
+>  hw/ppc/spapr_pci.c | 86 ++++++++++------------------------------------
+>  1 file changed, 18 insertions(+), 68 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 1d73d05a0a..b6036be51c 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1203,46 +1203,36 @@ static SpaprDrc *drc_from_devfn(SpaprPhbState *phb,
+>                             drc_id_from_devfn(phb, chassis, devfn));
+>  }
+>  
+> -static uint8_t chassis_from_bus(PCIBus *bus, Error **errp)
+> +static uint8_t chassis_from_bus(PCIBus *bus)
+>  {
+>      if (pci_bus_is_root(bus)) {
+>          return 0;
+>      } else {
+>          PCIDevice *bridge = pci_bridge_get_device(bus);
+>  
+> -        return object_property_get_uint(OBJECT(bridge), "chassis_nr", errp);
+> +        return object_property_get_uint(OBJECT(bridge), "chassis_nr",
+> +                                        &error_abort);
+>      }
+>  }
+>  
+>  static SpaprDrc *drc_from_dev(SpaprPhbState *phb, PCIDevice *dev)
+>  {
+> -    Error *local_err = NULL;
+> -    uint8_t chassis = chassis_from_bus(pci_get_bus(dev), &local_err);
+> -
+> -    if (local_err) {
+> -        error_report_err(local_err);
+> -        return NULL;
+> -    }
+> +    uint8_t chassis = chassis_from_bus(pci_get_bus(dev));
+>  
+>      return drc_from_devfn(phb, chassis, dev->devfn);
+>  }
+>  
+> -static void add_drcs(SpaprPhbState *phb, PCIBus *bus, Error **errp)
+> +static void add_drcs(SpaprPhbState *phb, PCIBus *bus)
+>  {
+>      Object *owner;
+>      int i;
+>      uint8_t chassis;
+> -    Error *local_err = NULL;
+>  
+>      if (!phb->dr_enabled) {
+>          return;
+>      }
+>  
+> -    chassis = chassis_from_bus(bus, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        return;
+> -    }
+> +    chassis = chassis_from_bus(bus);
+>  
+>      if (pci_bus_is_root(bus)) {
+>          owner = OBJECT(phb);
+> @@ -1256,21 +1246,16 @@ static void add_drcs(SpaprPhbState *phb, PCIBus *bus, Error **errp)
+>      }
+>  }
+>  
+> -static void remove_drcs(SpaprPhbState *phb, PCIBus *bus, Error **errp)
+> +static void remove_drcs(SpaprPhbState *phb, PCIBus *bus)
+>  {
+>      int i;
+>      uint8_t chassis;
+> -    Error *local_err = NULL;
+>  
+>      if (!phb->dr_enabled) {
+>          return;
+>      }
+>  
+> -    chassis = chassis_from_bus(bus, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        return;
+> -    }
+> +    chassis = chassis_from_bus(bus);
+>  
+>      for (i = PCI_SLOT_MAX * PCI_FUNC_MAX - 1; i >= 0; i--) {
+>          SpaprDrc *drc = drc_from_devfn(phb, chassis, i);
+> @@ -1488,17 +1473,11 @@ int spapr_pci_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
+>  }
+>  
+>  static void spapr_pci_bridge_plug(SpaprPhbState *phb,
+> -                                  PCIBridge *bridge,
+> -                                  Error **errp)
+> +                                  PCIBridge *bridge)
+>  {
+> -    Error *local_err = NULL;
+>      PCIBus *bus = pci_bridge_get_sec_bus(bridge);
+>  
+> -    add_drcs(phb, bus, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        return;
+> -    }
+> +    add_drcs(phb, bus);
+>  }
+>  
+>  static void spapr_pci_plug(HotplugHandler *plug_handler,
+> @@ -1529,11 +1508,7 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
+>      g_assert(drc);
+>  
+>      if (pc->is_bridge) {
+> -        spapr_pci_bridge_plug(phb, PCI_BRIDGE(plugged_dev), &local_err);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> -            return;
+> -        }
+> +        spapr_pci_bridge_plug(phb, PCI_BRIDGE(plugged_dev));
+>      }
+>  
+>      /* Following the QEMU convention used for PCIe multifunction
+> @@ -1560,12 +1535,7 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
+>          spapr_drc_reset(drc);
+>      } else if (PCI_FUNC(pdev->devfn) == 0) {
+>          int i;
+> -        uint8_t chassis = chassis_from_bus(pci_get_bus(pdev), &local_err);
+> -
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> -            return;
+> -        }
+> +        uint8_t chassis = chassis_from_bus(pci_get_bus(pdev));
+>  
+>          for (i = 0; i < 8; i++) {
+>              SpaprDrc *func_drc;
+> @@ -1587,17 +1557,11 @@ out:
+>  }
+>  
+>  static void spapr_pci_bridge_unplug(SpaprPhbState *phb,
+> -                                    PCIBridge *bridge,
+> -                                    Error **errp)
+> +                                    PCIBridge *bridge)
+>  {
+> -    Error *local_err = NULL;
+>      PCIBus *bus = pci_bridge_get_sec_bus(bridge);
+>  
+> -    remove_drcs(phb, bus, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        return;
+> -    }
+> +    remove_drcs(phb, bus);
+>  }
+>  
+>  static void spapr_pci_unplug(HotplugHandler *plug_handler,
+> @@ -1619,11 +1583,7 @@ static void spapr_pci_unplug(HotplugHandler *plug_handler,
+>      pci_device_reset(PCI_DEVICE(plugged_dev));
+>  
+>      if (pc->is_bridge) {
+> -        Error *local_err = NULL;
+> -        spapr_pci_bridge_unplug(phb, PCI_BRIDGE(plugged_dev), &local_err);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> -        }
+> +        spapr_pci_bridge_unplug(phb, PCI_BRIDGE(plugged_dev));
+>          return;
+>      }
+>  
+> @@ -1654,13 +1614,7 @@ static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
+>          SpaprDrcClass *func_drck;
+>          SpaprDREntitySense state;
+>          int i;
+> -        Error *local_err = NULL;
+> -        uint8_t chassis = chassis_from_bus(pci_get_bus(pdev), &local_err);
+> -
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> -            return;
+> -        }
+> +        uint8_t chassis = chassis_from_bus(pci_get_bus(pdev));
+>  
+>          if (pc->is_bridge) {
+>              error_setg(errp, "PCI: Hot unplug of PCI bridges not supported");
+> @@ -1741,7 +1695,7 @@ static void spapr_phb_unrealize(DeviceState *dev)
+>          }
+>      }
+>  
+> -    remove_drcs(sphb, phb->bus, &error_abort);
+> +    remove_drcs(sphb, phb->bus);
+>  
+>      for (i = PCI_NUM_PINS - 1; i >= 0; i--) {
+>          if (sphb->lsi_table[i].irq) {
+> @@ -1980,11 +1934,7 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+>      }
+>  
+>      /* allocate connectors for child PCI devices */
+> -    add_drcs(sphb, phb->bus, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        goto unrealize;
+> -    }
+> +    add_drcs(sphb, phb->bus);
+>  
+>      /* DMA setup */
+>      for (i = 0; i < windows_supported; ++i) {
 
-Jingqi
-
-
---------------4264F1F39D4D5103731A4369
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: 7bit
-
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  </head>
-  <body>
-    <div class="moz-cite-prefix">On 4/29/2020 12:23 AM, Joao Martins
-      wrote:<br>
-    </div>
-    <blockquote type="cite"
-      cite="mid:7b6a53cb-7591-26dd-2bdc-8d6a0bbb0338@oracle.com">
-      <pre class="moz-quote-pre" wrap="">On 4/15/20 4:35 AM, Jingqi Liu wrote:
-</pre>
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">Add a pair of configure options --{enable,disable}-libdaxctl to control
-whether QEMU is compiled with libdaxctl [1]. Libdaxctl is a utility
-library for managing the device dax subsystem.
-
-QEMU uses mmap(2) to maps vNVDIMM backends and aligns the mapping
-address to the page size (getpagesize(2)) by default. However, some
-types of backends may require an alignment different than the page
-size. The 'align' option is provided to memory-backend-file to allow
-users to specify the proper alignment.
-
-For device dax (e.g., /dev/dax0.0), the 'align' option needs to match
-the alignment requirement of the device dax, which can be fetched
-through the libdaxctl APIs.
-
-[1] Libdaxctl is a part of ndctl project.
-The project's repository is: <a class="moz-txt-link-freetext" href="https://github.com/pmem/ndctl">https://github.com/pmem/ndctl</a>
-
-For more information about libdaxctl APIs, you can refer to the
-comments in source code of: pmem/ndctl/daxctl/lib/libdaxctl.c.
-
-Signed-off-by: Jingqi Liu <a class="moz-txt-link-rfc2396E" href="mailto:jingqi.liu@intel.com">&lt;jingqi.liu@intel.com&gt;</a>
----
- configure | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
-
-diff --git a/configure b/configure
-index e225a1e3ff..df1752cf08 100755
---- a/configure
-+++ b/configure
-@@ -509,6 +509,7 @@ libpmem=""
- default_devices="yes"
- plugins="no"
- fuzzing="no"
-+libdaxctl=""
- 
- supported_cpu="no"
- supported_os="no"
-@@ -1601,6 +1602,10 @@ for opt do
-   ;;
-   --gdb=*) gdb_bin="$optarg"
-   ;;
-+  --enable-libdaxctl) libdaxctl=yes
-+  ;;
-+  --disable-libdaxctl) libdaxctl=no
-+  ;;
-   *)
-       echo "ERROR: unknown option $opt"
-       echo "Try '$0 --help' for more information"
-@@ -1894,6 +1899,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   debug-mutex     mutex debugging support
-   libpmem         libpmem support
-   xkbcommon       xkbcommon support
-+  libdaxctl       libdaxctl support
- 
- NOTE: The object files are built at the place where configure is launched
- EOF
-@@ -6190,6 +6196,25 @@ if test "$libpmem" != "no"; then
- 	fi
- fi
- 
-+##########################################
-+# check for libdaxctl
-+
-+if test "$libdaxctl" != "no"; then
-+	if $pkg_config --exists "libdaxctl"; then
-+		libdaxctl="yes"
-+		libdaxctl_libs=$($pkg_config --libs libdaxctl)
-+		libdaxctl_cflags=$($pkg_config --cflags libdaxctl)
-+		libs_softmmu="$libs_softmmu $libdaxctl_libs"
-+		QEMU_CFLAGS="$QEMU_CFLAGS $libdaxctl_cflags"
-+	else
-+		if test "$libdaxctl" = "yes" ; then
-+			feature_not_found "libdaxctl" "Install libdaxctl"
-+		fi
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-Region iteration APIs, align and path getter routines are only available since
-libdaxctl v56/v57 (the latest is v68).
-
-Not sure how likely this happens in today's distros but if we care about systems
-with &lt; v57 we should probably check that
-daxctl_region_foreach/daxctl_region_get_align/daxctl_region_get_path symbols
-exist? Or alternatively requiring v57 or up which serves as a bandage, but more
-long term ... any usage of newer daxctl APIs will require the former.
-</pre>
-    </blockquote>
-    <pre>Thanks for your suggestion.
-Better to require v57 or up. 
-How about adding the following check:
-+       if $pkg_config --atleast-version=57 "libdaxctl"; then
-
-
-Jingqi
-</pre>
-  </body>
-</html>
-
---------------4264F1F39D4D5103731A4369--
 
