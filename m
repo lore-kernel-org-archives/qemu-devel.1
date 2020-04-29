@@ -2,84 +2,87 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28FF0C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CABEC83004
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:41:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E224E2073E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:40:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29C972073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:41:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FLm0doXr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E224E2073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="fTFgwSqe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29C972073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jThKB-0004ta-0U
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:40:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46252)
+	id 1jThLb-0006Jv-5i
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:41:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46776)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jTh27-0007uG-8H
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:22:35 -0400
+ (envelope-from <luc.michel@greensocs.com>) id 1jTh6O-0007vG-Js
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:26:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jTh1i-0003zN-MI
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:21:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31206
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jTh1h-0003uf-IT
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:21:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588144857;
+ (envelope-from <luc.michel@greensocs.com>) id 1jTh6H-00072K-Km
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:25:52 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:57170)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
+ id 1jTh4Q-0005bj-O7; Wed, 29 Apr 2020 03:23:50 -0400
+Received: from [172.17.10.6] (unknown [172.17.10.6])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 9AE0C96EF2;
+ Wed, 29 Apr 2020 07:23:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1588145029;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ARsxO36GYr/5NC74E6ItLer6/hyG11wa9m/wl3IdRbI=;
- b=FLm0doXrB3X2HO92y8Kwl0zTgccp+/hHd8ZrWQK8PXIb4ifY/IH1UC1HJKPtNFlgAdD8+F
- ztw+Gb9aml48074+9LLOgIh2kvLZCQHXVTrCUKmCXrtvtCqq8VKW39H4bN7+FDYxgHwTJE
- AMHPyZgMX9c5uFWpUU5x6vlXdNyxRTY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-0a0jWyUZOZ2y_NQq2XFQHw-1; Wed, 29 Apr 2020 03:20:54 -0400
-X-MC-Unique: 0a0jWyUZOZ2y_NQq2XFQHw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD69C8015CE;
- Wed, 29 Apr 2020 07:20:53 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 815721000329;
- Wed, 29 Apr 2020 07:20:53 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 47D3311358D2; Wed, 29 Apr 2020 09:20:49 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 21/32] migration/colo: Fix qmp_xen_colo_do_checkpoint() error
- handling
-Date: Wed, 29 Apr 2020 09:20:37 +0200
-Message-Id: <20200429072048.29963-22-armbru@redhat.com>
-In-Reply-To: <20200429072048.29963-1-armbru@redhat.com>
-References: <20200429072048.29963-1-armbru@redhat.com>
+ bh=RgZxt7m47Azwf4GwDjyuYY/Lnebn+TdybSEDtuCUIfg=;
+ b=fTFgwSqe+rKtbFJbLmR/pNdiQxlB8PRXQCbNH30DPrdIaqL7j21l4eMAa1qfcK8R6hsqVz
+ qhRuQTBwYJtXCJnvcuNYJ+pxYJtPtNF8HfskZfwqKoW6Ll/x8XMnv0mq+EJG68WKPflj2/
+ 711ZDaFZueSCkCVeDnsTsNh0ea2CuPs=
+Subject: Re: [PATCH v1 02/11] hw/arm: versal: Move misplaced comment
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
+References: <20200427181649.26851-1-edgar.iglesias@gmail.com>
+ <20200427181649.26851-3-edgar.iglesias@gmail.com>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <43668463-c08d-533c-d296-5e5c1c877483@greensocs.com>
+Date: Wed, 29 Apr 2020 09:23:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+In-Reply-To: <20200427181649.26851-3-edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1588145029;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RgZxt7m47Azwf4GwDjyuYY/Lnebn+TdybSEDtuCUIfg=;
+ b=YHbqWQlJBnDfX8Fs6ygxa1hNozDh5+/pMYI52KB0QZU8wuA9L5F/k6fjIpMWF4f1VfJL73
+ luQtvbfiXR3t5kWl9Le6JcBMWfSa602HEVqq/OdE6j8BpBHQ8DUc/2gMx1R/GKzCVoHMpo
+ ioxOw4bv/u84sGcRwkDmn7Sl3KejLjs=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1588145029; a=rsa-sha256; cv=none;
+ b=tQvGiAIrn3B9B9rHfjskBY7s0ZELb+VSNPwyJeaqlpz9aiOyfZhBMxI7XuVeiNsEz9MRFp
+ e4juZ8T3sZ9vsm2sp05SaDMoLo6pI5AoZgoGpUHgSfD6eZ/PCv3oZBdNhEKYxUHopQ2ccr
+ riO0dcGPS04yJmT6L3V0B7wUfBIQUJI=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=luc smtp.mailfrom=luc.michel@greensocs.com
+Received-SPF: pass client-ip=5.135.226.135;
+ envelope-from=luc.michel@greensocs.com; helo=beetle.greensocs.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 03:23:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,61 +94,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
+ frasse.iglesias@gmail.com, alistair@alistair23.me,
+ richard.henderson@linaro.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Error ** argument must be NULL, &error_abort, &error_fatal, or a
-pointer to a variable containing NULL.  Passing an argument of the
-latter kind twice without clearing it in between is wrong: if the
-first call sets an error, it no longer points to NULL for the second
-call.
+On 4/27/20 8:16 PM, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> 
+> Move misplaced comment.
+> 
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-qmp_xen_colo_do_checkpoint() passes @errp first to
-replication_do_checkpoint_all(), and then to
-colo_notify_filters_event().  If both fail, this will trip the
-assertion in error_setv().
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 
-Similar code in secondary_vm_do_failover() calls
-colo_notify_filters_event() only after replication_do_checkpoint_all()
-succeeded.  Do the same here.
-
-Fixes: 0e8818f023616677416840d6ddc880db8de3c967
-Cc: Zhang Chen <chen.zhang@intel.com>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-Message-Id: <20200422130719.28225-12-armbru@redhat.com>
----
- migration/colo.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/migration/colo.c b/migration/colo.c
-index a54ac84f41..1b3493729b 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -263,7 +263,13 @@ ReplicationStatus *qmp_query_xen_replication_status(Er=
-ror **errp)
-=20
- void qmp_xen_colo_do_checkpoint(Error **errp)
- {
--    replication_do_checkpoint_all(errp);
-+    Error *err =3D NULL;
-+
-+    replication_do_checkpoint_all(&err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-     /* Notify all filters of all NIC to do checkpoint */
-     colo_notify_filters_event(COLO_EVENT_CHECKPOINT, errp);
- }
---=20
-2.21.1
-
+> ---
+>  hw/arm/xlnx-versal.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
+> index c73b2fe755..cc696e44c0 100644
+> --- a/hw/arm/xlnx-versal.c
+> +++ b/hw/arm/xlnx-versal.c
+> @@ -36,7 +36,6 @@ static void versal_create_apu_cpus(Versal *s)
+>  
+>          obj = object_new(XLNX_VERSAL_ACPU_TYPE);
+>          if (!obj) {
+> -            /* Secondary CPUs start in PSCI powered-down state */
+>              error_report("Unable to create apu.cpu[%d] of type %s",
+>                           i, XLNX_VERSAL_ACPU_TYPE);
+>              exit(EXIT_FAILURE);
+> @@ -49,6 +48,7 @@ static void versal_create_apu_cpus(Versal *s)
+>          object_property_set_int(obj, s->cfg.psci_conduit,
+>                                  "psci-conduit", &error_abort);
+>          if (i) {
+> +            /* Secondary CPUs start in PSCI powered-down state */
+>              object_property_set_bool(obj, true,
+>                                       "start-powered-off", &error_abort);
+>          }
+> 
 
