@@ -2,103 +2,83 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCAD5C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:31:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3BF5C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:32:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47DD920731
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:31:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BA9A20731
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:32:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dFtrgc9r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47DD920731
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AWo0qaF2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BA9A20731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTj3U-00014j-GL
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 05:31:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34006)
+	id 1jTj4S-0001y4-9F
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 05:32:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34042)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTj2l-0000Ya-4r
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:30:15 -0400
+ (envelope-from <stefanha@redhat.com>) id 1jTj3H-000130-4N
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:30:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTj2k-0007Gr-IW
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:30:14 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39517)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTj2k-0007Fx-3P
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:30:14 -0400
-Received: by mail-wm1-x344.google.com with SMTP id y24so1231919wma.4
- for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 02:30:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=4QGJae0BCqMZU2OL7B8SvOTCFE3T5r49zHG+H+abWMM=;
- b=dFtrgc9rP4dnQ4j5qLYC1xAEBsq2dZ6R/mpg1d0TVBLRQidkGd/hA02CEiVVywKJVF
- pVROMtP2corngwM5Ytna4QjgWUwfXRP9WaSgX/3I7CWa3abiBZaEiV0M1WB+N8r8+jL5
- KG0H+q5MQ5UiIVgou5HxdX2+altUoxQmtE+hk5Kj9dzM5ds2w8K/vgyD5rw5uJGnQF+y
- vG+6bxE9JT6mCZJXqV3JHh6dDVfWrjgPEnY3VI8vfblXSaqjaYKBZF7ecZaj8aDhX/ok
- Wd6UJW312UPLPx8Z2UniP6poFnATbC8Vp1kNQgKR3rNxXtXxaaAEG6nGE+Vx2tqWwHsE
- PwZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=4QGJae0BCqMZU2OL7B8SvOTCFE3T5r49zHG+H+abWMM=;
- b=AzJ5R5VNCVLHdmOwXMX9gMCgtW1N2JAyQ67hqO9dDKXEC7u5LljnC6MNGryocdSZbF
- R8uEG+tw26xznO3s1ogAhM+W2+/+PsvL3qJHYjXnalmT7D8b+qq1GS2RtcgFw2FcuHtg
- YCZz3zJR2XxPLVT3J1gvQ+KDHyeQK4B+7O+kug85I2obWMuLPQ51qHPY9imN/Kcpz2u2
- NgzCvwkHI0TyImUfCQLqAt0fwBemUkZWCDEKcrqFpP/5Tzw6WIGb+0q0kLAKrVK9Yb/g
- kvQvkLlUXX7AbPfrq1QKXtdraOYuQS23yiJqz6TWrPMyBQRhEJBcwxNs83Y07Nlgldm9
- tPVQ==
-X-Gm-Message-State: AGi0PuaSDoujaSycFBMyqrVY2AjT5/hGnZ1qg3ZplFiFDXU2hqflhAN8
- 0Uev/SIAqxLjDBRxyGgnar8=
-X-Google-Smtp-Source: APiQypKm9VkOKxwGR82ZGcncPN7oiNJzI4dwkK+Us58cAz564/RE4AOXMV8n1yQTRDSKWopJc5BLoA==
-X-Received: by 2002:a1c:4b0a:: with SMTP id y10mr2167409wma.24.1588152612786; 
- Wed, 29 Apr 2020 02:30:12 -0700 (PDT)
-Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.137])
- by smtp.gmail.com with ESMTPSA id q18sm6519769wmj.11.2020.04.29.02.30.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 29 Apr 2020 02:30:12 -0700 (PDT)
-Subject: Re: [PATCH for-5.1 4/7] target/mips: Add Loongson-3 CPU definition
-To: Huacai Chen <chenhuacai@gmail.com>
-References: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
- <1587979995-17717-4-git-send-email-chenhc@lemote.com>
- <c1a3aec6-dc45-3484-3a70-c06449bee609@amsat.org>
- <CABDp7Vq-YX0LWU3iM=oygpcKzoS8cmXG6mvTQ5Gm_PbQsQMAgw@mail.gmail.com>
- <CAHiYmc6zFjBtgXRv=8+dqnbDtZqKqiwSDwEi0wKqJmJnys_y0g@mail.gmail.com>
- <CAAhV-H6NFV7hbaOp8BwPck3FWm5ZHBpuoA9FDmN6tby5LcoTeg@mail.gmail.com>
- <a791f90b-a2a5-6665-59b5-212f98c7afc8@amsat.org>
- <CAAhV-H7NS_KCTuYQYvZeseNEZh56FBFz97kEj4KK-NsBDMJotQ@mail.gmail.com>
- <a1b333c6-e9a0-aabc-9ec2-b9bcb2007211@amsat.org>
- <CAAhV-H5_0Nn-omF+_+6T1mbtnFC-3VHTOgvAPfbc44Fnv0px_Q@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c133fe4a-03a9-c3c5-540b-31fd0283d62d@amsat.org>
-Date: Wed, 29 Apr 2020 11:30:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <stefanha@redhat.com>) id 1jTj3G-0007Sj-AE
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:30:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33697
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jTj3F-0007Sc-SP
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:30:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588152645;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=yMN3EEndEJnm147G0ZrXJChXQsQJD92uKUFbscyR0K0=;
+ b=AWo0qaF2J2E9GtHb2+V+h7ClDPBDdUMZutJ+tD706MNug2zscfFnUk0uFgi1X5JGFwSIIa
+ hdmV+ORCBuumyuiG6rvA8JeYHINkkWBj0ojpO5oqHHe7vkzNo4qT0XPBFFi8nTrvD2jhpZ
+ vOi9DgoP4KFS/35ObFYV+IVrlSK7ueY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-420-DKjDGLk5PC-JBkr4-QQ_eQ-1; Wed, 29 Apr 2020 05:30:41 -0400
+X-MC-Unique: DKjDGLk5PC-JBkr4-QQ_eQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 250FD84B8A1;
+ Wed, 29 Apr 2020 09:30:39 +0000 (UTC)
+Received: from localhost (ovpn-114-2.ams2.redhat.com [10.36.114.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 931D019634;
+ Wed, 29 Apr 2020 09:30:31 +0000 (UTC)
+Date: Wed, 29 Apr 2020 10:30:30 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH RESEND v6 00/36] Initial support for multi-process qemu
+Message-ID: <20200429093030.GD122432@stefanha-x1.localdomain>
+References: <cover.1587614626.git.elena.ufimtseva@oracle.com>
+ <20200428172920.GA111124@stefanha-x1.localdomain>
+ <20200428134350-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H5_0Nn-omF+_+6T1mbtnFC-3VHTOgvAPfbc44Fnv0px_Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::344
+In-Reply-To: <20200428134350-mutt-send-email-mst@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="5gxpn/Q6ypwruk0T"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,142 +90,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: chen huacai <zltjiangshi@gmail.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- qemu-level <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ jag.raman@oracle.com, quintela@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, thanos.makatos@nutanix.com, rth@twiddle.net,
+ kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/29/20 11:25 AM, Huacai Chen wrote:
-> Hi, Philippe,
-> 
-> I think that this CPU definition is for Guest, not for Host (Maybe I'm wrong?).
+--5gxpn/Q6ypwruk0T
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-OK, it was not obvious to me (I haven't received the cover letter of 
-this series).
-The code you modified is used by both host emulation and guest 
-virtualization.
+On Tue, Apr 28, 2020 at 01:47:24PM -0400, Michael S. Tsirkin wrote:
+> On Tue, Apr 28, 2020 at 06:29:20PM +0100, Stefan Hajnoczi wrote:
+> > On Wed, Apr 22, 2020 at 09:13:35PM -0700, elena.ufimtseva@oracle.com wr=
+ote:
+> > > We will post separate patchsets for the following improvements for
+> > > the experimental Qemu multi-process:
+> > >  - Live migration;
+> > >  - Asynchronous communication channel;
+> > >  - Libvirt support;
+> > >=20
+> > > We welcome all your ideas, concerns, and questions for this patchset.
+> >=20
+> > This patch series does two things:
+> > 1. It introduces the remote device infrastructure.
+> > 2. It creates the remote device program and the associated build change=
+s
+> >    (makefiles, stubs, etc).
+> >=20
+> > There are many patches and it's likely that a bunch more revisions will
+> > be necessary before this can be merged.
+> >=20
+> > I want to share an idea to reduce the scope and get patches merged more
+> > quickly.  It looks like the series can be reduced to 21 patches using
+> > this approach.
+> >=20
+> > I suggest dropping the remote device program from this patch series (an=
+d
+> > maybe never bringing it back).  Instead, use the softmmu target for the
+> > remote device.
+> >=20
+> > Why?  Because the remote device program is just a QEMU that uses the
+> > remote machine type and has no vCPUs:
+> >=20
+> >   $ qemu-system-x86_64 -chardev id=3Dchar0,... \
+> >                        -M remote,chardev=3Dchar0 \
+> > =09=09       -device lsi53c810 \
+> > =09=09       -drive if=3Dnone,id=3Ddrive0,file=3Dvm.img,format=3Draw \
+> > =09=09       -device scsi-hd,drive=3Ddrive0
+> >=20
+> > This will use the remote machine type, interrupt controller, and PCI bu=
+s
+> > that you have created.
+> >=20
+> > The remote machine type should default to no vCPUs and no memory
+> > creation (the memory comes via the mpqemu link communications channel).
+> >=20
+> > At this point qemu-system-x86_64 contains a lot of code that you don't
+> > want in the final remote device program.  Let's ignore that for a
+> > second.
+> >=20
+> > Now you can submit a 21-patch series containing just the remote device
+> > infrastructure.  This will be easier to merge.
+> >=20
+> > Returning to code size, the next step is to reduce the binary.  QEMU ha=
+s
+> > a Kconfig-style system for optional features and dependencies.  It's a
+> > better approach than creating a separate make target because it
+> > eliminates the duplication and mess in the makefiles.
+> >=20
+> > For example, you can disable TCG and KVM so that your binary has no
+> > ability to execute guest code.  Currently ./configure disallows this bu=
+t
+> > I've tried it and it works.
+> >=20
+> > You can add a new default-configs/ file that disables CONFIG_ISAPC,
+> > CONFIG_I440FX, etc.  When you compile QEMU most of hw/ will not be buil=
+t
+> > anymore.  At this point you have a smaller binary that is still a
+> > softmmu target so the makefiles are shared with the regular
+> > qemu-system-x86_64.
+> >=20
+> > There will be some code for which there is no Kconfig option yet.
+> > Further improvements can be made by adding Kconfig options for any code
+> > that you wish to eliminate.  Instead of writing makefile changes like
+> > you did in this patch series you would be adding Kconfig options.  The
+> > nice thing is that this work isn't specific to the remote device progra=
+m
+> > - anyone can use the new Kconfig options to reduce the size of their
+> > QEMU.  So not only is it less messy than duplicating the makefiles,
+> > but it also benefits everyone.
+> >=20
+> > The downside to doing this is that it will take a while to eliminate al=
+l
+> > code that you don't want via Kconfig.  However, your initial patch
+> > series can be merged sooner and I think this direction is also cleaner.
+> >=20
+> > I hope I've explained the idea properly :).  We can continue reviewing
+> > the current series if you prefer, but I think it would be quicker to
+> > drop the remote device program.
+> >=20
+> > Stefan
+>=20
+> Building QEMU twices just to get the remote is however not very
+> attractive. So how about making remote a special target?
+> Either remote-softmmu/ or if impossible x86_64-remote-softmmu/
 
-If you want to only add a guest cpu type, you should name it 
-"Loongson-3A virtualized" and can restrict with:
+Yes, that's a good idea.  It needs to be the full x86_64-remote-softmmu
+because hw/ code depends on the QEMU target :(.
 
-   if (kvm_enabled()) {
-     add_guest_cpu();
-   }
+To summarize the big advantage of this approach (besides reducing the
+patch series): the existing makefile rules for softmmu will be used to
+build the remote device program.  No new main() and no new per-object
+file makefile rules are needed.
 
-But cleaner is to add the host cpu regardless, and in cpu_state_reset() 
-restrict when virtualized:
+Stefan
 
-   if (kvm_enabled()) {
-     /* disable host features on guest */
-     env->CP0_Config3 &= ~CP0C3_VZ;
-     ...
-   }
+--5gxpn/Q6ypwruk0T
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> 
-> On Wed, Apr 29, 2020 at 4:58 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>
->> On 4/29/20 10:27 AM, Huacai Chen wrote:
->>> Hi, Philippe,
->>>
->>> The major differences of R3 and R4 are:
->>> 1, R4 has complete MIPS VZ ASE (while R3 is incomplete), so very
->>> usable for KVM host;
->>
->> So you need to set CP0C3_VZ.
-> If the definition is for Guest, I think CP0C3_VZ should not be set in
-> CP0_Config3, because only the Host can see VZ ASE.
-> 
->>
->>> 2, R4 has MSA ASE while R3 hasn't;
->>
->> So you need to set CP0C5_MSAEn.
-> I have already set CP0C5_MSAEn CP0_Config5_rw_bitmask, but I don't
-> think it should be set in CP0_Config5 because MSA is disabled by
-> default.
-> 
->>
->>> 3, R4 has cpucfg, rdcsr and wrcsr instructions (similar to cpuid,
->>> rdmsr and wrmsr in X86).
->>
->> OK, these are not implemented.
+-----BEGIN PGP SIGNATURE-----
 
-I was looking at TCG emulation, now I understand why you don't mind 
-about them there.
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6pSTYACgkQnKSrs4Gr
+c8j7CAgAuWdwtEkdK5iLwIPIvRpUZoCq/fcFAEyQx4eT53IT2J7IQJhx26+RliXO
+4UhZv+l/50d7Wt1MIrIkqv9Htck9peAbzjjsw9Y/0lZP3kmC/XpTnpzOJIfwE1Bk
+Jl8c+1zXjWFYg/pLlOiZ01Qifk/ex9JbrcOMNIY9EVNDAsKUxirdPTIVEd2Uy7YZ
+LOzAwUWgqnsA9Oe3opq/UR43AHYira3JoxqrJotVDVbRmtrpId5FNUXj9Zx3/KYb
+GKl/jqMIRaLOfv/xfLSr68jsbwHpcP0WDuoppOwlcqs+1PMgjlBaZuK1u4lyZfsf
+Mb2kvVdTs19r9DjeJJzL5H4416RBTA==
+=GLEm
+-----END PGP SIGNATURE-----
 
->>
->> [...]
->>
->>>>>>>>> diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
->>>>>>>>> index 6d145a9..a32412d 100644
->>>>>>>>> --- a/target/mips/translate_init.inc.c
->>>>>>>>> +++ b/target/mips/translate_init.inc.c
->>>>>>>>> @@ -802,6 +802,57 @@ const mips_def_t mips_defs[] =
->>>>>>>>>             .mmu_type = MMU_TYPE_R4000,
->>>>>>>>>         },
->>>>>>>>>         {
->>>>>>>>> +        .name = "Loongson-3A",
->>>>>>>>> +        .CP0_PRid = 0x14C000,
->>>>>>>>> +        /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
->>>>>>>>> +        .CP0_Config0 = MIPS_CONFIG0 | (0x1 << CP0C0_AR) | (0x2 << CP0C0_AT) |
->>>>>>>>> +                       (MMU_TYPE_R4000 << CP0C0_MT),
->>>>>>>>> +        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << CP0C1_MMU) |
->>>>>>>>> +                       (2 << CP0C1_IS) | (4 << CP0C1_IL) | (3 << CP0C1_IA) |
->>>>>>>>> +                       (2 << CP0C1_DS) | (4 << CP0C1_DL) | (3 << CP0C1_DA) |
->>>>>>>>> +                       (1 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << CP0C1_EP),
->>>>>>>>> +        .CP0_Config2 = MIPS_CONFIG2,
->>>>>>>>> +        .CP0_Config3 = MIPS_CONFIG3 | (1U << CP0C3_M) | (1 << CP0C3_MSAP) |
->>>>>>>>> +                       (1 << CP0C3_BP) | (1 << CP0C3_BI) | (1 << CP0C3_ULRI) |
->>>>>>>>> +                       (1 << CP0C3_RXI) | (1 << CP0C3_LPA) | (1 << CP0C3_VInt),
->>>>>>>>> +        .CP0_Config4 = MIPS_CONFIG4 | (1U << CP0C4_M) | (2 << CP0C4_IE) |
->>>>>>>>> +                       (1 << CP0C4_AE) | (0x1c << CP0C4_KScrExist),
->>>>>>>>> +        .CP0_Config4_rw_bitmask = 0,
->>>>>>>>> +        .CP0_Config5 = MIPS_CONFIG5 | (1 << CP0C5_NFExists) | (1 << 18),
->>>>>>>>> +        .CP0_Config5_rw_bitmask = (1 << CP0C5_K) | (1 << CP0C5_CV) |
->>>>>>>>> +                                  (1 << CP0C5_MSAEn) | (1 << CP0C5_UFE) |
->>>>>>>>> +                                  (1 << CP0C5_FRE) | (1 << CP0C5_SBRI),
->>>>>>>>> +        .CP0_Config6 = (1 << CP0C6_VCLRU) | (1 << CP0C6_DCLRU) | (1 << CP0C6_SFBEN) |
->>>>>>>>> +                       (1 << CP0C6_FLTINT) | (1 << CP0C6_INSTPREF) | (1 << CP0C6_DATAPREF),
->>>>>>>>> +        .CP0_Config6_rw_bitmask = (1 << CP0C6_BPPASS) | (0x3f << CP0C6_KPOS) |
->>>>>>>>> +                                  (1 << CP0C6_KE) | (1 << CP0C6_VTLBONLY) | (1 << CP0C6_LASX) |
->>>>>>>>> +                                  (1 << CP0C6_SSEN) | (1 << CP0C6_DISDRTIME) |
->>>>>>>>> +                                  (1 << CP0C6_PIXNUEN) | (1 << CP0C6_SCRAND) |
->>>>>>>>> +                                  (1 << CP0C6_LLEXCEN) | (1 << CP0C6_DISVC) |
->>>>>>>>> +                                  (1 << CP0C6_VCLRU) | (1 << CP0C6_DCLRU) |
->>>>>>>>> +                                  (1 << CP0C6_PIXUEN) | (1 << CP0C6_DISBLKLYEN) |
->>>>>>>>> +                                  (1 << CP0C6_UMEMUALEN) | (1 << CP0C6_SFBEN) |
->>>>>>>>> +                                  (1 << CP0C6_FLTINT) | (1 << CP0C6_VLTINT) |
->>>>>>>>> +                                  (1 << CP0C6_DISBTB) | (3 << CP0C6_STPREFCTL) |
->>>>>>>>> +                                  (1 << CP0C6_INSTPREF) | (1 << CP0C6_DATAPREF),
->>>>>>>>> +        .CP0_Config7 = 0,
->>>>>>>>> +        .CP0_Config7_rw_bitmask = (1 << CP0C7_NAPCGEN) | (1 << CP0C7_UNIMUEN) | \
->>>>>>>>> +                                  (1 << CP0C7_VFPUCGEN),
->>>>>>>>> +        .CP0_LLAddr_rw_bitmask = 1,
->>>>>>>>> +        .SYNCI_Step = 16,
->>>>>>>>> +        .CCRes = 2,
->>>>>>>>> +        .CP0_Status_rw_bitmask = 0x7DDBFFFF,
->>>>>>>>> +        .CP0_PageGrain_rw_bitmask = (1U << CP0PG_RIE) | (1 << CP0PG_XIE) |
->>>>>>>>> +                    (1 << CP0PG_ELPA) | (1 << CP0PG_IEC),
->>>>>>>>> +        .CP1_fcr0 = (0x5 << FCR0_PRID) | (0x1 << FCR0_REV) | (0x1 << FCR0_F64),
->>>>>>>>> +        .CP1_fcr31 = 0,
->>>>>>>>> +        .CP1_fcr31_rw_bitmask = 0xFF83FFFF,
->>>>>>>>> +        .SEGBITS = 48,
->>>>>>>>> +        .PABITS = 48,
->>>>>>>>> +        .insn_flags = CPU_LOONGSON3A,
->>>>>>>>> +        .mmu_type = MMU_TYPE_R4000,
->>>>>>>>> +    },
->>>>>>>>> +    {
->>>>>>>>>             /* A generic CPU providing MIPS64 DSP R2 ASE features.
->>>>>>>>>                FIXME: Eventually this should be replaced by a real CPU model. */
->>>>>>>>>             .name = "mips64dspr2",
->>>>>>>>>
->>>>>>>
->>>>>>>
->>>>>>>
->>>>>>> --
->>>>>>> Huacai Chen
->>>>>
->>>
-> 
+--5gxpn/Q6ypwruk0T--
+
 
