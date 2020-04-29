@@ -2,82 +2,84 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB51C83000
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:38:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1828C83007
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:38:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37CF0206D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:38:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D81D206D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:38:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nFGYIp7b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37CF0206D9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mxt4Lsa7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D81D206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTtTW-0002kw-AA
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:38:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53784)
+	id 1jTtTX-0002nm-Ml
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:38:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53802)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTtOi-0007rI-Ah
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:37:19 -0400
+ id 1jTtOj-0007sY-2w
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:37:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTtO3-0005vf-3e
+ id 1jTtO3-00060Z-KU
  for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:33:36 -0400
 Received: from esa4.hgst.iphmx.com ([216.71.154.42]:7545)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTtJx-00065g-CN; Wed, 29 Apr 2020 16:28:42 -0400
+ id 1jTtJz-00065g-0R; Wed, 29 Apr 2020 16:28:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1588192121; x=1619728121;
- h=from:to:cc:subject:date:message-id:mime-version:
- content-transfer-encoding;
- bh=FJkl9Hbgys0eb3sfQF3l+EdkuBfAEQQRKAr1946F++g=;
- b=nFGYIp7bWEdBHWtKdZdRap2fTop/MnzGhlDSC7YgajmeeyJsSVY4VTsD
- bGGHyZqiHakvTqiZl+SY6m9AiQOMTP/JfkDweyt5zI2H5ae3JZ3Z2cVe8
- nZ2RFVmpf0HIrdFw9c15/NG/7H9IKO5ZjPtNRsXtqhPNHlgY8BIY2/Tsb
- oggOJvBRlEIJ1yFOFF/p1NEpkQXk5Hyz+3h2OwAHkp2TGmgDQNah6oOqQ
- dQvFFSPkVktLxTc3+mwJaX7O1T+HZLkVhd8YjAG2bCH2wAkU3vzOtzOsH
- 6qqpczKe9/JQ2WQi0skzTBoOfDtNRFMwB7WFTLZXyGOvcWhNs2tWiMXIl g==;
-IronPort-SDR: ulywGUWNMtt3LY1f47kLUIn5PFpzxw/gx05FLJXmhy6S5kTO38uOxC5RICpSThfK8Y41WoP2m1
- 0n/0ChWyhLSBt8NDjJZyFCrWLDcOYElQPpn8lJDljvZduvMgzQpg8LzqNFPbf6YEl9UIPn9hR7
- WurZT4J71VfLGl144VkMVFQryjceVeOAOs4OT44ft/6qcksvD8dC+bZquJOOvSUSoqP8FeCXgq
- Ggpx+/jYrdiHre0iBX9n39v1QnaJSqMse/xgBVqViKRKs5uHSigPWb7zbexyuZXsS76IBUpxvY
- htY=
-X-IronPort-AV: E=Sophos;i="5.73,333,1583164800"; d="scan'208";a="136507030"
+ t=1588192122; x=1619728122;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=Xc2HQz6O5RjSlw99rYqvdA4/cNZgeA5W0cIUaqMOKPk=;
+ b=mxt4Lsa7vFG1izcTzqB8PdJLwA7FdwzvcNE9Id4KtzU1AAjGRQVhKHFk
+ Ec3ofYHvP4xfVt1ns1efXDikAOira+dnnoDQ71LoTDFtWTH1s24H0tXTs
+ NdQHq54yhNH9Gg7Kwocbl1+K+fM5PnXJ5fsMsWI4TPuVr0xXyUmqHorgG
+ z/tAjPHXQ0XE+7mR77awM99A7Z4zuohON8k+yMRzG/dhWoGTz9fEok4Pt
+ afrqqBR+6L9vaGLGA+fSrC+EmM6QdUAGpe2r2szv6Ru3/ZuwsCOdcZKOW
+ bKzhIsTFZXG2rnzXpMcLGVwozeHJIpO7leib60x8W6SHKWGlX1s/GpIVg A==;
+IronPort-SDR: sn1OlBLTXEzHxB5o+lRfZjlw9sqOCi632DUimphyfWuZX6+2Ez7oYO5qW5yk6FvP5/HtmtHhwk
+ 7tZiFjyoQXs9QyuV0yQT5v+wzkjII1wGhp0KI7d8ZVNsMs2DH/epmCB6YFyGuoOclop3Hf7+s+
+ YSwuFFpz0NbDvulZO1hL9PAoaJwcRN6SKGfx2AmOlnCKm2s3MI8QIuwNsH5y9r7Rh0ZwQj0C7q
+ iPCVkvoRyJvI0g3CxnmdqAkl/Bj91a7MBZ7VX/XX/QPqNjsxO7dYgLwTLd24b7vDxo1p+3JDrj
+ AuE=
+X-IronPort-AV: E=Sophos;i="5.73,333,1583164800"; d="scan'208";a="136507033"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 04:28:37 +0800
-IronPort-SDR: ivRKSTrY6I7XGiDAq91CPMHX0OgXLIuf3U/4lmXDo+KAvUsaMM44g5c6k8IwFelOfqnGUtTzaH
- dsO97CyM+7bqrFQsZ4qK0y5ALaVldjmOY=
+ by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 04:28:38 +0800
+IronPort-SDR: toGsanGXqjnwkB5s/kFbSnJuLDjV+ETwDSsycaPkfKQO+dHx/AVfBeWMkMa/sTUkuIZU/UKHZi
+ GP9LQt7k5Lhao1ypr45q7kNjxL3EErpWY=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Apr 2020 13:18:41 -0700
-IronPort-SDR: WJ1PtoS4mKBWGJn3kA25ZUO4apDazX6Zkh23QLFXAZQ1fcUSRftFVLLwdHuFiQYe2KsSEDjUIE
- PoN4EypCzPrA==
+ 29 Apr 2020 13:18:42 -0700
+IronPort-SDR: p+xBYG0V2x0r7UL7YqejYEwL0XAu726qpR8mw5NITv8vpGPKdV4plyk33ALfgsFtlqbiaV8XR7
+ QBLBvSrCccbg==
 WDCIronportException: Internal
 Received: from usa004631.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.56.145])
- by uls-op-cesaip01.wdc.com with ESMTP; 29 Apr 2020 13:28:37 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 29 Apr 2020 13:28:38 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 00/14] RISC-V Patch Queue for 5.1
-Date: Wed, 29 Apr 2020 13:19:52 -0700
-Message-Id: <20200429202006.775322-1-alistair.francis@wdc.com>
+Subject: [PULL v2 03/14] riscv/sifive_u: Add a serial property to the sifive_u
+ machine
+Date: Wed, 29 Apr 2020 13:19:55 -0700
+Message-Id: <20200429202006.775322-4-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200429202006.775322-1-alistair.francis@wdc.com>
+References: <20200429202006.775322-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.71.154.42;
  envelope-from=prvs=381fbd49e=alistair.francis@wdc.com;
@@ -97,72 +99,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Alistair Francis <alistair.francis@wdc.com>, palmerdabbelt@google.com,
- qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Bin Meng <bmeng.cn@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 648db19685b7030aa558a4ddbd3a8e53d8c9a062:
+From: Bin Meng <bmeng.cn@gmail.com>
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-misc-2020-04-29' into staging (2020-04-29 15:07:33 +0100)
+At present the board serial number is hard-coded to 1, and passed
+to OTP model during initialization. Firmware (FSBL, U-Boot) uses
+the serial number to generate a unique MAC address for the on-chip
+ethernet controller. When multiple QEMU 'sifive_u' instances are
+created and connected to the same subnet, they all have the same
+MAC address hence it creates a unusable network.
 
-are available in the Git repository at:
+A new "serial" property is introduced to specify the board serial
+number. When not given, the default serial number 1 is used.
 
-  git@github.com:alistair23/qemu.git tags/pull-riscv-to-apply-20200429-2
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <1573916930-19068-1-git-send-email-bmeng.cn@gmail.com>
+[ Changed by AF:
+ - Use the SoC's serial property to pass the info to the SoC
+ - Fixup commit title
+ - Rebase on file restructuring
+]
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ hw/riscv/sifive_u.c         | 20 ++++++++++++++++++++
+ include/hw/riscv/sifive_u.h |  1 +
+ 2 files changed, 21 insertions(+)
 
-for you to fetch changes up to 31e6d70485b1a719ca27e9a2d21f2a61ac497cdf:
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 6e659e986f..8d0ee8b9c4 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -34,6 +34,7 @@
+ #include "qemu/log.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
++#include "qapi/visitor.h"
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+ #include "hw/sysbus.h"
+@@ -326,6 +327,8 @@ static void sifive_u_machine_init(MachineState *machine)
+     object_initialize_child(OBJECT(machine), "soc", &s->soc,
+                             sizeof(s->soc), TYPE_RISCV_U_SOC,
+                             &error_abort, NULL);
++    object_property_set_uint(OBJECT(&s->soc), s->serial, "serial",
++                            &error_abort);
+     object_property_set_bool(OBJECT(&s->soc), true, "realized",
+                             &error_abort);
+ 
+@@ -417,6 +420,18 @@ static void sifive_u_machine_set_start_in_flash(Object *obj, bool value, Error *
+     s->start_in_flash = value;
+ }
+ 
++static void sifive_u_machine_get_serial(Object *obj, Visitor *v, const char *name,
++                                void *opaque, Error **errp)
++{
++    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
++}
++
++static void sifive_u_machine_set_serial(Object *obj, Visitor *v, const char *name,
++                                void *opaque, Error **errp)
++{
++    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
++}
++
+ static void sifive_u_machine_instance_init(Object *obj)
+ {
+     SiFiveUState *s = RISCV_U_MACHINE(obj);
+@@ -428,6 +443,11 @@ static void sifive_u_machine_instance_init(Object *obj)
+                                     "Set on to tell QEMU's ROM to jump to "
+                                     "flash. Otherwise QEMU will jump to DRAM",
+                                     NULL);
++
++    s->serial = OTP_SERIAL;
++    object_property_add(obj, "serial", "uint32", sifive_u_machine_get_serial,
++                        sifive_u_machine_set_serial, NULL, &s->serial, NULL);
++    object_property_set_description(obj, "serial", "Board serial number", NULL);
+ }
+ 
+ static void sifive_u_machine_class_init(ObjectClass *oc, void *data)
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index a2baa1de5f..16c297ec5f 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -61,6 +61,7 @@ typedef struct SiFiveUState {
+     int fdt_size;
+ 
+     bool start_in_flash;
++    uint32_t serial;
+ } SiFiveUState;
+ 
+ enum {
+-- 
+2.26.2
 
-  hw/riscv/spike: Allow more than one CPUs (2020-04-29 13:16:38 -0700)
-
-----------------------------------------------------------------
-RISC-V pull request for 5.1
-
-This is the first pull request for the 5.1 development period. It
-contains all of the patches that were sent during the 5.0 timeframe.
-
-This is an assortment of fixes for RISC-V, including fixes for the
-Hypervisor extension, the Spike machine and an update to OpenSBI.
-
-----------------------------------------------------------------
-Alistair Francis (4):
-      riscv/sifive_u: Fix up file ordering
-      riscv/sifive_u: Add a serial property to the sifive_u SoC
-      riscv: Don't use stage-2 PTE lookup protection flags
-      riscv: AND stage-1 and stage-2 protection flags
-
-Anup Patel (4):
-      riscv: Fix Stage2 SV32 page table walk
-      hw/riscv: Add optional symbol callback ptr to riscv_load_firmware()
-      hw/riscv/spike: Allow loading firmware separately using -bios option
-      hw/riscv/spike: Allow more than one CPUs
-
-Bin Meng (3):
-      riscv/sifive_u: Add a serial property to the sifive_u machine
-      hw/riscv: Generate correct "mmu-type" for 32-bit machines
-      roms: opensbi: Upgrade from v0.6 to v0.7
-
-Corey Wharton (2):
-      riscv: sifive_e: Support changing CPU type
-      target/riscv: Add a sifive-e34 cpu type
-
-LIU Zhiwei (1):
-      linux-user/riscv: fix up struct target_ucontext definition
-
- hw/riscv/boot.c                              |  13 ++-
- hw/riscv/sifive_e.c                          |   5 +-
- hw/riscv/sifive_u.c                          | 142 ++++++++++++++++-----------
- hw/riscv/spike.c                             |  30 +++++-
- hw/riscv/virt.c                              |   6 +-
- include/hw/riscv/boot.h                      |   6 +-
- include/hw/riscv/sifive_u.h                  |   3 +
- linux-user/riscv/signal.c                    |   3 +-
- pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin | Bin 49472 -> 49520 bytes
- pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin 41280 -> 49504 bytes
- pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin 53760 -> 57936 bytes
- pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin 49664 -> 57920 bytes
- roms/opensbi                                 |   2 +-
- target/riscv/cpu.c                           |  10 ++
- target/riscv/cpu.h                           |   1 +
- target/riscv/cpu_helper.c                    |  18 ++--
- 16 files changed, 159 insertions(+), 80 deletions(-)
 
