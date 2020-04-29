@@ -2,79 +2,79 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB07AC83000
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF1F8C83004
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:39:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B715B2072A
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:39:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A0BF2072A
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:39:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mz31XhIY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B715B2072A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qGe4F+Gy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A0BF2072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTrbq-0002hd-TU
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 14:39:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37588)
+	id 1jTrbs-0002km-Ld
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 14:39:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37410)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTraU-0000Zc-SX
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:37:40 -0400
+ id 1jTraA-0008J2-Rh
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTraS-0003uN-Qe
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:37:38 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:2049)
+ id 1jTra8-0003Tp-1p
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:37:18 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:2041)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTraQ-0003Ps-M7; Wed, 29 Apr 2020 14:37:34 -0400
+ id 1jTra1-0003PZ-9U; Wed, 29 Apr 2020 14:37:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1588185455; x=1619721455;
+ t=1588185430; x=1619721430;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=tbkmc57R+L0aN9VLZbhIXSvamug7nnx7kvOn3zmvZfk=;
- b=mz31XhIY5E/vWsgAFLOomn2VzqjWolHd362+qrIAmoGibhJUQjuN07SQ
- c+wkQzcF1IbPJKL/kqYuKedH1xPkpHArgIDWecADwuU3uAa+ydmA7jzl+
- +xL/5zXjXDCz39Guia2jPwPZ9UeWC16hwsA6sKpgjoL2O8iRh+HvIwkYZ
- xWZqGK2eMFW+2o7Eucel9Gyh55T/iY/lMefW4DRrdF/VprnsnrD1QN/U4
- BJK2FUFZF0In0IxBAwIWnLD3rGqigwIQ8LSJFh7irhkKJNx4gmxJZcPl+
- yDqBNe+zMriy8f7QronHvSiRDEj1aQIlYAICjq+qaZFsBvAf/RSHITvxt Q==;
-IronPort-SDR: tAFnAgZBtRfSAbsQHi7cpkZ5W1Xfoto/qyqkl75xVRx/lrfCoFil2Vv7twW4vb/qhF7bruV4qk
- 3a+CuSCAz0e3urcruwrOyzcAjnKZ0trye7gs8gBzPfYbsv/aFDpehpnMki5ZPl+JGl4Evs9uYa
- r1g7lJHFm4NcyX2ozzdyEhMrUU1SUrTCN+P1ZTnhbBlWk+URUIbH3eVr9ryseoa4lQ8v4VdB+N
- aGCy32SZGopSGbzdA/xioPEg6Ak1ZF0YO1IAPxWsAQSea8j91DA6/8kVMRvBz9oXFUrna7aWxz
- erk=
-X-IronPort-AV: E=Sophos;i="5.73,332,1583164800"; d="scan'208";a="137935149"
+ bh=dQnv0AWXrAZvSlmsbH49Gt2Jsse2jUj501EULWstkYo=;
+ b=qGe4F+GyK7Ysl6iie/4c7WBlrw+lKLZ/hD8QcFIUBjh0jGdv06NEQVDA
+ trlrI3Jio5mgv4MkYdBAq5Yuw3Z+4cTyAvuah0VyUTe3faFsIuDtM0kMC
+ t9fDjpfR3cvR4u/OOEXTc0HuS+lVPRBmZZIaFL8dqK2g6HeFajh2gLMAe
+ 55728gh+G9NQQKwCzE69OnwgewCFGzHzAP7gFTnaUBXGKP+RULVvZTQbh
+ VR2o1/G/hkc7rkAiH+/GyKIgRuRbWvP7+zvWNlT7Vr+LMoYkslex+sSOW
+ /Q0DZeCfxIv1gg3W8ubS6BIe9/NB561uQCozlHSPW7d2PbNcqqFBt+Lk1 g==;
+IronPort-SDR: rgSO3F5miD5lHbbtOap8JOCl9P1g2Qzf+Tsxx8mGARNuKE6D0drlrdD/hFNs71i+VJrVVmsWY6
+ +P9aa+8ucpoYTpIwbCeby82TrkWx/26gDgWDSmCWnKMpdpgCe0CQYQ2Q/WD1JbFvUyxm5VywBe
+ QaJxdCfoF7n2YG+MSNyUHown9DGr0pr3Jqf821JkwVztEbqoocbxRYZVde5hwGCmKqO00lBpgh
+ CfzkaVtYvlvNh5QcabhvWRY7W0bmAzrm7yJUQc0+3pSQNZm86vFogQknRc0G14b/yohYfBx1fY
+ qgQ=
+X-IronPort-AV: E=Sophos;i="5.73,332,1583164800"; d="scan'208";a="137935128"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 02:37:07 +0800
-IronPort-SDR: imqoSWRzhUVgNpwXzrNF/djgQwWMqMKJ6YFMbbQLRSSfd226rRzpzMJe+Uc8mmp8T4wEOaps3j
- toD5e0A6fGLC6LREiSru3mKce0QZjUkUg=
+ by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 02:37:04 +0800
+IronPort-SDR: jKBlkO6P8KnylH+UIbawlj6puiY1AipcedR8Yk5cavsNpiSxcb5fy1ekEfJRgu7loBXjdYi/Nb
+ MovGAQtj5I3KKWnL0GqMUc+0QEjUJpK/M=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Apr 2020 11:27:11 -0700
-IronPort-SDR: 7wl+mEfBXH9Bh9GC/LqFxh6jl3RugCiQg0KxEwWpjGnY62k6F0CShiq9cbp31kpsME+nkrNdMa
- 2q0T6OOpH/Lw==
+ 29 Apr 2020 11:27:08 -0700
+IronPort-SDR: yjz7qovcvUwPLULOV6wltPLDIu1SWFJV1B3/coKpv4Of/XYY2N71+EE2+XC2IZryS37RKs0xET
+ TH2pU2iUsEMA==
 WDCIronportException: Internal
 Received: from cnf007834.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.55.253])
- by uls-op-cesaip01.wdc.com with ESMTP; 29 Apr 2020 11:37:04 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 29 Apr 2020 11:37:02 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org
-Subject: [PULL 09/14] target/riscv: Add a sifive-e34 cpu type
-Date: Wed, 29 Apr 2020 11:28:51 -0700
-Message-Id: <20200429182856.2588202-10-alistair.francis@wdc.com>
+Subject: [PULL 01/14] riscv/sifive_u: Fix up file ordering
+Date: Wed, 29 Apr 2020 11:28:43 -0700
+Message-Id: <20200429182856.2588202-2-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200429182856.2588202-1-alistair.francis@wdc.com>
 References: <20200429182856.2588202-1-alistair.francis@wdc.com>
@@ -97,69 +97,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Corey Wharton <coreyw7@fb.com>,
- palmerdabbelt@google.com, qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>, palmerdabbelt@google.com,
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Bin Meng <bmeng.cn@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Corey Wharton <coreyw7@fb.com>
+Split the file into clear machine and SoC sections.
 
-The sifive-e34 cpu type is the same as the sifive-e31 with the
-single precision floating-point extension enabled.
-
-Signed-off-by: Corey Wharton <coreyw7@fb.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
-Message-id: 20200313193429.8035-3-coreyw7@fb.com
-Message-Id: <20200313193429.8035-3-coreyw7@fb.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
 ---
- target/riscv/cpu.c | 10 ++++++++++
- target/riscv/cpu.h |  1 +
- 2 files changed, 11 insertions(+)
+ hw/riscv/sifive_u.c | 109 ++++++++++++++++++++++----------------------
+ 1 file changed, 55 insertions(+), 54 deletions(-)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 4e578239d3..059d71f2c7 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -164,6 +164,15 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
-     set_feature(env, RISCV_FEATURE_PMP);
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 56351c4faa..d0ea6803db 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -312,7 +312,7 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+     g_free(nodename);
  }
  
-+static void rv32imafcu_nommu_cpu_init(Object *obj)
+-static void riscv_sifive_u_init(MachineState *machine)
++static void sifive_u_machine_init(MachineState *machine)
+ {
+     const struct MemmapEntry *memmap = sifive_u_memmap;
+     SiFiveUState *s = RISCV_U_MACHINE(machine);
+@@ -403,6 +403,60 @@ static void riscv_sifive_u_init(MachineState *machine)
+                           &address_space_memory);
+ }
+ 
++static bool sifive_u_machine_get_start_in_flash(Object *obj, Error **errp)
 +{
-+    CPURISCVState *env = &RISCV_CPU(obj)->env;
-+    set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVC | RVU);
-+    set_priv_version(env, PRIV_VERSION_1_10_0);
-+    set_resetvec(env, DEFAULT_RSTVEC);
-+    set_feature(env, RISCV_FEATURE_PMP);
++    SiFiveUState *s = RISCV_U_MACHINE(obj);
++
++    return s->start_in_flash;
 +}
 +
- #elif defined(TARGET_RISCV64)
++static void sifive_u_machine_set_start_in_flash(Object *obj, bool value, Error **errp)
++{
++    SiFiveUState *s = RISCV_U_MACHINE(obj);
++
++    s->start_in_flash = value;
++}
++
++static void sifive_u_machine_instance_init(Object *obj)
++{
++    SiFiveUState *s = RISCV_U_MACHINE(obj);
++
++    s->start_in_flash = false;
++    object_property_add_bool(obj, "start-in-flash", sifive_u_machine_get_start_in_flash,
++                             sifive_u_machine_set_start_in_flash, NULL);
++    object_property_set_description(obj, "start-in-flash",
++                                    "Set on to tell QEMU's ROM to jump to " \
++                                    "flash. Otherwise QEMU will jump to DRAM",
++                                    NULL);
++}
++
++
++static void sifive_u_machine_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++
++    mc->desc = "RISC-V Board compatible with SiFive U SDK";
++    mc->init = sifive_u_machine_init;
++    mc->max_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + SIFIVE_U_COMPUTE_CPU_COUNT;
++    mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
++    mc->default_cpus = mc->min_cpus;
++}
++
++static const TypeInfo sifive_u_machine_typeinfo = {
++    .name       = MACHINE_TYPE_NAME("sifive_u"),
++    .parent     = TYPE_MACHINE,
++    .class_init = sifive_u_machine_class_init,
++    .instance_init = sifive_u_machine_instance_init,
++    .instance_size = sizeof(SiFiveUState),
++};
++
++static void sifive_u_machine_init_register_types(void)
++{
++    type_register_static(&sifive_u_machine_typeinfo);
++}
++
++type_init(sifive_u_machine_init_register_types)
++
+ static void riscv_sifive_u_soc_init(Object *obj)
+ {
+     MachineState *ms = MACHINE(qdev_get_machine());
+@@ -443,33 +497,6 @@ static void riscv_sifive_u_soc_init(Object *obj)
+                           TYPE_CADENCE_GEM);
+ }
  
- static void riscv_base64_cpu_init(Object *obj)
-@@ -610,6 +619,7 @@ static const TypeInfo riscv_cpu_type_infos[] = {
- #if defined(TARGET_RISCV32)
-     DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base32_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32imafcu_nommu_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init),
-     /* Depreacted */
-     DEFINE_CPU(TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_init),
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 7d21addbab..d0e7f5b9c5 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -36,6 +36,7 @@
- #define TYPE_RISCV_CPU_BASE32           RISCV_CPU_TYPE_NAME("rv32")
- #define TYPE_RISCV_CPU_BASE64           RISCV_CPU_TYPE_NAME("rv64")
- #define TYPE_RISCV_CPU_SIFIVE_E31       RISCV_CPU_TYPE_NAME("sifive-e31")
-+#define TYPE_RISCV_CPU_SIFIVE_E34       RISCV_CPU_TYPE_NAME("sifive-e34")
- #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e51")
- #define TYPE_RISCV_CPU_SIFIVE_U34       RISCV_CPU_TYPE_NAME("sifive-u34")
- #define TYPE_RISCV_CPU_SIFIVE_U54       RISCV_CPU_TYPE_NAME("sifive-u54")
+-static bool sifive_u_get_start_in_flash(Object *obj, Error **errp)
+-{
+-    SiFiveUState *s = RISCV_U_MACHINE(obj);
+-
+-    return s->start_in_flash;
+-}
+-
+-static void sifive_u_set_start_in_flash(Object *obj, bool value, Error **errp)
+-{
+-    SiFiveUState *s = RISCV_U_MACHINE(obj);
+-
+-    s->start_in_flash = value;
+-}
+-
+-static void riscv_sifive_u_machine_instance_init(Object *obj)
+-{
+-    SiFiveUState *s = RISCV_U_MACHINE(obj);
+-
+-    s->start_in_flash = false;
+-    object_property_add_bool(obj, "start-in-flash", sifive_u_get_start_in_flash,
+-                             sifive_u_set_start_in_flash, NULL);
+-    object_property_set_description(obj, "start-in-flash",
+-                                    "Set on to tell QEMU's ROM to jump to " \
+-                                    "flash. Otherwise QEMU will jump to DRAM",
+-                                    NULL);
+-}
+-
+ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+ {
+     MachineState *ms = MACHINE(qdev_get_machine());
+@@ -607,29 +634,3 @@ static void riscv_sifive_u_soc_register_types(void)
+ }
+ 
+ type_init(riscv_sifive_u_soc_register_types)
+-
+-static void riscv_sifive_u_machine_class_init(ObjectClass *oc, void *data)
+-{
+-    MachineClass *mc = MACHINE_CLASS(oc);
+-
+-    mc->desc = "RISC-V Board compatible with SiFive U SDK";
+-    mc->init = riscv_sifive_u_init;
+-    mc->max_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + SIFIVE_U_COMPUTE_CPU_COUNT;
+-    mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
+-    mc->default_cpus = mc->min_cpus;
+-}
+-
+-static const TypeInfo riscv_sifive_u_machine_typeinfo = {
+-    .name       = MACHINE_TYPE_NAME("sifive_u"),
+-    .parent     = TYPE_MACHINE,
+-    .class_init = riscv_sifive_u_machine_class_init,
+-    .instance_init = riscv_sifive_u_machine_instance_init,
+-    .instance_size = sizeof(SiFiveUState),
+-};
+-
+-static void riscv_sifive_u_machine_init_register_types(void)
+-{
+-    type_register_static(&riscv_sifive_u_machine_typeinfo);
+-}
+-
+-type_init(riscv_sifive_u_machine_init_register_types)
 -- 
 2.26.2
 
