@@ -2,101 +2,108 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 535D2C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:03:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6089CC83007
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:03:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19A662076B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:03:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 26BD32076B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:03:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OQNyB6B+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19A662076B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H9hO30M4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26BD32076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTick-00034A-6w
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 05:03:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58470)
+	id 1jTidF-0003mR-4k
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 05:03:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58290)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTiae-0000gh-AI
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:01:42 -0400
+ (envelope-from <mst@redhat.com>) id 1jTia4-0008Pu-KY
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:01:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTiYO-00040p-G2
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:01:12 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54976)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTiYN-00040Q-VH
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:58:52 -0400
-Received: by mail-wm1-x343.google.com with SMTP id h4so1115684wmb.4
- for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 01:58:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=+JJiHga6enBSPy4Z0jIURbXqsKuRNYMHVVnsrcs642Q=;
- b=OQNyB6B+C/iOOUJe2OjzLjgrAuGUvoTRHhJApqSvQl1yNT4p+ZxnkEhUohhyXwDNcA
- rrt+LWrBwPQK4mLpWy+dp/zU6487kDXGdvK6zIYhmhTupWL13bbH0MbSmTvvDmRWQanr
- NmRgdPW9FnVRQdEN7Q/3TZsmrzNmxKuRgi5MBFHB5xhex17tacNGrb7oCOWuKdA3vMf3
- 3WEbBQAs2v+U+R6zK23XVO4Z9AIu3+UE5ApHfo+geOmB48lFCXTN01RtGdEcRhkAnKfb
- 0IPr6apYXlue/4qh3GixlbqEqXpZjfrunOz0npAFo/PIPgrS38nS9xINhwgSKFNwgg1l
- D5ew==
+ (envelope-from <mst@redhat.com>) id 1jTiWV-0004Ci-GU
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:00:36 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24748
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jTiWV-000487-1r
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:56:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588150614;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Pulz+KnawAn2bBcefZQzgGt8FYq6KYVhU84dCjo7DKs=;
+ b=H9hO30M4b6lHdc+RKBOdDQVo0iFw9/OckbIoBHiOkwuZoJoEyNENb2swkbPWGwgN8eZ/c8
+ FOGrpol5JCXxmYslC4V0FX6Bi4XFlEYWW/V8BuOStqVYHcsfRkAHu4lSSczioHcrHYE8Jo
+ 9GkcbFlyusxpmcIjx8q2b5BxLPbQNR0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-18-ezpbuRbePDqSPBttuME9Lw-1; Wed, 29 Apr 2020 04:56:52 -0400
+X-MC-Unique: ezpbuRbePDqSPBttuME9Lw-1
+Received: by mail-wm1-f70.google.com with SMTP id 72so2307917wmb.1
+ for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 01:56:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=+JJiHga6enBSPy4Z0jIURbXqsKuRNYMHVVnsrcs642Q=;
- b=VbQiSRdu2g9/8At3m/lJU2x03LzbeqpBxTnOqP/wP5c2lk14AcN9Jy12z/niqI1DKN
- UXtH/4v7H7ly6e2S1xjKO6oTw3j5aBOPuMeNadpKLV9rre7rRVetZeu1sQ+0SijsFTAN
- OJaho8NwIkp8E8VAjqiPvfoNxK13IEyL04REkJww8noCkQhsTVOJAOaDLKa6IVMkgBug
- AFXVWjHCLSrkLr+WA/8Vya4BL7rlWsdq2o1k7jj+MRMdRoHpIkJi1AkurNODe79yYl7y
- oMRd0BVmz4B3yHUkb26MitMFncvCA5GIZ/N+Mluu8riinNvVk20avIroZCysLONdkU2F
- tQ4g==
-X-Gm-Message-State: AGi0PuaiZt2ghy3BlJwwmnEr1V9DJ9+22VgUxTe7LRuwJHBFFUMDNEWH
- ixMekWgJ+w9FH8zTuXUh9ok=
-X-Google-Smtp-Source: APiQypIKKSbOg7JpBNEWZYlCXXOfh42aFvWzm9gDy+SxuxjY5Ybj2stFEHXCDiuIaHnG0QeDdeyEkg==
-X-Received: by 2002:a7b:c944:: with SMTP id i4mr2203244wml.144.1588150730350; 
- Wed, 29 Apr 2020 01:58:50 -0700 (PDT)
-Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.137])
- by smtp.gmail.com with ESMTPSA id s18sm30898169wra.94.2020.04.29.01.58.49
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 29 Apr 2020 01:58:49 -0700 (PDT)
-Subject: Re: [PATCH for-5.1 4/7] target/mips: Add Loongson-3 CPU definition
-To: Huacai Chen <chenhuacai@gmail.com>
-References: <1587979995-17717-1-git-send-email-chenhc@lemote.com>
- <1587979995-17717-4-git-send-email-chenhc@lemote.com>
- <c1a3aec6-dc45-3484-3a70-c06449bee609@amsat.org>
- <CABDp7Vq-YX0LWU3iM=oygpcKzoS8cmXG6mvTQ5Gm_PbQsQMAgw@mail.gmail.com>
- <CAHiYmc6zFjBtgXRv=8+dqnbDtZqKqiwSDwEi0wKqJmJnys_y0g@mail.gmail.com>
- <CAAhV-H6NFV7hbaOp8BwPck3FWm5ZHBpuoA9FDmN6tby5LcoTeg@mail.gmail.com>
- <a791f90b-a2a5-6665-59b5-212f98c7afc8@amsat.org>
- <CAAhV-H7NS_KCTuYQYvZeseNEZh56FBFz97kEj4KK-NsBDMJotQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a1b333c6-e9a0-aabc-9ec2-b9bcb2007211@amsat.org>
-Date: Wed, 29 Apr 2020 10:58:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=VsQW8+kzj3UdgWSX3tV7dinnShvnPg8H1WOwfpramrQ=;
+ b=YcwdQS5HqJd2Y/KRjLM6irGMnUbGCVwPJtQiDnYk6PzPRh7pYTciSGc0+pw2FzvEyv
+ CLZbj7a3vgw6lzr/7QM2Ovca4HBf5V1AkpCqZ+BcuazsIOZb8Cun3b8Gqa397NCVWeXH
+ ke75c7p/NcJJZZTTW3Szqym8M0Vy4KmZguUnzc0HiqyQs6/clxJ7wE+amhSkKcVPPXYi
+ J4StE1CZ7JmApUNq0UU+k4MPtb9eF/b0gABuK8NxDSWM91ELZf26h7oCB4y5E7dGa5Qg
+ /n7HsluCABYw0/JvD5zEnKLY25LEAJB9nKAF5H8HnureFbxJ9PvjVfyTl9k3IhkOZBV4
+ ZRJA==
+X-Gm-Message-State: AGi0PubBuVGeOZLrFZMWk0JDp3VNb2SXYbaJjPF+vXsr4ypCqsB42c7n
+ +QttQDo8DKS9/9ZV3bK6gRsENWwIMJUU+eKoY0r6n9q28pWd6o3Gb2bHHAwoYMahHhtFA1br5MG
+ yJvE2Z5U+DXO0cPA=
+X-Received: by 2002:adf:f1c6:: with SMTP id z6mr31051743wro.361.1588150610339; 
+ Wed, 29 Apr 2020 01:56:50 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJ6Z3cP+tsUv1qr+qtu6Qa9HpWCTD1VyFuqLBEpxHI3MvXZmmBkUcoN1uK5DEmd1FHWtGcG/g==
+X-Received: by 2002:adf:f1c6:: with SMTP id z6mr31051719wro.361.1588150610094; 
+ Wed, 29 Apr 2020 01:56:50 -0700 (PDT)
+Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
+ by smtp.gmail.com with ESMTPSA id
+ r18sm26265195wrj.70.2020.04.29.01.56.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Apr 2020 01:56:49 -0700 (PDT)
+Date: Wed, 29 Apr 2020 04:56:46 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Ani Sinha <ani.sinha@nutanix.com>
+Subject: Re: [PATCH V2] Add a new PIIX option to control PCI hot unplugging
+ of devices on non-root buses
+Message-ID: <20200429045427-mutt-send-email-mst@kernel.org>
+References: <20200429011228-mutt-send-email-mst@kernel.org>
+ <544B4749-9A1C-44BB-BD89-C37A7E8D86F4@nutanix.com>
+ <20200429025200-mutt-send-email-mst@kernel.org>
+ <A69272ED-DDFF-4CC7-B12C-2994B004C013@nutanix.com>
+ <20200429025535-mutt-send-email-mst@kernel.org>
+ <B5DF1405-B261-4CE4-8484-F3738BE83E14@nutanix.com>
+ <20200429033657-mutt-send-email-mst@kernel.org>
+ <D4141715-B662-407A-8B4D-0EB64B41F6A1@nutanix.com>
+ <20200429035457-mutt-send-email-mst@kernel.org>
+ <2F2DCEBC-C0B5-4653-B741-245A9FF38BDE@nutanix.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H7NS_KCTuYQYvZeseNEZh56FBFz97kEj4KK-NsBDMJotQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::343
+In-Reply-To: <2F2DCEBC-C0B5-4653-B741-245A9FF38BDE@nutanix.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 00:53:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,101 +115,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: chen huacai <zltjiangshi@gmail.com>,
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- qemu-level <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+ Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/29/20 10:27 AM, Huacai Chen wrote:
-> Hi, Philippe,
-> 
-> The major differences of R3 and R4 are:
-> 1, R4 has complete MIPS VZ ASE (while R3 is incomplete), so very
-> usable for KVM host;
+On Wed, Apr 29, 2020 at 08:14:01AM +0000, Ani Sinha wrote:
+>=20
+>=20
+> > On Apr 29, 2020, at 1:39 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >=20
+> > On Wed, Apr 29, 2020 at 07:43:04AM +0000, Ani Sinha wrote:
+> >>=20
+> >>=20
+> >>> On Apr 29, 2020, at 1:08 PM, Michael S. Tsirkin <mst@redhat.com> wrot=
+e:
+> >>>=20
+> >>> On Wed, Apr 29, 2020 at 07:02:56AM +0000, Ani Sinha wrote:
+> >>>>=20
+> >>>>=20
+> >>>>> On Apr 29, 2020, at 12:27 PM, Michael S. Tsirkin <mst@redhat.com> w=
+rote:
+> >>>>>=20
+> >>>>> On Wed, Apr 29, 2020 at 06:54:52AM +0000, Ani Sinha wrote:
+> >>>>>>=20
+> >>>>>>=20
+> >>>>>>> On Apr 29, 2020, at 12:22 PM, Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+> >>>>>>>=20
+> >>>>>>> On Wed, Apr 29, 2020 at 06:11:20AM +0000, Ani Sinha wrote:
+> >>>>>>>>=20
+> >>>>>>>>=20
+> >>>>>>>>> On Apr 29, 2020, at 10:58 AM, Michael S. Tsirkin <mst@redhat.co=
+m> wrote:
+> >>>>>>>>>=20
+> >>>>>>>>> o if there's a need to disable
+> >>>>>>>>> just one of these, commit log needs to do a better job document=
+ing the
+> >>>>>>>>> usecase.
+> >>>>>>>>=20
+> >>>>>>>> The use case is simple. With this feature admins will be able to=
+ do what they were forced to do from Windows driver level but now at the bu=
+s level. Hence,=20
+> >>>>>>>> (a) They need not have access to the guest VM to change or updat=
+e windows driver registry settings. They can enable the same setting from a=
+dmin management console without any access to VM.
+> >>>>>>>> (b) It is more robust. No need to mess with driver settings. Inc=
+orrect settings can brick guest OS. Also no guest specific knowhow required=
+.
+> >>>>>>>> (c) It is more scalable since a single cluster wide setting can =
+be used for all VM power ons and the management plane can take care of the =
+rest automatically. No need to access individual VMs to enforce this.
+> >>>>>>>> (d) I am told that the driver level solution does not persist ac=
+ross a reboot.=20
+> >>>>>>>>=20
+> >>>>>>>> Ani
+> >>>>>>>=20
+> >>>>>>> Looks like disabling both plug and unplug would also address thes=
+e needs.
+> >>>>>>=20
+> >>>>>> No the driver level solution does not prevent hot plugging of devi=
+ces but blocks just hot unplugging. The solution I am proposing tries to do=
+ the same but from the bus/hypervisor level.
+> >>>>>=20
+> >>>>> Why does the driver level solution need to prevent just hot unplugg=
+ing?
+> >>>>=20
+> >>>> Because it not fair to prevent end users from hot plugging new devic=
+es when it is the (accidental?) hot unplugging of existing devices which ca=
+uses issues.
+> >>>=20
+> >>> Accidental? So maybe what you need is actually something else then -
+> >>> avoid *removing* the device when it's powered down.
+> >>=20
+> >> You don=E2=80=99t get it. It is not hypervisor admins who are unpluggi=
+ng it. It is the end users. Even RedHat customers want this feature. See fo=
+llowing resources:=20
+> >> https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__www.redhat.com_=
+archives_libvir-2Dlist_2020-2DFebruary_msg00110.html&d=3DDwIFaQ&c=3Ds883GpU=
+COChKOHiocYtGcg&r=3DIIUxIyRwG4RGy57y2nvMNYcDkqW-NHozZ2R38VYcg5U&m=3DMf70_yU=
+9LUbRFZOy4rYM5N43B_MDbO7SxEMSSJKVaJY&s=3DKgR1-KlzL-bGr51uY1vupOIgTpTjNAecbu=
+OUIpcuMUs&e=3D=20
+> >> https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__bugzilla.redhat=
+.com_show-5Fbug.cgi-3Fid-3D1802592&d=3DDwIFaQ&c=3Ds883GpUCOChKOHiocYtGcg&r=
+=3DIIUxIyRwG4RGy57y2nvMNYcDkqW-NHozZ2R38VYcg5U&m=3DMf70_yU9LUbRFZOy4rYM5N43=
+B_MDbO7SxEMSSJKVaJY&s=3DKVis9gzVeA7nnGauZpXWm_sEnl_UpsIzSlggwb60Fg8&e=3D=20
+> >> https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__bugzilla.redhat=
+.com_show-5Fbug.cgi-3Fid-3D1790899&d=3DDwIFaQ&c=3Ds883GpUCOChKOHiocYtGcg&r=
+=3DIIUxIyRwG4RGy57y2nvMNYcDkqW-NHozZ2R38VYcg5U&m=3DMf70_yU9LUbRFZOy4rYM5N43=
+B_MDbO7SxEMSSJKVaJY&s=3DY0K8tiyqpmKeXU245pnhTTAr2e3YSuxxw4BkiDxGwB8&e=3D=20
+> >=20
+> > That doesn't seem to require that hotplug keeps working.
+>=20
+> Like I said, that is because PCIE limits this at this moment. We can
+> do better than this solution on i440fx. We can be narrower in limiting
+> just hot unplug leaving hot plugging as is. Why should we always go
+> with the least common denominator for all the features? Why do we have
+> to be limited when we can do better?
 
-So you need to set CP0C3_VZ.
+Even if it seems to work for guests now, if we don't stick to emulating
+capabilities that hardware interfaces provide we can never be sure it
+will keep working.
 
-> 2, R4 has MSA ASE while R3 hasn't;
+>=20
+> >=20
+> >> My approach is much more fine grained than just disable everything app=
+roach that we have for q35. For i440fx we can do better than that.
+> >>=20
+> >>=20
+> >>>=20
+> >>>>>=20
+> >>>>>=20
+> >>>>>>=20
+> >>>>>>> --=20
+> >>>>>>> MST
+>=20
 
-So you need to set CP0C5_MSAEn.
-
-> 3, R4 has cpucfg, rdcsr and wrcsr instructions (similar to cpuid,
-> rdmsr and wrmsr in X86).
-
-OK, these are not implemented.
-
-[...]
-
->>>>>>> diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
->>>>>>> index 6d145a9..a32412d 100644
->>>>>>> --- a/target/mips/translate_init.inc.c
->>>>>>> +++ b/target/mips/translate_init.inc.c
->>>>>>> @@ -802,6 +802,57 @@ const mips_def_t mips_defs[] =
->>>>>>>            .mmu_type = MMU_TYPE_R4000,
->>>>>>>        },
->>>>>>>        {
->>>>>>> +        .name = "Loongson-3A",
->>>>>>> +        .CP0_PRid = 0x14C000,
->>>>>>> +        /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
->>>>>>> +        .CP0_Config0 = MIPS_CONFIG0 | (0x1 << CP0C0_AR) | (0x2 << CP0C0_AT) |
->>>>>>> +                       (MMU_TYPE_R4000 << CP0C0_MT),
->>>>>>> +        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << CP0C1_MMU) |
->>>>>>> +                       (2 << CP0C1_IS) | (4 << CP0C1_IL) | (3 << CP0C1_IA) |
->>>>>>> +                       (2 << CP0C1_DS) | (4 << CP0C1_DL) | (3 << CP0C1_DA) |
->>>>>>> +                       (1 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << CP0C1_EP),
->>>>>>> +        .CP0_Config2 = MIPS_CONFIG2,
->>>>>>> +        .CP0_Config3 = MIPS_CONFIG3 | (1U << CP0C3_M) | (1 << CP0C3_MSAP) |
->>>>>>> +                       (1 << CP0C3_BP) | (1 << CP0C3_BI) | (1 << CP0C3_ULRI) |
->>>>>>> +                       (1 << CP0C3_RXI) | (1 << CP0C3_LPA) | (1 << CP0C3_VInt),
->>>>>>> +        .CP0_Config4 = MIPS_CONFIG4 | (1U << CP0C4_M) | (2 << CP0C4_IE) |
->>>>>>> +                       (1 << CP0C4_AE) | (0x1c << CP0C4_KScrExist),
->>>>>>> +        .CP0_Config4_rw_bitmask = 0,
->>>>>>> +        .CP0_Config5 = MIPS_CONFIG5 | (1 << CP0C5_NFExists) | (1 << 18),
->>>>>>> +        .CP0_Config5_rw_bitmask = (1 << CP0C5_K) | (1 << CP0C5_CV) |
->>>>>>> +                                  (1 << CP0C5_MSAEn) | (1 << CP0C5_UFE) |
->>>>>>> +                                  (1 << CP0C5_FRE) | (1 << CP0C5_SBRI),
->>>>>>> +        .CP0_Config6 = (1 << CP0C6_VCLRU) | (1 << CP0C6_DCLRU) | (1 << CP0C6_SFBEN) |
->>>>>>> +                       (1 << CP0C6_FLTINT) | (1 << CP0C6_INSTPREF) | (1 << CP0C6_DATAPREF),
->>>>>>> +        .CP0_Config6_rw_bitmask = (1 << CP0C6_BPPASS) | (0x3f << CP0C6_KPOS) |
->>>>>>> +                                  (1 << CP0C6_KE) | (1 << CP0C6_VTLBONLY) | (1 << CP0C6_LASX) |
->>>>>>> +                                  (1 << CP0C6_SSEN) | (1 << CP0C6_DISDRTIME) |
->>>>>>> +                                  (1 << CP0C6_PIXNUEN) | (1 << CP0C6_SCRAND) |
->>>>>>> +                                  (1 << CP0C6_LLEXCEN) | (1 << CP0C6_DISVC) |
->>>>>>> +                                  (1 << CP0C6_VCLRU) | (1 << CP0C6_DCLRU) |
->>>>>>> +                                  (1 << CP0C6_PIXUEN) | (1 << CP0C6_DISBLKLYEN) |
->>>>>>> +                                  (1 << CP0C6_UMEMUALEN) | (1 << CP0C6_SFBEN) |
->>>>>>> +                                  (1 << CP0C6_FLTINT) | (1 << CP0C6_VLTINT) |
->>>>>>> +                                  (1 << CP0C6_DISBTB) | (3 << CP0C6_STPREFCTL) |
->>>>>>> +                                  (1 << CP0C6_INSTPREF) | (1 << CP0C6_DATAPREF),
->>>>>>> +        .CP0_Config7 = 0,
->>>>>>> +        .CP0_Config7_rw_bitmask = (1 << CP0C7_NAPCGEN) | (1 << CP0C7_UNIMUEN) | \
->>>>>>> +                                  (1 << CP0C7_VFPUCGEN),
->>>>>>> +        .CP0_LLAddr_rw_bitmask = 1,
->>>>>>> +        .SYNCI_Step = 16,
->>>>>>> +        .CCRes = 2,
->>>>>>> +        .CP0_Status_rw_bitmask = 0x7DDBFFFF,
->>>>>>> +        .CP0_PageGrain_rw_bitmask = (1U << CP0PG_RIE) | (1 << CP0PG_XIE) |
->>>>>>> +                    (1 << CP0PG_ELPA) | (1 << CP0PG_IEC),
->>>>>>> +        .CP1_fcr0 = (0x5 << FCR0_PRID) | (0x1 << FCR0_REV) | (0x1 << FCR0_F64),
->>>>>>> +        .CP1_fcr31 = 0,
->>>>>>> +        .CP1_fcr31_rw_bitmask = 0xFF83FFFF,
->>>>>>> +        .SEGBITS = 48,
->>>>>>> +        .PABITS = 48,
->>>>>>> +        .insn_flags = CPU_LOONGSON3A,
->>>>>>> +        .mmu_type = MMU_TYPE_R4000,
->>>>>>> +    },
->>>>>>> +    {
->>>>>>>            /* A generic CPU providing MIPS64 DSP R2 ASE features.
->>>>>>>               FIXME: Eventually this should be replaced by a real CPU model. */
->>>>>>>            .name = "mips64dspr2",
->>>>>>>
->>>>>
->>>>>
->>>>>
->>>>> --
->>>>> Huacai Chen
->>>
-> 
 
