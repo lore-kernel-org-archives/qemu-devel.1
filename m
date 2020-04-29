@@ -6,78 +6,78 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BDCCC83004
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:08:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9A60C83000
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:09:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9092208FE
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:08:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 831372083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:09:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NcFwWb5G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9092208FE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G6XeiYVB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 831372083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTnO5-0006Q3-V3
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 10:08:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42506)
+	id 1jTnOj-0008LF-Ld
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 10:09:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42450)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTnGm-0002Lh-BS
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:01:14 -0400
+ (envelope-from <kraxel@redhat.com>) id 1jTnGf-0002GR-By
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:01:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTnGH-0003zT-0S
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:01:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55388
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kraxel@redhat.com>) id 1jTnGB-0003sl-KQ
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:00:53 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25267
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jTnGG-0003yf-K8
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:00:28 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jTnGB-0003rX-75
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:00:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588168827;
+ s=mimecast20190719; t=1588168822;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wVia+kqi56m7fobc/F24sqeB+1njvSGFY4Ow1Djzbvw=;
- b=NcFwWb5GLxu1VPy8tGzws7NblZk6Ca9bqLFFrDck9RMjOH+KABmrBBbDRI9cuOEey0z6id
- uj22AXfyfs770MGZO/P6QoimFpfsQPpi4BpXFjEWSIffV+hZ+PfMP3XV6+FCqV2Qy5FFlG
- GKbQu8QvGDkVIi88YJKu2Wr3gwu53rI=
+ bh=5ZDaOnP7JoaHpj6dJQ1fXf7vB0ob55bzO9rc0pYbHF0=;
+ b=G6XeiYVBb9R/WW4AuKeeQZUZ7eMFbzG4EAq1RAcWtrHAP7dDZ80r/tEwWKqZ3HQnR2fm03
+ voWKOkHi7/hfBf6Hc0FxuG0hJM7jtbTbmZaVb+5xx1WzKzqnCQEZn12o6nLGquxC3LIFjV
+ TpQ1COPSBF+C4vYEXgRFvKriaNZ8/XA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-oQ03J7uhMVqDnkHldktIHA-1; Wed, 29 Apr 2020 10:00:26 -0400
-X-MC-Unique: oQ03J7uhMVqDnkHldktIHA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-216-Dg2078jNOQWiCF376AWcyQ-1; Wed, 29 Apr 2020 10:00:19 -0400
+X-MC-Unique: Dg2078jNOQWiCF376AWcyQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA698100A633;
- Wed, 29 Apr 2020 14:00:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EECC8C1A00;
+ Wed, 29 Apr 2020 14:00:18 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
  [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 82EF2605FB;
- Wed, 29 Apr 2020 14:00:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3B1205D9C9;
+ Wed, 29 Apr 2020 14:00:17 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 59C0A9D9F; Wed, 29 Apr 2020 16:00:03 +0200 (CEST)
+ id 8B43B9DA6; Wed, 29 Apr 2020 16:00:03 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 06/15] rtc: add RTC_ISA_BASE
-Date: Wed, 29 Apr 2020 15:59:54 +0200
-Message-Id: <20200429140003.7336-7-kraxel@redhat.com>
+Subject: [PATCH v3 11/15] acpi: move aml builder code for parallel device
+Date: Wed, 29 Apr 2020 15:59:59 +0200
+Message-Id: <20200429140003.7336-12-kraxel@redhat.com>
 In-Reply-To: <20200429140003.7336-1-kraxel@redhat.com>
 References: <20200429140003.7336-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 00:53:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,59 +101,119 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add and use RTC_ISA_BASE define instead of hardcoding 0x70.
+Also adds support for multiple LPT devices.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/hw/rtc/mc146818rtc.h | 1 +
- hw/rtc/mc146818rtc.c         | 5 ++---
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ hw/char/parallel.c   | 32 ++++++++++++++++++++++++++++++++
+ hw/i386/acpi-build.c | 23 -----------------------
+ 2 files changed, 32 insertions(+), 23 deletions(-)
 
-diff --git a/include/hw/rtc/mc146818rtc.h b/include/hw/rtc/mc146818rtc.h
-index 10c93a096a1d..3713181b56fe 100644
---- a/include/hw/rtc/mc146818rtc.h
-+++ b/include/hw/rtc/mc146818rtc.h
-@@ -47,6 +47,7 @@ typedef struct RTCState {
- } RTCState;
+diff --git a/hw/char/parallel.c b/hw/char/parallel.c
+index 8dd67d13759b..bc6b55b3b910 100644
+--- a/hw/char/parallel.c
++++ b/hw/char/parallel.c
+@@ -28,6 +28,7 @@
+ #include "qemu/module.h"
+ #include "chardev/char-parallel.h"
+ #include "chardev/char-fe.h"
++#include "hw/acpi/aml-build.h"
+ #include "hw/irq.h"
+ #include "hw/isa/isa.h"
+ #include "hw/qdev-properties.h"
+@@ -568,6 +569,35 @@ static void parallel_isa_realizefn(DeviceState *dev, E=
+rror **errp)
+                              s, "parallel");
+ }
 =20
- #define RTC_ISA_IRQ 8
-+#define RTC_ISA_BASE 0x70
-=20
- ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,
-                              qemu_irq intercept_irq);
-diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
-index dc4269cc55cb..d18c09911be2 100644
---- a/hw/rtc/mc146818rtc.c
-+++ b/hw/rtc/mc146818rtc.c
-@@ -908,7 +908,6 @@ static void rtc_realizefn(DeviceState *dev, Error **err=
-p)
++static void parallel_isa_build_aml(ISADevice *isadev, Aml *scope)
++{
++    ISAParallelState *isa =3D ISA_PARALLEL(isadev);
++    int i, uid =3D 0;
++    Aml *dev;
++    Aml *crs;
++
++    for (i =3D 0; i < ARRAY_SIZE(isa_parallel_io); i++) {
++        if (isa->iobase =3D=3D isa_parallel_io[i]) {
++            uid =3D i + 1;
++        }
++    }
++    if (!uid) {
++        return;
++    }
++
++    crs =3D aml_resource_template();
++    aml_append(crs, aml_io(AML_DECODE16, isa->iobase, isa->iobase, 0x08, 0=
+x08));
++    aml_append(crs, aml_irq_no_flags(isa->isairq));
++
++    dev =3D aml_device("LPT%d", uid);
++    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
++    aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
++    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
++    aml_append(dev, aml_name_decl("_CRS", crs));
++
++    aml_append(scope, dev);
++}
++
+ /* Memory mapped interface */
+ static uint64_t parallel_mm_readfn(void *opaque, hwaddr addr, unsigned siz=
+e)
  {
-     ISADevice *isadev =3D ISA_DEVICE(dev);
-     RTCState *s =3D MC146818_RTC(dev);
--    int base =3D 0x70;
+@@ -624,9 +654,11 @@ static Property parallel_isa_properties[] =3D {
+ static void parallel_isa_class_initfn(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
++    ISADeviceClass *isa =3D ISA_DEVICE_CLASS(klass);
 =20
-     s->cmos_data[RTC_REG_A] =3D 0x26;
-     s->cmos_data[RTC_REG_B] =3D 0x02;
-@@ -951,7 +950,7 @@ static void rtc_realizefn(DeviceState *dev, Error **err=
-p)
-     qemu_register_suspend_notifier(&s->suspend_notifier);
+     dc->realize =3D parallel_isa_realizefn;
+     dc->vmsd =3D &vmstate_parallel_isa;
++    isa->build_aml =3D parallel_isa_build_aml;
+     device_class_set_props(dc, parallel_isa_properties);
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+ }
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index e01afbd011d9..12a017e1f45b 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1167,28 +1167,6 @@ static Aml *build_mouse_device_aml(void)
+     return dev;
+ }
 =20
-     memory_region_init_io(&s->io, OBJECT(s), &cmos_ops, s, "rtc", 2);
--    isa_register_ioport(isadev, &s->io, base);
-+    isa_register_ioport(isadev, &s->io, RTC_ISA_BASE);
+-static void build_lpt_device_aml(Aml *scope)
+-{
+-    Aml *dev;
+-    Aml *crs;
+-
+-    if (!memory_region_present(get_system_io(), 0x0378)) {
+-        return;
+-    }
+-
+-    dev =3D aml_device("LPT");
+-    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
+-
+-    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
+-
+-    crs =3D aml_resource_template();
+-    aml_append(crs, aml_io(AML_DECODE16, 0x0378, 0x0378, 0x08, 0x08));
+-    aml_append(crs, aml_irq_no_flags(7));
+-    aml_append(dev, aml_name_decl("_CRS", crs));
+-
+-    aml_append(scope, dev);
+-}
+-
+ static void build_isa_devices_aml(Aml *table)
+ {
+     ISADevice *fdc =3D pc_find_fdc0();
+@@ -1202,7 +1180,6 @@ static void build_isa_devices_aml(Aml *table)
+     if (fdc) {
+         aml_append(scope, build_fdc_device_aml(fdc));
+     }
+-    build_lpt_device_aml(scope);
 =20
-     /* register rtc 0x70 port for coalesced_pio */
-     memory_region_set_flush_coalesced(&s->io);
-@@ -960,7 +959,7 @@ static void rtc_realizefn(DeviceState *dev, Error **err=
-p)
-     memory_region_add_subregion(&s->io, 0, &s->coalesced_io);
-     memory_region_add_coalescing(&s->coalesced_io, 0, 1);
-=20
--    qdev_set_legacy_instance_id(dev, base, 3);
-+    qdev_set_legacy_instance_id(dev, RTC_ISA_BASE, 3);
-     qemu_register_reset(rtc_reset, s);
-=20
-     object_property_add_tm(OBJECT(s), "date", rtc_get_date, NULL);
+     if (ambiguous) {
+         error_report("Multiple ISA busses, unable to define IPMI ACPI data=
+");
 --=20
 2.18.2
 
