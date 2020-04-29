@@ -2,95 +2,91 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E20C83000
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:48:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9396FC83000
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:49:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F17E220661
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:48:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F01020661
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:49:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c4wek8El"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F17E220661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mn5GPnWa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F01020661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTrl4-0000Tp-TN
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 14:48:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37966)
+	id 1jTrlX-0000fm-FI
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 14:49:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37606)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jTrcZ-0004vS-MR
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:39:49 -0400
+ (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
+ id 1jTraX-0000eg-CA
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:37:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jTrcY-0005nv-Kd
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:39:47 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:36124)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jTrcY-0005nT-3Z
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:39:46 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id a31so1105578pje.1
- for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 11:39:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=sT7xYNB/pNhcIuB1QH4lh70g3ycEbYWObZyq67d7YwU=;
- b=c4wek8El4w1AEgivaAGRfz3u6ScZoySujT/D5mkOnCJREBVg3sYDw8B2mZvjF3kdPO
- m55gWDBGu0bfrSi/vdC0GvrM1xDEi+Bi0pwDkkrbRsHehSjNIxIEePYTe8xnzNJ+1Us7
- nbzIWAzk4ytQX6p+DheI+wKmoPOTwnfHuJ4r2Hm33gV0zuVXlcu+wJYx/4D9jD8+C69A
- 9g680g9CSDc4ENybsRatUe0fcuyZnGi/xKYkl3jgUf/JhNFl05nhTvLIGsABmvqu4TNY
- fTgvWGyE8UPs1C9E5kccaYdUlNRocUU64bDJe3DzTQSMKkImJpZpUeUGRgXUU3DkNS8e
- iN/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=sT7xYNB/pNhcIuB1QH4lh70g3ycEbYWObZyq67d7YwU=;
- b=acLv4do+c1sJipSwB6r62INacwgckM7axRQuPjFbSQ6WYNfOkwjGxeQtqakCBveVik
- PruYkq/BxGQD+CkCf1sydazh93gNBMRkZYGtZzhta4e+GlGNrSpJNLWBwf04vPlWENnp
- 545f1mcmUeVOyfvcei5r6efnkAgWEkpWqBUKlWvPwIsnSa7RFQb2t1nisSfRZcI/VWms
- 5UoRdgRQWV/Ri21gzoSIGkkoT9lPX0s7nYONsHbj5lCA0gr5EgQimVopJH4lBclEok17
- NAjh9CqPkonmV1yUZZt2AjFebnBJ4P7TtnoZL2udjXHn1dEe+i//fOWoa86/fYbYdCSS
- r9/A==
-X-Gm-Message-State: AGi0PuZcMFXbLanNN710snr7PnfbtPZ9NRtCJAGOexxWGi+dF8pD0o3X
- 0kizeZf+linG1ildZj5i04E88FZGqdE=
-X-Google-Smtp-Source: APiQypKSw6ZBQlsS2IP4FdiZkKRDDHBhlCzl9JJo+SJuQLFSP5KL6WY12JkQLRCPuug/vjQmkvqm6w==
-X-Received: by 2002:a17:902:207:: with SMTP id
- 7mr34159461plc.331.1588185583675; 
- Wed, 29 Apr 2020 11:39:43 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id b1sm1560094pfa.202.2020.04.29.11.39.42
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 29 Apr 2020 11:39:42 -0700 (PDT)
-Subject: Re: [PATCH 1/4] target/arm: Don't use a TLB for ARMMMUIdx_Stage2
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200330210400.11724-1-peter.maydell@linaro.org>
- <20200330210400.11724-2-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <771268c8-6971-e6ff-3970-ee911d1413af@linaro.org>
-Date: Wed, 29 Apr 2020 11:39:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
+ id 1jTraV-0003z7-FD
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:37:41 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:2041)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
+ id 1jTraR-0003PZ-UK; Wed, 29 Apr 2020 14:37:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1588185456; x=1619721456;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=y2PxtJkBDcgg6/2XLAnv6fsOHXzs6BDrOSXRANlXYzY=;
+ b=mn5GPnWahF0SSYMB+KJTYX+Bz0X6KTpe6P23EaK/wLRQ9XjhTPoYbeTI
+ cwzsqmGJ+lMYcn8oKQyusgF0AZovfP1CwXBVipCdJId9ER4NHzQYp2Qm3
+ G6B9bHHqxcj8YxmhjtsUYN1JJNghpzDenzsF6YSupnbBueDb/6B6Auyb9
+ BCJYXPW3E8f1i5ZDQCXBe/I2I3/BADU8fQvm6YZEjVj3YDdGuzZDkLxE4
+ nyVRefoHyFQSWQsP4PeIa6bN/tSWx9lxZkCLPlP/4w/W4lZafKUxJm0Su
+ f8rWdqeKHjZ+fra43KN3AN+T8X2lWZhd0/+NZSo0xHA7d9Ddky5vFlPMQ Q==;
+IronPort-SDR: rb87Y5vK68j6vVbTXfNhyxM8FSo2lCNhZCQObX3qgm7s0cqktVNCICRFvreHalMz0L+YPSgsZ+
+ tvD8uKJnDT6feR4xfgRRph7KnCnJvqYuHj2NWUYqxZtH6dGfCt6UHesa2lOsESjWwIVmeXhvRx
+ mS3+TALbOgbToTQM2zr58p6aItFmyCbrfWzmz15Z4vRkxyM2uQQoUX/BqvT2KiJ+/2uIv0FWnp
+ o1CcQWZjHngowoQP6o9qxDU7p4I4W1WYAnNldaIUB3uLJK76RuVel9xmWVWGM7hHMfAZbw+fT5
+ 928=
+X-IronPort-AV: E=Sophos;i="5.73,332,1583164800"; d="scan'208";a="137935156"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 02:37:08 +0800
+IronPort-SDR: /pKT4rYuVgi5xIK10DKDcNZPHR/dCwUuVmf0o25JXK2MOCCc5JgT8OCJTZDx0DUqqvjA5n5v3w
+ S1ObzZGN+4DTSfS9a6nfQ1Q5nucr/T/y8=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 29 Apr 2020 11:27:12 -0700
+IronPort-SDR: /ylXJcU/lduVDPmJK/b0Zxt1cLPHkpVDjXJR40jSeY39WHzTbIJh/pC+gljo5TJm2gUHCOfCZA
+ wwQ7imovOTLw==
+WDCIronportException: Internal
+Received: from cnf007834.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.55.253])
+ by uls-op-cesaip01.wdc.com with ESMTP; 29 Apr 2020 11:37:06 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: peter.maydell@linaro.org
+Subject: [PULL 12/14] hw/riscv: Add optional symbol callback ptr to
+ riscv_load_firmware()
+Date: Wed, 29 Apr 2020 11:28:54 -0700
+Message-Id: <20200429182856.2588202-13-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200429182856.2588202-1-alistair.francis@wdc.com>
+References: <20200429182856.2588202-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20200330210400.11724-2-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::1042
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.154.45;
+ envelope-from=prvs=381fbd49e=alistair.francis@wdc.com;
+ helo=esa6.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 14:37:03
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Received-From: 216.71.154.45
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,42 +98,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ Anup Patel <anup.patel@wdc.com>, palmerdabbelt@google.com,
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/30/20 2:03 PM, Peter Maydell wrote:
-> We define ARMMMUIdx_Stage2 as being an MMU index which uses a QEMU
-> TLB.  However we never actually use the TLB -- all stage 2 lookups
-> are done by direct calls to get_phys_addr_lpae() followed by a
-> physical address load via address_space_ld*().
-> 
-> Remove Stage2 from the list of ARM MMU indexes which correspond to
-> real core MMU indexes, and instead put it in the set of "NOTLB" ARM
-> MMU indexes.
-> 
-> This allows us to drop NB_MMU_MODES to 11.  It also means we can
-> safely add support for the ARMv8.3-TTS2UXN extension, which adds
-> permission bits to the stage 2 descriptors which define execute
-> permission separatel for EL0 and EL1; supporting that while keeping
-> Stage2 in a QEMU TLB would require us to use separate TLBs for
-> "Stage2 for an EL0 access" and "Stage2 for an EL1 access", which is a
-> lot of extra complication given we aren't even using the QEMU TLB.
-> 
-> In the process of updating the comment on our MMU index use,
-> fix a couple of other minor errors:
->  * NS EL2 EL2&0 was missing from the list in the comment
->  * some text hadn't been updated from when we bumped NB_MMU_MODES
->    above 8
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/cpu-param.h |   2 +-
->  target/arm/cpu.h       |  21 +++++---
->  target/arm/helper.c    | 112 ++++-------------------------------------
->  3 files changed, 27 insertions(+), 108 deletions(-)
+From: Anup Patel <anup.patel@wdc.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This patch adds an optional function pointer, "sym_cb", to
+riscv_load_firmware() which provides the possibility to access
+the symbol table during kernel loading.
 
-r~
+The pointer is ignored, if supplied with flat (non-elf) firmware image.
+
+The Spike board requires it locate the HTIF symbols from firmware ELF
+passed via "-bios" option.
+
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 20200427080644.168461-2-anup.patel@wdc.com
+Message-Id: <20200427080644.168461-2-anup.patel@wdc.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ hw/riscv/boot.c         | 13 ++++++++-----
+ hw/riscv/sifive_u.c     |  2 +-
+ hw/riscv/virt.c         |  2 +-
+ include/hw/riscv/boot.h |  6 ++++--
+ 4 files changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+index b8e765277d..726300a171 100644
+--- a/hw/riscv/boot.c
++++ b/hw/riscv/boot.c
+@@ -36,7 +36,8 @@
+ 
+ void riscv_find_and_load_firmware(MachineState *machine,
+                                   const char *default_machine_firmware,
+-                                  hwaddr firmware_load_addr)
++                                  hwaddr firmware_load_addr,
++                                  symbol_fn_t sym_cb)
+ {
+     char *firmware_filename = NULL;
+ 
+@@ -76,7 +77,7 @@ void riscv_find_and_load_firmware(MachineState *machine,
+ 
+     if (firmware_filename) {
+         /* If not "none" load the firmware */
+-        riscv_load_firmware(firmware_filename, firmware_load_addr);
++        riscv_load_firmware(firmware_filename, firmware_load_addr, sym_cb);
+         g_free(firmware_filename);
+     }
+ }
+@@ -96,12 +97,14 @@ char *riscv_find_firmware(const char *firmware_filename)
+ }
+ 
+ target_ulong riscv_load_firmware(const char *firmware_filename,
+-                                 hwaddr firmware_load_addr)
++                                 hwaddr firmware_load_addr,
++                                 symbol_fn_t sym_cb)
+ {
+     uint64_t firmware_entry, firmware_start, firmware_end;
+ 
+-    if (load_elf(firmware_filename, NULL, NULL, NULL, &firmware_entry,
+-                 &firmware_start, &firmware_end, NULL, 0, EM_RISCV, 1, 0) > 0) {
++    if (load_elf_ram_sym(firmware_filename, NULL, NULL, NULL,
++                         &firmware_entry, &firmware_start, &firmware_end, NULL,
++                         0, EM_RISCV, 1, 0, NULL, true, sym_cb) > 0) {
+         return firmware_entry;
+     }
+ 
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 0dd0efaa68..cfd6416b19 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -352,7 +352,7 @@ static void sifive_u_machine_init(MachineState *machine)
+     create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+ 
+     riscv_find_and_load_firmware(machine, BIOS_FILENAME,
+-                                 memmap[SIFIVE_U_DRAM].base);
++                                 memmap[SIFIVE_U_DRAM].base, NULL);
+ 
+     if (machine->kernel_filename) {
+         uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index c621a970aa..daae3ebdbb 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -511,7 +511,7 @@ static void riscv_virt_board_init(MachineState *machine)
+                                 mask_rom);
+ 
+     riscv_find_and_load_firmware(machine, BIOS_FILENAME,
+-                                 memmap[VIRT_DRAM].base);
++                                 memmap[VIRT_DRAM].base, NULL);
+ 
+     if (machine->kernel_filename) {
+         uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
+diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
+index df80051fbc..474a940ad5 100644
+--- a/include/hw/riscv/boot.h
++++ b/include/hw/riscv/boot.h
+@@ -24,10 +24,12 @@
+ 
+ void riscv_find_and_load_firmware(MachineState *machine,
+                                   const char *default_machine_firmware,
+-                                  hwaddr firmware_load_addr);
++                                  hwaddr firmware_load_addr,
++                                  symbol_fn_t sym_cb);
+ char *riscv_find_firmware(const char *firmware_filename);
+ target_ulong riscv_load_firmware(const char *firmware_filename,
+-                                 hwaddr firmware_load_addr);
++                                 hwaddr firmware_load_addr,
++                                 symbol_fn_t sym_cb);
+ target_ulong riscv_load_kernel(const char *kernel_filename,
+                                symbol_fn_t sym_cb);
+ hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
+-- 
+2.26.2
+
 
