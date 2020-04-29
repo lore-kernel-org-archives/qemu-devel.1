@@ -2,120 +2,125 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6E14C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E3EFC83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:08:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2F3021775
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:04:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42BB02087E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:08:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Y7Iqo7c6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2F3021775
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="UvTqhoOF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42BB02087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTlRy-0003GP-Rz
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 08:04:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52284)
+	id 1jTlVn-0005X5-8k
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 08:08:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52696)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTlPl-0002QK-SG
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:03:39 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jTlSZ-00047x-Fd
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:07:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTlO2-0007QH-37
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:02:08 -0400
-Received: from mail-eopbgr10094.outbound.protection.outlook.com
- ([40.107.1.94]:25438 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jTlRy-0006RV-68
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:05:03 -0400
+Received: from mail-eopbgr50109.outbound.protection.outlook.com
+ ([40.107.5.109]:52812 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jTlO1-0007JO-Cx; Wed, 29 Apr 2020 08:00:21 -0400
+ id 1jTlRx-0006Fb-NA; Wed, 29 Apr 2020 08:04:25 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ot7SbZn4IN2ibJ16YuNvVBO4FXk+MViJ4q3z5TZ//8XfecKEbXfsKq+/qDSskUfwqOPc8qXPukRpw/tfEL4/IjaxAEwcDXerQMS9+PlnqpFWFw6wsYctWZXz8Vif46/u+9rUCkiVP45kN5LQdy/mVQ01+5VLrrxlBDfVsd53awJ1GKm8grJ1CskHiGex2KdWNn14Un4PMJkc42JVZhVDzQPvYXfBs0Gf7ZvndPi6GiC22rv+9Dqly3UuS5wUogepiZ9sn+qIUwmDGaq5rkl/aLOoXZguEmXhB2KOY+qD9GCfQbcLalinr7HRkns+Qqxp4KBmleHdEedhcx9G1Vu7tw==
+ b=E+CXU0ivpgxMd8LYu4A6NuHt3K56jsgi5IEQSKiCl0QZfv9t0J16Cw8uksY8/9VN3VhZoh/ExzmlHs9ldG5HId2Xr/XkOh6Xo4bzjewaT0EeDF4D8c0GboFQFXghqNrrT4j2XfKfCbcUwnoej2bPrtzIDCie8lhEdInJqaje884fC14mIwJnQvkbG8c5gpm9g/MrjsOWjmr+5girJ5XdcqstAYXnWYUQZc34ujrh/J/yGr+8mB5iZdlso1+POR+1Znl/D0bJFCvb8loqEI7yGjBvjQcemdugqWpSby108roOQEG2Xd1G3ot9atGwOrZLiGWXpP+Zu0OdViz/X5YN0g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AHQVWOsnnEm/jtDqFr33y8nJaMcPT1GWj/o+6wg4cdw=;
- b=VX9SEYZ7TFeKQlubqgrQRMC3Ly2foMDyp2JNfl90n3iCBSJn5TzbWVITeM6hQi+aYZePSmm11l6ITQjxaRnp1lL0XG+uHjw0cDwB8yX9I2q+QJmyo0z0ulPa5bJfxLLBs3g/0MgGtj9yn7ozLDVJu+fpUD6O/qF8LKzHEk9T6V6E4h33TU1eYzs72oarjaYuQqQKVvqLoo6spqJtWay/t8Yze5/gcgH2p6azKYUDWWgW8RFPC70CdiKyuPh1pg5JpruFa6A+/uPiyL+Rcupe6buix9rlGbss5mznylcIlNt76Y/LomzNnt3iJ1Ju0BrvcqweevgF3D1wuRhyzPIsmg==
+ bh=hRiOL2ngvQfwSXlkBrf2FKjdcsvhZWqRhBx9lMquJTc=;
+ b=AejzFqr11gPqfZvNa9lZTgBw8LdXgG8l/xs0uYypir2PR9C83ShCePXiau+047EnI30wMiMP/hSQ1JiFtkg7JsxjyonYXuOQvDo1eFomZmu33ebSHfhObmqMa7yGptxAcaW+sst6D9N0oH8IZzrapMfTDqQX8FwTSffPhuci5WKP5ROXnK7ktDTGeWxJ95FcHyPaJnzZYxzCO9vBi9tfQq3fAGI0Oc0JDmjdbza8+7HJYuK8gkqthxvR4GGNpW6eHJWNxs2ceT7wy1fAwjGwgWeFc8o4q0QppmpaQ4jRHsSPw/OxZtrq9hdUepAqDUL0qtQMuFJoazTQVryYT+YbAg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AHQVWOsnnEm/jtDqFr33y8nJaMcPT1GWj/o+6wg4cdw=;
- b=Y7Iqo7c6vGj8hltdrGOR6BAN4G+6o7PrUCeYUEK5d/7S5MUSgvUmpn0ahhUzlveh2d9Otcg44mLy19e7v4oyl0GHNTTohqj+jid73WiJHFJgyUoyu8bbMxJjM12GkR5jDR+N01zE0iyzOAUnsh/diRWBeUJTxkZD8xtJ+7xBzxU=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+ bh=hRiOL2ngvQfwSXlkBrf2FKjdcsvhZWqRhBx9lMquJTc=;
+ b=UvTqhoOFsGkvCIN+MgoPw2Skb6p8vI5HlYKgvrySUXLxH0nf73JqNN2MT6mVKn9dsr8ASDjwOAWQt7Pm5+dihEA3bSCHZob4M5DBBdpl+Cr/xwjry7iv5x4f0bVj3NrLVLLThux/hhzGdgF/XKaI/zFVq7QBepDEaHBt/l2WNZs=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5528.eurprd08.prod.outlook.com (2603:10a6:20b:dd::19)
+ by AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Wed, 29 Apr
- 2020 12:00:17 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Wed, 29 Apr
+ 2020 12:04:22 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.023; Wed, 29 Apr 2020
- 12:00:17 +0000
-Subject: Re: [PATCH 2/3] backup: Make sure that source and target size match
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200429111539.42103-1-kwolf@redhat.com>
- <20200429111539.42103-3-kwolf@redhat.com>
+ 12:04:22 +0000
+Subject: Re: [PATCH v3 4/5] block/block-copy: refactor task creation
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200429061039.12687-1-vsementsov@virtuozzo.com>
+ <20200429061039.12687-5-vsementsov@virtuozzo.com>
+ <affc8770-2b70-c3e4-af1b-ca620119c2d5@redhat.com>
+ <92dd552d-b181-5b39-c796-e228c4d33379@virtuozzo.com>
+ <0f14b02d-884a-9581-f1c7-7133e6d36557@redhat.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200429150015953
-Message-ID: <7991aeee-59bf-0f36-c90e-1dd9adeee51a@virtuozzo.com>
-Date: Wed, 29 Apr 2020 15:00:15 +0300
+X-Tagtoolbar-Keys: D20200429150420718
+Message-ID: <3117b258-aecc-d588-68a9-1b32ee8acff9@virtuozzo.com>
+Date: Wed, 29 Apr 2020 15:04:20 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
-In-Reply-To: <20200429111539.42103-3-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <0f14b02d-884a-9581-f1c7-7133e6d36557@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FRYP281CA0013.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::23)
- To AM7PR08MB5494.eurprd08.prod.outlook.com
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0PR02CA0080.eurprd02.prod.outlook.com
+ (2603:10a6:208:154::21) To AM7PR08MB5494.eurprd08.prod.outlook.com
  (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from [192.168.100.2] (185.215.60.184) by
- FRYP281CA0013.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2958.19 via Frontend Transport; Wed, 29 Apr 2020 12:00:17 +0000
-X-Tagtoolbar-Keys: D20200429150015953
+ AM0PR02CA0080.eurprd02.prod.outlook.com (2603:10a6:208:154::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19 via Frontend
+ Transport; Wed, 29 Apr 2020 12:04:21 +0000
+X-Tagtoolbar-Keys: D20200429150420718
 X-Originating-IP: [185.215.60.184]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 799964fd-8c9d-4b3f-1fd7-08d7ec34e268
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5528:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB55283ED594B906C561CEDC37C1AD0@AM7PR08MB5528.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Office365-Filtering-Correlation-Id: 26c8bb3a-f1c7-4eec-d9a6-08d7ec357421
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5494:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5494F634C5E65072C9FF810AC1AD0@AM7PR08MB5494.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:525;
 X-Forefront-PRVS: 03883BD916
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(136003)(39840400004)(376002)(346002)(396003)(366004)(52116002)(31696002)(86362001)(186003)(16526019)(4326008)(2616005)(31686004)(956004)(36756003)(26005)(6486002)(66476007)(16576012)(66946007)(66556008)(8676002)(8936002)(2906002)(5660300002)(316002)(478600001)(966005);
+ SFS:(4636009)(136003)(376002)(346002)(396003)(39840400004)(366004)(2906002)(478600001)(5660300002)(31696002)(86362001)(6486002)(4326008)(107886003)(66556008)(186003)(2616005)(956004)(66476007)(16526019)(66946007)(16576012)(316002)(52116002)(8936002)(8676002)(36756003)(31686004)(26005)(53546011);
  DIR:OUT; SFP:1102; 
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7VfobNCf+X3aGB+X9Rm/7C7ViacgpcTY9i5oSdkwSqzqtmjt0Cs4kEmL76rWb1xxwfS5kv55FGjBF2NJajQpxgt+4ui6X5J/KwdFNLpZGgswpmnXssKYh+ELxuRrbB5G8cHYjBXLSfDpOX1K/TL3yGAJVVWYKsHLHiWQ/AGCx6+whk/9uEj0+T3ozW86CELKoTBnmkltxigG2vXFqSUBdnK9P6zPn12LgQxNLqVEa0WG4rnOOqrHuiqNN+t/jI3lePfEueYm01aokNUL14Zppdau4apFJlITW0qIIMBhOnZ7luoDrqVvbeYgT8KH34b86I+GN3lRfSp9ppyWz1vMntJfIbbKPRBKzO3WdeGk+s70M7E8Y8xbxOlmL7NOfFesQ9bXpLEnCP5Ay2S1jd2vCKQE551a8+ahI89Xey9DNbBK7OhdAvINhAp4HMyILk/bW0ThJ5F4pif9U6LDiKADVuR8XeO6HyNXKQWLE74BLCGotKQz2fx65BRrUlhLnDGcZ1ZCmhrSjUj/HkccfyWg/A==
-X-MS-Exchange-AntiSpam-MessageData: ugmgvy9Ad6p787yd8R7FxkCOg2A0oKsbMddJsOP9bZ9ieRZtluYtoF2xFvnVyoeqenVXwfuxH5oeYW8DV3bK3url44AJaVzTe+JdoLxsCxt4nLbqvPmwr7UtCPZr2dBg8qcHYNoqTW67uTPaERpWhiJQUKqtI+fWk2RB+J42QSFBFhSseeocfSY8IB5yNY+Csxpo30OY3JZzmmD3bREDVACCwne8sSffo2lSs+v0dhs9tsl4DQQbTKcZRXrGXyrDqf6p5u7RW5eAjj2Bz0GYR/sKFy3JW+SVQ4rv5WEhsUYiE0GIB+xZ0fwltkA/119AfEs8GOtrCtv5zBCPYdld3dTPzH5QYKuU12yJiraFq0O1IxMQW8AOUXivyaasiSh1qt0NvhwAB10Y/+ItMed9d4xBduXNB14yG0UJtkeOwW/4f+ADALNf+ZzfhrGcGjXekNOBFekbioCykRlm6jbZY3rFmP/h4I843ARDxlXv8yb7kPZqywvBUD9v/VdZVjB2miorzgyAGNt1jlbc4550E/FNFdKC9UmOcsnepX1SEjZ04BuygBpGFH62Ypb6j3Pfg95ZL4bbnFR/l232g6CWJ+iJ5jhZ2UjZOfYkZJmQWYtuB+kni6Kk9gm8sb6QkrSwVtzTleJsGoB/gBJJM0yqDPa4Eo+Ap43KgZSdfBH7uBxBHK7suAdLB8z4CCp2/GGpFCF1vVJ9BTf6eIkUGEs7UrICyhwJWlA9CbcQL0Ie86hNVTuyQ4UmvlBkV8q9BuMrx/Cav8FtHIx/j0wf3o8IvfH5SIJB3oD07KtR0dzY0Pc=
+X-Microsoft-Antispam-Message-Info: 0K0w/l+1BKQKz81hm7RAwiAIb0D769MA6ljJSdgijSlEVmv5Cl4ZceLHOf9VDhaJIVA+JE6+zpPEPATKeNdOAHUCTa/+qPIOeVKSLzMg3GcXqNQXzs1KX3ZmatMwyubRu8jzbrBwh6CFw5rU+zAQYEj5/02x6VZLDTvUybpfJHGD9hi+zAPbEzXQfAjrzyj+HauFfasYaKMMbFgTpDPdF3wrPwv7ACENIMAitohGzLuskZoTkvgdXCmF/i6KoTmBAi7OyEopgen4ER7w4E4DrqCS8HHp3/CxJ5LuuRgPf8SGa53L2ki0+WHVj26/rN3MHPkqpfm2vKuNUlk4EAaJd85xXQHy4jPUUUnFDfDWLeaQ6+mbA6OksYDlvAJb37DMrfTr0E6cwmle8B7hlAppv3JvZy68kWofgRk41dqfgkGFFjvaV7AFAMHyaO/Ceb8l
+X-MS-Exchange-AntiSpam-MessageData: wmq2hQSJH2Pzv5m3LrGSQE7laWJ3f+1IwVYQmfyS668i5vOYB61IQ7mYSCTXks+d7Sdsd7/k/KmDu9OwuX8eXucdlagljhvxim/4wS5zGO9Yrqg3xKhc4XEW3Lr2RvCusVITA8NZsfBo+dcuLtdAVY5pIMETR3SlNWjGWh4djFW8dBMMox8LhHmeTWtuH5NHliWpSeZ8BN1X+TTKSijlUAlCwt5KvsSFKqRppfqymIPLre5O19P82PL77WFr6ICzm7AqEhaNkhyeDAj2Zu1/tkFgR0hOgon969MLXL8CFwgAOkkuSzES3t0O34WSDJI/ob8nFcYnZpnd5cPmEvTKmpp+fxphcnPtaOmyM5fyt7H6p550inJzoYkk7y4NgRZjL9zyluPyGdq6ZXh5HeQy4CUT5FFzXYv6VZ3t1ITQ8A5Krk5mhnuw9pvsrl0P3z0hmc2XQkvihllkx3SEqYygDaoYF2rplyQvZ25a5orh44Y+Ee1kigmzdCkk5O6H4UbMr4t2oq3KArgJHiZpJRdJ2Dn+VpTWFVFRYQXxfveyxzoWorlgjOA8jt+ZE9ZR6nQoE0Yw3eQFR84Ba3JtC7cY/NkR/VJiDCZmhGiHY0/izSK/xCThDbPD81nEjyz7ivVMiyu42ht90zyETAZkTX0BksdXaF6h0JmfWgm2C7ZgCrhJ5sqxRbhEMbesj1LPPjRsHyn5W21ZWbuo1f3RqWs3Ufav7WFcEfuKNbg3xnZCYinXepi0+dw6rryp4rxFcCSQykGqOfPk5GU7vp9ScWs8czMN0vledhuO0NO8J0+nXgs=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 799964fd-8c9d-4b3f-1fd7-08d7ec34e268
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2020 12:00:17.8298 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 26c8bb3a-f1c7-4eec-d9a6-08d7ec357421
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2020 12:04:22.3156 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6pBkzM49dXLHlmnGp3TuubyHGqeaIsFxxdKwzEJa0J43OdD3S6GLNFhDoouoHGLZ9cZl2XYbL4czKRbzSHhjjvxlcFMJotjPX87cBlF2Cv4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5528
-Received-SPF: pass client-ip=40.107.1.94;
+X-MS-Exchange-CrossTenant-UserPrincipalName: mf/1C5A+01weL+4MhQO46ZjBzZUBqx/y8fpRlOru/q1hyuGV980Ggw+bbo2iOreNLvLrvzzNXtJXHKuJFDp7f5JMxTA5Gw6y9wMvgzPepfU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5494
+Received-SPF: pass client-ip=40.107.5.109;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR02-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 08:00:18
+ helo=EUR03-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 08:04:23
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.1.94
+X-Received-From: 40.107.5.109
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,130 +132,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jsnow@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-29.04.2020 14:15, Kevin Wolf wrote:
-> Since the introduction of a backup filter node, the backup block job
-> crashes when the target image is smaller than the source image because
-> it will try to write after the end of the target node without having
-> BLK_PERM_RESIZE. (Previously, the BlockBackend layer would have caught
-> this and errored out gracefully.)
+29.04.2020 14:56, Max Reitz wrote:
+> On 29.04.20 13:54, Vladimir Sementsov-Ogievskiy wrote:
+>> 29.04.2020 14:38, Max Reitz wrote:
+>>> On 29.04.20 08:10, Vladimir Sementsov-Ogievskiy wrote:
+>>>> Instead of just relying on the comment "Called only on full-dirty
+>>>> region" in block_copy_task_create() let's move initial dirty area
+>>>> search directly to block_copy_task_create(). Let's also use effective
+>>>> bdrv_dirty_bitmap_next_dirty_area instead of looping through all
+>>>> non-dirty clusters.
+>>>>
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>> ---
+>>>>    block/block-copy.c | 78 ++++++++++++++++++++++++++--------------------
+>>>>    1 file changed, 44 insertions(+), 34 deletions(-)
+>>>>
+>>>> diff --git a/block/block-copy.c b/block/block-copy.c
+>>>> index 35ff9cc3ef..5cf032c4d8 100644
+>>>> --- a/block/block-copy.c
+>>>> +++ b/block/block-copy.c
+>>>
+>>> [...]
+>>>
+>>>> @@ -106,17 +111,27 @@ static bool coroutine_fn
+>>>> block_copy_wait_one(BlockCopyState *s, int64_t offset,
+>>>>        return true;
+>>>>    }
+>>>>    -/* Called only on full-dirty region */
+>>>> +/*
+>>>> + * Search for the first dirty area in offset/bytes range and create
+>>>> task at
+>>>> + * the beginning of it.
+>>>
+>>> Oh, that’s even better.
+>>>
+>>>> + */
+>>>>    static BlockCopyTask *block_copy_task_create(BlockCopyState *s,
+>>>>                                                 int64_t offset,
+>>>> int64_t bytes)
+>>>>    {
+>>>> -    BlockCopyTask *task = g_new(BlockCopyTask, 1);
+>>>> +    if (!bdrv_dirty_bitmap_next_dirty_area(s->copy_bitmap,
+>>>> +                                           offset, offset + bytes,
+>>>> +                                           s->copy_size, &offset,
+>>>> &bytes))
+>>>> +    {
+>>>> +        return NULL;
+>>>> +    }
+>>>>    +    /* region is dirty, so no existent tasks possible in it */
+>>>>        assert(!find_conflicting_task(s, offset, bytes));
+>>>>          bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
+>>>>        s->in_flight_bytes += bytes;
+>>>>    +    BlockCopyTask *task = g_new(BlockCopyTask, 1);
+>>>
+>>> This should be declared at the top of the function.
+>>>
+>>
+>> I just thought, why not to try another style? Are you against?
+>> Requirement to declare variables at start of block is obsolete, isn't it?
 > 
-> We can fix this and even do better than the old behaviour: Check that
-> source and target have the same image size at the start of the block job
-> and unshare BLK_PERM_RESIZE. This will immediately error out when
-> starting the job instead of only when writing to a block that doesn't
-> exist in the target.
+> Oh, it absolutely is and personally I’m absolutely not against it, but
+> CODING_STYLE says:
 > 
-> Longer target than source would technically work because we would never
-> write to blocks that don't exist, but semantically these are invalid,
-> too, because a backup is supposed to create a copy, not just an image
-> that starts with a copy.
+>> Mixed declarations (interleaving statements and declarations within
+>> blocks) are generally not allowed; declarations should be at the beginning
+>> of blocks.
 > 
-> The bugs were introduced in commits 2c8074c45 (BLK_PERM_RESIZE is shared
 
-no, it was unshared by blks in block-copy
+Oh, missed (or forget). Let's fix it? :) Not in these series, of course. OK, I'll fix the patch.
 
-> since this commit) and 00e30f05d (BdrvChild instead of BlockBackend
-> turns I/O errors into assertion failures).
-
-and here becomes shared.
-
-So, seems only 00e30f05d is broken and introduces both problems
-
-> 
-> Fixes: 2c8074c453ff13a94bd08ec26061917670ec03be
-> Fixes: 00e30f05de1d19586345ec373970ef4c192c6270
-> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1778593
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   block/backup-top.c | 12 ++++++++----
->   block/backup.c     | 14 +++++++++++++-
->   2 files changed, 21 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/backup-top.c b/block/backup-top.c
-> index 3b50c06e2c..0e515a7705 100644
-> --- a/block/backup-top.c
-> +++ b/block/backup-top.c
-> @@ -148,8 +148,10 @@ static void backup_top_child_perm(BlockDriverState *bs, BdrvChild *c,
->            *
->            * Share write to target (child_file), to not interfere
->            * with guest writes to its disk which may be in target backing chain.
-> +         * Can't resize during a backup block job because we check the size
-> +         * only upfront.
->            */
-> -        *nshared = BLK_PERM_ALL;
-> +        *nshared = BLK_PERM_ALL & ~BLK_PERM_RESIZE;
->           *nperm = BLK_PERM_WRITE;
->       } else {
->           /* Source child */
-> @@ -192,11 +194,13 @@ BlockDriverState *bdrv_backup_top_append(BlockDriverState *source,
->   {
->       Error *local_err = NULL;
->       BDRVBackupTopState *state;
-> -    BlockDriverState *top = bdrv_new_open_driver(&bdrv_backup_top_filter,
-> -                                                 filter_node_name,
-> -                                                 BDRV_O_RDWR, errp);
-> +    BlockDriverState *top;
->       bool appended = false;
->   
-> +    assert(source->total_sectors == target->total_sectors);
-
-Is it correct to use directly total_sectors and not bdrv_getlenght()?
-Anyway, using bdrv_getlength() seems safer, and will help us if we move
-to byte-accurate block-layer at some moment in future.
-
-Hmm but total_sectors used directly anyway in this function, so OK
-
-
-> +
-> +    top = bdrv_new_open_driver(&bdrv_backup_top_filter, filter_node_name,
-> +                              BDRV_O_RDWR, errp);
-
-alignment broken. With it fixed:
-
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
->       if (!top) {
->           return NULL;
->       }
-> diff --git a/block/backup.c b/block/backup.c
-> index c4c3b8cd46..4f13bb20a5 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -340,7 +340,7 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
->                     BlockCompletionFunc *cb, void *opaque,
->                     JobTxn *txn, Error **errp)
->   {
-> -    int64_t len;
-> +    int64_t len, target_len;
->       BackupBlockJob *job = NULL;
->       int64_t cluster_size;
->       BdrvRequestFlags write_flags;
-> @@ -405,6 +405,18 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
->           goto error;
->       }
->   
-> +    target_len = bdrv_getlength(target);
-> +    if (target_len < 0) {
-> +        error_setg_errno(errp, -target_len, "Unable to get length for '%s'",
-> +                         bdrv_get_device_or_node_name(bs));
-> +        goto error;
-> +    }
-> +
-> +    if (target_len != len) {
-> +        error_setg(errp, "Source and target image have different sizes");
-> +        goto error;
-> +    }
-> +
->       cluster_size = backup_calculate_cluster_size(target, errp);
->       if (cluster_size < 0) {
->           goto error;
-> 
 
 
 -- 
