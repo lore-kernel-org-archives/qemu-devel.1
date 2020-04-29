@@ -2,89 +2,93 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B108C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:30:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A86F0C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:30:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22CFF20731
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:30:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7374C20731
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:30:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O2QoJLrj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22CFF20731
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k/vWWwHy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7374C20731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTi73-0004ze-6p
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:30:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54614)
+	id 1jTi7H-00056D-JV
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:30:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54622)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTi5p-0003jK-P2
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:29:22 -0400
+ id 1jTi5r-0003jV-05
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:29:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTi5p-0002J4-AR
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:29:21 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:44781)
+ id 1jTi5q-0002JP-Kp
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:29:22 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51205)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jTi5o-0002Iv-Uf
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:29:20 -0400
-Received: by mail-wr1-x432.google.com with SMTP id d17so1375434wrg.11
- for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 01:29:20 -0700 (PDT)
+ id 1jTi5q-0002JA-8t
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:29:22 -0400
+Received: by mail-wm1-x344.google.com with SMTP id x4so1010817wmj.1
+ for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 01:29:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=DwPbxu23lkjyUl5B0qgGKA8zAjYZIJItzWNye25rgBQ=;
- b=O2QoJLrjysCNKN6oJKzFwY9zKog7X3tENWgF+PGhWpA+vaii/rvI2mzXFamMtwBne3
- aXwZ4WRslIw9fw7UEcwUc36uwwMYtPM90dLnGs9r55cvyBxS80GqKGxdr8cYBuuo0Mpq
- zrb37U6cV/HP52m3eyH3Aj2FS3yntJfs+LusIgXtojDun3IaX3gUQfhoQjsz0uuDiTU6
- egFQN281PqEjiKYtP3h7NkR0vj4+E8luTSnyEfANr3wCB7uyhitlUYNzkU/BeDwx4Cki
- VvIZqksm71swfEYDIbyxuC4v9Z9GPQZWa/tH9x3VHNIaZnx49k+0/skdsLNvqmkIkEco
- Nxhg==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=s3vuzfzHqrILA6RfaHqkgzWfKCZQlZmqp6m3sNft2FE=;
+ b=k/vWWwHyVmftdgJlHL/K5iRhDGaMTz9Y+ThIHtUE+fWLFZ4IKUcQmhWk2U3quCzr9q
+ lDYfybt5tcclFPdqzytKPXy7HAEl8pnQ9rfuInmzzqov45UQsNBJzShYJLWi6BtU2r7y
+ KG3Tu8Au1xvE5tfERWMj1qOZKqTS+a385p89hFXjRA9Pg0kdMHxZQUH7vSwc2mDHQ0oY
+ ud3hP2+OUVfbXpJb8LSNdycO8T43Th0oRY0V7cdHDlpq8/9tW5mgHnigOiIJfFb8Hzw1
+ FSLHcwZkV7MWrCsdwT58GFWYcXWzVIBwBUhdcFTF2w509WYIyCF7zlWs7ScWp195nJnI
+ 3LkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=DwPbxu23lkjyUl5B0qgGKA8zAjYZIJItzWNye25rgBQ=;
- b=HhTC+GzrA2npGPiqvDvABYKoFlOnZzNcjunchrkPeYMjigFxTCAzCKS5QvLlko+Z39
- fP3N8aRoa+W6TrwY2h+Zy5a6norJyTC7ApXd4NdNX/jA04Vzu7olLBU+4bSESSX/6/HG
- 0d3UVjPpQDm3Aj/F4PLIe1vogpR3l1GsypgSndanGEygDCG4HGswxQa3kIeD4sGcBsAd
- zVg39XsZDAyMvtoYii3Az9AythZxFpqk3a35bo+020U0NJ3F4NNAGmaoN17Yymt3/RKf
- 9FtHyX5CLj+W4oUEXGSbsGSlxc+3kHPwbCV+HOnYfVu5XQkx7Pga/8ugM8OaFyg+VjlK
- KsGQ==
-X-Gm-Message-State: AGi0PuZsuORt4BoZ+DHGzLEXnwXPET+q58ujs2TMCOg9F4dNor8a+RDT
- IqoHqwXfrgi4/KWgrpJB0TuHkUhwyoU=
-X-Google-Smtp-Source: APiQypJRps+Y3wGpDH6nRw/7042oXxDpHezPO0wd05kUN98asGHqIkkJiqz4yLKqXCcvNIjQy0iaHQ==
-X-Received: by 2002:a5d:438c:: with SMTP id i12mr37645574wrq.14.1588148959214; 
- Wed, 29 Apr 2020 01:29:19 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=s3vuzfzHqrILA6RfaHqkgzWfKCZQlZmqp6m3sNft2FE=;
+ b=hcX7Taf8UIBNSPkNhyT8OneP7LDAg2CmYVn2/FmOV/K79h55N1DAa4JCIR0zcEjJAp
+ rhH4TK36mP/w5S1986zFollsIaXihvWK36oJ41yy6S5rn9u7PwtCizkmJjvVmq5K8AkJ
+ HdtLj0GfshN4nK1aTkFUOuEtx6kEhtbC9+98zLawtYJoNR3bl+chfMvaa9rzNfi/KGcE
+ P3ReBBSvO/sTEpDv7ZE1/q1g4KhHkUFmxNYkIVimmNi+2JZCm4GopnRCGcSavWYX+b8f
+ ZqNYT9sF0SkWjwQH5fpub8kc2sL2rqb7sstgJhwjbJSGiVbi/ggACMWt9AiPpGXlGkxO
+ 6yCw==
+X-Gm-Message-State: AGi0Pub6iy0dcIhFT+KlnutnFoIJfgyoPGmbrcpifeiIcPn8lNl2dfCC
+ xiZkxyn/tO7BIhw0JRX+G9Nmd6vqQco=
+X-Google-Smtp-Source: APiQypK/ht8IopfGi2eiVWSwdJdodx7tXbgvXyqm7Sh0h+QxdQYFK3wpm/BHBJ5Uv4g6HRMVfywG0g==
+X-Received: by 2002:a7b:c390:: with SMTP id s16mr1857960wmj.14.1588148960788; 
+ Wed, 29 Apr 2020 01:29:20 -0700 (PDT)
 Received: from localhost.localdomain (137.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.137])
- by smtp.gmail.com with ESMTPSA id a9sm6373615wmm.38.2020.04.29.01.29.17
+ by smtp.gmail.com with ESMTPSA id a9sm6373615wmm.38.2020.04.29.01.29.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Apr 2020 01:29:18 -0700 (PDT)
+ Wed, 29 Apr 2020 01:29:20 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/2] mips: Minor simplifications for KVM use
-Date: Wed, 29 Apr 2020 10:29:14 +0200
-Message-Id: <20200429082916.10669-1-f4bug@amsat.org>
+Subject: [PATCH 1/2] hw/mips/mips_int: De-duplicate KVM interrupt delivery
+Date: Wed, 29 Apr 2020 10:29:15 +0200
+Message-Id: <20200429082916.10669-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200429082916.10669-1-f4bug@amsat.org>
+References: <20200429082916.10669-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::432;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x432.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::432
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,17 +111,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A pair of trivial patches while reviewing Huacai's
-"KVM target support for MIPS64" series.
+Refactor duplicated code in a single place.
 
-Philippe Mathieu-Daudé (2):
-  hw/mips/mips_int: De-duplicate KVM interrupt delivery
-  target/mips/kvm: Assert unreachable code is not used
-
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
  hw/mips/mips_int.c | 11 +++--------
- target/mips/kvm.c  |  8 ++------
- 2 files changed, 5 insertions(+), 14 deletions(-)
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
+diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
+index 796730b11d..4a1bf846da 100644
+--- a/hw/mips/mips_int.c
++++ b/hw/mips/mips_int.c
+@@ -47,17 +47,12 @@ static void cpu_mips_irq_request(void *opaque, int irq, int level)
+ 
+     if (level) {
+         env->CP0_Cause |= 1 << (irq + CP0Ca_IP);
+-
+-        if (kvm_enabled() && irq == 2) {
+-            kvm_mips_set_interrupt(cpu, irq, level);
+-        }
+-
+     } else {
+         env->CP0_Cause &= ~(1 << (irq + CP0Ca_IP));
++    }
+ 
+-        if (kvm_enabled() && irq == 2) {
+-            kvm_mips_set_interrupt(cpu, irq, level);
+-        }
++    if (kvm_enabled() && irq == 2) {
++        kvm_mips_set_interrupt(cpu, irq, level);
+     }
+ 
+     if (env->CP0_Cause & CP0Ca_IP_mask) {
 -- 
 2.21.1
 
