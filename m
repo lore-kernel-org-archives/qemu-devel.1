@@ -2,83 +2,95 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F10BBC83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:23:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA9C9C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:27:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8ED520731
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:23:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A48852082E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:27:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bFpcTf2B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8ED520731
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CSzCpTfV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A48852082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTiw4-0003Ow-Uw
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 05:23:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33148)
+	id 1jTizh-0005HA-Lw
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 05:27:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33492)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jTivO-0002YF-Mc
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:22:39 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jTiz1-0004ks-8k
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jTivN-0006zn-HB
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:22:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52222
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jTivN-0006qI-0a
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:22:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588152154;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=k0buYRTYTi0d2vF01agownmWEJuC/4qGmXxXl9LWQmQ=;
- b=bFpcTf2B4lLofGl9naet4aTvWVfrsPAkAp0srqTKK1hRxnBoG01JMZBFOUAwIIXKSMbi4D
- iVheHOd6JlRTJ51k61cGAf6k+cGBwFhUAm7FvbO0KXZQumYGjc/Dkq8C3Y8NkU5h7jCP43
- smgNih49iRtmFhfZt0VCn7HPH9l/WUU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-7qvN90lMMx67HLrSrZa07g-1; Wed, 29 Apr 2020 05:22:31 -0400
-X-MC-Unique: 7qvN90lMMx67HLrSrZa07g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 431A6464
- for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 09:22:30 +0000 (UTC)
-Received: from localhost (ovpn-114-2.ams2.redhat.com [10.36.114.2])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CCDA499D6;
- Wed, 29 Apr 2020 09:22:29 +0000 (UTC)
-Date: Wed, 29 Apr 2020 10:22:28 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PULL 12/32] block/file-posix: Fix check_cache_dropped() error
- handling
-Message-ID: <20200429092228.GC122432@stefanha-x1.localdomain>
-References: <20200429072048.29963-1-armbru@redhat.com>
- <20200429072048.29963-13-armbru@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1jTiyz-0004H7-Ml
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:26:22 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39975)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jTiyz-0004Gk-0b
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:26:21 -0400
+Received: by mail-wm1-x342.google.com with SMTP id u16so1223134wmc.5
+ for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 02:26:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=sgXXg4ceZKsTQ6nV86CvYTkHxSQK0zyjxQd2Fe7sS04=;
+ b=CSzCpTfVA1zjOobnTKAu4ECvgBvxVeLIkxtbrFoBaWRXySuX9UV1mmlGJ0NXT02SLa
+ H/n/yixfEyQ7OMNbEvEQEN9AGCDzi6fjvBLa0F2BV98zZG/nthAfu94i2IL9+g+1FIWV
+ zsSQ1N9nSD7ylXFFxQFfh2FielIIUQhMMxSBT4iZJDVRZvdKwqNJOPyemB11AqhgKY8k
+ 2zS+41AuxcZxrR6kM/2pREK1VO8TgtUlWuPSk57dpy5bcLh9HjXzjfwogmpBJcjWr/wf
+ K41UuiBonaawRqfLvs6QhYBkdRanr6g59k0DHivNRYTFHvQ2kaOUjywgVkJcoTiub5Hd
+ h7Ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=sgXXg4ceZKsTQ6nV86CvYTkHxSQK0zyjxQd2Fe7sS04=;
+ b=c/N1/Cpky0NfrwkeHWCcfTx03kBmPss6GWgZl7vXRrCF6WcM5TkjwNveXS+dmVIZqe
+ o514hI8LnLWertK2u7Q5DGZXy83UNojIjE4yXMCP7sBmKrBbcucEH3HrI4UIDyDtmCI8
+ tVRUlUer7XQahth7R5h6Hf13rARBNzmrzzCDsL0TNiLaMuu6YIZw5StTbEcj2wkGPx7L
+ Y5pf116vXrJDiDFWgTMKXw2CpfzyXhczisW9+EoJYr02BMCrSCcKC375SS6lw78/6kLe
+ r7/Il/Sv8TAdOPGlhAjbSIKFRnROPbX5Ws3PGoJQa2jIXcD9u7ukcTAeMVbkKj87hKT0
+ XAig==
+X-Gm-Message-State: AGi0PuZA89ZfyCC7z56W6nBmHj0ox9RLFC70UK7VYwwU0mHra97IQSMC
+ pV3oGhxINLaZBJzJEd2JEAAPcQ==
+X-Google-Smtp-Source: APiQypI6BeJ1oTcI+4UBBdN+vYA48LR8VXDdjnDCrNy0kPBwyNgRTyVcUMwk/hP8m/Vx78uQVANvOQ==
+X-Received: by 2002:a7b:c20f:: with SMTP id x15mr2113349wmi.2.1588152379418;
+ Wed, 29 Apr 2020 02:26:19 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id b4sm29294207wrv.42.2020.04.29.02.26.17
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Apr 2020 02:26:18 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 26F5B1FF7E;
+ Wed, 29 Apr 2020 10:26:17 +0100 (BST)
+References: <1588094279-17913-1-git-send-email-frederic.konrad@adacore.com>
+ <1588094279-17913-2-git-send-email-frederic.konrad@adacore.com>
+ <87d07rlac5.fsf@linaro.org>
+ <9f6c1efc-a195-0f5d-8c34-4dfb45d910f8@vivier.eu>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Subject: Re: [PATCH 1/2] softfloat: m68k: infinity is a valid encoding
+In-reply-to: <9f6c1efc-a195-0f5d-8c34-4dfb45d910f8@vivier.eu>
+Date: Wed, 29 Apr 2020 10:26:16 +0100
+Message-ID: <87a72ulk1z.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200429072048.29963-13-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="69pVuxX8awAiJ7fD"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:18:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,57 +102,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, philmd@redhat.com,
+ qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---69pVuxX8awAiJ7fD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 29, 2020 at 09:20:28AM +0200, Markus Armbruster wrote:
-> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
-> pointer to a variable containing NULL.  Passing an argument of the
-> latter kind twice without clearing it in between is wrong: if the
-> first call sets an error, it no longer points to NULL for the second
-> call.
->=20
-> check_cache_dropped() calls error_setg() in a loop.  It fails to break
-> the loop in one instance.  If a subsequent iteration error_setg()s
-> again, it trips error_setv()'s assertion.
->=20
-> Fix it to break the loop.
->=20
-> Fixes: 31be8a2a97ecba7d31a82932286489cac318e9e9
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Message-Id: <20200422130719.28225-3-armbru@redhat.com>
-> ---
->  block/file-posix.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+Laurent Vivier <laurent@vivier.eu> writes:
 
-Thanks for fixing this bug!
+> Le 28/04/2020 =C3=A0 20:43, Alex Benn=C3=A9e a =C3=A9crit :
+>>=20
+>> KONRAD Frederic <frederic.konrad@adacore.com> writes:
+>>=20
+>>> The MC68881 say about infinities (3.2.4):
+>>>
+>>> "*For the extended precision format, the most significant bit of the
+>>> mantissa (the integer bit) is a don't care."
+>>>
+>>> https://www.nxp.com/docs/en/reference-manual/MC68881UM.pdf
+>>>
+>>> The m68k extended format is implemented with the floatx80 and
+>>> floatx80_invalid_encoding currently treats 0x7fff00000000000000000000 as
+>>> an invalid encoding.  This patch fixes floatx80_invalid_encoding so it
+>>> accepts that the most significant bit of the mantissa can be 0.
+>>>
+>>> This bug can be revealed with the following code which pushes extended
+>>> infinity on the stack as a double and then reloads it as a double.  It
+>>> should normally be converted and read back as infinity and is currently
+>>> read back as nan:
+>>=20
+>> Do you have any real HW on which you could record some .ref files for
+>> the various multiarch float tests we have (float_convs/float_madds)?
+>> Does this different of invalid encoding show up when you add them?
+>
+> On my side, in the past when I started to implement m68k FPU, I used
+> TestFloat and SoftFloat I have ported to m68k and I compare the result
+> in QEMU and in a Quadra 800.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Surely TestFloat and SoftFloat is all emulation though?
 
---69pVuxX8awAiJ7fD
-Content-Type: application/pgp-signature; name="signature.asc"
+Anyway if you have a Quadra 800 running Linux could you generate some
+.ref files for the float_convs and float_madds test cases. The binaries
+are static so you should just be able to copy them and run.
 
------BEGIN PGP SIGNATURE-----
+> https://github.com/vivier/m68k-testfloat
+> https://github.com/vivier/m68k-softfloat
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6pR1QACgkQnKSrs4Gr
-c8hu3wgAqsYhHhT2HgdYJzMPmNfuO0Az4CqiI3nmCFHjMBagVbnaeNklHNqWIrsn
-T8Zib/js6kT++DFPjq8/tYK0FlId3RBDeCUanI0zThOl7r90sxgTVzu3IZhvUwBK
-Mrl1t6FPvRbL8fOjNM7y2SmKlllMt8FZy8DtmoZ7jNjgDvByd4bWapiD9j1aDfH6
-h6zdGlUwdZNcNB9Y9zKUSj+b3FJXhELUy1cF69B0XHaPNOxCNLTgWNlLod9AxOSJ
-F90qdhUZH3bGl+gUR9dojLGQt8fZB6vP/Hvi4owmcWBcShw7tEYTNoE/fJTy3a1k
-jMRJAdp87ntFv+hyGQiKKvOG93OatA==
-=5C6z
------END PGP SIGNATURE-----
+Ahh I see you have sys_float functions to compare to TestFloat.=20
 
---69pVuxX8awAiJ7fD--
+> I also used the gcc and libc testsuite to detect problems but this was a
+> very slow process...
+>
+> I have also ported RISU to m68k, but I didn't add FPU test in it (does
+> it support FPU test?).
 
+There is no reason why it couldn't. The FPU support would basically be
+ensuring the appropriate registers are saved out of the context. I did
+similar when we expanded the aarch64 RISU to support SVE. In fact
+looking at the code:
+
+    for (i =3D 0; i < 8; i++) {
+        if (m->fpregs.f_fpregs[i][0] !=3D a->fpregs.f_fpregs[i][0] ||
+            m->fpregs.f_fpregs[i][1] !=3D a->fpregs.f_fpregs[i][1] ||
+            m->fpregs.f_fpregs[i][2] !=3D a->fpregs.f_fpregs[i][2]) {
+            return 0;
+        }
+    }
+
+it seems the fpregs are included and tested so it should be good.
+
+That said RISU's random instruction approach means most floating point
+numbers very quickly become tend to NaNs which is part of the reason I
+wrote the float_convs/float_madds tests which try to be more systematic
+in exercising the range of float types (normals, denormals, min and max
+etc). Maybe we could improve risugen's seeding of floating point values
+to better exercise FP ops rather than just dumping random stuff there.
+
+>
+> Thanks,
+> Laurent
+
+
+--=20
+Alex Benn=C3=A9e
 
