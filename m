@@ -2,89 +2,70 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC71EC83007
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:50:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0490C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:54:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67A092082E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:50:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eMEdNObp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67A092082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9AE3920775
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:54:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AE3920775
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTjMY-0004Y4-JH
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 05:50:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35710)
+	id 1jTjQA-00071T-Ng
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 05:54:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36246)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jTjLA-0002rs-KV
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:49:19 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jTjPc-0006cJ-Oz
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jTjL8-0003sh-QR
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:49:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25273
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <no-reply@patchew.org>) id 1jTjPa-0007UP-QR
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:53:52 -0400
+Resent-Date: Wed, 29 Apr 2020 05:53:52 -0400
+Resent-Message-Id: <E1jTjPa-0007UP-QR@eggs.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21312)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jTjL8-0003sL-AZ
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:49:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588153753;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=9Mkr/Z4CbEN7CRdyJL4Q5ry0f4xgeSUyp9sSh0QDpKw=;
- b=eMEdNObpeQJosIxpjfDNJtkHXClyxxfJGxPJOdTRfFoKW64oh9tMU0P/UiGJnVNQuTvF7V
- BThb3DFx7jgTYbAqufOM76o141PzOUeY/k224S2qkAckHTKqbSynJ/mIplUjOD4mVADM6L
- eNN1ahgauF2oVGPw8+r9h9fYq+JizaI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-ATMuaC_yO0K3L4MjMUgsLQ-1; Wed, 29 Apr 2020 05:49:10 -0400
-X-MC-Unique: ATMuaC_yO0K3L4MjMUgsLQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 845FA19200CA;
- Wed, 29 Apr 2020 09:49:06 +0000 (UTC)
-Received: from work-vm (ovpn-114-192.ams2.redhat.com [10.36.114.192])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DE21A5D715;
- Wed, 29 Apr 2020 09:48:51 +0000 (UTC)
-Date: Wed, 29 Apr 2020 10:48:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
- VFIO live migration
-Message-ID: <20200429094844.GE2834@work-vm>
-References: <AADFC41AFE54684AB9EE6CBC0274A5D19D86DF06@SHSMSX104.ccr.corp.intel.com>
- <20200422073628.GA12879@joy-OptiPlex-7040>
- <20200424191049.GU3106@work-vm>
- <20200426013628.GC12879@joy-OptiPlex-7040>
- <20200427153743.GK2923@work-vm>
- <20200428005429.GJ12879@joy-OptiPlex-7040>
- <20200428141437.GG2794@work-vm>
- <20200429072616.GL12879@joy-OptiPlex-7040>
- <20200429082201.GA2834@work-vm>
- <20200429093555.GM12879@joy-OptiPlex-7040>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jTjPa-0007U5-AD
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:53:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1588154021; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=SrQI6Nj97HxiB/Hm1ryiAYCV+pCaiV7vBkM5H8NZIF40s+mWjOoZXon2Pumd0RcENHhjShS7DPrgArWLMDp44Hw2g/MINYXAZQhxLtLivs/GEiuOiqyzismPN4QHKLcPVosl3bjaywuU5LHiQ/IP6+p9PVoH9gtfCALLrHwUQcM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1588154021;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=fIafXtV7pyC4vCcC8E/odehTiBMFLEWaNbCd6VfUyFM=; 
+ b=Hk7qflCh5nSsHJj8tZ2YWkuMY/I1U18wmVF7hcsKhJBrrtS2owlNwFFMqjjGd032l8IMeVpA3CmCrtHzjcFrYqQ+G+ep92OiSR1Krp1uGmt4AZ4TsSRj//47jSe48ghgSkxTic7ZcP1gLhhI0F4JonInIreXnlUs1u2dhVWnu+Y=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 158815402028579.02298148673788;
+ Wed, 29 Apr 2020 02:53:40 -0700 (PDT)
+Message-ID: <158815401927.79.13168573222091525255@45ef0f9c86ae>
+In-Reply-To: <20200429072435.F13E23C0D11@aeryn.lan.ktmba>
+Subject: Re: [PATCH v2] audio/jack: add JACK client audiodev
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200429093555.GM12879@joy-OptiPlex-7040>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: geoff@hostfission.com
+Date: Wed, 29 Apr 2020 02:53:40 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 02:03:04
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Received-From: 136.143.188.53
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,375 +77,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
- "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "Yang, Ziye" <ziye.yang@intel.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
- "Tian, Kevin" <kevin.tian@intel.com>, "Zeng, Xin" <xin.zeng@intel.com>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
- "Liu, Changpeng" <changpeng.liu@intel.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "dinechin@redhat.com" <dinechin@redhat.com>,
- "He, Shaopeng" <shaopeng.he@intel.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Yan Zhao (yan.y.zhao@intel.com) wrote:
-> On Wed, Apr 29, 2020 at 04:22:01PM +0800, Dr. David Alan Gilbert wrote:
-> > * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> > > On Tue, Apr 28, 2020 at 10:14:37PM +0800, Dr. David Alan Gilbert wrote:
-> > > > * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> > > > > On Mon, Apr 27, 2020 at 11:37:43PM +0800, Dr. David Alan Gilbert wrote:
-> > > > > > * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> > > > > > > On Sat, Apr 25, 2020 at 03:10:49AM +0800, Dr. David Alan Gilbert wrote:
-> > > > > > > > * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> > > > > > > > > On Tue, Apr 21, 2020 at 08:08:49PM +0800, Tian, Kevin wrote:
-> > > > > > > > > > > From: Yan Zhao
-> > > > > > > > > > > Sent: Tuesday, April 21, 2020 10:37 AM
-> > > > > > > > > > > 
-> > > > > > > > > > > On Tue, Apr 21, 2020 at 06:56:00AM +0800, Alex Williamson wrote:
-> > > > > > > > > > > > On Sun, 19 Apr 2020 21:24:57 -0400
-> > > > > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > > > > > > > >
-> > > > > > > > > > > > > On Fri, Apr 17, 2020 at 07:24:57PM +0800, Cornelia Huck wrote:
-> > > > > > > > > > > > > > On Fri, 17 Apr 2020 05:52:02 -0400
-> > > > > > > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > On Fri, Apr 17, 2020 at 04:44:50PM +0800, Cornelia Huck wrote:
-> > > > > > > > > > > > > > > > On Mon, 13 Apr 2020 01:52:01 -0400
-> > > > > > > > > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > > > This patchset introduces a migration_version attribute under sysfs
-> > > > > > > > > > > of VFIO
-> > > > > > > > > > > > > > > > > Mediated devices.
-> > > > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > > > This migration_version attribute is used to check migration
-> > > > > > > > > > > compatibility
-> > > > > > > > > > > > > > > > > between two mdev devices.
-> > > > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > > > Currently, it has two locations:
-> > > > > > > > > > > > > > > > > (1) under mdev_type node,
-> > > > > > > > > > > > > > > > >     which can be used even before device creation, but only for
-> > > > > > > > > > > mdev
-> > > > > > > > > > > > > > > > >     devices of the same mdev type.
-> > > > > > > > > > > > > > > > > (2) under mdev device node,
-> > > > > > > > > > > > > > > > >     which can only be used after the mdev devices are created, but
-> > > > > > > > > > > the src
-> > > > > > > > > > > > > > > > >     and target mdev devices are not necessarily be of the same
-> > > > > > > > > > > mdev type
-> > > > > > > > > > > > > > > > > (The second location is newly added in v5, in order to keep
-> > > > > > > > > > > consistent
-> > > > > > > > > > > > > > > > > with the migration_version node for migratable pass-though
-> > > > > > > > > > > devices)
-> > > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > > What is the relationship between those two attributes?
-> > > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > (1) is for mdev devices specifically, and (2) is provided to keep the
-> > > > > > > > > > > same
-> > > > > > > > > > > > > > > sysfs interface as with non-mdev cases. so (2) is for both mdev
-> > > > > > > > > > > devices and
-> > > > > > > > > > > > > > > non-mdev devices.
-> > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > in future, if we enable vfio-pci vendor ops, (i.e. a non-mdev device
-> > > > > > > > > > > > > > > is binding to vfio-pci, but is able to register migration region and do
-> > > > > > > > > > > > > > > migration transactions from a vendor provided affiliate driver),
-> > > > > > > > > > > > > > > the vendor driver would export (2) directly, under device node.
-> > > > > > > > > > > > > > > It is not able to provide (1) as there're no mdev devices involved.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > Ok, creating an alternate attribute for non-mdev devices makes sense.
-> > > > > > > > > > > > > > However, wouldn't that rather be a case (3)? The change here only
-> > > > > > > > > > > > > > refers to mdev devices.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > as you pointed below, (3) and (2) serve the same purpose.
-> > > > > > > > > > > > > and I think a possible usage is to migrate between a non-mdev device and
-> > > > > > > > > > > > > an mdev device. so I think it's better for them both to use (2) rather
-> > > > > > > > > > > > > than creating (3).
-> > > > > > > > > > > >
-> > > > > > > > > > > > An mdev type is meant to define a software compatible interface, so in
-> > > > > > > > > > > > the case of mdev->mdev migration, doesn't migrating to a different type
-> > > > > > > > > > > > fail the most basic of compatibility tests that we expect userspace to
-> > > > > > > > > > > > perform?  IOW, if two mdev types are migration compatible, it seems a
-> > > > > > > > > > > > prerequisite to that is that they provide the same software interface,
-> > > > > > > > > > > > which means they should be the same mdev type.
-> > > > > > > > > > > >
-> > > > > > > > > > > > In the hybrid cases of mdev->phys or phys->mdev, how does a
-> > > > > > > > > > > management
-> > > > > > > > > > > > tool begin to even guess what might be compatible?  Are we expecting
-> > > > > > > > > > > > libvirt to probe ever device with this attribute in the system?  Is
-> > > > > > > > > > > > there going to be a new class hierarchy created to enumerate all
-> > > > > > > > > > > > possible migrate-able devices?
-> > > > > > > > > > > >
-> > > > > > > > > > > yes, management tool needs to guess and test migration compatible
-> > > > > > > > > > > between two devices. But I think it's not the problem only for
-> > > > > > > > > > > mdev->phys or phys->mdev. even for mdev->mdev, management tool needs
-> > > > > > > > > > > to
-> > > > > > > > > > > first assume that the two mdevs have the same type of parent devices
-> > > > > > > > > > > (e.g.their pciids are equal). otherwise, it's still enumerating
-> > > > > > > > > > > possibilities.
-> > > > > > > > > > > 
-> > > > > > > > > > > on the other hand, for two mdevs,
-> > > > > > > > > > > mdev1 from pdev1, its mdev_type is 1/2 of pdev1;
-> > > > > > > > > > > mdev2 from pdev2, its mdev_type is 1/4 of pdev2;
-> > > > > > > > > > > if pdev2 is exactly 2 times of pdev1, why not allow migration between
-> > > > > > > > > > > mdev1 <-> mdev2.
-> > > > > > > > > > 
-> > > > > > > > > > How could the manage tool figure out that 1/2 of pdev1 is equivalent 
-> > > > > > > > > > to 1/4 of pdev2? If we really want to allow such thing happen, the best
-> > > > > > > > > > choice is to report the same mdev type on both pdev1 and pdev2.
-> > > > > > > > > I think that's exactly the value of this migration_version interface.
-> > > > > > > > > the management tool can take advantage of this interface to know if two
-> > > > > > > > > devices are migration compatible, no matter they are mdevs, non-mdevs,
-> > > > > > > > > or mix.
-> > > > > > > > > 
-> > > > > > > > > as I know, (please correct me if not right), current libvirt still
-> > > > > > > > > requires manually generating mdev devices, and it just duplicates src vm
-> > > > > > > > > configuration to the target vm.
-> > > > > > > > > for libvirt, currently it's always phys->phys and mdev->mdev (and of the
-> > > > > > > > > same mdev type).
-> > > > > > > > > But it does not justify that hybrid cases should not be allowed. otherwise,
-> > > > > > > > > why do we need to introduce this migration_version interface and leave
-> > > > > > > > > the judgement of migration compatibility to vendor driver? why not simply
-> > > > > > > > > set the criteria to something like "pciids of parent devices are equal,
-> > > > > > > > > and mdev types are equal" ?
-> > > > > > > > > 
-> > > > > > > > > 
-> > > > > > > > > > btw mdev<->phys just brings trouble to upper stack as Alex pointed out. 
-> > > > > > > > > could you help me understand why it will bring trouble to upper stack?
-> > > > > > > > > 
-> > > > > > > > > I think it just needs to read src migration_version under src dev node,
-> > > > > > > > > and test it in target migration version under target dev node. 
-> > > > > > > > > 
-> > > > > > > > > after all, through this interface we just help the upper layer
-> > > > > > > > > knowing available options through reading and testing, and they decide
-> > > > > > > > > to use it or not.
-> > > > > > > > > 
-> > > > > > > > > > Can we simplify the requirement by allowing only mdev<->mdev and 
-> > > > > > > > > > phys<->phys migration? If an customer does want to migrate between a 
-> > > > > > > > > > mdev and phys, he could wrap physical device into a wrapped mdev 
-> > > > > > > > > > instance (with the same type as the source mdev) instead of using vendor 
-> > > > > > > > > > ops. Doing so does add some burden but if mdev<->phys is not dominant 
-> > > > > > > > > > usage then such tradeoff might be worthywhile...
-> > > > > > > > > >
-> > > > > > > > > If the interfaces for phys<->phys and mdev<->mdev are consistent, it makes no
-> > > > > > > > > difference to phys<->mdev, right?
-> > > > > > > > > I think the vendor string for a mdev device is something like:
-> > > > > > > > > "Parent PCIID + mdev type + software version", and
-> > > > > > > > > that for a phys device is something like:
-> > > > > > > > > "PCIID + software version".
-> > > > > > > > > as long as we don't migrate between devices from different vendors, it's
-> > > > > > > > > easy for vendor driver to tell if a phys device is migration compatible
-> > > > > > > > > to a mdev device according it supports it or not.
-> > > > > > > > 
-> > > > > > > > It surprises me that the PCIID matching is a requirement; I'd assumed
-> > > > > > > > with this clever mdev name setup that you could migrate between two
-> > > > > > > > different models in a series, or to a newer model, as long as they
-> > > > > > > > both supported the same mdev view.
-> > > > > > > > 
-> > > > > > > hi Dave
-> > > > > > > the migration_version string is transparent to userspace, and is
-> > > > > > > completely defined by vendor driver.
-> > > > > > > I put it there just as an example of how vendor driver may implement it.
-> > > > > > > e.g.
-> > > > > > > the src migration_version string is "src PCIID + src software version", 
-> > > > > > > then when this string is write to target migration_version node,
-> > > > > > > the vendor driver in the target device will compare it with its own
-> > > > > > > device info and software version.
-> > > > > > > If different models are allowed, the write just succeeds even
-> > > > > > > PCIIDs in src and target are different.
-> > > > > > > 
-> > > > > > > so, it is the vendor driver to define whether two devices are able to
-> > > > > > > migrate, no matter their PCIIDs, mdev types, software versions..., which
-> > > > > > > provides vendor driver full flexibility.
-> > > > > > > 
-> > > > > > > do you think it's good?
-> > > > > > 
-> > > > > > Yeh that's OK; I guess it's going to need to have a big table in their
-> > > > > > with all the PCIIDs in.
-> > > > > > The alternative would be to abstract it a little; e.g. to say it's
-> > > > > > an Intel-gpu-core-v4  and then it would be less worried about the exact
-> > > > > > clock speed etc - but yes you might be right htat PCIIDs might be best
-> > > > > > for checking for quirks.
-> > > > > >
-> > > > > glad that you are agreed with it:)
-> > > > > I think the vendor driver still can choose a way to abstract a little
-> > > > > (e.g. Intel-gpu-core-v4...) if they think it's better. In that case, the
-> > > > > migration_string would be something like "Intel-gpu-core-v4 + instance
-> > > > > number + software version".
-> > > > > IOW, they can choose anything they think appropriate to identify migration
-> > > > > compatibility of a device.
-> > > > > But Alex is right, we have to prevent namespace overlapping. So I think
-> > > > > we need to ensure src and target devices are from the same vendors.
-> > > > > or, any other ideas?
-> > > > 
-> > > > That's why I kept the 'Intel' in that example; or PCI vendor ID; I was
-> > > Yes, it's a good idea!
-> > > could we add a line in the doc saying that
-> > > it is the vendor driver to add a unique string to avoid namespace
-> > > collision?
-> > 
-> > So why don't we split the difference; lets say that it should start with
-> > the hex PCI Vendor ID.
-> >
-> The problem is for mdev devices, if the parent devices are not PCI devices, 
-> they don't have PCI vendor IDs.
-
-Hmm it would be best not to invent a whole new way of giving unique
-idenitifiers for vendors if we can.
-
-Dave
-
-> Thanks
-> Yan
-> 
-> 
-> > > > only really trying to say that within one vendors range there are often
-> > > > a lot of PCI-IDs that have really minor variations.
-> > > Yes. I also prefer to include PCI-IDs.
-> > > BTW, sometimes even the same PCI-ID does not guarantee two devices are of no
-> > > difference or are migration compatible. for example, two local NVMe
-> > > devices may have the same PCI-ID but are configured to two different remote NVMe
-> > > devices. the vendor driver needs to add extra info besides PCI-IDs then.
-> > 
-> > Ah, yes that's an interesting example.
-> > 
-> > Dave
-> > 
-> > > 
-> > > > 
-> > > > 
-> > > > > 
-> > > > > 
-> > > > > > > > > > > 
-> > > > > > > > > > > 
-> > > > > > > > > > > > I agree that there was a gap in the previous proposal for non-mdev
-> > > > > > > > > > > > devices, but I think this bring a lot of questions that we need to
-> > > > > > > > > > > > puzzle through and libvirt will need to re-evaluate how they might
-> > > > > > > > > > > > decide to pick a migration target device.  For example, I'm sure
-> > > > > > > > > > > > libvirt would reject any policy decisions regarding picking a physical
-> > > > > > > > > > > > device versus an mdev device.  Had we previously left it that only a
-> > > > > > > > > > > > layer above libvirt would select a target device and libvirt only tests
-> > > > > > > > > > > > compatibility to that target device?
-> > > > > > > > > > > I'm not sure if there's a layer above libvirt would select a target
-> > > > > > > > > > > device. but if there is such a layer (even it's human), we need to
-> > > > > > > > > > > provide an interface for them to know whether their decision is suitable
-> > > > > > > > > > > for migration. The migration_version interface provides a potential to
-> > > > > > > > > > > allow mdev->phys migration, even libvirt may currently reject it.
-> > > > > > > > > > > 
-> > > > > > > > > > > 
-> > > > > > > > > > > > We also need to consider that this expands the namespace.  If we no
-> > > > > > > > > > > > longer require matching types as the first level of comparison, then
-> > > > > > > > > > > > vendor migration strings can theoretically collide.  How do we
-> > > > > > > > > > > > coordinate that can't happen?  Thanks,
-> > > > > > > > > > > yes, it's indeed a problem.
-> > > > > > > > > > > could only allowing migration beteen devices from the same vendor be a
-> > > > > > > > > > > good
-> > > > > > > > > > > prerequisite?
-> > > > > > > > > > > 
-> > > > > > > > > > > Thanks
-> > > > > > > > > > > Yan
-> > > > > > > > > > > >
-> > > > > > > > > > > > > > > > Is existence (and compatibility) of (1) a pre-req for possible
-> > > > > > > > > > > > > > > > existence (and compatibility) of (2)?
-> > > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > no. (2) does not reply on (1).
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > Hm. Non-existence of (1) seems to imply "this type does not support
-> > > > > > > > > > > > > > migration". If an mdev created for such a type suddenly does support
-> > > > > > > > > > > > > > migration, it feels a bit odd.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > yes. but I think if the condition happens, it should be reported a bug
-> > > > > > > > > > > > > to vendor driver.
-> > > > > > > > > > > > > should I add a line in the doc like "vendor driver should ensure that the
-> > > > > > > > > > > > > migration compatibility from migration_version under mdev_type should
-> > > > > > > > > > > be
-> > > > > > > > > > > > > consistent with that from migration_version under device node" ?
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > > (It obviously cannot be a prereq for what I called (3) above.)
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > > Does userspace need to check (1) or can it completely rely on (2), if
-> > > > > > > > > > > > > > > > it so chooses?
-> > > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > I think it can completely reply on (2) if compatibility check before
-> > > > > > > > > > > > > > > mdev creation is not required.
-> > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > > If devices with a different mdev type are indeed compatible, it
-> > > > > > > > > > > seems
-> > > > > > > > > > > > > > > > userspace can only find out after the devices have actually been
-> > > > > > > > > > > > > > > > created, as (1) does not apply?
-> > > > > > > > > > > > > > > yes, I think so.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > How useful would it be for userspace to even look at (1) in that case?
-> > > > > > > > > > > > > > It only knows if things have a chance of working if it actually goes
-> > > > > > > > > > > > > > ahead and creates devices.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > hmm, is it useful for userspace to test the migration_version under mdev
-> > > > > > > > > > > > > type before it knows what mdev device to generate ?
-> > > > > > > > > > > > > like when the userspace wants to migrate an mdev device in src vm,
-> > > > > > > > > > > > > but it has not created target vm and the target mdev device.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > > One of my worries is that the existence of an attribute with the
-> > > > > > > > > > > same
-> > > > > > > > > > > > > > > > name in two similar locations might lead to confusion. But maybe it
-> > > > > > > > > > > > > > > > isn't a problem.
-> > > > > > > > > > > > > > > >
-> > > > > > > > > > > > > > > Yes, I have the same feeling. but as (2) is for sysfs interface
-> > > > > > > > > > > > > > > consistency, to make it transparent to userspace tools like libvirt,
-> > > > > > > > > > > > > > > I guess the same name is necessary?
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > What do we actually need here, I wonder? (1) and (2) seem to serve
-> > > > > > > > > > > > > > slightly different purposes, while (2) and what I called (3) have the
-> > > > > > > > > > > > > > same purpose. Is it important to userspace that (1) and (2) have the
-> > > > > > > > > > > > > > same name?
-> > > > > > > > > > > > > so change (1) to migration_type_version and (2) to
-> > > > > > > > > > > > > migration_instance_version?
-> > > > > > > > > > > > > But as they are under different locations, could that location imply
-> > > > > > > > > > > > > enough information?
-> > > > > > > > > > > > >
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > Thanks
-> > > > > > > > > > > > > Yan
-> > > > > > > > > > > > >
-> > > > > > > > > > > > >
-> > > > > > > > > > > >
-> > > > > > > > > > > _______________________________________________
-> > > > > > > > > > > intel-gvt-dev mailing list
-> > > > > > > > > > > intel-gvt-dev@lists.freedesktop.org
-> > > > > > > > > > > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
-> > > > > > > > > 
-> > > > > > > > --
-> > > > > > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > > > > > > 
-> > > > > > > 
-> > > > > > --
-> > > > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > > > > 
-> > > > > 
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > > 
-> > > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQyOTA3MjQzNS5GMTNF
+MjNDMEQxMUBhZXJ5bi5sYW4ua3RtYmEvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMjAwNDI5MDcyNDM1LkYxM0UyM0MwRDExQGFlcnlu
+Lmxhbi5rdG1iYQpTdWJqZWN0OiBbUEFUQ0ggdjJdIGF1ZGlvL2phY2s6IGFkZCBKQUNLIGNsaWVu
+dCBhdWRpb2RldgpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
+L2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2Ny
+aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQg
+PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZy
+b20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRl
+XSAgICAgIHBhdGNoZXcvMjAyMDA0MjgyMDI5MDUuNzcwNzI3LTEtZWJsYWtlQHJlZGhhdC5jb20g
+LT4gcGF0Y2hldy8yMDIwMDQyODIwMjkwNS43NzA3MjctMS1lYmxha2VAcmVkaGF0LmNvbQogLSBb
+dGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAwNDI5MDcyMDQ4LjI5OTYzLTEtYXJtYnJ1QHJl
+ZGhhdC5jb20gLT4gcGF0Y2hldy8yMDIwMDQyOTA3MjA0OC4yOTk2My0xLWFybWJydUByZWRoYXQu
+Y29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAyMDA0MjkwOTE4MTMuMTQ2OTUxMC0x
+LXJ2a2FnYW5AeWFuZGV4LXRlYW0ucnUgLT4gcGF0Y2hldy8yMDIwMDQyOTA5MTgxMy4xNDY5NTEw
+LTEtcnZrYWdhbkB5YW5kZXgtdGVhbS5ydQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CjM4MzFhOWEgYXVkaW8vamFjazogYWRkIEpBQ0sgY2xpZW50IGF1ZGlvZGV2Cgo9PT0gT1VUUFVU
+IEJFR0lOID09PQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
+IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpF
+UlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIGVudW0gZ28gb24gdGhlIHNhbWUgbGluZQoj
+OTc6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjQxOgordHlwZWRlZiBlbnVtIFFKYWNrU3RhdGUK
+K3sKCkVSUk9SOiBvcGVuIGJyYWNlICd7JyBmb2xsb3dpbmcgc3RydWN0IGdvIG9uIHRoZSBzYW1l
+IGxpbmUKIzEwODogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6NTI6Cit0eXBlZGVmIHN0cnVjdCBR
+SmFja0J1ZmZlcgorewoKRVJST1I6ICJmb28gICAgICoqIGJhciIgc2hvdWxkIGJlICJmb28gICAg
+ICoqYmFyIgojMTEzOiBGSUxFOiBhdWRpby9qYWNrYXVkaW8uYzo1NzoKKyAgZmxvYXQgICAgICoq
+IGRhdGE7CgpFUlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIHN0cnVjdCBnbyBvbiB0aGUg
+c2FtZSBsaW5lCiMxMTg6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjYyOgordHlwZWRlZiBzdHJ1
+Y3QgUUphY2tDbGllbnQKK3sKCkVSUk9SOiAiZm9vICAqIGJhciIgc2hvdWxkIGJlICJmb28gICpi
+YXIiCiMxMjE6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjY1OgorICBqYWNrX2NsaWVudF90ICAq
+IGNsaWVudDsKCkVSUk9SOiAiZm9vICAgKiBiYXIiIHNob3VsZCBiZSAiZm9vICAgKmJhciIKIzEy
+NDogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6Njg6CisgIHN0cnVjdCBRSmFjayAgICogajsKCkVS
+Uk9SOiAiZm9vICAgKiogYmFyIiBzaG91bGQgYmUgImZvbyAgICoqYmFyIgojMTI3OiBGSUxFOiBh
+dWRpby9qYWNrYXVkaW8uYzo3MToKKyAgamFja19wb3J0X3QgICAqKiBwb3J0OwoKRVJST1I6IG9w
+ZW4gYnJhY2UgJ3snIGZvbGxvd2luZyBzdHJ1Y3QgZ28gb24gdGhlIHNhbWUgbGluZQojMTMzOiBG
+SUxFOiBhdWRpby9qYWNrYXVkaW8uYzo3NzoKK3R5cGVkZWYgc3RydWN0IFFKYWNrT3V0Cit7CgpF
+UlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIHN0cnVjdCBnbyBvbiB0aGUgc2FtZSBsaW5l
+CiMxNDA6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjg0OgordHlwZWRlZiBzdHJ1Y3QgUUphY2tJ
+bgorewoKRVJST1I6ICJmb28gKiBiYXIiIHNob3VsZCBiZSAiZm9vICpiYXIiCiMxNDY6IEZJTEU6
+IGF1ZGlvL2phY2thdWRpby5jOjkwOgorc3RhdGljIHZvaWQgcWphY2tfYnVmZmVyX2NyZWF0ZShR
+SmFja0J1ZmZlciAqIGJ1ZmZlciwgaW50IGNoYW5uZWxzLCBpbnQgZnJhbWVzKQoKRVJST1I6IHNw
+YWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzE1NDogRklMRTog
+YXVkaW8vamFja2F1ZGlvLmM6OTg6CisgICAgZm9yKGludCBpID0gMDsgaSA8IGNoYW5uZWxzOyAr
+K2kpCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMg
+c3RhdGVtZW50CiMxNTQ6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjk4OgorICAgIGZvcihpbnQg
+aSA9IDA7IGkgPCBjaGFubmVsczsgKytpKQpbLi4uXQoKRVJST1I6ICJmb28gKiBiYXIiIHNob3Vs
+ZCBiZSAiZm9vICpiYXIiCiMxNTg6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjEwMjoKK3N0YXRp
+YyB2b2lkIHFqYWNrX2J1ZmZlcl9jbGVhcihRSmFja0J1ZmZlciAqIGJ1ZmZlcikKCkVSUk9SOiAi
+Zm9vICogYmFyIiBzaG91bGQgYmUgImZvbyAqYmFyIgojMTY1OiBGSUxFOiBhdWRpby9qYWNrYXVk
+aW8uYzoxMDk6CitzdGF0aWMgdm9pZCBxamFja19idWZmZXJfZnJlZShRSmFja0J1ZmZlciAqIGJ1
+ZmZlcikKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVzaXMg
+JygnCiMxNjc6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjExMToKKyAgICBmb3IoaW50IGkgPSAw
+OyBpIDwgYnVmZmVyLT5jaGFubmVsczsgKytpKQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNz
+YXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTY3OiBGSUxFOiBhdWRpby9qYWNr
+YXVkaW8uYzoxMTE6CisgICAgZm9yKGludCBpID0gMDsgaSA8IGJ1ZmZlci0+Y2hhbm5lbHM7ICsr
+aSkKWy4uLl0KCkVSUk9SOiAiZm9vICogYmFyIiBzaG91bGQgYmUgImZvbyAqYmFyIgojMTc0OiBG
+SUxFOiBhdWRpby9qYWNrYXVkaW8uYzoxMTg6CitpbmxpbmUgc3RhdGljIGludCBxamFja19idWZm
+ZXJfdXNlZChRSmFja0J1ZmZlciAqIGJ1ZmZlcikKCkVSUk9SOiBzdG9yYWdlIGNsYXNzIHNob3Vs
+ZCBiZSBhdCB0aGUgYmVnaW5uaW5nIG9mIHRoZSBkZWNsYXJhdGlvbgojMTc0OiBGSUxFOiBhdWRp
+by9qYWNrYXVkaW8uYzoxMTg6CitpbmxpbmUgc3RhdGljIGludCBxamFja19idWZmZXJfdXNlZChR
+SmFja0J1ZmZlciAqIGJ1ZmZlcikKCkVSUk9SOiBpbmxpbmUga2V5d29yZCBzaG91bGQgc2l0IGJl
+dHdlZW4gc3RvcmFnZSBjbGFzcyBhbmQgdHlwZQojMTc0OiBGSUxFOiBhdWRpby9qYWNrYXVkaW8u
+YzoxMTg6CitpbmxpbmUgc3RhdGljIGludCBxamFja19idWZmZXJfdXNlZChRSmFja0J1ZmZlciAq
+IGJ1ZmZlcikKCkVSUk9SOiAiZm9vICogYmFyIiBzaG91bGQgYmUgImZvbyAqYmFyIgojMTgwOiBG
+SUxFOiBhdWRpby9qYWNrYXVkaW8uYzoxMjQ6CitzdGF0aWMgaW50IHFqYWNrX2J1ZmZlcl93cml0
+ZShRSmFja0J1ZmZlciAqIGJ1ZmZlciwgZmxvYXQgKiBkYXRhLCBpbnQgc2l6ZSkKCkVSUk9SOiBi
+cmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE4
+NzogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6MTMxOgorICAgIGlmIChmcmFtZXMgPiBhdmFpbCkK
+Wy4uLl0KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVzaXMg
+JygnCiMxOTM6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjEzNzoKKyAgICB3aGlsZShjb3B5KSB7
+CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwoj
+MTk1OiBGSUxFOiBhdWRpby9qYWNrYXVkaW8uYzoxMzk6CisgICAgICAgIGZvcihpbnQgYyA9IDA7
+IGMgPCBidWZmZXItPmNoYW5uZWxzOyArK2MpCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3Nh
+cnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxOTU6IEZJTEU6IGF1ZGlvL2phY2th
+dWRpby5jOjEzOToKKyAgICAgICAgZm9yKGludCBjID0gMDsgYyA8IGJ1ZmZlci0+Y2hhbm5lbHM7
+ICsrYykKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMg
+b2YgdGhpcyBzdGF0ZW1lbnQKIzE5ODogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6MTQyOgorICAg
+ICAgICBpZiAoKyt3cHRyID09IGJ1ZmZlci0+ZnJhbWVzKQpbLi4uXQoKRVJST1I6ICJmb28gKiBi
+YXIiIHNob3VsZCBiZSAiZm9vICpiYXIiCiMyMTE6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjE1
+NToKK3N0YXRpYyBpbnQgcWphY2tfYnVmZmVyX3dyaXRlX2woUUphY2tCdWZmZXIgKiBidWZmZXIs
+IGZsb2F0ICoqIGRlc3QsIGludCBmcmFtZXMpCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3Nh
+cnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMyMTc6IEZJTEU6IGF1ZGlvL2phY2th
+dWRpby5jOjE2MToKKyAgICBpZiAoZnJhbWVzID4gYXZhaWwpClsuLi5dCgpFUlJPUjogc3VzcGVj
+dCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoNCwgNikKIzIyMTogRklM
+RTogYXVkaW8vamFja2F1ZGlvLmM6MTY1OgorICAgIGlmIChyaWdodCA+IGZyYW1lcykKKyAgICAg
+IHJpZ2h0ID0gZnJhbWVzOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwg
+YXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMjIxOiBGSUxFOiBhdWRpby9qYWNrYXVkaW8uYzoxNjU6
+CisgICAgaWYgKHJpZ2h0ID4gZnJhbWVzKQpbLi4uXQoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJl
+Zm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzIyNTogRklMRTogYXVkaW8vamFja2F1ZGlv
+LmM6MTY5OgorICAgIGZvcihpbnQgYyA9IDA7IGMgPCBidWZmZXItPmNoYW5uZWxzOyArK2MpIHsK
+CkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICg0
+LCA2KQojMjMxOiBGSUxFOiBhdWRpby9qYWNrYXVkaW8uYzoxNzU6CisgICAgaWYgKHdwdHIgPj0g
+YnVmZmVyLT5mcmFtZXMpCisgICAgICB3cHRyIC09IGJ1ZmZlci0+ZnJhbWVzOwoKRVJST1I6IGJy
+YWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMjMx
+OiBGSUxFOiBhdWRpby9qYWNrYXVkaW8uYzoxNzU6CisgICAgaWYgKHdwdHIgPj0gYnVmZmVyLT5m
+cmFtZXMpClsuLi5dCgpFUlJPUjogImZvbyAqIGJhciIgc2hvdWxkIGJlICJmb28gKmJhciIKIzI0
+MDogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6MTg0Ogorc3RhdGljIGludCBxamFja19idWZmZXJf
+cmVhZChRSmFja0J1ZmZlciAqIGJ1ZmZlciwgZmxvYXQgKiBkZXN0LCBpbnQgc2l6ZSkKCkVSUk9S
+OiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQK
+IzI0NzogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6MTkxOgorICAgIGlmIChmcmFtZXMgPiBhdmFp
+bCkKWy4uLl0KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVz
+aXMgJygnCiMyNTM6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjE5NzoKKyAgICB3aGlsZShjb3B5
+KSB7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICco
+JwojMjU1OiBGSUxFOiBhdWRpby9qYWNrYXVkaW8uYzoxOTk6CisgICAgICAgIGZvcihpbnQgYyA9
+IDA7IGMgPCBidWZmZXItPmNoYW5uZWxzOyArK2MpCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNl
+c3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMyNTU6IEZJTEU6IGF1ZGlvL2ph
+Y2thdWRpby5jOjE5OToKKyAgICAgICAgZm9yKGludCBjID0gMDsgYyA8IGJ1ZmZlci0+Y2hhbm5l
+bHM7ICsrYykKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFy
+bXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzI1ODogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6MjAyOgor
+ICAgICAgICBpZiAoKytycHRyID09IGJ1ZmZlci0+ZnJhbWVzKQpbLi4uXQoKRVJST1I6ICJmb28g
+KiBiYXIiIHNob3VsZCBiZSAiZm9vICpiYXIiCiMyNzE6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5j
+OjIxNToKK3N0YXRpYyBpbnQgcWphY2tfYnVmZmVyX3JlYWRfbChRSmFja0J1ZmZlciAqIGJ1ZmZl
+ciwgZmxvYXQgKiogZGVzdCwgaW50IGZyYW1lcykKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vz
+c2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzI3NzogRklMRTogYXVkaW8vamFj
+a2F1ZGlvLmM6MjIxOgorICAgIGlmIChjb3B5ID4gdXNlZCkKWy4uLl0KCkVSUk9SOiBicmFjZXMg
+e30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzI4MTogRklM
+RTogYXVkaW8vamFja2F1ZGlvLmM6MjI1OgorICAgIGlmIChyaWdodCA+IGNvcHkpClsuLi5dCgpF
+UlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwojMjg1
+OiBGSUxFOiBhdWRpby9qYWNrYXVkaW8uYzoyMjk6CisgICAgZm9yKGludCBjID0gMDsgYyA8IGJ1
+ZmZlci0+Y2hhbm5lbHM7ICsrYykgewoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZv
+ciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMjkxOiBGSUxFOiBhdWRpby9qYWNrYXVkaW8u
+YzoyMzU6CisgICAgaWYgKHJwdHIgPj0gYnVmZmVyLT5mcmFtZXMpClsuLi5dCgpFUlJPUjogYnJh
+Y2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMzMDY6
+IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjI1MDoKKyAgICAgICAgaWYgKGMtPnN0YXRlICE9IFFK
+QUNLX1NUQVRFX1JVTk5JTkcpClsuLi5dCgpFUlJPUjogImZvbyAqIGJhciIgc2hvdWxkIGJlICJm
+b28gKmJhciIKIzMxMDogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6MjU0OgorICAgICAgICBmbG9h
+dCAqIGJ1ZmZlcnNbYy0+bmNoYW5uZWxzXTsKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUg
+dGhlIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzMTE6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjI1
+NToKKyAgICAgICAgZm9yKGludCBpID0gMDsgaSA8IGMtPm5jaGFubmVsczsgKytpKQoKRVJST1I6
+IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAoj
+MzExOiBGSUxFOiBhdWRpby9qYWNrYXVkaW8uYzoyNTU6CisgICAgICAgIGZvcihpbnQgaSA9IDA7
+IGkgPCBjLT5uY2hhbm5lbHM7ICsraSkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vz
+c2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzMxNDogRklMRTogYXVkaW8vamFj
+a2F1ZGlvLmM6MjU4OgorICAgICAgICBpZiAoYy0+b3V0KQpbLi4uXQorICAgICAgICBlbHNlClsu
+Li5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMg
+c3RhdGVtZW50CiMzMjE6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjI2NToKKyAgICAgICAgaWYg
+KGMtPnN0YXRlID09IFFKQUNLX1NUQVRFX1JVTk5JTkcpClsuLi5dCgpFUlJPUjogImZvbyAqIGJh
+ciIgc2hvdWxkIGJlICJmb28gKmJhciIKIzMyOTogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6Mjcz
+Ogorc3RhdGljIGludCBxamFja194cnVuKHZvaWQgKiBhcmcpCgpFUlJPUjogYnJhY2VzIHt9IGFy
+ZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMzMzM6IEZJTEU6IGF1
+ZGlvL2phY2thdWRpby5jOjI3NzoKKyAgICBpZiAoYy0+c3RhdGUgIT0gUUpBQ0tfU1RBVEVfUlVO
+TklORykKWy4uLl0KCkVSUk9SOiB0aGF0IG9wZW4gYnJhY2UgeyBzaG91bGQgYmUgb24gdGhlIHBy
+ZXZpb3VzIGxpbmUKIzM0NDogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6Mjg4OgorICAgIHN3aXRj
+aChjLT5zdGF0ZSkKKyAgICB7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVu
+IHBhcmVudGhlc2lzICcoJwojMzQ0OiBGSUxFOiBhdWRpby9qYWNrYXVkaW8uYzoyODg6CisgICAg
+c3dpdGNoKGMtPnN0YXRlKQoKRVJST1I6IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9yIGNvbmRpdGlv
+bmFsIHN0YXRlbWVudHMgKDQsIDYpCiMzNjk6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjMxMzoK
+KyAgICBpZiAoam8tPmMuc3RhdGUgIT0gUUpBQ0tfU1RBVEVfUlVOTklORykKKyAgICAgIHJldHVy
+biBsZW47CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRo
+aXMgc3RhdGVtZW50CiMzNjk6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjMxMzoKKyAgICBpZiAo
+am8tPmMuc3RhdGUgIT0gUUpBQ0tfU1RBVEVfUlVOTklORykKWy4uLl0KCkVSUk9SOiBzdXNwZWN0
+IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICg0LCA2KQojMzc5OiBGSUxF
+OiBhdWRpby9qYWNrYXVkaW8uYzozMjM6CisgICAgaWYgKGppLT5jLnN0YXRlICE9IFFKQUNLX1NU
+QVRFX1JVTk5JTkcpCisgICAgICByZXR1cm4gbGVuOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVj
+ZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMzc5OiBGSUxFOiBhdWRpby9q
+YWNrYXVkaW8uYzozMjM6CisgICAgaWYgKGppLT5jLnN0YXRlICE9IFFKQUNLX1NUQVRFX1JVTk5J
+TkcpClsuLi5dCgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3Rh
+dGVtZW50cyAoNCwgNikKIzM5ODogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6MzQyOgorICAgIGlm
+IChvcHQtPmV4YWN0X25hbWUpCisgICAgICBvcHRpb25zIHw9IEphY2tVc2VFeGFjdE5hbWU7CgpF
+UlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVt
+ZW50CiMzOTg6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjM0MjoKKyAgICBpZiAob3B0LT5leGFj
+dF9uYW1lKQpbLi4uXQoKRVJST1I6IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFs
+IHN0YXRlbWVudHMgKDQsIDYpCiM0MDE6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjM0NToKKyAg
+ICBpZiAoIW9wdC0+c3RhcnRfc2VydmVyKQorICAgICAgb3B0aW9ucyB8PSBKYWNrTm9TdGFydFNl
+cnZlcjsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhp
+cyBzdGF0ZW1lbnQKIzQwMTogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6MzQ1OgorICAgIGlmICgh
+b3B0LT5zdGFydF9zZXJ2ZXIpClsuLi5dCgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3Ig
+Y29uZGl0aW9uYWwgc3RhdGVtZW50cyAoNCwgNikKIzQwNDogRklMRTogYXVkaW8vamFja2F1ZGlv
+LmM6MzQ4OgorICAgIGlmIChvcHQtPnNlcnZlcl9uYW1lKQorICAgICAgb3B0aW9ucyB8PSBKYWNr
+U2VydmVyTmFtZTsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMg
+b2YgdGhpcyBzdGF0ZW1lbnQKIzQwNDogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6MzQ4OgorICAg
+IGlmIChvcHQtPnNlcnZlcl9uYW1lKQpbLi4uXQoKRVJST1I6IHN1c3BlY3QgY29kZSBpbmRlbnQg
+Zm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDgsIDEwKQojNDEyOiBGSUxFOiBhdWRpby9qYWNr
+YXVkaW8uYzozNTY6CisgICAgICAgIGlmIChzdGF0dXMgJiBKYWNrU2VydmVyRmFpbGVkKQorICAg
+ICAgICAgIGRvbG9nKCJ1bmFibGUgdG8gY29ubmVjdCB0byBKQUNLIHNlcnZlclxuIik7CgpFUlJP
+UjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50
+CiM0MTI6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjM1NjoKKyAgICAgICAgaWYgKHN0YXR1cyAm
+IEphY2tTZXJ2ZXJGYWlsZWQpClsuLi5dCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVu
+IGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiM0Mjk6IEZJTEU6IGF1ZGlv
+L2phY2thdWRpby5jOjM3MzoKKyAgICBqYWNrX3NldF94cnVuX2NhbGxiYWNrICAgKGMtPmNsaWVu
+dCwgcWphY2tfeHJ1biAgICAsIGMpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBm
+dW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNDMwOiBGSUxFOiBhdWRpby9q
+YWNrYXVkaW8uYzozNzQ6CisgICAgamFja19vbl9zaHV0ZG93biAgICAgICAgIChjLT5jbGllbnQs
+IHFqYWNrX3NodXRkb3duLCBjKTsKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRp
+bmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM0NDA6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjM4
+NDoKKyAgICAvKiBlbnN1cmUgdGhlIGJ1ZmZlcnNpemUgaXMgbm8gc21hbGxlciB0aGVuIDUxMiBz
+YW1wbGVzLCBzb21lIChhbGw/KSBxZW11CgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0
+cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzQ0MTogRklMRTogYXVkaW8vamFja2F1ZGlv
+LmM6Mzg1OgorICAgICAqIHZpcnR1YWwgZGV2aWNlcyBkbyBub3Qgd29yayBjb3JyZWN0bHkgb3Ro
+ZXJ3aXNlICovCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9m
+IHRoaXMgc3RhdGVtZW50CiM0NDI6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5jOjM4NjoKKyAgICBp
+ZiAoYy0+YnVmZmVyc2l6ZSA8IDUxMikKWy4uLl0KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZv
+cmUgdGhlIG9wZW4gcGFyZW50aGVzaXMgJygnCiM0NTA6IEZJTEU6IGF1ZGlvL2phY2thdWRpby5j
+OjM5NDoKKyAgICBmb3IoaW50IGkgPSAwOyBpIDwgYy0+bmNoYW5uZWxzOyArK2kpIHsKCkVSUk9S
+OiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQK
+IzQ3NzogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6NDIxOgorICAgIGlmIChqby0+Yy5zdGF0ZSAh
+PSBRSkFDS19TVEFURV9ESVNDT05ORUNURUQpClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBu
+ZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM0ODE6IEZJTEU6IGF1ZGlv
+L2phY2thdWRpby5jOjQyNToKKyAgICBpZiAocmV0ICE9IDApClsuLi5dCgpFUlJPUjogYnJhY2Vz
+IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM1MDg6IEZJ
+TEU6IGF1ZGlvL2phY2thdWRpby5jOjQ1MjoKKyAgICBpZiAoamktPmMuc3RhdGUgIT0gUUpBQ0tf
+U1RBVEVfRElTQ09OTkVDVEVEKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5
+IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNTEyOiBGSUxFOiBhdWRpby9qYWNrYXVk
+aW8uYzo0NTY6CisgICAgaWYgKHJldCAhPSAwKQpbLi4uXQoKRVJST1I6IHNwYWNlIHJlcXVpcmVk
+IGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzUzOTogRklMRTogYXVkaW8vamFja2F1
+ZGlvLmM6NDgzOgorICAgIGZvcihpbnQgaSA9IDA7IGkgPCBjLT5uY2hhbm5lbHM7ICsraSkKCkVS
+Uk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1l
+bnQKIzUzOTogRklMRTogYXVkaW8vamFja2F1ZGlvLmM6NDgzOgorICAgIGZvcihpbnQgaSA9IDA7
+IGkgPCBjLT5uY2hhbm5lbHM7ICsraSkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vz
+c2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzU1ODogRklMRTogYXVkaW8vamFj
+a2F1ZGlvLmM6NTAyOgorICAgIGlmIChjLT5zdGF0ZSAhPSBRSkFDS19TVEFURV9JRExFKQpbLi4u
+XQoKRVJST1I6ICJmb28gKiBiYXIiIHNob3VsZCBiZSAiZm9vICpiYXIiCiM1ODI6IEZJTEU6IGF1
+ZGlvL2phY2thdWRpby5jOjUyNjoKK3N0YXRpYyBpbnQgcWphY2tfdGhyZWFkX2NyZWF0b3IoamFj
+a19uYXRpdmVfdGhyZWFkX3QgKiB0aHJlYWQsCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3Nh
+cnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM1ODY6IEZJTEU6IGF1ZGlvL2phY2th
+dWRpby5jOjUzMDoKKyAgICBpZiAocmV0ICE9IDApClsuLi5dCgpFUlJPUjogImZvbyogYmFyIiBz
+aG91bGQgYmUgImZvbyAqYmFyIgojNTk1OiBGSUxFOiBhdWRpby9qYWNrYXVkaW8uYzo1Mzk6Citz
+dGF0aWMgdm9pZCogcWphY2tfaW5pdChBdWRpb2RldiAqZGV2KQoKRVJST1I6IHNwYWNlIHByb2hp
+Yml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNjA0
+OiBGSUxFOiBhdWRpby9qYWNrYXVkaW8uYzo1NDg6CitzdGF0aWMgdm9pZCBxamFja19maW5pICh2
+b2lkICpvcGFxdWUpCgp0b3RhbDogODAgZXJyb3JzLCAzIHdhcm5pbmdzLCA3MDMgbGluZXMgY2hl
+Y2tlZAoKQ29tbWl0IDM4MzFhOWExODNjNiAoYXVkaW8vamFjazogYWRkIEpBQ0sgY2xpZW50IGF1
+ZGlvZGV2KSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRl
+c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
+ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDQyOTA3MjQzNS5GMTNFMjNDMEQxMUBh
+ZXJ5bi5sYW4ua3RtYmEvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
