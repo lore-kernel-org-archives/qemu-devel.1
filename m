@@ -2,79 +2,76 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 505A5C83004
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:15:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F6AC83000
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:18:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F4C020B80
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:15:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7EF8C206D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:18:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J9PvuYpi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F4C020B80
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MdNzf1OF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EF8C206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTnUg-0002fL-5o
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 10:15:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42544)
+	id 1jTnXw-0007KZ-Hk
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 10:18:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44600)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTnGp-0002Ov-Po
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:01:18 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jTnRF-0004SY-9y
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:11:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTnGL-00043f-QR
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:01:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50077
+ (envelope-from <mreitz@redhat.com>) id 1jTnRE-0003zx-M5
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:11:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59465
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jTnGL-00043S-CK
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:00:33 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTnRE-0003vH-5Z
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:11:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588168832;
+ s=mimecast20190719; t=1588169507;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=I5eleDN6DsLA6DYusavg7UDhHoUtm8pXBb0dPnybbnM=;
- b=J9PvuYpiwI6hup18z69b2i4Bm0cZ/NaXMw5Brvv3nMGYbBOtUdSTkgS/MgkBEQ/COpi5Ii
- 6J35VegP5nUKcLCiagofzrIXAI6b/YYgpWfNkL/4I4aDVplua8LkynVbe//e/7XT6HblMJ
- CBgS/r+Gl2thRH7BTgv2xbq5pmUrV6o=
+ bh=3iFJA1sE2IUTsGX+c99KkPhxahWSl8oT3iPtXyqjU3E=;
+ b=MdNzf1OFTziZSjDvNIJP+vHrWT64dZfhmLm5FSBUDYmvnM7B+Rbr9mGicKLvAGQnBPnpgP
+ Ae6x3nLS2qD0o3Wd2AOIpy8x2EUIr3HMMfol3tYln1Oes2rCawAh0W12SWeZwirrwGqqtk
+ qamfT7NxuXavzZQdjB7wyH+z2cdZTYY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-18swSLtDOVOBHjqFohHjtA-1; Wed, 29 Apr 2020 10:00:20 -0400
-X-MC-Unique: 18swSLtDOVOBHjqFohHjtA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-485-3iY82_NmPWiulTm8jaQQxg-1; Wed, 29 Apr 2020 10:11:45 -0400
+X-MC-Unique: 3iY82_NmPWiulTm8jaQQxg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECD128BEE85;
- Wed, 29 Apr 2020 14:00:18 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
- [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1B36F66070;
- Wed, 29 Apr 2020 14:00:04 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 325759D9B; Wed, 29 Apr 2020 16:00:03 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 02/15] acpi: add aml builder stubs
-Date: Wed, 29 Apr 2020 15:59:50 +0200
-Message-Id: <20200429140003.7336-3-kraxel@redhat.com>
-In-Reply-To: <20200429140003.7336-1-kraxel@redhat.com>
-References: <20200429140003.7336-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97182100A8D1;
+ Wed, 29 Apr 2020 14:11:36 +0000 (UTC)
+Received: from localhost (ovpn-113-19.ams2.redhat.com [10.36.113.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 347411002388;
+ Wed, 29 Apr 2020 14:11:36 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2 4/4] block: Use blk_make_empty() after commits
+Date: Wed, 29 Apr 2020 16:11:26 +0200
+Message-Id: <20200429141126.85159-5-mreitz@redhat.com>
+In-Reply-To: <20200429141126.85159-1-mreitz@redhat.com>
+References: <20200429141126.85159-1-mreitz@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:18:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -90,128 +87,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Needed when moving aml builder code to devices.
+bdrv_commit() already has a BlockBackend pointing to the BDS that we
+want to empty, it just has the wrong permissions.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+qemu-img commit has no BlockBackend pointing to the old backing file
+yet, but introducing one is simple.
+
+After this commit, bdrv_make_empty() is the only remaining caller of
+BlockDriver.bdrv_make_empty().
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- hw/acpi/aml-build-stub.c | 79 ++++++++++++++++++++++++++++++++++++++++
- hw/acpi/Makefile.objs    |  4 +-
- 2 files changed, 81 insertions(+), 2 deletions(-)
- create mode 100644 hw/acpi/aml-build-stub.c
+ block/commit.c | 16 +++++++++-------
+ qemu-img.c     | 19 ++++++++++++++-----
+ 2 files changed, 23 insertions(+), 12 deletions(-)
 
-diff --git a/hw/acpi/aml-build-stub.c b/hw/acpi/aml-build-stub.c
-new file mode 100644
-index 000000000000..58b2e162277f
---- /dev/null
-+++ b/hw/acpi/aml-build-stub.c
-@@ -0,0 +1,79 @@
-+/*
-+ * ACPI aml builder stubs for platforms that don't support ACPI.
-+ *
-+ * Copyright (c) 2006 Fabrice Bellard
-+ * Copyright (c) 2016 Red Hat, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
+diff --git a/block/commit.c b/block/commit.c
+index 87f6096d90..ba60fb7955 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -414,7 +414,9 @@ int bdrv_commit(BlockDriverState *bs)
+     }
+=20
+     ctx =3D bdrv_get_aio_context(bs);
+-    src =3D blk_new(ctx, BLK_PERM_CONSISTENT_READ, BLK_PERM_ALL);
++    /* WRITE_UNCHANGED is required for bdrv_make_empty() */
++    src =3D blk_new(ctx, BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANG=
+ED,
++                  BLK_PERM_ALL);
+     backing =3D blk_new(ctx, BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_AL=
+L);
+=20
+     ret =3D blk_insert_bs(src, bs, &local_err);
+@@ -492,14 +494,14 @@ int bdrv_commit(BlockDriverState *bs)
+         }
+     }
+=20
+-    if (drv->bdrv_make_empty) {
+-        ret =3D drv->bdrv_make_empty(bs);
+-        if (ret < 0) {
+-            goto ro_cleanup;
+-        }
+-        blk_flush(src);
++    ret =3D blk_make_empty(src, NULL);
++    /* Ignore -ENOTSUP */
++    if (ret < 0 && ret !=3D -ENOTSUP) {
++        goto ro_cleanup;
+     }
+=20
++    blk_flush(src);
 +
-+#include "qemu/osdep.h"
-+#include "hw/acpi/acpi.h"
-+#include "hw/acpi/aml-build.h"
+     /*
+      * Make sure all data we wrote to the backing device is actually
+      * stable on disk.
+diff --git a/qemu-img.c b/qemu-img.c
+index 7f52742ef2..77f3575538 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1065,11 +1065,20 @@ static int img_commit(int argc, char **argv)
+         goto unref_backing;
+     }
+=20
+-    if (!drop && bs->drv->bdrv_make_empty) {
+-        ret =3D bs->drv->bdrv_make_empty(bs);
+-        if (ret) {
+-            error_setg_errno(&local_err, -ret, "Could not empty %s",
+-                             filename);
++    if (!drop) {
++        BlockBackend *old_backing_blk;
 +
-+void aml_append(Aml *parent_ctx, Aml *child)
-+{
-+}
-+
-+Aml *aml_resource_template(void)
-+{
-+    return NULL;
-+}
-+
-+Aml *aml_device(const char *name_format, ...)
-+{
-+    return NULL;
-+}
-+
-+Aml *aml_eisaid(const char *str)
-+{
-+    return NULL;
-+}
-+
-+Aml *aml_name_decl(const char *name, Aml *val)
-+{
-+    return NULL;
-+}
-+
-+Aml *aml_io(AmlIODecode dec, uint16_t min_base, uint16_t max_base,
-+            uint8_t aln, uint8_t len)
-+{
-+    return NULL;
-+}
-+
-+Aml *aml_irq_no_flags(uint8_t irq)
-+{
-+    return NULL;
-+}
-+
-+Aml *aml_int(const uint64_t val)
-+{
-+    return NULL;
-+}
-+
-+Aml *aml_package(uint8_t num_elements)
-+{
-+    return NULL;
-+}
-+
-+Aml *aml_dma(AmlDmaType typ, AmlDmaBusMaster bm, AmlTransferSize sz,
-+             uint8_t channel)
-+{
-+    return NULL;
-+}
-+
-+Aml *aml_buffer(int buffer_size, uint8_t *byte_list)
-+{
-+    return NULL;
-+}
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 777da07f4d70..cab9bcd457dc 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -20,6 +20,6 @@ common-obj-$(CONFIG_TPM) +=3D tpm.o
- common-obj-$(CONFIG_IPMI) +=3D ipmi.o
- common-obj-$(call lnot,$(CONFIG_IPMI)) +=3D ipmi-stub.o
- else
--common-obj-y +=3D acpi-stub.o
-+common-obj-y +=3D acpi-stub.o aml-build-stub.o
- endif
--common-obj-$(CONFIG_ALL) +=3D acpi-stub.o acpi-x86-stub.o ipmi-stub.o
-+common-obj-$(CONFIG_ALL) +=3D acpi-stub.o aml-build-stub.o acpi-x86-stub.o=
- ipmi-stub.o
++        old_backing_blk =3D blk_new_with_bs(bs, BLK_PERM_WRITE, BLK_PERM_A=
+LL,
++                                          &local_err);
++        if (!old_backing_blk) {
++            goto unref_backing;
++        }
++        ret =3D blk_make_empty(old_backing_blk, &local_err);
++        blk_unref(old_backing_blk);
++        if (ret =3D=3D -ENOTSUP) {
++            error_free(local_err);
++            local_err =3D NULL;
++        } else if (ret < 0) {
+             goto unref_backing;
+         }
+     }
 --=20
-2.18.2
+2.25.4
 
 
