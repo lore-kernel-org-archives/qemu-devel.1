@@ -2,90 +2,129 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89035C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:51:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4308EC83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:52:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 522782076B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:51:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 080D32076B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:52:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BUJ4M40K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 522782076B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IBn1S4Qk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 080D32076B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jThVO-0002i8-Eq
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:51:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46932)
+	id 1jThW1-000409-65
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:52:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48892)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jTh8A-0002rn-BP
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:27:43 -0400
+ (envelope-from <david@redhat.com>) id 1jThQd-00060h-Vb
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:51:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jTh88-0000jj-DF
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:27:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43395
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1jThOC-0007xK-Sx
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:46:47 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49639
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jTh86-0000PN-CP
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:27:38 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jThOC-0007xB-Gz
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:44:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588145256;
+ s=mimecast20190719; t=1588146255;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RzuqMdQe/809M7Rx0MUJ+9lSGhW1ibHtH2DKCeZNun0=;
- b=BUJ4M40Kctw2S39c8GqtjkuXAZo/sZFBNGYN/OZYkiwrndtr0b+ocSiBSfZPjSDJRoTQFF
- vW5GEgRGrR7Wsec5tc9wvwd1pS+CYPc0xZZtHGybmueSslIOzjwzO0xd41a9ZvRAnxL2f9
- /06t0Khfd6iCUZTtRdCD/h8eSfNsIS0=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=cR+pqt7DFWWTjbOo47cY6UdieuTaXUMVKrcA8fJsmIM=;
+ b=IBn1S4Qk2kvdvQhWDDKo0XRE4JM67a6CTGFN7yOxKU1FASWgE0pAwttKi99ypRiHI7wlgB
+ mmX7foeyVfVl2WYUwYh4LjCTsOQcgu8B4/gg8ff9T9Mxaw1lyjA0jA4bWO0sbXBye9q0BV
+ oqtWa1O3s4orIoiF304odqO6bwn18Bs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-PhD_TkVLOhCNqhbcQDTw8A-1; Wed, 29 Apr 2020 03:27:33 -0400
-X-MC-Unique: PhD_TkVLOhCNqhbcQDTw8A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-459-5KOhS8qhO7Oli7QJNZcd0g-1; Wed, 29 Apr 2020 03:44:11 -0400
+X-MC-Unique: 5KOhS8qhO7Oli7QJNZcd0g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12503872FE0;
- Wed, 29 Apr 2020 07:27:32 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 861121000329;
- Wed, 29 Apr 2020 07:27:31 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0B41911358BC; Wed, 29 Apr 2020 09:27:30 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 07/11] mips/malta: Fix create_cps() error handling
-References: <20200424192027.11404-1-armbru@redhat.com>
- <20200424192027.11404-8-armbru@redhat.com>
- <75dc4fbc-2b39-c8ef-8030-370672621c2f@amsat.org>
- <871ro6x26g.fsf@dusky.pond.sub.org>
- <d9a17752-6a8d-a59e-f661-a9e6c59b670f@amsat.org>
-Date: Wed, 29 Apr 2020 09:27:29 +0200
-In-Reply-To: <d9a17752-6a8d-a59e-f661-a9e6c59b670f@amsat.org> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed, 29 Apr 2020 09:13:10
- +0200")
-Message-ID: <87sggmrbtq.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30CD680058A;
+ Wed, 29 Apr 2020 07:44:10 +0000 (UTC)
+Received: from [10.36.114.55] (ovpn-114-55.ams2.redhat.com [10.36.114.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DFB5F648C9;
+ Wed, 29 Apr 2020 07:44:07 +0000 (UTC)
+Subject: Re: [PATCH v2] s390x/kvm: help valgrind in several places
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
+References: <20200429074201.100924-1-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <42594f57-cc13-fbc0-b128-7454c8d6a6a4@redhat.com>
+Date: Wed, 29 Apr 2020 09:44:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200429074201.100924-1-borntraeger@de.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:18:10
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:28:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,112 +136,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+On 29.04.20 09:42, Christian Borntraeger wrote:
+> We need some little help in the code to reduce the valgrind noise.
+> This patch does this with some designated initializers for the cpu
+> model features and subfunctions.
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  target/s390x/kvm.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 69881a0da0..f2f75d2a57 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -2165,7 +2165,7 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+> =20
+>  static int query_cpu_subfunc(S390FeatBitmap features)
+>  {
+> -    struct kvm_s390_vm_cpu_subfunc prop;
+> +    struct kvm_s390_vm_cpu_subfunc prop =3D {};
+>      struct kvm_device_attr attr =3D {
+>          .group =3D KVM_S390_VM_CPU_MODEL,
+>          .attr =3D KVM_S390_VM_CPU_MACHINE_SUBFUNC,
+> @@ -2292,7 +2292,7 @@ static int kvm_to_feat[][2] =3D {
+> =20
+>  static int query_cpu_feat(S390FeatBitmap features)
+>  {
+> -    struct kvm_s390_vm_cpu_feat prop;
+> +    struct kvm_s390_vm_cpu_feat prop =3D {};
+>      struct kvm_device_attr attr =3D {
+>          .group =3D KVM_S390_VM_CPU_MODEL,
+>          .attr =3D KVM_S390_VM_CPU_MACHINE_FEAT,
+>=20
 
-> +Peter for crediting his advice.
->
-> On 4/29/20 7:59 AM, Markus Armbruster wrote:
->> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
->>
->>> On 4/24/20 9:20 PM, Markus Armbruster wrote:
->>>> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
->>>> pointer to a variable containing NULL.  Passing an argument of the
->>>> latter kind twice without clearing it in between is wrong: if the
->>>> first call sets an error, it no longer points to NULL for the second
->>>>
->>>> create_cps() is wrong that way.  The last calls treats an error as
->>>> fatal.  Do that for the prior ones, too.
->>>>
->>>> Fixes: bff384a4fbd5d0e86939092e74e766ef0f5f592c
->>>> Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->>>> Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
->>>> Cc: Aurelien Jarno <aurelien@aurel32.net>
->>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>>> ---
->>>>   hw/mips/mips_malta.c | 15 ++++++---------
->>>>   1 file changed, 6 insertions(+), 9 deletions(-)
->>>>
->>>> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
->>>> index e4c4de1b4e..17bf41616b 100644
->>>> --- a/hw/mips/mips_malta.c
->>>> +++ b/hw/mips/mips_malta.c
->>>> @@ -1185,17 +1185,14 @@ static void create_cpu_without_cps(MachineStat=
-e *ms,
->>>>   static void create_cps(MachineState *ms, MaltaState *s,
->>>>                          qemu_irq *cbus_irq, qemu_irq *i8259_irq)
->>>>   {
->>>> -    Error *err =3D NULL;
->>>> -
->>>>       sysbus_init_child_obj(OBJECT(s), "cps", OBJECT(&s->cps), sizeof(=
-s->cps),
->>>>                             TYPE_MIPS_CPS);
->>>> -    object_property_set_str(OBJECT(&s->cps), ms->cpu_type, "cpu-type"=
-, &err);
->>>> -    object_property_set_int(OBJECT(&s->cps), ms->smp.cpus, "num-vp", =
-&err);
->>>> -    object_property_set_bool(OBJECT(&s->cps), true, "realized", &err)=
-;
->>>> -    if (err !=3D NULL) {
->>>> -        error_report("%s", error_get_pretty(err));
->>>
->>> In https://www.mail-archive.com/qemu-devel@nongnu.org/msg695645.html I
->>> also remove "qemu/error-report.h" which is not needed once you remove
->>> this call.
->>
->> Missed it, sorry.  I only reviewed the Coccinelle scripts [PATCH 1+3/7].
->
-> My bad for not Cc'ing you on the whole series, which is Error related,
-> and use the default get_maintainer.pl selection.
->
->> I'd replace my patch by yours to give you proper credit, but your commit
->> message mentions "the coccinelle script", presumably the one from PATCH
->> 1/7, and that patch isn't quite ready in my opinion.
->
-> I'm not worried about credit, but duplicating effort or wasting time.
->
-> Peter once warned the problem with Coccinelle scripts is finding the
-> correct balance between time spent to improve QEMU codebase, and time
-> spent learning Coccinelle and improving a script that is often used
-> only once in a lifetime.
-> If the script is not provided, we ask for the script. If the script is
-> embedded in various patch descriptions, we ask to add it independently
-> for reuse or as example. Then the script must be almost
-> perfect. Meanwhile all the following patches referencing it, while
-> reviewed, are stuck.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-True.  I try not to ask for undue perfection, but perfection eludes me
-in that, too :)
+--=20
+Thanks,
 
-For PATCH 1/7, I only asked you to explain the script's limitations in
-the script and the commit message.  Her's a bit of inspiration from the
-kernel's scripts/coccinelle/misc/doubleinit.cocci (picked almost at
-random):
-
-    /// Find duplicate field initializations.  This has a high rate of fals=
-e
-    /// positives due to #ifdefs, which Coccinelle is not aware of in a str=
-ucture
-    /// initialization.
-    ///
-    // Confidence: Low
-
-I like the Confidence: tag.  It should come with an explanation, as it
-does here.
-
-For PATCH 3/7, I had a question.
-
-> Anyway back to your patch:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Thanks!
+David / dhildenb
 
 
