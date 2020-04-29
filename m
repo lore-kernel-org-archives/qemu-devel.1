@@ -6,78 +6,78 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D1DC83000
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:05:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1671CC83004
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:07:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7757A2083B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:05:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4C932082E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:07:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b0FUreTs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7757A2083B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RW9gdY45"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4C932082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTnL5-0000BJ-H9
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 10:05:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42448)
+	id 1jTnMc-0003OB-VE
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 10:07:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTnGf-0002GQ-Ap
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:01:10 -0400
+ (envelope-from <kraxel@redhat.com>) id 1jTnGe-0002GK-AR
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:01:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTnGB-0003sY-FZ
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:00:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24293
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kraxel@redhat.com>) id 1jTnGB-0003s6-0x
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:00:52 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57245
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jTnGB-0003rN-2z
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:00:23 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jTnGA-0003qL-Ge
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:00:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588168822;
+ s=mimecast20190719; t=1588168821;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=B+GFEragVS80ptAKJBTWsePETywlC56dk7pNXnTkfMI=;
- b=b0FUreTs4yFoNOWwgkvtXRTWnqEFkcn6iA5Vmqgj/5SVOVa+wJs0Yh5GvK4reut5rmWG2w
- q7g6IRPlP9X8ziQ7cNa2bLU2tS+xar98vMjF4++KxyUEY3o51WzciA/jG1cFa57Sc8M6x+
- +zSK+joZ5ZVFg+/004GtD3hn1lRmAwE=
+ bh=Ns10TmOrrDyIyxSx6sKY7GiFbnXZHstnlbWiBISKw4g=;
+ b=RW9gdY45FENHQx4Uhf151Fa9tiye7MhrQGnfSoGC6OloABYi+jZXyQ5oZg/4w562HNcnGQ
+ FczR3SRzceg/On2cPBZtx4k3iPjOLjxe7ZtSNIsXUAREfB2siAUbsaom/bQVp68mlA1tCp
+ GILcgECNn6jhOPTVB5bE9kqHlmOwekE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-434-Z_hLFL0oNbmG0DN-IUXODA-1; Wed, 29 Apr 2020 10:00:18 -0400
-X-MC-Unique: Z_hLFL0oNbmG0DN-IUXODA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-480-vLy9JsC-PXmXvgt9G2oSIA-1; Wed, 29 Apr 2020 10:00:20 -0400
+X-MC-Unique: vLy9JsC-PXmXvgt9G2oSIA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF4398BEE80;
- Wed, 29 Apr 2020 14:00:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF38091165;
+ Wed, 29 Apr 2020 14:00:18 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
  [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1C8A838A;
- Wed, 29 Apr 2020 14:00:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7C706648D2;
+ Wed, 29 Apr 2020 14:00:16 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 77D7C9DA2; Wed, 29 Apr 2020 16:00:03 +0200 (CEST)
+ id 4FAA99D9E; Wed, 29 Apr 2020 16:00:03 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 09/15] acpi: move aml builder code for serial device
-Date: Wed, 29 Apr 2020 15:59:57 +0200
-Message-Id: <20200429140003.7336-10-kraxel@redhat.com>
+Subject: [PATCH v3 05/15] acpi: add ISADeviceClass->build_aml()
+Date: Wed, 29 Apr 2020 15:59:53 +0200
+Message-Id: <20200429140003.7336-6-kraxel@redhat.com>
 In-Reply-To: <20200429140003.7336-1-kraxel@redhat.com>
 References: <20200429140003.7336-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 00:53:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,130 +101,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The code uses the isa_serial_io array to figure what the device uid is.
-Side effect is that acpi antries are not limited to port 1+2 any more,
-we'll also get entries for ports 3+4.
+Also add isa_aml_build() function which walks all isa devices.
+This allows to move aml builder code to isa devices.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/char/serial-isa.c | 32 ++++++++++++++++++++++++++++++++
- hw/i386/acpi-build.c | 32 --------------------------------
- 2 files changed, 32 insertions(+), 32 deletions(-)
+ include/hw/isa/isa.h |  2 ++
+ hw/i386/acpi-build.c |  1 +
+ hw/isa/isa-bus.c     | 15 +++++++++++++++
+ 3 files changed, 18 insertions(+)
 
-diff --git a/hw/char/serial-isa.c b/hw/char/serial-isa.c
-index f9b6eed7833d..f7c19a398ced 100644
---- a/hw/char/serial-isa.c
-+++ b/hw/char/serial-isa.c
-@@ -27,6 +27,7 @@
- #include "qapi/error.h"
- #include "qemu/module.h"
- #include "sysemu/sysemu.h"
-+#include "hw/acpi/aml-build.h"
- #include "hw/char/serial.h"
- #include "hw/isa/isa.h"
- #include "hw/qdev-properties.h"
-@@ -81,6 +82,35 @@ static void serial_isa_realizefn(DeviceState *dev, Error=
- **errp)
-     isa_register_ioport(isadev, &s->io, isa->iobase);
- }
+diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
+index 59a4d4b50a6d..02c235027484 100644
+--- a/include/hw/isa/isa.h
++++ b/include/hw/isa/isa.h
+@@ -69,6 +69,7 @@ typedef struct IsaDmaClass {
 =20
-+static void serial_isa_build_aml(ISADevice *isadev, Aml *scope)
-+{
-+    ISASerialState *isa =3D ISA_SERIAL(isadev);
-+    int i, uid =3D 0;
-+    Aml *dev;
-+    Aml *crs;
-+
-+    for (i =3D 0; i < ARRAY_SIZE(isa_serial_io); i++) {
-+        if (isa->iobase =3D=3D isa_serial_io[i]) {
-+            uid =3D i + 1;
-+        }
-+    }
-+    if (!uid) {
-+        return;
-+    }
-+
-+    crs =3D aml_resource_template();
-+    aml_append(crs, aml_io(AML_DECODE16, isa->iobase, isa->iobase, 0x00, 0=
-x08));
-+    aml_append(crs, aml_irq_no_flags(isa->isairq));
-+
-+    dev =3D aml_device("COM%d", uid);
-+    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0501")));
-+    aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
-+    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
-+    aml_append(dev, aml_name_decl("_CRS", crs));
-+
-+    aml_append(scope, dev);
-+}
-+
- static const VMStateDescription vmstate_isa_serial =3D {
-     .name =3D "serial",
-     .version_id =3D 3,
-@@ -103,9 +133,11 @@ static Property serial_isa_properties[] =3D {
- static void serial_isa_class_initfn(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    ISADeviceClass *isa =3D ISA_DEVICE_CLASS(klass);
+ typedef struct ISADeviceClass {
+     DeviceClass parent_class;
++    void (*build_aml)(ISADevice *dev, Aml *scope);
+ } ISADeviceClass;
 =20
-     dc->realize =3D serial_isa_realizefn;
-     dc->vmsd =3D &vmstate_isa_serial;
-+    isa->build_aml =3D serial_isa_build_aml;
-     device_class_set_props(dc, serial_isa_properties);
-     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
- }
+ struct ISABus {
+@@ -107,6 +108,7 @@ ISADevice *isa_try_create(ISABus *bus, const char *name=
+);
+ ISADevice *isa_create_simple(ISABus *bus, const char *name);
+=20
+ ISADevice *isa_vga_init(ISABus *bus);
++void isa_build_aml(ISABus *bus, Aml *scope);
+=20
+ /**
+  * isa_register_ioport: Install an I/O port region on the ISA bus.
 diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index a99e5bbd1156..fea83352e6ab 100644
+index 3a046b03e4cd..97f3c75cd995 100644
 --- a/hw/i386/acpi-build.c
 +++ b/hw/i386/acpi-build.c
-@@ -1202,36 +1202,6 @@ static Aml *build_lpt_device_aml(void)
-     return dev;
+@@ -1288,6 +1288,7 @@ static void build_isa_devices_aml(Aml *table)
+         error_report("No ISA bus, unable to define IPMI ACPI data");
+     } else {
+         build_acpi_ipmi_devices(scope, BUS(obj), "\\_SB.PCI0.ISA");
++        isa_build_aml(ISA_BUS(obj), scope);
+     }
+=20
+     aml_append(table, scope);
+diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
+index 798dd9194e8f..1f2189f4d5db 100644
+--- a/hw/isa/isa-bus.c
++++ b/hw/isa/isa-bus.c
+@@ -207,6 +207,21 @@ ISADevice *isa_vga_init(ISABus *bus)
+     }
  }
 =20
--static void build_com_device_aml(Aml *scope, uint8_t uid)
--{
--    Aml *dev;
--    Aml *crs;
--    uint8_t irq =3D 4;
--    uint16_t io_port =3D 0x03F8;
--
--    assert(uid =3D=3D 1 || uid =3D=3D 2);
--    if (uid =3D=3D 2) {
--        irq =3D 3;
--        io_port =3D 0x02F8;
--    }
--    if (!memory_region_present(get_system_io(), io_port)) {
--        return;
--    }
--
--    dev =3D aml_device("COM%d", uid);
--    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0501")));
--    aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
--
--    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
--
--    crs =3D aml_resource_template();
--    aml_append(crs, aml_io(AML_DECODE16, io_port, io_port, 0x00, 0x08));
--    aml_append(crs, aml_irq_no_flags(irq));
--    aml_append(dev, aml_name_decl("_CRS", crs));
--
--    aml_append(scope, dev);
--}
--
- static void build_isa_devices_aml(Aml *table)
++void isa_build_aml(ISABus *bus, Aml *scope)
++{
++    BusChild *kid;
++    ISADevice *dev;
++    ISADeviceClass *dc;
++
++    QTAILQ_FOREACH(kid, &bus->parent_obj.children, sibling) {
++        dev =3D ISA_DEVICE(kid->child);
++        dc =3D ISA_DEVICE_GET_CLASS(dev);
++        if (dc->build_aml) {
++            dc->build_aml(dev, scope);
++        }
++    }
++}
++
+ static void isabus_dev_print(Monitor *mon, DeviceState *dev, int indent)
  {
-     ISADevice *fdc =3D pc_find_fdc0();
-@@ -1246,8 +1216,6 @@ static void build_isa_devices_aml(Aml *table)
-         aml_append(scope, build_fdc_device_aml(fdc));
-     }
-     aml_append(scope, build_lpt_device_aml());
--    build_com_device_aml(scope, 1);
--    build_com_device_aml(scope, 2);
-=20
-     if (ambiguous) {
-         error_report("Multiple ISA busses, unable to define IPMI ACPI data=
-");
+     ISADevice *d =3D ISA_DEVICE(dev);
 --=20
 2.18.2
 
