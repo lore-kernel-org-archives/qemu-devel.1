@@ -2,83 +2,70 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 650BBC83000
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF3EC83000
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 19:11:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30988208E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:54:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DdhS+6Wt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30988208E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6145E205C9
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 19:11:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6145E205C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTrql-0000QE-CD
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 14:54:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39542)
+	id 1jTs76-0000FD-GZ
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 15:11:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41828)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jTroQ-0005XP-Mi
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:52:03 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jTs5j-00070v-Ku
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 15:09:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jTroQ-0002i2-6f
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:52:02 -0400
-Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:44664)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jTroO-0002h2-9N; Wed, 29 Apr 2020 14:52:00 -0400
-Received: by mail-il1-x141.google.com with SMTP id s10so3449023iln.11;
- Wed, 29 Apr 2020 11:51:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=IsBLFWc6fdYBfIh5gE4fLMG8y9tfNXkYmnIVynU01FY=;
- b=DdhS+6WtTnftHsy/F/mhAimFsoq9r8rSmgxkxwm7MxIDA31MvCmVVe3u5DfOQRs36y
- UbdWuRkYyeeep72DlFT8sREMmjCjs//4aRt/g9e9Fs35zPYRlCr6YNJ+e9orafiOwm/3
- lwVZWzgA4Yjkm6ZvU4MAI5L8NFi1Ish7iWFdfwI5DwDq4w4hyrOXMNLV1sYkV77LyWdu
- qa2XcDfgTMkPcIUwRy8NG0mmHILG95FPsn+vJVfOzr2MCc2PTY6jLrlm5TFeiiriJq/Z
- HfJ02adxftXwvyoV9W3QjIonU1g4IKDrJSa9cZs+NJXTwd6al7DEhhUoihDS00bdYU5/
- GdZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=IsBLFWc6fdYBfIh5gE4fLMG8y9tfNXkYmnIVynU01FY=;
- b=hpfYACv3AsXPsoUt53e/lkf0ZoQF7Xd8fI61EKKGqVhqJfL6LxG42+igcxO7DOiwY9
- 5uE+V6/YRT0qrCKpDAb4nG5QU4OU7QE96RjKmkF7APhfiltMxLBFe74Fms9N3el+/kX3
- oXGzO1ajzYGunzLe1WonwKzvhZEnpfKjHRMdonFWAEPUAu/vq8472if/+aeJE4Swjidw
- bl4Kuyjtix1QjpF+tZxpIConw+UFPTwXeeVVrSkAKaSNPNq8sv1dKrfuGbqBcWUvgcbp
- B8Oy+As9/pOIBkM3KBAh7LsUcZ0ihGO2x+dyerAmBdgGHDXRUoOO91+4qaBOBOwkjbZe
- cJIw==
-X-Gm-Message-State: AGi0Puadn4c+lFWpsNKrbA2M28lImVrLxYZusXWw4zvjUpHJ3LkPqL71
- 0OYEGzUbFfuaW+q2YWQKtXtlU2s1wFSUMWI2OpQ=
-X-Google-Smtp-Source: APiQypLwVrvR+WvgigohLXSLZNiIxNYJGw7lK7o4zFozQ+AT0n5X1mi+ooyWlTfN3FoWyH8JMk6/6W/gGRFm4l1w0iU=
-X-Received: by 2002:a92:d0c6:: with SMTP id y6mr34619061ila.227.1588186317519; 
- Wed, 29 Apr 2020 11:51:57 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1jTs5e-0004yi-T8
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 15:09:55 -0400
+Resent-Date: Wed, 29 Apr 2020 15:09:55 -0400
+Resent-Message-Id: <E1jTs5e-0004yi-T8@eggs.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21333)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jTs37-00031c-12; Wed, 29 Apr 2020 15:07:13 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1588187225; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=niyYrqC3aUJtiisnMbgjI9hMLS8iI4fY3wCFYTukrklThtFyrDqShVAqQav6QTmQwOf6hHwC7wHntilCxZfIFNdGgGD3eN+7tS6Aq8PE+jSjcXoQje2A/IkiS00o38RvhSdImkjdE521DMu+22bI7g59r8a90CNO1sGA250PRU8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1588187225;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=mXRdBE3G0HWtLopkKKEw8PgBvzf0YzSvKFMcE/33P50=; 
+ b=As2ZsbKS/QfXOpl7/Tt9GzFIYBkBN8HOyLul5ZfHoOfUJf3vqSBKKaAT3psPV3gLfD4iyLLwdHuqi+hVggASb3TAT5F3SSYU4TaggQ0K8yPjO/0cNECHpi4tFEToLH0lS7RrL0VMNwSOURN/hdex8AIVsWQLD5M2cWrBdjIDYLU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 15881872229730.2970267795152495;
+ Wed, 29 Apr 2020 12:07:02 -0700 (PDT)
+Message-ID: <158818722162.4471.10347903151740616896@45ef0f9c86ae>
+In-Reply-To: <20200429141126.85159-1-mreitz@redhat.com>
+Subject: Re: [PATCH v2 0/4] block: Do not call BlockDriver.bdrv_make_empty()
+ directly
 MIME-Version: 1.0
-References: <CAC41xo2O1k+cn7EO3Zu3U70qefFwGa5B1iNRNgRwLk7SGX=-Aw@mail.gmail.com>
- <CAKmqyKPDzusVqzCFwCJ+2gY0qchguhR57zHNkE-0MTeffKs_OA@mail.gmail.com>
- <CAC41xo3qeQZ+i8XoQq3j80_JDEoL2yMA__arpmE+GXyjX4c1sg@mail.gmail.com>
-In-Reply-To: <CAC41xo3qeQZ+i8XoQq3j80_JDEoL2yMA__arpmE+GXyjX4c1sg@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 29 Apr 2020 11:43:18 -0700
-Message-ID: <CAKmqyKPJ6QqUULrDj9NX_bLdnjsjzPOGcCBH5q23fG=ScT_NzA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] target/riscv: fix VS interrupts forwarding to HS
-To: Jose Martins <josemartins90@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::141
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mreitz@redhat.com
+Date: Wed, 29 Apr 2020 12:07:02 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 02:03:04
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Received-From: 136.143.188.53
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,100 +77,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- On Wed, Apr 29, 2020 at 9:07 AM Jose Martins <josemartins90@gmail.com> wrote:
->
-> > If the Hypervisor sets the V* interrupts why does it then want to
-> > receive the interrupt itself?
->
-> I don't think this is a question of whether there is a use case for it
-> or not (I agree with you, of the top of my head I don't see why would
-> you forward v* interrupts to the hypervisor). However,  from what I
-> can understand,  the spec allows for it. If you don't set the
-> corresponding bits in hideleg, v* interrupts should be forwarded to HS
-> (as I said, they are guaranteed not to be forwarded to m mode because
-> these bits must be hardwired in mideleg). Otherwise, there would be no
-> purpose for the hideleg register, as v* interrupts bits are the only
-> ones that can be written in it (am I missing something?).
-
-I think you are right.
-
-"Among bits 15:0 of hideleg, only bits 10, 6, and 2 (corresponding to
-the standard VS-level interrupts) shall be writable, and the others
-shall be hardwired to zero."
-
-Which means that it only controls the V* interrupts.
-
->
-> > Isn't hs_sie only ever accessed if riscv_cpu_virt_enabled(env)?
-> > Doesn't this just set hs_sie to always be 1?
->
-> I don't understand if you don't agree that hs_sie should be always set
-> when riscv_cpu_virt_enabled(env), or if you agree with it and don't
-> see the need for the hs_sie variable at all. If it is the latter, I
-> agree with you. So the patch would become:
-
-Currently hs_sie is set:
- - When we are in U-Mode
- - If we are in S-Mode and hs_mstatus_sie is true
-
-Then hs_sie is only accessed if virtulisation is enabled.
-
-Your change just made it true for whenever virtulisation is enabled
-(in which case we don't need it).
-
->
-> Signed-off-by: Jose Martins <josemartins90@gmail.com>
-> ---
->  target/riscv/cpu_helper.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
->
-> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> index d3ba9efb02..a85eadb4fb 100644
-> --- a/target/riscv/cpu_helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -41,10 +41,8 @@ static int riscv_cpu_local_irq_pending(CPURISCVState *env)
->
->      target_ulong mstatus_mie = get_field(env->mstatus, MSTATUS_MIE);
->      target_ulong mstatus_sie = get_field(env->mstatus, MSTATUS_SIE);
-> -    target_ulong hs_mstatus_sie = get_field(env->mstatus_hs, MSTATUS_SIE);
->
-> -    target_ulong pending = env->mip & env->mie &
-> -                               ~(MIP_VSSIP | MIP_VSTIP | MIP_VSEIP);
-> +    target_ulong pending = env->mip & env->mie;
-
-This looks good
-
->      target_ulong vspending = (env->mip & env->mie &
->                                (MIP_VSSIP | MIP_VSTIP | MIP_VSEIP));
->
-> @@ -52,11 +50,9 @@ static int riscv_cpu_local_irq_pending(CPURISCVState *env)
->                            (env->priv == PRV_M && mstatus_mie);
->      target_ulong sie    = env->priv < PRV_S ||
->                            (env->priv == PRV_S && mstatus_sie);
-> -    target_ulong hs_sie = env->priv < PRV_S ||
-> -                          (env->priv == PRV_S && hs_mstatus_sie);
->
->      if (riscv_cpu_virt_enabled(env)) {
-> -        target_ulong pending_hs_irq = pending & -hs_sie;
-> +        target_ulong pending_hs_irq = pending & ~env->hideleg;
-
-I don't see why we don't need to check the HS version of MSTATUS_SIE.
-I think hs_sie should stay shouldn't it?
-
-Alistair
-
->
->          if (pending_hs_irq) {
->              riscv_cpu_set_force_hs_excep(env, FORCE_HS_EXCEP);
-> --
-> 2.17.1
->
-> Jose
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQyOTE0MTEyNi44NTE1
+OS0xLW1yZWl0ekByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
+bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
+ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
+V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
+NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgTElOSyAgICBxZW11LXN0b3Jh
+Z2UtZGFlbW9uCiAgTElOSyAgICBxZW11LWlvCi90bXAvcWVtdS10ZXN0L3NyYy9xZW11LWltZy5j
+OiBJbiBmdW5jdGlvbiAnaW1nX2NvbW1pdCc6Ci90bXAvcWVtdS10ZXN0L3NyYy9xZW11LWltZy5j
+OjEwNzE6OTogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdibGtfbmV3
+X3dpdGhfYnMnIFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogICAgICAg
+ICBvbGRfYmFja2luZ19ibGsgPSBibGtfbmV3X3dpdGhfYnMoYnMsIEJMS19QRVJNX1dSSVRFLCBC
+TEtfUEVSTV9BTEwsCiAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3FlbXUtaW1nLmM6MTA3
+MTo5OiBlcnJvcjogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAnYmxrX25ld193aXRoX2Jz
+JyBbLVdlcnJvcj1uZXN0ZWQtZXh0ZXJuc10KL3RtcC9xZW11LXRlc3Qvc3JjL3FlbXUtaW1nLmM6
+MTA3MToyNTogZXJyb3I6IGFzc2lnbm1lbnQgbWFrZXMgcG9pbnRlciBmcm9tIGludGVnZXIgd2l0
+aG91dCBhIGNhc3QgWy1XZXJyb3JdCiAgICAgICAgIG9sZF9iYWNraW5nX2JsayA9IGJsa19uZXdf
+d2l0aF9icyhicywgQkxLX1BFUk1fV1JJVEUsIEJMS19QRVJNX0FMTCwKICAgICAgICAgICAgICAg
+ICAgICAgICAgIF4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFr
+ZTogKioqIFtxZW11LWltZy5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlz
+aGVkIGpvYnMuLi4uCm1ha2U6ICoqKiB3YWl0OiBObyBjaGlsZCBwcm9jZXNzZXMuICBTdG9wLgpU
+cmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJv
+Y2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENv
+bW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFl
+bXUuaW5zdGFuY2UudXVpZD01NGMxZThkN2YzOGQ0OTFjODc5YTlmN2ZkNzBiOTNmZCcsICctdScs
+ICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywg
+Jy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUn
+LCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScs
+ICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3
+Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1qOThscGVlNi9zcmMvZG9ja2VyLXNyYy4yMDIwLTA0
+LTI5LTE1LjA0LjIxLjE2NTQ3Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAn
+L3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0
+IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD01
+NGMxZThkN2YzOGQ0OTFjODc5YTlmN2ZkNzBiOTNmZAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5d
+IEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVz
+dGVyLXRtcC1qOThscGVlNi9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNl
+bnRvczddIEVycm9yIDIKCnJlYWwgICAgMm00MS4xOTJzCnVzZXIgICAgMG04LjA5NXMKCgpUaGUg
+ZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNDI5
+MTQxMTI2Ljg1MTU5LTEtbXJlaXR6QHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2Vu
+dG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
+UGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
