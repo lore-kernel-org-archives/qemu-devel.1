@@ -2,87 +2,89 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D4FC83004
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB51C83000
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:38:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A73F214D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:33:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37CF0206D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:38:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RqqCsvGR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A73F214D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nFGYIp7b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37CF0206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTtOy-0007pa-IA
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:33:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53372)
+	id 1jTtTW-0002kw-AA
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:38:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53784)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jTtNK-0006Ls-Bs
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:32:50 -0400
+ (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
+ id 1jTtOi-0007rI-Ah
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:37:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jTtJS-0005vQ-LI
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:32:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47202
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jTtJQ-0005ux-WA
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:28:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588192087;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qSq3vZYAKDQjQAKE4D8xiqg+i+Lw+X1sipG4ALihLKA=;
- b=RqqCsvGRNDizl/YOm9LEZLd8yL3QMpe8nSrzYHf1H6w/1Vjhi+vCUEuD9gfmUdKkK7B18o
- nGgHNR0DVPeEvxExtvn3MYKy6+TNsevYaVQEQ5qVaspwMKHgfd/e3PFM38SIRGDQLYube/
- 5bqe2SGdlzn9A/ugWp/gPpHeNkvtfdc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-25s0jj-SNFunHBOX-sjpjw-1; Wed, 29 Apr 2020 16:28:03 -0400
-X-MC-Unique: 25s0jj-SNFunHBOX-sjpjw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06494800C78;
- Wed, 29 Apr 2020 20:28:01 +0000 (UTC)
-Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BCE35D780;
- Wed, 29 Apr 2020 20:27:50 +0000 (UTC)
-Subject: Re: [PATCH v2 04/17] block/io: use int64_t bytes in driver wrappers
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200427082325.10414-1-vsementsov@virtuozzo.com>
- <20200427082325.10414-5-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <b9daa960-b607-6ef4-9dbb-67807d4fd13c@redhat.com>
-Date: Wed, 29 Apr 2020 15:27:49 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
+ id 1jTtO3-0005vf-3e
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:33:36 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:7545)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
+ id 1jTtJx-00065g-CN; Wed, 29 Apr 2020 16:28:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1588192121; x=1619728121;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=FJkl9Hbgys0eb3sfQF3l+EdkuBfAEQQRKAr1946F++g=;
+ b=nFGYIp7bWEdBHWtKdZdRap2fTop/MnzGhlDSC7YgajmeeyJsSVY4VTsD
+ bGGHyZqiHakvTqiZl+SY6m9AiQOMTP/JfkDweyt5zI2H5ae3JZ3Z2cVe8
+ nZ2RFVmpf0HIrdFw9c15/NG/7H9IKO5ZjPtNRsXtqhPNHlgY8BIY2/Tsb
+ oggOJvBRlEIJ1yFOFF/p1NEpkQXk5Hyz+3h2OwAHkp2TGmgDQNah6oOqQ
+ dQvFFSPkVktLxTc3+mwJaX7O1T+HZLkVhd8YjAG2bCH2wAkU3vzOtzOsH
+ 6qqpczKe9/JQ2WQi0skzTBoOfDtNRFMwB7WFTLZXyGOvcWhNs2tWiMXIl g==;
+IronPort-SDR: ulywGUWNMtt3LY1f47kLUIn5PFpzxw/gx05FLJXmhy6S5kTO38uOxC5RICpSThfK8Y41WoP2m1
+ 0n/0ChWyhLSBt8NDjJZyFCrWLDcOYElQPpn8lJDljvZduvMgzQpg8LzqNFPbf6YEl9UIPn9hR7
+ WurZT4J71VfLGl144VkMVFQryjceVeOAOs4OT44ft/6qcksvD8dC+bZquJOOvSUSoqP8FeCXgq
+ Ggpx+/jYrdiHre0iBX9n39v1QnaJSqMse/xgBVqViKRKs5uHSigPWb7zbexyuZXsS76IBUpxvY
+ htY=
+X-IronPort-AV: E=Sophos;i="5.73,333,1583164800"; d="scan'208";a="136507030"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 04:28:37 +0800
+IronPort-SDR: ivRKSTrY6I7XGiDAq91CPMHX0OgXLIuf3U/4lmXDo+KAvUsaMM44g5c6k8IwFelOfqnGUtTzaH
+ dsO97CyM+7bqrFQsZ4qK0y5ALaVldjmOY=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 29 Apr 2020 13:18:41 -0700
+IronPort-SDR: WJ1PtoS4mKBWGJn3kA25ZUO4apDazX6Zkh23QLFXAZQ1fcUSRftFVLLwdHuFiQYe2KsSEDjUIE
+ PoN4EypCzPrA==
+WDCIronportException: Internal
+Received: from usa004631.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.56.145])
+ by uls-op-cesaip01.wdc.com with ESMTP; 29 Apr 2020 13:28:37 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: peter.maydell@linaro.org
+Subject: [PULL v2 00/14] RISC-V Patch Queue for 5.1
+Date: Wed, 29 Apr 2020 13:19:52 -0700
+Message-Id: <20200429202006.775322-1-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20200427082325.10414-5-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 14:59:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.154.42;
+ envelope-from=prvs=381fbd49e=alistair.francis@wdc.com;
+ helo=esa4.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 16:28:37
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Received-From: 216.71.154.42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,119 +96,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org, berto@igalia.com,
- pavel.dovgaluk@ispras.ru, qemu-devel@nongnu.org, dillaman@redhat.com,
- pl@kamp.de, ronniesahlberg@gmail.com, mreitz@redhat.com, den@openvz.org,
- sheepdog@lists.wpkg.org, stefanha@redhat.com, namei.unix@gmail.com,
- pbonzini@redhat.com, sw@weilnetz.de, jsnow@redhat.com, ari@tuxera.com
+Cc: Alistair Francis <alistair.francis@wdc.com>, palmerdabbelt@google.com,
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/27/20 3:23 AM, Vladimir Sementsov-Ogievskiy wrote:
-> We are generally moving to int64_t for both offset and bytes parameters
-> on all io paths. Convert driver wrappers parameters which are
-> already 64bit to signed type.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   block/io.c | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/io.c b/block/io.c
-> index 1267918def..4796476835 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -1086,7 +1086,7 @@ static void bdrv_co_io_em_complete(void *opaque, int ret)
->   }
->   
->   static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
-> -                                           uint64_t offset, uint64_t bytes,
-> +                                           int64_t offset, int64_t bytes,
+The following changes since commit 648db19685b7030aa558a4ddbd3a8e53d8c9a062:
 
-Remains 64 bits, the question is whether any caller could pass in 
-something larger than 63 bits.  Callers are:
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-misc-2020-04-29' into staging (2020-04-29 15:07:33 +0100)
 
-bdrv_co_do_copy_on_readv() - passes 'int64_t pnum', but sets pnum in a 
-fragmenting loop, MAX_BOUNCE_BUFFER when copy-on-read is needed, or 
-max_transfer bounded by BDRV_REQUEST_MAX_BYTES otherwise
-bdrv_aligned_preadv() - passes 'unsigned int bytes' further limited by 
-fragmenting loop on max_transfer <= INT_MAX
+are available in the Git repository at:
 
-Input is bounded to < 2G, internal use of 'bytes' is:
-drv->bdrv_co_preadv_part(uint64_t) - safe
-qemu_iovec_init_slice(size_t) - potential truncation on 32-bit platform, 
-if you don't fix qemu_iovec
-drv->bdrv_co_preadv(uint64_t) - safe
-drv->bdrv_aio_preadv(uint64_t) - safe
-drv->bdrv_co_readv(int) after assertion of <2G - safe
+  git@github.com:alistair23/qemu.git tags/pull-riscv-to-apply-20200429-2
 
->                                              QEMUIOVector *qiov,
->                                              size_t qiov_offset, int flags)
->   {
-> @@ -1155,7 +1155,7 @@ out:
->   }
->   
->   static int coroutine_fn bdrv_driver_pwritev(BlockDriverState *bs,
-> -                                            uint64_t offset, uint64_t bytes,
-> +                                            int64_t offset, int64_t bytes,
+for you to fetch changes up to 31e6d70485b1a719ca27e9a2d21f2a61ac497cdf:
 
-Remains 64 bits, the question is whether any caller could pass in 
-something larger than 63.  Callers are:
+  hw/riscv/spike: Allow more than one CPUs (2020-04-29 13:16:38 -0700)
 
-bdrv_co_do_copy_on_readv() - passes 'int64_t pnum', but set in a 
-fragmenting loop bounded by MAX_BOUNCE_BUFFER
-bdrv_co_do_pwrite_zeroes() - passes 'int num'
-bdrv_aligned_pwritev() - passes 'unsigned int bytes' further limited by 
-fragmenting loop on max_transfer <= INT_MAX
+----------------------------------------------------------------
+RISC-V pull request for 5.1
 
-Input is bounded to < 2G, internal use of 'bytes' is:
-drv->bdrv_co_pwritev_part(uint64_t) - safe
-qemu_iovec_init_slice(size_t) - potential truncation on 32-bit platform, 
-if you don't fix qemu_iovec
-drv->bdrv_co_pwritev(uint64_t) - safe
-drv->bdrv_aio_pwritev(uint64_t) - safe
-drv->bdrv_co_writev(int) after assertion of <2G - safe
+This is the first pull request for the 5.1 development period. It
+contains all of the patches that were sent during the 5.0 timeframe.
 
->                                               QEMUIOVector *qiov,
->                                               size_t qiov_offset, int flags)
->   {
-> @@ -1235,8 +1235,8 @@ emulate_flags:
->   }
->   
->   static int coroutine_fn
-> -bdrv_driver_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
-> -                               uint64_t bytes, QEMUIOVector *qiov,
-> +bdrv_driver_pwritev_compressed(BlockDriverState *bs, int64_t offset,
-> +                               int64_t bytes, QEMUIOVector *qiov,
->                                  size_t qiov_offset)
+This is an assortment of fixes for RISC-V, including fixes for the
+Hypervisor extension, the Spike machine and an update to OpenSBI.
 
-Remains 64 bits, the question is whether any caller could pass in 
-something larger than 63.  Callers are:
+----------------------------------------------------------------
+Alistair Francis (4):
+      riscv/sifive_u: Fix up file ordering
+      riscv/sifive_u: Add a serial property to the sifive_u SoC
+      riscv: Don't use stage-2 PTE lookup protection flags
+      riscv: AND stage-1 and stage-2 protection flags
 
-bdrv_aligned_pwritev() - passes 'unsigned int bytes'
+Anup Patel (4):
+      riscv: Fix Stage2 SV32 page table walk
+      hw/riscv: Add optional symbol callback ptr to riscv_load_firmware()
+      hw/riscv/spike: Allow loading firmware separately using -bios option
+      hw/riscv/spike: Allow more than one CPUs
 
-Input is bounded to < 4G, internal use of 'bytes' is:
-drv->bdrv_co_pwritev_compressed_part(uint64_t) - safe
-drv->bdrv_co_pwritev_compressed(uint64_t) - safe
-qemu_iovec_init_slice(size_t) - potential truncation on 32-bit platform, 
-if you don't fix qemu_iovec
+Bin Meng (3):
+      riscv/sifive_u: Add a serial property to the sifive_u machine
+      hw/riscv: Generate correct "mmu-type" for 32-bit machines
+      roms: opensbi: Upgrade from v0.6 to v0.7
 
-Because our input is bounded, all of the changes made here have no 
-semantic impact, and I argue this patch is safe.  However, I also 
-pointed out the spots where we have latent bugs (on 32-bit machines 
-only) if the callers are relaxed to pass larger than 2G or 4G.  As long 
-as you are auditing things, it would be nice to either fix that in this 
-patch, or document in the commit message how a future patch will address 
-that latent problem (whether by enforcing max_transfer to be capped at 
-2G on 32-bit platforms, or else fixing qemu_iovec to use int64_t instead 
-of size_t bounds).
+Corey Wharton (2):
+      riscv: sifive_e: Support changing CPU type
+      target/riscv: Add a sifive-e34 cpu type
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+LIU Zhiwei (1):
+      linux-user/riscv: fix up struct target_ucontext definition
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+ hw/riscv/boot.c                              |  13 ++-
+ hw/riscv/sifive_e.c                          |   5 +-
+ hw/riscv/sifive_u.c                          | 142 ++++++++++++++++-----------
+ hw/riscv/spike.c                             |  30 +++++-
+ hw/riscv/virt.c                              |   6 +-
+ include/hw/riscv/boot.h                      |   6 +-
+ include/hw/riscv/sifive_u.h                  |   3 +
+ linux-user/riscv/signal.c                    |   3 +-
+ pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin | Bin 49472 -> 49520 bytes
+ pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin 41280 -> 49504 bytes
+ pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin 53760 -> 57936 bytes
+ pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin 49664 -> 57920 bytes
+ roms/opensbi                                 |   2 +-
+ target/riscv/cpu.c                           |  10 ++
+ target/riscv/cpu.h                           |   1 +
+ target/riscv/cpu_helper.c                    |  18 ++--
+ 16 files changed, 159 insertions(+), 80 deletions(-)
 
