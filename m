@@ -6,79 +6,78 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC45FC83006
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:05:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7616C83000
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:05:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB7772082E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:05:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A4A732082E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:05:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bpWEJcmK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB7772082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AhUBFYgX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4A732082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTnKy-0008LE-Rm
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 10:05:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42458)
+	id 1jTnL1-0008SK-MO
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 10:05:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTnGi-0002HX-6H
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:01:11 -0400
+ (envelope-from <kraxel@redhat.com>) id 1jTnGc-0002GE-SG
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:01:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jTnGD-0003vB-2t
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:00:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36095
+ (envelope-from <kraxel@redhat.com>) id 1jTnGA-0003rt-Tu
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:00:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20564
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jTnGC-0003tP-L8
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:00:24 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jTnGA-0003q9-Al
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:00:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588168823;
+ s=mimecast20190719; t=1588168821;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=f/It/ZA+R3p3hYtBP/kFTBvIq2cDsS7LMF3deJDMLj0=;
- b=bpWEJcmKQY47xZ6uftJqllBE83tsURvvuy7ZXG3KzXaz4l9uPPbLDBu5zdgdXufZzg7oXY
- eguHAkT4qS+no0Lxb/1IvqQ2MO4UajbwSSW6Qg4UOFRGReIK+13ym4iwXwWGH1DjppvbVU
- VmzvHWySIJR9O/5EO8ylelqwd9zENEo=
+ bh=kIA+ZY/aP5q6VvWDCeDsaYYp8cEiw2KsP3HhLwBiwSw=;
+ b=AhUBFYgXYdfxkgb01j7uyQ64XlEIQb2vhosKTflcWEYuzbSir2tW0mlJYpan+jBGzvg22U
+ DfJ0djLEZbn70syVzg2n5zwhQ1QuLz/MPEIWvYrG50z4l2wuBT51g1itg0+1OWBZUSjhFL
+ VzPRX7ctaDFXBv+XgNjj9KKT1VNnbiA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-dLHX3XuOMyGm0CaZwNcO2w-1; Wed, 29 Apr 2020 10:00:21 -0400
-X-MC-Unique: dLHX3XuOMyGm0CaZwNcO2w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-453-NoZAwNugMJWCa5KprF-WFg-1; Wed, 29 Apr 2020 10:00:17 -0400
+X-MC-Unique: NoZAwNugMJWCa5KprF-WFg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7077107ACF2;
- Wed, 29 Apr 2020 14:00:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49112100A61F;
+ Wed, 29 Apr 2020 14:00:16 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
  [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 098AD99D1;
- Wed, 29 Apr 2020 14:00:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2D7405C221;
+ Wed, 29 Apr 2020 14:00:04 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id AF3009DA9; Wed, 29 Apr 2020 16:00:03 +0200 (CEST)
+ id 280F09D99; Wed, 29 Apr 2020 16:00:03 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 14/15] acpi: factor out fw_cfg_add_acpi_dsdt()
-Date: Wed, 29 Apr 2020 16:00:02 +0200
-Message-Id: <20200429140003.7336-15-kraxel@redhat.com>
+Subject: [PATCH v3 01/15] move 'typedef Aml' to qemu/types.h
+Date: Wed, 29 Apr 2020 15:59:49 +0200
+Message-Id: <20200429140003.7336-2-kraxel@redhat.com>
 In-Reply-To: <20200429140003.7336-1-kraxel@redhat.com>
 References: <20200429140003.7336-1-kraxel@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:18:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,113 +101,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add helper function to add fw_cfg device,
-also move code to hw/i386/fw_cfg.c.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/i386/fw_cfg.h     |  1 +
- hw/i386/acpi-build.c | 24 +-----------------------
- hw/i386/fw_cfg.c     | 28 ++++++++++++++++++++++++++++
- 3 files changed, 30 insertions(+), 23 deletions(-)
+ include/hw/acpi/aml-build.h | 1 -
+ include/qemu/typedefs.h     | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
-index 9e742787792b..275f15c1c5e8 100644
---- a/hw/i386/fw_cfg.h
-+++ b/hw/i386/fw_cfg.h
-@@ -25,5 +25,6 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
-                                uint16_t apic_id_limit);
- void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg);
- void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
-+void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg);
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 0f4ed53d7fbf..1539fe066714 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -33,7 +33,6 @@ struct Aml {
+     uint8_t op;
+     AmlBlockFlags block_flags;
+ };
+-typedef struct Aml Aml;
 =20
- #endif
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 643e875c05a5..a8b790021974 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1874,30 +1874,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-=20
-     /* create fw_cfg node, unconditionally */
-     {
--        /* when using port i/o, the 8-bit data register *always* overlaps
--         * with half of the 16-bit control register. Hence, the total size
--         * of the i/o region used is FW_CFG_CTL_SIZE; when using DMA, the
--         * DMA control register is located at FW_CFG_DMA_IO_BASE + 4 */
--        uint8_t io_size =3D object_property_get_bool(OBJECT(x86ms->fw_cfg)=
-,
--                                                   "dma_enabled", NULL) ?
--                          ROUND_UP(FW_CFG_CTL_SIZE, 4) + sizeof(dma_addr_t=
-) :
--                          FW_CFG_CTL_SIZE;
--
-         scope =3D aml_scope("\\_SB.PCI0");
--        dev =3D aml_device("FWCF");
--
--        aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0002")));
--
--        /* device present, functioning, decoding, not shown in UI */
--        aml_append(dev, aml_name_decl("_STA", aml_int(0xB)));
--
--        crs =3D aml_resource_template();
--        aml_append(crs,
--            aml_io(AML_DECODE16, FW_CFG_IO_BASE, FW_CFG_IO_BASE, 0x01, io_=
-size)
--        );
--        aml_append(dev, aml_name_decl("_CRS", crs));
--
--        aml_append(scope, dev);
-+        fw_cfg_add_acpi_dsdt(scope, x86ms->fw_cfg);
-         aml_append(dsdt, scope);
-     }
-=20
-diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
-index da60ada59462..c55abfb01abb 100644
---- a/hw/i386/fw_cfg.c
-+++ b/hw/i386/fw_cfg.c
-@@ -15,6 +15,7 @@
- #include "qemu/osdep.h"
- #include "sysemu/numa.h"
- #include "hw/acpi/acpi.h"
-+#include "hw/acpi/aml-build.h"
- #include "hw/firmware/smbios.h"
- #include "hw/i386/fw_cfg.h"
- #include "hw/timer/hpet.h"
-@@ -179,3 +180,30 @@ void fw_cfg_build_feature_control(MachineState *ms, FW=
-CfgState *fw_cfg)
-     *val =3D cpu_to_le64(feature_control_bits | FEATURE_CONTROL_LOCKED);
-     fw_cfg_add_file(fw_cfg, "etc/msr_feature_control", val, sizeof(*val));
- }
-+
-+void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg)
-+{
-+    /*
-+     * when using port i/o, the 8-bit data register *always* overlaps
-+     * with half of the 16-bit control register. Hence, the total size
-+     * of the i/o region used is FW_CFG_CTL_SIZE; when using DMA, the
-+     * DMA control register is located at FW_CFG_DMA_IO_BASE + 4
-+     */
-+    Object *obj =3D OBJECT(fw_cfg);
-+    uint8_t io_size =3D object_property_get_bool(obj, "dma_enabled", NULL)=
- ?
-+        ROUND_UP(FW_CFG_CTL_SIZE, 4) + sizeof(dma_addr_t) :
-+        FW_CFG_CTL_SIZE;
-+    Aml *dev =3D aml_device("FWCF");
-+    Aml *crs =3D aml_resource_template();
-+
-+    aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0002")));
-+
-+    /* device present, functioning, decoding, not shown in UI */
-+    aml_append(dev, aml_name_decl("_STA", aml_int(0xB)));
-+
-+    aml_append(crs,
-+        aml_io(AML_DECODE16, FW_CFG_IO_BASE, FW_CFG_IO_BASE, 0x01, io_size=
-));
-+
-+    aml_append(dev, aml_name_decl("_CRS", crs));
-+    aml_append(scope, dev);
-+}
+ typedef enum {
+     AML_COMPATIBILITY =3D 0,
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index 375770a80f06..ecf3cde26c3c 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -24,6 +24,7 @@
+ typedef struct AdapterInfo AdapterInfo;
+ typedef struct AddressSpace AddressSpace;
+ typedef struct AioContext AioContext;
++typedef struct Aml Aml;
+ typedef struct AnnounceTimer AnnounceTimer;
+ typedef struct BdrvDirtyBitmap BdrvDirtyBitmap;
+ typedef struct BdrvDirtyBitmapIter BdrvDirtyBitmapIter;
 --=20
 2.18.2
 
