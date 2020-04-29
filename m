@@ -2,89 +2,86 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7002AC83004
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:53:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D845C83000
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:54:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A87B2073E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:53:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43837206F0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:54:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="meAKgOoX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A87B2073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IOdp4Aby"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43837206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTo5N-0008VZ-A7
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 10:53:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51230)
+	id 1jTo6F-0002j8-Fn
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 10:54:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51570)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jTo20-0005Vd-9n
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:49:48 -0400
+ (envelope-from <eblake@redhat.com>) id 1jTo4S-000727-DW
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:52:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jTo1y-0003uQ-SC
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:49:48 -0400
-Received: from mail-oo1-xc2d.google.com ([2607:f8b0:4864:20::c2d]:41870)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jTo1y-0003uC-DB
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:49:46 -0400
-Received: by mail-oo1-xc2d.google.com with SMTP id t3so475778oou.8
- for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 07:49:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0fQ8UfZ6XSti3VkPBlrs9GDBA7hTbayMlPd/qo+hVHQ=;
- b=meAKgOoXW2Qu4RpJOcS4QIhCuDxh4vf0owSDX4+LipFrtwfarFBpW2LFgks9Dwo400
- Sa/SepSixsGcP3A9H7PTAl2UmO6wo+Wl7WshruBBVXwpapzxUfY32bWrqucnSJFrU2Vn
- cFO+BkWSM8KEKct1EWYIlAm2463zOhRxI6mDQE/GpeiFr96R+IIXUSjJRJZBii/fsbVV
- 9OIUrTuHZOhA8UHnItcaGuKwTCWk0ighwBLGH7xLf7JUbmGgSjpuE885v+jRK+t2DJZu
- D7a+G+XX+rS/Ghgr3NeD2ELmmUQ7PwButsW5VH4gu1TzUwobeDTXLvBc04iGhzTFioUq
- zbcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=0fQ8UfZ6XSti3VkPBlrs9GDBA7hTbayMlPd/qo+hVHQ=;
- b=IVsOFidSkDr1iPB4G2UZ70n73ySbRuGtgKhNCipVoMGKuUYkY/DPrQWrIg7ORm/sAj
- 9WwsMlHUYEmnt8HMLmQjWT/sY2I1QqcQULuE//kElha//LLBlYqLFcLf2wrNQTuVvnYg
- omvykvTmaZEXt4eI7tcT6F6HNTpNJF1P/ebbVLraW2UAmsmlXnEOT8NxPdp26L4lvjQO
- SFcyDThcW5hAmgDVrHYlrSycF3oYGJcYbOwlyqn8ZI81EiZndaNDJostJvsQgQyXrKN4
- Iiu0PhvKeEXP/IYR3kKvCNKtJM87/rqPsDS4EOMna9mFmphpu/vbcwlel+iOx/42r4BD
- MjVg==
-X-Gm-Message-State: AGi0PuaCNB9U+65/FFOPqCyEMF2QNTxF1QNEKhV/ELanI9M0SJ+sD2cV
- rbfsK+7rS8fkdn4FRbYPDJpoqsHv4pjMKnHPjOcwVA==
-X-Google-Smtp-Source: APiQypISk+bPDQED9YhJOm5bHEXsM5ethp7Z6E7Sp3Zp/7t1B6wLL+a+ZORGyRGuWN6uzkEeyd2pexbsCy5n76KZsOE=
-X-Received: by 2002:a4a:8253:: with SMTP id t19mr27464961oog.69.1588171785015; 
- Wed, 29 Apr 2020 07:49:45 -0700 (PDT)
+ (envelope-from <eblake@redhat.com>) id 1jTo4R-0004c4-37
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:52:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40838
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jTo4Q-0004br-Mq
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:52:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588171938;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UFTxqrHdb3Fxmn+49gxrBLqSvLSZ7TXc9O+OWjQyAGM=;
+ b=IOdp4AbyMVy2vdpGGsYaKy1/sDWtBSytW2XNB1PQBa9RedvFItGu7h4FgIASQu5RpH3N3s
+ Axglo07rMi05DXGaLgb2vOom4rmS5r/V2XnZQ6hjocTZgY4n9wxExMazLPQ+uszkRBYQvI
+ DriJ5DWwLgkmdZzMyEQ354kHXg9kVBE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-_AHK4wJDOcauLIaDV2FIHg-1; Wed, 29 Apr 2020 10:52:16 -0400
+X-MC-Unique: _AHK4wJDOcauLIaDV2FIHg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EF1783DD59;
+ Wed, 29 Apr 2020 14:52:15 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F27A65C296;
+ Wed, 29 Apr 2020 14:52:13 +0000 (UTC)
+Subject: Re: [PATCH v2 3/4] block: Add blk_make_empty()
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200429141126.85159-1-mreitz@redhat.com>
+ <20200429141126.85159-4-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <334b4045-0321-697f-b93e-a0cf78018c07@redhat.com>
+Date: Wed, 29 Apr 2020 09:52:12 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
- <87lfmhl0xa.fsf@linaro.org>
- <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
- <87imhlkwun.fsf@linaro.org>
- <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
- <87ftcoknvu.fsf@linaro.org>
- <AM4PR07MB350653D5961DFCE441646131CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <871ro6ld2f.fsf@linaro.org>
- <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
-In-Reply-To: <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 29 Apr 2020 15:49:33 +0100
-Message-ID: <CAFEAcA_c7hb-Ahi-fws9yjLiCHn5LnF6mdYaHyw8T3athzDZ8w@mail.gmail.com>
-Subject: Re: R: About hardfloat in ppc
-To: Dino Papararo <skizzato73@msn.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c2d;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc2d.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::c2d
+In-Reply-To: <20200429141126.85159-4-mreitz@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:18:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,70 +93,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Programmingkid <programmingkidx@gmail.com>,
- "luoyonggang@gmail.com" <luoyonggang@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 29 Apr 2020 at 15:33, Dino Papararo <skizzato73@msn.com> wrote:
->
-> Hi Alex,
-> maybe a pseudo code can show better what I mean
->
-> if (ppc_fpu_instruction == USE_FPSCR) /* instruction have dot '.' so FPSCR will be updated and we need have care about it */
->         soft_decode (ppc_fpu_instruction)
-> else  /* instruction have not dot '.' and FPSCR will be never updated and we don't need to have care about it -> maxspeed */
->         hard_decode (ppc_fpu_instruction)
+On 4/29/20 9:11 AM, Max Reitz wrote:
+> Two callers of BlockDriver.bdrv_make_empty() remain that should not call
+> this method directly.  Both do not have access to a BdrvChild, but they
+> can use a BlockBackend, so we add this function that lets them use it.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   include/sysemu/block-backend.h |  2 ++
+>   block/block-backend.c          | 10 ++++++++++
+>   2 files changed, 12 insertions(+)
+> 
 
-My understanding was that the '.' indicates whether
-the instruction updates CR1 (the condition register),
-which is separate from whether it updates FPSCR
-flags. So all insns update FPSCR flags; insns with
-a '.' additionally update CR state which can be
-tested by a following branch insn. (I'm not a PPC
-expert but that's what my reading of the ISA spec is.)
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> In ppc assembly all instructions who needs to take care of inexact flag and/or exception flags, are processed prior than test instructions, look at following exception handling example:
->
->    fadd. f0,f1,f2 # f1 + f2 = f0. CR1 contains except.summary
->    bta   4,error  # if bit 0 of CR1 is set, go to error
->                   # bit 0 is set if any exception occurs
->    .              # if clear, continue operation
->    .
->    .
-> error:
->    mcrfs 2,1   # copy FPSCR bits 4-7 to CR field 2
->                # now CR1 and CR2 (bits 6 through 10)
->                # contain all exception bits from FPSCR
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-This may be a common pattern, but the architecture doesn't
-require it. You could equally do
-
-    fadd f0,f1,f2   # insn which sets fpscr bits
-    mffs 30         # copy whole fpscr to a gp register
-    # now do stuff based on that value
-
-So unless you can tell for certain that nothing in
-the future guest execution can the relevant FPSCR bits
-before they're overwritten, you have to generate them
-correctly; or be able to re-generate them later, if
-you want to get fancy (you could imagine a scheme
-similar to how we handle CPU condition flags on
-some guests, where instead of calculating them every
-time we make a note of what the operation that should
-have set them was, so that at the point where the
-guest actually does read the fpscr or do something
-else that demands the real flag value we can recreate
-them, in this case by repeating the fp operation via
-softfloat. Getting that working would be a non-trivial
-project, though.)
-
-thanks
--- PMM
 
