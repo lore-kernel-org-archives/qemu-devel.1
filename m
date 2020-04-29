@@ -2,64 +2,86 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27089C83004
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B4EC83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:58:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECBDE20775
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:56:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECBDE20775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9B26320775
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:58:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VbS0IlNM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B26320775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTiWU-0002K1-2k
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:56:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57796)
+	id 1jTiXz-0004xu-Mt
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:58:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57782)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jingqi.liu@intel.com>) id 1jTiVb-0000qN-FR
+ (envelope-from <jasowang@redhat.com>) id 1jTiVX-0000q6-LU
  for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:56:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <jingqi.liu@intel.com>) id 1jTiV7-0001AE-QU
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:55:58 -0400
-Received: from mga05.intel.com ([192.55.52.43]:25911)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jingqi.liu@intel.com>)
- id 1jTiV6-0000gc-Rs
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:55:29 -0400
-IronPort-SDR: LcrOJWY6f2E5C8qWVMN3m8xc5mjnhfKkktuTZwk1IFq+4Vagm6Qa6Q/+VcDMJTZEb2RcManuwl
- veYyqbJkMCZg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Apr 2020 01:55:24 -0700
-IronPort-SDR: Cgw6ZF3Y9GPACo+TR3qYKlTcCBaM1dJrFr74Z/2mGyN3//X6lSGOzRqOFjUinHVu9hukbbBOpF
- XJdX+dLSMzLQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,331,1583222400"; d="scan'208";a="459114591"
-Received: from dazhang1-mobile.sh.intel.com ([10.239.48.70])
- by fmsmga005.fm.intel.com with ESMTP; 29 Apr 2020 01:55:22 -0700
-From: Jingqi Liu <jingqi.liu@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Joao Martins <joao.m.martins@oracle.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Dan Williams <dan.j.williams@intel.com>
-Subject: [PATCH v3 0/3] fetch the alignment of device dax
-Date: Wed, 29 Apr 2020 16:50:08 +0800
-Message-Id: <20200429085011.63752-1-jingqi.liu@intel.com>
-X-Mailer: git-send-email 2.17.1
-Received-SPF: pass client-ip=192.55.52.43; envelope-from=jingqi.liu@intel.com;
- helo=mga05.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 04:55:24
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 192.55.52.43
+ (envelope-from <jasowang@redhat.com>) id 1jTiUr-0008KI-Al
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:55:55 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20792
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jTiUq-0008Eu-Tc
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:55:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588150511;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=e57l5YTKI4bFng9/Rv8zdl9Fcv+tUeFGml+k3HGJWHw=;
+ b=VbS0IlNMlqkSBqb1C2uTi6L3Eg+nwCVq5EBT9c64RQaBtHg51wjUt3ptkj2RRfKwFxysCB
+ iZyUzRFOb6NlK7xbPiOQsUZtStFJjGPMd1PdaA7VDXFI2fTHQyEL1QGcktvlqp03N1nDdg
+ O6r2fVghI3QDAyb5Q3Py0It8fTTjSOU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-HJi82mMdMEKgSlHHOp0lMg-1; Wed, 29 Apr 2020 04:55:09 -0400
+X-MC-Unique: HJi82mMdMEKgSlHHOp0lMg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BE16100CC84
+ for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 08:55:08 +0000 (UTC)
+Received: from [10.72.13.2] (ovpn-13-2.pek2.redhat.com [10.72.13.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BDFC3605CB;
+ Wed, 29 Apr 2020 08:55:06 +0000 (UTC)
+Subject: Re: [PATCH 10/17] e1000: Don't run e1000_instance_init() twice
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200428163419.4483-1-armbru@redhat.com>
+ <20200428163419.4483-11-armbru@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <addfb661-76cc-468f-50dd-ac691b042578@redhat.com>
+Date: Wed, 29 Apr 2020 16:55:05 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
+MIME-Version: 1.0
+In-Reply-To: <20200428163419.4483-11-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 00:53:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,52 +93,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jingqi Liu <jingqi.liu@intel.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series adds libdaxctl support and fetchs the alignment of
-device dax through libdaxctl [1] APIs.
 
-QEMU uses mmap(2) to maps vNVDIMM backends and aligns the mapping
-address to the page size (getpagesize(2)) by default. However, some
-types of backends may require an alignment different than the page
-size. The 'align' option is provided to memory-backend-file to allow
-users to specify the proper alignment.
+On 2020/4/29 =E4=B8=8A=E5=8D=8812:34, Markus Armbruster wrote:
+> QOM object initialization runs .instance_init() for the type and all
+> its supertypes; see object_init_with_type().
+>
+> Both TYPE_E1000_BASE and its concrete subtypes set .instance_init() to
+> e1000_instance_init().  For the concrete subtypes, it duly gets run
+> twice.  The second run fails, but the error gets ignored (a later
+> commit will change that).
+>
+> Remove it from the subtypes.
+>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-For device dax (e.g., /dev/dax0.0), the 'align' option needs to
-match the alignment requirement of the device dax, which can be fetched
-through the APIs of libdaxctl version 57 or up.
 
-[1] Libdaxctl is a part of ndctl project.
-The project's repository is: https://github.com/pmem/ndctl
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-Changelog:
-  v3:
-  - Per Joao's suggestion, require libdaxctl version 57 or up.
-  - Per Joao's suggestion, suggest to query the @align with daxctl tool
-    in docs/nvdimm.txt.
 
-  v2:
-  - Per Paolo and Dan's suggestions, fetch the alignment of device dax
-    through libdaxctl APIs.
-
-  v1:
-  - The initial version.
-    Fetch the alignment through "/sys/dev/char/%d:%d/device/align".
-
-Jingqi Liu (3):
-  exec: fetch the alignment of Linux devdax pmem character device nodes
-  docs/nvdimm: add description of alignment requirement of device dax
-  configure: add libdaxctl support
-
- configure       | 29 ++++++++++++++++++++++++++
- docs/nvdimm.txt | 10 +++++++++
- exec.c          | 54 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 92 insertions(+), 1 deletion(-)
-
--- 
-2.17.1
+> ---
+>   hw/net/e1000.c | 1 -
+>   1 file changed, 1 deletion(-)
+>
+> diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+> index 2a69eee63f..0d2c2759e3 100644
+> --- a/hw/net/e1000.c
+> +++ b/hw/net/e1000.c
+> @@ -1824,7 +1824,6 @@ static void e1000_register_types(void)
+>           type_info.parent =3D TYPE_E1000_BASE;
+>           type_info.class_data =3D (void *)info;
+>           type_info.class_init =3D e1000_class_init;
+> -        type_info.instance_init =3D e1000_instance_init;
+>  =20
+>           type_register(&type_info);
+>       }
 
 
