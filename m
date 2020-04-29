@@ -2,144 +2,112 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16931C83007
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:12:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51CECC83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:18:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA3FF2173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:12:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA3FF2173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 16F1321BE5
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 12:18:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ILlNAju5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16F1321BE5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTlZg-00085v-34
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 08:12:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53456)
+	id 1jTlg1-0004wn-3a
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 08:18:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54256)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jTlYt-0007Fr-Au
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:11:35 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jTlee-0004EV-CV
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:17:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jTlYs-0000Wi-3c
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:11:35 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51984)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jTlYr-0000WT-CR; Wed, 29 Apr 2020 08:11:33 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 03TC3tVZ037367; Wed, 29 Apr 2020 08:11:29 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30mfhfcr92-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 29 Apr 2020 08:11:29 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03TC4Bgb038997;
- Wed, 29 Apr 2020 08:11:29 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com
- [159.122.73.70])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30mfhfcr84-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 29 Apr 2020 08:11:29 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
- by ppma01fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03TCAnQ1016441;
- Wed, 29 Apr 2020 12:11:26 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com
- (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
- by ppma01fra.de.ibm.com with ESMTP id 30mcu8dscx-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 29 Apr 2020 12:11:26 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 03TCBO0n60293538
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 29 Apr 2020 12:11:24 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5A5D24C04E;
- Wed, 29 Apr 2020 12:11:24 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0E0124C058;
- Wed, 29 Apr 2020 12:11:24 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.84.78])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 29 Apr 2020 12:11:23 +0000 (GMT)
-Subject: Re: [PATCH 0/8] pc-bios: s390x: Cleanup part 1
-From: Janosch Frank <frankja@linux.ibm.com>
-To: qemu-devel@nongnu.org
-References: <20200324150847.10476-1-frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <6d7af967-7567-5e0b-e73a-a4eecc5ad7bf@linux.ibm.com>
-Date: Wed, 29 Apr 2020 14:11:23 +0200
+ (envelope-from <mreitz@redhat.com>) id 1jTlec-0001sQ-Vz
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:17:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59785
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTleO-0001kW-Ao
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 08:17:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588162634;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=ZqM6ln/EhU4qUSMMxOu3rI3hURpe+O0a7jvkec3sn3Q=;
+ b=ILlNAju5esBwL+5lpdVWA2LbvsUpa0vdAjl7jY46TzM59LYnWbwFgYr9p1SjOvIkfBc2wO
+ ak4gXH2XYi3Pi7HBe+gz2Bon+Qe1iH1vo93UsQj5ORP9Brlc4T7TCXW5geyMT3M77erATk
+ jb+PKKfb9ezcCvLkSWk9fqkJBHizQw0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-q5C3pR6iMPi_TBLP2rrczg-1; Wed, 29 Apr 2020 08:17:10 -0400
+X-MC-Unique: q5C3pR6iMPi_TBLP2rrczg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E75711005510;
+ Wed, 29 Apr 2020 12:17:08 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-19.ams2.redhat.com
+ [10.36.113.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CD4B95D9C9;
+ Wed, 29 Apr 2020 12:17:06 +0000 (UTC)
+Subject: Re: [PATCH v22 3/4] qcow2: add zstd cluster compression
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
+References: <20200428200013.24474-1-dplotnikov@virtuozzo.com>
+ <20200428200013.24474-4-dplotnikov@virtuozzo.com>
+ <daf5a573-56a3-62b0-4387-1db73978463e@redhat.com>
+ <feeec7a1-6987-18a1-1352-1512dc42824e@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <be6f57c0-23d9-6a6c-3a39-3a7132f23a42@redhat.com>
+Date: Wed, 29 Apr 2020 14:17:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200324150847.10476-1-frankja@linux.ibm.com>
+In-Reply-To: <feeec7a1-6987-18a1-1352-1512dc42824e@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="D1aSspkyvYBjJdyaKehWr3K7Uh6NPM32z"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-29_04:2020-04-29,
- 2020-04-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 suspectscore=0
- phishscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 mlxlogscore=833
- malwarescore=0 impostorscore=0 clxscore=1011 priorityscore=1501
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004290098
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=frankja@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 08:11:30
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+ boundary="1jSoLnnrQ6S6nsT6A7CaKkOGqqbUTtSlY"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:18:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -151,91 +119,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- david@redhat.com
+Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org,
+ armbru@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---D1aSspkyvYBjJdyaKehWr3K7Uh6NPM32z
-Content-Type: multipart/mixed; boundary="LthCg88Cct1U4MOlDdBNMXk6GRCAGtJWs"
+--1jSoLnnrQ6S6nsT6A7CaKkOGqqbUTtSlY
+Content-Type: multipart/mixed; boundary="lo3qfLw6yfWZnTxLNXhKVs81ZiqS7V78K"
 
---LthCg88Cct1U4MOlDdBNMXk6GRCAGtJWs
-Content-Type: text/plain; charset=utf-8
+--lo3qfLw6yfWZnTxLNXhKVs81ZiqS7V78K
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 3/24/20 4:08 PM, Janosch Frank wrote:
-> The bios is in dire need for a cleanup as there are still a lot of
-> magic constants being used throughout as well as duplicated code.
+On 29.04.20 12:37, Vladimir Sementsov-Ogievskiy wrote:
+> 29.04.2020 13:24, Max Reitz wrote:
+>> On 28.04.20 22:00, Denis Plotnikov wrote:
+>>> zstd significantly reduces cluster compression time.
+>>> It provides better compression performance maintaining
+>>> the same level of the compression ratio in comparison with
+>>> zlib, which, at the moment, is the only compression
+>>> method available.
+>>>
+>>> The performance test results:
+>>> Test compresses and decompresses qemu qcow2 image with just
+>>> installed rhel-7.6 guest.
+>>> Image cluster size: 64K. Image on disk size: 2.2G
+>>>
+>>> The test was conducted with brd disk to reduce the influence
+>>> of disk subsystem to the test results.
+>>> The results is given in seconds.
+>>>
+>>> compress cmd:
+>>> =A0=A0 time ./qemu-img convert -O qcow2 -c -o compression_type=3D[zlib|=
+zstd]
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 src.img [zlib|zs=
+td]_compressed.img
+>>> decompress cmd
+>>> =A0=A0 time ./qemu-img convert -O qcow2
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 [zlib|zstd]_comp=
+ressed.img uncompressed.img
+>>>
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 compression=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0 decompression
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 zlib=A0=A0=A0=A0=A0=A0 zstd=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0 zlib=A0=A0=A0=A0=A0=A0=A0=A0 zstd
+>>> ------------------------------------------------------------
+>>> real=A0=A0=A0=A0 65.5=A0=A0=A0=A0=A0=A0 16.3 (-75 %)=A0=A0=A0 1.9=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0 1.6 (-16 %)
+>>> user=A0=A0=A0=A0 65.0=A0=A0=A0=A0=A0=A0 15.8=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0 5.3=A0=A0=A0=A0=A0=A0=A0=A0=A0 2.5
+>>> sys=A0=A0=A0=A0=A0=A0 3.3=A0=A0=A0=A0=A0=A0=A0 0.2=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0 2.0=A0=A0=A0=A0=A0=A0=A0=A0=A0 2.0
+>>>
+>>> Both ZLIB and ZSTD gave the same compression ratio: 1.57
+>>> compressed image size in both cases: 1.4G
+>>>
+>>> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+>>> QAPI part:
+>>> Acked-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>> =A0 docs/interop/qcow2.txt |=A0=A0 1 +
+>>> =A0 configure=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0=A0 2 +-
+>>> =A0 qapi/block-core.json=A0=A0 |=A0=A0 3 +-
+>>> =A0 block/qcow2-threads.c=A0 | 169 ++++++++++++++++++++++++++++++++++++=
++++++
+>>> =A0 block/qcow2.c=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0=A0 7 ++
+>>> =A0 slirp=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0=A0 2 =
++-
+>>> =A0 6 files changed, 181 insertions(+), 3 deletions(-)
+>>
+>> [...]
+>>
+>>> diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+>>> index 7dbaf53489..a0b12e1b15 100644
+>>> --- a/block/qcow2-threads.c
+>>> +++ b/block/qcow2-threads.c
+>>
+>> [...]
+>>
+>>> +static ssize_t qcow2_zstd_decompress(void *dest, size_t dest_size,
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 const void *src, size_t src_size)
+>>> +{
+>>
+>> [...]
+>>
+>>> +=A0=A0=A0 /*
+>>> +=A0=A0=A0=A0 * The compressed stream from the input buffer may consist=
+ of more
+>>> +=A0=A0=A0=A0 * than one zstd frame.
+>>
+>> Can it?
 >=20
-> In the first part of this series we consolidate constants and
-> functions, as well as doing some minor cleanups and fixes.
->=20
-> The patches are based on my protvirt branch and are available here:
-> https://github.com/frankjaa/qemu/pull/new/cleanup_bios
+> If not, we must require it in the specification.
 
-Ping
-It's not urgent, but I don't want it to get buried and forgotten.
+Actually, now that you mention it, it would make sense anyway to add
+some note to the specification on what exactly compressed with zstd means.
 
->=20
-> Janosch Frank (8):
->   pc-bios: s390x: Consolidate timing functions into time.h
->   pc-bios: s390x: Get rid of magic offsets into the lowcore
->   pc-bios: s390x: Rename and use PSW_MASK_ZMODE constant
->   pc-bios: s390x: Use PSW masks where possible
->   pc-bios: s390x: Move panic() into header and add infinite loop
->   pc-bios: s390x: Use ebcdic2ascii table
->   pc-bios: s390x: Replace 0x00 with 0x0 or 0
->   pc-bios: s390x: Make u32 ptr check explicit
->=20
->  pc-bios/s390-ccw/bootmap.c     |  4 +---
->  pc-bios/s390-ccw/cio.h         | 17 +++++++++------
->  pc-bios/s390-ccw/dasd-ipl.c    | 17 +++++++--------
->  pc-bios/s390-ccw/helper.h      |  2 +-
->  pc-bios/s390-ccw/jump2ipl.c    | 10 ++++-----
->  pc-bios/s390-ccw/main.c        | 15 +++----------
->  pc-bios/s390-ccw/menu.c        |  1 +
->  pc-bios/s390-ccw/netmain.c     | 23 +++-----------------
->  pc-bios/s390-ccw/s390-arch.h   |  4 +++-
->  pc-bios/s390-ccw/s390-ccw.h    | 25 ++++++----------------
->  pc-bios/s390-ccw/start.S       |  5 +++--
->  pc-bios/s390-ccw/time.h        | 39 ++++++++++++++++++++++++++++++++++=
+> Hmm. If at some point
+> we'll want multi-threaded compression of one big (2M) cluster.. Could
+> this be implemented with zstd lib, if multiple frames are allowed, will
+> allowing multiple frames help? I don't know actually, but I think better
+> not to forbid it. On the other hand, I don't see any benefit in large
+> compressed clusters. At least, in our scenarios (for compressed backups)
+> we use 64k compressed clusters, for good granularity of incremental
+> backups (when for running vm we use 1M clusters).
 
->  pc-bios/s390-ccw/virtio-net.c  |  1 +
->  pc-bios/s390-ccw/virtio-scsi.c |  1 +
->  pc-bios/s390-ccw/virtio.c      | 18 +++-------------
->  15 files changed, 88 insertions(+), 94 deletions(-)
->  create mode 100644 pc-bios/s390-ccw/time.h
->=20
+Is it really that important?  Na=EFvely, it sounds rather complicated to
+introduce multithreading into block drivers.
+
+(Also, as for compression, it can only be used in backup scenarios
+anyway, where you write many clusters at once.  So parallelism on the
+cluster level should sufficient to get high usage, and it would benefit
+all compression types and cluster sizes.)
+
+Max
 
 
+--lo3qfLw6yfWZnTxLNXhKVs81ZiqS7V78K--
 
---LthCg88Cct1U4MOlDdBNMXk6GRCAGtJWs--
-
---D1aSspkyvYBjJdyaKehWr3K7Uh6NPM32z
+--1jSoLnnrQ6S6nsT6A7CaKkOGqqbUTtSlY
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6pbusACgkQ41TmuOI4
-ufgvvA/+PKgvb/ToMi9orCLnrDjcZKCF2jZr1x7y0FICGKJ8sgdXCMwKJ+1x87RD
-swJk353Wq98+WklGF6nanx513Kv8Y6fg7dXrVwWnCgIPLdDIQ+NSZGfqaPSLwMNJ
-4eQSOs8lV8goStegfuGUWqvEQTdCG6BfrVcxh92anFGV9ROAEJ+IjGrGiWHgDaWX
-yy+CSSFV4vk4UPwOLttsSQmdd+vPP7NKpptYW8vWUNxEGHsWHaOWwAmlo/096D8j
-s2PNvtbSG7/U5QNwjHzT0kOVEigjzw4m7N77w0I6684pkpwKxdr02/rPrc8lySYK
-wdYtPVUVwseQaarmE675B6DJHk4KO2+QCkDzVWij30ho8yDrnoJdGEz7xxL3nzvx
-5zozKxw8bLX3RnMwNX+OBirYf+zo1mtmUGFKRrgHKJggS6DNvFBPPVhG9eAK6sn/
-wWLWbThNQUdAWmIZQujxYoH6/ThMSGK2NraRT0TGhgjjz/QQXTFcHXd6xYDRgRmJ
-LaDNTyOzjh9gGIb/dG+jFO/9RVLeCSwF69QetkIUYGT8CWCKr55VWo2OD2jt0Odu
-9b2U9gpmOwAfqmP1yX7clgZtX7zW6SYtfOkeYMzLjooSbIZT9ByxpXpSHiC7R3tu
-DLMkOx9jgzZQscUY1kJc4/eNWhzyP02jI5m6ZODZo20gnlEWTAk=
-=fYvy
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6pcEEACgkQ9AfbAGHV
+z0DsVwf/bo076lAi2qVIa0gpgMEf7JbuH8Dc6mJxqIQc+NMa/v3fOOwLm1/41CYv
+QAmeYLAVrVp1XsqeztmoIt0T+H5JAq+342iXQ7a0lMb9O8iglR9uhShKjVfpZuK5
+wPxiU6cnP6SiUOzUesGtaRWv9DuDkBK8wCzuIGDHpcdB8vF/ifPqE96DFs1PcALB
+kFMYxXOxbS4ikikHw1klEtLH/Gpq4T6jBM1u6saELgEIfZb1KS6EDdoPVE5Nz7k8
+rNvUovkn4PZpdKaRTWm+lVuQg5kGy22xb8dbW8M8M6YrS5IYAVPLe39VKMWsh+BX
+OmBQFQPKBNnpresQnWln4FhrTBY8tg==
+=enzl
 -----END PGP SIGNATURE-----
 
---D1aSspkyvYBjJdyaKehWr3K7Uh6NPM32z--
+--1jSoLnnrQ6S6nsT6A7CaKkOGqqbUTtSlY--
 
 
