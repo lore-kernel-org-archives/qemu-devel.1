@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5981DC83004
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB64C83007
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:42:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EDD9206D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:42:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 68CCD206D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:42:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="VsFa0xCm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EDD9206D9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="n+aCLJKi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68CCD206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTtXW-0001t4-5U
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:42:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53834)
+	id 1jTtXY-0001yq-B5
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:42:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53842)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTtOl-0007wK-Ar
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:37:22 -0400
+ id 1jTtOm-0007xX-8O
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:37:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTtO5-0006Nc-L1
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:33:39 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:7550)
+ id 1jTtO6-0006ZL-Sz
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:33:40 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:7549)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTtK0-000664-Cm; Wed, 29 Apr 2020 16:28:44 -0400
+ id 1jTtJz-00065w-Oq; Wed, 29 Apr 2020 16:28:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1588192124; x=1619728124;
+ t=1588192123; x=1619728123;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=HwZtWSsiHzCN/1ubqwhEIMjajFwjKCAraFEUeH9ODUA=;
- b=VsFa0xCmWv58o5UjlXSFL3cGcx0A5CSEhJaIftl4Rl31JhDVrNZOp6jw
- CXh0ZPrO0uymoH/HEVODaRMPo8Z9SKYaK81qFuJrB02hI0Kf84tX7y2RR
- JA+E5f/TgI1vKDh9SEOsxx/aR4O6nU2cPr/nEjeG4mCt78lxY0chO7fWB
- Aj2nnQos2J49RyXhrYGraoCjFB786MX+b4Qrzdm2MBVMW/bLxKLlmoYUk
- KTcKsppycbcnH3vAuHUMZ6TKZYAZzgXsD3sB+hlhWRrlW3EISMaHl2GaK
- Xnuo5O6qNSGYWUSLH0/U+V8zyVOrT540gfeLIfe1Qan5ZulfHecy2OLdP g==;
-IronPort-SDR: 5S7kMxr8GlNJ/JwTY1MnWj4em9FbrZuhrVzKH4SZIdYV2RyfKk/Sr30oyPLLX3dzslDj6684Eg
- plHCLxjGV6rbiQl352zjEPZ5fsLr3g+OJuRrj2BaZIn6Tbj3/ysZtVuV5IarMNvZheEWp4zSF4
- tOZNexBhAFWaRA7YpE0YoDKMo3KQhkSc2GrpKG0gdi1gkyvMi7bx6wPUUgJ/eDzUFBN2ug+Xnj
- zgLWNwreWzw1mLHUjqnxGvDyCzdvDPaGLblHIXAWyrQdUFlbrYj3RLqWHtpSQtnGO7bB9+DlZX
- 5g8=
-X-IronPort-AV: E=Sophos;i="5.73,333,1583164800"; d="scan'208";a="136507037"
+ bh=V4JMB03R57xU/l231U+ZmY2qS+gGKlGPiocloP9j6yI=;
+ b=n+aCLJKiMmtxetjPc0ZlGod+lqQhXvR2wbxZkZ/KEHQiXOwDNPeHE6OR
+ qtFH+0Lc8az0ykWvEtTmAHuHxZHT4vFdmLdNI9BFHTQ8RVNQ5OaOfIW4+
+ 3FFZ2orcGPKrty/lVJJo6yc7UxWskV8wrzk6nA/miCEy/aAt9t0u9MzkF
+ WF5q8DNdkLIjMMz4sfhuIaL5Tg++sug/8U1vlYL2SThPR3TDkt3JaLqyC
+ IktHY9lVmDhZfb+JkisU5H/vbPQkWGJYSWeUuys08IE59swRczL8cMnNL
+ vQFh7dof497dLJIguIsbWCXOOUl7xduCP2jBzV0c51Kdkl3rrBn18SPIR g==;
+IronPort-SDR: eQDWtC9AUmGJ+Ktyh4324E5Io0aTmg5cQahANnmOqKnIPm/caBdVH9aVjW13JxTZd0prMYmk+I
+ WJClCOqW6XothpJOexRM+ODYrDNq4Qd7AqiZpb6S2adp3eu1aId3D9OZQQQubGkzC9UKpI5qi2
+ ymYRnaDxbKzb7ZU5hbRE5TxAm0fQzR6gaiiu7UQYxIYg5zSUy7PlUuSzZGNrJYPgpdgr5QILhu
+ bcLyG/z5nTr+gyowelA09wh7G7EMlkg1RTfqmVSVMAerEMIWx8bi3VhU+0Ru3j3wlfHnFG5rjp
+ D84=
+X-IronPort-AV: E=Sophos;i="5.73,333,1583164800"; d="scan'208";a="136507035"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 04:28:39 +0800
-IronPort-SDR: gM8GNChzYhyRtP9MioW/wC4dIuUcRCwIaw92kiFDDw2gnvLjMzMBIk6cN+UxsXkJY0rhlanmor
- pRu6yhlErltW/dGcXh7oE9WDcfrRVnLIg=
+ by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 04:28:38 +0800
+IronPort-SDR: CeRKygex5l3tRKGpoVTJ/HpyKXe5KVGrN76WAEhMgXp4l5hU0YsRMKy9p74fM8x9AVk59JChUA
+ LL52X7LIV6Azw7uZ2noEq/9DN4faDP3eY=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  29 Apr 2020 13:18:43 -0700
-IronPort-SDR: ivu4pp9LberV3klvUqlgh27iE5bqSsINHNYRmPQ4OBN+JXg0hbam44v37YWOZtyxOE0CYewUYZ
- nchRn5JYBZQw==
+IronPort-SDR: sDB1xR12VpedGS0KGRXXFsa7kDST6+JO5JZ6D7vssW1rYxOyX7agMMNvEN1UYa/alHj40g8RF5
+ ns7s0+s+RTzQ==
 WDCIronportException: Internal
 Received: from usa004631.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.56.145])
- by uls-op-cesaip01.wdc.com with ESMTP; 29 Apr 2020 13:28:39 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 29 Apr 2020 13:28:38 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 07/14] hw/riscv: Generate correct "mmu-type" for 32-bit
- machines
-Date: Wed, 29 Apr 2020 13:19:59 -0700
-Message-Id: <20200429202006.775322-8-alistair.francis@wdc.com>
+Subject: [PULL v2 05/14] riscv: AND stage-1 and stage-2 protection flags
+Date: Wed, 29 Apr 2020 13:19:57 -0700
+Message-Id: <20200429202006.775322-6-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200429202006.775322-1-alistair.francis@wdc.com>
 References: <20200429202006.775322-1-alistair.francis@wdc.com>
@@ -98,75 +97,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>, palmerdabbelt@google.com,
- qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Bin Meng <bmeng.cn@gmail.com>
+Cc: qemu-riscv@nongnu.org, Anup Patel <anup@brainfault.org>,
+ palmerdabbelt@google.com, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bmeng.cn@gmail.com>
+Take the result of stage-1 and stage-2 page table walks and AND the two
+protection flags together. This way we require both to set permissions
+instead of just stage-2.
 
-32-bit machine should have its CPU's "mmu-type" set to "riscv,sv32".
-
-Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 1583585319-26603-1-git-send-email-bmeng.cn@gmail.com
-Message-Id: <1583585319-26603-1-git-send-email-bmeng.cn@gmail.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Tested-by: Anup Patel <anup@brainfault.org>
+Message-id: 846f1e18f5922d818bc464ec32c144ef314ec724.1585262586.git.alistair.francis@wdc.com
+Message-Id: <846f1e18f5922d818bc464ec32c144ef314ec724.1585262586.git.alistair.francis@wdc.com>
 ---
- hw/riscv/sifive_u.c | 4 ++++
- hw/riscv/spike.c    | 4 ++++
- hw/riscv/virt.c     | 4 ++++
- 3 files changed, 12 insertions(+)
+ target/riscv/cpu_helper.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 8d0ee8b9c4..e32355a691 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -160,7 +160,11 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-         qemu_fdt_add_subnode(fdt, nodename);
-         /* cpu 0 is the management hart that does not have mmu */
-         if (cpu != 0) {
-+#if defined(TARGET_RISCV32)
-+            qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv32");
-+#else
-             qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
-+#endif
-             isa = riscv_isa_string(&s->soc.u_cpus.harts[cpu - 1]);
-         } else {
-             isa = riscv_isa_string(&s->soc.e_cpus.harts[0]);
-diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index 5053fe4590..98697a244e 100644
---- a/hw/riscv/spike.c
-+++ b/hw/riscv/spike.c
-@@ -102,7 +102,11 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
-         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
-         qemu_fdt_add_subnode(fdt, nodename);
-+#if defined(TARGET_RISCV32)
-+        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv32");
-+#else
-         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
-+#endif
-         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
-         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
-         qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 85ec9e22aa..c621a970aa 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -229,7 +229,11 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
-         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
-         qemu_fdt_add_subnode(fdt, nodename);
-+#if defined(TARGET_RISCV32)
-+        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv32");
-+#else
-         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
-+#endif
-         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
-         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
-         qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index f36d184b7b..50e13a064f 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -707,7 +707,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+ #ifndef CONFIG_USER_ONLY
+     vaddr im_address;
+     hwaddr pa = 0;
+-    int prot;
++    int prot, prot2;
+     bool pmp_violation = false;
+     bool m_mode_two_stage = false;
+     bool hs_mode_two_stage = false;
+@@ -757,13 +757,15 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+             /* Second stage lookup */
+             im_address = pa;
+ 
+-            ret = get_physical_address(env, &pa, &prot, im_address,
++            ret = get_physical_address(env, &pa, &prot2, im_address,
+                                        access_type, mmu_idx, false, true);
+ 
+             qemu_log_mask(CPU_LOG_MMU,
+                     "%s 2nd-stage address=%" VADDR_PRIx " ret %d physical "
+                     TARGET_FMT_plx " prot %d\n",
+-                    __func__, im_address, ret, pa, prot);
++                    __func__, im_address, ret, pa, prot2);
++
++            prot &= prot2;
+ 
+             if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+                 (ret == TRANSLATE_SUCCESS) &&
 -- 
 2.26.2
 
