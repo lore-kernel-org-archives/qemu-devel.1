@@ -2,99 +2,88 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA8C6C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:47:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA09C83007
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:49:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C6492076B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:47:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C6492076B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6A66120787
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:49:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="wQBkJ2+S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A66120787
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jThRW-0006by-Ja
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:47:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48520)
+	id 1jThSh-0006kQ-W5
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:48:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46766)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jThMw-0001QV-7s
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:46:30 -0400
+ (envelope-from <luc.michel@greensocs.com>) id 1jTh6L-0007nS-AT
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:25:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jThM9-0006ZY-FH
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:42:57 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55818
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <luc.michel@greensocs.com>) id 1jTh6A-0006zJ-81
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:25:49 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:57134)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jThM8-0006ZI-VC; Wed, 29 Apr 2020 03:42:09 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 03T7Wpcg086202; Wed, 29 Apr 2020 03:42:07 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30pjxvufs8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 29 Apr 2020 03:42:07 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03T7dEgo104533;
- Wed, 29 Apr 2020 03:42:06 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30pjxvufrt-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 29 Apr 2020 03:42:06 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03T7e4RW020306;
- Wed, 29 Apr 2020 07:42:06 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma03dal.us.ibm.com with ESMTP id 30mcu7kr7m-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 29 Apr 2020 07:42:06 +0000
-Received: from b03ledav004.gho.boulder.ibm.com
- (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 03T7g49n19464596
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 29 Apr 2020 07:42:04 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 514F478064;
- Wed, 29 Apr 2020 07:42:04 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 738CB7806B;
- Wed, 29 Apr 2020 07:42:03 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.114.17.106])
- by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed, 29 Apr 2020 07:42:03 +0000 (GMT)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH v2] s390x/kvm: help valgrind in several places
-Date: Wed, 29 Apr 2020 03:42:01 -0400
-Message-Id: <20200429074201.100924-1-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.25.1
+ (Exim 4.90_1) (envelope-from <luc.michel@greensocs.com>)
+ id 1jTh4E-0005aO-KV; Wed, 29 Apr 2020 03:23:39 -0400
+Received: from [172.17.10.6] (unknown [172.17.10.6])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 332E296EF0;
+ Wed, 29 Apr 2020 07:23:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1588145014;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fMd+4wIDhy4VuieueBBhVTrXprknNqYism8E1D6RAps=;
+ b=wQBkJ2+SZAa3PqcPyAHgYoUmp3zySTJBmJ4rc9BmMG0usdP68Mz6poW9E2sN5x317khjVz
+ +lOpwJrQC0lPq6qPjhXLrkeO9ScxaUt71f/moGatZXCgvM1IsG8KYoDcdHa4Bqte1X7LF7
+ Urnkb28b9VgQI2/K69caCthSkHWQqps=
+Subject: Re: [PATCH v1 01/11] hw/arm: versal: Remove inclusion of
+ arm_gicv3_common.h
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
+References: <20200427181649.26851-1-edgar.iglesias@gmail.com>
+ <20200427181649.26851-2-edgar.iglesias@gmail.com>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <14ed00d6-6a40-bcfa-0c06-984016adff29@greensocs.com>
+Date: Wed, 29 Apr 2020 09:23:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-29_02:2020-04-28,
- 2020-04-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0
- priorityscore=1501 phishscore=0 adultscore=0 malwarescore=0
- impostorscore=0 mlxlogscore=999 bulkscore=0 lowpriorityscore=0 mlxscore=0
- suspectscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2003020000 definitions=main-2004290057
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 03:42:07
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+In-Reply-To: <20200427181649.26851-2-edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1588145015;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fMd+4wIDhy4VuieueBBhVTrXprknNqYism8E1D6RAps=;
+ b=Fg0N6L9hikB2+glswoO9SSrnx/SepaSrg9WRgLrz+vQ+8ErXeKsQUkQPHKyiT80W2naR3D
+ 4w/Fb5DkGbaq6Ly9RRbsaMQXi72eR+36DMlOhtUzhY9RXQWuWqtG+FZBbzulTNaj5+2gml
+ 40bUMNTS27GBSje8rgC/dDxGybQhi7s=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1588145015; a=rsa-sha256; cv=none;
+ b=SxtpqkkfFMSeuDtZIwowVIRFa4rYTjGEDXeoQ4Ds6Dn4lpu7AUtxRCgcptF0Kx9APVGsWn
+ VUWV0icpcEZUiHVVcgWoVlRdt5GXn8ZwEWwKb0HxLiAvxrbNvKfSzqDWhUyo6eEUQuoHZs
+ 3gaep07zww+IXnQS40sZM7GGbHK9sP0=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=luc smtp.mailfrom=luc.michel@greensocs.com
+Received-SPF: pass client-ip=5.135.226.135;
+ envelope-from=luc.michel@greensocs.com; helo=beetle.greensocs.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 03:23:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,49 +95,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
+ frasse.iglesias@gmail.com, alistair@alistair23.me,
+ richard.henderson@linaro.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We need some little help in the code to reduce the valgrind noise.
-This patch does this with some designated initializers for the cpu
-model features and subfunctions.
+On 4/27/20 8:16 PM, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> 
+> Remove inclusion of arm_gicv3_common.h, this already gets
+> included via xlnx-versal.h.
+> 
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- target/s390x/kvm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 69881a0da0..f2f75d2a57 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -2165,7 +2165,7 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
- 
- static int query_cpu_subfunc(S390FeatBitmap features)
- {
--    struct kvm_s390_vm_cpu_subfunc prop;
-+    struct kvm_s390_vm_cpu_subfunc prop = {};
-     struct kvm_device_attr attr = {
-         .group = KVM_S390_VM_CPU_MODEL,
-         .attr = KVM_S390_VM_CPU_MACHINE_SUBFUNC,
-@@ -2292,7 +2292,7 @@ static int kvm_to_feat[][2] = {
- 
- static int query_cpu_feat(S390FeatBitmap features)
- {
--    struct kvm_s390_vm_cpu_feat prop;
-+    struct kvm_s390_vm_cpu_feat prop = {};
-     struct kvm_device_attr attr = {
-         .group = KVM_S390_VM_CPU_MODEL,
-         .attr = KVM_S390_VM_CPU_MACHINE_FEAT,
--- 
-2.25.1
-
+> ---
+>  hw/arm/xlnx-versal.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
+> index 94460f2343..c73b2fe755 100644
+> --- a/hw/arm/xlnx-versal.c
+> +++ b/hw/arm/xlnx-versal.c
+> @@ -20,7 +20,6 @@
+>  #include "hw/arm/boot.h"
+>  #include "kvm_arm.h"
+>  #include "hw/misc/unimp.h"
+> -#include "hw/intc/arm_gicv3_common.h"
+>  #include "hw/arm/xlnx-versal.h"
+>  #include "hw/char/pl011.h"
+>  
+> 
 
