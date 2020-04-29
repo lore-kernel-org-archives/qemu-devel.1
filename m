@@ -2,122 +2,104 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 532BEC83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 05:25:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42CD4C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 05:31:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14771206D6
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 05:25:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C8F92072A
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 05:31:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="OK8WfBfA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14771206D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N3MxYmdj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C8F92072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTfEL-0003gK-98
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 01:25:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36170)
+	id 1jTfK4-0005Z7-64
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 01:31:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36474)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTfDU-0002mN-IY
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 01:25:04 -0400
+ (envelope-from <mst@redhat.com>) id 1jTfIw-0004fY-5T
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 01:30:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jTfDT-0002mu-C8
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 01:25:04 -0400
-Received: from mail-eopbgr00137.outbound.protection.outlook.com
- ([40.107.0.137]:44614 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jTfDP-0002m0-Ln; Wed, 29 Apr 2020 01:25:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BciO+5L7jDSTrh64suagBkB29rzCP5Fei7sjEspyPR8QyOhyAEmk8OBclXocrQRFnDE55jTd/ryJmN7e6Je73mR0NpL9rLSCqD2K9SZYb94oN4PrHSlzW2WhbzhXaCn3m/saUELwOW1j78ADDgJc43pnrxzUKJI43t9ZRqEwf9UCMtVuXEIhyaRb/DVVkmoVamgzMHB3VsLuZ3bpnR1cFLidjQyOZOV34WXegVVoEpVvGQnBry0pDni8oB9z9KUVnm6Mx6v4IsZ4xiWcCrl0/Oul2UkoHglzNzxxOTy4iQB/9bjY7KBsysucWYugrrofUXABMZkTrt/09VVqUsv6sg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I0OGyfelSmtCoB0AK3skK145MdlCUQs1OzkISLUl780=;
- b=Q0f4M1uTlhvvdck25hSI1dnkE6vab26CJ03rEmAAc2VbyHpm+Pl/OKffoy2rjoP2TcKgQI6gMCBoO7g4StkFKAOY5VrtKGf57GnXhP2lT50WfMP5um2OHeAC5S8bNaN5Cx1UX2aAOsNR/NB4cecsQskE4hKgUGGE9MEPhFsINemTJM7355994bIw7z+l9+wz2p8y3mxu1e+h7JP9b9ws30tT+O3EZGmb1k3O4Tpog5uDvVRBUyrhjOSMepA4yPs4H0rFAXyGLbwcmTYs6yQL6MfrUoiFeDeTBJ+uxWvJQz4pL9/O30zGmQmeehhX1vlYLEg8Kt97YEOfcTsdgweX0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I0OGyfelSmtCoB0AK3skK145MdlCUQs1OzkISLUl780=;
- b=OK8WfBfABHuwDhytHmTlF0DnpZpPYjIUmH437NQsMJfnwriBsApL8ZfBhGJCWK0gvmiy7eEzkVrjkAmOk4ozHmejF577Lo4fBxF5iqo+bmdpLnHIkl5MKMMNMc1BQ0DG4dy7rheGyJu9trNXlTvUhi0nOKHxlFcGEmqYfZb/KnI=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5368.eurprd08.prod.outlook.com (2603:10a6:20b:103::17)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19; Wed, 29 Apr
- 2020 05:24:56 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2937.023; Wed, 29 Apr 2020
- 05:24:56 +0000
-Subject: Re: [PATCH v2 00/17] 64bit block-layer
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <20200427082325.10414-1-vsementsov@virtuozzo.com>
- <4bb8e5d2-8ac5-bee2-7128-8c7cccf8f653@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200429082453873
-Message-ID: <93a006cd-eed0-2665-c017-b888bc60ca5c@virtuozzo.com>
-Date: Wed, 29 Apr 2020 08:24:53 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <4bb8e5d2-8ac5-bee2-7128-8c7cccf8f653@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR01CA0126.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:168::31) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <mst@redhat.com>) id 1jTfGY-00070g-0F
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 01:30:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27184
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jTfGX-0006ra-DL
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 01:28:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588138091;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=yW7KzLKyeditHW+0TJT609XgzRfoJVQ9r7eV3EZ/Qag=;
+ b=N3MxYmdjPe4oX87ny9DsUT9luYHBZKmmJ2Wqp2Kd7W6YryiOjsSkxo16kA4nfl7ku9e3cW
+ ES+5QlL0+dDNd3ach8tYEpZrwvczScX6CnCixuDiy1LHUyhoR/03et1UAjilUnP28WA0CC
+ o9Im63IPqogwmhkyYFDEYdLhepw9dzs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-309-HohvkL3BP5SoiEcUD56ocA-1; Wed, 29 Apr 2020 01:28:10 -0400
+X-MC-Unique: HohvkL3BP5SoiEcUD56ocA-1
+Received: by mail-wm1-f71.google.com with SMTP id l21so716490wmh.2
+ for <qemu-devel@nongnu.org>; Tue, 28 Apr 2020 22:28:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=eeH9sWDoim/rHWkeLwiGH53msb9ctC1mifN6wvyxmns=;
+ b=Zc1ZdzVG8B/a9v5b3hLcn97HbS5PAZtoNGM+2zuPaDuHjxm0Sd6znkb+gD+rxsADQb
+ dg4fV+ATpczvodKcjrroNDcLHnxlCwEZ5IMzTjBIoCO3OI/w2vY+Zb3QKJLi+qP/YpF9
+ LjT5DlvPK9h6jubQurtA+sGb+D8dZz21ezQi4dt3t6oXZMjQZABYLHxgCpeaFpfWdpp7
+ xh2TMwgB/Iyv8GpDNMeVndLDqiWZbRdTrDVTM6P7oMIOm5GZM6ZsqptmyhhJiMUixWkK
+ Eyieo/t/ktlwN+JqUL1u6TNvqt3url8YziXAAmTTmeoccQrsGHhhaiOYFxmJUOqvj9bV
+ bsKg==
+X-Gm-Message-State: AGi0PuY8CBP4gGF6GzlzsfItpL4iMIpVCHG7qrOQFqpWmJtRpJMC9k4/
+ J6mBLbGH/nLlL/pQywRAU0fAg/MlVII6UZVTjKRdL/2uzg8NJyKNMHZn+6LPmooZRsDEIOA7jDY
+ bsux8sSXCJFtrxRY=
+X-Received: by 2002:a1c:1f8e:: with SMTP id f136mr1055320wmf.166.1588138088917; 
+ Tue, 28 Apr 2020 22:28:08 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLLwC5cnx7b4FxFY9M2GyTqzO8dShhp8JmpXBW0/oTGLEwqweFdgJcr+sJKpeH7aUy64iTlbg==
+X-Received: by 2002:a1c:1f8e:: with SMTP id f136mr1055294wmf.166.1588138088701; 
+ Tue, 28 Apr 2020 22:28:08 -0700 (PDT)
+Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
+ by smtp.gmail.com with ESMTPSA id
+ a67sm6375336wmc.30.2020.04.28.22.28.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Apr 2020 22:28:08 -0700 (PDT)
+Date: Wed, 29 Apr 2020 01:28:05 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Ani Sinha <ani@anisinha.ca>
+Subject: Re: [PATCH V2] Add a new PIIX option to control PCI hot unplugging
+ of devices on non-root buses
+Message-ID: <20200429011228-mutt-send-email-mst@kernel.org>
+References: <1588069012-211196-1-git-send-email-ani.sinha@nutanix.com>
+ <20200428120426-mutt-send-email-mst@kernel.org>
+ <67e481a5-de04-4e01-b9ec-70932194d69f@Spark>
+ <20200428121837-mutt-send-email-mst@kernel.org>
+ <CAARzgwwTo+r9xFge_XL_eu8-nsRFBFXEaQmTOhT1YHJifzfCJA@mail.gmail.com>
+ <20200428164428-mutt-send-email-mst@kernel.org>
+ <CAARzgwznhCPhGmwOxUBf_6bnFX7-Za7TxFMd999CARM+hDm8bA@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.184) by
- AM0PR01CA0126.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend
- Transport; Wed, 29 Apr 2020 05:24:54 +0000
-X-Tagtoolbar-Keys: D20200429082453873
-X-Originating-IP: [185.215.60.184]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: accdea96-a688-41ef-8f32-08d7ebfda70d
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5368:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB53686E084CDF3EF3620671FCC1AD0@AM7PR08MB5368.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
-X-Forefront-PRVS: 03883BD916
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: TFQyBYeajrUM8RG4GodAdZL9WdgpTiAbtU0xsyIEwtefPsDaVyf9NVksUl2924rBXx6Nv1N1po/Pu0u5lrw0afprrYFr3/L4EFWEgGYUgUjnVEAgtFk8+o0bhRk1uiJT7nt7tV7Lx45p+yFRYR+clhfWhwc+rZYsuK67bduUqURPVgP5p7ezUASIig7R4FIRNS6p1ZTfoad+Ro0P/tkNJnwKd+0/ZHbbUmGx+zIuzvLcNPm+CruPZrlHDs/Pr696OmQxtC0LR9inFMvMJYqWCDmw9xUGcH9+CWEszs/3UPdsUGEkYY9tGa4JRRyK5EXC3TQPHOf7vnjxtC5foepVtbBzI7R50DHRAUfc1dBs00WOB1Yk95ySuJtUeliMqcucw8xlZYT5GbdtyyjMXMqtfAeIkSn2glocDmF/hNp4X9D17V6lP0Fr7b1sWWoTKOK+rD5hSlXIA0ebae9fTMP10GjG1cN4Io52Y9IB/gvgJmQ2zWFxzWhDwy/tLMPNxubVtleyFHFwoP8bUoZPIMINeg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(376002)(396003)(346002)(39830400003)(136003)(5660300002)(16576012)(66476007)(66556008)(31686004)(316002)(4744005)(66946007)(956004)(186003)(8936002)(16526019)(2616005)(52116002)(6486002)(26005)(2906002)(36756003)(8676002)(31696002)(107886003)(4326008)(7416002)(86362001)(53546011)(966005)(478600001);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: MqCWQ4k/Za2l45GhC/TlJj+7qDzkNv58VhVdIFCJXvxXSABtCQM+UcSdLcA1zeSaAnWIJuLBj3CZyvmUNAwr2Ge/9nOgH6DgFMDNEJD0Bwo7tC5T1id8SGV3X3yKLQKgkTGJ6iQEI3XzsmanqgBUs0cLzRuOcdgZKtPd9MOXGgiOME2jfhWrjq+mNAutjyQCAaIV35nYN+njB3FMQEFnIXcu7FIwFI5I+kvQ9KHAzvfR3vnJhhp5oOvUkEcx4w8WY4bZDk1rXoMnGNgLKGaCV+boMpKpfPUFDsW7lWUQLANZolhci7bj1kDVFsy7027iwncIpBs/e9K8S5B1VJAquPJeaSzkd7u/PEMYAFfTH3QYJW8cdKzQia6T1acVvvaFD7ZTDci40VToRvgW5lW7UIyVXGuxgascwuKgh9q7q7jcble8j62llmRx01LNWB0pLjWkaoevBxIyFKs7B7ivtpordGoRPxLGJezpiC5/FT3DXCJNrMeHcemRVnW7WEj/T4cAHC1oejcGkDanNQd1O31k7t9wwGUHmdurvtxExyuH2BZqMX57WvZFcOcoPp3uXzkOvDmEFuvjQbgVM/eaWm0X+A/phYFrlZOUBb5cr9g//Pg3qtWmJhz+/wERV8/irPfEOlOLZtcdTmwZCgZXepv3hhZb8MmXPiqnleoKeiAl1KrrIHOthRjfc8JJZukI2GxqxaJufQzZMmdmYe46eVqa3/lxfDywxv0WT37aJZP3+WuO6GIcMd415LT6OGQyDK5yL6lTumTxzizx4qmGbjgoUBVc2xIiP0OTmqukVxg=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: accdea96-a688-41ef-8f32-08d7ebfda70d
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2020 05:24:55.9595 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ggfzxmyqd7C3OfQqME666mRuq2HbQeSj5NjPmut1zgrFnj25x8WdIvBHrDhbc/OI4U7sXpoTcJgP5qyq3SwWaFMFFEtGKvYD68bFGBT0LMw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5368
-Received-SPF: pass client-ip=40.107.0.137;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR02-AM5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:24:57
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.0.137
+In-Reply-To: <CAARzgwznhCPhGmwOxUBf_6bnFX7-Za7TxFMd999CARM+hDm8bA@mail.gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:28:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,38 +111,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org, berto@igalia.com,
- pavel.dovgaluk@ispras.ru, qemu-devel@nongnu.org, dillaman@redhat.com,
- pl@kamp.de, ronniesahlberg@gmail.com, mreitz@redhat.com, den@openvz.org,
- sheepdog@lists.wpkg.org, stefanha@redhat.com, namei.unix@gmail.com,
- pbonzini@redhat.com, sw@weilnetz.de, jsnow@redhat.com, ari@tuxera.com
+Cc: Ani Sinha <ani.sinha@nutanix.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-devel@nongnu.org, Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-29.04.2020 0:33, Eric Blake wrote:
-> On 4/27/20 3:23 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Hi all!
->>
->> v1 was "[RFC 0/3] 64bit block-layer part I", please refer to initial
->> cover-letter
->>   https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg08723.html
->> for motivation.
->>
->> v2:
->> patch 02 is unchanged, add Stefan's r-b. Everything other is changed a
->> lot. What's new:
->>
-> 
-> You'll also want to check my (now-abandoned?) posting from a while back:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg02769.html
-> 
-> to see what (if anything) from that attempt can be salvaged.
-> 
+On Wed, Apr 29, 2020 at 06:28:46AM +0530, Ani Sinha wrote:
+> Well there were several discussions in the other thread around how PCIE b=
+ehaves
+> and how we can't change the slot features without a HW reset. Those were =
+useful
+> inputs.
 
-Hmm, looks close :) will keep it in mind, thanks. Or, may be you want to resend? First 4 patches are not needed now, as bdrv_read/bdrv_write already dropped.
+OK so I'd expect these to be addressed in some way. If we commit to
+support a feature which has no chance to work on real hardware, we paint
+ourselves into a tight corner. This kind of thing tends to create
+maintainance problems down the road. Disabling both hotplug and unplug
+sounds like a reasonable thing to do, so if there's a need to disable
+just one of these, commit log needs to do a better job documenting the
+usecase.
 
--- 
-Best regards,
-Vladimir
+Alternatively, we need to be more creative with achieving what you are
+trying to do in ways that can work on real hardware.
+
+For example, how about hot-plugging a bridge which doesn't
+support hotplug itself? Would that happen to make windows
+do what you want, for both PCI and PCIE? We don't support
+hotplugging bridges with devices behind them ATM, but
+that sounds like a useful option.
+
+
+Also, pcie root ports recently gained ability to disable hotplug, see
+=09commit 530a0963184e57e71a5b538e9161f115df533e96
+=09Author: Julia Suvorova <jusual@redhat.com>
+=09Date:   Wed Feb 26 18:46:07 2020 +0100
+
+=09    pcie_root_port: Add hotplug disabling option
+
+adding this to pci and pcie bridges sounds very reasonable.
+
+--=20
+MST
+
 
