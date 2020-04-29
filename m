@@ -7,70 +7,69 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E51C83007
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:30:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A5AC83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:32:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2624C206D6
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:30:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 710A9206D6
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:32:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bChIX4gS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2624C206D6
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ehSyKLh+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 710A9206D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jThB2-0007C7-7k
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:30:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46174)
+	id 1jThD4-0001i4-F0
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:32:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46188)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jTh1x-0007tn-7i
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:22:15 -0400
+ (envelope-from <armbru@redhat.com>) id 1jTh1y-0007tt-S9
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:22:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jTh1g-0003wp-T3
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:21:17 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26506
+ (envelope-from <armbru@redhat.com>) id 1jTh1i-0003xv-Gv
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:21:18 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56736
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jTh1f-0003vR-TS
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jTh1g-0003v2-HQ
  for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:21:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588144858;
+ s=mimecast20190719; t=1588144857;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8Nr3g64N1ZbytavTEHUIn3pBRY3200wKKl65xH32qj8=;
- b=bChIX4gSpg57Nax+9+Uaie5KVxTnJF8qjT4vkkDnfUz4cs/oJFxjNVlmdCLuGfurVXugWF
- 6mHe3rBDrQ5SbmPzizcn7FZ8nr+CHF6cMVTQYpn7LXbteMOSqf3AIzu1dFIHhx7qcqKBYn
- YcRmP3B1QIlMw3c2yzeJFq/KkTLk1UA=
+ bh=yF+PmgERbTWXmJQUaeokDtWDsSNx4xCM1rtQqZprl0M=;
+ b=ehSyKLh+otWHgMR4Rpx2MN/UQkucbt9XrVLIPTCWHGMJXQOJQPdZuhjz88nEecBlgcOI6b
+ kmQ4iRe/2OwT2cQiED407GDyE60/kSC9jz8VMyJ9I1RuwmbHk7meFshRuL/NSHch6oU/mE
+ RknktOpjr6tmGy/P6FcIzi4HNWeQKy8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-njkdIEKSNHuXjEG2PHpVDQ-1; Wed, 29 Apr 2020 03:20:56 -0400
-X-MC-Unique: njkdIEKSNHuXjEG2PHpVDQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-289-ZhFa8XY5PACWZ3LIDjQ3Ug-1; Wed, 29 Apr 2020 03:20:55 -0400
+X-MC-Unique: ZhFa8XY5PACWZ3LIDjQ3Ug-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 203771009445;
- Wed, 29 Apr 2020 07:20:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BBFC80058A
+ for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 07:20:55 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E40AD60BF4;
- Wed, 29 Apr 2020 07:20:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DF4EE5D9F1
+ for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 07:20:54 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8E4F711358DD; Wed, 29 Apr 2020 09:20:49 +0200 (CEST)
+ id 7388811358D9; Wed, 29 Apr 2020 09:20:49 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 32/32] qemu-option: pass NULL rather than 0 to the id of
- qemu_opts_set()
-Date: Wed, 29 Apr 2020 09:20:48 +0200
-Message-Id: <20200429072048.29963-33-armbru@redhat.com>
+Subject: [PULL 28/32] smbus: Fix spd_data_generate() for number of banks > 2
+Date: Wed, 29 Apr 2020 09:20:44 +0200
+Message-Id: <20200429072048.29963-29-armbru@redhat.com>
 In-Reply-To: <20200429072048.29963-1-armbru@redhat.com>
 References: <20200429072048.29963-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -91,69 +90,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Masahiro Yamada <masahiroy@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Masahiro Yamada <masahiroy@kernel.org>
+spd_data_generate() splits @ram_size bytes into @nbanks RAM banks of
+1 << sz_log2 MiB each, like this:
 
-The second argument 'id' is a pointer. Pass NULL rather than 0.
+    size =3D ram_size >> 20; /* work in terms of megabytes */
+    [...]
+    nbanks =3D 1;
+    while (sz_log2 > max_log2 && nbanks < 8) {
+        sz_log2--;
+        nbanks++;
+    }
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Message-Id: <20200427005704.2475782-1-masahiroy@kernel.org>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Each iteration halves the size of a bank, and increments the number of
+banks.  Wrong: it should double the number of banks.
+
+The bug goes back all the way to commit b296b664ab "smbus: Add a
+helper to generate SPD EEPROM data".
+
+It can't bite because spd_data_generate()'s current users pass only
+@ram_size that result in *zero* iterations:
+
+    machine     RAM size    #banks  type    bank size
+    fulong2e     256 MiB         1   DDR      256 MiB
+    sam460ex    2048 MiB         1   DDR2    2048 MiB
+                1024 MiB         1   DDR2    1024 MiB
+                 512 MiB         1   DDR2     512 MiB
+                 256 MiB         1   DDR2     256 MiB
+                 128 MiB         1   SDR      128 MiB
+                  64 MiB         1   SDR       64 MiB
+                  32 MiB         1   SDR       32 MiB
+
+Apply the obvious, minimal fix.  I admit I'm tempted to rip out the
+unused (and obviously untested) feature instead, because YAGNI.
+
+Note that this is not the final result, as spd_data_generate() next
+increases #banks from 1 to 2 if possible.  This is done "to avoid a
+bug in MIPS Malta firmware".  We don't even use this function with
+machine type malta.  *Shrug*
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20200422134815.1584-5-armbru@redhat.com>
 ---
- softmmu/vl.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/i2c/smbus_eeprom.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 32c0047889..afd2615fb3 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -3059,19 +3059,19 @@ void qemu_init(int argc, char **argv, char **envp)
-                 }
-                 break;
-             case QEMU_OPTION_kernel:
--                qemu_opts_set(qemu_find_opts("machine"), 0, "kernel", opta=
-rg,
-+                qemu_opts_set(qemu_find_opts("machine"), NULL, "kernel", o=
-ptarg,
-                               &error_abort);
-                 break;
-             case QEMU_OPTION_initrd:
--                qemu_opts_set(qemu_find_opts("machine"), 0, "initrd", opta=
-rg,
-+                qemu_opts_set(qemu_find_opts("machine"), NULL, "initrd", o=
-ptarg,
-                               &error_abort);
-                 break;
-             case QEMU_OPTION_append:
--                qemu_opts_set(qemu_find_opts("machine"), 0, "append", opta=
-rg,
-+                qemu_opts_set(qemu_find_opts("machine"), NULL, "append", o=
-ptarg,
-                               &error_abort);
-                 break;
-             case QEMU_OPTION_dtb:
--                qemu_opts_set(qemu_find_opts("machine"), 0, "dtb", optarg,
-+                qemu_opts_set(qemu_find_opts("machine"), NULL, "dtb", opta=
-rg,
-                               &error_abort);
-                 break;
-             case QEMU_OPTION_cdrom:
-@@ -3182,7 +3182,7 @@ void qemu_init(int argc, char **argv, char **envp)
-                 }
-                 break;
-             case QEMU_OPTION_bios:
--                qemu_opts_set(qemu_find_opts("machine"), 0, "firmware", op=
-targ,
-+                qemu_opts_set(qemu_find_opts("machine"), NULL, "firmware",=
- optarg,
-                               &error_abort);
-                 break;
-             case QEMU_OPTION_singlestep:
+diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+index 07fbbf87f1..e199fc8678 100644
+--- a/hw/i2c/smbus_eeprom.c
++++ b/hw/i2c/smbus_eeprom.c
+@@ -229,7 +229,7 @@ uint8_t *spd_data_generate(enum sdram_type type, ram_ad=
+dr_t ram_size)
+     nbanks =3D 1;
+     while (sz_log2 > max_log2 && nbanks < 8) {
+         sz_log2--;
+-        nbanks++;
++        nbanks *=3D 2;
+     }
+=20
+     assert(size =3D=3D (1ULL << sz_log2) * nbanks);
 --=20
 2.21.1
 
