@@ -2,142 +2,110 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77238C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:50:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 406DBC83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:51:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DF742076B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:50:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 094822076B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 07:51:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="ZQ0m9kfa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DF742076B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ju2iB54J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 094822076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jThTk-0000U4-Dg
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:50:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48842)
+	id 1jThUo-0001uH-7c
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 03:51:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48108)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ani.sinha@nutanix.com>) id 1jThQR-0005tG-Ob
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:49:09 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jThJs-0004ja-Rn
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:39:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <ani.sinha@nutanix.com>) id 1jThNI-0007si-DX
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:46:35 -0400
-Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:58510)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
- id 1jThNH-0007sY-MA
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:43:20 -0400
-Received: from pps.filterd (m0127842.ppops.net [127.0.0.1])
- by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 03T7WPD6010013; Wed, 29 Apr 2020 00:43:07 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version;
- s=proofpoint20171006; bh=qO+QwzLEXcL2lT5+9dMym8WCcWPtCarPfZ2aOPyK+uU=;
- b=ZQ0m9kfaqnPgZSCHaGIN1HWXU5uLw16pB+R8PYxcFHbMqvciJDFDNhMQd6b9hAime9iO
- gT4OxDS98Yc7E3iEy3Ub3FnCYAPM4vt45fk6fn3BorZIaJIJ/2MSPTIcRDizPZaqAzVw
- hhV/iIEZrcjvrnA8lDxKgQQILNEMdaTN4K6UIG0KuV6HgI2t19sebJSKKJX/YOjEc2vz
- i/vVszUwfsh6tkMhr5/3V0sv9Wyinl+9Rbg2/0DpTFIx1qjwjeqrZdbl7nzF6KEbkGKo
- EB9vpV7bcVbZ+h7UTUtGkOtkM4Gst3GpjzA+pDVCa9gTYOIH7CM5zvb7XdWdXvZ/YQBU WA== 
-Received: from nam11-co1-obe.outbound.protection.outlook.com
- (mail-co1nam11lp2170.outbound.protection.outlook.com [104.47.56.170])
- by mx0b-002c1b01.pphosted.com with ESMTP id 30mmhj84xd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 29 Apr 2020 00:43:07 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=URuGYrJhnxUxwLJ8jY06dnthx730/QS5iHH4KUC51+lpoiY2b+QvuFgdmA3wVX8b1pHhyGRNLPfYfAxh2wIwoqF3xJL+84C05saalwpzMDz6bekXTEr3IFrDZF+RGUqb3CkBjZzcnUqqSKcbv0/QZfrqbtXQF103XWa3vLGepw5Jar78n59vVeHyDqzLfuPNja07FvUabN/lnsc6jguL5Oz7sX3+JWI6J3FiN1W8k5R/utyjLWpm4LCSjHQCiPIcZKk/aWRENvmW4P+grJwi/5cXvAqmqAvKWIPD1q62BUY2f0RD/0e1cTfTekTKy3UoSiphSqTEs4lrhelEmLqb/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qO+QwzLEXcL2lT5+9dMym8WCcWPtCarPfZ2aOPyK+uU=;
- b=Cf5kkwoweTbUOg4kB3weUQy+oiwxsBMjXYq1+8L9s68qB4HodffPw3dl8yuwTSPngqgql4ghaMmkK0TsuWeiJLLJNbypzIe0t6FvRMVAHaXLeuYKpK5lBNqwhMglsikMCup3ro2f6CRcZrVLC5VgpVHxsCuMqTfLpAmFjIjVPqT2R362c5gca17UaJLRhVEptBAr6ajrVoxLGatR1LW2BMKCGmp7Pc2mjosp0/7OBK9T4HmqLrXILXKVia/ItFOySNP5+M9fKdshQ30Njjizp3VmHfSoohQ1KVbp6eiYf7lnHwCQ64gQ5tSehVmX4/Bz4Mm1QPZPM8RutLhbN1OUrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MN2PR02MB5742.namprd02.prod.outlook.com (2603:10b6:208:10d::27)
- by MN2PR02MB7104.namprd02.prod.outlook.com (2603:10b6:208:1f5::21)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Wed, 29 Apr
- 2020 07:43:05 +0000
-Received: from MN2PR02MB5742.namprd02.prod.outlook.com
- ([fe80::200c:b06c:d8c6:42a]) by MN2PR02MB5742.namprd02.prod.outlook.com
- ([fe80::200c:b06c:d8c6:42a%7]) with mapi id 15.20.2937.028; Wed, 29 Apr 2020
- 07:43:05 +0000
-From: Ani Sinha <ani.sinha@nutanix.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH V2] Add a new PIIX option to control PCI hot unplugging of
- devices on non-root buses
-Thread-Topic: [PATCH V2] Add a new PIIX option to control PCI hot unplugging
- of devices on non-root buses
-Thread-Index: AQHWHUYvMyDNYIpa20C9378Nh0w8t6iOszWAgAAA+QCAAANNgIAABV8AgABEbYCAAEbYAIAASz+AgAAMEQCAAAuhAIAAAIgAgAAAq4CAAAGWAIAACeGAgAABVgA=
-Date: Wed, 29 Apr 2020 07:43:04 +0000
-Message-ID: <D4141715-B662-407A-8B4D-0EB64B41F6A1@nutanix.com>
-References: <20200428121837-mutt-send-email-mst@kernel.org>
- <CAARzgwwTo+r9xFge_XL_eu8-nsRFBFXEaQmTOhT1YHJifzfCJA@mail.gmail.com>
- <20200428164428-mutt-send-email-mst@kernel.org>
- <CAARzgwznhCPhGmwOxUBf_6bnFX7-Za7TxFMd999CARM+hDm8bA@mail.gmail.com>
- <20200429011228-mutt-send-email-mst@kernel.org>
- <544B4749-9A1C-44BB-BD89-C37A7E8D86F4@nutanix.com>
- <20200429025200-mutt-send-email-mst@kernel.org>
- <A69272ED-DDFF-4CC7-B12C-2994B004C013@nutanix.com>
- <20200429025535-mutt-send-email-mst@kernel.org>
- <B5DF1405-B261-4CE4-8484-F3738BE83E14@nutanix.com>
- <20200429033657-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200429033657-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nutanix.com;
-x-originating-ip: [192.146.154.3]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d9abf244-daad-4217-e284-08d7ec10f3cf
-x-ms-traffictypediagnostic: MN2PR02MB7104:
-x-microsoft-antispam-prvs: <MN2PR02MB710412FFC58C175EC477E981F1AD0@MN2PR02MB7104.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 03883BD916
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MN2PR02MB5742.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(39860400002)(346002)(396003)(366004)(376002)(136003)(6506007)(53546011)(8676002)(33656002)(316002)(6512007)(4326008)(186003)(26005)(478600001)(966005)(6486002)(8936002)(86362001)(54906003)(2906002)(64756008)(36756003)(66946007)(66446008)(66476007)(66556008)(71200400001)(2616005)(7416002)(5660300002)(44832011)(6916009)(76116006)(91956017);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: YBZ+l4LIWUNDnijYsvVJ3ApjxZLqY8jGM/vTJtfk+yioiN8IjU7GcuvZQLb9zZdTlGKQyTt0S3EIVC2dmj5s/t4Dd0nnS2g38iAEci5YyC6J/hfxcNpF693XOjQLbMXyfuslzfauVnNbDFsUUjubgTFbGnJAQrsgpbi4FR07XTLiY4SZgDWG1MtkASZNcC2GasM4dcectTQrhdpzLaVAPKuPHKv8V2/EBOdPirPdki2Na/JfliEgHmW0vCUxAwbFPYXLTZjroIkTpaO1bEknayEXVL41mTDMCUyTFbRETh8nMrd2lLkhiwXJkJdVVy+fdxuH3sjJ8hwOuEBcYnaOB/R/k0/7XTLcyeUjIMOniffrchtlaJCxtMHEP8iouqJQfsbuE70gLNon4o9ZUvMFb2TuAIZ3kDSxGJkhlA/vBaJSDYKwXTaNoLAhPhfL79NzkOMPoYgm3HTIsAWT4/DkVoRIjZ7DYsFPV8haAyunu1W42taGtvTYzKttUr0EF+LyfzE2ZbDyhwrVanku1N3W9A==
-x-ms-exchange-antispam-messagedata: xd/fGW6vqumIvMatekT0dUEhPp7qyuEIrVqb9Lnv0OnkUeEI0LJzNOzuJmtcsAr1KpJ92BBWdXgvwPDnZrc3GuEBpfS63xAAFBb7vm0DAHrhP9u3R8tf7O/AuklVoxq10LNFB7H0YLvc1BXhhQSC8x8sTnHh/rsPWiWBfTslg+zT6XgwIFPDRKVCQH5PN50C+B+WefqZqgrZPy4k2GWlJYx1jNsNfBXk4jWFHH7AGz261zW6Q68LRmkqPjkFuiMqEshWQdXnHviB0vE3/79afuMkn+9gyfbS5Ba9tEQkkZlJ2tksw73pLe9+JWJeNk7OBEjg3pRk+gJYAgIrFWfu+VAnyVvufeCurGHv8N6J9KSKBc1YxkkVsxxHCncYkCRV8hE6B2R/VD+TfHtPruxycAlPxqtmaZ7Sm3o4QuU4XDxoKLQcXV6yOk7dF7+oYl8UMSr+/WDJLBrrLUcNM+BKP3rBu7Q2tu49SKa//mZapTbSPUXDZ4uvmqCQtiwrBjVZHMd2FDwemFCC/e79SbueAp4dVA4zHSe4y5u2mOulsDnRYUAPlESkYOOUIlNBFnmfrzr35zb8v4Dmj+dlzc7/l3hubGhfOsMOEmMtPPBzO6eeJMAJojX3eyQMkT6gh25WcnBGGf71kO6vv1rvEoqsWzEv5UU5CfJ5b4sF1DzjX26W1BvHb9tQnoRACFeolGEKoOYuH50oivn8+4JqFiHGsPWHr+mN7R7jxeRzdPyiPI3SsvxWTdUEvhr9nS6RV/8tVdQVAgAw11WYxWWLjEDBFDxgV2UgVQMXL9Et1e3aNbI=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6F8432A53F898E42A46F371C07500816@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <mreitz@redhat.com>) id 1jThJr-0005Ea-Jk
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:39:48 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55626
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jThJr-0005EH-4Z
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:39:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588145986;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=j8rSc3GxOznaNlzTU3yZnFsa1fJOX3HQTZ2C/iBYQFw=;
+ b=Ju2iB54J/2KvAoaZmo8jC1FejwTTHtPEm/LFrJdeTSAW2ArmWdwQ2biAgYfwqqzwwP1+DX
+ 374tVP7OUQQIoL/EhMtb9+G22KWw7oCnrDiVvHFSpWw8r8sgwLn+WulMxKXvs5wTQ2VQ5U
+ z/JByaEClaFqUGM42tn8qUi5tWPwy0o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-38--DmRtkI2Nbu9kAG0n9I-vg-1; Wed, 29 Apr 2020 03:39:43 -0400
+X-MC-Unique: -DmRtkI2Nbu9kAG0n9I-vg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1A398014D9;
+ Wed, 29 Apr 2020 07:39:42 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-19.ams2.redhat.com
+ [10.36.113.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BEF195D9E5;
+ Wed, 29 Apr 2020 07:39:41 +0000 (UTC)
+Subject: Re: [PATCH 1/4] block: Add bdrv_make_empty()
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200428132629.796753-1-mreitz@redhat.com>
+ <20200428132629.796753-2-mreitz@redhat.com>
+ <20200428142104.GI5789@linux.fritz.box>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <a638f036-dd2e-cda2-11b4-c3b15ea8eff0@redhat.com>
+Date: Wed, 29 Apr 2020 09:39:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d9abf244-daad-4217-e284-08d7ec10f3cf
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2020 07:43:04.8484 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yV9VlZIEwOypmU7LHU9vWHiZB9cStZlOsT/S3jgtPhOXXdI7o+PJ40CMVjCTdlLzxTFrpJwY1GO4kdlkb7xscA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB7104
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-29_02:2020-04-28,
- 2020-04-29 signatures=0
-X-Proofpoint-Spam-Reason: safe
-Received-SPF: pass client-ip=148.163.155.12;
- envelope-from=ani.sinha@nutanix.com; helo=mx0b-002c1b01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 02:11:36
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Received-From: 148.163.155.12
+In-Reply-To: <20200428142104.GI5789@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="JELVLaOGRUFLtAwhRmeBpjGTYFhvsltma"
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 00:53:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,64 +117,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
- Igor Mammedov <imammedo@redhat.com>,
- =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gT24gQXByIDI5LCAyMDIwLCBhdCAxOjA4IFBNLCBNaWNoYWVsIFMuIFRzaXJraW4gPG1z
-dEByZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+IE9uIFdlZCwgQXByIDI5LCAyMDIwIGF0IDA3OjAy
-OjU2QU0gKzAwMDAsIEFuaSBTaW5oYSB3cm90ZToNCj4+IA0KPj4gDQo+Pj4gT24gQXByIDI5LCAy
-MDIwLCBhdCAxMjoyNyBQTSwgTWljaGFlbCBTLiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT4gd3Jv
-dGU6DQo+Pj4gDQo+Pj4gT24gV2VkLCBBcHIgMjksIDIwMjAgYXQgMDY6NTQ6NTJBTSArMDAwMCwg
-QW5pIFNpbmhhIHdyb3RlOg0KPj4+PiANCj4+Pj4gDQo+Pj4+PiBPbiBBcHIgMjksIDIwMjAsIGF0
-IDEyOjIyIFBNLCBNaWNoYWVsIFMuIFRzaXJraW4gPG1zdEByZWRoYXQuY29tPiB3cm90ZToNCj4+
-Pj4+IA0KPj4+Pj4gT24gV2VkLCBBcHIgMjksIDIwMjAgYXQgMDY6MTE6MjBBTSArMDAwMCwgQW5p
-IFNpbmhhIHdyb3RlOg0KPj4+Pj4+IA0KPj4+Pj4+IA0KPj4+Pj4+PiBPbiBBcHIgMjksIDIwMjAs
-IGF0IDEwOjU4IEFNLCBNaWNoYWVsIFMuIFRzaXJraW4gPG1zdEByZWRoYXQuY29tPiB3cm90ZToN
-Cj4+Pj4+Pj4gDQo+Pj4+Pj4+IG8gaWYgdGhlcmUncyBhIG5lZWQgdG8gZGlzYWJsZQ0KPj4+Pj4+
-PiBqdXN0IG9uZSBvZiB0aGVzZSwgY29tbWl0IGxvZyBuZWVkcyB0byBkbyBhIGJldHRlciBqb2Ig
-ZG9jdW1lbnRpbmcgdGhlDQo+Pj4+Pj4+IHVzZWNhc2UuDQo+Pj4+Pj4gDQo+Pj4+Pj4gVGhlIHVz
-ZSBjYXNlIGlzIHNpbXBsZS4gV2l0aCB0aGlzIGZlYXR1cmUgYWRtaW5zIHdpbGwgYmUgYWJsZSB0
-byBkbyB3aGF0IHRoZXkgd2VyZSBmb3JjZWQgdG8gZG8gZnJvbSBXaW5kb3dzIGRyaXZlciBsZXZl
-bCBidXQgbm93IGF0IHRoZSBidXMgbGV2ZWwuIEhlbmNlLCANCj4+Pj4+PiAoYSkgVGhleSBuZWVk
-IG5vdCBoYXZlIGFjY2VzcyB0byB0aGUgZ3Vlc3QgVk0gdG8gY2hhbmdlIG9yIHVwZGF0ZSB3aW5k
-b3dzIGRyaXZlciByZWdpc3RyeSBzZXR0aW5ncy4gVGhleSBjYW4gZW5hYmxlIHRoZSBzYW1lIHNl
-dHRpbmcgZnJvbSBhZG1pbiBtYW5hZ2VtZW50IGNvbnNvbGUgd2l0aG91dCBhbnkgYWNjZXNzIHRv
-IFZNLg0KPj4+Pj4+IChiKSBJdCBpcyBtb3JlIHJvYnVzdC4gTm8gbmVlZCB0byBtZXNzIHdpdGgg
-ZHJpdmVyIHNldHRpbmdzLiBJbmNvcnJlY3Qgc2V0dGluZ3MgY2FuIGJyaWNrIGd1ZXN0IE9TLiBB
-bHNvIG5vIGd1ZXN0IHNwZWNpZmljIGtub3dob3cgcmVxdWlyZWQuDQo+Pj4+Pj4gKGMpIEl0IGlz
-IG1vcmUgc2NhbGFibGUgc2luY2UgYSBzaW5nbGUgY2x1c3RlciB3aWRlIHNldHRpbmcgY2FuIGJl
-IHVzZWQgZm9yIGFsbCBWTSBwb3dlciBvbnMgYW5kIHRoZSBtYW5hZ2VtZW50IHBsYW5lIGNhbiB0
-YWtlIGNhcmUgb2YgdGhlIHJlc3QgYXV0b21hdGljYWxseS4gTm8gbmVlZCB0byBhY2Nlc3MgaW5k
-aXZpZHVhbCBWTXMgdG8gZW5mb3JjZSB0aGlzLg0KPj4+Pj4+IChkKSBJIGFtIHRvbGQgdGhhdCB0
-aGUgZHJpdmVyIGxldmVsIHNvbHV0aW9uIGRvZXMgbm90IHBlcnNpc3QgYWNyb3NzIGEgcmVib290
-LiANCj4+Pj4+PiANCj4+Pj4+PiBBbmkNCj4+Pj4+IA0KPj4+Pj4gTG9va3MgbGlrZSBkaXNhYmxp
-bmcgYm90aCBwbHVnIGFuZCB1bnBsdWcgd291bGQgYWxzbyBhZGRyZXNzIHRoZXNlIG5lZWRzLg0K
-Pj4+PiANCj4+Pj4gTm8gdGhlIGRyaXZlciBsZXZlbCBzb2x1dGlvbiBkb2VzIG5vdCBwcmV2ZW50
-IGhvdCBwbHVnZ2luZyBvZiBkZXZpY2VzIGJ1dCBibG9ja3MganVzdCBob3QgdW5wbHVnZ2luZy4g
-VGhlIHNvbHV0aW9uIEkgYW0gcHJvcG9zaW5nIHRyaWVzIHRvIGRvIHRoZSBzYW1lIGJ1dCBmcm9t
-IHRoZSBidXMvaHlwZXJ2aXNvciBsZXZlbC4NCj4+PiANCj4+PiBXaHkgZG9lcyB0aGUgZHJpdmVy
-IGxldmVsIHNvbHV0aW9uIG5lZWQgdG8gcHJldmVudCBqdXN0IGhvdCB1bnBsdWdnaW5nPw0KPj4g
-DQo+PiBCZWNhdXNlIGl0IG5vdCBmYWlyIHRvIHByZXZlbnQgZW5kIHVzZXJzIGZyb20gaG90IHBs
-dWdnaW5nIG5ldyBkZXZpY2VzIHdoZW4gaXQgaXMgdGhlIChhY2NpZGVudGFsPykgaG90IHVucGx1
-Z2dpbmcgb2YgZXhpc3RpbmcgZGV2aWNlcyB3aGljaCBjYXVzZXMgaXNzdWVzLg0KPiANCj4gQWNj
-aWRlbnRhbD8gU28gbWF5YmUgd2hhdCB5b3UgbmVlZCBpcyBhY3R1YWxseSBzb21ldGhpbmcgZWxz
-ZSB0aGVuIC0NCj4gYXZvaWQgKnJlbW92aW5nKiB0aGUgZGV2aWNlIHdoZW4gaXQncyBwb3dlcmVk
-IGRvd24uDQoNCllvdSBkb27igJl0IGdldCBpdC4gSXQgaXMgbm90IGh5cGVydmlzb3IgYWRtaW5z
-IHdobyBhcmUgdW5wbHVnZ2luZyBpdC4gSXQgaXMgdGhlIGVuZCB1c2Vycy4gRXZlbiBSZWRIYXQg
-Y3VzdG9tZXJzIHdhbnQgdGhpcyBmZWF0dXJlLiBTZWUgZm9sbG93aW5nIHJlc291cmNlczogDQpo
-dHRwczovL3d3dy5yZWRoYXQuY29tL2FyY2hpdmVzL2xpYnZpci1saXN0LzIwMjAtRmVicnVhcnkv
-bXNnMDAxMTAuaHRtbA0KaHR0cHM6Ly9idWd6aWxsYS5yZWRoYXQuY29tL3Nob3dfYnVnLmNnaT9p
-ZD0xODAyNTkyDQpodHRwczovL2J1Z3ppbGxhLnJlZGhhdC5jb20vc2hvd19idWcuY2dpP2lkPTE3
-OTA4OTkNCg0KTXkgYXBwcm9hY2ggaXMgbXVjaCBtb3JlIGZpbmUgZ3JhaW5lZCB0aGFuIGp1c3Qg
-ZGlzYWJsZSBldmVyeXRoaW5nIGFwcHJvYWNoIHRoYXQgd2UgaGF2ZSBmb3IgcTM1LiBGb3IgaTQ0
-MGZ4IHdlIGNhbiBkbyBiZXR0ZXIgdGhhbiB0aGF0Lg0KDQoNCg0KPiANCj4+PiANCj4+PiANCj4+
-Pj4gDQo+Pj4+PiAtLSANCj4+Pj4+IE1TVA0KDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JELVLaOGRUFLtAwhRmeBpjGTYFhvsltma
+Content-Type: multipart/mixed; boundary="KuoTs7hNC8rCu5jabmJajhuoq1Qemz58b"
+
+--KuoTs7hNC8rCu5jabmJajhuoq1Qemz58b
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 28.04.20 16:21, Kevin Wolf wrote:
+> Am 28.04.2020 um 15:26 hat Max Reitz geschrieben:
+>> Right now, all users of bdrv_make_empty() call the BlockDriver method
+>> directly.  That is not only bad style, it is also wrong, unless the
+>> caller has a BdrvChild with a WRITE permission.
+>>
+>> Introduce bdrv_make_empty() that verifies that it does.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  include/block/block.h |  1 +
+>>  block.c               | 23 +++++++++++++++++++++++
+>>  2 files changed, 24 insertions(+)
+>>
+>> diff --git a/include/block/block.h b/include/block/block.h
+>> index b05995fe9c..d947fb4080 100644
+>> --- a/include/block/block.h
+>> +++ b/include/block/block.h
+>> @@ -351,6 +351,7 @@ BlockMeasureInfo *bdrv_measure(BlockDriver *drv, Qem=
+uOpts *opts,
+>>  void bdrv_get_geometry(BlockDriverState *bs, uint64_t *nb_sectors_ptr);
+>>  void bdrv_refresh_limits(BlockDriverState *bs, Error **errp);
+>>  int bdrv_commit(BlockDriverState *bs);
+>> +int bdrv_make_empty(BdrvChild *c, Error **errp);
+>>  int bdrv_change_backing_file(BlockDriverState *bs,
+>>      const char *backing_file, const char *backing_fmt);
+>>  void bdrv_register(BlockDriver *bdrv);
+>> diff --git a/block.c b/block.c
+>> index 2e3905c99e..b0d5b98617 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -6791,3 +6791,26 @@ void bdrv_del_child(BlockDriverState *parent_bs, =
+BdrvChild *child, Error **errp)
+>> =20
+>>      parent_bs->drv->bdrv_del_child(parent_bs, child, errp);
+>>  }
+>> +
+>> +int bdrv_make_empty(BdrvChild *c, Error **errp)
+>> +{
+>> +    BlockDriver *drv =3D c->bs->drv;
+>> +    int ret;
+>> +
+>> +    assert(c->perm & BLK_PERM_WRITE);
+>=20
+> If I understand correctly, bdrv_make_empty() is called to drop an
+> overlay whose content is identical to what it would read from its
+> backing file (in particular after a commit operation). This means that
+> the caller promises that the visible content doesn't change.
+>=20
+> So should we check BLK_PERM_WRITE_UNCHANGED instead?
+
+Ah, right.  Yes, that would be better.  (Or to check both, whether any
+of them has been taken.)
+
+Max
+
+
+--KuoTs7hNC8rCu5jabmJajhuoq1Qemz58b--
+
+--JELVLaOGRUFLtAwhRmeBpjGTYFhvsltma
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6pLzsACgkQ9AfbAGHV
+z0D/bAf7BceJHRlYifeCSsI/PoUyGXfv5/gXVSIf4TjHaef5dnxNtxrBz56ZjOOc
+0pMGOQkAbfHn9CKejuZaQYIJG9OxbH8EuIPO1gq6yhzqQSNsxu1Q9H6WgVLTZZ8b
+drxjaAoo2YtxxN1BifzIL7O7mz7uLBgpaN6lxXXw3+ANvlYt5b3zqIGbeodKS7cG
+0GkOjJBKtA02HPbUmtLdbeKxhEtbdNIBE/3DS/fad02qoQA8wxjkRiMdv48R+TrE
+VW5IuAqwV9tJ2lzdaacgB8OlH5w8V1l2tWFUY6Ro3p0WvO4gb3XxaTvOGcSVu2cT
+rVORXdvNNdDpQjKgq9Yft3hxrP2VWw==
+=G1I7
+-----END PGP SIGNATURE-----
+
+--JELVLaOGRUFLtAwhRmeBpjGTYFhvsltma--
+
 
