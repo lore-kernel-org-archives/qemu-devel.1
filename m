@@ -2,80 +2,90 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51E05C83000
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:15:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAAF9C83000
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:15:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DAA120B80
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:15:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F29020B80
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 14:15:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lg5MZ530"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DAA120B80
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jjnbt07/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F29020B80
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTnUT-0002Dp-37
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 10:15:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44612)
+	id 1jTnUb-0002YH-Jz
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 10:15:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45086)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTnRH-0004ZC-DO
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:11:51 -0400
+ (envelope-from <eblake@redhat.com>) id 1jTnT2-0008RM-1z
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:13:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTnRH-00045M-0S
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:11:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57055
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eblake@redhat.com>) id 1jTnT1-00058d-5w
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:13:39 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41162
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTnRG-00045E-IU
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:11:50 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jTnT0-00057o-M7
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 10:13:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588169509;
+ s=mimecast20190719; t=1588169617;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+JfwS4rDpAdfjq6rnTazzWwBEOj7DlcLQ3maGcEHnmo=;
- b=Lg5MZ530CuQtTmIk0j0jvxFW7lOzUHW7VlDwW/zoK8S+NYVzAcHZtPGYLOHQ9R/dqtaAb5
- fFAM/B7La2q37Yrba4r3EI809/kwzYfC8t3nz6xVqefrT66+Yv/i89N6qp3FXJTXDlhmeL
- NBmAHR/CK7PPen28th4DkjBVg+AQ7+o=
+ bh=z5KJj0/IEeIDfSeMUgMfCAULVkkEU1Ysj/D3ASB/G5k=;
+ b=Jjnbt07/xHr9MSmwaGkRW+SU9zwLeg+tWBLDpcyaJ8kdFqzNXqs+sEv7dMEg25VtatmkQP
+ KVHYYUzXoJ3iF5ofIjcdAIOwebO1HzafF3GsApowtIdeKuzToBlhJ2YJteqXue17tRnISt
+ 8uaRc+dwGmPPJEWBnZpxUSI2MkpKONY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-oxTgmQrXOtKL2VwXh0QJ2g-1; Wed, 29 Apr 2020 10:11:35 -0400
-X-MC-Unique: oxTgmQrXOtKL2VwXh0QJ2g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-300-eJjW36AfMLWIeaVqCQ_XUQ-1; Wed, 29 Apr 2020 10:13:23 -0400
+X-MC-Unique: eJjW36AfMLWIeaVqCQ_XUQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7AACF100CCE4;
- Wed, 29 Apr 2020 14:11:34 +0000 (UTC)
-Received: from localhost (ovpn-113-19.ams2.redhat.com [10.36.113.19])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DA7B1001281;
- Wed, 29 Apr 2020 14:11:33 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 3/4] block: Add blk_make_empty()
-Date: Wed, 29 Apr 2020 16:11:25 +0200
-Message-Id: <20200429141126.85159-4-mreitz@redhat.com>
-In-Reply-To: <20200429141126.85159-1-mreitz@redhat.com>
-References: <20200429141126.85159-1-mreitz@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C31EF108BD0F;
+ Wed, 29 Apr 2020 14:13:19 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 998945D9E5;
+ Wed, 29 Apr 2020 14:13:02 +0000 (UTC)
+Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
+ VFIO live migration
+To: Yan Zhao <yan.y.zhao@intel.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200421023718.GA12111@joy-OptiPlex-7040>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D86DF06@SHSMSX104.ccr.corp.intel.com>
+ <20200422073628.GA12879@joy-OptiPlex-7040> <20200424191049.GU3106@work-vm>
+ <20200426013628.GC12879@joy-OptiPlex-7040> <20200427153743.GK2923@work-vm>
+ <20200428005429.GJ12879@joy-OptiPlex-7040> <20200428141437.GG2794@work-vm>
+ <20200429072616.GL12879@joy-OptiPlex-7040> <20200429082201.GA2834@work-vm>
+ <20200429093555.GM12879@joy-OptiPlex-7040>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <94cd58d2-0580-53cd-6ca2-2c33146e0f2c@redhat.com>
+Date: Wed, 29 Apr 2020 09:13:01 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
+In-Reply-To: <20200429093555.GM12879@joy-OptiPlex-7040>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 00:53:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,54 +97,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+ "eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "Yang, Ziye" <ziye.yang@intel.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "felipe@nutanix.com" <felipe@nutanix.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+ "Tian, Kevin" <kevin.tian@intel.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Zeng, Xin" <xin.zeng@intel.com>,
+ "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+ "dinechin@redhat.com" <dinechin@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
+ "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "berrange@redhat.com" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He,
+ Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Two callers of BlockDriver.bdrv_make_empty() remain that should not call
-this method directly.  Both do not have access to a BdrvChild, but they
-can use a BlockBackend, so we add this function that lets them use it.
+[meta-comment]
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- include/sysemu/block-backend.h |  2 ++
- block/block-backend.c          | 10 ++++++++++
- 2 files changed, 12 insertions(+)
+On 4/29/20 4:35 AM, Yan Zhao wrote:
+> On Wed, Apr 29, 2020 at 04:22:01PM +0800, Dr. David Alan Gilbert wrote:
+[...]
+>>>>>>>>>>>>>>>>> This patchset introduces a migration_version attribute under sysfs
+>>>>>>>>>>> of VFIO
+>>>>>>>>>>>>>>>>> Mediated devices.
 
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.=
-h
-index 0917663d89..8203d7f6f9 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -266,4 +266,6 @@ int coroutine_fn blk_co_copy_range(BlockBackend *blk_in=
-, int64_t off_in,
-=20
- const BdrvChild *blk_root(BlockBackend *blk);
-=20
-+int blk_make_empty(BlockBackend *blk, Error **errp);
-+
- #endif
-diff --git a/block/block-backend.c b/block/block-backend.c
-index f4944861fa..47bd56244d 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -2402,3 +2402,13 @@ const BdrvChild *blk_root(BlockBackend *blk)
- {
-     return blk->root;
- }
-+
-+int blk_make_empty(BlockBackend *blk, Error **errp)
-+{
-+    if (!blk_is_available(blk)) {
-+        error_setg(errp, "No medium inserted");
-+        return -ENOMEDIUM;
-+    }
-+
-+    return bdrv_make_empty(blk->root, errp);
-+}
---=20
-2.25.4
+Hmm, several pages with up to 16 levels of quoting, with editors making 
+the lines ragged, all before I get to the real meat of the email. 
+Remember, it's okay to trim content,...
+
+>> So why don't we split the difference; lets say that it should start with
+>> the hex PCI Vendor ID.
+>>
+> The problem is for mdev devices, if the parent devices are not PCI devices,
+> they don't have PCI vendor IDs.
+
+...to just what you are replying to.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
