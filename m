@@ -2,82 +2,84 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C5DC83004
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E955EC83000
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:40:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33A3C2072A
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:39:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B53FC2072A
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 18:40:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="gHaxnY0a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33A3C2072A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="EN9nbLdJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B53FC2072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTrcV-0004EE-D9
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 14:39:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37374)
+	id 1jTrdC-0005Xy-RN
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 14:40:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37462)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTra7-0008C5-O7
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:37:18 -0400
+ id 1jTraF-0008SH-24
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:37:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTra5-0003SK-GA
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:37:15 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:2035)
+ id 1jTraC-0003VX-C1
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 14:37:22 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:2041)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTra1-0003PL-3o; Wed, 29 Apr 2020 14:37:09 -0400
+ id 1jTra6-0003PZ-JX; Wed, 29 Apr 2020 14:37:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1588185430; x=1619721430;
- h=from:to:cc:subject:date:message-id:mime-version:
- content-transfer-encoding;
- bh=1XgLDz26nHEpu0y9cchduMq7HttvXlRu1DO0Cxc980c=;
- b=gHaxnY0ahJrOgO2//M8kwml7XFL2JjaxtpJDBOMeCDUVH+hV9cy5ksih
- BAffZL9iuILzN3oeEeucGY0U2GZHYY7a3D7xBT/O7vjQ+UQG8rPC/1yNF
- sdg/IUN1zr6eXrn5d2/7BPGWiZ+D8lmhuf/zoxBnMeFY3ew5B3S2UIkB1
- nSl2+71nkw5PMy9W6EodzcTtp3wSAJUYe6c52MqG76N03Lf0DxH2cvd6j
- 0hADduEunGZp1R6P1OKrT3kJQLP17OaCVRVn/WwafxuArZc8K/X92dv2X
- XVfKXAm0VQ4G7VTnKb/AECrxuv2iQaLFAoMOqRZC8bnCRzlalyi88upa+ A==;
-IronPort-SDR: ttwrcDOhqC7HG77Q3N01ltTOz6dawUJBo7SLwzsguXB33u8rrF2LYEB0MuVDV+ssA5IY3BMfe0
- u9Rx9+mUsfePhHXWs72agolRwe+19YB0ToPP6SVQoijWCmnuHcaqaVURfMN24mTeXzP2jqhQuW
- ExpPX9Qf+8ENFyobsgJ7fD8rJRiK/JiQN8w4PSJ5EEErCB3dZ/npcQEZR6f6iWvZxlljYfPbU9
- /2RhvVInz5e/jvmP2UVmdvY5q2uEtP7vpHllck88FVfu7+/bOqh5NN+tiUxOKWTqZPaETwr2mk
- 4FM=
-X-IronPort-AV: E=Sophos;i="5.73,332,1583164800"; d="scan'208";a="137935126"
+ t=1588185435; x=1619721435;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=xAP1D28Ruxk2F1O9NmhqCbS55wsbO5b1VBkOLwbfPLU=;
+ b=EN9nbLdJeSEOe39GPcLtxViEyZVWvSSQGFJ0vc6mQH8tUZGTD0ZmuCe9
+ cyldnd805BqsrJtAJ3/jFX6ajBjUIUBX54XKdEyzcCieRG2ViuIK4TWev
+ BqnL7yIj6bzyWSkldL4bo/9LKAWPHz62chu7Pgt9fCrUST2PaxrCTBtfw
+ 2uEcatY65yUfbckyuGY8N2exzlwkxBdQwJYvx9tg29IQCxbcrIey8YfYy
+ JEan6SeAX1IrZegIXJ6t7lcV2D5futi0eVZD2V7MsjxLy7guRaxmJuEJd
+ +HkTpbeIOVzLC13fMtpDoOlcN/PLqPVQtb8CDlth7mlj8cVekWEqkHH49 Q==;
+IronPort-SDR: mr8Gi2ver2QV83FVQYSTuph3RzVFhhL/PbXdkTPQ2tMCeOKIQV65sn/AU+s+gfiUvSPGfcR8E2
+ tzCMOA1Ioo2TcPbftyeQQeBfNxyyiS+GJU+fpZu7zt2FDQ6e1B7mi99JokHx90TKH/S8dIsf84
+ R7el5h7bvZkWygE3IYjlcM5C3a0UyR9TQdcKaQ5ielWSrJIOqkxUIAkLNDzn6fBHyY2udc7c6j
+ ghn/nOiDSxztyrlA8Vp+GtIvatjmNaOLXb9RhhLcAx2391fK2QgkF3ruNA9ugo1V3xRyz6SFoH
+ vws=
+X-IronPort-AV: E=Sophos;i="5.73,332,1583164800"; d="scan'208";a="137935152"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 02:37:04 +0800
-IronPort-SDR: 62ykwJIudIHRRjtow64sxiI8BA0AYD2N91pP12yWlaeIzbeUlFTXe4noKO0Qw9SshMrpNcK0U3
- 4pdSBbrpBFjnFu21KbDsjpgGYWGmHXlXo=
+ by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 02:37:07 +0800
+IronPort-SDR: MI8C4XM7g4JeIk3ppcnjznctMT2pgzLBJmE7lYw8h9yapS3N0sAI1e5EGCSWVk9ExKQLhCNelg
+ ZeJpJ6iQ4+1a3e0JMLAlx1dlZspTN7d9M=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Apr 2020 11:27:08 -0700
-IronPort-SDR: t3qSngCryoWVlFS84BFNntMO/IxERhDyrcbbdq/91Z0rqEFe5vKzzDqZqZIFvGKnjqusWGXeoc
- vRnfN8Fvvx1A==
+ 29 Apr 2020 11:27:11 -0700
+IronPort-SDR: spjpOaVPflTp66IWzQWIONik1mO5SVONUp1DXi70MoZa+humlSkje7dG9TNDYPiCe/XQBMcj+H
+ 31+deURj8FSg==
 WDCIronportException: Internal
 Received: from cnf007834.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.55.253])
- by uls-op-cesaip01.wdc.com with ESMTP; 29 Apr 2020 11:37:02 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 29 Apr 2020 11:37:05 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org
-Subject: [PULL 00/14] RISC-V Patch Queue for 5.1
-Date: Wed, 29 Apr 2020 11:28:42 -0700
-Message-Id: <20200429182856.2588202-1-alistair.francis@wdc.com>
+Subject: [PULL 10/14] linux-user/riscv: fix up struct target_ucontext
+ definition
+Date: Wed, 29 Apr 2020 11:28:52 -0700
+Message-Id: <20200429182856.2588202-11-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200429182856.2588202-1-alistair.francis@wdc.com>
+References: <20200429182856.2588202-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.71.154.45;
  envelope-from=prvs=381fbd49e=alistair.francis@wdc.com;
@@ -97,72 +99,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Alistair Francis <alistair.francis@wdc.com>, palmerdabbelt@google.com,
- qemu-riscv@nongnu.org, qemu-devel@nongnu.org
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit a7922a3c81f34f45b1ebc9670a7769edc4c42a43:
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
-  Open 5.1 development tree (2020-04-29 15:07:10 +0100)
+As struct target_ucontext will be transfered to signal handler, it
+must keep pace with struct ucontext_t defined in Linux kernel.
 
-are available in the Git repository at:
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 20200412020830.607-1-zhiwei_liu@c-sky.com
+Message-Id: <20200412020830.607-1-zhiwei_liu@c-sky.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ linux-user/riscv/signal.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-  git@github.com:alistair23/qemu.git tags/pull-riscv-to-apply-20200429-1
+diff --git a/linux-user/riscv/signal.c b/linux-user/riscv/signal.c
+index 83ecc6f799..67a95dbc7b 100644
+--- a/linux-user/riscv/signal.c
++++ b/linux-user/riscv/signal.c
+@@ -40,8 +40,9 @@ struct target_ucontext {
+     unsigned long uc_flags;
+     struct target_ucontext *uc_link;
+     target_stack_t uc_stack;
+-    struct target_sigcontext uc_mcontext;
+     target_sigset_t uc_sigmask;
++    uint8_t   __unused[1024 / 8 - sizeof(target_sigset_t)];
++    struct target_sigcontext uc_mcontext QEMU_ALIGNED(16);
+ };
+ 
+ struct target_rt_sigframe {
+-- 
+2.26.2
 
-for you to fetch changes up to 23766b6a35d5b1664ab782c02624bf2435c4ed5d:
-
-  hw/riscv/spike: Allow more than one CPUs (2020-04-29 11:23:44 -0700)
-
-----------------------------------------------------------------
-RISC-V pull request for 5.1
-
-This is the first pull request for the 5.1 development period. It
-contains all of the patches that were sent during the 5.0 timeframe.
-
-This is an assortment of fixes for RISC-V, including fixes for the
-Hypervisor extension, the Spike machine and an update to OpenSBI.
-
-----------------------------------------------------------------
-Alistair Francis (4):
-      riscv/sifive_u: Fix up file ordering
-      riscv/sifive_u: Add a serial property to the sifive_u SoC
-      riscv: Don't use stage-2 PTE lookup protection flags
-      riscv: AND stage-1 and stage-2 protection flags
-
-Anup Patel (4):
-      riscv: Fix Stage2 SV32 page table walk
-      hw/riscv: Add optional symbol callback ptr to riscv_load_firmware()
-      hw/riscv/spike: Allow loading firmware separately using -bios option
-      hw/riscv/spike: Allow more than one CPUs
-
-Bin Meng (3):
-      riscv/sifive_u: Add a serial property to the sifive_u machine
-      hw/riscv: Generate correct "mmu-type" for 32-bit machines
-      roms: opensbi: Upgrade from v0.6 to v0.7
-
-Corey Wharton (2):
-      riscv: sifive_e: Support changing CPU type
-      target/riscv: Add a sifive-e34 cpu type
-
-LIU Zhiwei (1):
-      linux-user/riscv: fix up struct target_ucontext definition
-
- hw/riscv/boot.c                              |  13 ++-
- hw/riscv/sifive_e.c                          |   5 +-
- hw/riscv/sifive_u.c                          | 143 ++++++++++++++++-----------
- hw/riscv/spike.c                             |  30 +++++-
- hw/riscv/virt.c                              |   6 +-
- include/hw/riscv/boot.h                      |   6 +-
- include/hw/riscv/sifive_u.h                  |   3 +
- linux-user/riscv/signal.c                    |   3 +-
- pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin | Bin 49472 -> 49520 bytes
- pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin 41280 -> 49504 bytes
- pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin 53760 -> 57936 bytes
- pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin 49664 -> 57920 bytes
- roms/opensbi                                 |   2 +-
- target/riscv/cpu.c                           |  10 ++
- target/riscv/cpu.h                           |   1 +
- target/riscv/cpu_helper.c                    |  18 ++--
- 16 files changed, 160 insertions(+), 80 deletions(-)
 
