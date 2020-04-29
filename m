@@ -2,86 +2,67 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B4EC83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCDBEC83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:58:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B26320775
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:58:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VbS0IlNM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B26320775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B42C820775
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:58:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B42C820775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTiXz-0004xu-Mt
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:58:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57782)
+	id 1jTiY1-00054u-T1
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:58:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57804)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1jTiVX-0000q6-LU
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:56:03 -0400
+ (envelope-from <jingqi.liu@intel.com>) id 1jTiVc-0000rk-53
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:56:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1jTiUr-0008KI-Al
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:55:55 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20792
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jTiUq-0008Eu-Tc
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:55:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588150511;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=e57l5YTKI4bFng9/Rv8zdl9Fcv+tUeFGml+k3HGJWHw=;
- b=VbS0IlNMlqkSBqb1C2uTi6L3Eg+nwCVq5EBT9c64RQaBtHg51wjUt3ptkj2RRfKwFxysCB
- iZyUzRFOb6NlK7xbPiOQsUZtStFJjGPMd1PdaA7VDXFI2fTHQyEL1QGcktvlqp03N1nDdg
- O6r2fVghI3QDAyb5Q3Py0It8fTTjSOU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-HJi82mMdMEKgSlHHOp0lMg-1; Wed, 29 Apr 2020 04:55:09 -0400
-X-MC-Unique: HJi82mMdMEKgSlHHOp0lMg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BE16100CC84
- for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 08:55:08 +0000 (UTC)
-Received: from [10.72.13.2] (ovpn-13-2.pek2.redhat.com [10.72.13.2])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BDFC3605CB;
- Wed, 29 Apr 2020 08:55:06 +0000 (UTC)
-Subject: Re: [PATCH 10/17] e1000: Don't run e1000_instance_init() twice
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200428163419.4483-1-armbru@redhat.com>
- <20200428163419.4483-11-armbru@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <addfb661-76cc-468f-50dd-ac691b042578@redhat.com>
-Date: Wed, 29 Apr 2020 16:55:05 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200428163419.4483-11-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 00:53:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ (envelope-from <jingqi.liu@intel.com>) id 1jTiV8-0001BE-HL
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:55:59 -0400
+Received: from mga05.intel.com ([192.55.52.43]:25913)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jingqi.liu@intel.com>)
+ id 1jTiV7-0000wb-II
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:55:30 -0400
+IronPort-SDR: 0N+vlx/ELAfT5oIF/ePZwBRbQFV+MakLSGnSBew8Ia7rpK5HlUfbfGfnClNejhKgeD92p1uR7z
+ W6/BRXBXyaqQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 29 Apr 2020 01:55:26 -0700
+IronPort-SDR: f+c7rNMlyGB4ZDKLhVjyNARVSQZ5ut6OSNUKkx1QxvDtcF0XOuLKuYpkfDpFvobpv/g3A/0yRS
+ 8QKcGSxvorZA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,331,1583222400"; d="scan'208";a="459114622"
+Received: from dazhang1-mobile.sh.intel.com ([10.239.48.70])
+ by fmsmga005.fm.intel.com with ESMTP; 29 Apr 2020 01:55:24 -0700
+From: Jingqi Liu <jingqi.liu@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Joao Martins <joao.m.martins@oracle.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ Dan Williams <dan.j.williams@intel.com>
+Subject: [PATCH v3 1/3] exec: fetch the alignment of Linux devdax pmem
+ character device nodes
+Date: Wed, 29 Apr 2020 16:50:09 +0800
+Message-Id: <20200429085011.63752-2-jingqi.liu@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200429085011.63752-1-jingqi.liu@intel.com>
+References: <20200429085011.63752-1-jingqi.liu@intel.com>
+Received-SPF: pass client-ip=192.55.52.43; envelope-from=jingqi.liu@intel.com;
+ helo=mga05.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 04:55:24
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Received-From: 192.55.52.43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,45 +74,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com
+Cc: Jingqi Liu <jingqi.liu@intel.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+If the backend file is devdax pmem character device, the alignment
+specified by the option 'align=NUM' in the '-object memory-backend-file'
+needs to match the alignment requirement of the devdax pmem character device.
 
-On 2020/4/29 =E4=B8=8A=E5=8D=8812:34, Markus Armbruster wrote:
-> QOM object initialization runs .instance_init() for the type and all
-> its supertypes; see object_init_with_type().
->
-> Both TYPE_E1000_BASE and its concrete subtypes set .instance_init() to
-> e1000_instance_init().  For the concrete subtypes, it duly gets run
-> twice.  The second run fails, but the error gets ignored (a later
-> commit will change that).
->
-> Remove it from the subtypes.
->
-> Cc: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+This patch uses the interfaces of libdaxctl to fetch the devdax pmem file
+'align', so that we can compare it with the NUM of 'align=NUM'.
+The NUM needs to be larger than or equal to the devdax pmem file 'align'.
 
+It also fixes the problem that mmap() returns failure in qemu_ram_mmap()
+when the NUM of 'align=NUM' is less than the devdax pmem file 'align'.
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Suggested-by: Dan Williams <dan.j.williams@intel.com>
+Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+---
+ exec.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 53 insertions(+), 1 deletion(-)
 
-
-> ---
->   hw/net/e1000.c | 1 -
->   1 file changed, 1 deletion(-)
->
-> diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-> index 2a69eee63f..0d2c2759e3 100644
-> --- a/hw/net/e1000.c
-> +++ b/hw/net/e1000.c
-> @@ -1824,7 +1824,6 @@ static void e1000_register_types(void)
->           type_info.parent =3D TYPE_E1000_BASE;
->           type_info.class_data =3D (void *)info;
->           type_info.class_init =3D e1000_class_init;
-> -        type_info.instance_init =3D e1000_instance_init;
->  =20
->           type_register(&type_info);
->       }
+diff --git a/exec.c b/exec.c
+index de9d949902..2c3444e47e 100644
+--- a/exec.c
++++ b/exec.c
+@@ -77,6 +77,10 @@
+ 
+ #include "monitor/monitor.h"
+ 
++#ifdef CONFIG_LIBDAXCTL
++#include <daxctl/libdaxctl.h>
++#endif
++
+ //#define DEBUG_SUBPAGE
+ 
+ #if !defined(CONFIG_USER_ONLY)
+@@ -1736,6 +1740,46 @@ static int64_t get_file_size(int fd)
+     return size;
+ }
+ 
++static int64_t get_file_align(int fd)
++{
++    int64_t align = -1;
++#if defined(__linux__) && defined(CONFIG_LIBDAXCTL)
++    struct stat st;
++
++    if (fstat(fd, &st) < 0) {
++        return -errno;
++    }
++
++    /* Special handling for devdax character devices */
++    if (S_ISCHR(st.st_mode)) {
++        g_autofree char *path = NULL;
++        g_autofree char *rpath = NULL;
++        struct daxctl_ctx *ctx;
++        struct daxctl_region *region;
++        int rc = 0;
++
++        path = g_strdup_printf("/sys/dev/char/%d:%d",
++                    major(st.st_rdev), minor(st.st_rdev));
++        rpath = realpath(path, NULL);
++
++        rc = daxctl_new(&ctx);
++        if (rc) {
++            return -1;
++        }
++
++        daxctl_region_foreach(ctx, region) {
++            if (strstr(rpath, daxctl_region_get_path(region))) {
++                align = daxctl_region_get_align(region);
++                break;
++            }
++        }
++        daxctl_unref(ctx);
++    }
++#endif /* defined(__linux__) && defined(CONFIG_LIBDAXCTL) */
++
++    return align;
++}
++
+ static int file_ram_open(const char *path,
+                          const char *region_name,
+                          bool *created,
+@@ -2275,7 +2319,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+ {
+     RAMBlock *new_block;
+     Error *local_err = NULL;
+-    int64_t file_size;
++    int64_t file_size, file_align;
+ 
+     /* Just support these ram flags by now. */
+     assert((ram_flags & ~(RAM_SHARED | RAM_PMEM)) == 0);
+@@ -2311,6 +2355,14 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+         return NULL;
+     }
+ 
++    file_align = get_file_align(fd);
++    if (file_align > 0 && mr && file_align > mr->align) {
++        error_setg(errp, "backing store align 0x%" PRIx64
++                   " is larger than 'align' option 0x" RAM_ADDR_FMT,
++                   file_align, mr->align);
++        return NULL;
++    }
++
+     new_block = g_malloc0(sizeof(*new_block));
+     new_block->mr = mr;
+     new_block->used_length = size;
+-- 
+2.17.1
 
 
