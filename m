@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A81DC83004
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 10:27:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30163C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 10:28:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 057C82074A
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 10:27:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE6252073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 10:28:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aTe4+PAm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 057C82074A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b4OiSsqj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE6252073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTjvk-0002FV-6d
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 06:27:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40136)
+	id 1jTjx4-0003ZO-AJ
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 06:28:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40440)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTjtu-0000dC-Qm
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 06:25:11 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jTjwD-00035q-K5
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 06:27:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jTjtt-0008Bk-5t
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 06:25:09 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57789
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1jTjvr-0004To-En
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 06:27:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43848
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTjts-0008BE-GE
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 06:25:08 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jTjvq-0004NL-V5
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 06:27:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588155906;
+ s=mimecast20190719; t=1588156029;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ATeedNhb8BWvoktR8zgrqM2arCeu/lSZH/hGQlswSGo=;
- b=aTe4+PAm1OcOa1v6PeYhKHIDJMdomqyBvK+CmNgbnE7RhPwiu1w7RCUTUzQjwKeW38JgYt
- hTDCEGSgEM3VELcBzIQfJKJDAIlv9qqG2j58QEWlxE1IwjUdA3SeVrZTm8aS7XyThmCFnv
- 5iy4D2wmQaBw6P+fddpauCNFUc8RuS4=
+ bh=i4KAGs+JyG23MW5XZwAlyq4LTC4Ik9fjnJKGQ7J0hZY=;
+ b=b4OiSsqjoXs/gP6cBaS89lm78t5tFIOOA7mkX669YGSk6v/ReWt+1fLugEWkjMIyLPhXX9
+ 1GGO/KlZzlxdJxCy+Xfpl3mkB6lL8fNV9wF+d9FztY+Y1jAjB07fxmgzHT/TTltSsOskza
+ 9irmUJ3pZmEAbJC1tXUUbHCDszzZPs0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-316-wzHyyWRfOJaREuilE_XDpA-1; Wed, 29 Apr 2020 06:25:04 -0400
-X-MC-Unique: wzHyyWRfOJaREuilE_XDpA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-274-iVhC5tevMbWhOKzKyw_7qQ-1; Wed, 29 Apr 2020 06:27:03 -0400
+X-MC-Unique: iVhC5tevMbWhOKzKyw_7qQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6EF31005510;
- Wed, 29 Apr 2020 10:25:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC5E145F;
+ Wed, 29 Apr 2020 10:27:01 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-113-19.ams2.redhat.com
  [10.36.113.19])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3487A648D0;
- Wed, 29 Apr 2020 10:24:59 +0000 (UTC)
-Subject: Re: [PATCH v22 3/4] qcow2: add zstd cluster compression
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C8CBE5C1C8;
+ Wed, 29 Apr 2020 10:26:59 +0000 (UTC)
+Subject: Re: [PATCH v22 4/4] iotests: 287: add qcow2 compression type test
 To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
 References: <20200428200013.24474-1-dplotnikov@virtuozzo.com>
- <20200428200013.24474-4-dplotnikov@virtuozzo.com>
+ <20200428200013.24474-5-dplotnikov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -88,23 +88,23 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <daf5a573-56a3-62b0-4387-1db73978463e@redhat.com>
-Date: Wed, 29 Apr 2020 12:24:58 +0200
+Message-ID: <9920c9a7-7442-d6de-a976-55be9f3896f9@redhat.com>
+Date: Wed, 29 Apr 2020 12:26:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200428200013.24474-4-dplotnikov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200428200013.24474-5-dplotnikov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="C7zSW8L1ZSSDK6pD6aDBhrATy5Ae1bvlh"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 00:53:13
+ boundary="AKMilsPHF4b7qyF2twp2Va858PJ923pul"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,102 +123,110 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---C7zSW8L1ZSSDK6pD6aDBhrATy5Ae1bvlh
-Content-Type: multipart/mixed; boundary="btA3phPV3IJD58AhbOWOgg5iHp61bwjMI"
+--AKMilsPHF4b7qyF2twp2Va858PJ923pul
+Content-Type: multipart/mixed; boundary="7v7bhBj0sUod4qu91strk60zVXmM3B5st"
 
---btA3phPV3IJD58AhbOWOgg5iHp61bwjMI
+--7v7bhBj0sUod4qu91strk60zVXmM3B5st
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 28.04.20 22:00, Denis Plotnikov wrote:
-> zstd significantly reduces cluster compression time.
-> It provides better compression performance maintaining
-> the same level of the compression ratio in comparison with
-> zlib, which, at the moment, is the only compression
-> method available.
->=20
-> The performance test results:
-> Test compresses and decompresses qemu qcow2 image with just
-> installed rhel-7.6 guest.
-> Image cluster size: 64K. Image on disk size: 2.2G
->=20
-> The test was conducted with brd disk to reduce the influence
-> of disk subsystem to the test results.
-> The results is given in seconds.
->=20
-> compress cmd:
->   time ./qemu-img convert -O qcow2 -c -o compression_type=3D[zlib|zstd]
->                   src.img [zlib|zstd]_compressed.img
-> decompress cmd
->   time ./qemu-img convert -O qcow2
->                   [zlib|zstd]_compressed.img uncompressed.img
->=20
->            compression               decompression
->          zlib       zstd           zlib         zstd
-> ------------------------------------------------------------
-> real     65.5       16.3 (-75 %)    1.9          1.6 (-16 %)
-> user     65.0       15.8            5.3          2.5
-> sys       3.3        0.2            2.0          2.0
->=20
-> Both ZLIB and ZSTD gave the same compression ratio: 1.57
-> compressed image size in both cases: 1.4G
+> The test checks fulfilling qcow2 requirements for the compression
+> type feature and zstd compression type operability.
 >=20
 > Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> QAPI part:
-> Acked-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Tested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  docs/interop/qcow2.txt |   1 +
->  configure              |   2 +-
->  qapi/block-core.json   |   3 +-
->  block/qcow2-threads.c  | 169 +++++++++++++++++++++++++++++++++++++++++
->  block/qcow2.c          |   7 ++
->  slirp                  |   2 +-
->  6 files changed, 181 insertions(+), 3 deletions(-)
-
-[...]
-
-> diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-> index 7dbaf53489..a0b12e1b15 100644
-> --- a/block/qcow2-threads.c
-> +++ b/block/qcow2-threads.c
-
-[...]
-
-> +static ssize_t qcow2_zstd_decompress(void *dest, size_t dest_size,
-> +                                     const void *src, size_t src_size)
+>  tests/qemu-iotests/287     | 152 +++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/287.out |  67 ++++++++++++++++
+>  tests/qemu-iotests/group   |   1 +
+>  3 files changed, 220 insertions(+)
+>  create mode 100755 tests/qemu-iotests/287
+>  create mode 100644 tests/qemu-iotests/287.out
+>=20
+> diff --git a/tests/qemu-iotests/287 b/tests/qemu-iotests/287
+> new file mode 100755
+> index 0000000000..21fe1f19f5
+> --- /dev/null
+> +++ b/tests/qemu-iotests/287
+> @@ -0,0 +1,152 @@
+> +#!/usr/bin/env bash
+> +#
+> +# Test case for an image using zstd compression
+> +#
+> +# Copyright (c) 2020 Virtuozzo International GmbH
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
+> +
+> +# creator
+> +owner=3Ddplotnikov@virtuozzo.com
+> +
+> +seq=3D"$(basename $0)"
+> +echo "QA output created by $seq"
+> +
+> +status=3D1=09# failure is the default!
+> +
+> +# standard environment
+> +. ./common.rc
+> +. ./common.filter
+> +
+> +# This tests qocw2-specific low-level functionality
+> +_supported_fmt qcow2
+> +_supported_proto file
+> +_supported_os Linux
+> +_unsupported_imgopts 'compat=3D0.10' data_file
+> +
+> +COMPR_IMG=3D"$TEST_IMG.compressed"
+> +RAND_FILE=3D"$TEST_DIR/rand_data"
+> +
+> +_cleanup()
 > +{
+> +=09_rm_test_img
 
-[...]
+_rm_test_img needs an argument (it basically replaces =93rm=94).  What I
+thus meant was to keep the _cleanup_test_img here (that was completely
+correct), but...
 
-> +    /*
-> +     * The compressed stream from the input buffer may consist of more
-> +     * than one zstd frame.
+> +=09rm -f "$COMPR_IMG"
 
-Can it?
+...to use =93_rm_test_img "$COMPR_IMG"=94 here instead of rm.
 
 Max
 
 
---btA3phPV3IJD58AhbOWOgg5iHp61bwjMI--
+--7v7bhBj0sUod4qu91strk60zVXmM3B5st--
 
---C7zSW8L1ZSSDK6pD6aDBhrATy5Ae1bvlh
+--AKMilsPHF4b7qyF2twp2Va858PJ923pul
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6pVfoACgkQ9AfbAGHV
-z0BSVAgAhxnbWg2LVnL3WigDr+AtiyqreL6zPIba21aACISsa+Rk5dL0C5y2GTuh
-SmmJrdvv5FtuEVufzmtcvXHkrv44cQc6y2BV84r4ED0ftAyYIYBZkcnDe93+wIbI
-OPax7IPs6eHHJE5tOi8cbBbh9tPI0olm1/QLcJHfbLvFehn5uYkilyJc0mqlEH3G
-a/LDxb4QbJEM0w+F6uzWi7F4uPjk5pkGu55l5sg7B5J31gVMFmd8MGWdp/ggbND+
-/YjaSJhQ09n8nDaOANmivr+VhjMRdYUZJz3unyrcbcqO7I2KAun/PRa2ErSlCNkO
-LWkvAeEa4qYfzTxWT+i4pVCE9hkjEw==
-=fGSw
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6pVnIACgkQ9AfbAGHV
+z0Dhnwf+KZYK1tN1teZG6mZcUPMMLzAbdRKQmqwMv1IAPcuVL6UBsUiIZ5Jp0FZ7
+dQdiy1udIgA/Dj2j99D8Vimwwqi/Pl0DtcGypHwCrnMaWTCJxSEIMpAEjVQXOK3O
+cjQL3OXQlXTQknFTJA1olH+9n7Lu+nwKxeiHscqER3YnUh97xGrRlSQcUY2lxQqm
+r0AjDpxD8PApLUa8URu1eg6laORLOoQAwjfPodEo/GKUpyTa+RuBFteDcK9hhGxF
+ezP01ZuAtRiNxppzhpsOQJ9fw/sT0QAVV10uijRdJUT5OWJK16ftaG4nTYdsQNd2
+QDlB4EZhlylYPtNNsTMunbxLiHhFkA==
+=q2bp
 -----END PGP SIGNATURE-----
 
---C7zSW8L1ZSSDK6pD6aDBhrATy5Ae1bvlh--
+--AKMilsPHF4b7qyF2twp2Va858PJ923pul--
 
 
