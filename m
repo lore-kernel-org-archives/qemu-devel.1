@@ -2,90 +2,87 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B1EC83004
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D4FC83004
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:33:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D9612076B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:09:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A73F214D8
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:33:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w1nNbUHk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D9612076B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RqqCsvGR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A73F214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTt11-0007c3-M8
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:09:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51014)
+	id 1jTtOy-0007pa-IA
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:33:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53372)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jTt01-0006ti-Uq
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:08:06 -0400
+ (envelope-from <eblake@redhat.com>) id 1jTtNK-0006Ls-Bs
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:32:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jTt00-00029j-S2
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:08:05 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:33897)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jTt00-00029P-Da
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:08:04 -0400
-Received: by mail-wm1-x333.google.com with SMTP id v4so5777906wme.1
- for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 13:08:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=MWJD9VHKHIRcnOU6dGwwOL9CEZLQrTExPBPRSPkn0ts=;
- b=w1nNbUHkVU99YI78lv/7S7UN0y4LHIC9tS26xgZ1+593Y8QShmMFfSJ/qwDp3O+9JL
- nsLoVPAoU6Lnj+HCOOWZQoqVQ1v09QtaZjVVmI+S42Gvg7QBuRg4vNoRv3sejhDHB2NR
- jUn0GjbWF+iYikK79VgrFQl6uRb1Ohb7fiBXvL4f7bS9y3ZirfCrrA/c1sYNddpfjAku
- i6E/AvL6RYFfpDBxicH+oKag4HYCtM5oWvlElCz9TAbihfva/28vyygnin/rAMyw2V/q
- eCyTdhpRopRO3OmC0wGEklwmOe/2bPTT0UusnbqBdXBLZg7/9CeIWWG/xSlRZACctcxx
- 4ztg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=MWJD9VHKHIRcnOU6dGwwOL9CEZLQrTExPBPRSPkn0ts=;
- b=RlrojpAwmdkMSBVIWsfNJURQW7si3xBRMGrM9PX0jJageWCkAykHsQjr+FHjhe0tFU
- AmhNuu1gSYtodp41oou15E6hUkQSV1I8h4W3YQ0gC2Mm2GDRROwesjk+/kUaoyBTHDOj
- zWCAfjVwS2ToZ5c2bZVMb7a9X3o6mol8iKivSwaj04XvWA6WNl9VJ/PpZO0ZOMQ0J+uX
- 2z0kGvLz0+XpSSDrEnjuTHiNboSB1w7hn9ppbn19M/GPakD1kMCVkn7jXaAJp4UKf9m7
- sTRIIF5YQ4hqW35smSQ+ukeJ9ogW9e5MSU219DoLjcMuRz06Ps9v5ooZpbbJ2N1RkEF5
- +uZw==
-X-Gm-Message-State: AGi0PubeMXlgyUK42OUU2bbfQ52rnWBbCygIpw8l9/JuyyHR5J8Yx+kz
- EAeAVikm2KsS/L5rQI5fBsuhFQ==
-X-Google-Smtp-Source: APiQypKgZZnA2v7pHjrcCh5gXMAeyEZSvCcpvD7mq6Cem7fu8aazV7dK6dCwwEG9WQA6XQdn04vM6A==
-X-Received: by 2002:a1c:4b16:: with SMTP id y22mr5091413wma.170.1588190882607; 
- Wed, 29 Apr 2020 13:08:02 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g186sm9459737wme.7.2020.04.29.13.08.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Apr 2020 13:08:00 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id AE6381FF7E;
- Wed, 29 Apr 2020 21:07:59 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v2] plugins: new lockstep plugin for debugging TCG changes
-Date: Wed, 29 Apr 2020 21:07:54 +0100
-Message-Id: <20200429200754.18327-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <eblake@redhat.com>) id 1jTtJS-0005vQ-LI
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:32:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47202
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jTtJQ-0005ux-WA
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:28:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588192087;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qSq3vZYAKDQjQAKE4D8xiqg+i+Lw+X1sipG4ALihLKA=;
+ b=RqqCsvGRNDizl/YOm9LEZLd8yL3QMpe8nSrzYHf1H6w/1Vjhi+vCUEuD9gfmUdKkK7B18o
+ nGgHNR0DVPeEvxExtvn3MYKy6+TNsevYaVQEQ5qVaspwMKHgfd/e3PFM38SIRGDQLYube/
+ 5bqe2SGdlzn9A/ugWp/gPpHeNkvtfdc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-433-25s0jj-SNFunHBOX-sjpjw-1; Wed, 29 Apr 2020 16:28:03 -0400
+X-MC-Unique: 25s0jj-SNFunHBOX-sjpjw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06494800C78;
+ Wed, 29 Apr 2020 20:28:01 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BCE35D780;
+ Wed, 29 Apr 2020 20:27:50 +0000 (UTC)
+Subject: Re: [PATCH v2 04/17] block/io: use int64_t bytes in driver wrappers
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200427082325.10414-1-vsementsov@virtuozzo.com>
+ <20200427082325.10414-5-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <b9daa960-b607-6ef4-9dbb-67807d4fd13c@redhat.com>
+Date: Wed, 29 Apr 2020 15:27:49 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::333;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x333.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::333
+In-Reply-To: <20200427082325.10414-5-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 14:59:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,398 +94,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, richard.henderson@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org, berto@igalia.com,
+ pavel.dovgaluk@ispras.ru, qemu-devel@nongnu.org, dillaman@redhat.com,
+ pl@kamp.de, ronniesahlberg@gmail.com, mreitz@redhat.com, den@openvz.org,
+ sheepdog@lists.wpkg.org, stefanha@redhat.com, namei.unix@gmail.com,
+ pbonzini@redhat.com, sw@weilnetz.de, jsnow@redhat.com, ari@tuxera.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When we make changes to the TCG we sometimes cause regressions that
-are deep into the execution cycle of the guest. Debugging this often
-requires comparing large volumes of trace information to figure out
-where behaviour has diverged.
+On 4/27/20 3:23 AM, Vladimir Sementsov-Ogievskiy wrote:
+> We are generally moving to int64_t for both offset and bytes parameters
+> on all io paths. Convert driver wrappers parameters which are
+> already 64bit to signed type.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   block/io.c | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/io.c b/block/io.c
+> index 1267918def..4796476835 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -1086,7 +1086,7 @@ static void bdrv_co_io_em_complete(void *opaque, int ret)
+>   }
+>   
+>   static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
+> -                                           uint64_t offset, uint64_t bytes,
+> +                                           int64_t offset, int64_t bytes,
 
-The lockstep plugin utilises a shared socket so two QEMU's running
-with the plugin will write their current execution position and wait
-to receive the position of their partner process. When execution
-diverges the plugins output where they were and the previous few
-blocks before unloading themselves and letting execution continue.
+Remains 64 bits, the question is whether any caller could pass in 
+something larger than 63 bits.  Callers are:
 
-Originally I planned for this to be most useful with -icount but it
-turns out you can get divergence pretty quickly due to asynchronous
-qemu_cpu_kick_rr_cpus() events causing one side to eventually run into
-a short block a few cycles before the other side. For this reason I've
-added a bit of tracking and I think the divergence reporting could be
-finessed to report only if we really start to diverge in execution.
+bdrv_co_do_copy_on_readv() - passes 'int64_t pnum', but sets pnum in a 
+fragmenting loop, MAX_BOUNCE_BUFFER when copy-on-read is needed, or 
+max_transfer bounded by BDRV_REQUEST_MAX_BYTES otherwise
+bdrv_aligned_preadv() - passes 'unsigned int bytes' further limited by 
+fragmenting loop on max_transfer <= INT_MAX
 
-An example run would be:
+Input is bounded to < 2G, internal use of 'bytes' is:
+drv->bdrv_co_preadv_part(uint64_t) - safe
+qemu_iovec_init_slice(size_t) - potential truncation on 32-bit platform, 
+if you don't fix qemu_iovec
+drv->bdrv_co_preadv(uint64_t) - safe
+drv->bdrv_aio_preadv(uint64_t) - safe
+drv->bdrv_co_readv(int) after assertion of <2G - safe
 
-  qemu-system-sparc -monitor none -parallel none -net none \
-    -M SS-20 -m 256 -kernel day11/zImage.elf \
-    -plugin ./tests/plugin/liblockstep.so,arg=lockstep-sparc.sock \
-    -d plugin,nochain
+>                                              QEMUIOVector *qiov,
+>                                              size_t qiov_offset, int flags)
+>   {
+> @@ -1155,7 +1155,7 @@ out:
+>   }
+>   
+>   static int coroutine_fn bdrv_driver_pwritev(BlockDriverState *bs,
+> -                                            uint64_t offset, uint64_t bytes,
+> +                                            int64_t offset, int64_t bytes,
 
-with an identical command in another window in the same working
-directory.
+Remains 64 bits, the question is whether any caller could pass in 
+something larger than 63.  Callers are:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+bdrv_co_do_copy_on_readv() - passes 'int64_t pnum', but set in a 
+fragmenting loop bounded by MAX_BOUNCE_BUFFER
+bdrv_co_do_pwrite_zeroes() - passes 'int num'
+bdrv_aligned_pwritev() - passes 'unsigned int bytes' further limited by 
+fragmenting loop on max_transfer <= INT_MAX
 
----
-v2
-  - track BlockInfo in a separate list to avoid double-free
-  - cleaner abstraction between run/exec/log state
-  - exit cleanly when out of sync
-  - more verbiage and explanation in commit message
-  - skip liblockstep in check-tcg
----
- tests/plugin/lockstep.c   | 307 ++++++++++++++++++++++++++++++++++++++
- tests/plugin/Makefile     |   1 +
- tests/tcg/Makefile.target |   2 +-
- 3 files changed, 309 insertions(+), 1 deletion(-)
- create mode 100644 tests/plugin/lockstep.c
+Input is bounded to < 2G, internal use of 'bytes' is:
+drv->bdrv_co_pwritev_part(uint64_t) - safe
+qemu_iovec_init_slice(size_t) - potential truncation on 32-bit platform, 
+if you don't fix qemu_iovec
+drv->bdrv_co_pwritev(uint64_t) - safe
+drv->bdrv_aio_pwritev(uint64_t) - safe
+drv->bdrv_co_writev(int) after assertion of <2G - safe
 
-diff --git a/tests/plugin/lockstep.c b/tests/plugin/lockstep.c
-new file mode 100644
-index 0000000000..b8a60cdc6b
---- /dev/null
-+++ b/tests/plugin/lockstep.c
-@@ -0,0 +1,307 @@
-+/*
-+ * Lockstep Execution Plugin
-+ *
-+ * Allows you to execute two QEMU instances in lockstep and report
-+ * when their execution diverges. This is mainly useful for developers
-+ * who want to see where a change to TCG code generation has
-+ * introduced a subtle and hard to find bug.
-+ *
-+ * Caveats:
-+ *   - single-threaded linux-user apps only with non-deterministic syscalls
-+ *   - no MTTCG enabled system emulation (icount may help)
-+ *
-+ * While icount makes things more deterministic it doesn't mean a
-+ * particular run may execute the exact same sequence of blocks. An
-+ * asynchronous event (for example X11 graphics update) may cause a
-+ * block to end early and a new partial block to start. This means
-+ * serial only test cases are a better bet. -d nochain may also help.
-+ *
-+ * This code is not thread safe!
-+ *
-+ * Copyright (c) 2020 Linaro Ltd
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include <glib.h>
-+#include <inttypes.h>
-+#include <unistd.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+#include <stdio.h>
-+#include <errno.h>
-+
-+#include <qemu-plugin.h>
-+
-+QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-+
-+/* saved so we can uninstall later */
-+static qemu_plugin_id_t our_id;
-+
-+static unsigned long bb_count;
-+static unsigned long insn_count;
-+
-+/* Information about a translated block */
-+typedef struct {
-+    uint64_t pc;
-+    uint64_t insns;
-+} BlockInfo;
-+
-+/* Information about an execution state in the log */
-+typedef struct {
-+    BlockInfo *block;
-+    unsigned long insn_count;
-+    unsigned long block_count;
-+} ExecInfo;
-+
-+/* The execution state we compare */
-+typedef struct {
-+    uint64_t pc;
-+    unsigned long insn_count;
-+} ExecState;
-+
-+/* list of translated block info */
-+static GSList *blocks;
-+
-+/* execution log and points of divergence */
-+static GSList *log, *divergence_log;
-+
-+static int divergence_count;
-+static int max_divergence = 10;
-+
-+static int socket_fd;
-+static char *path_to_unlink;
-+
-+
-+static void plugin_cleanup(qemu_plugin_id_t id)
-+{
-+    /* Free our block data */
-+    g_slist_free_full(blocks, &g_free);
-+    g_slist_free_full(log, &g_free);
-+    g_slist_free(divergence_log);
-+
-+    close(socket_fd);
-+    if (path_to_unlink) {
-+        unlink(path_to_unlink);
-+    }
-+}
-+
-+static void plugin_exit(qemu_plugin_id_t id, void *p)
-+{
-+    g_autoptr(GString) out = g_string_new("No divergence :-)\n");
-+    g_string_append_printf(out, "Executed %ld/%d blocks\n",
-+                           bb_count, g_slist_length(log));
-+    g_string_append_printf(out, "Executed ~%ld instructions\n", insn_count);
-+    qemu_plugin_outs(out->str);
-+
-+    plugin_cleanup(id);
-+}
-+
-+static void report_divergance(ExecState *us, ExecState *them)
-+{
-+    int i;
-+    GSList *entry = log;
-+    g_autoptr(GString) out = g_string_new("I feel the ");
-+
-+    divergence_count++;
-+
-+    g_string_append_printf(out,
-+                           "%d%s divergence in the force\n", divergence_count,
-+                           divergence_count > 3 ? "th" :
-+                           divergence_count == 3 ? "rd" :
-+                           divergence_count == 2 ? "nd" : "st");
-+
-+    g_string_append_printf(out,
-+                           "We have executed ~%ld instructions over %ld blocks\n",
-+                           insn_count, bb_count);
-+    g_string_append_printf(out, "We are  @ %#016lx vs %#016lx\n", us->pc, them->pc);
-+
-+    for (i = 0; i < 3; i++) {
-+        ExecInfo *prev = (ExecInfo *) entry->data;
-+        g_string_append_printf(out, "  previously @ %#016lx/%ld (%ld insn, %ld blocks)\n",
-+                               prev->block->pc, prev->block->insns,
-+                               prev->insn_count, prev->block_count);
-+        entry = g_slist_next(entry);
-+    }
-+
-+    qemu_plugin_outs(out->str);
-+
-+    /* Do we continue or uninstall ourselves */
-+    if (divergence_count > max_divergence) {
-+        qemu_plugin_outs("too much divergence... giving up.");
-+        qemu_plugin_uninstall(our_id, plugin_cleanup);
-+    }
-+}
-+
-+static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
-+{
-+    BlockInfo *bi = (BlockInfo *) udata;
-+    ExecState us, them;
-+    ssize_t bytes;
-+    ExecInfo *exec;
-+
-+    us.pc = bi->pc;
-+    us.insn_count = insn_count;
-+
-+    /*
-+     * Write our current position to the other end. If we fail the
-+     * other end has probably died and we should shut down gracefully.
-+     */
-+    bytes = write(socket_fd, &us, sizeof(ExecState));
-+    if (bytes < sizeof(ExecState)) {
-+        qemu_plugin_outs(bytes < 0 ?
-+                         "problem writing to socket" :
-+                         "wrote less than expected to socket");
-+        qemu_plugin_uninstall(our_id, plugin_cleanup);
-+        return;
-+    }
-+
-+    /*
-+     * Now read where our peer has reached. Again a failure probably
-+     * indicates the other end died and we should close down cleanly.
-+     */
-+    bytes = read(socket_fd, &them, sizeof(ExecState));
-+    if (bytes < sizeof(ExecState)) {
-+        qemu_plugin_outs(bytes < 0 ?
-+                         "problem reading from socket" :
-+                         "read less than expected");
-+        qemu_plugin_uninstall(our_id, plugin_cleanup);
-+        return;
-+    }
-+
-+    /*
-+     * Compare and bail out if we have diverged. It may be a temporary
-+     * blip so save the position we were in to the divergence log for
-+     * later.
-+     */
-+    if (us.pc != them.pc) {
-+        report_divergance(&us, &them);
-+        divergence_log = g_slist_prepend(divergence_log, log);
-+    }
-+
-+    /*
-+     * Assume this block will execute fully and record it
-+     * in the execution log.
-+     */
-+    insn_count += bi->insns;
-+    bb_count++;
-+    exec = g_new0(ExecInfo, 1);
-+    exec->block = bi;
-+    exec->insn_count = insn_count;
-+    exec->block_count = bb_count;
-+    log = g_slist_prepend(log, exec);
-+}
-+
-+static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-+{
-+    BlockInfo *bi = g_new0(BlockInfo, 1);
-+    bi->pc = qemu_plugin_tb_vaddr(tb);
-+    bi->insns = qemu_plugin_tb_n_insns(tb);
-+
-+    // save a reference so we can free later
-+    blocks = g_slist_prepend(blocks, bi);
-+    qemu_plugin_register_vcpu_tb_exec_cb(tb, vcpu_tb_exec,
-+                                         QEMU_PLUGIN_CB_NO_REGS, (void *)bi);
-+}
-+
-+
-+/*
-+ * Instead of encoding master/slave status into what is essentially
-+ * two peers we shall just take the simple approach of checking for
-+ * the existence of the pipe and assuming if it's not there we are the
-+ * first process.
-+ */
-+static bool setup_socket(const char *path)
-+{
-+    struct sockaddr_un sockaddr;
-+    int fd;
-+
-+    fd = socket(AF_UNIX, SOCK_STREAM, 0);
-+    if (fd < 0) {
-+        perror("create socket");
-+        return false;
-+    }
-+
-+    sockaddr.sun_family = AF_UNIX;
-+    g_strlcpy(sockaddr.sun_path, path, sizeof(sockaddr.sun_path) - 1);
-+    if (bind(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {
-+        perror("bind socket");
-+        close(fd);
-+        return false;
-+    }
-+
-+    /* remember to clean-up */
-+    path_to_unlink = g_strdup(path);
-+
-+    if (listen(fd, 1) < 0) {
-+        perror("listen socket");
-+        close(fd);
-+        return false;
-+    }
-+
-+    socket_fd = accept(fd, NULL, NULL);
-+    if (socket_fd < 0 && errno != EINTR) {
-+        perror("accept socket");
-+        return false;
-+    }
-+
-+    qemu_plugin_outs("setup_socket::ready\n");
-+
-+    return true;
-+}
-+
-+static bool connect_socket(const char *path)
-+{
-+    int fd;
-+    struct sockaddr_un sockaddr;
-+
-+    fd = socket(AF_UNIX, SOCK_STREAM, 0);
-+    if (fd < 0) {
-+        perror("create socket");
-+        return false;
-+    }
-+
-+    sockaddr.sun_family = AF_UNIX;
-+    g_strlcpy(sockaddr.sun_path, path, sizeof(sockaddr.sun_path) - 1);
-+
-+    if (connect(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {
-+        perror("failed to connect");
-+        return false;
-+    }
-+
-+    qemu_plugin_outs("connect_socket::ready\n");
-+
-+    socket_fd = fd;
-+    return true;
-+}
-+
-+static bool setup_unix_socket(const char *path)
-+{
-+    if (g_file_test(path, G_FILE_TEST_EXISTS)) {
-+        return connect_socket(path);
-+    } else {
-+        return setup_socket(path);
-+    }
-+}
-+
-+
-+QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
-+                                           const qemu_info_t *info,
-+                                           int argc, char **argv)
-+{
-+    if (!argc || !argv[0]) {
-+        qemu_plugin_outs("Need a socket path to talk to other instance.");
-+        return -1;
-+    }
-+
-+    if (!setup_unix_socket(argv[0])) {
-+        qemu_plugin_outs("Failed to setup socket for communications.");
-+        return -1;
-+    }
-+
-+    our_id = id;
-+
-+    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-+    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
-+    return 0;
-+}
-diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
-index 75467b6db8..b3250e2504 100644
---- a/tests/plugin/Makefile
-+++ b/tests/plugin/Makefile
-@@ -13,6 +13,7 @@ NAMES += mem
- NAMES += hotblocks
- NAMES += howvec
- NAMES += hotpages
-+NAMES += lockstep
- 
- SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
- 
-diff --git a/tests/tcg/Makefile.target b/tests/tcg/Makefile.target
-index b3cff3cad1..075daf3d22 100644
---- a/tests/tcg/Makefile.target
-+++ b/tests/tcg/Makefile.target
-@@ -128,7 +128,7 @@ RUN_TESTS=$(patsubst %,run-%, $(TESTS))
- ifeq ($(CONFIG_PLUGIN),y)
- PLUGIN_DIR=../../plugin
- VPATH+=$(PLUGIN_DIR)
--PLUGINS=$(notdir $(wildcard $(PLUGIN_DIR)/*.so))
-+PLUGINS=$(filter-out liblockstep.so,$(notdir $(wildcard $(PLUGIN_DIR)/*.so)))
- 
- # We need to ensure expand the run-plugin-TEST-with-PLUGIN
- # pre-requistes manually here as we can't use stems to handle it. We
+>                                               QEMUIOVector *qiov,
+>                                               size_t qiov_offset, int flags)
+>   {
+> @@ -1235,8 +1235,8 @@ emulate_flags:
+>   }
+>   
+>   static int coroutine_fn
+> -bdrv_driver_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+> -                               uint64_t bytes, QEMUIOVector *qiov,
+> +bdrv_driver_pwritev_compressed(BlockDriverState *bs, int64_t offset,
+> +                               int64_t bytes, QEMUIOVector *qiov,
+>                                  size_t qiov_offset)
+
+Remains 64 bits, the question is whether any caller could pass in 
+something larger than 63.  Callers are:
+
+bdrv_aligned_pwritev() - passes 'unsigned int bytes'
+
+Input is bounded to < 4G, internal use of 'bytes' is:
+drv->bdrv_co_pwritev_compressed_part(uint64_t) - safe
+drv->bdrv_co_pwritev_compressed(uint64_t) - safe
+qemu_iovec_init_slice(size_t) - potential truncation on 32-bit platform, 
+if you don't fix qemu_iovec
+
+Because our input is bounded, all of the changes made here have no 
+semantic impact, and I argue this patch is safe.  However, I also 
+pointed out the spots where we have latent bugs (on 32-bit machines 
+only) if the callers are relaxed to pass larger than 2G or 4G.  As long 
+as you are auditing things, it would be nice to either fix that in this 
+patch, or document in the commit message how a future patch will address 
+that latent problem (whether by enforcing max_transfer to be capped at 
+2G on 32-bit platforms, or else fixing qemu_iovec to use int64_t instead 
+of size_t bounds).
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 -- 
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
