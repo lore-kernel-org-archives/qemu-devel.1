@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92A0AC83004
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:40:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5981DC83004
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:42:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F255206D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:40:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EDD9206D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 20:42:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="G3g8jzv8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F255206D9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="VsFa0xCm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EDD9206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTtVI-0006iV-FM
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:40:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53848)
+	id 1jTtXW-0001t4-5U
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 16:42:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53834)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTtOm-0007yM-Ql
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:37:23 -0400
+ id 1jTtOl-0007wK-Ar
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:37:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTtO7-0006bf-CF
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:33:40 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:7545)
+ id 1jTtO5-0006Nc-L1
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 16:33:39 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:7550)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=381fbd49e=alistair.francis@wdc.com>)
- id 1jTtK1-00065g-Dd; Wed, 29 Apr 2020 16:28:45 -0400
+ id 1jTtK0-000664-Cm; Wed, 29 Apr 2020 16:28:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1588192125; x=1619728125;
+ t=1588192124; x=1619728124;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=tbkmc57R+L0aN9VLZbhIXSvamug7nnx7kvOn3zmvZfk=;
- b=G3g8jzv8tmRsodo0wi7IaCnBUcs7v3FJywM0oD6UbQ6VHfh6IpAGMEbA
- p/8qpmjb2V2C+eDCOOgOFrPiS/yHdUxF/uha5WkRmr77D85xfa0sp18ja
- AfP7GDO2bdFic4aZ7+ZAsiN/I2MS6jB+lGP/mjNQRJSDWE4+Cfoe2XXl7
- LPpoM5Hox9eIC4cD5tvehf7jQUhPwCqNFhqks+/hUMVvc0ZOIDAXGnhse
- LtZFIrIWtZDN/Wsj6nJuOdz2zwoC8zX1TRkrqoCYgo4T8HKRi9y+3DA9r
- ni/crW0h46Whoh9JP1c/epAdAjZX0ICFaXa5rUkBqtecsCe2ZSTh65ZqX g==;
-IronPort-SDR: NIoKf+cFCClzysUNxEvqxWkqARc7NJ7yAwzVRtllxSL32dqtmm9pKkxDMSICtQuAoJOO+WruQ5
- f9aoPw7zvRS1z8+JrKoE0GfUHKIU6krhgxyLKGwtRVUi6E8V1Yq0du3nuRfOp3E1nuerbkTTSu
- PL4/r46/kA+i1BoUcBSC742mD2g+A/IUlF6gVMEUTA2lL7cStxTaRrIS2gtx6Ma3SnLjm9soc6
- SYtsYXPcq2vwwMBSFBQWbhLwV0EVug+ZggvV1SjOIsmJfpvnQzqF/cTVj6fS+9QNn+0RM68suF
- VtI=
-X-IronPort-AV: E=Sophos;i="5.73,333,1583164800"; d="scan'208";a="136507039"
+ bh=HwZtWSsiHzCN/1ubqwhEIMjajFwjKCAraFEUeH9ODUA=;
+ b=VsFa0xCmWv58o5UjlXSFL3cGcx0A5CSEhJaIftl4Rl31JhDVrNZOp6jw
+ CXh0ZPrO0uymoH/HEVODaRMPo8Z9SKYaK81qFuJrB02hI0Kf84tX7y2RR
+ JA+E5f/TgI1vKDh9SEOsxx/aR4O6nU2cPr/nEjeG4mCt78lxY0chO7fWB
+ Aj2nnQos2J49RyXhrYGraoCjFB786MX+b4Qrzdm2MBVMW/bLxKLlmoYUk
+ KTcKsppycbcnH3vAuHUMZ6TKZYAZzgXsD3sB+hlhWRrlW3EISMaHl2GaK
+ Xnuo5O6qNSGYWUSLH0/U+V8zyVOrT540gfeLIfe1Qan5ZulfHecy2OLdP g==;
+IronPort-SDR: 5S7kMxr8GlNJ/JwTY1MnWj4em9FbrZuhrVzKH4SZIdYV2RyfKk/Sr30oyPLLX3dzslDj6684Eg
+ plHCLxjGV6rbiQl352zjEPZ5fsLr3g+OJuRrj2BaZIn6Tbj3/ysZtVuV5IarMNvZheEWp4zSF4
+ tOZNexBhAFWaRA7YpE0YoDKMo3KQhkSc2GrpKG0gdi1gkyvMi7bx6wPUUgJ/eDzUFBN2ug+Xnj
+ zgLWNwreWzw1mLHUjqnxGvDyCzdvDPaGLblHIXAWyrQdUFlbrYj3RLqWHtpSQtnGO7bB9+DlZX
+ 5g8=
+X-IronPort-AV: E=Sophos;i="5.73,333,1583164800"; d="scan'208";a="136507037"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 04:28:40 +0800
-IronPort-SDR: GhA83PvkdXTUo4VE7/y+lgk2KVRVsan7A42BSCZEtE8aY2KXeOmNyYTBTZQKP+zWupKS1pK4PL
- KJEjfEjpKx7FXStem15+p53nhKrG5d7/w=
+ by ob1.hgst.iphmx.com with ESMTP; 30 Apr 2020 04:28:39 +0800
+IronPort-SDR: gM8GNChzYhyRtP9MioW/wC4dIuUcRCwIaw92kiFDDw2gnvLjMzMBIk6cN+UxsXkJY0rhlanmor
+ pRu6yhlErltW/dGcXh7oE9WDcfrRVnLIg=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Apr 2020 13:18:44 -0700
-IronPort-SDR: huJC9rIB9WDsoyYH0o1FEdzO+tBW8DKawmjdTWhFUDuvyaqFY6dyQ+k4GvqLc7QCXZxvywgpai
- YkWXOZIC3hYg==
+ 29 Apr 2020 13:18:43 -0700
+IronPort-SDR: ivu4pp9LberV3klvUqlgh27iE5bqSsINHNYRmPQ4OBN+JXg0hbam44v37YWOZtyxOE0CYewUYZ
+ nchRn5JYBZQw==
 WDCIronportException: Internal
 Received: from usa004631.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.56.145])
  by uls-op-cesaip01.wdc.com with ESMTP; 29 Apr 2020 13:28:39 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 09/14] target/riscv: Add a sifive-e34 cpu type
-Date: Wed, 29 Apr 2020 13:20:01 -0700
-Message-Id: <20200429202006.775322-10-alistair.francis@wdc.com>
+Subject: [PULL v2 07/14] hw/riscv: Generate correct "mmu-type" for 32-bit
+ machines
+Date: Wed, 29 Apr 2020 13:19:59 -0700
+Message-Id: <20200429202006.775322-8-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200429202006.775322-1-alistair.francis@wdc.com>
 References: <20200429202006.775322-1-alistair.francis@wdc.com>
@@ -97,69 +98,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Corey Wharton <coreyw7@fb.com>,
- palmerdabbelt@google.com, qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>, palmerdabbelt@google.com,
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Bin Meng <bmeng.cn@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Corey Wharton <coreyw7@fb.com>
+From: Bin Meng <bmeng.cn@gmail.com>
 
-The sifive-e34 cpu type is the same as the sifive-e31 with the
-single precision floating-point extension enabled.
+32-bit machine should have its CPU's "mmu-type" set to "riscv,sv32".
 
-Signed-off-by: Corey Wharton <coreyw7@fb.com>
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
-Message-id: 20200313193429.8035-3-coreyw7@fb.com
-Message-Id: <20200313193429.8035-3-coreyw7@fb.com>
+Message-id: 1583585319-26603-1-git-send-email-bmeng.cn@gmail.com
+Message-Id: <1583585319-26603-1-git-send-email-bmeng.cn@gmail.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/cpu.c | 10 ++++++++++
- target/riscv/cpu.h |  1 +
- 2 files changed, 11 insertions(+)
+ hw/riscv/sifive_u.c | 4 ++++
+ hw/riscv/spike.c    | 4 ++++
+ hw/riscv/virt.c     | 4 ++++
+ 3 files changed, 12 insertions(+)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 4e578239d3..059d71f2c7 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -164,6 +164,15 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
-     set_feature(env, RISCV_FEATURE_PMP);
- }
- 
-+static void rv32imafcu_nommu_cpu_init(Object *obj)
-+{
-+    CPURISCVState *env = &RISCV_CPU(obj)->env;
-+    set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVC | RVU);
-+    set_priv_version(env, PRIV_VERSION_1_10_0);
-+    set_resetvec(env, DEFAULT_RSTVEC);
-+    set_feature(env, RISCV_FEATURE_PMP);
-+}
-+
- #elif defined(TARGET_RISCV64)
- 
- static void riscv_base64_cpu_init(Object *obj)
-@@ -610,6 +619,7 @@ static const TypeInfo riscv_cpu_type_infos[] = {
- #if defined(TARGET_RISCV32)
-     DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base32_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32imafcu_nommu_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init),
-     /* Depreacted */
-     DEFINE_CPU(TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_init),
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 7d21addbab..d0e7f5b9c5 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -36,6 +36,7 @@
- #define TYPE_RISCV_CPU_BASE32           RISCV_CPU_TYPE_NAME("rv32")
- #define TYPE_RISCV_CPU_BASE64           RISCV_CPU_TYPE_NAME("rv64")
- #define TYPE_RISCV_CPU_SIFIVE_E31       RISCV_CPU_TYPE_NAME("sifive-e31")
-+#define TYPE_RISCV_CPU_SIFIVE_E34       RISCV_CPU_TYPE_NAME("sifive-e34")
- #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e51")
- #define TYPE_RISCV_CPU_SIFIVE_U34       RISCV_CPU_TYPE_NAME("sifive-u34")
- #define TYPE_RISCV_CPU_SIFIVE_U54       RISCV_CPU_TYPE_NAME("sifive-u54")
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 8d0ee8b9c4..e32355a691 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -160,7 +160,11 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+         qemu_fdt_add_subnode(fdt, nodename);
+         /* cpu 0 is the management hart that does not have mmu */
+         if (cpu != 0) {
++#if defined(TARGET_RISCV32)
++            qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv32");
++#else
+             qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
++#endif
+             isa = riscv_isa_string(&s->soc.u_cpus.harts[cpu - 1]);
+         } else {
+             isa = riscv_isa_string(&s->soc.e_cpus.harts[0]);
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index 5053fe4590..98697a244e 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -102,7 +102,11 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+         qemu_fdt_add_subnode(fdt, nodename);
++#if defined(TARGET_RISCV32)
++        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv32");
++#else
+         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
++#endif
+         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+         qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index 85ec9e22aa..c621a970aa 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -229,7 +229,11 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+         qemu_fdt_add_subnode(fdt, nodename);
++#if defined(TARGET_RISCV32)
++        qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv32");
++#else
+         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
++#endif
+         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+         qemu_fdt_setprop_string(fdt, nodename, "status", "okay");
 -- 
 2.26.2
 
