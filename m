@@ -2,42 +2,44 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AFD3C83003
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B5CC83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:51:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C8EF20731
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:43:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C8EF20731
+	by mail.kernel.org (Postfix) with ESMTPS id 4495520775
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:51:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4495520775
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTiJU-0004zj-9H
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:43:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56302)
+	id 1jTiR4-0007ZB-A1
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:51:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57026)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jTiIl-0004SV-FN
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:42:45 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jTiP5-0006xJ-9L
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jTiIi-0008Cn-Uj
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:42:43 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:33809)
+ (envelope-from <laurent@vivier.eu>) id 1jTiOo-0002fx-6k
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:49:15 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:42149)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jTiIi-0008Cb-CQ
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:42:40 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jTiOn-0002do-KR
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:48:57 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MIcux-1jQ57o3pAL-00EhMy; Wed, 29 Apr 2020 10:42:22 +0200
-To: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N7Qp1-1j6TyP0mc9-017m8Y; Wed, 29 Apr 2020 10:48:40 +0200
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>
 References: <1588094279-17913-1-git-send-email-frederic.konrad@adacore.com>
  <1588094279-17913-2-git-send-email-frederic.konrad@adacore.com>
+ <87d07rlac5.fsf@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,37 +84,37 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
 Subject: Re: [PATCH 1/2] softfloat: m68k: infinity is a valid encoding
-Message-ID: <55a6feb0-38ba-432f-82cb-06c5694c325a@vivier.eu>
-Date: Wed, 29 Apr 2020 10:42:20 +0200
+Message-ID: <9f6c1efc-a195-0f5d-8c34-4dfb45d910f8@vivier.eu>
+Date: Wed, 29 Apr 2020 10:48:38 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <1588094279-17913-2-git-send-email-frederic.konrad@adacore.com>
+In-Reply-To: <87d07rlac5.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:QwMDEc0ntaibV1eqgwI/PrJEeLCDrSqhxb/O9dJJGPPt/8YUN+Z
- DV3HeX+sVIMgcHlgeAwXVQnPgCcXEWkrDWDoO09WCekXu0lt7HvR8yQ82RyLCJNYJn6n5U+
- iKGtXgWiKQ4qXiomLJa7fTDYSsUfGp8Id0/SE07FkQUqaRHZgYEgNXhEDBQF7TuT9BTI5cW
- gAXo2IM1x4je3WJxMb3Tg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:SwO1N+IWciQ=:XIEGAdzQ6un7S5e96sy5Pb
- iNDGhGyh5HHac1MlqG5+D9+CEMxpasCZOjuq8u86PIqKukW0Et3yzYGaH8j9nZyYwhwOwF6nT
- ltJflfITZ1NBp/WeJLfYPZExzGTCBtefJPlGQZ1Kz/6SXXOffNP4P8SljejtM5UvGTeb89Nd/
- YdYWUVVJUXVHiRrQ9WCCnhJJYevfPCngp5SpLmzRJKbrXJnY3wsLQ4KOhSPzt2Z7C45t6LMzG
- 9YoOvB7UvkwZxYuHTAAthkelIO9sDSx4IRYcQf91W6xQ9zEjlhO0nQKNhaN6Fzr9diEHh1wrG
- SFZOyTUepAz/if9pZGxulOF8Rp0+fypl7K6PGK2bhPrirkcXTIdz+wGFzMurOdfYSv+HAADCp
- f8Cft1ZQ4DHn2zQlA5r49w04LJ1CgBb+YkPDFLe8tIYtW4tqJikS5S+E6pU97VCck01lt9DJw
- HPARqq4uN0y29+rrttByamN6f6GpWur1aqYAzdQqPhhCxZk3WyQmclOc59YSUEZwUEXbfggXj
- jnqmMBzUf3G6RsEC00R1OnXl8VFrXrG3U3gzy/FBPARrJCy9LXd0LExcyH/eCHoLk/LXAesdj
- k2G44oGvKBz5fT5TpI14VWYvvJViCCB+5UFiJQ9zUSoTyA9Hspkcx2Jp6MzLlQpleWkWd9pOo
- Rs/5SiNl+TAfcOgdP7zo1NQC16OxMzFc/bAH2ORp6yx2Y2TcBh8XFp+FmAcWEKOTdU2HeMAjl
- c1cn2uQH+CmZlL3A95k4rw3cpE3GEE/cr1IxO81bquRUYewN/IouR1ktKK699L7zpOS/CGPcs
- c/jWIV/QfRgT51JbVc3AL78Awv31C7f6dj6QJvr71DClxF4BTT1KdhWLhBW8Ff+L6mPWnLA
-Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:sDVfGgviY7+KIDWpkCw5vFgKsb3A7ixHtOUYZ6kCOqBTF+WIKx0
+ VhBiaCH6zJrm+rQfQ+Tc/ZTS3lQASxYZVCudok2XS6NRxyko5kxHhkMSuIhQznSKs98c66u
+ GCwtDVQAkUCaA4WVQT3Ya3XlsKfd9FqZKjSuzsFg4NfhTQGWKEHCGq5M2u+Rj1WCLPNcZNG
+ jlygotr+KrgAkaIoOulxg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:+B12m7Hs4Vs=:2QDEM42TZRlrRCRfJTj1P/
+ dojiHtpB+v4WP3akJBkwWb79avuD825NaEkliZurDrH19cw8ECVMXwpJSkH781qIDWcfnYc9F
+ DnBWxoUEBneGrgfONtioV8uYIMx4pbWXsvJyFMmBhluBSIIf1OqKuRDXhRq5aHTrjjGhWPkdb
+ qO9VnDJ2w6j3+5RrOXnOIdhZco0ARbyIumBon6UEKP7MHsN9iGwDW+8cd68jIo5R6VTvQLUmr
+ FQo8mwvyCgxh4M+VJg3Yv4PhGErH5O6mLTmtTITtBWnnbjmvvGo6/7JWGKScGsrHgXyqyxcoT
+ Ms/m1i82V6CwC8+RdNc87k1o9sIgCFLA6G7yUg1u7194wvanqSl1qokXXU+XdoEHLFWLFHHtq
+ rz53XADnaiing62PYi97nmXHxb4dRlvgL6oF4tnwGAB3Nk9qNL0md1vFlO3jf+Ah/6EW0YKV0
+ wDOOpGi4b5KlXTeLhx9pGORGSF+6aX5bpPLA2DreoMhdbRlgRYxdQG1WzN/4a9Vh97yS+x9bf
+ urwVMapieRsC1GiUhNylYjOxviWHHuQAsvq2G1/smXj2049bnczoYdnZk8x0xlPJZTcAMF3n5
+ WDFJkmqpaNdmWKfmo/cPjeNmhX4WtPfiMWlT2jRPFuv1aO8wbIjrBGp6UlFYb8TIPkOsGSS/3
+ sV/4dddqzng0PJCywQnaOBP0DBBnuQtPfvdKDzH4TE74I5zgwhMcMqLyl6hfAWUfKNXecGqsl
+ yrAwEiU+MvF4YcI7vd5vUQZIDADZbDRWiCaPwN8lvO8kkb4bjq2YC1L0TU1myYg7WI/Krux9r
+ KZX9pgrKWPU4cnLMev+T1xkm6qB6KVMxy6x1Qa+TTt5eqHA8MGhufwsBKM3NS3/qd2Gzdtn
+Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 04:42:38
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 04:48:56
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 217.72.192.75
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,129 +126,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, alex.bennee@linaro.org,
- Pierre Muller <pierre@freepascal.org>, Aurelien Jarno <aurelien@aurel32.net>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, philmd@redhat.com,
+ qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 28/04/2020 à 19:17, KONRAD Frederic a écrit :
-> The MC68881 say about infinities (3.2.4):
+Le 28/04/2020 à 20:43, Alex Bennée a écrit :
 > 
-> "*For the extended precision format, the most significant bit of the
-> mantissa (the integer bit) is a don't care."
+> KONRAD Frederic <frederic.konrad@adacore.com> writes:
 > 
-> https://www.nxp.com/docs/en/reference-manual/MC68881UM.pdf
+>> The MC68881 say about infinities (3.2.4):
+>>
+>> "*For the extended precision format, the most significant bit of the
+>> mantissa (the integer bit) is a don't care."
+>>
+>> https://www.nxp.com/docs/en/reference-manual/MC68881UM.pdf
+>>
+>> The m68k extended format is implemented with the floatx80 and
+>> floatx80_invalid_encoding currently treats 0x7fff00000000000000000000 as
+>> an invalid encoding.  This patch fixes floatx80_invalid_encoding so it
+>> accepts that the most significant bit of the mantissa can be 0.
+>>
+>> This bug can be revealed with the following code which pushes extended
+>> infinity on the stack as a double and then reloads it as a double.  It
+>> should normally be converted and read back as infinity and is currently
+>> read back as nan:
+> 
+> Do you have any real HW on which you could record some .ref files for
+> the various multiarch float tests we have (float_convs/float_madds)?
+> Does this different of invalid encoding show up when you add them?
 
-As we use 68040 I refer to:
+On my side, in the past when I started to implement m68k FPU, I used
+TestFloat and SoftFloat I have ported to m68k and I compare the result
+in QEMU and in a Quadra 800.
 
-https://www.nxp.com/files-static/archives/doc/ref_manual/M68000PRM.pdf
+https://github.com/vivier/m68k-testfloat
+https://github.com/vivier/m68k-softfloat
 
-> 
-> The m68k extended format is implemented with the floatx80 and
-> floatx80_invalid_encoding currently treats 0x7fff00000000000000000000 as
-> an invalid encoding.  This patch fixes floatx80_invalid_encoding so it
-> accepts that the most significant bit of the mantissa can be 0.
-> 
-> This bug can be revealed with the following code which pushes extended
-> infinity on the stack as a double and then reloads it as a double.  It
-> should normally be converted and read back as infinity and is currently
-> read back as nan:
-> 
->         .global _start
->         .text
-> _start:
->         lea val, %a0
->         lea fp, %fp
->         fmovex (%a0), %fp0
->         fmoved %fp0, %fp@(-8)
->         fmoved %fp@(-8), %fp0
-> end:
->         bra end
-> 
-> .align 0x4
-> val:
->         .fill 1, 4, 0x7fff0000
->         .fill 1, 4, 0x00000000
->         .fill 1, 4, 0x00000000
-> .align 0x4
->         .fill 0x100, 1, 0
-> fp:
-> 
-> -------------
-> 
-> (gdb) tar rem :1234
-> Remote debugging using :1234
-> _start () at main.S:5
-> 5              lea val, %a0
-> (gdb) display $fp0
-> 1: $fp0 = nan(0xffffffffffffffff)
-> (gdb) si
-> 6             lea fp, %fp
-> 1: $fp0 = nan(0xffffffffffffffff)
-> (gdb) si
-> _start () at main.S:7
-> 7              fmovex (%a0), %fp0
-> 1: $fp0 = nan(0xffffffffffffffff)
-> (gdb) si
-> 8             fmoved %fp0, %fp@(-8)
-> 1: $fp0 = inf
-> (gdb) si
-> 9             fmoved %fp@(-8), %fp0
-> 1: $fp0 = inf
-> (gdb) si
-> end () at main.S:12
-> 12          bra end
-> 1: $fp0 = nan(0xfffffffffffff800)
-> (gdb) x/1xg $fp-8
-> 0x40000120 <val+260>:   0x7fffffffffffffff
-> 
-> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
-> ---
->  include/fpu/softfloat.h | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-> index ecb8ba0..dc80298 100644
-> --- a/include/fpu/softfloat.h
-> +++ b/include/fpu/softfloat.h
-> @@ -688,7 +688,12 @@ static inline int floatx80_is_any_nan(floatx80 a)
->  *----------------------------------------------------------------------------*/
->  static inline bool floatx80_invalid_encoding(floatx80 a)
->  {
-> +#if defined(TARGET_M68K)
-> +    return (a.low & (1ULL << 63)) == 0 && (((a.high & 0x7FFF) != 0)
-> +                                           && (a.high != 0x7FFF));
-> +#else
->      return (a.low & (1ULL << 63)) == 0 && (a.high & 0x7FFF) != 0;
-> +#endif
->  }
->  
->  #define floatx80_zero make_floatx80(0x0000, 0x0000000000000000LL)
-> 
+I also used the gcc and libc testsuite to detect problems but this was a
+very slow process...
 
-This is denormalized numbers and should generate an exception.
-
-I tried something like that in the past:
-
-https://patchew.org/QEMU/20170207005930.28327-1-laurent@vivier.eu/20170207005930.28327-3-laurent@vivier.eu/
-
-Pierre tried recently:
-https://patchew.org/QEMU/1615bbe5-3033-3b76-5cfb-52e343dc4d67@freepascal.org/
-
-See "1.6.2 Denormalized Numbers" in M68000 FAMILY PROGRAMMER’S REFERENCE
-MANUAL.
-
-"Since the extended-precision data format has an explicit integer bit, a
-number can be formatted with a nonzero exponent, less than the maximum
-value, and a zero integer bit. The IEEE 754 standard does not define a
-zero integer bit. Such a number is an unnormalized number. Hardware does
-not directly support denormalized and unnormalized numbers, but
-implicitly supports them by trapping them as unimplemented data types,
-allowing efficient conversion in software."
-
-But m68k FPU exceptions are not currently implemented in QEMU.
+I have also ported RISU to m68k, but I didn't add FPU test in it (does
+it support FPU test?).
 
 Thanks,
 Laurent
