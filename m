@@ -2,102 +2,110 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 601D0C83004
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:07:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1061C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:07:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29FB220787
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:07:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AB0C2083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 08:07:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IuyDMJyp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29FB220787
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hKR+mo4r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AB0C2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jThkO-00038x-9Z
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:07:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47792)
+	id 1jThkc-0003bH-LP
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 04:07:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50662)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jThGX-0007gr-G4
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:37:42 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jThgA-0004eF-DT
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:05:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jThFl-0008JH-H8
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:36:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28183
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1jThbg-0001Ml-BX
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 04:02:49 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20839
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jThFl-0008Iw-1L
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:35:33 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jThbf-0001M6-P6
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 03:58:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588145732;
+ s=mimecast20190719; t=1588147090;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Bn031hu9FuB+hQDcncldDV7O7zumKkeKonc8xXgOjJg=;
- b=IuyDMJypIQ3ovKtWXhuaqRKJg2/es0PXoVufuGn5dudfDxyCEC91fDC1YwKFtHrwTbRYfq
- JQveJYaqxXbQ4mkrmA/MY6lughy4glIDv/BFYVCQXX4Gk06pYDQQEUqBXWYtflsBy+IIyx
- EFIc3+1Ebv/5YTU8ym6YIpL4iqMf75s=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-334-ukRg9_LRO1KHbY917G3DGA-1; Wed, 29 Apr 2020 03:35:30 -0400
-X-MC-Unique: ukRg9_LRO1KHbY917G3DGA-1
-Received: by mail-wm1-f69.google.com with SMTP id 71so660419wmb.8
- for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 00:35:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=qrOy8jSEtT2CwsIuD9tAV5omsz0ophXWymW3wRqWZ6c=;
- b=qd9tNvn1pedVWL/k9xD/OnULVvVDPKpZFveTkdSp3YDfaG51T/qaV+PH3oh+z1EQ3a
- Cpv/NJX003drxRhM+Os97h9vz0TxC/+/slgGBQT8w1L1wYinmkZAD12eVSauQ05F7IBm
- UP2in6brNpNvsLZmbYpJ98oHSB/KriMvAhqzlFaNuyYXT3ZOR6WByBRAUgfXnYuJ0wto
- ihOAx3eQ3Swe4G3kJYE62Bn9IgovDtP8DVZM1fa+W9uhiJ0EAeaJXgSQmESpIlw8hKel
- CX8UB6S9bml69pfkkTHTjZnJwweraX5FUd2e/0ftw7GFHw2RC1NwPDl4qoHfPka5WJIa
- 05pA==
-X-Gm-Message-State: AGi0PuaLSETACd/ojcndWy/O87QnTpHNPH7u9wD7C6ewd8RvBqRg3P1o
- Vc3zxsP113HE0GLnSQ3CAyulIcASc5Xxl2zwjyCTo2e0agYmUxIZQi2gzcAagNybXuibMzTZf1i
- PK6I+lBEp3Ft6E/M=
-X-Received: by 2002:adf:f881:: with SMTP id u1mr36777527wrp.348.1588145729233; 
- Wed, 29 Apr 2020 00:35:29 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIX/8ORmATcXFniftZNkoqwfWbCSu7FhKLKm3BRyGMcX5KuYLTpXB4bFdlkxaUlDyl56pge4g==
-X-Received: by 2002:adf:f881:: with SMTP id u1mr36777499wrp.348.1588145728943; 
- Wed, 29 Apr 2020 00:35:28 -0700 (PDT)
-Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.137])
- by smtp.gmail.com with ESMTPSA id g25sm6383889wmh.24.2020.04.29.00.35.27
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 29 Apr 2020 00:35:28 -0700 (PDT)
-Subject: Re: [PATCH 16/17] spapr_pci: Drop some dead error handling
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200428163419.4483-1-armbru@redhat.com>
- <20200428163419.4483-17-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <12c0d93f-672a-41e7-4374-6b2d8a35bf53@redhat.com>
-Date: Wed, 29 Apr 2020 09:35:27 +0200
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=x2aTTj0F7hIXvGyY70KkfRFYrPMxUZiJB5XUQF4IaoE=;
+ b=hKR+mo4rVlimKeeZUIABvd2H5KOoBurd9msRtie7M7N6FWA6cePNzPJKHq4eiZDX7aEC2x
+ Uk0xfpUdfGvScqNUgDyMTJcP+ERGX6Xplc3ykR2EeHTbKAMgaLUh2hConv5vOHIdA5FWBk
+ ktUwg1L6vU71Pplr5wDvlBHZAbe8IeM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-406-hVoAmiEUPLa0Z5_pgyVDXQ-1; Wed, 29 Apr 2020 03:58:08 -0400
+X-MC-Unique: hVoAmiEUPLa0Z5_pgyVDXQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3AB85835B41;
+ Wed, 29 Apr 2020 07:58:07 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-19.ams2.redhat.com
+ [10.36.113.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0FFBE600DB;
+ Wed, 29 Apr 2020 07:58:05 +0000 (UTC)
+Subject: Re: [PATCH 4/4] block: Use blk_make_empty() after commits
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20200428132629.796753-1-mreitz@redhat.com>
+ <20200428132629.796753-5-mreitz@redhat.com>
+ <0fb5d21f-4075-8c6a-0105-01fc60acaecf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <5b22a747-c00e-02a2-17fb-652d1eaea453@redhat.com>
+Date: Wed, 29 Apr 2020 09:58:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200428163419.4483-17-armbru@redhat.com>
-Content-Language: en-US
+In-Reply-To: <0fb5d21f-4075-8c6a-0105-01fc60acaecf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="m9wEpVvEhjEC9nfuOHA6DIecCsv4wjmdg"
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 00:53:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,239 +117,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, David Gibson <david@gibson.dropbear.id.au>,
- qemu-ppc@nongnu.org, berrange@redhat.com, ehabkost@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/28/20 6:34 PM, Markus Armbruster wrote:
-> chassis_from_bus() uses object_property_get_uint() to get property
-> "chassis_nr" of the bridge device.  Failure would be a programming
-> error.  Pass &error_abort, and simplify its callers.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--m9wEpVvEhjEC9nfuOHA6DIecCsv4wjmdg
+Content-Type: multipart/mixed; boundary="gHhCvHdmBrzcHjs1cm9BoxkpDCHrmINOE"
+
+--gHhCvHdmBrzcHjs1cm9BoxkpDCHrmINOE
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 28.04.20 16:07, Eric Blake wrote:
+> On 4/28/20 8:26 AM, Max Reitz wrote:
+>> bdrv_commit() already has a BlockBackend pointing to the BDS that we
+>> want to empty, it just has the wrong permissions.
+>>
+>> qemu-img commit has no BlockBackend pointing to the old backing file
+>> yet, but introducing one is simple.
+>>
+>> After this commit, bdrv_make_empty() is the only remaining caller of
+>> BlockDriver.bdrv_make_empty().
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 block/commit.c |=C2=A0 8 +++++++-
+>> =C2=A0 qemu-img.c=C2=A0=C2=A0=C2=A0=C2=A0 | 19 ++++++++++++++-----
+>> =C2=A0 2 files changed, 21 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/block/commit.c b/block/commit.c
+>> index 8e672799af..24720ba67d 100644
+>> --- a/block/commit.c
+>> +++ b/block/commit.c
+>> @@ -493,10 +493,16 @@ int bdrv_commit(BlockDriverState *bs)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (drv->bdrv_make_empty) {
 >=20
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: qemu-ppc@nongnu.org
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   hw/ppc/spapr_pci.c | 86 ++++++++++------------------------------------
->   1 file changed, 18 insertions(+), 68 deletions(-)
+> This 'if' is still a bit awkward. Do all filter drivers set this
+> function, or will bdrv_make_empty() automatically take care of looking
+> through filters?=C2=A0 Should this be a check of a supported_ variable
+> instead (similar to how Kevin just added supported_truncate_flags)?
 >=20
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 1d73d05a0a..b6036be51c 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1203,46 +1203,36 @@ static SpaprDrc *drc_from_devfn(SpaprPhbState *ph=
-b,
->                              drc_id_from_devfn(phb, chassis, devfn));
->   }
->  =20
-> -static uint8_t chassis_from_bus(PCIBus *bus, Error **errp)
-> +static uint8_t chassis_from_bus(PCIBus *bus)
->   {
->       if (pci_bus_is_root(bus)) {
->           return 0;
->       } else {
->           PCIDevice *bridge =3D pci_bridge_get_device(bus);
->  =20
-> -        return object_property_get_uint(OBJECT(bridge), "chassis_nr", er=
-rp);
-> +        return object_property_get_uint(OBJECT(bridge), "chassis_nr",
-> +                                        &error_abort);
->       }
->   }
->  =20
->   static SpaprDrc *drc_from_dev(SpaprPhbState *phb, PCIDevice *dev)
->   {
-> -    Error *local_err =3D NULL;
-> -    uint8_t chassis =3D chassis_from_bus(pci_get_bus(dev), &local_err);
-> -
-> -    if (local_err) {
-> -        error_report_err(local_err);
-> -        return NULL;
-> -    }
-> +    uint8_t chassis =3D chassis_from_bus(pci_get_bus(dev));
->  =20
->       return drc_from_devfn(phb, chassis, dev->devfn);
->   }
->  =20
-> -static void add_drcs(SpaprPhbState *phb, PCIBus *bus, Error **errp)
-> +static void add_drcs(SpaprPhbState *phb, PCIBus *bus)
->   {
->       Object *owner;
->       int i;
->       uint8_t chassis;
-> -    Error *local_err =3D NULL;
->  =20
->       if (!phb->dr_enabled) {
->           return;
->       }
->  =20
-> -    chassis =3D chassis_from_bus(bus, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        return;
-> -    }
-> +    chassis =3D chassis_from_bus(bus);
->  =20
->       if (pci_bus_is_root(bus)) {
->           owner =3D OBJECT(phb);
-> @@ -1256,21 +1246,16 @@ static void add_drcs(SpaprPhbState *phb, PCIBus *=
-bus, Error **errp)
->       }
->   }
->  =20
-> -static void remove_drcs(SpaprPhbState *phb, PCIBus *bus, Error **errp)
-> +static void remove_drcs(SpaprPhbState *phb, PCIBus *bus)
->   {
->       int i;
->       uint8_t chassis;
-> -    Error *local_err =3D NULL;
->  =20
->       if (!phb->dr_enabled) {
->           return;
->       }
->  =20
-> -    chassis =3D chassis_from_bus(bus, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        return;
-> -    }
-> +    chassis =3D chassis_from_bus(bus);
->  =20
->       for (i =3D PCI_SLOT_MAX * PCI_FUNC_MAX - 1; i >=3D 0; i--) {
->           SpaprDrc *drc =3D drc_from_devfn(phb, chassis, i);
-> @@ -1488,17 +1473,11 @@ int spapr_pci_dt_populate(SpaprDrc *drc, SpaprMac=
-hineState *spapr,
->   }
->  =20
->   static void spapr_pci_bridge_plug(SpaprPhbState *phb,
-> -                                  PCIBridge *bridge,
-> -                                  Error **errp)
-> +                                  PCIBridge *bridge)
->   {
-> -    Error *local_err =3D NULL;
->       PCIBus *bus =3D pci_bridge_get_sec_bus(bridge);
->  =20
-> -    add_drcs(phb, bus, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        return;
-> -    }
-> +    add_drcs(phb, bus);
->   }
->  =20
->   static void spapr_pci_plug(HotplugHandler *plug_handler,
-> @@ -1529,11 +1508,7 @@ static void spapr_pci_plug(HotplugHandler *plug_ha=
-ndler,
->       g_assert(drc);
->  =20
->       if (pc->is_bridge) {
-> -        spapr_pci_bridge_plug(phb, PCI_BRIDGE(plugged_dev), &local_err);
-> -        if (local_err) {
-> -            error_propagate(errp, local_err);
-> -            return;
-> -        }
-> +        spapr_pci_bridge_plug(phb, PCI_BRIDGE(plugged_dev));
->       }
->  =20
->       /* Following the QEMU convention used for PCIe multifunction
-> @@ -1560,12 +1535,7 @@ static void spapr_pci_plug(HotplugHandler *plug_ha=
-ndler,
->           spapr_drc_reset(drc);
->       } else if (PCI_FUNC(pdev->devfn) =3D=3D 0) {
->           int i;
-> -        uint8_t chassis =3D chassis_from_bus(pci_get_bus(pdev), &local_e=
-rr);
-> -
-> -        if (local_err) {
-> -            error_propagate(errp, local_err);
-> -            return;
-> -        }
-> +        uint8_t chassis =3D chassis_from_bus(pci_get_bus(pdev));
->  =20
->           for (i =3D 0; i < 8; i++) {
->               SpaprDrc *func_drc;
-> @@ -1587,17 +1557,11 @@ out:
->   }
->  =20
->   static void spapr_pci_bridge_unplug(SpaprPhbState *phb,
-> -                                    PCIBridge *bridge,
-> -                                    Error **errp)
-> +                                    PCIBridge *bridge)
->   {
-> -    Error *local_err =3D NULL;
->       PCIBus *bus =3D pci_bridge_get_sec_bus(bridge);
->  =20
-> -    remove_drcs(phb, bus, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        return;
-> -    }
-> +    remove_drcs(phb, bus);
->   }
->  =20
->   static void spapr_pci_unplug(HotplugHandler *plug_handler,
-> @@ -1619,11 +1583,7 @@ static void spapr_pci_unplug(HotplugHandler *plug_=
-handler,
->       pci_device_reset(PCI_DEVICE(plugged_dev));
->  =20
->       if (pc->is_bridge) {
-> -        Error *local_err =3D NULL;
-> -        spapr_pci_bridge_unplug(phb, PCI_BRIDGE(plugged_dev), &local_err=
-);
-> -        if (local_err) {
-> -            error_propagate(errp, local_err);
-> -        }
-> +        spapr_pci_bridge_unplug(phb, PCI_BRIDGE(plugged_dev));
->           return;
->       }
->  =20
-> @@ -1654,13 +1614,7 @@ static void spapr_pci_unplug_request(HotplugHandle=
-r *plug_handler,
->           SpaprDrcClass *func_drck;
->           SpaprDREntitySense state;
->           int i;
-> -        Error *local_err =3D NULL;
-> -        uint8_t chassis =3D chassis_from_bus(pci_get_bus(pdev), &local_e=
-rr);
-> -
-> -        if (local_err) {
-> -            error_propagate(errp, local_err);
-> -            return;
-> -        }
-> +        uint8_t chassis =3D chassis_from_bus(pci_get_bus(pdev));
->  =20
->           if (pc->is_bridge) {
->               error_setg(errp, "PCI: Hot unplug of PCI bridges not suppor=
-ted");
-> @@ -1741,7 +1695,7 @@ static void spapr_phb_unrealize(DeviceState *dev)
->           }
->       }
->  =20
-> -    remove_drcs(sphb, phb->bus, &error_abort);
-> +    remove_drcs(sphb, phb->bus);
->  =20
->       for (i =3D PCI_NUM_PINS - 1; i >=3D 0; i--) {
->           if (sphb->lsi_table[i].irq) {
-> @@ -1980,11 +1934,7 @@ static void spapr_phb_realize(DeviceState *dev, Er=
-ror **errp)
->       }
->  =20
->       /* allocate connectors for child PCI devices */
-> -    add_drcs(sphb, phb->bus, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        goto unrealize;
-> -    }
-> +    add_drcs(sphb, phb->bus);
->  =20
->       /* DMA setup */
->       for (i =3D 0; i < windows_supported; ++i) {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D drv->bdrv_make_empty=
+(bs);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D blk_set_perm(src, BL=
+K_PERM_WRITE, BLK_PERM_ALL, NULL);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 goto ro_cleanup;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D blk_make_empty(src, =
+NULL);
+>=20
+> So, if the driver lacks the callback, you miss calling blk_make_empty()
+> even if it would have done something.
+
+We can=E2=80=99t just call blk_make_empty() and then special case -ENOTSUP =
+here,
+though, because the BB doesn=E2=80=99t have a WRITE permission beforehand. =
+ So
+we have to take that permission before we can call blk_make_empty().
+But taking the permission can fail, and then we kind of have to report
+the -EPERM, even though the BlockDriver may not support emptying anyway.
+
+I suppose if we just have to take the WRITE_UNCHANGED permission,
+though, we can assume that that=E2=80=99s basically always allowed, so it
+shouldn=E2=80=99t be that much of a problem there.
+
+Max
+
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto=
+ ro_cleanup;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blk_flush(src);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0 diff --git a/qemu-img.c b/qemu-img.c
+>> index 821cbf610e..a5e8659867 100644
+>> --- a/qemu-img.c
+>> +++ b/qemu-img.c
+>> @@ -1065,11 +1065,20 @@ static int img_commit(int argc, char **argv)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto unref_backin=
+g;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0 -=C2=A0=C2=A0=C2=A0 if (!drop && bs->drv->bdrv_make_empty) {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D bs->drv->bdrv_make_e=
+mpty(bs);
+>=20
+> Old code: if the driver had the callback, use it.
+>=20
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret) {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 erro=
+r_setg_errno(&local_err, -ret, "Could not empty %s",
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 filename);
+>> +=C2=A0=C2=A0=C2=A0 if (!drop) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockBackend *old_backing_bl=
+k;
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 old_backing_blk =3D blk_new_=
+with_bs(bs, BLK_PERM_WRITE,
+>> BLK_PERM_ALL,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 &local_err);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!old_backing_blk) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto=
+ unref_backing;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D blk_make_empty(old_b=
+acking_blk, &local_err);
+>=20
+> New code: Call blk_make_empty() whether or not driver has the callback,
+> then deal with the fallout.
+>=20
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blk_unref(old_backing_blk);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret =3D=3D -ENOTSUP) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 erro=
+r_free(local_err);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 loca=
+l_err =3D NULL;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (ret < 0) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 goto unref_backing;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>=20
+> But this actually looks smarter than the commit case.
 >=20
 
-Very nice cleanup.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+--gHhCvHdmBrzcHjs1cm9BoxkpDCHrmINOE--
+
+--m9wEpVvEhjEC9nfuOHA6DIecCsv4wjmdg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6pM4wACgkQ9AfbAGHV
+z0DQAAf/V2Wqlar1KUiDrPKrhCio3YNBB/nrDnHMxN4whnAqmUhRN8bnDpJ02xg/
+2lUOxCLiwI0+ELM1Hnve19dqt6/ac8smR/PBCvyh9XhuIcZZUyp1Qye1bCtuCuGP
+VlnO8OLrAVA5QE7qAXeqywFuGS2+pvdF7Cd7sIR2u0ifqt3SsX5Rmy1v/BuhyECW
+sopaxLybQZgKTG8Jl2RPAuxx9OlHZgqfUuaVVPxvGf49kcD6sIqDsJba/OWY5fc8
+nRw4xzogpNtg9KhIDvBPg/aSx9h53hUYBi+CTqMEf1gSmrl2goTcgYpQan90dWCr
+6zj19BUsW1+Gta5vB5da3qSAG2+aSQ==
+=+Je3
+-----END PGP SIGNATURE-----
+
+--m9wEpVvEhjEC9nfuOHA6DIecCsv4wjmdg--
 
 
