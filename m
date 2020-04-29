@@ -2,97 +2,94 @@ Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38AFAC83007
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:27:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 816A0C83003
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:29:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 043662085B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:27:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 448CE20731
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 09:29:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hE/1qmle"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 043662085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ji5XwNsM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 448CE20731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTj0V-0006gx-7H
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 05:27:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33574)
+	id 1jTj2K-0008UE-GU
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 05:29:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33878)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mszeredi@redhat.com>) id 1jTizi-0005Vb-Gt
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:27:06 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jTj1d-00083o-6z
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:29:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mszeredi@redhat.com>) id 1jTizi-0004ql-1J
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:27:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23106
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mszeredi@redhat.com>)
- id 1jTizh-0004qZ-Kq
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:27:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588152423;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rgFcQ+SdEUEIQ0E6LSiXls7KMMBT4VUoZSxga9J06so=;
- b=hE/1qmleccF3j2mwXXpX3qaLhCtYL9MRl6sgz48Hm4jx6OuHxYH25VCF56Lz+dxtewzXNU
- ClkSAxwKaN8mVXkWwS318KSiXCB9s0h0Zcv/pMydZ33HSvqmoevJCCqWS0f/IIa0mHYAYR
- RCoIb+JjGIRpEetpt8N4OFxiGRB+4HU=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-K_Eq6c0AOquwSR2LPPHaKw-1; Wed, 29 Apr 2020 05:27:02 -0400
-X-MC-Unique: K_Eq6c0AOquwSR2LPPHaKw-1
-Received: by mail-qk1-f199.google.com with SMTP id d15so1934769qkl.10
- for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 02:27:02 -0700 (PDT)
+ (envelope-from <alex.bennee@linaro.org>) id 1jTj1c-0006Rh-Hx
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:29:05 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39997)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jTj1c-0006RI-4f
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 05:29:04 -0400
+Received: by mail-wm1-x344.google.com with SMTP id u16so1232117wmc.5
+ for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 02:29:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=7enXGeO/1KR66fSPg8u4TxZfNClgKNpxyJ7WcKkmSG0=;
+ b=ji5XwNsMg0wGOyD+zYzxTEoC/K3rFFqxwwX3a5HPUQ2nZhUChslltvVWv8zxcy74wB
+ 2+sNglEUVApuPTLBAQhtoBYAKQZGXFAmEkfcmnhZaLtqfnedsovkTNweyo6MjiWkwb+p
+ WzyQYSwYcvtvyORi7DdRJeN2mpkmWhv8FUqXst5jE5LPduJO1c5POsSzyGIYKKEAZgV0
+ CKmXSbP/6aLBU+rowrUuiTtb4vcuwu9lnvTtHp/0tvaAeocdTiR02fCXw3sm/6sFAKSa
+ b1lanam1rSBpC2wlkPX2G8obIv1+z6iJTjzR9uB05uxI8rgN5rKeDJRYXxMqstRreh9S
+ 4bYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=rgFcQ+SdEUEIQ0E6LSiXls7KMMBT4VUoZSxga9J06so=;
- b=oeXqZ0gDK/fvf0WWdIphzTXopFQsSijfDrYc/Hn0N6fqhKhZmMo0XBdFjanN8NjuDk
- EjdC2ykIRNEOhA9pdGAwLckhHcIQzQ1kV/KShgr/EgblAhA5pZjO7OL9Oi0xErRCHXhm
- SNa9wg1pvF3EGNSgvpIZLO1GzXg2G0bDJvwCaIYK10072LYASKgo+F7WkzA7K5oAXgXQ
- ARpsl/adr2mVLLEzNwtN0IAQ0L2pAOSG5g0wl+neOalrHSfiGonKmBu0wtfpBSCV4HBd
- /5hXr3XIuvqrLwfGLhcXXWDD8V7KH1ZCmoQYTcRRG767Y1S4x7NPRqeDwZNZWnodlki4
- nMmg==
-X-Gm-Message-State: AGi0PuaSDA9AYVtJgAYSvMXYek/syeR9NlGJHXovoYR4c3ZKKymlBAuI
- Mt+9XRBromG1ocPGkYT/FYD9KPoB4ogUkVgJ1OyjsBMpypU8Uc3bxdI1+KeKOgN1noz8hsECskY
- tTmWdhap89uQSNlctkf4LL6XnBO169u4=
-X-Received: by 2002:a37:a102:: with SMTP id k2mr10990270qke.199.1588152421236; 
- Wed, 29 Apr 2020 02:27:01 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI2Av0qC0C38eEYHZ/IbWoXVo9nP0JwgNm2hQ9Ew9hN3L0dPmE2fJvi+4Em9sC/avlQzlJff/Uvm3TP89ThE+s=
-X-Received: by 2002:a37:a102:: with SMTP id k2mr10990249qke.199.1588152421001; 
- Wed, 29 Apr 2020 02:27:01 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=7enXGeO/1KR66fSPg8u4TxZfNClgKNpxyJ7WcKkmSG0=;
+ b=pSA96/S2gh4mKg9wfhsVCHypLTW8d45qKIq2v/hHq+o3Y8maDYSfcViBS0L7Hi2TUZ
+ G9k1JOMXFgL0DQXnct4EoFm7bnpz/gEad4FS7rtUnU+Q74kAkBsn5onUpUus3zGie6Vx
+ lz6KtRggSWaLlfKmBBbj8+HaBPzxdarfXqQ7glq4Cr0YLcigtIo253U6adE76Ik7y1pD
+ aJCTJAfr+fu/xCobTwQD67iw5WapZziT+tW1h2FWXjaA7I2msCcQ5lBUnKT0gcrcSEdi
+ fdoSzlXkirk/OESyuQYGZuj83klI/oAgFvKAIUXD90n1//5tEoyIJrprJc8KWjBRCdIU
+ pnbg==
+X-Gm-Message-State: AGi0Pua4lZFHUQJaDulu8NLqbOhJKhMWsAWMnlBaeM7CQWc5VPk8KmrP
+ 92oO3MZG7GlOm14n/pQdY1Lzmvgq4hM=
+X-Google-Smtp-Source: APiQypJ7HryCz+EKklH86px/9Lc1rRF1VxeWFfvKetsDCGygeTFy25bHlil8Ap/Dnd35DAIt2h9hcQ==
+X-Received: by 2002:a05:600c:2218:: with SMTP id
+ z24mr2182184wml.82.1588152541468; 
+ Wed, 29 Apr 2020 02:29:01 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id t2sm6904625wmt.15.2020.04.29.02.28.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Apr 2020 02:29:00 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3B5D01FF7E;
+ Wed, 29 Apr 2020 10:28:59 +0100 (BST)
+References: <1588094279-17913-1-git-send-email-frederic.konrad@adacore.com>
+ <1588094279-17913-3-git-send-email-frederic.konrad@adacore.com>
+ <d565528d-426f-bf00-5974-5653eaf5cd25@vivier.eu>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Subject: Re: [PATCH 2/2] target/m68k: fix gdb for m68xxx
+In-reply-to: <d565528d-426f-bf00-5974-5653eaf5cd25@vivier.eu>
+Date: Wed, 29 Apr 2020 10:28:59 +0100
+Message-ID: <877dxyljxg.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20200424133516.73077-1-mreitz@redhat.com>
- <20200427175902.GM2923@work-vm>
- <20200428145143.GB107541@stefanha-x1.localdomain>
- <CAOssrKcoXBAxE=Ld5ZY79G=Dy=qBh3HdSxxC+nMGJOX52rUxxg@mail.gmail.com>
- <20200428191523.GU2794@work-vm>
- <CAOssrKcsVvMok6i+vAm1KJaq07Ep9JLcMiB1nWhsNU2n1m-Fmw@mail.gmail.com>
-In-Reply-To: <CAOssrKcsVvMok6i+vAm1KJaq07Ep9JLcMiB1nWhsNU2n1m-Fmw@mail.gmail.com>
-From: Miklos Szeredi <mszeredi@redhat.com>
-Date: Wed, 29 Apr 2020 11:26:49 +0200
-Message-ID: <CAOssrKcZr4QXV1qLO7wmvdutkPKm59nSquPisEApBCWGx-c-uA@mail.gmail.com>
-Subject: Re: [Virtio-fs] [PATCH] virtiofsd: Show submounts
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mszeredi@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 01:42:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,50 +101,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs-list <virtio-fs@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>, philmd@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Apr 29, 2020 at 9:59 AM Miklos Szeredi <mszeredi@redhat.com> wrote:
+
+Laurent Vivier <laurent@vivier.eu> writes:
+
+> Le 28/04/2020 =C3=A0 19:17, KONRAD Frederic a =C3=A9crit :
+>> Currently "cf-core.xml" is sent to GDB when using any m68k flavor.  Thin=
+g is
+>> it uses the "org.gnu.gdb.coldfire.core" feature name and gdb 8.3 then ex=
+pects
+>> a coldfire FPU instead of the default m68881 FPU.
+>>=20
+>> This is not OK because the m68881 floats registers are 96 bits wide so it
+>> crashes GDB with the following error message:
+>>=20
+>> (gdb) target remote localhost:7960
+>> Remote debugging using localhost:7960
+>> warning: Register "fp0" has an unsupported size (96 bits)
+>> warning: Register "fp1" has an unsupported size (96 bits)
+>> ...
+>> Remote 'g' packet reply is too long (expected 148 bytes, got 180 bytes):=
+    \
+>>   00000000000[...]0000
+>>=20
+>> With this patch: qemu-system-m68k -M none -cpu m68020 -s -S
+>>=20
+>> (gdb) tar rem :1234
+>> Remote debugging using :1234
+>> warning: No executable has been specified and target does not support
+>> determining executable automatically.  Try using the "file" command.
+>> 0x00000000 in ?? ()
+>> (gdb) p $fp0
+>> $1 =3D nan(0xffffffffffffffff)
+>>=20
+>> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+>> ---
+>>  configure             |  2 +-
+>>  gdb-xml/m68k-core.xml | 29 ++++++++++++++++++++++++++++
+>>  target/m68k/cpu.c     | 52 ++++++++++++++++++++++++++++++++++++--------=
+-------
+>>  3 files changed, 67 insertions(+), 16 deletions(-)
+>>  create mode 100644 gdb-xml/m68k-core.xml
 >
-> On Tue, Apr 28, 2020 at 9:15 PM Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
->
-> > So our current sequence is:
-> >
-> >    (new namespace)
-> >  1)    if (mount(NULL, "/", NULL, MS_REC | MS_SLAVE, NULL) < 0) {
-> >  2)   if (mount("proc", "/proc", "proc",
-> >            ....
-> >  3)   if (mount(source, source, NULL, MS_BIND | MS_REC, NULL) < 0) {
-> >  4)  (chdir newroot, pivot, chdir oldroot)
-> >  5)   if (mount("", ".", "", MS_SLAVE | MS_REC, NULL) < 0) {
-> >  6)   if (umount2(".", MNT_DETACH) < 0) {
-> >
-> > So are you saying we need a:
-> >        if (mount(NULL, "/", NULL, MS_REC | MS_SHARED, NULL) < 0) {
-> >
-> >   and can this go straight after (1) ?
->
-> Or right before (3).   Important thing is that that new mount will
-> only receive propagation if the type of the mount at source (before
-> (3) is performed) is shared.
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
-And seems I was wrong.  Bind mounting clones the slave property, hence
-no need to set MS_SHARED.  I.e. if the source was a slave, the bind
-mount will be a slave to the same master as well; the two slaves won't
-receive propagation between each other, but both will receive
-propagation from the master.
+Are you going to take this through your tree or do you want me to add it
+to my small pile of gdbstub fixes?
 
-The only reason to set MS_SHARED would be if the bind mount wanted to
-receive propagation from within the cloned namespace.   Which is not
-the case.
-
-Didn't I tell ya it was complicated ;)
-
-Thanks,
-Miklos
-
+--=20
+Alex Benn=C3=A9e
 
