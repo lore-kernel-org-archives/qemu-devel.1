@@ -2,60 +2,98 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C11EC83001
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:26:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E90D7C83002
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:27:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D3F720838
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:26:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D3F720838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id B7770214D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:27:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BK2R5Xpd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7770214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU3ai-0001tf-8h
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 03:26:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34268)
+	id 1jU3b8-0002zN-Sh
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 03:27:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34324)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jU3XY-0004b0-Ev
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:23:49 -0400
+ (envelope-from <philmd@redhat.com>) id 1jU3Xg-0004ry-OK
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:23:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jU3W7-0006YN-G7
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:23:24 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:46144)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jU3W6-0006WW-Pu; Thu, 30 Apr 2020 03:21:55 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.704462-0.000721421-0.294816;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01l07447; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.HQfovas_1588231302; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HQfovas_1588231302) by smtp.aliyun-inc.com(10.147.40.7);
- Thu, 30 Apr 2020 15:21:43 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: peter.maydell@linaro.org
-Subject: [RFC PATCH 1/8] riscv: Add RV64I instructions description
-Date: Thu, 30 Apr 2020 15:21:32 +0800
-Message-Id: <20200430072139.4602-2-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200430072139.4602-1-zhiwei_liu@c-sky.com>
-References: <20200430072139.4602-1-zhiwei_liu@c-sky.com>
+ (envelope-from <philmd@redhat.com>) id 1jU3Wz-0006uf-A1
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:23:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42160
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jU3Wy-0006pB-U2
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:22:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588231367;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=uDiqxiBQKtXEe1JkBjxHXYRGF/sSEvKxFT2mFNvznJs=;
+ b=BK2R5XpdYw6CNlTy9ysXVR2NuzALwJ/apNtNXZWcGHGrfhR8gkw8dBRgW+IlrXwseElV2i
+ my36hCtkpadHaOPCe4S4jHe1M+jbChCmP6WNwBrcH0PA9xmBru/4GdP1tcnko1PSd6Dc3g
+ cBIkpy8hoqlN2uSN0rzMs2sJRbYeGFc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-454-oOYSFmrlPYeur2glObjQCg-1; Thu, 30 Apr 2020 03:22:44 -0400
+X-MC-Unique: oOYSFmrlPYeur2glObjQCg-1
+Received: by mail-wm1-f71.google.com with SMTP id q5so418774wmc.9
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 00:22:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=SUypC+mYeFaC5dWzw2aAaa8wAXxEdn5K+LOUYWt/mtg=;
+ b=If8irgEJESPTE7Vmz2/aJql5NUKAZS/cBQ1HG5iGHLv/K2LJDhxJgJ0w7BwY/1Zp0N
+ gdHvR1RaE50SqRN4lNET7pK8cY2DhMdP+0rCqh2tbeIas873ImBOaetnOx8h+g9guqNI
+ HPH3dApMXpxXGxIRdAaiSNLW+zsCwBSsDPub4FBSWY2AMNhZQg4TVua4CoC3tLtcHkBh
+ rHMcsKoN09u3YZzBIbpMAsfHbRjbazQwzhDr5Sd3VMHZnXoygq78xOQNN60+e9soO3Jj
+ kDgI3slGTO+v8GcEctu8vmXM+9T4tIz+apapMgvbonVaXk5nfsihpN/yAd57+tQuB4TW
+ D7Rw==
+X-Gm-Message-State: AGi0PuamUgf2v4nGD0mQtby6qGi81if3UInhGfhu6ryyeP57US0rtqrk
+ zKnEsRYyvbjNArvIXdpqBAKwigRHHt0lELkJvLijI2gQZFXSfeGAJfcOiOn3/brnB1V6DQ9zCad
+ UPApGA+yQgd0c5EA=
+X-Received: by 2002:adf:df04:: with SMTP id y4mr2212851wrl.413.1588231363091; 
+ Thu, 30 Apr 2020 00:22:43 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJeFfaEhSKlBAybKiGut+hS6hDR/an9dqU/U9FoEZCczDVdiF+ooCKUw8NsZCWFABwe2UOK4g==
+X-Received: by 2002:adf:df04:: with SMTP id y4mr2212824wrl.413.1588231362854; 
+ Thu, 30 Apr 2020 00:22:42 -0700 (PDT)
+Received: from localhost.localdomain (137.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.137])
+ by smtp.gmail.com with ESMTPSA id s8sm2608177wru.38.2020.04.30.00.22.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Apr 2020 00:22:42 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>,
+	qemu-devel@nongnu.org
+Subject: [RFC PATCH v2 0/3] hw/audio: Make 'soundhw' command line option a QOM
+ interface
+Date: Thu, 30 Apr 2020 09:22:37 +0200
+Message-Id: <20200430072240.18142-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 03:21:44
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:24:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,168 +105,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com, palmer@dabbelt.com,
- alistair23@gmail.com, alex.bennee@linaro.org,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- riscv64.risu | 141 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 141 insertions(+)
- create mode 100644 riscv64.risu
+After looking at Gerd's "audio: deprecate -soundhw":
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg698818.html
+I updated a patch I started some time ago.
+It is unfinished due to problem with hda-intel and pcspk. I have
+some idea how to fix pcspk, but it invasive. I haven't looked at
+hda-intel yet.
+Looking at Gerd series, fixing these issue might be trivial for
+him, so I send this patch as it, in case it helps.
 
-diff --git a/riscv64.risu b/riscv64.risu
-new file mode 100644
-index 0000000..98141ab
---- /dev/null
-+++ b/riscv64.risu
-@@ -0,0 +1,141 @@
-+# Input file for risugen defining RISC-V instructions
-+.mode riscv
-+@RV64I
-+
-+# x2 stack pointer, x3 global pointer, x4 thread pointer
-+# These registers should be reserved for signal handler.
-+
-+LUI RISCV imm:20 rd:5 0110111 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 }
-+
-+AUIPC RISCV imm:20 rd:5 0110111 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 }
-+
-+# Limit to current implementation, the base address register will be overide
-+LB RISCV imm:12 rs1:5 000 rd:5 0000011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
-+!memory { align(1); reg_plus_imm($rs1, sextract($imm, 12)); }
-+
-+LH RISCV imm:12 rs1:5 001 rd:5 0000011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
-+!memory { align(2); reg_plus_imm($rs1, sextract($imm, 12)); }
-+
-+LW RISCV imm:12 rs1:5 010 rd:5 0000011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
-+!memory { align(4); reg_plus_imm($rs1, sextract($imm, 12)); }
-+
-+LBU RISCV imm:12 rs1:5 100 rd:5 0000011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
-+!memory { align(1); reg_plus_imm($rs1, sextract($imm, 12)); }
-+
-+LHU RISCV imm:12 rs1:5 101 rd:5 0000011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
-+!memory { align(2); reg_plus_imm($rs1, sextract($imm, 12)); }
-+
-+SB RISCV imm5:7 rs2:5 rs1:5 000 imm:5 0100011 \
-+!constraints { $rs1 != 0 && $rs1 != 2 && $rs1 !=3 && $rs1 != 4 && $rs2 != 2 } \
-+!memory { align(1); reg_plus_imm($rs1, sextract($imm5 << 5 | $imm, 12)); }
-+
-+SH RISCV imm5:7 rs2:5 rs1:5 001 imm:5 0100011 \
-+!constraints { $rs1 != 0 && $rs1 != 2 && $rs1 !=3 && $rs1 != 4 && $rs2 != 2 } \
-+!memory { align(2); reg_plus_imm($rs1, sextract($imm5 << 5 | $imm, 12)); }
-+
-+SW RISCV imm5:7 rs2:5 rs1:5 010 imm:5 0100011 \
-+!constraints { $rs1 != 0 && $rs1 != 2 && $rs1 !=3 && $rs1 != 4 && $rs2 != 2 } \
-+!memory { align(4); reg_plus_imm($rs1, sextract($imm5 << 5 | $imm, 12)); }
-+
-+ADDI RISCV imm:12 rs1:5 000 rd:5 0010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+SLTI RISCV imm:12 rs1:5 010 rd:5 0010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+SLTIU RISCV imm:12 rs1:5 011 rd:5 0010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+XORI RISCV imm:12 rs1:5 100 rd:5 0010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+ORI RISCV imm:12 rs1:5 110 rd:5 0010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+ANDI RISCV imm:12 rs1:5 111 rd:5 0010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+ADD RISCV 0000000 rs2:5 rs1:5 000 rd:5 0110011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
-+
-+SUB RISCV 0100000 rs2:5 rs1:5 000 rd:5 0110011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
-+
-+SLL RISCV 0000000 rs2:5 rs1:5 001 rd:5 0110011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
-+
-+SLT RISCV 0000000 rs2:5 rs1:5 010 rd:5 0110011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
-+
-+SLTU  RISCV 0000000 rs2:5 rs1:5 011 rd:5 0110011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
-+
-+XOR RISCV 0000000 rs2:5 rs1:5 100 rd:5 0110011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
-+
-+SRL RISCV 0000000 rs2:5 rs1:5 101 rd:5 0110011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
-+
-+SRA RISCV 0100000 rs2:5 rs1:5 101 rd:5 0110011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
-+
-+OR RISCV 0000000 rs2:5 rs1:5 110 rd:5 0110011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
-+
-+AND RISCV 0000000 rs2:5 rs1:5 111 rd:5 0110011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
-+
-+LWU RISCV imm:12 rs1:5 110 rd:5 0000011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
-+!memory { align(4); reg_plus_imm($rs1, sextract($imm, 12)); }
-+
-+LD RISCV imm:12 rs1:5 011 rd:5 0000011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
-+!memory { align(8); reg_plus_imm($rs1, sextract($imm, 12)); }
-+
-+SD RISCV imm5:7 rs2:5 rs1:5 011 imm:5 0100011 \
-+!constraints { $rs1 != 0 && $rs1 != 2 && $rs1 !=3 && $rs1 != 4 && $rs2 != 2} \
-+!memory { align(8); reg_plus_imm($rs1, sextract($imm5 << 5 | $imm, 12)); }
-+
-+SLLI RISCV 00000 sham5:7 rs1:5 001 rd:5 0010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+SRLI RISCV 00000 sham5:7 rs1:5 101 rd:5 0010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+SRAI RISCV 01000 sham5:7 rs1:5 101 rd:5 0010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+ADDIW RISCV imm:12 rs1:5 000 rd:5 0011011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+SLLIW RISCV 0000000 shamt:5 rs1:5 001 rd:5 0011011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+SRLIW RISCV 0000000 shamt:5 rs1:5 101 rd:5 0011011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+SRAIW RISCV 0100000 shamt:5 rs1:5 101 rd:5 0011011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+ADDW RISCV 0000000 rs2:5 rs1:5 000 rd:5 0011011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+SUBW RISCV 0100000 rs2:5 rs1:5 000 rd:5 0011011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+SLLW RISCV 0000000 rs2:5 rs1:5 001 rd:5 0011011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+SRLW RISCV 0000000 rs2:5 rs1:5 101 rd:5 0011011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
-+
-+SRAW RISCV 0100000 rs2:5 rs1:5 101 rd:5 0011011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
--- 
-2.23.0
+Since v1:
+- Include Gerd ISA/PCI stub patches to avoid link failure when
+  target does no kselect the bus.
+
+Regards,
+
+Phil.
+
+Gerd Hoffmann (2):
+  stubs: add isa_create_simple
+  stubs: add pci_create_simple
+
+Philippe Mathieu-Daud=C3=A9 (1):
+  hw/audio: Make 'soundhw' command line option a QOM interface
+
+ include/hw/audio/soundhw.h |  20 +++-
+ hw/audio/ac97.c            |  10 +-
+ hw/audio/adlib.c           |  13 ++-
+ hw/audio/cs4231a.c         |  13 ++-
+ hw/audio/es1370.c          |  10 +-
+ hw/audio/gus.c             |  13 ++-
+ hw/audio/intel-hda.c       |  13 ++-
+ hw/audio/pcspk.c           |  14 ++-
+ hw/audio/sb16.c            |  13 ++-
+ hw/audio/soundhw.c         | 203 ++++++++++++++++++++-----------------
+ stubs/isa-bus.c            |   7 ++
+ stubs/pci-bus.c            |   7 ++
+ stubs/Makefile.objs        |   2 +
+ 13 files changed, 194 insertions(+), 144 deletions(-)
+ create mode 100644 stubs/isa-bus.c
+ create mode 100644 stubs/pci-bus.c
+
+--=20
+2.21.1
 
 
