@@ -2,80 +2,76 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FCFBC47254
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 13:57:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E8EC4724C
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 13:58:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D124F2072A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 13:57:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="1NtO/Hyi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D124F2072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id C97242072A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 13:58:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C97242072A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU9hA-00005z-0R
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 09:57:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49860)
+	id 1jU9hX-0000bB-UJ
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 09:58:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51750)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dimastep@yandex-team.ru>) id 1jU9TO-0001FH-2L
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:45:26 -0400
+ (envelope-from <bounces@canonical.com>) id 1jU9ay-0003WO-DU
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dimastep@yandex-team.ru>) id 1jU9Qh-0008OL-Aq
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:43:29 -0400
-Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:38810)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1jU9NS-00029D-1G; Thu, 30 Apr 2020 09:37:22 -0400
-Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
- [IPv6:2a02:6b8:0:1a2d::301])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 4265E2E1537;
- Thu, 30 Apr 2020 16:37:20 +0300 (MSK)
-Received: from myt4-18a966dbd9be.qloud-c.yandex.net
- (myt4-18a966dbd9be.qloud-c.yandex.net [2a02:6b8:c00:12ad:0:640:18a9:66db])
- by mxbackcorp1o.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- UvACH8Lz7U-bIbKtqjR; Thu, 30 Apr 2020 16:37:20 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1588253840; bh=Fv6pZWWviC9Gnz6pDjZHVEUsXW2GPb2wYw220Nlajio=;
- h=In-Reply-To:In-Reply-To:Message-Id:References:References:Date:
- Subject:To:From:Cc;
- b=1NtO/HyijYGOZgH8x+JaBvM5ZRZOjnhZi2qMZB/kWqYr8w8oPfh+yrG3GxSyK+ah4
- aUiMPOvtUe5J8WJ7Bnhg83hwdkYe9CsrxO842iC9ntjeWnWYYE4yT3xY3+sfXM89wf
- LjRemFkKUXGN770oVPRN08BIcMiI85UEftYQJPrk=
-Authentication-Results: mxbackcorp1o.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b080:7108::1:9])
- by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- tZ29y7t6r8-bHWKsw5w; Thu, 30 Apr 2020 16:37:18 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
- (Client certificate not present)
-From: Dima Stepanov <dimastep@yandex-team.ru>
+ (envelope-from <bounces@canonical.com>) id 1jU9ap-0000nt-7I
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36388)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jU9ao-0000ij-NU
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:10 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jU9am-0007kE-O4
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B08AD2E802D
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:08 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 30 Apr 2020 13:40:59 -0000
+From: Laurent Vivier <Laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/5] vhost: add device started check in migration set log
-Date: Thu, 30 Apr 2020 16:36:20 +0300
-Message-Id: <d25241eb1fe7a55fc7dbe63ecedb4f1adf407837.1588252862.git.dimastep@yandex-team.ru>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <cover.1588252861.git.dimastep@yandex-team.ru>
-References: <cover.1588252861.git.dimastep@yandex-team.ru>
-In-Reply-To: <cover.1588252861.git.dimastep@yandex-team.ru>
-References: <cover.1588252861.git.dimastep@yandex-team.ru>
-Received-SPF: pass client-ip=2a02:6b8:0:1a2d::193;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a02:6b8:0:1a2d::193
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: gdb
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: laurent-vivier mkdolata
+X-Launchpad-Bug-Reporter: Marek Dolata (mkdolata)
+X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
+References: <157740016424.15105.4522605454597916967.malonedeb@wampee.canonical.com>
+Message-Id: <158825406038.4508.17705569912212790954.launchpad@soybean.canonical.com>
+Subject: [Bug 1857640] Re: qemu-system-i386 registers clobbered after gdb set
+ due to k_gs_base bug in gdbstub
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: e7bbeb3a2e7b99dea75f78172da4ceaf1a0e489e
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 09:35:36
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -86,115 +82,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, yc-core@yandex-team.ru,
- qemu-block@nongnu.org, mst@redhat.com, jasowang@redhat.com,
- dgilbert@redhat.com, mreitz@redhat.com, arei.gonglei@huawei.com,
- fengli@smartx.com, stefanha@redhat.com, marcandre.lureau@redhat.com,
- pbonzini@redhat.com, raphael.norwitz@nutanix.com
+Reply-To: Bug 1857640 <1857640@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If vhost-user daemon is used as a backend for the vhost device, then we
-should consider a possibility of disconnect at any moment. If such
-disconnect happened in the vhost_migration_log() routine the vhost
-device structure will be clean up.
-At the start of the vhost_migration_log() function there is a check:
-  if (!dev->started) {
-      dev->log_enabled = enable;
-      return 0;
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1857640
+
+Title:
+  qemu-system-i386 registers clobbered after gdb set due to k_gs_base
+  bug in gdbstub
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  Due to a bug in /target/i386/gdbstub.c, setting registers in gdb
+  causes the ones following k_gs_base to get clobbered.
+
+  I'm using qemu version 4.2.50 on an msys64 and start qemu's i386 with
+  a gdb server.
+
+  $ qemu-system-i386 -version
+  QEMU emulator version 4.2.50 (v4.2.0-363-gdd5b0f9549-dirty)
+  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+
+  $ qemu-system-i386 -gdb tcp::29096 -S
+  C:\msys64\usr\local\qemu-system-i386.exe: invalid accelerator kvm
+  C:\msys64\usr\local\qemu-system-i386.exe: falling back to tcg
+
+  =
+
+  I start a gdb client, connect to the server, display the register state, =
+set k_gs_base, display the register state again, and notice an issue. (Sett=
+ing other registers also clobbers the ones after k_gs_base).
+
+  $ gdb -q
+  (gdb) target remote :29096
+  ...
+  (gdb) info regs
+  ...
+  gs_base        0x0      0
+  k_gs_base      0x0      0
+  cr0            0x60000010       [ CD NW ET ]
+  cr2            0x0      0
+  ...
+  (gdb) set $k_gs_base =3D 0x41414141
+  (gdb) info regs
+  ...
+  gs_base        0x0      0
+  k_gs_base      0x0      0
+  cr0            0x41414151       [ CD WP ET PE ]
+  cr2            0x60000010       1610612752
+  ...
+
+  =
+
+  In the gdbstub code, I notice that the read and write functions are not s=
+ymmetric for IDX_SEG_REGS + 8, which corresponds to k_gs_base.
+
+  $ cat /usr/local/src/qemu-4.2.0/target/i386/gdbstub.c
+  ...
+  int x86_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+  {
+  ...
+          case IDX_SEG_REGS + 8:
+  #ifdef TARGET_X86_64
+              if ((env->hflags & HF_CS64_MASK) || GDB_FORCE_64) {
+                  return gdb_get_reg64(mem_buf, env->kernelgsbase);
+              }
+              return gdb_get_reg32(mem_buf, env->kernelgsbase);
+  #else
+              return gdb_get_reg32(mem_buf, 0);
+  #endif
+  ...
   }
-To be consistent with this check add the same check after calling the
-vhost_dev_set_log() routine. This in general help not to break a
-migration due the assert() message. But it looks like that this code
-should be revised to handle these errors more carefully.
+  ...
+  int x86_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+  {
+  ...
+  #ifdef TARGET_X86_64
+          case IDX_SEG_REGS + 8:
+              if (env->hflags & HF_CS64_MASK) {
+                  env->kernelgsbase =3D ldq_p(mem_buf);
+                  return 8;
+              }
+              env->kernelgsbase =3D ldl_p(mem_buf);
+              return 4;
+  #endif
+  ...
+  }
+  ...
 
-In case of vhost-user device backend the fail paths should consider the
-state of the device. In this case we should skip some function calls
-during rollback on the error paths, so not to get the NULL dereference
-errors.
+  =
 
-Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
----
- hw/virtio/vhost.c | 39 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 35 insertions(+), 4 deletions(-)
+  I change the write function, rebuild, and verify that the issue is resolv=
+ed.
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 3ee50c4..d5ab96d 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -787,6 +787,17 @@ static int vhost_dev_set_features(struct vhost_dev *dev,
- static int vhost_dev_set_log(struct vhost_dev *dev, bool enable_log)
- {
-     int r, i, idx;
-+
-+    if (!dev->started) {
-+        /*
-+         * If vhost-user daemon is used as a backend for the
-+         * device and the connection is broken, then the vhost_dev
-+         * structure will be reset all its values to 0.
-+         * Add additional check for the device state.
-+         */
-+        return -1;
-+    }
-+
-     r = vhost_dev_set_features(dev, enable_log);
-     if (r < 0) {
-         goto err_features;
-@@ -801,12 +812,19 @@ static int vhost_dev_set_log(struct vhost_dev *dev, bool enable_log)
-     }
-     return 0;
- err_vq:
--    for (; i >= 0; --i) {
-+    /*
-+     * Disconnect with the vhost-user daemon can lead to the
-+     * vhost_dev_cleanup() call which will clean up vhost_dev
-+     * structure.
-+     */
-+    for (; dev->started && (i >= 0); --i) {
-         idx = dev->vhost_ops->vhost_get_vq_index(dev, dev->vq_index + i);
-         vhost_virtqueue_set_addr(dev, dev->vqs + i, idx,
-                                  dev->log_enabled);
-     }
--    vhost_dev_set_features(dev, dev->log_enabled);
-+    if (dev->started) {
-+        vhost_dev_set_features(dev, dev->log_enabled);
-+    }
- err_features:
-     return r;
- }
-@@ -832,7 +850,15 @@ static int vhost_migration_log(MemoryListener *listener, int enable)
-     } else {
-         vhost_dev_log_resize(dev, vhost_get_log_size(dev));
-         r = vhost_dev_set_log(dev, true);
--        if (r < 0) {
-+        /*
-+         * The dev log resize can fail, because of disconnect
-+         * with the vhost-user-blk daemon. Check the device
-+         * state before calling the vhost_dev_set_log()
-+         * function.
-+         * Don't return error if device isn't started to be
-+         * consistent with the check above.
-+         */
-+        if (dev->started && r < 0) {
-             return r;
-         }
-     }
-@@ -1739,7 +1765,12 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
- fail_log:
-     vhost_log_put(hdev, false);
- fail_vq:
--    while (--i >= 0) {
-+    /*
-+     * Disconnect with the vhost-user daemon can lead to the
-+     * vhost_dev_cleanup() call which will clean up vhost_dev
-+     * structure.
-+     */
-+    while ((--i >= 0) && (hdev->started)) {
-         vhost_virtqueue_stop(hdev,
-                              vdev,
-                              hdev->vqs + i,
--- 
-2.7.4
+  $ cat /usr/local/src/qemu-4.2.0/target/i386/gdbstub.c
+  int x86_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+  {
+  ...
+          case IDX_SEG_REGS + 8:
+  #ifdef TARGET_X86_64
+              if (env->hflags & HF_CS64_MASK) {
+                  env->kernelgsbase =3D ldq_p(mem_buf);
+                  return 8;
+              }
+              env->kernelgsbase =3D ldl_p(mem_buf);
+              return 4;
+  #else
+              return 4;
+  #endif
+  ...
+  }
+  ...
 
+  $ make
+  ...
+  $ make install
+  ...
+
+  $ qemu-system-i386 -gdb tcp::29096 -S
+
+  $ gdb -q
+  (gdb) target remote :29096
+  ...
+  (gdb) info regs
+  ...
+  gs_base        0x0      0
+  k_gs_base      0x0      0
+  cr0            0x60000010       [ CD NW ET ]
+  cr2            0x0      0
+  ...
+  (gdb) set $k_gs_base =3D 0x41414141
+  (gdb) info regs
+  ...
+  gs_base        0x0      0
+  k_gs_base      0x0      0
+  cr0            0x60000010       [ CD NW ET ]
+  cr2            0x0      0
+  ...
+
+  =
+
+  I'll submit the patch below.
+
+  $ diff gdbstub.c gdbstub.c.bkp
+  353d352
+  <         case IDX_SEG_REGS + 8:
+  354a354
+  >         case IDX_SEG_REGS + 8:
+  362,363d361
+  < #else
+  <             return 4;
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1857640/+subscriptions
 
