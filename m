@@ -2,91 +2,51 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7569C8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:30:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A29C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:30:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B477B20838
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:30:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aez6PmbN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B477B20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 19DEE20838
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:30:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19DEE20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU6Sc-0008RB-R8
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:30:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52874)
+	id 1jU6Sj-0000JC-9F
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:30:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52476)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zltjiangshi@gmail.com>) id 1jU6MS-0006xU-QU
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:24:09 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jU6Ic-0008HY-0m
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <zltjiangshi@gmail.com>) id 1jU6MR-0006l3-R7
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:24:08 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44201)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1jU6MR-0006eX-DM
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:24:07 -0400
-Received: by mail-pl1-x641.google.com with SMTP id h11so2077601plr.11
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 03:24:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=PP5ZBO5V+/qsHiEs8q8QJMOieeCuo90ei1MsjiyJ2Hg=;
- b=aez6PmbN8S7+sXSijL/ZA4GKOxUmbTmMuO5h8SS7bwqPeT73uM3EN1ng3U2nYlntMp
- wMgJTfpeqYIaDpC4Rb5RD/yt5VPZL1jj1RltMxcMdaT1OMMIsje5kVmhpOyCqcqE+ctW
- jnNZh0cPcEv/nNRVFQQJAd9oZSUdCoTf/yeSBNl2lR8twJ2QGC2EKUx+ptf9PPiNeuDT
- dB6eDe3kdh40PlKvAnS5v3PS7OGPos5u18Y7g7XK0Ze7JS+Dv0D60tDLc5OclvBGBQln
- iUw/+ANKP6/ktwxQGy5k1isoaajO8j9EXfSAz3C4eZ4pRbVBCXgye73zyxcKnobRIrGG
- UG9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=PP5ZBO5V+/qsHiEs8q8QJMOieeCuo90ei1MsjiyJ2Hg=;
- b=oHlKXWuCM9IgJaJCjqP52V6D7ZxGOOuEd87AZ5Iqxxppx6uX6EKE1AfgLM5Q2zfqmC
- a4coMHpi2vE/DD9apRm5J1j5B9u6s5gKDav1jI3Ss4pGn13JAdq/nlyVdh6JFrUkjPG+
- h1qV/E3H1Kuis8rkn8KxCnzKKNVJsZSe3htx0h5pvh9k8AW0jer713jgSDn488359LJs
- ib12Igj6dcnf0jbN0b2g6iXfeJm52BHuRGb3JNZq0G8OmdNYX4FChTPPaVFNm6ypEdCm
- zmgIeDZ+WmpUF4D9Y7hzdwrot0nUw9LNBYoRF79ZaHOxp9w+gqDa1STZzrP+PBrKj9wR
- zYLg==
-X-Gm-Message-State: AGi0PuYfqrU4Pnsh5cWAvwTpBI6JeN1ey24/pxbqHNMR408odY2M1Evm
- 0QfDqyXng73DEwNcFU+ViYltHYjC070=
-X-Google-Smtp-Source: APiQypKbam6Sivo32KrDY3z6IpcGw4Qw47sC1S4lTk5n1hW/vxOnYniXwem0nypd1a7AM1j71TOUtA==
-X-Received: by 2002:a17:902:8eca:: with SMTP id
- x10mr3144285plo.60.1588242242779; 
- Thu, 30 Apr 2020 03:24:02 -0700 (PDT)
-Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
- [34.92.144.28])
- by smtp.gmail.com with ESMTPSA id a15sm1397872pju.3.2020.04.30.03.24.00
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 30 Apr 2020 03:24:02 -0700 (PDT)
-From: Huacai Chen <zltjiangshi@gmail.com>
-X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
-To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: [PATCH for-5.1 V2 2/7] hw/mips: Implement the kvm_type() hook in
- MachineClass
-Date: Thu, 30 Apr 2020 18:22:30 +0800
-Message-Id: <1588242155-23924-3-git-send-email-chenhc@lemote.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1588242155-23924-1-git-send-email-chenhc@lemote.com>
-References: <1588242155-23924-1-git-send-email-chenhc@lemote.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=zltjiangshi@gmail.com; helo=mail-pl1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::641
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jU6IV-0001GY-Oh
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:08 -0400
+Received: from relay.sw.ru ([185.231.240.75]:35812)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jU6IV-00018E-8H; Thu, 30 Apr 2020 06:20:03 -0400
+Received: from dptest2.qa.sw.ru ([10.94.4.71])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jU6IH-0003TP-Tp; Thu, 30 Apr 2020 13:19:50 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v23 0/4]  implement zstd cluster compression method
+Date: Thu, 30 Apr 2020 13:19:14 +0300
+Message-Id: <20200430101918.30351-1-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+Received-SPF: pass client-ip=185.231.240.75;
+ envelope-from=dplotnikov@virtuozzo.com; helo=relay.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 06:20:00
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,126 +58,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>, qemu-devel@nongnu.org,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MIPS has two types of KVM: TE & VZ, and TE is the default type. Now we
-can't create a VZ guest in QEMU because it lacks the kvm_type() hook in
-MachineClass. Besides, libvirt uses a null-machine to detect the kvm
-capability, so by default it will return "KVM not supported" on a VZ
-platform. Thus, null-machine also need the kvm_type() hook.
+v23:
+   Undecided: whether to add zstd(zlib) compression
+              details to the qcow2 spec
+   03: tighten assertion on zstd decompression [Eric]
+   04: use _rm_test_img appropriately [Max]
 
-Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
----
- hw/core/Makefile.objs  |  2 +-
- hw/core/null-machine.c |  4 ++++
- hw/mips/Makefile.objs  |  2 +-
- hw/mips/common.c       | 29 +++++++++++++++++++++++++++++
- include/hw/mips/mips.h |  3 +++
- 5 files changed, 38 insertions(+), 2 deletions(-)
- create mode 100644 hw/mips/common.c
+v22:
+   03: remove assignemnt in if condition
 
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index 6215e7c..7cfef1f 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -16,10 +16,10 @@ common-obj-$(CONFIG_SOFTMMU) += vm-change-state-handler.o
- common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
- common-obj-$(CONFIG_SOFTMMU) += sysbus.o
- common-obj-$(CONFIG_SOFTMMU) += machine.o
--common-obj-$(CONFIG_SOFTMMU) += null-machine.o
- common-obj-$(CONFIG_SOFTMMU) += loader.o
- common-obj-$(CONFIG_SOFTMMU) += machine-hmp-cmds.o
- common-obj-$(CONFIG_SOFTMMU) += numa.o
-+obj-$(CONFIG_SOFTMMU) += null-machine.o
- obj-$(CONFIG_SOFTMMU) += machine-qmp-cmds.o
- 
- common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
-diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-index cb47d9d..94a36f9 100644
---- a/hw/core/null-machine.c
-+++ b/hw/core/null-machine.c
-@@ -17,6 +17,7 @@
- #include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
- #include "hw/core/cpu.h"
-+#include "hw/mips/mips.h"
- 
- static void machine_none_init(MachineState *mch)
- {
-@@ -50,6 +51,9 @@ static void machine_none_machine_init(MachineClass *mc)
-     mc->max_cpus = 1;
-     mc->default_ram_size = 0;
-     mc->default_ram_id = "ram";
-+#ifdef TARGET_MIPS
-+    mc->kvm_type = mips_kvm_type;
-+#endif
- }
- 
- DEFINE_MACHINE("none", machine_none_machine_init)
-diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
-index 525809a..2f7795b 100644
---- a/hw/mips/Makefile.objs
-+++ b/hw/mips/Makefile.objs
-@@ -1,4 +1,4 @@
--obj-y += addr.o mips_int.o
-+obj-y += addr.o common.o mips_int.o
- obj-$(CONFIG_R4K) += mips_r4k.o
- obj-$(CONFIG_MALTA) += gt64xxx_pci.o mips_malta.o
- obj-$(CONFIG_MIPSSIM) += mips_mipssim.o
-diff --git a/hw/mips/common.c b/hw/mips/common.c
-new file mode 100644
-index 0000000..eb0c649
---- /dev/null
-+++ b/hw/mips/common.c
-@@ -0,0 +1,29 @@
-+/*
-+ * Common MIPS routines
-+ *
-+ * Copyright (c) 2020 Huacai Chen (chenhc@lemote.com)
-+ * This code is licensed under the GNU GPL v2.
-+ */
-+
-+#include <linux/kvm.h>
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "hw/boards.h"
-+#include "hw/mips/mips.h"
-+#include "sysemu/kvm_int.h"
-+
-+int mips_kvm_type(MachineState *machine, const char *vm_type)
-+{
-+    int r;
-+    KVMState *s = KVM_STATE(machine->accelerator);;
-+
-+    r = kvm_check_extension(s, KVM_CAP_MIPS_VZ);
-+    if (r > 0)
-+        return KVM_VM_MIPS_VZ;
-+
-+    r = kvm_check_extension(s, KVM_CAP_MIPS_TE);
-+    if (r > 0)
-+        return KVM_VM_MIPS_TE;
-+
-+    return -1;
-+}
-diff --git a/include/hw/mips/mips.h b/include/hw/mips/mips.h
-index 0af4c3d..2ac0580 100644
---- a/include/hw/mips/mips.h
-+++ b/include/hw/mips/mips.h
-@@ -20,4 +20,7 @@ void rc4030_dma_write(void *dma, uint8_t *buf, int len);
- 
- DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_mr);
- 
-+/* common.c */
-+int mips_kvm_type(MachineState *machine, const char *vm_type);
-+
- #endif
+v21:
+   03:
+       * remove the loop on compression [Max]
+       * use designated initializers [Max]
+   04:
+       * don't erase user's options [Max]
+       * use _rm_test_img [Max]
+       * add unsupported qcow2 options [Max]
+
+v20:
+   04: fix a number of flaws [Vladimir]
+       * don't use $RAND_FILE passing to qemu-io,
+         so check $TEST_DIR is redundant
+       * re-arrage $RAND_FILE writing
+       * fix a typo
+
+v19:
+   04: fix a number of flaws [Eric]
+       * remove rudundant test case descriptions
+       * fix stdout redirect
+       * don't use (())
+       * use peek_file_be instead of od
+       * check $TEST_DIR for spaces and other before using
+       * use $RAND_FILE safer
+
+v18:
+   * 04: add quotes to all file name variables [Vladimir] 
+   * 04: add Vladimir's comment according to "qemu-io write -s"
+         option issue.
+
+v17:
+   * 03: remove incorrect comment in zstd decompress [Vladimir]
+   * 03: remove "paraniod" and rewrite the comment on decompress [Vladimir]
+   * 03: fix dead assignment [Vladimir]
+   * 04: add and remove quotes [Vladimir]
+   * 04: replace long offset form with the short one [Vladimir]
+
+v16:
+   * 03: ssize_t for ret, size_t for zstd_ret [Vladimir]
+   * 04: small fixes according to the comments [Vladimir] 
+
+v15:
+   * 01: aiming qemu 5.1 [Eric]
+   * 03: change zstd_res definition place [Vladimir]
+   * 04: add two new test cases [Eric]
+         1. test adjacent cluster compression with zstd
+         2. test incompressible cluster processing
+   * 03, 04: many rewording and gramma fixing [Eric]
+
+v14:
+   * fix bug on compression - looping until compress == 0 [Me]
+   * apply reworked Vladimir's suggestions:
+      1. not mixing ssize_t with size_t
+      2. safe check for ENOMEM in compression part - avoid overflow
+      3. tolerate sanity check allow zstd to make progress only
+         on one of the buffers
+v13:
+   * 03: add progress sanity check to decompression loop [Vladimir]
+     03: add successful decompression check [Me]
+
+v12:
+   * 03: again, rework compression and decompression loops
+         to make them more correct [Vladimir]
+     03: move assert in compression to more appropriate place
+             [Vladimir]
+v11:
+   * 03: the loops don't need "do{}while" form anymore and
+         the they were buggy (missed "do" in the beginning)
+         replace them with usual "while(){}" loops [Vladimir]
+v10:
+   * 03: fix zstd (de)compressed loops for multi-frame
+         cases [Vladimir]
+v9:
+   * 01: fix error checking and reporting in qcow2_amend compression type part [Vladimir]
+   * 03: replace asserts with -EIO in qcow2_zstd_decompression [Vladimir, Alberto]
+   * 03: reword/amend/add comments, fix typos [Vladimir]
+
+v8:
+   * 03: switch zstd API from simple to stream [Eric]
+         No need to state a special cluster layout for zstd
+         compressed clusters.
+v7:
+   * use qapi_enum_parse instead of the open-coding [Eric]
+   * fix wording, typos and spelling [Eric]
+
+v6:
+   * "block/qcow2-threads: fix qcow2_decompress" is removed from the series
+      since it has been accepted by Max already
+   * add compile time checking for Qcow2Header to be a multiple of 8 [Max, Alberto]
+   * report error on qcow2 amending when the compression type is actually chnged [Max]
+   * remove the extra space and the extra new line [Max]
+   * re-arrange acks and signed-off-s [Vladimir]
+
+v5:
+   * replace -ENOTSUP with abort in qcow2_co_decompress [Vladimir]
+   * set cluster size for all test cases in the beginning of the 287 test
+
+v4:
+   * the series is rebased on top of 01 "block/qcow2-threads: fix qcow2_decompress"
+   * 01 is just a no-change resend to avoid extra dependencies. Still, it may be merged in separate
+
+v3:
+   * remove redundant max compression type value check [Vladimir, Eric]
+     (the switch below checks everything)
+   * prevent compression type changing on "qemu-img amend" [Vladimir]
+   * remove zstd config setting, since it has been added already by
+     "migration" patches [Vladimir]
+   * change the compression type error message [Vladimir] 
+   * fix alignment and 80-chars exceeding [Vladimir]
+
+v2:
+   * rework compression type setting [Vladimir]
+   * squash iotest changes to the compression type introduction patch [Vladimir, Eric]
+   * fix zstd availability checking in zstd iotest [Vladimir]
+   * remove unnecessry casting [Eric]
+   * remove rudundant checks [Eric]
+   * fix compressed cluster layout in qcow2 spec [Vladimir]
+   * fix wording [Eric, Vladimir]
+   * fix compression type filtering in iotests [Eric]
+
+v1:
+   the initial series
+
+Denis Plotnikov (4):
+  qcow2: introduce compression type feature
+  qcow2: rework the cluster compression routine
+  qcow2: add zstd cluster compression
+  iotests: 287: add qcow2 compression type test
+
+ docs/interop/qcow2.txt           |   1 +
+ configure                        |   2 +-
+ qapi/block-core.json             |  23 ++-
+ block/qcow2.h                    |  20 ++-
+ include/block/block_int.h        |   1 +
+ block/qcow2-threads.c            | 240 +++++++++++++++++++++++++++++--
+ block/qcow2.c                    | 120 ++++++++++++++++
+ tests/qemu-iotests/031.out       |  14 +-
+ tests/qemu-iotests/036.out       |   4 +-
+ tests/qemu-iotests/049.out       | 102 ++++++-------
+ tests/qemu-iotests/060.out       |   1 +
+ tests/qemu-iotests/061.out       |  34 +++--
+ tests/qemu-iotests/065           |  28 ++--
+ tests/qemu-iotests/080           |   2 +-
+ tests/qemu-iotests/144.out       |   4 +-
+ tests/qemu-iotests/182.out       |   2 +-
+ tests/qemu-iotests/242.out       |   5 +
+ tests/qemu-iotests/255.out       |   8 +-
+ tests/qemu-iotests/287           | 152 ++++++++++++++++++++
+ tests/qemu-iotests/287.out       |  67 +++++++++
+ tests/qemu-iotests/common.filter |   3 +-
+ tests/qemu-iotests/group         |   1 +
+ 22 files changed, 726 insertions(+), 108 deletions(-)
+ create mode 100755 tests/qemu-iotests/287
+ create mode 100644 tests/qemu-iotests/287.out
+
 -- 
-2.7.0
+2.17.0
 
 
