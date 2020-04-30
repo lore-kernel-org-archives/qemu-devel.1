@@ -2,137 +2,112 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E1FC8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A93C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:39:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F67320774
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:27:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 505F52076D
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:39:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="ClNBzBWq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F67320774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPzcZO8r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 505F52076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU7La-0001da-Ak
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 07:27:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58910)
+	id 1jU7Xk-0006iN-Hk
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 07:39:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60326)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thanos.makatos@nutanix.com>) id 1jU7IH-0005y1-Dm
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:23:57 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jU7X8-0005gj-R8
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:39:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <thanos.makatos@nutanix.com>) id 1jU7IA-0003QG-BV
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:23:52 -0400
-Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:22434)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thanos.makatos@nutanix.com>)
- id 1jU7I9-0003Q5-Lj
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:23:46 -0400
-Received: from pps.filterd (m0127838.ppops.net [127.0.0.1])
- by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 03UBMqSG002904; Thu, 30 Apr 2020 04:23:37 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=proofpoint20171006;
- bh=oixrk1TaMqYsGftluZDu/Ai1AhbkUComWWhGHuFdkcQ=;
- b=ClNBzBWqhWG8AtaQHOVPmTtW6h0aKf68xQO8RHJ91ivSTwj6/iUZOpBJW7RiGKQ8sfuq
- UleravvgqQ7vEpRZi5M2weHsuK3cvX7jyHD0R+0efzCHGDnShxrRCa8KA7rDzsuQugoV
- bRPhOgWdgZhH0wxjhftqyarOYIvSIshHj47wYJ9b1Dca0mcriwlPu9HYn4PJLSoTaGM+
- iUxXxslxsdJuKcUBS1DNsmko00MhB66BZWA2jaiJMu+LdrKu/zKa6JxhodZFOjdxgxlT
- c4JuKmlaTW8k1rAFqdLui2yGvC/OJLon4fRIo78l263R1DPHIVoaIPoyWT7VxEzDjjUz Ag== 
-Received: from nam10-dm6-obe.outbound.protection.outlook.com
- (mail-dm6nam10lp2109.outbound.protection.outlook.com [104.47.58.109])
- by mx0a-002c1b01.pphosted.com with ESMTP id 30mmryu908-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 30 Apr 2020 04:23:37 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oNDZj/DIR1iuxEjz5AQ3WCm6Xu2hkeBI7dcW/Hv/ZA6zsq1uk6GiDJajX/LyftUikoljjhz86PenWhaypvDkN3LwLYEL/1OM/YYOx0FCswuGPt5IrnjL9d+cG0OgP2a63SkNh0gjrV5CtqVZ0Qs8fNz97GAqQpyp4zS0L5++lvwHZlvsduB//Px36OJZYOErM147y/lBBIshyUNmkV9WZwV9mjg1lRBX4qQAfd7axRke7hglmSYAYI0+Dh0PG4OA2bryxpDNslhdCgsEkxU590zerf20sooJ38tbMZu8BdpkyD5WdWjsvuWAroRI/a35YihQPoKJE/SJllB7MuNohA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oixrk1TaMqYsGftluZDu/Ai1AhbkUComWWhGHuFdkcQ=;
- b=MhXiorxkiBmzwHnhcjJuIDLJ46KAejEF9bNO8HzfE3qQZFnQVbvnNKl2JwN0KOcifEC3tqwBYmGLM2MgHOGnB/fntW6syYTr0L3gQAcIcQaZYQz+DsDut0OZAyk0dJneAifq/0J5bYqOWtcya6M68rlWL0vhCiwf70oGyiPdZh1zldi6hb+e9FVNGYlYdyiEGmJvC4cBc+BmesbBeJCdP8dmy0UbGmyoy5KFI4nfmVpv6AJwkZ98bZEeswzCsScrCmYEKA7SMjzVrplfi3zCe4ODaaQ0e6qG7qB0QGmykBI8ug5d68392MsU9ayw9gn1c/VfEiB80w7Xy5awNAgsjA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MW2PR02MB3723.namprd02.prod.outlook.com (2603:10b6:907:2::32)
- by MW2PR02MB3787.namprd02.prod.outlook.com (2603:10b6:907:3::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Thu, 30 Apr
- 2020 11:23:35 +0000
-Received: from MW2PR02MB3723.namprd02.prod.outlook.com
- ([fe80::b90a:dbb6:2412:266e]) by MW2PR02MB3723.namprd02.prod.outlook.com
- ([fe80::b90a:dbb6:2412:266e%5]) with mapi id 15.20.2958.020; Thu, 30 Apr 2020
- 11:23:35 +0000
-From: Thanos Makatos <thanos.makatos@nutanix.com>
-To: Thanos Makatos <thanos.makatos@nutanix.com>, Stefan Hajnoczi
- <stefanha@gmail.com>, John G Johnson <john.g.johnson@oracle.com>
-Subject: RE: RFC: use VFIO over a UNIX domain socket to implement device
- offloading
-Thread-Topic: RFC: use VFIO over a UNIX domain socket to implement device
- offloading
-Thread-Index: AdYDU20BI9Of/G6jR7ONy5zZTB1T9QEsuagAA77zu+AAbiuPAADxCFGgAJikHLA=
-Date: Thu, 30 Apr 2020 11:23:34 +0000
-Message-ID: <MW2PR02MB372319618A59DA06851BBFB48BAA0@MW2PR02MB3723.namprd02.prod.outlook.com>
-References: <MN2PR02MB62052E54C752229C115EAD898BCF0@MN2PR02MB6205.namprd02.prod.outlook.com>
- <20200401091712.GA221892@stefanha-x1.localdomain>
- <MW2PR02MB372349E25A0842DE045B95F58BD40@MW2PR02MB3723.namprd02.prod.outlook.com>
- <20200422152930.GC47385@stefanha-x1.localdomain>
- <MW2PR02MB372340D8EF74A43D64E67B728BAF0@MW2PR02MB3723.namprd02.prod.outlook.com>
-In-Reply-To: <MW2PR02MB372340D8EF74A43D64E67B728BAF0@MW2PR02MB3723.namprd02.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: nutanix.com; dkim=none (message not signed)
- header.d=none;nutanix.com; dmarc=none action=none header.from=nutanix.com;
-x-originating-ip: [92.29.225.29]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: bab32d3d-0a8f-4a7f-fbcd-08d7ecf8ebfd
-x-ms-traffictypediagnostic: MW2PR02MB3787:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MW2PR02MB3787C72DED215E9AFD70F2818BAA0@MW2PR02MB3787.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0389EDA07F
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MW2PR02MB3723.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(396003)(346002)(39860400002)(136003)(366004)(376002)(71200400001)(316002)(52536014)(8936002)(478600001)(7416002)(8676002)(186003)(7696005)(66946007)(64756008)(9686003)(66556008)(55016002)(66476007)(6506007)(110136005)(26005)(66446008)(76116006)(44832011)(2906002)(4326008)(54906003)(5660300002)(86362001)(966005)(33656002);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: a6LRTt581LDBmR4rWUe5VmtLC6PBC9+oUwUlm9wqZ5g/Q+GUVYWSx2nCXXMzASerHLR3iijIqPKlkSrU26kV5VXQ+HEgQ8aXbamNtKZLFDz4/k92buXVuYz+iP+dNgc8TEm2rPXFOBc5XwLMZkzMc/tELs4Gk0bi4cynrHWW28k48IrlSrSaan697S0uDXuf1kFSibNv4yDd3aksKsiic21j1FvF+bg5Zqu4nCrECnDejYnZ6LdD0Ukd2toQXqvv3vgjtA0bHRqrDUneFhCE+PuIlET6T7E1/OE6Tet2kbHwY5fdJyphEvcsXaCdIgvJ8GVVMUQ3Gd8O6qB9yspzfqmwGNO59hQ5HpdYhOVgUy5NSyilJF4JBqqePAZWhvfsBoGMJL7WFAIGgGXgfiSnxsRNZuO/daZnbauc7oZStT7DqjekMkPJbhJjSHRqEPqM1A9taheG2BaceTHRPXFnew+OQKi6xOZSoQauqQCLa+PFH8BUdh7qv6SkyGETIrzXtYuymtgyP/4UQVDeOqxqaQ==
-x-ms-exchange-antispam-messagedata: C1NN6XrrmIaWDgBp0Dq/aEIw0gAmw7rRP0PPdFMMfXw3dPDwxOxc+lP2ljETe9dagPVmHbOaWqT1zhmrhjQIW+quE2IsCla3RhxKN6tCdylB/pR9RKg251YW1P2ZVNN3NfpnXt6MyfLXUSE6iH2F58qE5s3GzOetKMiQWcDCbFBnzezFKQssjzURip5qLsubm0ea7FK1EyfKMzJm6jd0LYymnmMM6nEbabO/k608lEwMuEljtVK6GtcBnYxlIycVRS6jIii544ni88eH0CV0HmJtHPWSaV6nEc3qOxS0Q9Pf+SFGr8GC015kNPJUGkS76RT+dDmPxXggVz8qq0TKUYDpGjL5TcnAkrVO/lbBTPQEwE2gbvEZsbmdoaVUT3aOrAKARGYHIVShdGQZVcdVfoKuRZ7OIGxl2LxVdKxOh7Im8f4YV/wsOaug0UMk7zscSQvoeC6VQKT6c1o3wGG7exxRlSF+0gkPcAyTnocmgdYHxvBWR+C3KXpD//G0gkIF69Nk7cONJ7Rrc4ovUM/QwmPInjzMcxfSNX/3Bo35yQlunbl33QnSjq3RCH6JV/Bgic0kVJMIBil8goU69E0KitsFneeFZ2WExqTE0gE91ftW4+BKrm3aruUdlYkxF8+WLJrMe2Y7YuG444GxmS1i9GD6eruRZsY5QwFE0GJ4IDLJ+n0Om1lLAVp8BfC8sq0kycgvi77mutWuwVzd0oKxrW+ghyFuTj0bBcwO2m4cvbmEeYLlvr4Y7hyV7lcmynO6qb79xgPXDvtcRc9WshaXTwg23R+Syii/umXN2seahYA=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <mreitz@redhat.com>) id 1jU7X7-0007NJ-Gv
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:39:14 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57812
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jU7X7-0007NC-0K
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:39:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588246750;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=9Q5OvfBkfU6LhdGqKO3mzpV0MFYFGesscIJf/yFA08M=;
+ b=jPzcZO8rcj7SMzcbj6L8WPlPQCE+j0RNAk2b6tSZSLUllbHM5xbReuJV0WIr7/GfxKaXUm
+ VETt8V0+n49W5JgsyHMc1SNKEo1yKK1Ku3zOdYUS7Q/Iggcv1obVXmd2EN1klk0DhwWUjb
+ Jn/wdh08oveHXPPBX3tkqjgQQyn5HLg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-tK7mMk4MNIyFCJKYaz3Ypw-1; Thu, 30 Apr 2020 07:39:08 -0400
+X-MC-Unique: tK7mMk4MNIyFCJKYaz3Ypw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 220BB19057A3
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 11:39:07 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-177.ams2.redhat.com
+ [10.36.112.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8EFC85EDE5;
+ Thu, 30 Apr 2020 11:38:59 +0000 (UTC)
+Subject: Re: [PATCH] virtiofsd: Show submounts
+From: Max Reitz <mreitz@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200424133516.73077-1-mreitz@redhat.com>
+ <20200427175902.GM2923@work-vm> <20200429145720.GA2835@work-vm>
+ <8c73f374-fcc8-1684-b581-84a9ab501aa9@redhat.com>
+ <20200430085812.GC2874@work-vm>
+ <94924861-d934-0151-aca5-19ea9eb211e1@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <7bca4d0d-5735-b8ca-4b30-21fc47f10c69@redhat.com>
+Date: Thu, 30 Apr 2020 13:38:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bab32d3d-0a8f-4a7f-fbcd-08d7ecf8ebfd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Apr 2020 11:23:34.7971 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nQ4GIvHxdu0OhU/YAYyLT/Zj/yu9AQJWyCJL/8PP68l6bGqATaxbB5yENpvtBVJfAWEqE0eV3Lua9yD+pIifSEMJct6my7GSnQXTDkU0nck=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR02MB3787
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-30_07:2020-04-30,
- 2020-04-30 signatures=0
-X-Proofpoint-Spam-Reason: safe
-Received-SPF: pass client-ip=148.163.151.68;
- envelope-from=thanos.makatos@nutanix.com; helo=mx0a-002c1b01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 07:23:39
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Received-From: 148.163.151.68
+In-Reply-To: <94924861-d934-0151-aca5-19ea9eb211e1@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Cr0jppYxlnBJVPb5HB4AGEm5hfWattA5y"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:31:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -144,162 +119,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Walker, Benjamin" <benjamin.walker@intel.com>,
- Elena Ufimtseva <elena.ufimtseva@oracle.com>, Jag Raman <jag.raman@oracle.com>,
- Swapnil Ingle <swapnil.ingle@nutanix.com>, "Harris,
- James R" <james.r.harris@intel.com>,
- Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- Kirti Wankhede <kwankhede@nvidia.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Felipe Franciosi <felipe@nutanix.com>,
- =?iso-8859-1?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Zhang, Tina" <tina.zhang@intel.com>,
- Kanth Ghatraju <Kanth.Ghatraju@oracle.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>
+Cc: virtio-fs@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-devel@nongnu.org, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> > > I've just shared with you the Google doc we've working on with John
-> > where we've
-> > > been drafting the protocol specification, we think it's time for some=
- first
-> > > comments. Please feel free to comment/edit and suggest more people
-> to
-> > be on the
-> > > reviewers list.
-> > >
-> > > You can also find the Google doc here:
-> > >
-> > >
-> > https://urldefense.proofpoint.com/v2/url?u=3Dhttps-
-> 3A__docs.google.com_document_d_1FspkL0hVEnZqHbdoqGLUpyC38rSk-
-> 5F&d=3DDwIFAw&c=3Ds883GpUCOChKOHiocYtGcg&r=3DXTpYsh5Ps2zJvtw6ogtti46a
-> tk736SI4vgsJiUKIyDE&m=3DlJC7YeMMsAaVsr99tmTYncQdjEfOXiJQkRkJW7NMg
-> Rg&s=3DRyyhgVrLX2bBTqpXZnBmllqkCg_wyalxwZKkfcYt50c&e=3D
-> > 7HhY471TsVwyK8/edit?usp=3Dsharing
-> > >
-> > > If a Google doc doesn't work for you we're open to suggestions.
-> >
-> > I can't add comments to the document so I've inlined them here:
-> >
-> > The spec assumes the reader is already familiar with VFIO and does not
-> > explain concepts like the device lifecycle, regions, interrupts, etc.
-> > We don't need to duplicate detailed VFIO information, but I think the
-> > device model should be explained so that anyone can start from the
-> > VFIO-user spec and begin working on an implementation.  Right now I
-> > think they would have to do some serious investigation of VFIO first in
-> > order to be able to write code.
->=20
-> I've added a high-level overview of how VFIO is used in this context.
->=20
-> > "only the source header files are used"
-> > I notice the current <linux/vfio.h> header is licensed "GPL-2.0 WITH
-> > Linux-syscall-note".  I'm not a lawyer but I guess this means there are
-> > some restrictions on using this header file.  The <linux/virtio*.h>
-> > header files were explicitly licensed under the BSD license to make it
-> > easy to use the non __KERNEL__ parts.
->=20
-> My impression is that this note actually relaxes the licensing requiremen=
-ts, so
-> that proprietary software can use the system call headers and run on Linu=
-x
-> without being considered derived work. In any case I'll double check with=
- our
-> legal team.
->=20
-> > VFIO-user Command Types: please indicate for each request type whether
-> > it is client->server, server->client, or both.  Also is it a "command"
-> > or "request"?
->=20
-> Will do. It's a command.
->=20
->=20
-> > vfio_user_req_type <-- is this an extension on top of <linux/vfio.h>?
-> > Please make it clear what is part of the base <linux/vfio.h> protocol
-> > and what is specific to vfio-user.
->=20
-> Correct, it's an extension over <linux/vfio.h>. I've clarified the two sy=
-mbol
-> namespaces.
->=20
->=20
-> > VFIO_USER_READ/WRITE serve completely different purposes depending
-> on
-> > whether they are sent client->server or server->client.  I suggest
-> > defining separate request type constants instead of overloading them.
->=20
-> Fixed.
->=20
-> > What is the difference between VFIO_USER_MAP_DMA and
-> > VFIO_USER_REG_MEM?
-> > They both seem to be client->server messages for setting up memory but
-> > I'm not sure why two request types are needed.
->=20
-> John will provide more information on this.
->=20
-> > struct vfio_user_req->data.  Is this really a union so that every
-> > message has the same size, regardless of how many parameters are
-> passed
-> > in the data field?
->=20
-> Correct, it's a union so that every message has the same length.
->=20
-> > "a framebuffer where the guest does multiple stores to the virtual
-> > device."  Do you mean in SMP guests?  Or even in a single CPU guest?
->=20
-> @John
->=20
-> > Also, is there any concurrency requirement on the client and server
-> > side?  Can I implement a client/server that processes requests
-> > sequentially and completes them before moving on to the next request or
-> > would that deadlock for certain message types?
->=20
-> I believe that this might also depend on the device semantics, will need =
-to
-> think about it in greater detail.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Cr0jppYxlnBJVPb5HB4AGEm5hfWattA5y
+Content-Type: multipart/mixed; boundary="2HNnvSZGdCtjcq5p8D5Jlv4N6PB4CzrpT"
 
-I've looked at this but can't provide a definitive answer yet. I believe th=
+--2HNnvSZGdCtjcq5p8D5Jlv4N6PB4CzrpT
+Content-Type: multipart/mixed;
+ boundary="------------2F7EFAE0B68055935B9B9592"
+Content-Language: en-US
+
+This is a multi-part message in MIME format.
+--------------2F7EFAE0B68055935B9B9592
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 30.04.20 11:21, Max Reitz wrote:
+> On 30.04.20 10:58, Dr. David Alan Gilbert wrote:
+>> * Max Reitz (mreitz@redhat.com) wrote:
+>>> On 29.04.20 16:57, Dr. David Alan Gilbert wrote:
+>>>> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+>>>>> * Max Reitz (mreitz@redhat.com) wrote:
+>>>>>> Currently, setup_mounts() bind-mounts the shared directory without
+>>>>>> MS_REC.  This makes all submounts disappear.
+>>>>>>
+>>>>>> Pass MS_REC so that the guest can see submounts again.
+>>>>>
+>>>>> Thanks!
+>>>>>
+>>>>>> Fixes: 3ca8a2b1c83eb185c232a4e87abbb65495263756
+>>>>>
+>>>>> Should this actually be 5baa3b8e95064c2434bd9e2f312edd5e9ae275dc ?
+>>>>>
+>>>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>>>> ---
+>>>>>>  tools/virtiofsd/passthrough_ll.c | 2 +-
+>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/pass=
+through_ll.c
+>>>>>> index 4c35c95b25..9d7f863e66 100644
+>>>>>> --- a/tools/virtiofsd/passthrough_ll.c
+>>>>>> +++ b/tools/virtiofsd/passthrough_ll.c
+>>>>>> @@ -2643,7 +2643,7 @@ static void setup_mounts(const char *source)
+>>>>>>      int oldroot;
+>>>>>>      int newroot;
+>>>>>> =20
+>>>>>> -    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
+>>>>>> +    if (mount(source, source, NULL, MS_BIND | MS_REC, NULL) < 0) {
+>>>>>>          fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", sour=
+ce, source);
+>>>>>>          exit(1);
+>>>>>>      }
+>>>>>
+>>>>> Do we want MS_SLAVE to pick up future mounts that might happenf rom t=
+he
+>>>>> host?
+>>>>> What's the interaction between this and the MS_REC|MS_SLAVE that we h=
+ave
+>>>>> a few lines above for / ?
+>>>>
+>>>> Just to confirm something from vgoyal, and what had confused me about
+>>>> why we hadn't spotted this earlier.
+>>>>
+>>>> Even without this patch, the SLAVE stuff worked so if you start the
+>>>> daemon and *then* mount under the shared directory, the guest sees it
+>>>> with or without this patch.
+>>>
+>>> Hm, I don=E2=80=99t.  Do you really?
+>>
+>> Yes! With your patch reverted:
+>>
+>> Start virtiofsd, mount in the guest:
+>>
+>> host:
+>> # ./virtiofsd --socket-path=3D/tmp/vhostqemu -o source=3D/home/dgilbert/=
+virtio-fs/fs  -o log_level=3Dwarn -o no_writeback
+>>
+>> guest:
+>> # mount -t virtiofs myfs /sysroot
+>=20
+> OK, for some reason I didn=E2=80=99t try to mount in the guest first, but=
+ did
+> the host mount after starting virtiofsd.
+>=20
+> My mount test uses multiple mounts, and two of them I see mounted, but
+> three I still don=E2=80=99t see mounted.
+
+And if I do a find /sysroot (or find /mnt in my case) in the guest
+before mounting anything on the host, the mounts don=E2=80=99t appear in th=
 e
-safest thing to do is for the server to process requests in order.
+guest at all, but that=E2=80=99s kind of a virtiofsd bug (or feature?).  Th=
+at
+is, if it has opened some directory before it became a mountpoint, then
+it stays not-a-mountpoint.
 
-> More importantly, considering:
-> a) Marc-Andr=E9's comments about data alignment etc., and
-> b) the possibility to run the server on another guest or host,
-> we won't be able to use native VFIO types. If we do want to support that
-> then
-> we'll have to redefine all data formats, similar to
-> https://urldefense.proofpoint.com/v2/url?u=3Dhttps-
-> 3A__github.com_qemu_qemu_blob_master_docs_interop_vhost-
-> 2Duser.rst&d=3DDwIFAw&c=3Ds883GpUCOChKOHiocYtGcg&r=3DXTpYsh5Ps2zJvtw6
-> ogtti46atk736SI4vgsJiUKIyDE&m=3DlJC7YeMMsAaVsr99tmTYncQdjEfOXiJQkRkJ
-> W7NMgRg&s=3D1d_kB7VWQ-8d4t6Ikga5KSVwws4vwiVMvTyWVaS6PRU&e=3D .
->=20
-> So the protocol will be more like an enhanced version of the Vhost-user
-> protocol
-> than VFIO. I'm fine with either direction (VFIO vs. enhanced Vhost-user),
-> so we need to decide before proceeding as the request format is
-> substantially
-> different.
+> Let me see whether I can come up with something reproducible that isn=E2=
+=80=99t
+> a script.
 
-Regarding the ability to use the protocol on non-AF_UNIX sockets, we can=20
-support this future use case without unnecessarily complicating the protoco=
-l by
-defining the C structs and stating that data alignment and endianness for t=
-he=20
-non AF_UNIX case must be the one used by GCC on a x86_64 bit machine, or ca=
-n=20
-be overridden as required.
+Unfortunately, I can=E2=80=99t.  I=E2=80=99ve attached the script.
 
-We've polished the document a bit more with the help of Marc-Andr=E9,
-Raphael, and Swapnil.
+It launches qemu, then in the guest you have to mount =E2=80=9Chost=E2=80=
+=9D somewhere
+(before the script emits =E2=80=9Cmounting=E2=80=9D, ideally).
 
-The major outstanding issue is agreeing on the having a pair of commands fo=
-r
-registering/unregistering guest memory and another pair of commands to map/=
-unmap
-DMA regions, similar to QEMU.
+I can see that in the guest, mnt0-0 is mounted, and mnt0-0/sub is, too,
+but mnt0-1 and mnt1 aren=E2=80=99t.
+
+With this patch here, everything is mounted.
+
+Max
+
+--------------2F7EFAE0B68055935B9B9592
+Content-Type: application/x-shellscript;
+ name="test.sh"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="test.sh"
+
+IyEvYmluL3NoCgpzZXQgLWUKCiNzdWRvIHNoIC1jICcuL3ZpcnRpb2ZzZCAtLXNvY2tldC1wYXRo
+PS90bXAvdmZzZHNvY2swIC1vIHNvdXJjZT0kUFdEL3ZpcnRpb2ZzLXNoYXJlZCAtbyBjYWNoZT1h
+bHdheXMgLWYgJicKc3VkbyBzaCAtYyAnLi92aXJ0aW9mc2QgLS1zb2NrZXQtcGF0aD0vdG1wL3Zm
+c2Rzb2NrMCAtbyBzb3VyY2U9JFBXRC92aXJ0aW9mcy1zaGFyZWQgLW8gbm9fd3JpdGViYWNrICYn
+CgpzbGVlcCAxCgpzdWRvIGNobW9kIGdvK3J3IC90bXAvdmZzZHNvY2swCgojIFRPRE86IEFkZCB5
+b3VyIGFyZ3VtZW50cyB0byBydW4gc29tZSB0ZXN0IHN5c3RlbQp4ODZfNjQtc29mdG1tdS9xZW11
+LXN5c3RlbS14ODZfNjQgXAogICAgLWFjY2VsIGt2bSAtbSA0RyBcCiAgICAtY2hhcmRldiBzb2Nr
+ZXQsaWQ9dmZzZHNvY2swLHBhdGg9L3RtcC92ZnNkc29jazAgXAogICAgLWRldmljZSB2aG9zdC11
+c2VyLWZzLXBjaSxxdWV1ZS1zaXplPTEwMjQsY2hhcmRldj12ZnNkc29jazAsdGFnPWhvc3QgXAog
+ICAgLW9iamVjdCBtZW1vcnktYmFja2VuZC1maWxlLGlkPW1lbSxzaXplPTRHLG1lbS1wYXRoPS9k
+ZXYvc2htLHNoYXJlPW9uIFwKICAgIC1udW1hIG5vZGUsbWVtZGV2PW1lbSAmCgpzbGVlcCAxCgpy
+bSAtZiBmczAuaW1nIGZzMS5pbWcgZnMyLmltZwoKdHJ1bmNhdGUgLXMgNTEyTSBmczAuaW1nCnRy
+dW5jYXRlIC1zIDUxMk0gZnMxLmltZwp0cnVuY2F0ZSAtcyA1MTJNIGZzMi5pbWcKCm1rZnMueGZz
+IC1xIGZzMC5pbWcKCnNsZWVwIDEKCnJtIC1mIGZzMC5pbWcgZnMxLmltZyBmczIuaW1nCgp0cnVu
+Y2F0ZSAtcyA1MTJNIGZzMC5pbWcKdHJ1bmNhdGUgLXMgNTEyTSBmczEuaW1nCnRydW5jYXRlIC1z
+IDUxMk0gZnMyLmltZwoKbWtmcy54ZnMgLXEgZnMwLmltZwpta2ZzLnhmcyAtcSBmczEuaW1nCm1r
+ZnMueGZzIC1xIGZzMi5pbWcKCnN1ZG8gbWtkaXIgLXAgdmlydGlvZnMtc2hhcmVkL21udDAtMApz
+dWRvIG1rZGlyIC1wIHZpcnRpb2ZzLXNoYXJlZC9tbnQwLTEKc3VkbyBta2RpciAtcCB2aXJ0aW9m
+cy1zaGFyZWQvbW50MQoKc3VkbyB0b3VjaCB2aXJ0aW9mcy1zaGFyZWQvbW50MC0wLzAtMC1ub3Qt
+bW91bnRlZApzdWRvIHRvdWNoIHZpcnRpb2ZzLXNoYXJlZC9tbnQwLTEvMC0xLW5vdC1tb3VudGVk
+CnN1ZG8gdG91Y2ggdmlydGlvZnMtc2hhcmVkL21udDEvMS1ub3QtbW91bnRlZAoKZm9yIGkgaW4g
+JChzZXEgMCA1OSk7IGRvCiAgICBlY2hvICJNb3VudGluZyBpbiAkKCg2MCAtIGkpKSBzIgogICAg
+c2xlZXAgMQpkb25lCgpkZXYwPSQoc3VkbyBsb3NldHVwIC1mIC0tc2hvdyBmczAuaW1nKQpkZXYx
+PSQoc3VkbyBsb3NldHVwIC1mIC0tc2hvdyBmczEuaW1nKQpkZXYyPSQoc3VkbyBsb3NldHVwIC1m
+IC0tc2hvdyBmczIuaW1nKQoKc3VkbyBtb3VudCAiJGRldjAiIHZpcnRpb2ZzLXNoYXJlZC9tbnQw
+LTAKc3VkbyB0b3VjaCB2aXJ0aW9mcy1zaGFyZWQvbW50MC0wL2RldjAtbW91bnRlZApzdWRvIG1v
+dW50ICIkZGV2MCIgdmlydGlvZnMtc2hhcmVkL21udDAtMQoKc3VkbyBta2RpciAtcCB2aXJ0aW9m
+cy1zaGFyZWQvbW50MC0wL3N1YgpzdWRvIHRvdWNoIHZpcnRpb2ZzLXNoYXJlZC9tbnQwLTAvc3Vi
+L2RldjItbm90LW1vdW50ZWQKc3VkbyBtb3VudCAiJGRldjIiIHZpcnRpb2ZzLXNoYXJlZC9tbnQw
+LTAvc3ViCnN1ZG8gdG91Y2ggdmlydGlvZnMtc2hhcmVkL21udDAtMC9zdWIvZGV2Mi1tb3VudGVk
+CgpzdWRvIG1vdW50ICIkZGV2MSIgdmlydGlvZnMtc2hhcmVkL21udDEKc3VkbyB0b3VjaCB2aXJ0
+aW9mcy1zaGFyZWQvbW50MS9kZXYxLW1vdW50ZWQKCnN1ZG8gbWtkaXIgLXAgdmlydGlvZnMtc2hh
+cmVkL21udDEvc3ViMApzdWRvIHRvdWNoIHZpcnRpb2ZzLXNoYXJlZC9tbnQxL3N1YjAvZGV2Mi1u
+b3QtbW91bnRlZAoKc3VkbyBtb3VudCAiJGRldjAiIHZpcnRpb2ZzLXNoYXJlZC9tbnQxL3N1YjAK
+CmVjaG8gJ01vdW50ZWQnCgp3YWl0CgpzdWRvIHVtb3VudCB2aXJ0aW9mcy1zaGFyZWQvbW50MC0w
+L3N1YgpzdWRvIHVtb3VudCB2aXJ0aW9mcy1zaGFyZWQvbW50MC0wCnN1ZG8gdW1vdW50IHZpcnRp
+b2ZzLXNoYXJlZC9tbnQwLTEKc3VkbyB1bW91bnQgdmlydGlvZnMtc2hhcmVkL21udDEvc3ViMApz
+dWRvIHVtb3VudCB2aXJ0aW9mcy1zaGFyZWQvbW50MQoKc3VkbyBsb3NldHVwIC1kICIkZGV2MCIK
+c3VkbyBsb3NldHVwIC1kICIkZGV2MSIKc3VkbyBsb3NldHVwIC1kICIkZGV2MiIK
+--------------2F7EFAE0B68055935B9B9592--
+
+--2HNnvSZGdCtjcq5p8D5Jlv4N6PB4CzrpT--
+
+--Cr0jppYxlnBJVPb5HB4AGEm5hfWattA5y
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6quNIACgkQ9AfbAGHV
+z0CtEwgAjk7iJ2ZogEkcbY0K65SNx4q99ZhXoMT35dqZpXXlDr+B6oW1oC6sDHVH
+wkOli1vzer1cgrBITm/pfoC36dlX8WHZ+4s3/riMVoLJSRm5v62oSaQKrHj8jno6
+EO8UQo09FBOKHjdjwELqeupXIyUP1oUSTfrm9Fb8czJ2INSr0khABX/KjUiA6130
+XZQJLwPEccY+k0XiD7LUfUrMm87NFg2Bx9vJGbZzirHbc6391fA5doIklIAoONxP
+OpQ5innr4IBjEh+qS7dzvoUggKPQ/j7ipxYsrOjLADWFyCvBnBUL4Ng8Hk4k5TvH
+CGgJvV6U/GY15OIgHVVj8NMFqwsBcQ==
+=KHxH
+-----END PGP SIGNATURE-----
+
+--Cr0jppYxlnBJVPb5HB4AGEm5hfWattA5y--
 
 
