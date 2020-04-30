@@ -2,81 +2,86 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71489C4724C
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:09:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D88EFC47254
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:11:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B5362076D
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:09:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 63DF72076D
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:11:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="boJQzy/1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B5362076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h5q1pEd1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63DF72076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUBkv-0005D8-7D
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:09:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44774)
+	id 1jUBms-00089C-76
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:11:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jUBWw-0007pm-E7
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:56:37 -0400
+ (envelope-from <robert.foley@linaro.org>) id 1jUBdU-0000UU-Gg
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:03:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jUBUz-0003x0-1z
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:55:18 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49727
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jUBUy-0003rq-Je
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:53:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588261995;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MzKCw+CvacQBEEtpOEkGsJA6GH7v/lM0D8gmEN1On64=;
- b=boJQzy/1oUrotbZf8pk5gx0L1M1+2goybPs4pu/thfQIYZXuHDMqvGeI3zgyx0n99u0eXc
- QeHrZDbUi34sxzBRbDch8iUXNI3dyxR5TjM9zOm3+3Od+4GHSYQ3KOB9COUla9FmsfhYaU
- EysobyjShrQ4sLX7ZjSoDES8ykMCLh8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-qT7fft1UOUiPjgENgZ7a2Q-1; Thu, 30 Apr 2020 11:53:11 -0400
-X-MC-Unique: qT7fft1UOUiPjgENgZ7a2Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7BB0462;
- Thu, 30 Apr 2020 15:53:10 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-114-60.ams2.redhat.com [10.36.114.60])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DCD7460C84;
- Thu, 30 Apr 2020 15:53:08 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 11/15] iotests: Test committing to short backing file
-Date: Thu, 30 Apr 2020 17:52:27 +0200
-Message-Id: <20200430155231.473156-12-kwolf@redhat.com>
-In-Reply-To: <20200430155231.473156-1-kwolf@redhat.com>
-References: <20200430155231.473156-1-kwolf@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:31:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+ (envelope-from <robert.foley@linaro.org>) id 1jUBaC-0003CJ-Tu
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:02:04 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:40432)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jUBaC-0003Bs-Eg
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:58:40 -0400
+Received: by mail-qt1-x844.google.com with SMTP id e17so5377787qtp.7
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 08:58:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=7n0OEOUcViSoi8lDFmvS1FDdqucfcjXxY1zrvZFIRGA=;
+ b=h5q1pEd1IHxUeE3X2QUkC6hHBI/quzW+osUrMvXMbkP26ag2wX+Rpys/RU1awmfLXZ
+ vEhMmZz2odSY3BefYjilamPgqGPyLWO5R3S697pgNocfh2TIlzoMQDn7Pqo0iJr1p+Kh
+ Q2F8QWja/Hz+X8EpKENKbq8NHroiMtV4eBcibLr2aLojHL1qu9AlNfqP6mdrzYMeKKq0
+ 6TWWpNsXdFPDX32TmgAOE4hxDV4JxNGdO3JdYHvNzu3lO3p8vJwQ/pLtwrnT7Jr46N4f
+ SkLhAyCGaHEh8+2RgImqvslORwIp0XtBhJY8P+2LJcjQMpB0cLruNhypHbDknXGxrGYi
+ oduw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=7n0OEOUcViSoi8lDFmvS1FDdqucfcjXxY1zrvZFIRGA=;
+ b=OS6OvI2j5NI9OHbJ0lK3gFQ344/4VfhCnhayo2sDf775ynn411bhzR9BeyFLPxH7fo
+ cN5x84NXqH2erL6e/XUqhDGzpyXnaGiouG+iK7rmGeIBZvDo9vJKdME2gGPgMsoVO8o4
+ BEw7xgt80YOVuMXCqrh9yE3brA4n9g1ZLY4eo48qm/QKVo4mFp/J3E/TzvvDQpumhSlq
+ pS7Ltc/0gP7Cn6/A5kKv4S//1GAdutNEPovWmCQKCXzYXGHJAbEpRcOvj3EnqbSfmAs4
+ ma7m7uCaDzuR6B8shn0Xh/nwaAEKVYcs88ry+M81wmYjtezJTmhqx9WkwqkXBg1fqb/p
+ V2kQ==
+X-Gm-Message-State: AGi0PuZrFq1nyvYVvAJC6iu1iZ0jqr32eHAVQfaDwzaxNtWNcAMwcClF
+ 4bszj+Bg3SBGKsCOE49X2DIGPMK7lPfj0w==
+X-Google-Smtp-Source: APiQypJhZKwtSGjR7Jrs14z2utCtaA2QY8s3pbxTEWpJMLZ4QMW5+xJE80iR85jaouamSrApYhG58Q==
+X-Received: by 2002:aed:3bda:: with SMTP id s26mr4329055qte.261.1588262319113; 
+ Thu, 30 Apr 2020 08:58:39 -0700 (PDT)
+Received: from Rfoley-MA01.hsd1.ma.comcast.net
+ ([2601:199:4480:60c0:7489:3328:3806:7c3])
+ by smtp.gmail.com with ESMTPSA id v16sm305254qkf.80.2020.04.30.08.58.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Apr 2020 08:58:38 -0700 (PDT)
+From: Robert Foley <robert.foley@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 3/9] tests/vm: add --boot-console switch
+Date: Thu, 30 Apr 2020 11:57:12 -0400
+Message-Id: <20200430155718.212-4-robert.foley@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200430155718.212-1-robert.foley@linaro.org>
+References: <20200430155718.212-1-robert.foley@linaro.org>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::844;
+ envelope-from=robert.foley@linaro.org; helo=mail-qt1-x844.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::844
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,549 +93,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: philmd@redhat.com, alex.bennee@linaro.org, robert.foley@linaro.org,
+ peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <20200424125448.63318-10-kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/274     | 155 +++++++++++++++++++++
- tests/qemu-iotests/274.out | 268 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 424 insertions(+)
- create mode 100755 tests/qemu-iotests/274
- create mode 100644 tests/qemu-iotests/274.out
+Added ability to view console during boot via
+--boot-console switch to basevm.py.  This helps debug issues that occur
+during the boot sequence.
+Also added a new special variable to vm-build:
+BOOT_CONSOLE=1 will cause this new --boot-console switch to be set.
 
-diff --git a/tests/qemu-iotests/274 b/tests/qemu-iotests/274
-new file mode 100755
-index 0000000000..e951f723b8
---- /dev/null
-+++ b/tests/qemu-iotests/274
-@@ -0,0 +1,155 @@
-+#!/usr/bin/env python3
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: Kevin Wolf <kwolf@redhat.com>
-+#
-+# Some tests for short backing files and short overlays
-+
-+import iotests
-+
-+iotests.verify_image_format(supported_fmts=3D['qcow2'])
-+iotests.verify_platform(['linux'])
-+
-+size_short =3D 1 * 1024 * 1024
-+size_long =3D 2 * 1024 * 1024
-+size_diff =3D size_long - size_short
-+
-+def create_chain() -> None:
-+    iotests.qemu_img_log('create', '-f', iotests.imgfmt, base,
-+                         str(size_long))
-+    iotests.qemu_img_log('create', '-f', iotests.imgfmt, '-b', base, mid,
-+                         str(size_short))
-+    iotests.qemu_img_log('create', '-f', iotests.imgfmt, '-b', mid, top,
-+                         str(size_long))
-+
-+    iotests.qemu_io_log('-c', 'write -P 1 0 %d' % size_long, base)
-+
-+def create_vm() -> iotests.VM:
-+    vm =3D iotests.VM()
-+    vm.add_blockdev('file,filename=3D%s,node-name=3Dbase-file' % base)
-+    vm.add_blockdev('%s,file=3Dbase-file,node-name=3Dbase' % iotests.imgfm=
-t)
-+    vm.add_blockdev('file,filename=3D%s,node-name=3Dmid-file' % mid)
-+    vm.add_blockdev('%s,file=3Dmid-file,node-name=3Dmid,backing=3Dbase'
-+                    % iotests.imgfmt)
-+    vm.add_drive(top, 'backing=3Dmid,node-name=3Dtop')
-+    return vm
-+
-+with iotests.FilePath('base') as base, \
-+     iotests.FilePath('mid') as mid, \
-+     iotests.FilePath('top') as top:
-+
-+    iotests.log('=3D=3D Commit tests =3D=3D')
-+
-+    create_chain()
-+
-+    iotests.log('=3D=3D=3D Check visible data =3D=3D=3D')
-+
-+    iotests.qemu_io_log('-c', 'read -P 1 0 %d' % size_short, top)
-+    iotests.qemu_io_log('-c', 'read -P 0 %d %d' % (size_short, size_diff),=
- top)
-+
-+    iotests.log('=3D=3D=3D Checking allocation status =3D=3D=3D')
-+
-+    iotests.qemu_io_log('-c', 'alloc 0 %d' % size_short,
-+                        '-c', 'alloc %d %d' % (size_short, size_diff),
-+                        base)
-+
-+    iotests.qemu_io_log('-c', 'alloc 0 %d' % size_short,
-+                        '-c', 'alloc %d %d' % (size_short, size_diff),
-+                        mid)
-+
-+    iotests.qemu_io_log('-c', 'alloc 0 %d' % size_short,
-+                        '-c', 'alloc %d %d' % (size_short, size_diff),
-+                        top)
-+
-+    iotests.log('=3D=3D=3D Checking map =3D=3D=3D')
-+
-+    iotests.qemu_img_log('map', '--output=3Djson', base)
-+    iotests.qemu_img_log('map', '--output=3Dhuman', base)
-+    iotests.qemu_img_log('map', '--output=3Djson', mid)
-+    iotests.qemu_img_log('map', '--output=3Dhuman', mid)
-+    iotests.qemu_img_log('map', '--output=3Djson', top)
-+    iotests.qemu_img_log('map', '--output=3Dhuman', top)
-+
-+    iotests.log('=3D=3D=3D Testing qemu-img commit (top -> mid) =3D=3D=3D'=
-)
-+
-+    iotests.qemu_img_log('commit', top)
-+    iotests.img_info_log(mid)
-+    iotests.qemu_io_log('-c', 'read -P 1 0 %d' % size_short, mid)
-+    iotests.qemu_io_log('-c', 'read -P 0 %d %d' % (size_short, size_diff),=
- mid)
-+
-+    iotests.log('=3D=3D=3D Testing HMP commit (top -> mid) =3D=3D=3D')
-+
-+    create_chain()
-+    with create_vm() as vm:
-+        vm.launch()
-+        vm.qmp_log('human-monitor-command', command_line=3D'commit drive0'=
-)
-+
-+    iotests.img_info_log(mid)
-+    iotests.qemu_io_log('-c', 'read -P 1 0 %d' % size_short, mid)
-+    iotests.qemu_io_log('-c', 'read -P 0 %d %d' % (size_short, size_diff),=
- mid)
-+
-+    iotests.log('=3D=3D=3D Testing QMP active commit (top -> mid) =3D=3D=
-=3D')
-+
-+    create_chain()
-+    with create_vm() as vm:
-+        vm.launch()
-+        vm.qmp_log('block-commit', device=3D'top', base_node=3D'mid',
-+                   job_id=3D'job0', auto_dismiss=3DFalse)
-+        vm.run_job('job0', wait=3D5)
-+
-+    iotests.img_info_log(mid)
-+    iotests.qemu_io_log('-c', 'read -P 1 0 %d' % size_short, mid)
-+    iotests.qemu_io_log('-c', 'read -P 0 %d %d' % (size_short, size_diff),=
- mid)
-+
-+
-+    iotests.log('=3D=3D Resize tests =3D=3D')
-+
-+    # Use different sizes for different allocation modes:
-+    #
-+    # We want to have at least one test where 32 bit truncation in the siz=
-e of
-+    # the overlapping area becomes visible. This is covered by the
-+    # prealloc=3D'off' case (1G to 6G is an overlap of 5G).
-+    #
-+    # However, we can only do this for modes that don't preallocate data
-+    # because otherwise we might run out of space on the test host.
-+    #
-+    # We also want to test some unaligned combinations.
-+    for (prealloc, base_size, top_size_old, top_size_new, off) in [
-+            ('off',       '6G',    '1G',   '8G',   '5G'),
-+            ('metadata', '32G',   '30G',  '33G',  '31G'),
-+            ('falloc',   '10M',    '5M',  '15M',   '9M'),
-+            ('full',     '16M',    '8M',  '12M',  '11M'),
-+            ('off',      '384k', '253k', '512k', '253k'),
-+            ('off',      '400k', '256k', '512k', '336k'),
-+            ('off',      '512k', '256k', '500k', '436k')]:
-+
-+        iotests.log('=3D=3D=3D preallocation=3D%s =3D=3D=3D' % prealloc)
-+        iotests.qemu_img_log('create', '-f', iotests.imgfmt, base, base_si=
-ze)
-+        iotests.qemu_img_log('create', '-f', iotests.imgfmt, '-b', base, t=
-op,
-+                             top_size_old)
-+        iotests.qemu_io_log('-c', 'write -P 1 %s 64k' % off, base)
-+
-+        # After this, top_size_old to base_size should be allocated/zeroed=
-.
-+        #
-+        # In theory, leaving base_size to top_size_new unallocated would b=
-e
-+        # correct, but in practice, if we zero out anything, we zero out
-+        # everything up to top_size_new.
-+        iotests.qemu_img_log('resize', '-f', iotests.imgfmt,
-+                             '--preallocation', prealloc, top, top_size_ne=
-w)
-+        iotests.qemu_io_log('-c', 'read -P 0 %s 64k' % off, top)
-+        iotests.qemu_io_log('-c', 'map', top)
-+        iotests.qemu_img_log('map', '--output=3Djson', top)
-diff --git a/tests/qemu-iotests/274.out b/tests/qemu-iotests/274.out
-new file mode 100644
-index 0000000000..1a796fd07c
---- /dev/null
-+++ b/tests/qemu-iotests/274.out
-@@ -0,0 +1,268 @@
-+=3D=3D Commit tests =3D=3D
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D2097152 cluster_size=3D=
-65536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+Formatting 'TEST_DIR/PID-mid', fmt=3Dqcow2 size=3D1048576 backing_file=3DT=
-EST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D=
-16
-+
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D2097152 backing_file=3DT=
-EST_DIR/PID-mid cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D1=
-6
-+
-+wrote 2097152/2097152 bytes at offset 0
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D=3D Check visible data =3D=3D=3D
-+read 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+read 1048576/1048576 bytes at offset 1048576
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D=3D Checking allocation status =3D=3D=3D
-+1048576/1048576 bytes allocated at offset 0 bytes
-+1048576/1048576 bytes allocated at offset 1 MiB
-+
-+0/1048576 bytes allocated at offset 0 bytes
-+0/0 bytes allocated at offset 1 MiB
-+
-+0/1048576 bytes allocated at offset 0 bytes
-+0/1048576 bytes allocated at offset 1 MiB
-+
-+=3D=3D=3D Checking map =3D=3D=3D
-+[{ "start": 0, "length": 2097152, "depth": 0, "zero": false, "data": true,=
- "offset": 327680}]
-+
-+Offset          Length          Mapped to       File
-+0               0x200000        0x50000         TEST_DIR/PID-base
-+
-+[{ "start": 0, "length": 1048576, "depth": 1, "zero": false, "data": true,=
- "offset": 327680}]
-+
-+Offset          Length          Mapped to       File
-+0               0x100000        0x50000         TEST_DIR/PID-base
-+
-+[{ "start": 0, "length": 1048576, "depth": 2, "zero": false, "data": true,=
- "offset": 327680},
-+{ "start": 1048576, "length": 1048576, "depth": 0, "zero": true, "data": f=
-alse}]
-+
-+Offset          Length          Mapped to       File
-+0               0x100000        0x50000         TEST_DIR/PID-base
-+
-+=3D=3D=3D Testing qemu-img commit (top -> mid) =3D=3D=3D
-+Image committed.
-+
-+image: TEST_IMG
-+file format: IMGFMT
-+virtual size: 2 MiB (2097152 bytes)
-+cluster_size: 65536
-+backing file: TEST_DIR/PID-base
-+Format specific information:
-+    compat: 1.1
-+    lazy refcounts: false
-+    refcount bits: 16
-+    corrupt: false
-+
-+read 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+read 1048576/1048576 bytes at offset 1048576
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D=3D Testing HMP commit (top -> mid) =3D=3D=3D
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D2097152 cluster_size=3D=
-65536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+Formatting 'TEST_DIR/PID-mid', fmt=3Dqcow2 size=3D1048576 backing_file=3DT=
-EST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D=
-16
-+
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D2097152 backing_file=3DT=
-EST_DIR/PID-mid cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D1=
-6
-+
-+wrote 2097152/2097152 bytes at offset 0
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+{"execute": "human-monitor-command", "arguments": {"command-line": "commit=
- drive0"}}
-+{"return": ""}
-+image: TEST_IMG
-+file format: IMGFMT
-+virtual size: 2 MiB (2097152 bytes)
-+cluster_size: 65536
-+backing file: TEST_DIR/PID-base
-+Format specific information:
-+    compat: 1.1
-+    lazy refcounts: false
-+    refcount bits: 16
-+    corrupt: false
-+
-+read 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+read 1048576/1048576 bytes at offset 1048576
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D=3D Testing QMP active commit (top -> mid) =3D=3D=3D
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D2097152 cluster_size=3D=
-65536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+Formatting 'TEST_DIR/PID-mid', fmt=3Dqcow2 size=3D1048576 backing_file=3DT=
-EST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D=
-16
-+
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D2097152 backing_file=3DT=
-EST_DIR/PID-mid cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D1=
-6
-+
-+wrote 2097152/2097152 bytes at offset 0
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+{"execute": "block-commit", "arguments": {"auto-dismiss": false, "base-nod=
-e": "mid", "device": "top", "job-id": "job0"}}
-+{"return": {}}
-+{"execute": "job-complete", "arguments": {"id": "job0"}}
-+{"return": {}}
-+{"data": {"device": "job0", "len": 0, "offset": 0, "speed": 0, "type": "co=
-mmit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microseconds": "USECS", =
-"seconds": "SECS"}}
-+{"data": {"device": "job0", "len": 0, "offset": 0, "speed": 0, "type": "co=
-mmit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USEC=
-S", "seconds": "SECS"}}
-+{"execute": "job-dismiss", "arguments": {"id": "job0"}}
-+{"return": {}}
-+image: TEST_IMG
-+file format: IMGFMT
-+virtual size: 2 MiB (2097152 bytes)
-+cluster_size: 65536
-+backing file: TEST_DIR/PID-base
-+Format specific information:
-+    compat: 1.1
-+    lazy refcounts: false
-+    refcount bits: 16
-+    corrupt: false
-+
-+read 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+read 1048576/1048576 bytes at offset 1048576
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D Resize tests =3D=3D
-+=3D=3D=3D preallocation=3Doff =3D=3D=3D
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D6442450944 cluster_size=
-=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D1073741824 backing_file=
-=3DTEST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bit=
-s=3D16
-+
-+wrote 65536/65536 bytes at offset 5368709120
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Image resized.
-+
-+read 65536/65536 bytes at offset 5368709120
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+1 GiB (0x40000000) bytes not allocated at offset 0 bytes (0x0)
-+7 GiB (0x1c0000000) bytes     allocated at offset 1 GiB (0x40000000)
-+
-+[{ "start": 0, "length": 1073741824, "depth": 1, "zero": true, "data": fal=
-se},
-+{ "start": 1073741824, "length": 7516192768, "depth": 0, "zero": true, "da=
-ta": false}]
-+
-+=3D=3D=3D preallocation=3Dmetadata =3D=3D=3D
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D34359738368 cluster_siz=
-e=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D32212254720 backing_file=
-=3DTEST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bit=
-s=3D16
-+
-+wrote 65536/65536 bytes at offset 33285996544
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Image resized.
-+
-+read 65536/65536 bytes at offset 33285996544
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+30 GiB (0x780000000) bytes not allocated at offset 0 bytes (0x0)
-+3 GiB (0xc0000000) bytes     allocated at offset 30 GiB (0x780000000)
-+
-+[{ "start": 0, "length": 32212254720, "depth": 1, "zero": true, "data": fa=
-lse},
-+{ "start": 32212254720, "length": 536870912, "depth": 0, "zero": true, "da=
-ta": false, "offset": 327680},
-+{ "start": 32749125632, "length": 536870912, "depth": 0, "zero": true, "da=
-ta": false, "offset": 537264128},
-+{ "start": 33285996544, "length": 536870912, "depth": 0, "zero": true, "da=
-ta": false, "offset": 1074200576},
-+{ "start": 33822867456, "length": 536870912, "depth": 0, "zero": true, "da=
-ta": false, "offset": 1611137024},
-+{ "start": 34359738368, "length": 536870912, "depth": 0, "zero": true, "da=
-ta": false, "offset": 2148139008},
-+{ "start": 34896609280, "length": 536870912, "depth": 0, "zero": true, "da=
-ta": false, "offset": 2685075456}]
-+
-+=3D=3D=3D preallocation=3Dfalloc =3D=3D=3D
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D10485760 cluster_size=
-=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D5242880 backing_file=3DT=
-EST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D=
-16
-+
-+wrote 65536/65536 bytes at offset 9437184
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Image resized.
-+
-+read 65536/65536 bytes at offset 9437184
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+5 MiB (0x500000) bytes not allocated at offset 0 bytes (0x0)
-+10 MiB (0xa00000) bytes     allocated at offset 5 MiB (0x500000)
-+
-+[{ "start": 0, "length": 5242880, "depth": 1, "zero": true, "data": false}=
-,
-+{ "start": 5242880, "length": 10485760, "depth": 0, "zero": true, "data": =
-false, "offset": 327680}]
-+
-+=3D=3D=3D preallocation=3Dfull =3D=3D=3D
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D16777216 cluster_size=
-=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D8388608 backing_file=3DT=
-EST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D=
-16
-+
-+wrote 65536/65536 bytes at offset 11534336
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Image resized.
-+
-+read 65536/65536 bytes at offset 11534336
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+8 MiB (0x800000) bytes not allocated at offset 0 bytes (0x0)
-+4 MiB (0x400000) bytes     allocated at offset 8 MiB (0x800000)
-+
-+[{ "start": 0, "length": 8388608, "depth": 1, "zero": true, "data": false}=
-,
-+{ "start": 8388608, "length": 4194304, "depth": 0, "zero": true, "data": f=
-alse, "offset": 327680}]
-+
-+=3D=3D=3D preallocation=3Doff =3D=3D=3D
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D393216 cluster_size=3D6=
-5536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D259072 backing_file=3DTE=
-ST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D1=
-6
-+
-+wrote 65536/65536 bytes at offset 259072
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Image resized.
-+
-+read 65536/65536 bytes at offset 259072
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+192 KiB (0x30000) bytes not allocated at offset 0 bytes (0x0)
-+320 KiB (0x50000) bytes     allocated at offset 192 KiB (0x30000)
-+
-+[{ "start": 0, "length": 196608, "depth": 1, "zero": true, "data": false},
-+{ "start": 196608, "length": 65536, "depth": 0, "zero": false, "data": tru=
-e, "offset": 327680},
-+{ "start": 262144, "length": 262144, "depth": 0, "zero": true, "data": fal=
-se}]
-+
-+=3D=3D=3D preallocation=3Doff =3D=3D=3D
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D409600 cluster_size=3D6=
-5536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D262144 backing_file=3DTE=
-ST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D1=
-6
-+
-+wrote 65536/65536 bytes at offset 344064
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Image resized.
-+
-+read 65536/65536 bytes at offset 344064
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+256 KiB (0x40000) bytes not allocated at offset 0 bytes (0x0)
-+256 KiB (0x40000) bytes     allocated at offset 256 KiB (0x40000)
-+
-+[{ "start": 0, "length": 262144, "depth": 1, "zero": true, "data": false},
-+{ "start": 262144, "length": 262144, "depth": 0, "zero": true, "data": fal=
-se}]
-+
-+=3D=3D=3D preallocation=3Doff =3D=3D=3D
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D524288 cluster_size=3D6=
-5536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D262144 backing_file=3DTE=
-ST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D1=
-6
-+
-+wrote 65536/65536 bytes at offset 446464
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Image resized.
-+
-+read 65536/65536 bytes at offset 446464
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+256 KiB (0x40000) bytes not allocated at offset 0 bytes (0x0)
-+244 KiB (0x3d000) bytes     allocated at offset 256 KiB (0x40000)
-+
-+[{ "start": 0, "length": 262144, "depth": 1, "zero": true, "data": false},
-+{ "start": 262144, "length": 249856, "depth": 0, "zero": true, "data": fal=
-se}]
-+
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 435dccd5af..1710470e70 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -286,6 +286,7 @@
- 270 rw backing quick
- 272 rw
- 273 backing quick
-+274 rw backing
- 277 rw quick
- 279 rw backing quick
- 280 rw migration quick
---=20
-2.25.3
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+---
+ tests/vm/Makefile.include |  4 ++++
+ tests/vm/basevm.py        | 11 +++++++++--
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index 78a2de1f82..d921ee14cf 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -40,6 +40,7 @@ endif
+ 	@echo '    EXTRA_CONFIGURE_OPTS="..."'
+ 	@echo "    J=[0..9]*            	 - Override the -jN parameter for make commands"
+ 	@echo "    DEBUG=1              	 - Enable verbose output on host and interactive debugging"
++	@echo "    BOOT_CONSOLE=1        	 - Show the console output at boot time. "
+ 	@echo "    V=1				 - Enable verbose ouput on host and guest commands"
+ 	@echo "    QEMU=/path/to/qemu		 - Change path to QEMU binary"
+ 	@echo "    QEMU_IMG=/path/to/qemu-img	 - Change path to qemu-img tool"
+@@ -62,6 +63,7 @@ $(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
+ 	$(call quiet-command, \
+ 		$(PYTHON) $< \
+ 		$(if $(V)$(DEBUG), --debug) \
++		$(if $(BOOT_CONSOLE),--boot-console) \
+ 		--image "$@" \
+ 		--force \
+ 		--build-image $@, \
+@@ -76,6 +78,7 @@ vm-build-%: $(IMAGES_DIR)/%.img
+ 		$(if $(DEBUG), --interactive) \
+ 		$(if $(J),--jobs $(J)) \
+ 		$(if $(V),--verbose) \
++		$(if $(BOOT_CONSOLE),--boot-console) \
+ 		--image "$<" \
+ 		$(if $(BUILD_TARGET),--build-target $(BUILD_TARGET)) \
+ 		--snapshot \
+@@ -96,6 +99,7 @@ vm-boot-ssh-%: $(IMAGES_DIR)/%.img
+ 	$(call quiet-command, \
+ 		$(PYTHON) $(SRC_PATH)/tests/vm/$* \
+ 		$(if $(J),--jobs $(J)) \
++		$(if $(BOOT_CONSOLE),--boot-console) \
+ 		--image "$<" \
+ 		--interactive \
+ 		false, \
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 97f8ac4218..983adbf6ff 100644
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -86,8 +86,10 @@ class BaseVM(object):
+     # 4 is arbitrary, but greater than 2,
+     # since we found we need to wait more than twice as long.
+     tcg_ssh_timeout_multiplier = 4
+-    def __init__(self, debug=False, vcpus=None, config=None):
++    def __init__(self, debug=False, vcpus=None, config=None,
++                 boot_console=None):
+         self._guest = None
++        self._boot_console = boot_console
+         # Allow input config to override defaults.
+         self._config = DEFAULT_CONFIG.copy()
+         if config != None:
+@@ -551,6 +553,8 @@ def parse_args(vmcls):
+     parser.add_option("--config", "-c", default=None,
+                       help="Provide config yaml for configuration. "\
+                            "See config_example.yaml for example.")
++    parser.add_option("--boot-console", action="store_true",
++                      help="Show console during boot. ")
+     parser.disable_interspersed_args()
+     return parser.parse_args()
+ 
+@@ -565,7 +569,8 @@ def main(vmcls, config=None):
+         config = parse_config(config, args)
+         logging.basicConfig(level=(logging.DEBUG if args.debug
+                                    else logging.WARN))
+-        vm = vmcls(debug=args.debug, vcpus=args.jobs, config=config)
++        vm = vmcls(debug=args.debug, vcpus=args.jobs, config=config,
++                   boot_console=args.boot_console)
+         if args.build_image:
+             if os.path.exists(args.image) and not args.force:
+                 sys.stderr.writelines(["Image file exists: %s\n" % args.image,
+@@ -585,6 +590,8 @@ def main(vmcls, config=None):
+         if args.snapshot:
+             img += ",snapshot=on"
+         vm.boot(img)
++        if vm._boot_console:
++            vm.wait_boot()
+         vm.wait_ssh()
+     except Exception as e:
+         if isinstance(e, SystemExit) and e.code == 0:
+-- 
+2.17.1
 
 
