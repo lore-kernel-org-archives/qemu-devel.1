@@ -2,57 +2,60 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E3CC83001
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8016C83001
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:30:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA3732083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:27:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA3732083B
+	by mail.kernel.org (Postfix) with ESMTPS id 9D91D2073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:30:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D91D2073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU1jl-0002qf-Sp
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 01:27:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53096)
+	id 1jU1lo-0003yW-QW
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 01:30:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53216)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jU1iz-0002N2-Sz
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:27:06 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1jU1lH-0003Ti-OD
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:29:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jU1iy-00016W-P3
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:27:05 -0400
-Received: from mga18.intel.com ([134.134.136.126]:47960)
+ (envelope-from <yan.y.zhao@intel.com>) id 1jU1lH-00028I-9u
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:29:27 -0400
+Received: from mga18.intel.com ([134.134.136.126]:48100)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1jU1iy-00015n-8A
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:27:04 -0400
-IronPort-SDR: Yw6su3UWqstEdf5IrZ0O1sQIQBL78dJOhLwortMzn/rxhGOAWT+zuF8k/n5hmLfmdm0wemLpAx
- 813BymVM51jQ==
+ id 1jU1lG-00028B-PT
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:29:26 -0400
+IronPort-SDR: hcZrCMAzQxXz8+EcMmr0ME/9uKYeKGoRAh/uVbwLT4EokG63aN2YXWcq8cMqyLQ22s4MTxmY3y
+ RL1w79+q+ZIA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Apr 2020 22:27:00 -0700
-IronPort-SDR: UG8qIIyDSoPbFx0MfH4kC7m0yUDeCgvQZEiFVUKdxu4Ftl3I6MAduc/NpSYHoE8O7oAiOaKqQr
- nWoZBe9HSYqA==
+ 29 Apr 2020 22:29:25 -0700
+IronPort-SDR: Xv52D3rETX74P8CJw1CHMA0xPGqIKq4I/9uPlXTE/k97zSSoAykr/vkXWGiytgLtjGLJdz7qi9
+ xlW0sg2AAo8w==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,334,1583222400"; d="scan'208";a="459440672"
+X-IronPort-AV: E=Sophos;i="5.73,334,1583222400"; d="scan'208";a="249649344"
 Received: from joy-optiplex-7040.sh.intel.com ([10.239.13.16])
- by fmsmga005.fm.intel.com with ESMTP; 29 Apr 2020 22:26:58 -0700
+ by fmsmga008.fm.intel.com with ESMTP; 29 Apr 2020 22:29:23 -0700
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	alex.williamson@redhat.com
-Subject: [PATCH v5 0/3] drop writes to read-only ram device & vfio regions
-Date: Thu, 30 Apr 2020 01:15:58 -0400
-Message-Id: <20200430051558.28991-1-yan.y.zhao@intel.com>
+Subject: [PATCH v5 1/3] memory: drop guest writes to read-only ram device
+ regions
+Date: Thu, 30 Apr 2020 01:19:23 -0400
+Message-Id: <20200430051923.29159-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200430051558.28991-1-yan.y.zhao@intel.com>
+References: <20200430051558.28991-1-yan.y.zhao@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -78,59 +81,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-guest writes to read-only memory regions need to be dropped.
+for ram device regions, drop guest writes if the regions is read-only.
 
-patch 1 modifies handler of ram device memory regions to drop guest writes
-to read-only ram device memory regions
+Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+Signed-off-by: Xin Zeng <xin.zeng@intel.com>
+---
+ memory.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-patch 2 modifies handler of non-mmap'd read-only vfio regions to drop guest
-writes to those regions 
-
-patch 3 set read-only flag to mmap'd read-only vfio regions, so that guest
-writes to those regions would be trapped.
-without patch 1, host qemu would then crash on guest write to those
-read-only regions.
-with patch 1, host qemu would drop the writes.
-
-Changelog:
-v5:
--changed write handler of ram device memory region from .write to
-.write_with_attrs in patch 1 (Paolo)
-(for vfio region in patch 2, I still keep the operations as .read & .write.
-the reasons are:
-1. vfio_region_ops are for mmio/pio regions. the top level read/write
-dispatcher in kvm just ignores their return values. (the return value of
-address_space_rw() is just ignored)
-2. there are a lot of callers to vfio_region_read() and
-vfio_region_write(), who actually do not care about the return values
-)
--minor changes on text format in error logs.
-
-v4:
--instead of modifying tracing log, added qemu_log_mask(LOG_GUEST_ERROR...)
-to log guest writes to read-only regions (Philippe)
-
-for
-v3:
--refreshed and Cc Stefan for reviewing of tracing part
-
-v2:
--split one big patches into smaller ones (Philippe)
--modify existing trace to record guest writes to read-only memory (Alex)
--modify vfio_region_write() to drop guest writes to non-mmap'd read-only
- region (Alex)
-
-
-
-Yan Zhao (3):
-  memory: drop guest writes to read-only ram device regions
-  hw/vfio: drop guest writes to ro regions
-  hw/vfio: let read-only flag take effect for mmap'd regions
-
- hw/vfio/common.c | 17 +++++++++++++++--
- memory.c         | 15 ++++++++++++---
- 2 files changed, 27 insertions(+), 5 deletions(-)
-
+diff --git a/memory.c b/memory.c
+index 601b749906..90a748912f 100644
+--- a/memory.c
++++ b/memory.c
+@@ -34,6 +34,7 @@
+ #include "sysemu/accel.h"
+ #include "hw/boards.h"
+ #include "migration/vmstate.h"
++#include "qemu/log.h"
+ 
+ //#define DEBUG_UNASSIGNED
+ 
+@@ -1307,12 +1308,19 @@ static uint64_t memory_region_ram_device_read(void *opaque,
+     return data;
+ }
+ 
+-static void memory_region_ram_device_write(void *opaque, hwaddr addr,
+-                                           uint64_t data, unsigned size)
++static MemTxResult memory_region_ram_device_write(void *opaque, hwaddr addr,
++                                           uint64_t data, unsigned size,
++                                           MemTxAttrs attrs)
+ {
+     MemoryRegion *mr = opaque;
+ 
+     trace_memory_region_ram_device_write(get_cpu_index(), mr, addr, data, size);
++    if (mr->readonly) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "Invalid write to read only ram device region addr 0x%"
++                       HWADDR_PRIx" size %u\n", addr, size);
++        return MEMTX_ERROR;
++    }
+ 
+     switch (size) {
+     case 1:
+@@ -1328,11 +1336,12 @@ static void memory_region_ram_device_write(void *opaque, hwaddr addr,
+         *(uint64_t *)(mr->ram_block->host + addr) = data;
+         break;
+     }
++    return MEMTX_OK;
+ }
+ 
+ static const MemoryRegionOps ram_device_mem_ops = {
+     .read = memory_region_ram_device_read,
+-    .write = memory_region_ram_device_write,
++    .write_with_attrs = memory_region_ram_device_write,
+     .endianness = DEVICE_HOST_ENDIAN,
+     .valid = {
+         .min_access_size = 1,
 -- 
 2.17.1
 
