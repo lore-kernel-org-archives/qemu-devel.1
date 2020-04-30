@@ -2,72 +2,72 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E14EC8300D
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:23:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0D49C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:23:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE20920774
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:23:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 792A32064A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:23:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="gCvbNEDd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE20920774
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZEYU8elH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 792A32064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU7Hm-0004Ic-46
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 07:23:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57854)
+	id 1jU7Hv-0004Ve-LU
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 07:23:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57762)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jU78k-0007GM-FD
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:14:21 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jU78V-00073D-SA
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:14:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jU78N-0005aL-1h
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:14:02 -0400
-Received: from mail-eopbgr70120.outbound.protection.outlook.com
- ([40.107.7.120]:6058 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jU770-0005Gi-6E
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:13:47 -0400
+Received: from mail-eopbgr60129.outbound.protection.outlook.com
+ ([40.107.6.129]:22328 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jU764-0003ZE-88; Thu, 30 Apr 2020 07:11:16 -0400
+ id 1jU75s-0003Xs-7s; Thu, 30 Apr 2020 07:11:04 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f7Q5A5JkCRkDww6YW0JJblLADkeDk43Y/vKuK2kZSDc8qdUgwWPYxXBmTAhMgyQSVj9cNq/XDm8JFTeIdzrCYNri+X3d+povovcuhF7D9kSCx2OWmdCYizDV0RqlQH+0T3MRQETcyuFDjxf9sobuGf9Y+yCOlDIf8HZsWp9PahCkk2JhrULY9HxDhrQTpDh7fpB101K0zXSFLzn2HIE4IM7RQAGRLR5WF3K+4b35aZsTWYHPMuzQkCm3NwI4SSoZF7GlZa56Sfea5bgVVDGFgjMG7wi8dCUtGNKz9wLCLlriHHXZ5nY2pmV/8xnOFX/kNzdT7eDAM9mZsioeA3hvuQ==
+ b=bSaFWrDSZMfzakb8COsVmE+ByOkrQH5n1WtI7hQYS/n0ixv6caCcimub0vPKLHZUlXswHDj4eXKaISA6ZMwmEFFt5INUqUgUpWllMfluFw4iI+eXdWXLRcFx5o2M/RRTGMYkjzhuc0zKAaqxNIxPzl949ttj2VWaOds8Uu5M2P081BU/09hFwwqIOZn5QeGB1Hk/G0IRIYo6cJ8hNE3LfaGu9OP5HBj/y2JBCqmZu5HRFWMvclN06hKDLJp45dqX4Iv2a5SuE7NUh4N6DM1dxu2dQ+FvN4BiEc+03Zkn9qffFzjhg+V4LpqFI3+/AEZGFsxXZYveXQooUxmtsA5dLg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uy8c4Wa2wkGpeKoSpZa0yVNK25XvV07VM5xdsjX0SLg=;
- b=DJF/dXFPb0XFkFvsJRQDEzAI3iKp5Rh1D2fGE70YeYbkOY0FekKmXjjWl4S130NsGeTpTZIsJTMym+VgAixtH3Q3lBwBq0223ZfhneT+fbpNdHWQLkRjRWx7UZVm0De+koc1TygiNF2RxTucglOSWxdfEZLJPxkIUFKGuhCpcTyStAbFwYnXsNeJppEvdzxMBIz8px86KQSSu+srtLGtLaW1OXFpobIR4veJSqDKr8BKMDtqWRwgpCuC9369UgJARajhXiBPvpkheRZXYGhq8ZAeGtB0JM7l5YD93/iQ0LkuJKfpNAqGJUPUH3JZ3PFPC8sxO9Hdjwrz/96hjJLI1A==
+ bh=hUkTTDThD4tWgPkpzYZLn22MWCM4YFEnWTss8BuYshQ=;
+ b=DsXLG3wrxxk8570KNN10r6UaQMDpQuFoywaw51qg2CzihFgPBj0tgZBA4LfxBCD9MNsmtu3lO/uYYXe3qF5yXIMhKPz/XjLntkUhn7+YhbR+X4Ec29mVyowxyxGiL4Pul5DmTWf6gUYee9L9NEDJZMy4/UORJxjlh1lVvmPwSace+YF0drrh9a7QhUWEq+z+nOxlV/zA/L+B4mCwzZ7a+5Rjw//IOYd+MPSoS5dN4JJ8p6ZAoC8ctCo3lU8rWHHFkprQ18QXbt+aIpdZwxybpS5X9ffdwSvnuu4w/AzElcIflkSyX4fmoL6RewDNx356Y1Dg9EFlDaedKK+33SG6Qw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uy8c4Wa2wkGpeKoSpZa0yVNK25XvV07VM5xdsjX0SLg=;
- b=gCvbNEDdrdT3GyYY/Kj52W6gr8MNafrr/fKjV35defIzSvhJAycu9muBaj/h19ndycMkmW50nDv/cbb2eNKaar5HzCKodUrLFuMEmAcc/nn1g8Ky85x4sv+nbdUEUuiCLCga0qPt+dqfPr2McAt+g71unQtHjUO6fUcNEWYDdOY=
+ bh=hUkTTDThD4tWgPkpzYZLn22MWCM4YFEnWTss8BuYshQ=;
+ b=ZEYU8elH0yDzD4HrDkeFei4ZSmVc/pyodAx+z530ZbHlzPiBgXdIGaxrSXerdK/bxrGxbhAcGvMOE36K8Gk4mWZXj8ZnfX0o8JNta7TQhf3FhWwN3mBUc5yYxHL08BfgyGHH9ctU1H7WlDGfjvXW2/h/K1MhdPKXyOeNxBkGAnA=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5399.eurprd08.prod.outlook.com (2603:10a6:20b:104::22)
+ by AM7PR08MB5447.eurprd08.prod.outlook.com (2603:10a6:20b:10b::18)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20; Thu, 30 Apr
- 2020 11:11:13 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Thu, 30 Apr
+ 2020 11:11:01 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2958.020; Thu, 30 Apr 2020
- 11:11:13 +0000
+ 11:11:01 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 17/17] block: use int64_t instead of int in driver discard
- handlers
-Date: Thu, 30 Apr 2020 14:10:33 +0300
-Message-Id: <20200430111033.29980-18-vsementsov@virtuozzo.com>
+Subject: [PATCH v3 09/17] block/io: support int64_t bytes in bdrv_co_p{read,
+ write}v_part()
+Date: Thu, 30 Apr 2020 14:10:25 +0300
+Message-Id: <20200430111033.29980-10-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200430111033.29980-1-vsementsov@virtuozzo.com>
 References: <20200430111033.29980-1-vsementsov@virtuozzo.com>
@@ -81,39 +81,39 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from kvm.sw.ru (185.215.60.138) by
  AM0P190CA0021.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::31) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2958.19 via Frontend Transport; Thu, 30 Apr 2020 11:11:12 +0000
+ 15.20.2958.19 via Frontend Transport; Thu, 30 Apr 2020 11:11:00 +0000
 X-Mailer: git-send-email 2.21.0
 X-Originating-IP: [185.215.60.138]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: df2a0719-9a12-4a84-38ee-08d7ecf73205
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5399:
+X-MS-Office365-Filtering-Correlation-Id: ddf97130-7f46-4d37-d3e4-08d7ecf72a91
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5447:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB53998957A2668D2EC6C48493C1AA0@AM7PR08MB5399.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:302;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5447B52D65C6E903286F00B2C1AA0@AM7PR08MB5447.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
 X-Forefront-PRVS: 0389EDA07F
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8SFnwmKBLt9YzSxNdx3d2u4JA868cOmfH5rAvhdxCqp7BC2iroA99iR8DiCdPRw4QWY+IKbeCic7fjOV/+En/liUL7HWgkJ1z73jSCxLvnSr0mLHbG6xaX9Wjf27ww+sAyi9fioKfn1YAU0StLNV4Ru1CdzdPbFZi96q5e70Fbd/61w7UEyZfE/l5din8GNzllfIs/tSMJ9nKFCXxLMUUTAw0YWQD9/fcZxMhEMuuZ8Ucy/p3TG3ZERt6ofIAcawNNjXl+ADrrxiilm6XFfOCcrCzU6ImMPoDknBrRhzlPdFd5SG17q+MdpfpEbaOo0txrV5ry/J1wbMfBThnmCLg5sDNLW/JO5+Q2CiXFK5cuZxO9hCdvfIx1ss7e1wlARr97vtW7gxZt9rgTwIPYEVYJP7HwtQuMNJbtyoSzxKeHps4iBq82hof98zsuC5B6x3
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(39850400004)(396003)(366004)(346002)(136003)(376002)(1076003)(36756003)(478600001)(8936002)(26005)(6512007)(30864003)(7416002)(5660300002)(107886003)(6486002)(66476007)(66556008)(86362001)(6916009)(6506007)(6666004)(8676002)(316002)(2906002)(186003)(66946007)(16526019)(2616005)(956004)(4326008)(52116002);
+ SFS:(4636009)(39840400004)(136003)(346002)(376002)(396003)(366004)(66556008)(6512007)(107886003)(316002)(6506007)(26005)(52116002)(186003)(478600001)(956004)(2616005)(16526019)(66476007)(2906002)(86362001)(5660300002)(66946007)(6486002)(6916009)(7416002)(36756003)(8936002)(1076003)(6666004)(8676002)(4326008)(142933001);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 9VevqVdFbu91v5Ab/onrf3UPpTtuxP8i0wNUuwVgaVCjtlZAH0WCnubsEqtg85PUyF+N06X0f0bUIPk4p7iNLsC/i702bNnsu6TEfO87H6q3LQq1l1JMeczwLQeztQ4v1lEtR16iVlTmE+gILaLSYrjQgbIxagle9d9gRHWCPEFCXHNua384t5TDmWySLTao9Z28IRVbacrO9YLnKVV1M5MDCRcOVBZM6T/MAords2A107KLdx3psCEwupv47B7dHF5YaT1UnB/RJacz8mosRUGPBqmV5Mc4KPyMYUnB36TPQGBRrILdo3gl8ud7gcVBJzyKuC3DbpEVP6xxQ3QHd2Xjo7bLoe93ZQu3E2T6t32rhwl0/iBwTFBNrWX0Kt8cCiIthotr+GTHqP1+oGd2Pd8IxsFa3F5D6ONSM0pDPFuyxmTGWAwm9+nMLGziwbnm2NtQnjGPSAH61lgHnoBsIVToSo3QjsU4enDzZuErXSvqwstzHuBS0ZkBnUwefCQpTjliunXBP+QrwrwC/fL2wmF3D0opfZ3gx0I7/M41M0TmLFW5f85KnZdVclQXhzJktZ/9OH1EbYYbXIaKR0PF+DZqdh2SxZD5I4hEjYWHaM4pPUiBkBT75BZulGEzw40SoYJDcvo6+64AvI2mnqy/wTXhhRvzBJKtI59oXyENQryspZxz0NC7mXloUtlAdwxN6MihbZuq43rlBZ84uLIfJqfnwIqElPFlkOqhm4UgLdlNghmHi/T2rfdX7TUXiVqT/JGikZWJdjzFYTbxjEQ+xtgcUJVSwqyhdz3QLyAy18w=
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 3p1ll+HZDYnbQIFy9/7nql2W2nqo4/TG1KxJ3ZBt5xyhax+WEFqT7+yaoid9tnK/wuhrmOHDKDd4SSVfVkULgmLz8J+GrdiYjVSQsLCxhRmM+tikjGn9QhVT3NI8tpyR1VDEO9cyb/jXFi7ctMH41kU6lzEWXxFPPp0h6roD3Yn5uAqJ7amtIxwLku1CxDo+DoT54egqt8/wSF36T2cG/IXNLm2JgOlQnTz+jPxEmDu8znnNC6k1t0/DwtIofq1APn4DtOaTBilqo5DpSbFD/Gk6KII+D7DXSBMRGvtU5CXBSqNrTdUimrZ36SUwb1JOFrgvahbww0xGlN30EMJYgx5C1sASEMIYFB2Nw1h2lNN4oMOVeiBwDDttwNxYNLDx1Zx9aa64WnDkj5jyxoJSn5gCeKB5vURTrePVT+MrAuWPKAKOioFbKiNpOLQjt3odtZ6r0qeSEdBy4x6Vo5xhBET6aeOIWtnYbopjQWQMI2c4K0SsvrN4UiRVVhRHZCDY
+X-MS-Exchange-AntiSpam-MessageData: 7PpwTfxPSw239q6I/fPJJbsgSHKQDGeN5ku0RE0o4asfPKrebyYEI1WixJIPSSGeF9IamtC3PJYnxuQYgmD2kdI9vbUe94R/+mkX4Rf9VcNEwFtRCTQ7wCJn+gQi+hSnFqE1Jgv83nicWhLQodjPiY6OcKaycQL1mxVzuJfJcqq2fngP2gzbT7uHBMa1O8NCL3ePf+iT/kC2zJCHQmWT0yDMJkLVB1etSIqXHE8pN1m10hoXpI2I3gl/HObLTfQ/OCRVjTy2ioW7r1J+BK8fMYR5oA5OOx7B/fc3p7nuCqTu3jRpyupCJ6acuymh1B4Tl4mpd0goAKB/35vsDdohrmvjggRe6zvzFkbLb51Z2lRDWh2GY7931VVp04FGmHeILRE0MqzifjB0sg2yQNHn/Qmg1hWA8odgs4lPS9sA2eipwtC2nYViy8Ov4+478Vyl612WZXLxr+v31JIzzCKm0prINt4qqPgEgdMB6k3muEmQh6qD9BP/oLS38/hy9aFvG4xHYhnJAM1hw6ZlOvcbPE3SQ8t1e9ISQGOr4b+R+ReiZ2uXCgPjXxBsuc9nACHnIERyRgDpK1YtncrfPNudS9X4e1nptewl3VyzfVDc24Xfw+Tphpzii1BzFTzmDWhn9E65nX4kvBFvftItSuSLoZ9IgKLwoJABb12vPCm0xvvdiyOIXSGXho15tjDfzptruTjvXu/4md/Zhvt9dEXTbqP+H2CtDnb4XOwjuQ6abHEqVNkiZj/iztCQUX0f+mNX9rB6MfwRRaCrLzTTDU/D3W8XIY+3Pr57LuAXvx6CuVU=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: df2a0719-9a12-4a84-38ee-08d7ecf73205
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2020 11:11:13.8366 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddf97130-7f46-4d37-d3e4-08d7ecf72a91
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2020 11:11:01.3582 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 94REndJPVjeFE76xBbr/ozfwT5f26SwCvt57nxpSfSbBomOW4j0wd1NkDLcP6pserOewCsc/gv4ypsOHPcaXnLU4fg8PhDOCRy1ORiKJxn0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5399
-Received-SPF: pass client-ip=40.107.7.120;
+X-MS-Exchange-CrossTenant-UserPrincipalName: ltZRwFaBGu8o83Vju7i2V+Uf7rlrEVWMEtZp/opbKvLVEZNtKCfRX9ET8pIqtJxtCxCeIgfNssX0VZAN4vVa6lM8hStpWnmYMJmr/s74AA4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5447
+Received-SPF: pass client-ip=40.107.6.129;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 07:11:10
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 07:11:02
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.7.120
+X-Received-From: 40.107.6.129
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -145,364 +145,128 @@ We chose signed type, to be consistent with off_t (which is signed) and
 with possibility for signed return type (where negative value means
 error).
 
-So, convert driver discard handlers bytes parameter to int64_t.
-
-This patch just converts handlers where it is obvious that bytes
-parameter is passed further to 64bit interfaces, and add simple
-wrappers where it is not obvious.
+So, prepare bdrv_co_preadv_part() and bdrv_co_pwritev_part() and their
+remaining dependencies now.
 
 Series: 64bit-block-status
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/block_int.h |  2 +-
- block/backup-top.c        |  2 +-
- block/blkdebug.c          |  2 +-
- block/blklogwrites.c      |  4 ++--
- block/blkreplay.c         |  2 +-
- block/copy-on-read.c      |  2 +-
- block/file-posix.c        | 18 ++++++++++++++++--
- block/filter-compress.c   |  2 +-
- block/gluster.c           |  6 ++++--
- block/iscsi.c             | 10 +++++++++-
- block/mirror.c            |  2 +-
- block/nbd.c               |  4 +++-
- block/nvme.c              | 13 ++++++++++---
- block/qcow2.c             |  2 +-
- block/raw-format.c        |  2 +-
- block/sheepdog.c          | 11 +++++++++--
- block/throttle.c          |  2 +-
- 17 files changed, 63 insertions(+), 23 deletions(-)
+ include/block/block_int.h |  4 ++--
+ block/io.c                | 16 ++++++++--------
+ block/trace-events        |  4 ++--
+ 3 files changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index c98d591a56..ff8860fee8 100644
+index c8daba608b..3c2a1d741a 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -248,7 +248,7 @@ struct BlockDriver {
-     int coroutine_fn (*bdrv_co_pwrite_zeroes)(BlockDriverState *bs,
-         int64_t offset, int64_t bytes, BdrvRequestFlags flags);
-     int coroutine_fn (*bdrv_co_pdiscard)(BlockDriverState *bs,
--        int64_t offset, int bytes);
-+        int64_t offset, int64_t bytes);
+@@ -975,13 +975,13 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags);
+ int coroutine_fn bdrv_co_preadv_part(BdrvChild *child,
+-    int64_t offset, unsigned int bytes,
++    int64_t offset, int64_t bytes,
+     QEMUIOVector *qiov, size_t qiov_offset, BdrvRequestFlags flags);
+ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags);
+ int coroutine_fn bdrv_co_pwritev_part(BdrvChild *child,
+-    int64_t offset, unsigned int bytes,
++    int64_t offset, int64_t bytes,
+     QEMUIOVector *qiov, size_t qiov_offset, BdrvRequestFlags flags);
  
-     /* Map [offset, offset + nbytes) range onto a child of @bs to copy from,
-      * and invoke bdrv_co_copy_range_from(child, ...), or invoke
-diff --git a/block/backup-top.c b/block/backup-top.c
-index 2484293fb0..8c02fa3a58 100644
---- a/block/backup-top.c
-+++ b/block/backup-top.c
-@@ -65,7 +65,7 @@ static coroutine_fn int backup_top_cbw(BlockDriverState *bs, uint64_t offset,
- }
- 
- static int coroutine_fn backup_top_co_pdiscard(BlockDriverState *bs,
--                                               int64_t offset, int bytes)
-+                                               int64_t offset, int64_t bytes)
+ static inline int coroutine_fn bdrv_co_pread(BdrvChild *child,
+diff --git a/block/io.c b/block/io.c
+index d336e4e691..d7fd429345 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1488,7 +1488,7 @@ static void bdrv_padding_destroy(BdrvRequestPadding *pad)
+  */
+ static bool bdrv_pad_request(BlockDriverState *bs,
+                              QEMUIOVector **qiov, size_t *qiov_offset,
+-                             int64_t *offset, unsigned int *bytes,
++                             int64_t *offset, int64_t *bytes,
+                              BdrvRequestPadding *pad)
  {
-     int ret = backup_top_cbw(bs, offset, bytes, 0);
+     if (!bdrv_init_padding(bs, *offset, *bytes, pad)) {
+@@ -1515,7 +1515,7 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+ 
+ /* To be called between exactly one pair of bdrv_inc/dec_in_flight() */
+ static int coroutine_fn bdrv_do_preadv_part(BdrvChild *child,
+-    int64_t offset, unsigned int bytes,
++    int64_t offset, int64_t bytes,
+     QEMUIOVector *qiov, size_t qiov_offset,
+     BdrvRequestFlags flags)
+ {
+@@ -1524,7 +1524,7 @@ static int coroutine_fn bdrv_do_preadv_part(BdrvChild *child,
+     BdrvRequestPadding pad;
+     int ret;
+ 
+-    trace_bdrv_co_preadv(bs, offset, bytes, flags);
++    trace_bdrv_co_preadv_part(bs, offset, bytes, flags);
+ 
+     ret = bdrv_check_byte_request(bs, offset, bytes);
      if (ret < 0) {
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index d593d6c85d..e1d91cf707 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -705,7 +705,7 @@ static int coroutine_fn blkdebug_co_pwrite_zeroes(BlockDriverState *bs,
+@@ -1562,7 +1562,7 @@ static int coroutine_fn bdrv_do_preadv_part(BdrvChild *child,
  }
  
- static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
--                                             int64_t offset, int bytes)
-+                                             int64_t offset, int64_t bytes)
+ int coroutine_fn bdrv_co_preadv_part(BdrvChild *child,
+-    int64_t offset, unsigned int bytes,
++    int64_t offset, int64_t bytes,
+     QEMUIOVector *qiov, size_t qiov_offset,
+     BdrvRequestFlags flags)
  {
-     uint32_t align = bs->bl.pdiscard_alignment;
-     int err;
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index 8ca41d09cd..f488864106 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -490,9 +490,9 @@ static int coroutine_fn blk_log_writes_co_flush_to_disk(BlockDriverState *bs)
- }
+@@ -1866,7 +1866,7 @@ static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
  
- static int coroutine_fn
--blk_log_writes_co_pdiscard(BlockDriverState *bs, int64_t offset, int count)
-+blk_log_writes_co_pdiscard(BlockDriverState *bs, int64_t offset, int64_t bytes)
+ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
+                                                 int64_t offset,
+-                                                unsigned int bytes,
++                                                int64_t bytes,
+                                                 BdrvRequestFlags flags,
+                                                 BdrvTrackedRequest *req)
  {
--    return blk_log_writes_co_log(bs, offset, count, NULL, 0,
-+    return blk_log_writes_co_log(bs, offset, bytes, NULL, 0,
-                                  blk_log_writes_co_do_file_pdiscard,
-                                  LOG_DISCARD_FLAG, false);
- }
-diff --git a/block/blkreplay.c b/block/blkreplay.c
-index 186d28cc6a..34a12ad5ac 100644
---- a/block/blkreplay.c
-+++ b/block/blkreplay.c
-@@ -106,7 +106,7 @@ static int coroutine_fn blkreplay_co_pwrite_zeroes(BlockDriverState *bs,
- }
+@@ -1941,7 +1941,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
  
- static int coroutine_fn blkreplay_co_pdiscard(BlockDriverState *bs,
--                                              int64_t offset, int bytes)
-+                                              int64_t offset, int64_t bytes)
+ /* To be called between exactly one pair of bdrv_inc/dec_in_flight() */
+ static int coroutine_fn bdrv_do_pwritev_part(BdrvChild *child,
+-    int64_t offset, unsigned int bytes, QEMUIOVector *qiov, size_t qiov_offset,
++    int64_t offset, int64_t bytes, QEMUIOVector *qiov, size_t qiov_offset,
+     BdrvRequestFlags flags)
  {
-     uint64_t reqid = blkreplay_next_id();
-     int ret = bdrv_co_pdiscard(bs->file, offset, bytes);
-diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index d99e07e99f..5bf1fabee6 100644
---- a/block/copy-on-read.c
-+++ b/block/copy-on-read.c
-@@ -102,7 +102,7 @@ static int coroutine_fn cor_co_pwrite_zeroes(BlockDriverState *bs,
- 
- 
- static int coroutine_fn cor_co_pdiscard(BlockDriverState *bs,
--                                        int64_t offset, int bytes)
-+                                        int64_t offset, int64_t bytes)
- {
-     return bdrv_co_pdiscard(bs->file, offset, bytes);
- }
-diff --git a/block/file-posix.c b/block/file-posix.c
-index fa9ac5b13e..132001dba8 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -2791,11 +2791,18 @@ raw_do_pdiscard(BlockDriverState *bs, int64_t offset, int bytes, bool blkdev)
- }
- 
- static coroutine_fn int
--raw_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
-+raw_co_pdiscard_old(BlockDriverState *bs, int64_t offset, int bytes)
- {
-     return raw_do_pdiscard(bs, offset, bytes, false);
- }
- 
-+static coroutine_fn int
-+raw_co_pdiscard(BlockDriverState *bs, int64_t offset, int64_t bytes)
-+{
-+    assert(bytes <= INT_MAX);
-+    return raw_co_pdiscard_old(bs, offset, bytes);
-+}
-+
- static int coroutine_fn
- raw_do_pwrite_zeroes(BlockDriverState *bs, int64_t offset, int64_t bytes,
-                      BdrvRequestFlags flags, bool blkdev)
-@@ -3475,7 +3482,7 @@ static int fd_open(BlockDriverState *bs)
- }
- 
- static coroutine_fn int
--hdev_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
-+hdev_co_pdiscard_old(BlockDriverState *bs, int64_t offset, int bytes)
- {
-     BDRVRawState *s = bs->opaque;
-     int ret;
-@@ -3488,6 +3495,13 @@ hdev_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
-     return raw_do_pdiscard(bs, offset, bytes, true);
- }
- 
-+static coroutine_fn int
-+hdev_co_pdiscard(BlockDriverState *bs, int64_t offset, int64_t bytes)
-+{
-+    assert(bytes <= INT_MAX);
-+    return hdev_co_pdiscard_old(bs, offset, bytes);
-+}
-+
- static coroutine_fn int hdev_co_pwrite_zeroes(BlockDriverState *bs,
-     int64_t offset, int64_t bytes, BdrvRequestFlags flags)
- {
-diff --git a/block/filter-compress.c b/block/filter-compress.c
-index 7cf47608b5..477dfaf959 100644
---- a/block/filter-compress.c
-+++ b/block/filter-compress.c
-@@ -93,7 +93,7 @@ static int coroutine_fn compress_co_pwrite_zeroes(BlockDriverState *bs,
- 
- 
- static int coroutine_fn compress_co_pdiscard(BlockDriverState *bs,
--                                             int64_t offset, int bytes)
-+                                             int64_t offset, int64_t bytes)
- {
-     return bdrv_co_pdiscard(bs->file, offset, bytes);
- }
-diff --git a/block/gluster.c b/block/gluster.c
-index 88130c3d2d..87cf69199d 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -1312,18 +1312,20 @@ error:
- 
- #ifdef CONFIG_GLUSTERFS_DISCARD
- static coroutine_fn int qemu_gluster_co_pdiscard(BlockDriverState *bs,
--                                                 int64_t offset, int size)
-+                                                 int64_t offset, int64_t bytes)
- {
-     int ret;
-     GlusterAIOCB acb;
-     BDRVGlusterState *s = bs->opaque;
- 
-+    assert(bytes <= INT_MAX);
-+
-     acb.size = 0;
-     acb.ret = 0;
-     acb.coroutine = qemu_coroutine_self();
-     acb.aio_context = bdrv_get_aio_context(bs);
- 
--    ret = glfs_discard_async(s->fd, offset, size, gluster_finish_aiocb, &acb);
-+    ret = glfs_discard_async(s->fd, offset, bytes, gluster_finish_aiocb, &acb);
-     if (ret < 0) {
-         return -errno;
-     }
-diff --git a/block/iscsi.c b/block/iscsi.c
-index c4183ef12f..c06521b74f 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -1141,7 +1141,8 @@ iscsi_getlength(BlockDriverState *bs)
- }
- 
- static int
--coroutine_fn iscsi_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
-+coroutine_fn iscsi_co_pdiscard_old(BlockDriverState *bs, int64_t offset,
-+                                   int bytes)
- {
-     IscsiLun *iscsilun = bs->opaque;
-     struct IscsiTask iTask;
-@@ -1203,6 +1204,13 @@ out_unlock:
-     return r;
- }
- 
-+static int
-+coroutine_fn iscsi_co_pdiscard(BlockDriverState *bs, int64_t offset, int64_t bytes)
-+{
-+    assert(bytes <= INT_MAX);
-+    return iscsi_co_pdiscard_old(bs, offset, bytes);
-+}
-+
- static int
- coroutine_fn iscsi_co_pwrite_zeroes_old(BlockDriverState *bs, int64_t offset,
-                                         int bytes, BdrvRequestFlags flags)
-diff --git a/block/mirror.c b/block/mirror.c
-index 7f4fdfb470..bd01c032fa 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1471,7 +1471,7 @@ static int coroutine_fn bdrv_mirror_top_pwrite_zeroes(BlockDriverState *bs,
- }
- 
- static int coroutine_fn bdrv_mirror_top_pdiscard(BlockDriverState *bs,
--    int64_t offset, int bytes)
-+    int64_t offset, int64_t bytes)
- {
-     return bdrv_mirror_top_do_write(bs, MIRROR_METHOD_DISCARD, offset, bytes,
-                                     NULL, 0);
-diff --git a/block/nbd.c b/block/nbd.c
-index 0e52b76d72..93d0ced28c 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -1295,7 +1295,7 @@ static int nbd_client_co_flush(BlockDriverState *bs)
- }
- 
- static int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset,
--                                  int bytes)
-+                                  int64_t bytes)
- {
-     BDRVNBDState *s = (BDRVNBDState *)bs->opaque;
-     NBDRequest request = {
-@@ -1304,6 +1304,8 @@ static int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset,
-         .len = bytes,
-     };
- 
-+    assert(bytes < INT_MAX);
-+
-     assert(!(s->info.flags & NBD_FLAG_READ_ONLY));
-     if (!(s->info.flags & NBD_FLAG_SEND_TRIM) || !bytes) {
-         return 0;
-diff --git a/block/nvme.c b/block/nvme.c
-index 724f894b00..adc19ee9e6 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -1166,9 +1166,9 @@ static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
-     return nvme_co_pwrite_zeroes_old(bs, offset, bytes, flags);
- }
- 
--static int coroutine_fn nvme_co_pdiscard(BlockDriverState *bs,
--                                         int64_t offset,
--                                         int bytes)
-+static int coroutine_fn nvme_co_pdiscard_old(BlockDriverState *bs,
-+                                             int64_t offset,
-+                                             int bytes)
- {
-     BDRVNVMeState *s = bs->opaque;
-     NVMeQueuePair *ioq = s->queues[1];
-@@ -1245,6 +1245,13 @@ out:
- 
- }
- 
-+static int coroutine_fn nvme_co_pdiscard(BlockDriverState *bs,
-+                                         int64_t offset,
-+                                         int64_t bytes)
-+{
-+    assert(bytes <= INT_MAX);
-+    return nvme_co_pdiscard_old(bs, offset, bytes);
-+}
- 
- static int nvme_reopen_prepare(BDRVReopenState *reopen_state,
-                                BlockReopenQueue *queue, Error **errp)
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 0800d0378a..c85f5a8331 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3787,7 +3787,7 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
- }
- 
- static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
--                                          int64_t offset, int bytes)
-+                                          int64_t offset, int64_t bytes)
- {
-     int ret;
-     BDRVQcow2State *s = bs->opaque;
-diff --git a/block/raw-format.c b/block/raw-format.c
-index 0996741056..f31bc4338f 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -292,7 +292,7 @@ static int coroutine_fn raw_co_pwrite_zeroes(BlockDriverState *bs,
- }
- 
- static int coroutine_fn raw_co_pdiscard(BlockDriverState *bs,
--                                        int64_t offset, int bytes)
-+                                        int64_t offset, int64_t bytes)
- {
+     BlockDriverState *bs = child->bs;
+@@ -1950,7 +1950,7 @@ static int coroutine_fn bdrv_do_pwritev_part(BdrvChild *child,
+     BdrvRequestPadding pad;
      int ret;
  
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 59f7ebb171..750bfae016 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -3091,8 +3091,8 @@ static int sd_load_vmstate(BlockDriverState *bs, QEMUIOVector *qiov,
+-    trace_bdrv_co_pwritev(child->bs, offset, bytes, flags);
++    trace_bdrv_co_pwritev_part(child->bs, offset, bytes, flags);
+ 
+     if (!bs->drv) {
+         return -ENOMEDIUM;
+@@ -2009,7 +2009,7 @@ out:
  }
  
- 
--static coroutine_fn int sd_co_pdiscard(BlockDriverState *bs, int64_t offset,
--                                      int bytes)
-+static coroutine_fn int sd_co_pdiscard_old(BlockDriverState *bs, int64_t offset,
-+                                           int bytes)
+ int coroutine_fn bdrv_co_pwritev_part(BdrvChild *child,
+-    int64_t offset, unsigned int bytes, QEMUIOVector *qiov, size_t qiov_offset,
++    int64_t offset, int64_t bytes, QEMUIOVector *qiov, size_t qiov_offset,
+     BdrvRequestFlags flags)
  {
-     SheepdogAIOCB acb;
-     BDRVSheepdogState *s = bs->opaque;
-@@ -3121,6 +3121,13 @@ static coroutine_fn int sd_co_pdiscard(BlockDriverState *bs, int64_t offset,
-     return acb.ret;
- }
+     int ret;
+diff --git a/block/trace-events b/block/trace-events
+index 179b47bf63..dd367a9b19 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -11,8 +11,8 @@ blk_root_attach(void *child, void *blk, void *bs) "child %p blk %p bs %p"
+ blk_root_detach(void *child, void *blk, void *bs) "child %p blk %p bs %p"
  
-+static coroutine_fn int sd_co_pdiscard(BlockDriverState *bs, int64_t offset,
-+                                       int64_t bytes)
-+{
-+    assert(bytes <= INT_MAX);
-+    return sd_co_pdiscard_old(bs, offset, bytes);
-+}
-+
- static coroutine_fn int
- sd_co_block_status(BlockDriverState *bs, bool want_zero, int64_t offset,
-                    int64_t bytes, int64_t *pnum, int64_t *map,
-diff --git a/block/throttle.c b/block/throttle.c
-index c97da1d6a7..61f6c291e7 100644
---- a/block/throttle.c
-+++ b/block/throttle.c
-@@ -147,7 +147,7 @@ static int coroutine_fn throttle_co_pwrite_zeroes(BlockDriverState *bs,
- }
- 
- static int coroutine_fn throttle_co_pdiscard(BlockDriverState *bs,
--                                             int64_t offset, int bytes)
-+                                             int64_t offset, int64_t bytes)
- {
-     ThrottleGroupMember *tgm = bs->opaque;
-     throttle_group_co_io_limits_intercept(tgm, bytes, true);
+ # io.c
+-bdrv_co_preadv(void *bs, int64_t offset, int64_t nbytes, unsigned int flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
+-bdrv_co_pwritev(void *bs, int64_t offset, int64_t nbytes, unsigned int flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
++bdrv_co_preadv_part(void *bs, int64_t offset, int64_t bytes, int flags) "bs %p offset %" PRId64 " bytes %" PRId64 " flags 0x%x"
++bdrv_co_pwritev_part(void *bs, int64_t offset, int64_t bytes, int flags) "bs %p offset %" PRId64 " bytes %" PRId64 " flags 0x%x"
+ bdrv_co_pwrite_zeroes(void *bs, int64_t offset, int count, int flags) "bs %p offset %"PRId64" count %d flags 0x%x"
+ bdrv_co_do_copy_on_readv(void *bs, int64_t offset, int64_t bytes, int64_t cluster_offset, int64_t cluster_bytes) "bs %p offset %" PRId64 " bytes %" PRId64 " cluster_offset %" PRId64 " cluster_bytes %" PRId64
+ bdrv_co_copy_range_from(void *src, uint64_t src_offset, void *dst, uint64_t dst_offset, uint64_t bytes, int read_flags, int write_flags) "src %p offset %"PRIu64" dst %p offset %"PRIu64" bytes %"PRIu64" rw flags 0x%x 0x%x"
 -- 
 2.21.0
 
