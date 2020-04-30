@@ -2,111 +2,90 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14ED3C8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 09:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BACD7C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 09:26:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D37862137B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 09:24:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 850B42137B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 09:26:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V0egPq9d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D37862137B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="GaHT8Zvg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 850B42137B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU5Qh-0003nR-2n
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 05:24:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46752)
+	id 1jU5Se-00069G-Ja
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 05:26:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47142)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jU5Pf-0002mi-Ua
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:23:30 -0400
+ (envelope-from <rvkagan@yandex-team.ru>) id 1jU5Ry-0005dA-3Z
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:25:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jU5OO-0000Te-AW
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:23:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57528
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jU5ON-0000TW-Mz
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:22:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588238521;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=XkUoXClEVl58JBgSQKNej7Q6g0mP78x1gSAc0Brlc5g=;
- b=V0egPq9dJ07tjTSCAkBgH20yNjmGN+CLdgEagyNxwOtE/9eWnxEQLADaZmhU0GU49TthsC
- DM6NZC35gfxx7vnoAZ4w1wTAbAlL8oAQ6ErADA31uWg36abxKCINSvA8KfUO3s6B9vzIIf
- HyZhE9yRdT2ZpSvbPL7VEVxQqob5xxY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-6ehl63agPaWBgyHqZX35cA-1; Thu, 30 Apr 2020 05:21:58 -0400
-X-MC-Unique: 6ehl63agPaWBgyHqZX35cA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E25688005B7
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 09:21:57 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-177.ams2.redhat.com
- [10.36.112.177])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E383605DD;
- Thu, 30 Apr 2020 09:21:49 +0000 (UTC)
-Subject: Re: [PATCH] virtiofsd: Show submounts
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20200424133516.73077-1-mreitz@redhat.com>
- <20200427175902.GM2923@work-vm> <20200429145720.GA2835@work-vm>
- <8c73f374-fcc8-1684-b581-84a9ab501aa9@redhat.com>
- <20200430085812.GC2874@work-vm>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <94924861-d934-0151-aca5-19ea9eb211e1@redhat.com>
-Date: Thu, 30 Apr 2020 11:21:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <rvkagan@yandex-team.ru>) id 1jU5Rx-0003bl-7K
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:25:45 -0400
+Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:44166)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
+ id 1jU5Rs-0002nq-38; Thu, 30 Apr 2020 05:25:40 -0400
+Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
+ [IPv6:2a02:6b8:0:1402::301])
+ by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 5AB222E146F;
+ Thu, 30 Apr 2020 12:25:32 +0300 (MSK)
+Received: from iva4-7c3d9abce76c.qloud-c.yandex.net
+ (iva4-7c3d9abce76c.qloud-c.yandex.net [2a02:6b8:c0c:4e8e:0:640:7c3d:9abc])
+ by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ qCMTu8ette-PUAWZ7Qk; Thu, 30 Apr 2020 12:25:32 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1588238732; bh=Q1MXmzvPzaV3j0oC7jyuuGuF8mD/ViQ1mYgbA1ZKCo8=;
+ h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+ b=GaHT8ZvgBnzvfkrCIZ5XRZXCjikMtZ7DDv/wcmgd7tZgR7i86EfE+DsDXxGM/E0G1
+ SHMts1nbusa1M9Rp6+WJWlDIHRCbABCHGKZ6cJloYP7xM+3ki/KojLEXsrKbPLswhu
+ r1T/aGIHcLwdd3bJdPP+ZZAZcVZny47y+3olEVX8=
+Authentication-Results: mxbackcorp1g.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-iva.dhcp.yndx.net (dynamic-iva.dhcp.yndx.net
+ [2a02:6b8:b080:9508::1:c])
+ by iva4-7c3d9abce76c.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ KyRWgMum2l-PUWOUEeL; Thu, 30 Apr 2020 12:25:30 +0300
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client certificate not present)
+Date: Thu, 30 Apr 2020 12:25:28 +0300
+From: Roman Kagan <rvkagan@yandex-team.ru>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v3] block: make BlockConf.*_size properties 32-bit
+Message-ID: <20200430092528.GC31415@rvkaganb>
+Mail-Followup-To: Roman Kagan <rvkagan@yandex-team.ru>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Michael S. Tsirkin\"" <mst@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>
+References: <20200429091813.1469510-1-rvkagan@yandex-team.ru>
+ <f80b44cf-5fe3-8e10-b928-b61f7940d3cf@redhat.com>
+ <20200429121915.GA31415@rvkaganb>
+ <caedf222-3fef-ad92-3b03-f28d8019b7f0@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200430085812.GC2874@work-vm>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="QfIUrViZs5Euqaf87kfYpcqVjvFsO1FSh"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 23:34:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <caedf222-3fef-ad92-3b03-f28d8019b7f0@redhat.com>
+Received-SPF: pass client-ip=2a02:6b8:0:1a2d::193;
+ envelope-from=rvkagan@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a02:6b8:0:1a2d::193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,134 +97,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
- qemu-devel@nongnu.org, vgoyal@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin\"" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QfIUrViZs5Euqaf87kfYpcqVjvFsO1FSh
-Content-Type: multipart/mixed; boundary="54ZYs4vew8w0glUUsJpzbmIWuUUfoegiz"
+On Wed, Apr 29, 2020 at 02:59:31PM +0200, Philippe Mathieu-Daudé wrote:
+> On 4/29/20 2:19 PM, Roman Kagan wrote:
+> > On Wed, Apr 29, 2020 at 11:41:04AM +0200, Philippe Mathieu-Daudé wrote:
+> > > Cc'ing virtio-blk and scsi maintainers.
+> > > 
+> > > On 4/29/20 11:18 AM, Roman Kagan wrote:
+> > > > Devices (virtio-blk, scsi, etc.) and the block layer are happy to use
+> > > > 32-bit for logical_block_size, physical_block_size, and min_io_size.
+> > > > However, the properties in BlockConf are defined as uint16_t limiting
+> > > > the values to 32768.
+> > > > 
+> > > > This appears unnecessary tight, and we've seen bigger block sizes handy
+> > > > at times.
+> > > > 
+> > > > Make them 32 bit instead and lift the limitation up to 2 MiB which
+> > > > appears to be good enough for everybody, and matches the qcow2 cluster
+> > > > size limit.
+> > > > 
+> > > > As the values can now be fairly big and awkward to type, make the
+> > > > property setter accept common size suffixes (k, m).
+> > > > 
+> > > > Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
+> > > > Reviewed-by: Eric Blake <eblake@redhat.com>
+> > > > ---
+> > > > v2 -> v3:
+> > > > - mention qcow2 cluster size limit in the log and comment [Eric]
+> > > > 
+> > > > v1 -> v2:
+> > > > - cap the property at 2 MiB [Eric]
+> > > > - accept size suffixes
+> > > > 
+> > > >    include/hw/block/block.h     |  8 ++++----
+> > > >    include/hw/qdev-properties.h |  2 +-
+> > > >    hw/core/qdev-properties.c    | 34 ++++++++++++++++++++++++----------
+> > > >    3 files changed, 29 insertions(+), 15 deletions(-)
+> > > > 
+> > > > diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+> > > > index d7246f3862..9dd6bba56a 100644
+> > > > --- a/include/hw/block/block.h
+> > > > +++ b/include/hw/block/block.h
+> > > > @@ -18,9 +18,9 @@
+> > > >    typedef struct BlockConf {
+> > > >        BlockBackend *blk;
+> > > > -    uint16_t physical_block_size;
+> > > > -    uint16_t logical_block_size;
+> > > > -    uint16_t min_io_size;
+> > > > +    uint32_t physical_block_size;
+> > > > +    uint32_t logical_block_size;
+> > > > +    uint32_t min_io_size;
+> > > >        uint32_t opt_io_size;
+> > > >        int32_t bootindex;
+> > > >        uint32_t discard_granularity;
+> > > > @@ -51,7 +51,7 @@ static inline unsigned int get_physical_block_exp(BlockConf *conf)
+> > > >                              _conf.logical_block_size),                    \
+> > > >        DEFINE_PROP_BLOCKSIZE("physical_block_size", _state,                \
+> > > >                              _conf.physical_block_size),                   \
+> > > > -    DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),    \
+> > > > +    DEFINE_PROP_UINT32("min_io_size", _state, _conf.min_io_size, 0),    \
+> > > >        DEFINE_PROP_UINT32("opt_io_size", _state, _conf.opt_io_size, 0),    \
+> > > >        DEFINE_PROP_UINT32("discard_granularity", _state,                   \
+> > > >                           _conf.discard_granularity, -1),                  \
+> > > > diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> > > > index f161604fb6..f9e0f8c041 100644
+> > > > --- a/include/hw/qdev-properties.h
+> > > > +++ b/include/hw/qdev-properties.h
+> > > > @@ -197,7 +197,7 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+> > > >    #define DEFINE_PROP_BIOS_CHS_TRANS(_n, _s, _f, _d) \
+> > > >        DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_bios_chs_trans, int)
+> > > >    #define DEFINE_PROP_BLOCKSIZE(_n, _s, _f) \
+> > > > -    DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
+> > > > +    DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint32_t)
+> > > >    #define DEFINE_PROP_PCI_HOST_DEVADDR(_n, _s, _f) \
+> > > >        DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr, PCIHostDeviceAddress)
+> > > >    #define DEFINE_PROP_OFF_AUTO_PCIBAR(_n, _s, _f, _d) \
+> > > > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> > > > index 2047114fca..e673f3c43f 100644
+> > > > --- a/hw/core/qdev-properties.c
+> > > > +++ b/hw/core/qdev-properties.c
+> > > > @@ -14,6 +14,7 @@
+> > > >    #include "qapi/visitor.h"
+> > > >    #include "chardev/char.h"
+> > > >    #include "qemu/uuid.h"
+> > > > +#include "qemu/units.h"
+> > > >    void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+> > > >                                      Error **errp)
+> > > > @@ -729,30 +730,42 @@ const PropertyInfo qdev_prop_pci_devfn = {
+> > > >    /* --- blocksize --- */
+> > > > +/* lower limit is sector size */
+> > > > +#define MIN_BLOCK_SIZE          512
+> > > > +#define MIN_BLOCK_SIZE_STR      "512 B"
+> > > > +/*
+> > > > + * upper limit is arbitrary, 2 MiB looks sufficient for all sensible uses, and
+> > > > + * matches qcow2 cluster size limit
+> > > > + */
+> > > > +#define MAX_BLOCK_SIZE          (2 * MiB)
+> > > > +#define MAX_BLOCK_SIZE_STR      "2 MiB"
+> > > > +
+> > > >    static void set_blocksize(Object *obj, Visitor *v, const char *name,
+> > > >                              void *opaque, Error **errp)
+> > > >    {
+> > > >        DeviceState *dev = DEVICE(obj);
+> > > >        Property *prop = opaque;
+> > > > -    uint16_t value, *ptr = qdev_get_prop_ptr(dev, prop);
+> > > > +    uint32_t *ptr = qdev_get_prop_ptr(dev, prop);
+> > > > +    uint64_t value;
+> > > >        Error *local_err = NULL;
+> > > > -    const int64_t min = 512;
+> > > > -    const int64_t max = 32768;
+> > > >        if (dev->realized) {
+> > > >            qdev_prop_set_after_realize(dev, name, errp);
+> > > >            return;
+> > > >        }
+> > > > -    visit_type_uint16(v, name, &value, &local_err);
+> > > > +    visit_type_size(v, name, &value, &local_err);
+> > > >        if (local_err) {
+> > > >            error_propagate(errp, local_err);
+> > > >            return;
+> > > >        }
+> > > >        /* value of 0 means "unset" */
+> > > > -    if (value && (value < min || value > max)) {
+> > > > -        error_setg(errp, QERR_PROPERTY_VALUE_OUT_OF_RANGE,
+> > > > -                   dev->id ? : "", name, (int64_t)value, min, max);
+> > > > +    if (value && (value < MIN_BLOCK_SIZE || value > MAX_BLOCK_SIZE)) {
+> > > > +        error_setg(errp,
+> > > > +                   "Property %s.%s doesn't take value %" PRIu64
+> > > > +                   " (minimum: " MIN_BLOCK_SIZE_STR
+> > > > +                   ", maximum: " MAX_BLOCK_SIZE_STR ")",
+> > > > +                   dev->id ? : "", name, value);
+> > > >            return;
+> > > >        }
+> > > > @@ -768,9 +781,10 @@ static void set_blocksize(Object *obj, Visitor *v, const char *name,
+> > > >    }
+> > > >    const PropertyInfo qdev_prop_blocksize = {
+> > > > -    .name  = "uint16",
+> > > > -    .description = "A power of two between 512 and 32768",
+> > > > -    .get   = get_uint16,
+> > > > +    .name  = "size",
+> > > > +    .description = "A power of two between " MIN_BLOCK_SIZE_STR
+> > > > +                   " and " MAX_BLOCK_SIZE_STR,
+> > > > +    .get   = get_uint32,
+> > > >        .set   = set_blocksize,
+> > > >        .set_default_value = set_default_value_uint,
+> > > >    };
+> > > > 
+> > > 
+> > > 1/ Don't you need to update SCSIBlockLimits too?
+> > 
+> > I guess you mean SCSIBlockLimits.min_io_size which is the only uint16_t
+> > field there, do you?
+> 
+> Yes.
+> 
+> > 
+> > > 2/ It seems hw/block/virtio-blk.c can get underflow now.
+> > 
+> > Both SCSIBlockLimits.min_io_size and virtio_blk_config.min_io_size are
+> > expressed in logical blocks so there appears to be no problem here.
+> > 
+> > > Maybe you miss this change:
+> > > 
+> > > -- >8 --
+> > > diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> > > --- a/hw/block/virtio-blk.c
+> > > +++ b/hw/block/virtio-blk.c
+> > > @@ -917,7 +917,7 @@ static void virtio_blk_update_config(VirtIODevice *vdev,
+> > > uint8_t *config)
+> > >                    s->conf.seg_max_adjust ? s->conf.queue_size - 2 : 128 -
+> > > 2);
+> > >       virtio_stw_p(vdev, &blkcfg.geometry.cylinders, conf->cyls);
+> > >       virtio_stl_p(vdev, &blkcfg.blk_size, blk_size);
+> > > -    virtio_stw_p(vdev, &blkcfg.min_io_size, conf->min_io_size / blk_size);
+> > > +    virtio_stl_p(vdev, &blkcfg.min_io_size, conf->min_io_size / blk_size);
+> > 
+> > The width of this field in the device's config space is defined in the
+> > spec and can't be changed.
+> > 
+> > Nor is there any need due to this patch.
+> 
+> OK, thanks :)
 
---54ZYs4vew8w0glUUsJpzbmIWuUUfoegiz
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+May I count this as an r-b? :)
 
-On 30.04.20 10:58, Dr. David Alan Gilbert wrote:
-> * Max Reitz (mreitz@redhat.com) wrote:
->> On 29.04.20 16:57, Dr. David Alan Gilbert wrote:
->>> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
->>>> * Max Reitz (mreitz@redhat.com) wrote:
->>>>> Currently, setup_mounts() bind-mounts the shared directory without
->>>>> MS_REC.  This makes all submounts disappear.
->>>>>
->>>>> Pass MS_REC so that the guest can see submounts again.
->>>>
->>>> Thanks!
->>>>
->>>>> Fixes: 3ca8a2b1c83eb185c232a4e87abbb65495263756
->>>>
->>>> Should this actually be 5baa3b8e95064c2434bd9e2f312edd5e9ae275dc ?
->>>>
->>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>>> ---
->>>>>  tools/virtiofsd/passthrough_ll.c | 2 +-
->>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passt=
-hrough_ll.c
->>>>> index 4c35c95b25..9d7f863e66 100644
->>>>> --- a/tools/virtiofsd/passthrough_ll.c
->>>>> +++ b/tools/virtiofsd/passthrough_ll.c
->>>>> @@ -2643,7 +2643,7 @@ static void setup_mounts(const char *source)
->>>>>      int oldroot;
->>>>>      int newroot;
->>>>> =20
->>>>> -    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
->>>>> +    if (mount(source, source, NULL, MS_BIND | MS_REC, NULL) < 0) {
->>>>>          fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", sourc=
-e, source);
->>>>>          exit(1);
->>>>>      }
->>>>
->>>> Do we want MS_SLAVE to pick up future mounts that might happenf rom th=
-e
->>>> host?
->>>> What's the interaction between this and the MS_REC|MS_SLAVE that we ha=
-ve
->>>> a few lines above for / ?
->>>
->>> Just to confirm something from vgoyal, and what had confused me about
->>> why we hadn't spotted this earlier.
->>>
->>> Even without this patch, the SLAVE stuff worked so if you start the
->>> daemon and *then* mount under the shared directory, the guest sees it
->>> with or without this patch.
->>
->> Hm, I don=E2=80=99t.  Do you really?
->=20
-> Yes! With your patch reverted:
->=20
-> Start virtiofsd, mount in the guest:
->=20
-> host:
-> # ./virtiofsd --socket-path=3D/tmp/vhostqemu -o source=3D/home/dgilbert/v=
-irtio-fs/fs  -o log_level=3Dwarn -o no_writeback
->=20
-> guest:
-> # mount -t virtiofs myfs /sysroot
-
-OK, for some reason I didn=E2=80=99t try to mount in the guest first, but d=
-id
-the host mount after starting virtiofsd.
-
-My mount test uses multiple mounts, and two of them I see mounted, but
-three I still don=E2=80=99t see mounted.
-
-Let me see whether I can come up with something reproducible that isn=E2=80=
-=99t
-a script.
-
-[...]
-
-> Maybe this is related to what Vivek said about default behaviours on
-> systemd's, what does:
->=20
-> # findmnt -o +PROPAGATION
-> TARGET    SOURCE         FSTYPE     OPTIONS                              =
-                                                    PROPAGATION
-> /         /dev/mapper/fedora_dgilbert--t580-root
-> =E2=94=82                        xfs        rw,relatime,seclabel,attr2,in=
-ode64,logbufs=3D8,logbsize=3D32k,noquota                        shared
->=20
-> say for your source=3D directory?
-
-I have Fedora, too, so pretty much the same.
-
-Max
-
-
---54ZYs4vew8w0glUUsJpzbmIWuUUfoegiz--
-
---QfIUrViZs5Euqaf87kfYpcqVjvFsO1FSh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6qmKsACgkQ9AfbAGHV
-z0Db1wf/aIFXWLNFxAHC+g0QoZDUd6nlDlqu3qi7Sf1sJNv0r8mlCEXWMcPn1IN8
-jl/vrGskXH6tEM0KuzpQI/H9NEwIQ/nLfnJvNR/taEfFCAx+/PH+QTxh6GA25Xzy
-YzUEbeO6+P9wrO/YSeaT/CGVn88U20gA4e/Gyjq7YBxACq/bF7uGvwmCyPoDOqm0
-1A9TZkyy54WGSqyzbPrxBtUa2ULMiEwwvjVnTXamOvikVL+oCiopxi/30i1/aRsP
-bUNZuJP/1tGFIMazN5R0YnXbTFuvUISe+bFKhkXR7OUEvsJON+lHejJVL1XfZg3Z
-AB7ZVxdNAGQKhFhs2vUAvHj0JFS/cg==
-=UzY4
------END PGP SIGNATURE-----
-
---QfIUrViZs5Euqaf87kfYpcqVjvFsO1FSh--
-
+Thanks,
+Roman.
 
