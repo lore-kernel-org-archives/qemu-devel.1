@@ -2,92 +2,105 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0561DC83002
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:00:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 268CEC83001
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:04:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C38382082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:00:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E48E0214D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:04:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NhsMrOZG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C38382082E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SIlBN0ph"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E48E0214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU3BJ-0007aW-Sp
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 03:00:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60196)
+	id 1jU3F2-0002JW-0X
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 03:04:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60766)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jU38h-0004DW-FO
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 02:57:46 -0400
+ (envelope-from <philmd@redhat.com>) id 1jU3Db-0001Mp-Sl
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:02:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jU38T-0001k3-7M
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 02:57:43 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:33569)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jU38S-0001jZ-Oe; Thu, 30 Apr 2020 02:57:28 -0400
-Received: by mail-wr1-x435.google.com with SMTP id c12so304939wrp.0;
- Wed, 29 Apr 2020 23:57:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=cV+J3v4N+dhvAeB8wrTrTrwCO4mCVCMXktdc15geTl4=;
- b=NhsMrOZGHeCYtuMvWVEbl4CVSXPlISpZjRDthpCRZCxQ6XyEROqIendqZhs6w+iamy
- iqkTaEs5O6Uij19dYrsC8J3fECCSm4zgApvPQm93lZfsEAgDBYU+XjYPtL9nyxNgtGav
- rDFPNU/u16LzQY7y85FpTtE38FgFmjvM5OEZhdMyZvsHtNwZ90ick2lIz1U/YQqojDjY
- wlklCM9R90ZvgycXWgO8iyq3I173/AXE4izTnloC8DZ7xoVrODbjTTWi/XJA1XkJgTox
- ScHPJR2aOtr1DbVWOwYORmdno+quuYMeD5vwZhmb5ZeWq8KGibFNUnG8pAG4fBj2Qe52
- 5gdA==
+ (envelope-from <philmd@redhat.com>) id 1jU3DZ-0001ly-Ix
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:02:47 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47866
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jU3DZ-0001Mo-0S
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:02:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588230160;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=yv0S0OuhWnk2aRbINtuM1cD9URxc7oIzXrTBxYwIIro=;
+ b=SIlBN0ph8nV8G2uXIyuZhGyZcooeHFrPQi+iuWHsgWAdI34VmGb2cZEmUtfZmRcemWCHcy
+ 1emRGnZsjz8w84TFb0czoIe97SZ+NJI1x7C3ZZiwKMWtDwGKhj4cWim7zdl/9sQQxx5Dc/
+ EBrMUwmlp8/PNV0SaXrgz8+LXnTslNQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-378-U0gx6OhxPeKyCYrVYCQP0w-1; Thu, 30 Apr 2020 03:02:39 -0400
+X-MC-Unique: U0gx6OhxPeKyCYrVYCQP0w-1
+Received: by mail-wm1-f72.google.com with SMTP id 71so187175wmb.8
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 00:02:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=cV+J3v4N+dhvAeB8wrTrTrwCO4mCVCMXktdc15geTl4=;
- b=Nj4q9OZlMKBJa2iS2h/6PEqFG7aevedDY77ud678JONkU3zZ/zE4EKm31Gxe2lKxpg
- pg0Tdi/A3N/kl2OJv9YnAL1UQG793Wl8SU4ne4B0IOC6ZGRAe+QqG1feQprmeP23oNcN
- G1lhVR0+3/em1McAJHLAsXtiTVI7Ht2i3nZjaUqRgXDV00Ixd2JXG1kaMnHw2uIZCPC5
- 5dSWknWpO8WoQ2T2+W0xPqCRGKsB7c8Kzp2o2wmaeGc4xQDpbjpf9Km870UImSOqdrlz
- wjxwQYESSTR1zus6NDxQanTFsKu+rScZTs4GdqdK1P3PAvHUUW8AekAhyy49faseJ7E7
- DPVw==
-X-Gm-Message-State: AGi0PubgMuwaok9+Fp+tU1HLhiq8SsfvDilgK9woJyZkrB8FTnuaUwbm
- TkPpCItDA1pKqNNla1y7QsgcRiqqsI8=
-X-Google-Smtp-Source: APiQypLdq276MTYnqvn0Yequ0L7XMDgwiBy6NoygaAGbUgvurzL7mKWj/9RGwrLlTtcGbQlhKzMOxQ==
-X-Received: by 2002:a5d:4404:: with SMTP id z4mr2057382wrq.316.1588229846784; 
- Wed, 29 Apr 2020 23:57:26 -0700 (PDT)
-Received: from localhost.localdomain (137.red-88-21-205.staticip.rima-tde.net.
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WI09xRu4MG/i/3E2L2i9lXl3LcBHHyWdgW1pJAwRA7g=;
+ b=TjI2N+8PiRyFz2PS/Lv+y5C8Qf5Sh2Nfat2FCFik5gn7EYgjP7uOVE3q5qmBq2fDQW
+ g1FSVMxcL8Awa3GOTI31p4uSlLCUxs7gp0CnSd+ABtj8uj/mAJvY+TZU8aJjc/5GVlvL
+ 35k3jq7IZETHYJJTMQS80xMhXkSaIPBBgcIvPE/babjwE4fP3pFHEO6WuuJ65XlSsNl4
+ qzuKmCK+/wrB4kMM/dzXgNfaspdAhUdiPGwGRTRZtIQIIdthWd6AvKyOy7zx+7pDS4ll
+ g1pvqfkLvjueZAvTjVXFX3zeevUheXFRwMcF2phUkn4vwZub82D9Hr9GjFrDz3VhShab
+ j3LA==
+X-Gm-Message-State: AGi0PuYQ72Qx0Xg8EsP7Lqe8BbnX1NptbayOGfrSnWSyE9KjlfBBoCRm
+ zULkqMA369Wefkv9GnlTB32PannM9YOc/jaYUrMgAMsHr4vzKc0i4ImAG6qNN1PAPugcBnCoD6O
+ RKVBjvkEf3ypqRu4=
+X-Received: by 2002:a05:6000:10c4:: with SMTP id
+ b4mr2167220wrx.203.1588230158017; 
+ Thu, 30 Apr 2020 00:02:38 -0700 (PDT)
+X-Google-Smtp-Source: APiQypI17D6vuLLedKmdVEsSrJ3FIUoaVppsGE3Tky8Z0nJaufp+CP2vLiIphDwC1iDm7K/KZXoHIg==
+X-Received: by 2002:a05:6000:10c4:: with SMTP id
+ b4mr2167195wrx.203.1588230157733; 
+ Thu, 30 Apr 2020 00:02:37 -0700 (PDT)
+Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.137])
- by smtp.gmail.com with ESMTPSA id k184sm11139730wmf.9.2020.04.29.23.57.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Apr 2020 23:57:26 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/3] scripts/qemugdb: Remove shebang header
-Date: Thu, 30 Apr 2020 08:57:19 +0200
-Message-Id: <20200430065720.10763-3-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200430065720.10763-1-f4bug@amsat.org>
-References: <20200430065720.10763-1-f4bug@amsat.org>
+ by smtp.gmail.com with ESMTPSA id f23sm10591007wml.4.2020.04.30.00.02.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 30 Apr 2020 00:02:37 -0700 (PDT)
+Subject: Re: [PATCH v5 2/3] hw/vfio: drop guest writes to ro regions
+To: Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com,
+ alex.williamson@redhat.com
+References: <20200430051558.28991-1-yan.y.zhao@intel.com>
+ <20200430052307.29235-1-yan.y.zhao@intel.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d78ed9ed-f78d-4aa5-efcc-77cb33fb1c76@redhat.com>
+Date: Thu, 30 Apr 2020 09:02:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::435;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x435.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::435
+In-Reply-To: <20200430052307.29235-1-yan.y.zhao@intel.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:04:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,90 +112,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: xin.zeng@intel.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These scripts are loaded as plugin by GDB (and they don't
-have any __main__ entry point). Remove the shebang header.
+On 4/30/20 7:23 AM, Yan Zhao wrote:
+> for vfio regions that are without write permission,
+> drop guest writes to those regions.
+>=20
+> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co>
 
-Acked-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- scripts/qemugdb/__init__.py  | 3 +--
- scripts/qemugdb/aio.py       | 3 +--
- scripts/qemugdb/coroutine.py | 3 +--
- scripts/qemugdb/mtree.py     | 4 +---
- scripts/qemugdb/tcg.py       | 1 -
- 5 files changed, 4 insertions(+), 10 deletions(-)
+The full domain name is redhat.com.
 
-diff --git a/scripts/qemugdb/__init__.py b/scripts/qemugdb/__init__.py
-index 969f552b26..da8ff612e5 100644
---- a/scripts/qemugdb/__init__.py
-+++ b/scripts/qemugdb/__init__.py
-@@ -1,5 +1,4 @@
--#!/usr/bin/python
--
-+#
- # GDB debugging support
- #
- # Copyright (c) 2015 Linaro Ltd
-diff --git a/scripts/qemugdb/aio.py b/scripts/qemugdb/aio.py
-index 2ba00c4444..d7c1ba0c28 100644
---- a/scripts/qemugdb/aio.py
-+++ b/scripts/qemugdb/aio.py
-@@ -1,5 +1,4 @@
--#!/usr/bin/python
--
-+#
- # GDB debugging support: aio/iohandler debug
- #
- # Copyright (c) 2015 Red Hat, Inc.
-diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
-index 41e079d0e2..db61389022 100644
---- a/scripts/qemugdb/coroutine.py
-+++ b/scripts/qemugdb/coroutine.py
-@@ -1,5 +1,4 @@
--#!/usr/bin/python
--
-+#
- # GDB debugging support
- #
- # Copyright 2012 Red Hat, Inc. and/or its affiliates
-diff --git a/scripts/qemugdb/mtree.py b/scripts/qemugdb/mtree.py
-index 3030a60d3f..8fe42c3c12 100644
---- a/scripts/qemugdb/mtree.py
-+++ b/scripts/qemugdb/mtree.py
-@@ -1,5 +1,4 @@
--#!/usr/bin/python
--
-+#
- # GDB debugging support
- #
- # Copyright 2012 Red Hat, Inc. and/or its affiliates
-@@ -84,4 +83,3 @@ def print_item(self, ptr, offset = gdb.Value(0), level = 0):
-         while not isnull(subregion):
-             self.print_item(subregion, addr, level)
-             subregion = subregion['subregions_link']['tqe_next']
--
-diff --git a/scripts/qemugdb/tcg.py b/scripts/qemugdb/tcg.py
-index 18880fc9a7..16c03c06a9 100644
---- a/scripts/qemugdb/tcg.py
-+++ b/scripts/qemugdb/tcg.py
-@@ -1,4 +1,3 @@
--#!/usr/bin/python
- # -*- coding: utf-8 -*-
- #
- # GDB debugging support, TCG status
--- 
-2.21.1
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
+> ---
+>   hw/vfio/common.c | 13 +++++++++++--
+>   1 file changed, 11 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 0b3593b3c0..2a4fedfeaa 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -38,6 +38,7 @@
+>   #include "sysemu/reset.h"
+>   #include "trace.h"
+>   #include "qapi/error.h"
+> +#include "qemu/log.h"
+>  =20
+>   VFIOGroupList vfio_group_list =3D
+>       QLIST_HEAD_INITIALIZER(vfio_group_list);
+> @@ -190,6 +191,16 @@ void vfio_region_write(void *opaque, hwaddr addr,
+>           uint64_t qword;
+>       } buf;
+>  =20
+> +    trace_vfio_region_write(vbasedev->name, region->nr, addr, data, size=
+);
+> +    if (!(region->flags & VFIO_REGION_INFO_FLAG_WRITE)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "Invalid write to read only vfio region (%s:region=
+%d"
+> +                      "+0x%"HWADDR_PRIx" size %d)\n", vbasedev->name,
+> +                      region->nr, addr, size);
+> +
+> +        return;
+> +    }
+> +
+>       switch (size) {
+>       case 1:
+>           buf.byte =3D data;
+> @@ -215,8 +226,6 @@ void vfio_region_write(void *opaque, hwaddr addr,
+>                        addr, data, size);
+>       }
+>  =20
+> -    trace_vfio_region_write(vbasedev->name, region->nr, addr, data, size=
+);
+> -
+>       /*
+>        * A read or write to a BAR always signals an INTx EOI.  This will
+>        * do nothing if not pending (including not in INTx mode).  We assu=
+me
+>=20
 
 
