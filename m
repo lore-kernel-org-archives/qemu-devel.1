@@ -2,52 +2,49 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAAF1C83002
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 775AEC83001
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:24:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C01EA214D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:24:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C01EA214D8
+	by mail.kernel.org (Postfix) with ESMTPS id 4DE9720838
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:24:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DE9720838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU3Yo-0006WI-UT
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 03:24:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34256)
+	id 1jU3Yx-0006pZ-EC
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 03:24:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34260)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jU3XW-0004Zm-Os
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:23:39 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jU3XX-0004af-8n
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:23:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jU3W7-0006Y2-8i
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:23:22 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:53190)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jU3W7-0006Y8-Ak
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:23:23 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:34278)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jU3W6-0006Wn-Kj; Thu, 30 Apr 2020 03:21:54 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1414109|-1; CH=green; DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.0183836-0.00115908-0.980457;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03300; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ id 1jU3W6-0006WG-Kj; Thu, 30 Apr 2020 03:21:54 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08792099|-1; CH=green;
+ DM=|CONTINUE|false|; DS=CONTINUE|ham_regular_dialog|0.1343-0.00143465-0.864266;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16384; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
  RN=10; RT=10; SR=0; TI=SMTPD_---.HQfovas_1588231302; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
  fp:SMTPD_---.HQfovas_1588231302) by smtp.aliyun-inc.com(10.147.40.7);
- Thu, 30 Apr 2020 15:21:44 +0800
+ Thu, 30 Apr 2020 15:21:43 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: peter.maydell@linaro.org
-Subject: [RFC PATCH 3/8] riscv: Define riscv struct reginfo
-Date: Thu, 30 Apr 2020 15:21:34 +0800
-Message-Id: <20200430072139.4602-4-zhiwei_liu@c-sky.com>
+Subject: [RFC PATCH 0/8] RISCV risu porting 
+Date: Thu, 30 Apr 2020 15:21:31 +0800
+Message-Id: <20200430072139.4602-1-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200430072139.4602-1-zhiwei_liu@c-sky.com>
-References: <20200430072139.4602-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: none client-ip=121.197.200.217;
@@ -74,47 +71,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- risu_reginfo_riscv64.h | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
- create mode 100644 risu_reginfo_riscv64.h
+When I test RISCV vector extension, many folks advice risu. Here is a
+very simple port only support RV64I, RV64F, RV64M.
 
-diff --git a/risu_reginfo_riscv64.h b/risu_reginfo_riscv64.h
-new file mode 100644
-index 0000000..7d365a8
---- /dev/null
-+++ b/risu_reginfo_riscv64.h
-@@ -0,0 +1,29 @@
-+/******************************************************************************
-+ * Copyright (c) 2020 PingTouGe Semiconductor
-+ * All rights reserved. This program and the accompanying materials
-+ * are made available under the terms of the Eclipse Public License v1.0
-+ * which accompanies this distribution, and is available at
-+ * http://www.eclipse.org/legal/epl-v10.html
-+ *
-+ * Contributors:
-+ *     LIU Zhiwei(PingTouGe) - initial implementation
-+ *     based on Peter Maydell's risu_arm.c
-+ *****************************************************************************/
-+
-+#ifndef RISU_REGINFO_RISCV64_H
-+#define RISU_REGINFO_RISCV64_H
-+
-+struct reginfo {
-+    uint64_t fault_address;
-+    uint64_t regs[32];
-+    uint64_t fregs[32];
-+    uint64_t sp;
-+    uint64_t pc;
-+    uint32_t flags;
-+    uint32_t faulting_insn;
-+
-+    /* FP */
-+    uint32_t fcsr;
-+};
-+
-+#endif /* RISU_REGINFO_RISCV64_H */
+It's some difficult when I try to support RV32, because it's very
+similiar to RV64, so I can't make two .risu files like arm.risu and
+aarch64.risu.
+
+Any idea are welcomed.
+
+LIU Zhiwei (8):
+  riscv: Add RV64I instructions description
+  riscv: Generate payload scripts
+  riscv: Define riscv struct reginfo
+  riscv: Implement payload load interfaces
+  riscv: Add standard test case
+  riscv: Add configure script
+  riscv: Add RV64M instructions description
+  riscv: Add RV64F instructions description
+
+ configure              |   4 +-
+ riscv64.risu           | 262 +++++++++++++++++++++
+ risu_reginfo_riscv64.c | 134 +++++++++++
+ risu_reginfo_riscv64.h |  29 +++
+ risu_riscv64.c         |  47 ++++
+ risugen_riscv.pm       | 501 +++++++++++++++++++++++++++++++++++++++++
+ test_riscv64.s         |  85 +++++++
+ 7 files changed, 1061 insertions(+), 1 deletion(-)
+ create mode 100644 riscv64.risu
+ create mode 100644 risu_reginfo_riscv64.c
+ create mode 100644 risu_reginfo_riscv64.h
+ create mode 100644 risu_riscv64.c
+ create mode 100644 risugen_riscv.pm
+ create mode 100644 test_riscv64.s
+
 -- 
 2.23.0
 
