@@ -2,70 +2,70 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 171B3C28CBC
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:07:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A763C28CBC
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:08:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9DEA206D9
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:07:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9DEA206D9
+	by mail.kernel.org (Postfix) with ESMTPS id D2DC02063A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:08:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2DC02063A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU9qY-0005BP-Uv
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:07:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51716)
+	id 1jU9rZ-0006dU-U3
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:08:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51856)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jU9an-0003P8-1d
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:18 -0400
+ (envelope-from <bounces@canonical.com>) id 1jU9b7-0003wu-CO
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jU9ak-0000Z4-Cn
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36236)
+ (envelope-from <bounces@canonical.com>) id 1jU9b6-0001jx-Ev
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:29 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36582)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jU9aj-0000RD-Pi
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:05 -0400
+ id 1jU9b5-0000y4-UH
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:28 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jU9ai-0007TJ-Da
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:04 +0000
+ id 1jU9ar-0007pw-NL
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:13 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 646772E80E7
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:04 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id ADC932E80E7
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:13 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Apr 2020 13:42:25 -0000
+Date: Thu, 30 Apr 2020 13:36:44 -0000
 From: Laurent Vivier <Laurent@vivier.eu>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=th.huth@posteo.de; 
-X-Launchpad-Bug-Tags: s390x
-X-Launchpad-Bug-Information-Type: Public Security
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: yes
-X-Launchpad-Bug-Commenters: jgkammerer laurent-vivier th-huth
-X-Launchpad-Bug-Reporter: Jean-Gabriel Kammerer (jgkammerer)
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange laurent-vivier npes87184 samuel-t
+X-Launchpad-Bug-Reporter: Samuel (samuel-t)
 X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <158005183659.18916.14986952783973408797.malonedeb@gac.canonical.com>
-Message-Id: <158825414580.5544.1813182086107458475.launchpad@soybean.canonical.com>
-Subject: [Bug 1860920] Re: qemu-s390x-softmmu: crash 
+References: <157191258679.29920.9268940625941119092.malonedeb@soybean.canonical.com>
+Message-Id: <158825380475.6048.1948774591421478758.launchpad@soybean.canonical.com>
+Subject: [Bug 1849644] Re: QEMU VNC websocket proxy requires non-standard
+ 'binary' subprotocol
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 456e6a58d03f847910dc697e5f44ee35cef90e46
+X-Launchpad-Hash: f52cd1a755e0d6324db2cebecef7c13a4dd15b09
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 09:35:36
@@ -81,7 +81,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1860920 <1860920@bugs.launchpad.net>
+Reply-To: Bug 1849644 <1849644@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -93,50 +93,37 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1860920
+https://bugs.launchpad.net/bugs/1849644
 
 Title:
-  qemu-s390x-softmmu: crash
+  QEMU VNC websocket proxy requires non-standard 'binary' subprotocol
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  Trying to compile and use rust programs on an s390x emulated machine,
-  crash in qemu/target/s390x/translate.c line 3894
+  When running a machine using "-vnc" and the "websocket" option QEMU
+  seems to require the subprotocol called 'binary'. This subprotocol
+  does not exist in the WebSocket specification. In fact it has never
+  existed in the spec, in one of the very early drafts of WebSockets it
+  was briefly mentioned but it never made it to a final version.
 
-  Steps to reproduce:
-  on a amd64 PC, installed debian on s390x emulated by qemu, seems to work =
-fine (installed some packages, etc.)
-  installed rust cargo (either from rustup or from debian)
-  cargo install anything makes *qemu* crash when beginning to compile
+  When the WebSocket server requires a non-standard subprotocol any
+  WebSocket client that works correctly won't be able to connect.
 
-  Technical details:
-  * host: amd64 Linux
-  * qemu v4.2.0 (recompiled from git with debug options using configure --t=
-arget-list=3Ds390x-softmmu --enable-debug) (problem appears also with older=
- versions of qemu from git, with default compilation options, with qemu fro=
-m debian, etc.)
-  * compiled with gcc 9.2
-  * command line, relevant part: qemu-system-s390x -snapshot -machine s390-=
-ccw-virtio -cpu max,zpci=3Don -serial mon:stdio -display none -m 512
-  (tested with -smp 4  -m 4096 as well and without snapshotting)
-  * command line, less relevant part: -drive file=3D./debian.qcow2,if=3Dnon=
-e,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=3Dnone    -device virtio-blk=
--ccw,devno=3Dfe.0.0001,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootind=
-ex=3D1,scsi=3Doff    -netdev user,id=3Dmynet0,hostfwd=3Dtcp::2223-:22 -devi=
-ce virtio-net-pci,netdev=3Dmynet0
-  * core dump: abort in qemu/target/s390x/translate.c line 3894 ; s->field:=
- op has value 0xEC and op2 has value 0x54
-  (more info available if needed)
+  One example of such a client is noVNC, it tells the server that it
+  doesn't want to use any subprotocol. QEMU's WebSocket proxy doesn't
+  let noVNC connect. If noVNC is modified to ask for 'binary' it will
+  work, this is, however, incorrect behavior.
 
-  Tried to patch source to add 0x54 case to no avail.
-  Tried other cpu variants to no avail as well.
+  Looking at the code in "io/channel-websock.c" it seems it's quite
+  hard-coded to binary:
 
-  Reporting this in security as well since it also looks very much like
-  a DoS (albeit somewhat minor), feel free to tell me to report the bug
-  somewhere else.
+  Look at line 58 and 433 here:
+  https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dio/channel-websock.c
+
+  This code has to be made more dynamic, and shouldn't require binary.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1860920/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1849644/+subscriptions
 
