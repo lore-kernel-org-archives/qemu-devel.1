@@ -2,86 +2,87 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC803C47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E24C47247
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:14:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FF5D20873
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:13:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0142B208C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:14:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cy6JHVlp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FF5D20873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TLFacWtW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0142B208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUBop-0003hC-Jq
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:13:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45444)
+	id 1jUBp7-0004KO-60
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:14:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45396)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1jUBdX-0000Y9-8r
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:03:14 -0400
+ (envelope-from <robert.foley@linaro.org>) id 1jUBdD-00008m-R9
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:03:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1jUBaF-0003MX-Ef
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:02:07 -0400
-Received: from mail-qt1-x82a.google.com ([2607:f8b0:4864:20::82a]:34303)
+ (envelope-from <robert.foley@linaro.org>) id 1jUBZv-000358-9L
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:01:47 -0400
+Received: from mail-qv1-xf41.google.com ([2607:f8b0:4864:20::f41]:36017)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jUBaE-0003HS-WA
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:58:43 -0400
-Received: by mail-qt1-x82a.google.com with SMTP id b1so5420468qtt.1
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 08:58:42 -0700 (PDT)
+ id 1jUBZu-00034r-0u
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:58:22 -0400
+Received: by mail-qv1-xf41.google.com with SMTP id w18so3258270qvs.3
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 08:58:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=aF24IKnVFhq1UB6gmNrnCUeMXZezC3NkQoX6jpUZt8c=;
- b=cy6JHVlpNUxfV38LmzXrlZLRwgiMfwqKMzLXkOM80giZPGva/sjsp7XttnRlBN02I5
- ml3IlaUEwaaJJmeDCg+kPXE1uehAbXZ71YgAXDiPYs3bFtQLs26PHCVFRdPTqKrc4wMb
- eyaAmT1H64ZJbKVoXTe3NcOjER7uxy7s82L6OC8HiXxtWniZtk+IkEU1emfia48ytlbM
- IZrXrxrqcxSeBn978UVeQSDzCHBW+KcC9NJr4BsCTpwJq/VC3gmorfbLVYHHLcC/Xwvy
- cTErmVnS4DRizUZuKfyfQTEISU2kNQ7BvRw1Elk1uq7ZUMLEWoLLthhxaUeCKN4xmlMS
- pyCg==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=M/HVPJJsarEjIjVx4H78Iqo7kCS5rt82H++LHRaHDJU=;
+ b=TLFacWtWa1DrBh1fkALLRqkqNoJAYQa45Wt4IZLzxN9fpv/T3BdPfsvsPJvkV72H9l
+ JqxdCWv1/Iqloa1QBEty/kkTJ+N6z/6CdkwVxrTboATRfEgiBAsm1NJPy6BaTSU5eRwv
+ YskAxAbuf+UFapSW0PO3cLhrOGG0i3GX3mc/V4qIr6IHIq0PwNn8TCsVnhYubkWltDhn
+ KRrSMbaRWyaTOcTzDHserKk+M/tlxq03pwu1V5PBzWdPpPyWJOIuE3ol28LYfsBdmZrr
+ Wl7n9ZZ5qlmHeKW9tFAiGHhk1XJrRBZ84umnjUxCb5073DeyUIeXyvZdrCgXI+GvwdGE
+ NwJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=aF24IKnVFhq1UB6gmNrnCUeMXZezC3NkQoX6jpUZt8c=;
- b=io64806EKT/AaCrW7uq/VQBAo63VOk62RdbEzuZ5drplVgwyCMfA6HhGUKE2Kum+6o
- ntEc3g9x+zTe3AqxWp8w3Jn/oiIB6k5HHVNBE2JI0Eg4fyo3m1kP5X9wcWK+2/XJkQZr
- 194G11XntryLJmISWG8qCnfy+hR+dqRZHhe+FBMhDL0s0eA91XEw4pTqMkzxzrxGyB0C
- QgHX8ERtKQxSqNQ1XXjntrHPNXIGL5vQJEs0bcdf42wqJ/MpRqVdxTrFwjXRDH/RuQVZ
- 3AmWBSG5TJm2g8jT+yUZUfQV9HVPi1jCliR5ZzErl6GZEO810ntN0QtkV0Va5+iG92AX
- 47dw==
-X-Gm-Message-State: AGi0PuZ2yLN5gzVDcYm4iYXv98UMNUSfc/BVN2RTH9g7h4QSVQtulE8P
- n36s3URbwpPa/42lk/7VbB4SB/SGDWVOZw==
-X-Google-Smtp-Source: APiQypLDIgBAsh6qAW4H+Ry/jg/6OKc9HeIAwK008JYk0QbltXw27ekaV+e6mTip+PjWKuHJZZm60Q==
-X-Received: by 2002:ac8:5653:: with SMTP id 19mr4289832qtt.252.1588262321752; 
- Thu, 30 Apr 2020 08:58:41 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=M/HVPJJsarEjIjVx4H78Iqo7kCS5rt82H++LHRaHDJU=;
+ b=CViV1FULxQZYy2de/c/xeeNomGVCx2LliUYTsRRblp9E12VyArRBKBlVtyw0AAGRwG
+ iZKPbDbfoZq/IIPBncpxBf/wSFJHVsJIa12MBCB3j+naXQnBY8qALnPCxOWplGRXa4SA
+ l4Js14V9ucR3f1j4OS0LkLPTsTGlyx6eOxpZ69xJhBi+LFugSd8/Cchodj4XGhmJLAWK
+ D36dUIjExxUybNCEPOmT1eLiCKzd31X0gDLn2NlBZy2f3qrdQFNN9AEu3i8fzkzDguZZ
+ ICq2npqj8/ENjAzBVnbQi40kwZS8/cPQ3JWvzUe4RqI457+E4DahoVEGnTIhAHSgBqfl
+ t8IQ==
+X-Gm-Message-State: AGi0PuYVxX6sPa/FUuFl0IqHb+eyeYmRr8JrJD2aYrQh+2eNnWFPqT1W
+ /sS4lgNvNjo7nWw1ZvJTp9gLvyH6j1T8YA==
+X-Google-Smtp-Source: APiQypJrScLC4ti9F1XL/xs9u8X+zVO11U1xzxM5ASC2IWCmQdVsJVsRFpVxabskQq4cGN3KKGDnSg==
+X-Received: by 2002:a0c:da87:: with SMTP id z7mr3635295qvj.141.1588262300075; 
+ Thu, 30 Apr 2020 08:58:20 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  ([2601:199:4480:60c0:7489:3328:3806:7c3])
- by smtp.gmail.com with ESMTPSA id v16sm305254qkf.80.2020.04.30.08.58.40
+ by smtp.gmail.com with ESMTPSA id v16sm305254qkf.80.2020.04.30.08.58.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 08:58:41 -0700 (PDT)
+ Thu, 30 Apr 2020 08:58:19 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 5/9] tests/vm: allow wait_ssh() to specify command
-Date: Thu, 30 Apr 2020 11:57:14 -0400
-Message-Id: <20200430155718.212-6-robert.foley@linaro.org>
+Subject: [PATCH v5 0/9] tests/vm: Add support for aarch64 VMs
+Date: Thu, 30 Apr 2020 11:57:09 -0400
+Message-Id: <20200430155718.212-1-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200430155718.212-1-robert.foley@linaro.org>
-References: <20200430155718.212-1-robert.foley@linaro.org>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::82a;
- envelope-from=robert.foley@linaro.org; helo=mail-qt1-x82a.google.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f41;
+ envelope-from=robert.foley@linaro.org; helo=mail-qv1-xf41.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::82a
+X-Received-From: 2607:f8b0:4864:20::f41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,50 +100,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows for waiting for completion of arbitrary commands.
+This is version 5 of the patch series to 
+add support for aarch64 VMs in the vm-build infrastructure.
+ - Ubuntu 20.04 aarch64 VM
+ - CentOS 8 aarch64 VM
 
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
----
- tests/vm/basevm.py | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+v4: https://lists.nongnu.org/archive/html/qemu-devel/2020-03/msg03558.html
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 7b86ccd018..9f06f84974 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -410,24 +410,24 @@ class BaseVM(object):
-     def print_step(self, text):
-         sys.stderr.write("### %s ...\n" % text)
- 
--    def wait_ssh(self, wait_root=False, seconds=300):
-+    def wait_ssh(self, wait_root=False, seconds=300, cmd="exit 0"):
-         # Allow more time for VM to boot under TCG.
-         if not kvm_available(self.arch):
-             seconds *= self.tcg_ssh_timeout_multiplier
-         starttime = datetime.datetime.now()
-         endtime = starttime + datetime.timedelta(seconds=seconds)
--        guest_up = False
-+        cmd_success = False
-         while datetime.datetime.now() < endtime:
--            if wait_root and self.ssh_root("exit 0") == 0:
--                guest_up = True
-+            if wait_root and self.ssh_root(cmd) == 0:
-+                cmd_success = True
-                 break
--            elif self.ssh("exit 0") == 0:
--                guest_up = True
-+            elif self.ssh(cmd) == 0:
-+                cmd_success = True
-                 break
-             seconds = (endtime - datetime.datetime.now()).total_seconds()
-             logging.debug("%ds before timeout", seconds)
-             time.sleep(1)
--        if not guest_up:
-+        if not cmd_success:
-             raise Exception("Timeout while waiting for guest ssh")
- 
-     def shutdown(self):
+Changes in v5
+- Updated the Ubuntu aarch64 VM from 18.04 to 20.04.
+- Changed the creation of the flash drives to be silent to stdout.
+- Changed handling of qemu_args from yaml file to preserve quoted strings.  
+  This allows us to put something like this in the yaml as part of the 
+  qemu_args, and preserve the quotes: -append "root=/dev/vda1 console=ttyAMA0"
+- Fix issue in CentOS aarch64 VM where python was not set up.
+
+Robert Foley (9):
+  tests/vm: Add configuration to basevm.py
+  tests/vm: Added configuration file support
+  tests/vm: add --boot-console switch
+  tests/vm: Add ability to select QEMU from current build.
+  tests/vm: allow wait_ssh() to specify command
+  tests/vm: Added a new script for ubuntu.aarch64.
+  tests/vm: Added a new script for centos.aarch64.
+  tests/vm: change scripts to use self._config
+  tests/vm: Add workaround to consume console
+
+ configure                         |  25 +++
+ python/qemu/console_socket.py     | 162 +++++++++++++++++
+ python/qemu/machine.py            |  23 ++-
+ tests/vm/Makefile.include         |  27 +++
+ tests/vm/aarch64vm.py             | 105 +++++++++++
+ tests/vm/basevm.py                | 282 ++++++++++++++++++++++++------
+ tests/vm/centos-8-aarch64.ks      |  51 ++++++
+ tests/vm/centos.aarch64           | 227 ++++++++++++++++++++++++
+ tests/vm/conf_example_aarch64.yml |  51 ++++++
+ tests/vm/conf_example_x86.yml     |  50 ++++++
+ tests/vm/fedora                   |  17 +-
+ tests/vm/freebsd                  |  16 +-
+ tests/vm/netbsd                   |  19 +-
+ tests/vm/openbsd                  |  17 +-
+ tests/vm/ubuntu.aarch64           | 117 +++++++++++++
+ 15 files changed, 1098 insertions(+), 91 deletions(-)
+ create mode 100644 python/qemu/console_socket.py
+ create mode 100644 tests/vm/aarch64vm.py
+ create mode 100644 tests/vm/centos-8-aarch64.ks
+ create mode 100755 tests/vm/centos.aarch64
+ create mode 100644 tests/vm/conf_example_aarch64.yml
+ create mode 100644 tests/vm/conf_example_x86.yml
+ create mode 100755 tests/vm/ubuntu.aarch64
+
 -- 
 2.17.1
 
