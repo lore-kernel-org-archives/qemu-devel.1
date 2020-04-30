@@ -2,88 +2,87 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDF7AC8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA2EFC8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:21:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6F122137B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:04:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 73DFD20787
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:21:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AzSWXuLf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6F122137B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZZffSq/E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73DFD20787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU63E-00014u-O3
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:04:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50778)
+	id 1jU6Jm-0001bP-Hd
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:21:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52406)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jU62M-0000RL-Pb
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:03:23 -0400
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jU6IT-00089V-O3
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jU62M-0004u7-2Y
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:03:22 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22633
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jU62L-0004tq-JS
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:03:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588240999;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AY1WQvEYyGiYLRMyc7B6MWd0LrmxQF+xikHvIuYOdec=;
- b=AzSWXuLf8RqqkRfsBGPvLDo9yCsjf0vPlLWApfOw1A2VfLxw38CZlKFz/lSqPkrnDxEf8b
- tdAom+/9/Ir4wzoyRFOBtdgv1qb+LqVNlMc401HI/HbFrLDCLsBt+qa5nOmD9hVISgcCiu
- vbp1yVcSClC4AiN0ZQ7GcH/tFdKHmBE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-1YgJG2CxMS-yRO-FNBVt5Q-1; Thu, 30 Apr 2020 06:03:17 -0400
-X-MC-Unique: 1YgJG2CxMS-yRO-FNBVt5Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD948107ACCD;
- Thu, 30 Apr 2020 10:03:16 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D71360605;
- Thu, 30 Apr 2020 10:03:14 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8D33E11358BC; Thu, 30 Apr 2020 12:03:12 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Configuring onboard devices (was: Failing property setters +
- hardwired devices + -global = a bad day)
-References: <87mu6uia5i.fsf@dusky.pond.sub.org>
- <20200429155719.GL1495129@redhat.com>
- <87k11xh2kq.fsf@dusky.pond.sub.org>
- <CAFEAcA9-oxkMD-kJ1z12d4K1S_Jaz7Wj6_38Ah7ChSaBfQNkkA@mail.gmail.com>
-Date: Thu, 30 Apr 2020 12:03:12 +0200
-In-Reply-To: <CAFEAcA9-oxkMD-kJ1z12d4K1S_Jaz7Wj6_38Ah7ChSaBfQNkkA@mail.gmail.com>
- (Peter Maydell's message of "Thu, 30 Apr 2020 10:27:07 +0100")
-Message-ID: <87tv11e1en.fsf_-_@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jU6IM-000121-De
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:01 -0400
+Received: from mail-lj1-x22b.google.com ([2a00:1450:4864:20::22b]:35433)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jU6IM-0000tj-1S
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:19:54 -0400
+Received: by mail-lj1-x22b.google.com with SMTP id g4so5899944ljl.2
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 03:19:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=J1+YZDcHmXz/UGOZ6Lct5kgtEJ8OfqbYJV+/OeHw5+k=;
+ b=ZZffSq/EDwLJJZj4lE8ls8tMs9ZAmMBbaSASl52zW32fhd+upADop8hNvd7qH4b8mw
+ Ipx/PTMzy9xgnS7tvAmeKaPAlqyQ/krw4tcsPXYP/qlMiVGsbfU8gHBQNefPSnyrCsHQ
+ MhiCUnQkyi/aOGxfAwajggzGbWu4nj2DoemErSu1XKADDwUyzh5UNwltYRjUM6hxSKZq
+ CzwzkpC4ABJm9VRuGTYVBDKTlN+SRud0Xg9T6lY0P3sTLIw+x36GZsE8uQ842zqNX7ki
+ pX4BRP8Tl727a4beySHwlIkji19qy8NyRTkBW7khQAZ0bHlqGkA2T1bKTntJUj3DLOIr
+ Tojw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=J1+YZDcHmXz/UGOZ6Lct5kgtEJ8OfqbYJV+/OeHw5+k=;
+ b=bHHBvoDW3I3VW0SyWXYn01oJcW4v5ycJpyIxi4YnjKDXqep1ykGhIH0at+K62A5YPl
+ 0tVoRuPwyLwzNG8uv7RYVc3FXP1bamjJo7/GbeRJZw8lIxNOtMfZci36KG3rcJR7QoA5
+ UA0lbLYUKl+Bcj4AGN7ImG9/UIbRnPJt5W8wOLRwg/pj7A589vWYDrb8HmFFbBC1CZpS
+ mQFSghafLhU2pEorHwLzu0fBnD6kXa2sYWlCCm/62TZztAxzL3O6xye3nlPV7CXAM5+J
+ TZm2q2biY2oEsrVLRQ33KaKo/PD4+OkXc3qhuRe8uaXZHRY5aFi8XT2dpj63m6AckXZ5
+ Yg7Q==
+X-Gm-Message-State: AGi0PuawCDH3RqRl5T0+hijqA0T5UvDXTx0ASr2m52TlHBzUUVGp9hXm
+ PBlaJE0ntaeUvS4jy69e7qGOBNdofUY=
+X-Google-Smtp-Source: APiQypJWRE+PyfzCbHM7Fvw68W006vHQTyI+9fBuO6RmsPXLpawk9KL0odgEkoUzzMy8KN4M4UZYpA==
+X-Received: by 2002:a2e:3208:: with SMTP id y8mr1757422ljy.282.1588241991537; 
+ Thu, 30 Apr 2020 03:19:51 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id 16sm4007795ljr.55.2020.04.30.03.19.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Apr 2020 03:19:50 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v1 0/6] Xilinx queue 2020-04-30
+Date: Thu, 30 Apr 2020 12:19:43 +0200
+Message-Id: <20200430101949.7754-1-edgar.iglesias@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:31:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::22b;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x22b.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::22b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,61 +94,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-> On Thu, 30 Apr 2020 at 08:09, Markus Armbruster <armbru@redhat.com> wrote=
-:
->> Our means to configure onboard devices are weak.  We sidestepped this
->> for isa-fdc by taking it off the board, and thus make -device work.
->
-> This seems to be a general dynamic: the x86 pc machine works
-> via -device options (or is changed so it can work that way);
-> and then people propose dropping/deprecating/etc the config
-> options that work with onboard devices, without providing
-> clear solutions/instructions on how the command line needs
-> to change/etc for the mass of boards which are not the x86
-> pc machine and which do have a lot of onboard devices which
-> can't be handled via -device.
->
-> So my gut reaction to the "we should deprecate -global"
-> suggestions in this thread was a bit "here we go again"...
-> What works for x86 or even "what is sufficient for libvirt"
-> doesn't necessarily cover all the cases.
+The following changes since commit 648db19685b7030aa558a4ddbd3a8e53d8c9a062:
 
-Such shortsighted proposals have been made, but don't think it's what
-we're doing here.
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-misc-2020-04-29' into staging (2020-04-29 15:07:33 +0100)
 
-You're 100% right in that we do need to configure onboard devices.
--global is a terrible way to do it, though: it applies to *all* devices
-of a kind.  What if the board has more than one?  What if the can add
-more?
+are available in the Git repository at:
 
-Taking onboard devices off the board can occasionally sidestep the
-issue.  For isa-fdc, we genuinely *wanted* to take the damn thing off,
-because all it did for most users was provide them with VENOM.  Not
-needing -global for it anymore was just a nice bonus.
+  git@github.com:edgarigl/qemu.git tags/edgar/xilinx-next-2020-04-30.for-upstream
 
-Taking onboard devices off just to reduce the device configuration
-problem to a solved one, namely -device, may be tempting (it was to me),
-but it's too intrusive to be practical at scale.
+for you to fetch changes up to 3ed43b5031ed2d7ef501bb81b87caed960218461:
 
-Adding machine properties that alias onboard device properties is less
-intrusive.  The ones I added were still a lot of work.
+  target/microblaze: Add the pvr-user2 property (2020-04-30 12:11:03 +0200)
 
-Configuring onboard devices via machine properties restricts property
-access to the ones we added to the machine.  This differs from pluggable
-devices, where users can access all properties.
+----------------------------------------------------------------
+For upstream
 
-Any better ideas for letting users configure onboard devices?
+----------------------------------------------------------------
+Edgar E. Iglesias (6):
+      target/microblaze: Add the opcode-0x0-illegal CPU property
+      target/microblaze: Add the ill-opcode-exception property
+      target/microblaze: Add the div-zero-exception property
+      target/microblaze: Add the unaligned-exceptions property
+      target/microblaze: Add the pvr-user1 property
+      target/microblaze: Add the pvr-user2 property
+
+ target/microblaze/cpu.h       |  6 ++++++
+ target/microblaze/cpu.c       | 24 ++++++++++++++++++++++--
+ target/microblaze/op_helper.c |  5 +++--
+ target/microblaze/translate.c |  8 ++++----
+ 4 files changed, 35 insertions(+), 8 deletions(-)
+
+Edgar E. Iglesias (6):
+  target/microblaze: Add the opcode-0x0-illegal CPU property
+  target/microblaze: Add the ill-opcode-exception property
+  target/microblaze: Add the div-zero-exception property
+  target/microblaze: Add the unaligned-exceptions property
+  target/microblaze: Add the pvr-user1 property
+  target/microblaze: Add the pvr-user2 property
+
+ target/microblaze/cpu.h       |  6 ++++++
+ target/microblaze/cpu.c       | 24 ++++++++++++++++++++++--
+ target/microblaze/op_helper.c |  5 +++--
+ target/microblaze/translate.c |  8 ++++----
+ 4 files changed, 35 insertions(+), 8 deletions(-)
+
+-- 
+2.20.1
 
 
