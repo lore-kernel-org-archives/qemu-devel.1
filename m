@@ -2,89 +2,53 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF2FC8300B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:21:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 162DFC8300B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:22:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 183AB20787
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:21:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="huUnGmF+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 183AB20787
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id DE35C20787
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:22:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE35C20787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU6Jw-0001sT-Tu
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:21:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52432)
+	id 1jU6Kf-0003BM-VO
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:22:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52486)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jU6IW-0008Bp-9r
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:13 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jU6Ic-0008KL-LP
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jU6IP-00017I-4w
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:04 -0400
-Received: from mail-lj1-x234.google.com ([2a00:1450:4864:20::234]:38623)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jU6IO-00016v-Lu
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:19:56 -0400
-Received: by mail-lj1-x234.google.com with SMTP id e25so5884131ljg.5
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 03:19:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=WFSocXCxBymnF1MvynrViesDS2ZIgpy+8V/Y8WL70Qw=;
- b=huUnGmF+7FvJsaC572x4H4NxH0s6xGpOl5Rjk3w/5yPFmi08/lCVgwmnvGGG5wM9Te
- eeKgjxwz3XCm+SK/qsJZ9/ABBKmYzJz2XghfUv3HCbyuByeQfL9WWk82TvZ8+22hkXTY
- O69r3ohmCP6tm+OAn6T5XAddJA6QF12g/qLGLydYWnUs+S4kToBN6hnwqzj0p81Zp7MH
- BhCpj44KX3MPV/ho/LTHCzG5tfFVwEmbI4Q/sr9w7yC2WaY12C5h+nmN7NimuC6qbomy
- mR7lszOMwec8fZidiz51KTxrUhzF4nQ9dqserzwnueMRuQG2ogNhOyft9Ev0Kly9n3rS
- cEuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=WFSocXCxBymnF1MvynrViesDS2ZIgpy+8V/Y8WL70Qw=;
- b=Z7Q/H581X4oFpIJYWjf9HiiDH8vBqonLS0+Ft09zGS0y1dxZnfqyJYR/n5ixqX1oVm
- YaG9yXSZH/jwlE7dYDbqMNF+6+E9QEBcsi41weRlTGDtlbQpLa4KC5KgtT1BZ5RrV9rb
- emVuV8tO5YD/IpbeI+3A8XWtRgjYMKRdH03PkwwMd5SodXCwW3HX3jbDD4//msfQUSU7
- B9ptksVtIoPCDOcrC3zRdpHrWdpNN9WTpTfvwpE1oWYpAzrNjXSYNxzw9tgaRa4JWyh7
- DRdT2kew1vegOz0nhESfgoYRv7mYI5yjmpQ+JU0kSg9+qYij0aSVm3i/AjR/r2AnZ20D
- TDRQ==
-X-Gm-Message-State: AGi0PubQdXt6JZ4cLlM7wOTiwGwDMZnUsSnZcYCWSYIw342ngIrKO8tN
- ei5lIimy97LQmpJQaayeUBwvj+RWCNg=
-X-Google-Smtp-Source: APiQypLENNIAdSp/g0oKbeqwiYOVw5DL5Rjn1lJzTuDT+B6hTnfUQxkRjiDB7UUqcgTyqE4O17GBDQ==
-X-Received: by 2002:a2e:5847:: with SMTP id x7mr1718855ljd.61.1588241994777;
- Thu, 30 Apr 2020 03:19:54 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id a15sm3998823ljb.37.2020.04.30.03.19.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 03:19:54 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jU6IV-0001HJ-W5
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:10 -0400
+Received: from relay.sw.ru ([185.231.240.75]:35814)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jU6IV-00018G-BE; Thu, 30 Apr 2020 06:20:03 -0400
+Received: from dptest2.qa.sw.ru ([10.94.4.71])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jU6II-0003TP-Hs; Thu, 30 Apr 2020 13:19:50 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v1 2/6] target/microblaze: Add the ill-opcode-exception property
-Date: Thu, 30 Apr 2020 12:19:45 +0200
-Message-Id: <20200430101949.7754-3-edgar.iglesias@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200430101949.7754-1-edgar.iglesias@gmail.com>
-References: <20200430101949.7754-1-edgar.iglesias@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::234;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x234.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::234
+Subject: [PATCH v23 4/4] iotests: 287: add qcow2 compression type test
+Date: Thu, 30 Apr 2020 13:19:18 +0300
+Message-Id: <20200430101918.30351-5-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+In-Reply-To: <20200430101918.30351-1-dplotnikov@virtuozzo.com>
+References: <20200430101918.30351-1-dplotnikov@virtuozzo.com>
+Received-SPF: pass client-ip=185.231.240.75;
+ envelope-from=dplotnikov@virtuozzo.com; helo=relay.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 06:20:00
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,73 +60,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+The test checks fulfilling qcow2 requirements for the compression
+type feature and zstd compression type operability.
 
-Add the ill-opcode-exception property to control if illegal
-instructions will raise exceptions.
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Tested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- target/microblaze/cpu.h       | 1 +
- target/microblaze/cpu.c       | 4 ++++
- target/microblaze/translate.c | 2 +-
- 3 files changed, 6 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/287     | 152 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/287.out |  67 ++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 220 insertions(+)
+ create mode 100755 tests/qemu-iotests/287
+ create mode 100644 tests/qemu-iotests/287.out
 
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index d51587b342..71d7317a58 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -303,6 +303,7 @@ struct MicroBlazeCPU {
-         bool endi;
-         bool dopb_bus_exception;
-         bool iopb_bus_exception;
-+        bool illegal_opcode_exception;
-         bool opcode_0_illegal;
-         char *version;
-         uint8_t pvr;
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 418a0cd1fa..2cc6b1513c 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -207,6 +207,8 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-                                                  PVR2_DOPB_BUS_EXC_MASK : 0) |
-                         (cpu->cfg.iopb_bus_exception ?
-                                                  PVR2_IOPB_BUS_EXC_MASK : 0) |
-+                        (cpu->cfg.illegal_opcode_exception ?
-+                                                PVR2_ILL_OPCODE_EXC_MASK : 0) |
-                         (cpu->cfg.opcode_0_illegal ?
-                                                  PVR2_OPCODE_0x0_ILL_MASK : 0);
- 
-@@ -276,6 +278,8 @@ static Property mb_properties[] = {
-     /* Enables bus exceptions on failed instruction fetches.  */
-     DEFINE_PROP_BOOL("iopb-bus-exception", MicroBlazeCPU,
-                      cfg.iopb_bus_exception, false),
-+    DEFINE_PROP_BOOL("ill-opcode-exception", MicroBlazeCPU,
-+                     cfg.illegal_opcode_exception, false),
-     DEFINE_PROP_BOOL("opcode-0x0-illegal", MicroBlazeCPU,
-                      cfg.opcode_0_illegal, false),
-     DEFINE_PROP_STRING("version", MicroBlazeCPU, cfg.version),
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 222632b670..b4a78551ef 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -185,7 +185,7 @@ static void write_carryi(DisasContext *dc, bool carry)
- static bool trap_illegal(DisasContext *dc, bool cond)
- {
-     if (cond && (dc->tb_flags & MSR_EE_FLAG)
--        && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)) {
-+        && dc->cpu->cfg.illegal_opcode_exception) {
-         tcg_gen_movi_i64(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
-         t_gen_raise_exception(dc, EXCP_HW_EXCP);
-     }
+diff --git a/tests/qemu-iotests/287 b/tests/qemu-iotests/287
+new file mode 100755
+index 0000000000..f98a4cadc1
+--- /dev/null
++++ b/tests/qemu-iotests/287
+@@ -0,0 +1,152 @@
++#!/usr/bin/env bash
++#
++# Test case for an image using zstd compression
++#
++# Copyright (c) 2020 Virtuozzo International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=dplotnikov@virtuozzo.com
++
++seq="$(basename $0)"
++echo "QA output created by $seq"
++
++status=1	# failure is the default!
++
++# standard environment
++. ./common.rc
++. ./common.filter
++
++# This tests qocw2-specific low-level functionality
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++_unsupported_imgopts 'compat=0.10' data_file
++
++COMPR_IMG="$TEST_IMG.compressed"
++RAND_FILE="$TEST_DIR/rand_data"
++
++_cleanup()
++{
++    _cleanup_test_img
++    _rm_test_img "$COMPR_IMG"
++    rm -f "$RAND_FILE"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# for all the cases
++CLUSTER_SIZE=65536
++
++# Check if we can run this test.
++if IMGOPTS='compression_type=zstd' _make_test_img 64M |
++    grep "Invalid parameter 'zstd'"; then
++    _notrun "ZSTD is disabled"
++fi
++
++echo
++echo "=== Testing compression type incompatible bit setting for zlib ==="
++echo
++_make_test_img -o compression_type=zlib 64M
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
++
++echo
++echo "=== Testing compression type incompatible bit setting for zstd ==="
++echo
++_make_test_img -o compression_type=zstd 64M
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
++
++echo
++echo "=== Testing zlib with incompatible bit set ==="
++echo
++_make_test_img -o compression_type=zlib 64M
++$PYTHON qcow2.py "$TEST_IMG" set-feature-bit incompatible 3
++# to make sure the bit was actually set
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
++
++if $QEMU_IMG info "$TEST_IMG" >/dev/null 2>&1 ; then
++    echo "Error: The image opened successfully. The image must not be opened."
++fi
++
++echo
++echo "=== Testing zstd with incompatible bit unset ==="
++echo
++_make_test_img -o compression_type=zstd 64M
++$PYTHON qcow2.py "$TEST_IMG" set-header incompatible_features 0
++# to make sure the bit was actually unset
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
++
++if $QEMU_IMG info "$TEST_IMG" >/dev/null 2>&1 ; then
++    echo "Error: The image opened successfully. The image must not be opened."
++fi
++
++echo
++echo "=== Testing compression type values ==="
++echo
++# zlib=0
++_make_test_img -o compression_type=zlib 64M
++peek_file_be "$TEST_IMG" 104 1
++echo
++
++# zstd=1
++_make_test_img -o compression_type=zstd 64M
++peek_file_be "$TEST_IMG" 104 1
++echo
++
++echo
++echo "=== Testing simple reading and writing with zstd ==="
++echo
++_make_test_img -o compression_type=zstd 64M
++$QEMU_IO -c "write -c -P 0xAC 64K 64K " "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 0xAC 64K 64K " "$TEST_IMG" | _filter_qemu_io
++# read on the cluster boundaries
++$QEMU_IO -c "read -v 131070 8 " "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -v 65534 8" "$TEST_IMG" | _filter_qemu_io
++
++echo
++echo "=== Testing adjacent clusters reading and writing with zstd ==="
++echo
++_make_test_img -o compression_type=zstd 64M
++$QEMU_IO -c "write -c -P 0xAB 0 64K " "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "write -c -P 0xAC 64K 64K " "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "write -c -P 0xAD 128K 64K " "$TEST_IMG" | _filter_qemu_io
++
++$QEMU_IO -c "read -P 0xAB 0 64k " "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 0xAC 64K 64k " "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 0xAD 128K 64k " "$TEST_IMG" | _filter_qemu_io
++
++echo
++echo "=== Testing incompressible cluster processing with zstd ==="
++echo
++# create a 2M image and fill it with 1M likely incompressible data
++# and 1M compressible data
++dd if=/dev/urandom of="$RAND_FILE" bs=1M count=1 seek=1
++QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS_NO_FMT" \
++$QEMU_IO -f raw -c "write -P 0xFA 0 1M" "$RAND_FILE" | _filter_qemu_io
++
++$QEMU_IMG convert -f raw -O $IMGFMT -c \
++-o "$(_optstr_add "$IMGOPTS" "compression_type=zlib")" "$RAND_FILE" \
++"$TEST_IMG" | _filter_qemu_io
++
++$QEMU_IMG convert -O $IMGFMT -c \
++-o "$(_optstr_add "$IMGOPTS" "compression_type=zstd")" "$TEST_IMG" \
++"$COMPR_IMG" | _filter_qemu_io
++
++$QEMU_IMG compare "$TEST_IMG" "$COMPR_IMG"
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/287.out b/tests/qemu-iotests/287.out
+new file mode 100644
+index 0000000000..6b9dfb4af0
+--- /dev/null
++++ b/tests/qemu-iotests/287.out
+@@ -0,0 +1,67 @@
++QA output created by 287
++
++=== Testing compression type incompatible bit setting for zlib ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++incompatible_features     []
++
++=== Testing compression type incompatible bit setting for zstd ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++incompatible_features     [3]
++
++=== Testing zlib with incompatible bit set  ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++incompatible_features     [3]
++
++=== Testing zstd with incompatible bit unset  ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++incompatible_features     []
++
++=== Testing compression type values  ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++   0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++   1
++
++=== Testing simple reading and writing with zstd ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++0001fffe:  ac ac 00 00 00 00 00 00  ........
++read 8/8 bytes at offset 131070
++8 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++0000fffe:  00 00 ac ac ac ac ac ac  ........
++read 8/8 bytes at offset 65534
++8 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++=== Testing adjacent clusters reading and writing with zstd ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++wrote 65536/65536 bytes at offset 0
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 65536/65536 bytes at offset 131072
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 0
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 131072
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++=== Testing incompressible cluster processing with zstd ===
++
++1+0 records in
++1+0 records out
++wrote 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Images are identical.
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 435dccd5af..3bbe02c88d 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -294,6 +294,7 @@
+ 283 auto quick
+ 284 rw
+ 286 rw quick
++287 auto quick
+ 288 quick
+ 289 rw quick
+ 290 rw auto quick
 -- 
-2.20.1
+2.17.0
 
 
