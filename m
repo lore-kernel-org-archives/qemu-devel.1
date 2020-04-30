@@ -2,71 +2,69 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA68C28CBC
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:00:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 675D4C4724C
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:01:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EBFD2076D
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:00:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EBFD2076D
+	by mail.kernel.org (Postfix) with ESMTPS id 3FAD92137B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:01:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FAD92137B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU9jX-0003rj-5O
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:00:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51746)
+	id 1jU9kf-00057W-D7
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:01:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51768)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jU9aw-0003SY-9M
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:22 -0400
+ (envelope-from <bounces@canonical.com>) id 1jU9b0-0003Yt-9m
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jU9an-0000ir-8k
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:17 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36336)
+ (envelope-from <bounces@canonical.com>) id 1jU9ap-0000oM-9g
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:21 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36432)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jU9am-0000et-PQ
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:08 -0400
+ id 1jU9ao-0000j6-Ov
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:10 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jU9al-0007ih-8M
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:07 +0000
+ id 1jU9an-0007YX-Pz
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 3BF842E8104
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:07 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id C39FA2E80E7
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:09 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Apr 2020 13:41:49 -0000
+Date: Thu, 30 Apr 2020 13:40:38 -0000
 From: Laurent Vivier <Laurent@vivier.eu>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
  assignee=None; 
-X-Launchpad-Bug-Tags: audio dos games gus sb16 timed timer
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: laurent-vivier zezuspam
-X-Launchpad-Bug-Reporter: David Miller (zezuspam)
+X-Launchpad-Bug-Commenters: belliash deorder docmax3 ec911 jnsnow
+X-Launchpad-Bug-Reporter: Rafal Kupiec (belliash)
 X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <157833854539.28173.10729724748625497755.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158825411029.11959.14691651805460123144.launchpad@wampee.canonical.com>
-Subject: [Bug 1858488] Re: qemu git && 4.2:  timed audio issues with sb16,
- gus not working?
+References: <157659673737.27526.16943710669363851261.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158825403896.13531.8450194863299910334.launchpad@gac.canonical.com>
+Subject: [Bug 1856724] Re: SB.PCI0.SMB0 device drivers unavailable
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e9de73d8695247f3acadd64dbeecc1161736b03d
+X-Launchpad-Hash: 1f510eed9bb4d759c2112a47e0de1c435e59ff88
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 09:35:36
@@ -82,7 +80,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1858488 <1858488@bugs.launchpad.net>
+Reply-To: Bug 1856724 <1856724@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -94,61 +92,34 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1858488
+https://bugs.launchpad.net/bugs/1856724
 
 Title:
-  qemu git && 4.2:  timed audio issues with sb16,  gus not working?
+  SB.PCI0.SMB0 device drivers unavailable
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  =
+  QEMU 4.2 introduces new device with this code:
 
-  I have built [both] current git, and 4.2.0, there are issues with audio/s=
-oundhw for both.
+  static void build_smb0(Aml *table, I2CBus *smbus, int devnr, int func)
+  {
+      Aml *scope =3D aml_scope("_SB.PCI0");
+      Aml *dev =3D aml_device("SMB0");
 
-  Specifics:
+      aml_append(dev, aml_name_decl("_HID", aml_eisaid("APP0005")));
+      aml_append(dev, aml_name_decl("_ADR", aml_int(devnr << 16 | func)));
+      build_acpi_ipmi_devices(dev, BUS(smbus), "\\_SB.PCI0.SMB0");
+      aml_append(scope, dev);
+      aml_append(table, scope);
+  }
 
-  Linux nullrig 5.3.0-24-generic #26-Ubuntu SMP Thu Nov 14 01:33:18 UTC
-  2019 x86_64 x86_64 x86_64 GNU/Linux
-
-  Out of source build, successful for both:
-
-  ../configure --prefix=3D/opt/qemu --target-list=3Di386-softmmu,mips64el-
-  softmmu ---enable-sdl --enable-sdl-image --enable-lzo --enable-bzip2
-  --enable-avx2 --enable-kvm --enable-membarrier --enable-plugin
-
-  Call:
-
-  ./qemu -machine pc,accel=3Dkvm,usb=3Doff -cpu pentium -m 64 -rtc
-  base=3Dlocaltime -parallel none -soundhw sb16,adlib,pcspk -device
-  cirrus-vga,bus=3Dpci.0 -drive
-  id=3Ddisk1,file=3Ddoom.cow,format=3Dqcow2,if=3Dvirtio -audiodev pa,id=3Dpa
-
-  Audio for sb16 sounds ok,  however if i switch to a timer based audio:
-  -audiodev wav
-
-  The output is wrong..  I had assumed it was all timer based audio,
-  however it seems to be limited to sb16.
-
-  So I then tried the next popular/compatible audio device for dos
-  games:  gravis ultrasound [gus].
-
-  I get no output at all for it.
-  I have tried more than one piece of software,  DOOM shareware is any easy=
- example.
-
-  I realize there are better solutions for playing DOS games, however I
-  am interested in snapshot support which many of them lack.
-
-  I am willing to put the work into fixing it myself if need be,
-  however i'm not very familiar with the audio backend.   Specifically,
-  it is already mixed into a single buffer,  if 'adlib' driver is
-  already working: (audio_pcm_ops.write() output is correct on timer
-  based output) I failed to see how it affects emulation of the sound
-  blaster.
+  It is detected by Windows 10 as 'Unknown Device' and there is no driver a=
+vailable.
+  Please provide a working Windows driver or give ability to disable this d=
+evice.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1858488/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1856724/+subscriptions
 
