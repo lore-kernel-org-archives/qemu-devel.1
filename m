@@ -2,109 +2,103 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1890C83006
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 08:07:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB44FC83001
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 08:12:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5ECA21974
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 08:07:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7647A2073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 08:12:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PYM5h0PI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5ECA21974
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GqCdbrfI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7647A2073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU4EE-0005TD-R8
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 04:07:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39028)
+	id 1jU4J6-0000pB-MN
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 04:12:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39698)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jU4De-00051E-Ag
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:06:54 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jU4IQ-0000Gq-Tn
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:11:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jU4Dd-0006Hd-J1
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:06:53 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54109
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jU4Dd-0006D7-5f
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:06:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588234012;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=WUmLNF3vK+9uqLMDaRyNbho20z9QXZHXrS5C0tf0+8s=;
- b=PYM5h0PIpvUzCcJM3r/2f7qHeHTzH6ayEztF64WROuYa5SGt/b3sOHRES2WKBq3S+0K2kA
- vop0MWUTw6bsPH4JQEXrbTxfKtjNnNu3lorzoMdSvl3bsoYYGZFlgNKrHR+pgpk4jSWv/v
- 1Aa9m35KbQ3vKtDe1pM3ejdWgpRAelQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-322-jmMTd2MRMcSLAs7AZnxc6Q-1; Thu, 30 Apr 2020 04:06:49 -0400
-X-MC-Unique: jmMTd2MRMcSLAs7AZnxc6Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A95EA19200C0
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 08:06:48 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-177.ams2.redhat.com
- [10.36.112.177])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 07F39165F6;
- Thu, 30 Apr 2020 08:06:41 +0000 (UTC)
-Subject: Re: [PATCH] virtiofsd: Show submounts
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, vgoyal@redhat.com
-References: <20200424133516.73077-1-mreitz@redhat.com>
- <20200427175902.GM2923@work-vm> <20200429145720.GA2835@work-vm>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8c73f374-fcc8-1684-b581-84a9ab501aa9@redhat.com>
-Date: Thu, 30 Apr 2020 10:06:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <alex.bennee@linaro.org>) id 1jU4IP-0002sk-Qj
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:11:50 -0400
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:50855)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jU4IP-0002rx-5X
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:11:49 -0400
+Received: by mail-wm1-x32c.google.com with SMTP id x25so800462wmc.0
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 01:11:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=RDxNiPlBsS20nSfiC3XgBEgxNQ3U5ugDvHJh3p9ybAo=;
+ b=GqCdbrfIVRhgSLMFUe7TlGbxdoV2iaGvBbpnv27T98BTEvlPcuvCx9P0rMNOXLswzN
+ ljxP1gq6BuY4BfFrwvk/ZpMVWhCuV7SVl88MUej8Pe1xAUFLMPWg6uWovkBHit57VCJe
+ 1WyLFGNFwR9foGqzi4/csCu0oI/G8YpwzLOKZ2++TAQRepeamthchDPpf98XkpVNd3w4
+ DN6c6ue0l3r1XakzLlfGoXcFC+4CkqcmtBVpLsth2ia9qHjBJcsJXN8zY/Ukvrkqtd7j
+ 8JCWT8gSbYw+1vd4iKYV0rusxOB1kzkusexNHLNhE1ieRf+4UYK73p3PUrFW2ma82RMe
+ I/fA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=RDxNiPlBsS20nSfiC3XgBEgxNQ3U5ugDvHJh3p9ybAo=;
+ b=sgdYTBfhjMuznqKPngOy7vR5q65ZlC76hqZRxs8abK4nc+KD7MDtKg6tJ2yTdYPsi4
+ XdTrawgMMsXBM3sF5j8MmDoUNSvGiSISdPMP+fvobjmq8IEWbvUfsO26dg3NamZ7NbXd
+ 0QWeh4vUAXeHNnO2QPYKORMkqU14ra9UMX8Cc3sjtim3LC1w/yEts0GApfgK18RSCeLz
+ JnJZ4a6fFUu6Vnfo/Av5BttM7J7/brmUF4URwl7LXG/NB/ozwfmPc0JpgqdR9fe/Rp63
+ NqBYdwmbS+FrSfJt12oMWgjJN9tOkxOU71cncxRxQIrDjY3WzKREIo5u2K9WWOOo8CW0
+ 43UQ==
+X-Gm-Message-State: AGi0PuaTt53Yf7kd2c+QGuqMhYFnTDV3KQJ8lFDl27ZQTaDt1l+sPv8r
+ xQlpzgRlo1spK4giEq+nzqujsQ==
+X-Google-Smtp-Source: APiQypKN3y5319yH5HczQT73bYPZ+I9+hfacK1jGYI/uBjuL5MDa/wH4ClkYgGj2VwDI9y/rbgLm/g==
+X-Received: by 2002:a7b:cc0e:: with SMTP id f14mr1606436wmh.39.1588234307328; 
+ Thu, 30 Apr 2020 01:11:47 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id c20sm11776738wmd.36.2020.04.30.01.11.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Apr 2020 01:11:46 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 51D8C1FF7E;
+ Thu, 30 Apr 2020 09:11:45 +0100 (BST)
+References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
+ <87lfmhl0xa.fsf@linaro.org>
+ <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
+ <87imhlkwun.fsf@linaro.org>
+ <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
+ <87ftcoknvu.fsf@linaro.org>
+ <AM4PR07MB350653D5961DFCE441646131CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <871ro6ld2f.fsf@linaro.org>
+ <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <87sggmjgit.fsf@linaro.org>
+ <CAE2XoE8wFK1nOq3YXhB=iqTvqSDQk7Zzd35Tjzdd==v8ouMijA@mail.gmail.com>
+ <43ac337c-752a-7151-1e88-de01949571de@linaro.org>
+ <CAE2XoE-MM6AR8fmExnst7o9wL4Q_nZkw=gyemMJmZSdPd_ydmg@mail.gmail.com>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: luoyonggang@gmail.com
+Subject: Re: R: R: About hardfloat in ppc
+In-reply-to: <CAE2XoE-MM6AR8fmExnst7o9wL4Q_nZkw=gyemMJmZSdPd_ydmg@mail.gmail.com>
+Date: Thu, 30 Apr 2020 09:11:45 +0100
+Message-ID: <87lfmdjsu6.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200429145720.GA2835@work-vm>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="VfMXd0A9lsKHTdtmnEIgup0HHc6Fg85BM"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:04:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32c.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,92 +110,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Programmingkid <programmingkidx@gmail.com>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>, Dino Papararo <skizzato73@msn.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VfMXd0A9lsKHTdtmnEIgup0HHc6Fg85BM
-Content-Type: multipart/mixed; boundary="O6YdhWTZKzSi3jxH66oRrf9TqiXKGl3wy"
 
---O6YdhWTZKzSi3jxH66oRrf9TqiXKGl3wy
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+=E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyonggang@gmail.com> writes:
 
-On 29.04.20 16:57, Dr. David Alan Gilbert wrote:
-> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
->> * Max Reitz (mreitz@redhat.com) wrote:
->>> Currently, setup_mounts() bind-mounts the shared directory without
->>> MS_REC.  This makes all submounts disappear.
->>>
->>> Pass MS_REC so that the guest can see submounts again.
+> On Thu, Apr 30, 2020 at 10:18 AM Richard Henderson <
+> richard.henderson@linaro.org> wrote:
+>
+>> On 4/29/20 5:20 PM, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
+>> > Question, in hard-float, if we don't want to read the fp register.
+>> > for example: If we wanna compute c =3D a + b in fp32
+>> > if c =3D a + b In hard float
+>> > and if b1 =3D c - a in hard float
+>> > if b1 !=3D b at bitwise level, the we se the inexat to 1, otherwsie
+>> > we set inexat bit to 0? are this valid?
+>> >
+>> > we can also do it for a * b, a - b, a / b.
+>> >
 >>
->> Thanks!
+>> That does seem plausible, for all of the normal values for which we would
+>> apply
+>> the hard-float optimization anyway.  But we already check for the
+>> exceptional
+>> cases:
 >>
->>> Fixes: 3ca8a2b1c83eb185c232a4e87abbb65495263756
+>>     if (unlikely(f32_is_inf(ur))) {
+>>         s->float_exception_flags |=3D float_flag_overflow;
+>>     } else if (unlikely(fabsf(ur.h) <=3D FLT_MIN)) {
+>>         if (post =3D=3D NULL || post(ua, ub)) {
+>>             goto soft;
+>>         }
+>>     }
 >>
->> Should this actually be 5baa3b8e95064c2434bd9e2f312edd5e9ae275dc ?
->>
->>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>> ---
->>>  tools/virtiofsd/passthrough_ll.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthr=
-ough_ll.c
->>> index 4c35c95b25..9d7f863e66 100644
->>> --- a/tools/virtiofsd/passthrough_ll.c
->>> +++ b/tools/virtiofsd/passthrough_ll.c
->>> @@ -2643,7 +2643,7 @@ static void setup_mounts(const char *source)
->>>      int oldroot;
->>>      int newroot;
->>> =20
->>> -    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
->>> +    if (mount(source, source, NULL, MS_BIND | MS_REC, NULL) < 0) {
->>>          fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", source,=
- source);
->>>          exit(1);
->>>      }
->>
->> Do we want MS_SLAVE to pick up future mounts that might happenf rom the
->> host?
->> What's the interaction between this and the MS_REC|MS_SLAVE that we have
->> a few lines above for / ?
->=20
-> Just to confirm something from vgoyal, and what had confused me about
-> why we hadn't spotted this earlier.
->=20
-> Even without this patch, the SLAVE stuff worked so if you start the
-> daemon and *then* mount under the shared directory, the guest sees it
-> with or without this patch.
+> I means remove of all thse exceptional cases, and detecting float
+> exception by hard float operation.
 
-Hm, I don=E2=80=99t.  Do you really?
+When this was originally done it was found to be faster testing for the
+float conditions in software (which are basically bitops) than reading
+the FP exception register which can be a high latency operation.
 
-Max
-
-
---O6YdhWTZKzSi3jxH66oRrf9TqiXKGl3wy--
-
---VfMXd0A9lsKHTdtmnEIgup0HHc6Fg85BM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6qhw4ACgkQ9AfbAGHV
-z0D4FQgApig8MgU761qQRHR9UZjX6LlUXBHFihv6ncKrjUojgtA6xJIs/jZSfX/W
-JVs/+tEqr5Pa60/u5kW5Cl05/rzPuwJNa7O/fvuZCemoMMM1U/iMAqO365qOcBBv
-xyJTufrX01PYh7u7w9LTpcg/hkoXC2xIue6z5jVNa/QqvOSI9Z5EUoSO/lDnVIKx
-IfJqNfyhQ5bDxXNYiiGHwX19RRtoMNsPid3b+0ZHr++Fc17KrTOvXlm3wwdu0qEd
-XGoldjorvPsVTTT/6iYCvE1JiGPqWcFpSvQunGQmzqfml1F33KjFtrNLLW13ZS6V
-p3wDvg3E00UeXf9s8Q5XZz9KqmGe+Q==
-=9HSK
------END PGP SIGNATURE-----
-
---VfMXd0A9lsKHTdtmnEIgup0HHc6Fg85BM--
-
+--=20
+Alex Benn=C3=A9e
 
