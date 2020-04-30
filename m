@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42762C83004
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 02:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC18C83003
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 02:10:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F36EE208E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 02:08:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CBDC9208E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 02:10:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m5deyNEy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F36EE208E0
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ah6WGcjs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBDC9208E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTydG-0004gj-6s
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 22:08:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37312)
+	id 1jTyeK-0005dq-WB
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 22:10:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37324)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jTyYw-0006yP-1L
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 22:04:51 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jTyYy-0006yU-Kh
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 22:04:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jTyXg-0004je-W9
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 22:04:29 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:38600)
+ (envelope-from <richard.henderson@linaro.org>) id 1jTyXi-0004kA-JU
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 22:04:32 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:40054)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jTyXg-0004jU-HY
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 22:03:12 -0400
-Received: by mail-pg1-x542.google.com with SMTP id p8so2003421pgi.5
- for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 19:03:12 -0700 (PDT)
+ id 1jTyXi-0004jt-67
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 22:03:14 -0400
+Received: by mail-pg1-x544.google.com with SMTP id n16so1997455pgb.7
+ for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 19:03:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=rFHIQ9gnK1y50o1in1Rk9q+bTI5N/EWp2WgbbTSdhTY=;
- b=m5deyNEyqdnNkDjltijr9SHncA6Y8rOkJxtNPAiWqW18n09PTfGTCBn52I3nGiFgWS
- 8SPjYq9hdwMf1msM0tp4d+TttrGNj6qQU67qvArcD7biNWuwAhqWHP45blCWQC8Jzrv5
- 4JwvKWv5dp+LmqZ5oO9AaImGY0yPEIieSA8d6lx+i7KBqxeZOOkx4YocznYAwo56dhq4
- 34CiaiksSkYcrkVCBaHH4PVEleUfyEP4ZbmFRLYikWJSKHiBUVhdab1z4Wy07QTcRgd8
- 3CK05cRxd7ll2MyPRQ1VFTYDpoaR6WWlI8SzFqq2iczs5J5vZRmtxFoXdsg29d5EguPn
- 3inA==
+ bh=8L/HzFlnUepBjkSitOTTfcu9xtOn9f9zC8OK1sAw3q4=;
+ b=ah6WGcjs+N49ahiCGocgT+kV8ZubTY+lxR1bFn5FpRkJ3TWvKAKsGuW+6XsIm4N94Z
+ caNVnyigjioy4vE+WSDsqzhzhZZBfX2JHJhmrBJ/hP7hQAI//KDJqE5j2TZzL6q99zLo
+ qCSW7URZXi2XuvGiJ2YeLlCl4m+cJeZXjE+emPVwn7ydEU47BT+xCjnQu2s14X/JlEVW
+ fmAZsPhDcTnkYlol9VTJALwWB4UCSTeCwg1Kp6xEjh+lPM4nTJwP7WkEkZfMgSsUN32g
+ XH+MrAVH3JIaeeRDufh8u0bZM84k7e66UxIMCdxS2FtQTUjQ/bCmLlz/Ry3P6RKhdMwv
+ LnQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=rFHIQ9gnK1y50o1in1Rk9q+bTI5N/EWp2WgbbTSdhTY=;
- b=D+mwWp5AHMKuQWL3EVVYr3PGm1e79rxKRSPlnutHOYlNsppvFkH2AzTvFhMPfBCDor
- xa2gfEdeEa31PyTJj4mbIkEsyIHaBnUR/fxRM36jjjFq5i4aLQ/RofJPFh8onnqsOuK+
- lyLAOwz4imRUpxpgpYK8d9l4iB/1VbKaKOk3HFMvxW/fPmnZB3akhp/r+/B4OaY5O64r
- LeQ0OugrsVv0pUPuozqv0sFnDACBPbHfBHu46dvHf+29OTK1Bxoz8QZWm5whtsjvxx3C
- NndWA1Gzt7AATPs41oV6/Wto9J8FHFMm2Mbq4dRMoz9jp63t4kesoJOg2J/l5L/54IGd
- PLqw==
-X-Gm-Message-State: AGi0PubIxLSNeN0GTKt8kTHsA8/1f0L3UiePja3AlUqMN+EuUeoqE0Qa
- ngnqb/W8YebRogkrr04JF3CkU0wy4GM=
-X-Google-Smtp-Source: APiQypJXnxaPv0aDfeydJW6dGFf9SxLM8DfPmH9sgWoBTCKYb7XP+RsGAMTpgRph1dWglNolLK+iVQ==
-X-Received: by 2002:aa7:9302:: with SMTP id 2mr1140034pfj.256.1588212190327;
- Wed, 29 Apr 2020 19:03:10 -0700 (PDT)
+ bh=8L/HzFlnUepBjkSitOTTfcu9xtOn9f9zC8OK1sAw3q4=;
+ b=Qxhv6YcqgTlZMKtNW0jk9pKuk3KXLExVd68DICda3b47/UeTZ/6xmHcUM8lbAA6VpR
+ vxZ9pio2cWm53W6rQ3kmDMh+N9VzApwk5JLjRyBRkgO1M67zqr4lgfu/dUIhc+s79d3R
+ 7lU/kWQ11M8vDToxfF2HMPkpAS0Q73o5sBzfshigysv8+OdHvrBU9mKl7d4wrATWf/pH
+ 1rSSH48qhmzXq07owVXolIOAXSbE7Qa3oz0yyNXzeQ3HPv86VsIm9ksUS0qJvUZEhO3i
+ EkjUzoJvgigzDZ/RLxg0h8yMg6zZmeLToQN10tK1XYwREVkRaOnJ3zYj5KnNKyBOvxfD
+ g6wg==
+X-Gm-Message-State: AGi0PubSdJbEoh9CEdJ9boA4EJaWQ/jMnHMy9ISUcWL97GQrRfpC6vnH
+ tzNNaruC7vrhuiEzV1krq8/7r1OJTwM=
+X-Google-Smtp-Source: APiQypLDxKzmnmm5w2w7qfDnnUGnzoWJKE9CSwmEg3ObxoJPTYraSgS+Pby+X+uTjuRLW8kmAaIQBw==
+X-Received: by 2002:aa7:8118:: with SMTP id b24mr1099773pfi.321.1588212192332; 
+ Wed, 29 Apr 2020 19:03:12 -0700 (PDT)
 Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
  [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id y3sm409284pjb.41.2020.04.29.19.03.09
+ by smtp.gmail.com with ESMTPSA id y3sm409284pjb.41.2020.04.29.19.03.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Apr 2020 19:03:09 -0700 (PDT)
+ Wed, 29 Apr 2020 19:03:11 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 4/9] target/arm: Convert sha1 and sha256 to gvec helpers
-Date: Wed, 29 Apr 2020 19:02:58 -0700
-Message-Id: <20200430020303.20264-5-richard.henderson@linaro.org>
+Subject: [PATCH v3 6/9] target/arm: Split helper_crypto_sm3tt
+Date: Wed, 29 Apr 2020 19:03:00 -0700
+Message-Id: <20200430020303.20264-7-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200430020303.20264-1-richard.henderson@linaro.org>
 References: <20200430020303.20264-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,290 +101,132 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do not yet convert the helpers to loop over opr_sz, but the
-descriptor allows the vector tail to be cleared.  Which fixes
-an existing bug.
+Rather than passing an opcode to a helper, fully decode the
+operation at translate time.  Use clear_tail_16 to zap the
+balance of the SVE register with the AdvSIMD write.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.h        | 12 +++++------
- target/arm/crypto_helper.c | 24 +++++++++++++++------
- target/arm/translate-a64.c | 34 +++++++++++------------------
- target/arm/translate.c     | 44 +++++++++++++++-----------------------
- 4 files changed, 53 insertions(+), 61 deletions(-)
+ target/arm/helper.h        |  5 ++++-
+ target/arm/crypto_helper.c | 24 ++++++++++++++++++------
+ target/arm/translate-a64.c | 21 +++++----------------
+ 3 files changed, 27 insertions(+), 23 deletions(-)
 
 diff --git a/target/arm/helper.h b/target/arm/helper.h
-index d564747808..07466ddc6c 100644
+index 24aca28a05..e891f91e65 100644
 --- a/target/arm/helper.h
 +++ b/target/arm/helper.h
-@@ -517,13 +517,13 @@ DEF_HELPER_FLAGS_4(crypto_aese, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_3(crypto_aesmc, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+@@ -534,7 +534,10 @@ DEF_HELPER_FLAGS_3(crypto_sha512su0, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(crypto_sha512su1, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, i32)
  
- DEF_HELPER_FLAGS_4(crypto_sha1_3reg, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
--DEF_HELPER_FLAGS_2(crypto_sha1h, TCG_CALL_NO_RWG, void, ptr, ptr)
--DEF_HELPER_FLAGS_2(crypto_sha1su1, TCG_CALL_NO_RWG, void, ptr, ptr)
-+DEF_HELPER_FLAGS_3(crypto_sha1h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_3(crypto_sha1su1, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
- 
--DEF_HELPER_FLAGS_3(crypto_sha256h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
--DEF_HELPER_FLAGS_3(crypto_sha256h2, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
--DEF_HELPER_FLAGS_2(crypto_sha256su0, TCG_CALL_NO_RWG, void, ptr, ptr)
--DEF_HELPER_FLAGS_3(crypto_sha256su1, TCG_CALL_NO_RWG, void, ptr, ptr, ptr)
-+DEF_HELPER_FLAGS_4(crypto_sha256h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(crypto_sha256h2, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_3(crypto_sha256su0, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(crypto_sha256su1, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- 
- DEF_HELPER_FLAGS_4(crypto_sha512h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(crypto_sha512h2, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+-DEF_HELPER_FLAGS_5(crypto_sm3tt, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32, i32)
++DEF_HELPER_FLAGS_4(crypto_sm3tt1a, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(crypto_sm3tt1b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(crypto_sm3tt2a, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(crypto_sm3tt2b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(crypto_sm3partw1, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(crypto_sm3partw2, TCG_CALL_NO_RWG,
 diff --git a/target/arm/crypto_helper.c b/target/arm/crypto_helper.c
-index 637e4c00bb..7124745c32 100644
+index 636683d0f1..c76806dc8d 100644
 --- a/target/arm/crypto_helper.c
 +++ b/target/arm/crypto_helper.c
-@@ -303,7 +303,7 @@ void HELPER(crypto_sha1_3reg)(void *vd, void *vn, void *vm, uint32_t op)
-     rd[1] = d.l[1];
+@@ -632,15 +632,14 @@ void HELPER(crypto_sm3partw2)(void *vd, void *vn, void *vm, uint32_t desc)
+     clear_tail_16(vd, desc);
  }
  
--void HELPER(crypto_sha1h)(void *vd, void *vm)
-+void HELPER(crypto_sha1h)(void *vd, void *vm, uint32_t desc)
+-void HELPER(crypto_sm3tt)(void *vd, void *vn, void *vm, uint32_t imm2,
+-                          uint32_t opcode)
++static inline void QEMU_ALWAYS_INLINE
++crypto_sm3tt(uint64_t *rd, uint64_t *rn, uint64_t *rm,
++             uint32_t desc, uint32_t opcode)
  {
-     uint64_t *rd = vd;
-     uint64_t *rm = vm;
-@@ -314,9 +314,11 @@ void HELPER(crypto_sha1h)(void *vd, void *vm)
+-    uint64_t *rd = vd;
+-    uint64_t *rn = vn;
+-    uint64_t *rm = vm;
+     union CRYPTO_STATE d = { .l = { rd[0], rd[1] } };
+     union CRYPTO_STATE n = { .l = { rn[0], rn[1] } };
+     union CRYPTO_STATE m = { .l = { rm[0], rm[1] } };
++    uint32_t imm2 = simd_data(desc);
+     uint32_t t;
  
-     rd[0] = m.l[0];
-     rd[1] = m.l[1];
-+
-+    clear_tail_16(vd, desc);
- }
+     assert(imm2 < 4);
+@@ -655,7 +654,7 @@ void HELPER(crypto_sm3tt)(void *vd, void *vn, void *vm, uint32_t imm2,
+         /* SM3TT2B */
+         t = cho(CR_ST_WORD(d, 3), CR_ST_WORD(d, 2), CR_ST_WORD(d, 1));
+     } else {
+-        g_assert_not_reached();
++        qemu_build_not_reached();
+     }
  
--void HELPER(crypto_sha1su1)(void *vd, void *vm)
-+void HELPER(crypto_sha1su1)(void *vd, void *vm, uint32_t desc)
- {
-     uint64_t *rd = vd;
-     uint64_t *rm = vm;
-@@ -330,6 +332,8 @@ void HELPER(crypto_sha1su1)(void *vd, void *vm)
+     t += CR_ST_WORD(d, 0) + CR_ST_WORD(m, imm2);
+@@ -680,8 +679,21 @@ void HELPER(crypto_sm3tt)(void *vd, void *vn, void *vm, uint32_t imm2,
  
      rd[0] = d.l[0];
      rd[1] = d.l[1];
 +
-+    clear_tail_16(vd, desc);
++    clear_tail_16(rd, desc);
  }
  
- /*
-@@ -357,7 +361,7 @@ static uint32_t s1(uint32_t x)
-     return ror32(x, 17) ^ ror32(x, 19) ^ (x >> 10);
- }
- 
--void HELPER(crypto_sha256h)(void *vd, void *vn, void *vm)
-+void HELPER(crypto_sha256h)(void *vd, void *vn, void *vm, uint32_t desc)
- {
-     uint64_t *rd = vd;
-     uint64_t *rn = vn;
-@@ -388,9 +392,11 @@ void HELPER(crypto_sha256h)(void *vd, void *vn, void *vm)
- 
-     rd[0] = d.l[0];
-     rd[1] = d.l[1];
++#define DO_SM3TT(NAME, OPCODE) \
++    void HELPER(NAME)(void *vd, void *vn, void *vm, uint32_t desc) \
++    { crypto_sm3tt(vd, vn, vm, desc, OPCODE); }
 +
-+    clear_tail_16(vd, desc);
- }
- 
--void HELPER(crypto_sha256h2)(void *vd, void *vn, void *vm)
-+void HELPER(crypto_sha256h2)(void *vd, void *vn, void *vm, uint32_t desc)
- {
-     uint64_t *rd = vd;
-     uint64_t *rn = vn;
-@@ -413,9 +419,11 @@ void HELPER(crypto_sha256h2)(void *vd, void *vn, void *vm)
- 
-     rd[0] = d.l[0];
-     rd[1] = d.l[1];
++DO_SM3TT(crypto_sm3tt1a, 0)
++DO_SM3TT(crypto_sm3tt1b, 1)
++DO_SM3TT(crypto_sm3tt2a, 2)
++DO_SM3TT(crypto_sm3tt2b, 3)
 +
-+    clear_tail_16(vd, desc);
- }
- 
--void HELPER(crypto_sha256su0)(void *vd, void *vm)
-+void HELPER(crypto_sha256su0)(void *vd, void *vm, uint32_t desc)
- {
-     uint64_t *rd = vd;
-     uint64_t *rm = vm;
-@@ -429,9 +437,11 @@ void HELPER(crypto_sha256su0)(void *vd, void *vm)
- 
-     rd[0] = d.l[0];
-     rd[1] = d.l[1];
++#undef DO_SM3TT
 +
-+    clear_tail_16(vd, desc);
- }
- 
--void HELPER(crypto_sha256su1)(void *vd, void *vn, void *vm)
-+void HELPER(crypto_sha256su1)(void *vd, void *vn, void *vm, uint32_t desc)
- {
-     uint64_t *rd = vd;
-     uint64_t *rn = vn;
-@@ -447,6 +457,8 @@ void HELPER(crypto_sha256su1)(void *vd, void *vn, void *vm)
- 
-     rd[0] = d.l[0];
-     rd[1] = d.l[1];
-+
-+    clear_tail_16(vd, desc);
- }
- 
- /*
+ static uint8_t const sm4_sbox[] = {
+     0xd6, 0x90, 0xe9, 0xfe, 0xcc, 0xe1, 0x3d, 0xb7,
+     0x16, 0xb6, 0x14, 0xc2, 0x28, 0xfb, 0x2c, 0x05,
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index c737a409d0..48f71e01e4 100644
+index 81ad287811..0fecc9b06f 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -14517,8 +14517,7 @@ static void disas_crypto_three_reg_sha(DisasContext *s, uint32_t insn)
+@@ -14902,13 +14902,15 @@ static void disas_crypto_xar(DisasContext *s, uint32_t insn)
+  */
+ static void disas_crypto_three_reg_imm2(DisasContext *s, uint32_t insn)
+ {
++    static gen_helper_gvec_3 * const fns[4] = {
++        gen_helper_crypto_sm3tt1a, gen_helper_crypto_sm3tt1b,
++        gen_helper_crypto_sm3tt2a, gen_helper_crypto_sm3tt2b,
++    };
+     int opcode = extract32(insn, 10, 2);
+     int imm2 = extract32(insn, 12, 2);
      int rm = extract32(insn, 16, 5);
      int rn = extract32(insn, 5, 5);
      int rd = extract32(insn, 0, 5);
--    CryptoThreeOpFn *genfn;
 -    TCGv_ptr tcg_rd_ptr, tcg_rn_ptr, tcg_rm_ptr;
-+    gen_helper_gvec_3 *genfn;
-     bool feature;
+-    TCGv_i32 tcg_imm2, tcg_opcode;
  
-     if (size != 0) {
-@@ -14560,23 +14559,22 @@ static void disas_crypto_three_reg_sha(DisasContext *s, uint32_t insn)
+     if (!dc_isar_feature(aa64_sm3, s)) {
+         unallocated_encoding(s);
+@@ -14919,20 +14921,7 @@ static void disas_crypto_three_reg_imm2(DisasContext *s, uint32_t insn)
          return;
      }
  
 -    tcg_rd_ptr = vec_full_reg_ptr(s, rd);
 -    tcg_rn_ptr = vec_full_reg_ptr(s, rn);
 -    tcg_rm_ptr = vec_full_reg_ptr(s, rm);
+-    tcg_imm2   = tcg_const_i32(imm2);
+-    tcg_opcode = tcg_const_i32(opcode);
 -
-     if (genfn) {
--        genfn(tcg_rd_ptr, tcg_rn_ptr, tcg_rm_ptr);
-+        gen_gvec_op3_ool(s, true, rd, rn, rm, 0, genfn);
-     } else {
-         TCGv_i32 tcg_opcode = tcg_const_i32(opcode);
-+        TCGv_ptr tcg_rd_ptr = vec_full_reg_ptr(s, rd);
-+        TCGv_ptr tcg_rn_ptr = vec_full_reg_ptr(s, rn);
-+        TCGv_ptr tcg_rm_ptr = vec_full_reg_ptr(s, rm);
- 
-         gen_helper_crypto_sha1_3reg(tcg_rd_ptr, tcg_rn_ptr,
-                                     tcg_rm_ptr, tcg_opcode);
--        tcg_temp_free_i32(tcg_opcode);
--    }
- 
+-    gen_helper_crypto_sm3tt(tcg_rd_ptr, tcg_rn_ptr, tcg_rm_ptr, tcg_imm2,
+-                            tcg_opcode);
+-
 -    tcg_temp_free_ptr(tcg_rd_ptr);
 -    tcg_temp_free_ptr(tcg_rn_ptr);
 -    tcg_temp_free_ptr(tcg_rm_ptr);
-+        tcg_temp_free_i32(tcg_opcode);
-+        tcg_temp_free_ptr(tcg_rd_ptr);
-+        tcg_temp_free_ptr(tcg_rn_ptr);
-+        tcg_temp_free_ptr(tcg_rm_ptr);
-+    }
+-    tcg_temp_free_i32(tcg_imm2);
+-    tcg_temp_free_i32(tcg_opcode);
++    gen_gvec_op3_ool(s, true, rd, rn, rm, imm2, fns[opcode]);
  }
  
- /* Crypto two-reg SHA
-@@ -14591,9 +14589,8 @@ static void disas_crypto_two_reg_sha(DisasContext *s, uint32_t insn)
-     int opcode = extract32(insn, 12, 5);
-     int rn = extract32(insn, 5, 5);
-     int rd = extract32(insn, 0, 5);
--    CryptoTwoOpFn *genfn;
-+    gen_helper_gvec_2 *genfn;
-     bool feature;
--    TCGv_ptr tcg_rd_ptr, tcg_rn_ptr;
- 
-     if (size != 0) {
-         unallocated_encoding(s);
-@@ -14626,14 +14623,7 @@ static void disas_crypto_two_reg_sha(DisasContext *s, uint32_t insn)
-     if (!fp_access_check(s)) {
-         return;
-     }
--
--    tcg_rd_ptr = vec_full_reg_ptr(s, rd);
--    tcg_rn_ptr = vec_full_reg_ptr(s, rn);
--
--    genfn(tcg_rd_ptr, tcg_rn_ptr);
--
--    tcg_temp_free_ptr(tcg_rd_ptr);
--    tcg_temp_free_ptr(tcg_rn_ptr);
-+    gen_gvec_op2_ool(s, true, rd, rn, 0, genfn);
- }
- 
- static void gen_rax1_i64(TCGv_i64 d, TCGv_i64 n, TCGv_i64 m)
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index caa98ed309..517048e982 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -5364,28 +5364,30 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                 tmp4 = tcg_const_i32(size);
-                 gen_helper_crypto_sha1_3reg(ptr1, ptr2, ptr3, tmp4);
-                 tcg_temp_free_i32(tmp4);
-+                tcg_temp_free_ptr(ptr1);
-+                tcg_temp_free_ptr(ptr2);
-+                tcg_temp_free_ptr(ptr3);
-             } else { /* SHA-256 */
--                if (!dc_isar_feature(aa32_sha2, s) || size == 3) {
-+                gen_helper_gvec_3 *fn;
-+
-+                if (!dc_isar_feature(aa32_sha2, s)) {
-                     return 1;
-                 }
--                ptr1 = vfp_reg_ptr(true, rd);
--                ptr2 = vfp_reg_ptr(true, rn);
--                ptr3 = vfp_reg_ptr(true, rm);
-                 switch (size) {
-                 case 0:
--                    gen_helper_crypto_sha256h(ptr1, ptr2, ptr3);
-+                    fn = gen_helper_crypto_sha256h;
-                     break;
-                 case 1:
--                    gen_helper_crypto_sha256h2(ptr1, ptr2, ptr3);
-+                    fn = gen_helper_crypto_sha256h2;
-                     break;
-                 case 2:
--                    gen_helper_crypto_sha256su1(ptr1, ptr2, ptr3);
-+                    fn = gen_helper_crypto_sha256su1;
-                     break;
-+                default:
-+                    return 1;
-                 }
-+                tcg_gen_gvec_3_ool(rd_ofs, rn_ofs, rm_ofs, 16, 16, 0, fn);
-             }
--            tcg_temp_free_ptr(ptr1);
--            tcg_temp_free_ptr(ptr2);
--            tcg_temp_free_ptr(ptr3);
-             return 0;
- 
-         case NEON_3R_VPADD_VQRDMLAH:
-@@ -6947,13 +6949,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     if (!dc_isar_feature(aa32_sha1, s) || ((rm | rd) & 1)) {
-                         return 1;
-                     }
--                    ptr1 = vfp_reg_ptr(true, rd);
--                    ptr2 = vfp_reg_ptr(true, rm);
--
--                    gen_helper_crypto_sha1h(ptr1, ptr2);
--
--                    tcg_temp_free_ptr(ptr1);
--                    tcg_temp_free_ptr(ptr2);
-+                    tcg_gen_gvec_2_ool(rd_ofs, rm_ofs, 16, 16, 0,
-+                                       gen_helper_crypto_sha1h);
-                     break;
-                 case NEON_2RM_SHA1SU1:
-                     if ((rm | rd) & 1) {
-@@ -6967,17 +6964,10 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     } else if (!dc_isar_feature(aa32_sha1, s)) {
-                         return 1;
-                     }
--                    ptr1 = vfp_reg_ptr(true, rd);
--                    ptr2 = vfp_reg_ptr(true, rm);
--                    if (q) {
--                        gen_helper_crypto_sha256su0(ptr1, ptr2);
--                    } else {
--                        gen_helper_crypto_sha1su1(ptr1, ptr2);
--                    }
--                    tcg_temp_free_ptr(ptr1);
--                    tcg_temp_free_ptr(ptr2);
-+                    tcg_gen_gvec_2_ool(rd_ofs, rm_ofs, 16, 16, 0,
-+                                       q ? gen_helper_crypto_sha256su0
-+                                       : gen_helper_crypto_sha1su1);
-                     break;
--
-                 case NEON_2RM_VMVN:
-                     tcg_gen_gvec_not(0, rd_ofs, rm_ofs, vec_size, vec_size);
-                     break;
+ /* C3.6 Data processing - SIMD, inc Crypto
 -- 
 2.20.1
 
