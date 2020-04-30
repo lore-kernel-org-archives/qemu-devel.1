@@ -1,99 +1,94 @@
 Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74D56C4724C
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A7CEC47247
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 17:14:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4485C20731
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:57:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4485C20731
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 4F7B52064A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 17:14:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="eIvM22Xt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F7B52064A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUCUd-0001nV-Aw
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:56:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53380)
+	id 1jUCl5-0007As-83
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 13:13:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55536)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jUCTq-0001ND-J3
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:56:10 -0400
+ (envelope-from <ani@anisinha.ca>) id 1jUCk1-0006dz-7w
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 13:13:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jUCTp-0006pl-IA
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:56:10 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:59186
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jUCTp-0006lW-5D
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:56:09 -0400
-Received: from host86-140-11-65.range86-140.btcentralplus.com ([86.140.11.65]
- helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jUCTo-0001ZJ-ET; Thu, 30 Apr 2020 17:56:09 +0100
-To: Markus Armbruster <armbru@redhat.com>
-References: <87mu6uia5i.fsf@dusky.pond.sub.org>
- <20200429155719.GL1495129@redhat.com> <87k11xh2kq.fsf@dusky.pond.sub.org>
- <CAFEAcA9-oxkMD-kJ1z12d4K1S_Jaz7Wj6_38Ah7ChSaBfQNkkA@mail.gmail.com>
- <87tv11e1en.fsf_-_@dusky.pond.sub.org>
- <51a4e9ea-eca3-6c1d-a753-86c5810ac094@ilande.co.uk>
- <874kt1dpw7.fsf@dusky.pond.sub.org>
- <c1fa0770-a07f-e5bc-9db8-6af0576c365f@ilande.co.uk>
- <877dxxc862.fsf@dusky.pond.sub.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <0b745eed-841e-8879-c320-3166e2a46953@ilande.co.uk>
-Date: Thu, 30 Apr 2020 17:56:04 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <ani@anisinha.ca>) id 1jUCjq-0005Sh-Od
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 13:12:52 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39323)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1jUCjq-0005RE-6u
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 13:12:42 -0400
+Received: by mail-wm1-x342.google.com with SMTP id y24so2845486wma.4
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 10:12:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=dyCi02HU4lMw6Td9Z3vxrZdwP6ujsprSmHgD5oNTtyY=;
+ b=eIvM22XtuP4qiHr+ZUt16YUfJZLh71OCm8fC5KSjMH/2dms0noCPX2tYdVHe+E7dZc
+ NfWp7yfhSxnbi11I1J97sCziPX0FdbHBpLugYD3WM8UlW8Tvgsf/Wl+lcTY83RoSYh4H
+ alnBncjtw8ENJb1ItI5dnzEfO/fx/ndM82B3BF8hfbqF7SyWEQdeYxa9ZhqDpY6m9wDi
+ qEBoAweakiGWMDlUSBJ7MddPyM4HfPIdeJFQMEDAxk+oYYOxjR21WI1bJ0ufYJre/vkP
+ 7j2SFBgrRgUZZIAbFfK0hcOcEFi2yueYDqTIb9azCXg67EV7ookpL2uHDdaWgjGdJaX8
+ M4Hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=dyCi02HU4lMw6Td9Z3vxrZdwP6ujsprSmHgD5oNTtyY=;
+ b=t6q/VR2mnb7ps8IejrLaonUAWo7n8n8tCDBVCx5zaKbmRizw7LztaGlnU8cMOwck/B
+ xHIqQ3R7Pn3MvCwTwdVHozChoREszizk8GaIgkV2oBZltPBx4LnqtoKa9MEXYc+UGcv9
+ EjdW93pnE9ujqbtbuV9zhHpuL1TI6h93J3+cxV545v3grlE9+oAbJk9X3f1IaoW6ycnM
+ BPyPcLNeaPVzdUYselBlkBZiwMCW8Wc0Z8EYxnH7pnJpUI7+YQj9pQBUcVxmkVTIGWT5
+ wBfvXn4FtS65nIQIq+ouBeoSx5/KGqS4Xa1kXNfpDIe4n18LMdE+W9v/je/Q3CZ3UM2C
+ sBKA==
+X-Gm-Message-State: AGi0PuZ7MxvVj4yF3i9LIvjBA+2gfRzBia6fNN/JqtIWsyPOmVdeWjuX
+ 9+UfR+4AM8hmMwJRG0zR0yEbyo5k0LzQYT2EeizTQg==
+X-Google-Smtp-Source: APiQypLd+I1/by+2meugdJr+4X6TbCpaTy0cmrvlhnq0QHXKHmJmiChN4p4WLXxHcL33WAs2POc5XVpX5ignNwumcuk=
+X-Received: by 2002:a7b:c959:: with SMTP id i25mr4036875wml.20.1588266759048; 
+ Thu, 30 Apr 2020 10:12:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <877dxxc862.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.140.11.65
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: Configuring onboard devices
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
+References: <20200428121837-mutt-send-email-mst@kernel.org>
+ <CAARzgwwTo+r9xFge_XL_eu8-nsRFBFXEaQmTOhT1YHJifzfCJA@mail.gmail.com>
+ <20200428164428-mutt-send-email-mst@kernel.org>
+ <CAARzgwznhCPhGmwOxUBf_6bnFX7-Za7TxFMd999CARM+hDm8bA@mail.gmail.com>
+ <20200429011228-mutt-send-email-mst@kernel.org>
+ <544B4749-9A1C-44BB-BD89-C37A7E8D86F4@nutanix.com>
+ <20200429025200-mutt-send-email-mst@kernel.org>
+ <A69272ED-DDFF-4CC7-B12C-2994B004C013@nutanix.com>
+ <20200429025535-mutt-send-email-mst@kernel.org>
+ <B5DF1405-B261-4CE4-8484-F3738BE83E14@nutanix.com>
+ <20200429033657-mutt-send-email-mst@kernel.org>
+ <D4141715-B662-407A-8B4D-0EB64B41F6A1@nutanix.com>
+In-Reply-To: <D4141715-B662-407A-8B4D-0EB64B41F6A1@nutanix.com>
+From: Ani Sinha <ani@anisinha.ca>
+Date: Thu, 30 Apr 2020 22:42:27 +0530
+Message-ID: <CAARzgwyUd=k7FPJBjznJpzfKZu_0aqZUEK1rg77tnTNbcewe8A@mail.gmail.com>
+Subject: Re: [PATCH V2] Add a new PIIX option to control PCI hot unplugging of
+ devices on non-root buses
+To: Ani Sinha <ani.sinha@nutanix.com>
+Content-Type: multipart/alternative; boundary="000000000000fb636a05a4852bb8"
+Received-SPF: none client-ip=2a00:1450:4864:20::342;
+ envelope-from=ani@anisinha.ca; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2001:41c9:1:41f::167
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,97 +100,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30/04/2020 16:20, Markus Armbruster wrote:
+--000000000000fb636a05a4852bb8
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->> Ah I see now, these aliases are for individual properties rather than objects. What I
->> was trying to ask was if it were possible to have something like this:
->>
->> /machine (SS-5-machine)
->>   /builtin
->>     /nic0 -> link to "lance" device
->>
->> Here nic0 is an alias "published" by the maintainer of the SS-5 machine which is
->> configured in the machine init() function using object_property_add_link() or a
->> suitable wrapper. Users can then configure these builtin devices from the command
->> line using your -machine nic0.netdev=my-netdev-id syntax or similar.
-> 
-> Got it now, thanks!
-> 
->> Having the default devices under /builtin or other known QOM path would enable
->> builtin devices to be easily enumerated programatically and/or from the command line
->> as required.
-> 
-> There are three standard containers under /machine/:
-> 
-> * /machine/peripheral/
-> 
->   Devices with a user-specified ID go here, as /machine/peripheral/ID.
->   User-specified means -device or device_add.
-> 
->   /machine/peripheral/ID is effectively a stable interface.  It's just
->   underdocumented (undocumented?).
-> 
->   To be useful, the stuff below ID/ needed to be stable and documented,
->   too.
-> 
-> * /machine/peripheral-anon/
-> 
->   Same, but user elected not to give an ID.
->   /machine/peripheral-anon/device[N], where N counts up from zero in
->   creation order.
-> 
->   N is obviously not stable, but this is a problem of the user's making.
->   If you want to refer to a device, give it an ID.
-> 
-> * /machine/unattached/
-> 
->   The orphanage.  When a device has no parent when its realized, it gets
->   put here, as /machine/unattached/device[N], where N counts up from
->   zero in realization order.
-> 
->   N is obviously not stable, and this time we can't blame the
->   victim^Wuser.  You can search for devices of a certain type.
->   Sometimes that's good enough.
-> 
->   All the onboard devices are here, and much more.  We've fathered a lot
->   of unloved red-headed children, it seems...
-> 
->   Some of the "much more" is due to sloppy modelling, i.e. neglecting to
->   set the proper parent.
-> 
->   I figure we could put onboard devices in a nicer place, with nicer
->   names.  Need a convention for the place and the names, then make board
->   code conform to it.
-
-That's good, it seems that this is already fairly close to how it works for -device
-at the moment.
-
-I don't think that it is possible to come up a single place for on-board devices to
-live directly though. Going back to one of my first examples: wiring up a chardev to
-a serial port on the macio device. To me it makes sense for that to exist in QOM
-under /machine/pci-bus/mac-io/escc. In contrast an in-built NIC could live under
-/machine/pci-bus/in-built/nic, and placing one or both of these devices directly
-under /machine/foo doesn't feel intuitive.
-
-AFAIK as per your ARM virt example I believe it is only possible to register an alias
-for a property rather than for an Object? The ultimate aim would be for
-object_resolve_path("/machine/builtin/nic0") and
-object_resolve_path("/machine/pci-bus/in-built/nic") to return the same Object, and
-for the aliases on built-in devices to be children of /machine/builtin to allow easy
-iteration and introspection.
+.
 
 
-ATB,
+Accidental? So maybe what you need is actually something else then -
 
-Mark.
+avoid *removing* the device when it's powered down.
+
+
+You don=E2=80=99t get it. It is not hypervisor admins who are unplugging it=
+. It is
+the end users. Even RedHat customers want this feature. See following
+resources:
+https://www.redhat.com/archives/libvir-list/2020-February/msg00110.html
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1802592
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1790899
+
+My approach is much more fine grained than just disable everything approach
+that we have for q35. For i440fx we can do better than that
+
+
+By the way, here's another glaring feature disparity between i440fx and q35
+which we perhaps did not debate with as much fervour and push back as we
+debated here. When we implemented per slot hotplug disable for PCIE, we
+ignored to implement the same per slot capability for conventional PCI. Why
+was feature disparity across two machine types wasn't so much of an issue
+then?
+
+
+
+
+
+
+--=20
+
+MST
+
+--000000000000fb636a05a4852bb8
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div><div dir=3D"auto"></div></div><div><div dir=3D"ltr"><br></div><div dir=
+=3D"ltr">.</div><blockquote type=3D"cite"><div dir=3D"ltr"><blockquote type=
+=3D"cite"><span></span><br></blockquote><blockquote type=3D"cite"><span>Acc=
+idental? So maybe what you need is actually something else then -</span><br=
+></blockquote><blockquote type=3D"cite"><span>avoid *removing* the device w=
+hen it&#39;s powered down.</span><br></blockquote><span></span><br><span>Yo=
+u don=E2=80=99t get it. It is not hypervisor admins who are unplugging it. =
+It is the end users. Even RedHat customers want this feature. See following=
+ resources: </span><br><span><a href=3D"https://www.redhat.com/archives/lib=
+vir-list/2020-February/msg00110.html" target=3D"_blank">https://www.redhat.=
+com/archives/libvir-list/2020-February/msg00110.html</a></span><br><span><a=
+ href=3D"https://bugzilla.redhat.com/show_bug.cgi?id=3D1802592" target=3D"_=
+blank">https://bugzilla.redhat.com/show_bug.cgi?id=3D1802592</a></span><br>=
+<span><a href=3D"https://bugzilla.redhat.com/show_bug.cgi?id=3D1790899" tar=
+get=3D"_blank">https://bugzilla.redhat.com/show_bug.cgi?id=3D1790899</a></s=
+pan><br><span></span><br><span>My approach is much more fine grained than j=
+ust disable everything approach that we have for q35. For i440fx we can do =
+better than that</span><br></div></blockquote><div><br></div></div><div><di=
+v>By the way, here&#39;s another glaring feature disparity between i440fx a=
+nd q35 which we perhaps did not debate with as much fervour and push back a=
+s we debated here. When we implemented per slot hotplug disable for PCIE, w=
+e ignored to implement the same per slot capability for conventional PCI. W=
+hy was feature disparity across two machine types wasn&#39;t so much of an =
+issue then?=C2=A0</div><blockquote type=3D"cite"><div dir=3D"ltr"><span></s=
+pan><br><blockquote type=3D"cite"><span></span><br></blockquote><blockquote=
+ type=3D"cite"><blockquote type=3D"cite"><blockquote type=3D"cite"><span></=
+span><br></blockquote></blockquote></blockquote><blockquote type=3D"cite"><=
+blockquote type=3D"cite"><blockquote type=3D"cite"><span></span><br></block=
+quote></blockquote></blockquote></div></blockquote></div><div><div dir=3D"a=
+uto"><blockquote type=3D"cite"><div dir=3D"ltr"><blockquote type=3D"cite"><=
+blockquote type=3D"cite"><blockquote type=3D"cite"><blockquote type=3D"cite=
+"><span></span><br></blockquote></blockquote></blockquote></blockquote><blo=
+ckquote type=3D"cite"><blockquote type=3D"cite"><blockquote type=3D"cite"><=
+blockquote type=3D"cite"><blockquote type=3D"cite"><span>-- </span><br></bl=
+ockquote></blockquote></blockquote></blockquote></blockquote><blockquote ty=
+pe=3D"cite"><blockquote type=3D"cite"><blockquote type=3D"cite"><blockquote=
+ type=3D"cite"><blockquote type=3D"cite"><span>MST</span><br></blockquote><=
+/blockquote></blockquote></blockquote></blockquote><span></span><br></div><=
+/blockquote></div></div>
+
+--000000000000fb636a05a4852bb8--
 
