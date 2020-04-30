@@ -2,89 +2,81 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35378C8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76443C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:09:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2AD920757
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:09:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42D7820757
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:09:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E41tsTjx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2AD920757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+H/fDMF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42D7820757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU80L-00026a-5c
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 08:09:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33954)
+	id 1jU80a-0002Ki-Fa
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 08:09:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jU7jp-0003aG-7l
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:52:22 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jU7sZ-0004yN-3L
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jU7jm-0000TU-Ph
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:52:20 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:39342)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jU7jm-0000T7-AT
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:52:18 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id b11so6520215wrs.6
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 04:52:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=AmiLI3uyw2TqnsUeUYVDfRNQU+o2aUltIEi9vudgVCE=;
- b=E41tsTjxbtt0t/Mjpv0/VJoO8nMtiIm46h7eCKxBpC7iC/ZuOgs8Nf/1EdQ+gueHD9
- +PoGf8YC2gK6/YUu6gxBii+UZttdhFzz6wNL9A2sOdpEPphBe3J1lC2I1GVzyuEk0oq+
- FPYmSWFP3G9K2qKuTToRt5CSkfKcZO5WEqouX4wSQ7e9B1R/Y95j4NXbiOqQEdIB+EoH
- 3Wg647HVClZjm6CtdLfEN9rc209UYqTtSpoRzo+TrFkmysrdlfyxB48uLl8WNtRCdw2Q
- ss0KeaNNGqRw9C8tVpBIlXXzfrtD+abaniWuMNhwUdbjlD9C+aFRAdSU0Squr6m5b8GH
- MRcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=AmiLI3uyw2TqnsUeUYVDfRNQU+o2aUltIEi9vudgVCE=;
- b=FufJ/GE9emHllcqkMhP+aGyqoSn9+/FfKAC8wBWt4HJo/BRJVqEdyD8bqWg9yxhv1v
- RT+rp91oQubwWSH8rBmxzRv51NkX/ZDAeMIrp42gaMOo7rlmhghummA7dKDdie+eXJAE
- +iS5OwZe4CiuNFxPc8/dG2KRdBgpMp0hYitYYggDjsdImZkYyYxU814xZmMajQI9Om4f
- gbnmTpvtnga3WK1yk+Mi7exbiXGi7JcUu38iiYSueCD1UMhBQ+EdEmjYuyAkZyhulIJm
- E9pNMxKKvT7l2IEjr+TKc5Oa8iAfIh5W1nSFJEErReK8yr/wOxPKZ0n0OVlfVbamn8hX
- CAPg==
-X-Gm-Message-State: AGi0PuYQNIZBgJ/TFa22anwBSQb2P1R9xmvXLm7YI0MhAPf45PrW1giK
- ftkduZtY1hgu6/0M7/zxzfTq8RUJsTk5RQ==
-X-Google-Smtp-Source: APiQypI7wUx+x7vBsc/AW17rvK9l7hEFkvrGRC4tlN3TSiWnMKe87PdDeKuUoYUcvVOXLuoP+VHxeQ==
-X-Received: by 2002:adf:e944:: with SMTP id m4mr3452919wrn.366.1588247536580; 
- Thu, 30 Apr 2020 04:52:16 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j22sm491518wre.84.2020.04.30.04.52.15
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 04:52:15 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 29/31] device_tree: Constify compat in qemu_fdt_node_path()
-Date: Thu, 30 Apr 2020 12:51:40 +0100
-Message-Id: <20200430115142.13430-30-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200430115142.13430-1-peter.maydell@linaro.org>
-References: <20200430115142.13430-1-peter.maydell@linaro.org>
+ (envelope-from <imammedo@redhat.com>) id 1jU7rz-0007T6-Ig
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:01:22 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27199
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jU7rz-0007Pg-2f
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:00:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588248044;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Rmi4mrxC2kjMximJG37kVyYsvSASF6Fbw0o5LGCNJAw=;
+ b=H+H/fDMF6FHTZvFkZCw8FIhj7Hn1X941Q2msQn1sNlauNkn/oMy+lw6wfuBpZsXRwqqe9q
+ 3CbTO3lbnf5ksZdN3zGAWnjqB9/Gh5Vmfh3wX41q+g7+dBJqtWXxRQmq4Z3WBZDQ8vKouw
+ pm1TL//mEHhVmvVK6vEOK7xAOnXPC7g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-31-OxUvUlMMOUKVMeXULKMzAA-1; Thu, 30 Apr 2020 08:00:35 -0400
+X-MC-Unique: OxUvUlMMOUKVMeXULKMzAA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FCAAEC1A3;
+ Thu, 30 Apr 2020 12:00:33 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8EDE5610AF;
+ Thu, 30 Apr 2020 12:00:17 +0000 (UTC)
+Date: Thu, 30 Apr 2020 14:00:16 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v25 00/10] Add ARMv8 RAS virtualization support in QEMU
+Message-ID: <20200430140016.0799afd7@redhat.com>
+In-Reply-To: <9906359a-cc13-fd7f-1cd3-c80c0ee90d09@huawei.com>
+References: <20200410114639.32844-1-gengdongjiu@huawei.com>
+ <CAFEAcA9oNuDf=bdSSE8mZWrB23+FegD5NeSAmu8dGWhB=adBQg@mail.gmail.com>
+ <9906359a-cc13-fd7f-1cd3-c80c0ee90d09@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42a.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::42a
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:31:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,50 +88,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>, kvm-devel <kvm@vger.kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, Zheng Xiang <zhengxiang9@huawei.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+On Thu, 30 Apr 2020 11:56:24 +0800
+gengdongjiu <gengdongjiu@huawei.com> wrote:
 
-Make compat in qemu_fdt_node_path() const char *.
+> On 2020/4/17 21:32, Peter Maydell wrote:
+> > On Fri, 10 Apr 2020 at 12:46, Dongjiu Geng <gengdongjiu@huawei.com> wrote:  
+> >>
+> >> In the ARMv8 platform, the CPU error types includes synchronous external abort(SEA)
+> >> and SError Interrupt (SEI). If exception happens in guest, host does not know the detailed
+> >> information of guest, so it is expected that guest can do the recovery. For example, if an
+> >> exception happens in a guest user-space application, host does not know which application
+> >> encounters errors, only guest knows it.
+> >>
+> >> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
+> >> After user space gets the notification, it will record the CPER into guest GHES
+> >> buffer and inject an exception or IRQ to guest.
+> >>
+> >> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
+> >> treat it as a synchronous exception, and notify guest with ARMv8 SEA
+> >> notification type after recording CPER into guest.  
+> > 
+> > Hi. I left a comment on patch 1. The other 3 patches unreviewed
+> > are 5, 6 and 8, which are all ACPI core code, so that's for
+> > MST, Igor or Shannon to review.  
+> 
+> Ping MST, Igor and Shannon, sorry for the noise.
 
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20200423121114.4274-3-edgar.iglesias@gmail.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/sysemu/device_tree.h | 2 +-
- device_tree.c                | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+I put it on my review queue 
 
-diff --git a/include/sysemu/device_tree.h b/include/sysemu/device_tree.h
-index 7c53ef76345..982c89345f8 100644
---- a/include/sysemu/device_tree.h
-+++ b/include/sysemu/device_tree.h
-@@ -43,7 +43,7 @@ void *load_device_tree_from_sysfs(void);
-  * @name may be NULL to wildcard names and only match compatibility
-  * strings.
-  */
--char **qemu_fdt_node_path(void *fdt, const char *name, char *compat,
-+char **qemu_fdt_node_path(void *fdt, const char *name, const char *compat,
-                           Error **errp);
- 
- /**
-diff --git a/device_tree.c b/device_tree.c
-index f5b4699aedb..b335dae7075 100644
---- a/device_tree.c
-+++ b/device_tree.c
-@@ -291,7 +291,7 @@ char **qemu_fdt_node_unit_path(void *fdt, const char *name, Error **errp)
-     return path_array;
- }
- 
--char **qemu_fdt_node_path(void *fdt, const char *name, char *compat,
-+char **qemu_fdt_node_path(void *fdt, const char *name, const char *compat,
-                           Error **errp)
- {
-     int offset, len, ret;
--- 
-2.20.1
+> 
+> > 
+> > Once those have been reviewed, please ping me if you want this
+> > to go via target-arm.next.
+> > 
+> > thanks
+> > -- PMM
+> > 
+> > .
+> >   
+> 
 
 
