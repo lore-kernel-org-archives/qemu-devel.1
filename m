@@ -2,138 +2,87 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14A72C47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 15:27:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E6BC47247
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 15:28:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D20672082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 15:27:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0CA1B20731
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 15:28:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="HeXRhkxo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D20672082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NR+m7zUR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CA1B20731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUB5Z-0001L2-1C
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 11:27:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40580)
+	id 1jUB6y-0003jy-6a
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 11:28:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40662)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thanos.makatos@nutanix.com>) id 1jUB2i-0006DB-KQ
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:26:04 -0400
+ (envelope-from <eblake@redhat.com>) id 1jUB3F-0006le-GL
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <thanos.makatos@nutanix.com>) id 1jUAzM-0007Gj-UB
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:24:04 -0400
-Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:57144)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thanos.makatos@nutanix.com>)
- id 1jUAzM-0007DA-DM
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:20:36 -0400
-Received: from pps.filterd (m0127842.ppops.net [127.0.0.1])
- by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 03UFIXFu023533; Thu, 30 Apr 2020 08:20:31 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=proofpoint20171006;
- bh=IwFBojMMVDbkZzXbJj5jLjNf4hbVx/v3PujGzUKDeBM=;
- b=HeXRhkxoQ/xPCh9ZKAa4OSsiV+oN8IK7UES8UAs+FWCXxwnhE/7Zam6f43jvZ8wnrGRo
- 0jw+6QKUOCpjpb3HyDsUaFFiTaMtC41shT4+ICwxNVpaWQl45F+ddgzqA71OT6WpYT7Q
- uwiZdJOnUPCQnQn2OagGXTqogHRMBJRcJ7LOeWHOv205vFWa4JxmKalbUsQj9n/poOLu
- soeuCvs3Kq6+Ihfn4XFs1uQKKzh7rvkGiVtW0zSIorF/F2coCoVR6woqn3JoLfzJJiZ9
- GaPr7XIsGPJWydVEZBbBsBK0LA+zM2bY19pXz0wilmt+Z74MvfhZ2GiUfWo4woUzHKzX kw== 
-Received: from nam12-mw2-obe.outbound.protection.outlook.com
- (mail-mw2nam12lp2045.outbound.protection.outlook.com [104.47.66.45])
- by mx0b-002c1b01.pphosted.com with ESMTP id 30mmhjbp91-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 30 Apr 2020 08:20:30 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GEZfiVecXpaG0GEJWMouseyiMYBkBdSFDpi/gXl57rueKOxwb0rM0YjDFCIaywvjYCvrAxbHmSkPQQv+6VkoPgGchi74dt5BidmrtA7yyNCo6Jl6JBE50OT5/SUrg8VwgGQSTN+lvbrz+bZxLf5j9fwoUYw+ZiO9Hfw0+rL1HcQQz4WrsNMWCeHQGxBXjs7lcToobPo/sQsvTzlqDK3xqhLk2L6rV31Kxxcx8TqGhAcObSdc9Rn15BSLllt1vppKlpCSA2HMERvvdr5srFrOtCA0TwNVEbkLg4ufgHHKwSqpgjMCAxKsqIA5fdPRBOLL9luhwp/NO0nhbEuubMdkUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IwFBojMMVDbkZzXbJj5jLjNf4hbVx/v3PujGzUKDeBM=;
- b=JVEBjBY1+Ftv8Np/FQYwJI7OHCRFLZHCczH6y0SVDke61gTOKy0iib56jfkNNQ/alMA4UvljMfiMRevu3t2avaUk7o4jMTAt8s1sUT9vzYkchjdjJInmAnj+4tVKB83UGXFJMqxo1QZgFwXEGQUi6jB0h29HT0BFmd/yBtZZRXK5EhFTS8y1Q2Ifjbt/8UN0/ViaAPnZDCuPzQ2JWLku870GqSl6jY20g5XRYrdwd3M1gkWtf6SbGtctKnCmrB7KDk0KifWnrsxiLjQaQmN66645efcra0IHspgot+efmq0o6KZ0W2c0UuwJ838+dh2dPICZi29lwNjVGXhQ5mfw1Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MW2PR02MB3723.namprd02.prod.outlook.com (2603:10b6:907:2::32)
- by MW2PR02MB3659.namprd02.prod.outlook.com (2603:10b6:907:e::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19; Thu, 30 Apr
- 2020 15:20:28 +0000
-Received: from MW2PR02MB3723.namprd02.prod.outlook.com
- ([fe80::b90a:dbb6:2412:266e]) by MW2PR02MB3723.namprd02.prod.outlook.com
- ([fe80::b90a:dbb6:2412:266e%5]) with mapi id 15.20.2958.020; Thu, 30 Apr 2020
- 15:20:28 +0000
-From: Thanos Makatos <thanos.makatos@nutanix.com>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>
-Subject: RE: RFC: use VFIO over a UNIX domain socket to implement device
- offloading
-Thread-Topic: RFC: use VFIO over a UNIX domain socket to implement device
- offloading
-Thread-Index: AdYDU20BI9Of/G6jR7ONy5zZTB1T9QEsuagAA77zu+AAbiuPAADxCFGgAJikHLAAAKqfgAAHJa0Q
-Date: Thu, 30 Apr 2020 15:20:28 +0000
-Message-ID: <MW2PR02MB37238FD8B5930EB45B533BFF8BAA0@MW2PR02MB3723.namprd02.prod.outlook.com>
-References: <MN2PR02MB62052E54C752229C115EAD898BCF0@MN2PR02MB6205.namprd02.prod.outlook.com>
- <20200401091712.GA221892@stefanha-x1.localdomain>
- <MW2PR02MB372349E25A0842DE045B95F58BD40@MW2PR02MB3723.namprd02.prod.outlook.com>
- <20200422152930.GC47385@stefanha-x1.localdomain>
- <MW2PR02MB372340D8EF74A43D64E67B728BAF0@MW2PR02MB3723.namprd02.prod.outlook.com>
- <MW2PR02MB372319618A59DA06851BBFB48BAA0@MW2PR02MB3723.namprd02.prod.outlook.com>
- <20200430114041.GN2084570@redhat.com>
-In-Reply-To: <20200430114041.GN2084570@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nutanix.com;
-x-originating-ip: [92.29.225.29]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 192562bf-fb9e-452b-c89f-08d7ed1a03cf
-x-ms-traffictypediagnostic: MW2PR02MB3659:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MW2PR02MB36596F227D9E242E02B9E8628BAA0@MW2PR02MB3659.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0389EDA07F
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: p6ntjgfpNhjvRiw1NQmps/Cj5CAloFoCAnrUCtvDQJ+AzGCRjw2l0Yx38CWABpDPRrvTTn94RbzFMBFQwF0E0ajSQHCUXEKg1BYyvKKgC3vSmNIdSsoyNtcMOVF2xez2CEgWQZFfKKLIs8XbEj9QrXwyeEu3GQLxxCt3sqrkVXS1UyrbtQpdDDrQBr5hPXE8YKmI0M6tkKia6vixeYkJVgwPQ0l2/Y+84pOJCs5QGPGe/zZSMwiS3xMYpQDBucLni433RUz3Lbn8xR/sW4ow1aX/lBo5d/OhqgQUKo3gmF2P8CiZnEXV3qtown632pLztYKWdH1PzSHrtpU6WZyM17Ngs35uAPFiN0d+S/nGWlRjCMuYLzGEMMbc7JxcXidwYSCx6sPo4p5GCHpSxwLJ27Czxz0X/pe7FtDVnK0Fn9lxjGOEUccpSR7wMlVyVUae5mJ/e8fvA3fqUUfULAsvEMMmzQs6Tl/70iVq+Ac4RoEtXO/ewFeL50ZMlBjLoAym/Qm6JtFp7lNh7xah285NBw==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MW2PR02MB3723.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(366004)(396003)(136003)(376002)(39860400002)(346002)(316002)(7416002)(6916009)(71200400001)(44832011)(33656002)(64756008)(66946007)(76116006)(8936002)(66476007)(8676002)(478600001)(66446008)(66556008)(966005)(19627235002)(2906002)(52536014)(26005)(6506007)(5660300002)(9686003)(54906003)(86362001)(186003)(7696005)(55016002)(4326008);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: LTYuUWSxRV1EXimf69CX+BbvbzqX0IVmVpYR+nPH1Qh6NmWn9YZReGok4YM8X7lwEL/N+aBgrj46ou0rdz6FKbtPdCGK1M3TJtg2IJ0biH+F8eRwQlWc9Mj4KjzY38EzsrXO3EvoFfuuNBOG7W73JZ/VNqOhkkzaNHnC9r/K31KHD0vnqNUUKDVOiUfoXPSssGy8QIpg+qFMxYf7jDO/bMNBY8yidOeEQ1SbqtaAMAtcndguyDztJjJP50/RVELWAvn6W6nQYTvu3J8AKc9YG7G9zrbRaEL/rX4KgKcLHdiaLxz3mevSX+cpx1jmbHXe7Kofsn3szgzcWVTq32mHygblTFRtmoje/Uo8bDGFfYSKwUrDoWpin0Rue7EtboKApe2T1t4apajIw6QXoUWRy3mPwYlJNzBJ2D/7ueOz2H9zJjefk+E2wMNwarGnnVKXPFkQl3Ya2cS0SpyhJmzEFk3jcUHF2X13UsTY+11kKQpD0zut9x93yLgSX9Z3kzVersgvulxrVhJo5AITqIPa4h1Xw0AHFMV6777Z/FpkbZlQ0G1lYq/9xGZTPz8qHj8YwE9ZyoJJD1muDFPSLSaYG1RYN8sosZgjLWiHOjZsCXxe4JuZ/Z2jfWt9ljjW37K//9+OzxARGzi/ycrad4IeYS9StNMfcJb5DAQqMA1pcA749jzNaiUM/o7r0IKpCEkGvCY4QgZwffRYELAYAcZGgAHWbFiK5fCFqAnJZmrGJd0le+cX+l7IbAhIGa+jMkGEKS/RRzllE7H+H7oBos5m/mXH5fWDWG2BWEJCF1JJkZ0=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <eblake@redhat.com>) id 1jUB0d-0001wI-Ag
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:24:37 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51016
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jUB0c-0001rp-Om
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:21:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588260113;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+n+Pnvffg2Z3NzDSEEWCxeVaiGC1LfTknk34MXcGlSA=;
+ b=NR+m7zURpSQOLE7M8x+iGe4C1HEiU2AEthywQd9DrxQZRZEaGDbiddgE5dqkkPhv/NGgne
+ kRF1kuTP9NlNFdhABN36l5Cn3459bD5vasQLhbduoHE1F1Hh4WnfdLzggpbeNktMwzsBKB
+ 8jGSaCRP7EVpKROW+QUY8QA5eJmHLFM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-169-sEFBUv38Psico5PzdyPxYQ-1; Thu, 30 Apr 2020 11:21:49 -0400
+X-MC-Unique: sEFBUv38Psico5PzdyPxYQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19B79EC1AD;
+ Thu, 30 Apr 2020 15:21:48 +0000 (UTC)
+Received: from [10.10.116.80] (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 33C725D9C5;
+ Thu, 30 Apr 2020 15:21:47 +0000 (UTC)
+Subject: Re: [PATCH v2 3/6] qemu-img: Add bitmap sub-command
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+References: <20200421212019.170707-1-eblake@redhat.com>
+ <20200421212019.170707-4-eblake@redhat.com>
+ <1dcf85b6-d9e6-b952-537c-791daec34ad9@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <9d4769d4-09ea-dced-d4bd-9ceb33044202@redhat.com>
+Date: Thu, 30 Apr 2020 10:21:46 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 192562bf-fb9e-452b-c89f-08d7ed1a03cf
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Apr 2020 15:20:28.3806 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: S5H//zhNMTLmyoS3NlyeDVh2DCPjuuck5zgnw9/PjlM1Jw0c2kLft2gCzp4Plrt9skbS9yGydEc188MbpHmkvwa3zqwbiI05ACMGr6l4/Oc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR02MB3659
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-04-30_09:2020-04-30,
- 2020-04-30 signatures=0
-X-Proofpoint-Spam-Reason: safe
-Received-SPF: pass client-ip=148.163.155.12;
- envelope-from=thanos.makatos@nutanix.com; helo=mx0b-002c1b01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 11:20:34
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Received-From: 148.163.155.12
+In-Reply-To: <1dcf85b6-d9e6-b952-537c-791daec34ad9@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:31:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -145,63 +94,284 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Walker, Benjamin" <benjamin.walker@intel.com>,
- Elena Ufimtseva <elena.ufimtseva@oracle.com>, Jag Raman <jag.raman@oracle.com>,
- "Harris, 
- James R" <james.r.harris@intel.com>, Swapnil Ingle <swapnil.ingle@nutanix.com>,
- John G Johnson <john.g.johnson@oracle.com>,
- Stefan Hajnoczi <stefanha@gmail.com>,
- Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- Kirti Wankhede <kwankhede@nvidia.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Felipe Franciosi <felipe@nutanix.com>,
- Kanth Ghatraju <Kanth.Ghatraju@oracle.com>,
- =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, "Zhang,
- Tina" <tina.zhang@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiA+ID4gTW9yZSBpbXBvcnRhbnRseSwgY29uc2lkZXJpbmc6DQo+ID4gPiBhKSBNYXJjLUFuZHLD
-qSdzIGNvbW1lbnRzIGFib3V0IGRhdGEgYWxpZ25tZW50IGV0Yy4sIGFuZA0KPiA+ID4gYikgdGhl
-IHBvc3NpYmlsaXR5IHRvIHJ1biB0aGUgc2VydmVyIG9uIGFub3RoZXIgZ3Vlc3Qgb3IgaG9zdCwN
-Cj4gPiA+IHdlIHdvbid0IGJlIGFibGUgdG8gdXNlIG5hdGl2ZSBWRklPIHR5cGVzLiBJZiB3ZSBk
-byB3YW50IHRvIHN1cHBvcnQgdGhhdA0KPiA+ID4gdGhlbg0KPiA+ID4gd2UnbGwgaGF2ZSB0byBy
-ZWRlZmluZSBhbGwgZGF0YSBmb3JtYXRzLCBzaW1pbGFyIHRvDQo+ID4gPiBodHRwczovL3VybGRl
-ZmVuc2UucHJvb2Zwb2ludC5jb20vdjIvdXJsP3U9aHR0cHMtDQo+ID4gPiAzQV9fZ2l0aHViLmNv
-bV9xZW11X3FlbXVfYmxvYl9tYXN0ZXJfZG9jc19pbnRlcm9wX3Zob3N0LQ0KPiA+ID4NCj4gMkR1
-c2VyLnJzdCZkPUR3SUZBdyZjPXM4ODNHcFVDT0NoS09IaW9jWXRHY2cmcj1YVHBZc2g1UHMyekp2
-dHc2DQo+ID4gPg0KPiBvZ3R0aTQ2YXRrNzM2U0k0dmdzSmlVS0l5REUmbT1sSkM3WWVNTXNBYVZz
-cjk5dG1UWW5jUWRqRWZPWGlKUWtSa0oNCj4gPiA+IFc3Tk1nUmcmcz0xZF9rQjdWV1EtDQo+IDhk
-NHQ2SWtnYTVLU1Z3d3M0dndpVk12VHlXVmFTNlBSVSZlPSAuDQo+ID4gPg0KPiA+ID4gU28gdGhl
-IHByb3RvY29sIHdpbGwgYmUgbW9yZSBsaWtlIGFuIGVuaGFuY2VkIHZlcnNpb24gb2YgdGhlIFZo
-b3N0LXVzZXINCj4gPiA+IHByb3RvY29sDQo+ID4gPiB0aGFuIFZGSU8uIEknbSBmaW5lIHdpdGgg
-ZWl0aGVyIGRpcmVjdGlvbiAoVkZJTyB2cy4gZW5oYW5jZWQgVmhvc3QtdXNlciksDQo+ID4gPiBz
-byB3ZSBuZWVkIHRvIGRlY2lkZSBiZWZvcmUgcHJvY2VlZGluZyBhcyB0aGUgcmVxdWVzdCBmb3Jt
-YXQgaXMNCj4gPiA+IHN1YnN0YW50aWFsbHkNCj4gPiA+IGRpZmZlcmVudC4NCj4gPg0KPiA+IFJl
-Z2FyZGluZyB0aGUgYWJpbGl0eSB0byB1c2UgdGhlIHByb3RvY29sIG9uIG5vbi1BRl9VTklYIHNv
-Y2tldHMsIHdlIGNhbg0KPiA+IHN1cHBvcnQgdGhpcyBmdXR1cmUgdXNlIGNhc2Ugd2l0aG91dCB1
-bm5lY2Vzc2FyaWx5IGNvbXBsaWNhdGluZyB0aGUNCj4gcHJvdG9jb2wgYnkNCj4gPiBkZWZpbmlu
-ZyB0aGUgQyBzdHJ1Y3RzIGFuZCBzdGF0aW5nIHRoYXQgZGF0YSBhbGlnbm1lbnQgYW5kIGVuZGlh
-bm5lc3MgZm9yDQo+IHRoZQ0KPiA+IG5vbiBBRl9VTklYIGNhc2UgbXVzdCBiZSB0aGUgb25lIHVz
-ZWQgYnkgR0NDIG9uIGEgeDg2XzY0IGJpdCBtYWNoaW5lLA0KPiBvciBjYW4NCj4gPiBiZSBvdmVy
-cmlkZGVuIGFzIHJlcXVpcmVkLg0KPiANCj4gRGVmaW5pbmcgaXQgdG8gYmUgeDg2XzY0IHNlbWFu
-dGljcyBpcyBlZmZlY3RpdmVseSBzYXlpbmcgIndlJ3JlIG5vdCBnb2luZw0KPiB0byBkbyBhbnl0
-aGluZyBhbmQgaXQgaXMgdXAgdG8gb3RoZXIgYXJjaCBtYWludGFpbmVycyB0byBmaXggdGhlIGlu
-ZXZpdGFibGUNCj4gcG9ydGFiaWxpdHkgcHJvYmxlbXMgdGhhdCBhcmlzZSIuDQoNClByZXR0eSBt
-dWNoLg0KIA0KPiBTaW5jZSB0aGlzIGlzIGEgbmV3IHByb3RvY29sIHNob3VsZCB3ZSB0YWtlIHRo
-ZSBvcHBvcnR1bml0eSB0byBtb2RlbCBpdA0KPiBleHBsaWNpdGx5IGluIHNvbWUgY29tbW9uIHN0
-YW5kYXJkIFJQQyBwcm90b2NvbCBsYW5ndWFnZS4gVGhpcyB3b3VsZCBoYXZlDQo+IHRoZSBiZW5l
-Zml0IG9mIGFsbG93aW5nIGltcGxlbWVudG9ycyB0byB1c2Ugb2ZmIHRoZSBzaGVsZiBBUElzIGZv
-ciB0aGVpcg0KPiB3aXJlIHByb3RvY29sIG1hcnNoYWxsaW5nLCBhbmQgZWxpbWluYXRlIHF1ZXN0
-aW9ucyBhYm91dCBlbmRpYW5uZXNzIGFuZA0KPiBhbGlnbm1lbnQgYWNyb3NzIGFyY2hpdGVjdHVy
-ZXMuDQoNClRoZSBwcm9ibGVtIGlzIHRoYXQgd2UgaGF2ZW4ndCBkZWZpbmVkIHRoZSBzY29wZSB2
-ZXJ5IHdlbGwuIE15IGluaXRpYWwgaW1wcmVzc2lvbiANCndhcyB0aGF0IHdlIHNob3VsZCB1c2Ug
-dGhlIGV4aXN0aW5nIFZGSU8gc3RydWN0cyBhbmQgY29uc3RhbnRzLCBob3dldmVyIHRoYXQncyAN
-CmltcG9zc2libGUgaWYgd2UncmUgdG8gc3VwcG9ydCBub24gQUZfVU5JWC4gV2UgbmVlZCBjb25z
-ZW5zdXMgb24gdGhpcywgd2UncmUgDQpvcGVuIHRvIGlkZWFzIGhvdyB0byBkbyB0aGlzLg0KDQoN
-Cg==
+On 4/30/20 9:55 AM, Max Reitz wrote:
+> On 21.04.20 23:20, Eric Blake wrote:
+>> Include actions for --add, --remove, --clear, --enable, --disable, and
+>> --merge (note that --clear is a bit of fluff, because the same can be
+>> accomplished by removing a bitmap and then adding a new one in its
+>> place,
+>=20
+> Well, ideally, all of qemu-img is just fluff because =E2=80=9Cthe same ca=
+n be
+> accomplished by launching qemu and issuing the equivalent QMP commands=E2=
+=80=9D. :)
+>=20
+>>         but it matches what QMP commands exist).  Listing is omitted,
+>> because it does not require a bitmap name and because it was already
+>> possible with 'qemu-img info'.
+>=20
+> Fair enough, although it can be said that qemu-img info=E2=80=99s output =
+is
+> qcow2-specific.  It might be nice to have some definitely
+> format-independent output.  (But we don=E2=80=99t have persistent bitmaps=
+ in
+> anything but qcow2 yet (or do we in NBD?), so I don=E2=80=99t expect anyo=
+ne to
+> care much.)
+
+We can add a list subcommand later if it is still desired.  I agree that=20
+a tabular format:
+
+name          enabled   granularity
+bitmap1       false     65536
+bitmap2       true      512
+
+in isolation is easier to read than:
+
+     bitmaps:
+         [0]:
+             flags:
+             name: bitmap1
+             granularity: 65536
+         [1]:
+             flags:
+                 [0]: auto
+             name: bitmap2
+             granularity: 512
+
+embedded inside even more information.
+
+>=20
+>>                                  Merge can work either from another
+>> bitmap in the same image, or from a bitmap in a distinct image.
+>>
+>> While this supports --image-opts for the file being modified, I did
+>> not think it worth the extra complexity to support that for the source
+>> file in a cross-file bitmap merge.  Likewise, I chose to have --merge
+>> only take a single source rather than following the QMP support for
+>> multiple merges in one go; in part to simplify the command line, and
+>> in part because an offline image can achieve the same effect by
+>> multiple qemu-img bitmap --merge calls.  We can enhance that if needed
+>> in the future (the same way that 'qemu-img convert' has a mode that
+>> concatenates multiple sources into one destination).
+>>
+>> Upcoming patches will add iotest coverage of these commands while
+>> also testing other features.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>   docs/tools/qemu-img.rst |  24 +++++
+>>   qemu-img.c              | 198 ++++++++++++++++++++++++++++++++++++++++
+>>   qemu-img-cmds.hx        |   7 ++
+>>   3 files changed, 229 insertions(+)
+>>
+>> diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
+>> index 7d08c48d308f..4f3b0e2c9ace 100644
+>> --- a/docs/tools/qemu-img.rst
+>> +++ b/docs/tools/qemu-img.rst
+>> @@ -281,6 +281,30 @@ Command description:
+>>     For write tests, by default a buffer filled with zeros is written. T=
+his can be
+>>     overridden with a pattern byte specified by *PATTERN*.
+>>
+>> +.. option:: bitmap {--add [-g GRANULARITY] [--disabled] | --remove | --=
+clear | --enable | --disable | --merge SOURCE_BITMAP [-b SOURCE_FILE [-F SO=
+URCE_FMT]]} [--object OBJECTDEF] [--image-opts] [-f FMT] FILENAME BITMAP
+>=20
+> So I can do multiple operations in one roll, but they all use the same
+> BITMAP?  Sounds a bit weird.  It actually took me a while to understands
+> this, because I thought for sure that each command would take a bitmap
+> name.  (And was ready to complain that it looked like they don=E2=80=99t,=
+ but,
+> well, that=E2=80=99s because they don=E2=80=99t.)
+
+All of the operations take one bitmap name (the final BITMAP).=20
+Additionally, the --merge operation takes a second bitmap name=20
+(SOURCE_BITMAP).  None of the other operations need a second bitmap=20
+name, so only --merge requires an option argument.  As written, the { a=20
+| b | c } implies that operations are mutually exclusive: you can only=20
+request one operation per qemu-img invocation.
+
+>=20
+> Although I suppose some practical example like
+>=20
+> $ qemu-img bitmap --add --merge sbmap --disable foo.qcow2 nbmap
+>=20
+> does make sense.[1]
+>=20
+>=20
+> Would
+>=20
+> $ qemu-img bitmap --add nbmap --merge nbmap sbmap --enable nbmap \
+>        foo.qcow2
+>=20
+> make more sense?
+
+That would be more transactional, and more effort to implement.  My=20
+argument is that you should instead write:
+
+$ qemu-img bitmap --add foo.qcow2 nbmap
+$ qemu-img bitmap --merge sbmap foo.qcow2 nbmap
+$ qemu-img bitmap --enable foo.qcow2 nbmap
+
+where I only have to implement one operation per qemu-img.
+
+>    Doesn=E2=80=99t really look like it, because at that point you
+> just have to ask why not just call qemu-img bitmap multiple times.
+>=20
+> *shrug*
+>=20
+>=20
+> [1] However, that leads me to ask:  Why does --add need a --disabled
+> option?  Isn=E2=80=99t that equivalent to --add --disable?
+
+The QMP command for add has an optional 'disabled' parameter, which I=20
+exposed here.  Alternatively, we could indeed NOT expose that parameter=20
+through qemu-img, but require two separate qemu-img bitmap commands to=20
+add and then disable things.  Atomicity is not a concern here like it=20
+was in QMP.  Removing that sugar does simplify things slightly.
+
+
+>> +static int img_bitmap(int argc, char **argv)
+>> +{
+>> +    Error *err =3D NULL;
+>> +    int c, ret =3D -1;
+>> +    QemuOpts *opts =3D NULL;
+>> +    const char *fmt =3D NULL, *src_fmt =3D NULL, *src_filename =3D NULL=
+;
+>> +    const char *filename, *bitmap;
+>> +    BlockBackend *blk =3D NULL, *src =3D NULL;
+>> +    BlockDriverState *bs =3D NULL, *src_bs =3D NULL;
+>> +    bool image_opts =3D false;
+>> +    unsigned long granularity =3D 0;
+>> +    bool add =3D false, remove =3D false, clear =3D false;
+>> +    bool enable =3D false, disable =3D false, add_disabled =3D false;
+>> +    const char *merge =3D NULL;
+>=20
+> So actually we can=E2=80=99t do one operation multiple times in one roll.
+
+Correct.  At least, not as I wrote it.
+
+>=20
+>> +
+>> +    for (;;) {
+>> +        static const struct option long_options[] =3D {
+>> +            {"help", no_argument, 0, 'h'},
+>> +            {"object", required_argument, 0, OPTION_OBJECT},
+>> +            {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+>> +            {"add", no_argument, 0, OPTION_ADD},
+>> +            {"remove", no_argument, 0, OPTION_REMOVE},
+>> +            {"clear", no_argument, 0, OPTION_CLEAR},
+>> +            {"enable", no_argument, 0, OPTION_ENABLE},
+>> +            {"disable", no_argument, 0, OPTION_DISABLE},
+>> +            {"disabled", no_argument, 0, OPTION_DISABLE},
+>=20
+> So if --disable and --disabled are exactly the same, I really don=E2=80=
+=99t know
+> why --disabled even exists.
+
+Logically, '--add --disabled' matches the name of the QMP command with=20
+its optional 'disabled' parameter, while --disable matches the name of=20
+the QMP command.  We don't have to have the alias; and in fact, if you=20
+agree that supporting '--add --disabled' is too much sugar (since we=20
+don't care about atomicity the way QMP did), then life gets simpler to=20
+drop --disabled altogether.
+
+>> +    if (add && disable) {
+>> +        disable =3D false;
+>> +        add_disabled =3D true;
+>> +    }
+>> +    if (add + remove + clear + enable + disable + !!merge !=3D 1) {
+>> +        error_report("Need exactly one mode of --add, --remove, --clear=
+, "
+>> +                     "--enable, --disable, or --merge");
+>=20
+> Aha.  So you can actually only do a single operation.
+>=20
+> That means the doc shouldn=E2=80=99t use {}, in my opinion, because that =
+to me
+> means repetition (thanks to EBNF).  It definitely served to confuse me
+> greatly until this point.
+
+In command line syntax, I'm most used to seeing repetition as '...',=20
+optional as [], and mutually-exclusive choice as {|}.  Yes, that's=20
+different than EBNF.
+
+>=20
+> I also don=E2=80=99t see why we would disallow multiple operations in one=
+ go.
+> The --add --merge combination seems useful to me, and I don=E2=80=99t see=
+ a
+> problem in implementing it.
+>=20
+> I don=E2=80=99t know why we don=E2=80=99t just create a list of operation=
+s to execute,
+> based on the order given in the argument list, and then execute them in
+> order.  That would even allow multiple --merge operations.
+
+If I understand, you're asking why we can't do:
+
+qemu-img bitmap foo.qcow2 --add b1 --merge sb b1
+
+in one operation.
+
+That changes the syntax entirely, compared to what I implemented.  You'd=20
+have to have an argument to every option, AND figure out how to specify=20
+TWO arguments to the --merge option.  Might be doable, but seems hairy.
+
+>=20
+> If we don=E2=80=99t want that (because we don=E2=80=99t want argument ord=
+er to matter),
+> we could still allow all operations to be done at least once and always
+> execute them in the same order, e.g.:
+> (1) add
+> (2) clear
+> (3) merge
+> (4) disable
+> (5) enable
+> (6) remove
+
+I still find it simpler to do exactly one operation per invocation.
+
+>=20
+>> +        goto out;
+>> +    }
+>> +    if (granularity && !add) {
+>> +        error_report("granularity only supported with --add");
+>> +        goto out;
+>> +    }
+>> +    if (src_fmt && !src_filename) {
+>> +        error_report("-F only supported with -b");
+>> +        goto out;
+>> +    }
+>> +    if (src_filename && !merge) {
+>> +        error_report("alternate source file only supported with --merge=
+");
+>=20
+> =E2=80=9Calternate=E2=80=9D sounds strange.  Why not be more precise and =
+call it a
+> =E2=80=9CMerge bitmap source file=E2=80=9D or =E2=80=9CFile to source mer=
+ge bitmap from=E2=80=9D?
+
+"Merge bitmap source file" sounds fine.
+
+>> +
+>> +    if (err) {
+>> +        error_reportf_err(err, "Bitmap %s operation failed", bitmap);
+>=20
+> Wouldn=E2=80=99t =E2=80=9COperation on bitmap %s failed=E2=80=9D work bet=
+ter?
+
+Yes.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
