@@ -2,129 +2,73 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DCFFC47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 15:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40631C4724C
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 15:37:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 589B720661
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 15:37:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XF0jYwZR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 589B720661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 158EA20661
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 15:37:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 158EA20661
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUBFH-0002vG-JC
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 11:37:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42326)
+	id 1jUBFY-0003AI-3Y
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 11:37:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42360)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jUBE7-0001aK-B1
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:35:51 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1jUBEK-00023m-MZ
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jUBE6-0007u7-Tu
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:35:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28147
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jUBE6-0007tH-Gq
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:35:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588260949;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=E5BgjJdlqT0Mv3OKpXCbyNQ44nXiwSc9t1MP0XCVNHc=;
- b=XF0jYwZRd/H6b5H2LnakIPXs2Q3gQbvj3uJhxNyO5oXD674t3a+cvueWM1ID0k3yW9eOCR
- SY3dg1qMSHsZiMARibReQLwBaABNge6G8kTPvuzpwl4G/OnpU7nwP54SERhdWlJf3IBX1B
- Ecy1XHJffftsp8/kMkfmp7khbNxjT18=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-JFijuRhXPHyB3KrJjHgEGQ-1; Thu, 30 Apr 2020 11:35:45 -0400
-X-MC-Unique: JFijuRhXPHyB3KrJjHgEGQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C393818FE867;
- Thu, 30 Apr 2020 15:35:44 +0000 (UTC)
-Received: from [10.36.113.172] (ovpn-113-172.ams2.redhat.com [10.36.113.172])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7AF5C5C1B0;
- Thu, 30 Apr 2020 15:35:43 +0000 (UTC)
-Subject: Re: [PATCH 6/8] pc-bios: s390x: Use ebcdic2ascii table
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200324150847.10476-1-frankja@linux.ibm.com>
- <20200324150847.10476-7-frankja@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <6fac8957-12dc-6e28-3fc3-d38ee14347ea@redhat.com>
-Date: Thu, 30 Apr 2020 17:35:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <balaton@eik.bme.hu>) id 1jUBEH-0007vq-Pd
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:36:03 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:47403)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jUBEH-0007v8-9T; Thu, 30 Apr 2020 11:36:01 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 03714746351;
+ Thu, 30 Apr 2020 17:35:56 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id C7012746344; Thu, 30 Apr 2020 17:35:55 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id C585374633F;
+ Thu, 30 Apr 2020 17:35:55 +0200 (CEST)
+Date: Thu, 30 Apr 2020 17:35:55 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: =?GB2312?Q?=C2=DE=D3=C2=B8=D5=28Yonggang_Luo=29?= <luoyonggang@gmail.com>
+Subject: Re: R: R: About hardfloat in ppc
+In-Reply-To: <CAE2XoE-f_rkcnpQO1cHPUgdaWNAOvBRyUX1aj27UePd0Hkr=KQ@mail.gmail.com>
+Message-ID: <alpine.BSF.2.22.395.2004301721420.29315@zero.eik.bme.hu>
+References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
+ <87lfmhl0xa.fsf@linaro.org>
+ <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
+ <87imhlkwun.fsf@linaro.org>
+ <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
+ <87ftcoknvu.fsf@linaro.org>
+ <AM4PR07MB350653D5961DFCE441646131CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <871ro6ld2f.fsf@linaro.org>
+ <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <87sggmjgit.fsf@linaro.org>
+ <CAE2XoE8wFK1nOq3YXhB=iqTvqSDQk7Zzd35Tjzdd==v8ouMijA@mail.gmail.com>
+ <43ac337c-752a-7151-1e88-de01949571de@linaro.org>
+ <CAE2XoE-f_rkcnpQO1cHPUgdaWNAOvBRyUX1aj27UePd0Hkr=KQ@mail.gmail.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <20200324150847.10476-7-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 23:34:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: multipart/mixed;
+ boundary="3866299591-1869358469-1588260955=:29315"
+Received-SPF: pass client-ip=2001:738:2001:2001::2001;
+ envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -136,42 +80,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Programmingkid <programmingkidx@gmail.com>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>, Dino Papararo <skizzato73@msn.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.03.20 16:08, Janosch Frank wrote:
-> Why should we do conversion of a ebcdic value if we have a handy table
-> where we coul look up the ascii value instead?
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  pc-bios/s390-ccw/bootmap.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-> index d13b7cbd1597bf2e..97205674e59aebb2 100644
-> --- a/pc-bios/s390-ccw/bootmap.c
-> +++ b/pc-bios/s390-ccw/bootmap.c
-> @@ -328,9 +328,7 @@ static void print_eckd_ldl_msg(ECKD_IPL_mode_t mode)
->          msg[0] = '2';
->          break;
->      default:
-> -        msg[0] = vlbl->LDL_version;
-> -        msg[0] &= 0x0f; /* convert EBCDIC   */
-> -        msg[0] |= 0x30; /* to ASCII (digit) */
-> +        msg[0] = ebc2asc[vlbl->LDL_version];
->          msg[1] = '?';
->          break;
->      }
-> 
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+--3866299591-1869358469-1588260955=:29315
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 
--- 
-Thanks,
+On Thu, 30 Apr 2020, 罗勇刚(Yonggang Luo) wrote:
+> I propose a new way to computing the float flags,
+> We preserve a  float computing cash
+> typedef struct FpRecord {
+>  uint8_t op;
+>  float32 A;
+>  float32 B;
+> }  FpRecord;
+> FpRecord fp_cache[1024];
+> int fp_cache_length;
+> uint32_t fp_exceptions;
+>
+> 1. For each new fp operation we push it to the  fp_cache,
+> 2. Once we read the fp_exceptions , then we re-compute
+> the fp_exceptions by re-running the fp FpRecord sequence.
+> and clear  fp_cache_length.
+> 3. If we clear the fp_exceptions , then we set fp_cache_length to 0 and
+> clear  fp_exceptions.
+> 4. If the  fp_cache are full, then we re-compute
+> the fp_exceptions by re-running the fp FpRecord sequence.
+>
+> Would this be a general method to use hard-float?
+> The consued time should be  2*hard_float.
+> Considerating read fp_exceptions are rare, then the amortized time
+> complexity
+> would be 1 * hard_float.
 
-David / dhildenb
+It's hard to guess what the hit rate of such cache would be and if it's 
+low then managing the cache is probably more expensive than running with 
+softfloat. So to evaluate any proposed patch we also need some benchmarks 
+which we can experiment with to tell if the results are good or not 
+otherwise we're just guessing. Are there some existing tests and 
+benchmarks that we can use? Alex mentioned fp-bench I think and to 
+evaluate the correctness of the FP implementation I've seen this other 
+conversation:
 
+https://lists.nongnu.org/archive/html/qemu-devel/2020-04/msg05107.html
+https://lists.nongnu.org/archive/html/qemu-devel/2020-04/msg05126.html
+
+Is that something we can use for PPC as well to check the correctness?
+
+So I think before implementing any potential solution that came up in this 
+brainstorming the first step would be to get and compile (or write if not 
+available) some tests and benchmarks:
+
+1. testing host behaviour for inexact and compare that for different archs
+2. some FP tests that can be used to compare results with QEMU and real 
+CPU to check correctness of emulation (if these check for inexact 
+differences then could be used instead of 1.)
+3. some benchmarks to evaluate QEMU performance (these could be same as FP 
+tests or some real world FP heavy applications).
+
+Then we can see if the proposed solution is faster and still correct.
+
+Regards,
+BALATON Zoltan
+--3866299591-1869358469-1588260955=:29315--
 
